@@ -60,45 +60,45 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '../../webAppEvents';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {buildMediaDevicesHandler, createSelfParticipant} from 'src/script/auth/util/test/testUtil';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallState} from 'Repositories/calling/CallState';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
-import {EventSource} from 'Repositories/event/EventSource';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {ConversationRecord, LegacyEventRecord, StorageService} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {Config} from 'src/script/Config';
-import {ConversationError} from 'src/script/error/conversationError';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {buildMediaDevicesHandler, createSelfParticipant} from '../../auth/util/test/testUtil';
+import {SystemMessageType} from '../../message/systemMessageType';
+import {Call} from '../calling/Call';
+import {CallingRepository} from '../calling/CallingRepository';
+import {CallState} from '../calling/CallState';
+import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {ClientEntity} from '../client/ClientEntity';
+import {ConnectionEntity} from '../connection/connectionEntity';
+import {ConnectionRepository} from '../connection/connectionRepository';
+import {Conversation} from '../entity/Conversation';
+import {CompositeMessage} from '../entity/message/compositeMessage';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {Message} from '../entity/message/message';
+import {User} from '../entity/User';
+import {ClientEvent, CONVERSATION} from '../event/Client';
+import {EventSource} from '../event/EventSource';
+import {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {SelfRepository} from '../self/SelfRepository';
+import {ConversationRecord, LegacyEventRecord, StorageService} from '../storage';
+import {StorageSchemata} from '../storage/storageSchemata';
+import {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
+import {Config} from '../../Config';
+import {ConversationError} from '../../error/conversationError';
 import {
   generateConversation as _generateConversation,
   generateAPIConversation,
-} from 'test/helper/ConversationGenerator';
-import {createDeleteEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {escapeRegex} from 'Util/sanitizationUtil';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+} from '../../../../test/helper/ConversationGenerator';
+import {createDeleteEvent, createMessageAddEvent} from '../../../../test/helper/EventGenerator';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {escapeRegex} from '../../util/sanitizationUtil';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
+import {createUuid} from '../../util/uuid';
 
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {CONVERSATION_READONLY_STATE, ConversationRepository} from './ConversationRepository';
@@ -234,6 +234,46 @@ function buildConversationRepository(
     },
   ] as const;
 }
+
+describe('conversation group selection', () => {
+  it('selects self-team groups separately from groups across all teams', () => {
+    const [conversationRepository, {conversationState, userState}] = buildConversationRepository(translateForTest);
+    const selfTeamId = 'self-team';
+    const selfUser = generateUser();
+    selfUser.teamId = selfTeamId;
+    userState.self(selfUser);
+
+    const selfTeamConversation = _generateConversation();
+    selfTeamConversation.teamId = selfTeamId;
+    const otherTeamConversation = _generateConversation();
+    otherTeamConversation.teamId = 'other-team';
+    const conversationWithoutTeam = _generateConversation();
+    conversationWithoutTeam.teamId = '';
+    const allGroupConversations = [selfTeamConversation, otherTeamConversation, conversationWithoutTeam];
+    conversationState.conversations(allGroupConversations);
+
+    const actualSelfTeamConversations = conversationRepository.getAllTeamGroupConversations();
+    const actualAllGroupConversations = conversationRepository.getAllGroupConversations();
+
+    expect(actualSelfTeamConversations).toEqual([selfTeamConversation]);
+    expect(actualAllGroupConversations).toEqual(allGroupConversations);
+  });
+
+  it('does not match empty conversation and self-user team IDs', () => {
+    const [conversationRepository, {conversationState, userState}] = buildConversationRepository(translateForTest);
+    const selfUser = generateUser();
+    selfUser.teamId = '';
+    userState.self(selfUser);
+
+    const conversationWithoutTeam = _generateConversation();
+    conversationWithoutTeam.teamId = '';
+    conversationState.conversations([conversationWithoutTeam]);
+
+    const actualConversations = conversationRepository.getAllTeamGroupConversations();
+
+    expect(actualConversations).toEqual([]);
+  });
+});
 
 describe('ConversationRepository', () => {
   const originalPrimaryModalShow = PrimaryModal.show;

@@ -85,6 +85,14 @@ export const selectionBarStyles: CSSObject = {
   },
 };
 
+export const selectionActionsStyles: CSSObject = {
+  display: 'flex',
+  flexShrink: 0,
+  alignItems: 'center',
+  gap: '8px',
+  marginLeft: 'auto',
+};
+
 export const clearSelectionButtonStyles: CSSObject = {
   flexShrink: 0,
   display: 'inline-flex',
@@ -100,7 +108,7 @@ export const clearSelectionButtonStyles: CSSObject = {
   cursor: 'pointer',
 
   '&:hover, &:focus-visible': {
-    backgroundColor: 'var(--foreground-fade-8)',
+    backgroundColor: 'var(--accent-color-fade-24)',
   },
 
   '&:focus-visible': {
@@ -138,7 +146,6 @@ export const bulkActionButtonStyles: CSSObject = {
   alignItems: 'center',
   justifyContent: 'center',
   gap: '4px',
-  marginLeft: 'auto',
   padding: '0 12px',
   border: '1px solid var(--border-color)',
   borderRadius: '16px',
@@ -147,7 +154,7 @@ export const bulkActionButtonStyles: CSSObject = {
   cursor: 'pointer',
 
   '&:hover, &:focus-visible': {
-    backgroundColor: 'var(--foreground-fade-8)',
+    backgroundColor: 'var(--accent-color-fade-24)',
   },
 
   '&:focus-visible': {
@@ -164,7 +171,6 @@ export const bulkActionButtonStyles: CSSObject = {
 
 export const bulkMoveToBinButtonStyles: CSSObject = {
   ...bulkActionButtonStyles,
-  marginLeft: 0,
   borderColor: 'transparent',
   background: 'var(--danger-color)',
   color: 'var(--main-color)',

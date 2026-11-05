@@ -23,20 +23,20 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import de from 'I18n/de-DE.json';
-import en from 'I18n/en-US.json';
-import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedToAddUsersMessage';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
-import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
+import de from '../../../../i18n/de-DE.json';
+import en from '../../../../i18n/en-US.json';
+import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../repositories/entity/message/failedToAddUsersMessage';
+import {User} from '../../../repositories/entity/User';
+import {UserState} from '../../../repositories/user/userState';
+import {generateQualifiedIds} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../../util/localizerUtil';
 
 import {FailedToAddUsersMessage} from './failedToAddUsersMessage';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 setStrings({en});
 const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));

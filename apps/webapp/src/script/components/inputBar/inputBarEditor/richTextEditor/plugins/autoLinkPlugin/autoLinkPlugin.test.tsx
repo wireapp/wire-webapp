@@ -26,7 +26,7 @@ import {useEffect, type FunctionComponent} from 'react';
 
 import {act, render} from '@testing-library/react';
 
-import {unwrap} from 'Util/test/resultTestSupport';
+import {unwrap} from '../../../../../../util/test/resultTestSupport';
 
 import {editorConfig} from '../../editorConfig';
 import {markdownTransformers} from '../../utils/markdownTransformers';

@@ -23,7 +23,7 @@ import {
   roleFromTeamPermissions,
   hasAccessToFeature,
   generatePermissionHelpers,
-} from 'Repositories/user/userPermission';
+} from '../../../src/script/repositories/user/userPermission';
 
 const partnerPermissionBitmask = 0b10000000001;
 const memberPermissionBitmask = 0b11000110011;

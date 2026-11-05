@@ -19,13 +19,13 @@
 
 import {render} from '@testing-library/react';
 
-import en from 'I18n/en-US.json';
-import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/fileTypeRestrictedMessage';
+import en from '../../../../i18n/en-US.json';
+import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from '../../../repositories/entity/message/fileTypeRestrictedMessage';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../../util/localizerUtil';
 
 import {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';
 

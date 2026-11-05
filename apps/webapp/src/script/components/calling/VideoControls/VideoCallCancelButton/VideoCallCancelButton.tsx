@@ -19,9 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {handleKeyDown, KEY} from '../../../../util/keyboardUtil';
+import * as Icon from '../../../icon';
 
 interface VideoCallCancelButtonProps {
   onAction: () => void;

@@ -19,9 +19,8 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import {getLogger, Logger} from 'Util/logger';
-
 import {ConversationError} from '../error/conversationError';
+import {getLogger, Logger} from '../util/logger';
 
 export class WindowHandler {
   logger: Logger;

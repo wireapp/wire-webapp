@@ -19,11 +19,11 @@
 
 import type {PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client';
 
-import {ClientRecord} from 'Repositories/storage';
-import {isClientRecord, isClientWithMLSPublicKeys} from 'Util/typePredicateUtil';
-
 import {ClientEntity} from './ClientEntity';
 import {parseClientId} from './ClientIdUtil';
+
+import {isClientRecord, isClientWithMLSPublicKeys} from '../../util/typePredicateUtil';
+import {ClientRecord} from '../storage';
 
 type ClientMapperConfig = {CLIENT_PAYLOAD: string[]; SELF_CLIENT_PAYLOAD: string[]};
 type ClientMappingResult<T> = {client: T; wasUpdated: boolean};

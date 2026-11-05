@@ -21,19 +21,19 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {EventService} from 'Repositories/event/EventService';
+import {Conversation} from '../../entity/Conversation';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {EventService} from '../EventService';
 import type {IncomingEvent} from '../EventProcessor';
-import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
-import {User} from 'Repositories/entity/User';
-import {StatusType} from 'src/script/message/statusType';
-import {createUuid} from 'Util/uuid';
+import {ConfirmationEvent} from '../../conversation/EventBuilder';
+import {User} from '../../entity/User';
+import {StatusType} from '../../../message/statusType';
+import {createUuid} from '../../../util/uuid';
 
 import {ReceiptsMiddleware} from './ReceiptsMiddleware';
 
 import {ClientEvent} from '../Client';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 type ReadReceiptEventServiceStub = {
   loadEvents: jest.Mock<Promise<unknown[]>, [conversationId: string, eventIds: string[]]>;

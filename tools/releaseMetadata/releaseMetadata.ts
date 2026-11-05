@@ -20,45 +20,60 @@
 import {Result} from 'true-myth';
 import type {NonEmptyString} from 'type-fest';
 
+import {parseStableWebAppTagName} from './webappReleaseIdentity.ts';
+import type {StableWebAppTagName} from './webappReleaseIdentity.ts';
+
 type NonZeroDecimalDigit = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 
 // Retained for maintenance lines and immutable historical Production tags.
 export type ReleaseIdentifier =
   NonEmptyString<`${number}${number}${number}${number}-${number}${number}-${number}${number}.${NonZeroDecimalDigit}${string}`>;
 export type ProductionTagName = NonEmptyString<`${ReleaseIdentifier}-production`>;
-export type MaintenanceLineKey = NonEmptyString<`${ReleaseIdentifier}-${string}`>;
+export type MaintenanceReleaseIdentifier = ReleaseIdentifier | StableWebAppTagName;
+export type MaintenanceSourceProductionTagName = ProductionTagName | StableWebAppTagName;
+export type MaintenanceLineKey = NonEmptyString<`${MaintenanceReleaseIdentifier}-${string}`>;
 export type MaintenanceBranchName = NonEmptyString<`maintenance/${MaintenanceLineKey}`>;
 export type MaintenanceTagName = NonEmptyString<`${MaintenanceLineKey}-maintenance.${number}`>;
 export type WebappBuildChannel = 'main' | 'development' | 'production';
 
 const releaseDatePattern = String.raw`\d{4}-\d{2}-\d{2}`;
 const releaseIdentifierPattern = String.raw`${releaseDatePattern}\.[1-9]\d*`;
+const stableWebAppReleaseIdentifierPattern = String.raw`v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)`;
+const maintenanceReleaseIdentifierPattern = String.raw`(?:${releaseIdentifierPattern}|${stableWebAppReleaseIdentifierPattern})`;
 const productionTagNamePattern = new RegExp(`^(${releaseIdentifierPattern})-production$`);
-const maintenanceLineKeyPattern = new RegExp(String.raw`^${releaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*$`);
+const maintenanceLineKeyPattern = new RegExp(
+  String.raw`^${maintenanceReleaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*$`,
+);
 const maintenanceBranchNamePattern = new RegExp(
-  String.raw`^maintenance/${releaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*$`,
+  String.raw`^maintenance/${maintenanceReleaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*$`,
 );
 const maintenanceTagNamePattern = new RegExp(
-  String.raw`^${releaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*-maintenance\.[1-9]\d*$`,
+  String.raw`^${maintenanceReleaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*-maintenance\.[1-9]\d*$`,
 );
 const maintenanceTagNumberPattern = /^[1-9]\d*$/;
 
 function isMaintenanceLineKey(value: string): value is MaintenanceLineKey {
-  return maintenanceLineKeyPattern.test(value);
+  const matchesMaintenanceLineKeyPattern = maintenanceLineKeyPattern.test(value);
+
+  return matchesMaintenanceLineKeyPattern;
 }
 
 function isMaintenanceBranchName(value: string): value is MaintenanceBranchName {
-  return maintenanceBranchNamePattern.test(value);
+  const matchesMaintenanceBranchNamePattern = maintenanceBranchNamePattern.test(value);
+
+  return matchesMaintenanceBranchNamePattern;
 }
 
 function isMaintenanceTagName(value: string): value is MaintenanceTagName {
-  return maintenanceTagNamePattern.test(value);
+  const matchesMaintenanceTagNamePattern = maintenanceTagNamePattern.test(value);
+
+  return matchesMaintenanceTagNamePattern;
 }
 
 export function validateProductionTagName(productionTagName: string): Result<ProductionTagName, Error> {
-  const productionTagNameMatches = productionTagNamePattern.test(productionTagName);
+  const productionTagNameMatchesPattern = productionTagNamePattern.test(productionTagName);
 
-  if (!productionTagNameMatches) {
+  if (!productionTagNameMatchesPattern) {
     return Result.err(new Error(`Invalid production tag name: ${productionTagName}`));
   }
 
@@ -111,13 +126,14 @@ export function createNextMaintenanceTagName(
 
   const maintenanceTagPrefix = `${maintenanceLineKeyResult.value}-maintenance.`;
   const existingMaintenanceTagNumbers = existingTagNames.flatMap(existingTagName => {
-    if (existingTagName.startsWith(maintenanceTagPrefix) === false) {
+    if (!existingTagName.startsWith(maintenanceTagPrefix)) {
       return [];
     }
 
     const maintenanceTagNumberText = existingTagName.slice(maintenanceTagPrefix.length);
+    const maintenanceTagNumberIsValid = maintenanceTagNumberPattern.test(maintenanceTagNumberText);
 
-    if (maintenanceTagNumberPattern.test(maintenanceTagNumberText) === false) {
+    if (!maintenanceTagNumberIsValid) {
       return [];
     }
 
@@ -133,27 +149,28 @@ export function createNextMaintenanceTagName(
 export function validateMaintenanceSource(
   maintenanceLineKey: string,
   sourceProductionTag: string,
-): Result<ProductionTagName, Error> {
+): Result<MaintenanceSourceProductionTagName, Error> {
   const maintenanceLineKeyResult = validateMaintenanceLineKey(maintenanceLineKey);
 
   if (maintenanceLineKeyResult.isErr) {
     return Result.err(maintenanceLineKeyResult.error);
   }
 
-  const sourceProductionTagResult = validateProductionTagName(sourceProductionTag);
+  const sourceProductionTagResult = sourceProductionTag.startsWith('v')
+    ? parseStableWebAppTagName(sourceProductionTag).map(() => {
+        return sourceProductionTag as StableWebAppTagName;
+      })
+    : validateProductionTagName(sourceProductionTag);
 
   if (sourceProductionTagResult.isErr) {
     return Result.err(sourceProductionTagResult.error);
   }
 
-  const releaseIdentifierEndIndex = maintenanceLineKeyResult.value.indexOf(
-    '-',
-    maintenanceLineKeyResult.value.indexOf('.') + 1,
-  );
-  const releaseIdentifier = maintenanceLineKeyResult.value.slice(0, releaseIdentifierEndIndex);
-  const expectedSourceProductionTag = `${releaseIdentifier}-production`;
+  const expectedMaintenanceReleaseIdentifier = sourceProductionTagResult.value.endsWith('-production')
+    ? sourceProductionTagResult.value.slice(0, -'-production'.length)
+    : sourceProductionTagResult.value;
 
-  if (sourceProductionTagResult.value !== expectedSourceProductionTag) {
+  if (!maintenanceLineKeyResult.value.startsWith(`${expectedMaintenanceReleaseIdentifier}-`)) {
     return Result.err(
       new Error(
         `Source production tag ${sourceProductionTag} does not belong to maintenance line ${maintenanceLineKey}`,

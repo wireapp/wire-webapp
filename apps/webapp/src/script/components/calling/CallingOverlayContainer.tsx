@@ -23,21 +23,20 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from 'Repositories/calling/CallState';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {Participant} from 'Repositories/calling/Participant';
-import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {ChooseScreen} from './ChooseScreen';
 import {FullscreenVideoCall} from './FullscreenVideoCall';
+import {useCallAlertState} from './useCallAlertState';
 
+import {Call} from '../../repositories/calling/Call';
+import {CallingRepository} from '../../repositories/calling/CallingRepository';
+import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from '../../repositories/calling/CallState';
+import {LEAVE_CALL_REASON} from '../../repositories/calling/enum/LeaveCallReason';
+import {Participant} from '../../repositories/calling/Participant';
+import {useVideoGrid} from '../../repositories/calling/videoGridHandler';
+import {MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler';
+import {useMediaDevicesStore} from '../../repositories/media/useMediaDevicesStore';
+import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
 interface CallingContainerProps {

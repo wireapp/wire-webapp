@@ -17,10 +17,10 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {withLogin, test, expect} from 'test/e2e_tests/test.fixtures';
-import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {withLogin, test, expect} from '../../test.fixtures';
+import {connectWithUser, createGroup} from '../../utils/userActions';
 
 /* ===== Helper Functions ===== */
 /**

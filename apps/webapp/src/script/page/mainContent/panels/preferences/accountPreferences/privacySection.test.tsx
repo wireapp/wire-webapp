@@ -19,16 +19,16 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
-import {AppLockState} from 'Repositories/user/appLockState';
-import {Config} from 'src/script/Config';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
+import {AppLockRepository} from '../../../../../repositories/user/appLockRepository';
+import {AppLockState} from '../../../../../repositories/user/appLockState';
+import {Config} from '../../../../../Config';
+import {withTheme} from '../../../../../auth/util/test/testUtil';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 import ko from 'knockout';
 
 import {PrivacySection} from './privacySection';

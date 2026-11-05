@@ -21,13 +21,12 @@ import {useCallback} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
-import {Config} from 'src/script/Config';
-import {allowsAllFiles, hasAllowedExtension} from 'Util/fileTypeUtil';
-import type {Translate} from 'Util/localizerUtil';
-
 import {getSharedDriveDropRejectionFeedback, handleSharedDriveDroppedFiles} from './sharedDriveDrop';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 
+import {Config} from '../../../Config';
+import {allowsAllFiles, hasAllowedExtension} from '../../../util/fileTypeUtil';
+import type {Translate} from '../../../util/localizerUtil';
 import {showFileDropzoneErrorModal} from '../useFilesUploadDropzone/showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 
 type ShowFileDropzoneError = typeof showFileDropzoneErrorModal;

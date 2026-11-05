@@ -18,7 +18,7 @@
  */
 
 import {isEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {Decoder} from 'bazinga64';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';

@@ -18,18 +18,18 @@
  */
 
 import {isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {Decoder, Encoder} from 'bazinga64';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
+import {Encoder} from '@wireapp/commons/lib/base64/encoder';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {noop} from 'noop-esm';
 
 import {Runtime} from '@wireapp/commons';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-
 import {isTabKey} from './keyboardUtil';
 import {getLogger} from './logger';
 
 import {AuthError} from '../error/authError';
+import type {Conversation} from '../repositories/entity/Conversation';
 
 const decimalRadix = 10;
 const environmentPollingIntervalInMilliseconds = 100;

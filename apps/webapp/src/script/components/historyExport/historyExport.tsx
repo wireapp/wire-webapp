@@ -25,21 +25,20 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
-import {CancelError} from 'Repositories/backup/error';
-import {ClientState} from 'Repositories/client/ClientState';
-import {User} from 'Repositories/entity/User';
-import {EventName} from 'Repositories/tracking/eventName';
-import {Segmentation} from 'Repositories/tracking/segmentation';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {ContentState} from 'src/script/page/useAppState';
-import {getLogger} from 'Util/logger';
-import {getCurrentDate} from 'Util/timeUtil';
-import {downloadBlob} from 'Util/util';
-
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {ContentState} from '../../page/useAppState';
+import {CancelError} from '../../repositories/backup/error';
+import {ClientState} from '../../repositories/client/ClientState';
+import {User} from '../../repositories/entity/User';
+import {EventName} from '../../repositories/tracking/eventName';
+import {Segmentation} from '../../repositories/tracking/segmentation';
+import {getLogger} from '../../util/logger';
+import {getCurrentDate} from '../../util/timeUtil';
+import {downloadBlob} from '../../util/util';
 import {WebAppEvents} from '../../webAppEvents';
+import {PrimaryModal} from '../Modals/PrimaryModal';
+import {ProgressBar} from '../ProgressBar/ProgressBar';
 
 enum ExportState {
   COMPRESSING = 'ExportState.STATE.COMPRESSING',

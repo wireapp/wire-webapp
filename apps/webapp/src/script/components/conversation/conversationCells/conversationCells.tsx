@@ -25,15 +25,6 @@ import {task} from 'true-myth';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {allowsAllFiles, hasAllowedExtension} from 'Util/fileTypeUtil';
-
 import {CellsHeader} from './cellsHeader/cellsHeader';
 import {CellsLoader} from './cellsLoader/cellsLoader';
 import {CellsPagination} from './cellsPagination/cellsPagination';
@@ -67,6 +58,14 @@ import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresigne
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 import {useSharedDriveFileDrop} from './useSharedDriveFileDrop';
 
+import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {UserRepository} from '../../../repositories/user/userRepository';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {allowsAllFiles, hasAllowedExtension} from '../../../util/fileTypeUtil';
 import {showFileDropzoneErrorModal} from '../useFilesUploadDropzone/showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 
 interface ConversationCellsProps {

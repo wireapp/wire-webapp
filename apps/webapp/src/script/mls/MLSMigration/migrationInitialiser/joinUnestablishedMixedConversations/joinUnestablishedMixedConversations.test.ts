@@ -21,16 +21,16 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {result, task} from 'true-myth';
 
-import {MixedConversation} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {Core} from 'src/script/service/coreSingleton';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {TestFactory} from 'test/helper/TestFactory';
-import {createUuid} from 'Util/uuid';
+import {MixedConversation} from '../../../../repositories/conversation/ConversationSelectors';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
+import {Core} from '../../../../service/coreSingleton';
+import {requireValueForTest} from '../../../../page/testSupport/rootContextTestSupport';
+import {TestFactory} from '../../../../../../test/helper/TestFactory';
+import {createUuid} from '../../../../util/uuid';
 
 import {joinUnestablishedMixedConversations} from '.';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 function getConversationServiceForTest(core: Core): NonNullable<NonNullable<Core['service']>['conversation']> {
   const service = requireValueForTest(core.service);

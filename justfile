@@ -64,13 +64,11 @@ type-check: build-libraries
     tsc --project ./apps/server/tsconfig.type-check.json
     tsc --project ./apps/server/bin/tsconfig.json
     tsc --project ./libraries/api-client/tsconfig.type-check.json
-    tsc --project ./libraries/bazinga64/tsconfig.type-check.json
     tsc --project ./libraries/commons/tsconfig.type-check.json
     tsc --project ./libraries/config/tsconfig.type-check.json
     tsc --project ./libraries/core/tsconfig.type-check.json
     tsc --project ./libraries/react-ui-kit/tsconfig.type-check.json
     tsc --project ./libraries/store-engine/tsconfig.type-check.json
-    tsc --project ./libraries/store-engine-dexie/tsconfig.type-check.json
     tsc --project ./libraries/telemetry/tsconfig.type-check-esm.json
     tsc --project ./libraries/telemetry/tsconfig.type-check-commonjs.json
     tsc --project ./libraries/telemetry/tsconfig.type-check.json
@@ -78,12 +76,10 @@ type-check: build-libraries
 # Build workspace libraries required by dependent tasks such as type-checking and tests.
 [group('build')]
 build-libraries:
-    cd libraries/bazinga64 && tsc
     cd libraries/commons && tsc
     cd libraries/config && tsc
     cd libraries/react-ui-kit && tsc
     cd libraries/store-engine && tsc
-    cd libraries/store-engine-dexie && tsc
     cd libraries/telemetry && node bin/copyAssets.mts
     cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json
     cd libraries/api-client && tsc
@@ -147,9 +143,7 @@ develop: prepare-development-server
         "just watch-library api-client" \
         "just watch-library react-ui-kit" \
         "just watch-library store-engine" \
-        "just watch-library store-engine-dexie" \
-        "just watch-library-telemetry" \
-        "just watch-library bazinga64"
+        "just watch-library-telemetry"
 
 # Alternative to develop: build dependencies, select libraries, and start the server.
 [group('development')]
@@ -174,7 +168,7 @@ run-development-server:
 [group('development')]
 watch-library library:
     case {{ quote(library) }} in \
-        api-client|bazinga64|commons|config|core|react-ui-kit|store-engine|store-engine-dexie) ;; \
+        api-client|commons|config|core|react-ui-kit|store-engine) ;; \
         *) echo "Unknown library: {{ quote(library) }}" >&2; exit 2 ;; \
     esac
     tsc --project {{ quote("libraries/" + library + "/tsconfig.json") }} --watch --preserveWatchOutput

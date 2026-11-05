@@ -44,18 +44,18 @@ import {
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '../../webAppEvents';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {CallingEvent} from 'Repositories/event/CallingEvent';
-import {CALL} from 'Repositories/event/Client';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {MediaType} from 'Repositories/media/MediaType';
-import {UserRepository} from 'Repositories/user/userRepository';
-import type {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
-import {TestFactory} from 'test/helper/TestFactory';
-import {createUuid} from 'Util/uuid';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {CallingEvent} from '../event/CallingEvent';
+import {CALL} from '../event/Client';
+import {EventRepository} from '../event/EventRepository';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {MediaType} from '../media/MediaType';
+import {UserRepository} from '../user/userRepository';
+import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {TestFactory} from '../../../../test/helper/TestFactory';
+import {createUuid} from '../../util/uuid';
 
 import {Call} from './Call';
 import {CallingRepository, MediaStreamQuery, setupDetachedWindowExternalLinksClick} from './CallingRepository';
@@ -64,23 +64,23 @@ import {type NetworkQuality, UNKNOWN_NETWORK_QUALITY} from './calling.schema';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
-import {useActiveWindowState} from 'Hooks/useActiveWindow';
+import {useActiveWindowState} from '../../hooks/useActiveWindow';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {Core} from '../../service/coreSingleton';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
-import {translateForTest} from 'Util/test/translateForTest';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {BackgroundEffectsHandler, ReleasableMediaStream} from 'Repositories/media/backgroundEffectsHandler';
+import {translateForTest} from '../../util/test/translateForTest';
+import {MessageRepository} from '../conversation/MessageRepository';
+import {MediaStreamHandler} from '../media/MediaStreamHandler';
+import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {BackgroundEffectsHandler, ReleasableMediaStream} from '../media/backgroundEffectsHandler';
 import {APIClient} from '../../service/apiClientSingleton';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Translate} from 'Util/localizerUtil';
+import {ConversationState} from '../conversation/ConversationState';
+import {Translate} from '../../util/localizerUtil';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {BackgroundEffectSelection} from '../media/VideoBackgroundEffects';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {NoAudioInputError} from '../../error/noAudioInputError';
 
 type AudioFlowStat = {

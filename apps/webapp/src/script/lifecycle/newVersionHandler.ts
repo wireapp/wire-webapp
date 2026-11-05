@@ -23,8 +23,8 @@ import {task, type Task} from 'true-myth';
 
 import {isBuildMetadata, type BuildMetadata} from '@wireapp/config';
 
-import {getLogger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {getLogger} from '../util/logger';
+import {TIME_IN_MILLIS} from '../util/timeUtil';
 
 const newVersionPollingIntervalInMinutes = 15;
 

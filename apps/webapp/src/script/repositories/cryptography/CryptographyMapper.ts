@@ -55,22 +55,21 @@ import {
   ButtonAction,
 } from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {CALL_MESSAGE_TYPE} from 'Repositories/calling/enum/CallMessageType';
-import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
-import type {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
-import type {CallingEvent} from 'Repositories/event/CallingEvent';
-import {ClientEvent} from 'Repositories/event/Client';
-import {getLogger, Logger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {toError} from 'Util/toError';
-import {base64ToArray, arrayToBase64} from 'Util/util';
-
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
 import {CryptographyError} from '../../error/cryptographyError';
 import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
+import {getLogger, Logger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {toError} from '../../util/toError';
+import {base64ToArray, arrayToBase64} from '../../util/util';
+import {AssetTransferState} from '../assets/assetTransferState';
+import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
+import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
+import type {MessageAddEvent} from '../conversation/EventBuilder';
+import type {CallingEvent} from '../event/CallingEvent';
+import {ClientEvent} from '../event/Client';
 
 export type MappedText = {
   data: {content: string; mentions: string[]; previews: string[]; quote?: string; replacing_message_id?: string};

@@ -21,13 +21,12 @@ import type {FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {ChannelSettings} from './ChannelSettings';
 import {groupsNotAllowedSectionCss} from './ConversationDetails.styles';
 import {ConversationNameInput} from './ConversationNameInput';
 
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {UserState} from '../../../../../repositories/user/userState';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ConversationType} from '../../types';
 import {Preference} from '../Preference';

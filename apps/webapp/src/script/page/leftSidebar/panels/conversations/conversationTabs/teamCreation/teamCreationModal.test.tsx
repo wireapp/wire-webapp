@@ -21,17 +21,17 @@ import {act} from 'react';
 
 import {fireEvent, render, waitFor, type RenderResult} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../testSupport/rootContextTestSupport';
 
 import {TeamCreationModal} from './teamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 
-jest.mock('Repositories/team/TeamService');
+jest.mock('../../../../../../repositories/team/TeamService');
 
 const testIdentifiers = {
   doContinue: 'do-continue',

@@ -21,10 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
 
-import {CellsBreadcrumbs} from 'Components/conversation/conversationCells/common/cellsBreadcrumbs/cellsBreadcrumbs';
-import {getBreadcrumbsFromPath} from 'Components/conversation/conversationCells/common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../../../../page/rootProvider';
+import {CellsBreadcrumbs} from '../../../../../common/cellsBreadcrumbs/cellsBreadcrumbs';
+import {getBreadcrumbsFromPath} from '../../../../../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
 import {CellsCreateNewFolderHint} from '../cellsFoldersListModalContent/cellsCreateNewFolderHint/cellsCreateNewFolderHint';
 import {CellsFolderList} from '../cellsFoldersListModalContent/cellsFolderList/cellsFolderList';
 import {CellsFolderListEmpty} from '../cellsFoldersListModalContent/cellsFolderListEmpty/cellsFolderListEmpty';

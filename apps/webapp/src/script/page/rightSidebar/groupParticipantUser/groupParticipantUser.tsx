@@ -25,25 +25,24 @@ import {amplify} from 'amplify';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {EnrichedFields} from 'Components/panel/enrichedFields';
-import {UserActions, Actions} from 'Components/panel/userActions';
-import {UserDetails} from 'Components/panel/userDetails';
-import {BaseToggle} from 'Components/toggle/BaseToggle';
-import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {MemberLeaveEvent, TeamMemberLeaveEvent} from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {ClientEvent} from 'Repositories/event/Client';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import * as Icon from '../../../components/icon';
+import {EnrichedFields} from '../../../components/panel/enrichedFields';
+import {UserActions, Actions} from '../../../components/panel/userActions';
+import {UserDetails} from '../../../components/panel/userDetails';
+import {BaseToggle} from '../../../components/toggle/BaseToggle';
+import {ConversationRoleRepository} from '../../../repositories/conversation/ConversationRoleRepository';
+import {MemberLeaveEvent, TeamMemberLeaveEvent} from '../../../repositories/conversation/EventBuilder';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {ClientEvent} from '../../../repositories/event/Client';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {WebAppEvents} from '../../../webAppEvents';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity} from '../rightSidebar';
 

@@ -17,7 +17,7 @@
  *
  */
 
-import type {Translate} from 'Util/localizerUtil';
+import type {Translate} from '../localizerUtil';
 
 export function translateForTest(translationKey: Parameters<Translate>[0]): string {
   return translationKey;

@@ -23,9 +23,8 @@ import {FormattedMessage} from 'react-intl';
 
 import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
 import {WirelessContainer} from '../component/wirelessContainer';
 
 type Props = React.HTMLProps<HTMLDivElement>;

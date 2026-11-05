@@ -21,8 +21,8 @@ import type {FunctionComponent} from 'react';
 
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import type {ClientRepository} from 'Repositories/client';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {ClientRepository} from '../../../../../repositories/client';
+import {useApplicationContext} from '../../../../rootProvider';
 
 interface LogoutSectionProps {
   clientRepository: ClientRepository;

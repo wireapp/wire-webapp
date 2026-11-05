@@ -22,11 +22,11 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Ciphersuite} from '@wireapp/core';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {ConversationProtocolDetails} from './conversationProtocolDetails';
 

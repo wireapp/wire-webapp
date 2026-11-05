@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from 'src/script/Config';
+import {Config} from '../Config';
 
 export const canUseMeetings = (input: {
   readonly isTeamMeetingsFeatureEnabled: boolean;

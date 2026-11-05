@@ -1,6 +1,6 @@
 import {Maybe} from 'true-myth';
 
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CellNode, CellNodeType} from '../../../../../types/cellNode';
 
 import {isBulkMoveValid} from './validateBulkMove';
 

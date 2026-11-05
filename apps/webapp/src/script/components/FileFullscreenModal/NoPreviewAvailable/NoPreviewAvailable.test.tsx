@@ -23,12 +23,12 @@ import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
   type CellsSelfUserDriveRole,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+} from '../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {NoPreviewAvailable} from './NoPreviewAvailable';
 import type {ReactNode} from 'react';

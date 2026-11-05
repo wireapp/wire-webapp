@@ -22,11 +22,11 @@ import {container} from 'tsyringe';
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {UserState} from 'Repositories/user/userState';
-import type {UserRepository} from 'Repositories/user/userRepository';
+import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import type {MessageRepository} from '../repositories/conversation/MessageRepository';
+import {Conversation} from '../repositories/entity/Conversation';
+import {UserState} from '../repositories/user/userState';
+import type {UserRepository} from '../repositories/user/userRepository';
 
 import {SidebarTabs, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
 import {ContentState, useAppState} from '../page/useAppState';

@@ -17,7 +17,7 @@
  *
  */
 
-import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
+import {BrowserPermissionStatus} from './BrowserPermissionStatus';
 import {
   arePermissionsGranted,
   getPermissionState,
@@ -27,8 +27,8 @@ import {
   queryBrowserPermission,
   setPermissionState,
   setupPermissionListener,
-} from 'Repositories/permission/permissionHandlers';
-import {PermissionType} from 'Repositories/permission/PermissionType';
+} from './permissionHandlers';
+import {PermissionType} from './PermissionType';
 
 import {permissionsStore} from './Permissions.store';
 

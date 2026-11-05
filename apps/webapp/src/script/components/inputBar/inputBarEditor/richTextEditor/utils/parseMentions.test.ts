@@ -18,8 +18,8 @@
 
 import {$createParagraphNode, $createTextNode, $getRoot} from 'lexical';
 
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {User} from '../../../../../repositories/entity/User';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {
   createWireLexicalEditorTestHarness,

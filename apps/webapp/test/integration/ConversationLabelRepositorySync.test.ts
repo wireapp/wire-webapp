@@ -20,11 +20,14 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
 import {asyncNoop} from 'noop-esm';
-import {ConversationLabelRepository, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {
+  ConversationLabelRepository,
+  LabelType,
+} from '../../src/script/repositories/conversation/ConversationLabelRepository';
+import {Conversation} from '../../src/script/repositories/entity/Conversation';
+import {PropertiesService} from '../../src/script/repositories/properties/propertiesService';
+import {translate} from '../../src/script/util/localizerUtil';
+import {createUuid} from '../../src/script/util/uuid';
 
 // Simple integration test to verify the synchronization fix
 describe('ConversationLabelRepository Integration - Synchronization Fix', () => {

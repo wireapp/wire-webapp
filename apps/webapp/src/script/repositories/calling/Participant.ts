@@ -23,9 +23,9 @@ import ko, {computed, observable, pureComputed} from 'knockout';
 import {VIDEO_STATE} from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
-import {User} from 'Repositories/entity/User';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {User} from '../entity/User';
 
 const screenShareEndedDelayInMilliseconds = 1000;
 

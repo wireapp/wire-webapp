@@ -23,15 +23,15 @@ import {act, render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
 import {Maybe} from 'true-myth';
 
-import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {withThemeAndRootContext} from '../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createExecutingFireAndForgetInvokerForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {CellFile, CellNodeType} from 'src/script/types/cellNode';
+} from '../../../../page/testSupport/rootContextTestSupport';
+import {CellFile, CellNodeType} from '../../../../types/cellNode';
 
 import {CellsFilePreviewModal} from './cellsFilePreviewModal';
 import {

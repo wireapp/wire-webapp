@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {meetingNotificationHostCollapsedOffset} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost.styles';
+import {meetingNotificationHostCollapsedOffset} from '../meetingNotificationHost/meetingNotificationHost.styles';
 
 const meetingCallingViewOffset = 24;
 

@@ -22,8 +22,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {WebAppEvents} from '../../../../webAppEvents';
 
 type UseMessageEditingResult = {

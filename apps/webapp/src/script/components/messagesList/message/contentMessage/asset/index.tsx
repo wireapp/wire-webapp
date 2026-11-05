@@ -22,20 +22,6 @@ import type {FunctionComponent} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {AssetType} from 'Repositories/assets/assetType';
-import {Asset} from 'Repositories/entity/message/asset';
-import {Button} from 'Repositories/entity/message/button';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
-import type {Location} from 'Repositories/entity/message/location';
-import type {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {Multipart} from 'Repositories/entity/message/multipart';
-import {Text} from 'Repositories/entity/message/text';
-import {StatusType} from 'src/script/message/statusType';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {includesOnlyEmojis} from 'Util/emojiUtil';
-
 import {AudioAsset} from './audioAsset/audioAsset';
 import {FileAsset} from './fileAsset/fileAsset';
 import {ImageAsset} from './imageAsset';
@@ -47,6 +33,19 @@ import {TextMessageRenderer} from './textMessageRenderer';
 import {VideoAsset} from './videoAsset/videoAsset';
 
 import {MessageActions} from '../..';
+import {StatusType} from '../../../../../message/statusType';
+import {AssetType} from '../../../../../repositories/assets/assetType';
+import {Asset} from '../../../../../repositories/entity/message/asset';
+import {Button} from '../../../../../repositories/entity/message/button';
+import {CompositeMessage} from '../../../../../repositories/entity/message/compositeMessage';
+import {ContentMessage} from '../../../../../repositories/entity/message/contentMessage';
+import type {FileAsset as FileAssetType} from '../../../../../repositories/entity/message/fileAsset';
+import type {Location} from '../../../../../repositories/entity/message/location';
+import type {MediumImage} from '../../../../../repositories/entity/message/mediumImage';
+import {Multipart} from '../../../../../repositories/entity/message/multipart';
+import {Text} from '../../../../../repositories/entity/message/text';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {includesOnlyEmojis} from '../../../../../util/emojiUtil';
 import {ReadIndicator} from '../../readIndicator';
 
 interface ContentAssetProps {

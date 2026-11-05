@@ -24,17 +24,16 @@ import {
   type FunctionComponent,
 } from 'react';
 
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, isKeyboardEvent, KEY} from 'Util/keyboardUtil';
-
 import {PlaceholderAvatar} from './placeholderAvatar';
 import {ServiceAvatar} from './serviceAvatar';
 import {TemporaryGuestAvatar} from './temporaryGuestAvatar';
 import {UserAvatar} from './userAvatar';
 
 import {isAppOrServiceEntity} from '../../guards/Service';
+import {User} from '../../repositories/entity/User';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {handleKeyDown, isKeyboardEvent, KEY} from '../../util/keyboardUtil';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',

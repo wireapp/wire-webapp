@@ -21,10 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
 
-import type {Translate} from 'Util/localizerUtil';
-
 import {TranslatedMessageContent} from './TranslatedMessageContent';
 
+import type {Translate} from '../../../../util/localizerUtil';
 import type {PrimaryModalTranslatedMessage} from '../PrimaryModalTranslatedMessage';
 
 interface MessageContentProps {

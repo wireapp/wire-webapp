@@ -33,7 +33,6 @@
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/protocol-messaging": "1.56.0",
     "@wireapp/store-engine": "5.1.19",
-    "bazinga64": "6.5.13",
     "hash.js": "1.1.7",
     "idb": "8.0.4",
     "lodash": "4.18.1",
@@ -42,7 +41,7 @@
     "true-myth": "9.4.0"
   },
   "devDependencies": {
-    "@swc/core": "1.16.20",
+    "@swc/core": "1.16.21",
     "@swc/jest": "0.2.39",
     "@types/lodash": "4.17.27",
     "commander": "14.0.3",

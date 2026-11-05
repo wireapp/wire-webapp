@@ -17,11 +17,8 @@
  *
  */
 
-import {
-  MEETING_TITLE_MAX_LENGTH,
-  meetingTitleErrorKeys,
-} from 'Components/meeting/shared/validation/meetingTitleValidation';
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {MEETING_TITLE_MAX_LENGTH, meetingTitleErrorKeys} from './shared/validation/meetingTitleValidation';
+import {unwrap, unwrapErr} from '../../util/test/resultTestSupport';
 
 import {mapMeetNowFormToMeetingCommand} from './mapMeetNowFormToMeetingCommand';
 

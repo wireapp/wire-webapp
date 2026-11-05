@@ -21,10 +21,9 @@ import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ClientRecord} from 'Repositories/storage/record/clientRecord';
-
 import {isObject} from '../guards/common';
+import {Conversation} from '../repositories/entity/Conversation';
+import {ClientRecord} from '../repositories/storage/record/clientRecord';
 
 type ErrorWithCode = Error & {readonly code: number};
 type ErrorWithType = Error & {readonly type: string};

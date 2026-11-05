@@ -19,10 +19,10 @@
 
 import type {FunctionComponent} from 'react';
 
-import {CloseIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {buttonStyles, iconStyles} from './filePreviewDeleteButton.styles';
+
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {CloseIcon} from '../../../../icon';
 
 interface FilePreviewDeleteButtonProps {
   onDelete: () => void;

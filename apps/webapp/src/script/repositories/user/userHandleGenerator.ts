@@ -20,8 +20,8 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import getSlug from 'speakingurl';
 
-import {randomElement} from 'Util/arrayUtil';
-import {getRandomNumber} from 'Util/numberUtil';
+import {randomElement} from '../../util/arrayUtil';
+import {getRandomNumber} from '../../util/numberUtil';
 
 const maximumRandomHandleDigit = 8;
 

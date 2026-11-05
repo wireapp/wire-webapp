@@ -22,23 +22,23 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
 import {randomInt} from 'crypto';
 
-import {generateUser} from 'test/helper/UserGenerator';
+import {generateUser} from '../../../../../test/helper/UserGenerator';
 
-import en from 'I18n/en-US.json';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
-import {User} from 'Repositories/entity/User';
-import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
+import en from '../../../../i18n/en-US.json';
+import {MemberMessage as MemberMessageEntity} from '../../../repositories/entity/message/memberMessage';
+import {User} from '../../../repositories/entity/User';
+import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
+import {SystemMessageType} from '../../../message/systemMessageType';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../../util/localizerUtil';
 
 import {MemberMessage} from './memberMessage';
 import {CONFIG} from './memberMessage/messageContent';
 
-jest.mock('Components/avatar', () => {
+jest.mock('../../avatar', () => {
   return {
     AVATAR_SIZE: {
       X_LARGE: 'avatar-xl',

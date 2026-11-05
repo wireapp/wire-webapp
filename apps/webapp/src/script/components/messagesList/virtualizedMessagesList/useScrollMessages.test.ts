@@ -21,7 +21,7 @@ import {renderHook, act} from '@testing-library/react';
 import {Virtualizer} from '@tanstack/react-virtual';
 
 import {StatusType} from '../../../message/statusType';
-import {Message} from 'Repositories/entity/message/message';
+import {Message} from '../../../repositories/entity/message/message';
 import {GroupedMessage} from '../utils/virtualizedMessagesGroup';
 
 import {useScrollMessages} from './useScrollMessages';

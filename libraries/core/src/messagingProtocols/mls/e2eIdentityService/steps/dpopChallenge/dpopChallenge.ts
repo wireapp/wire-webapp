@@ -17,7 +17,7 @@
  *
  */
 
-import {Converter} from 'bazinga64';
+import {Converter} from '@wireapp/commons/lib/base64/converter';
 
 import {DoWireDpopChallengeParams, GetClientNonceParams} from './dpopChallenge.types';
 

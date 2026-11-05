@@ -17,13 +17,13 @@
  *
  */
 
-import {Metrics} from 'Repositories/media/backgroundEffects';
-import {Mode} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
-import {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
-
 import {WorkerProcessVideoTrackOptions} from './options';
 import {runSegmenter, updateSegmenterOptions} from './segmenter';
+
+import {Metrics} from '..';
+import {Mode} from '../backgroundEffectsWorkerTypes';
+import {getSafeLogger} from '../helper/logger';
+import {PerformanceSample} from '../helper/samples';
 
 const workerLogger = getSafeLogger('virtual-background-worker');
 globalThis.onmessage = ({data}) => {

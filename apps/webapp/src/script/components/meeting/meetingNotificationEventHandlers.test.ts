@@ -20,12 +20,9 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
-import {
-  type AddNotificationInput,
-  MeetingNotificationKind,
-} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import {type AddNotificationInput, MeetingNotificationKind} from './meetingNotificationStore/meetingNotificationStore';
+import type {MeetingSeries} from './types/meetingSeries';
+import {matchQualifiedIds} from '../../util/qualifiedId';
 
 import {
   createMeetingNotificationEventHandlers,

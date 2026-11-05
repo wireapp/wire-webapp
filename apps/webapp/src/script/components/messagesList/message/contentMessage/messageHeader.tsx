@@ -24,18 +24,18 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {AVATAR_SIZE, Avatar} from 'Components/avatar';
-import {UserBlockedBadge} from 'Components/badge';
-import * as Icon from 'Components/icon';
-import {UserName} from 'Components/UserName';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {DeleteMessage} from 'Repositories/entity/message/deleteMessage';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './messageHeader.styles';
+
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {DeleteMessage} from '../../../../repositories/entity/message/deleteMessage';
+import {User} from '../../../../repositories/entity/User';
+import {ServiceEntity} from '../../../../repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {AVATAR_SIZE, Avatar} from '../../../avatar';
+import {UserBlockedBadge} from '../../../badge';
+import * as Icon from '../../../icon';
+import {UserName} from '../../../UserName';
 
 type MessageHeaderParams = {
   message: ContentMessage | DeleteMessage;

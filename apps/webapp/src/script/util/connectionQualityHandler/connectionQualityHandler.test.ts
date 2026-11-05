@@ -18,7 +18,7 @@
  */
 
 import {getConnectionQualityHander} from './';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 
 function getAvailableConnectionQualityHandlerForTest(): NonNullable<ReturnType<typeof getConnectionQualityHander>> {
   return requireValueForTest(getConnectionQualityHander());

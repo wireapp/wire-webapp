@@ -38,16 +38,16 @@ import {noop} from 'noop-esm';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {getCellsFilesPath} from 'Components/conversation/conversationCells/common/getCellsFilesPath/getCellsFilesPath';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {getCellsFilesPath} from '../../../../common/getCellsFilesPath/getCellsFilesPath';
+import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {CellNode} from 'src/script/types/cellNode';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../../../../../page/testSupport/rootContextTestSupport';
+import {driveBulkActionsFeatureToggleName} from '../../../../../../../featureToggles/startupFeatureToggleNames';
+import {CellNode} from '../../../../../../../types/cellNode';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
 
 import {CellsMoveNodeModal} from './cellsMoveNodeModal';
 import type {JSX} from '@emotion/react/jsx-runtime';

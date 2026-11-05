@@ -19,8 +19,8 @@
 
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
-import {Message} from 'Repositories/entity/message/message';
-import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
+import {Message} from '../../../repositories/entity/message/message';
+import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 const groupedMessageIntervalInSeconds = 30;
 

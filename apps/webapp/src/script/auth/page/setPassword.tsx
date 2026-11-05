@@ -28,12 +28,11 @@ import {AnyAction, Dispatch} from 'redux';
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, ContainerXS, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {toError} from 'Util/toError';
-
 import {Page} from './page';
 
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {toError} from '../../util/toError';
 import {Exception} from '../component/exception';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/validationError';

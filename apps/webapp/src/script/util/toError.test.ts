@@ -17,7 +17,7 @@
  *
  */
 
-import {toError} from 'Util/toError';
+import {toError} from './toError';
 
 describe('toError', () => {
   it('returns error instances unchanged', () => {

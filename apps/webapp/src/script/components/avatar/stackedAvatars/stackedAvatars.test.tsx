@@ -19,12 +19,12 @@
 
 import {render, screen, type RenderResult} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {StackedAvatars} from './stackedAvatars';
 

@@ -21,17 +21,17 @@ import type {FunctionComponent} from 'react';
 
 import {Button, Text} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
-
 import {
   teamCreationBodyCss,
   teamCreationButtonCss,
   teamCreationTextCss,
   teamCreationWrapperCss,
 } from './conversationHistory.styles';
+
+import {Config} from '../../../Config';
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
+import {safeWindowOpen} from '../../../util/sanitizationUtil';
+import {useApplicationContext} from '../../rootProvider';
 
 export const TeamCreationBanner: FunctionComponent = () => {
   const {translate} = useApplicationContext();

@@ -34,22 +34,22 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE, GroupAvatar, ChannelAvatar} from 'Components/avatar';
-import {UserBlockedBadge} from 'Components/badge';
-import {CellDescription} from 'Components/conversationListCell/components/cellDescription';
-import {UserInfo} from 'Components/UserInfo';
-import {useConversationCall} from 'Hooks/useConversationCall';
-import type {RegisterConversationElement} from 'Hooks/useConversationFocus';
-import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {MediaType} from 'Repositories/media/MediaType';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isKey, isOneOfKeys, KEY} from 'Util/keyboardUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-import {noop, setContextMenuPosition} from 'Util/util';
-
+import {CellDescription} from './components/cellDescription';
 import {StatusIcon} from './components/statusIcon';
+
+import {useConversationCall} from '../../hooks/useConversationCall';
+import type {RegisterConversationElement} from '../../hooks/useConversationFocus';
+import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {useApplicationContext} from '../../page/rootProvider';
+import type {Conversation} from '../../repositories/entity/Conversation';
+import {MediaType} from '../../repositories/media/MediaType';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {isKey, isOneOfKeys, KEY} from '../../util/keyboardUtil';
+import {useChannelsFeatureFlag} from '../../util/useChannelsFeatureFlag';
+import {noop, setContextMenuPosition} from '../../util/util';
+import {Avatar, AVATAR_SIZE, GroupAvatar, ChannelAvatar} from '../avatar';
+import {UserBlockedBadge} from '../badge';
+import {UserInfo} from '../UserInfo';
 
 interface ConversationListCellProps {
   conversation: Conversation;

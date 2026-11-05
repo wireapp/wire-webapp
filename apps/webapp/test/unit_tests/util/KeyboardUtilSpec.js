@@ -17,7 +17,7 @@
  *
  */
 
-import {KEY, isOneOfKeys, isArrowKey, isKey, isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
+import {KEY, isOneOfKeys, isArrowKey, isKey, isEnterKey, isEscapeKey} from '../../../src/script/util/keyboardUtil';
 
 describe('KEY', () => {
   describe('isArrowKey', () => {

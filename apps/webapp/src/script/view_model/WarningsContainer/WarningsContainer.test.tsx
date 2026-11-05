@@ -19,13 +19,13 @@
 
 import {act, cleanup, fireEvent, render} from '@testing-library/react';
 
-import en from 'I18n/en-US.json';
-import {setStrings, translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import en from '../../../i18n/en-US.json';
+import {setStrings, translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 
 import {WarningsContainer} from './WarningsContainer';
 import {useWarningsState} from './WarningsState';

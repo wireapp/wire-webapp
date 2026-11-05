@@ -1,10 +1,10 @@
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
-import {test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
-import {connectWithUser, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
-import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
-import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {interceptNotifications} from '../../utils/mockNotifications.util';
+import {test, withLogin, expect} from '../../test.fixtures';
+import {connectWithUser, createGroup, sendConnectionRequest} from '../../utils/userActions';
+import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from '../../utils/asset.util';
+import {getImageFilePath} from '../../utils/sendImage.util';
 
 test.describe('Notifications', () => {
   let userA: User;

@@ -24,15 +24,15 @@ import ko from 'knockout';
 import {task} from 'true-myth';
 import {asyncNoop, noop} from 'noop-esm';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {withTheme} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
+import {ConversationMapper} from '../../../repositories/conversation/ConversationMapper';
 
 import {ManualMigrationProtocolDetails} from './manualMigrationProtocolDetails';
 

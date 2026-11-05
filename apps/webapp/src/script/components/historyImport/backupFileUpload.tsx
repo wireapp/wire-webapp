@@ -21,9 +21,9 @@ import {useRef, type FunctionComponent} from 'react';
 
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {CONFIG as HistoryExportConfig} from 'Components/historyExport';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {useApplicationContext} from '../../page/rootProvider';
+import {handleKeyDown, KEY} from '../../util/keyboardUtil';
+import {CONFIG as HistoryExportConfig} from '../historyExport';
 
 interface BackupFileUploadProps {
   onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;

@@ -19,12 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
-import type {User} from 'Repositories/entity/User';
-
 import {getStackedAvatarDisplay} from './getStackedAvatarDisplay';
 import {ParticipantAvatarTooltip} from './participantAvatarTooltip';
 import {overflowCountStyles, wrapperStyles} from './stackedAvatars.styles';
 
+import type {User} from '../../../repositories/entity/User';
 import {AVATAR_SIZE} from '../avatar';
 
 interface StackedAvatarsProps {

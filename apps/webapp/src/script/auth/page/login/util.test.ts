@@ -23,7 +23,7 @@ import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api
 import {StatusCodes} from 'http-status-codes';
 import {Dispatch} from 'redux';
 
-import {APIClient} from 'src/script/service/apiClientSingleton';
+import {APIClient} from '../../../service/apiClientSingleton';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';

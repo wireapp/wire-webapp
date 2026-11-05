@@ -20,11 +20,8 @@
 import {maybe} from 'true-myth';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
-import {
-  MEETING_TITLE_MAX_LENGTH,
-  meetingTitleErrorKeys,
-} from 'Components/meeting/shared/validation/meetingTitleValidation';
-import {meetingPasswordConfirmationErrorKey} from 'Components/meeting/shared/validation/meetingPasswordValidation';
+import {MEETING_TITLE_MAX_LENGTH, meetingTitleErrorKeys} from '../shared/validation/meetingTitleValidation';
+import {meetingPasswordConfirmationErrorKey} from '../shared/validation/meetingPasswordValidation';
 
 import {getScheduleMeetingFormErrors, hasScheduleMeetingFormErrors} from './scheduleMeetingValidation';
 

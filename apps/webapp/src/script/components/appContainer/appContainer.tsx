@@ -28,38 +28,37 @@ import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {MeetingStoreRoot} from 'Components/meeting/meetingStore/meetingStoreRoot';
-import {LeaveGroupAdminModal} from 'Components/Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
-import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
-import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
-import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
-import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
-import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import type {Translate} from 'Util/localizerUtil';
-
 import {getOtherInstanceAction} from './getOtherInstanceAction';
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {Config, Configuration} from '../../Config';
 import {markAsUnreadFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
+import {useAppSoftLock} from '../../hooks/useAppSoftLock';
+import {useSingleInstance} from '../../hooks/useSingleInstance';
+import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import type {FetchLatestBuildMetadata} from '../../lifecycle/newVersionHandler';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
 import type {ApplicationObservability} from '../../observability/applicationObservability';
 import {AppMain} from '../../page/appMain';
 import {RootProvider} from '../../page/rootProvider';
+import {PROPERTIES_TYPE} from '../../repositories/properties/propertiesType';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
+import type {Translate} from '../../util/localizerUtil';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import {AppLoader} from '../appLoader/index';
+import {MeetingStoreRoot} from '../meeting/meetingStore/meetingStoreRoot';
+import {LeaveGroupAdminModal} from '../Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
+import {PrimaryModalComponent} from '../Modals/PrimaryModal/PrimaryModal';
+import {QualityFeedbackModal} from '../Modals/QualityFeedbackModal';
 
 type AppProps = {
   readonly config: Configuration;

@@ -24,28 +24,25 @@ import {container} from 'tsyringe';
 import {task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
-import type {CreateMeetingSuccess} from 'Components/meeting/shared/service/meetingService';
-import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
-import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {
-  MEETING_TITLE_MAX_LENGTH,
-  meetingTitleErrorKeys,
-} from 'Components/meeting/shared/validation/meetingTitleValidation';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import type {CreateMeetingSuccess} from '../shared/service/meetingService';
+import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
+import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
+import {meetingSubmitErrors} from '../meetingSubmitErrors';
+import {MEETING_TITLE_MAX_LENGTH, meetingTitleErrorKeys} from '../shared/validation/meetingTitleValidation';
+import {ConversationState} from '../../../repositories/conversation/ConversationState';
+import {User} from '../../../repositories/entity/User';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {UserState} from '../../../repositories/user/userState';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
-import {KEY} from 'Util/keyboardUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {MainViewModel} from '../../../view_model/MainViewModel';
+import {useWarningsState} from '../../../view_model/WarningsContainer/WarningsState';
+import {KEY} from '../../../util/keyboardUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {MeetNowModal} from './meetNowModal';
 import {useMeetNowModal} from './useMeetNowModal';

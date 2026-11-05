@@ -17,8 +17,8 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {getUser} from '../../data/user';
+import {PageManager} from '../../pageManager';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 

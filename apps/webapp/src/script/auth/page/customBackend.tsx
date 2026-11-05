@@ -26,12 +26,11 @@ import {useNavigate} from 'react-router';
 
 import {Button, ButtonVariant, Container, Text} from '@wireapp/react-ui-kit';
 
-import {LogoFullIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './customBackend.styles';
 import {Page} from './page';
 
+import {LogoFullIcon} from '../../components/icon';
+import {useApplicationContext} from '../../page/rootProvider';
 import * as AuthSelector from '../module/selector/authSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {getSearchParams, navigateTo} from '../util/urlUtil';

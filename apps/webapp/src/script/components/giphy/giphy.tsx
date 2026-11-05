@@ -25,12 +25,12 @@ import cx from 'classnames';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {GifImage} from 'Components/giphy/gifImage';
-import * as Icon from 'Components/icon';
-import {Gif, GiphyRepository} from 'Repositories/extension/GiphyRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {GifImage} from './gifImage';
 
+import {useApplicationContext} from '../../page/rootProvider';
+import {Gif, GiphyRepository} from '../../repositories/extension/GiphyRepository';
 import {WebAppEvents} from '../../webAppEvents';
+import * as Icon from '../icon';
 
 const GIPHY_CLOSE_TIMEOUT = 350;
 

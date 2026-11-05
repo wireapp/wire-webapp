@@ -21,7 +21,7 @@ import React from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {CSS_FILL_PARENT, CSS_FLEX_CENTER, CSS_ICON} from 'Util/cssMixin';
+import {CSS_FILL_PARENT, CSS_FLEX_CENTER, CSS_ICON} from '../../util/cssMixin';
 
 import {STATE} from '.';
 

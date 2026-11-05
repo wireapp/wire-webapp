@@ -19,7 +19,7 @@
 
 import {addDays, isSameDay, startOfDay} from 'date-fns';
 
-import {formatLocale} from 'Util/timeUtil';
+import {formatLocale} from '../../../util/timeUtil';
 
 export const getDaySectionHeader = (day: Date, now: Date, translate: (key: string) => string): string => {
   const formattedDay = formatLocale(day, 'EEEE, MMMM d');

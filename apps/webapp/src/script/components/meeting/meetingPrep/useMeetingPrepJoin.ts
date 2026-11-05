@@ -22,11 +22,12 @@ import {useCallback, useMemo} from 'react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {joinPreparedMeeting} from 'Components/meeting/meetingPrep/joinPreparedMeeting';
-import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
+import {joinPreparedMeeting} from './joinPreparedMeeting';
+
+import {useNoInternetCallGuard} from '../../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {useApplicationContext, useMainViewModel} from '../../../page/rootProvider';
+import type {CallMediaChoice} from '../../../repositories/calling/callMediaChoice';
+import {ConversationState} from '../../../repositories/conversation/ConversationState';
 
 export const useMeetingPrepJoin = (): ((
   qualifiedConversationId: QualifiedId,

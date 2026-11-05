@@ -19,10 +19,10 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {FileAssetSmall} from './fileAssetSmall/fileAssetSmall';
 import {FileAssetWithPreview} from './fileAssetWithPreview/fileAssetWithPreview';
+
+import {useApplicationContext} from '../../../../../../../page/rootProvider';
 
 interface FileAssetCardProps {
   src?: string;

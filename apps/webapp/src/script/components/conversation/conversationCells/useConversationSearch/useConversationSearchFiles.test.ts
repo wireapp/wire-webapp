@@ -21,10 +21,10 @@ import {act, renderHook, waitFor} from '@testing-library/react';
 import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
 import {Maybe} from 'true-myth';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {UserRepository} from '../../../../repositories/user/userRepository';
+import {createExecutingFireAndForgetInvokerForTest} from '../../../../page/testSupport/rootContextTestSupport';
+import {CellNode, CellNodeType} from '../../../../types/cellNode';
 import {CELLS_SELF_USER_DRIVE_ROLE} from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
 import {useConversationSearchFiles} from './useConversationSearchFiles';

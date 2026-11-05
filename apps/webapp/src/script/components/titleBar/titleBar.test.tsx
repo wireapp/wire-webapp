@@ -27,28 +27,28 @@ import {Runtime} from '@wireapp/commons';
 import * as uiKit from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '../../webAppEvents';
 
-import en from 'I18n/en-US.json';
-import ru from 'I18n/ru-RU.json';
-import {TitleBar} from 'Components/titleBar';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {ContentState} from 'src/script/page/useAppState';
+import en from '../../../i18n/en-US.json';
+import ru from '../../../i18n/ru-RU.json';
+import {TitleBar} from './';
+import {CallingRepository} from '../../repositories/calling/CallingRepository';
+import {CallState} from '../../repositories/calling/CallState';
+import {ConversationVerificationState} from '../../repositories/conversation/ConversationVerificationState';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {TeamState} from '../../repositories/team/TeamState';
+import {withTheme} from '../../auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../auth/util/test/testUtil';
+import {ContentState} from '../../page/useAppState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
+} from '../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../util/localizerUtil';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {PanelState} from '../../page/rightSidebar/rightSidebar';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('@wireapp/react-ui-kit', () => {
@@ -58,7 +58,7 @@ jest.mock('@wireapp/react-ui-kit', () => {
   };
 });
 
-jest.mock('Components/calling/useCallAlertState', () => {
+jest.mock('../calling/useCallAlertState', () => {
   return {
     useCallAlertState: () => {
       return {

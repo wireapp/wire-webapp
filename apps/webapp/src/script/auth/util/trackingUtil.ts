@@ -21,8 +21,8 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import * as telemetry from '@wireapp/telemetry';
 
-import {Config} from 'src/script/Config';
-import {createUuid} from 'Util/uuid';
+import {Config} from '../../Config';
+import {createUuid} from '../../util/uuid';
 
 let telemetryInitialized = false;
 

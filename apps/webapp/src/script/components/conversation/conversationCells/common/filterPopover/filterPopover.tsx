@@ -23,8 +23,6 @@ import {Button, Dialog, DialogTrigger, Popover} from 'react-aria-components';
 
 import {Checkbox, CheckboxLabel, CircleCloseIcon, SearchIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   badgeStyles,
   checkboxLabelStyles,
@@ -45,6 +43,8 @@ import {
   startContentStyles,
   triggerButtonStyles,
 } from './filterPopover.styles';
+
+import {useApplicationContext} from '../../../../../page/rootProvider';
 
 export interface FilterItem {
   id: string;

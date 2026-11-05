@@ -31,10 +31,6 @@ import {Navigate} from 'react-router';
 import {UrlUtil} from '@wireapp/commons';
 import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isBackendError} from 'Util/typePredicateUtil';
-import {noop} from 'Util/util';
-
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './conversationJoinComponents';
 import {ConversationJoinFull} from './conversationJoinInvalid';
 import {EntropyContainer} from './entropyContainer';
@@ -42,6 +38,9 @@ import {Login} from './login/login';
 import {Page} from './page';
 
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {isBackendError} from '../../util/typePredicateUtil';
+import {noop} from '../../util/util';
 import {AppAlreadyOpen} from '../component/appAlreadyOpen';
 import {JoinGuestLinkPasswordModal} from '../component/joinGuestLinkPasswordModal';
 import {WirelessContainer} from '../component/wirelessContainer';

@@ -21,26 +21,26 @@ import {act, render, waitFor} from '@testing-library/react';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import en from 'I18n/en-US.json';
-import si from 'I18n/si-LK.json';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {ClientRepository} from 'Repositories/client';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {translateForTest} from 'Util/test/translateForTest';
-import {setStrings, translate} from 'Util/localizerUtil';
-import {splitFingerprint} from 'Util/stringUtil';
+import en from '../../../../i18n/en-US.json';
+import si from '../../../../i18n/si-LK.json';
+import {ClientEntity} from '../../../repositories/client/ClientEntity';
+import {useLegalHoldModalState} from './LegalHoldModal.state';
+import {ClientRepository} from '../../../repositories/client';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {CryptographyRepository} from '../../../repositories/cryptography/CryptographyRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {SearchRepository} from '../../../repositories/search/searchRepository';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {UserRepository} from '../../../repositories/user/userRepository';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {setStrings, translate} from '../../../util/localizerUtil';
+import {splitFingerprint} from '../../../util/stringUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {LegalHoldModal, LegalHoldModalProps, LegalHoldModalType} from './LegalHoldModal';
 

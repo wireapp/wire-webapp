@@ -23,7 +23,7 @@ import {noop} from 'noop-esm';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 
 import {InputLevel, MAX_AUDIO_BULLETS} from './inputLevel';
 

@@ -22,17 +22,17 @@ import {act, render, screen} from '@testing-library/react';
 import type {RenderResult} from '@testing-library/react';
 import type {ReactElement} from 'react';
 
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
+import {NOTIFICATION_STATE} from '../../../../repositories/conversation/NotificationSetting';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {Text} from '../../../../repositories/entity/message/text';
+import {User} from '../../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+} from '../../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../util/test/translateForTest';
+import {createUuid} from '../../../../util/uuid';
 
 import {CellDescription} from './cellDescription';
 

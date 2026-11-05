@@ -21,19 +21,15 @@ import {createClock} from '@enormora/clock/clock';
 import {ImageSegmenter} from '@mediapipe/tasks-vision';
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import type {Metrics, Mode} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
-import {
-  buildMetrics,
-  createMetricsWindow,
-  pushMetricsSample,
-} from 'Repositories/media/backgroundEffects/helper/metrics';
-import {createRestartQueue} from 'Repositories/media/backgroundEffects/helper/restartQueue';
-import {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
-
 import {VideoFilter} from './filter';
 import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
+
+import type {Metrics, Mode} from '../backgroundEffectsWorkerTypes';
+import {getSafeLogger} from '../helper/logger';
+import {buildMetrics, createMetricsWindow, pushMetricsSample} from '../helper/metrics';
+import {createRestartQueue} from '../helper/restartQueue';
+import {PerformanceSample} from '../helper/samples';
 
 const segmentationInitializationRetryDelayInMilliseconds = 1000;
 const metricsWindowFrameCount = 60;

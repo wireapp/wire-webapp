@@ -23,7 +23,7 @@ import type {DeterministicClock} from '@enormora/clock/deterministic-clock';
 import {act} from 'react';
 import {Maybe, maybe} from 'true-myth';
 
-import {StringKeyValueStorage} from 'src/script/storage/stringKeyValueStorageTypes';
+import {StringKeyValueStorage} from '../storage/stringKeyValueStorageTypes';
 
 import {createUseSingleInstance} from './useSingleInstance';
 

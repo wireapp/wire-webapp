@@ -24,10 +24,9 @@ import {FormattedMessage} from 'react-intl';
 
 import {ErrorMessage, Link} from '@wireapp/react-ui-kit';
 
-import {errorHandlerStrings} from 'Util/errorUtil';
-import {validationErrorStrings} from 'Util/validationUtil';
-
 import {Config} from '../../Config';
+import {errorHandlerStrings} from '../../util/errorUtil';
+import {validationErrorStrings} from '../../util/validationUtil';
 
 interface ExceptionProps {
   errors: unknown[];

@@ -21,10 +21,10 @@ import {TZDate} from '@date-fns/tz';
 import {isUndefined} from '@sindresorhus/is';
 import {addDays, startOfDay} from 'date-fns';
 
-import type {ScheduleMeetingRecurrenceOption} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {getMeetingTemporalStatusAt, MeetingTemporalStatuses} from 'Components/meeting/utils/meetingStatusUtil';
+import type {ScheduleMeetingRecurrenceOption} from '../scheduleMeetingModal/scheduleMeetingTypes';
+import type {MeetingInstance} from '../types/meetingInstance';
+import type {MeetingSeries} from '../types/meetingSeries';
+import {getMeetingTemporalStatusAt, MeetingTemporalStatuses} from '../utils/meetingStatusUtil';
 
 const daysPerWeek = 7;
 const daysPerBiweeklyPeriod = 14;

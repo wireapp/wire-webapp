@@ -16,15 +16,22 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-import { PageManager } from 'test/e2e_tests/pageManager';
-import { expect, test } from 'test/e2e_tests/test.fixtures';
+import {createClock} from '@enormora/clock/clock';
+import {PageManager} from '../../pageManager';
+import {expect, test} from '../../test.fixtures';
 import {
-  createMeetingDetailsData, createOngoingMeetingWindow, meetingWindowWithinPastEditPeriod,
-  prepareMeetingParticipantProfiles, createMidnightMeetingTimes, createOrderedMeetingListData
-} from 'test/e2e_tests/utils/meetingTime.util';
-import { createMeetingsTeam, loginMeetingsUsers } from 'test/e2e_tests/utils/meetings.util';
-import { getImageFilePath } from 'test/e2e_tests/utils/sendImage.util';
-import { createClock } from '@enormora/clock/clock';
+  createMeetingDetailsData,
+  createOngoingMeetingWindow,
+  meetingWindowWithinPastEditPeriod,
+  prepareMeetingParticipantProfiles,
+  createMidnightMeetingTimes,
+  createOrderedMeetingListData,
+} from '../../utils/meetingTime.util';
+import {
+  createMeetingsTeam,
+  loginMeetingsUsers,
+} from '../../utils/meetings.util';
+import {getImageFilePath} from '../../utils/sendImage.util';
 
 const MEETING_TITLE = 'Team sync';
 const UPDATED_MEETING_TITLE = 'Updated team sync';

@@ -26,17 +26,17 @@ import {randomUUID} from 'crypto';
 
 import {Account, MLSService} from '@wireapp/core';
 
-import {ConversationService} from 'Repositories/conversation/ConversationService';
-import {MLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
-import {Core} from 'src/script/service/coreSingleton';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {TestFactory} from 'test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {ConversationService} from '../repositories/conversation/ConversationService';
+import {MLSConversation} from '../repositories/conversation/ConversationSelectors';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import {ConversationStatus} from '../repositories/conversation/ConversationStatus';
+import {Conversation} from '../repositories/entity/Conversation';
+import {User} from '../repositories/entity/User';
+import {UserState} from '../repositories/user/userState';
+import {Core} from '../service/coreSingleton';
+import {requireValueForTest} from '../page/testSupport/rootContextTestSupport';
+import {TestFactory} from '../../../test/helper/TestFactory';
+import {translateForTest} from '../util/test/translateForTest';
 
 import {
   classifyLocal,

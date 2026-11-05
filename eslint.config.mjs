@@ -263,30 +263,6 @@ const productionPlugins = {
   'unused-imports': unusedImportsPlugin,
   'header-tony': headerPlugin,
 };
-const webappImportOrderRule = [
-  'error',
-  {
-    groups: ['external', 'builtin', 'internal', 'sibling', 'parent', 'index'],
-    pathGroups: [
-      {pattern: 'react', group: 'external', position: 'before'},
-      {pattern: '@wireapp/*', group: 'internal', position: 'before'},
-      // One group for all webapp TS path aliases — alphabetize sorts Components/…/Util/…/src/…
-      {
-        pattern: '{apps,Components,Hooks,I18n,Repositories,Resource,src,Util}/**',
-        group: 'internal',
-        position: 'after',
-      },
-    ],
-    pathGroupsExcludedImportTypes: ['react', '@wireapp/*'],
-    'newlines-between': 'always',
-    alphabetize: {
-      order: 'asc',
-      caseInsensitive: true,
-    },
-    warnOnUnassignedImports: true,
-  },
-];
-
 const strictBooleanExpressionsRule = [
   'error',
   {
@@ -583,6 +559,7 @@ const productionConfigs = [
     files: [
       'tools/buildArtifact/**/*.ts',
       'tools/development/**/*.ts',
+      'tools/maintenanceRelease/**/*.ts',
       'tools/productionDistribution/**/*.ts',
       'tools/releaseSummary/**/*.ts',
       'tools/runtimeVerification/**/*.ts',
@@ -651,7 +628,6 @@ const productionConfigs = [
       'libraries/commons/**/*.{ts,tsx}',
       'libraries/core/**/*.{ts,tsx}',
       'libraries/store-engine/**/*.{ts,tsx}',
-      'libraries/store-engine-dexie/**/*.{ts,tsx}',
       'libraries/react-ui-kit/**/*.{ts,tsx}',
     ],
     rules: {
@@ -693,10 +669,8 @@ const productionConfigs = [
   {
     files: ['apps/webapp/**/*.{ts,tsx}'],
     rules: {
-      // Webapp path aliases (Util/*, Components/*, …) resolve to lowercase dirs on disk.
+      // Webapp path aliases resolve to lowercase dirs on disk.
       'import/no-unresolved': ['error', {caseSensitive: false}],
-      // Pin alias import order so Linux CI and macOS agree on webapp path aliases.
-      'import/order': webappImportOrderRule,
     },
   },
   {
@@ -729,9 +703,9 @@ const productionConfigs = [
       'no-restricted-imports': [
         'error',
         {
-          paths: [
+          patterns: [
             {
-              name: 'src/script/page/RootProvider',
+              group: ['../**/page/rootProvider'],
               importNames: ['useApplicationContext'],
               message: 'This modal is rendered outside RootProvider. Pass required dependencies explicitly instead.',
             },
@@ -741,20 +715,14 @@ const productionConfigs = [
     },
   },
   {
-    files: ['apps/webapp/src/script/page/components/WindowTitleUpdater.ts'],
+    files: ['apps/webapp/src/script/page/components/windowTitleUpdater.ts'],
     rules: {
       'no-restricted-imports': [
         'error',
         {
           paths: [
             {
-              name: 'src/script/page/RootProvider',
-              importNames: ['useApplicationContext'],
-              message:
-                'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
-            },
-            {
-              name: '../RootProvider',
+              name: '../rootProvider',
               importNames: ['useApplicationContext'],
               message:
                 'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',

@@ -30,8 +30,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {SingleSignOnForm} from './singleSignOnForm';
 

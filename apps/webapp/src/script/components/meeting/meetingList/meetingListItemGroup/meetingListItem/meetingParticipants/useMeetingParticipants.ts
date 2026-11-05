@@ -22,13 +22,13 @@ import {useMemo} from 'react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import {getMeetingParticipantsForDisplay} from './getMeetingParticipantsForDisplay';
+
+import type {Conversation} from '../../../../../../repositories/entity/Conversation';
+import type {User} from '../../../../../../repositories/entity/User';
+import {UserState} from '../../../../../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
+import {matchQualifiedIds} from '../../../../../../util/qualifiedId';
 
 export const useMeetingParticipants = (conversation: Conversation, qualifiedCreator: QualifiedId): User[] => {
   const userState = container.resolve(UserState);

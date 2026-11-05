@@ -17,11 +17,10 @@
  *
  */
 
-import type {Translate} from 'Util/localizerUtil';
-
 import {Message} from './message';
 
 import {SuperType} from '../../../message/superType';
+import type {Translate} from '../../../util/localizerUtil';
 
 /**
  * Federation stop system message

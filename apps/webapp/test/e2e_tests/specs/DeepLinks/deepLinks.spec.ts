@@ -17,9 +17,9 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {expect, test, Team, withLogin} from 'test/e2e_tests/test.fixtures';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {expect, test, Team, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup, sendConnectionRequest} from '../../utils/userActions';
 import {UserProfileModal} from '../../pageManager/webapp/modals/userProfile.modal';
 

@@ -20,15 +20,15 @@
 import {render} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
-import * as Icon from 'Components/icon';
-import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {translateForTest} from 'Util/test/translateForTest';
+import * as Icon from '../../../../../components/icon';
+import {createLabel, LabelType} from '../../../../../repositories/conversation/ConversationLabelRepository';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {TestFactory} from 'test/helper/TestFactory';
+} from '../../../../testSupport/rootContextTestSupport';
+import {TestFactory} from '../../../../../../../test/helper/TestFactory';
 
 import {ConversationFolderTab} from './conversationFolderTab';
 

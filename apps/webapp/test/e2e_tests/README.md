@@ -45,7 +45,7 @@ CI/CD PR git actions job can be found [here](/.github/workflows/precommit-crit-f
 Set startup feature toggles per page through `withLogin` options:
 
 ```typescript
-import {forTestsOnlyFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {forTestsOnlyFeatureToggleName} from '../../../../src/script/featureToggles/startupFeatureToggleNames';
 
 const enabledPage = await createPage(
   withLogin(userA, {

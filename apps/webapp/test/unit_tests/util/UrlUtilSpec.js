@@ -17,7 +17,7 @@
  *
  */
 
-import {URLParameter} from 'src/script/auth/urlParameter';
+import {URLParameter} from '../../../src/script/auth/urlParameter';
 import {
   forwardParameter,
   appendParameter,
@@ -26,7 +26,7 @@ import {
   cleanURL,
   getLinksFromHtml,
   prependProtocol,
-} from 'Util/urlUtil';
+} from '../../../src/script/util/urlUtil';
 
 describe('UrlUtil', () => {
   describe('appendParameter', () => {

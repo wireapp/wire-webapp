@@ -23,24 +23,6 @@ import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import type {TeamState} from 'Repositories/team/TeamState';
-import {
-  canManuallyMigrateConversation,
-  manuallyMigrateConversation,
-  type ManualMigrationFailure,
-} from 'src/script/mls/MLSMigration/manualMigration';
-import {useManualMigrationStore} from 'src/script/mls/MLSMigration/useManualMigrationStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {errorHandlerStrings} from 'Util/errorUtil';
-import type {TranslationKey} from 'Util/localizerUtil';
-import {isAxiosError, isBackendError} from 'Util/typePredicateUtil';
-import {useIsMounted} from 'Util/useIsMounted';
-
 import {ConversationProtocolDetails} from './conversationProtocolDetails';
 import {
   migrationButtonStyles,
@@ -51,6 +33,24 @@ import {
   modalActionsStyles,
 } from './manualMigrationProtocolDetails.styles';
 import {useOnMultipleClicks} from './useOnMultipleClicks';
+
+import {
+  canManuallyMigrateConversation,
+  manuallyMigrateConversation,
+  type ManualMigrationFailure,
+} from '../../../mls/MLSMigration/manualMigration';
+import {useManualMigrationStore} from '../../../mls/MLSMigration/useManualMigrationStore';
+import {useApplicationContext} from '../../../page/rootProvider';
+import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import type {Conversation} from '../../../repositories/entity/Conversation';
+import type {User} from '../../../repositories/entity/User';
+import type {TeamState} from '../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {errorHandlerStrings} from '../../../util/errorUtil';
+import type {TranslationKey} from '../../../util/localizerUtil';
+import {isAxiosError, isBackendError} from '../../../util/typePredicateUtil';
+import {useIsMounted} from '../../../util/useIsMounted';
+import {ModalComponent} from '../../Modals/ModalComponent';
 
 const REQUIRED_PROTOCOL_ACTIVATIONS = 5;
 

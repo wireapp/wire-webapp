@@ -22,8 +22,8 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {RestNode} from 'cells-sdk-ts';
 import {noop} from 'noop-esm';
 
-import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {CellNode} from 'src/script/types/cellNode';
+import {createExecutingFireAndForgetInvokerForTest} from '../../../../../../../../page/testSupport/rootContextTestSupport';
+import {CellNode} from '../../../../../../../../types/cellNode';
 
 import {useGetCellsFolders} from './useGetCellsFolders';
 

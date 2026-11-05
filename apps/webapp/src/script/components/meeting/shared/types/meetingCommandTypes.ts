@@ -20,8 +20,8 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {Maybe} from 'true-myth';
 
-import type {ScheduleMeetingRecurrenceOption} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
-import type {User} from 'Repositories/entity/User';
+import type {User} from '../../../../repositories/entity/User';
+import type {ScheduleMeetingRecurrenceOption} from '../../scheduleMeetingModal/scheduleMeetingTypes';
 
 export type MeetNowMeetingCommand = {
   title: string;
