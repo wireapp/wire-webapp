@@ -50,6 +50,12 @@ export type GetMLSPublicKeysResponseData = {
   removal: MLSPublicKeyRecord;
 };
 
+type ClientUpdateOptions = {
+  readonly clientId: string;
+  readonly updatedClient: UpdateClientPayload;
+  readonly retryCount?: number;
+};
+
 export class ClientAPI {
   constructor(private readonly client: HttpClient) {}
 
@@ -76,11 +82,20 @@ export class ClientAPI {
   }
 
   public async putClient(clientId: string, updatedClient: UpdateClientPayload): Promise<void> {
+    return this.updateClient({clientId, updatedClient});
+  }
+
+  public async putClientCapabilities(clientId: string, capabilities: ClientCapabilityData): Promise<void> {
+    return this.updateClient({clientId, updatedClient: capabilities, retryCount: 0});
+  }
+
+  private async updateClient(options: ClientUpdateOptions): Promise<void> {
+    const {clientId, updatedClient, retryCount} = options;
     const config: AxiosRequestConfig = {
       data: updatedClient,
       method: 'put',
       url: `${ClientAPI.URL.CLIENTS}/${clientId}`,
-      'axios-retry': {retries: 0},
+      ...(retryCount === undefined ? {} : {'axios-retry': {retries: retryCount}}),
     };
 
     try {

@@ -26,7 +26,7 @@ describe('client capability updates before WebSocket connection', () => {
     const sendJSON = jest.fn().mockRejectedValue(updateFailure);
     const clientApi = new ClientAPI({sendJSON} as unknown as HttpClient);
 
-    await expect(clientApi.putClient('test-client', {capabilities: []})).rejects.toBe(updateFailure);
+    await expect(clientApi.putClientCapabilities('test-client', {capabilities: []})).rejects.toBe(updateFailure);
     expect(sendJSON).toHaveBeenCalledTimes(1);
     expect(sendJSON).toHaveBeenCalledWith({
       data: {capabilities: []},
@@ -35,4 +35,13 @@ describe('client capability updates before WebSocket connection', () => {
       'axios-retry': {retries: 0},
     });
   });
+
+  it.each([{prekeys: [{id: 1, key: 'prekey'}]}, {mls_public_keys: {ed25519: 'public-key'}}])(
+    'preserves the default retry policy for ordinary client updates: %s', async update => {
+      const sendJSON = jest.fn().mockResolvedValue({data: {}});
+      const clientApi = new ClientAPI({sendJSON} as unknown as HttpClient);
+      await clientApi.putClient('test-client', update);
+      expect(sendJSON).toHaveBeenCalledWith({data: update, method: 'put', url: '/clients/test-client'});
+    },
+  );
 });
