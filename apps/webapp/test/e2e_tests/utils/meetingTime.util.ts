@@ -16,15 +16,65 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-import { TZDate } from '@date-fns/tz';
-import type { Clock } from '@enormora/clock/clock';
-import { expect, type Page } from '@playwright/test';
-
-import type { User } from 'test/e2e_tests/data/user';
-import { PageManager } from 'test/e2e_tests/pageManager';
+import {TZDate} from '@date-fns/tz';
+import type {Clock} from '@enormora/clock/clock';
+import {expect, type Page} from '@playwright/test';
+import type {User} from '../data/user';
+import {PageManager} from '../pageManager';
 
 const FIFTEEN_MINUTES_MS = 15 * 60 * 1000;
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+
+type GeneratedMeetingData = {
+  title: string;
+  dayOffset: number;
+  startHour: number;
+  startMinute: number;
+  startLabel: string;
+  endLabel: string;
+  timeRange: string;
+  dateLabel: string;
+};
+
+type ExpectedMeetingOccurrence = {
+  title: string;
+  dayHeading: string;
+  timeRange: string;
+  startMilliseconds: number;
+};
+
+type ExpectedMeetingTimelineRow = {
+  kind: 'day' | 'meeting';
+  dayHeading: string;
+  title: string;
+};
+
+type OrderedMeetingListData = {
+  meetingsToCreate: GeneratedMeetingData[];
+  observationTime: Date;
+  initialOccurrences: ExpectedMeetingOccurrence[];
+  expectedOccurrences: ExpectedMeetingOccurrence[];
+  expectedInitialTimeline: ExpectedMeetingTimelineRow[];
+  expectedTimeline: ExpectedMeetingTimelineRow[];
+};
+
+type MidnightMeetingTimes = {
+  dateLabel: string;
+  startLabel: string;
+  endLabel: string;
+  todayHeading: string;
+  afterMeetingEnds: Date;
+  beforeMidnight: Date;
+  midnight: Date;
+};
+
+type MeetingDetailsData = {
+  dateLabel: string;
+  dayHeading: string;
+  startLabel: string;
+  endLabel: string;
+  timeRange: string;
+};
 
 export const roundDateDownToFifteenMinutes = (date: Date): Date => {
   const rounded = new Date(date);
@@ -46,7 +96,7 @@ export const roundDateUpToFifteenMinutes = (date: Date): Date => {
 };
 
 export const formatMeetingTimeLabel = (date: Date): string => {
-  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  return date.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true});
 };
 
 export const formatMeetingDateIso = (date: Date): string => {
@@ -60,8 +110,9 @@ export const createOrderedMeetingListData = (
   clock: Pick<Clock, 'currentUnixEpochMilliseconds'>,
   timeZone: string,
   occurrenceCount: number,
-  baseTitle: string) => {
-  const referenceClock = { currentUnixEpochMilliseconds: clock.currentUnixEpochMilliseconds };
+  baseTitle: string,
+): OrderedMeetingListData => {
+  const referenceClock = {currentUnixEpochMilliseconds: clock.currentUnixEpochMilliseconds};
 
   // Use tomorrow as the first meeting day.
   const observationTime = new TZDate(referenceClock.currentUnixEpochMilliseconds, timeZone);
@@ -69,22 +120,25 @@ export const createOrderedMeetingListData = (
   observationTime.setDate(observationTime.getDate() + 1);
   observationTime.setHours(8, 0, 0, 0);
 
-  const observationClock = { currentUnixEpochMilliseconds: observationTime.getTime(), };
+  const observationClock = {currentUnixEpochMilliseconds: observationTime.getTime()};
 
   // Deliberate test inputs, rather than manually written time strings.
   const firstStartHour = 9;
   const spacingMinutes = 120;
   const durationMinutes = 60;
 
-  const formatTime = (date: Date, hour: 'numeric' | '2-digit',) =>
-    date.toLocaleTimeString('en-US', {
-      timeZone,
-      hour,
-      minute: '2-digit',
-      hour12: true,
-    }).replace(/[\u00a0\u202f]/g, ' ');
+  const formatTime = (date: Date, hour: 'numeric' | '2-digit'): string => {
+    return date
+      .toLocaleTimeString('en-US', {
+        timeZone,
+        hour,
+        minute: '2-digit',
+        hour12: true,
+      })
+      .replace(/[\u00a0\u202f]/g, ' ');
+  };
 
-  const formatTimeRange = (start: Date, end: Date) => {
+  const formatTimeRange = (start: Date, end: Date): string => {
     const startText = formatTime(start, '2-digit');
     const endText = formatTime(end, '2-digit');
 
@@ -92,15 +146,12 @@ export const createOrderedMeetingListData = (
     const endPeriod = endText.match(/(AM|PM)$/)?.[0];
 
     // The approved format omits the first AM/PM when both are the same.
-    const displayedStart =
-      startPeriod === endPeriod
-        ? startText.replace(/ (AM|PM)$/, '')
-        : startText;
+    const displayedStart = startPeriod === endPeriod ? startText.replace(/ (AM|PM)$/, '') : startText;
 
     return `${displayedStart} - ${endText}`;
   };
 
-  const createMeeting = (dayOffset: number, timeSlot: number, index: number,) => {
+  const createMeeting = (dayOffset: number, timeSlot: number, index: number): GeneratedMeetingData => {
     const start = new TZDate(observationTime.getTime(), timeZone);
 
     start.setDate(start.getDate() + dayOffset);
@@ -118,15 +169,15 @@ export const createOrderedMeetingListData = (
       startLabel: formatTime(start, 'numeric'),
       endLabel: formatTime(end, 'numeric'),
       timeRange: formatTimeRange(start, end),
-      dateLabel: createMeetingDetailsData(referenceClock, timeZone, 1 + dayOffset,).dateLabel,
+      dateLabel: createMeetingDetailsData(referenceClock, timeZone, 1 + dayOffset).dateLabel,
     };
   };
 
   // Create the first day's meetings out of chronological order.
   const meetingsToCreate = [
-    ...[2, 0, 1].map((timeSlot, index) =>
-      createMeeting(0, timeSlot, index),
-    ),
+    ...[2, 0, 1].map((timeSlot, index) => {
+      return createMeeting(0, timeSlot, index);
+    }),
 
     // Next day has one meeting.
     createMeeting(1, 0, 3),
@@ -136,40 +187,32 @@ export const createOrderedMeetingListData = (
   ];
 
   // Calculate enough weekly occurrences to cross the loading boundary.
-  const weeks = Math.ceil(
-    occurrenceCount / meetingsToCreate.length,
-  );
+  const weeks = Math.ceil(occurrenceCount / meetingsToCreate.length);
 
-  const expectedOccurrences = Array.from({ length: weeks }, (_, week) =>
-    meetingsToCreate.map(meeting => {
+  const expectedOccurrences = Array.from({length: weeks}, (_, week) => {
+    return meetingsToCreate.map(meeting => {
       const daysAhead = meeting.dayOffset + week * 7;
       const start = new TZDate(observationTime.getTime(), timeZone);
 
       start.setDate(start.getDate() + daysAhead);
-      start.setHours(
-        meeting.startHour,
-        meeting.startMinute,
-        0,
-        0,
-      );
+      start.setHours(meeting.startHour, meeting.startMinute, 0, 0);
 
       return {
         title: meeting.title,
-        dayHeading: createMeetingDetailsData(
-          observationClock,
-          timeZone,
-          daysAhead,
-        ).dayHeading,
+        dayHeading: createMeetingDetailsData(observationClock, timeZone, daysAhead).dayHeading,
         timeRange: meeting.timeRange,
         startMilliseconds: start.getTime(),
       };
-    }),
-  ).flat()
-    .sort((first, second) => first.startMilliseconds - second.startMilliseconds,)
+    });
+  })
+    .flat()
+    .sort((first, second) => {
+      return first.startMilliseconds - second.startMilliseconds;
+    })
     .slice(0, occurrenceCount);
 
-  const toTimeline = (occurrences: typeof expectedOccurrences) => {
-    const rows: Array<{ kind: 'day' | 'meeting'; dayHeading: string; title: string; }> = [];
+  const toTimeline = (occurrences: typeof expectedOccurrences): ExpectedMeetingTimelineRow[] => {
+    const rows: Array<{kind: 'day' | 'meeting'; dayHeading: string; title: string}> = [];
 
     let previousDay = '';
 
@@ -206,20 +249,20 @@ export const createOrderedMeetingListData = (
   };
 };
 
-type CreateOngoingMeetingWindowResult = { start: Date; end: Date };
+type CreateOngoingMeetingWindowResult = {start: Date; end: Date};
 export const createOngoingMeetingWindow = (now = new Date()): CreateOngoingMeetingWindowResult => {
   const start = roundDateDownToFifteenMinutes(new Date(now.getTime() - 30 * 60 * 1000));
   const end = roundDateUpToFifteenMinutes(new Date(now.getTime() + 2 * 60 * 60 * 1000));
 
-  return { start, end };
+  return {start, end};
 };
 
-type CreateEndedMeetingWindowResult = { start: Date; end: Date };
+type CreateEndedMeetingWindowResult = {start: Date; end: Date};
 export const createEndedMeetingWindow = (now = new Date()): CreateEndedMeetingWindowResult => {
   const end = roundDateDownToFifteenMinutes(new Date(now.getTime() - 15 * 60 * 1000));
   const start = roundDateDownToFifteenMinutes(new Date(end.getTime() - 60 * 60 * 1000));
 
-  return { start, end };
+  return {start, end};
 };
 
 export const meetingWindowWithinPastEditPeriod = (start: Date, now = new Date()): boolean => {
@@ -230,10 +273,10 @@ export const prepareMeetingParticipantProfiles = async (
   ownerPage: Page,
   memberPage: Page,
   member: User,
-  options: { profileImagePath: string; longName: string },
+  options: {profileImagePath: string; longName: string},
 ): Promise<void> => {
-  const { pages: ownerPages, components: ownerComponents } = PageManager.from(ownerPage).webapp;
-  const { pages: memberPages, components: memberComponents } = PageManager.from(memberPage).webapp;
+  const {pages: ownerPages, components: ownerComponents} = PageManager.from(ownerPage).webapp;
+  const {pages: memberPages, components: memberComponents} = PageManager.from(memberPage).webapp;
 
   // Upload the organizer's picture and confirm the save succeeded.
   await ownerComponents.conversationSidebar().clickPreferencesButton();
@@ -246,7 +289,7 @@ export const prepareMeetingParticipantProfiles = async (
     ownerAccount.uploadProfilePicture(options.profileImagePath),
   ]);
 
-  expect(pictureResponse.ok(), 'The organizer profile picture should save successfully',).toBe(true);
+  expect(pictureResponse.ok(), 'The organizer profile picture should save successfully').toBe(true);
 
   // Give the viewing member a long name.
   // This newly created account keeps its default state without a picture.
@@ -265,16 +308,17 @@ export const prepareMeetingParticipantProfiles = async (
   await ownerPage.reload();
 };
 
-
 export const createMidnightMeetingTimes = (
-  clock: Pick<Clock, 'currentUnixEpochMilliseconds'>, timeZone: string,) => {
-  const meetingDay = new TZDate(clock.currentUnixEpochMilliseconds, timeZone,);
+  clock: Pick<Clock, 'currentUnixEpochMilliseconds'>,
+  timeZone: string,
+): MidnightMeetingTimes => {
+  const meetingDay = new TZDate(clock.currentUnixEpochMilliseconds, timeZone);
 
   // Schedule tomorrow to avoid creating a meeting in the past.
   meetingDay.setDate(meetingDay.getDate() + 1);
   meetingDay.setHours(9, 0, 0, 0);
 
-  const atTime = (hours: number, minutes = 0, seconds = 0) => {
+  const atTime = (hours: number, minutes = 0, seconds = 0): Date => {
     const date = new TZDate(meetingDay.getTime(), timeZone);
     date.setHours(hours, minutes, seconds, 0);
     return date;
@@ -310,7 +354,10 @@ export const createMidnightMeetingTimes = (
 };
 
 export const createMeetingDetailsData = (
-  clock: Pick<Clock, 'currentUnixEpochMilliseconds'>, timeZone: string, daysAhead = 1) => {
+  clock: Pick<Clock, 'currentUnixEpochMilliseconds'>,
+  timeZone: string,
+  daysAhead = 1,
+): MeetingDetailsData => {
   const start = new TZDate(clock.currentUnixEpochMilliseconds, timeZone);
 
   start.setDate(start.getDate() + daysAhead);
@@ -340,5 +387,3 @@ export const createMeetingDetailsData = (
     timeRange: '09:00 - 10:00 AM',
   };
 };
-
-

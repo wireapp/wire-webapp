@@ -27,10 +27,7 @@ import {
   createMidnightMeetingTimes,
   createOrderedMeetingListData,
 } from '../../utils/meetingTime.util';
-import {
-  createMeetingsTeam,
-  loginMeetingsUsers,
-} from '../../utils/meetings.util';
+import {createMeetingsTeam, loginMeetingsUsers} from '../../utils/meetings.util';
 import {getImageFilePath} from '../../utils/sendImage.util';
 
 const MEETING_TITLE = 'Team sync';
@@ -43,25 +40,25 @@ const UPDATED_DAILY_TITLE = 'Daily ongoing edit updated';
 const LONG_NAME = 'Alexandria-Marie O’Connor-Sørensen';
 const ORDERING_OCCURRENCE_COUNT = 53;
 const RECURRENCE_SCENARIOS = [
-  { label: 'Daily', intervalDays: 1 },
-  { label: 'Weekly', intervalDays: 7 },
-  { label: 'Every two weeks', intervalDays: 14 },
-  { label: 'Every four weeks', intervalDays: 28 },
+  {label: 'Daily', intervalDays: 1},
+  {label: 'Weekly', intervalDays: 7},
+  {label: 'Every two weeks', intervalDays: 14},
+  {label: 'Every four weeks', intervalDays: 28},
 ] as const;
 
 test.describe('Meetings', () => {
-
   test.describe('Meeting List', () => {
-    test('TC-11643: User can view the empty Meetings list and creation options', { tag: ['@regression'] },
-      async ({ createUser, createTeam, createPage }) => {
-
-        const { owner } = await createMeetingsTeam(createUser, createTeam, 0);
+    test(
+      'TC-11643: User can view the empty Meetings list and creation options',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
         const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
         const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
 
         await meetings.openMeetingsTab();
         await expect(meetings.meetingsTab).toHaveAttribute('aria-selected', 'true');
-        await expect(meetings.emptyMeetingsTitle).toHaveText('No meetings yet.',);
+        await expect(meetings.emptyMeetingsTitle).toHaveText('No meetings yet.');
         await expect(meetings.emptyMeetingsDescription).toHaveText(
           'Start a meeting with team members. Your communication is always end-to-end encrypted, offering the highest level of security.',
         );
@@ -69,19 +66,24 @@ test.describe('Meetings', () => {
         await expect(meetings.emptyScheduleMeetingButton).toBeEnabled();
         // Assert: there are no meeting entries.
         await expect(meetings.meetingEntries).toHaveCount(0);
-      });
+      },
+    );
 
-    test('TC-11653: User can view meeting details and participant information', { tag: ['@regression'] },
-      async ({ createUser, createTeam, createPage }) => {
-
-        const { owner, members } = await createMeetingsTeam(createUser, createTeam, 4);
+    test(
+      'TC-11653: User can view meeting details and participant information',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner, members} = await createMeetingsTeam(createUser, createTeam, 4);
         const member = members[0];
         const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, ...members]);
 
         const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
         const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
 
-        await prepareMeetingParticipantProfiles(ownerPage, memberPage, member, { profileImagePath: getImageFilePath(), longName: LONG_NAME, });
+        await prepareMeetingParticipantProfiles(ownerPage, memberPage, member, {
+          profileImagePath: getImageFilePath(),
+          longName: LONG_NAME,
+        });
         await ownerMeetings.openMeetingsTab();
         const details = createMeetingDetailsData(createClock(), await ownerMeetings.getLocalTimeZone());
 
@@ -92,7 +94,9 @@ test.describe('Meetings', () => {
           details.endLabel,
           {
             recurrence: 'Daily',
-            participantNames: members.map(user => user.fullName)
+            participantNames: members.map(user => {
+              return user.fullName;
+            }),
           },
         );
 
@@ -101,9 +105,9 @@ test.describe('Meetings', () => {
 
         // Verify the intended occurrence and saved details.
         await expect(meeting).toHaveCount(1);
-        await expect(memberMeetings.meetingTitle(meeting, MEETING_TITLE),).toBeVisible();
+        await expect(memberMeetings.meetingTitle(meeting, MEETING_TITLE)).toBeVisible();
         await expect(meeting).toContainText(details.timeRange);
-        await expect(memberMeetings.meetingRepeatLabel(meeting, 'Daily'),).toBeVisible();
+        await expect(memberMeetings.meetingRepeatLabel(meeting, 'Daily')).toBeVisible();
 
         const avatars = memberMeetings.participantAvatars(meeting);
 
@@ -120,12 +124,16 @@ test.describe('Meetings', () => {
 
         // The organizer's image is present and successfully loaded.
         await expect(memberMeetings.participantImage(organizerAvatar)).toBeVisible();
-        await expect.poll(() => memberMeetings.isParticipantImageLoaded(organizerAvatar),).toBe(true);
+        await expect
+          .poll(() => {
+            return memberMeetings.isParticipantImageLoaded(organizerAvatar);
+          })
+          .toBe(true);
 
         // Small meeting avatars display one initial.
-        await expect(memberMeetings.participantInitials(selfAvatar),).toBeVisible();
-        await expect(memberMeetings.participantInitials(selfAvatar),).toHaveText('A');
-        await expect(memberMeetings.participantImage(selfAvatar),).toHaveCount(0);
+        await expect(memberMeetings.participantInitials(selfAvatar)).toBeVisible();
+        await expect(memberMeetings.participantInitials(selfAvatar)).toHaveText('A');
+        await expect(memberMeetings.participantImage(selfAvatar)).toHaveCount(0);
 
         // Tooltips appear on hover and disappear afterward.
         await expect(organizerAvatar).toHaveAttribute('aria-label', organizerLabel);
@@ -155,11 +163,14 @@ test.describe('Meetings', () => {
 
         await memberMeetings.movePointerAwayFromParticipants();
         await expect(memberTooltip).toBeHidden();
-      });
+      },
+    );
 
-    test('TC-11654: Host can view list updates after creating editing and deleting a meeting', { tag: ['@regression'] },
-      async ({ createUser, createTeam, createPage }) => {
-        const { owner } = await createMeetingsTeam(createUser, createTeam, 0);
+    test(
+      'TC-11654: Host can view list updates after creating editing and deleting a meeting',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
         const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
         const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
 
@@ -169,18 +180,13 @@ test.describe('Meetings', () => {
         const updated = createMeetingDetailsData(createClock(), timeZone, 2);
 
         // Create: the new meeting appears under tomorrow without refreshing.
-        await meetings.scheduleMeetingOnDate(
-          MEETING_TITLE,
-          original.dateLabel,
-          original.startLabel,
-          original.endLabel,
-        );
+        await meetings.scheduleMeetingOnDate(MEETING_TITLE, original.dateLabel, original.startLabel, original.endLabel);
         const originalMeeting = meetings.meetingOccurrence(MEETING_TITLE, original.dayHeading);
         await expect(originalMeeting).toHaveCount(1);
         await expect(originalMeeting).toBeVisible();
 
         // Edit: the renamed meeting moves to its new day.
-        await meetings.editMeeting(MEETING_TITLE, { newTitle: UPDATED_MEETING_TITLE, dateLabel: updated.dateLabel });
+        await meetings.editMeeting(MEETING_TITLE, {newTitle: UPDATED_MEETING_TITLE, dateLabel: updated.dateLabel});
         const updatedMeeting = meetings.meetingOccurrence(UPDATED_MEETING_TITLE, updated.dayHeading);
 
         await expect(updatedMeeting).toHaveCount(1);
@@ -190,18 +196,21 @@ test.describe('Meetings', () => {
         // Delete: the meeting disappears without refreshing.
         await meetings.deleteMeetingForAll(UPDATED_MEETING_TITLE);
 
-        await expect(meetings.meetingListItem(UPDATED_MEETING_TITLE),).toHaveCount(0);
+        await expect(meetings.meetingListItem(UPDATED_MEETING_TITLE)).toHaveCount(0);
         await expect(meetings.meetingListItem(MEETING_TITLE)).toHaveCount(0);
         await expect(meetings.meetingEntries).toHaveCount(0);
         await expect(meetings.emptyMeetingsTitle).toHaveText('No meetings yet.');
-      })
+      },
+    );
 
-    test('TC-11657 , TC-11658 :Participant can view invited meetings and removal updates and Host can refresh the meeting without loosing data', { tag: ['@regression'] },
-      async ({ createUser, createTeam, createPage }) => {
-        const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1,);
+    test(
+      'TC-11657 , TC-11658 :Participant can view invited meetings and removal updates and Host can refresh the meeting without loosing data',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
         const member = members[0];
 
-        const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member],);
+        const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
 
         const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
         const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
@@ -216,11 +225,11 @@ test.describe('Meetings', () => {
           details.dateLabel,
           details.startLabel,
           details.endLabel,
-          { participantNames: [member.fullName] },
+          {participantNames: [member.fullName]},
         );
 
         // Both users see the same saved title, day, and time.
-        const hostMeeting = ownerMeetings.meetingOccurrence(MEETING_TITLE, details.dayHeading,);
+        const hostMeeting = ownerMeetings.meetingOccurrence(MEETING_TITLE, details.dayHeading);
         await ownerPage.reload();
 
         await expect(hostMeeting).toHaveCount(1);
@@ -229,26 +238,29 @@ test.describe('Meetings', () => {
 
         await memberMeetings.openMeetingsTab();
 
-        const invitedMeeting = memberMeetings.meetingOccurrence(MEETING_TITLE, details.dayHeading,);
+        const invitedMeeting = memberMeetings.meetingOccurrence(MEETING_TITLE, details.dayHeading);
 
         await expect(invitedMeeting).toHaveCount(1);
         await expect(invitedMeeting).toBeVisible();
         await expect(invitedMeeting).toContainText(details.timeRange);
 
         // Participant stays on Meetings while the host removes them.
-        await ownerMeetings.editMeeting(MEETING_TITLE, { removeParticipants: [member.fullName], });
+        await ownerMeetings.editMeeting(MEETING_TITLE, {removeParticipants: [member.fullName]});
 
         // Synchronization removes the entry without a participant refresh.
-        await expect(memberMeetings.meetingListItem(MEETING_TITLE),).toHaveCount(0);
+        await expect(memberMeetings.meetingListItem(MEETING_TITLE)).toHaveCount(0);
 
         await expect(memberMeetings.meetingEntries).toHaveCount(0);
         await expect(memberMeetings.emptyMeetingsTitle).toBeVisible();
         await expect(memberMeetings.emptyMeetingsTitle).toHaveText('No meetings yet.');
-      });
+      },
+    );
 
-    test('TC-11657 : Host can view an ongoing Meet Now meeting', { tag: ['@regression'] },
-      async ({ createUser, createTeam, createPage }) => {
-        const { owner } = await createMeetingsTeam(createUser, createTeam, 0);
+    test(
+      'TC-11657 : Host can view an ongoing Meet Now meeting',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
         const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
 
         const ownerPages = PageManager.from(ownerPage).webapp.pages;
@@ -275,13 +287,13 @@ test.describe('Meetings', () => {
 
           await expect(meeting).toHaveCount(1);
           await expect(meeting).toBeVisible();
-          await expect(meetings.meetingAttendingStatus(meeting),).toBeVisible();
+          await expect(meetings.meetingAttendingStatus(meeting)).toBeVisible();
 
           // Check the host's available actions without selecting them.
           const menu = await meetings.openMeetingContextMenu(MEETING_TITLE);
 
-          await expect(meetings.editMeetingMenuAction(menu),).toBeVisible();
-          await expect(meetings.deleteMeetingForEveryoneMenuAction(menu),).toBeVisible();
+          await expect(meetings.editMeetingMenuAction(menu)).toBeVisible();
+          await expect(meetings.deleteMeetingForEveryoneMenuAction(menu)).toBeVisible();
         } finally {
           // Attempt to leave the call even if an assertion fails.
           await meetings.closeMeetingContextMenu();
@@ -292,31 +304,30 @@ test.describe('Meetings', () => {
             await expect(calling.callCell).toBeHidden();
           }
         }
-      });
+      },
+    );
 
-    test('TC-11661: User can view two separate meetings with identical details', { tag: ['@regression'] },
-      async ({ createUser, createTeam, createPage }) => {
-        const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1,);
+    test(
+      'TC-11661: User can view two separate meetings with identical details',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
         const member = members[0];
 
         // Both users log in to initialize their MLS clients.
-        const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member],);
+        const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
         const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
         await meetings.openMeetingsTab();
-        const details = createMeetingDetailsData(createClock(), await meetings.getLocalTimeZone(),);
+        const details = createMeetingDetailsData(createClock(), await meetings.getLocalTimeZone());
 
         // Create two separate meetings with identical details.
         for (let index = 0; index < 2; index++) {
-          await meetings.scheduleMeetingOnDate(
-            MEETING_TITLE,
-            details.dateLabel,
-            details.startLabel,
-            details.endLabel,
-            { participantNames: [member.fullName] },
-          );
+          await meetings.scheduleMeetingOnDate(MEETING_TITLE, details.dateLabel, details.startLabel, details.endLabel, {
+            participantNames: [member.fullName],
+          });
         }
 
-        const identicalMeetings = meetings.meetingOccurrence(MEETING_TITLE, details.dayHeading,);
+        const identicalMeetings = meetings.meetingOccurrence(MEETING_TITLE, details.dayHeading);
 
         // Both meetings appear separately under the expected day.
         await expect(identicalMeetings).toHaveCount(2);
@@ -328,30 +339,28 @@ test.describe('Meetings', () => {
           await expect(meeting).toBeVisible();
           await expect(meeting).toContainText(details.timeRange);
         }
-      });
+      },
+    );
 
-    test('TC-11648: User can view completed meetings until local midnight', { tag: ['@regression'] },
+    test(
+      'TC-11648: User can view completed meetings until local midnight',
+      {tag: ['@regression']},
 
-      async ({ createUser, createTeam, createPage }) => {
-        const { owner } = await createMeetingsTeam(createUser, createTeam, 0);
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
         const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
         const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
 
         await meetings.openMeetingsTab();
-        const times = createMidnightMeetingTimes(createClock(), await meetings.getLocalTimeZone(),);
+        const times = createMidnightMeetingTimes(createClock(), await meetings.getLocalTimeZone());
 
         // Schedule tomorrow's meeting from 09:00 to 10:00.
-        await meetings.scheduleMeetingOnDate(
-          MEETING_TITLE,
-          times.dateLabel,
-          times.startLabel,
-          times.endLabel,
-        );
+        await meetings.scheduleMeetingOnDate(MEETING_TITLE, times.dateLabel, times.startLabel, times.endLabel);
 
         // At 11:00 on the meeting day, it has ended but remains under Today.
         await meetings.openMeetingsAt(times.afterMeetingEnds);
 
-        const completedMeeting = meetings.meetingOccurrence(MEETING_TITLE, times.todayHeading,);
+        const completedMeeting = meetings.meetingOccurrence(MEETING_TITLE, times.todayHeading);
 
         await expect(completedMeeting).toHaveCount(1);
         await expect(completedMeeting).toBeVisible();
@@ -367,20 +376,21 @@ test.describe('Meetings', () => {
         // At the following local midnight, refresh and check removal.
         await meetings.openMeetingsAt(times.midnight);
 
-        await expect(
-          meetings.meetingListItem(MEETING_TITLE),
-        ).toHaveCount(0);
+        await expect(meetings.meetingListItem(MEETING_TITLE)).toHaveCount(0);
 
         await expect(meetings.meetingEntries).toHaveCount(0);
         await expect(meetings.emptyMeetingsTitle).toBeVisible();
         await expect(meetings.emptyMeetingsTitle).toHaveText('No meetings yet.');
-      });
+      },
+    );
 
     for (const scenario of RECURRENCE_SCENARIOS) {
-      test(`TC-11649: User can view recurring meeting instances: ${scenario.label}`, { tag: ['@regression'] },
-        async ({ createUser, createTeam, createPage }) => {
-          const { owner } = await createMeetingsTeam(createUser, createTeam, 0,);
-          const [ownerPage] = await loginMeetingsUsers(createPage, [owner],);
+      test(
+        `TC-11649: User can view recurring meeting instances: ${scenario.label}`,
+        {tag: ['@regression']},
+        async ({createUser, createTeam, createPage}) => {
+          const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
+          const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
           const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
           await meetings.openMeetingsTab();
 
@@ -388,30 +398,40 @@ test.describe('Meetings', () => {
           const clock = createClock();
 
           // All expected dates use the same starting instant.
-          const referenceClock = { currentUnixEpochMilliseconds: clock.currentUnixEpochMilliseconds, };
+          const referenceClock = {currentUnixEpochMilliseconds: clock.currentUnixEpochMilliseconds};
 
-          const expectedOccurrences = [0, 1, 2].map(index =>
-            createMeetingDetailsData(referenceClock, timeZone, 1 + index * scenario.intervalDays,),
-          );
+          const expectedOccurrences = [0, 1, 2].map(index => {
+            return createMeetingDetailsData(referenceClock, timeZone, 1 + index * scenario.intervalDays);
+          });
 
           const first = expectedOccurrences[0];
 
-          await meetings.scheduleMeetingOnDate(
-            MEETING_TITLE,
-            first.dateLabel,
-            first.startLabel,
-            first.endLabel,
-            { recurrence: scenario.label },
-          );
+          await meetings.scheduleMeetingOnDate(MEETING_TITLE, first.dateLabel, first.startLabel, first.endLabel, {
+            recurrence: scenario.label,
+          });
 
           const actualOccurrences = await meetings.readFirstMeetingOccurrences(MEETING_TITLE, 3);
 
           // The first three occurrences follow the selected repeat pattern.
           await expect(actualOccurrences).toHaveLength(3);
-          expect(actualOccurrences.map(occurrence => occurrence.dayHeading),).toEqual(expectedOccurrences.map(occurrence => occurrence.dayHeading),);
+          expect(
+            actualOccurrences.map(occurrence => {
+              return occurrence.dayHeading;
+            }),
+          ).toEqual(
+            expectedOccurrences.map(occurrence => {
+              return occurrence.dayHeading;
+            }),
+          );
 
           // No repeated day among these three occurrences.
-          expect(new Set(actualOccurrences.map(occurrence => occurrence.dayHeading),).size,).toBe(3);
+          expect(
+            new Set(
+              actualOccurrences.map(occurrence => {
+                return occurrence.dayHeading;
+              }),
+            ).size,
+          ).toBe(3);
 
           // Every inspected occurrence has the expected details and label.
           for (const occurrence of actualOccurrences) {
@@ -420,20 +440,29 @@ test.describe('Meetings', () => {
             expect(occurrence.text).toContain(scenario.label);
           }
         },
-      )
-    };
+      );
+    }
 
-    test('TC-11645 , TC-11650: User can view ordered meetings, load more, and retain ordering after refresh ', { tag: ['@regression'] },
-      async ({ createUser, createTeam, createPage }) => {
-        const { owner } = await createMeetingsTeam(createUser, createTeam, 0);
+    test(
+      'TC-11645 , TC-11650: User can view ordered meetings, load more, and retain ordering after refresh ',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
         const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
         const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
 
         await meetings.openMeetingsTab();
 
-        const data = createOrderedMeetingListData(createClock(), await meetings.getLocalTimeZone(), ORDERING_OCCURRENCE_COUNT, MEETING_TITLE);
+        const data = createOrderedMeetingListData(
+          createClock(),
+          await meetings.getLocalTimeZone(),
+          ORDERING_OCCURRENCE_COUNT,
+          MEETING_TITLE,
+        );
         for (const meeting of data.meetingsToCreate) {
-          await meetings.scheduleMeetingOnDate(meeting.title, meeting.dateLabel, meeting.startLabel, meeting.endLabel, { recurrence: 'Weekly' },);
+          await meetings.scheduleMeetingOnDate(meeting.title, meeting.dateLabel, meeting.startLabel, meeting.endLabel, {
+            recurrence: 'Weekly',
+          });
         }
 
         await meetings.openMeetingsAt(data.observationTime);
@@ -472,43 +501,47 @@ test.describe('Meetings', () => {
           }
 
           timeline = await meetings.readMeetingTimeline(stage.count, timeline);
-          expect(timeline.map(({ kind, dayHeading, title }) => ({ kind, dayHeading, title, })), `${stage.name}: grouping and ordering`,).toEqual(stage.expectedTimeline);
-          const entries = timeline.filter(row => row.kind === 'meeting');
-          expect(entries, `${stage.name}: entry count`,).toHaveLength(stage.count);
+          expect(
+            timeline.map(({kind, dayHeading, title}) => {
+              return {kind, dayHeading, title};
+            }),
+            `${stage.name}: grouping and ordering`,
+          ).toEqual(stage.expectedTimeline);
+          const entries = timeline.filter(row => {
+            return row.kind === 'meeting';
+          });
+          expect(entries, `${stage.name}: entry count`).toHaveLength(stage.count);
 
           for (const [index, entry] of entries.entries()) {
-            expect(entry.text, `${stage.name}: ${entry.title} time`,).toContain(stage.expectedOccurrences[index].timeRange);
-            expect(entry.text, `${stage.name}: ${entry.title} repeat label`,).toContain('Weekly');
+            expect(entry.text, `${stage.name}: ${entry.title} time`).toContain(
+              stage.expectedOccurrences[index].timeRange,
+            );
+            expect(entry.text, `${stage.name}: ${entry.title} repeat label`).toContain('Weekly');
           }
         }
-      });
+      },
+    );
 
-    test('TC-11659: User can recover Meetings after a network failure', { tag: ['@regression'] },
-      async ({ createUser, createTeam, createPage }) => {
-        const { owner } = await createMeetingsTeam(createUser, createTeam, 0);
+    test(
+      'TC-11659: User can recover Meetings after a network failure',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
         const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
 
-        const { pages, components } = PageManager.from(ownerPage).webapp;
+        const {pages, components} = PageManager.from(ownerPage).webapp;
         const meetings = pages.meetings();
         const sidebar = components.conversationSidebar();
         const context = ownerPage.context();
 
         await meetings.openMeetingsTab();
 
-        const details = createMeetingDetailsData(createClock(), await meetings.getLocalTimeZone(),);
+        const details = createMeetingDetailsData(createClock(), await meetings.getLocalTimeZone());
 
         // Establish that the saved meeting exists before the failure.
-        await meetings.scheduleMeetingOnDate(
-          MEETING_TITLE,
-          details.dateLabel,
-          details.startLabel,
-          details.endLabel,
-        );
+        await meetings.scheduleMeetingOnDate(MEETING_TITLE, details.dateLabel, details.startLabel, details.endLabel);
 
-        const meeting = meetings.meetingOccurrence(
-          MEETING_TITLE,
-          details.dayHeading,
-        );
+        const meeting = meetings.meetingOccurrence(MEETING_TITLE, details.dayHeading);
 
         await expect(meeting).toHaveCount(1);
         await expect(meeting).toBeVisible();
@@ -516,7 +549,7 @@ test.describe('Meetings', () => {
 
         // Navigate away while online so reopening Meetings triggers loading.
         await sidebar.clickAllConversationsButton();
-        await expect(meetings.meetingsTab).toHaveAttribute('aria-selected', 'false',);
+        await expect(meetings.meetingsTab).toHaveAttribute('aria-selected', 'false');
 
         try {
           // Disable networking only for this browser context.
@@ -524,7 +557,7 @@ test.describe('Meetings', () => {
           await meetings.openMeetingsTab();
 
           await expect(meetings.meetingsLoadError).toBeVisible();
-          await expect(meetings.meetingsLoadErrorMessage).toHaveText('Could not load meetings. Please try again.',);
+          await expect(meetings.meetingsLoadErrorMessage).toHaveText('Could not load meetings. Please try again.');
 
           await expect(meetings.meetingsRefreshButton).toBeVisible();
           await expect(meetings.meetingsRefreshButton).toBeEnabled();
@@ -550,8 +583,8 @@ test.describe('Meetings', () => {
   });
 
   test.describe('Schedule', () => {
-    test('creates a password-protected meeting join link', async ({ createUser, createTeam, createPage }) => {
-      const { owner } = await createMeetingsTeam(createUser, createTeam, 0);
+    test('creates a password-protected meeting join link', async ({createUser, createTeam, createPage}) => {
+      const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
       const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
       const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
 
@@ -565,8 +598,8 @@ test.describe('Meetings', () => {
       await meetings.assertConversationCodeRequest(requestPromise, 'MeetingSecret1!');
     });
 
-    test('host sees a new meeting in the list', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+    test('host sees a new meeting in the list', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
@@ -578,8 +611,8 @@ test.describe('Meetings', () => {
       await expect(meetings.meetingListItem(MEETING_TITLE)).toBeVisible();
     });
 
-    test('invitee sees a meeting they were added to', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+    test('invitee sees a meeting they were added to', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
@@ -594,8 +627,8 @@ test.describe('Meetings', () => {
       await expect(memberMeetings.meetingListItem(MEETING_TITLE)).toBeVisible();
     });
 
-    test('host cannot pick a start date in the past', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+    test('host cannot pick a start date in the past', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
@@ -616,13 +649,13 @@ test.describe('Meetings', () => {
       });
 
       await meetings.openStartDateCalendar();
-      await expect(meetings.calendarDateButton(yesterdayLabel),).toBeDisabled();
+      await expect(meetings.calendarDateButton(yesterdayLabel)).toBeDisabled();
     });
   });
 
   test.describe('Edit', () => {
-    test('host can rename a meeting', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+    test('host can rename a meeting', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
@@ -632,13 +665,13 @@ test.describe('Meetings', () => {
       await meetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
       await meetings.waitForMeetingInList(MEETING_TITLE);
 
-      await meetings.editMeeting(MEETING_TITLE, { newTitle: UPDATED_MEETING_TITLE });
+      await meetings.editMeeting(MEETING_TITLE, {newTitle: UPDATED_MEETING_TITLE});
       await meetings.waitForMeetingInList(UPDATED_MEETING_TITLE);
       await expect(meetings.meetingListItem(UPDATED_MEETING_TITLE)).toBeVisible();
     });
 
-    test('invitee sees the renamed meeting', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+    test('invitee sees the renamed meeting', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
@@ -649,7 +682,7 @@ test.describe('Meetings', () => {
       await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
       await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
 
-      await ownerMeetings.editMeeting(MEETING_TITLE, { newTitle: UPDATED_MEETING_TITLE });
+      await ownerMeetings.editMeeting(MEETING_TITLE, {newTitle: UPDATED_MEETING_TITLE});
 
       await memberMeetings.openMeetingsTab();
       await memberMeetings.waitForMeetingInList(UPDATED_MEETING_TITLE);
@@ -661,17 +694,17 @@ test.describe('Meetings', () => {
       createTeam,
       createPage,
     }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
       const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
 
       await meetings.openMeetingsTab();
-      await meetings.scheduleMeeting(DAILY_ONGOING_TITLE, [member.fullName], { recurrence: 'Daily' });
+      await meetings.scheduleMeeting(DAILY_ONGOING_TITLE, [member.fullName], {recurrence: 'Daily'});
       await meetings.waitForMeetingInList(DAILY_ONGOING_TITLE, 2);
 
-      await meetings.editMeeting(DAILY_ONGOING_TITLE, { setOngoingTimes: true });
+      await meetings.editMeeting(DAILY_ONGOING_TITLE, {setOngoingTimes: true});
       await meetings.waitForMeetingInList(DAILY_ONGOING_TITLE, 2);
       await meetings.expectEditMeetingActionVisible(DAILY_ONGOING_TITLE, true);
 
@@ -686,8 +719,8 @@ test.describe('Meetings', () => {
       await meetings.expectEditPrefillDateIsToday();
     });
 
-    test('host can edit an ongoing one-off meeting', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+    test('host can edit an ongoing one-off meeting', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
@@ -697,7 +730,7 @@ test.describe('Meetings', () => {
       await meetings.scheduleMeeting(SINGLE_ONGOING_TITLE, [member.fullName]);
       await meetings.waitForMeetingInList(SINGLE_ONGOING_TITLE);
 
-      await meetings.editMeeting(SINGLE_ONGOING_TITLE, { setOngoingTimes: true });
+      await meetings.editMeeting(SINGLE_ONGOING_TITLE, {setOngoingTimes: true});
       await meetings.waitForMeetingInList(SINGLE_ONGOING_TITLE);
       await meetings.expectEditMeetingActionVisible(SINGLE_ONGOING_TITLE, true);
     });
@@ -707,16 +740,16 @@ test.describe('Meetings', () => {
       createTeam,
       createPage,
     }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
-      const { start } = createOngoingMeetingWindow();
+      const {start} = createOngoingMeetingWindow();
       expect(meetingWindowWithinPastEditPeriod(start)).toBe(true);
 
       const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
       const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
 
       await meetings.openMeetingsTab();
-      await meetings.scheduleMeeting(DAILY_ONGOING_TITLE, [member.fullName], { recurrence: 'Daily' });
+      await meetings.scheduleMeeting(DAILY_ONGOING_TITLE, [member.fullName], {recurrence: 'Daily'});
       await meetings.waitForMeetingInList(DAILY_ONGOING_TITLE);
 
       await meetings.openEditMeetingModal(DAILY_ONGOING_TITLE);
@@ -726,8 +759,8 @@ test.describe('Meetings', () => {
       await meetings.waitForMeetingInList(DAILY_ONGOING_TITLE);
     });
 
-    test('host cannot edit a meeting after it has ended', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+    test('host cannot edit a meeting after it has ended', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
@@ -737,7 +770,7 @@ test.describe('Meetings', () => {
       await meetings.scheduleMeeting(ENDED_MEETING_TITLE, [member.fullName]);
       await meetings.waitForMeetingInList(ENDED_MEETING_TITLE);
 
-      await meetings.editMeeting(ENDED_MEETING_TITLE, { setEndedTimes: true });
+      await meetings.editMeeting(ENDED_MEETING_TITLE, {setEndedTimes: true});
       await meetings.waitForMeetingInList(ENDED_MEETING_TITLE);
 
       await meetings.expectEditMeetingActionVisible(ENDED_MEETING_TITLE, false);
@@ -745,8 +778,8 @@ test.describe('Meetings', () => {
   });
 
   test.describe('Participants', () => {
-    test('host can add a participant', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 2);
+    test('host can add a participant', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
       const [firstMember, secondMember] = members;
 
       const [ownerPage, , secondMemberPage] = await loginMeetingsUsers(createPage, [owner, firstMember, secondMember]);
@@ -757,15 +790,15 @@ test.describe('Meetings', () => {
       await ownerMeetings.scheduleMeeting(MEETING_TITLE, [firstMember.fullName]);
       await ownerMeetings.waitForMeetingInList(MEETING_TITLE);
 
-      await ownerMeetings.editMeeting(MEETING_TITLE, { addParticipants: [secondMember.fullName] });
+      await ownerMeetings.editMeeting(MEETING_TITLE, {addParticipants: [secondMember.fullName]});
 
       await secondMemberMeetings.openMeetingsTab();
       await secondMemberMeetings.waitForMeetingInList(MEETING_TITLE);
       await expect(secondMemberMeetings.meetingListItem(MEETING_TITLE)).toBeVisible();
     });
 
-    test('host can remove a participant', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 2);
+    test('host can remove a participant', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
       const [firstMember, secondMember] = members;
 
       const [ownerPage, firstMemberPage] = await loginMeetingsUsers(createPage, [owner, firstMember, secondMember]);
@@ -779,15 +812,15 @@ test.describe('Meetings', () => {
       await firstMemberMeetings.openMeetingsTab();
       await firstMemberMeetings.waitForMeetingInList(MEETING_TITLE);
 
-      await ownerMeetings.editMeeting(MEETING_TITLE, { removeParticipants: [firstMember.fullName] });
+      await ownerMeetings.editMeeting(MEETING_TITLE, {removeParticipants: [firstMember.fullName]});
 
       await firstMemberMeetings.waitForMeetingAbsentFromList(MEETING_TITLE);
     });
   });
 
   test.describe('Delete', () => {
-    test('host can delete a meeting for everyone', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+    test('host can delete a meeting for everyone', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
@@ -808,8 +841,8 @@ test.describe('Meetings', () => {
       await memberMeetings.waitForNotificationContaining(`Canceled: ${MEETING_TITLE}`);
     });
 
-    test('invitee can remove a meeting only for themselves', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+    test('invitee can remove a meeting only for themselves', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
@@ -832,8 +865,8 @@ test.describe('Meetings', () => {
   });
 
   test.describe('Notifications', () => {
-    test('invitee sees an invitation', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+    test('invitee sees an invitation', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
@@ -848,8 +881,8 @@ test.describe('Meetings', () => {
       await expect(memberMeetings.notificationCards()).not.toContainText(`Update: ${MEETING_TITLE}`);
     });
 
-    test('each invitee gets exactly one invitation', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 2);
+    test('each invitee gets exactly one invitation', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
       const [firstMember, secondMember] = members;
 
       const [ownerPage, firstMemberPage, secondMemberPage] = await loginMeetingsUsers(createPage, [
@@ -873,8 +906,8 @@ test.describe('Meetings', () => {
       await expect(secondMemberMeetings.notificationCards()).toHaveCount(1);
     });
 
-    test('invitee sees an update after a title change', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+    test('invitee sees an update after a title change', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
@@ -889,7 +922,7 @@ test.describe('Meetings', () => {
       await memberMeetings.openMeetingsTab();
       await memberMeetings.waitForMeetingInList(MEETING_TITLE);
 
-      await ownerMeetings.editMeeting(MEETING_TITLE, { newTitle: UPDATED_MEETING_TITLE });
+      await ownerMeetings.editMeeting(MEETING_TITLE, {newTitle: UPDATED_MEETING_TITLE});
 
       await memberMeetings.waitForNotificationContaining(`Update: ${UPDATED_MEETING_TITLE}`);
       await expect(memberMeetings.notificationCardContaining(`Update: ${UPDATED_MEETING_TITLE}`)).toHaveCount(1);
@@ -897,8 +930,8 @@ test.describe('Meetings', () => {
       await expect(memberMeetings.notificationCards()).toHaveCount(1);
     });
 
-    test('invitee sees an update after a time change', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 1);
+    test('invitee sees an update after a time change', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
       const member = members[0];
 
       const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
@@ -913,7 +946,7 @@ test.describe('Meetings', () => {
       await memberMeetings.openMeetingsTab();
       await memberMeetings.waitForMeetingInList(MEETING_TITLE);
 
-      await ownerMeetings.editMeeting(MEETING_TITLE, { updateStartTime: true });
+      await ownerMeetings.editMeeting(MEETING_TITLE, {updateStartTime: true});
 
       await memberMeetings.waitForNotificationContaining(`Update: ${MEETING_TITLE}`);
       await expect(memberMeetings.notificationCardContaining(`Update: ${MEETING_TITLE}`)).toHaveCount(1);
@@ -926,7 +959,7 @@ test.describe('Meetings', () => {
       createTeam,
       createPage,
     }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 2);
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
       const [firstMember, secondMember] = members;
 
       const [ownerPage, firstMemberPage, secondMemberPage] = await loginMeetingsUsers(createPage, [
@@ -942,7 +975,7 @@ test.describe('Meetings', () => {
       await ownerMeetings.scheduleMeeting(MEETING_TITLE, [firstMember.fullName]);
       await firstMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
 
-      await ownerMeetings.editMeeting(MEETING_TITLE, { addParticipants: [secondMember.fullName] });
+      await ownerMeetings.editMeeting(MEETING_TITLE, {addParticipants: [secondMember.fullName]});
 
       await expect(firstMemberMeetings.notificationCardContaining(`Invitation: ${MEETING_TITLE}`)).toHaveCount(1);
       await secondMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
@@ -954,7 +987,7 @@ test.describe('Meetings', () => {
       createTeam,
       createPage,
     }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 2);
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
       const [firstMember, secondMember] = members;
 
       const [ownerPage, firstMemberPage] = await loginMeetingsUsers(createPage, [owner, firstMember, secondMember]);
@@ -969,7 +1002,7 @@ test.describe('Meetings', () => {
       await firstMemberMeetings.waitForMeetingInList(MEETING_TITLE);
       await firstMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
 
-      await ownerMeetings.editMeeting(MEETING_TITLE, { removeParticipants: [firstMember.fullName] });
+      await ownerMeetings.editMeeting(MEETING_TITLE, {removeParticipants: [firstMember.fullName]});
 
       await firstMemberMeetings.waitForMeetingAbsentFromList(MEETING_TITLE);
       await firstMemberMeetings.waitForNotificationContaining(`Canceled: ${MEETING_TITLE}`);
@@ -978,8 +1011,8 @@ test.describe('Meetings', () => {
       await expect(firstMemberMeetings.notificationCards()).not.toContainText(`Update: ${MEETING_TITLE}`);
     });
 
-    test('re-adding someone sends a new invitation', async ({ createUser, createTeam, createPage }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 2);
+    test('re-adding someone sends a new invitation', async ({createUser, createTeam, createPage}) => {
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 2);
       const [firstMember, secondMember] = members;
 
       const [ownerPage, firstMemberPage] = await loginMeetingsUsers(createPage, [owner, firstMember, secondMember]);
@@ -988,17 +1021,17 @@ test.describe('Meetings', () => {
 
       await ownerMeetings.openMeetingsTab();
       await ownerMeetings.scheduleMeeting(MEETING_TITLE, [secondMember.fullName]);
-      await ownerMeetings.editMeeting(MEETING_TITLE, { addParticipants: [firstMember.fullName] });
+      await ownerMeetings.editMeeting(MEETING_TITLE, {addParticipants: [firstMember.fullName]});
 
       await firstMemberMeetings.waitForMeetingInList(MEETING_TITLE);
       await firstMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
 
-      await ownerMeetings.editMeeting(MEETING_TITLE, { removeParticipants: [firstMember.fullName] });
+      await ownerMeetings.editMeeting(MEETING_TITLE, {removeParticipants: [firstMember.fullName]});
 
       await firstMemberMeetings.waitForNotificationContaining(`Canceled: ${MEETING_TITLE}`);
       await expect(firstMemberMeetings.notificationCardContaining(`Invitation: ${MEETING_TITLE}`)).toHaveCount(0);
 
-      await ownerMeetings.editMeeting(MEETING_TITLE, { addParticipants: [firstMember.fullName] });
+      await ownerMeetings.editMeeting(MEETING_TITLE, {addParticipants: [firstMember.fullName]});
 
       await firstMemberMeetings.waitForMeetingInList(MEETING_TITLE);
       await firstMemberMeetings.waitForNotificationContaining(`Invitation: ${MEETING_TITLE}`);
@@ -1012,18 +1045,25 @@ test.describe('Meetings', () => {
       createTeam,
       createPage,
     }) => {
-      const { owner, members } = await createMeetingsTeam(createUser, createTeam, 5);
+      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 5);
       const [ownerPage] = await loginMeetingsUsers(createPage, [owner, ...members]);
       const ownerPages = PageManager.from(ownerPage).webapp.pages;
       const ownerModals = PageManager.from(ownerPage).webapp.modals;
       const meetings = ownerPages.meetings();
 
-      await meetings.startMeetNow(LARGE_MEETING_TITLE, members.map(member => { return member.fullName; }),);
+      await meetings.startMeetNow(
+        LARGE_MEETING_TITLE,
+        members.map(member => {
+          return member.fullName;
+        }),
+      );
 
       await expect(meetings.meetingPrepModal).toBeVisible();
-      await expect(meetings.meetingPrepModal.getByRole('heading', { name: LARGE_MEETING_TITLE, exact: true }),).toBeVisible();
+      await expect(
+        meetings.meetingPrepModal.getByRole('heading', {name: LARGE_MEETING_TITLE, exact: true}),
+      ).toBeVisible();
       await expect(ownerPages.calling().callCell).toBeHidden();
-      await meetings.meetingPrepModal.getByRole('button', { name: 'Join', exact: true }).click();
+      await meetings.meetingPrepModal.getByRole('button', {name: 'Join', exact: true}).click();
       await expect(meetings.meetingPrepModal).toBeHidden();
       await expect(ownerModals.withoutTitle().modal).toBeHidden();
       await expect(ownerPages.calling().callCell).toBeVisible();
