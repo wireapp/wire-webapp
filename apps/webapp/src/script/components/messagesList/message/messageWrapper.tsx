@@ -42,7 +42,6 @@ import {PingMessage} from './pingMessage';
 import {SystemMessage} from './systemMessage';
 import {VerificationMessage} from './verificationMessage';
 
-import {markAsUnreadFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from '../../../message/quoteEntity';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {AssetRepository} from '../../../repositories/assets/assetRepository';
@@ -89,7 +88,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
 }: MessageParams) => {
-  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   type FindMessageResult = Promise<ContentMessage & {primary_key: string}>;
   const findMessage = async (conversation: Conversation, messageId: string): FindMessageResult => {
     const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
@@ -187,7 +186,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
       });
     }
 
-    if (isFeatureToggleEnabled(markAsUnreadFeatureToggleName) && !conversation.isSelfUserRemoved()) {
+    if (!conversation.isSelfUserRemoved()) {
       entries.push({
         click: () => {
           cancelPendingReadReceiptsForConversation(conversation);
