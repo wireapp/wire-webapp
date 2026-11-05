@@ -581,9 +581,16 @@ export class ReconnectingWebsocket {
    * it considers the connection healthy without sending a ping, as message processing
    * indicates the connection is working properly.
    *
-   * If the WebSocket is idle, it sends a ping and expects a pong within the timeout.
+   * If the WebSocket is idle and its protocol supports application pings, it sends
+   * a ping and expects a pong within the timeout.
    * This approach prevents false failures during high-load scenarios where pong responses
    * get queued behind many other messages.
+   *
+   * Async /events does not support these pings. For that protocol an OPEN result
+   * only confirms local socket state, not end-to-end liveness. An idle connection
+   * may legitimately receive no notifications, so silence is not a failure signal.
+   * Recovery still relies on close/error events, wake detection and the connecting
+   * watchdog; callers must not interpret this probe as a server acknowledgement.
    *
    * Does not close or reconnect the socket; callers can decide how to react to failures.
    */
