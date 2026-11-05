@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, useEffect, useRef, useState, type FunctionComponent} from 'react';
+import {ChangeEvent, type FunctionComponent, useEffect, useRef, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined} from '@sindresorhus/is';
@@ -37,6 +37,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
+import {CallSecurityLine} from './callSecurityLine/callSecurityLine';
 import {Duration} from './Duration';
 import {
   classifiedBarStyles,
@@ -54,6 +55,8 @@ import {VideoBackgroundPerformancePanel} from './VideoControls/videoBackgroundPe
 import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
 import {VideoControls} from './VideoControls/VideoControls';
 
+import {Config} from '../../Config';
+import {callSecurityLineFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useActiveWindowMatchMedia} from '../../hooks/useActiveWindowMatchMedia';
 import {useToggleState} from '../../hooks/useToggleState';
 import {useApplicationContext} from '../../page/rootProvider';
@@ -66,8 +69,8 @@ import type {Conversation} from '../../repositories/entity/Conversation';
 import {detectCapabilities} from '../../repositories/media/backgroundEffects';
 import {MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler';
 import {BackgroundEffectsQuality, useBackgroundEffectsStore} from '../../repositories/media/useBackgroundEffectsStore';
-import {BUILTIN_BACKGROUNDS} from '../../repositories/media/VideoBackgroundEffects';
 import type {BackgroundEffectSelection} from '../../repositories/media/VideoBackgroundEffects';
+import {BUILTIN_BACKGROUNDS} from '../../repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
 import {TeamState} from '../../repositories/team/TeamState';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
@@ -145,7 +148,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: FullscreenVideoCallProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const selfParticipant = call.getSelfParticipant();
   const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesCamera']);
@@ -166,6 +169,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
     startedAt,
     participants,
     handRaisedParticipants,
+    state: callConnectionState,
   } = useKoSubscribableChildren(call, [
     'activeSpeakers',
     'currentPage',
@@ -173,9 +177,13 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
     'startedAt',
     'participants',
     'handRaisedParticipants',
+    'state',
   ]);
   const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
+  const {BRAND_NAME: brandName, URL: configUrls} = Config.getConfig();
+  const isCallSecurityLineEnabled = isFeatureToggleEnabled(callSecurityLineFeatureToggleName);
+  const callEncryptionSupportUrl = configUrls.SUPPORT.CALL_ENCRYPTION;
 
   const {selfUser, roles} = useKoSubscribableChildren(conversation, ['selfUser', 'roles']);
   const {emojis, viewMode, detachedWindow, isScreenSharingSourceFromDetachedWindow} = useKoSubscribableChildren(
@@ -359,7 +367,17 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
               <h2 className="video-remote-title">{conversationName}</h2>
 
               <div data-uie-name="video-timer" className="video-timer label-xs">
-                <Duration startedAt={startedAt} />
+                {isCallSecurityLineEnabled ? (
+                  <CallSecurityLine
+                    callConnectionState={callConnectionState}
+                    participants={participants}
+                    startedAt={startedAt}
+                    brandName={brandName}
+                    supportUrl={callEncryptionSupportUrl}
+                  />
+                ) : (
+                  <Duration startedAt={startedAt} />
+                )}
               </div>
             </div>
           </div>
