@@ -33,6 +33,9 @@ export const EventName = {
     PRESS_SPACE_TO_UNMUTE: 'calling.press_space_to_unmute',
   },
   CONTRIBUTED: 'contributed',
+  CONNECTIVITY: {
+    RETRYING_FOR_ONE_MINUTE: 'connectivity.retrying_for_one_minute',
+  },
   E2EE: {
     FAILED_MESSAGE_DECRYPTION: 'e2ee.failed_message_decryption',
   },
