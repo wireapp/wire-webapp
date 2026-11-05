@@ -64,6 +64,11 @@ type WebSocketConnectTrigger =
   | 'heartbeat-closed'
   | 'heartbeat-unhealthy';
 
+type ReadinessClock = {
+  readonly setTimeout: (callback: () => void, delayMilliseconds: number) => number;
+  readonly clearTimeout: (identifier: number) => void;
+};
+
 function getNotificationHandlingStateName(notificationHandlingState: NOTIFICATION_HANDLING_STATE): string {
   return notificationHandlingState.split('.').at(-1) ?? notificationHandlingState;
 }
@@ -82,6 +87,7 @@ export class EventRepository {
     return {
       E_CALL_EVENT_LIFETIME: TIME_IN_MILLIS.SECOND * 30,
       HEARTBEAT_INTERVAL: TIME_IN_MILLIS.SECOND * 30,
+      INITIAL_CONNECTION_TIMEOUT: TIME_IN_MILLIS.MINUTE * 5,
       IGNORED_ERRORS: [
         CryptographyError.TYPE.IGNORED_ASSET,
         CryptographyError.TYPE.IGNORED_PREVIEW,
@@ -113,6 +119,7 @@ export class EventRepository {
     readonly notificationService: NotificationService,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userState = container.resolve(UserState),
+    private readonly readinessClock: ReadinessClock = window,
   ) {
     this.logger = getLogger('EventRepository');
 
@@ -216,14 +223,62 @@ export class EventRepository {
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     dryRun = false,
   ): Promise<void> {
-    await this.handleTimeDrift();
+    this.disconnectWebSocket();
 
     const cleanupHandlers: Array<() => void> = [];
+    const connectionLifetime = new AbortController();
+    let disposed = false;
+    let readinessSettled = false;
+    let resolveReadiness: () => void = () => {};
+    let rejectReadiness: (error: Error) => void = () => {};
+    const readiness = new Promise<void>((resolve, reject) => {
+      resolveReadiness = resolve;
+      rejectReadiness = reject;
+    });
+    const readinessTimeout = this.readinessClock.setTimeout(() => {
+      failInitialization(new Error('WebSocket notification synchronization timed out'));
+    }, EventRepository.CONFIG.INITIAL_CONNECTION_TIMEOUT);
+    const readinessClock = this.readinessClock;
     let actualDisconnect: () => void = () => {};
     let connectionInProgress = false;
     let healthCheckInProgress = false;
     let currentConnectionState: ConnectionState | undefined;
     let connectCycleId = 0;
+
+    function completeInitialization(): void {
+      if (readinessSettled === false) {
+        readinessSettled = true;
+        readinessClock.clearTimeout(readinessTimeout);
+        resolveReadiness();
+      }
+    }
+
+    function disconnect(): void {
+      if (disposed === true) {
+        return;
+      }
+      disposed = true;
+      connectionLifetime.abort();
+      cleanupHandlers.forEach(cleanup => {
+        cleanup();
+      });
+      actualDisconnect();
+      if (readinessSettled === false) {
+        readinessSettled = true;
+        readinessClock.clearTimeout(readinessTimeout);
+        rejectReadiness(new Error('WebSocket initialization was cancelled'));
+      }
+    }
+
+    function failInitialization(error: Error): void {
+      if (readinessSettled === false) {
+        readinessSettled = true;
+        readinessClock.clearTimeout(readinessTimeout);
+        rejectReadiness(error);
+        disconnect();
+      }
+    }
+    this.disconnectWebSocket = disconnect;
 
     const notificationHandlingState = this.notificationHandlingState;
     function getBrowserConnectionContext(): string {
@@ -231,7 +286,7 @@ export class EventRepository {
     }
 
     const connect = async (trigger: WebSocketConnectTrigger) => {
-      if (connectionInProgress) {
+      if (disposed === true || connectionInProgress) {
         this.logger.debug(
           `[WebSocketLifecycle] layer=event-repository event=connect-skip trigger=${trigger} ${getBrowserConnectionContext()} reason=connection-in-progress`,
         );
@@ -245,13 +300,18 @@ export class EventRepository {
       );
       connectionInProgress = true;
       actualDisconnect();
+      let setupCompleted = false;
       try {
-        actualDisconnect = await account.listen({
+        const disconnectAttempt = await account.listen({
           useLegacy,
+          signal: connectionLifetime.signal,
           onConnectionStateChanged: (
             connectionState: ConnectionState,
             connectionContext: WebSocketConnectionContext | undefined,
           ) => {
+            if (disposed === true || currentConnectCycleId !== connectCycleId) {
+              return;
+            }
             currentConnectionState = connectionState;
             this.updateConnectivitityStatus(connectionState);
             const lifecycleConnectionContext =
@@ -261,20 +321,39 @@ export class EventRepository {
             this.logger.info(
               `[WebSocketLifecycle] layer=event-repository event=connection-state-change connectCycleId=${currentConnectCycleId} state=${connectionState.toUpperCase()}${lifecycleConnectionContext}`,
             );
+            if (connectionState === ConnectionState.CLOSED) {
+              failInitialization(new Error('WebSocket closed before notification synchronization completed'));
+            } else if (connectionState === ConnectionState.LIVE && setupCompleted === true) {
+              completeInitialization();
+            }
           },
           onEvent: this.handleIncomingEvent,
           onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
           onNotificationStreamProgress: onNotificationStreamProgress,
           dryRun,
         });
+        if (connectionLifetime.signal.aborted === true || currentConnectCycleId !== connectCycleId) {
+          disconnectAttempt();
+          return;
+        }
+        actualDisconnect = disconnectAttempt;
+        setupCompleted = true;
+        if (currentConnectionState === ConnectionState.LIVE) {
+          completeInitialization();
+        }
         this.logger.info(
           `[WebSocketLifecycle] layer=event-repository event=connect-setup-success trigger=${trigger} connectCycleId=${currentConnectCycleId}`,
         );
       } catch {
         actualDisconnect = () => {};
+        currentConnectionState = ConnectionState.CLOSED;
+        if (disposed === false) {
+          this.updateConnectivitityStatus(ConnectionState.CLOSED);
+        }
         this.logger.warn(
           `[WebSocketLifecycle] layer=event-repository event=connect-failure trigger=${trigger} connectCycleId=${currentConnectCycleId}`,
         );
+        failInitialization(new Error('WebSocket initialization failed'));
       } finally {
         connectionInProgress = false;
       }
@@ -290,6 +369,9 @@ export class EventRepository {
     };
 
     const verifyConnectionHealthAndReconnect = async (trigger: 'focus' | 'visibility' | 'heartbeat') => {
+      if (disposed === true) {
+        return;
+      }
       if (!navigator.onLine) {
         this.logger.debug(
           `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=offline ${getBrowserConnectionContext()}`,
@@ -330,6 +412,7 @@ export class EventRepository {
       }
 
       healthCheckInProgress = true;
+      const checkedConnectCycleId = connectCycleId;
       try {
         this.logger.debug(
           `[WebSocketLifecycle] layer=event-repository event=health-check-start trigger=${trigger} connectCycleId=${connectCycleId}`,
@@ -349,7 +432,7 @@ export class EventRepository {
             `[WebSocketLifecycle] layer=event-repository event=health-check-result trigger=${trigger} connectCycleId=${connectCycleId} healthy=false`,
           );
         }
-        if (!isHealthy) {
+        if (!isHealthy && disposed === false && checkedConnectCycleId === connectCycleId) {
           const reconnectTrigger: WebSocketConnectTrigger = trigger === 'heartbeat' ? 'heartbeat-unhealthy' : trigger;
           this.logger.info(
             `[WebSocketLifecycle] layer=event-repository event=reconnect-requested trigger=${reconnectTrigger} connectCycleId=${connectCycleId + 1}`,
@@ -363,6 +446,7 @@ export class EventRepository {
 
     const handleOffline = () => {
       this.logger.warn('Internet connection lost');
+      failInitialization(new Error('WebSocket initialization interrupted by an offline connection'));
       actualDisconnect();
       Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
     };
@@ -412,14 +496,18 @@ export class EventRepository {
       window.clearInterval(heartbeatInterval);
     });
 
-    // Connect first to get the actual disconnect function
-    await connect('initial');
+    const repository = this;
+    async function initialize(): Promise<void> {
+      try {
+        await repository.handleTimeDrift();
+        await connect('initial');
+      } catch {
+        failInitialization(new Error('WebSocket initialization failed'));
+      }
+    }
+    void initialize();
 
-    // Then override disconnect to include cleanup
-    this.disconnectWebSocket = () => {
-      cleanupHandlers.forEach(cleanup => cleanup());
-      actualDisconnect();
-    };
+    return readiness;
   }
 
   /**

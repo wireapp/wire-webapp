@@ -30,15 +30,18 @@ type ListenOptions = Parameters<Account['listen']>[0];
 function noop(): void {}
 
 async function flushConnectionCallbacks(): Promise<void> {
-  await new Promise<void>(resolve => {
-    setTimeout(resolve, 0);
-  });
+  for (let turn = 0; turn < 20; turn += 1) {
+    await Promise.resolve();
+  }
 }
 
 describe('WebSocket recovery orchestration', () => {
   let repository: EventRepository;
   let connectionStateChanged: ((state: ConnectionState, context?: WebSocketConnectionContext) => void) | undefined;
   let heartbeat: (() => void) | undefined;
+  let automaticallySynchronize = true;
+  let readinessDeadline: (() => void) | undefined;
+  const clearReadinessTimeout = jest.fn();
   const disconnect = jest.fn();
   const listen = jest.fn<Promise<() => void>, [ListenOptions]>();
   const isWebsocketHealthy = jest.fn<Promise<boolean>, []>();
@@ -47,9 +50,13 @@ describe('WebSocket recovery orchestration', () => {
   beforeEach(() => {
     connectionStateChanged = undefined;
     heartbeat = undefined;
+    automaticallySynchronize = true;
     disconnect.mockReset();
     listen.mockReset().mockImplementation(async options => {
       connectionStateChanged = options.onConnectionStateChanged;
+      if (automaticallySynchronize === true) {
+        connectionStateChanged?.(ConnectionState.LIVE);
+      }
 
       return disconnect;
     });
@@ -73,6 +80,10 @@ describe('WebSocket recovery orchestration', () => {
       {getServerTime: jest.fn().mockResolvedValue('2026-01-01T00:00:00Z')} as unknown as RepositoryInputs[1],
       {computeTimeOffset: noop} as unknown as RepositoryInputs[2],
       {} as RepositoryInputs[3],
+      {
+        setTimeout(callback): number { readinessDeadline = callback; return 456; },
+        clearTimeout: clearReadinessTimeout,
+      },
     );
   });
 
@@ -98,6 +109,7 @@ describe('WebSocket recovery orchestration', () => {
   async function connect(): Promise<void> {
     await repository.connectWebSocket(account, true, noop);
     setConnectionState(ConnectionState.LIVE);
+    automaticallySynchronize = false;
     listen.mockClear();
   }
 
@@ -231,10 +243,95 @@ describe('WebSocket recovery orchestration', () => {
   it('logs setup failures without serializing their sensitive contents', async () => {
     const warning = jest.spyOn(repository.logger, 'warn');
     listen.mockRejectedValue(new Error('private-notification Cookie: secret-cookie'));
-    await repository.connectWebSocket(account, true, noop);
+    await expect(repository.connectWebSocket(account, true, noop)).rejects.toThrow('WebSocket initialization failed');
 
     expect(warning).toHaveBeenCalledWith(expect.stringContaining('event=connect-failure trigger=initial connectCycleId=1'));
     expect(JSON.stringify(warning.mock.calls)).not.toMatch(/private-notification|secret-cookie/);
+  });
+
+  it.each([true, false])('waits for notification synchronization with useLegacy=%s', async useLegacy => {
+    listen.mockImplementation(async options => {
+      connectionStateChanged = options.onConnectionStateChanged;
+      connectionStateChanged?.(ConnectionState.PROCESSING_NOTIFICATIONS);
+      return disconnect;
+    });
+    let ready = false;
+    async function initialize(): Promise<void> {
+      await repository.connectWebSocket(account, useLegacy, noop);
+      ready = true;
+    }
+    const initialization = initialize();
+    await flushConnectionCallbacks();
+    expect(ready).toBe(false);
+    setConnectionState(ConnectionState.LIVE);
+    await initialization;
+    expect(ready).toBe(true);
+    expect(clearReadinessTimeout).toHaveBeenCalledWith(456);
+  });
+
+  it('rejects if the connection closes before synchronization completes', async () => {
+    listen.mockImplementation(async options => {
+      connectionStateChanged = options.onConnectionStateChanged;
+      return disconnect;
+    });
+    const initialization = repository.connectWebSocket(account, true, noop);
+    const rejected = expect(initialization).rejects.toThrow('closed before notification synchronization');
+    await flushConnectionCallbacks();
+    setConnectionState(ConnectionState.CLOSED);
+    await rejected;
+    expect(disconnect).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects a stalled setup at the injected readiness deadline and ignores late LIVE', async () => {
+    listen.mockImplementation(async options => {
+      connectionStateChanged = options.onConnectionStateChanged;
+      return new Promise<() => void>(() => {});
+    });
+    const initialization = repository.connectWebSocket(account, false, noop);
+    const rejected = expect(initialization).rejects.toThrow('timed out');
+    await flushConnectionCallbacks();
+    readinessDeadline?.();
+    await rejected;
+    setConnectionState(ConnectionState.LIVE);
+    expect(repository.notificationHandlingState()).not.toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+    expect(listen.mock.calls[0]?.[0].signal?.aborted).toBe(true);
+  });
+
+  it('cancels overlapping initialization and ignores obsolete connection callbacks', async () => {
+    const callbacks: ListenOptions[] = [];
+    listen.mockImplementation(async options => {
+      callbacks.push(options);
+      return disconnect;
+    });
+    const first = repository.connectWebSocket(account, true, noop);
+    const firstRejected = expect(first).rejects.toThrow('cancelled');
+    await flushConnectionCallbacks();
+    let secondReady = false;
+    async function initializeSecond(): Promise<void> {
+      await repository.connectWebSocket(account, false, noop);
+      secondReady = true;
+    }
+    const second = initializeSecond();
+    await firstRejected;
+    await flushConnectionCallbacks();
+    callbacks[0]?.onConnectionStateChanged?.(ConnectionState.LIVE);
+    await flushConnectionCallbacks();
+    expect(secondReady).toBe(false);
+    expect(callbacks[0]?.signal?.aborted).toBe(true);
+    callbacks[1]?.onConnectionStateChanged?.(ConnectionState.LIVE);
+    await second;
+    expect(secondReady).toBe(true);
+  });
+
+  it('does not reconnect after a pending health check completes following disconnect', async () => {
+    await connect();
+    let finishProbe: (healthy: boolean) => void = noop;
+    isWebsocketHealthy.mockReturnValue(new Promise(resolve => { finishProbe = resolve; }));
+    runHeartbeat();
+    repository.disconnectWebSocket();
+    finishProbe(false);
+    await flushConnectionCallbacks();
+    expect(listen).not.toHaveBeenCalled();
   });
 
 });

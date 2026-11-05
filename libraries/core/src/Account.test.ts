@@ -292,6 +292,7 @@ describe('Account', () => {
   describe('Websocket connection', () => {
     let dependencies: {account: Account; apiClient: APIClient};
     let server: WS;
+    let synchronizeOnConnect = true;
 
     const mockNotifications = (size: number) => {
       const notifications = Array.from(new Array(size)).map(() => ({
@@ -322,8 +323,19 @@ describe('Account', () => {
 
     beforeEach(async () => {
       server = new WS(websocketServerAddress); // isolate per test
+      synchronizeOnConnect = true;
 
       dependencies = await createAccount();
+      dependencies.apiClient.transport.http.accessTokenStore.markerToken = markerId;
+      server.on('connection', socket => {
+        if (dependencies.apiClient.transport.ws['useLegacySocket'] === true || synchronizeOnConnect === false) {
+          return;
+        }
+        socket.send(JSON.stringify({
+          type: ConsumableEvent.SYNCHRONIZATION,
+          data: {marker_id: dependencies.apiClient.transport.http.accessTokenStore.markerToken, delivery_tag: 1},
+        }));
+      });
       const {account} = dependencies;
       await account.login({
         clientType: ClientType.TEMPORARY,
@@ -352,6 +364,90 @@ describe('Account', () => {
     });
 
     describe('listen', () => {
+      it('preserves external listeners across repeated capability failures and a successful connection', async () => {
+        const {account, apiClient} = dependencies;
+        const webSocket = apiClient.transport.ws;
+        const capabilityUpdate = jest.spyOn(account.service!.client, 'putClientCapabilities');
+        const connect = jest.spyOn(apiClient, 'connect').mockReturnValue(webSocket);
+        const externalMessage = jest.fn();
+        const externalRetry = jest.fn();
+        webSocket.on(WebSocketClient.TOPIC.ON_MESSAGE, externalMessage);
+        webSocket.on(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, externalRetry);
+        const stateListenerCount = webSocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE);
+        capabilityUpdate.mockRejectedValue(new Error('Capability update failed'));
+        for (let attempt = 0; attempt < 3; attempt += 1) {
+          await expect(account.listen({useLegacy: true})).rejects.toThrow('Capability update failed');
+          expect(webSocket.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(1);
+          expect(webSocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE)).toBe(stateListenerCount);
+        }
+        expect(connect).not.toHaveBeenCalled();
+        capabilityUpdate.mockResolvedValue(undefined);
+        const disconnect = await account.listen({useLegacy: true});
+        expect(webSocket.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(2);
+        disconnect();
+        webSocket.emit(WebSocketClient.TOPIC.ON_MESSAGE, {id: 'external', payload: []});
+        webSocket.emit(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, {retryCount: 1, retryDurationInMilliseconds: 60_000});
+        expect(externalMessage).toHaveBeenCalledTimes(1);
+        expect(externalRetry).toHaveBeenCalledTimes(1);
+        expect(webSocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE)).toBe(stateListenerCount);
+      });
+
+      it('does not connect after capability setup is cancelled', async () => {
+        const {account, apiClient} = dependencies;
+        let finishUpdate: () => void = () => {};
+        jest.spyOn(account.service!.client, 'putClientCapabilities').mockReturnValue(new Promise(resolve => { finishUpdate = resolve; }));
+        const connect = jest.spyOn(apiClient, 'connect');
+        const stateChanged = jest.fn();
+        const lifetime = new AbortController();
+        const listening = account.listen({useLegacy: true, signal: lifetime.signal, onConnectionStateChanged: stateChanged});
+        lifetime.abort();
+        finishUpdate();
+        await expect(listening).rejects.toThrow();
+        expect(connect).not.toHaveBeenCalled();
+        expect(stateChanged).not.toHaveBeenCalled();
+        expect(apiClient.transport.ws.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(0);
+      });
+
+      it('cleans up if final legacy migration or transport setup fails', async () => {
+        const {account, apiClient} = dependencies;
+        jest.spyOn(account.service!.client, 'putClientCapabilities').mockResolvedValue(undefined);
+        jest.spyOn(account.service!.notification, 'legacyProcessNotificationStream').mockRejectedValue(new Error('Migration failed'));
+        await expect(account.listen({useLegacy: false})).rejects.toThrow('Migration failed');
+        expect(apiClient.transport.ws.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(0);
+        jest.spyOn(apiClient, 'connect').mockImplementation(() => { throw new Error('Transport setup failed'); });
+        await expect(account.listen({useLegacy: true})).rejects.toThrow('Transport setup failed');
+        expect(apiClient.transport.ws.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(0);
+      });
+
+      it('does not report LIVE for the pre-socket legacy migration', async () => {
+        const {account, apiClient} = dependencies;
+        jest.spyOn(account.service!.client, 'putClientCapabilities').mockResolvedValue(undefined);
+        jest.spyOn(account.service!.notification, 'legacyProcessNotificationStream').mockResolvedValue({total: 0, success: 0, error: 0});
+        jest.spyOn(apiClient, 'connect').mockReturnValue(apiClient.transport.ws);
+        const stateChanged = jest.fn();
+        const disconnect = await account.listen({useLegacy: false, onConnectionStateChanged: stateChanged});
+        expect(stateChanged).not.toHaveBeenCalledWith(ConnectionState.LIVE);
+        disconnect();
+      });
+
+      it('ignores aborted legacy catch-up even when fetching succeeds', async () => {
+        const {account, apiClient} = dependencies;
+        const lifetime = new AbortController();
+        jest.spyOn(account.service!.notification, 'legacyProcessNotificationStream').mockImplementation(async () => {
+          lifetime.abort();
+          return {total: 0, success: 0, error: 0};
+        });
+        const stateChanged = jest.fn();
+        const unlock = jest.spyOn(apiClient.transport.ws, 'unlock');
+        const processStream = account['createLegacyNotificationStreamProcessor']({
+          handleLegacyNotification: async () => {},
+          handleMissedNotifications: async () => {},
+          onConnectionStateChanged: stateChanged,
+        });
+        await expect(processStream(lifetime)).rejects.toThrow();
+        expect(stateChanged).not.toHaveBeenCalledWith(ConnectionState.LIVE);
+        expect(unlock).not.toHaveBeenCalled();
+      });
       it('acknowledges an async notification with an empty payload', async () => {
         const notification: ConsumableNotificationEvent = {
           type: ConsumableEvent.EVENT,
@@ -605,6 +701,7 @@ describe('Account', () => {
       });
 
       it('does stop processing messages if websocket connection is aborted', async () => {
+        synchronizeOnConnect = false;
         jest
           .spyOn(dependencies.account, 'getClientCapabilities')
           .mockReturnValue([ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT, ClientCapability.CONSUMABLE_NOTIFICATIONS]);
