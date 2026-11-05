@@ -462,6 +462,21 @@ describe('ReconnectingWebsocket', () => {
       expect(RWS['socket']).toBe(secondSocket);
     });
 
+    it('rejects a delayed URL callback from a disconnected wrapper before authentication starts', async () => {
+      const socket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+      let resolveUrl: (() => Promise<string>) | undefined;
+      const authenticate = jest.fn().mockResolvedValue('wss://example.invalid');
+      const transport = createRWS(authenticate, {
+        ...defaultReconnectingWebsocketTestOptions,
+        websocketFactory(provider) { resolveUrl = provider; return socket; },
+      });
+      transport.connect();
+      transport.disconnect();
+      if (resolveUrl === undefined) { throw new Error('Expected a URL provider'); }
+      await expect(resolveUrl()).rejects.toMatchObject({name: 'AbortError'});
+      expect(authenticate).not.toHaveBeenCalled();
+    });
+
     it('does not arm a watchdog from a reconnect flow whose socket was replaced while waiting for the reconnect URL', async () => {
       const deterministicWallClock = createDeterministicTimeoutWallClock(0);
       const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
@@ -490,7 +505,7 @@ describe('ReconnectingWebsocket', () => {
       expect(RWS['connectingTimeoutId']).toBeUndefined();
 
       resolveReconnectUrl('ws://example.invalid');
-      await expect(reconnectPromise).resolves.toBe('ws://example.invalid');
+      await expect(reconnectPromise).rejects.toMatchObject({name: 'AbortError'});
 
       expect(RWS['connectingTimeoutId']).toBeUndefined();
 

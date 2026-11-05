@@ -364,6 +364,43 @@ describe('Account', () => {
     });
 
     describe('listen', () => {
+      it('keeps the active marker and reaches LIVE when authenticated attempts finish in reverse order', async () => {
+        const {account, apiClient} = dependencies;
+        const webSocket = apiClient.transport.ws;
+        jest.spyOn(webSocket, 'buildWebSocketUrl').mockRestore();
+        webSocket.useAsyncNotificationsSocket();
+        jest.spyOn(apiClient.transport.http, 'hasValidAccessToken').mockReturnValue(true);
+        let finishFirst: () => void = () => {};
+        let finishSecond: () => void = () => {};
+        const firstPreflight = new Promise<void>(resolve => { finishFirst = resolve; });
+        const secondPreflight = new Promise<void>(resolve => { finishSecond = resolve; });
+        const sendRequest = jest.spyOn(apiClient.transport.http, 'sendRequest')
+          .mockImplementationOnce(async () => { await firstPreflight; return {data: {}} as never; })
+          .mockImplementationOnce(async () => { await secondPreflight; return {data: {}} as never; });
+        const transport = webSocket['socket'];
+        const first = transport['internalOnReconnect']();
+        const firstCancelled = expect(first).rejects.toMatchObject({name: 'AbortError'});
+        await Promise.resolve();
+        const second = transport['internalOnReconnect']();
+        await Promise.resolve();
+        expect(sendRequest).toHaveBeenCalledTimes(2);
+        finishSecond();
+        const activeUrl = new URL(await second);
+        const activeMarker = activeUrl.searchParams.get('sync_marker');
+        expect(activeMarker).toEqual(expect.any(String));
+        finishFirst();
+        await firstCancelled;
+        await Promise.resolve();
+        expect(apiClient.transport.http.accessTokenStore.markerToken).toBe(activeMarker);
+        if (activeMarker === null) { throw new Error('Expected active synchronization marker'); }
+        const stateChanged = jest.fn();
+        await account['handleSynchronizationNotification']({
+          notification: {type: ConsumableEvent.SYNCHRONIZATION, data: {marker_id: activeMarker, delivery_tag: 1}},
+          onConnectionStateChanged: stateChanged,
+        });
+        expect(stateChanged).toHaveBeenCalledWith(ConnectionState.LIVE);
+        webSocket.disconnect();
+      });
       it('preserves external listeners across repeated capability failures and a successful connection', async () => {
         const {account, apiClient} = dependencies;
         const webSocket = apiClient.transport.ws;

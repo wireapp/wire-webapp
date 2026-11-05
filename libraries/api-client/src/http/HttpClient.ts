@@ -52,6 +52,12 @@ type SendRequest = {
   abortController?: AbortController;
 };
 
+type AccessTokenRequestOptions = {
+  readonly expiredAccessToken?: AccessTokenData;
+  readonly clientId?: string;
+  readonly signal?: AbortSignal;
+};
+
 export interface HttpClient {
   on(event: TOPIC.ON_CONNECTION_STATE_CHANGE, listener: (state: ConnectionState) => void): this;
 
@@ -164,7 +170,7 @@ export class HttpClient extends EventEmitter {
     try {
       const response = await this.client.request<T>({
         ...config,
-        signal: abortController?.signal,
+        signal: abortController?.signal ?? config.signal,
         // We want to prefix all urls, except for the "access" endpoint
         url: config.url?.startsWith(AuthAPI.URL.ACCESS) ? config.url : `${this.versionPrefix}${config.url}`,
         maxBodyLength: FILE_SIZE_100_MB,
@@ -245,13 +251,15 @@ export class HttpClient extends EventEmitter {
     return false;
   }
 
-  public async refreshAccessToken(): Promise<AccessTokenData> {
+  public async refreshAccessToken(signal?: AbortSignal): Promise<AccessTokenData> {
+    signal?.throwIfAborted();
     let expiredAccessToken: AccessTokenData | undefined;
     if (this.accessTokenStore.accessTokenData?.access_token) {
       expiredAccessToken = this.accessTokenStore.accessTokenData;
     }
 
-    const accessToken = await this.postAccess(expiredAccessToken);
+    const accessToken = await this.requestAccessToken({expiredAccessToken, signal});
+    signal?.throwIfAborted();
     this.logger.info(
       `Received updated access token. It will expire in "${accessToken.expires_in}" seconds.`,
       ObfuscationUtil.obfuscateAccessToken(accessToken),
@@ -260,7 +268,14 @@ export class HttpClient extends EventEmitter {
   }
 
   public async postAccess(expiredAccessToken?: AccessTokenData, clientId?: string): Promise<AccessTokenData> {
+    return this.requestAccessToken({expiredAccessToken, clientId});
+  }
+
+  private async requestAccessToken(options: AccessTokenRequestOptions): Promise<AccessTokenData> {
+    const {expiredAccessToken, clientId, signal} = options;
     const config: AxiosRequestConfig = {
+      signal,
+      ...(signal === undefined ? {} : {requestOptions: {skipLogout: true}}),
       headers: {},
       method: 'post',
       url: `${AuthAPI.URL.ACCESS}`,

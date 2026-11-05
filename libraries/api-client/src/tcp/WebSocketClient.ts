@@ -58,6 +58,29 @@ const accessTokenRefreshRetryMaximumDelayInMilliseconds = 10_000;
 const accessTokenRefreshRetryBackoffFactor = 2;
 const firstRetryAttemptOffset = 1;
 
+async function waitForReconnectOperation<Value>(operation: Promise<Value>, signal: AbortSignal): Promise<Value> {
+  signal.throwIfAborted();
+
+  return new Promise<Value>((resolve, reject) => {
+    function abort(): void {
+      reject(signal.reason);
+    }
+    signal.addEventListener('abort', abort, {once: true});
+    async function complete(): Promise<void> {
+      try {
+        const value = await operation;
+        signal.throwIfAborted();
+        resolve(value);
+      } catch (error: unknown) {
+        reject(error);
+      } finally {
+        signal.removeEventListener('abort', abort);
+      }
+    }
+    void complete();
+  });
+}
+
 export interface WebSocketClient {
   on(event: TOPIC.ON_ERROR, listener: (error: Error | ErrorEvent) => void): this;
   on(event: TOPIC.ON_INVALID_TOKEN, listener: (error: InvalidTokenError | MissingCookieError) => void): this;
@@ -75,6 +98,9 @@ export type WebSocketClientOptions = {
 export class WebSocketClient extends EventEmitter {
   private clientId?: string;
   private accessTokenRefreshPromise?: Promise<void>;
+  private accessTokenRefreshLifetime?: AbortController;
+  private reconnectLifetime = new AbortController();
+  private readonly refreshConsumers = new Set<AbortSignal>();
   private readonly baseUrl: string;
   private readonly logger: logdown.Logger;
   private readonly socket: ReconnectingWebsocket;
@@ -144,10 +170,13 @@ export class WebSocketClient extends EventEmitter {
   };
 
   private readonly onError = async (error: ErrorEvent, reconnectContext: WebSocketReconnectContext) => {
+    if (this.reconnectLifetime.signal.aborted === true) {
+      return;
+    }
     this.onStateChange(this.socket.getState());
     this.emit(WebSocketClient.TOPIC.ON_ERROR, error);
     try {
-      await this.refreshAccessToken();
+      await this.refreshAccessToken(this.reconnectLifetime.signal);
     } catch (refreshError: unknown) {
       this.logger.warn(
         `[WebSocketLifecycle] event=token-refresh-failure source=socket-error attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} fatal=${this.isInvalidSessionError(refreshError)}`,
@@ -162,11 +191,26 @@ export class WebSocketClient extends EventEmitter {
       reconnectAttemptCount: 0,
       reconnectSequenceRetryCount: 0,
     },
-  ) => {
-    await this.waitForValidAccessTokenBeforeReconnect(reconnectContext);
-    await this.verifyAuthenticatedSessionBeforeReconnect(reconnectContext);
+    signal?: AbortSignal,
+  ): Promise<string> => {
+    this.reconnectLifetime.abort();
+    const lifetime = new AbortController();
+    this.reconnectLifetime = lifetime;
+    function abort(): void {
+      lifetime.abort();
+    }
+    signal?.addEventListener('abort', abort, {once: true});
+    try {
+      signal?.throwIfAborted();
+      await this.waitForValidAccessTokenBeforeReconnect(reconnectContext, lifetime.signal);
+      await this.verifyAuthenticatedSessionBeforeReconnect(reconnectContext, lifetime);
+      // URL construction creates the marker: cancellation must be checked before this side effect.
+      lifetime.signal.throwIfAborted();
 
-    return this.buildWebSocketUrl(reconnectContext);
+      return this.buildWebSocketUrl(reconnectContext);
+    } finally {
+      signal?.removeEventListener('abort', abort);
+    }
   };
 
   private readonly onOpen = () => {
@@ -215,17 +259,25 @@ export class WebSocketClient extends EventEmitter {
     return this;
   }
 
-  private async refreshAccessToken(): Promise<void> {
-    if (this.accessTokenRefreshPromise !== undefined) {
-      return this.accessTokenRefreshPromise;
+  private async refreshAccessToken(signal: AbortSignal): Promise<void> {
+    signal.throwIfAborted();
+    this.refreshConsumers.add(signal);
+    if (this.accessTokenRefreshPromise === undefined || this.accessTokenRefreshLifetime?.signal.aborted === true) {
+      const refreshLifetime = new AbortController();
+      this.accessTokenRefreshLifetime = refreshLifetime;
+      this.accessTokenRefreshPromise = this.refreshAccessTokenWithCleanup(refreshLifetime);
     }
-
-    this.accessTokenRefreshPromise = this.refreshAccessTokenWithCleanup();
-
-    return this.accessTokenRefreshPromise;
+    try {
+      await waitForReconnectOperation(this.accessTokenRefreshPromise, signal);
+    } finally {
+      this.refreshConsumers.delete(signal);
+    }
   }
 
-  private async waitForValidAccessTokenBeforeReconnect(reconnectContext: WebSocketReconnectContext): Promise<void> {
+  private async waitForValidAccessTokenBeforeReconnect(
+    reconnectContext: WebSocketReconnectContext,
+    signal: AbortSignal,
+  ): Promise<void> {
     let retryCount = 0;
     const tokenValidationStartTimestampInMilliseconds = this.wallClock.currentTimestampInMilliseconds;
     this.logger.debug(
@@ -233,14 +285,16 @@ export class WebSocketClient extends EventEmitter {
     );
 
     while (!this.client.hasValidAccessToken()) {
+      signal.throwIfAborted();
       const refreshStartTimestampInMilliseconds = this.wallClock.currentTimestampInMilliseconds;
       this.logger.debug(
         `[WebSocketLifecycle] event=token-refresh-start attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} retry=${retryCount}`,
       );
 
       try {
-        await this.refreshAccessToken();
+        await this.refreshAccessToken(signal);
       } catch (error: unknown) {
+        signal.throwIfAborted();
         if (this.isInvalidSessionError(error)) {
           this.logger.warn(
             `[WebSocketLifecycle] event=token-refresh-failure attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} fatal=true`,
@@ -253,7 +307,7 @@ export class WebSocketClient extends EventEmitter {
         this.logger.warn(
           `[WebSocketLifecycle] event=token-refresh-retry attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} retry=${retryCount} nextDelayMs=${nextRetryDelayInMilliseconds}`,
         );
-        await this.waitForNextAccessTokenRefreshRetry(nextRetryDelayInMilliseconds);
+        await this.waitForNextAccessTokenRefreshRetry(nextRetryDelayInMilliseconds, signal);
         continue;
       }
 
@@ -272,25 +326,41 @@ export class WebSocketClient extends EventEmitter {
       this.logger.warn(
         `[WebSocketLifecycle] event=token-refresh-retry attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} retry=${retryCount} nextDelayMs=${nextRetryDelayInMilliseconds} errorName=InvalidAccessTokenState errorMessage="Token remains invalid after refresh"`,
       );
-      await this.waitForNextAccessTokenRefreshRetry(nextRetryDelayInMilliseconds);
+      await this.waitForNextAccessTokenRefreshRetry(nextRetryDelayInMilliseconds, signal);
     }
     this.logger.info(
       `[WebSocketLifecycle] event=token-validation-success attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} durationMs=${this.wallClock.currentTimestampInMilliseconds - tokenValidationStartTimestampInMilliseconds}`,
     );
   }
 
-  private async verifyAuthenticatedSessionBeforeReconnect(reconnectContext: WebSocketReconnectContext): Promise<void> {
+  private async verifyAuthenticatedSessionBeforeReconnect(
+    reconnectContext: WebSocketReconnectContext,
+    lifetime: AbortController,
+  ): Promise<void> {
+    lifetime.signal.throwIfAborted();
     const preflightStartTimestampInMilliseconds = this.wallClock.currentTimestampInMilliseconds;
     this.logger.debug(
       `[WebSocketLifecycle] event=auth-preflight-start attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} endpoint=cookies`,
     );
 
     try {
-      await this.client.sendRequest({
-        method: 'get',
-        url: AuthAPI.URL.COOKIES,
-      });
+      await waitForReconnectOperation(
+        this.client.sendRequest(
+          {
+            method: 'get',
+            url: AuthAPI.URL.COOKIES,
+            requestOptions: {skipLogout: true},
+          },
+          false,
+          lifetime,
+        ),
+        lifetime.signal,
+      );
     } catch (error: unknown) {
+      lifetime.signal.throwIfAborted();
+      if (this.isInvalidSessionError(error)) {
+        this.emit(WebSocketClient.TOPIC.ON_INVALID_TOKEN, error);
+      }
       this.logger.warn(
         `[WebSocketLifecycle] event=auth-preflight-failure attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration} durationMs=${this.wallClock.currentTimestampInMilliseconds - preflightStartTimestampInMilliseconds}`,
       );
@@ -318,24 +388,45 @@ export class WebSocketClient extends EventEmitter {
     return Math.min(delayInMilliseconds, accessTokenRefreshRetryMaximumDelayInMilliseconds);
   }
 
-  private waitForNextAccessTokenRefreshRetry(delayInMilliseconds: number): Promise<void> {
-    return new Promise(resolve => {
-      this.wallClock.setTimeout(resolve, delayInMilliseconds);
+  private waitForNextAccessTokenRefreshRetry(delayInMilliseconds: number, signal: AbortSignal): Promise<void> {
+    signal.throwIfAborted();
+    const wallClock = this.wallClock;
+
+    return new Promise((resolve, reject) => {
+      function abort(): void {
+        wallClock.clearTimeout(timeoutIdentifier);
+        reject(signal.reason);
+      }
+      const timeoutIdentifier = wallClock.setTimeout(() => {
+        signal.removeEventListener('abort', abort);
+        resolve();
+      }, delayInMilliseconds);
+      signal.addEventListener('abort', abort, {once: true});
     });
   }
 
-  private async refreshAccessTokenWithCleanup(): Promise<void> {
+  private async refreshAccessTokenWithCleanup(lifetime: AbortController): Promise<void> {
     try {
-      await this.refreshAccessTokenOnce();
+      await this.refreshAccessTokenOnce(lifetime.signal);
     } finally {
-      this.accessTokenRefreshPromise = undefined;
+      if (this.accessTokenRefreshLifetime === lifetime) {
+        this.accessTokenRefreshPromise = undefined;
+        this.accessTokenRefreshLifetime = undefined;
+      }
     }
   }
 
-  private async refreshAccessTokenOnce(): Promise<void> {
+  private async refreshAccessTokenOnce(signal: AbortSignal): Promise<void> {
     try {
-      await this.client.refreshAccessToken();
+      await this.client.refreshAccessToken(signal);
     } catch (error: unknown) {
+      signal.throwIfAborted();
+      const hasActiveConsumer = Array.from(this.refreshConsumers).some(signal => {
+        return signal.aborted === false;
+      });
+      if (hasActiveConsumer === false) {
+        throw error;
+      }
       if (
         error instanceof InvalidTokenError ||
         error instanceof MissingCookieError ||
@@ -352,6 +443,9 @@ export class WebSocketClient extends EventEmitter {
   }
 
   public disconnect(reason?: string): void {
+    this.reconnectLifetime.abort();
+    this.accessTokenRefreshLifetime?.abort();
+    this.abortHandler?.abort();
     if (this.socket !== undefined) {
       this.socket.disconnect(reason);
     }

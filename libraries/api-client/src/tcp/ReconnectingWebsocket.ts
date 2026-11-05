@@ -93,7 +93,7 @@ type ReconnectingWebsocketOptions = {
   readonly backFromSleepHandler?: BackFromSleepHandler;
   readonly pingInterval?: number;
   readonly wallClock: ReconnectingWebsocketWallClock;
-  readonly websocketFactory?: () => ReconnectingWebsocketWrapper;
+  readonly websocketFactory?: (resolveUrl: () => Promise<string>) => ReconnectingWebsocketWrapper;
 };
 
 function getWebSocketStateName(state: WEBSOCKET_STATE): string {
@@ -223,11 +223,13 @@ export class ReconnectingWebsocket {
   private activeConnectionAttemptId?: number;
   private activeConnectionAttemptStartTimestamp?: number;
   private activeWrapperGeneration?: number;
+  private wrapperLifetime = new AbortController();
+  private reconnectLifetime?: AbortController;
 
   private readonly options: ReconnectingWebsocketOptions;
 
   constructor(
-    private readonly onReconnect: (context: WebSocketReconnectContext) => Promise<string>,
+    private readonly onReconnect: (context: WebSocketReconnectContext, signal: AbortSignal) => Promise<string>,
     options: Partial<ReconnectingWebsocketOptions> = {},
   ) {
     this.options = {...options, wallClock: options.wallClock ?? createWebSocketWallClock()};
@@ -324,6 +326,9 @@ export class ReconnectingWebsocket {
   };
 
   private readonly internalOnReconnect = async (): Promise<string> => {
+    this.reconnectLifetime?.abort();
+    const reconnectLifetime = new AbortController();
+    this.reconnectLifetime = reconnectLifetime;
     const nowInMilliseconds = this.options.wallClock.currentTimestampInMilliseconds;
     this.connectionAttemptId += 1;
     this.activeConnectionAttemptId = this.connectionAttemptId;
@@ -345,7 +350,8 @@ export class ReconnectingWebsocket {
     this.logger.debug(`[WebSocketLifecycle] event=url-resolution-start ${this.getLifecycleContext(reconnectContext)}`);
     let websocketUrl: string;
     try {
-      websocketUrl = await this.onReconnect(reconnectContext);
+      websocketUrl = await this.onReconnect(reconnectContext, reconnectLifetime.signal);
+      reconnectLifetime.signal.throwIfAborted();
     } catch (error: unknown) {
       const durationInMilliseconds = this.options.wallClock.currentTimestampInMilliseconds - nowInMilliseconds;
       this.logger.warn(
@@ -428,6 +434,7 @@ export class ReconnectingWebsocket {
    * opening the next, so we never leave two `/await` sessions alive from the app.
    */
   private reconnectInPlace(socket: ReconnectingWebsocketWrapper): void {
+    this.reconnectLifetime?.abort();
     try {
       socket.reconnect(CloseEventCode.NORMAL_CLOSURE);
     } catch {
@@ -528,6 +535,9 @@ export class ReconnectingWebsocket {
   }
 
   private createAndBindSocketWrapper(reason: string): void {
+    this.wrapperLifetime.abort();
+    this.reconnectLifetime?.abort();
+    this.wrapperLifetime = new AbortController();
     const nextSocket = this.getReconnectingWebsocket();
     this.wrapperGeneration += 1;
     this.activeWrapperGeneration = this.wrapperGeneration;
@@ -640,6 +650,8 @@ export class ReconnectingWebsocket {
   }
 
   public disconnect(reason = 'Closed by client'): void {
+    this.wrapperLifetime.abort();
+    this.reconnectLifetime?.abort();
     this.resetLongRunningRetrySequence();
     if (this.socket !== undefined) {
       this.logger.info(`[WebSocketLifecycle] event=disconnect-requested ${this.getActiveLifecycleContext()}`);
@@ -667,11 +679,18 @@ export class ReconnectingWebsocket {
   }
 
   private getReconnectingWebsocket(): ReconnectingWebsocketWrapper {
+    const wrapperSignal = this.wrapperLifetime.signal;
+    const transport = this;
+    async function resolveUrl(): Promise<string> {
+      wrapperSignal.throwIfAborted();
+
+      return transport.internalOnReconnect();
+    }
     if (this.options.websocketFactory !== undefined) {
-      return this.options.websocketFactory();
+      return this.options.websocketFactory(resolveUrl);
     }
 
-    return new PartySocketWebSocket(this.internalOnReconnect, undefined, ReconnectingWebsocket.RECONNECTING_OPTIONS);
+    return new PartySocketWebSocket(resolveUrl, undefined, ReconnectingWebsocket.RECONNECTING_OPTIONS);
   }
 
   private resolvePendingHealthChecks(isHealthy: boolean) {

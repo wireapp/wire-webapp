@@ -41,6 +41,31 @@ describe('HttpClient', () => {
   };
 
   describe('"_sendRequest"', () => {
+    it('passes refresh cancellation to HTTP and does not save a late token', async () => {
+      const store = new AccessTokenStore();
+      const client = new HttpClient(testConfig, store);
+      const lifetime = new AbortController();
+      let finishRequest: () => void = () => {};
+      const request = jest.spyOn(client.client, 'request').mockImplementation(async () => {
+        await new Promise<void>(resolve => { finishRequest = resolve; });
+        return {data: mockedAccessTokenStore.accessTokenData, headers: {}} as never;
+      });
+      const refresh = client.refreshAccessToken(lifetime.signal);
+      lifetime.abort();
+      finishRequest();
+      await expect(refresh).rejects.toMatchObject({name: 'AbortError'});
+      expect(request).toHaveBeenCalledWith(expect.objectContaining({signal: lifetime.signal}));
+      expect(store.accessTokenData).toBeUndefined();
+    });
+
+    it('does not start a refresh request after cancellation', async () => {
+      const client = new HttpClient(testConfig, new AccessTokenStore());
+      const lifetime = new AbortController();
+      lifetime.abort();
+      const request = jest.spyOn(client.client, 'request');
+      await expect(client.refreshAccessToken(lifetime.signal)).rejects.toMatchObject({name: 'AbortError'});
+      expect(request).not.toHaveBeenCalled();
+    });
     // eslint-disable-next-line jest/expect-expect
     it('retries on 403 token expired error', async () => {
       nock(testConfig.urls.rest).get(AuthAPI.URL.ACCESS).once().reply(StatusCode.FORBIDDEN, {

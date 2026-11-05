@@ -98,6 +98,7 @@ type WebSocketReconnectHttpClientOptions = Pick<
 >;
 type RetryDelayCallback = () => void;
 type ManualRetryWallClock = {
+  readonly pendingTimeoutCount: () => number;
   readonly retryDelaysInMilliseconds: number[];
   readonly runNextRetryDelay: () => void;
   readonly wallClock: ReconnectingWebsocketWallClock;
@@ -140,11 +141,11 @@ function createManualRetryTimeoutIdentifier(): ManualRetryTimeoutIdentifier {
 }
 
 function createManualRetryWallClock(): ManualRetryWallClock {
-  const retryDelayCallbacks: RetryDelayCallback[] = [];
+  const retryDelayCallbacks = new Map<ManualRetryTimeoutIdentifier, RetryDelayCallback>();
   const retryDelaysInMilliseconds: number[] = [];
   const wallClock: ReconnectingWebsocketWallClock = {
     clearInterval: testWallClock.clearInterval,
-    clearTimeout: testWallClock.clearTimeout,
+    clearTimeout(identifier): void { retryDelayCallbacks.delete(identifier); },
 
     get currentTimestampInMilliseconds() {
       return currentTimestampInMilliseconds;
@@ -152,26 +153,32 @@ function createManualRetryWallClock(): ManualRetryWallClock {
 
     setInterval: testWallClock.setInterval,
     setTimeout: (callback, delayInMilliseconds) => {
-      retryDelayCallbacks.push(callback);
+      const identifier = createManualRetryTimeoutIdentifier();
+      retryDelayCallbacks.set(identifier, callback);
       retryDelaysInMilliseconds.push(delayInMilliseconds);
 
-      return createManualRetryTimeoutIdentifier();
+      return identifier;
     },
   };
 
   return {
+    pendingTimeoutCount(): number { return retryDelayCallbacks.size; },
     retryDelaysInMilliseconds,
     runNextRetryDelay: () => {
-      retryDelayCallbacks.shift()?.();
+      const next = retryDelayCallbacks.entries().next().value;
+      if (next !== undefined) {
+        retryDelayCallbacks.delete(next[0]);
+        next[1]();
+      }
     },
     wallClock,
   };
 }
 
 async function flushPromises(): Promise<void> {
-  await Promise.resolve();
-  await Promise.resolve();
-  await Promise.resolve();
+  for (let turn = 0; turn < 20; turn += 1) {
+    await Promise.resolve();
+  }
 }
 
 const webSocketClients: WebSocketClient[] = [];
@@ -260,6 +267,64 @@ describe('WebSocketClient', () => {
   });
 
   describe('refreshAccessToken', () => {
+    it('clears a pending retry delay on disconnect and does not refresh again', async () => {
+      const clock = createManualRetryWallClock();
+      const refreshAccessToken = jest.fn().mockRejectedValue(new Error('Temporary failure'));
+      const httpClient = createWebSocketReconnectHttpClient({refreshAccessToken, hasValidAccessToken: () => false, sendRequest: jest.fn()});
+      const client = createWebSocketClient('wss://example.invalid', httpClient, clock.wallClock);
+      webSocketClients.push(client);
+      client.on(WebSocketClient.TOPIC.ON_ERROR, noop);
+      const reconnect = client['onReconnect']();
+      const cancelled = expect(reconnect).rejects.toMatchObject({name: 'AbortError'});
+      await flushPromises();
+      expect(clock.pendingTimeoutCount()).toBe(1);
+      client.disconnect();
+      await cancelled;
+      expect(clock.pendingTimeoutCount()).toBe(0);
+      clock.runNextRetryDelay();
+      await flushPromises();
+      expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+    });
+
+    it('cancels an active refresh without emitting a late invalid-session event', async () => {
+      let rejectRefresh: (error: Error) => void = noop;
+      const refreshAccessToken = jest.fn(() => { return new Promise<never>((_resolve, reject) => { rejectRefresh = reject; }); });
+      const sendRequest = jest.fn();
+      const httpClient = createWebSocketReconnectHttpClient({refreshAccessToken, hasValidAccessToken: () => false, sendRequest});
+      const client = createWebSocketClientWithTestWallClock('wss://example.invalid', httpClient);
+      webSocketClients.push(client);
+      const invalidSession = jest.fn();
+      client.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, invalidSession);
+      const reconnect = client['onReconnect']();
+      const cancelled = expect(reconnect).rejects.toMatchObject({name: 'AbortError'});
+      client.disconnect();
+      await cancelled;
+      rejectRefresh(new InvalidTokenError('Expired session'));
+      await flushPromises();
+      expect(invalidSession).not.toHaveBeenCalled();
+      expect(sendRequest).not.toHaveBeenCalled();
+      expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+    });
+
+    it('aborts authenticated preflight before URL construction on disconnect', async () => {
+      let finishPreflight: () => void = noop;
+      const sendRequest = jest.fn(() => { return new Promise<void>(resolve => { finishPreflight = resolve; }); });
+      const httpClient = createWebSocketReconnectHttpClient({refreshAccessToken: jest.fn(), hasValidAccessToken: () => true, sendRequest: sendRequest as unknown as WebSocketHttpClient['sendRequest']});
+      const client = createWebSocketClientWithTestWallClock('wss://example.invalid', httpClient);
+      webSocketClients.push(client);
+      const buildUrl = jest.spyOn(client, 'buildWebSocketUrl');
+      const reconnect = client['onReconnect']();
+      const cancelled = expect(reconnect).rejects.toMatchObject({name: 'AbortError'});
+      await flushPromises();
+      client.disconnect();
+      await cancelled;
+      finishPreflight();
+      await flushPromises();
+      expect(buildUrl).not.toHaveBeenCalled();
+      const request = (sendRequest.mock.calls as unknown as Array<[unknown, boolean, AbortController]>)[0];
+      expect(request?.[2].signal.aborted).toBe(true);
+    });
+
     // eslint-disable-next-line jest/expect-expect
     it('emits the correct message for invalid tokens', async () => {
       const websocketClient = createWebSocketClientWithTestWallClock('ws://url', invalidTokenHttpClient);
@@ -299,6 +364,7 @@ describe('WebSocketClient', () => {
       const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('ws://url/await');
 
       const firstReconnect = websocketClient['onReconnect']();
+      const firstCancelled = expect(firstReconnect).rejects.toMatchObject({name: 'AbortError'});
       const secondReconnect = websocketClient['onReconnect']();
 
       await Promise.resolve();
@@ -308,11 +374,9 @@ describe('WebSocketClient', () => {
 
       resolveRefreshAccessToken();
 
-      await expect(Promise.all([firstReconnect, secondReconnect])).resolves.toEqual([
-        'ws://url/await',
-        'ws://url/await',
-      ]);
-      expect(buildWebSocketUrl).toHaveBeenCalledTimes(2);
+      await firstCancelled;
+      await expect(secondReconnect).resolves.toBe('ws://url/await');
+      expect(buildWebSocketUrl).toHaveBeenCalledTimes(1);
     });
 
     it('retries transient refresh failures without rejecting reconnect before building a WebSocket URL', async () => {
@@ -395,7 +459,8 @@ describe('WebSocketClient', () => {
       expect(sendRequest).toHaveBeenCalledWith({
         method: 'get',
         url: '/cookies',
-      });
+        requestOptions: {skipLogout: true},
+      }, false, expect.any(AbortController));
       expect(buildWebSocketUrl).toHaveBeenCalledTimes(1);
       expect(sendRequest.mock.invocationCallOrder[0]).toBeLessThan(buildWebSocketUrl.mock.invocationCallOrder[0]);
     });
