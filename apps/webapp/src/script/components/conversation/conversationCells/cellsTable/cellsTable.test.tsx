@@ -3671,7 +3671,6 @@ describe('CellsTable internal drag and drop', () => {
       cellsRepository: {moveNodes} as unknown as CellsRepository,
       selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
     });
-    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
     const source = screen.getByRole('row', {name: /Wire logs\.pdf/});
     expect(source).toHaveAttribute('draggable', 'false');
     const transfer = createInternalDragTransfer();
