@@ -203,6 +203,7 @@ export class ReconnectingWebsocket {
   private onMessage?: (data: string) => void;
   private onError?: WebSocketErrorHandler;
   private onClose?: (event: CloseEvent) => void;
+  private onConnecting?: () => void;
   private onLongRunningRetry?: (retryDetails: LongRunningRetryDetails) => void;
   /**
    * Cleanup function returned by onBackFromSleep to stop the sleep detection interval.
@@ -326,6 +327,7 @@ export class ReconnectingWebsocket {
   };
 
   private readonly internalOnReconnect = async (): Promise<string> => {
+    this.onConnecting?.();
     this.reconnectLifetime?.abort();
     const reconnectLifetime = new AbortController();
     this.reconnectLifetime = reconnectLifetime;
@@ -418,7 +420,7 @@ export class ReconnectingWebsocket {
         `[WebSocketLifecycle] event=ping-timeout ${this.getActiveLifecycleContext()} timeoutMs=${this.PING_INTERVAL} state=${getWebSocketStateName(this.getState())} lastMessageAgeMs=${this.getLastMessageAgeInMilliseconds()}`,
       );
       this.stopPinging();
-      this.socket.reconnect();
+      this.reconnectInPlace(this.socket);
       return;
     }
     this.logger.debug(
@@ -434,6 +436,7 @@ export class ReconnectingWebsocket {
    * opening the next, so we never leave two `/await` sessions alive from the app.
    */
   private reconnectInPlace(socket: ReconnectingWebsocketWrapper): void {
+    this.onConnecting?.();
     this.reconnectLifetime?.abort();
     try {
       socket.reconnect(CloseEventCode.NORMAL_CLOSURE);
@@ -535,6 +538,9 @@ export class ReconnectingWebsocket {
   }
 
   private createAndBindSocketWrapper(reason: string): void {
+    // Closing a wrapper does not always emit close (for example while already CLOSING).
+    // Invalidate the previous connection's processing before constructing its replacement.
+    this.onConnecting?.();
     this.wrapperLifetime.abort();
     this.reconnectLifetime?.abort();
     this.wrapperLifetime = new AbortController();
@@ -719,6 +725,10 @@ export class ReconnectingWebsocket {
 
   public setOnClose(onClose: (event: CloseEvent) => void): void {
     this.onClose = onClose;
+  }
+
+  public setOnConnecting(onConnecting: () => void): void {
+    this.onConnecting = onConnecting;
   }
 
   public setOnLongRunningRetry(onLongRunningRetry: (retryDetails: LongRunningRetryDetails) => void): void {

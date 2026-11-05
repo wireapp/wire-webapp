@@ -27,13 +27,13 @@ import {
 } from '@wireapp/api-client/lib/client';
 import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/Config';
 import {ConversationAPI} from '@wireapp/api-client/lib/conversation';
-import {BackendEvent} from '@wireapp/api-client/lib/event';
+import {BackendEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {NotificationAPI} from '@wireapp/api-client/lib/notification';
 import {ConsumableEvent, ConsumableNotificationEvent} from '@wireapp/api-client/lib/notification/ConsumableNotification';
 import {Self, SelfAPI} from '@wireapp/api-client/lib/self';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
-import {ReconnectingWebsocket} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
+import {ReconnectingWebsocket, WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {WS} from 'jest-websocket-mock';
 import nock, {cleanAll} from 'nock';
@@ -58,7 +58,7 @@ jest.mock('./conversation', () => {
 });
 
 import {Account, ConnectionState} from './Account';
-import {NotificationSource} from './notification';
+import {HandledEventPayload, NotificationSource} from './notification';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -68,6 +68,43 @@ const MOCK_BACKEND = {
 };
 
 const apiClients: APIClient[] = [];
+
+type ControlledSocket = ReturnType<ReconnectingWebsocket['getReconnectingWebsocket']> & {
+  readonly open: () => void;
+  readonly beginClose: () => void;
+  readonly receive: (notification: unknown) => void;
+};
+
+function createControlledSocket(): ControlledSocket {
+  let state = WEBSOCKET_STATE.CONNECTING;
+  const socket: ControlledSocket = {
+    binaryType: 'blob',
+    get readyState(): WEBSOCKET_STATE { return state; },
+    close: jest.fn(() => { state = WEBSOCKET_STATE.CLOSED; }),
+    reconnect: jest.fn(),
+    send: jest.fn(),
+    onopen: null,
+    onclose: null,
+    onerror: null,
+    onmessage: null,
+    open(): void {
+      state = WEBSOCKET_STATE.OPEN;
+      socket.onopen?.(new Event('open'));
+    },
+    beginClose(): void { state = WEBSOCKET_STATE.CLOSING; },
+    receive(notification): void {
+      socket.onmessage?.({data: JSON.stringify(notification)} as MessageEvent);
+    },
+  };
+
+  return socket;
+}
+
+async function flushNotificationCallbacks(): Promise<void> {
+  for (let turn = 0; turn < 30; turn += 1) {
+    await Promise.resolve();
+  }
+}
 
 async function createAccount(): Promise<{account: Account; apiClient: APIClient}> {
   const apiClient = new APIClient({urls: MOCK_BACKEND});
@@ -364,6 +401,144 @@ describe('Account', () => {
     });
 
     describe('listen', () => {
+      it('cancels legacy catch-up when replacing a closing wrapper before its close event', async () => {
+        const {account, apiClient} = dependencies;
+        const firstSocket = createControlledSocket();
+        const replacementSocket = createControlledSocket();
+        const transport = apiClient.transport.ws['socket'];
+        jest.spyOn(transport as unknown as {getReconnectingWebsocket: () => ControlledSocket}, 'getReconnectingWebsocket')
+          .mockReturnValueOnce(firstSocket).mockReturnValue(replacementSocket);
+        jest.spyOn(account.service!.client, 'putClientCapabilities').mockResolvedValue(undefined);
+        const catchupSignals: Array<AbortSignal | undefined> = [];
+        const finishCatchups: Array<() => void> = [];
+        const deliverCatchups: Array<() => Promise<void>> = [];
+        const deliverMissedNotifications: Array<() => void> = [];
+        jest.spyOn(account.service!.notification, 'legacyProcessNotificationStream').mockImplementation(async (onNotification, onMissed, lifetime) => {
+          catchupSignals.push(lifetime?.signal);
+          deliverMissedNotifications.push(() => { onMissed('obsolete-notification'); });
+          deliverCatchups.push(async () => {
+            await onNotification({id: 'late-notification', payload: []}, NotificationSource.NOTIFICATION_STREAM);
+          });
+          await new Promise<void>(resolve => { finishCatchups.push(resolve); });
+
+          return {total: 0, success: 0, error: 0};
+        });
+        const stateChanged = jest.fn();
+        const missedNotifications = jest.fn();
+        const unlock = jest.spyOn(apiClient.transport.ws, 'unlock');
+        const disconnect = await account.listen({useLegacy: true, onConnectionStateChanged: stateChanged, onMissedNotifications: missedNotifications});
+        firstSocket.open();
+        firstSocket.beginClose();
+        transport['handleBackFromSleep']();
+        expect(catchupSignals[0]?.aborted).toBe(true);
+        expect(stateChanged).toHaveBeenLastCalledWith(ConnectionState.CONNECTING, expect.any(Object));
+        replacementSocket.open();
+        const handleNotification = jest.spyOn(account.service!.notification, 'handleNotification');
+        await deliverCatchups[0]?.();
+        deliverMissedNotifications[0]?.();
+        finishCatchups[0]?.();
+        await flushNotificationCallbacks();
+        expect(handleNotification).not.toHaveBeenCalled();
+        expect(missedNotifications).not.toHaveBeenCalled();
+        expect(unlock).not.toHaveBeenCalled();
+        expect(stateChanged.mock.calls.some(call => { return call[0] === ConnectionState.LIVE; })).toBe(false);
+        expect(catchupSignals[1]?.aborted).toBe(false);
+        finishCatchups[1]?.();
+        await flushNotificationCallbacks();
+        expect(unlock).toHaveBeenCalledTimes(1);
+        expect(stateChanged).toHaveBeenLastCalledWith(ConnectionState.LIVE, expect.any(Object));
+        disconnect();
+        expect(catchupSignals[1]?.aborted).toBe(true);
+      });
+
+      it.each([true, false])('rejects obsolete async processing and accepts the replacement marker when decryption yields=%s', async yieldsNotification => {
+        const {account, apiClient} = dependencies;
+        const firstSocket = createControlledSocket();
+        const replacementSocket = createControlledSocket();
+        const transport = apiClient.transport.ws['socket'];
+        jest.spyOn(transport as unknown as {getReconnectingWebsocket: () => ControlledSocket}, 'getReconnectingWebsocket')
+          .mockReturnValueOnce(firstSocket).mockReturnValue(replacementSocket);
+        jest.spyOn(account.service!.client, 'putClientCapabilities').mockResolvedValue(undefined);
+        jest.spyOn(account, 'getClientCapabilities').mockReturnValue([ClientCapability.CONSUMABLE_NOTIFICATIONS]);
+        let finishDecryption: () => void = () => {};
+        const decryption = new Promise<void>(resolve => { finishDecryption = resolve; });
+        const obsoleteEvent: BackendEvent = {
+          type: USER_EVENT.DELETE,
+          id: 'obsolete-user',
+          qualified_id: {id: 'obsolete-user', domain: 'example.invalid'},
+        };
+        async function* decryptObsoleteNotification(): AsyncGenerator<HandledEventPayload> {
+          await decryption;
+          if (yieldsNotification === true) {
+            yield {event: obsoleteEvent};
+          }
+        }
+        const decryptNotification = jest.spyOn(account.service!.notification, 'handleNotification')
+          .mockImplementation(decryptObsoleteNotification);
+        const eventReceived = jest.fn();
+        const stateChanged = jest.fn();
+        const acknowledge = jest.spyOn(apiClient.transport.ws, 'acknowledgeNotification');
+        const acknowledgeMarker = jest.spyOn(apiClient.transport.ws, 'acknowledgeConsumableNotificationSynchronization');
+        const disconnect = await account.listen({useLegacy: false, onEvent: eventReceived, onConnectionStateChanged: stateChanged});
+        firstSocket.open();
+        firstSocket.receive({type: ConsumableEvent.EVENT, data: {delivery_tag: 1, event: {id: 'obsolete', payload: [obsoleteEvent]}}});
+        firstSocket.receive({type: ConsumableEvent.SYNCHRONIZATION, data: {delivery_tag: 2, marker_id: markerId}});
+        await flushNotificationCallbacks();
+        expect(decryptNotification).toHaveBeenCalledTimes(1);
+        firstSocket.beginClose();
+        transport['handleBackFromSleep']();
+        replacementSocket.open();
+        apiClient.transport.http.accessTokenStore.markerToken = 'replacement-marker';
+        const replacementMarker = {type: ConsumableEvent.SYNCHRONIZATION, data: {delivery_tag: 3, marker_id: 'replacement-marker'}};
+        replacementSocket.receive(replacementMarker);
+        finishDecryption();
+        await flushNotificationCallbacks();
+        expect(eventReceived).not.toHaveBeenCalled();
+        expect(acknowledge).not.toHaveBeenCalled();
+        expect(acknowledgeMarker).toHaveBeenCalledTimes(1);
+        expect(acknowledgeMarker).toHaveBeenCalledWith(replacementMarker);
+        expect(stateChanged).toHaveBeenLastCalledWith(ConnectionState.LIVE, expect.any(Object));
+        disconnect();
+      });
+
+      it('preserves external subscriptions and cleans up each lifetime across repeated replacements', async () => {
+        const {account, apiClient} = dependencies;
+        const transport = apiClient.transport.ws['socket'];
+        const sockets: ControlledSocket[] = [];
+        jest.spyOn(transport as unknown as {getReconnectingWebsocket: () => ControlledSocket}, 'getReconnectingWebsocket')
+          .mockImplementation(() => {
+            const socket = createControlledSocket();
+            sockets.push(socket);
+
+            return socket;
+          });
+        jest.spyOn(account.service!.client, 'putClientCapabilities').mockResolvedValue(undefined);
+        jest.spyOn(account, 'getClientCapabilities').mockReturnValue([ClientCapability.CONSUMABLE_NOTIFICATIONS]);
+        const retryReported = jest.fn();
+        const cancelled = jest.fn();
+        apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, retryReported);
+        const initialMessageListeners = apiClient.transport.ws.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE);
+        const disconnect = await account.listen({useLegacy: false});
+        for (let replacement = 0; replacement < 3; replacement += 1) {
+          const socket = sockets.at(-1);
+          if (socket === undefined) { throw new Error('Expected active wrapper'); }
+          socket.open();
+          apiClient.transport.ws['abortHandler']?.signal.addEventListener('abort', cancelled);
+          socket.beginClose();
+          transport['handleBackFromSleep']();
+          expect(socket.close).toHaveBeenCalledTimes(1);
+          expect(apiClient.transport.ws.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(initialMessageListeners + 1);
+        }
+        expect(cancelled).toHaveBeenCalledTimes(3);
+        disconnect();
+        disconnect();
+        expect(sockets.at(-1)?.close).toHaveBeenCalledTimes(1);
+        expect(apiClient.transport.ws.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(initialMessageListeners);
+        apiClient.transport.ws.emit(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, {retryCount: 1, retryDurationInMilliseconds: 60_000});
+        expect(retryReported).toHaveBeenCalledTimes(1);
+        apiClient.transport.ws.removeListener(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, retryReported);
+      });
+
       it('keeps the active marker and reaches LIVE when authenticated attempts finish in reverse order', async () => {
         const {account, apiClient} = dependencies;
         const webSocket = apiClient.transport.ws;

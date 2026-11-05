@@ -218,10 +218,15 @@ export class WebSocketClient extends EventEmitter {
   };
 
   private readonly onClose = () => {
-    this.abortHandler?.abort();
-    this.bufferedMessages = [];
-    this.onStateChange(this.socket.getState());
+    this.abortNotificationProcessing();
+    this.onStateChange(WEBSOCKET_STATE.CLOSED);
   };
+
+  private abortNotificationProcessing(): void {
+    this.abortHandler?.abort();
+    this.abortHandler = undefined;
+    this.bufferedMessages = [];
+  }
 
   private readonly onLongRunningRetry = (retryDetails: LongRunningRetryDetails) => {
     this.emit(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, retryDetails);
@@ -247,6 +252,7 @@ export class WebSocketClient extends EventEmitter {
     this.socket.setOnError(this.onError);
     this.socket.setOnLongRunningRetry(this.onLongRunningRetry);
     this.socket.setOnOpen((_event, reconnectContext) => {
+      this.abortNotificationProcessing();
       this.onOpen();
       if (onConnect !== undefined) {
         this.abortHandler = new AbortController();
@@ -254,6 +260,10 @@ export class WebSocketClient extends EventEmitter {
       }
     });
     this.socket.setOnClose(this.onClose);
+    this.socket.setOnConnecting(() => {
+      this.abortNotificationProcessing();
+      this.onStateChange(WEBSOCKET_STATE.CONNECTING);
+    });
 
     this.socket.connect();
     return this;
@@ -445,10 +455,11 @@ export class WebSocketClient extends EventEmitter {
   public disconnect(reason?: string): void {
     this.reconnectLifetime.abort();
     this.accessTokenRefreshLifetime?.abort();
-    this.abortHandler?.abort();
+    this.abortNotificationProcessing();
     if (this.socket !== undefined) {
       this.socket.disconnect(reason);
     }
+    this.onStateChange(WEBSOCKET_STATE.CLOSED);
   }
 
   /**

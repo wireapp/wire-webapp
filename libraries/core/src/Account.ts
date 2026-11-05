@@ -103,6 +103,10 @@ function getWebSocketLifecycleContext(connectionContext: WebSocketConnectionCont
     : ` attemptId=${connectionContext.attemptId} wrapperGeneration=${connectionContext.wrapperGeneration}`;
 }
 
+function isNotificationProcessingAborted(signal: AbortSignal | undefined): boolean {
+  return signal?.aborted === true;
+}
+
 export enum ConnectionState {
   /** The WebSocket is closed and no notifications are being processed */
   CLOSED = 'closed',
@@ -121,10 +125,10 @@ type NotificationHandlingOptions = {
   readonly handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>;
   readonly onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void;
   readonly getCurrentWebSocketConnectionContext: () => WebSocketConnectionContext | undefined;
+  readonly getNotificationProcessingSignal?: () => AbortSignal;
 };
 type ConsumableNotificationHandlingOptions = NotificationHandlingOptions & {
   readonly onConnectionStateChanged: (state: ConnectionState) => void;
-  readonly signal?: AbortSignal;
 };
 type SynchronizationNotificationOptions = {
   readonly notification: ConsumableNotificationSynchronization;
@@ -135,6 +139,7 @@ type DecryptNotificationOptions = Pick<NotificationHandlingOptions, 'handleEvent
   readonly notification: ConsumableNotificationEvent;
   readonly source: NotificationSource;
   readonly connectionContext?: WebSocketConnectionContext;
+  readonly signal?: AbortSignal;
 };
 
 export type CreateStoreFn = (storeName: string, key: Uint8Array) => undefined | Promise<CRUDEngine | undefined>;
@@ -771,6 +776,10 @@ export class Account extends TypedEventEmitter<Events> {
     signal?.addEventListener('abort', disconnect, {once: true});
 
     let currentWebSocketConnectionContext: WebSocketConnectionContext | undefined;
+    let notificationProcessingSignal = lifetime.signal;
+    function getNotificationProcessingSignal(): AbortSignal {
+      return notificationProcessingSignal;
+    }
     function getCurrentWebSocketConnectionContext(): WebSocketConnectionContext | undefined {
       return currentWebSocketConnectionContext;
     }
@@ -797,13 +806,14 @@ export class Account extends TypedEventEmitter<Events> {
       handleEvent,
       onNotificationStreamProgress,
       getCurrentWebSocketConnectionContext,
+      getNotificationProcessingSignal,
     });
     const handleNotification = this.createNotificationHandler({
       handleEvent,
       onNotificationStreamProgress,
       onConnectionStateChanged,
       getCurrentWebSocketConnectionContext,
-      signal: lifetime.signal,
+      getNotificationProcessingSignal,
     });
 
     const handleMissedNotifications = this.createLegacyMissedNotificationsHandler(onMissedNotifications);
@@ -875,6 +885,7 @@ export class Account extends TypedEventEmitter<Events> {
           return;
         }
         currentWebSocketConnectionContext = reconnectContext;
+        notificationProcessingSignal = abortController.signal;
         // this call back is called every single time the websocket connection is (re)established
         this.logger.info(
           `[WebSocketLifecycle] layer=account event=websocket-open-processing-start useLegacy=${useLegacy} aborted=${abortController.signal.aborted}${getWebSocketLifecycleContext(reconnectContext)}`,
@@ -980,11 +991,20 @@ export class Account extends TypedEventEmitter<Events> {
    * when all clients are capable of handling consumable notifications.
    */
   private readonly createLegacyNotificationHandler = (options: NotificationHandlingOptions) => {
-    const {handleEvent, onNotificationStreamProgress, getCurrentWebSocketConnectionContext} = options;
+    const {
+      handleEvent,
+      onNotificationStreamProgress,
+      getCurrentWebSocketConnectionContext,
+      getNotificationProcessingSignal,
+    } = options;
     return async (notification: Notification, source: NotificationSource): Promise<void> => {
+      const signal = getNotificationProcessingSignal?.();
       void this.notificationProcessingQueue
         .push(async () => {
           try {
+            if (isNotificationProcessingAborted(signal)) {
+              return;
+            }
             const start = Date.now();
             const firstNotificationPayload = notification.payload[0];
             const notificationTime =
@@ -1003,7 +1023,17 @@ export class Account extends TypedEventEmitter<Events> {
             const messages = this.service!.notification.handleNotification(notification, source);
 
             for await (const message of messages) {
+              if (isNotificationProcessingAborted(signal)) {
+                return;
+              }
               await handleEvent(message, source);
+              if (isNotificationProcessingAborted(signal)) {
+                return;
+              }
+            }
+
+            if (isNotificationProcessingAborted(signal)) {
+              return;
             }
 
             this.logger.info(
@@ -1025,9 +1055,13 @@ export class Account extends TypedEventEmitter<Events> {
       onNotificationStreamProgress,
       onConnectionStateChanged,
       getCurrentWebSocketConnectionContext,
-      signal,
+      getNotificationProcessingSignal,
     } = options;
     return async (notification: ConsumableNotification, source: NotificationSource): Promise<void> => {
+      const signal = getNotificationProcessingSignal?.();
+      if (isNotificationProcessingAborted(signal)) {
+        return;
+      }
       this.logger.info(
         `[WebSocketLifecycle] layer=account event=consumable-notification-received${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())}`,
       );
@@ -1040,7 +1074,7 @@ export class Account extends TypedEventEmitter<Events> {
         if (notification.type === ConsumableEvent.SYNCHRONIZATION) {
           this.notificationProcessingQueue
             .push(async () => {
-              if (signal?.aborted === true) {
+              if (isNotificationProcessingAborted(signal)) {
                 return;
               }
               await this.handleSynchronizationNotification({
@@ -1061,6 +1095,7 @@ export class Account extends TypedEventEmitter<Events> {
               source,
               onNotificationStreamProgress,
               connectionContext: getCurrentWebSocketConnectionContext(),
+              signal,
             });
           })
           .catch(this.handleNotificationQueueError);
@@ -1125,8 +1160,11 @@ export class Account extends TypedEventEmitter<Events> {
   };
 
   private readonly decryptAckEmitNotification = async (options: DecryptNotificationOptions): Promise<void> => {
-    const {notification, handleEvent, source, onNotificationStreamProgress, connectionContext} = options;
+    const {notification, handleEvent, source, onNotificationStreamProgress, connectionContext, signal} = options;
     try {
+      if (isNotificationProcessingAborted(signal)) {
+        return;
+      }
       this.logger.info(
         `[WebSocketLifecycle] layer=account event=consumable-notification-decryption-start${getWebSocketLifecycleContext(connectionContext)}`,
       );
@@ -1140,7 +1178,17 @@ export class Account extends TypedEventEmitter<Events> {
       }
 
       for await (const payload of payloads ?? []) {
+        if (isNotificationProcessingAborted(signal)) {
+          return;
+        }
         await handleEvent(payload, source);
+        if (isNotificationProcessingAborted(signal)) {
+          return;
+        }
+      }
+
+      if (isNotificationProcessingAborted(signal)) {
+        return;
       }
 
       this.logger.info(
@@ -1219,9 +1267,17 @@ export class Account extends TypedEventEmitter<Events> {
 
       await this.service!.notification.legacyProcessNotificationStream(
         async (notification, source) => {
+          if (abortController?.signal.aborted === true) {
+            return;
+          }
           await handleLegacyNotification(notification, source);
         },
-        handleMissedNotifications,
+        async notificationId => {
+          if (abortController?.signal.aborted === true) {
+            return;
+          }
+          await handleMissedNotifications(notificationId);
+        },
         abortController,
       );
       abortController?.signal.throwIfAborted();
@@ -1312,7 +1368,7 @@ export class Account extends TypedEventEmitter<Events> {
 
       const connectionState = mapping[wsState];
 
-      if (connectionState === ConnectionState.CLOSED) {
+      if (connectionState === ConnectionState.CLOSED || connectionState === ConnectionState.CONNECTING) {
         flushProposalsQueue();
         account.pauseAndFlushNotificationQueue();
         if (useLegacy) {
