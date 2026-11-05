@@ -183,7 +183,7 @@ describe('ReconnectingWebsocket', () => {
     const socket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.OPEN);
     const websocket = new ReconnectingWebsocket(
       async () => {
-        return 'ws://example.test/events';
+        return 'wss://example.test/events';
       },
       {
         websocketFactory: () => {
@@ -397,7 +397,7 @@ describe('ReconnectingWebsocket', () => {
       const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const websocketFactory = createSocketFactory(firstSocket, secondSocket);
-      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+      const RWS = createRWS(jest.fn().mockResolvedValue('wss://example.invalid'), {
         ...defaultReconnectingWebsocketTestOptions,
         wallClock: deterministicWallClock,
         websocketFactory: websocketFactory,
@@ -449,8 +449,8 @@ describe('ReconnectingWebsocket', () => {
       expect(RWS['socket']).toBe(firstSocket);
       expect(RWS['connectingTimeoutId']).toBeUndefined();
 
-      resolveReconnectUrl('ws://example.invalid');
-      await expect(reconnectPromise).resolves.toBe('ws://example.invalid');
+      resolveReconnectUrl('wss://example.invalid');
+      await expect(reconnectPromise).resolves.toBe('wss://example.invalid');
 
       expect(RWS['connectingTimeoutId']).toBeDefined();
 
@@ -504,7 +504,7 @@ describe('ReconnectingWebsocket', () => {
       expect(RWS['socket']).toBe(secondSocket);
       expect(RWS['connectingTimeoutId']).toBeUndefined();
 
-      resolveReconnectUrl('ws://example.invalid');
+      resolveReconnectUrl('wss://example.invalid');
       await expect(reconnectPromise).rejects.toMatchObject({name: 'AbortError'});
 
       expect(RWS['connectingTimeoutId']).toBeUndefined();
@@ -522,7 +522,7 @@ describe('ReconnectingWebsocket', () => {
       const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const websocketFactory = createSocketFactory(firstSocket, secondSocket);
-      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+      const RWS = createRWS(jest.fn().mockResolvedValue('wss://example.invalid'), {
         ...defaultReconnectingWebsocketTestOptions,
         wallClock: deterministicWallClock,
         websocketFactory: websocketFactory,
@@ -552,9 +552,9 @@ describe('ReconnectingWebsocket', () => {
     });
 
     it('does not throw when internalOnReconnect runs before a socket is assigned', async () => {
-      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'));
+      const RWS = createRWS(jest.fn().mockResolvedValue('wss://example.invalid'));
 
-      await expect(RWS['internalOnReconnect']()).resolves.toBe('ws://example.invalid');
+      await expect(RWS['internalOnReconnect']()).resolves.toBe('wss://example.invalid');
     });
 
     it('does not start the watchdog after internalOnReconnect resolves if the socket is already OPEN', async () => {
@@ -562,7 +562,7 @@ describe('ReconnectingWebsocket', () => {
       const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.OPEN);
       const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const websocketFactory = createSocketFactory(firstSocket, secondSocket);
-      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+      const RWS = createRWS(jest.fn().mockResolvedValue('wss://example.invalid'), {
         ...defaultReconnectingWebsocketTestOptions,
         wallClock: deterministicWallClock,
         websocketFactory: websocketFactory,
@@ -593,7 +593,7 @@ describe('ReconnectingWebsocket', () => {
       firstSocket.reconnect.mockImplementation(() => {
         firstSocket.readyState = WEBSOCKET_STATE.CONNECTING;
       });
-      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+      const RWS = createRWS(jest.fn().mockResolvedValue('wss://example.invalid'), {
         ...defaultReconnectingWebsocketTestOptions,
         wallClock: deterministicWallClock,
         websocketFactory: websocketFactory,
@@ -638,7 +638,7 @@ describe('ReconnectingWebsocket', () => {
       const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const websocketFactory = createSocketFactory(firstSocket, secondSocket);
-      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+      const RWS = createRWS(jest.fn().mockResolvedValue('wss://example.invalid'), {
         ...defaultReconnectingWebsocketTestOptions,
         wallClock: wallClockWithOptionalClear,
         websocketFactory: websocketFactory,
@@ -668,7 +668,7 @@ describe('ReconnectingWebsocket', () => {
       const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const websocketFactory = createSocketFactory(firstSocket, secondSocket);
-      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+      const RWS = createRWS(jest.fn().mockResolvedValue('wss://example.invalid'), {
         ...defaultReconnectingWebsocketTestOptions,
         wallClock: deterministicWallClock,
         websocketFactory: websocketFactory,
@@ -692,7 +692,7 @@ describe('ReconnectingWebsocket', () => {
       const deterministicWallClock = createDeterministicTimeoutWallClock(0);
       const socket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const websocketFactory = createSocketFactory(socket);
-      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+      const RWS = createRWS(jest.fn().mockResolvedValue('wss://example.invalid'), {
         ...defaultReconnectingWebsocketTestOptions,
         wallClock: deterministicWallClock,
         websocketFactory: websocketFactory,
@@ -719,7 +719,7 @@ describe('ReconnectingWebsocket', () => {
       const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const websocketFactory = createSocketFactory(firstSocket, secondSocket);
-      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+      const RWS = createRWS(jest.fn().mockResolvedValue('wss://example.invalid'), {
         ...defaultReconnectingWebsocketTestOptions,
         wallClock: staleTimeoutWallClock,
         websocketFactory: websocketFactory,
@@ -762,7 +762,7 @@ describe('ReconnectingWebsocket', () => {
       const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const websocketFactory = createSocketFactory(firstSocket, secondSocket);
-      const RWS = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+      const RWS = createRWS(jest.fn().mockResolvedValue('wss://example.invalid'), {
         ...defaultReconnectingWebsocketTestOptions,
         wallClock: deterministicWallClock,
         websocketFactory: websocketFactory,

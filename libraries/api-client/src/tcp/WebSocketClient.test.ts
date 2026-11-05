@@ -194,7 +194,7 @@ describe('WebSocketClient', () => {
 
   describe('handler', () => {
     it('calls "onOpen" when WebSocket opens', async () => {
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', fakeHttpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', fakeHttpClient);
       webSocketClients.push(websocketClient);
       const onOpenSpy = jest.spyOn(websocketClient as any, 'onOpen');
       const socket = websocketClient['socket'];
@@ -207,7 +207,7 @@ describe('WebSocketClient', () => {
     });
 
     it('calls "onClose" when WebSocket closes', async () => {
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', fakeHttpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', fakeHttpClient);
       webSocketClients.push(websocketClient);
       const onCloseSpy = jest.spyOn(websocketClient as any, 'onClose');
       const socket = websocketClient['socket'];
@@ -220,7 +220,7 @@ describe('WebSocketClient', () => {
     });
 
     it('calls "onError" when WebSocket received error', async () => {
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', fakeHttpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', fakeHttpClient);
       webSocketClients.push(websocketClient);
       const onErrorSpy = jest.spyOn(websocketClient as any, 'onError');
       const refreshTokenSpy = jest.spyOn(websocketClient as any, 'refreshAccessToken');
@@ -236,7 +236,7 @@ describe('WebSocketClient', () => {
 
     it('calls "onMessage" when WebSocket received message', async () => {
       const message = {type: ConsumableEvent.MISSED};
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', fakeHttpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', fakeHttpClient);
       webSocketClients.push(websocketClient);
       const onMessageSpy = jest.spyOn(websocketClient as any, 'onMessage');
       const socket = websocketClient['socket'];
@@ -253,7 +253,7 @@ describe('WebSocketClient', () => {
       const onConnect = () => {
         return onConnectResult();
       };
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', fakeHttpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', fakeHttpClient);
       webSocketClients.push(websocketClient);
       const socket = websocketClient['socket'];
       jest.spyOn(socket as any, 'getReconnectingWebsocket').mockReturnValue(fakeSocket);
@@ -327,7 +327,7 @@ describe('WebSocketClient', () => {
 
     // eslint-disable-next-line jest/expect-expect
     it('emits the correct message for invalid tokens', async () => {
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', invalidTokenHttpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', invalidTokenHttpClient);
       webSocketClients.push(websocketClient);
       const socket = websocketClient['socket'];
       jest.spyOn(socket as any, 'getReconnectingWebsocket').mockReturnValue(fakeSocket);
@@ -359,9 +359,9 @@ describe('WebSocketClient', () => {
         hasValidAccessToken: () => accessTokenIsValid,
         sendRequest: jest.fn().mockResolvedValue({data: {}}),
       });
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', httpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', httpClient);
       webSocketClients.push(websocketClient);
-      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('ws://url/await');
+      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('wss://url/await');
 
       const firstReconnect = websocketClient['onReconnect']();
       const firstCancelled = expect(firstReconnect).rejects.toMatchObject({name: 'AbortError'});
@@ -375,7 +375,7 @@ describe('WebSocketClient', () => {
       resolveRefreshAccessToken();
 
       await firstCancelled;
-      await expect(secondReconnect).resolves.toBe('ws://url/await');
+      await expect(secondReconnect).resolves.toBe('wss://url/await');
       expect(buildWebSocketUrl).toHaveBeenCalledTimes(1);
     });
 
@@ -395,9 +395,9 @@ describe('WebSocketClient', () => {
         hasValidAccessToken: () => accessTokenIsValid,
         sendRequest: jest.fn().mockResolvedValue({data: {}}),
       });
-      const websocketClient = createWebSocketClient('ws://url', httpClient, manualRetryWallClock.wallClock);
+      const websocketClient = createWebSocketClient('wss://url', httpClient, manualRetryWallClock.wallClock);
       webSocketClients.push(websocketClient);
-      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('ws://url/await');
+      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('wss://url/await');
 
       const reconnectPromise = websocketClient['onReconnect']();
 
@@ -412,7 +412,7 @@ describe('WebSocketClient', () => {
 
       manualRetryWallClock.runNextRetryDelay();
 
-      await expect(reconnectPromise).resolves.toBe('ws://url/await');
+      await expect(reconnectPromise).resolves.toBe('wss://url/await');
       expect(refreshAccessToken).toHaveBeenCalledTimes(2);
       expect(buildWebSocketUrl).toHaveBeenCalledTimes(1);
     });
@@ -425,9 +425,9 @@ describe('WebSocketClient', () => {
         hasValidAccessToken: () => false,
         sendRequest,
       });
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', httpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', httpClient);
       webSocketClients.push(websocketClient);
-      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('ws://url/await');
+      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('wss://url/await');
       const invalidTokenListener = jest.fn();
 
       websocketClient.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, invalidTokenListener);
@@ -448,11 +448,11 @@ describe('WebSocketClient', () => {
         hasValidAccessToken: () => true,
         sendRequest,
       });
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', httpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', httpClient);
       webSocketClients.push(websocketClient);
-      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('ws://url/await');
+      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('wss://url/await');
 
-      await expect(websocketClient['onReconnect']()).resolves.toBe('ws://url/await');
+      await expect(websocketClient['onReconnect']()).resolves.toBe('wss://url/await');
 
       expect(refreshAccessToken).not.toHaveBeenCalled();
       expect(sendRequest).toHaveBeenCalledTimes(1);
@@ -474,11 +474,11 @@ describe('WebSocketClient', () => {
         hasValidAccessToken,
         sendRequest,
       });
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', httpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', httpClient);
       webSocketClients.push(websocketClient);
-      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('ws://url/await');
+      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('wss://url/await');
 
-      await expect(websocketClient['onReconnect']()).resolves.toBe('ws://url/await');
+      await expect(websocketClient['onReconnect']()).resolves.toBe('wss://url/await');
 
       expect(refreshAccessToken).toHaveBeenCalledTimes(1);
       expect(sendRequest).toHaveBeenCalledTimes(1);
@@ -495,9 +495,9 @@ describe('WebSocketClient', () => {
         hasValidAccessToken: () => true,
         sendRequest,
       });
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', httpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', httpClient);
       webSocketClients.push(websocketClient);
-      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('ws://url/await');
+      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('wss://url/await');
 
       await expect(websocketClient['onReconnect']()).rejects.toBe(preflightError);
 
@@ -513,11 +513,11 @@ describe('WebSocketClient', () => {
         hasValidAccessToken: () => true,
         sendRequest,
       });
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', httpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', httpClient);
       webSocketClients.push(websocketClient);
-      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('ws://url/await');
+      const buildWebSocketUrl = jest.spyOn(websocketClient, 'buildWebSocketUrl').mockReturnValue('wss://url/await');
 
-      await expect(websocketClient['onReconnect']()).resolves.toBe('ws://url/await');
+      await expect(websocketClient['onReconnect']()).resolves.toBe('wss://url/await');
 
       expect(refreshAccessToken).not.toHaveBeenCalled();
       expect(sendRequest).toHaveBeenCalledTimes(1);
@@ -649,7 +649,7 @@ describe('WebSocketClient', () => {
     };
 
     it('does not lock websocket by default', async () => {
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', fakeHttpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', fakeHttpClient);
       webSocketClients.push(websocketClient);
       const onMessageSpy = jest.spyOn(websocketClient as any, 'onMessage');
       const socket = websocketClient['socket'];
@@ -670,7 +670,7 @@ describe('WebSocketClient', () => {
     });
 
     it('emits buffered messages when unlocked', async () => {
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', fakeHttpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', fakeHttpClient);
       webSocketClients.push(websocketClient);
       const onMessageSpy = jest.spyOn(websocketClient as any, 'onMessage');
       const socket = websocketClient['socket'];
@@ -695,7 +695,7 @@ describe('WebSocketClient', () => {
     });
 
     it('emits a long-running retry event once reconnect retries reach one minute', async () => {
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', fakeHttpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', fakeHttpClient);
       webSocketClients.push(websocketClient);
       const retryDetailsListener = jest.fn();
       const socket = websocketClient['socket'];
@@ -720,7 +720,7 @@ describe('WebSocketClient', () => {
     });
 
     it('does not emit a long-running retry event before reconnect retries reach one minute', async () => {
-      const websocketClient = createWebSocketClientWithTestWallClock('ws://url', fakeHttpClient);
+      const websocketClient = createWebSocketClientWithTestWallClock('wss://url', fakeHttpClient);
       webSocketClients.push(websocketClient);
       const retryDetailsListener = jest.fn();
       const socket = websocketClient['socket'];
