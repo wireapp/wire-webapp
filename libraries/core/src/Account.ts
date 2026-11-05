@@ -767,7 +767,12 @@ export class Account extends TypedEventEmitter<Events> {
       getCurrentWebSocketConnectionContext,
     });
 
-    this.setupWebSocketListeners(onConnectionStateChanged, handleNotification, handleLegacyNotification, useLegacy);
+    const removeWebSocketListeners = this.setupWebSocketListeners(
+      onConnectionStateChanged,
+      handleNotification,
+      handleLegacyNotification,
+      useLegacy,
+    );
 
     const isClientCapableOfConsumableNotifications = this.getClientCapabilities().includes(
       ClientCapability.CONSUMABLE_NOTIFICATIONS,
@@ -867,7 +872,7 @@ export class Account extends TypedEventEmitter<Events> {
       this.pauseAndFlushNotificationQueue();
       this.apiClient.disconnect();
       onConnectionStateChanged(ConnectionState.CLOSED);
-      this.apiClient.transport.ws.removeAllListeners();
+      removeWebSocketListeners();
     };
   };
 
@@ -1212,20 +1217,22 @@ export class Account extends TypedEventEmitter<Events> {
     handleNotification: (notification: ConsumableNotification, source: NotificationSource) => Promise<void>,
     handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>,
     useLegacy: boolean,
-  ) => {
+  ): (() => void) => {
     this.logger.info('Setting up WebSocket listeners');
-    this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
+    const account = this;
+    const webSocket = this.apiClient.transport.ws;
+    webSocket.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
 
-    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
-      this.logger.info('Received new notification from backend');
+    function onNotification(notification: Notification | ConsumableNotification): void {
+      account.logger.info('Received new notification from backend');
       if (Account.checkIsConsumable(notification)) {
         void handleNotification(notification, NotificationSource.WEBSOCKET);
         return;
       }
       void handleLegacyNotification(notification, NotificationSource.WEBSOCKET);
-    });
+    }
 
-    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, wsState => {
+    function onWebSocketStateChanged(wsState: WEBSOCKET_STATE): void {
       const mapping: Partial<Record<WEBSOCKET_STATE, ConnectionState>> = {
         [WEBSOCKET_STATE.CLOSED]: ConnectionState.CLOSED,
         [WEBSOCKET_STATE.CONNECTING]: ConnectionState.CONNECTING,
@@ -1235,16 +1242,24 @@ export class Account extends TypedEventEmitter<Events> {
 
       if (connectionState === ConnectionState.CLOSED) {
         flushProposalsQueue();
-        this.pauseAndFlushNotificationQueue();
+        account.pauseAndFlushNotificationQueue();
         if (useLegacy) {
-          this.apiClient.transport.ws.lock();
+          webSocket.lock();
         }
       }
 
       if (connectionState) {
         onConnectionStateChanged(connectionState);
       }
-    });
+    }
+
+    webSocket.on(WebSocketClient.TOPIC.ON_MESSAGE, onNotification);
+    webSocket.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, onWebSocketStateChanged);
+
+    return function removeWebSocketListeners(): void {
+      webSocket.removeListener(WebSocketClient.TOPIC.ON_MESSAGE, onNotification);
+      webSocket.removeListener(WebSocketClient.TOPIC.ON_STATE_CHANGE, onWebSocketStateChanged);
+    };
   };
 
   /**

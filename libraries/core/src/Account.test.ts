@@ -32,6 +32,7 @@ import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {NotificationAPI} from '@wireapp/api-client/lib/notification';
 import {ConsumableEvent} from '@wireapp/api-client/lib/notification/ConsumableNotification';
 import {Self, SelfAPI} from '@wireapp/api-client/lib/self';
+import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
 import {ReconnectingWebsocket} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {WS} from 'jest-websocket-mock';
@@ -351,6 +352,36 @@ describe('Account', () => {
     });
 
     describe('listen', () => {
+      it('removes only account listeners so retry reporting survives application reconnects', async () => {
+        const webSocket = dependencies.apiClient.transport.ws;
+        const clientService = dependencies.account.service?.client;
+        if (clientService === undefined) {
+          throw new Error('Expected initialized client service');
+        }
+        jest.spyOn(clientService, 'putClientCapabilities').mockResolvedValue(undefined);
+        jest.spyOn(dependencies.apiClient, 'connect').mockReturnValue(webSocket);
+        const retryListener = jest.fn();
+        const externalStateListener = jest.fn();
+        webSocket.on(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, retryListener);
+        webSocket.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, externalStateListener);
+        const existingStateListeners = webSocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE);
+
+        const disconnect = await dependencies.account.listen({useLegacy: true});
+        expect(webSocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE)).toBe(existingStateListeners + 1);
+        disconnect();
+        disconnect();
+        expect(webSocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE)).toBe(existingStateListeners);
+        expect(webSocket.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(0);
+
+        const disconnectAgain = await dependencies.account.listen({useLegacy: true});
+        webSocket.emit(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, {retryCount: 9, retryDurationInMilliseconds: 65_000});
+        disconnectAgain();
+
+        expect(retryListener).toHaveBeenCalledTimes(1);
+        expect(webSocket.listenerCount(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY)).toBe(1);
+        expect(webSocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE)).toBe(existingStateListeners);
+      });
+
       it.each([true, false])('keeps synchronization marker contents private when matched=%s', async markerMatches => {
         const marker = 'private-synchronization-marker';
         dependencies.apiClient.transport.http.accessTokenStore.markerToken = markerMatches ? marker : 'other-marker';

@@ -274,7 +274,9 @@ export class App {
       serverTimeHandler,
     );
 
-    repositories.eventTracker = new EventTrackingRepository(repositories.message);
+    repositories.eventTracker = new EventTrackingRepository(repositories.message, undefined, undefined, {
+      webSocket: this.apiClient.transport.ws,
+    });
 
     repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
 
