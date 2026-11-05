@@ -174,11 +174,17 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
   const [cameraMenuOpen, setCameraMenuOpen] = useState(false);
   const microphoneMenuRef = useRef<HTMLDivElement | null>(null);
   const cameraMenuRef = useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const videoElementRef = useRef<HTMLVideoElement | null>(null);
   const isJoiningRef = useRef(false);
   const reportedCameraPermissionErrorRef = useRef(false);
   const reportedMicrophonePermissionErrorRef = useRef(false);
   const [isJoining, setIsJoining] = useState(false);
+
+  useEffect(() => {
+    closeButtonRef.current?.focus();
+  }, []);
+
   const {
     audioInputDevices,
     audioInputDeviceId,
@@ -424,6 +430,7 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
       <header css={meetingPrepHeaderStyles}>
         <button
           type="button"
+          ref={closeButtonRef}
           css={meetingPrepCloseButtonStyles}
           onClick={onCancel}
           disabled={isJoining}
