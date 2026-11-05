@@ -29,7 +29,6 @@ import {
   type ReactElement,
 } from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
@@ -46,11 +45,9 @@ import {
   UploadIcon,
 } from '@wireapp/react-ui-kit';
 
-import {normalizeCellsPath} from './cellsBulkMovePreviewModal/normalizeCellsPath';
-import {isBulkMoveValid} from './cellsBulkMovePreviewModal/validateBulkMove';
-
 import {bulkMoveReducer} from './bulkMoveState';
 import {CellsBulkMovePreviewModal} from './cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
+import {normalizeCellsPath} from './cellsBulkMovePreviewModal/normalizeCellsPath';
 import {CellsBulkMoveToBinConfirmationModal} from './cellsBulkMoveToBinConfirmationModal';
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
@@ -159,7 +156,10 @@ const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
   isSortingEnabled,
 }: CellsTableHeaderCellProps) => {
   const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
-  const ariaSort = isSortingEnabled && isNonEmptyString(sortField) ? toAriaSort(getDirectionFor(sortField)) : undefined;
+  const ariaSort =
+    isSortingEnabled && typeof sortField === 'string' && sortField.length > 0
+      ? toAriaSort(getDirectionFor(sortField))
+      : undefined;
 
   return (
     <th
