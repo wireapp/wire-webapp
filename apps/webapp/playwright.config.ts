@@ -42,7 +42,7 @@ module.exports = defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? numberOfRetriesOnCI : 0,
   /* Opt out of parallel tests on CI. */
-  workers: numberOfParallelWorkersOnCI,
+  workers: process.env.CI ? numberOfParallelWorkersOnCI : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html', {outputFolder: 'playwright-report/html', open: 'never'}],

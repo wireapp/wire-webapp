@@ -17,16 +17,16 @@
  *
  */
 
-import { test as baseTest, type BrowserContext, type Page } from '@playwright/test';
+import {test as baseTest, type BrowserContext, type Page} from '@playwright/test';
 
-import { ApiManagerE2E } from './backend/apiManager.e2e';
-import { getUser, User } from './data/user';
-import { PageManager, WebAppNavigationOptions } from './pageManager';
-import { mockAudioAndVideoDevices } from './utils/mockVideoDevice.util';
-import { Role } from '@wireapp/api-client/lib/team';
-import { FEATURE_KEY } from '@wireapp/api-client/lib/team/feature';
-import { BrigRepositoryE2E } from './backend/brigRepository.e2e';
-import { MeetingsPage } from './pageManager/webapp/pages/meetings.page';
+import {ApiManagerE2E} from './backend/apiManager.e2e';
+import {getUser, User} from './data/user';
+import {PageManager, WebAppNavigationOptions} from './pageManager';
+import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
+import {Role} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
+import {BrigRepositoryE2E} from './backend/brigRepository.e2e';
+import {MeetingsPage} from './pageManager/webapp/pages/meetings.page';
 
 export type PagePlugin = (page: Page) => void | Promise<void>;
 
@@ -40,7 +40,7 @@ type Fixtures = {
    * @param ctx BrowserContext - optional browser context to reuse, if not provided, a new one will be created
    * @param setup Array of PagePlugins, effectively functions which will be applied to the page in the given order
    */
-  createPage: { (...setup: PagePlugin[]): Promise<Page>; (ctx: BrowserContext, ...setup: PagePlugin[]): Promise<Page> };
+  createPage: {(...setup: PagePlugin[]): Promise<Page>; (ctx: BrowserContext, ...setup: PagePlugin[]): Promise<Page>};
   /**
    * Create a new user
    * Note: The created user will be deleted automatically once the test is finished
@@ -62,27 +62,27 @@ export type Team = {
   teamId: string;
   owner: User;
   /** Add a new member to the team after its initial creation */
-  addTeamMember: (member: User, options?: { role?: keyof typeof Role }) => Promise<void>;
+  addTeamMember: (member: User, options?: {role?: keyof typeof Role}) => Promise<void>;
 };
 
-export { expect } from '@playwright/test';
+export {expect} from '@playwright/test';
 
 export const test = baseTest.extend<Fixtures>({
   // Create a new instance of ApiManager for each test
-  api: async ({ }, use) => {
+  api: async ({}, use) => {
     const backendUrl = process.env.BACKEND_URL;
     if (backendUrl === undefined) throw new Error('Missing environment variable BACKEND_URL');
 
     const basicAuth = process.env.BASIC_AUTH;
     if (basicAuth === undefined) throw new Error('Missing environment variable BASIC_AUTH');
 
-    await use(new ApiManagerE2E({ backendUrl, basicAuth }));
+    await use(new ApiManagerE2E({backendUrl, basicAuth}));
   },
-  pageManager: async ({ page }, use) => {
+  pageManager: async ({page}, use) => {
     // Create a new instance of PageManager for each test
     await use(new PageManager(page));
   },
-  createPage: async ({ browser }, use) => {
+  createPage: async ({browser}, use) => {
     const contexts: BrowserContext[] = [];
 
     // Due to the function overload firstParam can be either a PagePlugin or a BrowserContext to reuse
@@ -121,7 +121,7 @@ export const test = baseTest.extend<Fixtures>({
       }),
     );
   },
-  createUser: async ({ api }, use) => {
+  createUser: async ({api}, use) => {
     const users: User[] = [];
 
     await use(async options => {
@@ -136,7 +136,7 @@ export const test = baseTest.extend<Fixtures>({
       }),
     );
   },
-  createTeam: async ({ api }, use) => {
+  createTeam: async ({api}, use) => {
     const teamOwners: User[] = [];
 
     await use(async (teamName, options) => {
@@ -152,10 +152,10 @@ export const test = baseTest.extend<Fixtures>({
       }),
     );
   },
-  meetingsTimeZone: ['Europe/Berlin', { option: true }],
+  meetingsTimeZone: ['Europe/Berlin', {option: true}],
 
-  meetingsPage: async ({ browser, createTeam, createPage, meetingsTimeZone }, use) => {
-    const { owner } = await createTeam('Meetings', {
+  meetingsPage: async ({browser, createTeam, createPage, meetingsTimeZone}, use) => {
+    const {owner} = await createTeam('Meetings', {
       features: {
         meetings: true,
         mls: true,
@@ -170,9 +170,7 @@ export const test = baseTest.extend<Fixtures>({
     try {
       const page = await createPage(context, withLogin(owner));
 
-      await use(
-        PageManager.from(page).webapp.pages.meetings(),
-      );
+      await use(PageManager.from(page).webapp.pages.meetings());
     } finally {
       await context.close();
     }
@@ -185,7 +183,7 @@ export const LOGIN_TIMEOUT = 40_000;
 /** PagePlugin to log in as the given user */
 export const withLogin = (
   user: User | Promise<User>,
-  options?: WebAppNavigationOptions & { readonly confirmNewHistory?: boolean },
+  options?: WebAppNavigationOptions & {readonly confirmNewHistory?: boolean},
 ): PagePlugin => {
   return async page => {
     const pageManager = PageManager.from(page);
@@ -202,7 +200,7 @@ export const withLogin = (
      */
     await pageManager.webapp.components
       .conversationSidebar()
-      .sidebar.waitFor({ state: 'visible', timeout: LOGIN_TIMEOUT });
+      .sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
   };
 };
 
@@ -210,7 +208,7 @@ export const withLogin = (
 export const withGuestUser = (link: string, guestName: string): PagePlugin => {
   return async page => {
     await page.goto(link);
-    await page.getByRole('link', { name: 'Join in Browser' }).click();
+    await page.getByRole('link', {name: 'Join in Browser'}).click();
     const pageManager = PageManager.from(page);
     await pageManager.webapp.pages.conversationJoin().joinAsGuest(guestName);
 
@@ -218,22 +216,22 @@ export const withGuestUser = (link: string, guestName: string): PagePlugin => {
      * Since the login may take up to 40s we manually wait for it to finish here instead of increasing the timeout on all actions / assertions after this util
      * This is an exception to the general best practice of using playwrights web assertions. (See: https://playwright.dev/docs/best-practices#use-web-first-assertions)
      */
-    await pageManager.webapp.pages.conversation().conversationTitle.waitFor({ state: 'visible', timeout: LOGIN_TIMEOUT });
+    await pageManager.webapp.pages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
   };
 };
 
 export const createUser = async (
   api: ApiManagerE2E,
-  options?: { disableTelemetry?: boolean } & Parameters<typeof getUser>[0],
+  options?: {disableTelemetry?: boolean} & Parameters<typeof getUser>[0],
 ): Promise<User> => {
-  const { disableTelemetry = true } = options ?? {};
+  const {disableTelemetry = true} = options ?? {};
 
   const user = getUser(options);
   await api.createPersonalUser(user);
 
   // Optionally decline to send telemetry via the api. This avoids the user being prompted for it in the UI upon first login
   if (disableTelemetry) {
-    await api.properties.putProperty({ settings: { privacy: { telemetry_data_sharing: false } } }, user.token);
+    await api.properties.putProperty({settings: {privacy: {telemetry_data_sharing: false}}}, user.token);
   }
 
   return user;
@@ -242,13 +240,13 @@ export const createUser = async (
 type CreateTeamResult = Promise<{
   teamId: any;
   owner: User;
-  addTeamMember: (member: User, options?: { role?: keyof typeof Role }) => Promise<void>;
+  addTeamMember: (member: User, options?: {role?: keyof typeof Role}) => Promise<void>;
 }>;
 export const createTeam = async (
   api: ApiManagerE2E,
   teamName: string,
   options?: {
-    users?: (User | { user: User; role?: keyof typeof Role })[];
+    users?: (User | {user: User; role?: keyof typeof Role})[];
     features?: {
       conferenceCalling?: boolean;
       channels?: boolean;
@@ -261,7 +259,7 @@ export const createTeam = async (
 ): CreateTeamResult => {
   const owner = await createUser(api);
 
-  const { teamId } = await api.auth.upgradeUserToTeamOwner(owner, teamName);
+  const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
   owner.teamId = teamId;
 
   const addTeamMember: Team['addTeamMember'] = async (member, options) => {
@@ -274,7 +272,7 @@ export const createTeam = async (
     await Promise.all(
       options.users.map(user => {
         if ('user' in user) {
-          return addTeamMember(user.user, { role: user.role });
+          return addTeamMember(user.user, {role: user.role});
         } else {
           return addTeamMember(user);
         }
@@ -294,7 +292,7 @@ export const createTeam = async (
       await api.brig.configureMLSFeature(
         owner.teamId,
         options.features.mls === true
-          ? { status: 'enabled', defaultProtocol: 'mls', supportedProtocols: ['mls', 'proteus'] }
+          ? {status: 'enabled', defaultProtocol: 'mls', supportedProtocols: ['mls', 'proteus']}
           : options.features.mls,
       );
     }
@@ -330,5 +328,5 @@ export const createTeam = async (
     }
   }
 
-  return { teamId, owner, addTeamMember };
+  return {teamId, owner, addTeamMember};
 };
