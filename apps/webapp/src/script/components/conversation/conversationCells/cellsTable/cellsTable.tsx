@@ -203,19 +203,6 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
 // Selecting rows only makes sense when at least one of these is available, e.g. never for viewers.
 const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE];
 
-const getPermanentDeleteCheckingMessageKey = (
-  reason: PermanentDeleteReviewReason | null,
-): PermanentDeleteCheckingMessageKey => {
-  if (reason === 'job-failed') {
-    return 'cells.bulkDelete.checkingAfterJobFailure';
-  }
-  if (reason === 'refresh-failed') {
-    return 'cells.bulkDelete.retryingRefresh';
-  }
-
-  return 'cells.bulkDelete.checking';
-};
-
 interface CapturedBulkMoveToBinSelection {
   nodeIds: string[];
   scopeKey: string;
@@ -1124,6 +1111,7 @@ export const CellsTable = ({
 
     isDropMoveSubmitting.current = true;
     const summary: SharedDriveMoveSummary = {
+      action: 'move',
       items: selected.map(node => {
         return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
       }),
