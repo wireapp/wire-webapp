@@ -403,6 +403,7 @@
   "cameraStatusOn": "on",
   "cells.breadcrumb.files": "{conversationName} files",
   "cells.bulkAction.refresh": "Refresh Bin",
+  "cells.bulkAction.refreshing": "Refreshing Bin…",
   "cells.bulkDelete.confirmation.multiple": "Permanently delete {count} selected items? Any selected folders and their contents will also be deleted. This cannot be undone.",
   "cells.bulkDelete.confirmation.single": "Permanently delete the 1 selected item? Any selected folders and their contents will also be deleted. This cannot be undone.",
   "cells.bulkDelete.jobFailed": "The delete job failed. Refresh the Bin to check the selected items.",

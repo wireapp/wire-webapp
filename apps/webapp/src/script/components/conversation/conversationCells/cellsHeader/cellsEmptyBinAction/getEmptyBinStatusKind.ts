@@ -17,6 +17,8 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 import type {SharedDriveMoveStatusKind} from '../../sharedDriveUploadStatusContext';
 
 export type EmptyBinStatus =
@@ -36,16 +38,16 @@ const kindByStatus: Readonly<Record<Exclude<EmptyBinStatus, 'idle' | 'completed'
   'lookup-error': 'request-failed',
 };
 
-/** Maps the empty-Bin state to the popup status kind, or null when nothing should be shown. */
+/** Maps the empty-Bin state to the popup status kind, or nothing when no status should be shown. */
 export const getEmptyBinStatusKind = ({
   status,
   refreshFailed,
-}: EmptyBinStatusInput): SharedDriveMoveStatusKind | null => {
+}: EmptyBinStatusInput): Maybe<SharedDriveMoveStatusKind> => {
   if (status === 'idle') {
-    return null;
+    return Maybe.nothing();
   }
   if (status === 'completed') {
-    return refreshFailed ? 'finished-unknown' : 'completed';
+    return Maybe.just(refreshFailed ? 'finished-unknown' : 'completed');
   }
-  return kindByStatus[status];
+  return Maybe.just(kindByStatus[status]);
 };

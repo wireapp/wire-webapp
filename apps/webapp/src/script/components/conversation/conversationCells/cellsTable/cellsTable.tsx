@@ -337,6 +337,7 @@ export const CellsTable = ({
     isRejected: isPermanentDeleteRejected,
     isUnresolved: isPermanentDeleteUnresolved,
     isReconciling: isPermanentDeleteReconciling,
+    isRefreshingReview: isPermanentDeleteRefreshingReview,
     reviewReason: permanentDeleteReviewReason,
     deletePermanently,
     refreshReview: handleRefreshAfterPermanentDeleteReview,
@@ -367,25 +368,42 @@ export const CellsTable = ({
     },
   });
   const {reset: resetBulkRestore} = bulkRestore;
-  const permanentDeleteStatusKind = getPermanentDeleteStatusKind({
-    isPending: isPermanentDeletePending,
-    isRejected: isPermanentDeleteRejected,
-    isUnresolved: isPermanentDeleteUnresolved,
-    isReconciling: isPermanentDeleteReconciling,
-    reviewReason: permanentDeleteReviewReason,
-  });
+  const setPermanentDeleteReviewing = permanentDeleteStatusReporter.setReviewing;
+  useEffect(() => {
+    setPermanentDeleteReviewing(isPermanentDeleteRefreshingReview);
+  }, [isPermanentDeleteRefreshingReview, setPermanentDeleteReviewing]);
+  const setRestoreReviewing = restoreStatusReporter.setReviewing;
+  const {isRefreshingReview: isRestoreRefreshingReview} = bulkRestore;
+  useEffect(() => {
+    setRestoreReviewing(isRestoreRefreshingReview);
+  }, [isRestoreRefreshingReview, setRestoreReviewing]);
   const reportPermanentDeleteStatus = permanentDeleteStatusReporter.report;
   const isPermanentDeleteStatusProcessing = permanentDeleteStatusReporter.isProcessing;
   useEffect(() => {
-    if (permanentDeleteStatusKind !== null) {
-      reportPermanentDeleteStatus(permanentDeleteStatusKind);
+    const permanentDeleteStatusKind = getPermanentDeleteStatusKind({
+      isPending: isPermanentDeletePending,
+      isRejected: isPermanentDeleteRejected,
+      isUnresolved: isPermanentDeleteUnresolved,
+      isReconciling: isPermanentDeleteReconciling,
+      reviewReason: permanentDeleteReviewReason,
+    });
+    if (maybe.isJust(permanentDeleteStatusKind)) {
+      reportPermanentDeleteStatus(permanentDeleteStatusKind.value);
       return;
     }
     // The reconciliation state was reset (e.g. the user navigated away) before an outcome was known.
     if (isPermanentDeleteStatusProcessing()) {
       reportPermanentDeleteStatus('status-unknown');
     }
-  }, [isPermanentDeleteStatusProcessing, permanentDeleteStatusKind, reportPermanentDeleteStatus]);
+  }, [
+    isPermanentDeletePending,
+    isPermanentDeleteReconciling,
+    isPermanentDeleteRejected,
+    isPermanentDeleteStatusProcessing,
+    isPermanentDeleteUnresolved,
+    permanentDeleteReviewReason,
+    reportPermanentDeleteStatus,
+  ]);
   const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
   const [backgroundMoveStatusId, setBackgroundMoveStatusId] = useState('');
   const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);

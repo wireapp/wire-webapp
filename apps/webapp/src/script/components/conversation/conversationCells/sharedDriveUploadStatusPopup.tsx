@@ -82,6 +82,7 @@ interface SharedDriveMoveActivityProps {
   readonly toggleLabel: string;
   readonly dismissLabel: string;
   readonly reviewLabel?: string;
+  readonly reviewingLabel?: string;
   readonly onToggle: () => void;
   readonly onDismiss: () => void;
   readonly onReview?: () => void;
@@ -451,6 +452,7 @@ export const SharedDriveUploadStatusPopup: FunctionComponent<
       toggleLabel,
       dismissLabel,
       reviewLabel,
+      reviewingLabel,
       onToggle,
       onDismiss,
       onReview,
@@ -458,6 +460,7 @@ export const SharedDriveUploadStatusPopup: FunctionComponent<
     const rowStatusKind = getMoveRowStatusKind(move);
     const rowsId = 'shared-drive-move-status-rows';
     const isMoveWarning = move.kind !== 'processing' && move.kind !== 'completed';
+    const isReviewing = move.isReviewing === true;
 
     return (
       <div css={sharedDriveUploadStatusPopupStyles} data-uie-name="shared-drive-upload-status-popup">
@@ -477,8 +480,14 @@ export const SharedDriveUploadStatusPopup: FunctionComponent<
           </div>
           <div css={sharedDriveUploadStatusPopupHeaderActionsStyles}>
             {isMoveWarning && onReview !== undefined && reviewLabel !== undefined && (
-              <button type="button" css={sharedDriveUploadStatusPopupHeaderCancelStyles} onClick={onReview}>
-                {reviewLabel}
+              <button
+                type="button"
+                css={sharedDriveUploadStatusPopupHeaderCancelStyles}
+                disabled={isReviewing}
+                aria-busy={isReviewing}
+                onClick={onReview}
+              >
+                {isReviewing ? (reviewingLabel ?? reviewLabel) : reviewLabel}
               </button>
             )}
             <button

@@ -265,6 +265,24 @@ describe('CellsEmptyBinAction', () => {
     });
   });
 
+  it('releases the in-progress signal when the Bin view is left while the outcome is unresolved', async () => {
+    const user = userEvent.setup();
+    const onInProgressChange = jest.fn();
+    const cellsRepository = createRepository({
+      deleteNodes: jest.fn().mockResolvedValue({Status: 'Background'}) as unknown as CellsRepository['deleteNodes'],
+    });
+    const rendered = renderEmptyBinAction(cellsRepository, {onInProgressChange});
+
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+    await screen.findByRole('button', {name: 'cells.emptyBin.refreshBin'});
+    expect(onInProgressChange).toHaveBeenLastCalledWith(true);
+
+    rendered.unmount();
+
+    expect(onInProgressChange).toHaveBeenLastCalledWith(false);
+  });
+
   it('does not render outside the Bin root, for viewers, or when the feature is disabled', () => {
     renderEmptyBinAction(createRepository(), {
       getCurrentCellsPath: () => {

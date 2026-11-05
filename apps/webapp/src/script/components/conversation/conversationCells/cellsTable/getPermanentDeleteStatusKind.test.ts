@@ -17,17 +17,19 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 import {getPermanentDeleteStatusKind} from './getPermanentDeleteStatusKind';
 
 const idle = {isPending: false, isRejected: false, isUnresolved: false, isReconciling: false, reviewReason: null};
 
 describe('getPermanentDeleteStatusKind', () => {
   it('has no status while idle', () => {
-    expect(getPermanentDeleteStatusKind(idle)).toBeNull();
+    expect(getPermanentDeleteStatusKind(idle)).toEqual(Maybe.nothing());
   });
 
   it('is processing while the request is pending', () => {
-    expect(getPermanentDeleteStatusKind({...idle, isPending: true})).toBe('processing');
+    expect(getPermanentDeleteStatusKind({...idle, isPending: true})).toEqual(Maybe.just('processing'));
   });
 
   it('stays processing while the Bin is being reconciled, even after a refresh error', () => {
@@ -38,16 +40,16 @@ describe('getPermanentDeleteStatusKind', () => {
         isReconciling: true,
         reviewReason: 'refresh-failed',
       }),
-    ).toBe('processing');
+    ).toEqual(Maybe.just('processing'));
   });
 
   it('reports a rejected request as request-failed', () => {
-    expect(getPermanentDeleteStatusKind({...idle, isRejected: true})).toBe('request-failed');
+    expect(getPermanentDeleteStatusKind({...idle, isRejected: true})).toEqual(Maybe.just('request-failed'));
   });
 
   it('does not report a rejection once reconciliation has taken over', () => {
-    expect(getPermanentDeleteStatusKind({...idle, isRejected: true, isUnresolved: true, isReconciling: true})).toBe(
-      'processing',
+    expect(getPermanentDeleteStatusKind({...idle, isRejected: true, isUnresolved: true, isReconciling: true})).toEqual(
+      Maybe.just('processing'),
     );
   });
 
@@ -57,10 +59,10 @@ describe('getPermanentDeleteStatusKind', () => {
     ['still-visible', 'partial'],
     ['timed-out', 'status-unknown'],
   ] as const)('maps the %s review reason to %s once reconciliation has stopped', (reviewReason, expected) => {
-    expect(getPermanentDeleteStatusKind({...idle, isUnresolved: true, reviewReason})).toBe(expected);
+    expect(getPermanentDeleteStatusKind({...idle, isUnresolved: true, reviewReason})).toEqual(Maybe.just(expected));
   });
 
   it('treats an unresolved delete without a reason as status-unknown', () => {
-    expect(getPermanentDeleteStatusKind({...idle, isUnresolved: true})).toBe('status-unknown');
+    expect(getPermanentDeleteStatusKind({...idle, isUnresolved: true})).toEqual(Maybe.just('status-unknown'));
   });
 });

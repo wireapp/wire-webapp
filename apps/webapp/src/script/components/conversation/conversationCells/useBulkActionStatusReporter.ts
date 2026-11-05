@@ -19,6 +19,8 @@
 
 import {useCallback, useRef} from 'react';
 
+import {Maybe, maybe} from 'true-myth';
+
 import {
   useSharedDriveUploadStatus,
   type SharedDriveBulkAction,
@@ -34,6 +36,7 @@ interface StartedStatus {
 export interface BulkActionStatusReporter {
   readonly start: (items: readonly SharedDriveMoveItem[]) => void;
   readonly report: (kind: SharedDriveMoveStatusKind) => void;
+  readonly setReviewing: (isReviewing: boolean) => void;
   readonly clear: () => void;
   readonly isProcessing: () => boolean;
 }
@@ -50,8 +53,9 @@ export const useBulkActionStatusReporter = (
   const {updateMoveStatus, createMoveStatusId, clearMoveStatus} = useSharedDriveUploadStatus();
   const onReviewRef = useRef(onReview);
   onReviewRef.current = onReview;
-  const started = useRef<StartedStatus | null>(null);
-  const lastKind = useRef<SharedDriveMoveStatusKind | null>(null);
+  const started = useRef<Maybe<StartedStatus>>(Maybe.nothing());
+  const lastKind = useRef<Maybe<SharedDriveMoveStatusKind>>(Maybe.nothing());
+  const isReviewing = useRef(false);
 
   // Stable, and always runs the latest callback, so the status published earlier never goes stale.
   const review = useCallback((): void => {
@@ -63,8 +67,9 @@ export const useBulkActionStatusReporter = (
   const start = useCallback(
     (items: readonly SharedDriveMoveItem[]): void => {
       const current = {id: createMoveStatusId(), items};
-      started.current = current;
-      lastKind.current = 'processing';
+      started.current = Maybe.just(current);
+      lastKind.current = Maybe.just('processing');
+      isReviewing.current = false;
       updateMoveStatus({
         id: current.id,
         action,
@@ -78,30 +83,41 @@ export const useBulkActionStatusReporter = (
   );
   const report = useCallback(
     (kind: SharedDriveMoveStatusKind): void => {
-      if (started.current !== null) {
-        lastKind.current = kind;
+      if (maybe.isJust(started.current)) {
+        const {id, items} = started.current.value;
+        lastKind.current = Maybe.just(kind);
         updateMoveStatus({
-          id: started.current.id,
+          id,
           action,
           kind,
-          items: started.current.items,
+          items,
           destinationPath: '',
+          isReviewing: isReviewing.current,
           ...(hasReview && {onReview: review}),
         });
       }
     },
     [action, hasReview, review, updateMoveStatus],
   );
+  const setReviewing = useCallback(
+    (reviewing: boolean): void => {
+      isReviewing.current = reviewing;
+      if (maybe.isJust(lastKind.current)) {
+        report(lastKind.current.value);
+      }
+    },
+    [report],
+  );
   const clear = useCallback((): void => {
-    if (started.current !== null) {
-      clearMoveStatus(started.current.id);
-      started.current = null;
-      lastKind.current = null;
+    if (maybe.isJust(started.current)) {
+      clearMoveStatus(started.current.value.id);
+      started.current = Maybe.nothing();
+      lastKind.current = Maybe.nothing();
     }
   }, [clearMoveStatus]);
   const isProcessing = useCallback((): boolean => {
-    return lastKind.current === 'processing';
+    return maybe.isJust(lastKind.current) && lastKind.current.value === 'processing';
   }, []);
 
-  return {start, report, clear, isProcessing};
+  return {start, report, setReviewing, clear, isProcessing};
 };

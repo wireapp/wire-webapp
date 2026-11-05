@@ -352,6 +352,26 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(onReview).toHaveBeenCalledTimes(1);
   });
 
+  it('disables the review button and shows it is refreshing while the review runs', async () => {
+    const user = userEvent.setup();
+    const onReview = jest.fn();
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'restore-job',
+      action: 'restore',
+      kind: 'status-unknown',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+      onReview,
+      isReviewing: true,
+    });
+
+    const refreshingButton = screen.getByRole('button', {name: 'cells.bulkAction.refreshing'});
+    expect(refreshingButton).toBeDisabled();
+    await user.click(refreshingButton);
+
+    expect(onReview).not.toHaveBeenCalled();
+  });
+
   it.each(['processing', 'completed'] as const)('does not offer the review button while %s', kind => {
     renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
       id: 'restore-job',

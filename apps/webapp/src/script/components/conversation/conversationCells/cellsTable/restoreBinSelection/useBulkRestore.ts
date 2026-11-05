@@ -69,6 +69,7 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
 
   const isMountedRef = useRef(true);
   const isPendingRef = useRef(false);
+  const isRefreshingReviewRef = useRef(false);
   const reviewReasonRef = useRef<BulkRestoreReviewReason | null>(null);
   const generationRef = useRef(0);
   const cancelJobObservationRef = useRef<(() => void) | undefined>(undefined);
@@ -78,6 +79,9 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
     return () => {
       isMountedRef.current = false;
       generationRef.current += 1;
+      if (isPendingRef.current) {
+        optionsRef.current.onStatusChange('status-unknown');
+      }
       cancelJobObservationRef.current?.();
     };
   }, []);
@@ -110,7 +114,7 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
   const observeJobs: BulkRestoreDependencies['observeJobs'] = jobUuids => {
     return new Promise(resolve => {
       const {cellsRepository, clock, random} = optionsRef.current;
-      cancelJobObservationRef.current = observeCellsBackgroundActionJobs({
+      const cancelObservation = observeCellsBackgroundActionJobs({
         actionName: 'restore',
         cellsRepository,
         jobUuids,
@@ -121,6 +125,11 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
         },
         onOutcome: resolve,
       });
+      cancelJobObservationRef.current = () => {
+        cancelObservation();
+        // Stopping the polling yields no outcome, so settle the wait or the restore would never finish.
+        resolve('status-unknown');
+      };
     });
   };
 
@@ -179,11 +188,12 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
   };
 
   const refreshReview = async (): Promise<void> => {
-    if (reviewReasonRef.current === null || isPendingRef.current) {
+    if (reviewReasonRef.current === null || isPendingRef.current || isRefreshingReviewRef.current) {
       return;
     }
 
     const generation = ++generationRef.current;
+    isRefreshingReviewRef.current = true;
     setIsRefreshingReview(true);
     const {clock} = optionsRef.current;
     let deadline: ReturnType<typeof clock.setTimeout> | undefined;
@@ -209,6 +219,7 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
       }
     } finally {
       if (isMountedRef.current && generationRef.current === generation) {
+        isRefreshingReviewRef.current = false;
         setIsRefreshingReview(false);
       }
     }
@@ -216,9 +227,13 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
 
   const reset = useCallback((): void => {
     generationRef.current += 1;
+    if (isPendingRef.current) {
+      optionsRef.current.onStatusChange('status-unknown');
+    }
     cancelJobObservationRef.current?.();
     cancelJobObservationRef.current = undefined;
     isPendingRef.current = false;
+    isRefreshingReviewRef.current = false;
     reviewReasonRef.current = null;
     setIsPending(false);
     setIsRefreshingReview(false);

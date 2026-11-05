@@ -17,6 +17,8 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 import type {PermanentDeleteReviewReason} from './usePermanentDeleteReconciliation';
 
 import type {SharedDriveMoveStatusKind} from '../sharedDriveUploadStatusContext';
@@ -37,7 +39,7 @@ const kindByReviewReason: Readonly<Record<PermanentDeleteReviewReason, SharedDri
 };
 
 /**
- * Maps the permanent-delete reconciliation flags to the popup status kind, or null when nothing should be shown.
+ * Maps the permanent-delete reconciliation flags to the popup status kind, or nothing when no status should be shown.
  * Completion is reported separately by the hook's completion callbacks.
  */
 export const getPermanentDeleteStatusKind = ({
@@ -46,15 +48,15 @@ export const getPermanentDeleteStatusKind = ({
   isUnresolved,
   isReconciling,
   reviewReason,
-}: PermanentDeleteStatusInput): SharedDriveMoveStatusKind | null => {
+}: PermanentDeleteStatusInput): Maybe<SharedDriveMoveStatusKind> => {
   if (isPending || (isUnresolved && isReconciling)) {
-    return 'processing';
+    return Maybe.just('processing');
   }
   if (isUnresolved) {
-    return reviewReason === null ? 'status-unknown' : kindByReviewReason[reviewReason];
+    return Maybe.just(reviewReason === null ? 'status-unknown' : kindByReviewReason[reviewReason]);
   }
   if (isRejected) {
-    return 'request-failed';
+    return Maybe.just('request-failed');
   }
-  return null;
+  return Maybe.nothing();
 };

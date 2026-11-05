@@ -25,7 +25,7 @@ import {Maybe} from 'true-myth';
 import {CellNode, CellNodeType} from '../../../../../types/cellNode';
 
 import type {RestoreTarget} from './resolveRestoreTargets';
-import {useBulkRestore, type UseBulkRestoreOptions} from './useBulkRestore';
+import {useBulkRestore, type BulkRestoreState, type UseBulkRestoreOptions} from './useBulkRestore';
 
 const conversationQualifiedId = {id: 'conversation-id', domain: 'wire.test'};
 
@@ -500,5 +500,84 @@ describe('useBulkRestore', () => {
 
     expect(onRefreshAndReportSuccess).not.toHaveBeenCalled();
     expect(onRestoreSettled).not.toHaveBeenCalled();
+  });
+
+  describe('when background polling is cancelled before an outcome is known', () => {
+    const startPollingRestore = async (): Promise<{
+      readonly setup: BulkRestoreTestSetup;
+      readonly view: ReturnType<typeof renderHook<BulkRestoreState, unknown>>;
+      readonly restoreRequest: Promise<void>;
+    }> => {
+      const setup = createSetup();
+      setup.getBackgroundActionInfo.mockResolvedValue({Status: JobsTaskStatus.Running});
+      setup.restoreNodes.mockResolvedValue({
+        Status: RestActionStatus.Background,
+        BackgroundActions: [{Name: 'restore', JobUuid: 'job-1', Status: JobsTaskStatus.Running}],
+      });
+      const view = renderHook(() => {
+        return useBulkRestore(setup.options);
+      });
+      let restoreRequest: Promise<void> = Promise.resolve();
+      await act(async () => {
+        restoreRequest = view.result.current.restore([selected('a.txt')], 'bin-scope');
+        await Promise.resolve();
+      });
+      await waitFor(() => {
+        expect(setup.getBackgroundActionInfo).toHaveBeenCalled();
+      });
+      return {setup, view, restoreRequest};
+    };
+
+    it('reports status-unknown and settles the restore when reset', async () => {
+      const {setup, view, restoreRequest} = await startPollingRestore();
+      expect(setup.onStatusChange).toHaveBeenLastCalledWith('processing');
+
+      act(() => {
+        view.result.current.reset();
+      });
+      await act(async () => {
+        await restoreRequest;
+      });
+
+      expect(setup.onStatusChange).toHaveBeenLastCalledWith('status-unknown');
+      expect(setup.onRefreshAndReportSuccess).not.toHaveBeenCalled();
+      expect(view.result.current.isPending).toBe(false);
+    });
+
+    it('reports status-unknown and settles the restore when unmounted', async () => {
+      const {setup, view, restoreRequest} = await startPollingRestore();
+
+      view.unmount();
+      await act(async () => {
+        await restoreRequest;
+      });
+
+      expect(setup.onStatusChange).toHaveBeenLastCalledWith('status-unknown');
+      expect(setup.onRefreshAndReportSuccess).not.toHaveBeenCalled();
+    });
+  });
+
+  it('starts only one review refresh when requested twice before it settles', async () => {
+    const {restoreNodes, onRefreshAndReportSuccess, options} = createSetup();
+    restoreNodes.mockRejectedValue(new Error('network'));
+    const {result} = renderHook(() => {
+      return useBulkRestore(options);
+    });
+    await act(async () => {
+      await result.current.restore([selected('a.txt')], 'bin-scope');
+    });
+    onRefreshAndReportSuccess.mockClear();
+    onRefreshAndReportSuccess.mockReturnValue(
+      new Promise<boolean>(() => {
+        return undefined;
+      }),
+    );
+
+    act(() => {
+      void result.current.refreshReview();
+      void result.current.refreshReview();
+    });
+
+    expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
   });
 });

@@ -17,23 +17,25 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 import {getEmptyBinStatusKind} from './getEmptyBinStatusKind';
 
 describe('getEmptyBinStatusKind', () => {
   it('has no popup status while idle', () => {
-    expect(getEmptyBinStatusKind({status: 'idle', refreshFailed: false})).toBeNull();
+    expect(getEmptyBinStatusKind({status: 'idle', refreshFailed: false})).toEqual(Maybe.nothing());
   });
 
   it.each(['submitting', 'processing'] as const)('is processing while %s', status => {
-    expect(getEmptyBinStatusKind({status, refreshFailed: false})).toBe('processing');
+    expect(getEmptyBinStatusKind({status, refreshFailed: false})).toEqual(Maybe.just('processing'));
   });
 
   it('is completed when the Bin was emptied and refreshed', () => {
-    expect(getEmptyBinStatusKind({status: 'completed', refreshFailed: false})).toBe('completed');
+    expect(getEmptyBinStatusKind({status: 'completed', refreshFailed: false})).toEqual(Maybe.just('completed'));
   });
 
   it('needs review when the Bin was emptied but could not be refreshed', () => {
-    expect(getEmptyBinStatusKind({status: 'completed', refreshFailed: true})).toBe('finished-unknown');
+    expect(getEmptyBinStatusKind({status: 'completed', refreshFailed: true})).toEqual(Maybe.just('finished-unknown'));
   });
 
   it.each([
@@ -42,6 +44,6 @@ describe('getEmptyBinStatusKind', () => {
     ['unknown', 'status-unknown'],
     ['lookup-error', 'request-failed'],
   ] as const)('maps %s to %s', (status, expected) => {
-    expect(getEmptyBinStatusKind({status, refreshFailed: false})).toBe(expected);
+    expect(getEmptyBinStatusKind({status, refreshFailed: false})).toEqual(Maybe.just(expected));
   });
 });

@@ -167,6 +167,48 @@ describe('useBulkActionStatusReporter', () => {
     expect(second).toHaveBeenCalledTimes(1);
   });
 
+  it('marks the shown status as reviewing while a review runs, and keeps the mark across later reports', () => {
+    const {result} = renderReporter(jest.fn());
+    act(() => {
+      result.current.reporter.start(items);
+      result.current.reporter.report('status-unknown');
+    });
+
+    act(() => {
+      result.current.reporter.setReviewing(true);
+    });
+    expect(maybe.isJust(result.current.shown) && result.current.shown.value).toMatchObject({
+      kind: 'status-unknown',
+      isReviewing: true,
+    });
+
+    act(() => {
+      result.current.reporter.report('partial');
+    });
+    expect(maybe.isJust(result.current.shown) && result.current.shown.value).toMatchObject({
+      kind: 'partial',
+      isReviewing: true,
+    });
+
+    act(() => {
+      result.current.reporter.setReviewing(false);
+    });
+    expect(maybe.isJust(result.current.shown) && result.current.shown.value).toMatchObject({
+      kind: 'partial',
+      isReviewing: false,
+    });
+  });
+
+  it('shows nothing when a review starts before any action did', () => {
+    const {result} = renderReporter(jest.fn());
+
+    act(() => {
+      result.current.reporter.setReviewing(true);
+    });
+
+    expect(maybe.isNothing(result.current.shown)).toBe(true);
+  });
+
   it('does not attach a review callback when none is given', () => {
     const {result} = renderReporter();
 

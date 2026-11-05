@@ -20,7 +20,7 @@
 import {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {Maybe} from 'true-myth';
+import {Maybe, maybe} from 'true-myth';
 
 import {Button, ButtonVariant, TrashIcon} from '@wireapp/react-ui-kit';
 
@@ -114,14 +114,14 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   }, [canEmptyBin]);
 
   const {report: reportStatus, clear: clearStatus, isProcessing: isStatusProcessing} = statusReporter;
-  const statusKind = getEmptyBinStatusKind({status, refreshFailed});
   useEffect(() => {
-    if (statusKind === null) {
+    const statusKind = getEmptyBinStatusKind({status, refreshFailed});
+    if (maybe.isNothing(statusKind)) {
       clearStatus();
       return;
     }
-    reportStatus(statusKind);
-  }, [clearStatus, reportStatus, statusKind]);
+    reportStatus(statusKind.value);
+  }, [clearStatus, refreshFailed, reportStatus, status]);
 
   useEffect(() => {
     return () => {
@@ -135,6 +135,10 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   const isInProgress = status === 'submitting' || status === 'processing' || requiresReview;
   useEffect(() => {
     onInProgressChange(isInProgress);
+    // Leaving the Bin view must not keep the parent's lock (e.g. disabled row selection) on other views.
+    return () => {
+      onInProgressChange(false);
+    };
   }, [isInProgress, onInProgressChange]);
 
   const refreshAfterOutcome = useCallback(async (): Promise<boolean> => {
