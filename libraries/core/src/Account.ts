@@ -691,6 +691,7 @@ export class Account extends TypedEventEmitter<Events> {
     onConnectionStateChanged: onConnectionStateChangedCallBack = () => {},
     onNotificationStreamProgress = () => {},
     onMissedNotifications = () => {},
+    onSessionExpired = () => {},
     signal,
   }: {
     /**
@@ -725,6 +726,8 @@ export class Account extends TypedEventEmitter<Events> {
     useLegacy?: boolean;
     /** Cancels setup and the listener owned by this call. */
     signal?: AbortSignal;
+    /** Called when authentication invalidates the session, rather than for a transient socket closure. */
+    onSessionExpired?: () => void;
 
     /**
      * When set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
@@ -754,6 +757,7 @@ export class Account extends TypedEventEmitter<Events> {
       cleanedUp = true;
       lifetime.abort();
       signal?.removeEventListener('abort', disconnect);
+      account.apiClient.removeListener(APIClient.TOPIC.ON_LOGOUT, handleSessionExpired);
       removeWebSocketListeners();
       if (connected === true || notificationQueueStarted === true) {
         flushProposalsQueue();
@@ -779,6 +783,13 @@ export class Account extends TypedEventEmitter<Events> {
         updateConnectionState(state);
       }
     }
+    function handleSessionExpired(): void {
+      if (cleanedUp === false) {
+        onSessionExpired();
+        disconnect();
+      }
+    }
+    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, handleSessionExpired);
 
     const handleEvent = this.createEventHandler(onEvent);
 

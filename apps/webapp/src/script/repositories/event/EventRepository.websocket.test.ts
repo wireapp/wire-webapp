@@ -19,6 +19,8 @@
 
 import {Runtime} from '@wireapp/commons';
 import {Account, ConnectionState, WebSocketConnectionContext} from '@wireapp/core';
+import {InvalidTokenError} from '@wireapp/api-client/lib/auth';
+import {BackendError} from '@wireapp/api-client/lib/http';
 
 import {Warnings} from '../../view_model/WarningsContainer';
 import {EventRepository} from './EventRepository';
@@ -48,6 +50,7 @@ describe('WebSocket recovery orchestration', () => {
   const account = {listen, isWebsocketHealthy} as unknown as Account;
 
   beforeEach(() => {
+    clearReadinessTimeout.mockClear();
     connectionStateChanged = undefined;
     heartbeat = undefined;
     automaticallySynchronize = true;
@@ -269,17 +272,100 @@ describe('WebSocket recovery orchestration', () => {
     expect(clearReadinessTimeout).toHaveBeenCalledWith(456);
   });
 
-  it('rejects if the connection closes before synchronization completes', async () => {
+  it.each([true, false])('allows transport recovery during initialization with useLegacy=%s', async useLegacy => {
     listen.mockImplementation(async options => {
       connectionStateChanged = options.onConnectionStateChanged;
       return disconnect;
     });
-    const initialization = repository.connectWebSocket(account, true, noop);
-    const rejected = expect(initialization).rejects.toThrow('closed before notification synchronization');
+    const initialization = repository.connectWebSocket(account, useLegacy, noop);
+    const completed = expect(initialization).resolves.toBeUndefined();
     await flushConnectionCallbacks();
     setConnectionState(ConnectionState.CLOSED);
+    setConnectionState(ConnectionState.CONNECTING);
+    runHeartbeat();
+    await flushConnectionCallbacks();
+    expect(listen).toHaveBeenCalledTimes(1);
+    expect(disconnect).not.toHaveBeenCalled();
+    setConnectionState(ConnectionState.PROCESSING_NOTIFICATIONS);
+    expect(clearReadinessTimeout).not.toHaveBeenCalled();
+    setConnectionState(ConnectionState.LIVE);
+    await completed;
+  });
+
+  it.each([{isAxiosError: true, code: 'ERR_NETWORK'}, new BackendError('Unavailable', undefined, 503)])(
+    'recovers transient setup failure without competing attempts: %s', async failure => {
+      listen.mockRejectedValueOnce(failure);
+      const initialization = repository.connectWebSocket(account, false, noop);
+      const completed = expect(initialization).resolves.toBeUndefined();
+      await flushConnectionCallbacks();
+      expect(clearReadinessTimeout).not.toHaveBeenCalled();
+      runHeartbeat();
+      window.dispatchEvent(new Event('online'));
+      await completed;
+      expect(listen).toHaveBeenCalledTimes(2);
+      expect(listen.mock.calls[0]?.[0].signal?.aborted).toBe(true);
+    },
+  );
+
+  it('rejects an invalid-session setup failure without retrying', async () => {
+    listen.mockRejectedValueOnce(new InvalidTokenError('Session expired'));
+    await expect(repository.connectWebSocket(account, true, noop)).rejects.toThrow('WebSocket initialization failed');
+    runHeartbeat();
+    window.dispatchEvent(new Event('online'));
+    await flushConnectionCallbacks();
+    expect(listen).toHaveBeenCalledTimes(1);
+    expect(window.clearInterval).toHaveBeenCalledWith(123);
+  });
+
+  it('terminates startup when an established listener reports an invalid session', async () => {
+    automaticallySynchronize = false;
+    const initialization = repository.connectWebSocket(account, false, noop);
+    const rejected = expect(initialization).rejects.toThrow('session expired');
+    await flushConnectionCallbacks();
+    listen.mock.calls[0]?.[0].onSessionExpired?.();
     await rejected;
+    runHeartbeat();
+    await flushConnectionCallbacks();
+    expect(listen).toHaveBeenCalledTimes(1);
     expect(disconnect).toHaveBeenCalledTimes(1);
+  });
+
+  it('recovers after going offline during setup and ignores the obsolete setup result', async () => {
+    let finishFirstSetup: (cleanup: () => void) => void = noop;
+    const obsoleteDisconnect = jest.fn();
+    listen.mockImplementationOnce(async options => {
+      connectionStateChanged = options.onConnectionStateChanged;
+
+      return new Promise(resolve => { finishFirstSetup = resolve; });
+    });
+    const initialization = repository.connectWebSocket(account, true, noop);
+    const completed = expect(initialization).resolves.toBeUndefined();
+    await flushConnectionCallbacks();
+    window.dispatchEvent(new Event('offline'));
+    expect(listen.mock.calls[0]?.[0].signal?.aborted).toBe(true);
+    window.dispatchEvent(new Event('online'));
+    await completed;
+    finishFirstSetup(obsoleteDisconnect);
+    await flushConnectionCallbacks();
+    expect(listen).toHaveBeenCalledTimes(2);
+    expect(obsoleteDisconnect).toHaveBeenCalledTimes(1);
+    expect(disconnect).not.toHaveBeenCalled();
+  });
+
+  it('cancels pending startup recovery and removes all recovery sources', async () => {
+    listen.mockRejectedValueOnce({isAxiosError: true, code: 'ERR_NETWORK'});
+    const initialization = repository.connectWebSocket(account, true, noop);
+    const cancelled = expect(initialization).rejects.toThrow('cancelled');
+    await flushConnectionCallbacks();
+    repository.disconnectWebSocket();
+    await cancelled;
+    runHeartbeat();
+    window.dispatchEvent(new Event('online'));
+    document.dispatchEvent(new Event('visibilitychange'));
+    await flushConnectionCallbacks();
+    expect(listen).toHaveBeenCalledTimes(1);
+    expect(clearReadinessTimeout).toHaveBeenCalledWith(456);
+    expect(window.clearInterval).toHaveBeenCalledWith(123);
   });
 
   it('rejects a stalled setup at the injected readiness deadline and ignores late LIVE', async () => {
@@ -295,6 +381,11 @@ describe('WebSocket recovery orchestration', () => {
     setConnectionState(ConnectionState.LIVE);
     expect(repository.notificationHandlingState()).not.toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
     expect(listen.mock.calls[0]?.[0].signal?.aborted).toBe(true);
+    expect(window.clearInterval).toHaveBeenCalledWith(123);
+    runHeartbeat();
+    window.dispatchEvent(new Event('online'));
+    await flushConnectionCallbacks();
+    expect(listen).toHaveBeenCalledTimes(1);
   });
 
   it('cancels overlapping initialization and ignores obsolete connection callbacks', async () => {

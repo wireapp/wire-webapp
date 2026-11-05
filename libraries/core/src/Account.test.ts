@@ -411,11 +411,13 @@ describe('Account', () => {
         webSocket.on(WebSocketClient.TOPIC.ON_MESSAGE, externalMessage);
         webSocket.on(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, externalRetry);
         const stateListenerCount = webSocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE);
+        const logoutListenerCount = apiClient.listenerCount(APIClient.TOPIC.ON_LOGOUT);
         capabilityUpdate.mockRejectedValue(new Error('Capability update failed'));
         for (let attempt = 0; attempt < 3; attempt += 1) {
           await expect(account.listen({useLegacy: true})).rejects.toThrow('Capability update failed');
           expect(webSocket.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(1);
           expect(webSocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE)).toBe(stateListenerCount);
+          expect(apiClient.listenerCount(APIClient.TOPIC.ON_LOGOUT)).toBe(logoutListenerCount);
         }
         expect(connect).not.toHaveBeenCalled();
         capabilityUpdate.mockResolvedValue(undefined);
@@ -427,6 +429,25 @@ describe('Account', () => {
         expect(externalMessage).toHaveBeenCalledTimes(1);
         expect(externalRetry).toHaveBeenCalledTimes(1);
         expect(webSocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE)).toBe(stateListenerCount);
+        expect(apiClient.listenerCount(APIClient.TOPIC.ON_LOGOUT)).toBe(logoutListenerCount);
+      });
+
+      it('reports an expired session and removes only its owned logout subscription', async () => {
+        const {account, apiClient} = dependencies;
+        jest.spyOn(account.service!.client, 'putClientCapabilities').mockResolvedValue(undefined);
+        jest.spyOn(apiClient, 'connect').mockReturnValue(apiClient.transport.ws);
+        const externalLogout = jest.fn();
+        const sessionExpired = jest.fn();
+        apiClient.on(APIClient.TOPIC.ON_LOGOUT, externalLogout);
+        const originalListenerCount = apiClient.listenerCount(APIClient.TOPIC.ON_LOGOUT);
+        const disconnect = await account.listen({useLegacy: true, onSessionExpired: sessionExpired});
+        apiClient.emit(APIClient.TOPIC.ON_LOGOUT);
+        disconnect();
+        expect(sessionExpired).toHaveBeenCalledTimes(1);
+        expect(externalLogout).toHaveBeenCalledTimes(1);
+        expect(apiClient.listenerCount(APIClient.TOPIC.ON_LOGOUT)).toBe(originalListenerCount);
+        expect(apiClient.transport.ws.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(0);
+        apiClient.removeListener(APIClient.TOPIC.ON_LOGOUT, externalLogout);
       });
 
       it('does not connect after capability setup is cancelled', async () => {

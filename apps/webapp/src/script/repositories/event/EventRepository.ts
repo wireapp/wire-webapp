@@ -23,6 +23,7 @@ import {
   ConversationOtrMessageAddEvent,
   ConversationMLSMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
+import {BackendError} from '@wireapp/api-client/lib/http';
 import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -39,6 +40,7 @@ import {EventName} from 'Repositories/tracking/EventName';
 import {UserState} from 'Repositories/user/UserState';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {isAxiosError} from 'Util/TypePredicateUtil';
 
 import {ClientEvent} from './Client';
 import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
@@ -71,6 +73,23 @@ type ReadinessClock = {
 
 function getNotificationHandlingStateName(notificationHandlingState: NOTIFICATION_HANDLING_STATE): string {
   return notificationHandlingState.split('.').at(-1) ?? notificationHandlingState;
+}
+
+function isRecoverableConnectionSetupFailure(error: unknown): boolean {
+  if (isAxiosError(error) && error.response === undefined) {
+    return ['ERR_NETWORK', 'ECONNABORTED', 'ETIMEDOUT', 'ECONNRESET', 'ENOTFOUND', 'EAI_AGAIN'].includes(
+      error.code ?? '',
+    );
+  }
+  const statusCode =
+    error instanceof BackendError ? error.code : isAxiosError(error) ? error.response?.status : undefined;
+
+  return (
+    statusCode === 408 ||
+    statusCode === 420 ||
+    statusCode === 429 ||
+    (statusCode !== undefined && statusCode >= 500 && statusCode < 600)
+  );
 }
 
 export class EventRepository {
@@ -226,7 +245,7 @@ export class EventRepository {
     this.disconnectWebSocket();
 
     const cleanupHandlers: Array<() => void> = [];
-    const connectionLifetime = new AbortController();
+    let connectionAttemptLifetime: AbortController | undefined;
     let disposed = false;
     let readinessSettled = false;
     let resolveReadiness: () => void = () => {};
@@ -258,7 +277,7 @@ export class EventRepository {
         return;
       }
       disposed = true;
-      connectionLifetime.abort();
+      connectionAttemptLifetime?.abort();
       cleanupHandlers.forEach(cleanup => {
         cleanup();
       });
@@ -299,12 +318,22 @@ export class EventRepository {
         `[WebSocketLifecycle] layer=event-repository event=connect-start trigger=${trigger} connectCycleId=${currentConnectCycleId} ${getBrowserConnectionContext()}`,
       );
       connectionInProgress = true;
+      connectionAttemptLifetime?.abort();
       actualDisconnect();
+      actualDisconnect = () => {};
+      const attemptLifetime = new AbortController();
+      connectionAttemptLifetime = attemptLifetime;
       let setupCompleted = false;
       try {
         const disconnectAttempt = await account.listen({
           useLegacy,
-          signal: connectionLifetime.signal,
+          signal: attemptLifetime.signal,
+          onSessionExpired: () => {
+            if (disposed === false && currentConnectCycleId === connectCycleId) {
+              failInitialization(new Error('WebSocket session expired during initialization'));
+              disconnect();
+            }
+          },
           onConnectionStateChanged: (
             connectionState: ConnectionState,
             connectionContext: WebSocketConnectionContext | undefined,
@@ -321,9 +350,7 @@ export class EventRepository {
             this.logger.info(
               `[WebSocketLifecycle] layer=event-repository event=connection-state-change connectCycleId=${currentConnectCycleId} state=${connectionState.toUpperCase()}${lifecycleConnectionContext}`,
             );
-            if (connectionState === ConnectionState.CLOSED) {
-              failInitialization(new Error('WebSocket closed before notification synchronization completed'));
-            } else if (connectionState === ConnectionState.LIVE && setupCompleted === true) {
+            if (connectionState === ConnectionState.LIVE && setupCompleted === true) {
               completeInitialization();
             }
           },
@@ -332,7 +359,7 @@ export class EventRepository {
           onNotificationStreamProgress: onNotificationStreamProgress,
           dryRun,
         });
-        if (connectionLifetime.signal.aborted === true || currentConnectCycleId !== connectCycleId) {
+        if (attemptLifetime.signal.aborted === true || currentConnectCycleId !== connectCycleId) {
           disconnectAttempt();
           return;
         }
@@ -344,7 +371,11 @@ export class EventRepository {
         this.logger.info(
           `[WebSocketLifecycle] layer=event-repository event=connect-setup-success trigger=${trigger} connectCycleId=${currentConnectCycleId}`,
         );
-      } catch {
+      } catch (error: unknown) {
+        if (attemptLifetime.signal.aborted === true || currentConnectCycleId !== connectCycleId) {
+          return;
+        }
+        attemptLifetime.abort();
         actualDisconnect = () => {};
         currentConnectionState = ConnectionState.CLOSED;
         if (disposed === false) {
@@ -353,9 +384,14 @@ export class EventRepository {
         this.logger.warn(
           `[WebSocketLifecycle] layer=event-repository event=connect-failure trigger=${trigger} connectCycleId=${currentConnectCycleId}`,
         );
-        failInitialization(new Error('WebSocket initialization failed'));
+        if (isRecoverableConnectionSetupFailure(error) === false) {
+          failInitialization(new Error('WebSocket initialization failed'));
+          disconnect();
+        }
       } finally {
-        connectionInProgress = false;
+        if (currentConnectCycleId === connectCycleId) {
+          connectionInProgress = false;
+        }
       }
     };
 
@@ -365,10 +401,10 @@ export class EventRepository {
       }
 
       this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-      void connect('online');
+      void verifyConnectionHealthAndReconnect('online');
     };
 
-    const verifyConnectionHealthAndReconnect = async (trigger: 'focus' | 'visibility' | 'heartbeat') => {
+    const verifyConnectionHealthAndReconnect = async (trigger: 'focus' | 'visibility' | 'heartbeat' | 'online') => {
       if (disposed === true) {
         return;
       }
@@ -446,8 +482,13 @@ export class EventRepository {
 
     const handleOffline = () => {
       this.logger.warn('Internet connection lost');
-      failInitialization(new Error('WebSocket initialization interrupted by an offline connection'));
+      connectCycleId += 1;
+      connectionAttemptLifetime?.abort();
       actualDisconnect();
+      actualDisconnect = () => {};
+      connectionInProgress = false;
+      currentConnectionState = ConnectionState.CLOSED;
+      this.updateConnectivitityStatus(ConnectionState.CLOSED);
       Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
     };
 
