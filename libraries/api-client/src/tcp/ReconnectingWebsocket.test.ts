@@ -179,6 +179,29 @@ async function startEchoServer(): Promise<WebSocketServer> {
 /* eslint-disable jest/no-done-callback */
 
 describe('ReconnectingWebsocket', () => {
+  it('does not send health-check pings on async notification sockets', async () => {
+    const socket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.OPEN);
+    const websocket = new ReconnectingWebsocket(
+      async () => {
+        return 'ws://example.test/events';
+      },
+      {
+        websocketFactory: () => {
+          return socket;
+        },
+      },
+    );
+    websocket.disablePinging();
+    websocket.connect();
+
+    try {
+      expect(await websocket.checkHealth()).toBe(true);
+      expect(socket.send).not.toHaveBeenCalled();
+    } finally {
+      websocket.disconnect();
+    }
+  });
+
   let server: WebSocketServer | undefined;
   let currentTimestampInMilliseconds = 1_000_000;
   const activeConnections: ReconnectingWebsocket[] = [];

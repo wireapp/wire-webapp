@@ -17,6 +17,8 @@
  *
  */
 
+/* global globalThis */
+
 import logdown from 'logdown';
 import PartySocketWebSocket, {type CloseEvent, type ErrorEvent, type Options} from 'partysocket/ws';
 
@@ -514,6 +516,11 @@ export class ReconnectingWebsocket {
     if (state !== WEBSOCKET_STATE.OPEN) {
       this.logger.debug(`Health check skipped — socket not OPEN (state: ${WEBSOCKET_STATE[state]})`);
       return Promise.resolve(false);
+    }
+
+    // Async notification sockets do not accept application-level ping messages.
+    if (this.isPingingEnabled === false) {
+      return Promise.resolve(true);
     }
 
     const now = this.options.wallClock.currentTimestampInMilliseconds;
