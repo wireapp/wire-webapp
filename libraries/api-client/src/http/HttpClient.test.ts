@@ -41,6 +41,29 @@ describe('HttpClient', () => {
   };
 
   describe('"_sendRequest"', () => {
+    it('preserves a configured signal through automatic authentication recovery', async () => {
+      const client = new HttpClient(testConfig, new AccessTokenStore());
+      const lifetime = new AbortController();
+      let rejectRefresh: (error: unknown) => void = () => {};
+      const unauthorized = {isAxiosError: true, response: {status: StatusCode.UNAUTHORIZED}};
+      const request = jest.spyOn(client.client, 'request')
+        .mockRejectedValueOnce(unauthorized)
+        .mockImplementation(() => {
+          return new Promise((_resolve, reject) => { rejectRefresh = reject; });
+        });
+      const invalidSession = jest.fn();
+      client.on(HttpClient.TOPIC.ON_INVALID_TOKEN, invalidSession);
+      const pending = client._sendRequest({config: {method: 'get', url: '/cookies', signal: lifetime.signal}});
+      const rejected = expect(pending).rejects.toThrow('Cancelled request');
+      await Promise.resolve();
+      lifetime.abort();
+      rejectRefresh(new Error('Cancelled request'));
+      await rejected;
+      expect(request).toHaveBeenCalledTimes(2);
+      expect(request).toHaveBeenNthCalledWith(2, expect.objectContaining({signal: lifetime.signal}));
+      expect(invalidSession).not.toHaveBeenCalled();
+    });
+
     it('does not recover authentication from a late response to a cancelled request', async () => {
       const client = new HttpClient(testConfig, new AccessTokenStore());
       const lifetime = new AbortController();

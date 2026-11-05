@@ -55,8 +55,14 @@ type SendRequest = {
 type AccessTokenRequestOptions = {
   readonly expiredAccessToken?: AccessTokenData;
   readonly clientId?: string;
-  readonly signal?: AbortSignal;
+  readonly signal?: AxiosRequestConfig['signal'];
 };
+
+function throwIfRequestAborted(signal: AxiosRequestConfig['signal']): void {
+  if (signal?.aborted === true) {
+    throw new DOMException('Access token refresh was cancelled', 'AbortError');
+  }
+}
 
 export interface HttpClient {
   on(event: TOPIC.ON_CONNECTION_STATE_CHANGE, listener: (state: ConnectionState) => void): this;
@@ -186,7 +192,7 @@ export class HttpClient extends EventEmitter {
       }
       const retryWithTokenRefresh = async () => {
         this.logger.warn('Access token refresh triggered by an authenticated request');
-        await this.refreshAccessToken(abortController?.signal);
+        await this.refreshAccessToken(abortController?.signal ?? config.signal);
         config['axios-retry'] = {
           retries: 0,
         };
@@ -254,15 +260,15 @@ export class HttpClient extends EventEmitter {
     return false;
   }
 
-  public async refreshAccessToken(signal?: AbortSignal): Promise<AccessTokenData> {
-    signal?.throwIfAborted();
+  public async refreshAccessToken(signal?: AxiosRequestConfig['signal']): Promise<AccessTokenData> {
+    throwIfRequestAborted(signal);
     let expiredAccessToken: AccessTokenData | undefined;
     if (this.accessTokenStore.accessTokenData?.access_token) {
       expiredAccessToken = this.accessTokenStore.accessTokenData;
     }
 
     const accessToken = await this.requestAccessToken({expiredAccessToken, signal});
-    signal?.throwIfAborted();
+    throwIfRequestAborted(signal);
     this.logger.info(
       `Received updated access token. It will expire in "${accessToken.expires_in}" seconds.`,
       ObfuscationUtil.obfuscateAccessToken(accessToken),
