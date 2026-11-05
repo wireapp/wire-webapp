@@ -288,11 +288,31 @@ describe('CellsHeader', () => {
     expect(screen.getByRole('button', {name: 'Public links'})).toBeInTheDocument();
   });
 
-  it('renders the viewer permission banner when restricted', () => {
-    renderCellsHeader({showViewerPermission: true, isSearchViewOpen: false});
+  it('keeps a dismissed viewer permission banner hidden when reopening the conversation', async () => {
+    const dismissedKey = 'conversation-viewer-permission-banner-dismissed:conversation-id@wire.com';
+    sessionStorage.removeItem(dismissedKey);
+    const view = renderCellsHeader({showViewerPermission: true, isSearchViewOpen: false});
 
     expect(screen.getByRole('status')).toBeInTheDocument();
     expect(screen.getByText('conversationFileUploadRestrictedOverlayDescription')).toBeInTheDocument();
+    expect(screen.getByText('conversationViewerPermissionBannerMessagesAllowed')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', {name: 'accessibility.rightPanel.close'}));
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+
+    view.unmount();
+    renderCellsHeader({showViewerPermission: true, isSearchViewOpen: false});
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+
+    renderCellsHeader({
+      showViewerPermission: true,
+      isSearchViewOpen: false,
+      conversationQualifiedId: {id: 'another-conversation', domain: 'wire.com'},
+    });
+    expect(screen.getByRole('status')).toBeInTheDocument();
+
+    sessionStorage.removeItem(dismissedKey);
+    sessionStorage.removeItem('conversation-viewer-permission-banner-dismissed:another-conversation@wire.com');
   });
 
   it('renders the new-item menu outside the recycle bin', () => {

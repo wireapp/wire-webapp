@@ -881,6 +881,7 @@
   "conversationFileUploadOverlayDescription": "Drag and Drop nutzen, um Dateien hinzuzufügen",
   "conversationFileUploadOverlayTitle": "Dateien hochladen",
   "conversationFileUploadRestrictedOverlayDescription": "Sie haben Betrachter-Zugriff für diese Unterhaltung, können jedoch keine Dateien hochladen, bearbeiten oder verwalten.",
+  "conversationViewerPermissionBannerMessagesAllowed": "Sie können weiterhin Nachrichten senden.",
   "conversationFileUploadRestrictedOverlayTitle": "Dateien können nicht geteilt werden",
   "conversationFileVideoPreviewLabel": "Vorschau der Videodatei für: {src}",
   "conversationFoldersEmptyText": "Fügen Sie Ihre Unterhaltungen Ordnern hinzu, um organisiert zu bleiben.",

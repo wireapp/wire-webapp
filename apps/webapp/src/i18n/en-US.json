@@ -1028,6 +1028,7 @@
   "conversationVideoAssetRestricted": "Receiving videos is prohibited",
   "conversationViewAllConversations": "All conversations",
   "conversationViewTooltip": "All",
+  "conversationViewerPermissionBannerMessagesAllowed": "You can still send messages.",
   "conversationVoiceChannelDeactivate": " called",
   "conversationVoiceChannelDeactivateYou": " called",
   "conversationWithBlockedUser": "You blocked this user",
