@@ -48,7 +48,6 @@ import {
 import {bulkMoveReducer} from './bulkMoveState';
 import {CellsBulkMovePreviewModal} from './cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
 import {normalizeCellsPath} from './cellsBulkMovePreviewModal/normalizeCellsPath';
-import {isBulkMoveValid} from './cellsBulkMovePreviewModal/validateBulkMove';
 import {CellsBulkMoveToBinConfirmationModal} from './cellsBulkMoveToBinConfirmationModal';
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
@@ -175,8 +174,6 @@ const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
   );
 };
 
-const INTERNAL_DRIVE_DRAG_TYPE = 'application/x-wire-drive-nodes';
-
 const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean => {
   return Array.from(event.dataTransfer.types).includes('Files');
 };
@@ -250,11 +247,6 @@ const getPermanentDeleteReviewMessageKey = (
       return 'cells.bulkDelete.timedOut';
   }
 };
-
-interface CapturedDriveDrag {
-  nodeIds: string[];
-  scopeKey: string;
-}
 
 interface CapturedBulkMoveToBinSelection {
   nodeIds: string[];
@@ -1074,6 +1066,19 @@ export const CellsTable = ({
     setActiveFolderDropTargetId(null);
     setActiveFolderDropTargetName(null);
   }, [folderDropResetKey]);
+
+  const getDriveDragNodesForEvent = (destination: CellNode, event: DragEvent<HTMLElement>): CellNode[] | null => {
+    return getDriveDragNodes({
+      activeDrag: activeDriveDrag.current,
+      dataTransferTypes: Array.from(event.dataTransfer.types),
+      selectedNodeIds: selectedNodeIdsRef.current,
+      selectionScopeKey: selectionScopeKeyRef.current,
+      canMoveSelection,
+      destination,
+      nodes,
+      conversationQualifiedId,
+    });
+  };
 
   const setActiveFolderDropTarget = (node: CellNode | null, isFileUpload = true): void => {
     setActiveFolderDropTargetId(node?.id ?? null);
