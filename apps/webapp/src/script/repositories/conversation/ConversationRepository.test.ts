@@ -161,10 +161,7 @@ function getConversationServiceFromCoreForTest(core: Core): NonNullable<NonNulla
   return requireValueForTest(requireValueForTest(core.service).conversation);
 }
 
-function buildConversationRepository(
-  translate: Translate,
-  isMarkAsUnreadFeatureEnabled: boolean = false,
-): ConversationRepositoryTestFixture {
+function buildConversationRepository(translate: Translate): ConversationRepositoryTestFixture {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
   // @ts-ignore
@@ -211,7 +208,6 @@ function buildConversationRepository(
     callingRepository,
     {} as any,
     translate,
-    {isMarkAsUnreadFeatureEnabled},
     userState,
     teamState,
     conversationState,
@@ -3569,47 +3565,28 @@ describe('ConversationRepository', () => {
       expect(conversations).toHaveLength(remoteConversations.found.length);
     });
 
-    it('discards persisted manual unread state while disabled so it cannot return after re-enabling', async () => {
+    it('preserves persisted manual unread state when loading conversations', async () => {
       const existingConversation = _generateConversation();
       existingConversation.last_read_timestamp(500);
       existingConversation.manualUnreadTimestamp(100);
-      let persistedConversations: ConversationRecord[] = [existingConversation.serialize()];
+      const persistedConversations = [existingConversation.serialize()];
       const remoteConversations = {failed: [], found: []} as unknown as RemoteConversations;
-
-      const [disabledRepository] = buildConversationRepository(translateForTest, false);
-      const disabledConversationService = disabledRepository['conversationService'];
-      jest.spyOn(disabledConversationService, 'loadConversationStatesFromDb').mockImplementation(async () => {
-        return persistedConversations as unknown as ConversationDatabaseData[];
-      });
-      const saveDisabledState = jest
-        .spyOn(disabledConversationService, 'saveConversationsInDb')
-        .mockImplementation(async conversations => {
-          persistedConversations = conversations;
-          return conversations;
-        });
-
-      const disabledConversations = await disabledRepository['loadRemoteConversations'](remoteConversations, []);
-
-      expect(saveDisabledState).toHaveBeenCalledTimes(1);
-      expect(persistedConversations.at(0)).not.toHaveProperty('manual_unread_timestamp');
-      expect(persistedConversations.at(0)?.last_read_timestamp).toBe(500);
-      expect(disabledConversations.at(0)?.manualUnreadTimestamp()).toBeUndefined();
-
-      const [enabledRepository] = buildConversationRepository(translateForTest, true);
+      const [conversationRepository, {conversationService}] = buildConversationRepository(translateForTest);
       jest
-        .spyOn(enabledRepository['conversationService'], 'loadConversationStatesFromDb')
-        .mockImplementation(async () => {
-          return persistedConversations as unknown as ConversationDatabaseData[];
-        });
+        .spyOn(conversationService, 'loadConversationStatesFromDb')
+        .mockResolvedValue(persistedConversations as unknown as ConversationDatabaseData[]);
+      const saveConversations = jest.spyOn(conversationService, 'saveConversationsInDb');
 
-      const enabledConversations = await enabledRepository['loadRemoteConversations'](remoteConversations, []);
+      const conversations = await conversationRepository['loadRemoteConversations'](remoteConversations, []);
 
-      expect(enabledConversations.at(0)?.manualUnreadTimestamp()).toBeUndefined();
-      expect(enabledConversations.at(0)?.last_read_timestamp()).toBe(500);
+      expect(saveConversations).not.toHaveBeenCalled();
+      expect(persistedConversations.at(0)?.manual_unread_timestamp).toBe(100);
+      expect(conversations.at(0)?.manualUnreadTimestamp()).toBe(100);
+      expect(conversations.at(0)?.last_read_timestamp()).toBe(500);
     });
 
     it('loads unread history from the local manual boundary without changing canonical read state', async () => {
-      const [conversationRepository] = buildConversationRepository(translateForTest, true);
+      const [conversationRepository] = buildConversationRepository(translateForTest);
       const conversation = _generateConversation();
       const firstUnreadMessage = new ContentMessage(createUuid(), translateForTest);
       firstUnreadMessage.timestamp(300);

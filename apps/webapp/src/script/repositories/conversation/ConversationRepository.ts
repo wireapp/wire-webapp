@@ -183,10 +183,6 @@ import {UserFilter} from '../user/userFilter';
 import {UserRepository} from '../user/userRepository';
 import {UserState} from '../user/userState';
 
-export type ConversationRepositoryOptions = {
-  readonly isMarkAsUnreadFeatureEnabled: boolean;
-};
-
 function withoutManualUnreadTimestamp<ConversationData extends ConversationRecord>(
   conversationData: ConversationData,
 ): ConversationData {
@@ -298,7 +294,6 @@ export class ConversationRepository {
     private readonly callingRepository: CallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly translate: Translate,
-    private readonly options: ConversationRepositoryOptions,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -1012,18 +1007,7 @@ export class ConversationRepository {
     connections: ConnectionEntity[],
     deadConnections: ConnectionEntity[] = [],
   ): Promise<Conversation[]> {
-    let localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
-
-    if (!this.options.isMarkAsUnreadFeatureEnabled) {
-      const hasManualUnreadMarkers = localConversations.some(conversationData => {
-        return !isUndefined(conversationData.manual_unread_timestamp);
-      });
-
-      if (hasManualUnreadMarkers) {
-        localConversations = localConversations.map(withoutManualUnreadTimestamp);
-        await this.conversationService.saveConversationsInDb(localConversations);
-      }
-    }
+    const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
 
     let conversationsData: any[];
 
@@ -2728,10 +2712,7 @@ export class ConversationRepository {
     initialTimestamp = this.getLatestEventTimestamp(true),
   ): Conversation[] {
     const conversationData = payload as ConversationDatabaseData[];
-    const conversationsForMapping = this.options.isMarkAsUnreadFeatureEnabled
-      ? conversationData
-      : conversationData.map(withoutManualUnreadTimestamp);
-    const entities = ConversationMapper.mapConversations(conversationsForMapping, initialTimestamp, this.translate);
+    const entities = ConversationMapper.mapConversations(conversationData, initialTimestamp, this.translate);
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.userState.self());
