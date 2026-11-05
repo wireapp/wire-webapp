@@ -296,4 +296,39 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
 
     websocket.disconnect();
   });
+  it('correlates attempts across wrapper replacement and suppresses sensitive transport diagnostics', async () => {
+    const {backFromSleepHandler, registrations} = createBackFromSleepHandlerTestDependencies();
+    const oldSocket = createMockSocket(WEBSOCKET_STATE.OPEN);
+    const nextSocket = createMockSocket(WEBSOCKET_STATE.OPEN);
+    const onReconnect = jest.fn().mockResolvedValue('wss://example.test?access_token=secret');
+    const websocket = new ReconnectingWebsocket(onReconnect, {
+      backFromSleepHandler,
+      wallClock: createTestWallClock(10_000),
+      websocketFactory: createMockWebsocketFactory(oldSocket, nextSocket),
+    });
+    const information = jest.spyOn(websocket['logger'], 'info');
+    const warning = jest.spyOn(websocket['logger'], 'warn');
+    const onOpen = jest.fn();
+    websocket.setOnOpen(onOpen);
+    websocket.disablePinging();
+    websocket.connect();
+    await websocket['internalOnReconnect']();
+    oldSocket.onopen?.(new Event('open'));
+    expect(onOpen).toHaveBeenLastCalledWith(expect.any(Event), expect.objectContaining({attemptId: 1, wrapperGeneration: 1}));
+    websocket['handleBackFromSleep']({expectedIntervalMilliseconds: 2000, observedIntervalMilliseconds: 10_000, suspensionDurationMilliseconds: 8000});
+    await websocket['internalOnReconnect']();
+    nextSocket.onopen?.(new Event('open'));
+    expect(onOpen).toHaveBeenLastCalledWith(expect.any(Event), expect.objectContaining({attemptId: 2, wrapperGeneration: 2}));
+    const numberOfLogs = information.mock.calls.length;
+    oldSocket.onopen?.(new Event('open'));
+    expect(information).toHaveBeenCalledTimes(numberOfLogs);
+    nextSocket.onerror?.({message: 'private-error access_token=secret'} as ErrorEvent);
+    nextSocket.onclose?.({code: 1006, reason: 'private-close Cookie: secret', wasClean: false} as CloseEvent);
+    websocket.disconnect('private-disconnect');
+    expect(information).toHaveBeenCalledWith(expect.stringContaining('suspensionDurationMs=8000'));
+    expect(information).toHaveBeenCalledWith(expect.stringContaining('event=socket-open attemptId=2 wrapperGeneration=2'));
+    expect(JSON.stringify([...information.mock.calls, ...warning.mock.calls])).not.toMatch(/private-error|private-close|private-disconnect|access_token|Cookie:/);
+    expect(getLatestBackFromSleepRegistration(registrations)).toBeDefined();
+  });
+
 });

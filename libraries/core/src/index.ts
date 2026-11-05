@@ -17,7 +17,7 @@
  *
  */
 
-export {Account, ConnectionState, ProcessedEventPayload} from './Account';
+export {Account, ConnectionState, ProcessedEventPayload, WebSocketConnectionContext} from './Account';
 export * as auth from './auth/';
 export * from './conversation/';
 export {CoreError} from './CoreError';

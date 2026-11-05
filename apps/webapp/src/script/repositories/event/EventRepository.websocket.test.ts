@@ -18,7 +18,7 @@
  */
 
 import {Runtime} from '@wireapp/commons';
-import {Account, ConnectionState} from '@wireapp/core';
+import {Account, ConnectionState, WebSocketConnectionContext} from '@wireapp/core';
 
 import {Warnings} from '../../view_model/WarningsContainer';
 import {EventRepository} from './EventRepository';
@@ -37,7 +37,7 @@ async function flushConnectionCallbacks(): Promise<void> {
 
 describe('WebSocket recovery orchestration', () => {
   let repository: EventRepository;
-  let connectionStateChanged: ((state: ConnectionState) => void) | undefined;
+  let connectionStateChanged: ((state: ConnectionState, context?: WebSocketConnectionContext) => void) | undefined;
   let heartbeat: (() => void) | undefined;
   const disconnect = jest.fn();
   const listen = jest.fn<Promise<() => void>, [ListenOptions]>();
@@ -216,4 +216,25 @@ describe('WebSocket recovery orchestration', () => {
     expect(listen).not.toHaveBeenCalled();
     expect(isWebsocketHealthy).not.toHaveBeenCalled();
   });
+  it('correlates application recovery cycles with the transport context', async () => {
+    const information = jest.spyOn(repository.logger, 'info');
+    await connect();
+    connectionStateChanged?.(ConnectionState.CLOSED, {attemptId: 12, wrapperGeneration: 4});
+    runHeartbeat();
+    await flushConnectionCallbacks();
+
+    expect(information).toHaveBeenCalledWith(expect.stringContaining('connectCycleId=1 state=CLOSED attemptId=12 wrapperGeneration=4'));
+    expect(information).toHaveBeenCalledWith(expect.stringContaining('event=connect-start trigger=heartbeat-closed connectCycleId=2'));
+    expect(listen).toHaveBeenCalledTimes(1);
+  });
+
+  it('logs setup failures without serializing their sensitive contents', async () => {
+    const warning = jest.spyOn(repository.logger, 'warn');
+    listen.mockRejectedValue(new Error('private-notification Cookie: secret-cookie'));
+    await repository.connectWebSocket(account, true, noop);
+
+    expect(warning).toHaveBeenCalledWith(expect.stringContaining('event=connect-failure trigger=initial connectCycleId=1'));
+    expect(JSON.stringify(warning.mock.calls)).not.toMatch(/private-notification|secret-cookie/);
+  });
+
 });

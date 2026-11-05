@@ -460,17 +460,17 @@ describe('WebSocketClient', () => {
     });
   });
 
-  describe('buildWebSocketUrl', () => {
-    function createHttpClientWithWebSocketTokens(accessToken: string, nextMarkerToken: string): WebSocketHttpClient {
+  function createHttpClientWithWebSocketTokens(accessToken: string, nextMarkerToken: string): WebSocketHttpClient {
       return {
         ...fakeHttpClient,
         accessTokenStore: {
-          getAccessToken: () => accessToken,
-          getNextMarkerToken: () => nextMarkerToken,
+          getAccessToken: () => {return accessToken;},
+          getNextMarkerToken: () => {return nextMarkerToken;},
         },
       };
-    }
+  }
 
+  describe('buildWebSocketUrl', () => {
     it('builds a legacy await WebSocket URL without the async sync marker', () => {
       const websocketClient = createWebSocketClientWithTestWallClock(
         'wss://websocket.example.test',
@@ -500,6 +500,65 @@ describe('WebSocketClient', () => {
       expect(websocketClient.buildWebSocketUrl()).toBe(
         `wss://websocket.example.test/v${MINIMUM_API_VERSION}/events?access_token=access-token&sync_marker=marker-token&client=client-id`,
       );
+    });
+  });
+
+  describe('lifecycle diagnostics', () => {
+    const reconnectContext = {attemptId: 12, wrapperGeneration: 4, reconnectAttemptCount: 3, reconnectSequenceRetryCount: 2};
+
+    it('correlates authenticated preflight failures without exposing untrusted errors', async () => {
+      const failure = new Error('private-notification Cookie: secret-cookie https://user:password@example.test?secret=value');
+      const httpClient = createWebSocketReconnectHttpClient({
+        refreshAccessToken: jest.fn(),
+        hasValidAccessToken: () => {return true;},
+        sendRequest: jest.fn().mockRejectedValue(failure),
+      });
+      const client = createWebSocketClientWithTestWallClock('wss://example.test', httpClient);
+      webSocketClients.push(client);
+      const warning = jest.spyOn(client['logger'], 'warn');
+      const buildUrl = jest.spyOn(client, 'buildWebSocketUrl');
+
+      await expect(client['onReconnect'](reconnectContext)).rejects.toBe(failure);
+
+      expect(buildUrl).not.toHaveBeenCalled();
+      expect(warning).toHaveBeenCalledWith(expect.stringContaining('event=auth-preflight-failure attemptId=12 wrapperGeneration=4'));
+      expect(warning.mock.calls.every(call => {return call.length === 1 && typeof call[0] === 'string';})).toBe(true);
+      expect(JSON.stringify(warning.mock.calls)).not.toMatch(/private-notification|secret-cookie|password|secret=value/);
+    });
+
+    it('logs only endpoint and presence flags while preserving the complete async URL', () => {
+      const client = createWebSocketClientWithTestWallClock('wss://user:password@example.test',
+        createHttpClientWithWebSocketTokens('secret-access', 'secret-marker'));
+      webSocketClients.push(client);
+      client.useVersion(MINIMUM_API_VERSION);
+      client.useAsyncNotificationsSocket();
+      client['clientId'] = 'secret-client';
+      const information = jest.spyOn(client['logger'], 'info');
+
+      const address = client.buildWebSocketUrl(reconnectContext);
+
+      expect(address).toContain('access_token=secret-access&sync_marker=secret-marker&client=secret-client');
+      expect(information).toHaveBeenCalledWith(expect.stringContaining('attemptId=12 wrapperGeneration=4 endpoint=async-events accessTokenPresent=true clientPresent=true markerIncluded=true'));
+      expect(JSON.stringify(information.mock.calls)).not.toMatch(/secret-access|secret-marker|secret-client|password|example.test/);
+    });
+
+    it('preserves invalid-session events while keeping socket-error diagnostics private', async () => {
+      const failure = new InvalidTokenError('arbitrary-private-content');
+      const client = createWebSocketClientWithTestWallClock('wss://example.test', createWebSocketReconnectHttpClient({
+        refreshAccessToken: jest.fn().mockRejectedValue(failure),
+        hasValidAccessToken: () => {return true;},
+        sendRequest: jest.fn(),
+      }));
+      webSocketClients.push(client);
+      const invalidSession = jest.fn();
+      client.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, invalidSession);
+      const warning = jest.spyOn(client['logger'], 'warn');
+
+      await client['onError']({message: 'private-socket-error'} as ErrorEvent, reconnectContext);
+
+      expect(invalidSession).toHaveBeenCalledWith(failure);
+      expect(warning).toHaveBeenCalledWith(expect.stringContaining('source=socket-error attemptId=12 wrapperGeneration=4 fatal=true'));
+      expect(JSON.stringify(warning.mock.calls)).not.toMatch(/arbitrary-private-content|private-socket-error/);
     });
   });
 

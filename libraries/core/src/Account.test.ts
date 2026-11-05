@@ -351,6 +351,29 @@ describe('Account', () => {
     });
 
     describe('listen', () => {
+      it.each([true, false])('keeps synchronization marker contents private when matched=%s', async markerMatches => {
+        const marker = 'private-synchronization-marker';
+        dependencies.apiClient.transport.http.accessTokenStore.markerToken = markerMatches ? marker : 'other-marker';
+        const information = jest.spyOn(dependencies.account['logger'], 'info');
+        const acknowledge = jest.spyOn(dependencies.apiClient.transport.ws, 'acknowledgeConsumableNotificationSynchronization');
+        const stateChanged = jest.fn();
+        const notification = {
+          type: ConsumableEvent.SYNCHRONIZATION,
+          data: {marker_id: marker, delivery_tag: 7},
+        } as const;
+
+        await dependencies.account['handleSynchronizationNotification']({
+          notification,
+          onConnectionStateChanged: stateChanged,
+          connectionContext: {attemptId: 12, wrapperGeneration: 4},
+        });
+
+        expect(acknowledge).toHaveBeenCalledWith(notification);
+        expect(stateChanged).toHaveBeenCalledTimes(markerMatches ? 1 : 0);
+        expect(information).toHaveBeenCalledWith(expect.stringContaining(`markerMatched=${markerMatches} attemptId=12 wrapperGeneration=4`));
+        expect(JSON.stringify(information.mock.calls)).not.toMatch(/private-synchronization-marker|other-marker|delivery_tag/);
+      });
+
       it('connects to websocket after the notification stream has been processed', async () => {
         jest
           .spyOn(dependencies.account, 'getClientCapabilities')
@@ -406,7 +429,7 @@ describe('Account', () => {
                 // Expect all states to have been called in order
                 expect(onConnectionStateChanged).toHaveBeenNthCalledWith(1, ConnectionState.PROCESSING_NOTIFICATIONS);
                 expect(onConnectionStateChanged).toHaveBeenNthCalledWith(2, ConnectionState.CONNECTING);
-                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(3, ConnectionState.LIVE);
+                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(3, ConnectionState.LIVE, expect.objectContaining({attemptId: 1, wrapperGeneration: 1}));
                 resolve();
                 break;
             }
@@ -417,7 +440,7 @@ describe('Account', () => {
             onConnectionStateChanged,
           });
 
-          await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE));
+          await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE, expect.objectContaining({attemptId: 1, wrapperGeneration: 1})));
 
           disconnect();
         });
@@ -482,17 +505,21 @@ describe('Account', () => {
 
         jest
           .spyOn(notificationService, 'legacyProcessNotificationStream')
-          .mockRejectedValue(new Error('Catch-up failed'));
+          .mockRejectedValue(new Error('private-notification access_token=secret-token Cookie: secret-cookie'));
+        const lifecycleWarning = jest.spyOn(dependencies.account['logger'], 'warn');
         const unlock = jest.spyOn(dependencies.apiClient.transport.ws, 'unlock');
         const onConnectionStateChanged = jest.fn<void, [ConnectionState]>();
         const disconnect = await dependencies.account.listen({useLegacy: true, onConnectionStateChanged});
 
         try {
           await waitFor(() => {
-            expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.CLOSED);
+            expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.CLOSED, expect.objectContaining({attemptId: 1, wrapperGeneration: 1}));
           });
-          expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.PROCESSING_NOTIFICATIONS);
-          expect(onConnectionStateChanged).not.toHaveBeenCalledWith(ConnectionState.LIVE);
+          expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.PROCESSING_NOTIFICATIONS, expect.objectContaining({attemptId: 1, wrapperGeneration: 1}));
+          expect(onConnectionStateChanged.mock.calls.some(call => {return call[0] === ConnectionState.LIVE;})).toBe(false);
+          expect(lifecycleWarning).toHaveBeenCalledWith(expect.stringContaining('event=legacy-catchup-failure'));
+          expect(lifecycleWarning).toHaveBeenCalledWith(expect.stringContaining('attemptId=1 wrapperGeneration=1'));
+          expect(JSON.stringify(lifecycleWarning.mock.calls)).not.toMatch(/private-notification|secret-token|secret-cookie/);
           expect(unlock).not.toHaveBeenCalled();
         } finally {
           disconnect();

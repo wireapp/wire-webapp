@@ -176,7 +176,7 @@ export class HttpClient extends EventEmitter {
       return response;
     } catch (error) {
       const retryWithTokenRefresh = async () => {
-        this.logger.warn(`Access token refresh triggered for "${config.method}" request to "${config.url}".`);
+        this.logger.warn('Access token refresh triggered by an authenticated request');
         await this.refreshAccessToken();
         config['axios-retry'] = {
           retries: 0,
@@ -209,10 +209,7 @@ export class HttpClient extends EventEmitter {
             mappedError instanceof MissingCookieAndTokenError)
         ) {
           // On invalid cookie the application is supposed to logout.
-          this.logger.warn(
-            `Cannot renew access token for "${config.method}" request to "${config.url}" because cookie/token is invalid: ${mappedError.message}`,
-            mappedError,
-          );
+          this.logger.warn('Cannot renew access token because the session is invalid');
           this.emit(HttpClient.TOPIC.ON_INVALID_TOKEN, mappedError);
         }
 

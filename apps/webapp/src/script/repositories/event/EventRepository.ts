@@ -29,7 +29,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
+import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '@wireapp/core';
 import {PromiseQueue} from '@wireapp/promise-queue';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -55,6 +55,18 @@ import {CryptographyError} from '../../error/CryptographyError';
 import {EventError} from '../../error/EventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
+
+type WebSocketConnectTrigger =
+  | 'initial'
+  | 'online'
+  | 'focus'
+  | 'visibility'
+  | 'heartbeat-closed'
+  | 'heartbeat-unhealthy';
+
+function getNotificationHandlingStateName(notificationHandlingState: NOTIFICATION_HANDLING_STATE): string {
+  return notificationHandlingState.split('.').at(-1) ?? notificationHandlingState;
+}
 
 export class EventRepository {
   logger: Logger;
@@ -171,7 +183,7 @@ export class EventRepository {
         await this.handleEvent(payload, source);
       } catch (error) {
         if (source === EventSource.NOTIFICATION_STREAM) {
-          this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
+          this.logger.warn('Failed to handle a notification stream event');
         } else {
           throw error;
         }
@@ -211,29 +223,58 @@ export class EventRepository {
     let connectionInProgress = false;
     let healthCheckInProgress = false;
     let currentConnectionState: ConnectionState | undefined;
+    let connectCycleId = 0;
 
-    const connect = async () => {
+    const notificationHandlingState = this.notificationHandlingState;
+    function getBrowserConnectionContext(): string {
+      return `connectCycleId=${connectCycleId} connectionInProgress=${connectionInProgress} notificationState=${getNotificationHandlingStateName(notificationHandlingState())} navigatorOnline=${navigator.onLine} visibility=${document.visibilityState} focused=${document.hasFocus()}`;
+    }
+
+    const connect = async (trigger: WebSocketConnectTrigger) => {
       if (connectionInProgress) {
-        this.logger.info('Connection attempt already in progress, skipping...');
+        this.logger.debug(
+          `[WebSocketLifecycle] layer=event-repository event=connect-skip trigger=${trigger} ${getBrowserConnectionContext()} reason=connection-in-progress`,
+        );
         return;
       }
 
+      connectCycleId += 1;
+      const currentConnectCycleId = connectCycleId;
+      this.logger.info(
+        `[WebSocketLifecycle] layer=event-repository event=connect-start trigger=${trigger} connectCycleId=${currentConnectCycleId} ${getBrowserConnectionContext()}`,
+      );
       connectionInProgress = true;
       actualDisconnect();
       try {
         actualDisconnect = await account.listen({
           useLegacy,
-          onConnectionStateChanged: connectionState => {
+          onConnectionStateChanged: (
+            connectionState: ConnectionState,
+            connectionContext: WebSocketConnectionContext | undefined,
+          ) => {
             currentConnectionState = connectionState;
             this.updateConnectivitityStatus(connectionState);
+            const lifecycleConnectionContext =
+              connectionContext === undefined
+                ? ''
+                : ` attemptId=${connectionContext.attemptId} wrapperGeneration=${connectionContext.wrapperGeneration}`;
+            this.logger.info(
+              `[WebSocketLifecycle] layer=event-repository event=connection-state-change connectCycleId=${currentConnectCycleId} state=${connectionState.toUpperCase()}${lifecycleConnectionContext}`,
+            );
           },
           onEvent: this.handleIncomingEvent,
           onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
           onNotificationStreamProgress: onNotificationStreamProgress,
           dryRun,
         });
+        this.logger.info(
+          `[WebSocketLifecycle] layer=event-repository event=connect-setup-success trigger=${trigger} connectCycleId=${currentConnectCycleId}`,
+        );
       } catch {
         actualDisconnect = () => {};
+        this.logger.warn(
+          `[WebSocketLifecycle] layer=event-repository event=connect-failure trigger=${trigger} connectCycleId=${currentConnectCycleId}`,
+        );
       } finally {
         connectionInProgress = false;
       }
@@ -245,16 +286,21 @@ export class EventRepository {
       }
 
       this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-      void connect();
+      void connect('online');
     };
 
-    const verifyConnectionHealthAndReconnect = async (reason: 'Focus' | 'Visibility' | 'Heartbeat') => {
+    const verifyConnectionHealthAndReconnect = async (trigger: 'focus' | 'visibility' | 'heartbeat') => {
       if (!navigator.onLine) {
+        this.logger.debug(
+          `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=offline ${getBrowserConnectionContext()}`,
+        );
         return;
       }
 
       if (connectionInProgress) {
-        this.logger.info(`${reason}: Reconnection already in progress, skipping health verification...`);
+        this.logger.debug(
+          `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=connection-in-progress ${getBrowserConnectionContext()}`,
+        );
         return;
       }
 
@@ -262,33 +308,53 @@ export class EventRepository {
         currentConnectionState === ConnectionState.CONNECTING ||
         currentConnectionState === ConnectionState.PROCESSING_NOTIFICATIONS;
       if (isTransitioningConnectionState) {
-        this.logger.info(`${reason}: Connection is transitioning, skipping health verification...`);
+        this.logger.debug(
+          `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=connection-transitioning connectionState=${currentConnectionState?.toUpperCase() ?? 'UNKNOWN'} ${getBrowserConnectionContext()}`,
+        );
         return;
       }
 
       if (this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.CLOSED) {
-        this.logger.info(`${reason}: Connection is closed and app is online, attempting reconnection...`);
-        await connect();
+        this.logger.info(
+          `[WebSocketLifecycle] layer=event-repository event=reconnect-requested trigger=${trigger === 'heartbeat' ? 'heartbeat-closed' : trigger} connectCycleId=${connectCycleId + 1}`,
+        );
+        await connect(`${trigger === 'heartbeat' ? 'heartbeat-closed' : trigger}`);
         return;
       }
 
       if (healthCheckInProgress) {
-        this.logger.info(`${reason}: Connection health check already in progress, skipping...`);
+        this.logger.debug(
+          `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=health-check-in-progress ${getBrowserConnectionContext()}`,
+        );
         return;
       }
 
       healthCheckInProgress = true;
       try {
+        this.logger.debug(
+          `[WebSocketLifecycle] layer=event-repository event=health-check-start trigger=${trigger} connectCycleId=${connectCycleId}`,
+        );
         let isHealthy: boolean;
         try {
           isHealthy = await account.isWebsocketHealthy();
         } catch {
-          this.logger.warn(`${reason}: Failed to verify WebSocket health, reconnecting...`);
           isHealthy = false;
         }
+        if (isHealthy) {
+          this.logger.debug(
+            `[WebSocketLifecycle] layer=event-repository event=health-check-result trigger=${trigger} connectCycleId=${connectCycleId} healthy=true`,
+          );
+        } else {
+          this.logger.warn(
+            `[WebSocketLifecycle] layer=event-repository event=health-check-result trigger=${trigger} connectCycleId=${connectCycleId} healthy=false`,
+          );
+        }
         if (!isHealthy) {
-          this.logger.warn(`${reason}: WebSocket appears unhealthy, reconnecting...`);
-          await connect();
+          const reconnectTrigger: WebSocketConnectTrigger = trigger === 'heartbeat' ? 'heartbeat-unhealthy' : trigger;
+          this.logger.info(
+            `[WebSocketLifecycle] layer=event-repository event=reconnect-requested trigger=${reconnectTrigger} connectCycleId=${connectCycleId + 1}`,
+          );
+          await connect(reconnectTrigger);
         }
       } finally {
         healthCheckInProgress = false;
@@ -306,7 +372,7 @@ export class EventRepository {
       const handleFocus = () => {
         if (navigator.onLine) {
           this.logger.info('Window focused, verifying connection...');
-          void verifyConnectionHealthAndReconnect('Focus');
+          void verifyConnectionHealthAndReconnect('focus');
         }
       };
 
@@ -317,7 +383,7 @@ export class EventRepository {
       const handleVisibilityChange = () => {
         if (document.visibilityState === 'visible' && navigator.onLine) {
           this.logger.info('Tab became visible, verifying connection...');
-          void verifyConnectionHealthAndReconnect('Visibility');
+          void verifyConnectionHealthAndReconnect('visibility');
         }
       };
 
@@ -339,7 +405,7 @@ export class EventRepository {
     // Heartbeat intentionally verifies connection health while online, even when the
     // connection is not CLOSED, to detect stale "open-but-unhealthy" websocket states.
     const heartbeatInterval = window.setInterval(() => {
-      void verifyConnectionHealthAndReconnect('Heartbeat');
+      void verifyConnectionHealthAndReconnect('heartbeat');
     }, EventRepository.CONFIG.HEARTBEAT_INTERVAL);
 
     cleanupHandlers.push(() => {
@@ -347,7 +413,7 @@ export class EventRepository {
     });
 
     // Connect first to get the actual disconnect function
-    await connect();
+    await connect('initial');
 
     // Then override disconnect to include cleanup
     this.disconnectWebSocket = () => {
@@ -505,7 +571,7 @@ export class EventRepository {
         return event;
       }
       case EventValidation.OUTDATED_TIMESTAMP: {
-        this.logger.warn(`Ignored outdated event type: '${event.type}'`);
+        this.logger.warn('Ignored an outdated notification event');
         return event;
       }
       case EventValidation.VALID:
@@ -527,13 +593,7 @@ export class EventRepository {
     source: EventSource,
   ): Promise<IncomingEvent | undefined> {
     if (decryptionError) {
-      this.logger.warn(`Decryption Error: '${event.type}'`, {
-        source,
-        eventType: event.type,
-        date: event.time,
-        code: decryptionError.code,
-        message: decryptionError.message,
-      });
+      this.logger.warn('Failed to decrypt a notification event');
 
       const ignoredCodes = [
         208, // Outated event decyption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
@@ -572,7 +632,7 @@ export class EventRepository {
       }
     } catch (error) {
       if (error instanceof EventValidationError) {
-        this.logger.warn(`Event validation failed: ${error.message}`, error);
+        this.logger.warn('Notification event validation failed');
         return;
       }
       throw error;

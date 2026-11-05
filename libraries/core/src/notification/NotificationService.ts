@@ -161,7 +161,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
     const results = {total: notifications.length, error: 0, success: 0};
     const logMessage =
       notifications.length > 0
-        ? `Start processing ${notifications.length} notifications since notification id ${lastNotificationId}`
+        ? `Start processing ${notifications.length} notifications`
         : `No notification to process from the stream`;
     this.logger.log(logMessage);
     for (const [index, notification] of notifications.entries()) {
@@ -178,9 +178,8 @@ export class NotificationService extends TypedEventEmitter<Events> {
           total: notifications.length,
         });
         results.success++;
-      } catch (error) {
-        const message = error instanceof Error ? error.message : error;
-        this.logger.error(`Error while processing notification ${notification.id}: ${message}`, error);
+      } catch {
+        this.logger.error('Error while processing a notification');
         results.error++;
       }
     }
@@ -212,7 +211,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
     source: NotificationSource,
   ): AsyncGenerator<HandledEventPayload> {
     for (const event of notification.payload) {
-      this.logger.debug(`Handling event of type "${event.type}"`, event);
+      this.logger.debug('Handling a notification event');
       let lastEventDate: Date | undefined = undefined;
       try {
         lastEventDate = await this.database.getLastEventDate();
@@ -220,7 +219,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
         // Ignore errors when fetching last event date
       }
       if ('time' in event && this.isOutdatedEvent(event, source, lastEventDate)) {
-        this.logger.info(`Ignored outdated event type: '${event.type}'`);
+        this.logger.info('Ignored an outdated notification event');
         continue;
       }
       try {
@@ -229,10 +228,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
           yield handledEventResult.payload;
         }
       } catch (error) {
-        this.logger.error(
-          `There was an error with notification ID "${notification.id}": ${(error as Error).message}`,
-          error,
-        );
+        this.logger.error('Failed to handle a notification event');
         const notificationError: NotificationError = {
           error: error as Error,
           notification,

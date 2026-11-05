@@ -39,7 +39,7 @@ import {
   ConsumableNotificationSynchronization,
 } from '@wireapp/api-client/lib/notification/ConsumableNotification';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp/';
-import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
+import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
@@ -95,6 +95,13 @@ import {LocalStorageStore} from './util/LocalStorageStore';
 import {RecurringTaskScheduler} from './util/RecurringTaskScheduler';
 
 export type ProcessedEventPayload = HandledEventPayload;
+export type WebSocketConnectionContext = Pick<WebSocketReconnectContext, 'attemptId' | 'wrapperGeneration'>;
+
+function getWebSocketLifecycleContext(connectionContext: WebSocketConnectionContext | undefined): string {
+  return connectionContext === undefined
+    ? ''
+    : ` attemptId=${connectionContext.attemptId} wrapperGeneration=${connectionContext.wrapperGeneration}`;
+}
 
 export enum ConnectionState {
   /** The WebSocket is closed and no notifications are being processed */
@@ -109,6 +116,25 @@ export enum ConnectionState {
   /** The WebSocket is open and new messages are processed live in real time */
   LIVE = 'live',
 }
+
+type NotificationHandlingOptions = {
+  readonly handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>;
+  readonly onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void;
+  readonly getCurrentWebSocketConnectionContext: () => WebSocketConnectionContext | undefined;
+};
+type ConsumableNotificationHandlingOptions = NotificationHandlingOptions & {
+  readonly onConnectionStateChanged: (state: ConnectionState) => void;
+};
+type SynchronizationNotificationOptions = {
+  readonly notification: ConsumableNotificationSynchronization;
+  readonly onConnectionStateChanged: (state: ConnectionState) => void;
+  readonly connectionContext?: WebSocketConnectionContext;
+};
+type DecryptNotificationOptions = Pick<NotificationHandlingOptions, 'handleEvent' | 'onNotificationStreamProgress'> & {
+  readonly notification: ConsumableNotificationEvent;
+  readonly source: NotificationSource;
+  readonly connectionContext?: WebSocketConnectionContext;
+};
 
 export type CreateStoreFn = (storeName: string, key: Uint8Array) => undefined | Promise<CRUDEngine | undefined>;
 
@@ -680,7 +706,7 @@ export class Account extends TypedEventEmitter<Events> {
     /**
      * called when the connection state with the backend has changed
      */
-    onConnectionStateChanged?: (state: ConnectionState) => void;
+    onConnectionStateChanged?: (state: ConnectionState, connectionContext?: WebSocketConnectionContext) => void;
 
     /**
      * called when we detect lost notification from backend.
@@ -710,22 +736,35 @@ export class Account extends TypedEventEmitter<Events> {
       throw new Error('use of legacy notifications must be explicitly set to true or false');
     }
 
-    const onConnectionStateChanged = this.createConnectionStateChangedHandler(onConnectionStateChangedCallBack);
+    let currentWebSocketConnectionContext: WebSocketConnectionContext | undefined;
+    function getCurrentWebSocketConnectionContext(): WebSocketConnectionContext | undefined {
+      return currentWebSocketConnectionContext;
+    }
+    const onConnectionStateChanged = this.createConnectionStateChangedHandler(
+      onConnectionStateChangedCallBack,
+      getCurrentWebSocketConnectionContext,
+    );
 
     const handleEvent = this.createEventHandler(onEvent);
 
-    const handleLegacyNotification = this.createLegacyNotificationHandler(handleEvent, onNotificationStreamProgress);
-    const handleNotification = this.createNotificationHandler(
+    const handleLegacyNotification = this.createLegacyNotificationHandler({
+      handleEvent,
+      onNotificationStreamProgress,
+      getCurrentWebSocketConnectionContext,
+    });
+    const handleNotification = this.createNotificationHandler({
       handleEvent,
       onNotificationStreamProgress,
       onConnectionStateChanged,
-    );
+      getCurrentWebSocketConnectionContext,
+    });
 
     const handleMissedNotifications = this.createLegacyMissedNotificationsHandler(onMissedNotifications);
     const legacyProcessNotificationStream = this.createLegacyNotificationStreamProcessor({
       handleLegacyNotification,
       handleMissedNotifications,
       onConnectionStateChanged,
+      getCurrentWebSocketConnectionContext,
     });
 
     this.setupWebSocketListeners(onConnectionStateChanged, handleNotification, handleLegacyNotification, useLegacy);
@@ -774,9 +813,12 @@ export class Account extends TypedEventEmitter<Events> {
        */
       this.apiClient.transport.ws.lock();
     }
-    this.apiClient.connect(async abortController => {
+    this.apiClient.connect(async (abortController, reconnectContext) => {
+      currentWebSocketConnectionContext = reconnectContext;
       // this call back is called every single time the websocket connection is (re)established
-      this.logger.info('Connection established with websocket, starting notification stream processing');
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=websocket-open-processing-start useLegacy=${useLegacy} aborted=${abortController.signal.aborted}${getWebSocketLifecycleContext(reconnectContext)}`,
+      );
       /**
        * This is to avoid passing proposals too early to core crypto
        * @See WPB-18995
@@ -794,10 +836,18 @@ export class Account extends TypedEventEmitter<Events> {
       this.notificationProcessingQueue.resume();
 
       if (useLegacy) {
+        this.logger.info(
+          `[WebSocketLifecycle] layer=account event=legacy-catchup-start aborted=${abortController.signal.aborted}${getWebSocketLifecycleContext(reconnectContext)}`,
+        );
         try {
           await legacyProcessNotificationStream(abortController);
-        } catch (error: unknown) {
-          this.logger.error('Failed legacy notification stream processing after WebSocket open', error);
+          this.logger.info(
+            `[WebSocketLifecycle] layer=account event=legacy-catchup-success aborted=${abortController.signal.aborted} live=${this.connectionState === ConnectionState.LIVE}${getWebSocketLifecycleContext(reconnectContext)}`,
+          );
+        } catch {
+          this.logger.warn(
+            `[WebSocketLifecycle] layer=account event=legacy-catchup-failure aborted=${abortController.signal.aborted} live=${this.connectionState === ConnectionState.LIVE}${getWebSocketLifecycleContext(reconnectContext)}`,
+          );
 
           if (abortController.signal.aborted === true) {
             return;
@@ -810,7 +860,9 @@ export class Account extends TypedEventEmitter<Events> {
     });
 
     return () => {
-      this.logger.info('Disconnecting from backend as requested by consumer');
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=disconnect-requested${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())}`,
+      );
       flushProposalsQueue();
       this.pauseAndFlushNotificationQueue();
       this.apiClient.disconnect();
@@ -820,12 +872,22 @@ export class Account extends TypedEventEmitter<Events> {
   };
 
   private readonly createConnectionStateChangedHandler = (
-    onConnectionStateChanged: (state: ConnectionState) => void,
+    onConnectionStateChanged: (state: ConnectionState, connectionContext?: WebSocketConnectionContext) => void,
+    getCurrentWebSocketConnectionContext: () => WebSocketConnectionContext | undefined,
   ): ((state: ConnectionState) => void) => {
+    let previousConnectionState = this.connectionState;
     return (state: ConnectionState): void => {
+      const connectionContext = getCurrentWebSocketConnectionContext();
       this.connectionState = state;
-      onConnectionStateChanged(state);
-      this.logger.info(`Connection state changed to: ${state}`);
+      if (connectionContext === undefined) {
+        onConnectionStateChanged(state);
+      } else {
+        onConnectionStateChanged(state, connectionContext);
+      }
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=connection-state-change previousState=${previousConnectionState.toUpperCase()} nextState=${state.toUpperCase()}${getWebSocketLifecycleContext(connectionContext)}`,
+      );
+      previousConnectionState = state;
     };
   };
 
@@ -862,19 +924,17 @@ export class Account extends TypedEventEmitter<Events> {
    * It can be replaced with the new notification handling system using `ConsumableNotification`
    * when all clients are capable of handling consumable notifications.
    */
-  private readonly createLegacyNotificationHandler = (
-    handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
-    onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
-  ) => {
+  private readonly createLegacyNotificationHandler = (options: NotificationHandlingOptions) => {
+    const {handleEvent, onNotificationStreamProgress, getCurrentWebSocketConnectionContext} = options;
     return async (notification: Notification, source: NotificationSource): Promise<void> => {
       void this.notificationProcessingQueue
         .push(async () => {
           try {
             const start = Date.now();
             const notificationTime = this.getNotificationEventTime(notification.payload[0]);
-            this.logger.info(`Processing legacy notification "${notification.id}" at ${notificationTime}`, {
-              notification,
-            });
+            this.logger.info(
+              `[WebSocketLifecycle] layer=account event=legacy-notification-start${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())}`,
+            );
             this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.getLength()}`);
             this.logger.info(`Total pending proposals queue length: ${getProposalQueueLength()}`);
             if (notificationTime) {
@@ -887,11 +947,12 @@ export class Account extends TypedEventEmitter<Events> {
               await handleEvent(message, source);
             }
 
-            this.logger.info(`Finished processing legacy notification "${notification.id}" in ${Date.now() - start}ms`);
-          } catch (error) {
+            this.logger.info(
+              `[WebSocketLifecycle] layer=account event=legacy-notification-success durationMs=${Date.now() - start}${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())}`,
+            );
+          } catch {
             this.logger.error(
-              `Failed to handle legacy notification "${notification.id}": ${(error as any).message}`,
-              error,
+              `[WebSocketLifecycle] layer=account event=legacy-notification-failure${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())}`,
             );
           }
         })
@@ -899,13 +960,13 @@ export class Account extends TypedEventEmitter<Events> {
     };
   };
 
-  private readonly createNotificationHandler = (
-    handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
-    onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
-    onConnectionStateChanged: (state: ConnectionState) => void,
-  ) => {
+  private readonly createNotificationHandler = (options: ConsumableNotificationHandlingOptions) => {
+    const {handleEvent, onNotificationStreamProgress, onConnectionStateChanged, getCurrentWebSocketConnectionContext} =
+      options;
     return async (notification: ConsumableNotification, source: NotificationSource): Promise<void> => {
-      this.logger.info(`Received consumable notification of type "${notification.type}"`, {notification});
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=consumable-notification-received${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())}`,
+      );
       try {
         if (notification.type === ConsumableEvent.MISSED) {
           this.reactToMissedNotification();
@@ -914,16 +975,32 @@ export class Account extends TypedEventEmitter<Events> {
 
         if (notification.type === ConsumableEvent.SYNCHRONIZATION) {
           this.notificationProcessingQueue
-            .push(() => this.handleSynchronizationNotification(notification, onConnectionStateChanged))
+            .push(() => {
+              return this.handleSynchronizationNotification({
+                notification,
+                onConnectionStateChanged,
+                connectionContext: getCurrentWebSocketConnectionContext(),
+              });
+            })
             .catch(this.handleNotificationQueueError);
           return;
         }
 
         this.notificationProcessingQueue
-          .push(() => this.decryptAckEmitNotification(notification, handleEvent, source, onNotificationStreamProgress))
+          .push(() => {
+            return this.decryptAckEmitNotification({
+              notification,
+              handleEvent,
+              source,
+              onNotificationStreamProgress,
+              connectionContext: getCurrentWebSocketConnectionContext(),
+            });
+          })
           .catch(this.handleNotificationQueueError);
-      } catch (error) {
-        this.logger.error(`Failed to handle notification "${notification.type}": ${(error as any).message}`, error);
+      } catch {
+        this.logger.error(
+          `[WebSocketLifecycle] layer=account event=consumable-notification-handling-failure${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())}`,
+        );
       }
     };
   };
@@ -935,10 +1012,10 @@ export class Account extends TypedEventEmitter<Events> {
 
     switch (error.cause) {
       case PromiseQueue.ERROR_CAUSES.TIMEOUT:
-        this.logger.warn('Notification decryption task timed out', error);
+        this.logger.warn('Notification decryption task timed out');
         break;
       case PromiseQueue.ERROR_CAUSES.FLUSHED:
-        this.logger.info('Notification processing queue was flushed, ignoring error', error);
+        this.logger.info('Notification processing queue was flushed, ignoring error');
         break;
     }
   };
@@ -947,18 +1024,18 @@ export class Account extends TypedEventEmitter<Events> {
     this.apiClient.transport.ws.acknowledgeConsumableNotificationSynchronization(notification);
   };
 
-  private readonly handleSynchronizationNotification = async (
-    notification: ConsumableNotificationSynchronization,
-    onConnectionStateChanged: (state: ConnectionState) => void,
-  ) => {
-    this.logger.info('acknowledging synchronization notification', {notification});
+  private readonly handleSynchronizationNotification = async (options: SynchronizationNotificationOptions) => {
+    const {notification, onConnectionStateChanged, connectionContext} = options;
+    this.logger.info(
+      `[WebSocketLifecycle] layer=account event=async-sync-marker-received markerPresent=${notification.data.marker_id.length > 0}${getWebSocketLifecycleContext(connectionContext)}`,
+    );
     this.acknowledgeSynchronizationNotification(notification);
 
     const markerId = notification.data.marker_id;
     const currentMarkerId = this.apiClient.transport.http.accessTokenStore.markerToken;
 
     this.logger.info(
-      `Handling synchronization notification with marker ID: ${markerId} current marker ID: ${currentMarkerId}`,
+      `[WebSocketLifecycle] layer=account event=async-sync-marker-compared markerMatched=${markerId === currentMarkerId}${getWebSocketLifecycleContext(connectionContext)}`,
     );
     /**
      * There is a chance that there might be multiple synchronization notifications (markers)
@@ -967,21 +1044,25 @@ export class Account extends TypedEventEmitter<Events> {
      * if the marker ID matches the current marker ID.
      */
     if (markerId === currentMarkerId) {
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=live-transition-start${getWebSocketLifecycleContext(connectionContext)}`,
+      );
       resumeProposalProcessing();
       resumeMessageSending();
       resumeRejoiningMLSConversations();
       onConnectionStateChanged(ConnectionState.LIVE);
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=live-transition-success${getWebSocketLifecycleContext(connectionContext)}`,
+      );
     }
   };
 
-  private readonly decryptAckEmitNotification = async (
-    notification: ConsumableNotificationEvent,
-    handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
-    source: NotificationSource,
-    onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
-  ): Promise<void> => {
+  private readonly decryptAckEmitNotification = async (options: DecryptNotificationOptions): Promise<void> => {
+    const {notification, handleEvent, source, onNotificationStreamProgress, connectionContext} = options;
     try {
-      this.logger.info(`Sending consumable notification for decryption`, notification.data.event.id);
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=consumable-notification-decryption-start${getWebSocketLifecycleContext(connectionContext)}`,
+      );
       const payloads = this.service!.notification.handleNotification(notification.data.event, source);
 
       const notificationTime = this.getNotificationEventTime(notification.data.event.payload[0]);
@@ -993,10 +1074,14 @@ export class Account extends TypedEventEmitter<Events> {
         await handleEvent(payload, source);
       }
 
-      this.logger.info(`Acknowledging consumable notification on the backend "${notification.data.delivery_tag}"`);
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=consumable-notification-acknowledging${getWebSocketLifecycleContext(connectionContext)}`,
+      );
       this.apiClient.transport.ws.acknowledgeNotification(notification);
-    } catch (err) {
-      this.logger.error(`Failed to process notification ${notification.data.delivery_tag}`, err);
+    } catch {
+      this.logger.error(
+        `[WebSocketLifecycle] layer=account event=consumable-notification-processing-failure${getWebSocketLifecycleContext(connectionContext)}`,
+      );
     }
   };
 
@@ -1046,10 +1131,14 @@ export class Account extends TypedEventEmitter<Events> {
     handleLegacyNotification,
     handleMissedNotifications,
     onConnectionStateChanged,
+    getCurrentWebSocketConnectionContext = () => {
+      return undefined;
+    },
   }: {
     handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>;
     handleMissedNotifications: (notificationId: string) => Promise<void>;
     onConnectionStateChanged: (state: ConnectionState) => void;
+    getCurrentWebSocketConnectionContext?: () => WebSocketConnectionContext | undefined;
   }) => {
     return async (abortController?: AbortController) => {
       this.apiClient.transport.ws.lock();
@@ -1058,7 +1147,7 @@ export class Account extends TypedEventEmitter<Events> {
       pauseRejoiningMLSConversations();
       onConnectionStateChanged(ConnectionState.PROCESSING_NOTIFICATIONS);
 
-      const results = await this.service!.notification.legacyProcessNotificationStream(
+      await this.service!.notification.legacyProcessNotificationStream(
         async (notification, source) => {
           await handleLegacyNotification(notification, source);
         },
@@ -1066,20 +1155,23 @@ export class Account extends TypedEventEmitter<Events> {
         abortController,
       );
 
-      this.logger.info(
-        'Finished inserting notifications for decryption from the legacy endpoint to the process queue',
-        results,
-      );
+      this.logger.info('Finished inserting notifications for decryption from the legacy endpoint to the process queue');
 
       // We need to wait for the notification stream to be fully handled before releasing the message sending queue.
       // This is due to the nature of how message are encrypted, any change in mls epoch needs to happen before we start encrypting any kind of messages
       void this.notificationProcessingQueue
         .push(async () => {
-          this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
+          const connectionContext = getCurrentWebSocketConnectionContext();
+          this.logger.info(
+            `[WebSocketLifecycle] layer=account event=live-transition-start pendingMessageCount=${getQueueLength()}${getWebSocketLifecycleContext(connectionContext)}`,
+          );
           resumeProposalProcessing();
           resumeMessageSending();
           resumeRejoiningMLSConversations();
           onConnectionStateChanged(ConnectionState.LIVE);
+          this.logger.info(
+            `[WebSocketLifecycle] layer=account event=live-transition-success${getWebSocketLifecycleContext(connectionContext)}`,
+          );
           this.apiClient.transport.ws.unlock();
         })
         .catch(this.handleNotificationQueueError);
@@ -1125,7 +1217,7 @@ export class Account extends TypedEventEmitter<Events> {
     this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
 
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
-      this.logger.info('Received new notification from backend', {notification});
+      this.logger.info('Received new notification from backend');
       if (Account.checkIsConsumable(notification)) {
         void handleNotification(notification, NotificationSource.WEBSOCKET);
         return;
