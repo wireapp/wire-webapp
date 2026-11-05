@@ -18,7 +18,7 @@
  */
 
 import logdown from 'logdown';
-import RWS, {CloseEvent, ErrorEvent, Event, Options} from 'reconnecting-websocket';
+import PartySocketWebSocket, {type CloseEvent, type ErrorEvent, type Options} from 'partysocket/ws';
 
 import {LogFactory, TimeUtil} from '@wireapp/commons';
 
@@ -45,9 +45,131 @@ export enum PingMessage {
   PONG = 'pong',
 }
 
+export type LongRunningRetryDetails = {
+  readonly retryCount: number;
+  readonly retryDurationInMilliseconds: number;
+};
+
+type IntervalIdentifier = ReturnType<typeof globalThis.setInterval>;
+
+const longRunningRetryThresholdInMilliseconds = TimeUtil.TimeInMillis.MINUTE;
+const connectingTimeoutInMilliseconds = TimeUtil.TimeInMillis.SECOND * 20;
+
+type BackFromSleepHandler = typeof onBackFromSleep;
+
+type ReconnectingWebsocketWrapper = Pick<
+  PartySocketWebSocket,
+  'binaryType' | 'close' | 'onclose' | 'onerror' | 'onmessage' | 'onopen' | 'readyState' | 'reconnect' | 'send'
+>;
+
+type TimeoutIdentifier = ReturnType<typeof globalThis.setTimeout>;
+type WebSocketEventListener = (event: Event) => void;
+type WebSocketConstructor = new (url: string, protocols?: string | string[]) => WebSocket;
+type WebSocketWithEventListeners = WebSocket & {
+  addEventListener: WebSocket['addEventListener'];
+  removeEventListener: WebSocket['removeEventListener'];
+};
+
+export type ReconnectingWebsocketWallClock = {
+  readonly currentTimestampInMilliseconds: number;
+  readonly setTimeout: (callback: () => void, delayInMilliseconds: number) => TimeoutIdentifier;
+  readonly clearTimeout: (timeoutIdentifier: TimeoutIdentifier) => void;
+  readonly setInterval: (callback: () => void, delayInMilliseconds: number) => IntervalIdentifier;
+  readonly clearInterval: (intervalIdentifier: IntervalIdentifier) => void;
+};
+
+type ReconnectingWebsocketOptions = {
+  readonly backFromSleepHandler?: BackFromSleepHandler;
+  readonly pingInterval?: number;
+  readonly wallClock: ReconnectingWebsocketWallClock;
+  readonly websocketFactory?: () => ReconnectingWebsocketWrapper;
+};
+
+function normalizeMessageEventForPartysocket(event: Event): Event {
+  if (!('data' in event)) {
+    return event;
+  }
+
+  if ((event as MessageEvent).ports !== null) {
+    return event;
+  }
+
+  return {
+    data: (event as MessageEvent).data,
+    lastEventId: (event as MessageEvent).lastEventId,
+    origin: (event as MessageEvent).origin,
+    ports: [],
+    source: (event as MessageEvent).source,
+    type: event.type,
+  } as unknown as MessageEvent;
+}
+
+export function createPartysocketCompatibleWebSocketConstructor(
+  WebSocketConstructor: WebSocketConstructor | undefined,
+): WebSocketConstructor | undefined {
+  if (WebSocketConstructor === undefined || globalThis.WebSocket === WebSocketConstructor) {
+    return WebSocketConstructor;
+  }
+
+  return function PartysocketCompatibleWebSocket(url: string, protocols?: string | string[]) {
+    const socket = (
+      protocols === undefined ? new WebSocketConstructor(url) : new WebSocketConstructor(url, protocols)
+    ) as WebSocketWithEventListeners;
+    const originalAddEventListener = socket.addEventListener.bind(socket) as EventTarget['addEventListener'];
+    const originalRemoveEventListener = socket.removeEventListener.bind(socket) as EventTarget['removeEventListener'];
+    const wrappedMessageListeners = new WeakMap<WebSocketEventListener, WebSocketEventListener>();
+
+    socket.addEventListener = ((
+      type: string,
+      listener: EventListenerOrEventListenerObject | null,
+      options?: boolean | AddEventListenerOptions,
+    ) => {
+      if (type !== 'message' || typeof listener !== 'function') {
+        originalAddEventListener(type, listener, options);
+        return;
+      }
+
+      const wrappedListener = (event: Event) => {
+        listener(normalizeMessageEventForPartysocket(event));
+      };
+      wrappedMessageListeners.set(listener as WebSocketEventListener, wrappedListener);
+      originalAddEventListener(type, wrappedListener as EventListener, options);
+    }) as WebSocket['addEventListener'];
+
+    socket.removeEventListener = ((
+      type: string,
+      listener: EventListenerOrEventListenerObject | null,
+      options?: boolean | EventListenerOptions,
+    ) => {
+      if (type !== 'message' || typeof listener !== 'function') {
+        originalRemoveEventListener(type, listener, options);
+        return;
+      }
+
+      const wrappedListener = wrappedMessageListeners.get(listener as WebSocketEventListener);
+      originalRemoveEventListener(type, (wrappedListener ?? listener) as EventListener, options);
+      wrappedMessageListeners.delete(listener as WebSocketEventListener);
+    }) as WebSocket['removeEventListener'];
+
+    return socket;
+  } as unknown as WebSocketConstructor;
+}
+
+export function createWebSocketWallClock(): ReconnectingWebsocketWallClock {
+  return {
+    get currentTimestampInMilliseconds(): number {
+      return Date.now();
+    },
+    setTimeout: globalThis.setTimeout.bind(globalThis),
+    clearTimeout: globalThis.clearTimeout.bind(globalThis),
+    setInterval: globalThis.setInterval.bind(globalThis),
+    clearInterval: globalThis.clearInterval.bind(globalThis),
+  };
+}
+
 export class ReconnectingWebsocket {
   private static readonly RECONNECTING_OPTIONS: Options = {
-    WebSocket: WebSocketNode,
+    WebSocket: createPartysocketCompatibleWebSocketConstructor(WebSocketNode),
     connectionTimeout: TimeUtil.TimeInMillis.SECOND * 4,
     debug: false,
     maxReconnectionDelay: TimeUtil.TimeInMillis.SECOND * 10,
@@ -57,37 +179,52 @@ export class ReconnectingWebsocket {
   };
 
   private readonly logger: logdown.Logger;
-  private socket?: RWS;
-  private pingerId?: NodeJS.Timeout;
+  private socket?: ReconnectingWebsocketWrapper;
+  private pingerId?: IntervalIdentifier;
+  private connectingTimeoutId?: TimeoutIdentifier;
   private readonly PING_INTERVAL = TimeUtil.TimeInMillis.SECOND * 20;
   private hasUnansweredPing: boolean;
   private onOpen?: (event: Event) => void;
   private onMessage?: (data: string) => void;
   private onError?: (error: ErrorEvent) => void;
   private onClose?: (event: CloseEvent) => void;
+  private onLongRunningRetry?: (retryDetails: LongRunningRetryDetails) => void;
   /**
    * Cleanup function returned by onBackFromSleep to stop the sleep detection interval.
    * This prevents memory leaks by ensuring the interval is cleared when the WebSocket is disconnected.
    */
-  private readonly stopBackFromSleepHandler?: () => void;
+  private stopBackFromSleepHandler?: () => void;
 
   private isPingingEnabled = true;
   private readonly pendingHealthChecks = new Set<(isHealthy: boolean) => void>();
   private lastMessageTimestamp = 0;
+  private reconnectAttemptCount = 0;
+  private reconnectSequenceRetryCount = 0;
+  private reconnectSequenceStartTimestamp?: number;
+  private hasReportedLongRunningRetry = false;
+
+  private readonly options: ReconnectingWebsocketOptions;
 
   constructor(
     private readonly onReconnect: () => Promise<string>,
-    options: {
-      pingInterval?: number;
-    } = {},
+    options: Partial<ReconnectingWebsocketOptions> = {},
   ) {
+    this.options = {...options, wallClock: options.wallClock ?? createWebSocketWallClock()};
     this.logger = LogFactory.getLogger('@wireapp/api-client/tcp/ReconnectingWebsocket');
 
-    if (options.pingInterval) {
+    if (options.pingInterval !== undefined) {
       this.PING_INTERVAL = options.pingInterval;
     }
 
     this.hasUnansweredPing = false;
+    this.startBackFromSleepHandler();
+  }
+
+  private startBackFromSleepHandler(): void {
+    if (this.stopBackFromSleepHandler !== undefined) {
+      return;
+    }
+
     /**
      * According to https://developer.mozilla.org/en-US/docs/Web/API/Navigator/onLine, navigator.onLine attribute and 'online' and 'offline' events are not reliable enough (especially when it's truthy).
      * We won't receive the 'offline' event when the system goes to sleep (e.g. closing the lid of a laptop).
@@ -97,29 +234,33 @@ export class ReconnectingWebsocket {
      * IMPORTANT: Store the cleanup function returned by onBackFromSleep. This function clears
      * the internal setInterval and must be called when disconnecting to prevent memory leaks.
      * **/
-    this.stopBackFromSleepHandler = onBackFromSleep({
-      callback: () => {
-        if (!this.socket) {
-          this.logger.debug('WebSocket instance does not exist, skipping reconnect after sleep');
-          return;
-        }
-        this.logger.debug('Back from sleep, reconnecting WebSocket');
-        // Force reconnect even if the browser keeps the socket in OPEN state after sleep.
-        this.socket.reconnect();
-      },
-    });
+    const backFromSleepHandler = this.options.backFromSleepHandler ?? onBackFromSleep;
+    const backFromSleepRegistration: Parameters<BackFromSleepHandler>[0] = {
+      callback: this.handleBackFromSleep,
+    };
+
+    this.stopBackFromSleepHandler = backFromSleepHandler(backFromSleepRegistration);
   }
+
+  private readonly handleBackFromSleep = (): void => {
+    const socket = this.socket;
+    if (socket === undefined) {
+      return;
+    }
+
+    this.stopPinging();
+    this.hasUnansweredPing = false;
+    this.replaceSocketWrapper(socket, 'Back from sleep');
+  };
 
   private readonly internalOnError = (error: ErrorEvent) => {
     this.logger.warn('WebSocket connection error', error);
-    if (this.onError) {
+    if (this.onError !== undefined) {
       this.onError(error);
     }
   };
 
   private readonly internalOnMessage = (event: MessageEvent) => {
-    this.logger.debug('Incoming message');
-
     const data = buffer.bufferToString(event.data);
 
     if (data === PingMessage.PONG) {
@@ -130,35 +271,58 @@ export class ReconnectingWebsocket {
       return;
     }
 
-    this.lastMessageTimestamp = Date.now();
+    this.logger.debug('Incoming message');
+    this.lastMessageTimestamp = this.options.wallClock.currentTimestampInMilliseconds;
     this.onMessage?.(data);
   };
 
   private readonly internalOnOpen = (event: Event) => {
-    this.logger.debug('WebSocket opened');
-    if (this.socket) {
+    this.logger.info(`WebSocket opened (reconnect attempt #${this.reconnectAttemptCount})`);
+    this.stopConnectingWatchdog();
+    this.resetLongRunningRetrySequence();
+    if (this.socket !== undefined) {
       this.socket.binaryType = 'arraybuffer';
     }
-    if (this.onOpen) {
+    if (this.onOpen !== undefined) {
       this.onOpen(event);
     }
   };
 
   private readonly internalOnReconnect = async (): Promise<string> => {
-    this.logger.debug('Connecting to WebSocket');
+    const attempt = this.reconnectAttemptCount + 1;
+    this.logger.info(`Connecting to WebSocket (attempt #${attempt})`);
+    this.recordReconnectAttempt(this.options.wallClock.currentTimestampInMilliseconds);
+    const reconnectingSocket = this.socket;
+
     // The ping is needed to keep the connection alive as long as possible.
     // Otherwise the connection would be closed after 1 min of inactivity and re-established.
     if (this.isPingingEnabled) {
       this.startPinging();
+      this.logger.debug(`Ping started (interval: ${this.PING_INTERVAL}ms)`);
     }
-    return this.onReconnect();
+
+    const websocketUrl = await this.onReconnect();
+    const socket = reconnectingSocket;
+
+    if (this.socket !== socket) {
+      return websocketUrl;
+    }
+
+    if (socket !== undefined && socket.readyState === WEBSOCKET_STATE.CONNECTING) {
+      this.startConnectingWatchdog(socket);
+    }
+
+    return websocketUrl;
   };
 
   private readonly internalOnClose = (event: CloseEvent) => {
-    this.logger.debug(`WebSocket closed with code: ${event?.code}${event?.reason ? `Reason: ${event?.reason}` : ''}`);
+    this.logger.info(
+      `WebSocket closed — code: ${event?.code}, reason: "${Boolean(event?.reason) ? event?.reason : 'none'}", wasClean: ${event?.wasClean ?? 'unknown'}`,
+    );
+    this.stopConnectingWatchdog();
     this.stopPinging();
     this.resolvePendingHealthChecks(false);
-    if (this.onClose) {
+    if (this.onClose !== undefined) {
       this.onClose(event);
     }
   };
@@ -166,50 +330,152 @@ export class ReconnectingWebsocket {
   private startPinging(): void {
     this.stopPinging();
     this.hasUnansweredPing = false;
-    this.pingerId = setInterval(this.sendPing, this.PING_INTERVAL);
+    this.pingerId = this.options.wallClock.setInterval(this.sendPing, this.PING_INTERVAL);
   }
 
   private stopPinging(): void {
-    if (this.pingerId) {
-      clearInterval(this.pingerId);
+    if (this.pingerId !== undefined) {
+      this.options.wallClock.clearInterval(this.pingerId);
+      this.pingerId = undefined;
     }
   }
 
   private readonly sendPing = (): void => {
-    if (!this.socket) {
+    if (this.socket === undefined) {
       this.logger.debug('WebSocket instance does not exist, skipping ping');
       return;
     }
 
-    if (this.hasUnansweredPing) {
-      this.logger.warn('Ping interval check failed');
-      this.stopPinging();
-      // Closing here intentionally triggers reconnecting-websocket's retry loop; it will call
-      // internalOnReconnect to build a fresh URL and re-open the socket.
-      this.socket.close(CloseEventCode.NORMAL_CLOSURE, 'Ping timeout');
+    if (this.socket.readyState !== WEBSOCKET_STATE.OPEN) {
+      this.logger.debug(`WebSocket is not OPEN (state: ${WEBSOCKET_STATE[this.socket.readyState]}), skipping ping`);
       return;
     }
+
+    if (this.hasUnansweredPing) {
+      this.logger.warn(
+        `Ping timeout — no pong received within ${this.PING_INTERVAL}ms, WebSocket state: ${WEBSOCKET_STATE[this.getState()]} (${this.getState()}), forcing reconnect`,
+      );
+      this.stopPinging();
+      this.socket.reconnect();
+      return;
+    }
+    this.logger.debug('Sending ping');
     this.hasUnansweredPing = true;
     this.send(PingMessage.PING);
   };
 
-  public connect(): void {
-    this.stopPinging();
-    if (this.socket !== undefined && this.socket.readyState !== WEBSOCKET_STATE.CLOSED) {
-      try {
-        this.socket.reconnect(CloseEventCode.NORMAL_CLOSURE);
-      } catch (error: unknown) {
-        this.logger.warn('Failed to reconnect WebSocket in place', error);
+  /**
+   * Reconnect on the existing ReconnectingWebSocket wrapper instead of allocating a new one.
+   * The library closes the current underlying WebSocket synchronously in `_disconnect` before
+   * opening the next, so we never leave two `/await` sessions alive from the app.
+   */
+  private reconnectInPlace(socket: ReconnectingWebsocketWrapper): void {
+    try {
+      socket.reconnect(CloseEventCode.NORMAL_CLOSURE);
+    } catch (error) {
+      this.logger.warn('Failed to reconnect WebSocket in place', error);
+    }
+  }
+
+  private startConnectingWatchdog(socket: ReconnectingWebsocketWrapper): void {
+    this.stopConnectingWatchdog();
+    this.logger.debug(
+      `Starting WebSocket CONNECTING watchdog (state: ${WEBSOCKET_STATE[socket.readyState]} (${socket.readyState}), timeout: ${connectingTimeoutInMilliseconds}ms)`,
+    );
+
+    this.connectingTimeoutId = this.options.wallClock.setTimeout(() => {
+      if (this.socket !== socket) {
+        return;
       }
 
+      this.connectingTimeoutId = undefined;
+
+      if (socket.readyState !== WEBSOCKET_STATE.CONNECTING) {
+        return;
+      }
+
+      this.logger.warn(
+        `WebSocket wrapper stayed CONNECTING for ${connectingTimeoutInMilliseconds}ms, replacing wrapper`,
+      );
+
+      this.replaceSocketWrapper(socket, 'Connecting timeout');
+    }, connectingTimeoutInMilliseconds);
+  }
+
+  private stopConnectingWatchdog(): void {
+    if (this.connectingTimeoutId !== undefined) {
+      this.options.wallClock.clearTimeout(this.connectingTimeoutId);
+      this.connectingTimeoutId = undefined;
+    }
+  }
+
+  private replaceSocketWrapper(socket: ReconnectingWebsocketWrapper, reason: string): void {
+    if (this.socket !== socket) {
       return;
     }
 
-    this.socket = this.getReconnectingWebsocket();
-    this.socket.onmessage = this.internalOnMessage;
-    this.socket.onerror = this.internalOnError;
-    this.socket.onopen = this.internalOnOpen;
-    this.socket.onclose = this.internalOnClose;
+    this.stopPinging();
+    this.hasUnansweredPing = false;
+    this.stopConnectingWatchdog();
+
+    try {
+      socket.close(CloseEventCode.NORMAL_CLOSURE, reason);
+    } catch (error) {
+      this.logger.warn(`Failed to close stale WebSocket wrapper during ${reason}`, error);
+    }
+
+    this.createAndBindSocketWrapper();
+  }
+
+  public connect(): void {
+    this.logger.info('Initializing WebSocket connection');
+    this.startBackFromSleepHandler();
+    this.resetLongRunningRetrySequence();
+    this.stopPinging();
+
+    const existingSocket = this.socket;
+
+    if (existingSocket !== undefined && !this.isExistingSocketClosed(existingSocket)) {
+      this.logger.warn(
+        `Existing WebSocket instance detected in state ${WEBSOCKET_STATE[existingSocket.readyState]} (${existingSocket.readyState}); reconnecting in place`,
+      );
+      this.reconnectInPlace(existingSocket);
+      return;
+    }
+
+    if (existingSocket !== undefined) {
+      this.logger.info('Existing WebSocket wrapper is CLOSED, creating a fresh wrapper');
+    }
+
+    this.createAndBindSocketWrapper();
+  }
+
+  private isExistingSocketClosed(socket: ReconnectingWebsocketWrapper): boolean {
+    return socket.readyState === WEBSOCKET_STATE.CLOSED;
+  }
+
+  private createAndBindSocketWrapper(): void {
+    const nextSocket = this.getReconnectingWebsocket();
+    this.socket = nextSocket;
+    this.bindSocketHandlers(nextSocket);
+  }
+
+  private bindSocketHandlers(socket: ReconnectingWebsocketWrapper): void {
+    socket.onmessage = this.runIfActiveSocket(socket, this.internalOnMessage);
+    socket.onerror = this.runIfActiveSocket(socket, this.internalOnError);
+    socket.onopen = this.runIfActiveSocket(socket, this.internalOnOpen);
+    socket.onclose = this.runIfActiveSocket(socket, this.internalOnClose);
+  }
+
+  // Ignore late async events emitted by a previously replaced socket instance.
+  // This prevents stale callbacks from mutating state that now belongs to a newer socket.
+  private runIfActiveSocket<T>(socket: ReconnectingWebsocketWrapper, handler: (event: T) => void): (event: T) => void {
+    return event => {
+      if (this.socket !== socket) {
+        return;
+      }
+      handler(event);
+    };
   }
 
   public send(message: any): void {
@@ -217,7 +483,7 @@ export class ReconnectingWebsocket {
   }
 
   public getState(): WEBSOCKET_STATE {
-    return this.socket ? this.socket.readyState : WEBSOCKET_STATE.CLOSED;
+    return this.socket !== undefined ? this.socket.readyState : WEBSOCKET_STATE.CLOSED;
   }
 
   /**
@@ -234,11 +500,23 @@ export class ReconnectingWebsocket {
    * Does not close or reconnect the socket; callers can decide how to react to failures.
    */
   public checkHealth(timeoutMs = TimeUtil.TimeInMillis.SECOND * 10): Promise<boolean> {
-    if (!this.socket || this.getState() !== WEBSOCKET_STATE.OPEN) {
+    const state = this.getState();
+    if (this.socket === undefined) {
+      this.logger.debug('Health check failed — socket instance does not exist');
       return Promise.resolve(false);
     }
 
-    const now = Date.now();
+    if (state === WEBSOCKET_STATE.CONNECTING || state === WEBSOCKET_STATE.CLOSING) {
+      this.logger.debug(`Health check skipped — socket is transitioning (state: ${WEBSOCKET_STATE[state]})`);
+      return Promise.resolve(true);
+    }
+
+    if (state !== WEBSOCKET_STATE.OPEN) {
+      this.logger.debug(`Health check skipped — socket not OPEN (state: ${WEBSOCKET_STATE[state]})`);
+      return Promise.resolve(false);
+    }
+
+    const now = this.options.wallClock.currentTimestampInMilliseconds;
     const timeSinceLastMessage = now - this.lastMessageTimestamp;
 
     // If we're actively processing messages during the last 5 seconds, consider the connection healthy
@@ -251,14 +529,14 @@ export class ReconnectingWebsocket {
 
     // If idle, use ping/pong to verify connection
     return new Promise<boolean>(resolve => {
-      const timeoutId = setTimeout(() => {
+      const timeoutId = this.options.wallClock.setTimeout(() => {
         this.pendingHealthChecks.delete(resolveHealthCheck);
         this.logger.debug('Health check timeout - no pong received within timeout');
         resolve(false);
       }, timeoutMs);
 
       const resolveHealthCheck = (isHealthy: boolean) => {
-        clearTimeout(timeoutId);
+        this.options.wallClock.clearTimeout(timeoutId);
         resolve(isHealthy);
       };
 
@@ -269,7 +547,8 @@ export class ReconnectingWebsocket {
   }
 
   public disconnect(reason = 'Closed by client'): void {
-    if (this.socket) {
+    this.resetLongRunningRetrySequence();
+    if (this.socket !== undefined) {
       this.logger.info(`Disconnecting from WebSocket (reason: "${reason}")`);
       this.socket.close(CloseEventCode.NORMAL_CLOSURE, reason);
     }
@@ -287,12 +566,19 @@ export class ReconnectingWebsocket {
    */
   private cleanup(): void {
     this.stopPinging();
-    // Clear the sleep detection interval if it exists
-    this.stopBackFromSleepHandler?.();
+    this.stopConnectingWatchdog();
+    if (this.stopBackFromSleepHandler !== undefined) {
+      this.stopBackFromSleepHandler();
+    }
+    this.stopBackFromSleepHandler = undefined;
   }
 
-  private getReconnectingWebsocket(): RWS {
-    return new RWS(this.internalOnReconnect, undefined, ReconnectingWebsocket.RECONNECTING_OPTIONS);
+  private getReconnectingWebsocket(): ReconnectingWebsocketWrapper {
+    if (this.options.websocketFactory !== undefined) {
+      return this.options.websocketFactory();
+    }
+
+    return new PartySocketWebSocket(this.internalOnReconnect, undefined, ReconnectingWebsocket.RECONNECTING_OPTIONS);
   }
 
   private resolvePendingHealthChecks(isHealthy: boolean) {
@@ -316,8 +602,66 @@ export class ReconnectingWebsocket {
     this.onClose = onClose;
   }
 
+  public setOnLongRunningRetry(onLongRunningRetry: (retryDetails: LongRunningRetryDetails) => void): void {
+    this.onLongRunningRetry = onLongRunningRetry;
+  }
+
   public disablePinging(): void {
     this.isPingingEnabled = false;
     this.stopPinging();
+  }
+
+  private recordReconnectAttempt(nowInMilliseconds: number): void {
+    this.reconnectAttemptCount += 1;
+
+    if (this.reconnectAttemptCount === 1) {
+      this.logger.info('WebSocket initial connection attempt');
+      return;
+    }
+
+    this.logger.warn(
+      `WebSocket reconnect attempt #${this.reconnectAttemptCount} (sequence retry #${this.reconnectSequenceRetryCount + 1})`,
+    );
+
+    if (this.reconnectSequenceStartTimestamp === undefined) {
+      this.reconnectSequenceStartTimestamp = nowInMilliseconds;
+    }
+
+    this.reconnectSequenceRetryCount += 1;
+    this.reportLongRunningRetryIfNeeded(nowInMilliseconds);
+  }
+
+  private reportLongRunningRetryIfNeeded(nowInMilliseconds: number): void {
+    if (this.hasReportedLongRunningRetry) {
+      return;
+    }
+
+    const reconnectSequenceStartTimestamp = this.reconnectSequenceStartTimestamp;
+
+    if (typeof reconnectSequenceStartTimestamp !== 'number') {
+      return;
+    }
+
+    const retryDurationInMilliseconds = nowInMilliseconds - reconnectSequenceStartTimestamp;
+
+    if (retryDurationInMilliseconds < longRunningRetryThresholdInMilliseconds) {
+      return;
+    }
+
+    this.hasReportedLongRunningRetry = true;
+    this.logger.warn(
+      `Long-running reconnect detected — retries: ${this.reconnectSequenceRetryCount}, duration: ${retryDurationInMilliseconds}ms`,
+    );
+    this.onLongRunningRetry?.({
+      retryCount: this.reconnectSequenceRetryCount,
+      retryDurationInMilliseconds,
+    });
+  }
+
+  private resetLongRunningRetrySequence(): void {
+    this.hasReportedLongRunningRetry = false;
+    this.reconnectAttemptCount = 0;
+    this.reconnectSequenceRetryCount = 0;
+    this.reconnectSequenceStartTimestamp = undefined;
   }
 }

@@ -18,7 +18,7 @@
  */
 
 import logdown from 'logdown';
-import {ErrorEvent} from 'reconnecting-websocket';
+import type {ErrorEvent} from 'partysocket/ws';
 
 import {EventEmitter} from 'events';
 
