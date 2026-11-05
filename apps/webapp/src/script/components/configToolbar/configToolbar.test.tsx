@@ -10,12 +10,16 @@
 
 import {act, render, screen} from '@testing-library/react';
 
-import {withTheme} from '../../auth/util/test/testUtil';
+import userEvent from '@testing-library/user-event';
+
+import {withTheme, withThemeAndRootContext} from '../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../util/test/translateForTest';
+
+import {sendCallLogsFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 
 import {ConfigToolbar} from './configToolbar';
 import {openDebugToolbar} from './debugToolbarEvents';
@@ -35,5 +39,32 @@ describe('ConfigToolbar', () => {
     });
 
     expect(screen.getByRole('heading', {name: 'Developer Menu'})).toBeInTheDocument();
+  });
+
+  it.each([false, true])('toggles sending call logs from enabled=%s', async enabled => {
+    const navigateTo = jest.fn();
+    const rootContextValue = createRootContextValueForTest({
+      translate: translateForTest,
+      isFeatureToggleEnabled: () => {
+        return enabled;
+      },
+    });
+    const wrapper = createRootProviderWrapperForTest({
+      ...rootContextValue,
+      applicationNavigation: {
+        currentPathname: '/app',
+        currentSearch: enabled ? '?enabled-features=send-call-logs' : '',
+        currentHash: '#preferences',
+        navigateTo,
+      },
+    });
+    render(withThemeAndRootContext(<ConfigToolbar />, wrapper));
+    act(() => {
+      openDebugToolbar();
+    });
+    await userEvent.click(screen.getByRole('checkbox', {name: sendCallLogsFeatureToggleName}));
+    expect(navigateTo).toHaveBeenCalledWith(
+      enabled ? '/app#preferences' : '/app?enabled-features=send-call-logs#preferences',
+    );
   });
 });

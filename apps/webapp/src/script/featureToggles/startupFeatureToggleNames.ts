@@ -25,6 +25,8 @@ export const driveBulkActionsFeatureToggleName = 'drive-bulk-actions';
 export const markAsUnreadFeatureToggleName = 'mark-as-unread';
 export const troubleshooterFeatureToggleName = 'troubleshooter';
 
+export const sendCallLogsFeatureToggleName = 'send-call-logs';
+
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
@@ -33,6 +35,7 @@ export const startupFeatureToggleNames = [
   driveBulkActionsFeatureToggleName,
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
+  sendCallLogsFeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

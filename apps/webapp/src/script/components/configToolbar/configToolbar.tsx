@@ -27,6 +27,7 @@ import {container} from 'tsyringe';
 
 import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
+import {CallLogsUploadSettings} from './callLogsUploadSettings';
 import {wrapperStyles} from './configToolbar.styles';
 import {openDebugToolbarEventName} from './debugToolbarEvents';
 
@@ -630,6 +631,10 @@ export function ConfigToolbar(): JSX.Element | null {
       <hr />
 
       <div>{renderStartupFeatureToggleCheckboxList()}</div>
+
+      <hr />
+
+      <CallLogsUploadSettings />
 
       <hr />
 

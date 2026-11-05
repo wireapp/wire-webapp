@@ -26,9 +26,12 @@ import {CallOptions} from './avPreferences/callOptions';
 import {CameraPreferences} from './avPreferences/cameraPreferences';
 import {MicrophonePreferences} from './avPreferences/microphonePreferences';
 import {SaveCallLogs} from './avPreferences/saveCallLogs';
+import {SendCallLogs} from './avPreferences/sendCallLogs';
 import {PreferencesPage} from './components/preferencesPage';
+import {PreferencesSection} from './components/preferencesSection';
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
+import {sendCallLogsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useInitializeMediaDevices} from '../../../../hooks/useInitializeMediaDevices';
 import type {CallingRepository} from '../../../../repositories/calling/CallingRepository';
 import {MediaConstraintsHandler} from '../../../../repositories/media/MediaConstraintsHandler';
@@ -52,7 +55,7 @@ const AVPreferencesComponent: FunctionComponent<AVPreferencesProps> = ({
   callingRepository,
   deviceSupport,
 }: AVPreferencesProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const devicesHandler = container.resolve(MediaDevicesHandler);
   const constraintsHandler = container.resolve(MediaConstraintsHandler);
   const streamHandler = container.resolve(MediaStreamHandler);
@@ -100,7 +103,14 @@ const AVPreferencesComponent: FunctionComponent<AVPreferencesProps> = ({
           return callingRepository.refreshAudioInput();
         }}
       />
-      {callingRepository.supportsCalling && <SaveCallLogs {...{callingRepository}} />}
+      {callingRepository.supportsCalling && (
+        <PreferencesSection title={translate('preferencesOptionsCallLogs')}>
+          <SaveCallLogs callingRepository={callingRepository} />
+          {isFeatureToggleEnabled(sendCallLogsFeatureToggleName) && (
+            <SendCallLogs callingRepository={callingRepository} />
+          )}
+        </PreferencesSection>
+      )}
     </PreferencesPage>
   );
 };
