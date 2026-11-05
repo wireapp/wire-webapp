@@ -21,14 +21,14 @@ import {useState, type FunctionComponent} from 'react';
 
 import {CloseIcon} from '@wireapp/react-ui-kit';
 
-import {Config} from '../../../Config';
-import {useApplicationContext} from '../../../page/rootProvider';
-
 import {
   dismissConversationViewerPermissionBanner,
   getSessionStorage,
   isConversationViewerPermissionBannerDismissed,
 } from './conversationViewerPermissionBannerStorage';
+
+import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
 
 interface ConversationViewerPermissionBannerProps {
   conversationId: string;
