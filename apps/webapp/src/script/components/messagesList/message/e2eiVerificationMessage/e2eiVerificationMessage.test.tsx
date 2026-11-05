@@ -23,21 +23,21 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {Maybe} from 'true-myth';
 
 import en from '../../../../../i18n/en-US.json';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
-import {User} from 'Repositories/entity/User';
-import {Config} from 'src/script/Config';
-import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {E2EIVerificationMessage as VerificationMessageEntity} from '../../../../repositories/entity/message/e2eiVerificationMessage';
+import {User} from '../../../../repositories/entity/User';
+import {Config} from '../../../../Config';
+import {E2EIVerificationMessageType} from '../../../../message/e2eiVerificationMessageType';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
+} from '../../../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../../../util/localizerUtil';
 
 import {E2EIVerificationMessage} from './e2eiVerificationMessage';
 
 import {withTheme, withThemeAndRootContext} from '../../../../auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 

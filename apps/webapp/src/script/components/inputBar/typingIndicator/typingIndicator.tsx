@@ -19,10 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   dotOneStyles,
   dotThreeStyles,
@@ -33,6 +29,10 @@ import {
   wrapperStyles,
 } from './typingIndicator.styles';
 import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {Avatar, AVATAR_SIZE} from '../../avatar';
+import * as Icon from '../../icon';
 
 const MAX_VISIBLE_TYPING_USERS = 3;
 const TWO_TYPING_USERS = 2;

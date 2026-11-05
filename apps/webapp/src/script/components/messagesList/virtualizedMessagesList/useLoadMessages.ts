@@ -22,10 +22,10 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {isUndefined} from '@sindresorhus/is';
 import {Virtualizer} from '@tanstack/react-virtual';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isLastReceivedMessage} from 'Util/conversationMessages';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {isLastReceivedMessage} from '../../../util/conversationMessages';
 
 const viewportCenterDivisor = 2;
 const messageLoadDebounceInMilliseconds = 100;

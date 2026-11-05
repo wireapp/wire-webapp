@@ -31,21 +31,20 @@ import {NIL as NilUuid} from 'uuid';
 
 import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import type {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {stripImageExifData} from 'Util/imageUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {downloadBlob, loadFileBuffer, loadImage} from 'Util/util';
-import {WebWorker} from 'Util/worker';
-
 import {AssetError} from './assetError';
 import {AssetRemoteData} from './assetRemoteData';
 import {AssetTransferState} from './assetTransferState';
 import {getAssetUrl, setAssetUrl} from './assetUrlCache';
 
 import {Core} from '../../service/coreSingleton';
+import {stripImageExifData} from '../../util/imageUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {downloadBlob, loadFileBuffer, loadImage} from '../../util/util';
+import {WebWorker} from '../../util/worker';
+import {Conversation} from '../entity/Conversation';
+import {FileAsset} from '../entity/message/fileAsset';
+import type {User} from '../entity/User';
+import {TeamState} from '../team/TeamState';
 
 const percentageScale = 100;
 type AssetUrlCacheKey = {domain: string | undefined; key: NonEmptyString};

@@ -1,9 +1,6 @@
 import {backgroundEffectsStore} from './useBackgroundEffectsStore';
-import {DEFAULT_BUILTIN_BACKGROUND_ID} from 'Repositories/media/VideoBackgroundEffects';
-import {
-  SELFIE_MULTICLASS_MODEL_PATH,
-  SELFIE_SEGMENTER_MODEL_PATH,
-} from 'Repositories/media/backgroundEffects/pipe/options';
+import {DEFAULT_BUILTIN_BACKGROUND_ID} from './VideoBackgroundEffects';
+import {SELFIE_MULTICLASS_MODEL_PATH, SELFIE_SEGMENTER_MODEL_PATH} from './backgroundEffects/pipe/options';
 
 describe('backgroundEffectsStore:lastVirtualBackgroundId', () => {
   beforeEach(() => {

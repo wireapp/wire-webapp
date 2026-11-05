@@ -19,12 +19,6 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {StorageKey} from 'Repositories/storage/storageKey';
-import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/localizerUtil';
-import {loadValue, storeValue} from 'Util/storageUtil';
-import {setDateLocale, setRegionalDateLocale} from 'Util/timeUtil';
-import {getParameter} from 'Util/urlUtil';
-
 import cs from '../../i18n/cs-CZ.json';
 import da from '../../i18n/da-DK.json';
 import de from '../../i18n/de-DE.json';
@@ -50,6 +44,11 @@ import tr from '../../i18n/tr-TR.json';
 import uk from '../../i18n/uk-UA.json';
 import {URLParameter} from '../auth/urlParameter';
 import {Config} from '../Config';
+import {StorageKey} from '../repositories/storage/storageKey';
+import {DEFAULT_LOCALE, setLocale, setStrings} from '../util/localizerUtil';
+import {loadValue, storeValue} from '../util/storageUtil';
+import {setDateLocale, setRegionalDateLocale} from '../util/timeUtil';
+import {getParameter} from '../util/urlUtil';
 
 const strings = {
   cs,

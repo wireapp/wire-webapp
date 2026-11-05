@@ -22,15 +22,6 @@ import {useEffect, useMemo, useState, type FunctionComponent} from 'react';
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
-import {ClientRepository, ClientEntity} from 'Repositories/client';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {partition} from 'Util/arrayUtil';
-import {getLogger} from 'Util/logger';
-import {capitalizeFirstChar} from 'Util/stringUtil';
-
 import {DeviceDetails} from './components/deviceDetails';
 import {DeviceList} from './components/DeviceList';
 import {NoDevicesFound} from './components/NoDevicesFound';
@@ -38,6 +29,14 @@ import {SelfFingerprint} from './components/SelfFingerprint';
 import {FIND_MODE, UserDevicesState} from './userDevices.types';
 
 import {useUserIdentity} from '../../hooks/useDeviceIdentities';
+import {useApplicationContext} from '../../page/rootProvider';
+import {ClientRepository, ClientEntity} from '../../repositories/client';
+import {MessageRepository} from '../../repositories/conversation/MessageRepository';
+import {CryptographyRepository} from '../../repositories/cryptography/CryptographyRepository';
+import {User} from '../../repositories/entity/User';
+import {partition} from '../../util/arrayUtil';
+import {getLogger} from '../../util/logger';
+import {capitalizeFirstChar} from '../../util/stringUtil';
 
 export interface UserDevicesHistoryEntry {
   headline: string;

@@ -19,7 +19,7 @@
 
 import {maybe} from 'true-myth';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {unwrap, unwrapErr} from '../../../util/test/resultTestSupport';
 
 import {scheduleFormErrors} from '../scheduleFormErrors';
 

@@ -17,16 +17,16 @@
  *
  */
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {createUuid} from 'Util/uuid';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {EventBuilder} from '../../conversation/EventBuilder';
+import {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
+import {UserRepository} from '../../user/userRepository';
+import {createUuid} from '../../../util/uuid';
 
 import {ServiceMiddleware} from './ServiceMiddleware';
 import {UserType} from '@wireapp/api-client/lib/user';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 function buildServiceMiddleware(): readonly [

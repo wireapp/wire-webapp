@@ -26,11 +26,10 @@ import {maybe} from 'true-myth';
 
 import {SharedDriveUploadCompletedIcon, SharedDriveUploadSpinnerIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
-import {KEY} from 'Util/keyboardUtil';
-
+import {useApplicationContext} from '../../../page/rootProvider';
+import {generateConversationUrl} from '../../../router/routeGenerator';
+import {createNavigate, createNavigateKeyboard} from '../../../router/routerBindings';
+import {KEY} from '../../../util/keyboardUtil';
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
 import {
   getRepresentativeSharedDriveUploadStatus,

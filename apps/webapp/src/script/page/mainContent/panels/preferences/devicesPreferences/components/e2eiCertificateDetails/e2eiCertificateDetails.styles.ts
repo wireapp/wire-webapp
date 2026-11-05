@@ -20,7 +20,7 @@
 import {CSSObject} from '@emotion/serialize';
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {MLSStatuses} from 'src/script/e2eIdentity';
+import {MLSStatuses} from '../../../../../../../e2eIdentity';
 
 const MLSStatusColor = {
   [MLSStatuses.VALID]: 'var(--success-color)',

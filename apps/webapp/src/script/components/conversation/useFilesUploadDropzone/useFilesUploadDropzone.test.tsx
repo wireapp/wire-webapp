@@ -5,8 +5,8 @@ import {useFileUploadState} from '../useFilesUploadState/useFilesUploadState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {useFilesUploadDropzone} from './useFilesUploadDropzone';
 

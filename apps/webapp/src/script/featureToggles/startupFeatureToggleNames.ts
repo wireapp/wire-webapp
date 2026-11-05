@@ -22,7 +22,9 @@ export const conversationListCollapseFeatureToggleName = 'conversation-list-coll
 export const forTestsOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
 export const driveBulkActionsFeatureToggleName = 'drive-bulk-actions';
-export const markAsUnreadFeatureToggleName = 'mark-as-unread';
+export const troubleshooterFeatureToggleName = 'troubleshooter';
+
+export const sendCallLogsFeatureToggleName = 'send-call-logs';
 
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
@@ -30,7 +32,8 @@ export const startupFeatureToggleNames = [
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
-  markAsUnreadFeatureToggleName,
+  troubleshooterFeatureToggleName,
+  sendCallLogsFeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

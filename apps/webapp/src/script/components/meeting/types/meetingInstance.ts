@@ -17,7 +17,7 @@
  *
  */
 
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
+import type {MeetingSeries} from './meetingSeries';
 
 /** One concrete time slot for a series — a single row in the meeting list. */
 export type MeetingInstance = {

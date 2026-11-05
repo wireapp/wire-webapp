@@ -19,13 +19,12 @@
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {ConversationRecord, EventRecord, UserRecord} from 'Repositories/storage';
-
 import {CPBackupImporter, BackupImportResult, BackupQualifiedId} from './CPB.library';
 import {ImportHistoryToDatabaseParams} from './CPB.types';
 import {mapConversationRecord, mapUserRecord} from './importMappers';
 import {mapEventRecord} from './importMappers/mapEventRecord';
 
+import {ConversationRecord, EventRecord, UserRecord} from '../../storage';
 import {FileDescriptor, Filename} from '../backup.types';
 import {DifferentAccountError, IncompatibleBackupError, IncompatibleBackupFormatError, InvalidPassword} from '../error';
 

@@ -22,17 +22,16 @@ import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {fixWebsocketString} from 'Util/stringUtil';
-import {TypedEventTarget} from 'Util/typedEventTarget';
-import {createUuid} from 'Util/uuid';
-
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conversations/useSidebarStore';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {fixWebsocketString} from '../../util/stringUtil';
+import {TypedEventTarget} from '../../util/typedEventTarget';
+import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
+import type {Conversation} from '../entity/Conversation';
+import type {PropertiesService} from '../properties/propertiesService';
 
 export enum LabelType {
   Custom = 0,

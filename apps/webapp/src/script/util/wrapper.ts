@@ -21,10 +21,9 @@ import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
 
-import {ROLE} from 'Repositories/user/userPermission';
-
 import {Environment} from './environment';
 
+import {ROLE} from '../repositories/user/userPermission';
 import {WebAppEvents} from '../webAppEvents';
 
 export function exposeWrapperGlobals(): void {

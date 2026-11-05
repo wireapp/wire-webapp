@@ -19,19 +19,18 @@
 
 import {FC, useState} from 'react';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {toggleFeature} from 'Repositories/conversation/ConversationAccessPermission';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {GuestOptions} from './components/guestOptions';
 import {ServicesOptions} from './components/servicesOptions';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
+import {toggleFeature} from '../../../repositories/conversation/ConversationAccessPermission';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 
 interface GuestServicesOptionsProps {

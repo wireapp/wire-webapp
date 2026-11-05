@@ -16,8 +16,8 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {sendTextMessageToConversation} from 'test/e2e_tests/utils/userActions';
+import {PageManager} from '../../pageManager';
+import {sendTextMessageToConversation} from '../../utils/userActions';
 import {test, expect, withLogin} from '../../test.fixtures';
 
 test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({createUser, createTeam, createPage}) => {

@@ -17,7 +17,7 @@
  *
  */
 
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../src/script/util/uuid';
 import {
   isBearerToken,
   isUUID,
@@ -27,7 +27,7 @@ import {
   assetRetentionPolicy,
   isValidAsset,
   ValidationUtilError,
-} from 'Util/validationUtil';
+} from '../../../src/script/util/validationUtil';
 
 describe('ValidationUtil', () => {
   describe('"asset.legacy"', () => {

@@ -24,10 +24,9 @@ import {useNavigate} from 'react-router';
 
 import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Page} from './page';
 
+import {useApplicationContext} from '../../page/rootProvider';
 import {RouterLink} from '../component/routerLink';
 import {RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/selfSelector';

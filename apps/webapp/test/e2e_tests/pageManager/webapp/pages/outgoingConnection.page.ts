@@ -18,7 +18,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {escapeHtml} from 'test/e2e_tests/utils/userDataProcessor';
+import {escapeHtml} from '../../../utils/userDataProcessor';
 
 export class OutgoingConnectionPage {
   private readonly page: Page;

@@ -17,7 +17,7 @@
  *
  */
 
-import {AppsFeatureOptions, checkAppsFeatureAvailability} from 'Util/featureUtil';
+import {AppsFeatureOptions, checkAppsFeatureAvailability} from './featureUtil';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 type AppsFeatureDataSet = AppsFeatureOptions & {expected: boolean};

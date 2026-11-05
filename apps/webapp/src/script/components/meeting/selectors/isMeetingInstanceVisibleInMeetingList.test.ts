@@ -17,8 +17,8 @@
  *
  */
 
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
+import type {MeetingInstance} from '../types/meetingInstance';
+import type {MeetingSeries} from '../types/meetingSeries';
 
 import {isMeetingInstanceVisibleInMeetingList} from './isMeetingInstanceVisibleInMeetingList';
 

@@ -17,15 +17,15 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
+import {User} from '../entity/User';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
-import {defaultAudioOutputId, mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {UserState} from 'Repositories/user/userState';
-import {createUuid} from 'Util/uuid';
+import {defaultAudioOutputId, mediaDevicesStore} from './useMediaDevicesStore';
+import {UserState} from '../user/userState';
+import {createUuid} from '../../util/uuid';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 interface SelectedDeviceId {
   exact?: string;

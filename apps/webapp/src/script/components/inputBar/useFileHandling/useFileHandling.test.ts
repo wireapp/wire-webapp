@@ -19,7 +19,7 @@
 
 import {act, fireEvent, renderHook} from '@testing-library/react';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {useFileHandling} from './useFileHandling';
 

@@ -20,8 +20,7 @@
 import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {create} from 'zustand';
 
-import {User} from 'Repositories/entity/User';
-
+import {User} from '../../../../repositories/entity/User';
 import {
   ConversationAccess,
   ChatHistory,

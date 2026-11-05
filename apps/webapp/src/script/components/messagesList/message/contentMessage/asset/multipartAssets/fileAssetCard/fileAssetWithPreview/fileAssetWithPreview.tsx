@@ -21,9 +21,6 @@ import {CSSProperties, useState, type FunctionComponent} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
-import {FileCard} from 'Components/fileCard/fileCard';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   contentWrapperStyles,
   errorIconStyles,
@@ -34,6 +31,8 @@ import {
   loaderIconStyles,
 } from './fileAssetWithPreview.styles';
 
+import {useApplicationContext} from '../../../../../../../../page/rootProvider';
+import {FileCard} from '../../../../../../../fileCard/fileCard';
 import {FileAssetOptions} from '../common/fileAssetOptions/fileAssetOptions';
 import {FilePreviewModal} from '../common/filePreviewModal/filePreviewModal';
 

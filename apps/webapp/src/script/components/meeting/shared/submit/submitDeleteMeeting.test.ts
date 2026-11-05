@@ -19,12 +19,12 @@
 
 import {task} from 'true-myth';
 
-import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {meetingSubmitErrors} from '../../meetingSubmitErrors';
+import type {MeetingInstance} from '../../types/meetingInstance';
+import type {MeetingSeries} from '../../types/meetingSeries';
+import {PrimaryModal} from '../../../Modals/PrimaryModal';
+import {User} from '../../../../repositories/entity/User';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {
   deleteMeetingSubmitResults,

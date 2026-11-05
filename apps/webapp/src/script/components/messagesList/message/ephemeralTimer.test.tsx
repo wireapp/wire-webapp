@@ -19,12 +19,12 @@
 
 import {render} from '@testing-library/react';
 
-import {Message} from 'Repositories/entity/message/message';
+import {Message} from '../../../repositories/entity/message/message';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {EphemeralTimer} from './ephemeralTimer';
 

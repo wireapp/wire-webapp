@@ -24,9 +24,10 @@ import {TrashIcon} from '@wireapp/react-ui-kit';
 import {
   deleteMeetingConfirmButtonContentStyles,
   deleteMeetingConfirmButtonIconStyles,
-} from 'Components/meeting/shared/delete/showDeleteMeetingModal.styles';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {Translate, TranslationKey} from 'Util/localizerUtil';
+} from './showDeleteMeetingModal.styles';
+
+import type {Translate, TranslationKey} from '../../../../util/localizerUtil';
+import {PrimaryModal} from '../../../Modals/PrimaryModal';
 
 export type DeleteMeetingModalMode = 'forAll' | 'forMe';
 

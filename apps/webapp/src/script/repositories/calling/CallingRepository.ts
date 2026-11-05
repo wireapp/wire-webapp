@@ -61,56 +61,12 @@ import {
 import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 
-import {showNoAudioInputModal, showNoCameraModal} from 'Components/calling/devicePermissionModals';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
-import {
-  NetworkQualityInfo,
-  NetworkQualityInfoSchema,
-  UNKNOWN_NETWORK_QUALITY,
-} from 'Repositories/calling/calling.schema';
-import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
-import {isMLSConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {CallingEvent} from 'Repositories/event/CallingEvent';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventSource} from 'Repositories/event/EventSource';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MediaType} from 'Repositories/media/MediaType';
-import {backgroundEffectsStore, BackgroundEffectsQuality} from 'Repositories/media/useBackgroundEffectsStore';
-import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
-import {TeamState} from 'Repositories/team/TeamState';
-import {EventName} from 'Repositories/tracking/eventName';
-import * as trackingHelpers from 'Repositories/tracking/helpers';
-import {Segmentation} from 'Repositories/tracking/segmentation';
-import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {flatten} from 'Util/arrayUtil';
-import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
-import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {captureModalFocusContext} from 'Util/modalFocusUtil';
-import {roundLogarithmic} from 'Util/numberUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {copyStyles} from 'Util/renderElement';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {toError} from 'Util/toError';
-import {createUuid} from 'Util/uuid';
-
 import {Call, SerializedConversationId} from './Call';
+import {NetworkQualityInfo, NetworkQualityInfoSchema, UNKNOWN_NETWORK_QUALITY} from './calling.schema';
 import {CallingEpochData} from './CallingEpochCache';
+import {MAX_MODERATOR_TARGET_USERS} from './callingMessage.schema';
 import {callingSubscriptions} from './callingSubscriptionsHandler';
+import type {CallMediaChoice} from './callMediaChoice';
 import {CallingViewMode, CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
@@ -118,14 +74,54 @@ import {isIncomingSetupOffer, shouldRejectStaleIncomingRing} from './incomingCal
 import {ClientId, Participant, UserId} from './Participant';
 import {getAllowedSftOrigins, isAllowedSftUrl} from './sftUrl';
 
+import {showNoAudioInputModal, showNoCameraModal} from '../../components/calling/devicePermissionModals';
+import {useCallAlertState} from '../../components/calling/useCallAlertState';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {CALL_QUALITY_FEEDBACK_KEY} from '../../components/Modals/QualityFeedbackModal/constants';
+import {RatingListLabel} from '../../components/Modals/QualityFeedbackModal/typings';
 import {Config} from '../../Config';
 import {NoAudioInputError} from '../../error/noAudioInputError';
 import {useActiveWindowState} from '../../hooks/useActiveWindow';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {flatten} from '../../util/arrayUtil';
+import {calculateChildWindowPosition} from '../../util/DOM/caculateChildWindowPosition';
+import {isDetachedCallingFeatureEnabled} from '../../util/isDetachedCallingFeatureEnabled';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {captureModalFocusContext} from '../../util/modalFocusUtil';
+import {roundLogarithmic} from '../../util/numberUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {copyStyles} from '../../util/renderElement';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {toError} from '../../util/toError';
+import {createUuid} from '../../util/uuid';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {WebAppEvents} from '../../webAppEvents';
+import {isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
+import {ConversationState} from '../conversation/ConversationState';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {EventBuilder} from '../conversation/EventBuilder';
+import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
+import {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
+import {CallingEvent} from '../event/CallingEvent';
+import {EventRepository} from '../event/EventRepository';
+import {EventSource} from '../event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {BackgroundEffectsHandler} from '../media/backgroundEffectsHandler';
+import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import type {MediaStreamHandler} from '../media/MediaStreamHandler';
+import {MediaType} from '../media/MediaType';
+import {backgroundEffectsStore, BackgroundEffectsQuality} from '../media/useBackgroundEffectsStore';
+import type {BackgroundEffectSelection, BackgroundSource} from '../media/VideoBackgroundEffects';
+import {TeamState} from '../team/TeamState';
+import {EventName} from '../tracking/eventName';
+import * as trackingHelpers from '../tracking/helpers';
+import {Segmentation} from '../tracking/segmentation';
+import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/telemetry.helpers';
+import type {UserRepository} from '../user/userRepository';
 
 type DetachedExternalLinksCleanup = () => void;
 type CallingRepositoryConfig = {
@@ -2631,12 +2627,16 @@ export class CallingRepository {
   };
 
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]): void => {
-    const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    void this.sendCallingMessage(
-      conversationId,
-      {type: CALL_MESSAGE_TYPE.REMOTE_MUTE, data: {targets: recipients}},
-      {nativePush: true, recipients},
-    );
+    for (let offset = 0; offset < participants.length; offset += MAX_MODERATOR_TARGET_USERS) {
+      const recipients = this.convertParticipantsToCallingMessageRecepients(
+        participants.slice(offset, offset + MAX_MODERATOR_TARGET_USERS),
+      );
+      void this.sendCallingMessage(
+        conversationId,
+        {type: CALL_MESSAGE_TYPE.REMOTE_MUTE, data: {targets: recipients}},
+        {nativePush: true, recipients},
+      );
+    }
   };
 
   readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]): void => {

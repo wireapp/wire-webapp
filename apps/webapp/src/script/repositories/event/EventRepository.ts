@@ -37,15 +37,6 @@ import {container} from 'tsyringe';
 import {Runtime, StringUtil} from '@wireapp/commons';
 import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '@wireapp/core';
 
-import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
-import {EventName} from 'Repositories/tracking/eventName';
-import {UserState} from 'Repositories/user/userState';
-import {getLogger, Logger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {toError} from 'Util/toError';
-import {isAxiosError} from 'Util/typePredicateUtil';
-
 import {ClientEvent} from './Client';
 import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
 import type {EventService} from './EventService';
@@ -60,8 +51,16 @@ import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventH
 import {CryptographyError} from '../../error/cryptographyError';
 import {EventError} from '../../error/eventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {getLogger, Logger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {toError} from '../../util/toError';
+import {isAxiosError} from '../../util/typePredicateUtil';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {WebAppEvents} from '../../webAppEvents';
+import {ClientConversationEvent, EventBuilder} from '../conversation/EventBuilder';
+import {CryptographyMapper} from '../cryptography/CryptographyMapper';
+import {EventName} from '../tracking/eventName';
+import {UserState} from '../user/userState';
 
 const callEventLifetimeInSeconds = 30;
 const heartbeatIntervalInSeconds = 30;

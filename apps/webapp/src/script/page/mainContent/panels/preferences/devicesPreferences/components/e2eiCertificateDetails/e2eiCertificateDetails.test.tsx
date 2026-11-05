@@ -23,20 +23,20 @@ import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/e2eIdentity';
+import {User} from '../../../../../../../repositories/entity/User';
+import {UserState} from '../../../../../../../repositories/user/userState';
+import {withTheme} from '../../../../../../../auth/util/test/testUtil';
+import {E2EIHandler, MLSStatuses, WireIdentity} from '../../../../../../../e2eIdentity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {Core} from 'src/script/service/coreSingleton';
-import {generateAPIConversation} from 'test/helper/ConversationGenerator';
+} from '../../../../../../testSupport/rootContextTestSupport';
+import {Core} from '../../../../../../../service/coreSingleton';
+import {generateAPIConversation} from '../../../../../../../../../test/helper/ConversationGenerator';
 
 import {E2EICertificateDetails} from './e2eiCertificateDetails';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
 
 const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => {
   return {

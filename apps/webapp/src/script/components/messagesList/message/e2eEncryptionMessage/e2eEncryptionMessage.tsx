@@ -21,9 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {Link, LinkVariant, ShieldIcon} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   e2eMessageContainerCss,
   e2eMessageIconContainerCss,
@@ -33,6 +30,9 @@ import {
   e2eMessageContentParagraphWithMarginCss,
   e2eMessageContentLinkCss,
 } from './e2eEncryptionMessage.styles';
+
+import {Config} from '../../../../Config';
+import {useApplicationContext} from '../../../../page/rootProvider';
 
 interface E2eEncryptionMessageProps {
   isCellsConversation: boolean;

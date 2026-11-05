@@ -17,7 +17,7 @@
  *
  */
 
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../../src/script/util/localizerUtil';
 import {
   formatDayMonth,
   formatDayMonthNumeral,
@@ -31,7 +31,7 @@ import {
   isToday,
   setDateLocale,
   weeksPassedSinceDate,
-} from 'Util/timeUtil';
+} from '../../../src/script/util/timeUtil';
 
 describe('TimeUtil', () => {
   const ONE_SECOND_IN_MILLIS = 1000;

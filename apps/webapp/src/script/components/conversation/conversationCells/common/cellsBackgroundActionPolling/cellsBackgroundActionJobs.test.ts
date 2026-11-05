@@ -189,6 +189,14 @@ describe('checkCellsBackgroundActionJobs', () => {
     expect(options.cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
   });
 
+  it('reads restore jobs under the restore action name', async () => {
+    const options = {...createCheckOptions(), actionName: 'restore' as const};
+
+    await checkCellsBackgroundActionJobs(options).result;
+
+    expect(options.cellsRepository.getBackgroundActionInfo).toHaveBeenCalledWith({name: 'restore', jobUuid: 'job-1'});
+  });
+
   it('preserves failed evidence when another read rejects', async () => {
     const options = createCheckOptions();
     options.cellsRepository.getBackgroundActionInfo

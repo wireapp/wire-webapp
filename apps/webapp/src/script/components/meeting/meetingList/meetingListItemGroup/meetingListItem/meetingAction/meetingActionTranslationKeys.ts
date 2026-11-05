@@ -17,7 +17,7 @@
  *
  */
 
-import type {TranslationKey} from 'Util/localizerUtil';
+import type {TranslationKey} from '../../../../../../util/localizerUtil';
 
 export const MEETING_ACTION_TRANSLATION_KEYS = {
   joinNow: 'meetings.action.joinNow',

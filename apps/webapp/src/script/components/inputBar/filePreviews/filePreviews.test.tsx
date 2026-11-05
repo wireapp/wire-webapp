@@ -19,8 +19,8 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {FileWithPreview} from '../../conversation/useFilesUploadState/useFilesUploadState';
+import {withTheme} from '../../../auth/util/test/testUtil';
 
 import {FilePreviews} from './filePreviews';
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from 'src/script/Config';
+import {Config} from '../Config';
 
 import {canUseMeetings} from './canUseMeetings';
 

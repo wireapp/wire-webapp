@@ -17,11 +17,11 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {createGroup, sendConnectionRequest} from '../../utils/userActions';
 
-import {test, expect, withLogin, Team} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, Team} from '../../test.fixtures';
 
 async function openParticipantDetailsFromGroup(
   pages: PageManager['webapp']['pages'],

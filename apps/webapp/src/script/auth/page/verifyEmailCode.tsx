@@ -28,12 +28,11 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {ActionLinkButton, CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-
 import {Page} from './page';
 import {styles} from './verifyEmailCode.styles';
 
+import {useApplicationContext} from '../../page/rootProvider';
+import {getLogger} from '../../util/logger';
 import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
 import {BackButton} from '../component/backButton';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';

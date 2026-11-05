@@ -20,10 +20,10 @@
 import {act, render, waitFor} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
-import {User} from 'Repositories/entity/User';
+import {User} from '../../repositories/entity/User';
 
 import {AppLoader} from '.';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('AppLoader', () => {
   it('triggers loading of the app once mounted', async () => {

@@ -19,10 +19,10 @@
 
 import type {FunctionComponent} from 'react';
 
-import {LinkIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {wrapperStyles, iconWrapperStyles, textStyles, wrapperStylesHidden} from './cellsTableSharedColumn.styles';
+
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {LinkIcon} from '../../../../icon';
 
 interface CellsTableSharedColumnProps {
   isShared: boolean;

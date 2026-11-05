@@ -21,8 +21,8 @@ import React, {CSSProperties, useEffect, useState, type FunctionComponent} from 
 
 import cx from 'classnames';
 
-import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
-import {clamp} from 'Util/numberUtil';
+import {clamp} from '../../../../../../../util/numberUtil';
+import {useMessageFocusedTabIndex} from '../../../../util';
 
 const percentageScale = 100;
 const decimalRadix = 10;

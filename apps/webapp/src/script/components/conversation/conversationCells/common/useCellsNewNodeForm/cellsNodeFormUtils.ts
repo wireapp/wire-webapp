@@ -19,8 +19,7 @@
 
 import {Maybe} from 'true-myth';
 
-import {isAxiosError} from 'Util/typePredicateUtil';
-
+import {isAxiosError} from '../../../../../util/typePredicateUtil';
 import {isValidCellsNodeName} from '../cellsNodeNameValidator';
 
 export const ITEM_ALREADY_EXISTS_ERROR = 409;

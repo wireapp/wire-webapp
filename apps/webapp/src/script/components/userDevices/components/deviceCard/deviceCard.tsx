@@ -22,17 +22,16 @@ import type {FunctionComponent} from 'react';
 import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
-import {DeviceVerificationBadges} from 'Components/badge';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
-import {type ClientEntity} from 'Repositories/client/ClientEntity';
-import {WireIdentity} from 'src/script/e2eIdentity';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {splitFingerprint} from 'Util/stringUtil';
-
+import {WireIdentity} from '../../../../e2eIdentity';
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {type ClientEntity} from '../../../../repositories/client/ClientEntity';
+import {handleKeyDown, KEY} from '../../../../util/keyboardUtil';
+import {splitFingerprint} from '../../../../util/stringUtil';
+import {DeviceVerificationBadges} from '../../../badge';
 import * as Icon from '../../../icon';
+import {LegalHoldDot} from '../../../LegalHoldDot';
+import {useMessageFocusedTabIndex} from '../../../messagesList/message/util';
 
 interface DeviceCardProps {
   click?: (device: ClientEntity) => void;

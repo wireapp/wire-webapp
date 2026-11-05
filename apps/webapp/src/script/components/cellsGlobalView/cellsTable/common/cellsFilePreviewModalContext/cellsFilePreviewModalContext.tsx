@@ -19,7 +19,7 @@
 
 import {createContext, ReactNode, useContext, useId, useMemo, useState, type FunctionComponent} from 'react';
 
-import {CellFile} from 'src/script/types/cellNode';
+import {CellFile} from '../../../../../types/cellNode';
 
 export interface CellsFilePreviewModalContextValue {
   id: string;

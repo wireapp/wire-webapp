@@ -19,11 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
-import * as Icon from 'Components/icon';
-import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/callMessage';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {MessageTime} from './messageTime';
+
+import {CallMessage as CallMessageEntity} from '../../../repositories/entity/message/callMessage';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import * as Icon from '../../icon';
 
 interface CallMessageProps {
   message: CallMessageEntity;

@@ -24,9 +24,6 @@ import {Maybe} from 'true-myth';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getBestPreviewSource} from 'Util/imageUtil';
-
 import {
   containerStyles,
   errorIconStyles,
@@ -38,6 +35,8 @@ import {
   loaderIconStyles,
 } from './imageAssetLarge.styles';
 
+import {useApplicationContext} from '../../../../../../../../page/rootProvider';
+import {getBestPreviewSource} from '../../../../../../../../util/imageUtil';
 import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
 
 interface ImageAssetLargeProps {

@@ -19,9 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import type {Location} from 'Repositories/entity/message/location';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getMapsUrl} from 'Util/locationUtil';
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import type {Location} from '../../../../../repositories/entity/message/location';
+import {getMapsUrl} from '../../../../../util/locationUtil';
 
 interface LocationAssetProps {
   asset: Location;

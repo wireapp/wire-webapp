@@ -17,14 +17,14 @@
  *
  */
 import {getGrid, updateVideoGrid} from './videoGridHandler';
-import {Call} from 'Repositories/calling/Call';
+import {Call} from './Call';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {buildMediaDevicesHandler} from '../../auth/util/test/testUtil';
-import {User} from 'Repositories/entity/User';
-import {createUuid} from 'Util/uuid';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Participant} from 'Repositories/calling/Participant';
-import {translateForTest} from 'Util/test/translateForTest';
+import {User} from '../entity/User';
+import {createUuid} from '../../util/uuid';
+import {Conversation} from '../entity/Conversation';
+import {Participant} from './Participant';
+import {translateForTest} from '../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('videoGridHandler', () => {

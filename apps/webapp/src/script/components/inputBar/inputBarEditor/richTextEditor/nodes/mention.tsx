@@ -44,10 +44,9 @@ import {
   BaseSelection,
 } from 'lexical';
 
-import {KEY} from 'Util/keyboardUtil';
-
 import {$isMentionNode} from './mentionNode';
 
+import {KEY} from '../../../../../util/keyboardUtil';
 import {getNextSibling, getPreviousSibling} from '../utils/getSelectionInfo';
 
 interface MentionComponentProps {

@@ -20,7 +20,7 @@
 import {ChangeEvent, FormEvent, type MouseEvent} from 'react';
 import {act, renderHook, type RenderHookResult} from '@testing-library/react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 
 import {useCellsNewFileForm} from './useCellsNewFileForm';
 import type {CellsFileType} from './useCellsNewFileForm';

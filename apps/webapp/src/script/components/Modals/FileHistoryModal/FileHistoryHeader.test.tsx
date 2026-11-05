@@ -21,9 +21,9 @@ import {ReactElement} from 'react';
 
 import {render, screen, fireEvent, type RenderResult} from '@testing-library/react';
 
-import {RootProvider} from 'src/script/page/rootProvider';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {RootProvider} from '../../../page/rootProvider';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {createRootContextValueForTest} from '../../../page/testSupport/rootContextTestSupport';
 
 import {FileHistoryHeader} from './FileHistoryHeader';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';

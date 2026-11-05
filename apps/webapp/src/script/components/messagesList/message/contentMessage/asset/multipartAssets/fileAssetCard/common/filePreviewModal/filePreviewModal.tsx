@@ -19,7 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../../../../../FileFullscreenModal/FileFullscreenModal';
 
 interface FilePreviewModalProps {
   id: string;

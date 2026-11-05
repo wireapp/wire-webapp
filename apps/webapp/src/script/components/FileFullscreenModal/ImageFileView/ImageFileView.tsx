@@ -19,10 +19,10 @@
 
 import type {FunctionComponent} from 'react';
 
-import {ZoomableImage} from 'Components/ZoomableImage/ZoomableImage';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {imageWrapperStyles, wrapperStyles} from './ImageFileView.styles';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {ZoomableImage} from '../../ZoomableImage/ZoomableImage';
 
 interface ImageFileViewProps {
   src?: string;

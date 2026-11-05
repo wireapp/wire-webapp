@@ -26,21 +26,20 @@ import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {ACCESS_STATE, type TEAM as TEAMType2} from 'Repositories/conversation/AccessState';
+import {useSidebarStore, SidebarTabs} from '../../../../page/leftSidebar/panels/conversations/useSidebarStore';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {ACCESS_STATE, type TEAM as TEAMType2} from '../../../../repositories/conversation/AccessState';
 import {
   toggleFeature,
   teamPermissionsForAccessState,
   ACCESS_TYPES,
   ACCESS_MODES,
-} from 'Repositories/conversation/ConversationAccessPermission';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useSidebarStore, SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isKeyboardEvent} from 'Util/keyboardUtil';
-
+} from '../../../../repositories/conversation/ConversationAccessPermission';
+import {TeamState} from '../../../../repositories/team/TeamState';
+import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {createNavigateKeyboard, createNavigate} from '../../../../router/routerBindings';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {isKeyboardEvent} from '../../../../util/keyboardUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
 import {PrimaryModal} from '../../PrimaryModal';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';

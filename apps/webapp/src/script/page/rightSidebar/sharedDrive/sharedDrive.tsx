@@ -25,21 +25,6 @@ import {noop} from 'noop-esm';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {
-  CELLS_SELF_USER_DRIVE_ROLE,
-  getSelfUserDriveRole,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {ParticipantItemContent} from 'Components/participantItemContent';
-import {BaseToggle} from 'Components/toggle/BaseToggle';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {capitalizeFirstChar, sortUsersByPriority} from 'Util/stringUtil';
-
 import {
   sharedDriveAvatarCss,
   sharedDriveContainerCss,
@@ -54,6 +39,20 @@ import {
   sharedDriveViewerRoleCss,
 } from './sharedDrive.styles';
 
+import {Avatar, AVATAR_SIZE} from '../../../components/avatar';
+import {
+  CELLS_SELF_USER_DRIVE_ROLE,
+  getSelfUserDriveRole,
+} from '../../../components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import * as Icon from '../../../components/icon';
+import {ParticipantItemContent} from '../../../components/participantItemContent';
+import {BaseToggle} from '../../../components/toggle/BaseToggle';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {capitalizeFirstChar, sortUsersByPriority} from '../../../util/stringUtil';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 
 interface SharedDriveProps {

@@ -19,12 +19,12 @@
 
 import {fireEvent, render, screen} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {withTheme} from '../../../../../auth/util/test/testUtil';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 
 import {AccountLink} from './accountLink';
 

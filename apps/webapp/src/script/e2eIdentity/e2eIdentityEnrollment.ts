@@ -27,14 +27,6 @@ import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {UserState} from 'Repositories/user/userState';
-import {Core} from 'src/script/service/coreSingleton';
-import {translate} from 'Util/localizerUtil';
-import {getLogger} from 'Util/logger';
-import {formatDelayTime, TIME_IN_MILLIS} from 'Util/timeUtil';
-import {removeUrlParameters} from 'Util/urlUtil';
-
 import {
   hasActiveCertificate,
   getActiveWireIdentity,
@@ -47,6 +39,13 @@ import {getModalOptions, ModalType} from './modals';
 import {OIDCService} from './oidcService';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 
+import {PrimaryModal, removeCurrentModal} from '../components/Modals/PrimaryModal';
+import {UserState} from '../repositories/user/userState';
+import {Core} from '../service/coreSingleton';
+import {translate} from '../util/localizerUtil';
+import {getLogger} from '../util/logger';
+import {formatDelayTime, TIME_IN_MILLIS} from '../util/timeUtil';
+import {removeUrlParameters} from '../util/urlUtil';
 import {WebAppEvents} from '../webAppEvents';
 
 const enrollmentProgressPollingIntervalInSeconds = 10;

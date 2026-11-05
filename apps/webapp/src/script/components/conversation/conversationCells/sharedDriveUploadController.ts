@@ -20,9 +20,9 @@
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {Result} from 'true-myth';
 
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {UploadSource, UploadState} from 'Repositories/cells/upload';
-import type {CellsUploadManager} from 'Repositories/cells/upload/manager';
+import type {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import type {UploadSource, UploadState} from '../../../repositories/cells/upload';
+import type {CellsUploadManager} from '../../../repositories/cells/upload/manager';
 
 export type SharedDriveUploadController = {
   readonly upload: (

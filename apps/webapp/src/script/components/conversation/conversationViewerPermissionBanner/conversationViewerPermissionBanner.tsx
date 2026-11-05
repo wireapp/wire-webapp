@@ -21,8 +21,8 @@ import {useState, type FunctionComponent} from 'react';
 
 import {CloseIcon} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
 
 export const ConversationViewerPermissionBanner: FunctionComponent = () => {
   const {translate} = useApplicationContext();

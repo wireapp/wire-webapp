@@ -323,11 +323,6 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
         // `@wireapp/core-crypto` V11 only exposes an `import` condition. `@wireapp/core` is compiled to CommonJS, so
         // its `require()` calls would otherwise fail with "Package subpath '.' is not defined by exports".
         '@wireapp/core-crypto$': path.resolve(rootPath, 'node_modules/@wireapp/core-crypto/dist/corecrypto.js'),
-        Components: path.resolve(scriptPath, 'components'),
-        Repositories: path.resolve(scriptPath, 'repositories'),
-        Util: path.resolve(scriptPath, 'util'),
-        src: path.resolve(configDirectoryPath, 'src'),
-        test: path.resolve(configDirectoryPath, 'test'),
       },
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
       fallback: {

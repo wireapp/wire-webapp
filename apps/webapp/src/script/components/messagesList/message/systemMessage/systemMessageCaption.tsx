@@ -19,8 +19,8 @@
 
 import {ReactNode} from 'react';
 
-import {Config} from 'src/script/Config';
-import {renderReactTranslation, replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+import {Config} from '../../../../Config';
+import {renderReactTranslation, replaceReactComponents} from '../../../../util/localizerUtil/reactLocalizerUtil';
 
 export function renderMemberRoleUpdateSystemMessageCaption(caption: string): ReactNode[] {
   return replaceReactComponents(caption, [

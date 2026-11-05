@@ -22,14 +22,14 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {MixedConversation, ProteusConversation} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Core} from 'src/script/service/coreSingleton';
-import {TestFactory} from 'test/helper/TestFactory';
-import {createUuid} from 'Util/uuid';
+import {MixedConversation, ProteusConversation} from '../../../repositories/conversation/ConversationSelectors';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {Core} from '../../../service/coreSingleton';
+import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {createUuid} from '../../../util/uuid';
 
 import {initialiseMigrationOfProteusConversations} from '.';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const selfUserId = {id: 'self-user-id', domain: 'local.wire.link'};
 

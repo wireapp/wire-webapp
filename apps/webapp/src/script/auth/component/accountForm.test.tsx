@@ -27,8 +27,8 @@ import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translate} from 'Util/localizerUtil';
+} from '../../page/testSupport/rootContextTestSupport';
+import {translate} from '../../util/localizerUtil';
 
 import {AccountForm} from './accountForm';
 

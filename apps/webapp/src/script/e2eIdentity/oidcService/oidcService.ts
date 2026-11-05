@@ -19,9 +19,9 @@
 
 import {UserManager, UserManagerSettings, WebStorageStateStore, type User} from 'oidc-client-ts';
 
-import {clearKeysStartingWith} from 'Util/localStorage';
-
 import {EncryptedStorage} from './oauthEncryptedStore';
+
+import {clearKeysStartingWith} from '../../util/localStorage';
 
 export class OIDCService {
   private readonly userManager: UserManager;

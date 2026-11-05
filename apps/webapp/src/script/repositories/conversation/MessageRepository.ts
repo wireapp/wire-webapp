@@ -61,53 +61,6 @@ import {partition} from 'underscore';
 
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/assetMetaDataBuilder';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {AudioRepository} from 'Repositories/audio/audioRepository';
-import {AudioType} from 'Repositories/audio/audioType';
-import {ClientState} from 'Repositories/client/ClientState';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService, type IdentifiedUpdatePayload} from 'Repositories/event/EventService';
-import {EventTypeHandling} from 'Repositories/event/EventTypeHandling';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import type {EventRecord, ReactionMap} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserType} from 'Repositories/tracking/attribute';
-import {EventName} from 'Repositories/tracking/eventName';
-import * as trackingHelpers from 'Repositories/tracking/helpers';
-import {Segmentation} from 'Repositories/tracking/segmentation';
-import {protoFromType} from 'Repositories/user/availabilityMapper';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {
-  cancelSendingLinkPreview,
-  clearLinkPreviewSendingState,
-  shouldSendLinkPreviewForMessage,
-} from 'Util/linkPreviewSender';
-import {type Translate, Declension, joinNames} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {isMarkdownText} from 'Util/markdownUtil';
-import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {roundLogarithmic} from 'Util/numberUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {capitalizeFirstChar} from 'Util/stringUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {isBackendError, isErrorWithCode} from 'Util/typePredicateUtil';
-import {loadUrlBlob, supportsMLS} from 'Util/util';
-import {createUuid} from 'Util/uuid';
-
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
 import {isMLSConversation, supportsReadReceipts} from './ConversationSelectors';
@@ -117,6 +70,7 @@ import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
@@ -125,7 +79,52 @@ import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {
+  cancelSendingLinkPreview,
+  clearLinkPreviewSendingState,
+  shouldSendLinkPreviewForMessage,
+} from '../../util/linkPreviewSender';
+import {type Translate, Declension, joinNames} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {isMarkdownText} from '../../util/markdownUtil';
+import {areMentionsDifferent, isTextDifferent} from '../../util/messageComparator';
+import {roundLogarithmic} from '../../util/numberUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {capitalizeFirstChar} from '../../util/stringUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {isBackendError, isErrorWithCode} from '../../util/typePredicateUtil';
+import {loadUrlBlob, supportsMLS} from '../../util/util';
+import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
+import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from '../assets/assetMetaDataBuilder';
+import {AssetRepository} from '../assets/assetRepository';
+import {AssetTransferState} from '../assets/assetTransferState';
+import {AudioRepository} from '../audio/audioRepository';
+import {AudioType} from '../audio/audioType';
+import {ClientState} from '../client/ClientState';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {Conversation} from '../entity/Conversation';
+import {CompositeMessage} from '../entity/message/compositeMessage';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {FileAsset} from '../entity/message/fileAsset';
+import {Message} from '../entity/message/message';
+import {User} from '../entity/User';
+import {EventRepository} from '../event/EventRepository';
+import {EventService, type IdentifiedUpdatePayload} from '../event/EventService';
+import {EventTypeHandling} from '../event/EventTypeHandling';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {PropertiesRepository} from '../properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../properties/propertiesType';
+import type {EventRecord, ReactionMap} from '../storage';
+import {TeamState} from '../team/TeamState';
+import {UserType} from '../tracking/attribute';
+import {EventName} from '../tracking/eventName';
+import * as trackingHelpers from '../tracking/helpers';
+import {Segmentation} from '../tracking/segmentation';
+import {protoFromType} from '../user/availabilityMapper';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 
 type OptimisticMessageEvent = Parameters<EventRepository['injectEvent']>[0];
 

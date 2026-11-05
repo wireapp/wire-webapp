@@ -24,10 +24,10 @@ import {Maybe} from 'true-myth';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {createFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {createFireAndForgetInvokerForTest} from '../../../../../page/testSupport/rootContextTestSupport';
+import {CellNode, CellNodeType} from '../../../../../types/cellNode';
 
 import {CellsShareModal} from './cellsShareModal';
 

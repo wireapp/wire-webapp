@@ -17,7 +17,7 @@
  *
  */
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from '../repositories/entity/Conversation';
 import {
   arrayToBase64,
   base64ToArray,
@@ -32,10 +32,10 @@ import {
   zeroPadding,
   getFileNameWithExtension,
   sanitizeFilename,
-} from 'Util/util';
+} from './util';
 
 import {createUuid} from './uuid';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from './test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('base64ToBlob', () => {

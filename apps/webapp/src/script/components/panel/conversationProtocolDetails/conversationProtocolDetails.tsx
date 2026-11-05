@@ -24,8 +24,6 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Ciphersuite} from '@wireapp/core';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   titleStyles,
   subTitleStyles,
@@ -34,6 +32,8 @@ import {
   protocolLabelStyles,
   protocolValueStyles,
 } from './conversationProtocolDetails.styles';
+
+import {useApplicationContext} from '../../../page/rootProvider';
 
 interface ConversationProtocolDetailsProps {
   protocol: CONVERSATION_PROTOCOL;

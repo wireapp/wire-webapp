@@ -17,10 +17,10 @@
  *
  */
 
-import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {type Translate} from 'Util/localizerUtil';
-
 import {SystemMessage} from './systemMessage';
+
+import {SystemMessageType} from '../../../message/systemMessageType';
+import {type Translate} from '../../../util/localizerUtil';
 
 export class MLSConversationRecoveredMessage extends SystemMessage {
   constructor(translate: Translate) {

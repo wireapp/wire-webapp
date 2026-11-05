@@ -21,8 +21,8 @@ import type {FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import type {Message} from 'Repositories/entity/message/message';
-import {formatDayMonthNumeral, formatTimeShort} from 'Util/timeUtil';
+import type {Message} from '../../../../../../../repositories/entity/message/message';
+import {formatDayMonthNumeral, formatTimeShort} from '../../../../../../../util/timeUtil';
 
 interface AssetHeaderProps {
   message: Message;

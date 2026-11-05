@@ -20,9 +20,9 @@
 import {act, renderHook} from '@testing-library/react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/message';
-import {translateForTest} from 'Util/test/translateForTest';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {Message} from '../../../repositories/entity/message/message';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {useConversationReadBoundary} from './useConversationReadBoundary';
 

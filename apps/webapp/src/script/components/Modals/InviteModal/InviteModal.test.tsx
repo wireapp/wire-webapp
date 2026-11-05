@@ -19,8 +19,8 @@
 
 import {render, screen, waitFor} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {User} from '../../../repositories/entity/User';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {InviteModal} from './InviteModal';
 

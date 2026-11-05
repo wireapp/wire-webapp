@@ -19,7 +19,7 @@
 
 import type {ReactNode, MouseEvent, KeyboardEvent, FunctionComponent} from 'react';
 
-import {CSS_SQUARE} from 'Util/cssMixin';
+import {CSS_SQUARE} from '../../util/cssMixin';
 
 import {DIAMETER, AVATAR_SIZE} from '.';
 

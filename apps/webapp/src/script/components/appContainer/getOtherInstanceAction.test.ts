@@ -22,8 +22,8 @@ import {createDeterministicClock, type DeterministicClock} from '@enormora/clock
 import {act} from 'react';
 import {Maybe} from 'true-myth';
 
-import {createUseSingleInstance} from 'src/script/hooks/useSingleInstance';
-import {StringKeyValueStorage} from 'src/script/storage/stringKeyValueStorageTypes';
+import {createUseSingleInstance} from '../../hooks/useSingleInstance';
+import {StringKeyValueStorage} from '../../storage/stringKeyValueStorageTypes';
 
 import {getOtherInstanceAction} from './getOtherInstanceAction';
 

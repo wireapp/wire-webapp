@@ -19,11 +19,6 @@
 
 import type {Config} from 'jest';
 import {createRequire} from 'node:module';
-import {fileURLToPath} from 'url';
-import {dirname} from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 const rootJestConfiguration = createRequire(import.meta.url)('../../jest.config.js') as Pick<
   Config,
   'coverageReporters' | 'reporters'
@@ -61,15 +56,12 @@ const config: Config = {
       statements: 48,
     },
   },
-  moduleDirectories: ['node_modules', __dirname],
   // Must be in sync with tsconfig.json >> paths
   moduleNameMapper: {
+    '^@wireapp/store-engine$': '<rootDir>/../../libraries/store-engine/src/index',
     '^@enormora/clock/clock$': '<rootDir>/../../node_modules/@enormora/clock/clock.entry-point.js',
     '^@enormora/clock/deterministic-clock$': '<rootDir>/../../node_modules/@enormora/clock/deterministic-clock.js',
     '^@enormora/fire-and-forget$': '<rootDir>/../../node_modules/@enormora/fire-and-forget/index.js',
-    'Components/(.*)': '<rootDir>/src/script/components/$1',
-    'Repositories/(.*)': '<rootDir>/src/script/repositories/$1',
-    'Util/(.*)': '<rootDir>/src/script/util/$1',
     '^react$': '<rootDir>/../../node_modules/react',
     '^react/(.*)$': '<rootDir>/../../node_modules/react/$1',
     '.*\\.glsl': 'jest-transform-stub',

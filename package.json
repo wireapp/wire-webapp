@@ -15,7 +15,7 @@
     "true-myth": "9.4.0",
     "ts-pattern": "5.9.2",
     "tslib": "2.9.1",
-    "uuid": "14.0.0",
+    "uuid": "14.0.3",
     "zod": "4.6.7"
   },
   "devDependencies": {
@@ -62,8 +62,8 @@
     "eslint-plugin-testing-library": "7.16.2",
     "eslint-plugin-unicorn": "64.0.0",
     "eslint-plugin-unused-imports": "4.4.1",
-    "fake-indexeddb": "6.2.5",
-    "globals": "17.13.0",
+    "fake-indexeddb": "6.2.7",
+    "globals": "17.14.0",
     "jest": "30.5.2",
     "jest-environment-jsdom": "30.5.2",
     "jest-silent-reporter": "0.6.0",

@@ -21,14 +21,13 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {create} from 'zustand';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
-import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
-
 import {TYPE} from './WarningsTypes';
 
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
+import {AppPermissionState} from '../../repositories/notification/AppPermissionState';
+import type {Substitutions, TranslationKey} from '../../util/localizerUtil';
+import {safeWindowOpen} from '../../util/sanitizationUtil';
 import {WebAppEvents} from '../../webAppEvents';
 
 type WarningsState = {

@@ -19,7 +19,7 @@
 
 import {useVirtualizer, type Virtualizer} from '@tanstack/react-virtual';
 
-import {MEETING_LIST_OVERSCAN} from 'Components/meeting/meetingList/meetingListConstants';
+import {MEETING_LIST_OVERSCAN} from './meetingListConstants';
 
 export type UseMeetingListVirtualizerParams = {
   itemCount: number;

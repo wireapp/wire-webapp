@@ -19,7 +19,7 @@
 
 import {RestNode} from 'cells-sdk-ts';
 
-import {UserRepository} from 'Repositories/user/userRepository';
+import {UserRepository} from '../../../../repositories/user/userRepository';
 
 import {getUsersFromNodes} from './getUsersFromNodes';
 

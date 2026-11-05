@@ -17,11 +17,7 @@
     "outDir": "../../dist/apps/webapp",
     "paths": {
       "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
-      "Components/*": ["./src/script/components/*"],
-      "Repositories/*": ["./src/script/repositories/*"],
-      "Util/*": ["./src/script/util/*"],
     },
-    "rootDirs": ["src"],
     "target": "ESNext",
     "strict": true,
     "strictPropertyInitialization": false,

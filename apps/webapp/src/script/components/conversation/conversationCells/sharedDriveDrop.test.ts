@@ -19,7 +19,7 @@
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {

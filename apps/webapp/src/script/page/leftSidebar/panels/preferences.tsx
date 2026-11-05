@@ -24,19 +24,19 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {ListWrapper} from './listWrapper';
+
+import * as Icon from '../../../components/icon';
+import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
+import {troubleshooterFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {
   ClientNotificationData,
   Notification,
   PreferenceNotificationRepository,
-} from 'Repositories/notification/PreferenceNotificationRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
-import {ListWrapper} from './listWrapper';
-
+} from '../../../repositories/notification/PreferenceNotificationRepository';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {WebAppEvents} from '../../../webAppEvents';
+import {useApplicationContext} from '../../rootProvider';
 import {ContentState, useAppState} from '../../useAppState';
 
 type PreferencesProps = {
@@ -133,7 +133,7 @@ const Preferences: FunctionComponent<PreferencesProps> = ({
   onPreferenceItemClick,
   onClose,
 }: PreferencesProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const contentState = useAppState(state => {
     return state.contentState;
   });
@@ -178,6 +178,13 @@ const Preferences: FunctionComponent<PreferencesProps> = ({
       id: ContentState.PREFERENCES_AV,
       label: translate('preferencesAV'),
       uieName: 'go-audio-video',
+    },
+    {
+      IconComponent: Icon.NetworkIcon,
+      hidden: !isFeatureToggleEnabled(troubleshooterFeatureToggleName),
+      id: ContentState.PREFERENCES_TROUBLESHOOTING,
+      label: translate('preferencesTroubleshooting'),
+      uieName: 'go-troubleshooting',
     },
     {
       IconComponent: Icon.AboutIcon,

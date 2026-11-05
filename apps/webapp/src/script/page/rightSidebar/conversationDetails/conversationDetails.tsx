@@ -28,34 +28,33 @@ import {noop} from 'noop-esm';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {ManualMigrationProtocolDetails} from 'Components/panel/conversationProtocolDetails/manualMigrationProtocolDetails';
-import {EnrichedFields} from 'Components/panel/enrichedFields';
-import {ServiceDetails} from 'Components/panel/serviceDetails';
-import {UserDetails} from 'Components/panel/userDetails';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {getNotificationText} from 'Repositories/conversation/NotificationSetting';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {sortUsersByPriority} from 'Util/stringUtil';
-import {formatDuration} from 'Util/timeUtil';
-
 import {ConversationDetailsHeader} from './components/conversationDetailsHeader';
 import {ConversationDetailsOptions} from './components/conversationDetailsOptions';
 import {ConversationDetailsParticipants} from './components/conversationDetailsParticipants';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import * as Icon from '../../../components/icon';
+import {ManualMigrationProtocolDetails} from '../../../components/panel/conversationProtocolDetails/manualMigrationProtocolDetails';
+import {EnrichedFields} from '../../../components/panel/enrichedFields';
+import {ServiceDetails} from '../../../components/panel/serviceDetails';
+import {UserDetails} from '../../../components/panel/userDetails';
 import {isServiceEntity} from '../../../guards/Service';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {ConversationVerificationState} from '../../../repositories/conversation/ConversationVerificationState';
+import {getNotificationText} from '../../../repositories/conversation/NotificationSetting';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
+import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../repositories/team/TeamState';
 import {Shortcut} from '../../../ui/shortcut';
 import {ShortcutType} from '../../../ui/shortcutType';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {sortUsersByPriority} from '../../../util/stringUtil';
+import {formatDuration} from '../../../util/timeUtil';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';
 

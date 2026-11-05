@@ -19,11 +19,10 @@
 
 import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
-import type {Translate} from 'Util/localizerUtil';
-
 import {Message} from './message';
 
 import {SuperType} from '../../../message/superType';
+import type {Translate} from '../../../util/localizerUtil';
 
 const decryptionErrorCodeUpperBound = 300;
 const minimumDecryptionErrorCode = 200;

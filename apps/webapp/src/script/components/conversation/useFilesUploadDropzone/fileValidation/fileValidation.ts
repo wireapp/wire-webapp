@@ -20,9 +20,8 @@
 import {isUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
-import {Config} from 'src/script/Config';
-import type {RootContextValue} from 'src/script/page/rootProvider';
-
+import {Config} from '../../../../Config';
+import type {RootContextValue} from '../../../../page/rootProvider';
 import {isValidCellsNodePath} from '../../conversationCells/common/cellsNodeNameValidator';
 
 const CONFIG = Config.getConfig();

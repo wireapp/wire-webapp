@@ -23,16 +23,15 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {UserVerificationBadges} from 'Components/badge';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import * as styles from './userDetails.styles';
 
+import {Avatar, AVATAR_SIZE} from '../../../components/avatar';
+import {UserVerificationBadges} from '../../../components/badge';
+import {LegalHoldDot} from '../../../components/LegalHoldDot';
+import {User} from '../../../repositories/entity/User';
 import {AvailabilityContextMenu} from '../../../ui/availabilityContextMenu';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {useApplicationContext} from '../../rootProvider';
 
 interface AvailabilityStateButtonWrapperProps {
   children: React.ReactElement;

@@ -19,11 +19,10 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {clearAllButtonStyles, filterGroupStyles, toggleFilterButtonStyles} from './cellsFiltersBar.styles';
 import type {FilterConfig} from './filterConfig';
 
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import {FilterPopover} from '../filterPopover/filterPopover';
 
 interface CellsFiltersBarProps {

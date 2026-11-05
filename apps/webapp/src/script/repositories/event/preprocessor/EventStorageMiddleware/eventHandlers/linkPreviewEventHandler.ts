@@ -19,16 +19,15 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
-import type {IdentifiedUpdatePayload} from 'Repositories/event/EventService';
-import {StoredEvent} from 'Repositories/storage';
-import {categoryFromEvent} from 'src/script/message/messageCategorization';
-
 import type {EditableEvent} from './editedEventHandler';
 import {EventValidationError} from './EventValidationError';
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 
+import {categoryFromEvent} from '../../../../../message/messageCategorization';
+import {MessageAddEvent} from '../../../../conversation/EventBuilder';
+import {StoredEvent} from '../../../../storage';
 import {CONVERSATION, ClientEvent} from '../../../Client';
+import type {IdentifiedUpdatePayload} from '../../../EventService';
 import {EventHandler, HandledEvents} from '../types';
 
 type LinkPreviewMessageUpdates = EditableEvent & Partial<IdentifiedUpdatePayload> & {server_time: string};

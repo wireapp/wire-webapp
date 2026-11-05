@@ -17,7 +17,7 @@
  *
  */
 
-import {getMapsUrl} from 'Util/locationUtil';
+import {getMapsUrl} from '../../../src/script/util/locationUtil';
 
 describe('LocationUtil', () => {
   describe('getMapsUrl', () => {

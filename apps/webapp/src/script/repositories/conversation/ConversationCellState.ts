@@ -19,20 +19,19 @@
 
 import {isEmptyArray, isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {FileAsset} from 'Repositories/entity/message/fileAsset';
-import type {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import type {SystemMessage} from 'Repositories/entity/message/systemMessage';
-import type {Text} from 'Repositories/entity/message/text';
-import {type Translate} from 'Util/localizerUtil';
-import {getRenderedTextContent} from 'Util/messageRenderer';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 
 import {ConversationError} from '../../error/conversationError';
 import {E2EIVerificationMessageType} from '../../message/e2eiVerificationMessageType';
+import {type Translate} from '../../util/localizerUtil';
+import {getRenderedTextContent} from '../../util/messageRenderer';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {AssetTransferState} from '../assets/assetTransferState';
+import type {Conversation} from '../entity/Conversation';
+import type {FileAsset} from '../entity/message/fileAsset';
+import type {MemberMessage} from '../entity/message/memberMessage';
+import type {SystemMessage} from '../entity/message/systemMessage';
+import type {Text} from '../entity/message/text';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',

@@ -19,7 +19,7 @@
 
 //@ts-check
 
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {FileAsset} from '../../../../src/script/repositories/entity/message/fileAsset';
 
 describe('FileAsset', () => {
   /**

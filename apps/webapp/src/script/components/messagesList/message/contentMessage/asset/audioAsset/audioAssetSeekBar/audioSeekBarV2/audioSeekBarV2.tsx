@@ -19,11 +19,11 @@
 
 import {useRef, useState, type FunctionComponent} from 'react';
 
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {createUuid} from 'Util/uuid';
-
 import {svgStyles, svgStylesDisabled} from './audioSeekBar.styles';
 import {useAudioSeekBar} from './useAudioSeekBar/useAudioSeekBar';
+
+import {FileAsset} from '../../../../../../../../repositories/entity/message/fileAsset';
+import {createUuid} from '../../../../../../../../util/uuid';
 
 interface AudioSeekBarNewProps {
   asset: FileAsset;

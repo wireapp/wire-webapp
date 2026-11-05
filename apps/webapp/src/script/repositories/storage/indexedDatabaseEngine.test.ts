@@ -17,19 +17,25 @@
  *
  */
 
-import {createSpec} from '@wireapp/store-engine/lib/test/createSpec';
-import {deleteAllSpec} from '@wireapp/store-engine/lib/test/deleteAllSpec';
-import {deleteSpec} from '@wireapp/store-engine/lib/test/deleteSpec';
-import {purgeSpec} from '@wireapp/store-engine/lib/test/purgeSpec';
-import {readAllPrimaryKeysSpec} from '@wireapp/store-engine/lib/test/readAllPrimaryKeysSpec';
-import {readAllSpec} from '@wireapp/store-engine/lib/test/readAllSpec';
-import {readSpec} from '@wireapp/store-engine/lib/test/readSpec';
-import {updateOrCreateSpec} from '@wireapp/store-engine/lib/test/updateOrCreateSpec';
-import {updateSpec} from '@wireapp/store-engine/lib/test/updateSpec';
+/** @jest-environment node */
+
+import 'core-js/stable/structured-clone';
+import 'fake-indexeddb/auto';
+
 import {Dexie} from 'dexie';
 import {v4 as uuidv4} from 'uuid';
 
-import {IndexedDBEngine} from './index';
+import {createSpec} from '../../../../../../libraries/store-engine/src/test/createSpec';
+import {deleteAllSpec} from '../../../../../../libraries/store-engine/src/test/deleteAllSpec';
+import {deleteSpec} from '../../../../../../libraries/store-engine/src/test/deleteSpec';
+import {purgeSpec} from '../../../../../../libraries/store-engine/src/test/purgeSpec';
+import {readAllPrimaryKeysSpec} from '../../../../../../libraries/store-engine/src/test/readAllPrimaryKeysSpec';
+import {readAllSpec} from '../../../../../../libraries/store-engine/src/test/readAllSpec';
+import {readSpec} from '../../../../../../libraries/store-engine/src/test/readSpec';
+import {updateOrCreateSpec} from '../../../../../../libraries/store-engine/src/test/updateOrCreateSpec';
+import {updateSpec} from '../../../../../../libraries/store-engine/src/test/updateSpec';
+
+import {IndexedDBEngine} from './indexedDatabaseEngine';
 
 describe('IndexedDBEngine', () => {
   let engine: IndexedDBEngine;

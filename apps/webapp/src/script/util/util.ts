@@ -25,12 +25,11 @@ import {noop} from 'noop-esm';
 
 import {Runtime} from '@wireapp/commons';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-
 import {isTabKey} from './keyboardUtil';
 import {getLogger} from './logger';
 
 import {AuthError} from '../error/authError';
+import type {Conversation} from '../repositories/entity/Conversation';
 
 const decimalRadix = 10;
 const environmentPollingIntervalInMilliseconds = 100;

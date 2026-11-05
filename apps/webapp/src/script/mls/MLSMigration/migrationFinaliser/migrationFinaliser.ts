@@ -23,9 +23,8 @@ import {
   MixedConversation,
   isMLSConversation,
   isMixedConversation,
-} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-
+} from '../../../repositories/conversation/ConversationSelectors';
+import {Conversation} from '../../../repositories/entity/Conversation';
 import {MLSMigrationStatus} from '../migrationStatus';
 import {mlsMigrationLogger} from '../MLSMigrationLogger';
 

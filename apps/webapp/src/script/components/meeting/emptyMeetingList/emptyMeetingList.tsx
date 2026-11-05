@@ -27,9 +27,10 @@ import {
   emptyListBodyStyles,
   emptyListHeadingStyles,
   emptyListStyles,
-} from 'Components/meeting/emptyMeetingList/emptyListStyles';
-import {useMeetingActions} from 'Components/meeting/useMeetingActions';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+} from './emptyListStyles';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {useMeetingActions} from '../useMeetingActions';
 
 export interface EmptyMeetingListProps {
   useMeetingActionsHook?: typeof useMeetingActions;

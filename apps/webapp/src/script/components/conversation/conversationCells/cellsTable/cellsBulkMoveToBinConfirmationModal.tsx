@@ -21,8 +21,8 @@ import type {FunctionComponent} from 'react';
 
 import type {CSSObject} from '@emotion/react';
 
-import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {CellsModal} from '../common/cellsModal/cellsModal';
 
 const confirmationContentStyles: CSSObject = {
   padding: '0 16px 16px',

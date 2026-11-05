@@ -23,13 +23,12 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {UserClassifiedBar} from 'Components/classifiedBar/classifiedBar';
-import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
-import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {User} from '../../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {Avatar, AVATAR_SIZE} from '../../../avatar';
+import {UserClassifiedBar} from '../../../classifiedBar/classifiedBar';
+import {UnverifiedUserWarning} from '../../../Modals/UserModal';
 import {E2eEncryptionMessage} from '../e2eEncryptionMessage/e2eEncryptionMessage';
 
 interface ConnectedMessageProps {

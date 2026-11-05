@@ -17,9 +17,9 @@
  *
  */
 
-import {PageManager, webAppPath} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
-import {connectWithUser} from 'test/e2e_tests/utils/userActions';
+import {PageManager, webAppPath} from '../../pageManager';
+import {test, expect, withLogin, LOGIN_TIMEOUT} from '../../test.fixtures';
+import {connectWithUser} from '../../utils/userActions';
 
 import {IncomingMessage} from 'node:http';
 import https from 'node:https';

@@ -22,7 +22,7 @@ import {
   isAttendingMeetingInstance,
   isMeetingListItemOngoing,
   MeetingTemporalStatuses,
-} from 'Components/meeting/utils/meetingStatusUtil';
+} from './meetingStatusUtil';
 
 describe('meetingStatusUtil', () => {
   const start = new Date('2026-07-15T10:00:00.000Z');

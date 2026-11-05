@@ -19,9 +19,6 @@
 
 import {ReactNode, type FunctionComponent, type ReactElement} from 'react';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {handleEscDown} from 'Util/keyboardUtil';
-
 import {largeModalStyles, wrapperStyles} from './cellsModal.styles';
 import {
   CellsModalActions,
@@ -30,6 +27,9 @@ import {
 } from './cellsModalActions/cellsModalActions';
 import {CellsModalProvider} from './cellsModalContext/cellsModalContext';
 import {CellsModalHeader} from './cellsModalHeader/cellsModalHeader';
+
+import {handleEscDown} from '../../../../../util/keyboardUtil';
+import {ModalComponent} from '../../../../Modals/ModalComponent';
 
 interface CellsModalProps {
   size?: 'small' | 'large';

@@ -22,22 +22,20 @@ import type {ComponentProps} from 'react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage as ContentMessageEntity} from 'Repositories/entity/message/contentMessage';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
-import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
-import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {markAsUnreadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import type {StartupFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {translateForTest} from 'Util/test/translateForTest';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {ContentMessage as ContentMessageEntity} from '../../../repositories/entity/message/contentMessage';
+import {MemberMessage as MemberMessageEntity} from '../../../repositories/entity/message/memberMessage';
+import {Text} from '../../../repositories/entity/message/text';
+import {User} from '../../../repositories/entity/User';
+import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
+import {SystemMessageType} from '../../../message/systemMessageType';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {generateUser} from 'test/helper/UserGenerator';
-import {createUuid} from 'Util/uuid';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {generateUser} from '../../../../../test/helper/UserGenerator';
+import {createUuid} from '../../../util/uuid';
 
 import {MessageWrapper} from './messageWrapper';
 
@@ -264,9 +262,6 @@ describe('MessageWrapper', () => {
 
   describe('Mark as unread context menu entry', () => {
     type RenderContentMessageResult = ReturnType<typeof render> & {
-      readonly isFeatureToggleEnabledForTest: jest.MockedFunction<
-        (featureToggleName: StartupFeatureToggleName) => boolean
-      >;
       readonly cancelPendingReadReceiptsForConversation: jest.MockedFunction<(conversation: Conversation) => void>;
       readonly conversation: Conversation;
       readonly markUnreadFrom: jest.SpiedFunction<Conversation['markUnreadFrom']>;
@@ -274,7 +269,7 @@ describe('MessageWrapper', () => {
       readonly actionOrder: string[];
     };
 
-    function renderContentMessage(isMarkAsUnreadEnabled?: boolean): RenderContentMessageResult {
+    function renderContentMessage(): RenderContentMessageResult {
       const conversation = new Conversation(
         createUuid(),
         'test.wire.link',
@@ -299,27 +294,13 @@ describe('MessageWrapper', () => {
         isFocused: true,
       };
 
-      const isFeatureToggleEnabledForTest = jest.fn((featureToggleName: StartupFeatureToggleName): boolean => {
-        return isMarkAsUnreadEnabled === true && featureToggleName === markAsUnreadFeatureToggleName;
-      });
-
-      const rootProviderWrapperForMessage =
-        isMarkAsUnreadEnabled === true
-          ? createRootProviderWrapperForTest(
-              createRootContextValueForTest({
-                translate: translateForTest,
-                isFeatureToggleEnabled: isFeatureToggleEnabledForTest,
-              }),
-            )
-          : rootProviderWrapper;
-      const view = render(withThemeAndRootContext(<MessageWrapper {...props} />, rootProviderWrapperForMessage));
+      const view = render(withThemeAndRootContext(<MessageWrapper {...props} />, rootProviderWrapper));
       fireEvent.click(view.getByLabelText('accessibility.conversationContextMenuOpenLabel'));
 
       return {
         ...view,
         cancelPendingReadReceiptsForConversation,
         conversation,
-        isFeatureToggleEnabledForTest,
         markUnreadFrom,
         message,
         actionOrder,
@@ -331,17 +312,8 @@ describe('MessageWrapper', () => {
     });
 
     it('marks the conversation as unread from the message when the entry is clicked', () => {
-      const {
-        getByText,
-        actionOrder,
-        cancelPendingReadReceiptsForConversation,
-        conversation,
-        isFeatureToggleEnabledForTest,
-        markUnreadFrom,
-        message,
-      } = renderContentMessage(true);
-
-      expect(isFeatureToggleEnabledForTest).toHaveBeenCalledWith(markAsUnreadFeatureToggleName);
+      const {getByText, actionOrder, cancelPendingReadReceiptsForConversation, conversation, markUnreadFrom, message} =
+        renderContentMessage();
 
       fireEvent.click(getByText('conversationContextMenuMarkUnread'));
 
@@ -350,10 +322,10 @@ describe('MessageWrapper', () => {
       expect(actionOrder).toEqual(['cancel pending receipts', 'mark unread']);
     });
 
-    it('does not offer the entry by default', () => {
+    it('offers the entry by default', () => {
       const {queryByText, cancelPendingReadReceiptsForConversation} = renderContentMessage();
 
-      expect(queryByText('conversationContextMenuMarkUnread')).not.toBeInTheDocument();
+      expect(queryByText('conversationContextMenuMarkUnread')).toBeInTheDocument();
       expect(cancelPendingReadReceiptsForConversation).not.toHaveBeenCalled();
     });
   });

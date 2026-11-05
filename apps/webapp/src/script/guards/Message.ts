@@ -19,11 +19,10 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {DeleteMessage} from 'Repositories/entity/message/deleteMessage';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-
 import {SuperType} from '../message/superType';
+import {ContentMessage} from '../repositories/entity/message/contentMessage';
+import {DeleteMessage} from '../repositories/entity/message/deleteMessage';
+import {MemberMessage} from '../repositories/entity/message/memberMessage';
 
 export const isReadableMessage = (message: any): message is ContentMessage => {
   if (!isTruthy(message)) {

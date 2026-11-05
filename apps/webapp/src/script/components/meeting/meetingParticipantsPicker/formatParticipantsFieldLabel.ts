@@ -17,7 +17,7 @@
  *
  */
 
-import type {Translate} from 'Util/localizerUtil';
+import type {Translate} from '../../../util/localizerUtil';
 
 export function formatParticipantsFieldLabel(label: string, selectedCount: number, translate: Translate): string {
   if (selectedCount === 0) {

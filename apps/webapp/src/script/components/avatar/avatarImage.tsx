@@ -24,10 +24,10 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {Transition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import {InViewport} from 'Components/inViewport';
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {CSS_FILL_PARENT} from 'Util/cssMixin';
+import {AssetRemoteData} from '../../repositories/assets/assetRemoteData';
+import {AssetRepository} from '../../repositories/assets/assetRepository';
+import {CSS_FILL_PARENT} from '../../util/cssMixin';
+import {InViewport} from '../inViewport';
 
 import {AVATAR_SIZE} from '.';
 
