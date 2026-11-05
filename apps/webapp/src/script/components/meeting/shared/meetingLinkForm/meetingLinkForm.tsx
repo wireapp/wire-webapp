@@ -26,6 +26,8 @@ import {Config} from 'src/script/Config';
 
 import {
   embeddedPasswordActionsStyles,
+  embeddedPasswordDescriptionStyles,
+  embeddedPasswordHeadingStyles,
   embeddedPasswordSectionStyles,
   passwordFieldsStyles,
 } from './meetingLinkForm.styles';
@@ -44,6 +46,12 @@ export const MeetingLinkForm: FunctionComponent<MeetingLinkFormProps> = ({
 }: MeetingLinkFormProps) => {
   return (
     <div css={embeddedPasswordSectionStyles}>
+      <div>
+        <h3 css={embeddedPasswordHeadingStyles}>{translate('meetings.meetingLink.title')}</h3>
+        <p css={embeddedPasswordDescriptionStyles}>
+          {translate('meetings.meetingLinkForm.description', {brandName: Config.getConfig().BRAND_NAME})}
+        </p>
+      </div>
       <div css={embeddedPasswordActionsStyles}>
         <div>
           <PasswordGeneratorButton
