@@ -19,7 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {constructFullyQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
+import {ClientId, DeviceId, Uuid} from '@wireapp/core-crypto';
 
 const textEncoder = new TextEncoder();
 
@@ -27,7 +27,6 @@ export function generateMLSUserId({id, domain}: QualifiedId): Uint8Array<ArrayBu
   return textEncoder.encode(`${id}@${domain}`);
 }
 
-export function generateMLSDeviceId({id, domain}: QualifiedId, clientId: string): Uint8Array<ArrayBuffer> {
-  const fullyQualifiedClientId = constructFullyQualifiedClientId(id, clientId, domain);
-  return textEncoder.encode(fullyQualifiedClientId);
+export function createMLSClientId({id, domain}: QualifiedId, clientId: string): ClientId {
+  return new ClientId(new Uuid(id), DeviceId.fromHexString(clientId), domain);
 }

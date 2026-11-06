@@ -17,6 +17,7 @@
  *
  */
 
+import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {
@@ -58,6 +59,7 @@ export class ClientService {
     private readonly apiClient: APIClient,
     private readonly proteusService: ProteusService,
     private readonly storeEngine: CRUDEngine,
+    private readonly clock: Clock,
   ) {
     this.database = new ClientDatabaseRepository(this.storeEngine);
     this.backend = new ClientBackendRepository(this.apiClient);
@@ -133,7 +135,7 @@ export class ClientService {
         await this.proteusService.wipe();
         // The MLS/CoreCrypto keystore is scoped to the user (not the client id), so it survives
         // a plain proteus wipe and would otherwise let a re-registered client inherit stale MLS key material.
-        await wipeCoreCryptoDb(this.storeEngine);
+        await wipeCoreCryptoDb(this.storeEngine, this.clock);
         if (shouldDeleteWholeDatabase) {
           await this.storeEngine.clearTables();
         }

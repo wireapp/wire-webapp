@@ -341,14 +341,14 @@ describe('SubconversationService', () => {
       jest.spyOn(apiClient.api.conversation, 'getSubconversation').mockResolvedValueOnce(subconversationResponse);
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(false);
 
-      const updatedEpoch = 1;
+      const updatedEpoch = 1n;
       jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(updatedEpoch);
 
       const response = await subconversationService.joinConferenceSubconversation(parentConversationId, parentGroupId);
 
       expect(mlsService.wipeConversation).not.toHaveBeenCalled();
       expect(mlsService.registerConversation).toHaveBeenCalledWith(subconversationGroupId, [], {parentGroupId});
-      expect(response).toEqual({epoch: updatedEpoch, groupId: subconversationGroupId});
+      expect(response).toEqual({epoch: Number(updatedEpoch), groupId: subconversationGroupId});
     });
   });
 
@@ -457,7 +457,7 @@ describe('SubconversationService', () => {
 
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
 
-      const mockedEpoch = 2;
+      const mockedEpoch = 2n;
       jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(mockedEpoch);
 
       const mockedSecretKey = 'mockedSecretKey';
@@ -499,7 +499,7 @@ describe('SubconversationService', () => {
       );
 
       const expected = {
-        epoch: mockedEpoch,
+        epoch: Number(mockedEpoch),
         keyLength: 32,
         members: [
           {clientid: 'clientId1', in_subconv: true, userid: isFederated ? 'userId1@domain' : 'userId1'},
@@ -521,7 +521,7 @@ describe('SubconversationService', () => {
       const parentConversationGroupId = 'parentConversationGroupId';
 
       const subconversationGroupId = 'subconversationGroupId';
-      const mockedInitialEpoch = 1;
+      const mockedInitialEpoch = 1n;
 
       await subconversationService.saveSubconversationGroupId(
         parentConversationId,
@@ -529,11 +529,11 @@ describe('SubconversationService', () => {
         subconversationGroupId,
       );
 
-      const mockedEpochInfo = {epoch: mockedInitialEpoch, keyLength: 32, members: [], secretKey: ''};
+      const mockedEpochInfo = {epoch: Number(mockedInitialEpoch), keyLength: 32, members: [], secretKey: ''};
       jest.spyOn(subconversationService, 'getSubconversationEpochInfo').mockResolvedValueOnce(mockedEpochInfo);
       jest
         .spyOn(subconversationService, 'joinConferenceSubconversation')
-        .mockResolvedValue({epoch: mockedInitialEpoch, groupId: subconversationGroupId});
+        .mockResolvedValue({epoch: Number(mockedInitialEpoch), groupId: subconversationGroupId});
       jest.spyOn(mlsService, 'getEpoch').mockResolvedValue(mockedInitialEpoch);
 
       const findConversationByGroupId = (groupId: string): QualifiedId | undefined => {

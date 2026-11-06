@@ -27,6 +27,7 @@ describe('APIClientSingleton', () => {
     const apiClient = new APIClient({clock});
 
     try {
+      expect(apiClient.clock).toBe(clock);
       expect(apiClient.config.wallClock.currentTimestampInMilliseconds).toBe(1_234);
 
       clock.advanceByMilliseconds(10);

@@ -37,6 +37,11 @@ import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
 import {Root} from './page/root';
 
+import {
+  getCurrentCoreCryptoBrowserEnvironment,
+  isCoreCryptoEnabled,
+  redirectIfCoreCryptoUnsupported,
+} from '../browser/coreCryptoSupport';
 import {Config} from '../Config';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
@@ -47,6 +52,7 @@ import {initializeDataDog} from '../util/dataDog';
 import {translate} from '../util/localizerUtil';
 import type {Translate} from '../util/localizerUtil';
 import {enableLogging} from '../util/loggerUtil';
+import {supportsMLS} from '../util/util';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
 type AuthAppProps = {clock: Clock; translate: Translate};
@@ -59,59 +65,76 @@ retireLegacyServiceWorker({
   console.warn('Legacy service worker cleanup failed; continuing application startup.', error);
 });
 
-exposeWrapperGlobals();
-
 const mainId = 'main';
 
-const clock = createClock();
-const apiClient = new APIClient({clock});
-container.registerInstance(APIClient, apiClient);
-const core = container.resolve(Core);
+const startAuthApp = (): void => {
+  exposeWrapperGlobals();
+  const config = Config.getConfig();
+  enableLogging(config);
 
-let localStorage;
-try {
-  localStorage = window.localStorage;
-} catch {
-  // ignore error
-}
-
-const store = configureStore({
-  clock,
-  actions: actionRoot,
-  apiClient,
-  core,
-  getConfig: Config.getConfig,
-  localStorage,
-});
-
-const render = (Component: FunctionComponent<AuthAppProps>): void => {
-  const container = document.getElementById(mainId);
-  if (isNull(container)) {
-    throw new Error(`No container '${mainId}' found to render application`);
+  const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
+  if (enforceDesktopApplication) {
+    window.location.replace(`${window.location.origin}/unsupported`);
+    return;
   }
-  createRoot(container).render(
-    <Provider store={store}>
-      <Component translate={translate} clock={clock} />
-    </Provider>,
-  );
+
+  const coreCryptoEnabled = isCoreCryptoEnabled({
+    supportsMls: supportsMLS(),
+    useCoreCryptoOverride: config.FEATURE.USE_CORE_CRYPTO,
+  });
+  const redirectedForCoreCryptoSupport = redirectIfCoreCryptoUnsupported({
+    coreCryptoEnabled,
+    environment: getCurrentCoreCryptoBrowserEnvironment(),
+    onUnsupported(message) {
+      console.error(message);
+      window.location.replace(`${window.location.origin}/unsupported`);
+    },
+  });
+  if (redirectedForCoreCryptoSupport) {
+    return;
+  }
+
+  const clock = createClock();
+  const apiClient = new APIClient({clock});
+  container.registerInstance(APIClient, apiClient);
+  const core = container.resolve(Core);
+
+  let localStorage;
+  try {
+    localStorage = window.localStorage;
+  } catch {
+    // ignore error
+  }
+
+  const store = configureStore({
+    clock,
+    actions: actionRoot,
+    apiClient,
+    core,
+    getConfig: Config.getConfig,
+    localStorage,
+  });
+
+  const render = (Component: FunctionComponent<AuthAppProps>): void => {
+    const container = document.getElementById(mainId);
+    if (isNull(container)) {
+      throw new Error(`No container '${mainId}' found to render application`);
+    }
+    createRoot(container).render(
+      <Provider store={store}>
+        <Component translate={translate} clock={clock} />
+      </Provider>,
+    );
+  };
+
+  const runApp = async (): Promise<void> => {
+    const {domain} = await updateApiVersion();
+    await initializeDataDog(config, {domain});
+    render(Root);
+    setAppLocale();
+  };
+
+  void runApp();
 };
 
-const config = Config.getConfig();
-
-async function runApp(): Promise<void> {
-  const {domain} = await updateApiVersion();
-  await initializeDataDog(config, {domain: domain});
-  render(Root);
-  setAppLocale();
-}
-
-enableLogging(config);
-
-const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
-
-if (enforceDesktopApplication) {
-  const unSupportedPageUrl = `${window.location.origin}/unsupported`;
-  window.location.replace(unSupportedPageUrl);
-}
-
-void runApp();
+startAuthApp();

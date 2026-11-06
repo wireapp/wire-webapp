@@ -43,6 +43,8 @@ export type HandledEventPayload = {
   decryptionError?: DecryptionError;
 };
 
+export type HandledEventPayloads = HandledEventPayload | readonly HandledEventPayload[];
+
 /**
  * The result of handling an event
  * - unhandled: The event was not handled by the particular service
@@ -50,7 +52,7 @@ export type HandledEventPayload = {
  * - handled: The event was handled and its payload will be emitted
  */
 export type HandledEventResult =
-  {status: 'unhandled'} | {status: 'ignored'} | {status: 'handled'; payload: HandledEventPayload | null};
+  {status: 'unhandled'} | {status: 'ignored'} | {status: 'handled'; payload: HandledEventPayloads | null};
 
 enum TOPIC {
   NOTIFICATION_ERROR = 'NotificationService.TOPIC.NOTIFICATION_ERROR',
@@ -224,7 +226,10 @@ export class NotificationService extends TypedEventEmitter<Events> {
       try {
         const handledEventResult = await this.handleEvent(event);
         if (handledEventResult.status === 'handled' && handledEventResult.payload !== null) {
-          yield handledEventResult.payload;
+          const payloads = Array.isArray(handledEventResult.payload)
+            ? handledEventResult.payload
+            : [handledEventResult.payload];
+          yield* payloads;
         }
       } catch (error: unknown) {
         this.logger.error(

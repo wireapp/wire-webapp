@@ -264,7 +264,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       parentConversationGroupId,
     );
 
-    const forwardNewEpoch = async ({groupId}: {groupId: string; epoch: number}): Promise<void> => {
+    const forwardNewEpoch = async ({groupId}: {groupId: string; epoch: bigint}): Promise<void> => {
       this.logger.debug('Received MLS NEW_EPOCH event', {eventGroupId: groupId, subconversationGroupId});
       if (groupId !== subconversationGroupId) {
         // if the epoch update did not happen in the subconversation directly, check if it happened in the parent conversation
@@ -317,7 +317,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
 
     this.mlsService.on(MLSServiceEvents.NEW_EPOCH, forwardNewEpoch);
 
-    await forwardNewEpoch({groupId: subconversationGroupId, epoch: initialEpoch});
+    await forwardNewEpoch({groupId: subconversationGroupId, epoch: BigInt(initialEpoch)});
 
     this.logger.info('Subscribed to MLS NEW_EPOCH events for subconversation', {subconversationGroupId});
     return () => {

@@ -70,15 +70,13 @@ describe('MLSConversationVerificationStateHandler', () => {
   const createRevokedWireIdentity = (): e2eIdentity.WireIdentity => {
     return {
       x509Identity: {
-        free: jest.fn(),
         certificate: '',
         displayName: 'John Doe',
         domain: 'wire.com',
         handle: 'wireapp://%40john.doe@wire.com',
-        notAfter: BigInt(0),
-        notBefore: BigInt(0),
+        notAfter: new Date(0),
+        notBefore: new Date(0),
         serialNumber: '',
-        [Symbol.dispose]: noop,
       },
       thumbprint: '',
       credentialType: CredentialType.X509,
@@ -107,7 +105,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if MLS feature is not active', () => {
     core.isMLSActiveForClient = jest.fn().mockReturnValue(false);
 
-    new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
+    new MLSConversationVerificationStateHandler(noop, asyncNoop, conversationState, core);
 
     expect(core.service?.mls?.conversationExists).not.toHaveBeenCalled();
   });
@@ -115,7 +113,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if E2EI feature is not active', () => {
     e2eiHandler.isE2EIEnabled = jest.fn().mockReturnValue(false);
 
-    new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
+    new MLSConversationVerificationStateHandler(noop, asyncNoop, conversationState, core);
 
     expect(core.service?.mls?.conversationExists).not.toHaveBeenCalled();
   });
@@ -124,7 +122,7 @@ describe('MLSConversationVerificationStateHandler', () => {
     getCoreServiceForTest().mls = undefined;
 
     const t = (): MLSConversationVerificationStateHandler => {
-      return new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
+      return new MLSConversationVerificationStateHandler(noop, asyncNoop, conversationState, core);
     };
 
     expect(t).not.toThrow();
@@ -133,7 +131,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if e2eIdentity service is not available', () => {
     getCoreServiceForTest().e2eIdentity = undefined;
 
-    new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
+    new MLSConversationVerificationStateHandler(noop, asyncNoop, conversationState, core);
 
     expect(core.service?.mls?.on).not.toHaveBeenCalled();
   });
@@ -141,65 +139,88 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if the user does not have an mls device', () => {
     jest.spyOn(core, 'hasMLSDevice', 'get').mockReturnValue(false);
 
-    new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
+    new MLSConversationVerificationStateHandler(noop, asyncNoop, conversationState, core);
 
     expect(core.service?.mls?.on).not.toHaveBeenCalled();
   });
 
-  describe('handleNewRevocationList', () => {
-    it('should check for self certificate revocation for tenant-prefixed CRL hosts', async () => {
+  describe('handleCredentialsChecked', () => {
+    it('re-evaluates conversation verification after a successful credentials check', async () => {
       const localConversationState = new ConversationState();
-      let triggerCrlChanged: (...args: {domain: string}[]) => void = noop;
+      const localConversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MLS, translateForTest);
+      localConversation.groupId = groupId;
+      localConversation.mlsVerificationState(ConversationVerificationState.VERIFIED);
+      localConversationState.conversations.push(localConversation);
+
+      let triggerCredentialsChecked: () => void = noop;
+      getActiveWireIdentityMock.mockResolvedValue({
+        ...createRevokedWireIdentity(),
+        status: e2eIdentity.MLSStatuses.VALID,
+      });
+      jest.spyOn(getE2EIServiceForTest(), 'on').mockImplementation((event, listener) => {
+        if (event === 'credentialsChecked') {
+          triggerCredentialsChecked = listener;
+        }
+
+        return getE2EIServiceForTest();
+      });
+      jest.spyOn(getMlsServiceForTest(), 'conversationExists').mockResolvedValue(true);
+      getConversationVerificationStateMock.mockResolvedValue(E2eiConversationState.NotVerified);
+
+      new MLSConversationVerificationStateHandler(noop, asyncNoop, localConversationState, core);
+
+      await triggerCredentialsChecked();
+
+      await waitFor(() => {
+        return localConversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
+      });
+      expect(getConversationVerificationStateMock).toHaveBeenCalledWith(groupId);
+    });
+
+    it('triggers the revoked certificate callback when the self certificate is revoked', async () => {
+      const localConversationState = new ConversationState();
+      let triggerCredentialsChecked: () => void = noop;
       const onSelfClientCertificateRevoked = jest.fn().mockResolvedValue(undefined);
 
       getActiveWireIdentityMock.mockResolvedValue(createRevokedWireIdentity());
       jest.spyOn(getE2EIServiceForTest(), 'on').mockImplementation((event, listener) => {
-        if (event === 'crlChanged') {
-          triggerCrlChanged = listener;
+        if (event === 'credentialsChecked') {
+          triggerCredentialsChecked = listener;
         }
 
         return getE2EIServiceForTest();
       });
 
-      new MLSConversationVerificationStateHandler(
-        'wire.com',
-        noop,
-        onSelfClientCertificateRevoked,
-        localConversationState,
-        core,
-      );
+      new MLSConversationVerificationStateHandler(noop, onSelfClientCertificateRevoked, localConversationState, core);
 
-      await triggerCrlChanged({domain: 'tenant-a.wire.com'});
+      await triggerCredentialsChecked();
 
       expect(e2eIdentity.getActiveWireIdentity).toHaveBeenCalledTimes(1);
       expect(onSelfClientCertificateRevoked).toHaveBeenCalledTimes(1);
     });
 
-    it('should not check for self certificate revocation for non-matching CRL hosts', async () => {
+    it('does not trigger the revoked certificate callback for a valid self certificate', async () => {
       const localConversationState = new ConversationState();
-      let triggerCrlChanged: (...args: {domain: string}[]) => void = noop;
+      let triggerCredentialsChecked: () => void = noop;
       const onSelfClientCertificateRevoked = jest.fn().mockResolvedValue(undefined);
 
-      getActiveWireIdentityMock.mockResolvedValue(createRevokedWireIdentity());
+      getActiveWireIdentityMock.mockResolvedValue({
+        ...createRevokedWireIdentity(),
+        status: e2eIdentity.MLSStatuses.VALID,
+      });
       jest.spyOn(getE2EIServiceForTest(), 'on').mockImplementation((event, listener) => {
-        if (event === 'crlChanged') {
-          triggerCrlChanged = listener;
+        if (event === 'credentialsChecked') {
+          triggerCredentialsChecked = listener;
         }
 
         return getE2EIServiceForTest();
       });
 
-      new MLSConversationVerificationStateHandler(
-        'wire.com',
-        noop,
-        onSelfClientCertificateRevoked,
-        localConversationState,
-        core,
-      );
+      new MLSConversationVerificationStateHandler(noop, onSelfClientCertificateRevoked, localConversationState, core);
 
-      await triggerCrlChanged({domain: 'tenant-a.example.com'});
+      await triggerCredentialsChecked();
 
-      expect(e2eIdentity.getActiveWireIdentity).not.toHaveBeenCalled();
+      expect(e2eIdentity.getActiveWireIdentity).toHaveBeenCalledTimes(1);
       expect(onSelfClientCertificateRevoked).not.toHaveBeenCalled();
     });
   });
@@ -214,7 +235,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         return (triggerEpochChange = listener) as any;
       });
 
-      new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
+      new MLSConversationVerificationStateHandler(noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId});
       await new Promise(resolve => {
@@ -233,7 +254,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         return (triggerEpochChange = listener) as any;
       });
 
-      new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
+      new MLSConversationVerificationStateHandler(noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId});
       await new Promise(resolve => {
@@ -253,7 +274,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         return (triggerEpochChange = listener) as any;
       });
 
-      new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
+      new MLSConversationVerificationStateHandler(noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId});
       await new Promise(resolve => {
@@ -273,7 +294,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         return (triggerEpochChange = listener) as any;
       });
 
-      new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
+      new MLSConversationVerificationStateHandler(noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId});
       await new Promise(resolve => {
@@ -295,7 +316,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         return (triggerEpochChange = listener) as any;
       });
 
-      new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
+      new MLSConversationVerificationStateHandler(noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId: newConversation.groupId});
       setTimeout(() => {

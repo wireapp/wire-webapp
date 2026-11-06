@@ -20,7 +20,6 @@
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-import {noop} from 'noop-esm';
 
 import {getEnrollmentTimer, getRemainingGracePeriodDelay, messageRetentionTime} from './enrollmentTimer';
 
@@ -32,15 +31,13 @@ const generateWireIdentity = (
 ): WireIdentity => {
   return {
     x509Identity: {
-      free: jest.fn(),
       certificate: '',
       displayName: 'John Doe',
       domain: 'domain',
       handle: 'johndoe',
-      notAfter: BigInt(0),
-      notBefore: BigInt(0),
+      notAfter: new Date(0),
+      notBefore: new Date(0),
       serialNumber: '',
-      [Symbol.dispose]: noop,
     },
     thumbprint: '',
     credentialType,
@@ -84,7 +81,7 @@ describe('e2ei delays', () => {
         credentialType: CredentialType.X509,
         x509Identity: {
           certificate: ' ',
-          notAfter: (clock.currentUnixEpochMilliseconds + validityPeriod) / 1000,
+          notAfter: new Date(clock.currentUnixEpochMilliseconds + validityPeriod),
         },
       } as any,
       clock.currentUnixEpochMilliseconds,
@@ -106,7 +103,7 @@ describe('e2ei delays', () => {
         credentialType: CredentialType.X509,
         x509Identity: {
           certificate: ' ',
-          notAfter: deadline / 1000,
+          notAfter: new Date(deadline),
         },
       } as any,
       clock.currentUnixEpochMilliseconds,
@@ -127,7 +124,7 @@ describe('e2ei delays', () => {
         credentialType: CredentialType.X509,
         x509Identity: {
           certificate: ' ',
-          notAfter: deadline / 1000,
+          notAfter: new Date(deadline),
         },
       } as any,
       clock.currentUnixEpochMilliseconds,

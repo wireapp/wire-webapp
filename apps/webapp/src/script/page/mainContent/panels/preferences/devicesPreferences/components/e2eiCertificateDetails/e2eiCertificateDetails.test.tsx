@@ -20,7 +20,6 @@
 import {render, waitFor} from '@testing-library/react';
 import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conversation';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
@@ -43,15 +42,13 @@ const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X
   return {
     status,
     x509Identity: {
-      free: jest.fn(),
       certificate: 'certificate',
       displayName: '',
       domain: '',
       handle: '',
-      notAfter: BigInt(0),
-      notBefore: BigInt(0),
+      notAfter: new Date(0),
+      notBefore: new Date(0),
       serialNumber: '',
-      [Symbol.dispose]: noop,
     },
     credentialType,
     deviceId: '',

@@ -76,7 +76,7 @@ function createMLSConversations(nbConversations: number, type?: CONVERSATION_TYP
 function mockSafeEpoch(core: {service?: Core['service']}): void {
   (core.service?.mls as unknown as {getSafeEpoch: jest.Mock}).getSafeEpoch = jest
     .fn()
-    .mockResolvedValue(task.resolve(1));
+    .mockResolvedValue(task.resolve(1n));
 }
 
 describe('MLSConversations', () => {
@@ -415,8 +415,8 @@ describe('MLSConversations', () => {
 
   describe('classifyLocal', () => {
     it('returns "missing" when the group does not exist locally regardless of epoch', () => {
-      expect(classifyLocal({existsLocally: false, epoch: {kind: 'epoch', value: 0}})).toEqual({kind: 'missing'});
-      expect(classifyLocal({existsLocally: false, epoch: {kind: 'epoch', value: 5}})).toEqual({kind: 'missing'});
+      expect(classifyLocal({existsLocally: false, epoch: {kind: 'epoch', value: 0n}})).toEqual({kind: 'missing'});
+      expect(classifyLocal({existsLocally: false, epoch: {kind: 'epoch', value: 5n}})).toEqual({kind: 'missing'});
       expect(classifyLocal({existsLocally: false, epoch: {kind: 'unreadable', error: new Error('x')}})).toEqual({
         kind: 'missing',
       });
@@ -431,20 +431,24 @@ describe('MLSConversations', () => {
     });
 
     it('returns "alreadyEstablished" when local exists and epoch > 0', () => {
-      expect(classifyLocal({existsLocally: true, epoch: {kind: 'epoch', value: 1}})).toEqual({
+      expect(classifyLocal({existsLocally: true, epoch: {kind: 'epoch', value: 1n}})).toEqual({
         kind: 'alreadyEstablished',
       });
-      expect(classifyLocal({existsLocally: true, epoch: {kind: 'epoch', value: 999}})).toEqual({
+      expect(classifyLocal({existsLocally: true, epoch: {kind: 'epoch', value: 999n}})).toEqual({
         kind: 'alreadyEstablished',
       });
     });
 
     it('returns "staleNeedsWipe" when local exists and epoch is 0', () => {
-      expect(classifyLocal({existsLocally: true, epoch: {kind: 'epoch', value: 0}})).toEqual({kind: 'staleNeedsWipe'});
+      expect(classifyLocal({existsLocally: true, epoch: {kind: 'epoch', value: 0n}})).toEqual({
+        kind: 'staleNeedsWipe',
+      });
     });
 
     it('returns "staleNeedsWipe" for any non-positive epoch when local exists (catch-all)', () => {
-      expect(classifyLocal({existsLocally: true, epoch: {kind: 'epoch', value: -1}})).toEqual({kind: 'staleNeedsWipe'});
+      expect(classifyLocal({existsLocally: true, epoch: {kind: 'epoch', value: -1n}})).toEqual({
+        kind: 'staleNeedsWipe',
+      });
     });
   });
 
@@ -455,12 +459,12 @@ describe('MLSConversations', () => {
     });
 
     it('returns "establish" with epoch 0 when remote epoch is 0', () => {
-      expect(classifyRemote({kind: 'epoch', value: 0})).toEqual({kind: 'establish', epoch: 0});
+      expect(classifyRemote({kind: 'epoch', value: 0n})).toEqual({kind: 'establish', epoch: 0n});
     });
 
     it('returns "joinExisting" with the epoch value when remote epoch > 0', () => {
-      expect(classifyRemote({kind: 'epoch', value: 1})).toEqual({kind: 'joinExisting', epoch: 1});
-      expect(classifyRemote({kind: 'epoch', value: 42})).toEqual({kind: 'joinExisting', epoch: 42});
+      expect(classifyRemote({kind: 'epoch', value: 1n})).toEqual({kind: 'joinExisting', epoch: 1n});
+      expect(classifyRemote({kind: 'epoch', value: 42n})).toEqual({kind: 'joinExisting', epoch: 42n});
     });
   });
 
@@ -472,12 +476,12 @@ describe('MLSConversations', () => {
         mlsGroupExistsLocally: jest.fn().mockResolvedValue(true),
       } as unknown as ConversationService;
       const mlsService = {
-        getSafeEpoch: jest.fn().mockResolvedValue(task.fromResult(result.ok(5))),
+        getSafeEpoch: jest.fn().mockResolvedValue(task.fromResult(result.ok(5n))),
       } as unknown as MLSService;
 
       const state = await readLocalMLSState(groupId, conversationService, mlsService);
 
-      expect(state).toEqual({existsLocally: true, epoch: {kind: 'epoch', value: 5}});
+      expect(state).toEqual({existsLocally: true, epoch: {kind: 'epoch', value: 5n}});
     });
 
     it('lifts a getSafeEpoch error into an "unreadable" reading', async () => {
@@ -511,7 +515,7 @@ describe('MLSConversations', () => {
 
       const reading = await fetchRemoteEpoch(conversationId, conversationService);
 
-      expect(reading).toEqual({kind: 'epoch', value: 7});
+      expect(reading).toEqual({kind: 'epoch', value: 7n});
     });
 
     it('accepts epoch = 0 as a valid reading (the establish-trigger case)', async () => {
@@ -519,7 +523,7 @@ describe('MLSConversations', () => {
 
       const reading = await fetchRemoteEpoch(conversationId, conversationService);
 
-      expect(reading).toEqual({kind: 'epoch', value: 0});
+      expect(reading).toEqual({kind: 'epoch', value: 0n});
     });
 
     it('returns "unreadable" when the fetch itself fails (Err branch)', async () => {
@@ -598,7 +602,7 @@ describe('MLSConversations', () => {
       const core = {
         service: {
           mls: {
-            getSafeEpoch: jest.fn().mockResolvedValue(task.fromResult(overrides.safeEpoch ?? result.ok(1))),
+            getSafeEpoch: jest.fn().mockResolvedValue(task.fromResult(overrides.safeEpoch ?? result.ok(1n))),
           },
           conversation: {
             wipeMLSConversation,
@@ -633,7 +637,7 @@ describe('MLSConversations', () => {
     };
 
     it('does nothing when the local group is already established (epoch > 0)', async () => {
-      const {deps, spies} = makeDeps({existsLocally: true, safeEpoch: result.ok(3)});
+      const {deps, spies} = makeDeps({existsLocally: true, safeEpoch: result.ok(3n)});
 
       await ensureMLSGroupIsEstablished(groupId, conversationId, deps);
 
@@ -655,7 +659,7 @@ describe('MLSConversations', () => {
     it('wipes a stale local group (epoch=0) before reconciling with the backend', async () => {
       const {deps, spies} = makeDeps({
         existsLocally: true,
-        safeEpoch: result.ok(0),
+        safeEpoch: result.ok(0n),
         safeRemote: result.ok({epoch: 5}),
       });
 

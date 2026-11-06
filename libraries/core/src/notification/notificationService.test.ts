@@ -24,7 +24,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 
 import {ConversationService} from '../conversation';
 
-import {NotificationService, NotificationSource} from '.';
+import {HandledEventPayload, HandledEventResult, NotificationService, NotificationSource} from '.';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -80,6 +80,59 @@ describe('NotificationService', () => {
   });
 
   describe('handleNotification', () => {
+    it('continues to yield a single handled payload', async () => {
+      const storeEngine = new MemoryEngine();
+      await storeEngine.init('NotificationService.test');
+
+      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      apiClients.push(apiClient);
+      const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
+      const payload = {event: {type: 'single'}} as unknown as HandledEventPayload;
+
+      const serviceWithHandleEvent = notificationService as unknown as {
+        handleEvent: () => Promise<HandledEventResult>;
+      };
+      jest.spyOn(serviceWithHandleEvent, 'handleEvent').mockResolvedValue({status: 'handled', payload});
+
+      const notification = {payload: [{}], transient: true} as unknown as Notification;
+      const handledNotifications = notificationService.handleNotification(
+        notification,
+        NotificationSource.NOTIFICATION_STREAM,
+      );
+
+      await expect(handledNotifications.next()).resolves.toEqual({done: false, value: payload});
+      await expect(handledNotifications.next()).resolves.toEqual({done: true, value: undefined});
+    });
+
+    it('yields multiple handled payloads in their original order', async () => {
+      const storeEngine = new MemoryEngine();
+      await storeEngine.init('NotificationService.test');
+
+      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      apiClients.push(apiClient);
+      const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
+      const firstPayload = {event: {type: 'first'}} as unknown as HandledEventPayload;
+      const secondPayload = {event: {type: 'second'}} as unknown as HandledEventPayload;
+
+      const serviceWithHandleEvent = notificationService as unknown as {
+        handleEvent: () => Promise<HandledEventResult>;
+      };
+      jest.spyOn(serviceWithHandleEvent, 'handleEvent').mockResolvedValue({
+        status: 'handled',
+        payload: [firstPayload, secondPayload],
+      });
+
+      const notification = {payload: [{}], transient: true} as unknown as Notification;
+      const handledNotifications = notificationService.handleNotification(
+        notification,
+        NotificationSource.NOTIFICATION_STREAM,
+      );
+
+      await expect(handledNotifications.next()).resolves.toEqual({done: false, value: firstPayload});
+      await expect(handledNotifications.next()).resolves.toEqual({done: false, value: secondPayload});
+      await expect(handledNotifications.next()).resolves.toEqual({done: true, value: undefined});
+    });
+
     it('updates last notification ID when notification is NOT transient', async () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');

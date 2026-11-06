@@ -35,6 +35,11 @@ import {Runtime} from '@wireapp/commons';
 import {createApplicationServices} from './createApplicationServices';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
+import {
+  getCurrentCoreCryptoBrowserEnvironment,
+  isCoreCryptoEnabled,
+  redirectIfCoreCryptoUnsupported,
+} from '../browser/coreCryptoSupport';
 import {AppContainer} from '../components/appContainer/appContainer';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
@@ -50,6 +55,7 @@ import {translate} from '../util/localizerUtil';
 import {getLogger} from '../util/logger';
 import {enableLogging} from '../util/loggerUtil';
 import {loadValue} from '../util/storageUtil';
+import {supportsMLS} from '../util/util';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
 retireLegacyServiceWorker({
@@ -87,6 +93,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (enforceDesktopApplication) {
     const unSupportedPageUrl = `${window.location.origin}/unsupported`;
     window.location.replace(unSupportedPageUrl);
+    return;
+  }
+
+  const coreCryptoEnabled = isCoreCryptoEnabled({
+    supportsMls: supportsMLS(),
+    useCoreCryptoOverride: config.FEATURE.USE_CORE_CRYPTO,
+  });
+  const redirectedForCoreCryptoSupport = redirectIfCoreCryptoUnsupported({
+    coreCryptoEnabled,
+    environment: getCurrentCoreCryptoBrowserEnvironment(),
+    onUnsupported(message) {
+      console.error(message);
+      window.location.replace(`${window.location.origin}/unsupported`);
+    },
+  });
+  if (redirectedForCoreCryptoSupport) {
     return;
   }
 

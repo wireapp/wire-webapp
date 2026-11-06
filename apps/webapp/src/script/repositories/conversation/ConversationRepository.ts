@@ -445,12 +445,10 @@ export class ConversationRepository {
   }
 
   public registerMLSConversationVerificationStateHandler = (
-    domain: string,
     onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = noop,
     onSelfClientCertificateRevoked: () => Promise<void> = asyncNoop,
   ): void => {
     this.mlsConversationVerificationStateHandler = new MLSConversationVerificationStateHandler(
-      domain,
       onConversationVerificationStateChange,
       onSelfClientCertificateRevoked,
       this.conversationState,
@@ -2014,11 +2012,16 @@ export class ConversationRepository {
 
     this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
 
-    await Promise.allSettled(
-      proteusConversations.map(proteusConversation => {
-        return this.eventService.moveEventsToConversation(proteusConversation.qualifiedId, mlsConversation.qualifiedId);
-      }),
-    );
+    const movedEvents = (
+      await Promise.all(
+        proteusConversations.map(proteusConversation => {
+          return this.eventService.moveEventsToConversation(
+            proteusConversation.qualifiedId,
+            mlsConversation.qualifiedId,
+          );
+        }),
+      )
+    ).flat();
 
     // In the event that multiple 1:1 Proteus conversations exist, we migrate the one with the lowest id
     // See https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/1344602120/Use+case+multiple+1+1+conversation+in+teams+Proteus
@@ -2052,7 +2055,13 @@ export class ConversationRepository {
 
     // Migration can happen after startup has loaded unread events. Populate the new entity as well,
     // since unread counts are derived from messages in memory, not just the persisted read timestamp.
-    await this.getUnreadEvents(mlsConversation);
+    const readTimestamp = mlsConversation.effectiveReadTimestamp();
+    const unreadEvents = movedEvents.filter(event => {
+      return new Date(event.time).getTime() > readTimestamp;
+    });
+    if (isNonEmptyArray(unreadEvents)) {
+      await this.addEventsToConversation(unreadEvents, mlsConversation, {offline: true});
+    }
 
     const wasProteus1to1ActiveConversation = proteusConversations.some(conversation => {
       return this.conversationState.isActiveConversation(conversation);
@@ -5059,11 +5068,11 @@ export class ConversationRepository {
 
       let epoch = 0;
       if (existingConversation) {
-        const newEpoch: number = await mlsService.getEpoch(newGroupId);
+        const newEpoch: bigint = await mlsService.getEpoch(newGroupId);
         this.logger.info('An MLS conversation with the new group ID already exists fetched epoch from core crypto', {
           newEpoch,
         });
-        epoch = newEpoch;
+        epoch = Number(newEpoch);
       }
 
       const updatedConversation = ConversationMapper.updateProperties(conversationEntity, {
