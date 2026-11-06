@@ -72,8 +72,12 @@ import {MediaConstraintsHandler} from '../../src/script/repositories/media/Media
 import {BackgroundEffectsHandler} from '../../src/script/repositories/media/backgroundEffectsHandler';
 
 export class TestFactory {
-  constructor() {
+  /** @param {Core | undefined} core */
+  constructor(core = undefined) {
     container.clearInstances();
+    if (core !== undefined) {
+      container.registerInstance(Core, core);
+    }
     /** @type {StorageService} */
     this.storage_service = Object.create(StorageService.prototype);
     /** @type {StorageRepository} */

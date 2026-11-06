@@ -34,6 +34,7 @@ import {
   requireValueForTest,
 } from '../../../../../../testSupport/rootContextTestSupport';
 import {Core} from '../../../../../../../service/coreSingleton';
+import {createCoreTestFixture} from '../../../../../../../util/test/createCoreTestFixture';
 import {generateAPIConversation} from '../../../../../../../../../test/helper/ConversationGenerator';
 
 import {E2EICertificateDetails} from './e2eiCertificateDetails';
@@ -64,13 +65,25 @@ const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X
   };
 };
 
-const core = container.resolve(Core);
-
 describe('E2EICertificateDetails', () => {
   const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    const core = createCoreTestFixture({
+      backendFeatures: {domain: 'domain'},
+      service: {
+        conversation: {getMLSSelfConversation: jest.fn()},
+        e2eIdentity: {
+          initialize: jest.fn(),
+          isEnrollmentInProgress: jest.fn(),
+          isFreshMLSSelfClient: jest.fn(),
+          getAllGroupUsersIdentities: jest.fn().mockResolvedValue(new Map()),
+        },
+      },
+    });
+    container.registerInstance(Core, core);
+    E2EIHandler.resetInstance();
     jest.spyOn(requireValueForTest(core.service?.conversation), 'getMLSSelfConversation').mockResolvedValue(
       generateAPIConversation({
         id: {id: 'id', domain: 'domain'},
@@ -88,6 +101,11 @@ describe('E2EICertificateDetails', () => {
       gracePeriodInSeconds: 100,
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
     });
+  });
+
+  afterEach(() => {
+    E2EIHandler.resetInstance();
+    container.clearInstances();
   });
 
   describe('idicates the state of the e2ei identity', () => {
