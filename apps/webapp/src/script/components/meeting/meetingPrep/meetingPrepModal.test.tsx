@@ -104,6 +104,24 @@ describe('MeetingPrepModal', () => {
     expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
   });
 
+  it('focuses the close button and closes on Escape immediately after opening', async () => {
+    render(<button type="button">Join from meeting list</button>);
+    const joinButton = screen.getByRole('button', {name: 'Join from meeting list'});
+    joinButton.focus();
+    expect(joinButton).toHaveFocus();
+    renderModal();
+
+    act(() => {
+      useMeetingPrepModal.getState().open(session);
+    });
+
+    const closeButton = screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'});
+    expect(closeButton).toHaveFocus();
+
+    fireEvent.keyDown(closeButton, {key: KEY.ESC});
+    await expectClosed();
+  });
+
   it('closes an open device list before closing the prep modal on Escape', () => {
     renderModal();
 
