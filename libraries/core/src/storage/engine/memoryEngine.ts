@@ -19,7 +19,7 @@
 
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
-import {CRUDEngine} from './CRUDEngine';
+import {CRUDEngine} from './crudEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
 export type MemoryStore = Record<string, Record<string, any>>;

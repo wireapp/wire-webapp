@@ -20,7 +20,7 @@
 import {Notification} from '@wireapp/api-client/lib/notification';
 
 import {APIClient} from '@wireapp/api-client';
-import {MemoryEngine} from '@wireapp/store-engine';
+import {MemoryEngine} from '../storage/engine/memoryEngine';
 
 import {ConversationService} from '../conversation';
 

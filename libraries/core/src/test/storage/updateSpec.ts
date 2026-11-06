@@ -17,8 +17,8 @@
  *
  */
 
-import {CRUDEngine} from '../engine';
-import {RecordNotFoundError} from '../engine/error';
+import type {CRUDEngine} from '../../storage/engine/crudEngine';
+import type {StorageErrorConstructors} from './storageErrorConstructors';
 
 const TABLE_NAME = 'the-simpsons';
 
@@ -32,7 +32,10 @@ interface DomainEntity {
 }
 
 export const updateSpec = {
-  'fails if the record does not exist.': async (engine: CRUDEngine) => {
+  'fails if the record does not exist.': async (
+    engine: CRUDEngine,
+    storageErrorConstructors: StorageErrorConstructors,
+  ) => {
     const PRIMARY_KEY = 'primary-key';
 
     const updates = {
@@ -46,7 +49,7 @@ export const updateSpec = {
     try {
       await engine.update(TABLE_NAME, PRIMARY_KEY, updates);
     } catch (error) {
-      expect(error).toEqual(expect.any(RecordNotFoundError));
+      expect(error).toEqual(expect.any(storageErrorConstructors.RecordNotFoundError));
     }
   },
   'updates an existing database record.': async (engine: CRUDEngine) => {

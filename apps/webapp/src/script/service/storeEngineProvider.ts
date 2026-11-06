@@ -18,10 +18,9 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
+import type {CRUDEngine} from '@wireapp/core/lib/storage/engine/crudEngine';
+import {MemoryEngine} from '@wireapp/core/lib/storage/engine/memoryEngine';
 import {applyEncryptionMiddleware, NON_INDEXED_FIELDS} from 'dexie-encrypted';
-
-import type {CRUDEngine} from '@wireapp/store-engine';
-import {MemoryEngine} from '@wireapp/store-engine';
 
 import {DexieDatabase} from '../repositories/storage/dexieDatabase';
 import {IndexedDBEngine} from '../repositories/storage/indexedDatabaseEngine';

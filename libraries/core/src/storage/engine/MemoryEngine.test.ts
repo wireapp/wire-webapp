@@ -17,20 +17,28 @@
  *
  */
 
-import {CRUDEngine} from './CRUDEngine';
-import {MemoryEngine} from './MemoryEngine';
+import {CRUDEngine} from './crudEngine';
+import {MemoryEngine} from './memoryEngine';
 
-import {createSpec} from '../test/createSpec';
-import {deleteAllSpec} from '../test/deleteAllSpec';
-import {deleteSpec} from '../test/deleteSpec';
-import {purgeSpec} from '../test/purgeSpec';
-import {readAllPrimaryKeysSpec} from '../test/readAllPrimaryKeysSpec';
-import {readAllSpec} from '../test/readAllSpec';
-import {readSpec} from '../test/readSpec';
-import {updateOrCreateSpec} from '../test/updateOrCreateSpec';
-import {updateSpec} from '../test/updateSpec';
+import {createSpec} from '../../test/storage/createSpec';
+import {deleteAllSpec} from '../../test/storage/deleteAllSpec';
+import {deleteSpec} from '../../test/storage/deleteSpec';
+import {purgeSpec} from '../../test/storage/purgeSpec';
+import {readAllPrimaryKeysSpec} from '../../test/storage/readAllPrimaryKeysSpec';
+import {readAllSpec} from '../../test/storage/readAllSpec';
+import {readSpec} from '../../test/storage/readSpec';
+import {updateOrCreateSpec} from '../../test/storage/updateOrCreateSpec';
+import {updateSpec} from '../../test/storage/updateSpec';
+import type {StorageErrorConstructors} from '../../test/storage/storageErrorConstructors';
+
+import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
 const STORE_NAME = 'store-name';
+const storageErrorConstructors: StorageErrorConstructors = {
+  RecordAlreadyExistsError,
+  RecordNotFoundError,
+  RecordTypeError,
+};
 
 let engine: CRUDEngine;
 
@@ -85,7 +93,7 @@ describe('MemoryEngine', () => {
   describe('create', () => {
     Object.entries(createSpec).forEach(([description, testFunction]) => {
       it(description, () => {
-        return testFunction(engine);
+        return testFunction(engine, storageErrorConstructors);
       });
     });
   });
@@ -133,7 +141,7 @@ describe('MemoryEngine', () => {
   describe('read', () => {
     Object.entries(readSpec).forEach(([description, testFunction]) => {
       it(description, () => {
-        return testFunction(engine);
+        return testFunction(engine, storageErrorConstructors);
       });
     });
   });
@@ -149,7 +157,7 @@ describe('MemoryEngine', () => {
   describe('update', () => {
     Object.entries(updateSpec).forEach(([description, testFunction]) => {
       it(description, () => {
-        return testFunction(engine);
+        return testFunction(engine, storageErrorConstructors);
       });
     });
   });

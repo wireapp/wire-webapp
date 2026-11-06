@@ -24,7 +24,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `apps/webapp/`: React client (Rspack internal, public production, and development), plus E2E tests and i18n files
 - `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
 - `libraries/config/`: `@wireapp/config` package - centralized environment configuration management with type-safe configuration loading and validation
-- `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
+- `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, protocol messaging, and shared storage engines
 - Root-level tooling (`justfile`, npm workspaces, and `tools/`) provides commands shared by apps and libraries
 
 Use `npx just --list` to discover repository tasks, including builds, development, type checks, unit tests, linting, E2E, and translation management.

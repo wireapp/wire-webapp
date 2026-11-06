@@ -23,7 +23,6 @@ import {Notification} from '@wireapp/api-client/lib/notification';
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {GenericMessage} from '@wireapp/protocol-messaging';
-import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 
 import {NotificationBackendRepository} from './notificationBackendRepository';
 import {NotificationDatabaseRepository} from './notificationDatabaseRepository';
@@ -33,6 +32,8 @@ import {isOutdatedNotificationStreamEvent} from './outdatedNotificationStreamEve
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../coreError';
 import {DecryptionError} from '../errors/decryptionError';
+import type {CRUDEngine} from '../storage/engine/crudEngine';
+import {RecordNotFoundError} from '../storage/engine/error';
 
 export type HandledEventPayload = {
   /** the raw event received from backend */
@@ -119,10 +120,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
     try {
       databaseLastEventDate = await this.database.getLastEventDate();
     } catch (error: unknown) {
-      if (
-        error instanceof StoreEngineError.RecordNotFoundError ||
-        (error as Error).constructor.name === StoreEngineError.RecordNotFoundError.name
-      ) {
+      if (error instanceof RecordNotFoundError || (error as Error).constructor.name === RecordNotFoundError.name) {
         return this.database.createLastEventDate(eventDate);
       }
       throw error;

@@ -17,7 +17,7 @@
  *
  */
 
-import {MemoryEngine} from '@wireapp/store-engine';
+import {MemoryEngine} from '@wireapp/core/lib/storage/engine/memoryEngine';
 
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/storageSchemata';

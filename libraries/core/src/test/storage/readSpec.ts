@@ -17,8 +17,8 @@
  *
  */
 
-import {CRUDEngine} from '../engine';
-import {RecordNotFoundError} from '../engine/error/RecordNotFoundError';
+import type {CRUDEngine} from '../../storage/engine/crudEngine';
+import type {StorageErrorConstructors} from './storageErrorConstructors';
 
 const TABLE_NAME = 'the-simpsons';
 
@@ -38,14 +38,17 @@ export const readSpec = {
     const record = await engine.read<DomainEntity>(TABLE_NAME, primaryKey);
     expect(record.some).toBe(entity.some);
   },
-  'throws an error if a record cannot be found.': async (engine: CRUDEngine) => {
+  'throws an error if a record cannot be found.': async (
+    engine: CRUDEngine,
+    storageErrorConstructors: StorageErrorConstructors,
+  ) => {
     const PRIMARY_KEY = 'primary-key';
 
     try {
       await engine.read(TABLE_NAME, PRIMARY_KEY);
       throw new Error('Method is supposed to throw an error.');
     } catch (error) {
-      expect(error).toEqual(expect.any(RecordNotFoundError));
+      expect(error).toEqual(expect.any(storageErrorConstructors.RecordNotFoundError));
     }
   },
 };

@@ -29,7 +29,6 @@ export const developmentLibraries: readonly DevelopmentLibrary[] = [
   {name: 'core', value: 'core'},
   {name: 'commons', value: 'commons'},
   {name: 'config', value: 'config'},
-  {name: 'store-engine', value: 'store-engine'},
   {name: 'telemetry', value: 'telemetry'},
 ];
 

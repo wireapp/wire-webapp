@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,5 +17,10 @@
  *
  */
 
-export * from './CRUDEngine';
-export * from './MemoryEngine';
+import type {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from '../../storage/engine/error';
+
+export type StorageErrorConstructors = {
+  readonly RecordAlreadyExistsError: typeof RecordAlreadyExistsError;
+  readonly RecordNotFoundError: typeof RecordNotFoundError;
+  readonly RecordTypeError: typeof RecordTypeError;
+};

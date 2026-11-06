@@ -17,12 +17,17 @@
  *
  */
 
-import {CRUDEngine} from '../engine';
+import type {CRUDEngine} from '../../storage/engine/crudEngine';
 
 const TABLE_NAME = 'the-simpsons';
 
-export const deleteAllSpec = {
-  'deletes all records from a database table.': async (engine: CRUDEngine) => {
+interface DomainEntity {
+  firstName: string;
+  lastName: string;
+}
+
+export const readAllSpec = {
+  'returns multiple database records.': async (engine: CRUDEngine) => {
     const homer = {
       entity: {
         firstName: 'Homer',
@@ -47,14 +52,11 @@ export const deleteAllSpec = {
       primaryKey: 'marge-simpson',
     };
 
-    await Promise.all([
-      engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
-      engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
-      engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
-    ]);
-    const hasBeenDeleted = await engine.deleteAll(TABLE_NAME);
-    expect(hasBeenDeleted).toBe(true);
-    const primaryKeys = await engine.readAllPrimaryKeys(TABLE_NAME);
-    expect(primaryKeys.length).toBe(0);
+    await engine.create(TABLE_NAME, homer.primaryKey, homer.entity);
+    await engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity);
+    await engine.create(TABLE_NAME, marge.primaryKey, marge.entity);
+    const records = await engine.readAll<DomainEntity>(TABLE_NAME);
+    expect(records.length).toBe(3);
+    expect(records).toEqual(expect.arrayContaining([homer.entity, lisa.entity, marge.entity]));
   },
 };

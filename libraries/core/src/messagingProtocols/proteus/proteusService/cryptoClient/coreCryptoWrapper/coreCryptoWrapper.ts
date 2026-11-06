@@ -32,11 +32,11 @@ import {
   migrateDatabaseKeyTypeToBytes,
   DatabaseKey,
 } from '@wireapp/core-crypto';
-import type {CRUDEngine} from '@wireapp/store-engine';
 
 import {PrekeyTracker} from './prekeysTracker';
 
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
+import type {CRUDEngine} from '../../../../../storage/engine/crudEngine';
 import {CoreCryptoConfig} from '../../../../common.types';
 import {CryptoClient, InitialPrekeys} from '../cryptoClient.types';
 

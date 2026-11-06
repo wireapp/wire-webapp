@@ -20,11 +20,10 @@
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CRUDEngine} from '@wireapp/store-engine';
-
 import {MetaClient} from './clientService';
 
 import {constructSessionId} from '../messagingProtocols/proteus/utility/sessionHandler';
+import type {CRUDEngine} from '../storage/engine/crudEngine';
 
 export enum DatabaseStores {
   CLIENTS = 'clients',

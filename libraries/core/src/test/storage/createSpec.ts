@@ -17,13 +17,13 @@
  *
  */
 
-import {CRUDEngine} from '../engine';
-import {RecordAlreadyExistsError, RecordTypeError} from '../engine/error';
+import type {CRUDEngine} from '../../storage/engine/crudEngine';
+import type {StorageErrorConstructors} from './storageErrorConstructors';
 
 const TABLE_NAME = 'the-simpsons';
 
 export const createSpec = {
-  "doesn't save empty values.": async (engine: CRUDEngine) => {
+  "doesn't save empty values.": async (engine: CRUDEngine, storageErrorConstructors: StorageErrorConstructors) => {
     const PRIMARY_KEY = 'primary-key';
 
     const entity = undefined;
@@ -32,10 +32,10 @@ export const createSpec = {
       await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
       throw new Error('Method is supposed to throw an error.');
     } catch (error) {
-      expect(error).toEqual(expect.any(RecordTypeError));
+      expect(error).toEqual(expect.any(storageErrorConstructors.RecordTypeError));
     }
   },
-  "doesn't save null values.": async (engine: CRUDEngine) => {
+  "doesn't save null values.": async (engine: CRUDEngine, storageErrorConstructors: StorageErrorConstructors) => {
     const PRIMARY_KEY = 'primary-key';
 
     const entity = undefined;
@@ -44,7 +44,7 @@ export const createSpec = {
       await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
       throw new Error('Method is supposed to throw an error.');
     } catch (error) {
-      expect(error).toEqual(expect.any(RecordTypeError));
+      expect(error).toEqual(expect.any(storageErrorConstructors.RecordTypeError));
     }
   },
   'saves objects.': async (engine: CRUDEngine) => {
@@ -80,7 +80,10 @@ export const createSpec = {
     const record = await engine.read(TABLE_NAME, PRIMARY_KEY);
     expect(record).toEqual(entity);
   },
-  'throws an error when attempting to overwrite a record.': async (engine: CRUDEngine) => {
+  'throws an error when attempting to overwrite a record.': async (
+    engine: CRUDEngine,
+    storageErrorConstructors: StorageErrorConstructors,
+  ) => {
     const PRIMARY_KEY = 'primary-key';
 
     const firstEntity = {
@@ -96,7 +99,7 @@ export const createSpec = {
       await engine.create(TABLE_NAME, PRIMARY_KEY, secondEntity);
       throw new Error('Method is supposed to throw an error.');
     } catch (error) {
-      expect(error).toEqual(expect.any(RecordAlreadyExistsError));
+      expect(error).toEqual(expect.any(storageErrorConstructors.RecordAlreadyExistsError));
     }
   },
 };

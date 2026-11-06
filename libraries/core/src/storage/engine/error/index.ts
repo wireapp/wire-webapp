@@ -17,8 +17,9 @@
  *
  */
 
-export class TransientBundle {
-  public expires: number = 0;
-  public payload: any;
-  public timeoutID?: ReturnType<typeof setTimeout>; // Note: Only cached values have a "timeoutID"
-}
+export {LowDiskSpaceError} from './lowDiskSpaceError';
+export {PathValidationError} from './pathValidationError';
+export {RecordAlreadyExistsError} from './recordAlreadyExistsError';
+export {RecordNotFoundError} from './recordNotFoundError';
+export {RecordTypeError} from './recordTypeError';
+export {UnsupportedError} from './unsupportedError';

@@ -32,11 +32,11 @@ import {StatusCodes} from 'http-status-codes';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
-import {CRUDEngine} from '@wireapp/store-engine';
 
 import type {ProteusService} from '../messagingProtocols/proteus';
 import {InitialPrekeys} from '../messagingProtocols/proteus/proteusService/cryptoClient';
 import {wipeCoreCryptoDb} from '../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
+import type {CRUDEngine} from '../storage/engine/crudEngine';
 
 import {ClientInfo, ClientBackendRepository, ClientDatabaseRepository} from './';
 

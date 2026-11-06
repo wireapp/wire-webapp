@@ -46,7 +46,6 @@
     "@types/pako": "2.0.4",
     "@types/spark-md5": "3.0.5",
     "@types/ws": "8.18.2",
-    "@wireapp/store-engine": "5.1.19",
     "browser-sync": "3.0.4",
     "concurrently": "9.2.5",
     "jest": "30.5.2",
