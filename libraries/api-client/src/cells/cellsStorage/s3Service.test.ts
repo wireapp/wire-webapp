@@ -17,7 +17,8 @@
  *
  */
 
-import {S3Client, S3ServiceException} from '@aws-sdk/client-s3';
+import {GetObjectCommand, S3Client, S3ServiceException} from '@aws-sdk/client-s3';
+import {FetchHttpHandler} from '@smithy/fetch-http-handler';
 import {Upload} from '@aws-sdk/lib-storage';
 import {XhrHttpHandler} from '@aws-sdk/xhr-http-handler';
 
@@ -141,6 +142,82 @@ describe('S3Service', () => {
         writable: true,
       });
     }
+  });
+
+  describe('getObject', () => {
+    it('uses a single-attempt header-signed GET and returns its stream', async () => {
+      const body = new ReadableStream<Uint8Array>();
+      mockSend.mockResolvedValueOnce({
+        Body: {
+          transformToWebStream: () => {
+            return body;
+          },
+        },
+        ContentType: 'application/zip',
+      });
+      const abortController = new AbortController();
+
+      await expect(
+        service.getObject({path: 'workspace/folder/space name-é-selection.zip', abortController}),
+      ).resolves.toEqual({body, contentType: 'application/zip'});
+
+      const [clientConfig] = (S3Client as jest.Mock).mock.calls.at(-1) as [Record<string, unknown>];
+      expect(clientConfig).toEqual(
+        expect.objectContaining({
+          endpoint: testConfig.endpoint,
+          forcePathStyle: true,
+          region: testConfig.region,
+          maxAttempts: 1,
+          requestHandler: expect.any(FetchHttpHandler),
+        }),
+      );
+      await expect((clientConfig.credentials as () => Promise<unknown>)()).resolves.toEqual({
+        accessKeyId: 'test-api-key',
+        secretAccessKey: 'gatewaysecret',
+      });
+      const command = mockSend.mock.calls[0][0] as GetObjectCommand;
+      expect(command.input).toEqual({Bucket: testConfig.bucket, Key: 'workspace/folder/space name-é-selection.zip'});
+      expect(mockSend).toHaveBeenCalledWith(command, {abortSignal: abortController.signal});
+    });
+
+    it('uses the normal access token as the signing key when no API key is configured', async () => {
+      const accessTokenStore = {getAccessToken: jest.fn().mockReturnValue('normal-user-token')};
+      mockSend.mockResolvedValueOnce({
+        Body: {
+          transformToWebStream: () => {
+            return new ReadableStream<Uint8Array>();
+          },
+        },
+      });
+      const tokenService = new S3Service({
+        config: {...testConfig, apiKey: undefined},
+        accessTokenStore: accessTokenStore as unknown as AccessTokenStore,
+      });
+
+      await tokenService.getObject({path: 'workspace/file.zip'});
+
+      const [clientConfig] = (S3Client as jest.Mock).mock.calls.at(-1) as [Record<string, unknown>];
+      await expect((clientConfig.credentials as () => Promise<unknown>)()).resolves.toEqual({
+        accessKeyId: 'normal-user-token',
+        secretAccessKey: 'gatewaysecret',
+      });
+    });
+
+    it('fails if Cells returned no response body', async () => {
+      mockSend.mockResolvedValueOnce({ContentType: 'application/zip'});
+
+      await expect(service.getObject({path: 'workspace/selection-id-selection.zip'})).rejects.toThrow(
+        'Cells returned an empty archive response',
+      );
+    });
+
+    it('propagates permission and transport failures without retrying', async () => {
+      const error = new Error('Access denied');
+      mockSend.mockRejectedValueOnce(error);
+
+      await expect(service.getObject({path: 'workspace/selection-id-selection.zip'})).rejects.toBe(error);
+      expect(mockSend).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('putObject', () => {
@@ -363,7 +440,7 @@ const File = global.File || MockFile;
 const testConfig = {
   apiKey: 'test-api-key',
   bucket: 'test-bucket',
-  endpoint: 'test-endpoint',
+  endpoint: 'https://s3.example.test',
   region: 'test-region',
 };
 

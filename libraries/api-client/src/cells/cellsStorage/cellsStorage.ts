@@ -18,6 +18,14 @@
  */
 
 export interface CellsStorage {
+  getObject({
+    path,
+    abortController,
+  }: {
+    path: string;
+    abortController?: AbortController;
+  }): Promise<{body: ReadableStream<Uint8Array>; contentType?: string}>;
+
   putObject({
     path,
     file,

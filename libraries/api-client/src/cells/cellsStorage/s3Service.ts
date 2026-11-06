@@ -17,9 +17,10 @@
  *
  */
 
-import {S3Client, S3ServiceException} from '@aws-sdk/client-s3';
+import {GetObjectCommand, S3Client, S3ServiceException} from '@aws-sdk/client-s3';
 import {Upload} from '@aws-sdk/lib-storage';
 import {XhrHttpHandler} from '@aws-sdk/xhr-http-handler';
+import {FetchHttpHandler} from '@smithy/fetch-http-handler';
 
 import {CellsStorage, CellsStorageError} from './cellsStorage';
 
@@ -68,6 +69,31 @@ export class S3Service implements CellsStorage {
     const initialToken = accessTokenStore.getAccessToken();
     this.client = this.createS3Client({accessToken: initialToken});
     this.currentAccessToken = initialToken;
+  }
+
+  async getObject({
+    path,
+    abortController,
+  }: {
+    path: string;
+    abortController?: AbortController;
+  }): Promise<{body: ReadableStream<Uint8Array>; contentType?: string}> {
+    const client = this.createS3Client({
+      accessToken: this.accessTokenStore.getAccessToken(),
+      requestHandler: new FetchHttpHandler(),
+      maxAttempts: 1,
+    });
+    const response = await client.send(
+      new GetObjectCommand({Bucket: this.bucket, Key: path}),
+      abortController === undefined ? undefined : {abortSignal: abortController.signal},
+    );
+    const body = response.Body?.transformToWebStream();
+
+    if (body === undefined) {
+      throw new CellsStorageError('Cells returned an empty archive response');
+    }
+
+    return {body, contentType: response.ContentType};
   }
 
   async putObject({
@@ -162,15 +188,20 @@ export class S3Service implements CellsStorage {
   private createS3Client({
     accessToken,
     abortSignal,
+    maxAttempts,
+    requestHandler = createReliableXhrHttpHandler(abortSignal),
   }: {
     accessToken: string | undefined;
     abortSignal?: AbortSignal;
+    maxAttempts?: number;
+    requestHandler?: XhrHttpHandler | FetchHttpHandler;
   }): S3Client {
     return new S3Client({
       endpoint: this.config.endpoint,
       forcePathStyle: true,
       region: this.config.region,
-      requestHandler: createReliableXhrHttpHandler(abortSignal),
+      requestHandler,
+      ...(maxAttempts === undefined ? {} : {maxAttempts}),
       credentials: async () => {
         if (this.config.apiKey !== undefined && this.config.apiKey.length > 0) {
           return {
