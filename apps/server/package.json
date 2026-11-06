@@ -34,7 +34,6 @@
     "@types/express-sitemap-xml": "3.0.4",
     "@types/express-useragent": "1.0.5",
     "@types/geolite2": "2.0.2",
-    "@types/hbs": "4.0.5",
-    "countly-sdk-web": "24.11.4"
+    "@types/hbs": "4.0.5"
   }
 }
