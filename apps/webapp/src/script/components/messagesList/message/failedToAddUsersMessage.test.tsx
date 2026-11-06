@@ -20,7 +20,7 @@
 import {act, render} from '@testing-library/react';
 import {isNull, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {AddUsersFailure, AddUsersFailureReasons} from '../../../core/conversation';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import de from '../../../../i18n/de-DE.json';

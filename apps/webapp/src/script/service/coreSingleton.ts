@@ -18,16 +18,15 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import type {CRUDEngine} from '@wireapp/core/lib/storage/engine/crudEngine';
 import {container, singleton} from 'tsyringe';
-
-import {Account} from '@wireapp/core';
 
 import {APIClient} from './apiClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './storeEngineProvider';
 import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
 
 import {Config} from '../Config';
+import {Account} from '../core';
+import type {CRUDEngine} from '../core/storage/engine/crudEngine';
 import {supportsMLS} from '../util/util';
 
 declare global {

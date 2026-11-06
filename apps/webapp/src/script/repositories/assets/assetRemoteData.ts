@@ -18,8 +18,9 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {AssetUrlData} from '@wireapp/core/lib/conversation/assetService/assetService';
 import {noop} from 'noop-esm';
+
+import {AssetUrlData} from '../../core/conversation/assetService/assetService';
 
 /**
  * Callback function that receives download progress updates.

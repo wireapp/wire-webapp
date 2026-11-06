@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 
 import {randomUUID} from 'crypto';
 
-import {Account, MLSService} from '@wireapp/core';
+import {Account, MLSService} from '../core';
 
 import {ConversationService} from '../repositories/conversation/ConversationService';
 import {MLSConversation} from '../repositories/conversation/ConversationSelectors';

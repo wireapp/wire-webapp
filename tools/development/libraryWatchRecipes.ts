@@ -26,7 +26,6 @@ export type DevelopmentLibrary = {
 export const developmentLibraries: readonly DevelopmentLibrary[] = [
   {name: 'react-ui-kit', value: 'react-ui-kit', checked: true},
   {name: 'api-client', value: 'api-client', checked: true},
-  {name: 'core', value: 'core'},
   {name: 'commons', value: 'commons'},
   {name: 'config', value: 'config'},
   {name: 'telemetry', value: 'telemetry'},

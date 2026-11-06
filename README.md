@@ -24,7 +24,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `apps/webapp/`: React client (Rspack internal, public production, and development), plus E2E tests and i18n files
 - `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
 - `libraries/config/`: `@wireapp/config` package - centralized environment configuration management with type-safe configuration loading and validation
-- `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, protocol messaging, and shared storage engines
+- `apps/webapp/src/script/core/`: communication core handling authentication, WebSocket connections, protocol messaging, and shared storage engines
 - Root-level tooling (`justfile`, npm workspaces, and `tools/`) provides commands shared by apps and libraries
 
 Use `npx just --list` to discover repository tasks, including builds, development, type checks, unit tests, linting, E2E, and translation management.
@@ -58,7 +58,7 @@ Prerequisites:
 1. Run `npx just develop`; Just builds the workspace libraries and server output, then starts the Express server, its TypeScript watcher, and watchers for the WebApp's upstream libraries. Rspack compiles the WebApp in memory and serves it at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
 1. Server TypeScript changes are recompiled with `tsc --watch`; `node --watch` restarts the compiled Express server when its output changes. `concurrently` stops sibling processes if any watcher exits.
 1. `npx just develop-watch` is an alternative to `npx just develop`: it starts the server with libraries you select interactively. Choose one development command; do not run `develop-watch` alongside `develop`.
-1. To watch one library without the server, run `npx just watch-library core`. Use `npx just watch-library-telemetry` to copy telemetry assets and watch both TypeScript module formats.
+1. To watch one library without the server, run `npx just watch-library api-client`. Use `npx just watch-library-telemetry` to copy telemetry assets and watch both TypeScript module formats.
 1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
    `FEATURE_CHECK_CONSENT="false"` to the env file
 
@@ -130,6 +130,10 @@ npx just test
 ```
 
 Run `npx just test-ci` to execute each Jest project with coverage and its existing project-specific thresholds. CI uses this command inside the network-isolation wrapper and uploads HTML and LCOV reports for the webapp, server, core, and API client. Use `npx just test-watch` for watch mode.
+
+Core tests retain a separate Node Jest project in `apps/webapp/test/core/jest.config.js`, with minimum coverage of 49% branches, 53% functions, and 62% lines/statements. Run it directly with `npx jest --config apps/webapp/test/core/jest.config.js --coverage`. Its original discovery patterns still exclude `encryptedStore.test.node.ts`. Webapp tests and coverage exclude the core tree; explicit service fixtures remain in `src/script/util/test/createCoreTestFixture.ts`.
+
+Asset encryption uses the browser crypto implementation explicitly. Node asset tests pass the Node implementation through the existing asset functions and `AssetService` constructor. Core source changes are compiled and watched directly by Rspack, without a separate library build or watcher.
 
 Other useful tasks:
 

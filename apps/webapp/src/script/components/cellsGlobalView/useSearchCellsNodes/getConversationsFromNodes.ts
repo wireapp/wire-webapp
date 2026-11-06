@@ -17,9 +17,9 @@
  *
  */
 
-import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
 
+import {parseQualifiedId} from '../../../core/util/qualifiedIdUtil';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import type {Conversation} from '../../../repositories/entity/Conversation';
 

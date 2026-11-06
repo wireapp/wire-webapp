@@ -20,7 +20,7 @@
 import {act} from 'react';
 import {render, fireEvent} from '@testing-library/react';
 import {isNull} from '@sindresorhus/is';
-import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
+import {ProteusErrors} from '../../../core/messagingProtocols/proteus';
 
 import en from '../../../../i18n/en-US.json';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../repositories/entity/message/decryptErrorMessage';

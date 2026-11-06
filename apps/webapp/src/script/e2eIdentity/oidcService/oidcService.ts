@@ -17,11 +17,11 @@
  *
  */
 
-import {KeyAuth} from '@wireapp/core/lib/messagingProtocols/mls';
 import {UserManager, UserManagerSettings, WebStorageStateStore, type User} from 'oidc-client-ts';
 
 import {EncryptedStorage} from './oauthEncryptedStore';
 
+import {KeyAuth} from '../../core/messagingProtocols/mls';
 import {clearKeysStartingWith} from '../../util/localStorage';
 
 export class OIDCService {

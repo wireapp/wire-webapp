@@ -270,39 +270,49 @@ describe('E2EIServiceExternal', () => {
     });
 
     it('registers the server certificates on initialization', async () => {
-      const [service, {transactionContext}] = await buildE2EIService('mockedDB1');
+      const [service, {transactionContext, recurringTaskScheduler}] = await buildE2EIService('mockedDB1');
       jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(false);
-      await service.initialize('https://some.crl.discovery.url');
+      try {
+        await service.initialize('https://some.crl.discovery.url');
 
-      expect(transactionContext.e2eiRegisterAcmeCA).toHaveBeenCalledWith(mockedRootCA);
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[0]);
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[1]);
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
+        expect(transactionContext.e2eiRegisterAcmeCA).toHaveBeenCalledWith(mockedRootCA);
+        expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[0]);
+        expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[1]);
+        expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
+      } finally {
+        await recurringTaskScheduler.cancelTask('update-intermediate-certificates');
+      }
     });
 
     it('does not register the root cert if it was already registered', async () => {
-      const [service, {transactionContext}] = await buildE2EIService('mockedDB2');
+      const [service, {transactionContext, recurringTaskScheduler}] = await buildE2EIService('mockedDB2');
 
       jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(true);
 
-      await service.initialize('https://some.crl.discovery.url');
+      try {
+        await service.initialize('https://some.crl.discovery.url');
 
-      jest.useFakeTimers();
-
-      expect(transactionContext.e2eiRegisterAcmeCA).not.toHaveBeenCalled();
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
+        expect(transactionContext.e2eiRegisterAcmeCA).not.toHaveBeenCalled();
+        expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
+      } finally {
+        await recurringTaskScheduler.cancelTask('update-intermediate-certificates');
+      }
     });
 
     it('refreshes revocation data on demand', async () => {
-      const [service, {transactionContext}] = await buildE2EIService('mockedDB3');
+      const [service, {transactionContext, recurringTaskScheduler}] = await buildE2EIService('mockedDB3');
 
       jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(true);
 
-      await service.initialize('https://some.crl.discovery.url');
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
+      try {
+        await service.initialize('https://some.crl.discovery.url');
+        expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
 
-      await service.refreshRevocationData();
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(4);
+        await service.refreshRevocationData();
+        expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(4);
+      } finally {
+        await recurringTaskScheduler.cancelTask('update-intermediate-certificates');
+      }
     });
   });
 });

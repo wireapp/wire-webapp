@@ -968,14 +968,18 @@ describe('MLSService', () => {
 
       jest.spyOn(TaskScheduler, 'addTask');
 
-      await mlsService.initialisePendingProposalsTasks();
+      try {
+        await mlsService.initialisePendingProposalsTasks();
 
-      expect(TaskScheduler.addTask).toHaveBeenCalledWith(
-        expect.objectContaining({
-          firingDate,
-          key: expect.stringContaining(groupId),
-        }),
-      );
+        expect(TaskScheduler.addTask).toHaveBeenCalledWith(
+          expect.objectContaining({
+            firingDate,
+            key: expect.stringContaining(groupId),
+          }),
+        );
+      } finally {
+        TaskScheduler.cancelTask(`pending-proposals-${groupId}`);
+      }
     });
   });
 

@@ -17,6 +17,8 @@
  *
  */
 
+import {isArray, isFunction, isObject} from '@sindresorhus/is';
+
 export interface CommitBundle {}
 
 export enum Ciphersuite {
@@ -134,40 +136,40 @@ type CoreCryptoError<T extends ErrorType> = Error & {
   context?: {type: string; context: {conversationId?: Uint8Array}};
 };
 
-export const isCoreCryptoError = <E extends ErrorType>(error: unknown, errorType: E): error is CoreCryptoError<E> => {
-  return typeof error === 'object' && error !== null && (error as any).type === errorType;
-};
+export function isCoreCryptoError<E extends ErrorType>(error: unknown, errorType: E): error is CoreCryptoError<E> {
+  return isObject(error) && isFunction(error) === false && 'type' in error && error.type === errorType;
+}
 
-export const isProteusError = <E extends ProteusErrorType>(
+export function isProteusError<E extends ProteusErrorType>(
   error: unknown,
   errorType: E,
-): error is CoreCryptoError<ErrorType.Proteus> & {context: {type: E}} => {
-  return isCoreCryptoError(error, ErrorType.Proteus) && (error as any).context?.type === errorType;
-};
+): error is CoreCryptoError<ErrorType.Proteus> & {context: {type: E}} {
+  return isCoreCryptoError(error, ErrorType.Proteus) && error.context?.type === errorType;
+}
 
-export const isProteusSessionNotFoundError = (error: unknown): boolean => {
+export function isProteusSessionNotFoundError(error: unknown): boolean {
   return isProteusError(error, ProteusErrorType.SessionNotFound);
-};
-export const isProteusDuplicateMessageError = (error: unknown): boolean => {
+}
+export function isProteusDuplicateMessageError(error: unknown): boolean {
   return isProteusError(error, ProteusErrorType.DuplicateMessage);
-};
-export const isProteusRemoteIdentityChangedError = (error: unknown): boolean => {
+}
+export function isProteusRemoteIdentityChangedError(error: unknown): boolean {
   return isProteusError(error, ProteusErrorType.RemoteIdentityChanged);
-};
+}
 
-export const isMlsOrphanWelcomeError = (error: unknown): boolean => {
-  return isCoreCryptoError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.OrphanWelcome;
-};
+export function isMlsOrphanWelcomeError(error: unknown): boolean {
+  return isCoreCryptoError(error, ErrorType.Mls) && error.context?.type === MlsErrorType.OrphanWelcome;
+}
 
 // Added to support tests that rely on the core-crypto guard for ConversationAlreadyExists classification
-export const isMlsConversationAlreadyExistsError = (error: unknown): boolean => {
+export function isMlsConversationAlreadyExistsError(error: unknown): boolean {
   return (
     isCoreCryptoError(error, ErrorType.Mls) &&
     error.context?.type === MlsErrorType.ConversationAlreadyExists &&
-    Array.isArray(error.context?.context?.conversationId)
+    isArray(error.context?.context?.conversationId)
   );
-};
+}
 
-export const isMlsMessageRejectedError = (error: unknown): boolean => {
+export function isMlsMessageRejectedError(error: unknown): boolean {
   return isCoreCryptoError(error, ErrorType.Mls) && error.context?.type === MlsErrorType.MessageRejected;
-};
+}

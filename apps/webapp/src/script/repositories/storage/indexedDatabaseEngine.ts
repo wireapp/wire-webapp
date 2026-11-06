@@ -17,16 +17,17 @@
  *
  */
 
-import type {CRUDEngine} from '@wireapp/core/lib/storage/engine/crudEngine';
+import {Dexie, DexieError, IndexableType} from 'dexie';
+import logdown from 'logdown';
+
+import type {CRUDEngine} from '../../core/storage/engine/crudEngine';
 import {
   LowDiskSpaceError,
   RecordAlreadyExistsError,
   RecordNotFoundError,
   RecordTypeError,
   UnsupportedError,
-} from '@wireapp/core/lib/storage/engine/error';
-import {Dexie, DexieError, IndexableType} from 'dexie';
-import logdown from 'logdown';
+} from '../../core/storage/engine/error';
 
 type DexieObservable = {_dbSchema?: Object};
 

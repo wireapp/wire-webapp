@@ -22,8 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, task} from 'true-myth';
 import {match, P} from 'ts-pattern';
 
-import {Account, MLSService} from '@wireapp/core';
-
+import {Account, MLSService} from '../core';
 import {ConversationRepository} from '../repositories/conversation/ConversationRepository';
 import {
   isMLSCapableConversation,

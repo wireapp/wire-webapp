@@ -22,9 +22,9 @@ import type {TraceState} from '@wireapp/api-client/lib/http/';
 import type {Consent, Self} from '@wireapp/api-client/lib/self/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {UserUpdate} from '@wireapp/api-client/lib/user/';
-import type {SelfService as CoreSelfService} from '@wireapp/core/lib/self';
 import {container} from 'tsyringe';
 
+import type {SelfService as CoreSelfService} from '../../core/self';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 

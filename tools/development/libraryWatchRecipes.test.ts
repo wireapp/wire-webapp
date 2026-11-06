@@ -47,4 +47,10 @@ describe('getSelectedLibraryWatchCommands', () => {
       getSelectedLibraryWatchCommands({libraryNames: ['store-engine']});
     }).toThrow('Unknown development library selection: store-engine');
   });
+
+  it('rejects the removed core workspace', () => {
+    expect(() => {
+      getSelectedLibraryWatchCommands({libraryNames: ['core']});
+    }).toThrow('Unknown development library selection: core');
+  });
 });

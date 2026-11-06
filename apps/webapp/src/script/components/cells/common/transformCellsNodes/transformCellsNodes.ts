@@ -18,10 +18,10 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
 import {Maybe, maybe} from 'true-myth';
 
+import {parseQualifiedId} from '../../../../core/util/qualifiedIdUtil';
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {User} from '../../../../repositories/entity/User';
 import {CellNode, CellNodeType} from '../../../../types/cellNode';

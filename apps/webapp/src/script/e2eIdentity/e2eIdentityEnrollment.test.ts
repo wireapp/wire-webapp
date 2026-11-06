@@ -18,8 +18,8 @@
  */
 
 import {waitFor} from '@testing-library/react';
-import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
+import {CredentialType} from '../core/messagingProtocols/mls';
+import {LowPrecisionTaskScheduler} from '../core/util/lowPrecisionTaskScheduler';
 import {container} from 'tsyringe';
 import {noop} from 'noop-esm';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';

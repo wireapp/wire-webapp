@@ -47,13 +47,13 @@ import {
 } from '@wireapp/api-client/lib/event';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {ConversationService as CoreConversationService} from '@wireapp/core/lib/conversation';
-import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {MLSCapableConversation} from './ConversationSelectors';
 
+import type {ConversationService as CoreConversationService} from '../../core/conversation';
+import {MLSServiceEvents} from '../../core/messagingProtocols/mls';
 import {MessageCategory} from '../../message/messageCategory';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';

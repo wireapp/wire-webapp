@@ -23,7 +23,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -32,6 +31,7 @@ import {PanelActions} from './panelActions';
 import {listCSS} from './panelActions/panelActions.styles';
 import {SingleAction} from './singleAction/singleAction';
 
+import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols/mls';
 import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from '../../page/rootProvider';
 import {ACCESS_STATE} from '../../repositories/conversation/AccessState';

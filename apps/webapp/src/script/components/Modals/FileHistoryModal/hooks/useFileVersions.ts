@@ -24,8 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RestVersion} from 'cells-sdk-ts';
 import {container} from 'tsyringe';
 
-import {parseQualifiedId} from '@wireapp/core';
-
+import {parseQualifiedId} from '../../../../core';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {UserState} from '../../../../repositories/user/userState';

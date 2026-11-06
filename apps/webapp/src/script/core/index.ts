@@ -17,7 +17,7 @@
  *
  */
 
-export {Account, ProcessedEventPayload, type WebSocketConnectionContext} from './account';
+export {Account, type ProcessedEventPayload, type WebSocketConnectionContext} from './account';
 export {ConnectionState} from './connectionState/connectionState';
 export * as auth from './auth/';
 export * from './conversation/';
