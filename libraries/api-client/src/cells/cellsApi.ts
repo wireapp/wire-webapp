@@ -874,7 +874,6 @@ export class CellsAPI {
           return {Path};
         }) as RestSelection['Nodes'],
       },
-
       {
         signal: abortController?.signal,
         'axios-retry': {retries: 0},
@@ -920,6 +919,9 @@ export class CellsAPI {
       normalizedContentType.length > 0 &&
       !supportedContentTypes.has(normalizedContentType)
     ) {
+      await body.cancel().catch(() => {
+        return undefined;
+      });
       throw new Error(`Cells returned an unexpected archive content type: ${normalizedContentType}`);
     }
 
