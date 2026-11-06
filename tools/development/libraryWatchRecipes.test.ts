@@ -42,9 +42,9 @@ describe('getSelectedLibraryWatchCommands', () => {
     }).toThrow('Unknown development library selection: missing');
   });
 
-  it('rejects the removed IndexedDB engine workspace', () => {
+  it('rejects the removed storage engine workspace', () => {
     expect(() => {
-      getSelectedLibraryWatchCommands({libraryNames: ['store-engine-dexie']});
-    }).toThrow('Unknown development library selection: store-engine-dexie');
+      getSelectedLibraryWatchCommands({libraryNames: ['store-engine']});
+    }).toThrow('Unknown development library selection: store-engine');
   });
 });

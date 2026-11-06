@@ -58,7 +58,6 @@ const config: Config = {
   },
   // Must be in sync with tsconfig.json >> paths
   moduleNameMapper: {
-    '^@wireapp/store-engine$': '<rootDir>/../../libraries/store-engine/src/index',
     '^@enormora/clock/clock$': '<rootDir>/../../node_modules/@enormora/clock/clock.entry-point.js',
     '^@enormora/clock/deterministic-clock$': '<rootDir>/../../node_modules/@enormora/clock/deterministic-clock.js',
     '^@enormora/fire-and-forget$': '<rootDir>/../../node_modules/@enormora/fire-and-forget/index.js',

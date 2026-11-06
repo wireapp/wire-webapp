@@ -120,7 +120,6 @@
     "@types/speakingurl": "13.0.6",
     "@types/underscore": "1.13.0",
     "@types/wicg-file-system-access": "2023.10.7",
-    "@wireapp/store-engine": "5.1.19",
     "autoprefixer": "10.6.2",
     "babel-jest": "30.5.2",
     "babel-plugin-transform-import-meta": "2.3.3",

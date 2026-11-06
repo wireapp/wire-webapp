@@ -68,7 +68,6 @@ type-check: build-libraries
     tsc --project ./libraries/config/tsconfig.type-check.json
     tsc --project ./libraries/core/tsconfig.type-check.json
     tsc --project ./libraries/react-ui-kit/tsconfig.type-check.json
-    tsc --project ./libraries/store-engine/tsconfig.type-check.json
     tsc --project ./libraries/telemetry/tsconfig.type-check-esm.json
     tsc --project ./libraries/telemetry/tsconfig.type-check-commonjs.json
     tsc --project ./libraries/telemetry/tsconfig.type-check.json
@@ -79,7 +78,6 @@ build-libraries:
     cd libraries/commons && tsc
     cd libraries/config && tsc
     cd libraries/react-ui-kit && tsc
-    cd libraries/store-engine && tsc
     cd libraries/telemetry && node bin/copyAssets.mts
     cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json
     cd libraries/api-client && tsc
@@ -142,7 +140,6 @@ develop: prepare-development-server
         "just watch-library core" \
         "just watch-library api-client" \
         "just watch-library react-ui-kit" \
-        "just watch-library store-engine" \
         "just watch-library-telemetry"
 
 # Alternative to develop: build dependencies, select libraries, and start the server.
@@ -168,7 +165,7 @@ run-development-server:
 [group('development')]
 watch-library library:
     case {{ quote(library) }} in \
-        api-client|commons|config|core|react-ui-kit|store-engine) ;; \
+        api-client|commons|config|core|react-ui-kit) ;; \
         *) echo "Unknown library: {{ quote(library) }}" >&2; exit 2 ;; \
     esac
     tsc --project {{ quote("libraries/" + library + "/tsconfig.json") }} --watch --preserveWatchOutput
