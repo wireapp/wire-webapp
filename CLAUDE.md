@@ -7,17 +7,17 @@ apps/
 ├── webapp/           # React frontend application
 └── server/           # Node.js/Express backend API
 libraries/
-└── core/             # @wireapp/core - Wire's communication core library
+└── …                 # Shared workspace libraries
 ```
 
-## Core Library (`@wireapp/core`)
+## Communication core
 
-Located in `libraries/core/`, this is Wire's communication core library that provides:
+Located in `apps/webapp/src/script/core/`, the communication core provides:
 - Account authentication and management
 - WebSocket connections for real-time communication
 - Protocol message handling (send/receive Protobuf messages)
 - Cryptographic operations for secure messaging
 
-The webapp depends on this library for all backend communication. When making changes to core functionality:
+The webapp uses these modules for all backend communication. When making changes to core functionality:
 - Run unit tests: `npx just test`
 - Build workspace libraries: `npx just build-libraries`
