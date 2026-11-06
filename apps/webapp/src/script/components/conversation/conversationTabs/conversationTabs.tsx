@@ -21,11 +21,11 @@ import {useCallback, KeyboardEvent, MouseEvent, useEffect, useState, type Functi
 
 import {isNonEmptyString, isNull} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {maybe} from 'true-myth';
 
 import {SharedDriveUploadCompletedIcon, SharedDriveUploadSpinnerIcon} from '@wireapp/react-ui-kit';
 
+import {stringifyQualifiedId} from '../../../core/util/qualifiedIdUtil';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {generateConversationUrl} from '../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../router/routerBindings';

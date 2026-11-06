@@ -18,14 +18,16 @@
  */
 
 const {TextDecoder, TextEncoder} = require('util');
-const rootJestConfiguration = require('../../jest.config.js');
+const rootJestConfiguration = require('../../../../jest.config.js');
 
 module.exports = {
+  rootDir: '../..',
+  roots: ['<rootDir>/src/script/core', '<rootDir>/test/core'],
   displayName: 'core-lib',
   testEnvironment: 'node',
   clearMocks: true,
   cacheDirectory: '../../target/jest/cache',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/test/core/jest.setup.ts'],
   globals: {
     TextDecoder,
     TextEncoder,
@@ -40,7 +42,7 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!(true-myth|uuid|noop-esm|p-queue|p-timeout|eventemitter3|@sindresorhus/is|@faker-js/faker|@enormora/fire-and-forget)/)',
   ],
-  coverageDirectory: '../../target/coverage/libraries/core',
+  coverageDirectory: '../../target/coverage/apps/webapp/core',
   coverageThreshold: {
     global: {
       branches: 49,
@@ -50,7 +52,10 @@ module.exports = {
     },
   },
   coverageReporters: rootJestConfiguration.coverageReporters,
-  testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
+  testMatch: [
+    '<rootDir>/src/script/core/**/__tests__/**/*.[jt]s?(x)',
+    '<rootDir>/src/script/core/**/?(*.)+(spec|test).[jt]s?(x)',
+  ],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
   reporters: rootJestConfiguration.reporters,
 };

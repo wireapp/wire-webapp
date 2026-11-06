@@ -20,10 +20,10 @@
 import {isNonEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
 import type {MessageSendingStatus, QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClientsUtil';
-import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {difference, intersection} from 'underscore';
 
+import {flattenUserMap} from '../../core/conversation/message/userClientsUtil';
+import {isQualifiedUserClients} from '../../core/util';
 import {matchQualifiedIds} from '../../util/qualifiedId';
 import {User} from '../entity/User';
 

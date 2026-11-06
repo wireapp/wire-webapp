@@ -25,18 +25,18 @@ import 'fake-indexeddb/auto';
 import {Dexie} from 'dexie';
 import {v4 as uuidv4} from 'uuid';
 
-import {createSpec} from '../../../../../../libraries/core/src/test/storage/createSpec';
-import {deleteAllSpec} from '../../../../../../libraries/core/src/test/storage/deleteAllSpec';
-import {deleteSpec} from '../../../../../../libraries/core/src/test/storage/deleteSpec';
-import {purgeSpec} from '../../../../../../libraries/core/src/test/storage/purgeSpec';
-import {readAllPrimaryKeysSpec} from '../../../../../../libraries/core/src/test/storage/readAllPrimaryKeysSpec';
-import {readAllSpec} from '../../../../../../libraries/core/src/test/storage/readAllSpec';
-import {readSpec} from '../../../../../../libraries/core/src/test/storage/readSpec';
-import {updateOrCreateSpec} from '../../../../../../libraries/core/src/test/storage/updateOrCreateSpec';
-import {updateSpec} from '../../../../../../libraries/core/src/test/storage/updateSpec';
-import type {StorageErrorConstructors} from '../../../../../../libraries/core/src/test/storage/storageErrorConstructors';
+import {createSpec} from '../../core/test/storage/createSpec';
+import {deleteAllSpec} from '../../core/test/storage/deleteAllSpec';
+import {deleteSpec} from '../../core/test/storage/deleteSpec';
+import {purgeSpec} from '../../core/test/storage/purgeSpec';
+import {readAllPrimaryKeysSpec} from '../../core/test/storage/readAllPrimaryKeysSpec';
+import {readAllSpec} from '../../core/test/storage/readAllSpec';
+import {readSpec} from '../../core/test/storage/readSpec';
+import {updateOrCreateSpec} from '../../core/test/storage/updateOrCreateSpec';
+import {updateSpec} from '../../core/test/storage/updateSpec';
+import type {StorageErrorConstructors} from '../../core/test/storage/storageErrorConstructors';
 
-import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from '@wireapp/core/lib/storage/engine/error';
+import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from '../../core/storage/engine/error';
 
 import {IndexedDBEngine} from './indexedDatabaseEngine';
 

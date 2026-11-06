@@ -17,7 +17,7 @@
  *
  */
 
-import * as cryptoLib from 'crypto';
+import {createHash, createDecipheriv, randomBytes, createCipheriv} from 'node:crypto';
 
 import {Crypto} from './interfaces';
 
@@ -25,14 +25,14 @@ const initializationVectorLengthInBytes = 16;
 
 export const crypto: Crypto = {
   async digest(cipherText: Uint8Array): Promise<Uint8Array> {
-    return cryptoLib.createHash('SHA256').update(cipherText).digest();
+    return createHash('SHA256').update(cipherText).digest();
   },
 
   async decrypt(cipherText: Uint8Array, keyBytes: Uint8Array): Promise<Uint8Array> {
     const initializationVector = cipherText.slice(0, initializationVectorLengthInBytes);
     const assetCipherText = cipherText.slice(initializationVectorLengthInBytes);
 
-    const decipher = cryptoLib.createDecipheriv('AES-256-CBC', keyBytes, initializationVector);
+    const decipher = createDecipheriv('AES-256-CBC', keyBytes, initializationVector);
     const decipherUpdated = decipher.update(assetCipherText);
     const decipherFinal = decipher.final();
 
@@ -40,7 +40,7 @@ export const crypto: Crypto = {
   },
 
   getRandomValues(size: number): Uint8Array {
-    return cryptoLib.randomBytes(size);
+    return randomBytes(size);
   },
 
   async encrypt(
@@ -49,7 +49,7 @@ export const crypto: Crypto = {
     initializationVector: Uint8Array,
     algorithm: string,
   ): Promise<{key: Uint8Array; cipher: Uint8Array}> {
-    const cipher = cryptoLib.createCipheriv(algorithm, keyBytes, initializationVector);
+    const cipher = createCipheriv(algorithm, keyBytes, initializationVector);
     const cipherUpdated = cipher.update(plainText);
     const cipherFinal = cipher.final();
 

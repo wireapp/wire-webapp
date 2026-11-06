@@ -79,9 +79,7 @@ const ignores = [
   'apps/webapp/src/script/localization/**/webapp*.js',
   'apps/webapp/src/worker/',
   'apps/webapp/src/script/components/icon.tsx',
-  'libraries/core/lib/',
   'libraries/api-client/lib/',
-  'libraries/core/.tmp/',
   'libraries/config/lib/',
   'libraries/react-ui-kit/lib/',
   'libraries/*/lib/',
@@ -90,7 +88,6 @@ const ignores = [
 
 const productionFileIgnorePatterns = [
   'apps/webapp/test/**',
-  'libraries/core/src/test/**',
   '**/test/**',
   '**/__mocks__/**',
   '*.js',
@@ -626,7 +623,6 @@ const productionConfigs = [
       'tools/configuration/**/*.{ts,mts}',
       'libraries/api-client/**/*.{ts,tsx}',
       'libraries/commons/**/*.{ts,tsx}',
-      'libraries/core/**/*.{ts,tsx}',
       'libraries/react-ui-kit/**/*.{ts,tsx}',
     ],
     rules: {

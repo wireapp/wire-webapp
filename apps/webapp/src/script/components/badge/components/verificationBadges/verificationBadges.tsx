@@ -22,7 +22,6 @@ import {CSSProperties, useEffect, useMemo, useRef, useState, type FunctionCompon
 import {CSSObject} from '@emotion/react';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
 
 import {
@@ -35,6 +34,7 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
+import {stringifyQualifiedId} from '../../../../core/util/qualifiedIdUtil';
 import {MLSStatuses, WireIdentity} from '../../../../e2eIdentity/e2eIdentityVerification';
 import {useUserIdentity} from '../../../../hooks/useDeviceIdentities';
 import {RootContextValue, useApplicationContext} from '../../../../page/rootProvider';

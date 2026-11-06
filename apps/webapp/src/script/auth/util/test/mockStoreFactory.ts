@@ -24,7 +24,7 @@ import {withExtraArgument} from 'redux-thunk';
 
 import type {APIClient} from '@wireapp/api-client';
 import type {TypeUtil} from '@wireapp/commons';
-import type {Account} from '@wireapp/core';
+import type {Account} from '../../../core';
 
 import {ActionRoot, actionRoot} from '../../module/action/';
 import type {RootState, ThunkDispatch} from '../../module/reducer';

@@ -386,7 +386,7 @@ jobs:
           path: |
             target/coverage/apps/webapp
             target/coverage/apps/server
-            target/coverage/libraries/core
+            target/coverage/apps/webapp/core
             target/coverage/libraries/api-client
 
   public-production-package:

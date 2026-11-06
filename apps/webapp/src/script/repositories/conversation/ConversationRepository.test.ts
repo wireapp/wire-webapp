@@ -50,7 +50,7 @@ import {
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
+import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';

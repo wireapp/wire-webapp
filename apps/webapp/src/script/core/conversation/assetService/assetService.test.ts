@@ -23,12 +23,13 @@ import {noop} from 'noop-esm';
 import {APIClient} from '@wireapp/api-client';
 
 import {AssetService} from './assetService';
+import {crypto as nodeCrypto} from '../../cryptography/assetCryptography/crypto.node';
 
 describe('AssetService', () => {
   describe('downloadRawAsset', () => {
     it('downloads remote assets and passes the progress callback as the final argument', () => {
       const apiClient = new APIClient();
-      const assetService = new AssetService(apiClient);
+      const assetService = new AssetService(apiClient, nodeCrypto);
       const progressCallback = jest.fn();
       const request = {
         cancel: noop,
@@ -62,7 +63,7 @@ describe('AssetService', () => {
 
     it('builds an encrypted asset payload', async () => {
       apiClient = new APIClient();
-      const assetService = new AssetService(apiClient);
+      const assetService = new AssetService(apiClient, nodeCrypto);
 
       const assetServerData = {
         domain: 'asset-server.test.wire.com',
@@ -90,7 +91,7 @@ describe('AssetService', () => {
 
     it('allows cancelling asset upload', async () => {
       apiClient = new APIClient();
-      const assetService = new AssetService(apiClient);
+      const assetService = new AssetService(apiClient, nodeCrypto);
 
       const apiUpload = {
         cancel: jest.fn(),
@@ -106,7 +107,7 @@ describe('AssetService', () => {
 
     it('exposes upload progress', async () => {
       apiClient = new APIClient();
-      const assetService = new AssetService(apiClient);
+      const assetService = new AssetService(apiClient, nodeCrypto);
 
       const apiUpload = {
         cancel: jest.fn(),

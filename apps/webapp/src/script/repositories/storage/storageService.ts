@@ -18,8 +18,6 @@
  */
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import type {CRUDEngine} from '@wireapp/core/lib/storage/engine/crudEngine';
-import {RecordNotFoundError} from '@wireapp/core/lib/storage/engine/error';
 import {Dexie, Transaction} from 'dexie';
 import {singleton} from 'tsyringe';
 
@@ -27,6 +25,8 @@ import {DexieDatabase} from './dexieDatabase';
 import {IndexedDBEngine} from './indexedDatabaseEngine';
 import {StorageSchemata} from './storageSchemata';
 
+import type {CRUDEngine} from '../../core/storage/engine/crudEngine';
+import {RecordNotFoundError} from '../../core/storage/engine/error';
 import {StorageError} from '../../error/storageError';
 import {Logger, getLogger} from '../../util/logger';
 import {loadValue, storeValue} from '../../util/storageUtil';

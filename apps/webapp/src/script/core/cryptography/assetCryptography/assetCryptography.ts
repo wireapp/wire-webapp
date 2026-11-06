@@ -19,13 +19,14 @@
 
 import {CipherOptions} from '@wireapp/api-client/lib/asset';
 
-import {crypto} from './crypto.node';
+import {crypto as browserCrypto} from './crypto.browser';
 import {EncryptedAsset} from './encryptedAsset';
+import type {Crypto} from './interfaces';
 
 const initializationVectorLengthInBytes = 16;
 const encryptionKeyLengthInBytes = 32;
 
-const isEqual = (firstBytes: Uint8Array, secondBytes: Uint8Array): boolean => {
+function isEqual(firstBytes: Uint8Array, secondBytes: Uint8Array): boolean {
   const firstByteValues = new Uint32Array(firstBytes);
   const secondByteValues = new Uint32Array(secondBytes);
 
@@ -35,17 +36,14 @@ const isEqual = (firstBytes: Uint8Array, secondBytes: Uint8Array): boolean => {
   });
 
   return hasSameLength && hasSameValues;
-};
+}
 
 interface EncryptOptions extends CipherOptions {
   plainText: Uint8Array;
 }
 
-export const decryptAsset = async ({
-  cipherText,
-  keyBytes,
-  sha256: referenceSha256,
-}: EncryptedAsset): Promise<Uint8Array> => {
+export async function decryptAsset(asset: EncryptedAsset, crypto: Crypto = browserCrypto): Promise<Uint8Array> {
+  const {cipherText, keyBytes, sha256: referenceSha256} = asset;
   const computedSha256 = await crypto.digest(cipherText);
 
   if (!isEqual(computedSha256, referenceSha256)) {
@@ -53,9 +51,10 @@ export const decryptAsset = async ({
   }
 
   return crypto.decrypt(cipherText, keyBytes);
-};
+}
 
-export const encryptAsset = async ({plainText, algorithm = 'AES-256-CBC'}: EncryptOptions): Promise<EncryptedAsset> => {
+export async function encryptAsset(options: EncryptOptions, crypto: Crypto = browserCrypto): Promise<EncryptedAsset> {
+  const {plainText, algorithm = 'AES-256-CBC'} = options;
   const initializationVector = crypto.getRandomValues(initializationVectorLengthInBytes);
   const rawKeyBytes = crypto.getRandomValues(encryptionKeyLengthInBytes);
 
@@ -72,4 +71,4 @@ export const encryptAsset = async ({plainText, algorithm = 'AES-256-CBC'}: Encry
     keyBytes: key,
     sha256,
   };
-};
+}

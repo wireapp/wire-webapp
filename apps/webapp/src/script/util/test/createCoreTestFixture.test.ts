@@ -17,13 +17,13 @@
  *
  */
 
-import {Account} from '@wireapp/core';
-import {Account as AccountImplementation} from '@wireapp/core/lib/account';
+import {Account} from '../../core';
+import {Account as AccountImplementation} from '../../core/account';
 
 import {createCoreTestFixture} from './createCoreTestFixture';
 
 describe('explicit core test fixtures', () => {
-  it('loads the real Account through the package entry', () => {
+  it('loads the real Account through the core entry', () => {
     expect(Account).toBe(AccountImplementation);
     expect(jest.isMockFunction(Account)).toBe(false);
     expect(Object.getOwnPropertyDescriptor(Account.prototype, 'clientId')?.get).toBeDefined();

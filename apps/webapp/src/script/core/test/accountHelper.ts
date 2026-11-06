@@ -22,7 +22,7 @@ import type {Account as AccountType} from '../account';
 const {ClientType} = require('@wireapp/api-client/lib/client');
 
 const {APIClient} = require('@wireapp/api-client');
-const {Account} = require('@wireapp/core');
+const {Account} = require('..');
 
 const StoreHelper = require('./storeHelper');
 

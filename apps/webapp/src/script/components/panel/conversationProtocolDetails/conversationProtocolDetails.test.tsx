@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Ciphersuite} from '@wireapp/core';
+import {Ciphersuite} from '../../../core';
 
 import {translateForTest} from '../../../util/test/translateForTest';
 import {

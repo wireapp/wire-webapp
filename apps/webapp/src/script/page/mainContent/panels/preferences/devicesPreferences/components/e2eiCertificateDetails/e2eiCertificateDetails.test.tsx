@@ -19,7 +19,7 @@
 
 import {render, waitFor} from '@testing-library/react';
 import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conversation';
-import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
+import {CredentialType} from '../../../../../../../core/messagingProtocols/mls';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';

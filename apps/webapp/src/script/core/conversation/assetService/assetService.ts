@@ -24,6 +24,8 @@ import {APIClient} from '@wireapp/api-client';
 
 import {EncryptedAsset, EncryptedAssetUploaded} from '../../cryptography';
 import {decryptAsset, encryptAsset} from '../../cryptography/assetCryptography/assetCryptography';
+import {crypto as browserCrypto} from '../../cryptography/assetCryptography/crypto.browser';
+import type {Crypto} from '../../cryptography/assetCryptography/interfaces';
 import {toBufferSource} from '../../util/bufferUtils';
 
 export {ProgressCallback};
@@ -35,7 +37,10 @@ export type AssetUrlData = {
 };
 
 export class AssetService {
-  constructor(private readonly apiClient: APIClient) {}
+  constructor(
+    private readonly apiClient: APIClient,
+    private readonly crypto: Crypto = browserCrypto,
+  ) {}
 
   /**
    * Will download an asset on the server.
@@ -86,11 +91,10 @@ export class AssetService {
     options?: AssetOptions,
     progressCallback?: ProgressCallback,
   ): Promise<RequestCancelable<EncryptedAssetUploaded>> {
-    const {cipherText, keyBytes, sha256} = await encryptAsset({
-      plainText,
-      algorithm: options?.algorithm,
-      hash: options?.hash,
-    });
+    const {cipherText, keyBytes, sha256} = await encryptAsset(
+      {plainText, algorithm: options?.algorithm, hash: options?.hash},
+      this.crypto,
+    );
 
     const request = this.uploadRawAsset(cipherText, options, progressCallback);
 
@@ -111,7 +115,7 @@ export class AssetService {
   }
 
   public decryptAsset(asset: EncryptedAsset): Promise<Uint8Array> {
-    return decryptAsset(asset);
+    return decryptAsset(asset, this.crypto);
   }
 
   /**
@@ -132,11 +136,10 @@ export class AssetService {
 
     return {
       response: response.then(async response => {
-        const decrypted = await decryptAsset({
-          cipherText: new Uint8Array(response.buffer),
-          keyBytes: otrKey,
-          sha256: sha256,
-        });
+        const decrypted = await decryptAsset(
+          {cipherText: new Uint8Array(response.buffer), keyBytes: otrKey, sha256},
+          this.crypto,
+        );
         return {
           ...response,
           buffer: toBufferSource(decrypted).buffer,
