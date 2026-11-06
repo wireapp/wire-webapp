@@ -98,7 +98,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   const canPerformCellsAction = useCellsActionPermissions();
   const currentPath = getCurrentCellsPath();
   const breadcrumbs = getBreadcrumbsFromPath({
-    baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
+    baseCrumb: translate('cells.breadcrumb.files', {conversationName}, undefined, true),
     currentPath,
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
