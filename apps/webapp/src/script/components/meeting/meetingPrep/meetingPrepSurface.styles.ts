@@ -107,6 +107,12 @@ export const meetingPrepDeviceMenuStyles: CSSObject = {
   transform: 'none',
   width: 'min(320px, calc(100vw - 32px))',
   maxWidth: 'calc(100vw - 32px)',
+  '@media (max-height: 500px)': {
+    '& [role="listbox"]': {
+      maxHeight: 170,
+      overflowY: 'auto',
+    },
+  },
 };
 
 export const meetingPrepAvatarStyles: CSSObject = {
