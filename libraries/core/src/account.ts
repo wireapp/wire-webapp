@@ -53,7 +53,6 @@ import {TimeoutError} from 'p-queue';
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
 import {LogFactory, StringUtil, TypedEventEmitter} from '@wireapp/commons';
 import type {CoreCryptoLogLevel} from '@wireapp/core-crypto';
-import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 
 import {AccountService} from './account/';
 import {LoginSanitizer} from './auth/';
@@ -101,6 +100,8 @@ import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from '
 import {generateSecretKey} from './secretStore/secretKeyGenerator';
 import {SelfService} from './self/';
 import {CoreDatabase, deleteDB, openDB} from './storage/coreDb';
+import {CRUDEngine} from './storage/engine/CRUDEngine';
+import {MemoryEngine} from './storage/engine/MemoryEngine';
 import {TeamService} from './team/';
 import {UserService} from './user/';
 import {LocalStorageStore} from './util/localStorageStore';

@@ -30,7 +30,6 @@ import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event
 import type {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 
 import {LogFactory} from '@wireapp/commons';
-import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptoClient, InitialPrekeys} from './cryptoClient';
 import {cryptoMigrationStore} from './cryptoMigrationStateStore';
@@ -54,6 +53,7 @@ import {
 import {MessageService} from '../../../conversation/message/messageService';
 import {NonFederatingBackendsError} from '../../../errors';
 import {HandledEventPayload} from '../../../notification';
+import type {CRUDEngine} from '../../../storage/engine/CRUDEngine';
 import {handleOtrMessageAdd} from '../eventHandler/events';
 import {getGenericMessageParams} from '../utility/getGenericMessageParams';
 import {isClearFromMismatch} from '../utility/isClearFromMismatch';

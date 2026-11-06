@@ -22,10 +22,10 @@ import {PreKey} from '@wireapp/api-client/lib/auth';
 
 import {Cryptobox} from '@wireapp/cryptobox';
 import {keys as ProteusKeys} from '@wireapp/proteus';
-import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptoClient, InitialPrekeys} from './cryptoClient.types';
 
+import type {CRUDEngine} from '../../../../storage/engine/CRUDEngine';
 import {toArrayBuffer} from '../../../../util/bufferUtils';
 
 type Config = {

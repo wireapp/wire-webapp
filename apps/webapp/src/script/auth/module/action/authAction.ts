@@ -26,7 +26,7 @@ import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api
 import {OAuthBody} from '@wireapp/api-client/lib/oauth/oAuthBody';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import type {TeamData} from '@wireapp/api-client/lib/team/';
-import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
+import {LowDiskSpaceError} from '@wireapp/core/lib/storage/engine/error';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import {asyncNoop} from 'noop-esm';
 

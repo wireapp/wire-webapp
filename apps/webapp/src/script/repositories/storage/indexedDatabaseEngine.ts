@@ -17,10 +17,16 @@
  *
  */
 
+import type {CRUDEngine} from '@wireapp/core/lib/storage/engine/CRUDEngine';
+import {
+  LowDiskSpaceError,
+  RecordAlreadyExistsError,
+  RecordNotFoundError,
+  RecordTypeError,
+  UnsupportedError,
+} from '@wireapp/core/lib/storage/engine/error';
 import {Dexie, DexieError, IndexableType} from 'dexie';
 import logdown from 'logdown';
-
-import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 
 type DexieObservable = {_dbSchema?: Object};
 
@@ -60,7 +66,7 @@ export class IndexedDBEngine implements CRUDEngine {
         };
       });
     }
-    return Promise.reject(new StoreEngineError.UnsupportedError('Could not find indexedDB in global scope'));
+    return Promise.reject(new UnsupportedError('Could not find indexedDB in global scope'));
   }
 
   /** @see https://developers.google.com/web/updates/2017/08/estimating-available-storage-space */
@@ -72,7 +78,7 @@ export class IndexedDBEngine implements CRUDEngine {
         const diskIsFull = usage >= quota;
         if (diskIsFull) {
           const errorMessage = `Out of disk space. Using "${usage}" out of "${quota}" bytes.`;
-          throw new StoreEngineError.LowDiskSpaceError(errorMessage);
+          throw new LowDiskSpaceError(errorMessage);
         }
       }
     }
@@ -128,10 +134,10 @@ export class IndexedDBEngine implements CRUDEngine {
 
     if (isAlreadyExisting) {
       const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
-      return new StoreEngineError.RecordAlreadyExistsError(message);
+      return new RecordAlreadyExistsError(message);
     } else if (hasNotEnoughDiskSpace) {
       const message = `Cannot save "${primaryKey}" in "${tableName}" because there is low disk space.`;
-      return new StoreEngineError.LowDiskSpaceError(message);
+      return new LowDiskSpaceError(message);
     }
     return error;
   }
@@ -150,7 +156,7 @@ export class IndexedDBEngine implements CRUDEngine {
       }
     }
     const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
-    throw new StoreEngineError.RecordTypeError(message);
+    throw new RecordTypeError(message);
   }
 
   public async delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
@@ -183,7 +189,7 @@ export class IndexedDBEngine implements CRUDEngine {
       return record;
     }
     const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
-    throw new StoreEngineError.RecordNotFoundError(message);
+    throw new RecordNotFoundError(message);
   }
 
   public readAll<EntityType>(tableName: string): Promise<EntityType[]> {
@@ -226,7 +232,7 @@ export class IndexedDBEngine implements CRUDEngine {
     const updatedRecords = await this.db.table(tableName).update(primaryKey, changes);
     if (updatedRecords === 0) {
       const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
-      throw new StoreEngineError.RecordNotFoundError(message);
+      throw new RecordNotFoundError(message);
     }
     return primaryKey;
   }
