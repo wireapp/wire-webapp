@@ -17,7 +17,7 @@
  *
  */
 
-import type {Configuration, rspack as rspackFactory} from '@rspack/core';
+import type {Configuration} from '@rspack/core';
 import type {RspackDevServer} from '@rspack/dev-server';
 import {isNullOrUndefined, isObject, isString, isTruthy} from '@sindresorhus/is';
 import express, {Router} from 'express';
@@ -49,6 +49,8 @@ type SitemapPage = {
   changeFreq: string;
   url: string;
 };
+
+type RspackDevServerOptions = ConstructorParameters<typeof RspackDevServer>[0];
 
 class Server {
   private readonly app: express.Express;
@@ -290,7 +292,9 @@ class Server {
   private async startRspackDevelopmentServer(): Promise<number> {
     const rspackConfigurationPath = path.resolve(process.cwd(), 'apps/webapp/rspack.config.dev.mts');
     const nativeRequire = createRequire(__filename);
-    type RspackCoreModule = {readonly rspack: typeof rspackFactory};
+    type RspackCoreModule = {
+      readonly rspack: (configuration: Configuration) => ConstructorParameters<typeof RspackDevServer>[1];
+    };
     type RspackDevServerModule = {readonly RspackDevServer: typeof RspackDevServer};
     const rspackCore = nativeRequire('@rspack/core') as RspackCoreModule;
     const rspackDevServer = nativeRequire('@rspack/dev-server') as RspackDevServerModule;
@@ -300,6 +304,8 @@ class Server {
     if (!isObject(rspackConfiguration.devServer)) {
       throw new Error('The Rspack development configuration must define devServer options.');
     }
+
+    const rspackDevServerConfiguration = rspackConfiguration.devServer as RspackDevServerOptions;
 
     const appBaseHostname = new URL(this.config.APP_BASE).hostname;
     const serverOptions = this.config.DEVELOPMENT_ENABLE_TLS
@@ -314,7 +320,7 @@ class Server {
     const compiler = rspackCore.rspack(rspackConfiguration);
     const developmentServer = new rspackDevServer.RspackDevServer(
       {
-        ...rspackConfiguration.devServer,
+        ...rspackDevServerConfiguration,
         allowedHosts: [appBaseHostname, 'localhost', '127.0.0.1'],
         app: async () => {
           const application = express();
