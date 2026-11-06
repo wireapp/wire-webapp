@@ -95,7 +95,7 @@ build-server: build-libraries
 [group('build')]
 build-webapp-internal: build-libraries
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal node_modules/.bin/rspack build --config rspack.config.mts
+    cd apps/webapp && PATH="node_modules/.bin:$PATH" WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal rspack build --config rspack.config.mts
 
 # Build and assemble the internal server deployment artifact as a ZIP.
 [group('build')]
@@ -114,13 +114,13 @@ package-server-public: build-server build-webapp-public
 [group('build')]
 build-webapp-development: build-libraries
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development node_modules/.bin/rspack build --config rspack.config.dev.mts
+    cd apps/webapp && PATH="node_modules/.bin:$PATH" WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development rspack build --config rspack.config.dev.mts
 
 # Build the public production webapp with Rspack.
 [group('build')]
 build-webapp-public: build-libraries
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public node_modules/.bin/rspack build --config rspack.config.public.mts
+    cd apps/webapp && PATH="node_modules/.bin:$PATH" WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public rspack build --config rspack.config.public.mts
 
 # Prepare compiled server output for local development after building its workspace dependencies.
 [group('development')]
