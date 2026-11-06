@@ -611,6 +611,7 @@
   "cells.selection.move": "Move",
   "cells.selection.moveToBin": "Move to bin",
   "cells.selection.selectItem": "Select {name}",
+  "cells.selection.allItemsOnPage": "all items on this page",
   "cells.selection.selectedCount": "{count} selected",
   "cells.selfDeletingMessage.info": "The feature is not available for conversations with a shared Drive.",
   "cells.shareModal.changePassword": "Change Password",
