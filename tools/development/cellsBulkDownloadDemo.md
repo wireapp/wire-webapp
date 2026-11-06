@@ -4,6 +4,8 @@ This developer-only script calls the real Cells API client. It creates a v2 sele
 
 ## Prerequisites
 
+Run the script with `--help` for required environment variables, prerequisites, and a copyable example. Missing configuration errors name the variable; request/SDK errors stay generic to avoid leaking credentials or response details, and point back to `--help` and this guide.
+
 - Node.js version required by the repository and `unzip` on `PATH`.
 - A Cells environment reachable through its Wire gateway, a normal Wire user access token with download permission, and the Cells S3 endpoint settings for that environment.
 - Known, non-empty fixture files/folders accessible to that user. Use workspace-qualified paths, for example `team-slug/Drive/example.txt`.
