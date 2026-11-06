@@ -22,6 +22,8 @@ import {noop} from 'noop-esm';
 import {match} from 'ts-pattern';
 import {Maybe} from 'true-myth';
 
+import {readFileSync} from 'node:fs';
+
 type RuntimeDiagnostics = {
   readonly uncaughtPageErrors: string[];
   readonly failedLocalRequests: string[];
@@ -153,6 +155,7 @@ test('loads the application entry points and redirects an unauthenticated visito
       '/min/vendor.js',
       '/min/runtime.js',
       '/min/app.js',
+      '/libs/wire/telemetry/embed.js',
     ],
   });
   expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
@@ -188,6 +191,7 @@ test('initializes authentication and navigates to an interactive login form', as
       '/min/vendor.js',
       '/min/runtime.js',
       '/min/auth.js',
+      '/libs/wire/telemetry/embed.js',
     ],
   });
 
@@ -201,4 +205,21 @@ test('initializes authentication and navigates to an interactive login form', as
   await passwordInput.fill('rspack-smoke-password');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeEnabled();
   expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
+});
+
+test('serves the unmodified standalone Countly SDK without initializing telemetry', async ({page, request}) => {
+  const sdkResponse = await request.get('/libs/wire/telemetry/embed.js');
+  const actualSdk = await sdkResponse.body();
+  const expectedSdk = readFileSync(require.resolve('countly-sdk-web/lib/countly.min.js'));
+
+  expect(sdkResponse.status()).toBe(200);
+  expect(actualSdk.equals(expectedSdk)).toBe(true);
+
+  await page.goto('/auth');
+  await expect(page.getByRole('button', {name: 'Create account'})).toBeVisible();
+  const providerState = await page.evaluate(() => {
+    return {initializationType: typeof window.Countly.init, apiKey: window.Countly.app_key};
+  });
+
+  expect(providerState).toEqual({initializationType: 'function', apiKey: undefined});
 });

@@ -17,7 +17,7 @@
  *
  */
 
-import {Countly, type CountlyConsentFeatures} from './countly.js';
+import {Countly, type CountlyConsentFeatures} from './countly';
 
 declare global {
   interface Window {
@@ -160,9 +160,10 @@ interface InitializeConfig {
  * Initializes the analytics library with the provided configuration.
  * @param {InitilaizeConfig} config - The configuration options.
  */
-export const initialize = (config: InitializeConfig): void => {
+export function initialize(config: InitializeConfig): void {
   if (!isLoaded()) {
     console.error('Telemetry script not loaded');
+
     return;
   }
 
@@ -201,46 +202,47 @@ export const initialize = (config: InitializeConfig): void => {
   }
 
   window.Countly.init();
-};
+}
 
 /**
  * Checks if the analytics provider has been successfully loaded and is available for use.
  */
-export const isLoaded = (): boolean => {
+export function isLoaded(): boolean {
   const loaded = 'Countly' in window;
   if (!loaded) {
     console.warn('Countly is not available');
   }
+
   return loaded;
-};
+}
 
 /**
  * Sets user data in the analytics provider.
  * @param {Record<string, Value>} userData - An object where the keys are the user data properties and the values are the corresponding data.
  * @template Value - The type of the user data values (string, number, or boolean).
  */
-export const setUserData = <Value = string | number | boolean>(userData: Record<string, Value>): void => {
+export function setUserData<Value = string | number | boolean>(userData: Record<string, Value>): void {
   Object.entries(userData).forEach(entry => {
     const [key, value] = entry;
     window.Countly.q.push(['userData.set', key, value]);
   });
 
   window.Countly.q.push(['userData.save']);
-};
+}
 
 /**
  * Manually starts a new user session
  */
-export const beginSession = (): void => {
+export function beginSession(): void {
   window.Countly.q.push(['begin_session']);
-};
+}
 
 /**
  * Manually ends the current user session
  */
-export const endSession = (): void => {
+export function endSession(): void {
   window.Countly.q.push(['end_session']);
-};
+}
 
 /**
  * Tracks a custom event.
@@ -249,22 +251,20 @@ export const endSession = (): void => {
  * You may also set segments to view a breakdown of the action by providing the segment values.
  *
  */
-export const trackEvent = <SegmentationType = string | number | boolean>({
-  name,
-  count,
-  sum,
-  duration,
-  segmentation,
-}: TelemetryEvent<SegmentationType>): void => {
+export function trackEvent<SegmentationType = string | number | boolean>(
+  options: TelemetryEvent<SegmentationType>,
+): void {
+  const {name, count, sum, duration, segmentation} = options;
+
   window.Countly.q.push(['add_event', {key: name, count, sum, dur: duration, segmentation}]);
-};
+}
 
 /**
  * Automatically track clicks on the last reported view and display them on the heatmap.
  */
-export const trackClicks = (): void => {
+export function trackClicks(): void {
   window.Countly.q.push(['track_clicks']);
-};
+}
 
 /**
  * Tracks a page view.
@@ -274,18 +274,18 @@ export const trackClicks = (): void => {
  *
  * @param {string} location - The URL or location of the page view.
  */
-export const trackPageView = (location?: string): void => {
+export function trackPageView(location?: string): void {
   window.Countly.q.push(['track_pageview', location]);
-};
+}
 
 /**
  * Adds all available consent features to the analytics library.
  *
  * Use this to inform provider of the all features the user has consented to.
  */
-export const addAllConsentFeatures = (): void => {
+export function addAllConsentFeatures(): void {
   window.Countly.q.push(['add_consent', allConsentFeatures]);
-};
+}
 
 /**
  * Removes all available consent features from the analytics library.
@@ -293,9 +293,9 @@ export const addAllConsentFeatures = (): void => {
  * Use this to inform provider of the all features the user has withdrawn consent for.
  *
  */
-export const removeAllConsentFeatures = (): void => {
+export function removeAllConsentFeatures(): void {
   window.Countly.q.push(['remove_consent', allConsentFeatures]);
-};
+}
 
 /**
  * Adds consent features to the analytics library.
@@ -304,9 +304,9 @@ export const removeAllConsentFeatures = (): void => {
  *
  * @param {TelemetryConsentFeatures[]} features - An array of consent features to add.
  */
-export const addConsentFeatures = (features: TelemetryConsentFeatures[]): void => {
+export function addConsentFeatures(features: TelemetryConsentFeatures[]): void {
   window.Countly.q.push(['add_consent', features]);
-};
+}
 
 /**
  * Removes consent features from the analytics library.
@@ -315,9 +315,9 @@ export const addConsentFeatures = (features: TelemetryConsentFeatures[]): void =
  *
  * @param {TelemetryConsentFeatures[]} features - An array of consent features to remove.
  */
-export const removeConsentFeatures = (features: TelemetryConsentFeatures[]): void => {
+export function removeConsentFeatures(features: TelemetryConsentFeatures[]): void {
   window.Countly.q.push(['remove_consent', features]);
-};
+}
 
 /**
  * Changes the device ID in the analytics library.
@@ -328,9 +328,9 @@ export const removeConsentFeatures = (features: TelemetryConsentFeatures[]): voi
  * @param {string} newDeviceId - The new device ID to use.
  * @param {boolean} [merge=false] - Whether to merge data of both user IDs.
  */
-export const changeDeviceId = (newDeviceId: string, merge: boolean = false): void => {
+export function changeDeviceId(newDeviceId: string, merge: boolean = false): void {
   window.Countly.q.push(['change_id', newDeviceId, merge]);
-};
+}
 
 /**
  * Disables offline mode for a specific device.
@@ -340,9 +340,9 @@ export const changeDeviceId = (newDeviceId: string, merge: boolean = false): voi
  *
  * @param {string} deviceId - The device ID for which to disable offline mode.
  */
-export const disableOfflineMode = (deviceId: string): void => {
+export function disableOfflineMode(deviceId: string): void {
   window.Countly.q.push(['disable_offline_mode', deviceId]);
-};
+}
 
 /**
  * Enables offline mode.
@@ -350,16 +350,16 @@ export const disableOfflineMode = (deviceId: string): void => {
  * In offline mode, data is collected but not sent to the server until offline mode is disabled.
  * If consent was enabled, it must be reestablished after enabling offline mode.
  */
-export const enableOfflineMode = (): void => {
+export function enableOfflineMode(): void {
   window.Countly.q.push(['enable_offline_mode']);
-};
+}
 
 /**
  * Returns the underlying analytics provider instance, which provides access to the full analytics library API.
  * @returns {AnalyticsProvider} - The analytics provider instance.
  */
-export const getProviderInstance = (): Countly => {
+export function getProviderInstance(): Countly {
   return window.Countly;
-};
+}
 
 export {CountlyConsentFeatures as TelemetryConsentFeatures};

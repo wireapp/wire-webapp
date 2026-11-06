@@ -67,9 +67,6 @@ type-check: build-libraries
     tsc --project ./libraries/commons/tsconfig.type-check.json
     tsc --project ./libraries/config/tsconfig.type-check.json
     tsc --project ./libraries/react-ui-kit/tsconfig.type-check.json
-    tsc --project ./libraries/telemetry/tsconfig.type-check-esm.json
-    tsc --project ./libraries/telemetry/tsconfig.type-check-commonjs.json
-    tsc --project ./libraries/telemetry/tsconfig.type-check.json
 
 # Build workspace libraries required by dependent tasks such as type-checking and tests.
 [group('build')]
@@ -77,8 +74,6 @@ build-libraries:
     cd libraries/commons && tsc
     cd libraries/config && tsc
     cd libraries/react-ui-kit && tsc
-    cd libraries/telemetry && node bin/copyAssets.mts
-    cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json
     cd libraries/api-client && tsc
 
 # Compile the production server and copy its runtime assets.
@@ -136,8 +131,7 @@ develop: prepare-development-server
         "just watch-library commons" \
         "just watch-library config" \
         "just watch-library api-client" \
-        "just watch-library react-ui-kit" \
-        "just watch-library-telemetry"
+        "just watch-library react-ui-kit"
 
 # Alternative to develop: build dependencies, select libraries, and start the server.
 [group('development')]
@@ -166,12 +160,6 @@ watch-library library:
         *) echo "Unknown library: {{ quote(library) }}" >&2; exit 2 ;; \
     esac
     tsc --project {{ quote("libraries/" + library + "/tsconfig.json") }} --watch --preserveWatchOutput
-
-# Copy telemetry assets and watch both TypeScript module formats.
-[group('development')]
-watch-library-telemetry:
-    cd libraries/telemetry && node bin/copyAssets.mts
-    cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json --watch --preserveWatchOutput
 
 # Configure the webapp, generate its React icon components, and validate their types.
 [group('setup')]

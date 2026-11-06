@@ -1,4 +1,0 @@
-{
-  "extends": "../tsconfig.type-check.json",
-  "include": ["./*.mts"]
-}

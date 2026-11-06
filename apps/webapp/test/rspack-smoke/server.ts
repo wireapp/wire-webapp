@@ -57,7 +57,7 @@ const webappDirectoryPath = path.resolve(smokeTestDirectoryPath, '../..');
 const workspaceRootPath = path.resolve(webappDirectoryPath, '../..');
 const buildMetadataPath = path.resolve(workspaceRootPath, 'apps/server/build/metadata/version.json');
 const environmentDefaultsPath = path.resolve(workspaceRootPath, '.env.defaults');
-const telemetryEmbedAssetPath = path.resolve(workspaceRootPath, 'libraries/telemetry/lib/embed.js');
+const telemetryEmbedAssetPath = fileURLToPath(import.meta.resolve('countly-sdk-web/lib/countly.min.js'));
 
 const contentTypes: Readonly<Record<string, string>> = {
   '.css': 'text/css; charset=utf-8',

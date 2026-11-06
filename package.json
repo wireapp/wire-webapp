@@ -44,6 +44,7 @@
     "concurrently": "9.2.5",
     "copy": "0.3.2",
     "cosmiconfig": "9.0.2",
+    "countly-sdk-web": "24.11.4",
     "cross-env": "10.1.0",
     "eslint": "9.39.5",
     "eslint-config-prettier": "10.1.8",
