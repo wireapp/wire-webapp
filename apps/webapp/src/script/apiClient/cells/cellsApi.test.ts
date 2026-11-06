@@ -25,6 +25,7 @@ import {
   RestNode,
   RestNodeCollection,
   RestPublicLinkDeleteSuccess,
+  RestSelection,
   RestShareLink,
   RestVersion,
   RestPerformActionResponse,
@@ -66,6 +67,10 @@ describe('CellsAPI', () => {
 
     mockStorage = {
       putObject: jest.fn().mockResolvedValue(undefined),
+      getObject: jest.fn().mockResolvedValue({
+        body: new ReadableStream<Uint8Array>(),
+        contentType: 'application/zip',
+      }),
     } as unknown as jest.Mocked<CellsStorage>;
 
     mockNodeServiceApi = {
@@ -75,6 +80,7 @@ describe('CellsAPI', () => {
       performAction: jest.fn(),
       backgroundActionInfo: jest.fn(),
       create: jest.fn(),
+      createSelection: jest.fn(),
       promoteVersion: jest.fn(),
       deleteVersion: jest.fn(),
       deletePublicLink: jest.fn(),
@@ -1017,6 +1023,69 @@ describe('CellsAPI', () => {
       mockNodeServiceApi.backgroundActionInfo.mockRejectedValueOnce(error);
 
       await expect(cellsAPI.getBackgroundActionInfo({name: 'move', jobUuid: 'move-job'})).rejects.toBe(error);
+    });
+  });
+
+  describe('downloadSelectionArchive', () => {
+    const paths = ['workspace/files/document.txt', 'workspace/files/folder'];
+    const archiveParentPath = 'workspace/files';
+
+    it('creates a v2 path selection and streams the matching ZIP object once', async () => {
+      const response: RestSelection = {Uuid: 'selection-id', Nodes: []};
+      const body = new ReadableStream<Uint8Array>();
+      mockNodeServiceApi.createSelection.mockResolvedValueOnce(createMockResponse(response));
+      mockStorage.getObject.mockResolvedValueOnce({body, contentType: 'application/zip'});
+
+      await expect(cellsAPI.downloadSelectionArchive({paths, archiveParentPath})).resolves.toBe(body);
+
+      expect(mockNodeServiceApi.createSelection).toHaveBeenCalledTimes(1);
+      expect(mockNodeServiceApi.createSelection).toHaveBeenCalledWith(
+        {
+          Nodes: paths.map(Path => {
+            return {Path};
+          }),
+        },
+        {'axios-retry': {retries: 0}},
+      );
+      expect(mockStorage.getObject).toHaveBeenCalledTimes(1);
+      expect(mockStorage.getObject).toHaveBeenCalledWith({path: `${archiveParentPath}/selection-id-selection.zip`});
+    });
+
+    it('does not create or download an archive for an empty selection', async () => {
+      await expect(cellsAPI.downloadSelectionArchive({paths: [], archiveParentPath})).rejects.toThrow(
+        'At least one non-empty node path is required',
+      );
+
+      expect(mockNodeServiceApi.createSelection).not.toHaveBeenCalled();
+      expect(mockStorage.getObject).not.toHaveBeenCalled();
+    });
+
+    it('does not download when selection creation fails or returns no UUID', async () => {
+      const error = new Error('Selection request failed');
+      mockNodeServiceApi.createSelection.mockRejectedValueOnce(error);
+      await expect(cellsAPI.downloadSelectionArchive({paths, archiveParentPath})).rejects.toBe(error);
+      expect(mockStorage.getObject).not.toHaveBeenCalled();
+
+      mockNodeServiceApi.createSelection.mockResolvedValueOnce(createMockResponse({Uuid: '', Nodes: []}));
+      await expect(cellsAPI.downloadSelectionArchive({paths, archiveParentPath})).rejects.toThrow(
+        'Cells did not return a selection UUID',
+      );
+      expect(mockStorage.getObject).not.toHaveBeenCalled();
+    });
+
+    it('rejects non-ZIP error payloads and propagates transfer failures', async () => {
+      mockNodeServiceApi.createSelection.mockResolvedValue(createMockResponse({Uuid: 'selection-id', Nodes: []}));
+      mockStorage.getObject.mockResolvedValueOnce({
+        body: new ReadableStream<Uint8Array>(),
+        contentType: 'application/xml',
+      });
+      await expect(cellsAPI.downloadSelectionArchive({paths, archiveParentPath})).rejects.toThrow(
+        'Cells returned an unexpected archive content type',
+      );
+
+      const error = new Error('Archive GET failed');
+      mockStorage.getObject.mockRejectedValueOnce(error);
+      await expect(cellsAPI.downloadSelectionArchive({paths, archiveParentPath})).rejects.toBe(error);
     });
   });
 
