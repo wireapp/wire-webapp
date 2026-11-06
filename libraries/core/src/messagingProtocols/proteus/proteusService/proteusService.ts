@@ -53,7 +53,7 @@ import {
 import {MessageService} from '../../../conversation/message/messageService';
 import {NonFederatingBackendsError} from '../../../errors';
 import {HandledEventPayload} from '../../../notification';
-import type {CRUDEngine} from '../../../storage/engine/CRUDEngine';
+import type {CRUDEngine} from '../../../storage/engine/crudEngine';
 import {handleOtrMessageAdd} from '../eventHandler/events';
 import {getGenericMessageParams} from '../utility/getGenericMessageParams';
 import {isClearFromMismatch} from '../utility/isClearFromMismatch';

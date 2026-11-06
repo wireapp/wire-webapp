@@ -18,7 +18,7 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import type {CRUDEngine} from '@wireapp/core/lib/storage/engine/CRUDEngine';
+import type {CRUDEngine} from '@wireapp/core/lib/storage/engine/crudEngine';
 import {container, singleton} from 'tsyringe';
 
 import {Account} from '@wireapp/core';

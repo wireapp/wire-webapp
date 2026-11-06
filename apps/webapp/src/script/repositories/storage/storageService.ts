@@ -18,7 +18,7 @@
  */
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import type {CRUDEngine} from '@wireapp/core/lib/storage/engine/CRUDEngine';
+import type {CRUDEngine} from '@wireapp/core/lib/storage/engine/crudEngine';
 import {RecordNotFoundError} from '@wireapp/core/lib/storage/engine/error';
 import {Dexie, Transaction} from 'dexie';
 import {singleton} from 'tsyringe';

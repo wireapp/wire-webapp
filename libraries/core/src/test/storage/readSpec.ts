@@ -17,7 +17,7 @@
  *
  */
 
-import type {CRUDEngine} from '../../storage/engine/CRUDEngine';
+import type {CRUDEngine} from '../../storage/engine/crudEngine';
 import type {StorageErrorConstructors} from './storageErrorConstructors';
 
 const TABLE_NAME = 'the-simpsons';

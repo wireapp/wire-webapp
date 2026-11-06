@@ -17,7 +17,7 @@
  *
  */
 
-import type {CRUDEngine} from '../../../storage/engine/CRUDEngine';
+import type {CRUDEngine} from '../../../storage/engine/crudEngine';
 
 /** all the tables in the database that stores information relative to the client identity */
 const IDENTITY_STORES = ['amplify', 'clients', 'keys', 'prekeys', 'sessions', 'group_ids'] as const;

@@ -36,7 +36,7 @@ import {
 import {PrekeyTracker} from './prekeysTracker';
 
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
-import type {CRUDEngine} from '../../../../../storage/engine/CRUDEngine';
+import type {CRUDEngine} from '../../../../../storage/engine/crudEngine';
 import {CoreCryptoConfig} from '../../../../common.types';
 import {CryptoClient, InitialPrekeys} from '../cryptoClient.types';
 

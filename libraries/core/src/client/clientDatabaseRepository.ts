@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {MetaClient} from './clientService';
 
 import {constructSessionId} from '../messagingProtocols/proteus/utility/sessionHandler';
-import type {CRUDEngine} from '../storage/engine/CRUDEngine';
+import type {CRUDEngine} from '../storage/engine/crudEngine';
 
 export enum DatabaseStores {
   CLIENTS = 'clients',

@@ -100,8 +100,8 @@ import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from '
 import {generateSecretKey} from './secretStore/secretKeyGenerator';
 import {SelfService} from './self/';
 import {CoreDatabase, deleteDB, openDB} from './storage/coreDb';
-import {CRUDEngine} from './storage/engine/CRUDEngine';
-import {MemoryEngine} from './storage/engine/MemoryEngine';
+import {CRUDEngine} from './storage/engine/crudEngine';
+import {MemoryEngine} from './storage/engine/memoryEngine';
 import {TeamService} from './team/';
 import {UserService} from './user/';
 import {LocalStorageStore} from './util/localStorageStore';

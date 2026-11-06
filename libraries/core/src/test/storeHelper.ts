@@ -17,7 +17,7 @@
  *
  */
 
-import {MemoryEngine} from '../storage/engine/MemoryEngine';
+import {MemoryEngine} from '../storage/engine/memoryEngine';
 
 export async function createMemoryEngine(storeName = `temp-${Date.now()}`): Promise<MemoryEngine> {
   const engine = new MemoryEngine();

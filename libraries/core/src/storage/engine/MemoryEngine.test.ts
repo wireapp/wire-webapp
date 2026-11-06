@@ -17,8 +17,8 @@
  *
  */
 
-import {CRUDEngine} from './CRUDEngine';
-import {MemoryEngine} from './MemoryEngine';
+import {CRUDEngine} from './crudEngine';
+import {MemoryEngine} from './memoryEngine';
 
 import {createSpec} from '../../test/storage/createSpec';
 import {deleteAllSpec} from '../../test/storage/deleteAllSpec';

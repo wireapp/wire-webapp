@@ -17,7 +17,7 @@
  *
  */
 
-import type {CRUDEngine} from '@wireapp/core/lib/storage/engine/CRUDEngine';
+import type {CRUDEngine} from '@wireapp/core/lib/storage/engine/crudEngine';
 import {
   LowDiskSpaceError,
   RecordAlreadyExistsError,

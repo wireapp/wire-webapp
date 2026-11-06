@@ -25,7 +25,7 @@ import {keys as ProteusKeys} from '@wireapp/proteus';
 
 import {CryptoClient, InitialPrekeys} from './cryptoClient.types';
 
-import type {CRUDEngine} from '../../../../storage/engine/CRUDEngine';
+import type {CRUDEngine} from '../../../../storage/engine/crudEngine';
 import {toArrayBuffer} from '../../../../util/bufferUtils';
 
 type Config = {

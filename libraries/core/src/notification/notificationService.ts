@@ -32,7 +32,7 @@ import {isOutdatedNotificationStreamEvent} from './outdatedNotificationStreamEve
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../coreError';
 import {DecryptionError} from '../errors/decryptionError';
-import type {CRUDEngine} from '../storage/engine/CRUDEngine';
+import type {CRUDEngine} from '../storage/engine/crudEngine';
 import {RecordNotFoundError} from '../storage/engine/error';
 
 export type HandledEventPayload = {
