@@ -1075,13 +1075,15 @@ describe('CellsAPI', () => {
 
     it('rejects non-ZIP error payloads and propagates transfer failures', async () => {
       mockNodeServiceApi.createSelection.mockResolvedValue(createMockResponse({Uuid: 'selection-id', Nodes: []}));
+      const cancel = jest.fn();
       mockStorage.getObject.mockResolvedValueOnce({
-        body: new ReadableStream<Uint8Array>(),
+        body: new ReadableStream<Uint8Array>({cancel}),
         contentType: 'application/xml',
       });
       await expect(cellsAPI.downloadSelectionArchive({paths, archiveParentPath})).rejects.toThrow(
         'Cells returned an unexpected archive content type',
       );
+      expect(cancel).toHaveBeenCalledTimes(1);
 
       const error = new Error('Archive GET failed');
       mockStorage.getObject.mockRejectedValueOnce(error);
