@@ -18,6 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {container} from 'tsyringe';
 import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 
 import {generateConversation as _generateConversation} from '../../../../test/helper/ConversationGenerator';
@@ -25,6 +26,7 @@ import {TestFactory} from '../../../../test/helper/TestFactory';
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {Core} from '../../service/coreSingleton';
+import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 
 import {ConversationRepository} from './ConversationRepository';
 
@@ -37,10 +39,17 @@ function getConversationServiceForTest(
 }
 
 describe('ConversationRepository safe* wrappers', () => {
-  const testFactory = new TestFactory();
+  let testFactory: TestFactory;
 
   beforeEach(async () => {
+    testFactory = new TestFactory(
+      createCoreTestFixture({backendFeatures: {isFederated: false}, service: {conversation: {}}}),
+    );
     await testFactory.exposeConversationActors();
+  });
+
+  afterEach(() => {
+    container.clearInstances();
   });
 
   describe('safeGetConversationById', () => {
