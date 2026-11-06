@@ -28,7 +28,6 @@ export const developmentLibraries: readonly DevelopmentLibrary[] = [
   {name: 'api-client', value: 'api-client', checked: true},
   {name: 'commons', value: 'commons'},
   {name: 'config', value: 'config'},
-  {name: 'telemetry', value: 'telemetry'},
 ];
 
 export type SelectedLibraryWatchCommandsOptions = {
@@ -55,10 +54,6 @@ export function getSelectedLibraryWatchCommands(options: SelectedLibraryWatchCom
       return selectedLibraryNames.has(library.value);
     })
     .map((library): string => {
-      if (library.value === 'telemetry') {
-        return 'just watch-library-telemetry';
-      }
-
       return `just watch-library ${library.value}`;
     });
 }

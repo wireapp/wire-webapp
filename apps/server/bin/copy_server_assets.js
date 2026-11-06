@@ -27,7 +27,6 @@ const srcFolder = '../';
 const serverOutputDirectory = path.resolve(
   process.env.WIRE_WEBAPP_SERVER_OUTPUT_PATH ?? path.resolve(__dirname, '../dist'),
 );
-const npmModulesFolder = '../../../node_modules/';
 const librariesDirectory = path.resolve(__dirname, '../../../libraries');
 
 const assetFolders = ['.ebextensions/', 'robots/', 'templates/', 'certificate'];
@@ -37,7 +36,7 @@ assetFolders.forEach(assetFolder => {
 });
 
 fs.copySync(
-  path.resolve(__dirname, npmModulesFolder, '@wireapp/telemetry/lib/embed.js'),
+  require.resolve('countly-sdk-web/lib/countly.min.js'),
   path.resolve(serverOutputDirectory, 'libs/wire/telemetry/embed.js'),
 );
 

@@ -22,7 +22,7 @@ import {developmentLibraries, getSelectedLibraryWatchCommands} from './libraryWa
 describe('getSelectedLibraryWatchCommands', () => {
   it('returns commands for selected libraries and keeps the existing defaults', () => {
     const actualCommands = getSelectedLibraryWatchCommands({
-      libraryNames: ['api-client', 'telemetry'],
+      libraryNames: ['api-client', 'config'],
     });
     const defaultSelections = developmentLibraries
       .filter((library): boolean => {
@@ -32,7 +32,7 @@ describe('getSelectedLibraryWatchCommands', () => {
         return library.value;
       });
 
-    expect(actualCommands).toEqual(['just watch-library api-client', 'just watch-library-telemetry']);
+    expect(actualCommands).toEqual(['just watch-library api-client', 'just watch-library config']);
     expect(defaultSelections).toEqual(['react-ui-kit', 'api-client']);
   });
 
@@ -52,5 +52,11 @@ describe('getSelectedLibraryWatchCommands', () => {
     expect(() => {
       getSelectedLibraryWatchCommands({libraryNames: ['core']});
     }).toThrow('Unknown development library selection: core');
+  });
+
+  it('rejects the removed telemetry workspace', () => {
+    expect(() => {
+      getSelectedLibraryWatchCommands({libraryNames: ['telemetry']});
+    }).toThrow('Unknown development library selection: telemetry');
   });
 });
