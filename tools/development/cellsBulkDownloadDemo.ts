@@ -30,24 +30,60 @@ import {CellsAPI} from '../../libraries/api-client/lib/cells/cellsApi';
 
 const executeFile = promisify(execFile);
 const FIRST_PATH_ARGUMENT_INDEX = 2;
+const HELP_FLAG = '--help';
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- 512 MiB caps temporary disk usage
 const MAX_ARCHIVE_BYTES = 512 * 1024 * 1024;
+const HELP_TEXT = `Cells bulk-download API demo
+
+Usage: npx ts-node --project tsconfig.tools.json tools/development/cellsBulkDownloadDemo.ts [--help] <path> [path...]
+
+Required environment:
+  CELLS_URL                  Cells gateway URL
+  CELLS_ACCESS_TOKEN         Normal Wire bearer token (read hidden; do not put in shell history)
+  CELLS_ARCHIVE_PARENT_PATH  Workspace-qualified archive parent path
+
+Optional environment:
+  CELLS_S3_ENDPOINT          Defaults to CELLS_URL
+  CELLS_S3_BUCKET            Defaults to io
+  CELLS_S3_REGION             Defaults to us-east-1
+
+Prerequisites: run 'npx just build-libraries' first and install 'unzip'. The demo requires small fixture paths and caps archives at 512 MiB.
+
+Example:
+  export CELLS_URL='https://drive.example.test'
+  read -rsp 'Normal Wire bearer token: ' CELLS_ACCESS_TOKEN; printf '\\n'
+  export CELLS_ACCESS_TOKEN
+  export CELLS_ARCHIVE_PARENT_PATH='team-slug/Drive'
+  npx just build-libraries
+  npx ts-node --project tsconfig.tools.json tools/development/cellsBulkDownloadDemo.ts \\
+    'team-slug/Drive/example.txt' 'team-slug/Drive/example-folder'
+
+Inspect the resulting archive with 'unzip -l <archive>' and 'unzip -p <archive> <entry>'.
+See tools/development/cellsBulkDownloadDemo.md for expected-content verification and limits.
+`;
+
+class DemoUsageError extends Error {}
 
 const requiredEnvironment = (name: string): string => {
   const value = process.env[name]?.trim();
   if (value === undefined || value.length === 0) {
-    throw new Error(`Missing required environment variable: ${name}`);
+    throw new DemoUsageError(`Missing required environment variable: ${name}`);
   }
   return value;
 };
 
 const main = async (): Promise<void> => {
+  const paths = process.argv.slice(FIRST_PATH_ARGUMENT_INDEX);
+  if (paths.includes(HELP_FLAG)) {
+    console.info(HELP_TEXT);
+    return;
+  }
+
   const cellsUrl = requiredEnvironment('CELLS_URL').replace(/\/$/, '');
   const accessToken = requiredEnvironment('CELLS_ACCESS_TOKEN');
   const archiveParentPath = requiredEnvironment('CELLS_ARCHIVE_PARENT_PATH');
-  const paths = process.argv.slice(FIRST_PATH_ARGUMENT_INDEX);
   if (paths.length === 0) {
-    throw new Error('Pass one or more workspace-qualified Cells paths as arguments.');
+    throw new DemoUsageError('Pass one or more workspace-qualified Cells paths as arguments.');
   }
 
   const accessTokenStore = new AccessTokenStore();
@@ -123,7 +159,13 @@ const main = async (): Promise<void> => {
 };
 
 void main().catch((error: unknown) => {
-  const errorName = error instanceof Error ? error.name : 'UnknownError';
-  console.error(`Bulk download demo failed (${errorName}). No completed archive was saved.`);
+  if (error instanceof DemoUsageError) {
+    console.error(error.message);
+    console.error('Run the demo with --help for prerequisites and a copyable example.');
+  } else {
+    const errorName = error instanceof Error ? error.name : 'UnknownError';
+    console.error(`Bulk download demo failed (${errorName}). No completed archive was saved.`);
+    console.error('See tools/development/cellsBulkDownloadDemo.md or rerun with --help.');
+  }
   process.exitCode = 1;
 });
