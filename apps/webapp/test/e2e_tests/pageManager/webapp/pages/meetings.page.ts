@@ -18,7 +18,6 @@
 
 import {expect, type Locator, type Page} from '@playwright/test';
 import {gunzipSync} from 'node:zlib';
-
 import {ConfirmModal} from '../modals/confirm.modal';
 import {
   createEndedMeetingWindow,
@@ -30,8 +29,19 @@ import type {Request} from 'playwright-core';
 
 const MEETINGS_LIST_TIMEOUT_MS = 30_000;
 
-type ScheduleMeetingRecurrenceLabel = 'Daily' | 'Never';
+type ScheduleMeetingRecurrenceLabel = 'Never' | 'Daily' | 'Weekly' | 'Every two weeks' | 'Every four weeks';
 type ScheduleMeetingModalMode = 'create' | 'edit';
+type MeetingTimelineRow = {
+  index: number;
+  kind: 'day' | 'meeting';
+  dayHeading: string;
+  title: string;
+  text: string;
+};
+type MeetingOccurrenceSnapshot = {
+  dayHeading: string;
+  text: string;
+};
 
 export class MeetingsPage {
   private readonly page: Page;
@@ -45,19 +55,39 @@ export class MeetingsPage {
   readonly meetNowModal: Locator;
   readonly meetingPrepModal: Locator;
   readonly notificationHost: Locator;
+  readonly emptyMeetingsTitle: Locator;
+  readonly emptyMeetingsDescription: Locator;
+  readonly emptyScheduleMeetingButton: Locator;
+  readonly emptyMeetNowButton: Locator;
+  readonly meetingEntries: Locator;
+  readonly scheduleMeetingSubmitButton: Locator;
+  readonly meetingsLoadError: Locator;
+  readonly meetingsLoadErrorMessage: Locator;
+  readonly meetingsRefreshButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-
     this.meetingsTab = page.getByTestId('go-meetings');
     this.meetingsList = page.getByTestId('meetings-list');
     this.emptyMeetingsList = page.getByTestId('empty-meetings-list');
+    this.emptyMeetingsTitle = this.emptyMeetingsList.locator('p').nth(0);
+    this.emptyMeetingsDescription = this.emptyMeetingsList.locator('p').nth(1);
+    this.emptyScheduleMeetingButton = this.emptyMeetingsList.getByRole('button', {
+      name: 'Schedule Meeting',
+      exact: true,
+    });
+    this.emptyMeetNowButton = this.emptyMeetingsList.getByRole('button', {name: 'Meet Now', exact: true});
+    this.meetingEntries = this.meetingsList.getByTestId('item-meeting');
     this.meetNowButton = page.getByTestId('meet-now');
     this.scheduleMeetingButton = page.locator('header').getByTestId('schedule-meeting');
     this.scheduleMeetingModal = page.getByTestId('schedule-meeting-modal');
+    this.scheduleMeetingSubmitButton = this.scheduleMeetingModal.getByTestId('schedule-meeting-modal-submit');
     this.meetNowModal = page.getByTestId('meet-now-modal');
     this.meetingPrepModal = page.getByTestId('meeting-prep-modal');
     this.notificationHost = page.getByTestId('meeting-notification-host');
+    this.meetingsLoadError = page.getByTestId('meetings-list-error');
+    this.meetingsLoadErrorMessage = this.meetingsLoadError.locator('p');
+    this.meetingsRefreshButton = this.meetingsLoadError.getByTestId('do-refresh-meetings');
   }
 
   async openMeetingsTab(): Promise<void> {
@@ -66,6 +96,11 @@ export class MeetingsPage {
     }
 
     await this.meetingsTab.click();
+    await expect(this.meetingsTab).toHaveAttribute('aria-selected', 'true');
+  }
+
+  async retryLoadingMeetings(): Promise<void> {
+    await this.meetingsRefreshButton.click();
   }
 
   async openScheduleMeetingModal(): Promise<void> {
@@ -75,6 +110,347 @@ export class MeetingsPage {
     }
 
     await this.scheduleMeetingButton.click();
+  }
+
+  async scheduleMeetingOnDate(
+    title: string,
+    dateLabel: string,
+    startTimeLabel: string,
+    endTimeLabel: string,
+    options: {
+      recurrence?: ScheduleMeetingRecurrenceLabel;
+      participantNames?: string[];
+    } = {},
+  ): Promise<void> {
+    await this.openScheduleMeetingModal();
+    await this.fillMeetingTitle(title);
+    await this.selectRecurrence(options.recurrence ?? 'Never');
+
+    for (const name of options.participantNames ?? []) {
+      await this.addParticipant(name);
+    }
+
+    await this.selectMeetingDate(dateLabel);
+    await this.selectTimeForGroup('Starts', startTimeLabel);
+    await this.selectTimeForGroup('Ends', endTimeLabel);
+
+    // Preserve the requested date and time.
+    await this.scheduleMeetingSubmitButton.click();
+    await expect(this.scheduleMeetingModal).toBeHidden({timeout: MEETINGS_LIST_TIMEOUT_MS});
+  }
+
+  async readMeetingTimeline(
+    meetingCount: number,
+    previousRows: MeetingTimelineRow[] = [],
+  ): Promise<MeetingTimelineRow[]> {
+    const scrollContainer = this.meetingsList.locator('..');
+
+    await expect(this.meetingsList).toBeVisible();
+    if (previousRows.length === 0) {
+      await scrollContainer.evaluate(element => {
+        element.scrollTop = 0;
+      });
+      await expect(this.meetingsList.locator('[data-index]').first()).toHaveAttribute('data-index', '0');
+    }
+
+    const collectedRows = new Map(
+      previousRows.map(row => {
+        return [row.index, row];
+      }),
+    );
+
+    await expect
+      .poll(
+        async () => {
+          const rows = await this.meetingsList.locator('[data-index]').evaluateAll(elements => {
+            return elements.flatMap<MeetingTimelineRow>(element => {
+              const index = Number(element.getAttribute('data-index'));
+              const heading = element.querySelector('[role="heading"]');
+
+              if (heading !== null) {
+                return [
+                  {
+                    index,
+                    kind: 'day',
+                    dayHeading: heading.textContent?.trim() ?? '',
+                    title: '',
+                    text: '',
+                  },
+                ];
+              }
+
+              const meeting = element.querySelector('[data-uie-name="item-meeting"]');
+
+              if (meeting === null) {
+                return [];
+              }
+
+              const description = element.querySelector('span[id^="meeting-day-description-"]');
+
+              return [
+                {
+                  index,
+                  kind: 'meeting',
+                  dayHeading: description?.textContent?.trim() ?? '',
+                  title: meeting.getAttribute('data-uie-value') ?? '',
+                  text: (meeting.textContent ?? '').replace(/\s+/g, ' ').trim(),
+                },
+              ];
+            });
+          });
+
+          for (const row of rows) {
+            collectedRows.set(row.index, row);
+          }
+
+          const count = [...collectedRows.values()].filter(row => {
+            return row.kind === 'meeting';
+          }).length;
+          if (count < meetingCount) {
+            await scrollContainer.evaluate(element => {
+              element.scrollTop += element.clientHeight / 2;
+            });
+          }
+
+          return count;
+        },
+        {
+          timeout: MEETINGS_LIST_TIMEOUT_MS,
+          intervals: [100, 200, 300],
+        },
+      )
+      .toBeGreaterThanOrEqual(meetingCount);
+
+    const orderedRows = [...collectedRows.values()].sort((first, second) => {
+      return first.index - second.index;
+    });
+    const meetings = orderedRows.filter(row => {
+      return row.kind === 'meeting';
+    });
+    const lastIndex = meetings[meetingCount - 1].index;
+
+    return orderedRows.filter(row => {
+      return row.index <= lastIndex;
+    });
+  }
+
+  async readFirstMeetingOccurrences(title: string, count: number): Promise<MeetingOccurrenceSnapshot[]> {
+    const scrollContainer = this.meetingsList.locator('..');
+    await expect(this.meetingsList).toBeVisible();
+
+    await scrollContainer.evaluate(element => {
+      element.scrollTop = 0;
+    });
+    const occurrences = new Map<number, {dayHeading: string; text: string}>();
+
+    await expect
+      .poll(
+        async () => {
+          const renderedOccurrences = await this.meetingsList
+            .locator('[data-index]')
+            .evaluateAll((rows, meetingTitle) => {
+              return rows.flatMap(row => {
+                const meeting = row.querySelector('[data-uie-name="item-meeting"]');
+
+                if (meeting === null || meeting.getAttribute('data-uie-value') !== meetingTitle) {
+                  return [];
+                }
+
+                const description = row.querySelector('span[id^="meeting-day-description-"]');
+
+                return [
+                  {
+                    index: Number(row.getAttribute('data-index')),
+                    dayHeading: description?.textContent?.trim() ?? '',
+                    text: (meeting.textContent ?? '').replace(/\s+/g, ' ').trim(),
+                  },
+                ];
+              });
+            }, title);
+
+          for (const occurrence of renderedOccurrences) {
+            occurrences.set(occurrence.index, {dayHeading: occurrence.dayHeading, text: occurrence.text});
+          }
+
+          if (occurrences.size < count) {
+            await scrollContainer.evaluate(element => {
+              element.scrollTop += element.clientHeight / 2;
+            });
+          }
+
+          return occurrences.size;
+        },
+        {timeout: MEETINGS_LIST_TIMEOUT_MS},
+      )
+      .toBeGreaterThanOrEqual(count);
+
+    return [...occurrences.entries()]
+      .sort(([firstIndex], [secondIndex]) => {
+        return firstIndex - secondIndex;
+      })
+      .slice(0, count)
+      .map(([, occurrence]) => {
+        return occurrence;
+      });
+  }
+
+  async selectMeetingDate(dateLabel: string): Promise<void> {
+    await this.startDateOpenCalendarButton().click();
+
+    // Wait until the calendar is displayed before inspecting its dates.
+    const calendar = this.page
+      .getByRole('dialog')
+      .filter({has: this.page.getByRole('button', {name: 'Next month', exact: true})});
+
+    await expect(calendar.getByRole('grid')).toBeVisible();
+
+    // Allow additional accessible text, such as a selected-date annotation.
+    const dateButton = calendar.getByRole('button', {name: dateLabel, exact: false});
+
+    // This scenario only uses tomorrow and the following day.
+    if (!(await dateButton.isVisible())) {
+      await calendar.getByRole('button', {name: 'Next month', exact: true}).click();
+    }
+
+    await expect(dateButton).toBeVisible();
+    await dateButton.click();
+  }
+
+  async openMeetingsAt(time: Date): Promise<void> {
+    await this.page.clock.setFixedTime(time.getTime());
+    await this.page.reload();
+
+    await expect(this.meetingsTab).toBeVisible({
+      timeout: MEETINGS_LIST_TIMEOUT_MS,
+    });
+
+    await this.openMeetingsTab();
+
+    await expect(this.meetingsTab).toHaveAttribute('aria-selected', 'true');
+  }
+
+  async getLocalTimeZone(): Promise<string> {
+    return this.page.evaluate(() => {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    });
+  }
+
+  meetingOccurrence(title: string, dayHeading: string): Locator {
+    const dayDescription = this.page
+      .getByText(dayHeading, {exact: true})
+      .and(this.page.locator('span[id^="meeting-day-description-"]'));
+
+    // Each virtualized row contains its own day description.
+    return this.meetingsList
+      .locator('[data-index]')
+      .filter({has: dayDescription})
+      .getByTestId('item-meeting')
+      .filter({
+        has: this.page.getByText(title, {exact: true}),
+      });
+  }
+
+  participantAvatars(meeting: Locator): Locator {
+    return meeting.getByTestId('meeting-participants-avatars').getByTestId('element-avatar-user');
+  }
+
+  participantOverflow(meeting: Locator): Locator {
+    return meeting.getByTestId('meeting-participants-avatars').getByText(/^\+\d+$/, {exact: true});
+  }
+
+  participantInitials(avatar: Locator): Locator {
+    return avatar.getByTestId('element-avatar-initials');
+  }
+
+  participantImage(avatar: Locator): Locator {
+    return avatar.locator('img[src]:not([src=""])');
+  }
+
+  meetingTitle(meeting: Locator, title: string): Locator {
+    return meeting.getByText(title, {exact: true});
+  }
+
+  meetingRepeatLabel(meeting: Locator, label: string): Locator {
+    return meeting.getByText(label, {exact: true});
+  }
+
+  async hoverParticipantAvatar(avatar: Locator): Promise<void> {
+    await avatar.hover();
+  }
+
+  editMeetingMenuAction(menu: Locator): Locator {
+    return menu.getByRole('button', {
+      name: 'Edit meeting',
+      exact: true,
+    });
+  }
+
+  deleteMeetingForEveryoneMenuAction(menu: Locator): Locator {
+    return menu.getByRole('button', {
+      name: 'Delete meeting for everyone',
+      exact: true,
+    });
+  }
+
+  async openStartDateCalendar(): Promise<void> {
+    await this.startDateOpenCalendarButton().click();
+  }
+
+  calendarDateButton(dateLabel: string): Locator {
+    const calendar = this.page.getByRole('dialog').filter({
+      has: this.page.getByRole('button', {
+        name: 'Next month',
+        exact: true,
+      }),
+    });
+
+    return calendar.getByRole('button', {
+      name: dateLabel,
+      exact: false,
+    });
+  }
+
+  meetingPrepHeading(title: string): Locator {
+    return this.meetingPrepModal.getByRole('heading', {
+      name: title,
+      exact: true,
+    });
+  }
+
+  async isParticipantImageLoaded(avatar: Locator): Promise<boolean> {
+    return this.participantImage(avatar).evaluateAll(images => {
+      return (
+        images.length === 1 &&
+        images.every(image => {
+          const picture = image as HTMLImageElement;
+          return picture.complete && picture.naturalWidth > 0;
+        })
+      );
+    });
+  }
+
+  participantTooltip(label: string): Locator {
+    return this.page.getByRole('tooltip', {
+      name: label,
+      exact: true,
+    });
+  }
+
+  async joinMeetingFromPrep(): Promise<void> {
+    await this.meetingPrepModal.getByRole('button', {name: 'Join', exact: true}).click();
+    await expect(this.meetingPrepModal).toBeHidden();
+  }
+
+  meetingAttendingStatus(meeting: Locator): Locator {
+    return meeting.getByText('Attending', {exact: true});
+  }
+
+  async closeMeetingContextMenu(): Promise<void> {
+    await this.page.keyboard.press('Escape');
+  }
+
+  async movePointerAwayFromParticipants(): Promise<void> {
+    await this.meetingsTab.hover();
   }
 
   async openMeetNowModal(): Promise<void> {
@@ -394,14 +770,14 @@ export class MeetingsPage {
 
   async openEditMeetingModal(title: string, occurrenceIndex = 0): Promise<void> {
     const menu = await this.openMeetingContextMenu(title, occurrenceIndex);
-    await menu.getByRole('button', {name: 'Edit meeting'}).click();
+    await this.editMeetingMenuAction(menu).click();
     await expect(this.scheduleMeetingModal).toBeVisible();
     await expect(this.scheduleMeetingForm()).toHaveAttribute('data-uie-mode', 'edit');
   }
 
   async expectEditMeetingActionVisible(title: string, visible: boolean): Promise<void> {
     const menu = await this.openMeetingContextMenu(title);
-    const editAction = menu.getByRole('button', {name: 'Edit meeting'});
+    const editAction = this.editMeetingMenuAction(menu);
 
     if (visible) {
       await expect(editAction).toBeVisible();
@@ -446,6 +822,7 @@ export class MeetingsPage {
       addParticipants?: string[];
       removeParticipants?: string[];
       occurrenceIndex?: number;
+      dateLabel?: string;
     },
   ): Promise<void> {
     await this.openEditMeetingModal(title, updates.occurrenceIndex ?? 0);
@@ -453,6 +830,10 @@ export class MeetingsPage {
 
     if (updates.newTitle !== undefined) {
       await this.fillMeetingTitle(updates.newTitle);
+    }
+
+    if (updates.dateLabel !== undefined) {
+      await this.selectMeetingDate(updates.dateLabel);
     }
 
     if (updates.setOngoingTimes) {
@@ -481,7 +862,7 @@ export class MeetingsPage {
 
   async deleteMeetingForAll(title: string): Promise<void> {
     const menu = await this.openMeetingContextMenu(title);
-    await menu.getByRole('button', {name: 'Delete meeting for everyone'}).click();
+    await this.deleteMeetingForEveryoneMenuAction(menu).click();
 
     const confirmModal = new ConfirmModal(this.page);
     await confirmModal.clickAction();

@@ -17,7 +17,8 @@
     "outDir": "../../dist/apps/webapp",
     "paths": {
       "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
-    },
+      "@enormora/clock/clock": ["../../node_modules/@enormora/clock/clock.entry-point.d.ts"] 
+   },
     "target": "ESNext",
     "strict": true,
     "strictPropertyInitialization": false,

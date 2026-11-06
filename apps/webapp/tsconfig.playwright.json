@@ -9,9 +9,9 @@
     "noEmit": true,
     "resolveJsonModule": true,
     "types": ["node"],
-    // Keep the root's legacy declaration path mapping from affecting Playwright runtime resolution.
-    "paths": {}
-  },
+    // Resolve Clock runtime and types from the inherited repository-root baseUrl.
+    "paths": {"@enormora/clock/clock": ["node_modules/@enormora/clock/clock.entry-point"]}
+},
   "include": [
     "playwright.config.ts",
     "playwright.rspack.config.ts",
