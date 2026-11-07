@@ -409,6 +409,15 @@ const renderCellsTable = ({
 };
 
 describe('CellsTable selection', () => {
+  it.each([THEME_ID.LIGHT, THEME_ID.DARK])('aligns page and row selection checkboxes in the %s theme', themeId => {
+    renderCellsTable({themeId});
+
+    const selectionHeader = screen.getAllByRole('columnheader')[0];
+    const firstSelectionCell = screen.getAllByRole('cell')[0];
+
+    expect(getComputedStyle(selectionHeader).paddingLeft).toBe(getComputedStyle(firstSelectionCell).paddingLeft);
+  });
+
   it('selects and deselects every item on the current page', () => {
     renderCellsTable();
 

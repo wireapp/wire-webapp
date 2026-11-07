@@ -193,6 +193,11 @@ export const headerCellStyles: CSSObject = {
   },
 };
 
+export const selectionHeaderCellStyles: CSSObject = {
+  ...headerCellStyles,
+  paddingLeft: '12px',
+};
+
 export const tableCellStyles: CSSObject = {
   padding: '12px',
   borderBottom: '1px solid var(--border-color)',

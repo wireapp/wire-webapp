@@ -52,6 +52,7 @@ import {
   folderDropOverlayTitleStyles,
   folderDropTargetRowStyles,
   headerCellStyles,
+  selectionHeaderCellStyles,
   moveOutcomeMessageStyles,
   tableActionsCellStyles,
   tableCellRow,
@@ -155,7 +156,7 @@ const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
 
   return (
     <th
-      css={headerCellStyles}
+      css={header.column.id === 'selection' ? selectionHeaderCellStyles : headerCellStyles}
       aria-sort={ariaSort}
       style={{
         width: header.id === 'name' ? undefined : header.getSize(),
