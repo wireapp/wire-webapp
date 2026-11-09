@@ -210,11 +210,11 @@ describe('GroupVideoGrid', () => {
     };
     const {queryByTestId, getByRole} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
 
-    fireEvent.click(getByRole('button', {name: 'Minimize self-video preview'}));
+    fireEvent.click(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'}));
     expect(queryByTestId('self-video-thumbnail-wrapper')).not.toBeInTheDocument();
     expect(participant.videoStream()).toBe(stream);
 
-    fireEvent.click(getByRole('button', {name: 'Restore self-video preview'}));
+    fireEvent.click(getByRole('button', {name: 'videoCallOverlayRestoreSelfVideo'}));
     expect(queryByTestId('self-video-thumbnail-wrapper')).toBeInTheDocument();
     expect(participant.videoStream()).toBe(stream);
   });

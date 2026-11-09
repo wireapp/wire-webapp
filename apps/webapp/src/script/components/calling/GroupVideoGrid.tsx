@@ -74,8 +74,10 @@ interface GroupVideoThumbnailProps {
   readonly thumbnail: Participant;
   readonly minimized: boolean;
   readonly maximizedParticipant: Participant | null;
-  readonly   selfParticipant: Participant;
+  readonly selfParticipant: Participant;
   allowMinimize: boolean;
+  minimizeLabel: string;
+  restoreLabel: string;
   isMinimized: boolean;
   onToggleMinimized: () => void;
 }
@@ -86,6 +88,8 @@ function GroupVideoThumbnail({
   maximizedParticipant,
   selfParticipant,
   allowMinimize,
+  minimizeLabel,
+  restoreLabel,
   isMinimized,
   onToggleMinimized,
 }: GroupVideoThumbnailProps): ReactNode {
@@ -181,8 +185,8 @@ function GroupVideoThumbnail({
       {allowMinimize && (
         <button
           type="button"
-          aria-label={isMinimized ? 'Restore self-video preview' : 'Minimize self-video preview'}
-          title={isMinimized ? 'Restore self-video preview' : 'Minimize self-video preview'}
+          aria-label={isMinimized ? restoreLabel : minimizeLabel}
+          title={isMinimized ? restoreLabel : minimizeLabel}
           onClick={onToggleMinimized}
           data-uie-name={isMinimized ? 'restore-self-video-preview' : 'minimize-self-video-preview'}
           css={{
@@ -284,7 +288,6 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
   setMaximizedParticipant,
   allowSelfVideoMinimize = false,
 }: GroupVideoGripProps) => {
-  const {translate} = useApplicationContext();
   const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
   const isTablet = useActiveWindowMatchMedia(QUERY.tablet);
   const isDesktop = useActiveWindowMatchMedia(QUERY.desktop);
@@ -293,6 +296,11 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
   const isTall = useActiveWindowMatchMedia(HEIGHT_QUERIES.TALL);
 
   const [isSelfVideoMinimized, setIsSelfVideoMinimized] = useState(false);
+  const {translate} = useApplicationContext();
+
+  useEffect(() => {
+    setIsSelfVideoMinimized(false);
+  }, [call]);
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(
     calculateRowsAndColumns({
       totalCount: grid?.grid.length,
@@ -425,6 +433,8 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
           maximizedParticipant={maximizedParticipant}
           selfParticipant={selfParticipant}
           allowMinimize={allowSelfVideoMinimize}
+          minimizeLabel={translate('videoCallOverlayMinimizeSelfVideo')}
+          restoreLabel={translate('videoCallOverlayRestoreSelfVideo')}
           isMinimized={allowSelfVideoMinimize && isSelfVideoMinimized}
           onToggleMinimized={() => setIsSelfVideoMinimized(minimized => !minimized)}
         />

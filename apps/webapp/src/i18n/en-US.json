@@ -2503,6 +2503,8 @@
   "videoCallOverlayHangUp": "Hang Up",
   "videoCallOverlayHideParticipantsList": "Hide participants list",
   "videoCallOverlayMicrophone": "Microphone",
+  "videoCallOverlayMinimizeSelfVideo": "Minimize self-video preview",
+  "videoCallOverlayRestoreSelfVideo": "Restore self-video preview",
   "videoCallOverlayOpenFullScreen": "Open the call in full screen",
   "videoCallOverlayOpenMicrophoneAndSpeakerOptions": "Open microphone and speaker options",
   "videoCallOverlayOpenPopupWindow": "Open in a new window",
