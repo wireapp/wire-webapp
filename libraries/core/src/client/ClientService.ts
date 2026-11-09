@@ -144,7 +144,7 @@ export class ClientService {
   }
 
   public putClientCapabilities(clientId: string, capabilities: ClientCapabilityData): Promise<void> {
-    return this.backend.putClient(clientId, capabilities);
+    return this.backend.putClientCapabilities(clientId, capabilities);
   }
 
   /**

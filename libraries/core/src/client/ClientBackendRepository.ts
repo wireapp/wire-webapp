@@ -17,7 +17,12 @@
  *
  */
 
-import {CreateClientPayload, RegisteredClient, UpdateClientPayload} from '@wireapp/api-client/lib/client/';
+import {
+  ClientCapabilityData,
+  CreateClientPayload,
+  RegisteredClient,
+  UpdateClientPayload,
+} from '@wireapp/api-client/lib/client/';
 
 import {APIClient} from '@wireapp/api-client';
 
@@ -34,6 +39,10 @@ export class ClientBackendRepository {
 
   public putClient(clientId: string, updates: UpdateClientPayload): Promise<void> {
     return this.apiClient.api.client.putClient(clientId, updates);
+  }
+
+  public putClientCapabilities(clientId: string, capabilities: ClientCapabilityData): Promise<void> {
+    return this.apiClient.api.client.putClientCapabilities(clientId, capabilities);
   }
 
   public deleteClient(clientId: string, password?: string): Promise<void> {

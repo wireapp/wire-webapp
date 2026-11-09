@@ -17,6 +17,8 @@
  *
  */
 
+import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
+import type {LongRunningRetryDetails} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -46,14 +48,38 @@ import {UserData} from './UserData';
 import {URLParameter} from '../../auth/URLParameter';
 import {Config} from '../../Config';
 
+type ProductReportingTelemetry = Pick<
+  typeof telemetry,
+  | 'isLoaded'
+  | 'changeDeviceId'
+  | 'addAllConsentFeatures'
+  | 'removeAllConsentFeatures'
+  | 'initialize'
+  | 'disableOfflineMode'
+  | 'endSession'
+  | 'beginSession'
+  | 'setUserData'
+  | 'trackEvent'
+>;
+
+type EventTrackingDependencies = {
+  readonly webSocket?: Pick<WebSocketClient, 'on' | 'removeListener'>;
+  readonly telemetry?: ProductReportingTelemetry;
+};
+
 const TEAM_SIZE_THRESHOLD_VALUE = 6;
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean = false;
+  private isProductReportingRequested = false;
   private sendAppOpenEvent: boolean = true;
   private telemetryDeviceId: string | undefined;
   private readonly logger: Logger = getLogger('EventTrackingRepository');
   private readonly telemetryLogger: Logger = getLogger('Telemetry');
   private telemetryInitialized: boolean = false;
+  private productEventSubscriptionsActive = false;
+  private readonly telemetry: ProductReportingTelemetry;
+  private readonly webSocket: EventTrackingDependencies['webSocket'];
+  private readonly onLongRunningWebSocketRetry = this.trackLongRunningWebSocketRetry.bind(this);
   isErrorReportingActivated: boolean = false;
 
   static get CONFIG() {
@@ -74,7 +100,10 @@ export class EventTrackingRepository {
     private readonly messageRepository: MessageRepository,
     private readonly teamState = container.resolve(TeamState),
     private readonly userState = container.resolve(UserState),
+    dependencies: EventTrackingDependencies = {},
   ) {
+    this.telemetry = dependencies.telemetry ?? telemetry;
+    this.webSocket = dependencies.webSocket;
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY.TELEMETRY_SHARING, this.toggleTelemetry);
     initForcedErrorReporting();
@@ -92,7 +121,7 @@ export class EventTrackingRepository {
   };
 
   public migrateDeviceId = async (newId: string) => {
-    if (!telemetry.isLoaded()) {
+    if (!this.telemetry.isLoaded()) {
       this.telemetryLogger.warn('Telemetry is not available');
       return;
     }
@@ -108,7 +137,7 @@ export class EventTrackingRepository {
         await this.startProductReporting(this.telemetryDeviceId);
         stopOnFinish = true;
       }
-      telemetry.changeDeviceId(newId);
+      this.telemetry.changeDeviceId(newId);
       storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY, newId);
       this.telemetryLogger.info(`Telemetry tracking id has been changed from ${this.telemetryDeviceId} to ${newId}`);
       this.telemetryDeviceId = newId;
@@ -183,20 +212,21 @@ export class EventTrackingRepository {
 
     this.logger.info(`Initialize analytics and error reporting: ${isConsentGiven}`);
 
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY.TELEMETRY_SHARING, this.toggleTelemetry);
     await this.toggleTelemetry(isConsentGiven);
   }
 
   private readonly toggleTelemetry = async (isEnabled: boolean) => {
+    this.isProductReportingRequested = isEnabled || getForcedErrorReportingStatus();
     if (isEnabled && this.isDomainAllowedForAnalytics()) {
-      telemetry.addAllConsentFeatures();
+      this.telemetry.addAllConsentFeatures();
       this.telemetryLogger.info('Consent was given due to user preferences');
       await this.startProductReporting();
     } else {
-      telemetry.removeAllConsentFeatures();
+      this.telemetry.removeAllConsentFeatures();
       this.telemetryLogger.info('Consent was removed due to user preferences');
       this.stopProductReporting();
     }
+    this.updateWebSocketRetrySubscription();
   };
 
   private stopProductReporting(): void {
@@ -206,13 +236,13 @@ export class EventTrackingRepository {
     }
 
     this.logger.debug('Analytics was disabled due to user preferences');
-    this.isProductReportingActivated = false;
     this.stopProductReportingSession();
+    this.isProductReportingActivated = false;
     this.unsubscribeFromProductTrackingEvents();
   }
 
   private async startProductReporting(trackingId: string = ''): Promise<void> {
-    if (!telemetry.isLoaded()) {
+    if (!this.telemetry.isLoaded()) {
       return;
     }
 
@@ -220,8 +250,6 @@ export class EventTrackingRepository {
       this.telemetryLogger.warn('Telemetry is not enabled at this environment');
       return;
     }
-
-    this.isProductReportingActivated = true;
 
     const {COUNTLY_ENABLE_LOGGING, VERSION, COUNTLY_API_KEY, COUNTLY_SERVER_URL} = Config.getConfig();
 
@@ -232,7 +260,7 @@ export class EventTrackingRepository {
         return;
       }
 
-      telemetry.initialize({
+      this.telemetry.initialize({
         appVersion: VERSION,
         provider: {
           apiKey: COUNTLY_API_KEY,
@@ -261,11 +289,12 @@ export class EventTrackingRepository {
       return;
     }
 
-    telemetry.changeDeviceId(device_id);
-    telemetry.disableOfflineMode(device_id);
+    this.telemetry.changeDeviceId(device_id);
+    this.telemetry.disableOfflineMode(device_id);
 
     this.telemetryLogger.info(`Telemetry tracking id is now ${device_id}`);
 
+    this.isProductReportingActivated = true;
     this.startProductReportingSession();
     this.subscribeToProductEvents();
   }
@@ -285,7 +314,7 @@ export class EventTrackingRepository {
   }
 
   private readonly stopProductReportingSession = (): void => {
-    if (!telemetry.isLoaded()) {
+    if (!this.telemetry.isLoaded()) {
       this.telemetryLogger.warn('Telemetry is not available');
       return;
     }
@@ -296,11 +325,15 @@ export class EventTrackingRepository {
     }
 
     if (this.isProductReportingActivated === true) {
-      telemetry.endSession();
+      this.telemetry.endSession();
     }
   };
 
   private subscribeToProductEvents(): void {
+    if (this.productEventSubscriptionsActive === true) {
+      return;
+    }
+    this.productEventSubscriptionsActive = true;
     amplify.subscribe(
       WebAppEvents.ANALYTICS.EVENT,
       this,
@@ -312,14 +345,44 @@ export class EventTrackingRepository {
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession);
   }
 
+  private updateWebSocketRetrySubscription(): void {
+    this.webSocket?.removeListener(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningWebSocketRetry);
+    // Q2 temporarily starts sessions for device-ID migration without product-reporting consent.
+    if (
+      this.isProductReportingActivated === true &&
+      this.isProductReportingRequested === true &&
+      isTelemetryEnabledAtCurrentEnvironment() === true &&
+      this.isDomainAllowedForAnalytics() === true
+    ) {
+      this.webSocket?.on(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningWebSocketRetry);
+    }
+  }
+
+  private trackLongRunningWebSocketRetry(retryDetails: LongRunningRetryDetails): void {
+    if (
+      this.isProductReportingActivated === false ||
+      this.isProductReportingRequested === false ||
+      isTelemetryEnabledAtCurrentEnvironment() === false ||
+      this.isDomainAllowedForAnalytics() === false
+    ) {
+      return;
+    }
+
+    this.trackProductReportingEvent(EventName.CONNECTIVITY.RETRYING_FOR_ONE_MINUTE, {
+      [Segmentation.CONNECTIVITY.RETRY_COUNT]: retryDetails.retryCount,
+      [Segmentation.CONNECTIVITY.RETRY_DURATION_IN_MILLISECONDS]: retryDetails.retryDurationInMilliseconds,
+      [Segmentation.CONNECTIVITY.TRANSPORT]: 'websocket',
+    });
+  }
+
   private startProductReportingSession(): void {
-    if (!telemetry.isLoaded()) {
+    if (!this.telemetry.isLoaded()) {
       this.telemetryLogger.warn('Telemetry is not available');
       return;
     }
 
     if (this.isProductReportingActivated === true || getForcedErrorReportingStatus()) {
-      telemetry.beginSession();
+      this.telemetry.beginSession();
       if (this.sendAppOpenEvent) {
         this.sendAppOpenEvent = false;
         this.trackProductReportingEvent(EventName.APP_OPEN);
@@ -349,7 +412,7 @@ export class EventTrackingRepository {
   }
 
   private trackProductReportingEvent(eventName: string, customSegmentations?: ContributedSegmentations): void {
-    if (!telemetry.isLoaded()) {
+    if (!this.telemetry.isLoaded()) {
       this.telemetryLogger.warn('Telemetry is not available');
       return;
     }
@@ -357,7 +420,7 @@ export class EventTrackingRepository {
     if (this.isProductReportingActivated === true || getForcedErrorReportingStatus()) {
       const userData = this.getUserData();
 
-      telemetry.setUserData(userData);
+      this.telemetry.setUserData(userData);
 
       this.telemetryLogger.info(`Reporting user data for product event ${eventName}@${JSON.stringify(userData)}`);
 
@@ -369,7 +432,7 @@ export class EventTrackingRepository {
         ...customSegmentations,
       };
 
-      telemetry.trackEvent({
+      this.telemetry.trackEvent({
         name: eventName,
         segmentation,
       });
@@ -384,6 +447,9 @@ export class EventTrackingRepository {
 
   private unsubscribeFromProductTrackingEvents(): void {
     this.logger.debug('Unsubscribing from product tracking events');
+    this.webSocket?.removeListener(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningWebSocketRetry);
+    amplify.unsubscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession);
+    this.productEventSubscriptionsActive = false;
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
   }
 }

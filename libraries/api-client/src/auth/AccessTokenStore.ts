@@ -79,7 +79,7 @@ export class AccessTokenStore extends EventEmitter {
 
   public getNextMarkerToken = (): string => {
     const newMarkerToken = uuidv4();
-    this.logger.info('Generated new marker token:', newMarkerToken, 'Previous marker token:', this.markerToken);
+    this.logger.info('Generated new WebSocket synchronization marker');
     this.markerToken = newMarkerToken;
     return this.markerToken;
   };

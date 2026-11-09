@@ -18,6 +18,11 @@
  */
 
 export const Segmentation = {
+  CONNECTIVITY: {
+    RETRY_COUNT: 'retry_count',
+    RETRY_DURATION_IN_MILLISECONDS: 'retry_duration_in_milliseconds',
+    TRANSPORT: 'transport',
+  },
   APP_OPEN: {
     DESKTOP_APP: 'app_desktop_app',
     APP_VERSION: 'app_version',

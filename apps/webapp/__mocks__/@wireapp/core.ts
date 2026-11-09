@@ -21,6 +21,13 @@ import {TaskScheduler} from '@wireapp/core/lib/util';
 
 import {EventEmitter} from 'stream';
 
+export enum ConnectionState {
+  CLOSED = 'closed',
+  CONNECTING = 'connecting',
+  PROCESSING_NOTIFICATIONS = 'processing_notifications',
+  LIVE = 'live',
+}
+
 export class Account extends EventEmitter {
   backendFeatures = {
     federationEndpoints: true,
