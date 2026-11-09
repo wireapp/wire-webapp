@@ -80,10 +80,10 @@ const getCallSecurityPhase = (
 const getKeyUpdateDetail = (translate: Translate, message: KeyUpdateMessage): string => {
   return match(message)
     .with({type: 'joined'}, ({name}) => {
-      return translate('callSecurityJoined', {name});
+      return translate('callSecurityJoined', {name}, {}, true);
     })
     .with({type: 'left'}, ({name}) => {
-      return translate('callSecurityLeft', {name});
+      return translate('callSecurityLeft', {name}, {}, true);
     })
     .with({type: 'summary', leftCount: 0}, ({joinedCount}) => {
       return translate('callSecurityPeopleJoined', {count: joinedCount});
