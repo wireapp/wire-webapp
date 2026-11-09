@@ -162,27 +162,79 @@ describe('APIClient', () => {
       expect(onSecondCookieRefresh.mock.calls).toEqual([[refreshedCookie], [undefined]]);
     });
 
-    it('stops cookie notifications even if WebSocket cleanup fails and permits cleanup to be retried', () => {
+    it.each(['dispose', Symbol.dispose] as const)(
+      'stops cookie notifications even if %s fails and permits cleanup to be retried',
+      disposalMethod => {
+        const client = createCookieRefreshClient();
+        const onCookieRefresh = jest.fn();
+        client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+        const disconnectFailure = new Error('WebSocket disconnection failed');
+        jest.spyOn(client.transport.ws, 'disconnect').mockImplementationOnce(() => {
+          throw disconnectFailure;
+        });
+
+        expect(() => {
+          client[disposalMethod]();
+        }).toThrow(disconnectFailure);
+        CookieStore.setCookie(refreshedCookie);
+        expect(onCookieRefresh).not.toHaveBeenCalled();
+
+        expect(() => {
+          client[disposalMethod]();
+          client[disposalMethod]();
+        }).not.toThrow();
+        CookieStore.setCookie(refreshedCookie);
+        expect(onCookieRefresh).not.toHaveBeenCalled();
+      },
+    );
+
+    it('releases its cookie subscription and disconnects through the Disposable protocol', () => {
       const client = createCookieRefreshClient();
+      const disposable: Disposable = client;
       const onCookieRefresh = jest.fn();
+      const disconnect = jest.spyOn(client.transport.ws, 'disconnect');
       client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
-      const disconnectFailure = new Error('WebSocket disconnection failed');
-      jest.spyOn(client.transport.ws, 'disconnect').mockImplementationOnce(() => {
-        throw disconnectFailure;
-      });
+
+      disposable[Symbol.dispose]();
+      disposable[Symbol.dispose]();
+      CookieStore.setCookie(refreshedCookie);
+
+      expect(onCookieRefresh).not.toHaveBeenCalled();
+      expect(disconnect.mock.calls).toEqual([['Closed by client disposal'], ['Closed by client disposal']]);
+    });
+
+    it('automatically releases its cookie subscription at scope exit', () => {
+      const initialListenerCount = CookieStore.emitter.listenerCount(CookieStore.TOPIC.COOKIE_REFRESH);
+      const onCookieRefresh = jest.fn();
+
+      {
+        using client = new APIClient(testConfig);
+        client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+        CookieStore.setCookie(refreshedCookie);
+        expect(onCookieRefresh.mock.calls).toEqual([[refreshedCookie]]);
+        onCookieRefresh.mockClear();
+      }
+      CookieStore.setCookie(refreshedCookie);
+
+      expect(onCookieRefresh).not.toHaveBeenCalled();
+      expect(CookieStore.emitter.listenerCount(CookieStore.TOPIC.COOKIE_REFRESH)).toBe(initialListenerCount);
+    });
+
+    it('automatically releases its cookie subscription when a scope throws', () => {
+      const initialListenerCount = CookieStore.emitter.listenerCount(CookieStore.TOPIC.COOKIE_REFRESH);
+      const onCookieRefresh = jest.fn();
+      const scopeFailure = new Error('Resource scope failed');
 
       expect(() => {
-        client.dispose();
-      }).toThrow(disconnectFailure);
-      CookieStore.setCookie(refreshedCookie);
-      expect(onCookieRefresh).not.toHaveBeenCalled();
+        using client = new APIClient(testConfig);
+        client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
 
-      expect(() => {
-        client.dispose();
-        client.dispose();
-      }).not.toThrow();
+        throw scopeFailure;
+      }).toThrow(scopeFailure);
       CookieStore.setCookie(refreshedCookie);
+
       expect(onCookieRefresh).not.toHaveBeenCalled();
+      expect(CookieStore.emitter.listenerCount(CookieStore.TOPIC.COOKIE_REFRESH)).toBe(initialListenerCount);
     });
 
     it('delivers notifications when initializing an HTTP-only session after disconnect', async () => {
@@ -253,15 +305,13 @@ describe('APIClient', () => {
 
   describe('constructor', () => {
     it('constructs a client with production backend and StoreEngine by default', () => {
-      const client = new APIClient(testConfig);
-      apiClients.push(client);
+      using client = new APIClient(testConfig);
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs StoreEngine when only the URLs is provided', () => {
-      const client = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
-      apiClients.push(client);
+      using client = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
