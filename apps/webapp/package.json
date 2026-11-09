@@ -23,7 +23,7 @@
     "@sindresorhus/is": "8.1.0",
     "@tanstack/react-table": "8.21.3",
     "@tanstack/react-virtual": "3.14.24",
-    "@wireapp/avs": "file:../../../wire-avs/build/dist/wasm/wireapp-avs-0.0.0.tgz",
+    "@wireapp/avs": "10.5.44",
     "@wireapp/avs-debugger": "0.0.7",
     "@wireapp/commons": "5.4.13",
     "@wireapp/config": "1.0.0",
