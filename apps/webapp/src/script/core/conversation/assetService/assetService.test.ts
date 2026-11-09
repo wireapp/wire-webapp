@@ -26,15 +26,9 @@ import {AssetService} from './assetService';
 import {crypto as nodeCrypto} from '../../cryptography/assetCryptography/crypto.node';
 
 describe('AssetService', () => {
-  let apiClient: APIClient;
-
-  afterEach(() => {
-    apiClient.dispose();
-  });
-
   describe('downloadRawAsset', () => {
     it('downloads remote assets and passes the progress callback as the final argument', () => {
-      apiClient = new APIClient();
+      using apiClient = new APIClient();
       const assetService = new AssetService(apiClient, nodeCrypto);
       const progressCallback = jest.fn();
       const request = {
@@ -61,7 +55,7 @@ describe('AssetService', () => {
 
   describe('"uploadAsset"', () => {
     it('builds an encrypted asset payload', async () => {
-      apiClient = new APIClient();
+      using apiClient = new APIClient();
       const assetService = new AssetService(apiClient, nodeCrypto);
 
       const assetServerData = {
@@ -89,7 +83,7 @@ describe('AssetService', () => {
     });
 
     it('allows cancelling asset upload', async () => {
-      apiClient = new APIClient();
+      using apiClient = new APIClient();
       const assetService = new AssetService(apiClient, nodeCrypto);
 
       const apiUpload = {
@@ -105,7 +99,7 @@ describe('AssetService', () => {
     });
 
     it('exposes upload progress', async () => {
-      apiClient = new APIClient();
+      using apiClient = new APIClient();
       const assetService = new AssetService(apiClient, nodeCrypto);
 
       const apiUpload = {
