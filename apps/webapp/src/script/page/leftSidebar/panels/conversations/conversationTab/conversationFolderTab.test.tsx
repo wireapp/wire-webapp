@@ -73,20 +73,12 @@ async function getProps(testFactory: TestFactory, conversations: Conversation[] 
 }
 
 describe('ConversationFolderTab', () => {
-  let testFactory: TestFactory;
-
-  beforeEach(() => {
-    testFactory = new TestFactory();
-  });
-
-  afterEach(() => {
-    testFactory.dispose();
-  });
-
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),
   );
   it('should render empty folders list', async () => {
+    using testFactory = new TestFactory();
+
     const {props} = await getProps(testFactory);
     const {getByText} = render(<ConversationFolderTab {...props} />, {wrapper: rootProviderWrapper});
 
@@ -94,6 +86,8 @@ describe('ConversationFolderTab', () => {
   });
 
   it('should list custom folders only', async () => {
+    using testFactory = new TestFactory();
+
     const favoriteConversation = new Conversation('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     favoriteConversation.name('favoriteConversation');
 

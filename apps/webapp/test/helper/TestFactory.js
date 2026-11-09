@@ -118,6 +118,11 @@ export class TestFactory {
     this.#apiClient.dispose();
   }
 
+  /** @returns {void} */
+  [Symbol.dispose]() {
+    this.dispose();
+  }
+
   /**
    * @returns {Promise<StorageRepository>} The storage repository.
    */
