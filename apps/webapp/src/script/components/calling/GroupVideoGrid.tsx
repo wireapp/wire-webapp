@@ -19,7 +19,7 @@
 
 import {CSSProperties, ReactNode, useEffect, useState, type FunctionComponent} from 'react';
 
-import {css} from '@emotion/react';
+import type {CSSObject} from '@emotion/react';
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
@@ -118,8 +118,9 @@ function GroupVideoThumbnail({
       data-uie-name={isMinimized ? 'restore-self-video-preview' : 'minimize-self-video-preview'}
       css={{
         alignItems: 'center',
-        background: 'transparent',
+        backgroundColor: 'var(--background-fade-40)',
         border: 0,
+        borderRadius: '50%',
         color: 'var(--foreground)',
         cursor: 'pointer',
         display: 'flex',
@@ -131,7 +132,6 @@ function GroupVideoThumbnail({
         transition: 'opacity 120ms ease-out',
         '.group-video__thumbnail:hover &, .group-video__thumbnail:focus-within &': {opacity: 1},
         '&:focus-visible': {
-          backgroundColor: 'var(--background-fade-40)',
           outline: '2px solid var(--foreground)',
           outlineOffset: -2,
           opacity: 1,
@@ -139,7 +139,7 @@ function GroupVideoThumbnail({
         '@media (hover: none)': {opacity: 1},
       }}
     >
-      {isMinimized ? <Icon.PlusIcon aria-hidden="true" /> : <Icon.MinusIcon aria-hidden="true" />}
+      {isMinimized ? <Icon.FullscreenIcon aria-hidden="true" /> : <Icon.MinusIcon aria-hidden="true" />}
     </button>
   );
   const selfVideoWindowHeader = allowMinimize && (
@@ -224,7 +224,7 @@ function GroupVideoThumbnail({
         </GroupVideoThumbnailWrapper>
       )}
       {allowMinimize && isMinimized && (
-        <GroupVideoThumbnailWrapper minimized allowMinimize>
+        <GroupVideoThumbnailWrapper minimized allowMinimize selfPreviewMinimized>
           {selfVideoWindowHeader}
         </GroupVideoThumbnailWrapper>
       )}
@@ -268,22 +268,37 @@ const GroupVideoThumbnailWrapper: FunctionComponent<{
   children?: ReactNode;
   minimized: boolean;
   allowMinimize?: boolean;
-}> = ({children, minimized, allowMinimize = false}) => {
+  selfPreviewMinimized?: boolean;
+}> = ({children, minimized, allowMinimize = false, selfPreviewMinimized = false}) => {
+  let thumbnailStyles: CSSObject | undefined;
+  if (selfPreviewMinimized) {
+    thumbnailStyles = {
+      backgroundColor: 'transparent',
+      bottom: 'unset',
+      boxShadow: 'none',
+      height: 36,
+      maxHeight: 'none',
+      maxWidth: 'none',
+      overflow: 'visible',
+      right: 8,
+      top: 8,
+      width: 36,
+    };
+  } else if (minimized) {
+    thumbnailStyles = {
+      bottom: 'unset',
+      boxShadow: '0 0 0 1px var(--gray-90)',
+      height: 40,
+      right: 8,
+      top: 8,
+      width: 70,
+    };
+  }
+
   return (
     <div
       className="group-video__thumbnail"
-      css={
-        minimized
-          ? css`
-              bottom: unset;
-              box-shadow: 0 0 0 1px var(--gray-90);
-              height: 40px;
-              right: 8px;
-              top: 8px;
-              width: 70px;
-            `
-          : undefined
-      }
+      css={thumbnailStyles}
       data-uie-name="self-video-thumbnail-wrapper"
       aria-hidden={!allowMinimize}
     >

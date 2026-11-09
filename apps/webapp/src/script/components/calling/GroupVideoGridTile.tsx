@@ -160,7 +160,17 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
       aria-label={`Focus video ${participant?.user.id}`}
       css={
         isSelfParticipant && isSelfPreviewMinimized
-          ? {position: 'absolute', right: 12, top: 12, width: 70, height: 40, zIndex: 3}
+          ? {
+              backgroundColor: 'transparent',
+              borderRadius: 0,
+              height: 36,
+              overflow: 'visible',
+              position: 'absolute',
+              right: 12,
+              top: 12,
+              width: 36,
+              zIndex: 3,
+            }
           : undefined
       }
     >
@@ -264,8 +274,9 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
             data-uie-name={isSelfPreviewMinimized ? 'restore-self-video-preview' : 'minimize-self-video-preview'}
             css={{
               alignItems: 'center',
-              background: 'transparent',
+              backgroundColor: 'var(--background-fade-40)',
               border: 0,
+              borderRadius: '50%',
               color: 'var(--foreground)',
               cursor: 'pointer',
               display: 'flex',
@@ -277,7 +288,6 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
               transition: 'opacity 120ms ease-out',
               '.group-video-grid__element:hover &, .group-video-grid__element:focus-within &': {opacity: 1},
               '&:focus-visible': {
-                backgroundColor: 'var(--background-fade-40)',
                 outline: '2px solid var(--foreground)',
                 outlineOffset: -2,
                 opacity: 1,
@@ -285,7 +295,11 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
               '@media (hover: none)': {opacity: 1},
             }}
           >
-            {isSelfPreviewMinimized ? <Icon.PlusIcon aria-hidden="true" /> : <Icon.MinusIcon aria-hidden="true" />}
+            {isSelfPreviewMinimized ? (
+              <Icon.FullscreenIcon aria-hidden="true" />
+            ) : (
+              <Icon.MinusIcon aria-hidden="true" />
+            )}
           </button>
         </div>
       )}
