@@ -18,11 +18,7 @@
  */
 
 import {initializeStartupFeatureToggleUrl} from './initializeStartupFeatureToggleUrl';
-import {
-  forTestsOnlyFeatureToggleName,
-  sendCallLogsFeatureToggleName,
-  previewDefaultEnabledStartupFeatureToggleNames,
-} from './startupFeatureToggleNames';
+import {forTestsOnlyFeatureToggleName, sendCallLogsFeatureToggleName} from './startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from './startupFeatureToggles';
 import {updateLocationSearchForStartupFeatureToggle} from './startupFeatureToggleQueryParameters';
 
@@ -118,9 +114,5 @@ describe('initializeStartupFeatureToggleUrl', () => {
 
     expect(replaceUrl).not.toHaveBeenCalled();
     expect(createStartupFeatureTogglesFromLocationSearch(locationSearch).enabledFeatureToggleNames).toEqual([]);
-  });
-
-  it('keeps existing flags opted out of preview defaults until explicitly selected', () => {
-    expect(previewDefaultEnabledStartupFeatureToggleNames).toEqual([]);
   });
 });

@@ -40,17 +40,28 @@ export const startupFeatureToggleRegistry = [
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleRegistry)[number]['name'];
 
+type StartupFeatureToggleDefinition = {
+  readonly name: StartupFeatureToggleName;
+  readonly previewDefaultEnabled: boolean;
+};
+
 export const startupFeatureToggleNames: readonly StartupFeatureToggleName[] = startupFeatureToggleRegistry.map(
   featureToggle => {
     return featureToggle.name;
   },
 );
 
-export const previewDefaultEnabledStartupFeatureToggleNames: readonly StartupFeatureToggleName[] =
-  startupFeatureToggleRegistry
+export function selectPreviewDefaultEnabledStartupFeatureToggleNames(
+  featureDefinitions: readonly StartupFeatureToggleDefinition[],
+): readonly StartupFeatureToggleName[] {
+  return featureDefinitions
     .filter(featureToggle => {
       return featureToggle.previewDefaultEnabled;
     })
     .map(featureToggle => {
       return featureToggle.name;
     });
+}
+
+export const previewDefaultEnabledStartupFeatureToggleNames: readonly StartupFeatureToggleName[] =
+  selectPreviewDefaultEnabledStartupFeatureToggleNames(startupFeatureToggleRegistry);
