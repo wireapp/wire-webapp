@@ -19,11 +19,9 @@
 
 import {createClock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isNull} from '@sindresorhus/is';
-// eslint-disable-next-line import/order
+import {isNull, isUndefined} from '@sindresorhus/is';
 import 'core-js/full/reflect';
 
-// eslint-disable-next-line import/order
 import {ClientType} from '@wireapp/api-client/lib/client/';
 
 import {createRoot} from 'react-dom/client';
@@ -33,10 +31,13 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 
 import {createApplicationServices} from './createApplicationServices';
+import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {AppContainer} from '../components/appContainer/appContainer';
 import {Config} from '../Config';
+import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeStartupFeatureToggleUrl';
+import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
 import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
@@ -52,19 +53,46 @@ import {enableLogging} from '../util/loggerUtil';
 import {loadValue} from '../util/storageUtil';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
-retireLegacyServiceWorker({
-  serviceWorkerContainer: Maybe.of(navigator.serviceWorker),
-  cacheStorage: Maybe.of(window.caches),
-  origin: window.location.origin,
-}).catch((error: unknown) => {
-  console.warn('Legacy service worker cleanup failed; continuing application startup.', error);
-});
+export async function startApplication(
+  defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[],
+): Promise<void> {
+  initializeStartupFeatureToggleUrl({
+    url: new URL(window.location.href),
+    defaultEnabledFeatureToggleNames,
+    replaceUrl(url) {
+      window.history.replaceState(window.history.state, '', url);
+    },
+  });
 
-const clock = createClock();
-const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
+  const clock = createClock();
+  const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
+  const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
+  const fireAndForgetInvoker = createFireAndForgetInvoker({
+    reportError(error) {
+      fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
+    },
+  });
+  const documentContentLoaded = waitForDocumentContentLoaded({
+    readDocumentReadyState() {
+      return document.readyState;
+    },
+    readMonotonicMicroseconds() {
+      return clock.currentMonotonicMicroseconds;
+    },
+    subscribeToDocumentContentLoaded(listener) {
+      document.addEventListener('DOMContentLoaded', listener, {once: true});
+    },
+  });
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const domContentLoadedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
+  fireAndForgetInvoker.fireAndForget(() => {
+    return retireLegacyServiceWorker({
+      serviceWorkerContainer: Maybe.of(navigator.serviceWorker),
+      cacheStorage: Maybe.of(window.caches),
+      origin: window.location.origin,
+    });
+  });
+
+  const domContentLoadedAtMonotonicMicroseconds = await documentContentLoaded;
   const config = Config.getConfig();
   const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
     fetchBuildMetadata: globalThis.fetch.bind(globalThis),
@@ -92,47 +120,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
 
-  if (shouldPersist === undefined) {
+  if (isUndefined(shouldPersist)) {
     return doSimpleRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
   }
 
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
-  const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const applicationServices = createApplicationServices({
     createApplicationObservability() {
       return createApplicationObservabilityFromConfig(config);
     },
     clock,
-    createFireAndForgetInvoker: () => {
-      return createFireAndForgetInvoker({
-        reportError(error) {
-          fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
-        },
-      });
-    },
+    fireAndForgetInvoker,
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
-  const {applicationObservability, fireAndForgetInvoker} = applicationServices;
+  const {applicationObservability} = applicationServices;
   const apiClient = new APIClient({clock: applicationServices.clock});
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
     apiClient,
-    visibilityState: () => {
+    visibilityState() {
       return document.visibilityState;
     },
-    isElectron: () => {
+    isElectron() {
       return Runtime.isElectron();
     },
-    subscribeToApplicationSignal: (signalName, listener) => {
+    subscribeToApplicationSignal(signalName, listener) {
       document.addEventListener(signalName, listener);
     },
-    subscribeToRuntimeSignal: (signalName, listener) => {
+    subscribeToRuntimeSignal(signalName, listener) {
       globalThis.addEventListener(signalName, listener);
     },
-    unsubscribeFromApplicationSignal: (signalName, listener) => {
+    unsubscribeFromApplicationSignal(signalName, listener) {
       document.removeEventListener(signalName, listener);
     },
-    unsubscribeFromRuntimeSignal: (signalName, listener) => {
+    unsubscribeFromRuntimeSignal(signalName, listener) {
       globalThis.removeEventListener(signalName, listener);
     },
   });
@@ -140,11 +161,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   container.registerInstance(APIClient, apiClient);
   container.registerInstance(Core, core);
   function disposeApplicationResources(): void {
-    try {
-      cleanupIncrementalHttpRetryBackoffReset();
-    } finally {
-      apiClient.dispose();
-    }
+    using disposableApiClient = apiClient;
+    cleanupIncrementalHttpRetryBackoffReset();
   }
 
   globalThis.addEventListener('unload', disposeApplicationResources);
@@ -164,4 +182,4 @@ document.addEventListener('DOMContentLoaded', async () => {
       translate={translate}
     />,
   );
-});
+}

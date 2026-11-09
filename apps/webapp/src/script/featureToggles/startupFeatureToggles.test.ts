@@ -46,6 +46,15 @@ const featureToggleNamesWithDedicatedExistenceTests = [
 ] as const;
 
 describe('startupFeatureToggles', function () {
+  it.each(['?enabled-features', '?enabled-features=', '?enabled-features=%20%2C%20'])(
+    'resolves an explicit empty selection to no enabled features: %s',
+    locationSearch => {
+      const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
+
+      expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+    },
+  );
+
   it('returns disabled toggles when the query parameter is missing', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar');
 

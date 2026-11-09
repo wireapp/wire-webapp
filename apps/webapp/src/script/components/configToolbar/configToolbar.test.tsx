@@ -64,7 +64,7 @@ describe('ConfigToolbar', () => {
     });
     await userEvent.click(screen.getByRole('checkbox', {name: sendCallLogsFeatureToggleName}));
     expect(navigateTo).toHaveBeenCalledWith(
-      enabled ? '/app#preferences' : '/app?enabled-features=send-call-logs#preferences',
+      enabled ? '/app?enabled-features=#preferences' : '/app?enabled-features=send-call-logs#preferences',
     );
   });
 });

@@ -17,34 +17,107 @@
  *
  */
 
-import {pathWithParams} from './urlUtil';
+import {createAuthRedirectPath} from './urlUtil';
 
 import {forTestsOnlyFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {initializeStartupFeatureToggleUrl} from '../../featureToggles/initializeStartupFeatureToggleUrl';
 import {startupFeatureToggleQueryParameterName} from '../../featureToggles/startupFeatureToggles';
-import {QUERY_KEY} from '../route';
+import {FORWARDED_QUERY_KEYS, QUERY_KEY} from '../route';
 
 type AuthRedirectTestCase = {
   readonly authPath: string;
   readonly expectedMainAppPath: string;
 };
 
-function createAuthRedirectTest({authPath, expectedMainAppPath}: AuthRedirectTestCase): () => void {
+function createAuthRedirectTest(options: AuthRedirectTestCase): () => void {
+  const {authPath, expectedMainAppPath} = options;
+
   return () => {
-    const originalUrl = window.location.href;
-    const originalHistoryState = window.history.state;
+    const authUrl = new URL(authPath, 'https://example.com');
+    const mainAppPath = createAuthRedirectPath({
+      path: '../',
+      locationSearch: authUrl.search,
+      additionalQueryParameters: {},
+      allowedQueryParameterNames: FORWARDED_QUERY_KEYS,
+    });
 
-    try {
-      window.history.replaceState(null, '', authPath);
-      const mainAppPath = pathWithParams('../');
-
-      expect(mainAppPath).toBe(expectedMainAppPath);
-    } finally {
-      window.history.replaceState(originalHistoryState, '', originalUrl);
-    }
+    expect(mainAppPath).toBe(expectedMainAppPath);
   };
 }
 
-describe('pathWithParams', () => {
+describe('createAuthRedirectPath', () => {
+  it('omits the question mark when no query parameters are forwarded', () => {
+    const actualPath = createAuthRedirectPath({
+      path: '../',
+      locationSearch: '?unrelated=value',
+      additionalQueryParameters: {},
+      allowedQueryParameterNames: FORWARDED_QUERY_KEYS,
+    });
+
+    expect(actualPath).toBe('../');
+  });
+
+  it('keeps a path unchanged when the query string is empty', () => {
+    const actualPath = createAuthRedirectPath({
+      path: '../',
+      locationSearch: '',
+      additionalQueryParameters: {},
+      allowedQueryParameterNames: FORWARDED_QUERY_KEYS,
+    });
+
+    expect(actualPath).toBe('../');
+  });
+
+  it('preserves repeated forwarded parameters and their original encoding', () => {
+    const actualPath = createAuthRedirectPath({
+      path: '../',
+      locationSearch: '?hl=en&tracking=a%20b&tracking=a+b&&enabled-features=',
+      additionalQueryParameters: {},
+      allowedQueryParameterNames: FORWARDED_QUERY_KEYS,
+    });
+
+    expect(actualPath).toBe('../?hl=en&tracking=a%20b&tracking=a+b&enabled-features=');
+  });
+
+  it('honors a custom allowlist and appends additional parameters without encoding them again', () => {
+    const actualPath = createAuthRedirectPath({
+      path: '/auth/',
+      locationSearch: '?return=conversation%2F123&hl=en',
+      allowedQueryParameterNames: ['return'],
+      additionalQueryParameters: {destination_url: 'https%3A%2F%2Fexample.com', hl: 'de'},
+    });
+
+    expect(actualPath).toBe('/auth/?return=conversation%2F123&destination_url=https%3A%2F%2Fexample.com&hl=de');
+  });
+
+  it('forwards initialized defaults into authentication and back to the application', () => {
+    let applicationUrl = new URL('https://example.com/?hl=en');
+
+    initializeStartupFeatureToggleUrl({
+      url: applicationUrl,
+      defaultEnabledFeatureToggleNames: [forTestsOnlyFeatureToggleName],
+      replaceUrl(url) {
+        applicationUrl = new URL(url);
+      },
+    });
+    const authPath = createAuthRedirectPath({
+      path: '/auth/',
+      locationSearch: applicationUrl.search,
+      additionalQueryParameters: {},
+      allowedQueryParameterNames: FORWARDED_QUERY_KEYS,
+    });
+    const authUrl = new URL(`${authPath}#/login`, applicationUrl);
+    const mainAppPath = createAuthRedirectPath({
+      path: '../',
+      locationSearch: authUrl.search,
+      additionalQueryParameters: {},
+      allowedQueryParameterNames: FORWARDED_QUERY_KEYS,
+    });
+
+    expect(authPath).toBe('/auth/?hl=en&enabled-features=for-tests-only');
+    expect(mainAppPath).toBe('../?hl=en&enabled-features=for-tests-only');
+  });
+
   const startupFeatureToggleQueryString = new URLSearchParams({
     [startupFeatureToggleQueryParameterName]: forTestsOnlyFeatureToggleName,
   }).toString();
@@ -54,6 +127,22 @@ describe('pathWithParams', () => {
     createAuthRedirectTest({
       authPath: `/auth/?${startupFeatureToggleQueryString}#/login`,
       expectedMainAppPath: `../?${startupFeatureToggleQueryString}`,
+    }),
+  );
+
+  it(
+    'forwards an explicit empty selection so preview defaults cannot be restored after login',
+    createAuthRedirectTest({
+      authPath: '/auth/?enabled-features=#/login',
+      expectedMainAppPath: '../?enabled-features=',
+    }),
+  );
+
+  it(
+    'preserves unknown feature selections during authentication',
+    createAuthRedirectTest({
+      authPath: '/auth/?enabled-features=unknown-feature#/login',
+      expectedMainAppPath: '../?enabled-features=unknown-feature',
     }),
   );
 
