@@ -118,20 +118,40 @@ function GroupVideoThumbnail({
       data-uie-name={isMinimized ? 'restore-self-video-preview' : 'minimize-self-video-preview'}
       css={{
         alignItems: 'center',
-        backgroundColor: 'var(--background-fade-16)',
+        background: 'transparent',
         border: 0,
-        borderRadius: '50%',
         color: 'var(--foreground)',
         cursor: 'pointer',
         display: 'flex',
-        height: 32,
+        height: 28,
         justifyContent: 'center',
-        width: 32,
-        '&:focus-visible': {outline: '2px solid var(--foreground)', outlineOffset: 2},
+        padding: 6,
+        width: 28,
+        '&:focus-visible': {outline: '2px solid var(--foreground)', outlineOffset: -2},
       }}
     >
       {isMinimized ? <Icon.PlusIcon aria-hidden="true" /> : <Icon.MinusIcon aria-hidden="true" />}
     </button>
+  );
+  const selfVideoWindowHeader = allowMinimize && (
+    <div
+      data-uie-name="self-video-preview-window-header"
+      css={{
+        alignItems: 'center',
+        backgroundColor: 'var(--background-fade-16)',
+        borderRadius: '4px 4px 0 0',
+        display: 'flex',
+        height: 32,
+        justifyContent: 'flex-end',
+        left: 0,
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        zIndex: 2,
+      }}
+    >
+      {selfVideoToggleControl}
+    </div>
   );
 
   return (
@@ -173,7 +193,7 @@ function GroupVideoThumbnail({
               ✋
             </span>
           )}
-          {allowMinimize && selfVideoToggleControl}
+          {selfVideoWindowHeader}
         </GroupVideoThumbnailWrapper>
       )}
       {!isMinimized && !thumbnail.hasActiveVideo && (
@@ -205,13 +225,13 @@ function GroupVideoThumbnail({
               participant={selfParticipant.user}
               hideAvailabilityStatus
             />
-            {allowMinimize && selfVideoToggleControl}
           </div>
+          {selfVideoWindowHeader}
         </GroupVideoThumbnailWrapper>
       )}
       {allowMinimize && isMinimized && (
         <GroupVideoThumbnailWrapper minimized allowMinimize>
-          {selfVideoToggleControl}
+          {selfVideoWindowHeader}
         </GroupVideoThumbnailWrapper>
       )}
     </>
