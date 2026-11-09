@@ -17,15 +17,16 @@
  *
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, waitFor, screen} from '@testing-library/react';
 import {ClientType} from '@wireapp/api-client/lib/client';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {Runtime, TypeUtil} from '@wireapp/commons';
 import {StatusCodes} from 'http-status-codes';
 import {Provider} from 'react-redux';
-import {HashRouter as Router} from 'react-router';
+import {HashRouter as Router, Route, Routes} from 'react-router';
 
 import {Login} from './login';
+import * as authHelpers from '../../util/helpers';
 
 import {Config, Configuration} from '../../../Config';
 import {configureStore} from '../../configureStore';
@@ -37,7 +38,19 @@ import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {mountComponent, withIntl, withTheme} from '../../util/test/testUtil';
 
 describe('Login', () => {
-  it('successfully logs in with email', async () => {
+  const originalUrl = window.location.href;
+  afterEach(() => {
+    window.history.replaceState({}, '', originalUrl);
+  });
+
+  it.each([false, true])('successfully logs in with email (OAuth: %s)', async isOAuth => {
+    const query = '?client_id=client&scope=read%3Aself&state=a%2Bb&code_challenge=challenge&code_challenge_method=S256';
+    if (isOAuth) {
+      window.history.replaceState({}, '', `#${ROUTE.PASSWORD_LOGIN}${query}`);
+      spyOn(actionRoot.authAction, 'doInit').and.returnValue(() => {
+        return Promise.reject(new Error('No existing session'));
+      });
+    }
     const historyPushSpy = spyOn(history, 'pushState');
 
     const email = 'email@mail.com';
@@ -64,7 +77,11 @@ describe('Login', () => {
       );
     });
 
-    expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.HISTORY_INFO}`);
+    expect(historyPushSpy).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(String),
+      isOAuth ? `#${ROUTE.AUTHORIZE}/${query}` : `#${ROUTE.HISTORY_INFO}`,
+    );
   });
 
   it('redirects to client deletion page if max devices is reached', async () => {
@@ -213,5 +230,77 @@ describe('Login', () => {
       const backButton = getByTestId('go-index');
       expect(backButton).not.toBeNull();
     });
+  });
+});
+
+describe.each([
+  '?scope=read%3Aself&client_id=client&state=a%2Bb&code_challenge=challenge&code_challenge_method=S256',
+  '?client_id=client&scope=read%3Aself&state=a%2Bb&code_challenge=challenge&code_challenge_method=S256',
+])('OAuth login entry (%s)', query => {
+  const originalUrl = window.location.href;
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    window.history.replaceState({}, '', originalUrl);
+  });
+
+  it('routes a direct OAuth login request to the enterprise entry with its query intact', async () => {
+    window.history.replaceState({}, '', `#/login/${query}`);
+    jest.spyOn(authHelpers, 'getEnterpriseLoginV2FF').mockReturnValue(true);
+    const replace = jest.spyOn(history, 'replaceState').mockReturnValue(undefined);
+    jest.spyOn(actionRoot.authAction, 'doInit').mockReturnValue(() => {
+      return Promise.reject(new Error('No existing session'));
+    });
+    mountComponent(<Login />, mockStoreFactory()(initialRootState));
+
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#/sso/${query}`);
+    });
+  });
+
+  it('preserves OAuth when an existing session reaches the device limit', async () => {
+    window.history.replaceState({}, '', `#/login/${query}`);
+    jest.spyOn(authHelpers, 'getEnterpriseLoginV2FF').mockReturnValue(true);
+    jest.spyOn(actionRoot.authAction, 'doInit').mockReturnValue(() => {
+      return Promise.resolve();
+    });
+    jest.spyOn(actionRoot.clientAction, 'doInitializeClient').mockReturnValue(() => {
+      return Promise.reject(
+        new BackendError('Too many clients', BackendErrorLabel.TOO_MANY_CLIENTS, StatusCodes.FORBIDDEN),
+      );
+    });
+    const push = jest.spyOn(history, 'pushState').mockReturnValue(undefined);
+    mountComponent(<Login />, mockStoreFactory()(initialRootState));
+
+    await waitFor(() => {
+      expect(push).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.CLIENTS}${query}`);
+    });
+  });
+
+  it('keeps the password step accessible after enterprise email discovery', async () => {
+    window.history.replaceState({}, '', `#${ROUTE.PASSWORD_LOGIN}${query}`);
+    jest.spyOn(authHelpers, 'getEnterpriseLoginV2FF').mockReturnValue(true);
+    const init = jest.spyOn(actionRoot.authAction, 'doInit').mockReturnValue(() => {
+      return Promise.resolve();
+    });
+    const initializeClient = jest.spyOn(actionRoot.clientAction, 'doInitializeClient').mockReturnValue(() => {
+      return Promise.reject(new Error('No existing session'));
+    });
+
+    await act(async () => {
+      mountComponent(
+        <Routes>
+          <Route path={`${ROUTE.LOGIN}/*`} element={<Login />} />
+          <Route path={`${ROUTE.SSO}/*`} element={<div>Unexpected SSO redirect</div>} />
+        </Routes>,
+        mockStoreFactory()(initialRootState),
+      );
+    });
+
+    expect(init).toHaveBeenCalled();
+    expect(initializeClient).toHaveBeenCalled();
+    expect(window.location.hash).toBe(`#${ROUTE.PASSWORD_LOGIN}${query}`);
+    expect(screen.getByTestId('enter-password')).toBeInTheDocument();
+    expect(screen.queryByText('Unexpected SSO redirect')).not.toBeInTheDocument();
   });
 });

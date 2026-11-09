@@ -51,6 +51,7 @@ import {QUERY_KEY, ROUTE} from '../../route';
 import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
 import {logoutReasonStrings} from '../../util/logoutUtil';
+import {withOAuthQuery} from '../../util/oauthUtil';
 import {getSearchParams, SSO_CODE_PREFIX} from '../../util/urlUtil';
 
 interface SingleSignOnFormProps {
@@ -122,7 +123,8 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
         await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
       }
 
-      navigate(ROUTE.HISTORY_INFO);
+      const authorizationRoute = withOAuthQuery(ROUTE.AUTHORIZE);
+      navigate(authorizationRoute === ROUTE.AUTHORIZE ? ROUTE.HISTORY_INFO : authorizationRoute);
     },
     [
       clientType,

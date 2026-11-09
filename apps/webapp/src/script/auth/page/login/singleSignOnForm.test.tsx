@@ -328,3 +328,40 @@ describe('SingleSignOnForm', () => {
     });
   });
 });
+
+describe('SSO OAuth continuation', () => {
+  const originalUrl = window.location.href;
+
+  afterEach(() => {
+    window.history.replaceState({}, '', originalUrl);
+  });
+
+  it('returns to consent with the original request after successful SSO', async () => {
+    const query =
+      '?client_id=client&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&scope=read%3Aself&state=a%2Bb%26c&response_type=code&code_challenge=challenge&code_challenge_method=S256';
+    window.history.replaceState({}, '', `#/sso${query}`);
+    const historyPushSpy = spyOn(history, 'pushState');
+    const doLogin = jest.fn().mockResolvedValue(undefined);
+    spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => {
+      return Promise.resolve();
+    });
+    spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => {
+      return Promise.resolve();
+    });
+
+    const {getByTestId} = mountComponent(<SingleSignOnForm doLogin={doLogin} />, mockStoreFactory()(initialRootState));
+    fireEvent.change(getByTestId(codeOrEmailInputId), {
+      target: {value: 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab'},
+    });
+    fireEvent.click(getByTestId(submitButtonId));
+
+    await waitFor(() => {
+      expect(historyPushSpy).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(String),
+        `#${ROUTE.AUTHORIZE}${query}`,
+      );
+    });
+    expect(doLogin).toHaveBeenCalledWith('cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab');
+  });
+});
