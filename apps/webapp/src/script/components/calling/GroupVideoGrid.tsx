@@ -150,8 +150,12 @@ function GroupVideoThumbnail({
 
   return (
     <>
-      {!isMinimized && !isNullOrUndefined(thumbnail.videoStream) && maximizedParticipant === null && (
-        <GroupVideoThumbnailWrapper minimized={minimized} allowMinimize={allowMinimize}>
+      {!isNullOrUndefined(thumbnail.videoStream) && maximizedParticipant === null && (
+        <GroupVideoThumbnailWrapper
+          minimized={minimized}
+          allowMinimize={allowMinimize}
+          selfPreviewMinimized={isMinimized}
+        >
           <Video
             className="group-video__thumbnail-video"
             autoPlay
@@ -165,6 +169,7 @@ function GroupVideoThumbnail({
             onCanPlay={onVideoCanPlay}
             css={{
               transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
+              visibility: isMinimized ? 'hidden' : 'visible',
             }}
             srcObject={thumbnail.processedVideoStream?.stream ?? thumbnail.videoStream}
           />
@@ -190,8 +195,12 @@ function GroupVideoThumbnail({
           {selfVideoWindowHeader}
         </GroupVideoThumbnailWrapper>
       )}
-      {!isMinimized && !thumbnail.hasActiveVideo && (
-        <GroupVideoThumbnailWrapper minimized={minimized} allowMinimize={allowMinimize}>
+      {!thumbnail.hasActiveVideo && (
+        <GroupVideoThumbnailWrapper
+          minimized={minimized}
+          allowMinimize={allowMinimize}
+          selfPreviewMinimized={isMinimized}
+        >
           <div
             css={{
               alignItems: 'center',
@@ -199,6 +208,7 @@ function GroupVideoThumbnail({
               height: '100%',
               justifyContent: 'center',
               width: '100%',
+              visibility: isMinimized ? 'hidden' : 'visible',
             }}
           >
             {selfIsMuted && !minimized && (
@@ -220,11 +230,6 @@ function GroupVideoThumbnail({
               hideAvailabilityStatus
             />
           </div>
-          {selfVideoWindowHeader}
-        </GroupVideoThumbnailWrapper>
-      )}
-      {allowMinimize && isMinimized && (
-        <GroupVideoThumbnailWrapper minimized allowMinimize selfPreviewMinimized>
           {selfVideoWindowHeader}
         </GroupVideoThumbnailWrapper>
       )}
