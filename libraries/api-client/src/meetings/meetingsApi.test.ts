@@ -25,6 +25,15 @@ import {MeetingRecurrenceFrequency} from './meetingRecurrence';
 
 describe('MeetingsAPI', () => {
   const testConfig: Config = {urls: {rest: 'https://test.zinfra.io', ws: '', name: 'test'}};
+  let client: APIClient;
+
+  beforeEach(() => {
+    client = new APIClient(testConfig);
+  });
+
+  afterEach(() => {
+    client.dispose();
+  });
 
   const validMeeting = {
     created_at: '2026-06-15T09:00:00.000Z',
@@ -73,7 +82,6 @@ describe('MeetingsAPI', () => {
   };
 
   it('sends meeting requests through the versioned HTTP client', async () => {
-    const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
       data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
@@ -94,7 +102,6 @@ describe('MeetingsAPI', () => {
   });
 
   it('throws when meeting responses fail schema validation', async () => {
-    const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
       data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
@@ -107,7 +114,6 @@ describe('MeetingsAPI', () => {
   });
 
   it('returns parsed meeting responses for valid payloads', async () => {
-    const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
       data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
@@ -122,7 +128,6 @@ describe('MeetingsAPI', () => {
   });
 
   it('returns parsed create meeting responses with embedded conversation', async () => {
-    const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
       data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
@@ -156,7 +161,6 @@ describe('MeetingsAPI', () => {
   });
 
   it('returns parsed update meeting responses with embedded conversation', async () => {
-    const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
       data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
@@ -181,7 +185,6 @@ describe('MeetingsAPI', () => {
   });
 
   it('deletes a meeting by qualified id', async () => {
-    const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
       data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
@@ -242,7 +245,6 @@ describe('MeetingsAPI', () => {
       validMeeting,
     ],
   ] as const)('disables infinite network retries for %s', async (_name, callMeetingsApi, responseData) => {
-    const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
       data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);

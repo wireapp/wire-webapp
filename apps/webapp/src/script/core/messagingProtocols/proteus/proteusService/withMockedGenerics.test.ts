@@ -20,7 +20,6 @@
 import type {ProteusService} from './proteusService';
 import * as GenericMessageParams from '../utility/getGenericMessageParams';
 
-import {APIClient} from '@wireapp/api-client';
 import {ClientClassification} from '@wireapp/api-client/lib/client';
 import {Conversation, NewConversation} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -36,11 +35,8 @@ jest.mock('../utility/getGenericMessageParams', () => {
 });
 const MockedGenericMessageParams = GenericMessageParams as jest.Mocked<typeof GenericMessageParams>;
 
-const apiClients: APIClient[] = [];
-
 const prepareProteusService = async (): Promise<ProteusService> => {
   const [proteusService, {apiClient}] = await buildProteusService();
-  apiClients.push(apiClient);
 
   jest.spyOn(apiClient.api.user, 'postListClients').mockImplementation(() => {
     return Promise.resolve({
@@ -63,6 +59,10 @@ const prepareProteusService = async (): Promise<ProteusService> => {
 };
 
 describe('sendGenericMessage', () => {
+  afterEach(() => {
+    cleanupProteusServiceMocks();
+  });
+
   describe('targetted messages', () => {
     it(`indicates when sending was canceled`, async () => {
       const proteusService = await prepareProteusService();
@@ -87,12 +87,12 @@ describe('sendGenericMessage', () => {
 });
 
 describe('createConversation', () => {
+  afterEach(() => {
+    cleanupProteusServiceMocks();
+  });
+
   afterAll(() => {
     jest.clearAllTimers();
-    apiClients.forEach(client => {
-      client.disconnect();
-    });
-    cleanupProteusServiceMocks();
   });
 
   describe('calls the api with valid conversation data', () => {

@@ -24,10 +24,14 @@ import {ClientType} from '../client/clientType';
 import {StatusCode} from '../http';
 
 describe('AuthAPI', () => {
-  const apiClient = new APIClient();
+  let apiClient: APIClient;
 
-  afterAll(() => {
-    apiClient.disconnect();
+  beforeEach(() => {
+    apiClient = new APIClient();
+  });
+
+  afterEach(() => {
+    apiClient.dispose();
   });
 
   it('sets the client to permanent', async () => {

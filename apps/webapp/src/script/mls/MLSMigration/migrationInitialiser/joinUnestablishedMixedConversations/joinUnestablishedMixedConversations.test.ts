@@ -49,6 +49,10 @@ const createMixedConversation = (mockGroupId: string, epoch = 5): MixedConversat
 };
 
 describe('joinUnestablishedMixedConversations', () => {
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
   let testFactory: TestFactory;
 
   beforeEach(() => {

@@ -105,10 +105,11 @@ const buildMessageService = async (): Promise<
 };
 
 describe('MessageService', () => {
-  afterAll(() => {
+  afterEach(() => {
     apiClients.forEach(client => {
-      client.disconnect();
+      client.dispose();
     });
+    apiClients.length = 0;
     cleanupProteusServiceMocks();
   });
   describe('sendMessage', () => {

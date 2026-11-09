@@ -96,10 +96,11 @@ const buildSubconversationService = async (isFederated = false): Promise<Subconv
 };
 
 describe('SubconversationService', () => {
-  afterAll(() => {
+  afterEach(() => {
     apiClients.forEach(client => {
-      client.disconnect();
+      client.dispose();
     });
+    apiClients.length = 0;
   });
 
   describe('joinConferenceSubconversation', () => {

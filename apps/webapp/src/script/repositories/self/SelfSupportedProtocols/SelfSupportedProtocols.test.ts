@@ -201,6 +201,10 @@ const evaluateProtocolsScenarios = [
 ] as const;
 
 describe('evaluateSelfSupportedProtocols', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   describe.each([{allActiveClientsMLSCapable: true}, {allActiveClientsMLSCapable: false}])(
     '%o',
     ({allActiveClientsMLSCapable}) => {

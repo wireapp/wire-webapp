@@ -254,6 +254,10 @@ function createSftCallingFixture(): SftCallingFixture {
 }
 
 describe('CallingRepository', () => {
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
   let testFactory: TestFactory;
   let callingRepository: CallingRepository;
   let wCall: Wcall;

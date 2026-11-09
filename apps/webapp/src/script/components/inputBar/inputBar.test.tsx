@@ -73,6 +73,10 @@ let searchRepository: SearchRepository;
 let storageRepository: StorageRepository;
 
 describe('InputBar', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     eventRepository = await testFactory.exposeEventActors();
 

@@ -56,6 +56,10 @@ const changeConversationProtocolToMixed = (conversation: Conversation, groupId: 
 };
 
 describe('initialiseMigrationOfProteusConversations', () => {
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
   let testFactory: TestFactory;
 
   beforeEach(() => {

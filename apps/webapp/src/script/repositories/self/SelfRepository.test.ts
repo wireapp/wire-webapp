@@ -55,6 +55,10 @@ const generateMLSFeatureConfig = (supportedProtocols: CONVERSATION_PROTOCOL[]): 
 };
 
 describe('SelfRepository', () => {
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
   beforeEach(() => {
     testFactory = new TestFactory(
       createCoreTestFixture({

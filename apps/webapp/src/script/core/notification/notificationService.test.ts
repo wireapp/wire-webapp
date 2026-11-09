@@ -38,10 +38,11 @@ const mockedConversationService = {} as unknown as ConversationService;
 const apiClients: APIClient[] = [];
 
 describe('NotificationService', () => {
-  afterAll(() => {
+  afterEach(() => {
     apiClients.forEach(client => {
-      client.disconnect();
+      client.dispose();
     });
+    apiClients.length = 0;
   });
 
   describe('handleEvent', () => {

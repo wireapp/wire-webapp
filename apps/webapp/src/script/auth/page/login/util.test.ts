@@ -147,6 +147,10 @@ describe('Login util', () => {
     let loginWithSSO: jest.MockedFunction<(code: string, password?: string) => Promise<void>>;
     let apiClient: APIClient;
 
+    afterEach(() => {
+      apiClient.dispose();
+    });
+
     beforeEach(() => {
       dispatchSpy = jest.fn();
       dispatch = dispatchSpy;

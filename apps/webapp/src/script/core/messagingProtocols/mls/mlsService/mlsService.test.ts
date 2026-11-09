@@ -145,10 +145,11 @@ describe('MLSService', () => {
     jest.clearAllTimers();
   });
 
-  afterAll(() => {
+  afterEach(() => {
     apiClients.forEach(client => {
-      client.disconnect();
+      client.dispose();
     });
+    apiClients.length = 0;
   });
 
   describe('registerConversation', () => {

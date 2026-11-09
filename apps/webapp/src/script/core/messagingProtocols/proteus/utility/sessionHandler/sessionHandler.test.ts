@@ -67,15 +67,19 @@ describe('SessionHandler', () => {
     saveSession: jest.fn(),
     deleteSession: jest.fn(),
   } as unknown as CryptoClient;
-  const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+  let apiClient: APIClient;
 
-  beforeAll(() => {
+  beforeEach(() => {
+    apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
     jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockImplementation(generatePrekeys);
   });
 
   afterAll(() => {
     jest.clearAllTimers();
-    apiClient.disconnect();
+  });
+
+  afterEach(() => {
+    apiClient.dispose();
   });
 
   describe('constructSessionId', () => {

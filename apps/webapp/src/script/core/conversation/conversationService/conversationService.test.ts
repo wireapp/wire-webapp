@@ -140,10 +140,11 @@ const mockedProteusService = {
 const apiClients: APIClient[] = [];
 
 describe('ConversationService', () => {
-  afterAll(() => {
+  afterEach(() => {
     apiClients.forEach(client => {
-      client.disconnect();
+      client.dispose();
     });
+    apiClients.length = 0;
   });
 
   async function buildConversationService(coreDatabase?: CoreDatabase): Promise<ConversationServiceTestSetup> {
