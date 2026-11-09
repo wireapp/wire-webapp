@@ -19,6 +19,7 @@
 
 import {
   applockRefactoredFeatureToggleName,
+  driveBulkActionsFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   previewDefaultEnabledStartupFeatureToggleNames,
   selectPreviewDefaultEnabledStartupFeatureToggleNames,
@@ -63,6 +64,10 @@ describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
 
     expect(previewDefaultEnabledStartupFeatureToggleNames).toEqual(expectedDefaultNames);
     expect(startupFeatureToggleNames).toEqual(expect.arrayContaining(previewDefaultEnabledStartupFeatureToggleNames));
+  });
+
+  it('enables Drive bulk actions by default in preview builds', () => {
+    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(driveBulkActionsFeatureToggleName);
   });
 
   it('keeps the test-only flag explicitly opted out of preview defaults', () => {
