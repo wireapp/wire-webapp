@@ -36,7 +36,7 @@ export const retrieveCookie = async <T>(response: AxiosResponse<T>): Promise<T> 
       return cookie !== undefined ? [cookie] : [];
     });
     for (const cookie of cookies) {
-      const cookieString = cookie.expires.toString();
+      const cookieString = cookie.expires?.toString() ?? 'Infinity';
       CookieStore.setCookie(new Cookie(cookie.value, cookieString));
       logger.info(
         `Saved internal cookie. It will expire on "${cookieString}".`,

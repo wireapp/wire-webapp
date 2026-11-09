@@ -35,7 +35,7 @@ const obfuscateAccessToken = (accessToken: AccessTokenData, enabled = true): Acc
 
 const obfuscateCookie = (cookie: ToughCookie, enabled = true): ToughCookie => {
   if (enabled) {
-    const obfuscatedCookie = cookie.clone();
+    const obfuscatedCookie = cookie.clone() ?? new ToughCookie({key: cookie.key});
     obfuscatedCookie.value = `${cookie.value.substr(0, obfuscationLengthLimit)}...`;
     return obfuscatedCookie;
   }
