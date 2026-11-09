@@ -52,6 +52,7 @@ import {
   folderDropOverlayTitleStyles,
   folderDropTargetRowStyles,
   headerCellStyles,
+  selectionHeaderCellStyles,
   moveOutcomeMessageStyles,
   tableActionsCellStyles,
   tableCellRow,
@@ -155,7 +156,7 @@ const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
 
   return (
     <th
-      css={headerCellStyles}
+      css={header.column.id === 'selection' ? selectionHeaderCellStyles : headerCellStyles}
       aria-sort={ariaSort}
       style={{
         width: header.id === 'name' ? undefined : header.getSize(),
@@ -679,6 +680,22 @@ export const CellsTable = ({
     });
   };
 
+  const handleTogglePageSelection = (isSelected: boolean): void => {
+    activeDriveDrag.current = null;
+    clearPermanentDeleteRejection();
+    setSelectedNodeIds(currentSelection => {
+      const nextSelection = new Set(currentSelection);
+      for (const node of nodes) {
+        if (isSelected) {
+          nextSelection.add(node.id);
+        } else {
+          nextSelection.delete(node.id);
+        }
+      }
+      return nextSelection;
+    });
+  };
+
   const isCurrentPermanentDeleteScope = (scopeKey: string, path: string): boolean => {
     return isInRecycleBin() && getCellsFilesPath() === path && selectionScopeKeyRef.current === scopeKey;
   };
@@ -747,6 +764,7 @@ export const CellsTable = ({
   const labels = {
     actions: translate('cells.tableRow.actions'),
     created: translate('cells.tableRow.modified'),
+    selectAllOnPage: translate('cells.selection.allItemsOnPage'),
     name: translate('cells.tableRow.name'),
     owner: translate('cells.tableRow.owner'),
     publicLink: translate('cells.tableRow.publicLink'),
@@ -777,6 +795,12 @@ export const CellsTable = ({
       onToggleSort,
       selectedNodeIds,
       onToggleSelection: handleToggleSelection,
+      onTogglePageSelection: handleTogglePageSelection,
+      isPageSelected:
+        nodes.length > 0 &&
+        nodes.every(node => {
+          return selectedNodeIds.has(node.id);
+        }),
       selectionEnabled: isRowSelectionEnabled,
     }),
     getCoreRowModel: getCoreRowModel(),

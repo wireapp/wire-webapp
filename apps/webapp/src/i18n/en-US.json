@@ -607,6 +607,7 @@
   "cells.search.placeholder": "Search files and folders",
   "cells.search.results": "Search results",
   "cells.search.resultsIn": "Search results in {folderName}",
+  "cells.selection.allItemsOnPage": "all items on this page",
   "cells.selection.clear": "Clear selection",
   "cells.selection.move": "Move",
   "cells.selection.moveToBin": "Move to bin",

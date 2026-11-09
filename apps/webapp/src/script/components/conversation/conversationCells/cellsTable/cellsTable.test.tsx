@@ -58,6 +58,9 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.selection.selectItem') {
     return `Select ${substitutions?.name}`;
   }
+  if (key === 'cells.selection.allItemsOnPage') {
+    return 'all items on this page';
+  }
   if (key === 'cells.selection.clear') {
     return 'Clear selection';
   }
@@ -406,15 +409,134 @@ const renderCellsTable = ({
 };
 
 describe('CellsTable selection', () => {
+  it.each([
+    {label: 'a viewer', selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER, isBulkActionsEnabled: true},
+    {
+      label: 'an editor with the feature flag off',
+      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+      isBulkActionsEnabled: false,
+    },
+    {
+      label: 'a viewer with the feature flag off',
+      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+      isBulkActionsEnabled: false,
+    },
+  ])('hides page and row selection for $label', ({selfUserDriveRole, isBulkActionsEnabled}) => {
+    renderCellsTable({selfUserDriveRole, isBulkActionsEnabled});
+
+    expect(screen.getByRole('row', {name: /Marketing images/})).toBeInTheDocument();
+    expect(screen.getByRole('row', {name: /Wire logs.pdf/})).toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', {name: 'Select all items on this page'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', {name: 'Select Marketing images'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', {name: 'Select Wire logs.pdf'})).not.toBeInTheDocument();
+  });
+
+  it.each([THEME_ID.LIGHT, THEME_ID.DARK])('aligns page and row selection checkboxes in the %s theme', themeId => {
+    renderCellsTable({themeId});
+
+    const selectionHeader = screen.getAllByRole('columnheader')[0];
+    const firstSelectionCell = screen.getAllByRole('cell')[0];
+
+    expect(getComputedStyle(selectionHeader).paddingLeft).toBe(getComputedStyle(firstSelectionCell).paddingLeft);
+  });
+
+  it('selects and deselects every item on the current page', () => {
+    renderCellsTable();
+
+    const selectAllCheckbox = screen.getByRole('checkbox', {name: 'Select all items on this page'});
+    expect(selectAllCheckbox).not.toBeChecked();
+
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    expect(selectAllCheckbox).not.toBeChecked();
+
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select all items on this page'}));
+
+    expect(screen.getAllByRole('checkbox')).toHaveLength(3);
+    expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeChecked();
+    expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeChecked();
+    expect(within(screen.getByRole('status')).getByText('2 selected')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', {name: 'Select all items on this page'})).toBeChecked();
+
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select all items on this page'}));
+
+    expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).not.toBeChecked();
+    expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).not.toBeChecked();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it.each([THEME_ID.LIGHT, THEME_ID.DARK])('selects all current-page items in the %s theme', themeId => {
+    renderCellsTable({themeId});
+
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select all items on this page'}));
+
+    expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeChecked();
+    expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeChecked();
+  });
+
+  it.each([1, 25])('selects and clears all %s items on the current page', pageSize => {
+    const pageItems = Array.from({length: pageSize}, (_, index) => {
+      return createNode({
+        id: `page-item-${index}`,
+        name: `Page item ${index}`,
+        type: CellNodeType.FILE,
+      });
+    });
+    renderCellsTable({initialNodes: pageItems});
+
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select all items on this page'}));
+
+    expect(screen.getByText(`${pageSize} selected`)).toBeInTheDocument();
+    expect(
+      screen
+        .getAllByRole('checkbox')
+        .slice(1)
+        .every(checkbox => {
+          return (checkbox as HTMLInputElement).checked;
+        }),
+    ).toBe(true);
+
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select all items on this page'}));
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('limits select all to the currently displayed page after page and page-size changes', () => {
+    const firstPage = [
+      createNode({id: 'first-page-file', name: 'First page file', type: CellNodeType.FILE}),
+      createNode({id: 'first-page-folder', name: 'First page folder', type: CellNodeType.FOLDER}),
+    ];
+    const secondPage = [
+      createNode({id: 'second-page-file', name: 'Second page file', type: CellNodeType.FILE}),
+      createNode({id: 'second-page-folder', name: 'Second page folder', type: CellNodeType.FOLDER}),
+      createNode({id: 'second-page-extra', name: 'Second page extra', type: CellNodeType.FILE}),
+    ];
+    const {rerenderWithNodes} = renderCellsTable({initialNodes: firstPage});
+
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select all items on this page'}));
+    expect(screen.getByText('2 selected')).toBeInTheDocument();
+
+    rerenderWithNodes(secondPage);
+
+    expect(screen.queryByText('2 selected')).not.toBeInTheDocument();
+    expect(screen.getByRole('checkbox', {name: 'Select all items on this page'})).not.toBeChecked();
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select all items on this page'}));
+
+    expect(screen.getByText('3 selected')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', {name: 'Select Second page file'})).toBeChecked();
+    expect(screen.getByRole('checkbox', {name: 'Select Second page folder'})).toBeChecked();
+    expect(screen.getByRole('checkbox', {name: 'Select Second page extra'})).toBeChecked();
+    expect(screen.queryByRole('checkbox', {name: 'Select First page file'})).not.toBeInTheDocument();
+  });
+
   it('shows the precise total for selected files and clears it with the selection', () => {
     const files = [
-      createNode({id: 'first-file', type: CellNodeType.FILE, sizeBytes: Maybe.just(104857600)}),
-      createNode({id: 'second-file', type: CellNodeType.FILE, sizeBytes: Maybe.just(129918566)}),
+      createNode({id: 'first-file', name: 'First file', type: CellNodeType.FILE, sizeBytes: Maybe.just(104857600)}),
+      createNode({id: 'second-file', name: 'Second file', type: CellNodeType.FILE, sizeBytes: Maybe.just(129918566)}),
     ];
     renderCellsTable({initialNodes: files});
 
-    fireEvent.click(screen.getAllByRole('checkbox')[0]);
-    fireEvent.click(screen.getAllByRole('checkbox')[1]);
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select First file'}));
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Second file'}));
 
     expect(within(screen.getByRole('status')).getByText('2 selected')).toBeInTheDocument();
     expect(within(screen.getByRole('status')).getByText('223.9 MB')).toBeInTheDocument();
@@ -427,13 +549,18 @@ describe('CellsTable selection', () => {
 
   it('omits the total when the selected files would overflow a safe integer', () => {
     const files = [
-      createNode({id: 'first-file', type: CellNodeType.FILE, sizeBytes: Maybe.just(Number.MAX_SAFE_INTEGER)}),
-      createNode({id: 'second-file', type: CellNodeType.FILE, sizeBytes: Maybe.just(1)}),
+      createNode({
+        id: 'first-file',
+        name: 'First file',
+        type: CellNodeType.FILE,
+        sizeBytes: Maybe.just(Number.MAX_SAFE_INTEGER),
+      }),
+      createNode({id: 'second-file', name: 'Second file', type: CellNodeType.FILE, sizeBytes: Maybe.just(1)}),
     ];
     renderCellsTable({initialNodes: files});
 
-    fireEvent.click(screen.getAllByRole('checkbox')[0]);
-    fireEvent.click(screen.getAllByRole('checkbox')[1]);
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select First file'}));
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Second file'}));
 
     expect(within(screen.getByRole('status')).getByText('2 selected')).toBeInTheDocument();
     expect(within(screen.getByRole('status')).queryByText(/\d+(\.\d+)? (B|KB|MB|GB)/)).not.toBeInTheDocument();
@@ -445,7 +572,7 @@ describe('CellsTable selection', () => {
   ])('omits the selected size when the selection contains $label', ({node}) => {
     renderCellsTable({initialNodes: [node]});
 
-    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Node name'}));
 
     const selectionStatus = screen.getByRole('status');
     expect(within(selectionStatus).getByText('1 selected')).toBeInTheDocument();
@@ -573,7 +700,7 @@ describe('CellsTable selection', () => {
     resolveDelete({Status: 'Performed'});
 
     await waitFor(() => {
-      expect(screen.getAllByRole('checkbox')[0]).toBeEnabled();
+      expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeEnabled();
     });
     expect(deleteNodes).toHaveBeenCalledTimes(1);
     expect(onRefreshAfterBulkMoveToBinOutcome).not.toHaveBeenCalled();
@@ -955,21 +1082,21 @@ describe('CellsTable selection', () => {
     renderCellsTable();
 
     const checkboxes = screen.getAllByRole('checkbox');
-    expect(checkboxes).toHaveLength(2);
+    expect(checkboxes).toHaveLength(3);
     expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
-    expect(checkboxes[0]).toHaveAccessibleName('Select Marketing images');
+    expect(checkboxes[1]).toHaveAccessibleName('Select Marketing images');
 
-    fireEvent.click(checkboxes[0]);
+    fireEvent.click(checkboxes[1]);
     expect(screen.getByRole('button', {name: 'Move'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Move'})).toHaveStyle({pointerEvents: 'auto'});
     expect(screen.getByText('1 selected')).toBeInTheDocument();
     expect(screen.getByRole('row', {name: /Marketing images/})).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('button', {name: 'Clear selection'})).toBeInTheDocument();
 
-    fireEvent.click(screen.getAllByRole('checkbox')[1]);
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
     expect(screen.getByText('2 selected')).toBeInTheDocument();
-    expect(screen.getAllByRole('checkbox')[0]).toBeChecked();
-    expect(screen.getAllByRole('checkbox')[1]).toBeChecked();
+    expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeChecked();
+    expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeChecked();
 
     fireEvent.click(screen.getByRole('button', {name: 'Clear selection'}));
     expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
@@ -985,7 +1112,7 @@ describe('CellsTable selection', () => {
     window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
     try {
       renderCellsTable({selectionScopeKey: 'conversation:/bin'});
-      fireEvent.click(screen.getAllByRole('checkbox')[0]);
+      fireEvent.click(screen.getAllByRole('checkbox')[1]);
 
       expect(screen.getByText('1 selected')).toBeInTheDocument();
       expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
@@ -1891,9 +2018,9 @@ describe('CellsTable selection', () => {
         type: CellNodeType.FILE,
         selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
       });
-      renderCellsTable({initialNodes: [createNode({id: 'editor-folder'}), viewerFile]});
-      fireEvent.click(screen.getAllByRole('checkbox')[0]);
-      fireEvent.click(screen.getAllByRole('checkbox')[1]);
+      renderCellsTable({initialNodes: [createNode({id: 'editor-folder', name: 'Editor folder'}), viewerFile]});
+      fireEvent.click(screen.getByRole('checkbox', {name: 'Select Editor folder'}));
+      fireEvent.click(screen.getByRole('checkbox', {name: 'Select Viewer file'}));
 
       expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
     } finally {
@@ -3413,7 +3540,7 @@ describe('CellsTable selection interactions', () => {
   it('preserves selection when opening a file from row options', async () => {
     const user = userEvent.setup();
     renderCellsTable();
-    const checkbox = screen.getAllByRole('checkbox')[0];
+    const checkbox = screen.getByRole('checkbox', {name: 'Select Marketing images'});
     fireEvent.click(checkbox);
     expect(screen.getByText('1 selected')).toBeInTheDocument();
 
@@ -3429,16 +3556,16 @@ describe('CellsTable selection interactions', () => {
 describe('CellsTable selection scope', () => {
   it('clears selected nodes when the folder/view scope changes', () => {
     const {rerenderWithSelectionScope} = renderCellsTable();
-    const checkbox = screen.getAllByRole('checkbox')[0];
+    const checkbox = screen.getByRole('checkbox', {name: 'Select Marketing images'});
     fireEvent.click(checkbox);
     expect(checkbox).toBeChecked();
 
     rerenderWithSelectionScope('conversation:/files/subfolder');
 
     expect(screen.queryByRole('button', {name: 'cells.selection.clear'})).not.toBeInTheDocument();
-    expect(screen.getAllByRole('checkbox')[0]).not.toBeChecked();
+    expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).not.toBeChecked();
 
-    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     expect(screen.getByText('1 selected')).toBeInTheDocument();
 
     rerenderWithSelectionScope('conversation:/bin');
@@ -3449,13 +3576,13 @@ describe('CellsTable selection scope', () => {
 
   it('removes selected items and count when a refresh removes nodes', () => {
     const {file, rerenderWithNodes} = renderCellsTable();
-    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     expect(screen.getByText('1 selected')).toBeInTheDocument();
 
     rerenderWithNodes([file]);
 
     expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
-    expect(screen.getByRole('checkbox')).not.toBeChecked();
+    expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).not.toBeChecked();
   });
 
   it('hides selection controls when selection is out of scope', () => {
