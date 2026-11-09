@@ -46,6 +46,7 @@ import {translate} from '../../util/localizerUtil';
 import {callSecurityLineFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
+import {useCallAlertState} from './useCallAlertState';
 import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
 import {KEY} from '../../util/keyboardUtil';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
@@ -98,6 +99,9 @@ describe('fullscreenVideoCall', () => {
   });
 
   afterEach(() => {
+    act(() => {
+      useCallAlertState.setState({isGroupCall: false});
+    });
     jest.restoreAllMocks();
     jest.useRealTimers();
   });
@@ -142,6 +146,18 @@ describe('fullscreenVideoCall', () => {
     await waitFor(() => {
       return expect(getByText('00:01')).toBeDefined();
     });
+  });
+
+  it('shows the self-video preview control for a one-on-one call when alert state is stale', () => {
+    const props = createProps();
+    act(() => {
+      useCallAlertState.setState({isGroupCall: true});
+    });
+    props.videoGrid = {grid: [], thumbnail: props.call.getSelfParticipant()};
+
+    const {getByRole} = render(withTheme(<FullscreenVideoCall {...props} />), {wrapper: rootProviderWrapper});
+
+    expect(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'})).toBeDefined();
   });
 
   it('has no active speaker toggle for calls with more less than 3 participants', () => {
