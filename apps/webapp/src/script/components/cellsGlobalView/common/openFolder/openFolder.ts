@@ -19,8 +19,7 @@
 
 import {MouseEvent as ReactMouseEvent} from 'react';
 
-import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
-
+import {parseQualifiedId} from '../../../../core/util/qualifiedIdUtil';
 import {useSidebarStore, SidebarTabs} from '../../../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate} from '../../../../router/routerBindings';

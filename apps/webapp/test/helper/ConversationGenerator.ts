@@ -28,7 +28,7 @@ import {
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {LegalHoldStatus} from '@wireapp/core/lib/conversation/content';
+import {LegalHoldStatus} from '../../src/script/core/conversation/content';
 import {ConnectionEntity} from '../../src/script/repositories/connection/connectionEntity';
 import {
   ConversationDatabaseData,

@@ -19,7 +19,7 @@
 
 import {isUndefined} from '@sindresorhus/is';
 import {BackendEvent, CONVERSATION_EVENT, MEETING_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
-import {ConnectionState} from '@wireapp/core';
+import {ConnectionState} from '../../core';
 import {WebAppEvents} from '../../webAppEvents';
 import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
@@ -42,6 +42,10 @@ function getEventRepositoryForTest(): EventRepository {
 }
 
 describe('EventRepository', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(() => {
     return testFactory.exposeClientActors();
   });

@@ -22,8 +22,6 @@ import {useId, type FunctionComponent} from 'react';
 import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Ciphersuite} from '@wireapp/core';
-
 import {
   titleStyles,
   subTitleStyles,
@@ -33,6 +31,7 @@ import {
   protocolValueStyles,
 } from './conversationProtocolDetails.styles';
 
+import {Ciphersuite} from '../../../core';
 import {useApplicationContext} from '../../../page/rootProvider';
 
 interface ConversationProtocolDetailsProps {

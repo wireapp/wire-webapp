@@ -19,9 +19,19 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import * as telemetry from '@wireapp/telemetry';
-
 import {Config} from '../../Config';
+import {
+  addAllConsentFeatures,
+  beginSession,
+  changeDeviceId,
+  disableOfflineMode,
+  endSession,
+  initialize,
+  isLoaded,
+  TelemetryEvent,
+  trackEvent,
+  trackPageView,
+} from '../../telemetry/telemetry';
 import {createUuid} from '../../util/uuid';
 
 let telemetryInitialized = false;
@@ -60,7 +70,7 @@ export enum PageView {
 export const isTelemetryEnabled = (): boolean => {
   const {COUNTLY_ENABLE_LOGGING, COUNTLY_API_KEY} = Config.getConfig();
 
-  if (!COUNTLY_ENABLE_LOGGING || !isNonEmptyString(COUNTLY_API_KEY) || !telemetry.isLoaded()) {
+  if (!COUNTLY_ENABLE_LOGGING || !isNonEmptyString(COUNTLY_API_KEY) || !isLoaded()) {
     return false;
   }
 
@@ -74,7 +84,7 @@ export const initializeTelemetry = (): void => {
     return;
   }
 
-  telemetry.initialize({
+  initialize({
     appVersion: VERSION,
     provider: {
       apiKey: COUNTLY_API_KEY,
@@ -87,13 +97,13 @@ export const initializeTelemetry = (): void => {
   });
 
   telemetryInitialized = true;
-  telemetry.addAllConsentFeatures();
-  telemetry.changeDeviceId(getDeviceId());
-  telemetry.disableOfflineMode(getDeviceId());
-  telemetry.beginSession();
+  addAllConsentFeatures();
+  changeDeviceId(getDeviceId());
+  disableOfflineMode(getDeviceId());
+  beginSession();
 
   window.addEventListener('beforeunload', () => {
-    telemetry.endSession();
+    endSession();
   });
 };
 
@@ -104,7 +114,7 @@ export const trackTelemetryEvent = (eventName: EventName, segmentation?: Segment
     return;
   }
 
-  const telemetryEvent: telemetry.TelemetryEvent = {
+  const telemetryEvent: TelemetryEvent = {
     name: eventName,
     segmentation: {
       ...segmentation,
@@ -113,7 +123,7 @@ export const trackTelemetryEvent = (eventName: EventName, segmentation?: Segment
     },
   };
 
-  telemetry.trackEvent(telemetryEvent);
+  trackEvent(telemetryEvent);
 };
 
 export const trackTelemetryPageView = (pageView: PageView): void => {
@@ -121,11 +131,11 @@ export const trackTelemetryPageView = (pageView: PageView): void => {
     return;
   }
 
-  telemetry.trackPageView(pageView);
+  trackPageView(pageView);
 };
 
 export const resetTelemetrySession = (): void => {
   window.localStorage.removeItem(REPORTING_DEVICE_ID);
   telemetryInitialized = false;
-  telemetry.endSession();
+  endSession();
 };

@@ -21,10 +21,11 @@ import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/li
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {result, task} from 'true-myth';
+import {container} from 'tsyringe';
 
 import {randomUUID} from 'crypto';
 
-import {Account, MLSService} from '@wireapp/core';
+import {Account, MLSService} from '../core';
 
 import {ConversationService} from '../repositories/conversation/ConversationService';
 import {MLSConversation} from '../repositories/conversation/ConversationSelectors';
@@ -37,6 +38,7 @@ import {Core} from '../service/coreSingleton';
 import {requireValueForTest} from '../page/testSupport/rootContextTestSupport';
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {translateForTest} from '../util/test/translateForTest';
+import {createCoreTestFixture} from '../util/test/createCoreTestFixture';
 
 import {
   classifyLocal,
@@ -79,11 +81,38 @@ function mockSafeEpoch(core: {service?: Core['service']}): void {
     .mockResolvedValue(task.resolve(1n));
 }
 
+function createMlsCoreForTest(): Core {
+  return createCoreTestFixture({
+    backendFeatures: {isFederated: false},
+    service: {
+      mls: {
+        getSafeEpoch: jest.fn().mockResolvedValue(task.resolve(1)),
+        scheduleKeyMaterialRenewal: jest.fn(),
+        registerConversation: jest.fn(),
+        isConversationEstablished: jest.fn(),
+      },
+      conversation: {
+        mlsGroupExistsLocally: jest.fn(),
+        joinByExternalCommit: jest.fn(),
+      },
+    },
+  });
+}
+
 describe('MLSConversations', () => {
-  const testFactory = new TestFactory();
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
+  let testFactory: TestFactory;
+
+  beforeEach(() => {
+    testFactory = new TestFactory(createMlsCoreForTest());
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
+    container.clearInstances();
   });
 
   describe('initMLSGroupConversations', () => {
@@ -263,7 +292,7 @@ describe('MLSConversations', () => {
   });
 
   it('schedules key renewal intervals for all already established mls groups', async () => {
-    const core = new Account();
+    const core = createMlsCoreForTest();
     const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
     const mlsConversations = createMLSConversations(nbMLSConversations, CONVERSATION_TYPE.REGULAR);
@@ -282,7 +311,7 @@ describe('MLSConversations', () => {
 
   describe('initialiseSelfAndTeamConversations', () => {
     it('register unestablished team and self mls conversations', async () => {
-      const core = new Account();
+      const core = createMlsCoreForTest();
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
       const selfConversation = createMLSConversation(CONVERSATION_TYPE.SELF);
@@ -309,7 +338,7 @@ describe('MLSConversations', () => {
     });
 
     it('does not register self and team conversation that have epoch > 0', async () => {
-      const core = new Account();
+      const core = createMlsCoreForTest();
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
       const selfConversation = createMLSConversation();
@@ -381,7 +410,7 @@ describe('MLSConversations', () => {
     });
 
     it('DOES NOT join self and team conversation with external commit that have epoch > 0, but is already established locally', async () => {
-      const core = new Account();
+      const core = createMlsCoreForTest();
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
       const selfConversation = createMLSConversation();

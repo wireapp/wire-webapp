@@ -51,8 +51,7 @@ type GetPropsResult = Promise<{
   };
   conversationRepository: ConversationRepository;
 }>;
-const getProps = async (conversations: Conversation[] = []): GetPropsResult => {
-  const testFactory = new TestFactory();
+async function getProps(testFactory: TestFactory, conversations: Conversation[] = []): GetPropsResult {
   const conversationRepository = await testFactory.exposeConversationActors();
 
   conversationRepository['conversationState'].conversations(conversations);
@@ -71,14 +70,24 @@ const getProps = async (conversations: Conversation[] = []): GetPropsResult => {
     },
     conversationRepository,
   };
-};
+}
 
 describe('ConversationFolderTab', () => {
+  let testFactory: TestFactory;
+
+  beforeEach(() => {
+    testFactory = new TestFactory();
+  });
+
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),
   );
   it('should render empty folders list', async () => {
-    const {props} = await getProps();
+    const {props} = await getProps(testFactory);
     const {getByText} = render(<ConversationFolderTab {...props} />, {wrapper: rootProviderWrapper});
 
     expect(getByText('conversationFoldersEmptyText')).toBeDefined();
@@ -96,7 +105,10 @@ describe('ConversationFolderTab', () => {
     );
     customFolderConversation.name('customFolderConversation');
 
-    const {props, conversationRepository} = await getProps([favoriteConversation, customFolderConversation]);
+    const {props, conversationRepository} = await getProps(testFactory, [
+      favoriteConversation,
+      customFolderConversation,
+    ]);
     conversationRepository['conversationLabelRepository'].addConversationToFavorites(favoriteConversation);
 
     const customFolderName = 'customFolder';

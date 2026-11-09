@@ -19,8 +19,6 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {isArray, isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
-import {CredentialType, type E2EIServiceExternal} from '@wireapp/core/lib/messagingProtocols/mls';
-import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
 import {SigninResponse} from 'oidc-client-ts';
 import {container} from 'tsyringe';
@@ -40,6 +38,8 @@ import {OIDCService} from './oidcService';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 
 import {PrimaryModal, removeCurrentModal} from '../components/Modals/PrimaryModal';
+import {CredentialType, type E2EIServiceExternal} from '../core/messagingProtocols/mls';
+import {LowPrecisionTaskScheduler} from '../core/util/lowPrecisionTaskScheduler';
 import {UserState} from '../repositories/user/userState';
 import {Core} from '../service/coreSingleton';
 import {translate} from '../util/localizerUtil';

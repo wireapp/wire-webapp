@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {GenericMessageType} from '@wireapp/core/lib/conversation';
+import {GenericMessageType} from '../../core/conversation';
 import {isObject} from 'underscore';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import Long from 'long';

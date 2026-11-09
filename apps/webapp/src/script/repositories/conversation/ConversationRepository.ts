@@ -66,8 +66,6 @@ import type {BackendError} from '@wireapp/api-client/lib/http/';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {AddUsersFailure, BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
-import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {asyncNoop, noop} from 'noop-esm';
@@ -75,7 +73,6 @@ import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
 
-import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {ACCESS_STATE} from './AccessState';
@@ -133,6 +130,9 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 import {TYPING_TIMEOUT, useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
+import {Account} from '../../core';
+import {AddUsersFailure, BaseCreateConversationResponse} from '../../core/conversation';
+import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols/mls';
 import {BASE_ERROR_TYPE, BaseError} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 import {isMemberMessage} from '../../guards/Message';

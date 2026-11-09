@@ -32,6 +32,10 @@ import {translateForTest} from '../../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('ProteusConversationVerificationStateHandler', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   const testFactory = new TestFactory();
   let stateHandler: ProteusConversationVerificationStateHandler;
   let conversationRepository: ConversationRepository;

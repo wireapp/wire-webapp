@@ -23,14 +23,6 @@ import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
-import {MessageSendingState} from '@wireapp/core/lib/conversation';
-import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClientsUtil';
-import {
-  SubconversationEpochInfoMember,
-  SubconversationService,
-} from '@wireapp/core/lib/conversation/subconversationService/subconversationService';
-import {TaskScheduler} from '@wireapp/core/lib/util';
-import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
@@ -80,6 +72,14 @@ import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {CALL_QUALITY_FEEDBACK_KEY} from '../../components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from '../../components/Modals/QualityFeedbackModal/typings';
 import {Config} from '../../Config';
+import {MessageSendingState} from '../../core/conversation';
+import {flattenUserMap} from '../../core/conversation/message/userClientsUtil';
+import {
+  SubconversationEpochInfoMember,
+  SubconversationService,
+} from '../../core/conversation/subconversationService/subconversationService';
+import {TaskScheduler} from '../../core/util';
+import {constructFullyQualifiedClientId} from '../../core/util/fullyQualifiedClientIdUtils';
 import {NoAudioInputError} from '../../error/noAudioInputError';
 import {useActiveWindowState} from '../../hooks/useActiveWindow';
 import {APIClient} from '../../service/apiClientSingleton';

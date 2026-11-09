@@ -33,27 +33,6 @@ import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/li
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
-import {
-  GenericMessageType,
-  InCallEmojiType,
-  MessageSendingState,
-  MessageTargetMode,
-  ReactionType,
-  SendResult,
-  type ConversationService,
-} from '@wireapp/core/lib/conversation';
-import {
-  EditedTextContent,
-  FileMetaDataContent,
-  LinkPreviewContent,
-  LinkPreviewUploadedContent,
-  MultiPartContent,
-  TextContent,
-} from '@wireapp/core/lib/conversation/content';
-import * as MessageBuilder from '@wireapp/core/lib/conversation/message/messageBuilder';
-import {OtrMessage} from '@wireapp/core/lib/conversation/message/otrMessage';
-import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/textContentBuilder';
-import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
@@ -72,6 +51,27 @@ import {getLinkPreviewFromString} from './linkPreviews';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
+import {
+  GenericMessageType,
+  InCallEmojiType,
+  MessageSendingState,
+  MessageTargetMode,
+  ReactionType,
+  SendResult,
+  type ConversationService,
+} from '../../core/conversation';
+import {
+  EditedTextContent,
+  FileMetaDataContent,
+  LinkPreviewContent,
+  LinkPreviewUploadedContent,
+  MultiPartContent,
+  TextContent,
+} from '../../core/conversation/content';
+import * as MessageBuilder from '../../core/conversation/message/messageBuilder';
+import {OtrMessage} from '../../core/conversation/message/otrMessage';
+import {TextContentBuilder} from '../../core/conversation/message/textContentBuilder';
+import {isQualifiedUserClients} from '../../core/util';
 import {ConversationError} from '../../error/conversationError';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
 import {MentionEntity} from '../../message/mentionEntity';

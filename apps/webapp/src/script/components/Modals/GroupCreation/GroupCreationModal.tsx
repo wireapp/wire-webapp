@@ -22,7 +22,6 @@ import React, {useCallback, useEffect, useMemo, useState, type FunctionComponent
 import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/conversationReceiptModeUpdateData';
 import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
-import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -30,6 +29,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
 
 import {Config} from '../../../Config';
+import {isNonFederatingBackendsError} from '../../../core/errors';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {SidebarTabs, useSidebarStore} from '../../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from '../../../page/rootProvider';

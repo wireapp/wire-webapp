@@ -161,7 +161,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   container.registerInstance(APIClient, apiClient);
   container.registerInstance(Core, core);
-  globalThis.addEventListener('unload', cleanupIncrementalHttpRetryBackoffReset);
+  function disposeApplicationResources(): void {
+    try {
+      cleanupIncrementalHttpRetryBackoffReset();
+    } finally {
+      apiClient.dispose();
+    }
+  }
+
+  globalThis.addEventListener('unload', disposeApplicationResources);
 
   createRoot(appContainer).render(
     <AppContainer

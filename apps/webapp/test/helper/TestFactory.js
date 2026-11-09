@@ -72,8 +72,17 @@ import {MediaConstraintsHandler} from '../../src/script/repositories/media/Media
 import {BackgroundEffectsHandler} from '../../src/script/repositories/media/backgroundEffectsHandler';
 
 export class TestFactory {
-  constructor() {
+  /** @type {APIClient} */
+  #apiClient;
+
+  /** @param {Core | undefined} core */
+  constructor(core = undefined) {
     container.clearInstances();
+    this.#apiClient = new APIClient();
+    container.registerInstance(APIClient, this.#apiClient);
+    if (core !== undefined) {
+      container.registerInstance(Core, core);
+    }
     /** @type {StorageService} */
     this.storage_service = Object.create(StorageService.prototype);
     /** @type {StorageRepository} */
@@ -102,6 +111,11 @@ export class TestFactory {
     this.calling_repository = Object.create(CallingRepository.prototype);
     /** @type {ConversationRepository} */
     this.conversation_repository = Object.create(ConversationRepository.prototype);
+  }
+
+  /** @returns {void} */
+  dispose() {
+    this.#apiClient.dispose();
   }
 
   /**

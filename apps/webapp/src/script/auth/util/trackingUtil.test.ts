@@ -17,160 +17,179 @@
  *
  */
 
-jest.mock('@wireapp/telemetry');
 jest.mock('../../Config');
 jest.mock('../../util/uuid');
-
-import * as telemetry from '@wireapp/telemetry';
 
 import {Config} from '../../Config';
 import {createUuid} from '../../util/uuid';
 
-import * as trackingUtil from './trackingUtil';
+import {
+  EventName,
+  initializeTelemetry,
+  PageView,
+  resetTelemetrySession,
+  Segmentation,
+  trackTelemetryEvent,
+  trackTelemetryPageView,
+} from './trackingUtil';
 
-const REPORTING_DEVICE_ID = 'REPORTING_DEVICE_ID';
-const MOCK_UUID = 'mock-uuid';
-const MOCK_USER_AGENT = 'test-user-agent';
-const CONFIG_DEFAULTS = {
+const reportingDeviceIdKey = 'REPORTING_DEVICE_ID';
+const generatedDeviceId = 'test-device-id';
+const userAgent = 'test-user-agent';
+const defaultConfiguration = {
   COUNTLY_ENABLE_LOGGING: true,
   VERSION: '1.2.3',
   COUNTLY_API_KEY: 'api-key',
   COUNTLY_SERVER_URL: 'https://server.url',
 };
-type TrackingTestConfig = typeof CONFIG_DEFAULTS;
+const queueCommand = jest.fn();
+const initializeCountly = jest.fn();
 
 describe('trackingUtil', () => {
-  const ORIGINAL_LOCAL_STORAGE = global.localStorage;
-
-  let localStorageMock: any;
-  const configFactory = (overrides = {}): TrackingTestConfig => {
-    return {
-      ...CONFIG_DEFAULTS,
-      ...overrides,
-    };
-  };
-
   beforeEach(() => {
-    localStorageMock = (() => {
-      let store: Record<string, string> = {};
-      return {
-        getItem: jest.fn((key: string) => {
-          return store[key] || null;
-        }),
-        setItem: jest.fn((key: string, value: string) => {
-          store[key] = value;
-        }),
-        removeItem: jest.fn((key: string) => {
-          delete store[key];
-        }),
-        clear: jest.fn(() => {
-          store = {};
-        }),
-      };
-    })();
-    Object.defineProperty(window, 'localStorage', {value: localStorageMock, configurable: true});
-    (telemetry.isLoaded as jest.Mock).mockReturnValue(true);
-    (createUuid as jest.Mock).mockReturnValue(MOCK_UUID);
-    jest.spyOn(window, 'addEventListener').mockImplementation(jest.fn());
-    jest.spyOn(navigator, 'userAgent', 'get').mockReturnValue(MOCK_USER_AGENT);
+    Object.defineProperty(window, 'Countly', {
+      configurable: true,
+      value: {q: {push: queueCommand}, init: initializeCountly},
+    });
+    localStorage.clear();
+    resetTelemetrySession();
     jest.clearAllMocks();
+    (Config.getConfig as jest.Mock).mockReturnValue(defaultConfiguration);
+    (createUuid as jest.Mock).mockReturnValue(generatedDeviceId);
+    jest.spyOn(window, 'addEventListener').mockImplementation(jest.fn());
+    jest.spyOn(navigator, 'userAgent', 'get').mockReturnValue(userAgent);
   });
 
   afterEach(() => {
-    Object.defineProperty(window, 'localStorage', {value: ORIGINAL_LOCAL_STORAGE, configurable: true});
     jest.restoreAllMocks();
+    Reflect.deleteProperty(window, 'Countly');
+    localStorage.clear();
   });
 
   describe('initializeTelemetry', () => {
-    it('should initialize telemetry and set device id if not present', () => {
-      (Config.getConfig as jest.Mock).mockReturnValue(configFactory());
-      localStorageMock.getItem.mockReturnValueOnce(null);
-      trackingUtil.initializeTelemetry();
-      expect(telemetry.initialize).toHaveBeenCalledWith(
+    it('configures Countly, grants consent, persists a device id, and starts a session', () => {
+      initializeTelemetry();
+
+      expect(initializeCountly).toHaveBeenCalledTimes(1);
+      expect(window.Countly).toEqual(
         expect.objectContaining({
-          appVersion: CONFIG_DEFAULTS.VERSION,
-          provider: expect.objectContaining({
-            apiKey: CONFIG_DEFAULTS.COUNTLY_API_KEY,
-            serverUrl: CONFIG_DEFAULTS.COUNTLY_SERVER_URL,
-          }),
+          app_version: defaultConfiguration.VERSION,
+          app_key: defaultConfiguration.COUNTLY_API_KEY,
+          url: defaultConfiguration.COUNTLY_SERVER_URL,
+          debug: false,
+          offline_mode: true,
+          require_consent: true,
+          use_session_cookie: false,
         }),
       );
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(REPORTING_DEVICE_ID, MOCK_UUID);
-      expect(telemetry.addAllConsentFeatures).toHaveBeenCalled();
-      expect(telemetry.changeDeviceId).toHaveBeenCalledWith(MOCK_UUID);
-      expect(telemetry.disableOfflineMode).toHaveBeenCalledWith(MOCK_UUID);
-      expect(telemetry.beginSession).toHaveBeenCalled();
-      expect(window.addEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
+      expect(localStorage.getItem(reportingDeviceIdKey)).toBe(generatedDeviceId);
+      expect(queueCommand.mock.calls).toEqual([
+        [['track_clicks']],
+        [['add_consent', expect.arrayContaining(['sessions', 'events', 'views'])]],
+        [['change_id', generatedDeviceId, false]],
+        [['disable_offline_mode', generatedDeviceId]],
+        [['begin_session']],
+      ]);
     });
 
-    it('should not initialize telemetry if COUNTLY_ENABLE_LOGGING is false', async () => {
-      (Config.getConfig as jest.Mock).mockReturnValue(configFactory({COUNTLY_ENABLE_LOGGING: false}));
-      trackingUtil.initializeTelemetry();
-      expect(telemetry.initialize).not.toHaveBeenCalled();
+    it('reuses the persisted device id', () => {
+      localStorage.setItem(reportingDeviceIdKey, 'existing-device-id');
+
+      initializeTelemetry();
+
+      expect(createUuid).not.toHaveBeenCalled();
+      expect(queueCommand).toHaveBeenCalledWith(['change_id', 'existing-device-id', false]);
+      expect(queueCommand).toHaveBeenCalledWith(['disable_offline_mode', 'existing-device-id']);
     });
 
-    it('should not initialize telemetry if COUNTLY_API_KEY is missing', () => {
-      (Config.getConfig as jest.Mock).mockReturnValue(configFactory({COUNTLY_API_KEY: ''}));
-      trackingUtil.initializeTelemetry();
-      expect(telemetry.initialize).not.toHaveBeenCalled();
+    it('ends the session before unloading', () => {
+      const registerListener = jest.spyOn(window, 'addEventListener');
+
+      initializeTelemetry();
+
+      expect(registerListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
+      expect(registerListener).toHaveBeenCalledTimes(1);
+      const unloadListener = registerListener.mock.lastCall?.[1];
+      if (typeof unloadListener !== 'function') {
+        throw new Error('Expected a beforeunload listener');
+      }
+      queueCommand.mockClear();
+      unloadListener(new Event('beforeunload'));
+
+      expect(queueCommand).toHaveBeenCalledWith(['end_session']);
+      window.removeEventListener('beforeunload', unloadListener);
     });
 
-    it('should not initialize telemetry if telemetry is not loaded', () => {
-      (Config.getConfig as jest.Mock).mockReturnValueOnce(configFactory());
-      (telemetry.isLoaded as jest.Mock).mockReturnValueOnce(false);
-      trackingUtil.initializeTelemetry();
-      expect(telemetry.initialize).not.toHaveBeenCalled();
+    it.each([{COUNTLY_ENABLE_LOGGING: false}, {COUNTLY_API_KEY: ''}])(
+      'does not initialize with disabled telemetry: %p',
+      configurationOverride => {
+        (Config.getConfig as jest.Mock).mockReturnValue({...defaultConfiguration, ...configurationOverride});
+
+        initializeTelemetry();
+
+        expect(initializeCountly).not.toHaveBeenCalled();
+        expect(queueCommand).not.toHaveBeenCalled();
+        expect(localStorage.getItem(reportingDeviceIdKey)).toBeNull();
+      },
+    );
+
+    it('does not initialize when the SDK is unavailable', () => {
+      Reflect.deleteProperty(window, 'Countly');
+
+      initializeTelemetry();
+
+      expect(initializeCountly).not.toHaveBeenCalled();
+      expect(localStorage.getItem(reportingDeviceIdKey)).toBeNull();
     });
   });
 
-  describe('trackTelemetryEvent', () => {
-    beforeEach(() => {
-      (Config.getConfig as jest.Mock).mockReturnValue(configFactory());
-      // Ensure telemetry is initialized
-      trackingUtil.initializeTelemetry();
-      jest.clearAllMocks();
+  it('tracks an event with application, browser, and caller segmentation', () => {
+    initializeTelemetry();
+    queueCommand.mockClear();
+
+    trackTelemetryEvent(EventName.ACCOUNT_SETUP_SCREEN_1, {
+      [Segmentation.MULTIPLE_PASSWORD_TRIES]: true,
     });
 
-    it('should track event with segmentation', () => {
-      trackingUtil.trackTelemetryEvent(trackingUtil.EventName.ACCOUNT_SETUP_SCREEN_1, {
-        [trackingUtil.Segmentation.MULTIPLE_PASSWORD_TRIES]: true,
-      });
-      expect(telemetry.trackEvent).toHaveBeenCalledWith({
-        name: trackingUtil.EventName.ACCOUNT_SETUP_SCREEN_1,
-        segmentation: expect.objectContaining({
-          [trackingUtil.Segmentation.APP_VERSION]: CONFIG_DEFAULTS.VERSION,
-          [trackingUtil.Segmentation.OS_VERSION]: MOCK_USER_AGENT,
-          [trackingUtil.Segmentation.MULTIPLE_PASSWORD_TRIES]: true,
-        }),
-      });
-    });
-
-    it('should not track event if telemetry is not initialized', () => {
-      // Simulate not initialized
-      trackingUtil.resetTelemetrySession();
-      jest.clearAllMocks();
-      trackingUtil.trackTelemetryEvent(trackingUtil.EventName.ACCOUNT_SETUP_SCREEN_1);
-      expect(telemetry.trackEvent).not.toHaveBeenCalled();
-    });
+    expect(queueCommand).toHaveBeenCalledWith([
+      'add_event',
+      expect.objectContaining({
+        key: EventName.ACCOUNT_SETUP_SCREEN_1,
+        segmentation: {
+          [Segmentation.APP_VERSION]: defaultConfiguration.VERSION,
+          [Segmentation.OS_VERSION]: userAgent,
+          [Segmentation.MULTIPLE_PASSWORD_TRIES]: true,
+        },
+      }),
+    ]);
   });
 
-  describe('trackTelemetryPageView', () => {
-    beforeEach(() => {
-      (Config.getConfig as jest.Mock).mockReturnValueOnce(configFactory());
-      trackingUtil.initializeTelemetry();
-      jest.clearAllMocks();
-    });
+  it('tracks page views after initialization', () => {
+    initializeTelemetry();
+    queueCommand.mockClear();
 
-    it('should track page view if telemetry is initialized', () => {
-      trackingUtil.trackTelemetryPageView(trackingUtil.PageView.ACCOUNT_COMPLETION_SCREEN_4);
-      expect(telemetry.trackPageView).toHaveBeenCalledWith(trackingUtil.PageView.ACCOUNT_COMPLETION_SCREEN_4);
-    });
+    trackTelemetryPageView(PageView.ACCOUNT_COMPLETION_SCREEN_4);
 
-    it('should not track page view if telemetry is not initialized', () => {
-      trackingUtil.resetTelemetrySession();
-      jest.clearAllMocks();
-      trackingUtil.trackTelemetryPageView(trackingUtil.PageView.ACCOUNT_COMPLETION_SCREEN_4);
-      expect(telemetry.trackPageView).not.toHaveBeenCalled();
-    });
+    expect(queueCommand).toHaveBeenCalledWith(['track_pageview', PageView.ACCOUNT_COMPLETION_SCREEN_4]);
+  });
+
+  it('does not initialize or track before explicitly requested', () => {
+    trackTelemetryEvent(EventName.ACCOUNT_SETUP_SCREEN_1);
+    trackTelemetryPageView(PageView.ACCOUNT_COMPLETION_SCREEN_4);
+
+    expect(initializeCountly).not.toHaveBeenCalled();
+    expect(queueCommand).not.toHaveBeenCalled();
+  });
+
+  it('resets the device id, ends the session, and stops tracking', () => {
+    initializeTelemetry();
+    queueCommand.mockClear();
+
+    resetTelemetrySession();
+    trackTelemetryEvent(EventName.ACCOUNT_SETUP_SCREEN_1);
+    trackTelemetryPageView(PageView.ACCOUNT_COMPLETION_SCREEN_4);
+
+    expect(localStorage.getItem(reportingDeviceIdKey)).toBeNull();
+    expect(queueCommand.mock.calls).toEqual([[['end_session']]]);
   });
 });

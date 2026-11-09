@@ -43,17 +43,6 @@ import {ROUTE, QUERY_KEY} from '../../route';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {mountComponent, withIntl, withThemeAndRootContext} from '../../util/test/testUtil';
 
-jest.mock('@wireapp/react-ui-kit', () => {
-  const actualModule = jest.requireActual('@wireapp/react-ui-kit');
-
-  return {
-    ...actualModule,
-    Loading: () => {
-      return null;
-    },
-  };
-});
-
 const codeOrEmailInputId = 'enter-code';
 const submitButtonId = 'do-sso-sign-in';
 const temporaryCheckboxId = 'enter-public-computer-sso-sign-in';

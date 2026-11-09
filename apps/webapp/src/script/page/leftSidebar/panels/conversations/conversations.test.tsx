@@ -90,11 +90,17 @@ const defaultParams: Omit<ConversationsProps, 'conversationRepository' | 'search
 };
 
 describe('Conversations', () => {
+  let testFactory: TestFactory;
+
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
   let conversationRepository: ConversationRepository;
   let searchRepository: SearchRepository;
 
   beforeEach(async () => {
-    const testFactory = new TestFactory();
+    testFactory = new TestFactory();
     conversationRepository = await testFactory.exposeConversationActors();
     searchRepository = new SearchRepository({} as UserRepository);
     window.Element.prototype.getBoundingClientRect = jest.fn().mockReturnValue({height: 1000, width: 1000});

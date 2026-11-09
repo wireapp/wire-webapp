@@ -17,10 +17,9 @@
  *
  */
 
-import {AddUsersFailure} from '@wireapp/core/lib/conversation';
-
 import {Message} from './message';
 
+import {AddUsersFailure} from '../../../core/conversation';
 import {SuperType} from '../../../message/superType';
 import type {Translate} from '../../../util/localizerUtil';
 

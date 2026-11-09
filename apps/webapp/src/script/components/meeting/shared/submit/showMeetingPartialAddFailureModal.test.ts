@@ -19,7 +19,7 @@
 
 import assert from 'node:assert';
 
-import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {AddUsersFailure, AddUsersFailureReasons} from '../../../../core/conversation';
 import {createElement} from 'react';
 
 import {render} from '@testing-library/react';

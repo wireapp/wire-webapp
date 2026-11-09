@@ -68,6 +68,10 @@ const buildMediaDevicesHandler = (): MediaDevicesHandler => {
 };
 
 describe('Call', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   const testFactory = new TestFactory();
   let call: Call;
   let callingRepository: CallingRepository;

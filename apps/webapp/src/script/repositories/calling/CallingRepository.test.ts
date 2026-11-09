@@ -75,6 +75,7 @@ import {useActiveWindowState} from '../../hooks/useActiveWindow';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {Core} from '../../service/coreSingleton';
+import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
 import {translateForTest} from '../../util/test/translateForTest';
@@ -253,7 +254,11 @@ function createSftCallingFixture(): SftCallingFixture {
 }
 
 describe('CallingRepository', () => {
-  const testFactory = new TestFactory();
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
+  let testFactory: TestFactory;
   let callingRepository: CallingRepository;
   let wCall: Wcall;
   let wUser: number;
@@ -261,7 +266,19 @@ describe('CallingRepository', () => {
   selfUser.isMe = true;
   const clientId = createUuid();
 
-  beforeAll(() => {
+  beforeEach(() => {
+    testFactory = new TestFactory(
+      createCoreTestFixture({
+        backendFeatures: {isFederated: false},
+        service: {
+          subconversation: {
+            joinConferenceSubconversation: jest.fn(),
+            leaveConferenceSubconversation: jest.fn(),
+            subscribeToEpochUpdates: jest.fn(),
+          },
+        },
+      }),
+    );
     return testFactory.exposeCallingActors().then(injectedCallingRepository => {
       callingRepository = injectedCallingRepository;
       return callingRepository.initAvs(selfUser, clientId).then(avsApi => {
@@ -276,6 +293,7 @@ describe('CallingRepository', () => {
     callingRepository['conversationState'].conversations([]);
     callingRepository.destroy();
     jest.restoreAllMocks();
+    container.clearInstances();
   });
 
   afterAll(() => {

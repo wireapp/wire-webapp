@@ -113,6 +113,10 @@ function createConnections(users: APIClientUser[]): ConnectionEntity[] {
 }
 
 describe('UserRepository', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   describe('Account preferences', () => {
     describe('Data usage permissions', () => {
       it('syncs the "Send anonymous data" preference through WebSocket events', async () => {

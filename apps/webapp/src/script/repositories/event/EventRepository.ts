@@ -26,8 +26,6 @@ import {
   ConversationOtrMessageAddEvent,
   ConversationMLSMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
-import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
-import {sequentialQueueOptions} from '@wireapp/core/lib/queue/sequentialQueueOptions';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
@@ -35,7 +33,6 @@ import PromiseQueue from 'p-queue';
 import {container} from 'tsyringe';
 
 import {Runtime, StringUtil} from '@wireapp/commons';
-import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '@wireapp/core';
 
 import {ClientEvent} from './Client';
 import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
@@ -48,6 +45,9 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventHandlers/EventValidationError';
 
+import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '../../core';
+import {NotificationSource, HandledEventPayload} from '../../core/notification';
+import {sequentialQueueOptions} from '../../core/queue/sequentialQueueOptions';
 import {CryptographyError} from '../../error/cryptographyError';
 import {EventError} from '../../error/eventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';

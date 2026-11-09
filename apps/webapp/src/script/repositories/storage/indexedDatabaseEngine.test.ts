@@ -25,17 +25,26 @@ import 'fake-indexeddb/auto';
 import {Dexie} from 'dexie';
 import {v4 as uuidv4} from 'uuid';
 
-import {createSpec} from '../../../../../../libraries/store-engine/src/test/createSpec';
-import {deleteAllSpec} from '../../../../../../libraries/store-engine/src/test/deleteAllSpec';
-import {deleteSpec} from '../../../../../../libraries/store-engine/src/test/deleteSpec';
-import {purgeSpec} from '../../../../../../libraries/store-engine/src/test/purgeSpec';
-import {readAllPrimaryKeysSpec} from '../../../../../../libraries/store-engine/src/test/readAllPrimaryKeysSpec';
-import {readAllSpec} from '../../../../../../libraries/store-engine/src/test/readAllSpec';
-import {readSpec} from '../../../../../../libraries/store-engine/src/test/readSpec';
-import {updateOrCreateSpec} from '../../../../../../libraries/store-engine/src/test/updateOrCreateSpec';
-import {updateSpec} from '../../../../../../libraries/store-engine/src/test/updateSpec';
+import {createSpec} from '../../core/test/storage/createSpec';
+import {deleteAllSpec} from '../../core/test/storage/deleteAllSpec';
+import {deleteSpec} from '../../core/test/storage/deleteSpec';
+import {purgeSpec} from '../../core/test/storage/purgeSpec';
+import {readAllPrimaryKeysSpec} from '../../core/test/storage/readAllPrimaryKeysSpec';
+import {readAllSpec} from '../../core/test/storage/readAllSpec';
+import {readSpec} from '../../core/test/storage/readSpec';
+import {updateOrCreateSpec} from '../../core/test/storage/updateOrCreateSpec';
+import {updateSpec} from '../../core/test/storage/updateSpec';
+import type {StorageErrorConstructors} from '../../core/test/storage/storageErrorConstructors';
+
+import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from '../../core/storage/engine/error';
 
 import {IndexedDBEngine} from './indexedDatabaseEngine';
+
+const storageErrorConstructors: StorageErrorConstructors = {
+  RecordAlreadyExistsError,
+  RecordNotFoundError,
+  RecordTypeError,
+};
 
 describe('IndexedDBEngine', () => {
   let engine: IndexedDBEngine;
@@ -84,7 +93,7 @@ describe('IndexedDBEngine', () => {
 
     Object.entries(createSpec).forEach(([description, testFunction]) => {
       it(description, () => {
-        return testFunction(engine);
+        return testFunction(engine, storageErrorConstructors);
       });
     });
 
@@ -181,7 +190,7 @@ describe('IndexedDBEngine', () => {
 
     Object.entries(readSpec).forEach(([description, testFunction]) => {
       it(description, () => {
-        return testFunction(engine);
+        return testFunction(engine, storageErrorConstructors);
       });
     });
 
@@ -276,7 +285,7 @@ describe('IndexedDBEngine', () => {
 
     Object.entries(updateSpec).forEach(([description, testFunction]) => {
       it(description, () => {
-        return testFunction(engine);
+        return testFunction(engine, storageErrorConstructors);
       });
     });
   });

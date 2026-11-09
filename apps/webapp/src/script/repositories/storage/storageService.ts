@@ -21,12 +21,12 @@ import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {Dexie, Transaction} from 'dexie';
 import {singleton} from 'tsyringe';
 
-import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
-
 import {DexieDatabase} from './dexieDatabase';
 import {IndexedDBEngine} from './indexedDatabaseEngine';
 import {StorageSchemata} from './storageSchemata';
 
+import type {CRUDEngine} from '../../core/storage/engine/crudEngine';
+import {RecordNotFoundError} from '../../core/storage/engine/error';
 import {StorageError} from '../../error/storageError';
 import {Logger, getLogger} from '../../util/logger';
 import {loadValue, storeValue} from '../../util/storageUtil';
@@ -284,7 +284,7 @@ export class StorageService {
     try {
       return await this.engine.read<T>(storeName, primaryKey);
     } catch (error: unknown) {
-      if (error instanceof StoreEngineError.RecordNotFoundError) {
+      if (error instanceof RecordNotFoundError) {
         return undefined;
       }
       this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);

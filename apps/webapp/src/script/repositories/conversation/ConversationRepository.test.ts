@@ -50,7 +50,7 @@ import {
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
+import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
@@ -121,6 +121,7 @@ import {TestFactory} from '../../../../test/helper/TestFactory';
 import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mockHttpServer';
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/coreSingleton';
+import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 
 type ConversationRepositoryTestDependencies = {
   readonly conversationState: ConversationState;
@@ -161,6 +162,27 @@ function getConversationServiceFromCoreForTest(core: Core): NonNullable<NonNulla
   return requireValueForTest(requireValueForTest(core.service).conversation);
 }
 
+function createConversationCoreForTest(): Core {
+  return createCoreTestFixture({
+    backendFeatures: {isFederated: false},
+    service: {
+      mls: {conversationExists: jest.fn(), wipeConversation: jest.fn(), getEpoch: jest.fn()},
+      conversation: {
+        blacklistConversation: jest.fn(),
+        removeConversationFromBlacklist: jest.fn(),
+        establishMLS1to1Conversation: jest.fn(),
+        isMLSGroupEstablishedLocally: jest.fn(),
+        mlsGroupExistsLocally: jest.fn(),
+        wipeMLSConversation: jest.fn(),
+        addUsersToProteusConversation: jest.fn(),
+        addUsersToMLSConversation: jest.fn(),
+        removeUserFromConversation: jest.fn(),
+        removeUsersFromMLSConversation: jest.fn(),
+      },
+    },
+  });
+}
+
 function buildConversationRepository(translate: Translate): ConversationRepositoryTestFixture {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
@@ -194,7 +216,7 @@ function buildConversationRepository(translate: Translate): ConversationReposito
   const teamRepository = {} as TeamRepository;
   const userRepository = {on: noop} as unknown as UserRepository;
   const userState = new UserState();
-  const core = new Core();
+  const core = createConversationCoreForTest();
 
   const conversationRepository = new ConversationRepository(
     conversationService,
@@ -272,8 +294,12 @@ describe('conversation group selection', () => {
 });
 
 describe('ConversationRepository', () => {
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
   const originalPrimaryModalShow = PrimaryModal.show;
-  const testFactory = new TestFactory();
+  let testFactory: TestFactory;
 
   let conversation_et = _generateConversation();
   const selfConversation = _generateConversation({type: CONVERSATION_TYPE.SELF});
@@ -307,7 +333,10 @@ describe('ConversationRepository', () => {
 
     const mark_as_read_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/self`;
     server.respondWith('PUT', mark_as_read_url, [HTTP_STATUS.OK, {}, '']);
+  });
 
+  beforeEach(async () => {
+    testFactory = new TestFactory(createConversationCoreForTest());
     await testFactory.exposeCallingActors();
     const conversationRepository = await testFactory.exposeConversationActors();
     amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
@@ -315,11 +344,6 @@ describe('ConversationRepository', () => {
 
     spyOn(testFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
     conversation_et.id = payload.conversations.knock.post.conversation;
-  });
-
-  beforeEach(async () => {
-    const conversationRepository = requireValueForTest(testFactory.conversation_repository);
-
     jest.spyOn(conversationRepository['conversationService'], 'saveConversationStateInDb').mockResolvedValue({} as any);
     await conversationRepository['saveConversation'](selfConversation);
     conversationRepository['saveConversation'](conversation_et);
@@ -332,6 +356,7 @@ describe('ConversationRepository', () => {
   afterEach(() => {
     const conversationRepository = requireValueForTest(testFactory.conversation_repository);
     conversationRepository['conversationState'].conversations.removeAll();
+    container.clearInstances();
   });
 
   describe('translation injection', () => {
@@ -838,7 +863,7 @@ describe('ConversationRepository', () => {
       selfSupportedProtocolsSpy = undefined;
     });
 
-    beforeAll(() => {
+    beforeEach(() => {
       jest
         .spyOn(requireValueForTest(testFactory.conversation_repository), 'saveConversation')
         .mockImplementation((conversation: Conversation) => {
@@ -2100,9 +2125,10 @@ describe('ConversationRepository', () => {
         otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
 
         conversationRepository['userState'].users.push(otherUser);
-        conversation.participating_user_ids.push(otherUserId);
+        conversation.participating_user_ids([otherUserId]);
+        conversation.connection(null);
 
-        await conversationRepository['saveConversation'](conversation);
+        conversationRepository['conversationState'].conversations([conversation]);
 
         const welcomeEvent: ConversationMLSWelcomeEvent = {
           conversation: conversation.id,
@@ -2773,6 +2799,22 @@ describe('ConversationRepository', () => {
         spyOn(getCoreConversationServiceForTest(), 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(true));
 
         conversation_et = _generateConversation();
+
+        await testFactory.conversation_repository['saveConversation'](conversation_et);
+        jest
+          .spyOn(testFactory.conversation_repository['conversationRoleRepository'], 'updateConversationRoles')
+          .mockResolvedValue(undefined);
+        jest.spyOn(testFactory.user_repository, 'getUserById').mockImplementation(async userId => {
+          return generateUser(userId);
+        });
+        jest
+          .spyOn(requireValueForTest(testFactory.conversation_service), 'getConversationById')
+          .mockImplementation(async conversationId => {
+            const conversation =
+              testFactory.conversation_repository['conversationState'].findConversation(conversationId);
+
+            return generateAPIConversation({id: conversationId, protocol: conversation?.protocol});
+          });
 
         memberJoinEvent = {
           conversation: conversation_et.id,

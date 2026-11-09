@@ -74,6 +74,10 @@ const getDefaultParams = (isGuest: boolean = true): GetDefaultParamsResult => {
 };
 
 describe('GuestServicesOptions', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     conversationRepository = await testFactory.exposeConversationActors();
   });

@@ -23,8 +23,6 @@ import {
   ConversationMLSMessageAddEvent,
   CONVERSATION_EVENT,
 } from '@wireapp/api-client/lib/event';
-import {GenericMessageType} from '@wireapp/core/lib/conversation';
-import {MultiPartContent} from '@wireapp/core/lib/conversation/content';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
@@ -58,6 +56,8 @@ import {
 
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
+import {GenericMessageType} from '../../core/conversation';
+import {MultiPartContent} from '../../core/conversation/content';
 import {CryptographyError} from '../../error/cryptographyError';
 import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';

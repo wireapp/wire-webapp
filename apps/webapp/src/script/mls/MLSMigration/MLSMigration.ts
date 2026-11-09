@@ -21,11 +21,10 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import type {Account} from '@wireapp/core';
-
 import {MLSMigrationStatus} from './migrationStatus';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
+import type {Account} from '../../core';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import type {Conversation} from '../../repositories/entity/Conversation';
 import type {User} from '../../repositories/entity/User';

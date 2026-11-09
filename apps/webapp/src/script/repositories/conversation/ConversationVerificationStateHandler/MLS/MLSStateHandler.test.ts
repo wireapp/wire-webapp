@@ -18,8 +18,9 @@
  */
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {CredentialType, E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
+import {CredentialType, E2eiConversationState} from '../../../../core/messagingProtocols/mls';
 import {asyncNoop, noop} from 'noop-esm';
+import {container} from 'tsyringe';
 
 import {Conversation} from '../../../entity/Conversation';
 import * as e2eIdentity from '../../../../e2eIdentity';
@@ -33,6 +34,7 @@ import {MLSConversationVerificationStateHandler} from './MLSStateHandler';
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
 import {translateForTest} from '../../../../util/test/translateForTest';
+import {createCoreTestFixture} from '../../../../util/test/createCoreTestFixture';
 
 jest.mock('../../../../e2eIdentity', () => {
   return {
@@ -96,10 +98,24 @@ describe('MLSConversationVerificationStateHandler', () => {
   conversation.groupId = groupId;
 
   beforeEach(() => {
-    core = new Core();
+    core = createCoreTestFixture({
+      get hasMLSDevice() {
+        return true;
+      },
+      isMLSActiveForClient: jest.fn().mockReturnValue(true),
+      service: {
+        mls: {conversationExists: jest.fn(), on: jest.fn()},
+        e2eIdentity: {on: jest.fn(), getAllGroupUsersIdentities: jest.fn().mockResolvedValue(new Map())},
+      },
+    });
+    container.registerInstance(Core, core);
     jest.clearAllMocks();
     core.isMLSActiveForClient = jest.fn().mockReturnValue(true);
     e2eiHandler.isE2EIEnabled = jest.fn().mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    container.clearInstances();
   });
 
   it('should do nothing if MLS feature is not active', () => {

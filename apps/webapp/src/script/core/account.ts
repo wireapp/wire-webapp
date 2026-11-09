@@ -1,0 +1,1492 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {createClock} from '@enormora/clock';
+import type {Clock} from '@enormora/clock/clock';
+import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import {
+  RegisterData,
+  AUTH_COOKIE_KEY,
+  AUTH_TABLE_NAME,
+  Context,
+  Cookie,
+  CookieStore,
+  LoginData,
+  PreKey,
+} from '@wireapp/api-client/lib/auth';
+import {ClientCapability, ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
+import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
+import * as Events from '@wireapp/api-client/lib/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {Notification} from '@wireapp/api-client/lib/notification';
+import {
+  ConsumableEvent,
+  ConsumableNotification,
+  ConsumableNotificationEvent,
+  ConsumableNotificationSynchronization,
+} from '@wireapp/api-client/lib/notification/consumableNotification';
+import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
+import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
+import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {once} from 'lodash';
+import logdown from 'logdown';
+import {asyncNoop, noop} from 'noop-esm';
+import {TimeoutError} from 'p-queue';
+
+import {APIClient, BackendFeatures} from '@wireapp/api-client';
+import {LogFactory, StringUtil, TypedEventEmitter} from '@wireapp/commons';
+import type {CoreCryptoLogLevel} from '@wireapp/core-crypto';
+
+import {AccountService} from './account/';
+import {LoginSanitizer} from './auth/';
+import {BroadcastService} from './broadcast/';
+import {ClientInfo, ClientService} from './client/';
+import type {MetaClient} from './client/clientService';
+import {ConnectionService} from './connection/';
+import {ConnectionState} from './connectionState/connectionState';
+import {AssetService, ConversationService} from './conversation/';
+import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conversation/message/messageSender';
+import {SubconversationService} from './conversation/subconversationService/subconversationService';
+import {GiphyService} from './giphy/';
+import {LinkPreviewService} from './linkPreview';
+import {CoreCryptoConfig} from './messagingProtocols/common.types';
+import {InitClientOptions, MLSService} from './messagingProtocols/mls';
+import {
+  pauseRejoiningMLSConversations,
+  queueConversationRejoin,
+  resumeRejoiningMLSConversations,
+} from './messagingProtocols/mls/conversationRejoinQueue';
+import {E2EIServiceExternal, User} from './messagingProtocols/mls/e2eIdentityService';
+import {getAllConversationsCallback} from './messagingProtocols/mls/e2eIdentityService/e2eiServiceInternal';
+import {
+  flushProposalsQueue,
+  getProposalQueueLength,
+  pauseProposalProcessing,
+  resumeProposalProcessing,
+} from './messagingProtocols/mls/eventHandler/events/messageAdd/incomingProposalsQueue';
+import {CoreCallbacks, SecretCrypto} from './messagingProtocols/mls/types';
+import {NewClient, ProteusService} from './messagingProtocols/proteus';
+import {CryptoClientType} from './messagingProtocols/proteus/proteusService/cryptoClient';
+import {
+  createPkiEnvironment,
+  wipeCoreCryptoDb,
+  CoreCryptoWrapper,
+} from './messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
+import type {CryptoboxWrapper} from './messagingProtocols/proteus/proteusService/cryptoClient/cryptoboxWrapper';
+import {deleteIdentity} from './messagingProtocols/proteus/proteusService/identityClearer';
+import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
+import {createFlushableQueue, isQueueFlushedError} from './queue/flushableQueue';
+import {sequentialQueueOptions} from './queue/sequentialQueueOptions';
+import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from './secretStore/encryptedStore';
+import {generateSecretKey} from './secretStore/secretKeyGenerator';
+import {SelfService} from './self/';
+import {CoreDatabase, deleteDB, openDB} from './storage/coreDb';
+import {CRUDEngine} from './storage/engine/crudEngine';
+import {MemoryEngine} from './storage/engine/memoryEngine';
+import {TeamService} from './team/';
+import {UserService} from './user/';
+import {LocalStorageStore} from './util/localStorageStore';
+import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
+
+type CryptoClientWithProtocol =
+  readonly [CryptoClientType.CORE_CRYPTO, CoreCryptoWrapper] | readonly [CryptoClientType.CRYPTOBOX, CryptoboxWrapper];
+
+const defaultCertificateLifetimeInDays = 90;
+
+export type ProcessedEventPayload = HandledEventPayload;
+export type WebSocketConnectionContext = Pick<WebSocketReconnectContext, 'attemptId' | 'wrapperGeneration'>;
+
+function getWebSocketLifecycleContext(connectionContext: WebSocketConnectionContext | undefined): string {
+  return connectionContext === undefined
+    ? ''
+    : ` attemptId=${connectionContext.attemptId} wrapperGeneration=${connectionContext.wrapperGeneration}`;
+}
+
+export type CreateStoreFn = (storeName: string, key: Uint8Array) => undefined | Promise<CRUDEngine | undefined>;
+
+interface AccountOptions {
+  /** Used to store info in the database (will create a inMemory engine if returns undefined) */
+  createStore?: CreateStoreFn;
+  systemCrypto?: SecretCrypto;
+  coreCryptoConfig?: CoreCryptoConfig;
+  /** Clock shared by services which need wall time or retry scheduling. */
+  clock?: Clock;
+
+  /** Number of prekeys to generate when creating a new device (defaults to 2)
+   * Prekeys are Diffie-Hellmann public keys which allow offline initiation of a secure Proteus session between two devices.
+   * Having a high value will:
+   *    - make creating a new device consuming more CPU resources
+   *    - make it less likely that all prekeys get consumed while the device is offline and the last resort prekey will not be used to create new session
+   * Having a low value will:
+   *    - make creating a new device fast
+   *    - make it likely that all prekeys get consumed while the device is offline and the last resort prekey will be used to create new session
+   */
+  nbPrekeys: number;
+}
+
+type InitOptions = {
+  /** cookie used to identify the current user. Will use the browser cookie if not defined */
+  cookie?: Cookie;
+};
+
+const coreDefaultClient: ClientInfo = {
+  classification: ClientClassification.DESKTOP,
+  cookieLabel: 'default',
+  model: '@wireapp/core',
+};
+
+export enum EVENTS {
+  /**
+   * event triggered when a message from an unknown client is received.
+   * An unknown client is a client we don't yet have a session with
+   */
+  NEW_SESSION = 'new_session',
+}
+
+type Events = {
+  [EVENTS.NEW_SESSION]: NewClient;
+};
+
+export const AccountLocalStorageStore = LocalStorageStore('core_account');
+
+export class Account extends TypedEventEmitter<Events> {
+  private readonly apiClient: APIClient;
+  private readonly logger: logdown.Logger;
+  /** this is the client the consumer is currently using. Will be set as soon as `initClient` is called and will be rest upon logout */
+  private currentClient?: RegisteredClient;
+  private storeEngine?: CRUDEngine;
+  private db?: CoreDatabase;
+  private encryptedDb?: EncryptedStore<any>;
+  private coreCallbacks?: CoreCallbacks;
+  private readonly clock: Clock;
+  private connectionState: ConnectionState = ConnectionState.CLOSED;
+
+  private readonly isConnectionLive = (): boolean => {
+    return this.connectionState === ConnectionState.LIVE;
+  };
+
+  /**
+   * {@link once}-wrapped {@link MLSService.initialisePendingProposalsTasks}; recreated in
+   * {@link resetContext} (login / logout) so each logged-in session runs it at most once after MLS
+   * is available on the first catch-up → LIVE hand-off.
+   */
+  private initialisePendingProposalsTasksOnce: () => Promise<void>;
+
+  private readonly notificationProcessingQueue = createFlushableQueue({
+    autoStart: false,
+    ...sequentialQueueOptions,
+  });
+
+  public setMaxCoreCryptoLogLevel: (level: CoreCryptoLogLevel) => void = () => {
+    return undefined;
+  };
+
+  public service?: {
+    mls?: MLSService;
+    e2eIdentity?: E2EIServiceExternal;
+    proteus: ProteusService;
+    account: AccountService;
+    asset: AssetService;
+    broadcast: BroadcastService;
+    client: ClientService;
+    connection: ConnectionService;
+    conversation: ConversationService;
+    subconversation: SubconversationService;
+    giphy: GiphyService;
+    linkPreview: LinkPreviewService;
+    notification: NotificationService;
+    self: SelfService;
+    team: TeamService;
+    user: UserService;
+  };
+  public backendFeatures: BackendFeatures;
+  public recurringTaskScheduler: RecurringTaskScheduler;
+
+  /**
+   * @param apiClient The apiClient instance to use in the core (will create a new new one if undefined)
+   * @param accountOptions
+   */
+  constructor(
+    apiClient: APIClient = new APIClient(),
+    private readonly options: AccountOptions = {
+      nbPrekeys: 100,
+      coreCryptoConfig: {wasmFilePath: '', enabled: false},
+    },
+  ) {
+    super();
+    this.clock = options.clock ?? createClock();
+    this.apiClient = apiClient;
+    this.backendFeatures = this.apiClient.backendFeatures;
+    this.logger = LogFactory.getLogger('@wireapp/core/Account');
+    const accountLogger = this.logger;
+    this.recurringTaskScheduler = new RecurringTaskScheduler(
+      {
+        get: async key => {
+          const task = await this.db?.get('recurringTasks', key);
+          return task?.firingDate;
+        },
+        set: async (key, timestamp) => {
+          await this.db?.put('recurringTasks', {key, firingDate: timestamp}, key);
+        },
+        delete: async key => {
+          await this.db?.delete('recurringTasks', key);
+        },
+      },
+      createFireAndForgetInvoker({
+        reportError(error) {
+          accountLogger.error('failed to execute fire-and-forget action', error);
+        },
+      }),
+    );
+
+    apiClient.on(APIClient.TOPIC.COOKIE_REFRESH, async (cookie?: Cookie) => {
+      if (cookie !== undefined && this.storeEngine !== undefined) {
+        try {
+          await this.persistCookie(this.storeEngine, cookie);
+        } catch (error: unknown) {
+          this.logger.error('Failed to save cookie:', error);
+        }
+      }
+    });
+
+    this.initialisePendingProposalsTasksOnce = this.createInitialisePendingProposalsTasksOnce();
+  }
+
+  private createInitialisePendingProposalsTasksOnce(): () => Promise<void> {
+    return once(async () => {
+      if (this.service?.mls === undefined) {
+        const errorMessage = 'Failed to initialise pending proposals tasks: MLS service is not set';
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      await this.service.mls.initialisePendingProposalsTasks();
+    });
+  }
+
+  /**
+   * Will set the APIClient to use a specific version of the API (by default uses version 0)
+   * It will fetch the API Config and use the highest possible version
+   * @param min mininum version to use
+   * @param max maximum version to use
+   * @param allowDev allow the api-client to use development version of the api (if present). The dev version also need to be listed on the supportedVersions given as parameters
+   *   If we have version 2 that is a dev version, this is going to be the output of those calls
+   *   - useVersion(0, 2, true) > version 2 is used
+   *   - useVersion(0, 2) > version 1 is used
+   *   - useVersion(0, 1, true) > version 1 is used
+   * @return The highest version that is both supported by client and backend
+   */
+  public useAPIVersion = async (min: number, max: number, allowDev?: boolean): Promise<BackendFeatures> => {
+    const features = await this.apiClient.useVersion(min, max, allowDev);
+    this.backendFeatures = features;
+    return features;
+  };
+
+  private readonly persistCookie = (storeEngine: CRUDEngine, cookie: Cookie): Promise<string> => {
+    const entity = {expiration: cookie.expiration, zuid: cookie.zuid};
+    return storeEngine.updateOrCreate(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, entity);
+  };
+
+  public enrollE2EI = async ({
+    displayName,
+    handle,
+    teamId,
+    discoveryUrl,
+    getAllConversations,
+    certificateTtl = defaultCertificateLifetimeInDays * (TimeInMillis.DAY / TimeInMillis.SECOND),
+  }: {
+    /** display name of the user (should match the identity provider) */
+    displayName: string;
+    /** handle of the user (should match the identity provider) */
+    handle: string;
+    /** team of the user */
+    teamId: string;
+    discoveryUrl: string;
+    /** function called to get all conversations */
+    getAllConversations: getAllConversationsCallback;
+    /** number of seconds the certificate should be valid (default 90 days) */
+    certificateTtl?: number;
+  }): Promise<void> => {
+    const context = this.apiClient.context;
+    const domain = context?.domain ?? '';
+
+    if (this.currentClient === undefined) {
+      throw new Error('Client has not been initialized - please login first');
+    }
+
+    if (this.service?.mls?.isEnabled !== true || this.service?.e2eIdentity === undefined) {
+      throw new Error('MLS not initialized, unable to enroll E2EI');
+    }
+
+    const user: User = {
+      displayName,
+      handle,
+      domain,
+      teamId,
+      id: this.userId,
+    };
+
+    return this.service.mls.enrollE2EI(
+      discoveryUrl,
+      user,
+      this.currentClient,
+      this.options.nbPrekeys,
+      certificateTtl,
+      getAllConversations,
+    );
+  };
+
+  get clientId(): string {
+    return this.apiClient.validatedClientId;
+  }
+
+  get userId(): string {
+    return this.apiClient.validatedUserId;
+  }
+
+  /**
+   * Will register a new user to the backend
+   *
+   * @param registration The user's data
+   * @param clientType Type of client to create (temporary or permanent)
+   */
+  public register = async (registration: RegisterData, clientType: ClientType): Promise<Context> => {
+    const context = await this.apiClient.register(registration, clientType);
+    await this.initServices(context);
+    return context;
+  };
+
+  /**
+   * Will init the core with an already logged in user
+   *
+   * @param clientType The type of client the user is using (temporary or permanent)
+   */
+  public init = async (clientType: ClientType, {cookie}: InitOptions = {}): Promise<Context> => {
+    const context = await this.apiClient.init(clientType, cookie);
+    await this.initServices(context);
+    return context;
+  };
+
+  /**
+   * Will log the user in with the given credential.
+   *
+   * @param loginData The credentials of the user
+   * @param clientInfo Info about the client to create (name, type...)
+   */
+  public login = async (loginData: LoginData): Promise<Context> => {
+    this.resetContext();
+    LoginSanitizer.removeNonPrintableCharacters(loginData);
+
+    const context = await this.apiClient.login(loginData);
+    await this.initServices(context);
+    return context;
+  };
+
+  /**
+   * Will register a new client for the current user
+   */
+  public registerClient = async (
+    loginData: LoginData,
+    useLegacyNotificationStream: boolean,
+    /** will add extra manual entropy to the client's identity being created */
+    entropyData?: Uint8Array,
+    clientInfo: ClientInfo = coreDefaultClient,
+  ): Promise<RegisteredClient> => {
+    if (this.service === undefined || this.apiClient.context === undefined || this.storeEngine === undefined) {
+      throw new Error('Services are not set or context not initialized.');
+    }
+
+    if (typeof useLegacyNotificationStream !== 'boolean') {
+      throw new Error('use of legacy notifications must be explicitly set to true or false');
+    }
+
+    // we reset the services to re-instantiate a new CryptoClient instance
+    await this.initServices(this.apiClient.context);
+
+    const initialPreKeys = await this.service.proteus.createClient(entropyData);
+
+    const client = await this.service.client.register(
+      loginData,
+      clientInfo,
+      initialPreKeys,
+      useLegacyNotificationStream,
+    );
+    const clientId = client.id;
+
+    if (useLegacyNotificationStream) {
+      await this.service.notification.legacyInitializeNotificationStream(clientId);
+    }
+    await this.service.client.synchronizeClients(clientId);
+    return client;
+  };
+
+  public getLocalClient(): Promise<MetaClient | undefined> | undefined {
+    return this.service?.client.loadClient();
+  }
+
+  /**
+   * Will initiate all the cryptographic material of the given registered device and setup all the background tasks.
+   *
+   * @returns The local existing client or undefined if the client does not exist or is not valid (non existing on backend)
+   */
+  public initClient = async (client: RegisteredClient, mlsConfig?: InitClientOptions): Promise<RegisteredClient> => {
+    if (this.service === undefined || this.apiClient.context === undefined || this.storeEngine === undefined) {
+      throw new Error('Services are not set.');
+    }
+    this.apiClient.context.clientId = client.id;
+
+    // Call /access endpoint with client_id after client initialisation
+    await this.apiClient.transport.http.associateClientWithSession(client.id);
+
+    await this.service.proteus.initClient(this.apiClient.context);
+
+    if ((await this.isMLSActiveForClient()) && this.service.mls !== undefined && mlsConfig !== undefined) {
+      const {userId, domain = ''} = this.apiClient.context;
+      await this.service.mls.initClient({id: userId, domain}, client, mlsConfig);
+
+      // initialize scheduler for syncing key packages with backend
+      await this.service.mls.schedulePeriodicKeyPackagesBackendSync(client.id);
+
+      // leave stale conference subconversations (e.g after a crash)
+      await this.service.subconversation.leaveStaleConferenceSubconversations();
+    }
+
+    this.currentClient = client;
+    return client;
+  };
+
+  private readonly buildCryptoClient = async (
+    context: Context,
+    storeEngine: CRUDEngine,
+    encryptedStore: EncryptedStore,
+  ): Promise<CryptoClientWithProtocol> => {
+    const baseConfig = {
+      clock: this.clock,
+      nbPrekeys: this.options.nbPrekeys,
+      onNewPrekeys: async (prekeys: PreKey[]) => {
+        this.logger.debug(`Received '${prekeys.length}' new PreKeys.`);
+
+        const clientId = context.clientId;
+        if (isUndefined(clientId)) {
+          throw new Error('Client id is not set in the account context.');
+        }
+        await this.apiClient.api.client.putClient(clientId, {prekeys});
+        this.logger.debug(`Successfully uploaded '${prekeys.length}' PreKeys.`);
+      },
+    };
+
+    if (this.options.coreCryptoConfig?.enabled === true) {
+      const {buildClient} = await import('./messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper');
+      const client = await buildClient(
+        storeEngine,
+        {
+          ...baseConfig,
+          generateSecretKey: (keyId, keySize) => {
+            return generateSecretKey({keyId, keySize, secretsDb: encryptedStore});
+          },
+        },
+        this.options.coreCryptoConfig,
+      );
+      this.setMaxCoreCryptoLogLevel = client.setMaxLogLevel;
+      return [CryptoClientType.CORE_CRYPTO, client] as const;
+    }
+
+    const {buildClient} = await import('./messagingProtocols/proteus/proteusService/cryptoClient/cryptoboxWrapper');
+    const client = buildClient(storeEngine, baseConfig);
+    return [CryptoClientType.CRYPTOBOX, client] as const;
+  };
+
+  /**
+   * In order to be able to send MLS messages, the core needs a few information from the consumer.
+   * Namely:
+   * - is the current user allowed to administrate a specific conversation
+   * - what is the groupId of a conversation
+   * @param coreCallbacks
+   */
+  configureCoreCallbacks = (coreCallbacks: CoreCallbacks): void => {
+    this.coreCallbacks = coreCallbacks;
+  };
+
+  private readonly initServices = async (context: Context): Promise<void> => {
+    const encryptedStoreName = this.generateEncryptedDbName(context);
+    this.encryptedDb =
+      this.options.systemCrypto !== undefined
+        ? await createCustomEncryptedStore(encryptedStoreName, this.options.systemCrypto)
+        : await createEncryptedStore(encryptedStoreName);
+    this.db = await openDB(this.generateCoreDbName(context));
+    this.storeEngine = await this.initEngine(context, this.encryptedDb);
+
+    const accountService = new AccountService(this.apiClient);
+    const assetService = new AssetService(this.apiClient);
+
+    const [clientType, cryptoClient] = await this.buildCryptoClient(context, this.storeEngine, this.encryptedDb);
+    this.logger.info(`CryptoClient of type ${clientType} created (version ${cryptoClient.version})`);
+
+    let mlsService: MLSService | undefined;
+    let e2eServiceExternal: E2EIServiceExternal | undefined;
+
+    const proteusService = new ProteusService(
+      this.apiClient,
+      cryptoClient,
+      {
+        onNewClient: payload => {
+          return this.emit(EVENTS.NEW_SESSION, payload);
+        },
+        nbPrekeys: this.options.nbPrekeys,
+      },
+      this.storeEngine,
+    );
+
+    const clientService = new ClientService(this.apiClient, proteusService, this.storeEngine, this.clock);
+
+    if (clientType === CryptoClientType.CORE_CRYPTO && (await this.apiClient.supportsMLS())) {
+      mlsService = new MLSService(this.apiClient, cryptoClient.getNativeClient(), this.db, this.recurringTaskScheduler);
+
+      e2eServiceExternal = new E2EIServiceExternal(
+        cryptoClient.getNativeClient(),
+        this.apiClient,
+        this.db,
+        this.recurringTaskScheduler,
+        clientService,
+        mlsService,
+        createPkiEnvironment,
+      );
+    }
+
+    const connectionService = new ConnectionService(this.apiClient);
+    const giphyService = new GiphyService(this.apiClient);
+    const linkPreviewService = new LinkPreviewService(assetService);
+    const subconversationService = new SubconversationService(this.apiClient, this.db, mlsService);
+    const conversationService = new ConversationService(
+      this.apiClient,
+      proteusService,
+      this.db,
+      this.groupIdFromConversationId,
+      subconversationService,
+      this.isMLSConversationRecoveryEnabled,
+      mlsService,
+      this.isConnectionLive,
+    );
+    const notificationService = new NotificationService(this.apiClient, this.storeEngine, conversationService);
+
+    const selfService = new SelfService(this.apiClient);
+    const teamService = new TeamService(this.apiClient);
+
+    const broadcastService = new BroadcastService(this.apiClient, proteusService);
+    const userService = new UserService(this.apiClient);
+
+    this.service = {
+      e2eIdentity: e2eServiceExternal,
+      mls: mlsService,
+      proteus: proteusService,
+      account: accountService,
+      asset: assetService,
+      broadcast: broadcastService,
+      client: clientService,
+      connection: connectionService,
+      conversation: conversationService,
+      subconversation: subconversationService,
+      giphy: giphyService,
+      linkPreview: linkPreviewService,
+      notification: notificationService,
+      self: selfService,
+      team: teamService,
+      user: userService,
+    };
+  };
+
+  private readonly resetContext = (): void => {
+    this.currentClient = undefined;
+    this.initialisePendingProposalsTasksOnce = this.createInitialisePendingProposalsTasksOnce();
+    this.connectionState = ConnectionState.CLOSED;
+    delete this.apiClient.context;
+    delete this.service;
+  };
+
+  /**
+   * Will logout the current user
+   * @param clearData if set to `true` will completely wipe any database that was created by the Account
+   */
+  public logout = async (data?: {clearAllData?: boolean; clearCryptoData?: boolean}): Promise<void> => {
+    this.db?.close();
+    this.encryptedDb?.close();
+
+    if (data?.clearAllData === true) {
+      await this.wipeAllData();
+    } else if (data?.clearCryptoData === true) {
+      await this.wipeCryptoData();
+    }
+
+    await this.apiClient.logout();
+    this.resetContext();
+  };
+
+  private readonly wipeCommonData = async (): Promise<void> => {
+    try {
+      await this.service?.client.deleteLocalClient();
+    } catch (error: unknown) {
+      this.logger.error('Failed to delete local client during logout cleanup:', error);
+    }
+
+    try {
+      if (this.storeEngine !== undefined) {
+        await wipeCoreCryptoDb(this.storeEngine, this.clock);
+      }
+    } catch (error: unknown) {
+      this.logger.error('Failed to wipe crypto database during logout cleanup:', error);
+    }
+
+    try {
+      // needs to be wiped last
+      await this.encryptedDb?.wipe();
+    } catch (error: unknown) {
+      this.logger.error('Failed to delete encrypted database during logout cleanup:', error);
+    }
+  };
+
+  /**
+   * Will delete the identity and history of the current user
+   */
+  private readonly wipeAllData = async (): Promise<void> => {
+    try {
+      if (this.storeEngine !== undefined) {
+        await deleteIdentity(this.storeEngine, false);
+      }
+    } catch (error: unknown) {
+      this.logger.error('Failed to delete identity during logout cleanup:', error);
+    }
+
+    try {
+      if (this.db !== undefined) {
+        await deleteDB(this.db);
+      }
+    } catch (error: unknown) {
+      this.logger.error('Failed to delete database during logout cleanup:', error);
+    }
+
+    await this.wipeCommonData();
+  };
+
+  /**
+   * Will delete the cryptography and client of the current user
+   * Will keep the history intact
+   */
+  private readonly wipeCryptoData = async (): Promise<void> => {
+    try {
+      if (this.storeEngine !== undefined) {
+        await deleteIdentity(this.storeEngine, true);
+      }
+    } catch (error: unknown) {
+      this.logger.error('Failed to delete identity during logout cleanup:', error);
+    }
+
+    await this.wipeCommonData();
+  };
+
+  /**
+   * return true if the current user has a MLS device that is initialized and ready to use
+   */
+  public get hasMLSDevice(): boolean {
+    return this.service?.mls?.isEnabled === true;
+  }
+
+  /**
+   * Will download and handle the notification stream since last stored notification id.
+   * Once the notification stream has been handled from backend, will then connect to the websocket and start listening to incoming events
+   *
+   * @param callbacks callbacks that will be called to handle different events
+   * @returns close a function that will disconnect from the websocket
+   */
+  public listen = async ({
+    useLegacy,
+    onEvent = asyncNoop,
+    onConnectionStateChanged: onConnectionStateChangedCallBack = noop,
+    onNotificationStreamProgress = noop,
+    onMissedNotifications = noop,
+  }: {
+    /**
+     * Called when a new event arrives from backend
+     * @param payload the payload of the event. Contains the raw event received and the decrypted data (if event was encrypted)
+     * @param source where the message comes from (either websocket or notification stream)
+     */
+    onEvent?: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>;
+
+    /**
+     * During the notification stream processing, this function will be called whenever a new notification has been processed
+     */
+    onNotificationStreamProgress?: (currentProcessingNotificationTimestamp: string) => void;
+
+    /**
+     * called when the connection state with the backend has changed
+     */
+    onConnectionStateChanged?: (state: ConnectionState, connectionContext?: WebSocketConnectionContext) => void;
+
+    /**
+     * called when we detect lost notification from backend.
+     * When a client doesn't log in for a while (28 days, as of now) notifications that are older than 28 days will be deleted from backend.
+     * If the client query the backend for the notifications since a particular notification ID and this ID doesn't exist anymore on the backend, we deduce that some messages were not sync before they were removed from backend.
+     * We can then detect that something was wrong and warn the consumer that there might be some missing old messages
+     * @param  {string} notificationId
+     */
+    onMissedNotifications?: (notificationId: string) => void;
+
+    /**
+     * When set to true, will use the legacy notification stream instead of the new async notifications.
+     */
+    useLegacy?: boolean;
+
+    /**
+     * When set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
+     * @deprecated Core doesn't support dryRun mode anymore and this parameter will be removed in future versions
+     */
+    dryRun?: boolean;
+  } = {}): Promise<() => void> => {
+    if (this.currentClient === undefined) {
+      throw new Error('Client has not been initialized - please login first');
+    }
+
+    if (typeof useLegacy !== 'boolean') {
+      throw new Error('use of legacy notifications must be explicitly set to true or false');
+    }
+
+    let currentWebSocketConnectionContext: WebSocketConnectionContext | undefined;
+    const getCurrentWebSocketConnectionContext = (): WebSocketConnectionContext | undefined => {
+      return currentWebSocketConnectionContext;
+    };
+    const onConnectionStateChanged = this.createConnectionStateChangedHandler(
+      onConnectionStateChangedCallBack,
+      getCurrentWebSocketConnectionContext,
+    );
+
+    const handleEvent = this.createEventHandler(onEvent);
+
+    const handleLegacyNotification = this.createLegacyNotificationHandler(
+      handleEvent,
+      onNotificationStreamProgress,
+      getCurrentWebSocketConnectionContext,
+    );
+    const handleNotification = this.createNotificationHandler(
+      handleEvent,
+      onNotificationStreamProgress,
+      onConnectionStateChanged,
+      getCurrentWebSocketConnectionContext,
+    );
+
+    const handleMissedNotifications = this.createLegacyMissedNotificationsHandler(onMissedNotifications);
+    const legacyProcessNotificationStream = this.createLegacyNotificationStreamProcessor({
+      handleLegacyNotification,
+      handleMissedNotifications,
+      onConnectionStateChanged,
+      getCurrentWebSocketConnectionContext,
+    });
+
+    this.setupWebSocketListeners(onConnectionStateChanged, handleNotification, handleLegacyNotification, useLegacy);
+
+    const isClientCapableOfConsumableNotifications = this.getClientCapabilities().includes(
+      ClientCapability.CONSUMABLE_NOTIFICATIONS,
+    );
+
+    const capabilities = [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT];
+
+    if (!useLegacy) {
+      // let the backend now client is capable of consumable notifications
+      capabilities.push(ClientCapability.CONSUMABLE_NOTIFICATIONS);
+      this.apiClient.transport.ws.useAsyncNotificationsSocket();
+    }
+
+    this.logger.info(`Client is using the ${useLegacy ? 'legacy' : 'async'} notification stream`);
+
+    await this.service?.client.putClientCapabilities(this.currentClient.id, {capabilities});
+
+    /*
+     * When enabling async notifications, be aware that the backend maintains a separate queue
+     * for new async notifications (/events weboscket endpoint), which only starts populating *after* the client declares support
+     * for async notifications.
+     *
+     * Therefore, after declaring support, it's necessary to perform one final fetch from the legacy
+     * system to ensure no notifications are missed—since older notifications won't
+     * appear in the new queue.
+     *
+     * These two systems are separate, and the transition timing
+     * is important to avoid missing any messages during the switch.
+     *
+     * @todo This can be removed when all clients are capable of consumable notifications.
+     */
+    if (!isClientCapableOfConsumableNotifications && !useLegacy) {
+      // do the last legacy sync without connecting to any websockets
+      await legacyProcessNotificationStream();
+      this.logger.info('Completed final legacy notification stream processing after enabling async notifications');
+    }
+
+    if (useLegacy) {
+      /**
+       * immediately lock the websocket to prevent any new messages from being received
+       * before legacy notifications endpoint is fetched otherwise it'll update the last notification ID
+       * and fetching legacy notifications will return an empty list
+       */
+      this.apiClient.transport.ws.lock();
+    }
+    this.apiClient.connect(async (abortController, reconnectContext) => {
+      currentWebSocketConnectionContext = reconnectContext;
+      // this call back is called every single time the websocket connection is (re)established
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=websocket-open-processing-start useLegacy=${useLegacy} aborted=${abortController.signal.aborted}${getWebSocketLifecycleContext(reconnectContext)}`,
+      );
+      /**
+       * This is to avoid passing proposals too early to core crypto
+       * @See WPB-18995
+       */
+      pauseProposalProcessing();
+      pauseMessageSending(); // pause message sending while processing notifications, it will be resumed once the processing is done and we have the marker token
+      pauseRejoiningMLSConversations(); // We want to avoid triggering rejoins of out-of-sync MLS conversations while we are processing the notification stream
+      /**
+       * resume the notification processing queue
+       * it will start processing notifications immediately and pause if web socket connection drops
+       * we should start decryption and therefore acknowledging the notifications in order for the backend to
+       * send us the next batch of notifications, currently total size of notifications coming from web socket is limited to 500
+       * so we need to acknowledge the notifications to let the backend know we are ready for the next batch
+       */
+      this.notificationProcessingQueue.queue.start();
+
+      if (useLegacy) {
+        this.logger.info(
+          `[WebSocketLifecycle] layer=account event=legacy-catchup-start aborted=${abortController.signal.aborted}${getWebSocketLifecycleContext(reconnectContext)}`,
+        );
+        try {
+          await legacyProcessNotificationStream(abortController);
+          this.logger.info(
+            `[WebSocketLifecycle] layer=account event=legacy-catchup-success aborted=${abortController.signal.aborted} live=${this.isConnectionLive()}${getWebSocketLifecycleContext(reconnectContext)}`,
+          );
+        } catch (error: unknown) {
+          const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
+          this.logger.warn(
+            `[WebSocketLifecycle] layer=account event=legacy-catchup-failure aborted=${abortController.signal.aborted} live=${this.isConnectionLive()}${getWebSocketLifecycleContext(reconnectContext)} errorName=${errorName} errorMessage=${errorMessage}`,
+          );
+
+          if (abortController.signal.aborted) {
+            return;
+          }
+
+          this.pauseAndFlushNotificationQueue();
+          onConnectionStateChanged(ConnectionState.CLOSED);
+        }
+      }
+    });
+
+    return () => {
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=disconnect-requested${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())}`,
+      );
+      flushProposalsQueue();
+      this.pauseAndFlushNotificationQueue();
+      this.apiClient.disconnect();
+      onConnectionStateChanged(ConnectionState.CLOSED);
+      this.apiClient.transport.ws.removeAllListeners();
+    };
+  };
+
+  private readonly createConnectionStateChangedHandler = (
+    onConnectionStateChanged: (state: ConnectionState, connectionContext?: WebSocketConnectionContext) => void,
+    getCurrentWebSocketConnectionContext: () => WebSocketConnectionContext | undefined,
+  ): ((state: ConnectionState) => void) => {
+    let previousConnectionState = this.connectionState;
+    return (state: ConnectionState): void => {
+      const connectionContext = getCurrentWebSocketConnectionContext();
+      this.connectionState = state;
+      if (connectionContext === undefined) {
+        onConnectionStateChanged(state);
+      } else {
+        onConnectionStateChanged(state, connectionContext);
+      }
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=connection-state-change previousState=${previousConnectionState.toUpperCase()} nextState=${state.toUpperCase()}${getWebSocketLifecycleContext(connectionContext)}`,
+      );
+      previousConnectionState = state;
+    };
+  };
+
+  /**
+   * Creates the event handler that is invoked for each decrypted event from the backend.
+   * Responsible for handling specific event types like `MESSAGE_TIMER_UPDATE`, and then
+   * forwarding the event to the consumer via the `onEvent` callback.
+   */
+  private readonly createEventHandler = (
+    onEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
+  ) => {
+    return async (payload: HandledEventPayload, source: NotificationSource) => {
+      const {event} = payload;
+      switch (event?.type) {
+        case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE: {
+          const {
+            data: {message_timer},
+            conversation,
+          } = event as Events.ConversationMessageTimerUpdateEvent;
+          const expireAfterMillis = Number(message_timer);
+          const accountServices = this.service;
+          if (isUndefined(accountServices)) {
+            throw new Error('Services are not set.');
+          }
+          accountServices.conversation.messageTimer.setConversationLevelTimer(conversation, expireAfterMillis);
+          break;
+        }
+      }
+
+      // Always forward the event to the consumer
+      await onEvent(payload, source);
+    };
+  };
+
+  /**
+   * @deprecated This method is used to handle legacy notifications from the backend.
+   * It processes notifications from the legacy system, decrypts them, and emits events.
+   * It can be replaced with the new notification handling system using `ConsumableNotification`
+   * when all clients are capable of handling consumable notifications.
+   */
+  private readonly createLegacyNotificationHandler = (
+    handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
+    onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
+    getCurrentWebSocketConnectionContext: () => WebSocketConnectionContext | undefined,
+  ) => {
+    return async (notification: Notification, source: NotificationSource): Promise<void> => {
+      void this.notificationProcessingQueue
+        .add(async () => {
+          try {
+            const start = Date.now();
+            const firstNotificationPayload = notification.payload[0];
+            const notificationTime =
+              firstNotificationPayload !== undefined ? this.getNotificationEventTime(firstNotificationPayload) : null;
+            this.logger.info(`Processing legacy notification at ${notificationTime}`);
+            this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.queue.size}`);
+            this.logger.info(`Total pending proposals queue length: ${getProposalQueueLength()}`);
+            if (notificationTime !== null && notificationTime.length > 0) {
+              onNotificationStreamProgress(notificationTime);
+            }
+
+            const accountServices = this.service;
+            if (isUndefined(accountServices)) {
+              throw new Error('Services are not set.');
+            }
+            const messages = accountServices.notification.handleNotification(notification, source);
+
+            for await (const message of messages) {
+              await handleEvent(message, source);
+            }
+
+            this.logger.info(`Finished processing legacy notification in ${Date.now() - start}ms`);
+          } catch (error: unknown) {
+            const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
+            this.logger.error(
+              `[WebSocketLifecycle] layer=account event=legacy-notification-failure${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())} errorName=${errorName} errorMessage=${errorMessage}`,
+            );
+          }
+        })
+        .catch(this.handleNotificationQueueError);
+    };
+  };
+
+  private readonly createNotificationHandler = (
+    handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
+    onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
+    onConnectionStateChanged: (state: ConnectionState) => void,
+    getCurrentWebSocketConnectionContext: () => WebSocketConnectionContext | undefined,
+  ) => {
+    return async (notification: ConsumableNotification, source: NotificationSource): Promise<void> => {
+      this.logger.info(`Received consumable notification of type "${notification.type}"`);
+      try {
+        if (notification.type === ConsumableEvent.MISSED) {
+          this.reactToMissedNotification();
+          return;
+        }
+
+        if (notification.type === ConsumableEvent.SYNCHRONIZATION) {
+          this.notificationProcessingQueue
+            .add(() => {
+              return this.handleSynchronizationNotification(
+                notification,
+                onConnectionStateChanged,
+                getCurrentWebSocketConnectionContext(),
+              );
+            })
+            .catch(this.handleNotificationQueueError);
+          return;
+        }
+
+        this.notificationProcessingQueue
+          .add(() => {
+            return this.decryptAckEmitNotification(
+              notification,
+              handleEvent,
+              source,
+              onNotificationStreamProgress,
+              getCurrentWebSocketConnectionContext(),
+            );
+          })
+          .catch(this.handleNotificationQueueError);
+      } catch (error: unknown) {
+        const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
+        this.logger.error(
+          `[WebSocketLifecycle] layer=account event=consumable-notification-handling-failure${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())} errorName=${errorName} errorMessage=${errorMessage}`,
+        );
+      }
+    };
+  };
+
+  private readonly handleNotificationQueueError = (error: unknown): void => {
+    if (!(error instanceof Error)) {
+      throw error;
+    }
+
+    if (error instanceof TimeoutError) {
+      this.logger.warn('Notification decryption task timed out', error);
+      return;
+    }
+
+    if (isQueueFlushedError(error)) {
+      this.logger.info('Notification processing queue was flushed, ignoring error', error);
+    }
+  };
+
+  private readonly acknowledgeSynchronizationNotification = (
+    notification: ConsumableNotificationSynchronization,
+  ): void => {
+    this.apiClient.transport.ws.acknowledgeConsumableNotificationSynchronization(notification);
+  };
+
+  /**
+   * Persistence-backed MLS pending-proposals timers: {@link MLSService.initialisePendingProposalsTasks}.
+   * Call only at the catch-up → LIVE hand-off, immediately before {@link resumeProposalProcessing}.
+   * The MLS call is wrapped with lodash `once` ({@link initialisePendingProposalsTasksOnce}), recreated
+   * in {@link resetContext}, so it runs at most once per logged-in session after MLS is available—matching
+   * the historical single call from {@link initClient} while keeping the unsafe work off the cold-start path.
+   *
+   * **Why defer:** rehydrating during {@link Account.initClient} or while notifications are still
+   * replaying is unsafe. Persisted `firingDate` values are often in the past, so {@link TaskScheduler}
+   * fires auto-commits on the next tick while the backlog is still being applied. That usually surfaces
+   * as failing or conflicting commits (for example `mls-stale-message` / delivery rejection), not as a
+   * dependable way to “catch up”. “Wrong epoch” skew during replay is not uniquely attributable to
+   * proposal commits (recovery / rejoin paths matter too); this method exists to keep **all**
+   * rehydrated pending-proposal side effects aligned with a session that has finished ordered replay.
+   */
+  private readonly rehydrateMlsPendingProposalsTasksOnLiveTransition = async (): Promise<void> => {
+    if (this.hasMLSDevice && this.service?.mls !== undefined) {
+      await this.initialisePendingProposalsTasksOnce();
+    }
+  };
+
+  private readonly handleSynchronizationNotification = async (
+    notification: ConsumableNotificationSynchronization,
+    onConnectionStateChanged: (state: ConnectionState) => void,
+    connectionContext: WebSocketConnectionContext | undefined,
+  ): Promise<void> => {
+    const markerId = notification.data.marker_id;
+    const currentMarkerId = this.apiClient.transport.http.accessTokenStore.markerToken;
+    const markerPresent = Boolean(markerId);
+    const markerMatched = markerId === currentMarkerId;
+    this.logger.info(
+      `[WebSocketLifecycle] layer=account event=async-sync-marker-received markerPresent=${markerPresent}${getWebSocketLifecycleContext(connectionContext)}`,
+    );
+    this.acknowledgeSynchronizationNotification(notification);
+    /**
+     * There is a chance that there might be multiple synchronization notifications (markers)
+     * in the queue in case websocket connection drops a few times
+     * Hence we only want to resume message sending and set the connection state to LIVE
+     * if the marker ID matches the current marker ID.
+     */
+    if (markerMatched) {
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=async-sync-marker-matched markerMatched=true${getWebSocketLifecycleContext(connectionContext)}`,
+      );
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=live-transition-start${getWebSocketLifecycleContext(connectionContext)}`,
+      );
+      await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
+      const accountServices = this.service;
+      if (isUndefined(accountServices)) {
+        throw new Error('Services are not set.');
+      }
+      await accountServices.conversation.runDeferredEpochRecovery();
+      resumeProposalProcessing();
+      resumeMessageSending();
+      resumeRejoiningMLSConversations();
+      onConnectionStateChanged(ConnectionState.LIVE);
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=live-transition-success${getWebSocketLifecycleContext(connectionContext)}`,
+      );
+      return;
+    }
+
+    this.logger.info(
+      `[WebSocketLifecycle] layer=account event=async-sync-marker-ignored markerMatched=false${getWebSocketLifecycleContext(connectionContext)}`,
+    );
+  };
+
+  private readonly decryptAckEmitNotification = async (
+    notification: ConsumableNotificationEvent,
+    handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
+    source: NotificationSource,
+    onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
+    connectionContext: WebSocketConnectionContext | undefined,
+  ): Promise<void> => {
+    try {
+      this.logger.info('Sending consumable notification for decryption');
+      const accountServices = this.service;
+      if (isUndefined(accountServices)) {
+        throw new Error('Services are not set.');
+      }
+      const payloads = accountServices.notification.handleNotification(notification.data.event, source);
+
+      const firstEventPayload = notification.data.event.payload[0];
+      const notificationTime =
+        firstEventPayload !== undefined ? this.getNotificationEventTime(firstEventPayload) : null;
+      if (!this.isConnectionLive() && isNonEmptyString(notificationTime)) {
+        onNotificationStreamProgress(notificationTime);
+      }
+
+      for await (const payload of payloads ?? []) {
+        await handleEvent(payload, source);
+      }
+
+      this.logger.info('Acknowledging consumable notification on the backend');
+      this.apiClient.transport.ws.acknowledgeNotification(notification);
+    } catch (error: unknown) {
+      const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
+      this.logger.error(
+        `[WebSocketLifecycle] layer=account event=consumable-notification-processing-failure${getWebSocketLifecycleContext(connectionContext)} errorName=${errorName} errorMessage=${errorMessage}`,
+      );
+    }
+  };
+
+  public getNotificationEventTime = (backendEvent: Events.BackendEvent): string | null => {
+    if ('time' in backendEvent && typeof backendEvent.time === 'string') {
+      return backendEvent.time;
+    }
+
+    return null;
+  };
+
+  /**
+   * Returns a function to handle missed notifications — i.e., when the backend indicates
+   * that some notifications were lost due to age (typically >28 days).
+   * Also handles MLS-specific epoch mismatch recovery by triggering a conversation rejoin.
+   *
+   * @deprecated This is used to handle legacy missed notifications.
+   * It should be replaced with the new notification handling system using `ConsumableNotification`.
+   * when all clients are capable of handling consumable notifications.
+   */
+  private readonly createLegacyMissedNotificationsHandler = (
+    onMissedNotifications: (notificationId: string) => void,
+  ) => {
+    return async (notificationId: string) => {
+      if (this.hasMLSDevice) {
+        void queueConversationRejoin('all-conversations', () => {
+          const accountServices = this.service;
+          if (isUndefined(accountServices)) {
+            throw new Error('Services are not set.');
+          }
+
+          return accountServices.conversation.handleConversationsEpochMismatch();
+        });
+      }
+
+      return onMissedNotifications(notificationId);
+    };
+  };
+
+  /**
+   * Returns a processor function for the notification stream (legacy sync).
+   * It pauses message sending and MLS rejoining during stream handling to prevent race conditions,
+   * then resumes normal operations after sync is complete.
+   *
+   * @deprecated This is used to do a final sync of the legacy notification stream
+   * before switching to the new notification handling system using `ConsumableNotification`.
+   * It should be replaced with the new notification handling system when all clients are capable of handling consumable notifications.
+   *
+   * @param handlers Various logic handlers wired to notification callbacks
+   */
+  private readonly createLegacyNotificationStreamProcessor = ({
+    handleLegacyNotification,
+    handleMissedNotifications,
+    onConnectionStateChanged,
+    getCurrentWebSocketConnectionContext = () => {
+      return undefined;
+    },
+  }: {
+    handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>;
+    handleMissedNotifications: (notificationId: string) => Promise<void>;
+    onConnectionStateChanged: (state: ConnectionState) => void;
+    getCurrentWebSocketConnectionContext?: () => WebSocketConnectionContext | undefined;
+  }) => {
+    return async (abortController?: AbortController) => {
+      this.apiClient.transport.ws.lock();
+      pauseProposalProcessing();
+      pauseMessageSending();
+      pauseRejoiningMLSConversations();
+      onConnectionStateChanged(ConnectionState.PROCESSING_NOTIFICATIONS);
+
+      const accountServices = this.service;
+      if (isUndefined(accountServices)) {
+        throw new Error('Services are not set.');
+      }
+      const results = await accountServices.notification.legacyProcessNotificationStream(
+        async (notification, source) => {
+          await handleLegacyNotification(notification, source);
+        },
+        handleMissedNotifications,
+        abortController,
+      );
+
+      this.logger.info(
+        'Finished inserting notifications for decryption from the legacy endpoint to the process queue',
+        results,
+      );
+
+      // We need to wait for the notification stream to be fully handled before releasing the message sending queue.
+      // This is due to the nature of how message are encrypted, any change in mls epoch needs to happen before we start encrypting any kind of messages
+      void this.notificationProcessingQueue
+        .add(async () => {
+          this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
+          const connectionContext = getCurrentWebSocketConnectionContext();
+          this.logger.info(
+            `[WebSocketLifecycle] layer=account event=live-transition-start${getWebSocketLifecycleContext(connectionContext)}`,
+          );
+          await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
+          await this.service?.conversation.runDeferredEpochRecovery();
+          resumeProposalProcessing();
+          resumeMessageSending();
+          resumeRejoiningMLSConversations();
+          onConnectionStateChanged(ConnectionState.LIVE);
+          this.logger.info(
+            `[WebSocketLifecycle] layer=account event=live-transition-success${getWebSocketLifecycleContext(connectionContext)}`,
+          );
+          this.apiClient.transport.ws.unlock();
+        })
+        .catch(this.handleNotificationQueueError);
+    };
+  };
+
+  /**
+   * In case of a closed connection, we flush the notification processing queue.
+   * As we are not acknowledging them before decryption is done
+   * they will be resent next time the connection is opened
+   * this is to avoid duplicate decryption of notifications
+   */
+  private readonly pauseAndFlushNotificationQueue = (): void => {
+    this.notificationProcessingQueue.queue.pause();
+    this.notificationProcessingQueue.flush();
+    this.logger.info('Notification processing queue paused and flushed');
+  };
+
+  public readonly pauseNotificationQueue = (): void => {
+    this.notificationProcessingQueue.queue.pause();
+    this.logger.info('Notification processing queue paused');
+  };
+
+  public readonly resumeNotificationQueue = (): void => {
+    this.notificationProcessingQueue.queue.start();
+    this.logger.info('Notification processing queue resumed');
+  };
+
+  /**
+   * Sets up WebSocket event listeners for:
+   * - Incoming backend messages
+   * - WebSocket state changes
+   * On each new backend message, we pass it to the  notification handler.
+   * On state changes, we map raw socket states to public connection states and emit them.
+   */
+  private readonly setupWebSocketListeners = (
+    onConnectionStateChanged: (state: ConnectionState) => void,
+    handleNotification: (notification: ConsumableNotification, source: NotificationSource) => Promise<void>,
+    handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>,
+    useLegacy: boolean,
+  ): void => {
+    this.logger.info('Setting up WebSocket listeners');
+    this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
+
+    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
+      this.logger.info('Received new notification from backend');
+      if (Account.checkIsConsumable(notification)) {
+        void handleNotification(notification, NotificationSource.WEBSOCKET);
+        return;
+      }
+      void handleLegacyNotification(notification, NotificationSource.WEBSOCKET);
+    });
+
+    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, wsState => {
+      const mapping: Partial<Record<WEBSOCKET_STATE, ConnectionState>> = {
+        [WEBSOCKET_STATE.CLOSED]: ConnectionState.CLOSED,
+        [WEBSOCKET_STATE.CONNECTING]: ConnectionState.CONNECTING,
+      };
+
+      const connectionState = mapping[wsState];
+
+      if (connectionState === ConnectionState.CLOSED) {
+        flushProposalsQueue();
+        this.pauseAndFlushNotificationQueue();
+        if (useLegacy) {
+          this.apiClient.transport.ws.lock();
+        }
+      }
+
+      if (connectionState !== undefined) {
+        onConnectionStateChanged(connectionState);
+      }
+    });
+  };
+
+  /**
+   * Handles logic for reacting to a missed notification event.
+   *
+   * The backend sends a special "missed notification" signal if it detects
+   * that the client has missed one or more notifications. Once this signal is sent,
+   * the backend will **stop sending all further notifications** until the client
+   * acknowledges the missed state.
+   *
+   * Because our app currently lacks functionality to perform a full real-time sync
+   * while running, we must reload the application to re-fetch the entire state.
+   *
+   * On first detection of the missed notification:
+   * - We set a local storage flag (`has_missing_notification`) to mark that we've
+   *   entered this state.
+   * - We reload the application so the state can be re-fetched from scratch.
+   *
+   * On the next load:
+   * - If the flag is already present, we acknowledge the missed notification via
+   * the WebSocket transport, unblocking the backend so it resumes sending updates
+   * then we remove the flag.
+   */
+  private readonly reactToMissedNotification = (): void => {
+    this.logger.info('Reacting to missed notification from consumable async websocket');
+    const localStorageKey = 'has_missing_notification';
+
+    // First-time handling: set flag and reload to trigger full re-fetch of state.
+    if (!AccountLocalStorageStore.has(localStorageKey)) {
+      this.logger.info('First missed notification detected, reloading to recover state');
+      AccountLocalStorageStore.add(localStorageKey, 'true');
+      window.location.reload();
+      return;
+    }
+
+    this.logger.info('Missed notification previously detected, acknowledging to resume updates');
+    // After reload: acknowledge the missed notification so backend resumes notifications.
+    this.apiClient.transport.ws.acknowledgeMissedNotification();
+    AccountLocalStorageStore.remove(localStorageKey);
+  };
+
+  public getClientCapabilities = (): ClientCapability[] => {
+    return this.currentClient?.capabilities ?? [];
+  };
+
+  public static checkIsConsumable = (
+    notification: Notification | ConsumableNotification,
+  ): notification is ConsumableNotification => {
+    return 'type' in notification;
+  };
+
+  public static checkIsLegacyNotification = (
+    notification: Notification | ConsumableNotification,
+  ): notification is Notification => {
+    return !Account.checkIsConsumable(notification);
+  };
+
+  private readonly generateDbName = (context: Context): string => {
+    const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
+    return `wire@${this.apiClient.config.urls.name}@${context.userId}${clientType}`;
+  };
+
+  private readonly generateCoreDbName = (context: Context): string => {
+    return `core-${this.generateDbName(context)}`;
+  };
+
+  private readonly generateEncryptedDbName = (context: Context): string => {
+    return `secrets-${this.generateDbName(context)}`;
+  };
+
+  private readonly initEngine = async (context: Context, encryptedStore: EncryptedStore): Promise<CRUDEngine> => {
+    const dbName = this.generateDbName(context);
+    this.logger.debug(`Initialising store with name "${dbName}"...`);
+    const openDb = async (): Promise<CRUDEngine | MemoryEngine> => {
+      const dbKey = await generateSecretKey({keyId: 'db-key', keySize: 32, secretsDb: encryptedStore});
+      const initializedDb = await this.options.createStore?.(dbName, dbKey.key);
+      if (initializedDb !== undefined) {
+        this.logger.debug(`Initialized store with existing engine "${dbName}".`);
+        return initializedDb;
+      }
+      this.logger.debug(`Initialized store with new memory engine "${dbName}".`);
+      const memoryEngine = new MemoryEngine();
+      await memoryEngine.init(dbName);
+      return memoryEngine;
+    };
+    const storeEngine = await openDb();
+    const cookie = CookieStore.getCookie();
+    if (cookie !== undefined) {
+      await this.persistCookie(storeEngine, cookie);
+    }
+    return storeEngine;
+  };
+
+  private readonly groupIdFromConversationId = async (
+    conversationId: QualifiedId,
+    subconversationId?: SUBCONVERSATION_ID,
+  ): Promise<string | undefined> => {
+    if (subconversationId === undefined) {
+      return this.coreCallbacks?.groupIdFromConversationId(conversationId);
+    }
+
+    return this.service?.subconversation.getSubconversationGroupId(conversationId, subconversationId);
+  };
+
+  public isMLSActiveForClient = async (): Promise<boolean> => {
+    // Check for CoreCrypto library, it is required for MLS
+    if (this.options.coreCryptoConfig?.enabled !== true) {
+      return false;
+    }
+
+    // Check if the backend supports MLS trough removal keys
+    if (!(await this.apiClient.supportsMLS())) {
+      return false;
+    }
+
+    // Check if MLS is enabled for the public via backend feature flag
+    const commonConfig = (await this.service?.team.getCommonFeatureConfig()) ?? {};
+
+    return commonConfig[FEATURE_KEY.MLS]?.status === FEATURE_STATUS.ENABLED;
+  };
+
+  private readonly isMLSConversationRecoveryEnabled = async (): Promise<boolean> => {
+    const commonConfig = (await this.service?.team.getCommonFeatureConfig()) ?? {};
+    return commonConfig[FEATURE_KEY.ALLOWED_GLOBAL_OPERATIONS]?.config?.mlsConversationReset === true;
+  };
+
+  /**
+   * Checks the health of the WebSocket connection by sending a ping and waiting for a pong response.
+   * This is a non-disruptive check that does not close or reconnect the socket.
+   * @returns A promise that resolves to true if the socket responds with a pong within the timeout, false otherwise.
+   *
+   * @example
+   * const healthy = await account.isWebsocketHealthy();
+   * if (!healthy) {
+   *   // handle unhealthy websocket
+   * }
+   */
+  public isWebsocketHealthy = async (): Promise<boolean> => {
+    return this.apiClient.transport.ws.checkHealth();
+  };
+}

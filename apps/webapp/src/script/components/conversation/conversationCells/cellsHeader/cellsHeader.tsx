@@ -67,6 +67,7 @@ interface CellsHeaderProps {
   onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   onRefreshAfterEmptyBinOutcome: () => Promise<boolean>;
   onEmptyBinSubmitted: () => void;
+  onEmptyBinInProgressChange: (isInProgress: boolean) => void;
   getCurrentCellsPath: () => string;
 }
 
@@ -89,6 +90,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   onSelectionBarAnchorChange,
   onRefreshAfterEmptyBinOutcome,
   onEmptyBinSubmitted,
+  onEmptyBinInProgressChange,
   getCurrentCellsPath,
 }: CellsHeaderProps) => {
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
@@ -96,7 +98,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   const canPerformCellsAction = useCellsActionPermissions();
   const currentPath = getCurrentCellsPath();
   const breadcrumbs = getBreadcrumbsFromPath({
-    baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
+    baseCrumb: translate('cells.breadcrumb.files', {conversationName}, undefined, true),
     currentPath,
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
@@ -131,6 +133,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
                 getCurrentCellsPath={getCurrentCellsPath}
                 onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
                 onEmptyBinSubmitted={onEmptyBinSubmitted}
+                onInProgressChange={onEmptyBinInProgressChange}
               />
             )}
             <div css={actionsStyles}>
@@ -176,7 +179,12 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
         </div>
       )}
 
-      {showViewerPermission && !isSearchViewOpen && !isInRecycleBin && <ConversationViewerPermissionBanner />}
+      {showViewerPermission && !isSearchViewOpen && !isInRecycleBin && (
+        <ConversationViewerPermissionBanner
+          key={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
+          conversationId={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
+        />
+      )}
     </div>
   );
 };

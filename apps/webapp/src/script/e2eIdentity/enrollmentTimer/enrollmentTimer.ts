@@ -21,8 +21,8 @@ import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 import {randomInt} from '@wireapp/commons/lib/util/RandomUtil';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
-import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 
+import {CredentialType} from '../../core/messagingProtocols/mls';
 import {MLSStatuses, WireIdentity} from '../e2eIdentityVerification';
 
 const shortEnrollmentReminderInMinutes = 5;

@@ -117,6 +117,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       SUPPORT: {
         BUG_REPORT: env.URL_SUPPORT_BUG_REPORT,
         CALLING: env.URL_SUPPORT_CALLING,
+        CALL_ENCRYPTION: env.URL_SUPPORT_CALL_ENCRYPTION,
         CAMERA_ACCESS_DENIED: env.URL_SUPPORT_CAMERA_ACCESS_DENIED,
         CONTACT: env.URL_SUPPORT_CONTACT,
         DECRYPT_ERROR: env.URL_SUPPORT_DECRYPT_ERROR,

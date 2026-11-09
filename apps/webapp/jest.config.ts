@@ -44,7 +44,7 @@ const esmPackagesToTransform = [
 const config: Config = {
   displayName: 'webapp',
   preset: '../../jest.preset.js',
-  collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
+  collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*', '!src/script/core/**'],
   cacheDirectory: '../../target/jest/cache',
   coverageDirectory: '../../target/coverage/apps/webapp',
   coverageReporters: rootJestConfiguration.coverageReporters,
@@ -58,7 +58,6 @@ const config: Config = {
   },
   // Must be in sync with tsconfig.json >> paths
   moduleNameMapper: {
-    '^@wireapp/store-engine$': '<rootDir>/../../libraries/store-engine/src/index',
     '^@enormora/clock/clock$': '<rootDir>/../../node_modules/@enormora/clock/clock.entry-point.js',
     '^@enormora/clock/deterministic-clock$': '<rootDir>/../../node_modules/@enormora/clock/deterministic-clock.js',
     '^@enormora/fire-and-forget$': '<rootDir>/../../node_modules/@enormora/fire-and-forget/index.js',
@@ -73,7 +72,13 @@ const config: Config = {
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons', 'require', 'import', 'default'],
   },
-  testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc', '<rootDir>/test/e2e_tests'],
+  testPathIgnorePatterns: [
+    '<rootDir>/server',
+    '<rootDir>/.yalc',
+    '<rootDir>/test/e2e_tests',
+    '<rootDir>/src/script/core/',
+  ],
+  modulePathIgnorePatterns: ['<rootDir>/test/core/__mocks__/'],
   testRunner: 'jest-jasmine2',
   // Some dependencies are ESM and/or expose only package.json exports import conditions.
   // Jest still needs help resolving and transforming them in this CommonJS-ish test setup.

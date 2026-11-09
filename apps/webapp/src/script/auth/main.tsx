@@ -96,6 +96,11 @@ const startAuthApp = (): void => {
 
   const clock = createClock();
   const apiClient = new APIClient({clock});
+  function disposeAuthenticationClient(): void {
+    apiClient.dispose();
+  }
+
+  globalThis.addEventListener('unload', disposeAuthenticationClient);
   container.registerInstance(APIClient, apiClient);
   const core = container.resolve(Core);
 

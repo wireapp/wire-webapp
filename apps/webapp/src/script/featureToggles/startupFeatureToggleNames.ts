@@ -18,6 +18,7 @@
  */
 
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
+export const callSecurityLineFeatureToggleName = 'call-security-line';
 export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
 export const forTestsOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
@@ -28,6 +29,7 @@ export const sendCallLogsFeatureToggleName = 'send-call-logs';
 
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
+  callSecurityLineFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,

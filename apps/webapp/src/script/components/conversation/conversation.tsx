@@ -859,7 +859,12 @@ function ConversationContent({
                 cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
               />
 
-              {showViewerPermission && !isFileTabActive && <ConversationViewerPermissionBanner />}
+              {showViewerPermission && !isFileTabActive && (
+                <ConversationViewerPermissionBanner
+                  key={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
+                  conversationId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
+                />
+              )}
 
               {isConversationLoaded &&
                 !isSelfUserRemoved &&

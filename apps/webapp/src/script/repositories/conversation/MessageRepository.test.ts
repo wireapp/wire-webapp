@@ -20,11 +20,11 @@
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {MessageSendingState} from '@wireapp/core/lib/conversation';
+import {MessageSendingState} from '../../core/conversation';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {Account} from '@wireapp/core';
+import {Account} from '../../core';
 import {Confirmation, GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '../../webAppEvents';
 
@@ -53,6 +53,8 @@ import {UserRepository} from '../user/userRepository';
 import {UserState} from '../user/userState';
 import {ConversationError} from '../../error/conversationError';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
+import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
+import {MessageTimer} from '../../core/conversation/messageTimer/messageTimer';
 import {generateQualifiedId} from '../../../../test/helper/UserGenerator';
 import type {Translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
@@ -109,7 +111,9 @@ async function buildMessageRepository(
   userState.self(selfUser);
   const clientState = new ClientState();
   clientState.currentClient = new ClientEntity(true, '');
-  const core = new Account();
+  const core = createCoreTestFixture({
+    service: {conversation: {send: jest.fn(), messageTimer: new MessageTimer()}},
+  });
 
   const teamState = new TeamState();
 
