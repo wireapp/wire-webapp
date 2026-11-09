@@ -75,7 +75,7 @@
     "nock": "14.0.17",
     "noop-esm": "1.1.0",
     "patch-package": "8.0.1",
-    "playwright": "1.64.1",
+    "playwright": "1.65.0",
     "prettier": "3.9.10",
     "rimraf": "6.1.4",
     "rust-just": "1.59.0",
