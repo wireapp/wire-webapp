@@ -125,12 +125,20 @@ test.describe('Conversations', () => {
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 
-      await test.step('Preconditions: Create group with drive enabled', async () => {
+      await test.step('Preconditions: Create group and wait for its Shared Drive to be ready', async () => {
         await createGroup(userAPages, conversationName, [userB], {cells: true});
+        await userAPages.conversationList().getConversation(conversationName).open();
+        const driveBrowseResponsePromise = userAPageManager.page.waitForResponse(response => {
+          const url = new URL(response.url());
+          return url.pathname === '/v2/n/nodes' && response.request().method() === 'POST';
+        });
+        await userAPages.conversation().clickFilesTab();
+        const driveBrowseResponse = await driveBrowseResponsePromise;
+        expect(driveBrowseResponse.status()).toBe(200);
+        await userAPages.conversation().clickMessagesTab();
       });
 
       await test.step('User A sends a multipart message in a group conversation', async () => {
-        await userAPages.conversationList().getConversation(conversationName).open();
         await userAComponents.inputBarControls().clickShareFile(imageFilePath);
         await userAComponents.inputBarControls().setMessageInput(initialMessageText);
         await userAComponents.inputBarControls().clickSendMessage();
