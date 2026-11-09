@@ -22,6 +22,10 @@ import {mkdtempSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 
+import type {TelemetryAssetFunctions} from './telemetryAssets.ts';
+
+const {copyTelemetryAsset}: TelemetryAssetFunctions = require('./telemetryAssets.ts');
+
 const workspaceDirectory = path.resolve(__dirname, '../..');
 const upstreamSdkPath = require.resolve('countly-sdk-web/lib/countly.min.js');
 
@@ -51,18 +55,14 @@ describe('standalone telemetry SDK', () => {
     );
   });
 
-  it('copies the original SDK to the deployed URL on repeated server asset builds', () => {
+  it('copies the original SDK to the deployed URL and overwrites stale assets on repeated copies', () => {
     const serverOutputDirectory = mkdtempSync(path.join(tmpdir(), 'telemetry-server-assets-'));
     try {
       const expectedEmbed = readFileSync(upstreamSdkPath);
       const deployedEmbedPath = path.join(serverOutputDirectory, 'libs/wire/telemetry/embed.js');
 
       for (const buildNumber of [1, 2]) {
-        execFileSync(process.execPath, [path.join(workspaceDirectory, 'apps/server/bin/copy_server_assets.js')], {
-          cwd: workspaceDirectory,
-          env: {...process.env, WIRE_WEBAPP_SERVER_OUTPUT_PATH: serverOutputDirectory},
-          timeout: 30_000,
-        });
+        copyTelemetryAsset(serverOutputDirectory);
 
         const actualEmbed = readFileSync(deployedEmbedPath);
         expect({buildNumber, matchesUpstream: actualEmbed.equals(expectedEmbed)}).toEqual({
