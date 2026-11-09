@@ -25,8 +25,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate, type Translate} from '../../../util/localizerUtil';
 import {translateForTest} from '../../../util/test/translateForTest';
-import type {Translate} from '../../../util/localizerUtil';
 
 import {
   CALL_SECURITY_ANNOUNCEMENT_INTERVAL_IN_MILLISECONDS,
@@ -304,6 +304,41 @@ describe('CallSecurityLine', () => {
     });
 
     expect(getByTestId('call-security-line').getAttribute('data-uie-value')).toBe('resting');
+  });
+
+  it('renders special characters in joined and left participant names', () => {
+    setStrings({en: {callSecurityJoined: '{name} joined', callSecurityLeft: '{name} left'}});
+
+    try {
+      const name = 'R&D <Admin> "Ace"';
+      const me = createParticipant('me', 'Me', true);
+      const participant = createParticipant('participant', name);
+      const participants = [me];
+      const {getByTestId, getByText, update, clock} = renderLine(
+        CALL_STATE.MEDIA_ESTAB,
+        startOfCallInMilliseconds,
+        startOfCallInMilliseconds + 60_000,
+        participants,
+        translate,
+      );
+
+      participants.push(participant);
+      update();
+      expect(getByText(`${name} joined`)).not.toBe(null);
+      expect(getByTestId('call-security-line').getAttribute('aria-label')).toContain(`${name} joined`);
+      expect(getByTestId('call-security-announcement').textContent).toContain(`${name} joined`);
+      expect(getByTestId('call-security-line').querySelector('admin')).toBe(null);
+
+      act(() => {
+        clock.advanceByMilliseconds(KEY_UPDATE_HOLD_IN_MILLISECONDS);
+      });
+      participants.pop();
+      update();
+      expect(getByText(`${name} left`)).not.toBe(null);
+      expect(getByTestId('call-security-line').getAttribute('aria-label')).toContain(`${name} left`);
+    } finally {
+      setStrings({});
+    }
   });
 
   it('does not show the people already in the call when it connects', () => {
