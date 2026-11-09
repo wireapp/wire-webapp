@@ -105,7 +105,7 @@
     "@rspack/core": "2.3.1",
     "@rspack/dev-server": "2.2.2",
     "@rspack/plugin-react-refresh": "2.0.2",
-    "@swc/core": "1.16.21",
+    "@swc/core": "1.16.22",
     "@swc/jest": "0.2.39",
     "@swc/plugin-emotion": "15.0.0",
     "@testing-library/dom": "10.4.2",
