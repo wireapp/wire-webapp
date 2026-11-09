@@ -35,7 +35,10 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../../page/testSupport/rootContextTestSupport';
-import {driveBulkActionsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
+import {
+  driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
+} from '../../../../featureToggles/startupFeatureToggleNames';
 import {CellNode, CellNodeType} from '../../../../types/cellNode';
 import type {Translate} from '../../../../util/localizerUtil/translationTypes';
 import {translateForTest} from '../../../../util/test/translateForTest';
@@ -279,6 +282,7 @@ const renderCellsTable = ({
   selectionEnabled = true,
   selectionScopeKey = 'conversation:/files',
   isBulkActionsEnabled = true,
+  isBulkRestoreEnabled = true,
   cellsRepository = {} as CellsRepository,
   initialNodes,
   selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
@@ -300,6 +304,7 @@ const renderCellsTable = ({
   readonly selectionEnabled?: boolean;
   readonly selectionScopeKey?: string;
   readonly isBulkActionsEnabled?: boolean;
+  readonly isBulkRestoreEnabled?: boolean;
   readonly cellsRepository?: CellsRepository;
   readonly initialNodes?: CellNode[];
   readonly onRefresh?: () => void;
@@ -327,7 +332,10 @@ const renderCellsTable = ({
       fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
       clock,
       isFeatureToggleEnabled: featureToggleName => {
-        return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
+        return (
+          (isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName) ||
+          (isBulkRestoreEnabled && featureToggleName === driveBulkRestoreFeatureToggleName)
+        );
       },
     }),
   );
@@ -4190,6 +4198,27 @@ describe('CellsTable restoring selected Bin items', () => {
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
   });
+
+  it.each([THEME_ID.LIGHT, THEME_ID.DARK])(
+    'keeps bulk delete available without offering bulk restore when its separate flag is off in theme %s',
+    async themeId => {
+      const user = userEvent.setup();
+      const repository = createRepository();
+      renderCellsTable({
+        cellsRepository: repository,
+        isBulkRestoreEnabled: false,
+        initialNodes: [createBinNode('a.txt'), createBinNode('b.txt')],
+        themeId,
+      });
+
+      await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+      await user.click(screen.getByRole('checkbox', {name: 'Select b.txt'}));
+
+      expect(screen.getByRole('button', {name: 'Delete permanently'})).toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
+      expect(repository.restoreNodes).not.toHaveBeenCalled();
+    },
+  );
 
   it('does not offer Restore outside the Bin', async () => {
     window.location.hash = '#/conversation/conversation-id@example.com/files';
