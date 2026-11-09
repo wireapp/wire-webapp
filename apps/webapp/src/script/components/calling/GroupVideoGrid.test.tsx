@@ -226,6 +226,31 @@ describe('GroupVideoGrid', () => {
     expect(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'})).toBeInTheDocument();
   });
 
+  it('minimizes and restores only the self tile in a group grid', () => {
+    const selfParticipant = createMockParticipant('self', 'client', {});
+    const stream = createMediaStream();
+    selfParticipant.videoState(VIDEO_STATE.STARTED);
+    selfParticipant.videoStream(stream);
+    const props: GroupVideoGripProps = {
+      grid: {grid: [selfParticipant], thumbnail: null},
+      maximizedParticipant: null,
+      selfParticipant,
+      call: createMockCall(),
+      allowSelfVideoMinimize: true,
+    };
+    const {container, getByRole} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
+
+    expect(container.querySelector('.group-video-grid__element-video')).toBeInTheDocument();
+    fireEvent.click(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'}));
+    expect(container.querySelector('.group-video-grid__element-video')).not.toBeInTheDocument();
+    expect(getByRole('button', {name: 'videoCallOverlayRestoreSelfVideo'})).toBeInTheDocument();
+    expect(selfParticipant.videoStream()).toBe(stream);
+
+    fireEvent.click(getByRole('button', {name: 'videoCallOverlayRestoreSelfVideo'}));
+    expect(container.querySelector('.group-video-grid__element-video')).toBeInTheDocument();
+    expect(selfParticipant.videoStream()).toBe(stream);
+  });
+
   it('shows and hides the loading overlay while the raw thumbnail video is loading with background effects disabled', () => {
     const participant = createMockParticipant('userId', 'clientId', {});
     const videoStream = createMediaStream();

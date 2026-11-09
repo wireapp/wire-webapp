@@ -447,6 +447,15 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
               participantCount={participants.length}
               isMaximized={!isNullOrUndefined(maximizedParticipant)}
               onTileDoubleClick={doubleClickedOnVideo}
+              isSelfPreviewMinimized={isSelfVideoMinimized}
+              allowSelfPreviewMinimize={allowSelfVideoMinimize}
+              minimizeSelfPreviewLabel={translate('videoCallOverlayMinimizeSelfVideo')}
+              restoreSelfPreviewLabel={translate('videoCallOverlayRestoreSelfVideo')}
+              onToggleSelfPreviewMinimized={() => {
+                return setIsSelfVideoMinimized(minimized => {
+                  return !minimized;
+                });
+              }}
             />
           );
         })}
@@ -461,7 +470,11 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
           minimizeLabel={translate('videoCallOverlayMinimizeSelfVideo')}
           restoreLabel={translate('videoCallOverlayRestoreSelfVideo')}
           isMinimized={allowSelfVideoMinimize && isSelfVideoMinimized}
-          onToggleMinimized={() => setIsSelfVideoMinimized(minimized => !minimized)}
+          onToggleMinimized={() => {
+            return setIsSelfVideoMinimized(minimized => {
+              return !minimized;
+            });
+          }}
         />
       )}
     </div>

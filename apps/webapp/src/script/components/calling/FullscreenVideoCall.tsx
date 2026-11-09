@@ -442,7 +442,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
                 : videoGrid
             }
             call={call}
-            allowSelfVideoMinimize={!call.isGroupOrConference}
+            allowSelfVideoMinimize
             setMaximizedParticipant={participant => {
               return setMaximizedParticipant(call, participant);
             }}
