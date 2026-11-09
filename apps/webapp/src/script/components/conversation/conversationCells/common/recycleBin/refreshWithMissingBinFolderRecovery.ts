@@ -19,7 +19,7 @@
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {isAxiosError} from 'Util/typePredicateUtil';
+import {isAxiosError} from '../../../../../util/typePredicateUtil';
 
 interface RefreshWithMissingBinFolderRecoveryParams {
   readonly refresh: () => Promise<boolean>;

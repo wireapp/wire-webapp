@@ -202,22 +202,6 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
 
 // Selecting rows only makes sense when at least one of these is available, e.g. never for viewers.
 const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE];
-type PermanentDeleteCheckingMessageKey =
-  'cells.bulkDelete.checking' | 'cells.bulkDelete.checkingAfterJobFailure' | 'cells.bulkDelete.retryingRefresh';
-type PermanentDeleteReviewMessageKey =
-  | 'cells.bulkDelete.jobFailed'
-  | 'cells.bulkDelete.refreshFailed'
-  | 'cells.bulkDelete.stillVisible'
-  | 'cells.bulkDelete.timedOut';
-
-const hasSameSelection = (selectedNodeIds: ReadonlySet<string>, nodeIds: readonly string[]): boolean => {
-  return (
-    selectedNodeIds.size === nodeIds.length &&
-    nodeIds.every(nodeId => {
-      return selectedNodeIds.has(nodeId);
-    })
-  );
-};
 
 interface CapturedBulkMoveToBinSelection {
   nodeIds: string[];

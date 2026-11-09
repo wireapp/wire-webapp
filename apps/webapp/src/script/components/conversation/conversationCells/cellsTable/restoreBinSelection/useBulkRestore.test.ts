@@ -605,8 +605,18 @@ describe('useBulkRestore', () => {
     });
 
     it.each([
-      ['request-failed', () => {return Promise.reject(new Error('network'))}],
-      ['status-unknown', () => {return Promise.resolve({Status: RestActionStatus.Background, BackgroundActions: []})}],
+      [
+        'request-failed',
+        () => {
+          return Promise.reject(new Error('network'));
+        },
+      ],
+      [
+        'status-unknown',
+        () => {
+          return Promise.resolve({Status: RestActionStatus.Background, BackgroundActions: []});
+        },
+      ],
     ] as const)('still reports the %s outcome instead of leaving the popup on processing', async (outcome, respond) => {
       const {restoreNodes, onRefreshAndReportSuccess, onStatusChange, options} = createSetup();
       restoreNodes.mockImplementation(respond);
