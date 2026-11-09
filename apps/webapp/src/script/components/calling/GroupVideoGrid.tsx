@@ -109,6 +109,31 @@ function GroupVideoThumbnail({
     'handRaisedAt',
   ]);
 
+  const selfVideoToggleControl = (
+    <button
+      type="button"
+      aria-label={isMinimized ? restoreLabel : minimizeLabel}
+      title={isMinimized ? restoreLabel : minimizeLabel}
+      onClick={onToggleMinimized}
+      data-uie-name={isMinimized ? 'restore-self-video-preview' : 'minimize-self-video-preview'}
+      css={{
+        alignItems: 'center',
+        backgroundColor: 'var(--background-fade-16)',
+        border: 0,
+        borderRadius: '50%',
+        color: 'var(--foreground)',
+        cursor: 'pointer',
+        display: 'flex',
+        height: 32,
+        justifyContent: 'center',
+        width: 32,
+        '&:focus-visible': {outline: '2px solid var(--foreground)', outlineOffset: 2},
+      }}
+    >
+      {isMinimized ? <Icon.PlusIcon aria-hidden="true" /> : <Icon.MinusIcon aria-hidden="true" />}
+    </button>
+  );
+
   return (
     <>
       {!isMinimized && !isNullOrUndefined(thumbnail.videoStream) && maximizedParticipant === null && (
@@ -148,6 +173,7 @@ function GroupVideoThumbnail({
               ✋
             </span>
           )}
+          {allowMinimize && selfVideoToggleControl}
         </GroupVideoThumbnailWrapper>
       )}
       {!isMinimized && !thumbnail.hasActiveVideo && (
@@ -179,35 +205,14 @@ function GroupVideoThumbnail({
               participant={selfParticipant.user}
               hideAvailabilityStatus
             />
+            {allowMinimize && selfVideoToggleControl}
           </div>
         </GroupVideoThumbnailWrapper>
       )}
-      {allowMinimize && (
-        <button
-          type="button"
-          aria-label={isMinimized ? restoreLabel : minimizeLabel}
-          title={isMinimized ? restoreLabel : minimizeLabel}
-          onClick={onToggleMinimized}
-          data-uie-name={isMinimized ? 'restore-self-video-preview' : 'minimize-self-video-preview'}
-          css={{
-            alignItems: 'center',
-            backgroundColor: 'var(--background-fade-16)',
-            border: 0,
-            borderRadius: '50%',
-            color: 'var(--foreground)',
-            cursor: 'pointer',
-            display: 'flex',
-            height: 32,
-            justifyContent: 'center',
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            width: 32,
-            zIndex: 1,
-          }}
-        >
-          {isMinimized ? '+' : '−'}
-        </button>
+      {allowMinimize && isMinimized && (
+        <GroupVideoThumbnailWrapper minimized allowMinimize>
+          {selfVideoToggleControl}
+        </GroupVideoThumbnailWrapper>
       )}
     </>
   );

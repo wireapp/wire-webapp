@@ -208,15 +208,20 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
       allowSelfVideoMinimize: true,
     };
-    const {queryByTestId, getByRole} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
+    const {queryByTestId, getByRole, rerender} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
 
     fireEvent.click(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'}));
-    expect(queryByTestId('self-video-thumbnail-wrapper')).not.toBeInTheDocument();
+    expect(queryByTestId('self-video-thumbnail-wrapper')).toBeInTheDocument();
+    expect(queryByTestId('self-video-thumbnail')).not.toBeInTheDocument();
     expect(participant.videoStream()).toBe(stream);
 
     fireEvent.click(getByRole('button', {name: 'videoCallOverlayRestoreSelfVideo'}));
     expect(queryByTestId('self-video-thumbnail-wrapper')).toBeInTheDocument();
     expect(participant.videoStream()).toBe(stream);
+
+    fireEvent.click(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'}));
+    rerender(<GroupVideoGrid {...props} call={createMockCall()} />);
+    expect(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'})).toBeInTheDocument();
   });
 
   it('shows and hides the loading overlay while the raw thumbnail video is loading with background effects disabled', () => {
