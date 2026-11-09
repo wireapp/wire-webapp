@@ -136,6 +136,10 @@ const mockSafeEpoch = (core: Core): void => {
 };
 
 describe('joinConversationsAfterMigrationFinalisation', () => {
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
   let testFactory: TestFactory;
 
   beforeEach(() => {

@@ -148,7 +148,7 @@ const prepareDataForEncryption = async (): Promise<EncryptionTestSetup> => {
 };
 
 describe('ProteusService', () => {
-  afterAll(() => {
+  afterEach(() => {
     cleanupProteusServiceMocks();
   });
 

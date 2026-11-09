@@ -31,6 +31,10 @@ import {TestFactory} from '../../../../test/helper/TestFactory';
 import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ConversationRoleRepository', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   const testFactory = new TestFactory();
   let roleRepository: ConversationRoleRepository;
 

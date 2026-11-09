@@ -294,6 +294,10 @@ describe('conversation group selection', () => {
 });
 
 describe('ConversationRepository', () => {
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
   const originalPrimaryModalShow = PrimaryModal.show;
   let testFactory: TestFactory;
 

@@ -159,6 +159,10 @@ function getWarningBadge(container: HTMLElement): HTMLElement {
 }
 
 describe('TitleBar', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     callingRepository = await testFactory.exposeCallingActors();
   });

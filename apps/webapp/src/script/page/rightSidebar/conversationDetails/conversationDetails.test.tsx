@@ -191,6 +191,10 @@ const getDefaultParams = (): GetDefaultParamsResult => {
 };
 
 describe('ConversationDetails', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     conversationRepository = await testFactory.exposeConversationActors();
     searchRepository = await testFactory.exposeSearchActors();

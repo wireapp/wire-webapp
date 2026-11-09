@@ -36,6 +36,10 @@ import {TestFactory} from '../../../../test/helper/TestFactory';
 import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ClientRepository', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   const originalPrimaryModalShow = PrimaryModal.show;
   const testFactory = new TestFactory();
   const clientId = '5021d77752286cac';

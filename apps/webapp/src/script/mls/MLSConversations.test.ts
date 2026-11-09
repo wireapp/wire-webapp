@@ -100,6 +100,10 @@ function createMlsCoreForTest(): Core {
 }
 
 describe('MLSConversations', () => {
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
   let testFactory: TestFactory;
 
   beforeEach(() => {

@@ -39,6 +39,10 @@ function getConversationServiceForTest(
 }
 
 describe('ConversationRepository safe* wrappers', () => {
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
   let testFactory: TestFactory;
 
   beforeEach(async () => {

@@ -70,6 +70,10 @@ const injectParticipantsIntoConversation = (
 const testFactory = new TestFactory();
 
 describe('finaliseMigrationOfMixedConversations', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   it('should finalise when finaliseRegardlessAfter date arrived', async () => {
     const conversationRepository = await testFactory.exposeConversationActors();
     const teamRepository = await testFactory.exposeTeamActors();

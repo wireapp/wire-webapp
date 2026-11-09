@@ -129,6 +129,10 @@ const defaultProps = (): DefaultPropsResult => {
 };
 
 describe('LegalHoldModal', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     await testFactory.exposeCallingActors();
   });

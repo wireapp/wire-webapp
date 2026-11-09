@@ -118,10 +118,11 @@ const waitFor = (assertion: () => void): Promise<void> => {
 describe('Account', () => {
   const CLIENT_ID = '4e37b32f57f6da55';
 
-  afterAll(() => {
+  afterEach(() => {
     apiClients.forEach(client => {
-      client.disconnect();
+      client.dispose();
     });
+    apiClients.length = 0;
   });
 
   // Fix for node 16, crypto.subtle.decrypt has a type problem

@@ -44,6 +44,10 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 describe('UserList', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     conversationRepository = await testFactory.exposeConversationActors();
   });

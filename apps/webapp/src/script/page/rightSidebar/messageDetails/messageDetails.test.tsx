@@ -72,6 +72,10 @@ const getDefaultParams = (showReactions: boolean = false): GetDefaultParamsResul
 };
 
 describe('MessageDetails', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     conversationRepository = await testFactory.exposeConversationActors();
     searchRepository = await testFactory.exposeSearchActors();

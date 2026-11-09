@@ -32,11 +32,15 @@ const MOCK_BACKEND = {
 
 describe('SelfService', () => {
   describe('putSupportedProtocols', () => {
-    const apiClient = new APIClient({urls: MOCK_BACKEND});
-    apiClient.backendFeatures.supportsMLS = true;
+    let apiClient: APIClient;
 
-    afterAll(() => {
-      apiClient.disconnect();
+    beforeEach(() => {
+      apiClient = new APIClient({urls: MOCK_BACKEND});
+      apiClient.backendFeatures.supportsMLS = true;
+    });
+
+    afterEach(() => {
+      apiClient.dispose();
     });
 
     it('updates the list of self supported protocols', async () => {

@@ -53,6 +53,10 @@ const getDefaultParams = (): GetDefaultParamsResult => {
 };
 
 describe('Notifications', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     await testFactory.exposeConversationActors();
   });

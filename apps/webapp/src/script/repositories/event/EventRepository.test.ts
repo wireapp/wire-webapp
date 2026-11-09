@@ -42,6 +42,10 @@ function getEventRepositoryForTest(): EventRepository {
 }
 
 describe('EventRepository', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(() => {
     return testFactory.exposeClientActors();
   });
