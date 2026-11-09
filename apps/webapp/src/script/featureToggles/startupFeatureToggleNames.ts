@@ -33,7 +33,7 @@ export const startupFeatureToggleRegistry = [
   {name: conversationListCollapseFeatureToggleName, previewDefaultEnabled: false},
   {name: forTestsOnlyFeatureToggleName, previewDefaultEnabled: false},
   {name: disableMessagePreprocessingFeatureToggleName, previewDefaultEnabled: false},
-  {name: driveBulkActionsFeatureToggleName, previewDefaultEnabled: false},
+  {name: driveBulkActionsFeatureToggleName, previewDefaultEnabled: true},
   {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},
   {name: sendCallLogsFeatureToggleName, previewDefaultEnabled: false},
 ] as const;
