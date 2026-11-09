@@ -51,7 +51,7 @@ import {Conversation} from '../entity/Conversation';
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {User} from '../entity/User';
 import {CallingEvent} from '../event/CallingEvent';
-import {CALL} from '../event/Client';
+import {CALL, CONVERSATION as CLIENT_CONVERSATION} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {MediaType} from '../media/MediaType';
@@ -1434,6 +1434,170 @@ describe('CallingRepository', () => {
       callingRepository['callState'].calls([incomingCall, activeCall, declinedCall]);
 
       expect(callingRepository['callState'].joinedCall()).toBe(activeCall);
+    });
+  });
+
+  describe('calls answered on another device', () => {
+    const createCallContext = (
+      conversationType: CONV_TYPE,
+      protocol = CONVERSATION_PROTOCOL.PROTEUS,
+      isOneToOne = conversationType === CONV_TYPE.ONEONONE,
+    ): {
+      call: Call;
+      callState: CallState;
+      eventRepository: {injectEvent: jest.Mock};
+      repository: CallingRepository;
+      conversation: Conversation;
+    } => {
+      const conversation = createConversation(
+        isOneToOne ? CONVERSATION_TYPE.ONE_TO_ONE : CONVERSATION_TYPE.REGULAR,
+        protocol,
+      );
+      const eventRepository = {injectEvent: jest.fn()};
+      const {repository, callState} = createCallingRepositoryForTest({
+        conversationState: {findConversation: jest.fn().mockReturnValue(conversation)} as unknown as ConversationState,
+        eventRepository,
+      });
+      const selfUser = new User(createUuid(), '', translateForTest);
+      selfUser.isMe = true;
+      repository['selfUser'] = selfUser;
+      repository['selfClientId'] = createUuid();
+      Object.defineProperty(repository, 'sendCallingEvent', {value: noop});
+      Object.defineProperty(repository, 'leaveMLSConference', {value: jest.fn().mockResolvedValue(undefined)});
+      const createCall = (): Call => {
+        return new Call(
+          {id: createUuid(), domain: ''},
+          conversation,
+          conversationType,
+          createSelfParticipant(),
+          CALL_TYPE.NORMAL,
+          buildMediaDevicesHandler(),
+        );
+      };
+      const call = createCall();
+      call.state(CALL_STATE.INCOMING);
+      callState.calls([call]);
+      return {call, callState, eventRepository, repository, conversation};
+    };
+
+    it.each([
+      [CONV_TYPE.CONFERENCE, CONVERSATION_PROTOCOL.PROTEUS],
+      [CONV_TYPE.CONFERENCE_MLS, CONVERSATION_PROTOCOL.MLS],
+    ])('does not emit a missed-call event for conference type %s', async (conversationType, protocol) => {
+      const {call, callState, eventRepository, repository, conversation} = createCallContext(
+        conversationType,
+        protocol,
+      );
+
+      await repository['callClosed'](REASON.ANSWERED_ELSEWHERE, conversation.id);
+      expect(call.reason()).toBe(REASON.STILL_ONGOING);
+      expect(call.wasAnsweredElsewhere).toBe(true);
+
+      repository['updateCallState'](conversation.id, CALL_STATE.INCOMING);
+      expect(callState.joinableCalls()).toContain(call);
+      await repository['callClosed'](REASON.NORMAL, conversation.id);
+
+      expect(callState.calls()).not.toContain(call);
+      expect(eventRepository.injectEvent).not.toHaveBeenCalled();
+    });
+
+    it('keeps the ordinary still-ongoing conference end event', async () => {
+      const {call, eventRepository, repository, conversation} = createCallContext(CONV_TYPE.CONFERENCE);
+
+      await repository['callClosed'](REASON.STILL_ONGOING, conversation.id);
+      await repository['callClosed'](REASON.NORMAL, conversation.id);
+
+      expect(call.reason()).toBe(REASON.STILL_ONGOING);
+      expect(eventRepository.injectEvent).toHaveBeenCalledWith(
+        expect.objectContaining({data: expect.objectContaining({reason: REASON.NORMAL})}),
+        expect.anything(),
+      );
+    });
+
+    it('does not emit a missed-call event for one-to-one calls using a conference engine', async () => {
+      const {call, eventRepository, repository, conversation} = createCallContext(
+        CONV_TYPE.CONFERENCE,
+        CONVERSATION_PROTOCOL.PROTEUS,
+        true,
+      );
+
+      await repository['callClosed'](REASON.ANSWERED_ELSEWHERE, conversation.id);
+      expect(call.reason()).toBe(REASON.ANSWERED_ELSEWHERE);
+      await repository['callClosed'](REASON.NORMAL, conversation.id);
+
+      expect(eventRepository.injectEvent).not.toHaveBeenCalled();
+    });
+
+    it.each([REASON.TIMEOUT, REASON.ERROR, REASON.LOST_MEDIA])(
+      'does not emit a missed-call event when an answered-elsewhere call ends with reason %s',
+      async reason => {
+        const {eventRepository, repository, conversation} = createCallContext(CONV_TYPE.CONFERENCE);
+
+        await repository['callClosed'](REASON.ANSWERED_ELSEWHERE, conversation.id);
+        await repository['callClosed'](reason, conversation.id);
+
+        expect(eventRepository.injectEvent).not.toHaveBeenCalled();
+      },
+    );
+
+    it('does not add a missed-call event when everyone leaves the conference', async () => {
+      const {eventRepository, repository, conversation} = createCallContext(CONV_TYPE.CONFERENCE);
+
+      await repository['callClosed'](REASON.ANSWERED_ELSEWHERE, conversation.id);
+      await repository['callClosed'](REASON.EVERYONE_LEFT, conversation.id);
+
+      const events = eventRepository.injectEvent.mock.calls.map(([event]) => {
+        return event;
+      });
+      expect(events).toContainEqual(expect.objectContaining({type: CLIENT_CONVERSATION.CALL_TIME_OUT}));
+      expect(events).not.toContainEqual(expect.objectContaining({type: CLIENT_CONVERSATION.VOICE_CHANNEL_DEACTIVATE}));
+    });
+
+    it('does not suppress the next call in the same conversation', async () => {
+      const {call, callState, eventRepository, repository, conversation} = createCallContext(CONV_TYPE.CONFERENCE);
+      const deactivationEvents = (): unknown[] => {
+        return eventRepository.injectEvent.mock.calls
+          .map(([event]) => {
+            return event;
+          })
+          .filter(event => {
+            return event.type === CLIENT_CONVERSATION.VOICE_CHANNEL_DEACTIVATE;
+          });
+      };
+
+      await repository['callClosed'](REASON.ANSWERED_ELSEWHERE, conversation.id);
+      await repository['callClosed'](REASON.NORMAL, conversation.id);
+      expect(callState.calls()).not.toContain(call);
+      expect(deactivationEvents()).toHaveLength(0);
+
+      repository['incomingCall'](
+        conversation.id,
+        Math.floor(Date.now() / 1000),
+        createUuid(),
+        createUuid(),
+        0,
+        0,
+        CONV_TYPE.CONFERENCE,
+      );
+      const [nextCall] = callState.calls();
+      expect(nextCall).toBeInstanceOf(Call);
+      expect(nextCall).not.toBe(call);
+      expect(nextCall.wasAnsweredElsewhere).toBe(false);
+
+      await repository['callClosed'](REASON.NORMAL, conversation.id);
+
+      expect(deactivationEvents()).toEqual([expect.objectContaining({data: expect.objectContaining({duration: 0})})]);
+    });
+
+    it('clears the answered-elsewhere state when this device joins the call', async () => {
+      const {eventRepository, repository, conversation} = createCallContext(CONV_TYPE.CONFERENCE);
+
+      await repository['callClosed'](REASON.ANSWERED_ELSEWHERE, conversation.id);
+      repository['updateCallState'](conversation.id, CALL_STATE.ANSWERED);
+      expect(repository['callState'].calls()[0].wasAnsweredElsewhere).toBe(false);
+      await repository['callClosed'](REASON.NORMAL, conversation.id);
+
+      expect(eventRepository.injectEvent).toHaveBeenCalledTimes(1);
     });
   });
 
