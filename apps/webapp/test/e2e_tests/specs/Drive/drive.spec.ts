@@ -144,9 +144,11 @@ test.describe('Conversations', () => {
       await test.step('User A edits text part of the multipart message', async () => {
         const message = userAPages.conversation().getMessage({sender: userA});
         await userAPages.conversation().editMessage(message);
+        await expect(userAComponents.inputBarControls().messageInput).toContainText(initialMessageText);
         await userAComponents.inputBarControls().setMessageInput(editedMessageText);
         await userAComponents.inputBarControls().clickSendMessage();
 
+        await expect(message).toContainText(editedMessageText);
         const multipartMessage = userBPages.conversation().getMessage({sender: userA});
         await expect(multipartMessage).toContainText(editedMessageText);
         await expect(multipartMessage.getByRole('button', {name: `Image from ${userA.fullName}`})).toBeVisible();
