@@ -18,6 +18,7 @@
  */
 
 import {isFunction, isUndefined} from '@sindresorhus/is';
+import 'core-js/actual/symbol/dispose';
 import logdown from 'logdown';
 
 import {EventEmitter} from 'events';
@@ -175,7 +176,7 @@ export type BackendVersionResponse = {
 };
 
 /** Owns a cookie subscription until disposal, independently of session and WebSocket state. */
-export class APIClient extends EventEmitter {
+export class APIClient extends EventEmitter implements Disposable {
   private readonly logger: logdown.Logger;
 
   // APIs
@@ -465,6 +466,10 @@ export class APIClient extends EventEmitter {
     }
 
     this.disconnect('Closed by client disposal');
+  }
+
+  public [Symbol.dispose](): void {
+    this.dispose();
   }
 
   public get clientId(): string | undefined {
