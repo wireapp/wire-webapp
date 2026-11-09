@@ -250,17 +250,25 @@ test.describe('Conversations', () => {
       await expect(preview.getByRole('button', {name: 'Move', exact: true})).toBeEnabled();
       await preview.getByRole('button', {name: 'Move', exact: true}).click();
 
-      await expect(preview.getByRole('alert')).toBeVisible();
-      await expect(preview.getByRole('button', {name: 'Refresh Drive'})).toBeVisible();
-      await expect(preview.getByRole('button', {name: 'Move', exact: true})).toBeDisabled();
+      await expect(preview).not.toBeVisible();
       await expect
         .poll(() => {
           return moveRequestCount;
         })
         .toBe(1);
 
-      await preview.getByRole('button', {name: 'Refresh Drive'}).click();
-      await expect(preview).not.toBeVisible();
+      const refreshDriveButton = page.getByRole('button', {name: 'Refresh Drive', exact: true});
+      const drivePanel = page.getByRole('tabpanel').filter({has: refreshDriveButton});
+      await expect(page.getByRole('alert')).toContainText('The move request failed.');
+      await expect(drivePanel.getByRole('row', {name: new RegExp(TextFileName)})).toHaveAttribute(
+        'aria-selected',
+        'true',
+      );
+      await expect(selection).toHaveCount(0);
+      await expect(drivePanel.getByRole('button', {name: 'Move', exact: true})).toHaveCount(0);
+
+      await expect(refreshDriveButton).toBeVisible();
+      await refreshDriveButton.click();
       await expect(selection).toBeEnabled();
       await expect(selection).not.toBeChecked();
       expect(moveRequestCount).toBe(1);
