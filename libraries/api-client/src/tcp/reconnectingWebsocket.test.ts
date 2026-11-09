@@ -1407,6 +1407,52 @@ describe('ReconnectingWebsocket', () => {
   });
 
   describe('disconnect', () => {
+    it('does not restart pinging when a queued reconnect callback runs after disconnect', async () => {
+      const scheduleInterval = jest.fn(testWallClock.setInterval);
+      const websocket = createRWS(jest.fn().mockResolvedValue('ws://example.invalid'), {
+        ...defaultReconnectingWebsocketTestOptions,
+        wallClock: {...testWallClock, setInterval: scheduleInterval},
+        websocketFactory: Maybe.just(() => {
+          return createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+        }),
+      });
+
+      websocket.connect();
+      websocket.disconnect();
+      await websocket['internalOnReconnect']();
+
+      expect(scheduleInterval).not.toHaveBeenCalled();
+    });
+
+    it('does not schedule a watchdog when a reconnect URL resolves after disconnect', async () => {
+      const deterministicWallClock = createDeterministicTimeoutWallClock(0);
+      const scheduleTimeout = jest.fn(deterministicWallClock.setTimeout);
+      const {promise: reconnectUrl, resolve: resolveReconnectUrl} = Promise.withResolvers<string>();
+      const socket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+      // A closing transport may still report CONNECTING while its URL is being resolved.
+      socket.close.mockImplementation(noop);
+      const websocket = createRWS(
+        () => {
+          return reconnectUrl;
+        },
+        {
+          ...defaultReconnectingWebsocketTestOptions,
+          wallClock: {...deterministicWallClock, setTimeout: scheduleTimeout},
+          websocketFactory: Maybe.just(() => {
+            return socket;
+          }),
+        },
+      );
+
+      websocket.connect();
+      const reconnect = websocket['internalOnReconnect']();
+      websocket.disconnect();
+      resolveReconnectUrl('ws://example.invalid');
+      await reconnect;
+
+      expect(scheduleTimeout).not.toHaveBeenCalled();
+    });
+
     it('disconnects with custom reason', done => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
       const RWS = createRWS(onReconnect);

@@ -119,46 +119,46 @@ describe('PriorityQueue', () => {
     });
 
     it('supports adding a label', async () => {
-      const promise = new Promise<void>(resolve => {
-        return setTimeout(() => {
-          return resolve();
-        }, 10000);
-      });
+      const {promise: requestCompletion, resolve: completeRequest} = Promise.withResolvers<void>();
 
       queue = new PriorityQueue();
 
-      void queue.add(
+      const firstRequest = queue.add(
         () => {
-          return promise;
+          return requestCompletion;
         },
         Priority.LOW,
         'get request',
       );
-      void queue.add(
+      const secondRequest = queue.add(
         () => {
-          return promise;
+          return requestCompletion;
         },
         Priority.LOW,
         'put request',
       );
-      void queue.add(
+      const tokenRefreshRequest = queue.add(
         () => {
-          return promise;
+          return requestCompletion;
         },
         Priority.MEDIUM,
         'access token refresh',
       );
-      void queue.add(
+      const finalRequest = queue.add(
         () => {
-          return promise;
+          return requestCompletion;
         },
         Priority.LOW,
         'another get request',
       );
 
-      const promisesByPriority = queue.all;
-      expect(promisesByPriority[0].label).toBe('access token refresh');
-    }, 10000);
+      try {
+        expect(queue.first.label).toBe('access token refresh');
+      } finally {
+        completeRequest();
+        await Promise.all([firstRequest, secondRequest, tokenRefreshRequest, finalRequest]);
+      }
+    });
 
     it('does not retry execution with maxRetries set to 0', async () => {
       const task = jest.fn().mockReturnValue(Promise.reject(new Error('nope')));
@@ -186,67 +186,69 @@ describe('PriorityQueue', () => {
   });
 
   describe('"delete"', () => {
-    it("deletes a Promise from the queue by it's UUID", () => {
-      const promise = new Promise<void>(resolve => {
-        return setTimeout(() => {
-          return resolve();
-        }, 10000);
-      });
+    it("deletes a Promise from the queue by it's UUID", async () => {
+      const {promise: requestCompletion, resolve: completeRequest} = Promise.withResolvers<void>();
 
       queue = new PriorityQueue();
-      void queue.add(() => {
-        return promise;
+      const firstRequest = queue.add(() => {
+        return requestCompletion;
       }, Priority.LOW);
-      void queue.add(() => {
-        return promise;
+      const secondRequest = queue.add(() => {
+        return requestCompletion;
       }, Priority.LOW);
-      void queue.add(
-        () => {
-          return promise;
-        },
-        Priority.LOW,
-        'delete-me',
-      );
-      void queue.add(() => {
-        return promise;
+      const deletedRequest = jest.fn(() => {
+        return requestCompletion;
+      });
+      void queue.add(deletedRequest, Priority.LOW, 'delete-me');
+      const finalRequest = queue.add(() => {
+        return requestCompletion;
       }, Priority.LOW);
 
-      // When adding four items, three are in the queue and one is in progress.
-      expect(queue.all.length).toBe(3);
+      try {
+        // When adding four items, three are in the queue and one is in progress.
+        expect(queue.all.length).toBe(3);
 
-      queue.delete('delete-me');
+        queue.delete('delete-me');
 
-      // After deleting one item, two are in the queue and one is in progress.
-      expect(queue.all.length).toBe(2);
-    }, 10000);
+        // After deleting one item, two are in the queue and one is in progress.
+        expect(queue.all.length).toBe(2);
+      } finally {
+        completeRequest();
+        await Promise.all([firstRequest, secondRequest, finalRequest]);
+      }
+
+      expect(deletedRequest).not.toHaveBeenCalled();
+    });
   });
 
   describe('"deleteAll"', () => {
-    it('deletes all queued Promises', () => {
-      const promise = new Promise<void>(resolve => {
-        return setTimeout(() => {
-          return resolve();
-        }, 10000);
-      });
+    it('deletes all queued Promises', async () => {
+      const {promise: requestCompletion, resolve: completeRequest} = Promise.withResolvers<void>();
 
       queue = new PriorityQueue();
-      void queue.add(() => {
-        return promise;
+      const runningRequest = queue.add(() => {
+        return requestCompletion;
       });
-      void queue.add(() => {
-        return promise;
+      const queuedRequest = jest.fn(() => {
+        return requestCompletion;
       });
-      void queue.add(() => {
-        return promise;
-      });
+      void queue.add(queuedRequest);
+      void queue.add(queuedRequest);
 
-      // When adding three items, two are in the queue and one is in progress.
-      expect(queue.all.length).toBe(2);
+      try {
+        // When adding three items, two are in the queue and one is in progress.
+        expect(queue.all.length).toBe(2);
 
-      queue.deleteAll();
+        queue.deleteAll();
 
-      expect(queue.all.length).toBe(0);
-    }, 10000);
+        expect(queue.all.length).toBe(0);
+      } finally {
+        completeRequest();
+        await runningRequest;
+      }
+
+      expect(queuedRequest).not.toHaveBeenCalled();
+    });
   });
 
   describe('"getGrowingDelay"', () => {
