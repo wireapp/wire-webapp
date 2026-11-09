@@ -252,22 +252,7 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
         </>
       )}
       {isSelfParticipant && allowSelfPreviewMinimize && (
-        <div
-          data-uie-name="self-video-preview-window-header"
-          css={{
-            alignItems: 'center',
-            backgroundColor: 'var(--background-fade-16)',
-            borderRadius: '4px 4px 0 0',
-            display: 'flex',
-            height: 32,
-            justifyContent: 'flex-end',
-            left: 0,
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            zIndex: 2,
-          }}
-        >
+        <div data-uie-name="self-video-preview-window-header" css={{position: 'absolute', right: 4, top: 4, zIndex: 2}}>
           <button
             type="button"
             aria-label={isSelfPreviewMinimized ? restoreSelfPreviewLabel : minimizeSelfPreviewLabel}
@@ -284,11 +269,20 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
               color: 'var(--foreground)',
               cursor: 'pointer',
               display: 'flex',
-              height: 28,
+              height: 32,
               justifyContent: 'center',
+              opacity: isSelfPreviewMinimized ? 1 : 0,
               padding: 6,
-              width: 28,
-              '&:focus-visible': {outline: '2px solid var(--foreground)', outlineOffset: -2},
+              width: 32,
+              transition: 'opacity 120ms ease-out',
+              '.group-video-grid__element:hover &, .group-video-grid__element:focus-within &': {opacity: 1},
+              '&:focus-visible': {
+                backgroundColor: 'var(--background-fade-40)',
+                outline: '2px solid var(--foreground)',
+                outlineOffset: -2,
+                opacity: 1,
+              },
+              '@media (hover: none)': {opacity: 1},
             }}
           >
             {isSelfPreviewMinimized ? <Icon.PlusIcon aria-hidden="true" /> : <Icon.MinusIcon aria-hidden="true" />}
