@@ -17,8 +17,6 @@
  *
  */
 
-import {Maybe} from 'true-myth';
-
 import {StartupFeatureToggleName, startupFeatureToggleNames} from './startupFeatureToggleNames';
 import {
   createStartupFeatureTogglesFromLocationSearch,
@@ -62,18 +60,6 @@ function toUpdatedEnabledFeatureToggleNameSet(
   return updatedEnabledFeatureToggleNameSet;
 }
 
-function serializeEnabledFeatureToggleNames(
-  enabledFeatureToggleNameSet: ReadonlySet<StartupFeatureToggleName>,
-): Maybe<string> {
-  const orderedEnabledFeatureToggleNames = toOrderedEnabledFeatureToggleNames(enabledFeatureToggleNameSet);
-
-  if (orderedEnabledFeatureToggleNames.length === 0) {
-    return Maybe.nothing<string>();
-  }
-
-  return Maybe.just(orderedEnabledFeatureToggleNames.join(','));
-}
-
 export function updateLocationSearchForStartupFeatureToggle(
   input: UpdateStartupFeatureToggleLocationSearchInput,
 ): string {
@@ -86,25 +72,10 @@ export function updateLocationSearchForStartupFeatureToggle(
   );
 
   const queryParameters = new URLSearchParams(locationSearch);
-  const serializedEnabledFeatureToggleNames = serializeEnabledFeatureToggleNames(updatedEnabledFeatureToggleNameSet);
+  const serializedEnabledFeatureToggleNames = toOrderedEnabledFeatureToggleNames(
+    updatedEnabledFeatureToggleNameSet,
+  ).join(',');
+  queryParameters.set(startupFeatureToggleQueryParameterName, serializedEnabledFeatureToggleNames);
 
-  if (serializedEnabledFeatureToggleNames.isNothing) {
-    queryParameters.delete(startupFeatureToggleQueryParameterName);
-  } else {
-    queryParameters.set(startupFeatureToggleQueryParameterName, serializedEnabledFeatureToggleNames.value);
-  }
-
-  const serializedQueryParameters = queryParameters.toString();
-  return Maybe.of(serializedQueryParameters)
-    .andThen((queryParameterString): Maybe<string> => {
-      if (queryParameterString.length === 0) {
-        return Maybe.nothing<string>();
-      }
-
-      return Maybe.just(queryParameterString);
-    })
-    .map((queryParameterString): string => {
-      return `?${queryParameterString}`;
-    })
-    .unwrapOr('');
+  return `?${queryParameters.toString()}`;
 }
