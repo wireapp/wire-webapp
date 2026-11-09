@@ -409,6 +409,28 @@ const renderCellsTable = ({
 };
 
 describe('CellsTable selection', () => {
+  it.each([
+    {label: 'a viewer', selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER, isBulkActionsEnabled: true},
+    {
+      label: 'an editor with the feature flag off',
+      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+      isBulkActionsEnabled: false,
+    },
+    {
+      label: 'a viewer with the feature flag off',
+      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+      isBulkActionsEnabled: false,
+    },
+  ])('hides page and row selection for $label', ({selfUserDriveRole, isBulkActionsEnabled}) => {
+    renderCellsTable({selfUserDriveRole, isBulkActionsEnabled});
+
+    expect(screen.getByRole('row', {name: /Marketing images/})).toBeInTheDocument();
+    expect(screen.getByRole('row', {name: /Wire logs.pdf/})).toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', {name: 'Select all items on this page'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', {name: 'Select Marketing images'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', {name: 'Select Wire logs.pdf'})).not.toBeInTheDocument();
+  });
+
   it.each([THEME_ID.LIGHT, THEME_ID.DARK])('aligns page and row selection checkboxes in the %s theme', themeId => {
     renderCellsTable({themeId});
 
