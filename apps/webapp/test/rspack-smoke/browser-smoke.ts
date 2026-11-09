@@ -198,18 +198,74 @@ test('starts when service-worker cleanup finishes after DOMContentLoaded', async
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
 });
 
-test('continues startup when service-worker cleanup fails', async ({page}) => {
-  const cleanupWarnings: string[] = [];
-  page.on('console', message => {
-    if (message.type() === 'warning') {
-      cleanupWarnings.push(message.text());
-    }
+test('redirects to authentication with the explicit feature selection while service-worker cleanup never settles', async ({
+  page,
+}) => {
+  const uncaughtPageErrors: string[] = [];
+  page.on('pageerror', error => {
+    uncaughtPageErrors.push(error.message);
   });
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'serviceWorker', {
       value: {
         getRegistrations() {
-          throw new Error('simulated cleanup failure');
+          return Promise.withResolvers<never>().promise;
+        },
+      },
+    });
+  });
+
+  await page.goto('/?enabled-features=for-tests-only&hl=en');
+
+  await expect(page).toHaveURL(/\/auth\//);
+  await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+  expect(new URL(page.url()).searchParams.get('enabled-features')).toBe('for-tests-only');
+  expect(new URL(page.url()).searchParams.get('hl')).toBe('en');
+  expect(uncaughtPageErrors).toEqual([]);
+});
+
+test('redirects to authentication with an empty selection while cache cleanup never settles', async ({page}) => {
+  const uncaughtPageErrors: string[] = [];
+  page.on('pageerror', error => {
+    uncaughtPageErrors.push(error.message);
+  });
+  await page.addInitScript(() => {
+    Object.defineProperty(window, 'caches', {
+      value: {
+        keys() {
+          return Promise.withResolvers<never>().promise;
+        },
+      },
+    });
+  });
+
+  await page.goto('/?enabled-features=');
+
+  await expect(page).toHaveURL(/\/auth\//);
+  await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+  expect(new URL(page.url()).searchParams.get('enabled-features')).toBe('');
+  expect(uncaughtPageErrors).toEqual([]);
+});
+
+test('reports rejected cleanup through the invoker without an unhandled rejection or blocked authentication', async ({
+  page,
+}) => {
+  const reportedErrors: string[] = [];
+  const uncaughtPageErrors: string[] = [];
+  page.on('pageerror', error => {
+    uncaughtPageErrors.push(error.message);
+  });
+  page.on('console', message => {
+    if (message.type() === 'error') {
+      reportedErrors.push(message.text());
+    }
+  });
+  await page.addInitScript(() => {
+    localStorage.setItem('debug', '*');
+    Object.defineProperty(navigator, 'serviceWorker', {
+      value: {
+        getRegistrations() {
+          return Promise.reject(new Error('simulated cleanup failure'));
         },
       },
     });
@@ -219,7 +275,9 @@ test('continues startup when service-worker cleanup fails', async ({page}) => {
 
   await expect(page).toHaveURL(/\/auth\//);
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
-  expect(cleanupWarnings.join('\n')).toContain('Legacy service worker cleanup failed; continuing application startup.');
+  expect(reportedErrors.join('\n')).toContain('failed to execute fire-and-forget action');
+  expect(reportedErrors.join('\n')).toContain('simulated cleanup failure');
+  expect(uncaughtPageErrors).toEqual([]);
 });
 
 test('bundles the application entrypoint selected for the artifact', async ({request}, testInfo) => {

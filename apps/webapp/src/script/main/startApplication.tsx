@@ -66,6 +66,12 @@ export async function startApplication(
 
   const clock = createClock();
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
+  const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
+  const fireAndForgetInvoker = createFireAndForgetInvoker({
+    reportError(error) {
+      fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
+    },
+  });
   const documentContentLoaded = waitForDocumentContentLoaded({
     readDocumentReadyState() {
       return document.readyState;
@@ -78,15 +84,13 @@ export async function startApplication(
     },
   });
 
-  try {
-    await retireLegacyServiceWorker({
+  fireAndForgetInvoker.fireAndForget(() => {
+    return retireLegacyServiceWorker({
       serviceWorkerContainer: Maybe.of(navigator.serviceWorker),
       cacheStorage: Maybe.of(window.caches),
       origin: window.location.origin,
     });
-  } catch (error: unknown) {
-    console.warn('Legacy service worker cleanup failed; continuing application startup.', error);
-  }
+  });
 
   const domContentLoadedAtMonotonicMicroseconds = await documentContentLoaded;
   const config = Config.getConfig();
@@ -121,22 +125,15 @@ export async function startApplication(
   }
 
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
-  const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const applicationServices = createApplicationServices({
     createApplicationObservability() {
       return createApplicationObservabilityFromConfig(config);
     },
     clock,
-    createFireAndForgetInvoker() {
-      return createFireAndForgetInvoker({
-        reportError(error) {
-          fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
-        },
-      });
-    },
+    fireAndForgetInvoker,
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
-  const {applicationObservability, fireAndForgetInvoker} = applicationServices;
+  const {applicationObservability} = applicationServices;
   const apiClient = new APIClient({clock: applicationServices.clock});
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
