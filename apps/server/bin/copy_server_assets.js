@@ -21,6 +21,7 @@
 
 const fs = require('fs-extra');
 const path = require('path');
+const {copyTelemetryAsset} = require('../../../tools/serverPackaging/telemetryAssets.ts');
 const {findLocalWorkspaceDependencyPackages} = require('../../../tools/serverPackaging/workspaceDependencies.ts');
 
 const srcFolder = '../';
@@ -35,10 +36,7 @@ assetFolders.forEach(assetFolder => {
   fs.copySync(path.resolve(__dirname, srcFolder, assetFolder), path.resolve(serverOutputDirectory, assetFolder));
 });
 
-fs.copySync(
-  require.resolve('countly-sdk-web/lib/countly.min.js'),
-  path.resolve(serverOutputDirectory, 'libs/wire/telemetry/embed.js'),
-);
+copyTelemetryAsset(serverOutputDirectory);
 
 // Bundle all local workspace dependencies for deployment.
 const serverPackageJson = require('../package.json');
