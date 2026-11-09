@@ -21,12 +21,15 @@ import type {Clock} from '@enormora/clock/clock';
 import {Maybe, Task, task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
+import type {ConnectionTestProgress} from '@wireapp/avs';
+
 import type {ConnectionResult, ScanResult, TroubleshooterService} from './troubleshooterService';
 
 export type DiagnosticResult<T> = {data: T; completedAt: number; durationMilliseconds: number};
 export type TroubleshooterState = {
-  running: 'idle' | 'connection' | 'scan';
+  running: 'idle' | 'connection' | 'scan' | 'resetting';
   connection: Maybe<DiagnosticResult<ConnectionResult>>;
+  connectionProgress: Partial<Record<ConnectionTestProgress['step'], ConnectionTestProgress>>;
   scan: Maybe<DiagnosticResult<ScanResult>>;
   error: Maybe<Error>;
 };
@@ -35,6 +38,7 @@ export type TroubleshooterRepository = {
   testConnection: () => Task<ConnectionResult, Error>;
   runFullScan: () => Task<ScanResult, Error>;
   getReport: (version: string) => string;
+  reset: () => void;
 };
 const MICROSECONDS_PER_MILLISECOND = 1_000;
 const REPORT_INDENTATION = 2;
@@ -44,7 +48,13 @@ export const createTroubleshooterRepository = (
   clock: Clock,
 ): TroubleshooterRepository => {
   const store = createStore<TroubleshooterState>(() => {
-    return {running: 'idle', connection: Maybe.nothing(), scan: Maybe.nothing(), error: Maybe.nothing()};
+    return {
+      running: 'idle',
+      connection: Maybe.nothing(),
+      connectionProgress: {},
+      scan: Maybe.nothing(),
+      error: Maybe.nothing(),
+    };
   });
   const run = <T>(
     kind: 'connection' | 'scan',
@@ -58,37 +68,75 @@ export const createTroubleshooterRepository = (
     store.setState({running: kind, error: Maybe.nothing()});
     return execute()
       .map(data => {
-        const elapsed = clock.currentMonotonicMicroseconds - startedAt;
-        save({
-          data,
-          completedAt: clock.currentUnixEpochMilliseconds,
-          durationMilliseconds: Number(elapsed) / MICROSECONDS_PER_MILLISECOND,
-        });
+        if (store.getState().running === kind) {
+          const elapsed = clock.currentMonotonicMicroseconds - startedAt;
+          save({
+            data,
+            completedAt: clock.currentUnixEpochMilliseconds,
+            durationMilliseconds: Number(elapsed) / MICROSECONDS_PER_MILLISECOND,
+          });
+        }
         store.setState({running: 'idle'});
         return data;
       })
       .mapRejected(error => {
-        store.setState({running: 'idle', error: Maybe.just(error)});
+        const reportError = store.getState().running === kind;
+        store.setState({running: 'idle', error: reportError ? Maybe.just(error) : Maybe.nothing()});
         return error;
       });
   };
   return {
     store,
+    reset: () => {
+      const running = store.getState().running === 'idle' ? 'idle' : 'resetting';
+      store.setState({...store.getInitialState(), running});
+    },
     testConnection: () => {
-      return run('connection', service.testConnection, connection => {
-        store.setState({connection: Maybe.just(connection)});
-      });
+      return run(
+        'connection',
+        () => {
+          store.setState({connection: Maybe.nothing(), connectionProgress: {}});
+          return service.testConnection(progress => {
+            if (store.getState().running !== 'connection') {
+              return;
+            }
+            store.setState(state => {
+              return {connectionProgress: {...state.connectionProgress, [progress.step]: progress}};
+            });
+          });
+        },
+        connection => {
+          store.setState({connection: Maybe.just(connection)});
+        },
+      );
     },
     runFullScan: () => {
-      return run('scan', service.runFullScan, scan => {
-        store.setState({scan: Maybe.just(scan)});
-      });
+      return run(
+        'scan',
+        () => {
+          store.setState({scan: Maybe.nothing()});
+          return service.runFullScan();
+        },
+        scan => {
+          store.setState({scan: Maybe.just(scan)});
+        },
+      );
     },
     getReport: (version: string): string => {
       const state = store.getState();
       return JSON.stringify(
         {
-          simulated: true,
+          simulated:
+            state.scan
+              .map(scan => {
+                return scan.data.report === undefined;
+              })
+              .unwrapOr(true) &&
+            state.connection
+              .map(connection => {
+                return 'route' in connection.data;
+              })
+              .unwrapOr(true),
           version,
           generatedAt: clock.currentDate.toISOString(),
           connection: state.connection

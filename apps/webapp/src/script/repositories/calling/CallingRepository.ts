@@ -260,17 +260,15 @@ export class CallingRepository {
   private selfUser: User | null = null;
   private wCall?: Wcall;
   private wUser: number = 0;
-  private connectionTest?: {
-    id: string;
-    finish: (reason: REASON) => void;
-    stream?: MediaStream;
-  };
+  private connectionTest?: {id: string; closed?: boolean; stream?: MediaStream};
 
-  readonly startConnectionTest = async (): Promise<void> => {
+  readonly startConnectionTest = async (
+    onProgress?: Parameters<Wcall['runConnectionTest']>[1],
+  ): ReturnType<Wcall['runConnectionTest']> => {
     const avs = this.wCall;
     if (
       isUndefined(avs) ||
-      !isFunction(avs.startTest) ||
+      !isFunction(avs.runConnectionTest) ||
       this.wUser === 0 ||
       isNullOrUndefined(this.selfUser) ||
       !isNonEmptyString(this.selfClientId)
@@ -282,29 +280,32 @@ export class CallingRepository {
     }
 
     const id = `avs-connection-test:${this.serializeQualifiedId(this.selfUser.qualifiedId)}:${this.selfClientId}`;
-    return new Promise<void>((resolve, reject) => {
-      this.connectionTest = {
-        id,
-        finish: reason => {
-          if (reason === REASON.NORMAL) {
-            resolve();
-          } else if (reason === REASON.TIMEOUT || reason === REASON.TIMEOUT_ECONN) {
-            reject(new DOMException('AVS connection setup timed out', 'TimeoutError'));
-          } else {
-            reject(new Error(`AVS connection test failed: ${this.getCallEndReasonText(reason)}`));
-          }
-        },
-      };
-      try {
-        const status = avs.startTest(this.wUser, 0);
-        if (status !== 0) {
-          throw new Error(`AVS rejected the connection test (${status})`);
-        }
-      } catch (error) {
+    const connectionTest = {id};
+    this.connectionTest = connectionTest;
+    try {
+      return await avs.runConnectionTest(this.wUser, onProgress);
+    } finally {
+      if (this.connectionTest === connectionTest) {
+        this.stopConnectionTestMedia(this.connectionTest);
         this.connectionTest = undefined;
-        reject(error);
       }
+    }
+  };
+
+  private stopConnectionTestMedia(connectionTest: NonNullable<CallingRepository['connectionTest']>): void {
+    connectionTest.closed = true;
+    connectionTest.stream?.getTracks().forEach(track => {
+      track.stop();
     });
+    connectionTest.stream = undefined;
+  }
+
+  readonly startScanTest = async (): ReturnType<Wcall['scanTest']> => {
+    const avs = this.wCall;
+    if (isUndefined(avs) || !isFunction(avs.scanTest) || this.wUser === 0) {
+      throw new Error('AVS scan testing is unavailable');
+    }
+    return avs.scanTest(this.wUser);
   };
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
@@ -2741,11 +2742,7 @@ export class CallingRepository {
   private readonly callClosed = async (reason: REASON, convId: SerializedConversationId): Promise<void> => {
     const connectionTest = this.connectionTest;
     if (connectionTest?.id === convId) {
-      this.connectionTest = undefined;
-      connectionTest.stream?.getTracks().forEach(track => {
-        track.stop();
-      });
-      connectionTest.finish(reason);
+      this.stopConnectionTestMedia(connectionTest);
       return;
     }
     Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
@@ -3167,7 +3164,7 @@ export class CallingRepository {
     const connectionTest = this.connectionTest;
     if (connectionTest?.id === convId) {
       const stream = await this.getMediaStream({audio, camera, screen}, true);
-      if (this.connectionTest !== connectionTest) {
+      if (this.connectionTest !== connectionTest || connectionTest.closed === true) {
         stream.getTracks().forEach(track => {
           track.stop();
         });

@@ -245,6 +245,24 @@ function createSftCallingFixture(): SftCallingFixture {
   };
 }
 
+describe('AVS connection test', () => {
+  it('forwards the progress callback and propagates AVS connection test failures', async () => {
+    const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+    const error = new Error('Connection setup timed out');
+    const runConnectionTest: jest.MockedFunction<Wcall['runConnectionTest']> = jest.fn();
+    runConnectionTest.mockRejectedValue(error);
+    repository['wCall'] = {runConnectionTest} as unknown as Wcall;
+    repository['wUser'] = 1;
+    repository['selfUser'] = new User(createUuid(), '', translateForTest);
+    repository['selfClientId'] = createUuid();
+    const onProgress = jest.fn();
+
+    await expect(repository.startConnectionTest(onProgress)).rejects.toBe(error);
+    expect(runConnectionTest).toHaveBeenCalledWith(1, onProgress);
+    await expect(repository.startConnectionTest(onProgress)).rejects.toBe(error);
+  });
+});
+
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
   let callingRepository: CallingRepository;
@@ -273,18 +291,6 @@ describe('CallingRepository', () => {
 
   afterAll(() => {
     return wCall && wCall.destroy(wUser);
-  });
-
-  it('waits for the AVS test close and reports setup timeouts', async () => {
-    const startTest = jest.spyOn(wCall, 'startTest').mockReturnValue(0);
-    const testId = `avs-connection-test:${selfUser.id}:${clientId}`;
-    const result = callingRepository.startConnectionTest();
-    const rejection = expect(result).rejects.toMatchObject({name: 'TimeoutError'});
-
-    expect(startTest).toHaveBeenCalledWith(wUser, 0);
-    await callingRepository['callClosed'](REASON.NORMAL, 'unrelated-call');
-    await callingRepository['callClosed'](REASON.TIMEOUT, testId);
-    await rejection;
   });
 
   describe('SFT request destinations', () => {

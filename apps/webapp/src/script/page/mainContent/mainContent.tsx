@@ -130,9 +130,10 @@ const MainContent: FunctionComponent<MainContentProps> = ({
   const {isFederated, repositories, switchContent} = contentViewModel;
   const callingRepository = repositories.calling;
   const troubleshooterRepository = useMemo(() => {
-    const service = createAvsTroubleshooterService(clock, () => {
-      return callingRepository.startConnectionTest();
-    });
+    const service = createAvsTroubleshooterService(
+      callingRepository.startConnectionTest,
+      callingRepository.startScanTest,
+    );
     return createTroubleshooterRepository(service, clock);
   }, [callingRepository, clock]);
 
