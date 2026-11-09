@@ -4214,8 +4214,10 @@ describe('CellsTable restoring selected Bin items', () => {
       await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
       await user.click(screen.getByRole('checkbox', {name: 'Select b.txt'}));
 
-      expect(screen.getByRole('button', {name: 'Delete permanently'})).toBeInTheDocument();
-      expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('button', {name: translateSelectionForTest('cells.options.deletePermanently')}),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: translateSelectionForTest('cells.options.restore')})).not.toBeInTheDocument();
       expect(repository.restoreNodes).not.toHaveBeenCalled();
     },
   );
