@@ -24,17 +24,9 @@ import {ClientType} from '../client/clientType';
 import {StatusCode} from '../http';
 
 describe('AuthAPI', () => {
-  let apiClient: APIClient;
-
-  beforeEach(() => {
-    apiClient = new APIClient();
-  });
-
-  afterEach(() => {
-    apiClient.dispose();
-  });
-
   it('sets the client to permanent', async () => {
+    using apiClient = new APIClient();
+
     const data = {
       clientType: ClientType.PERMANENT,
       email: 'email@example.com',
@@ -68,6 +60,8 @@ describe('AuthAPI', () => {
   });
 
   it('sets the client to temporary', async () => {
+    using apiClient = new APIClient();
+
     const data = {
       clientType: ClientType.TEMPORARY,
       email: 'email@example.com',
