@@ -66,7 +66,7 @@ export const CellsFoldersListModalContent: FunctionComponent<CellsFoldersListMod
 }: CellsFoldersListModalContentProps) => {
   const {translate} = useApplicationContext();
   const breadcrumbs = getBreadcrumbsFromPath({
-    baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
+    baseCrumb: translate('cells.breadcrumb.files', {conversationName}, undefined, true),
     currentPath,
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });

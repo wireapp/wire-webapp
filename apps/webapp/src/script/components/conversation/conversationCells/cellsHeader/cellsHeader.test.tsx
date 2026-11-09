@@ -27,12 +27,15 @@ import {JobsTaskStatus, TreeNodeType} from 'cells-sdk-ts';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import en from '../../../../../i18n/en-US.json';
+
 import type {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../../../util/localizerUtil';
 import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {CellsHeader} from './cellsHeader';
@@ -106,11 +109,12 @@ const renderCellsHeader = (
     onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   } = {},
   isBulkActionsEnabled = true,
+  translateFunction: typeof translate | typeof translateForTest = translateForTest,
 ): RenderResult => {
   const {clock, ...headerProperties} = properties;
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
-      translate: translateForTest,
+      translate: translateFunction,
       clock,
       isFeatureToggleEnabled: featureToggleName => {
         return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
@@ -122,6 +126,32 @@ const renderCellsHeader = (
 };
 
 describe('CellsHeader', () => {
+  afterEach(() => {
+    setStrings({});
+  });
+
+  it.each([
+    ['MFA feature - Administration & Identity', 'MFA feature - Administration & Identity files'],
+    ['R&amp;D', 'R&amp;D files'],
+    ['<img src=x onerror=alert(1)>', '<img src=x onerror=alert(1)> files'],
+  ])('renders conversation name %s as plain breadcrumb text', (conversationName, expectedLabel) => {
+    setStrings({en});
+    const {container} = renderCellsHeader(
+      {
+        conversationName,
+        getCurrentCellsPath: () => {
+          return 'wire-cells-web/Mocks';
+        },
+        isSearchViewOpen: false,
+      },
+      true,
+      translate,
+    );
+
+    expect(screen.getByRole('button', {name: expectedLabel})).toBeInTheDocument();
+    expect(container.querySelector('img')).not.toBeInTheDocument();
+  });
+
   it('keeps the breadcrumb strip clickable while providing a selection overlay anchor', () => {
     const onSelectionBarAnchorChange = jest.fn();
     const {container} = renderCellsHeader({isSearchViewOpen: false, onSelectionBarAnchorChange});
