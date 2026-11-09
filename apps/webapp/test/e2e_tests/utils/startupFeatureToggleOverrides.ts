@@ -18,30 +18,46 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
+import {Maybe} from 'true-myth';
 
 import {
   StartupFeatureToggleName,
   startupFeatureToggleNames,
 } from '../../../src/script/featureToggles/startupFeatureToggleNames';
 import {updateLocationSearchForStartupFeatureToggle} from '../../../src/script/featureToggles/startupFeatureToggleQueryParameters';
+import {startupFeatureToggleQueryParameterName} from '../../../src/script/featureToggles/startupFeatureToggles';
 
 export type StartupFeatureToggleOverrides = Readonly<Partial<Record<StartupFeatureToggleName, boolean>>>;
 
-export function applyStartupFeatureToggleOverridesToUrl(url: URL, overrides: StartupFeatureToggleOverrides): URL {
-  const updatedUrl = new URL(url.toString());
+export function applyStartupFeatureToggleOverridesToUrl(
+  url: URL,
+  overrides: Maybe<StartupFeatureToggleOverrides>,
+): URL {
+  return overrides.match({
+    Nothing() {
+      return new URL(url.toString());
+    },
+    Just(featureToggleOverrides) {
+      const updatedUrl = new URL(url.toString());
 
-  for (const featureToggleName of startupFeatureToggleNames) {
-    const shouldEnableFeatureToggle = overrides[featureToggleName];
-    if (isUndefined(shouldEnableFeatureToggle)) {
-      continue;
-    }
+      if (!updatedUrl.searchParams.has(startupFeatureToggleQueryParameterName)) {
+        updatedUrl.searchParams.set(startupFeatureToggleQueryParameterName, '');
+      }
 
-    updatedUrl.search = updateLocationSearchForStartupFeatureToggle({
-      locationSearch: updatedUrl.search,
-      featureToggleName,
-      shouldEnableFeatureToggle,
-    });
-  }
+      for (const featureToggleName of startupFeatureToggleNames) {
+        const shouldEnableFeatureToggle = featureToggleOverrides[featureToggleName];
+        if (isUndefined(shouldEnableFeatureToggle)) {
+          continue;
+        }
 
-  return updatedUrl;
+        updatedUrl.search = updateLocationSearchForStartupFeatureToggle({
+          locationSearch: updatedUrl.search,
+          featureToggleName,
+          shouldEnableFeatureToggle,
+        });
+      }
+
+      return updatedUrl;
+    },
+  });
 }
