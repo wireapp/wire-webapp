@@ -19,4 +19,4 @@
 
 import {startApplication} from './startApplication';
 
-startApplication([]);
+await startApplication([]);

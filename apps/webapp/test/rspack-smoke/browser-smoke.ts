@@ -171,6 +171,57 @@ test('loads the application entry points and redirects an unauthenticated visito
   expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
 });
 
+test('starts when service-worker cleanup finishes after DOMContentLoaded', async ({page}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'serviceWorker', {
+      value: {
+        async getRegistrations() {
+          await new Promise<void>(resolve => {
+            document.addEventListener(
+              'DOMContentLoaded',
+              () => {
+                resolve();
+              },
+              {once: true},
+            );
+          });
+
+          return [];
+        },
+      },
+    });
+  });
+
+  await page.goto('/');
+
+  await expect(page).toHaveURL(/\/auth\//);
+  await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+});
+
+test('continues startup when service-worker cleanup fails', async ({page}) => {
+  const cleanupWarnings: string[] = [];
+  page.on('console', message => {
+    if (message.type() === 'warning') {
+      cleanupWarnings.push(message.text());
+    }
+  });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'serviceWorker', {
+      value: {
+        getRegistrations() {
+          throw new Error('simulated cleanup failure');
+        },
+      },
+    });
+  });
+
+  await page.goto('/');
+
+  await expect(page).toHaveURL(/\/auth\//);
+  await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+  expect(cleanupWarnings.join('\n')).toContain('Legacy service worker cleanup failed; continuing application startup.');
+});
+
 test('bundles the application entrypoint selected for the artifact', async ({request}, testInfo) => {
   const sourceMapResponse = await request.get('/min/app.js.map');
   const sourceMapText = await sourceMapResponse.text();

@@ -31,6 +31,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 
 import {createApplicationServices} from './createApplicationServices';
+import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {AppContainer} from '../components/appContainer/appContainer';
@@ -52,7 +53,9 @@ import {enableLogging} from '../util/loggerUtil';
 import {loadValue} from '../util/storageUtil';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
-export function startApplication(defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[]): void {
+export async function startApplication(
+  defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[],
+): Promise<void> {
   initializeStartupFeatureToggleUrl({
     url: new URL(window.location.href),
     defaultEnabledFeatureToggleNames,
@@ -61,114 +64,125 @@ export function startApplication(defaultEnabledFeatureToggleNames: readonly Star
     },
   });
 
-  retireLegacyServiceWorker({
-    serviceWorkerContainer: Maybe.of(navigator.serviceWorker),
-    cacheStorage: Maybe.of(window.caches),
-    origin: window.location.origin,
-  }).catch((error: unknown) => {
-    console.warn('Legacy service worker cleanup failed; continuing application startup.', error);
-  });
-
   const clock = createClock();
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
-
-  document.addEventListener('DOMContentLoaded', async () => {
-    const domContentLoadedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
-    const config = Config.getConfig();
-    const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
-      fetchBuildMetadata: globalThis.fetch.bind(globalThis),
-    });
-    function isOnline(): boolean {
-      return globalThis.navigator.onLine;
-    }
-
-    enableLogging(config);
-    exposeWrapperGlobals();
-
-    const appContainer = document.getElementById('wire-app');
-
-    if (isNull(appContainer)) {
-      throw new Error('container for application does not exist in the DOM');
-    }
-
-    const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
-
-    if (enforceDesktopApplication) {
-      const unSupportedPageUrl = `${window.location.origin}/unsupported`;
-      window.location.replace(unSupportedPageUrl);
-      return;
-    }
-
-    const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
-
-    if (isUndefined(shouldPersist)) {
-      return doSimpleRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
-    }
-
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
-    const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
-    const applicationServices = createApplicationServices({
-      createApplicationObservability() {
-        return createApplicationObservabilityFromConfig(config);
-      },
-      clock,
-      createFireAndForgetInvoker() {
-        return createFireAndForgetInvoker({
-          reportError(error) {
-            fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
-          },
-        });
-      },
-    });
-    const {isFeatureToggleEnabled} = startupFeatureToggles;
-    const {applicationObservability, fireAndForgetInvoker} = applicationServices;
-    const apiClient = new APIClient({clock: applicationServices.clock});
-    const core = new Core(apiClient);
-    const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
-      apiClient,
-      visibilityState() {
-        return document.visibilityState;
-      },
-      isElectron() {
-        return Runtime.isElectron();
-      },
-      subscribeToApplicationSignal(signalName, listener) {
-        document.addEventListener(signalName, listener);
-      },
-      subscribeToRuntimeSignal(signalName, listener) {
-        globalThis.addEventListener(signalName, listener);
-      },
-      unsubscribeFromApplicationSignal(signalName, listener) {
-        document.removeEventListener(signalName, listener);
-      },
-      unsubscribeFromRuntimeSignal(signalName, listener) {
-        globalThis.removeEventListener(signalName, listener);
-      },
-    });
-
-    container.registerInstance(APIClient, apiClient);
-    container.registerInstance(Core, core);
-    function disposeApplicationResources(): void {
-      using disposableApiClient = apiClient;
-      cleanupIncrementalHttpRetryBackoffReset();
-    }
-
-    globalThis.addEventListener('unload', disposeApplicationResources);
-
-    createRoot(appContainer).render(
-      <AppContainer
-        config={config}
-        clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
-        applicationObservability={applicationObservability}
-        applicationBootstrapStartedAtMonotonicMicroseconds={applicationBootstrapStartedAtMonotonicMicroseconds}
-        domContentLoadedAtMonotonicMicroseconds={domContentLoadedAtMonotonicMicroseconds}
-        fireAndForgetInvoker={fireAndForgetInvoker}
-        fetchLatestBuildMetadata={fetchLatestBuildMetadata}
-        isOnline={isOnline}
-        isFeatureToggleEnabled={isFeatureToggleEnabled}
-        clock={applicationServices.clock}
-        translate={translate}
-      />,
-    );
+  const documentContentLoaded = waitForDocumentContentLoaded({
+    readDocumentReadyState() {
+      return document.readyState;
+    },
+    readMonotonicMicroseconds() {
+      return clock.currentMonotonicMicroseconds;
+    },
+    subscribeToDocumentContentLoaded(listener) {
+      document.addEventListener('DOMContentLoaded', listener, {once: true});
+    },
   });
+
+  try {
+    await retireLegacyServiceWorker({
+      serviceWorkerContainer: Maybe.of(navigator.serviceWorker),
+      cacheStorage: Maybe.of(window.caches),
+      origin: window.location.origin,
+    });
+  } catch (error: unknown) {
+    console.warn('Legacy service worker cleanup failed; continuing application startup.', error);
+  }
+
+  const domContentLoadedAtMonotonicMicroseconds = await documentContentLoaded;
+  const config = Config.getConfig();
+  const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
+    fetchBuildMetadata: globalThis.fetch.bind(globalThis),
+  });
+  function isOnline(): boolean {
+    return globalThis.navigator.onLine;
+  }
+
+  enableLogging(config);
+  exposeWrapperGlobals();
+
+  const appContainer = document.getElementById('wire-app');
+
+  if (isNull(appContainer)) {
+    throw new Error('container for application does not exist in the DOM');
+  }
+
+  const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
+
+  if (enforceDesktopApplication) {
+    const unSupportedPageUrl = `${window.location.origin}/unsupported`;
+    window.location.replace(unSupportedPageUrl);
+    return;
+  }
+
+  const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
+
+  if (isUndefined(shouldPersist)) {
+    return doSimpleRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
+  }
+
+  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
+  const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
+  const applicationServices = createApplicationServices({
+    createApplicationObservability() {
+      return createApplicationObservabilityFromConfig(config);
+    },
+    clock,
+    createFireAndForgetInvoker() {
+      return createFireAndForgetInvoker({
+        reportError(error) {
+          fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
+        },
+      });
+    },
+  });
+  const {isFeatureToggleEnabled} = startupFeatureToggles;
+  const {applicationObservability, fireAndForgetInvoker} = applicationServices;
+  const apiClient = new APIClient({clock: applicationServices.clock});
+  const core = new Core(apiClient);
+  const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
+    apiClient,
+    visibilityState() {
+      return document.visibilityState;
+    },
+    isElectron() {
+      return Runtime.isElectron();
+    },
+    subscribeToApplicationSignal(signalName, listener) {
+      document.addEventListener(signalName, listener);
+    },
+    subscribeToRuntimeSignal(signalName, listener) {
+      globalThis.addEventListener(signalName, listener);
+    },
+    unsubscribeFromApplicationSignal(signalName, listener) {
+      document.removeEventListener(signalName, listener);
+    },
+    unsubscribeFromRuntimeSignal(signalName, listener) {
+      globalThis.removeEventListener(signalName, listener);
+    },
+  });
+
+  container.registerInstance(APIClient, apiClient);
+  container.registerInstance(Core, core);
+  function disposeApplicationResources(): void {
+    using disposableApiClient = apiClient;
+    cleanupIncrementalHttpRetryBackoffReset();
+  }
+
+  globalThis.addEventListener('unload', disposeApplicationResources);
+
+  createRoot(appContainer).render(
+    <AppContainer
+      config={config}
+      clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
+      applicationObservability={applicationObservability}
+      applicationBootstrapStartedAtMonotonicMicroseconds={applicationBootstrapStartedAtMonotonicMicroseconds}
+      domContentLoadedAtMonotonicMicroseconds={domContentLoadedAtMonotonicMicroseconds}
+      fireAndForgetInvoker={fireAndForgetInvoker}
+      fetchLatestBuildMetadata={fetchLatestBuildMetadata}
+      isOnline={isOnline}
+      isFeatureToggleEnabled={isFeatureToggleEnabled}
+      clock={applicationServices.clock}
+      translate={translate}
+    />,
+  );
 }

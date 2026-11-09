@@ -21,4 +21,4 @@ import {startApplication} from './startApplication';
 
 import {previewDefaultEnabledStartupFeatureToggleNames} from '../featureToggles/startupFeatureToggleNames';
 
-startApplication(previewDefaultEnabledStartupFeatureToggleNames);
+await startApplication(previewDefaultEnabledStartupFeatureToggleNames);
