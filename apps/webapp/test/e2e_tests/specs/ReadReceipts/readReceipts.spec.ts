@@ -17,11 +17,11 @@
  *
  */
 
-import {getRequiredUserId, User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
-import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
-import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
+import {getRequiredUserId, User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, expect, withLogin} from '../../test.fixtures';
+import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from '../../utils/asset.util';
+import {getImageFilePath} from '../../utils/sendImage.util';
 import {connectWithUser, createGroup} from '../../utils/userActions';
 import {Page} from '@playwright/test';
 import {ApiManagerE2E} from '../../backend/apiManager.e2e';

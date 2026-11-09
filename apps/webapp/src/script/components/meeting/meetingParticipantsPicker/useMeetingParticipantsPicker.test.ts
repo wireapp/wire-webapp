@@ -19,8 +19,8 @@
 
 import {act, fireEvent, renderHook} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import type {Conversation} from '../../../repositories/entity/Conversation';
 
 import {useMeetingParticipantsPicker} from './useMeetingParticipantsPicker';
 import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';

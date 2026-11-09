@@ -20,8 +20,9 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import getSlug from 'speakingurl';
 
-import type {User} from 'Repositories/entity/User';
-import {randomElement} from 'Util/arrayUtil';
+import {randomElement} from './arrayUtil';
+
+import type {User} from '../repositories/entity/User';
 
 const obfuscationExtraCharacterRange = 10;
 const wordBoundarySearchLength = 25;

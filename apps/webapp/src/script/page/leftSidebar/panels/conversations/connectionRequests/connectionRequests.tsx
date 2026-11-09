@@ -23,11 +23,10 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/avatar';
-import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-
+import {Avatar, AVATAR_SIZE, GroupAvatar} from '../../../../../components/avatar';
+import {User} from '../../../../../repositories/entity/User';
+import {handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
+import {useApplicationContext} from '../../../../rootProvider';
 import {ContentState, useAppState} from '../../../../useAppState';
 
 interface ConnectionRequestsProps {

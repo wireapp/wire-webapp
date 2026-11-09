@@ -19,12 +19,12 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-
 import {SidebarTabs} from './useSidebarStore';
+
+import {ConversationLabel} from '../../../../repositories/conversation/ConversationLabelRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {SearchRepository} from '../../../../repositories/search/searchRepository';
 
 type GetGroupParticipantsConversationsParams = {
   currentTab: SidebarTabs;

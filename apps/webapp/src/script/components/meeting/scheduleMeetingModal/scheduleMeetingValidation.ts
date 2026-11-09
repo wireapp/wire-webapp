@@ -22,10 +22,10 @@ import {isUndefined} from '@sindresorhus/is';
 import type {Maybe, Result} from 'true-myth';
 import {result} from 'true-myth';
 
-import {getMeetingPasswordErrors} from 'Components/meeting/shared/validation/meetingPasswordValidation';
-import {getMeetingTitleError} from 'Components/meeting/shared/validation/meetingTitleValidation';
-
 import {type ScheduleMeetingFormErrors, ScheduleMeetingMode, scheduleMeetingModes} from './scheduleMeetingTypes';
+
+import {getMeetingPasswordErrors} from '../shared/validation/meetingPasswordValidation';
+import {getMeetingTitleError} from '../shared/validation/meetingTitleValidation';
 
 export interface ScheduleMeetingValidationInput {
   title: string;

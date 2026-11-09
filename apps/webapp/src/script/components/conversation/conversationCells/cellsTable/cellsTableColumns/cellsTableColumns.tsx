@@ -26,10 +26,6 @@ import {
 } from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsSelectionCheckbox} from 'Components/cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode} from 'src/script/types/cellNode';
-
 import {CellsTableDateColumn} from './cellsTableDateColumn/cellsTableDateColumn';
 import {CellsTableNameColumn} from './cellsTableNameColumn/cellsTableNameColumn';
 import {CellsTableOwnerColumn} from './cellsTableOwnerColumn/cellsTableOwnerColumn';
@@ -37,6 +33,9 @@ import {CellsTableRowOptions} from './cellsTableRowOptions/cellsTableRowOptions'
 import {CellsTableSharedColumn} from './cellsTableSharedColumn/cellsTableSharedColumn';
 import {CellsTagsColumn} from './cellsTagsColumn/cellsTagsColumn';
 
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../../types/cellNode';
+import {CellsSelectionCheckbox} from '../../../../cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
 import {CellsSortDirection} from '../../common/cellsSortIcon/cellsSortIcon';
 import {CellsTableSortableHeader} from '../../common/cellsTableSortableHeader/cellsTableSortableHeader';
 import {CellsSortField} from '../../common/useCellsSorting/useCellsSorting';
@@ -45,6 +44,7 @@ const columnHelper = createColumnHelper<CellNode>();
 
 interface CellsTableLabels {
   actions: string;
+  selectAllOnPage: string;
   created: string;
   name: string;
   owner: string;
@@ -85,6 +85,8 @@ export const getCellsTableColumns = ({
   onToggleSort,
   selectedNodeIds,
   onToggleSelection,
+  onTogglePageSelection,
+  isPageSelected,
   selectionEnabled,
 }: {
   cellsRepository: CellsRepository;
@@ -98,6 +100,8 @@ export const getCellsTableColumns = ({
   onToggleSort: (field: CellsSortField) => void;
   selectedNodeIds: Set<string>;
   onToggleSelection: (nodeId: string, isSelected: boolean) => void;
+  onTogglePageSelection: (isSelected: boolean) => void;
+  isPageSelected: boolean;
   selectionEnabled: boolean;
 }): GetCellsTableColumnsResult => {
   return [
@@ -106,6 +110,16 @@ export const getCellsTableColumns = ({
           columnHelper.display({
             id: 'selection',
             size: 40,
+            header: () => {
+              return (
+                <CellsSelectionCheckbox
+                  id="all-on-page"
+                  name={labels.selectAllOnPage}
+                  isChecked={isPageSelected}
+                  onChange={onTogglePageSelection}
+                />
+              );
+            },
             cell: info => {
               const node = info.row.original;
               return (

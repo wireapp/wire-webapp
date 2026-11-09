@@ -23,18 +23,6 @@ import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import * as telemetry from '@wireapp/telemetry';
-
-import type {ContributedSegmentations, MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {ClientEvent} from 'Repositories/event/Client';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {getLogger, Logger} from 'Util/logger';
-import {loadValue, storeValue, resetStoreValue} from 'Util/storageUtil';
-import {includesString} from 'Util/stringUtil';
-import {getParameter} from 'Util/urlUtil';
-import {createUuid} from 'Util/uuid';
-
 import {EventName} from './eventName';
 import {getPlatform} from './helpers';
 import {Segmentation} from './segmentation';
@@ -48,7 +36,28 @@ import {UserData} from './userData';
 import {URLParameter} from '../../auth/urlParameter';
 import {Config} from '../../Config';
 import {APIClient} from '../../service/apiClientSingleton';
+import {
+  addAllConsentFeatures,
+  beginSession,
+  changeDeviceId,
+  disableOfflineMode,
+  endSession,
+  initialize,
+  isLoaded,
+  removeAllConsentFeatures,
+  setUserData,
+  trackEvent,
+} from '../../telemetry/telemetry';
+import {getLogger, Logger} from '../../util/logger';
+import {loadValue, storeValue, resetStoreValue} from '../../util/storageUtil';
+import {includesString} from '../../util/stringUtil';
+import {getParameter} from '../../util/urlUtil';
+import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
+import type {ContributedSegmentations, MessageRepository} from '../conversation/MessageRepository';
+import {ClientEvent} from '../event/Client';
+import {TeamState} from '../team/TeamState';
+import {UserState} from '../user/userState';
 
 const TEAM_SIZE_THRESHOLD_VALUE = 6;
 
@@ -132,7 +141,7 @@ export class EventTrackingRepository {
   };
 
   public migrateDeviceId = async (newId: string): Promise<void> => {
-    if (!telemetry.isLoaded()) {
+    if (!isLoaded()) {
       this.telemetryLogger.warn('Telemetry is not available');
       return;
     }
@@ -148,7 +157,7 @@ export class EventTrackingRepository {
         await this.startProductReporting(this.telemetryDeviceId);
         stopOnFinish = true;
       }
-      telemetry.changeDeviceId(newId);
+      changeDeviceId(newId);
       storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY, newId);
       this.telemetryLogger.info(`Telemetry tracking id has been changed from ${this.telemetryDeviceId} to ${newId}`);
       this.telemetryDeviceId = newId;
@@ -229,11 +238,11 @@ export class EventTrackingRepository {
 
   private readonly toggleTelemetry = async (isEnabled: boolean): Promise<void> => {
     if (isEnabled && this.isDomainAllowedForAnalytics()) {
-      telemetry.addAllConsentFeatures();
+      addAllConsentFeatures();
       this.telemetryLogger.info('Consent was given due to user preferences');
       await this.startProductReporting();
     } else {
-      telemetry.removeAllConsentFeatures();
+      removeAllConsentFeatures();
       this.telemetryLogger.info('Consent was removed due to user preferences');
       this.stopProductReporting();
     }
@@ -252,7 +261,7 @@ export class EventTrackingRepository {
   }
 
   private async startProductReporting(trackingId: string = ''): Promise<void> {
-    if (!telemetry.isLoaded()) {
+    if (!isLoaded()) {
       return;
     }
 
@@ -272,7 +281,7 @@ export class EventTrackingRepository {
         return;
       }
 
-      telemetry.initialize({
+      initialize({
         appVersion: VERSION,
         provider: {
           apiKey: COUNTLY_API_KEY,
@@ -301,8 +310,8 @@ export class EventTrackingRepository {
       return;
     }
 
-    telemetry.changeDeviceId(device_id);
-    telemetry.disableOfflineMode(device_id);
+    changeDeviceId(device_id);
+    disableOfflineMode(device_id);
 
     this.telemetryLogger.info(`Telemetry tracking id is now ${device_id}`);
 
@@ -325,7 +334,7 @@ export class EventTrackingRepository {
   }
 
   private readonly stopProductReportingSession = (): void => {
-    if (!telemetry.isLoaded()) {
+    if (!isLoaded()) {
       this.telemetryLogger.warn('Telemetry is not available');
       return;
     }
@@ -336,7 +345,7 @@ export class EventTrackingRepository {
     }
 
     if (this.isProductReportingActivated) {
-      telemetry.endSession();
+      endSession();
     }
   };
 
@@ -375,13 +384,13 @@ export class EventTrackingRepository {
   }
 
   private startProductReportingSession(): void {
-    if (!telemetry.isLoaded()) {
+    if (!isLoaded()) {
       this.telemetryLogger.warn('Telemetry is not available');
       return;
     }
 
     if (this.isProductReportingActivated || getForcedErrorReportingStatus()) {
-      telemetry.beginSession();
+      beginSession();
       if (this.sendAppOpenEvent) {
         this.sendAppOpenEvent = false;
         this.trackProductReportingEvent(EventName.APP_OPEN);
@@ -415,7 +424,7 @@ export class EventTrackingRepository {
   }
 
   private trackProductReportingEvent(eventName: string, customSegmentations?: ContributedSegmentations): void {
-    if (!telemetry.isLoaded()) {
+    if (!isLoaded()) {
       this.telemetryLogger.warn('Telemetry is not available');
       return;
     }
@@ -423,7 +432,7 @@ export class EventTrackingRepository {
     if (this.isProductReportingActivated || getForcedErrorReportingStatus()) {
       const userData = this.getUserData();
 
-      telemetry.setUserData(userData);
+      setUserData(userData);
 
       this.telemetryLogger.info(`Reporting user data for product event ${eventName}@${JSON.stringify(userData)}`);
 
@@ -435,7 +444,7 @@ export class EventTrackingRepository {
         ...customSegmentations,
       };
 
-      telemetry.trackEvent({
+      trackEvent({
         name: eventName,
         segmentation,
       });

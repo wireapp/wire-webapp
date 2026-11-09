@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, useEffect, useRef, useState, type FunctionComponent} from 'react';
+import {ChangeEvent, type FunctionComponent, useEffect, useRef, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined} from '@sindresorhus/is';
@@ -36,35 +36,8 @@ import {
   TabIndex,
 } from '@wireapp/react-ui-kit';
 
-import {useAppNotification} from 'Components/appNotification/appNotification';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {VideoBackgroundPerformancePanel} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
-import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import type {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
-import {Participant} from 'Repositories/calling/Participant';
-import type {Grid} from 'Repositories/calling/videoGridHandler';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {detectCapabilities} from 'Repositories/media/backgroundEffects';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {BackgroundEffectsQuality, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
-import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
-import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
-import {useToggleState} from 'src/script/hooks/useToggleState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CallViewTab} from 'src/script/view_model/CallingViewModel';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {handleKeyDown, isTabKey, KEY} from 'Util/keyboardUtil';
-import {preventFocusOutside} from 'Util/util';
-
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
+import {CallSecurityLine} from './callSecurityLine/callSecurityLine';
 import {Duration} from './Duration';
 import {
   classifiedBarStyles,
@@ -77,12 +50,41 @@ import {
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination/Pagination';
+import {useCallAlertState} from './useCallAlertState';
+import {VideoBackgroundPerformancePanel} from './VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
 import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
 import {VideoControls} from './VideoControls/VideoControls';
 
+import {Config} from '../../Config';
+import {callSecurityLineFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {useActiveWindowMatchMedia} from '../../hooks/useActiveWindowMatchMedia';
+import {useToggleState} from '../../hooks/useToggleState';
+import {useApplicationContext} from '../../page/rootProvider';
+import type {Call} from '../../repositories/calling/Call';
+import {CallingRepository} from '../../repositories/calling/CallingRepository';
+import {CallingViewMode, CallState, MuteState} from '../../repositories/calling/CallState';
+import {Participant} from '../../repositories/calling/Participant';
+import type {Grid} from '../../repositories/calling/videoGridHandler';
+import type {Conversation} from '../../repositories/entity/Conversation';
+import {detectCapabilities} from '../../repositories/media/backgroundEffects';
+import {MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler';
+import {BackgroundEffectsQuality, useBackgroundEffectsStore} from '../../repositories/media/useBackgroundEffectsStore';
+import type {BackgroundEffectSelection} from '../../repositories/media/VideoBackgroundEffects';
+import {BUILTIN_BACKGROUNDS} from '../../repositories/media/VideoBackgroundEffects';
+import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
+import {TeamState} from '../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {isDetachedCallingFeatureEnabled} from '../../util/isDetachedCallingFeatureEnabled';
+import {handleKeyDown, isTabKey, KEY} from '../../util/keyboardUtil';
+import {preventFocusOutside} from '../../util/util';
+import {CallViewTab} from '../../view_model/CallingViewModel';
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 import {WebAppEvents} from '../../webAppEvents';
+import {useAppNotification} from '../appNotification/appNotification';
+import {ConversationClassifiedBar} from '../classifiedBar/classifiedBar';
+import * as Icon from '../icon';
+import {ModalComponent} from '../Modals/ModalComponent';
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;
@@ -146,7 +148,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: FullscreenVideoCallProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const selfParticipant = call.getSelfParticipant();
   const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesCamera']);
@@ -167,6 +169,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
     startedAt,
     participants,
     handRaisedParticipants,
+    state: callConnectionState,
   } = useKoSubscribableChildren(call, [
     'activeSpeakers',
     'currentPage',
@@ -174,9 +177,13 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
     'startedAt',
     'participants',
     'handRaisedParticipants',
+    'state',
   ]);
   const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
+  const {BRAND_NAME: brandName, URL: configUrls} = Config.getConfig();
+  const isCallSecurityLineEnabled = isFeatureToggleEnabled(callSecurityLineFeatureToggleName);
+  const callEncryptionSupportUrl = configUrls.SUPPORT.CALL_ENCRYPTION;
 
   const {selfUser, roles} = useKoSubscribableChildren(conversation, ['selfUser', 'roles']);
   const {emojis, viewMode, detachedWindow, isScreenSharingSourceFromDetachedWindow} = useKoSubscribableChildren(
@@ -360,7 +367,17 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
               <h2 className="video-remote-title">{conversationName}</h2>
 
               <div data-uie-name="video-timer" className="video-timer label-xs">
-                <Duration startedAt={startedAt} />
+                {isCallSecurityLineEnabled ? (
+                  <CallSecurityLine
+                    callConnectionState={callConnectionState}
+                    participants={participants}
+                    startedAt={startedAt}
+                    brandName={brandName}
+                    supportUrl={callEncryptionSupportUrl}
+                  />
+                ) : (
+                  <Duration startedAt={startedAt} />
+                )}
               </div>
             </div>
           </div>

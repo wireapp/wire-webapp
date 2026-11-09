@@ -19,7 +19,7 @@
 
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
-import {MessageCategory} from 'src/script/message/messageCategory';
+import {MessageCategory} from '../../../../message/messageCategory';
 
 import {mapEventRecord} from './mapEventRecord';
 

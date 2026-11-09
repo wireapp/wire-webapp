@@ -19,8 +19,6 @@
 
 import {isNonEmptyString, isTruthy} from '@sindresorhus/is';
 
-import {ConversationRecord, UserRecord, EventRecord} from 'Repositories/storage';
-
 import {buildMetaData} from './assetMetadata';
 import {
   CPBackupExporter,
@@ -41,6 +39,7 @@ import {
   UserTableEntrySchema,
 } from './data.schema';
 
+import {ConversationRecord, UserRecord, EventRecord} from '../../storage';
 import {CancelError, ExportError} from '../error';
 import {preprocessConversations, preprocessUsers, preprocessEvents} from '../recordPreprocessors';
 

@@ -17,6 +17,7 @@ import {webAppVersionSynchronizationPackageFilePaths} from './webappVersionSynch
 import type {
   WebAppVersionSynchronizationGitClient,
   WebAppVersionSynchronizationMainSnapshot,
+  WebAppVersionSynchronizationPackageDocuments,
 } from './webappVersionSynchronizationGit.ts';
 import type {WebAppVersionSynchronizationPullRequest} from './webappVersionSynchronization.ts';
 import type {WebAppVersionSynchronizationGitHubClient} from './webappVersionSynchronizationGitHubClient.ts';
@@ -35,11 +36,24 @@ type SynchronizationHarness = {
     readonly pullRequestLabels: number[];
     readonly pullRequests: WebAppVersionSynchronizationPullRequest[];
     readonly writtenVersions: string[];
+    readonly writtenPackageDocuments: WebAppVersionSynchronizationPackageDocuments[];
   };
 };
 
 function createPackageDocument(version: string): Readonly<Record<string, unknown>> {
   return {name: '@wireapp/example', private: true, version, scripts: {test: 'jest'}};
+}
+
+function createLockfileDocument(version: string): Readonly<Record<string, unknown>> {
+  return {
+    version,
+    lockfileVersion: 3,
+    packages: {
+      '': {version},
+      'apps/webapp': {version},
+      'node_modules/example': {version: '2.0.0', integrity: 'sha512-example'},
+    },
+  };
 }
 
 function createPullRequest(options: {
@@ -69,11 +83,15 @@ function createPullRequest(options: {
 function createSynchronizationHarness(options: {
   readonly packageVersion: string;
   readonly pullRequests?: readonly WebAppVersionSynchronizationPullRequest[];
+  readonly lockfileDocument?: Readonly<Record<string, unknown>>;
+  readonly workingTreeLockfileDocument?: Readonly<Record<string, unknown>>;
+  readonly changedFilePaths?: readonly string[];
 }): SynchronizationHarness {
   const mainSnapshot: WebAppVersionSynchronizationMainSnapshot = {
     commitSha: 'a'.repeat(40),
     rootPackageDocument: createPackageDocument(options.packageVersion),
     webAppPackageDocument: createPackageDocument(options.packageVersion),
+    lockfileDocument: options.lockfileDocument ?? createLockfileDocument(options.packageVersion),
   };
   const calls = {
     branchCreations: [] as string[],
@@ -81,10 +99,12 @@ function createSynchronizationHarness(options: {
     pullRequestLabels: [] as number[],
     pullRequests: [...(options.pullRequests ?? [])],
     writtenVersions: [] as string[],
+    writtenPackageDocuments: [] as WebAppVersionSynchronizationPackageDocuments[],
   };
   let workingTreePackageDocuments = {
     rootPackageDocument: mainSnapshot.rootPackageDocument,
     webAppPackageDocument: mainSnapshot.webAppPackageDocument,
+    lockfileDocument: mainSnapshot.lockfileDocument,
   };
 
   const githubClient: WebAppVersionSynchronizationGitHubClient = {
@@ -126,18 +146,22 @@ function createSynchronizationHarness(options: {
       return Task.resolve(Unit);
     },
     readWorkingTreePackageDocuments() {
-      return Task.resolve(workingTreePackageDocuments);
+      return Task.resolve({
+        ...workingTreePackageDocuments,
+        lockfileDocument: options.workingTreeLockfileDocument ?? workingTreePackageDocuments.lockfileDocument,
+      });
     },
     writePackageDocuments(packageDocuments) {
       const packageVersion = packageDocuments.rootPackageDocument.version;
       assert(typeof packageVersion === 'string');
       calls.writtenVersions.push(packageVersion);
+      calls.writtenPackageDocuments.push(packageDocuments);
       workingTreePackageDocuments = packageDocuments;
 
       return Task.resolve(Unit);
     },
     getWorkingTreeChangedFilePaths() {
-      return Task.resolve(webAppVersionSynchronizationPackageFilePaths);
+      return Task.resolve(options.changedFilePaths ?? webAppVersionSynchronizationPackageFilePaths);
     },
     commit(commitOptions) {
       calls.commits.push(commitOptions.message);
@@ -185,6 +209,13 @@ describe('WebApp version synchronization orchestration', () => {
       pullRequestNumber: 50,
     });
     expect(harness.calls.writtenVersions).toEqual(['1.1.0']);
+    expect(harness.calls.writtenPackageDocuments).toEqual([
+      {
+        rootPackageDocument: createPackageDocument('1.1.0'),
+        webAppPackageDocument: createPackageDocument('1.1.0'),
+        lockfileDocument: createLockfileDocument('1.1.0'),
+      },
+    ]);
     expect(harness.calls.branchCreations).toEqual(['webapp-version-1.1.0']);
     expect(harness.calls.commits).toEqual(['Update WebApp version to 1.1.0']);
     expect(harness.calls.pullRequestLabels).toEqual([50]);
@@ -198,6 +229,48 @@ describe('WebApp version synchronization orchestration', () => {
     assert(actualResult.isOk);
     expect(actualResult.value.webAppVersion).toBe('1.2.0');
     expect(harness.calls.writtenVersions).toEqual(['1.2.0']);
+  });
+
+  it('rejects inconsistent base lockfile versions before writing or committing', async () => {
+    const harness = createSynchronizationHarness({
+      packageVersion: '1.0.0',
+      lockfileDocument: createLockfileDocument('0.9.0'),
+    });
+
+    const actualResult = await synchronize(createSynchronizationOptions('v1.1.0'), harness.dependencies).toPromise();
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('package-lock.json');
+    expect(harness.calls.writtenPackageDocuments).toEqual([]);
+    expect(harness.calls.commits).toEqual([]);
+    expect(harness.calls.pullRequests).toEqual([]);
+  });
+
+  it('rejects stale lockfile versions read back from the working tree', async () => {
+    const harness = createSynchronizationHarness({
+      packageVersion: '1.0.0',
+      workingTreeLockfileDocument: createLockfileDocument('1.0.0'),
+    });
+
+    const actualResult = await synchronize(createSynchronizationOptions('v1.1.0'), harness.dependencies).toPromise();
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('package-lock.json');
+    expect(harness.calls.commits).toEqual([]);
+    expect(harness.calls.pullRequests).toEqual([]);
+  });
+
+  it('rejects a synchronization that omits the lockfile from changed files', async () => {
+    const harness = createSynchronizationHarness({
+      packageVersion: '1.0.0',
+      changedFilePaths: ['apps/webapp/package.json', 'package.json'],
+    });
+
+    const actualResult = await synchronize(createSynchronizationOptions('v1.1.0'), harness.dependencies).toPromise();
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('unexpected files');
+    expect(harness.calls.commits).toEqual([]);
   });
 
   it('rejects a package version downgrade', async () => {

@@ -21,16 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
-import {
-  CELLS_ACTION,
-  useCellsActionPermissions,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {CellsViewerAccessLabel} from 'Components/conversation/conversationCells/common/cellsViewerAccessLabel';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {CellsEmptyBinAction} from './cellsEmptyBinAction/cellsEmptyBinAction';
 import {
   actionsStyles,
@@ -45,10 +35,16 @@ import {CellsNewMenu} from './cellsNewMenu/cellsNewMenu';
 import {CellsRefresh} from './cellsRefresh/cellsRefresh';
 import {CellsRootHomeIcon} from './cellsRootHomeIcon';
 
+import {driveBulkActionsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {CellsSearchInput} from '../../../cellsSearchInput/cellsSearchInput';
 import {ConversationViewerPermissionBanner} from '../../conversationViewerPermissionBanner/conversationViewerPermissionBanner';
 import {CellsBreadcrumbs} from '../common/cellsBreadcrumbs/cellsBreadcrumbs';
 import {CellsFiltersBar} from '../common/cellsFiltersBar/cellsFiltersBar';
 import type {FilterConfig} from '../common/cellsFiltersBar/filterConfig';
+import {CELLS_ACTION, useCellsActionPermissions} from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {CellsViewerAccessLabel} from '../common/cellsViewerAccessLabel';
 import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
 import {openBreadcrumb} from '../common/openBreadcrumb/openBreadcrumb';
 
@@ -71,6 +67,7 @@ interface CellsHeaderProps {
   onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   onRefreshAfterEmptyBinOutcome: () => Promise<boolean>;
   onEmptyBinSubmitted: () => void;
+  onEmptyBinInProgressChange: (isInProgress: boolean) => void;
   getCurrentCellsPath: () => string;
 }
 
@@ -93,6 +90,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   onSelectionBarAnchorChange,
   onRefreshAfterEmptyBinOutcome,
   onEmptyBinSubmitted,
+  onEmptyBinInProgressChange,
   getCurrentCellsPath,
 }: CellsHeaderProps) => {
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
@@ -100,7 +98,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   const canPerformCellsAction = useCellsActionPermissions();
   const currentPath = getCurrentCellsPath();
   const breadcrumbs = getBreadcrumbsFromPath({
-    baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
+    baseCrumb: translate('cells.breadcrumb.files', {conversationName}, undefined, true),
     currentPath,
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
@@ -135,6 +133,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
                 getCurrentCellsPath={getCurrentCellsPath}
                 onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
                 onEmptyBinSubmitted={onEmptyBinSubmitted}
+                onInProgressChange={onEmptyBinInProgressChange}
               />
             )}
             <div css={actionsStyles}>
@@ -180,7 +179,12 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
         </div>
       )}
 
-      {showViewerPermission && !isSearchViewOpen && !isInRecycleBin && <ConversationViewerPermissionBanner />}
+      {showViewerPermission && !isSearchViewOpen && !isInRecycleBin && (
+        <ConversationViewerPermissionBanner
+          key={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
+          conversationId={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
+        />
+      )}
     </div>
   );
 };

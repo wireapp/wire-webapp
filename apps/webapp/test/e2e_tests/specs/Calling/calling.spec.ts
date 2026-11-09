@@ -18,12 +18,12 @@
  */
 
 import {Page} from 'playwright/test';
-import {AudioType} from 'Repositories/audio/audioType';
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withLogin, expect, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
-import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
-import {connectWithUser, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {AudioType} from '../../../../src/script/repositories/audio/audioType';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, withLogin, expect, Team, LOGIN_TIMEOUT} from '../../test.fixtures';
+import {isPlayingAudio} from '../../utils/audio.util';
+import {connectWithUser, createGroup, sendConnectionRequest} from '../../utils/userActions';
 
 async function joinCall(userPages: PageManager['webapp']['pages']): Promise<void> {
   await expect(userPages.calling().callCell).toBeVisible();

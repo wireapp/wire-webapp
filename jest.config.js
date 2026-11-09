@@ -9,6 +9,7 @@ module.exports = {
   coverageReporters: ['html', 'lcov', 'text-summary'],
   maxWorkers: 2,
   projects: [
+    '<rootDir>/apps/webapp/test/core/jest.config.js',
     '<rootDir>/apps/*/jest.config.*',
     '<rootDir>/libraries/*/jest.config.js',
     '<rootDir>/tools/jest.config.js',

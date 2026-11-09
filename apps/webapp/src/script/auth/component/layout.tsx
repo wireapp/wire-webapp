@@ -23,11 +23,10 @@ import {WavesPattern} from '@wireapp/react-ui-kit/lib/images/wavesPattern';
 
 import {Bold, COLOR_V2, FlexBox, Link, Logo, Text} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss} from './layout.styles';
 
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
 
 export const Layout: FunctionComponent<{children: ReactNode}> = ({children}: {children: ReactNode}) => {
   const {translate} = useApplicationContext();

@@ -19,8 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {FilePlaceholder} from '../../common/FilePlaceholder/FilePlaceholder';
 
 export const PdfError: FunctionComponent = () => {

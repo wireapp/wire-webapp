@@ -18,8 +18,8 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {StatusType} from 'src/script/message/statusType';
-import {createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
+import {StatusType} from '../../../../../message/statusType';
+import {createMessageAddEvent, toSavedEvent} from '../../../../../../../test/helper/EventGenerator';
 
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 

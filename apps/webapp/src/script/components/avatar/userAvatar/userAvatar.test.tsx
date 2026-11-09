@@ -21,17 +21,17 @@ import {render} from '@testing-library/react';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import {User} from '../../../repositories/entity/User';
+import {TeamState} from '../../../repositories/team/TeamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {UserAvatar} from './userAvatar';
 
 import {AVATAR_SIZE, STATE} from '../avatar';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

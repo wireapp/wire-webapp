@@ -27,9 +27,10 @@ import {
   joinButtonStyles,
   participatingStatusIconStyles,
   participatingStatusStyles,
-} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingStatus/meetingStatus.styles';
-import {MeetingTemporalStatuses} from 'Components/meeting/utils/meetingStatusUtil';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+} from './meetingStatus.styles';
+
+import {useApplicationContext} from '../../../../../../page/rootProvider';
+import {MeetingTemporalStatuses} from '../../../../utils/meetingStatusUtil';
 
 export interface MeetingStatusProps {
   temporalStatus: MeetingTemporalStatuses;

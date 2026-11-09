@@ -21,13 +21,13 @@ import {render} from '@testing-library/react';
 import {isNull} from '@sindresorhus/is';
 
 import en from '../../../../i18n/en-US.json';
-import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/federationStopMessage';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {FederationStopMessage as FederationStopMessageEntity} from '../../../repositories/entity/message/federationStopMessage';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../../util/localizerUtil';
 
 import {FederationStopMessage} from './federationStopMessage';
 

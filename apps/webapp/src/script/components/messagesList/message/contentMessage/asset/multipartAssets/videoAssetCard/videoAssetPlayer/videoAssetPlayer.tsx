@@ -23,9 +23,6 @@ import {isEmptyString, isUndefined} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useInView} from 'src/script/hooks/useInView/useInView';
-import {useEffectRef} from 'Util/useEffectRef';
-
 import {useVideoPlayback} from './useVideoPlayback/useVideoPlayback';
 import {VideoAssetCard} from './videoAssetCard/videoAssetCard';
 import {VideoAssetError} from './videoAssetError/videoAssetError';
@@ -33,6 +30,9 @@ import {VideoAssetLoading} from './videoAssetLoading/videoAssetLoading';
 import {wrapperStyles, videoStyles, controlsWrapperStyles} from './videoAssetPlayer.styles';
 import {VideoControls} from './videoControls/videoControls';
 import {VideoPlayOverlay} from './videoPlayOverlay/videoPlayOverlay';
+
+import {useInView} from '../../../../../../../../hooks/useInView/useInView';
+import {useEffectRef} from '../../../../../../../../util/useEffectRef';
 
 interface VideoAssetPlayerProps {
   url?: string;

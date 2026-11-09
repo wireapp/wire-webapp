@@ -20,7 +20,7 @@
 import {expect, test, type ConsoleMessage, type Page} from '@playwright/test';
 import {isEmptyString} from '@sindresorhus/is';
 
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {PageManager} from '../../pageManager';
 
 type ConsoleErrorRecord = {
   readonly message: string;

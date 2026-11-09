@@ -22,17 +22,17 @@ import {ReactElement} from 'react';
 
 import {render} from '@testing-library/react';
 
-import {usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import {usePrimaryModalState} from '../../../components/Modals/PrimaryModal';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import type {DeterministicClock} from '@enormora/clock/deterministic-clock';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {translate} from 'Util/localizerUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {MainViewModel} from '../../../view_model/MainViewModel';
+import {translate} from '../../../util/localizerUtil';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
-import {RootProvider} from 'src/script/page/rootProvider';
+import {RootProvider} from '../../rootProvider';
 import {createRootContextValueForTest} from '../../testSupport/rootContextTestSupport';
 import {ForceReloadModal} from './forceReloadModal';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 interface ForceReloadModalTestContextValue {
   readonly doesApplicationNeedForceReload: boolean;

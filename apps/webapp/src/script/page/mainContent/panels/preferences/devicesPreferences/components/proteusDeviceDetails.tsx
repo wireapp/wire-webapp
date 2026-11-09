@@ -19,13 +19,13 @@
 
 import {useId, type FunctionComponent} from 'react';
 
-import {VerificationBadges} from 'Components/badge';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {splitFingerprint} from 'Util/stringUtil';
-import {formatTimestamp} from 'Util/timeUtil';
-
 import {type DeviceProps} from './detailedDevice';
 import {FormattedId} from './formattedId';
+
+import {VerificationBadges} from '../../../../../../components/badge';
+import {splitFingerprint} from '../../../../../../util/stringUtil';
+import {formatTimestamp} from '../../../../../../util/timeUtil';
+import {useApplicationContext} from '../../../../../rootProvider';
 
 interface ProteusDeviceDetailsProps extends Omit<DeviceProps, 'getDeviceIdentity'> {
   isProteusVerified?: boolean;

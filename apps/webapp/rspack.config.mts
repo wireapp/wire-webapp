@@ -132,7 +132,7 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
     },
     devtool: 'source-map',
     entry: {
-      app: path.resolve(scriptPath, 'main/index.tsx'),
+      app: path.resolve(scriptPath, 'main/previewEntrypoint.tsx'),
       auth: path.resolve(authPath, 'main.tsx'),
       checkBrowser: path.resolve(browserCheckPath, 'checkBrowser.ts'),
     },
@@ -316,11 +316,6 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
     resolve: {
       alias: {
         '@enormora/fire-and-forget$': path.resolve(rootPath, 'node_modules/@enormora/fire-and-forget/index.js'),
-        Components: path.resolve(scriptPath, 'components'),
-        Repositories: path.resolve(scriptPath, 'repositories'),
-        Util: path.resolve(scriptPath, 'util'),
-        src: path.resolve(configDirectoryPath, 'src'),
-        test: path.resolve(configDirectoryPath, 'test'),
       },
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
       fallback: {

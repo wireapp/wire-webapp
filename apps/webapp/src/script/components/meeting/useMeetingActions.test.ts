@@ -20,13 +20,13 @@
 import {renderHook} from '@testing-library/react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
-import {useMeetNowModal} from 'Components/meeting/meetNowModal/useMeetNowModal';
-import {useMeetingActions} from 'Components/meeting/useMeetingActions';
+import {useMeetNowModal} from './meetNowModal/useMeetNowModal';
+import {useMeetingActions} from './useMeetingActions';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../util/test/translateForTest';
 
 const clock = createDeterministicClock({
   initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-16T10:00:00.000Z')) * 1_000n,

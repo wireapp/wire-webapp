@@ -19,15 +19,15 @@
 
 import React from 'react';
 
-import {User} from 'Repositories/entity/User';
-import {CSS_FILL_PARENT} from 'Util/cssMixin';
-
 import {AvatarBackground} from './avatarBackground';
 import {AvatarBadge} from './avatarBadge';
 import {AvatarBorder} from './avatarBorder';
 import {AvatarInitials} from './avatarInitials';
 import {AvatarWrapper} from './avatarWrapper';
 import {shouldShowBadge} from './userAvatar';
+
+import {User} from '../../repositories/entity/User';
+import {CSS_FILL_PARENT} from '../../util/cssMixin';
 
 import {AVATAR_SIZE, STATE, DIAMETER} from '.';
 

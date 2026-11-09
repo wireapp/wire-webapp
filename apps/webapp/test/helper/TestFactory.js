@@ -27,53 +27,62 @@ import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/'
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AudioRepository} from 'Repositories/audio/audioRepository';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ClientRepository} from 'Repositories/client/ClientRepository';
-import {ClientService} from 'Repositories/client/ClientService';
-import {ClientState} from 'Repositories/client/ClientState';
-import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {ConnectionService} from 'Repositories/connection/connectionService';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationService} from 'Repositories/conversation/ConversationService';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
-import {NotificationService} from 'Repositories/event/NotificationService';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {SelfService} from 'Repositories/self/SelfService';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {Core} from 'src/script/service/coreSingleton';
-import {APIClient} from 'src/script/service/apiClientSingleton';
-import {createStorageEngine, DatabaseTypes} from 'src/script/service/storeEngineProvider';
-import {StorageService} from 'Repositories/storage';
-import {StorageRepository} from 'Repositories/storage/storageRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamService} from 'Repositories/team/TeamService';
-import {TeamState} from 'Repositories/team/TeamState';
-import {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserService} from 'Repositories/user/userService';
-import {UserState} from 'Repositories/user/userState';
-import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {translate} from 'Util/localizerUtil';
+import {AssetRepository} from '../../src/script/repositories/assets/assetRepository';
+import {AudioRepository} from '../../src/script/repositories/audio/audioRepository';
+import {CallingRepository} from '../../src/script/repositories/calling/CallingRepository';
+import {ClientEntity} from '../../src/script/repositories/client/ClientEntity';
+import {ClientRepository} from '../../src/script/repositories/client/ClientRepository';
+import {ClientService} from '../../src/script/repositories/client/ClientService';
+import {ClientState} from '../../src/script/repositories/client/ClientState';
+import {ConnectionRepository} from '../../src/script/repositories/connection/connectionRepository';
+import {ConnectionService} from '../../src/script/repositories/connection/connectionService';
+import {ConversationRepository} from '../../src/script/repositories/conversation/ConversationRepository';
+import {ConversationService} from '../../src/script/repositories/conversation/ConversationService';
+import {ConversationState} from '../../src/script/repositories/conversation/ConversationState';
+import {MessageRepository} from '../../src/script/repositories/conversation/MessageRepository';
+import {CryptographyRepository} from '../../src/script/repositories/cryptography/CryptographyRepository';
+import {User} from '../../src/script/repositories/entity/User';
+import {EventRepository} from '../../src/script/repositories/event/EventRepository';
+import {EventService} from '../../src/script/repositories/event/EventService';
+import {NotificationService} from '../../src/script/repositories/event/NotificationService';
+import {PropertiesRepository} from '../../src/script/repositories/properties/propertiesRepository';
+import {PropertiesService} from '../../src/script/repositories/properties/propertiesService';
+import {SearchRepository} from '../../src/script/repositories/search/searchRepository';
+import {SelfService} from '../../src/script/repositories/self/SelfService';
+import {SelfRepository} from '../../src/script/repositories/self/SelfRepository';
+import {Core} from '../../src/script/service/coreSingleton';
+import {APIClient} from '../../src/script/service/apiClientSingleton';
+import {createStorageEngine, DatabaseTypes} from '../../src/script/service/storeEngineProvider';
+import {StorageService} from '../../src/script/repositories/storage';
+import {StorageRepository} from '../../src/script/repositories/storage/storageRepository';
+import {TeamRepository} from '../../src/script/repositories/team/TeamRepository';
+import {TeamService} from '../../src/script/repositories/team/TeamService';
+import {TeamState} from '../../src/script/repositories/team/TeamState';
+import {EventTrackingRepository} from '../../src/script/repositories/tracking/eventTrackingRepository';
+import {UserRepository} from '../../src/script/repositories/user/userRepository';
+import {UserService} from '../../src/script/repositories/user/userService';
+import {UserState} from '../../src/script/repositories/user/userState';
+import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
+import {translate} from '../../src/script/util/localizerUtil';
 
 import {entities} from '../api/payloads';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
+import {MediaStreamHandler} from '../../src/script/repositories/media/MediaStreamHandler';
+import {MediaDevicesHandler} from '../../src/script/repositories/media/MediaDevicesHandler';
+import {MediaConstraintsHandler} from '../../src/script/repositories/media/MediaConstraintsHandler';
+import {BackgroundEffectsHandler} from '../../src/script/repositories/media/backgroundEffectsHandler';
 
 export class TestFactory {
-  constructor() {
+  /** @type {APIClient} */
+  #apiClient;
+
+  /** @param {Core | undefined} core */
+  constructor(core = undefined) {
     container.clearInstances();
+    this.#apiClient = new APIClient();
+    container.registerInstance(APIClient, this.#apiClient);
+    if (core !== undefined) {
+      container.registerInstance(Core, core);
+    }
     /** @type {StorageService} */
     this.storage_service = Object.create(StorageService.prototype);
     /** @type {StorageRepository} */
@@ -102,6 +111,16 @@ export class TestFactory {
     this.calling_repository = Object.create(CallingRepository.prototype);
     /** @type {ConversationRepository} */
     this.conversation_repository = Object.create(ConversationRepository.prototype);
+  }
+
+  /** @returns {void} */
+  dispose() {
+    this.#apiClient.dispose();
+  }
+
+  /** @returns {void} */
+  [Symbol.dispose]() {
+    this.dispose();
   }
 
   /**
@@ -354,7 +373,6 @@ export class TestFactory {
       callingRepository,
       serverTimeHandler,
       translate,
-      {isMarkAsUnreadFeatureEnabled: false},
       userRepository['userState'],
       teamRepository['teamState'],
       conversationState,

@@ -19,17 +19,14 @@
 
 import {fireEvent, render, screen} from '@testing-library/react';
 
-import {
-  MeetingStatus,
-  type MeetingStatusProps,
-} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingStatus/meetingStatus';
-import {MeetingTemporalStatuses} from 'Components/meeting/utils/meetingStatusUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {MeetingStatus, type MeetingStatusProps} from './meetingStatus';
+import {MeetingTemporalStatuses} from '../../../../utils/meetingStatusUtil';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
+import {withThemeAndRootContext} from '../../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../../page/testSupport/rootContextTestSupport';
 
 const createTestProps = (): MeetingStatusProps & {joinMeeting: jest.Mock} => {
   const joinMeeting = jest.fn();

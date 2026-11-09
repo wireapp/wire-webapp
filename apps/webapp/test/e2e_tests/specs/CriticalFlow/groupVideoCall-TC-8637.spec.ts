@@ -18,9 +18,9 @@
  */
 
 import {asyncNoop} from 'noop-esm';
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {PageManager} from '../../pageManager';
 import {test, expect, withLogin} from '../../test.fixtures';
-import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {createGroup, sendConnectionRequest} from '../../utils/userActions';
 
 test('Group Video call', {tag: ['@TC-8637', '@crit-flow-web']}, async ({createTeam, createUser, createPage, api}) => {
   test.setTimeout(150_000);

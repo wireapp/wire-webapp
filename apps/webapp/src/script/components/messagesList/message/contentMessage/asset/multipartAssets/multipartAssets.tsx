@@ -24,11 +24,6 @@ import {container} from 'tsyringe';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isPreviewableImage} from 'Util/imageUtil';
-import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
-
 import {MediaFilePreviewCard} from './common/mediaFilePreviewCard/mediaFilePreviewCard';
 import {FileAssetCard} from './fileAssetCard/fileAssetCard';
 import {ImageAssetCard} from './imageAssetCard/imageAssetCard';
@@ -43,6 +38,10 @@ import {useGetMultipartAsset} from './useGetMultipartAsset/useGetMultipartAsset'
 import {VideoAssetCard} from './videoAssetCard/videoAssetCard';
 
 import {useInView} from '../../../../../../hooks/useInView/useInView';
+import {useApplicationContext} from '../../../../../../page/rootProvider';
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
+import {isPreviewableImage} from '../../../../../../util/imageUtil';
+import {formatBytes, getFileExtension, trimFileExtension} from '../../../../../../util/util';
 
 interface MultipartAssetsProps {
   assets: ICellAsset[];

@@ -19,9 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {wrapper} from './userBlockedBadge.styles';
+
+import {useApplicationContext} from '../../../../page/rootProvider';
 
 export const UserBlockedBadge: FunctionComponent = () => {
   const {translate} = useApplicationContext();

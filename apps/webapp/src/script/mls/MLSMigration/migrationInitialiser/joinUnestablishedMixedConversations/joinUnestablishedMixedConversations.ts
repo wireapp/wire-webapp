@@ -19,13 +19,11 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Account} from '@wireapp/core';
-
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isMixedConversation, MixedConversation} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {initMLSGroupConversation} from 'src/script/mls/MLSConversations';
-
+import {Account} from '../../../../core';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {isMixedConversation, MixedConversation} from '../../../../repositories/conversation/ConversationSelectors';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {initMLSGroupConversation} from '../../../MLSConversations';
 import {mlsMigrationLogger} from '../../MLSMigrationLogger';
 
 interface JoinUnestablishedMixedConversationsParams {

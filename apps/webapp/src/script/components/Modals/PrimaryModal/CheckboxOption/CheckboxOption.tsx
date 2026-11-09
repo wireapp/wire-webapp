@@ -21,19 +21,23 @@ import type {ChangeEvent, FunctionComponent} from 'react';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
+import {warningOptionStyles} from './CheckboxOption.styles';
+
 interface CheckboxOptionProps {
   isChecked: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   label: string;
+  variant?: 'default' | 'warning';
 }
 
 export const CheckboxOption: FunctionComponent<CheckboxOptionProps> = ({
   label,
   isChecked,
   onChange,
+  variant = 'default',
 }: CheckboxOptionProps) => {
   return (
-    <div className="modal-option">
+    <div className="modal-option" css={[variant === 'warning' && warningOptionStyles]}>
       <Checkbox checked={isChecked} data-uie-name="modal-option-checkbox" id="clear-data-checkbox" onChange={onChange}>
         <CheckboxLabel className="label-xs" htmlFor="clear-data-checkbox">
           {label}

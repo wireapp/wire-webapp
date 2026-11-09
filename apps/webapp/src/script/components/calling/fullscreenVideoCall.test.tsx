@@ -22,25 +22,31 @@ import {act, render, waitFor} from '@testing-library/react';
 import {QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
 import {noop} from 'noop-esm';
 
-import {Call} from 'Repositories/calling/Call';
-import {Participant} from 'Repositories/calling/Participant';
-import {Grid} from 'Repositories/calling/videoGridHandler';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SelfService} from 'Repositories/self/SelfService';
-import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {Call} from '../../repositories/calling/Call';
+import {Participant} from '../../repositories/calling/Participant';
+import {Grid} from '../../repositories/calling/videoGridHandler';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
+import {PropertiesService} from '../../repositories/properties/propertiesService';
+import {SelfService} from '../../repositories/self/SelfService';
+import {
+  buildCallingRepository,
+  buildMediaDevicesHandler,
+  withTheme,
+  withThemeAndRootContext,
+} from '../../auth/util/test/testUtil';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translate} from 'Util/localizerUtil';
+} from '../../page/testSupport/rootContextTestSupport';
+import {translate} from '../../util/localizerUtil';
+import {callSecurityLineFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {KEY} from 'Util/keyboardUtil';
+import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
+import {KEY} from '../../util/keyboardUtil';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;
@@ -89,15 +95,32 @@ describe('fullscreenVideoCall', () => {
   });
 
   afterEach(() => {
-    return jest.useRealTimers();
+    jest.restoreAllMocks();
+    jest.useRealTimers();
+  });
+
+  it('shows the security line in the timer when the feature is enabled', () => {
+    const wrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: featureName => {
+          return featureName === callSecurityLineFeatureToggleName;
+        },
+      }),
+    );
+
+    const {getByTestId} = render(withThemeAndRootContext(<FullscreenVideoCall {...createProps()} />, wrapper));
+
+    expect(getByTestId('video-timer').contains(getByTestId('call-security-line'))).toBe(true);
   });
 
   it('shows the calling timer', async () => {
     const props = createProps();
 
-    const {getByText} = render(withTheme(withTheme(<FullscreenVideoCall {...props} />)), {
+    const {getByText, queryByTestId} = render(withTheme(withTheme(<FullscreenVideoCall {...props} />)), {
       wrapper: rootProviderWrapper,
     });
+    expect(queryByTestId('call-security-line')).toBeNull();
     const now = Date.now();
 
     jest.setSystemTime(now);

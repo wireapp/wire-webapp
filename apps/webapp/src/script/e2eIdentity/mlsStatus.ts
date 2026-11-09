@@ -17,7 +17,7 @@
  *
  */
 
-import {DeviceStatus} from '@wireapp/core/lib/messagingProtocols/mls';
+import {DeviceStatus} from '../core/messagingProtocols/mls';
 
 export enum MLSStatuses {
   VALID = 'valid',

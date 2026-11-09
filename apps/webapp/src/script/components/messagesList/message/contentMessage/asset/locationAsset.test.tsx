@@ -19,15 +19,15 @@
 
 import {render} from '@testing-library/react';
 
-import type {Location} from 'Repositories/entity/message/location';
+import type {Location} from '../../../../../repositories/entity/message/location';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../page/testSupport/rootContextTestSupport';
 
 import {LocationAsset} from './locationAsset';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 describe('LocationAsset', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(

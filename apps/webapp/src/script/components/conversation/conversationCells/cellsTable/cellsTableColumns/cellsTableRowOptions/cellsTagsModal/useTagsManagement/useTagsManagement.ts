@@ -21,11 +21,10 @@ import {useEffect, useMemo, useState} from 'react';
 
 import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {transformTagToSelectOption} from './transformTagToSelectOption/transformTagToSelectOption';
 
+import {useApplicationContext} from '../../../../../../../../page/rootProvider';
+import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
 import {useAllCellsTagsStore} from '../../../../../common/useAllCellsTagsStore/useAllCellsTagsStore';
 
 interface UseTagsManagementProps {

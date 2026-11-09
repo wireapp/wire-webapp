@@ -21,10 +21,10 @@ import React, {type FunctionComponent} from 'react';
 
 import {Select} from '@wireapp/react-ui-kit';
 
-import {selectGroupStyles} from 'Components/calling/VideoControls/VideoControlsSelect/VideoControlsSelect.styles';
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {selectGroupStyles} from './VideoControlsSelect.styles';
 
+import {useApplicationContext} from '../../../../page/rootProvider';
+import * as Icon from '../../../icon';
 import {
   videoOptionInlineMenuStyles,
   videoOptionLabelIconStyles,

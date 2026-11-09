@@ -20,14 +20,8 @@
 import {Locator} from '@playwright/test';
 import {Buffer} from 'node:buffer';
 
-import {
-  AudioFileName,
-  getAudioFilePath,
-  getTextFilePath,
-  readLocalFile,
-  TextFileName,
-} from 'test/e2e_tests/utils/asset.util';
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {AudioFileName, getAudioFilePath, getTextFilePath, readLocalFile, TextFileName} from '../../utils/asset.util';
+import {PageManager} from '../../pageManager';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup, sendConnectionRequest} from '../../utils/userActions';
@@ -99,10 +93,19 @@ test.describe('Drive file uploads', () => {
       const sharedDrive = pages.cellsSharedDrive();
       const renamedTextFileName = 'example-1.txt';
 
-      await test.step('User uploads the same file twice', async () => {
+      await test.step('The first upload is available before uploading its duplicate', async () => {
         await sharedDrive.uploadFile(getTextFilePath());
         await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+        await expect(async () => {
+          await sharedDrive.refresh();
+          await expect(sharedDrive.getFile(TextFileName)).toBeVisible({timeout: 2_000});
+        }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
 
+        await sharedDrive.uploadStatusHeader.getByRole('button', {name: 'Close upload status'}).click();
+        await expect(sharedDrive.uploadStatusHeader).not.toBeVisible();
+      });
+
+      await test.step('User uploads the same file again and waits for its own completion', async () => {
         await sharedDrive.uploadFile(getTextFilePath());
         await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
       });

@@ -17,12 +17,12 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
+import {User} from '../../data/user';
 
 import {Services} from '../../data/serviceInfo';
 import {PageManager} from '../../pageManager';
 import {test, expect, withLogin} from '../../test.fixtures';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {createGroup} from '../../utils/userActions';
 
 // Generating test data
 const conversationName = 'Crits';

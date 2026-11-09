@@ -19,6 +19,7 @@
 
 import {isUndefined} from '@sindresorhus/is';
 import {Page} from '@playwright/test';
+import {Maybe} from 'true-myth';
 
 import {MarketingConsentModal} from './webapp/modals/marketingConsent.modal';
 import {SetUsernamePage} from './webapp/pages/setUsername.page';
@@ -124,9 +125,9 @@ export class PageManager {
   };
 
   private createNavigationUrl(path: string, options: WebAppNavigationOptions): string {
-    const {baseUrl = webAppPath, startupFeatureToggles = {}} = options;
+    const {baseUrl = webAppPath, startupFeatureToggles} = options;
     const navigationUrl = new URL(path, baseUrl);
-    return applyStartupFeatureToggleOverridesToUrl(navigationUrl, startupFeatureToggles).toString();
+    return applyStartupFeatureToggleOverridesToUrl(navigationUrl, Maybe.of(startupFeatureToggles)).toString();
   }
 
   openMainPage = (options: WebAppNavigationOptions = {}): Promise<Response | null> => {

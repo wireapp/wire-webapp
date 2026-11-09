@@ -17,11 +17,11 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
-import type {TeamState} from 'Repositories/team/TeamState';
-import type {UserState} from 'Repositories/user/userState';
-import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {User} from '../../repositories/entity/User';
+import type {TeamState} from '../../repositories/team/TeamState';
+import type {UserState} from '../../repositories/user/userState';
+import {generateQualifiedIds} from '../../auth/util/test/testUtil';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {getScheduleMeetingParticipantPool} from './getScheduleMeetingParticipantPool';
 

@@ -23,16 +23,16 @@ import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {RestrictedFile} from 'Components/messagesList/message/contentMessage/asset/fileAsset/restrictedFile/restrictedFile';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
+import {RestrictedFile} from './restrictedFile/restrictedFile';
 
+import {useApplicationContext} from '../../../../../../page/rootProvider';
+import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
+import type {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
+import type {FileAsset as FileAssetType} from '../../../../../../repositories/entity/message/fileAsset';
+import {TeamState} from '../../../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';
+import {formatBytes, getFileExtension, trimFileExtension} from '../../../../../../util/util';
 import {useMessageFocusedTabIndex} from '../../../util';
 import {AssetHeader} from '../common/assetHeader/assetHeader';
 import {AssetLoader} from '../common/assetLoader/assetLoader';

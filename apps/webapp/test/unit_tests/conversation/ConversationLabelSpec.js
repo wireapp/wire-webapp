@@ -17,10 +17,10 @@
  *
  */
 
-import {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {ConversationLabelRepository} from '../../../src/script/repositories/conversation/ConversationLabelRepository';
+import {Conversation} from '../../../src/script/repositories/entity/Conversation';
+import {translate} from '../../../src/script/util/localizerUtil';
+import {createUuid} from '../../../src/script/util/uuid';
 
 describe('ConversationLabelRepository', () => {
   const createConversation = isGroup => {

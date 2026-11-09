@@ -19,18 +19,18 @@
 
 import {isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {ConversationService} from '@wireapp/core/lib/conversation';
-import {DeviceIdentity, type E2EIServiceExternal} from '@wireapp/core/lib/messagingProtocols/mls';
-import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
 
 import type {E2eiConversationState} from '@wireapp/core-crypto';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Core} from 'src/script/service/coreSingleton';
-import {base64ToArray} from 'Util/util';
-
 import {mapMLSStatus, MLSStatuses} from './mlsStatus';
+
+import type {ConversationService} from '../core/conversation';
+import {DeviceIdentity, type E2EIServiceExternal} from '../core/messagingProtocols/mls';
+import {StringifiedQualifiedId, stringifyQualifiedId} from '../core/util/qualifiedIdUtil';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import {Core} from '../service/coreSingleton';
+import {base64ToArray} from '../util/util';
 
 export {MLSStatuses};
 

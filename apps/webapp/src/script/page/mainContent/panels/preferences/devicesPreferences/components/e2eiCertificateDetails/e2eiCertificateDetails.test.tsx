@@ -19,25 +19,26 @@
 
 import {render, waitFor} from '@testing-library/react';
 import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conversation';
-import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
+import {CredentialType} from '../../../../../../../core/messagingProtocols/mls';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/e2eIdentity';
+import {User} from '../../../../../../../repositories/entity/User';
+import {UserState} from '../../../../../../../repositories/user/userState';
+import {withTheme} from '../../../../../../../auth/util/test/testUtil';
+import {E2EIHandler, MLSStatuses, WireIdentity} from '../../../../../../../e2eIdentity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {Core} from 'src/script/service/coreSingleton';
-import {generateAPIConversation} from 'test/helper/ConversationGenerator';
+} from '../../../../../../testSupport/rootContextTestSupport';
+import {Core} from '../../../../../../../service/coreSingleton';
+import {createCoreTestFixture} from '../../../../../../../util/test/createCoreTestFixture';
+import {generateAPIConversation} from '../../../../../../../../../test/helper/ConversationGenerator';
 
 import {E2EICertificateDetails} from './e2eiCertificateDetails';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
 
 const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => {
   return {
@@ -64,13 +65,25 @@ const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X
   };
 };
 
-const core = container.resolve(Core);
-
 describe('E2EICertificateDetails', () => {
   const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    const core = createCoreTestFixture({
+      backendFeatures: {domain: 'domain'},
+      service: {
+        conversation: {getMLSSelfConversation: jest.fn()},
+        e2eIdentity: {
+          initialize: jest.fn(),
+          isEnrollmentInProgress: jest.fn(),
+          isFreshMLSSelfClient: jest.fn(),
+          getAllGroupUsersIdentities: jest.fn().mockResolvedValue(new Map()),
+        },
+      },
+    });
+    container.registerInstance(Core, core);
+    E2EIHandler.resetInstance();
     jest.spyOn(requireValueForTest(core.service?.conversation), 'getMLSSelfConversation').mockResolvedValue(
       generateAPIConversation({
         id: {id: 'id', domain: 'domain'},
@@ -88,6 +101,11 @@ describe('E2EICertificateDetails', () => {
       gracePeriodInSeconds: 100,
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
     });
+  });
+
+  afterEach(() => {
+    E2EIHandler.resetInstance();
+    container.clearInstances();
   });
 
   describe('idicates the state of the e2ei identity', () => {

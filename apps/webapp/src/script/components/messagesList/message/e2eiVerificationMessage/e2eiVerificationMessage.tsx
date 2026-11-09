@@ -24,22 +24,21 @@ import {Maybe} from 'true-myth';
 
 import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {ReactTranslationValueReplacement} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {TranslationKey, Translate} from 'Util/localizerUtil/translationTypes';
-import {getLogger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import {MessageIcon, IconInfo, Link as LinkStyles} from './e2eiVerificationMessage.styles';
 
 import {Config} from '../../../../Config';
 import {E2EIHandler} from '../../../../e2eIdentity';
 import {E2EIVerificationMessageType} from '../../../../message/e2eiVerificationMessageType';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from '../../../../repositories/entity/message/e2eiVerificationMessage';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../../util/localizerUtil/reactLocalizerUtil';
+import type {ReactTranslationValueReplacement} from '../../../../util/localizerUtil/reactLocalizerUtil';
+import type {TranslationKey, Translate} from '../../../../util/localizerUtil/translationTypes';
+import {getLogger} from '../../../../util/logger';
+import {matchQualifiedIds} from '../../../../util/qualifiedId';
+import * as Icon from '../../../icon';
 
 const logger = getLogger('E2EIVerificationMessage');
 

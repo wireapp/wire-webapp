@@ -34,19 +34,22 @@ import {
   WireLogoIcon,
 } from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {getScanResults, scanTransports} from 'Repositories/troubleshooter/scanResults';
-import type {TroubleshooterRepository, DiagnosticResult} from 'Repositories/troubleshooter/troubleshooterRepository';
-import type {CheckStatus} from 'Repositories/troubleshooter/troubleshooterService';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {copyText} from 'Util/clipboardUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import {downloadBlob} from 'Util/util';
-
 import {PreferencesPage} from './components/preferencesPage';
 import {DiagnosticStatusIcon as StatusIcon} from './troubleshooting/diagnosticStatusIcon';
 import * as styles from './troubleshooting/troubleshooting.styles';
+
+import * as Icon from '../../../../components/icon';
+import {Config} from '../../../../Config';
+import {getScanResults, scanTransports} from '../../../../repositories/troubleshooter/scanResults';
+import type {
+  TroubleshooterRepository,
+  DiagnosticResult,
+} from '../../../../repositories/troubleshooter/troubleshooterRepository';
+import type {CheckStatus} from '../../../../repositories/troubleshooter/troubleshooterService';
+import {copyText} from '../../../../util/clipboardUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../../util/localizerUtil/reactLocalizerUtil';
+import {downloadBlob} from '../../../../util/util';
+import {useApplicationContext} from '../../../rootProvider';
 
 const MILLISECONDS_PER_SECOND = 1_000;
 const TURN_TLS_PORT = 5349;
@@ -180,11 +183,12 @@ export const TroubleshootingPreferences = ({repository}: {repository: Troublesho
       seconds: Math.round(result.durationMilliseconds / MILLISECONDS_PER_SECOND),
     });
   };
-  const qualityChecks = state.connection
-    .map(result => {
-      return result.data.qualityChecks ?? [];
-    })
-    .unwrapOr([]);
+  const qualityChecks =
+    state.connection
+      .andThen(result => {
+        return Maybe.of(result.data.qualityChecks);
+      })
+      .unwrapOr(undefined) ?? [];
   const measuredQuality = state.connection
     .andThen(result => {
       return Maybe.of('report' in result.data ? result.data.report.network : undefined);

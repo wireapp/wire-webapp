@@ -66,8 +66,6 @@ import type {BackendError} from '@wireapp/api-client/lib/http/';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {AddUsersFailure, BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
-import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {asyncNoop, noop} from 'noop-esm';
@@ -75,49 +73,7 @@ import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
 
-import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
-
-import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {ConnectionState} from 'Repositories/connection/connectionState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {DeleteConversationMessage} from 'Repositories/entity/message/deleteConversationMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from 'Repositories/event/Client';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
-import {EventSource} from 'Repositories/event/EventSource';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import type {EventRecord, WithSender} from 'Repositories/storage';
-import {ConversationRecord} from 'Repositories/storage';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserFilter} from 'Repositories/user/userFilter';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {getNextItem} from 'Util/arrayUtil';
-import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
-import {compareTransliteration, sortByPriority, sortUsersByPriority, startsWith} from 'Util/stringUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {toError} from 'Util/toError';
-import {isBackendError, isErrorWithType} from 'Util/typePredicateUtil';
-import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
@@ -171,7 +127,12 @@ import {isSelfInitiatedConversationLeave} from './isSelfInitiatedConversationLea
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
+import {TYPING_TIMEOUT, useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
+import {Account} from '../../core';
+import {AddUsersFailure, BaseCreateConversationResponse} from '../../core/conversation';
+import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols/mls';
 import {BASE_ERROR_TYPE, BaseError} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 import {isMemberMessage} from '../../guards/Message';
@@ -182,11 +143,45 @@ import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {getNextItem} from '../../util/arrayUtil';
+import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from '../../util/fileTypeUtil';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {removeClientFromUserClientMap} from '../../util/removeClientFromUserClientMap';
+import {compareTransliteration, sortByPriority, sortUsersByPriority, startsWith} from '../../util/stringUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {toError} from '../../util/toError';
+import {isBackendError, isErrorWithType} from '../../util/typePredicateUtil';
+import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
-
-export type ConversationRepositoryOptions = {
-  readonly isMarkAsUnreadFeatureEnabled: boolean;
-};
+import {AssetTransferState} from '../assets/assetTransferState';
+import {CallingRepository} from '../calling/CallingRepository';
+import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {ConnectionEntity} from '../connection/connectionEntity';
+import {ConnectionRepository} from '../connection/connectionRepository';
+import {ConnectionState} from '../connection/connectionState';
+import {Conversation} from '../entity/Conversation';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {DeleteConversationMessage} from '../entity/message/deleteConversationMessage';
+import {FileAsset} from '../entity/message/fileAsset';
+import {MemberMessage} from '../entity/message/memberMessage';
+import {Message} from '../entity/message/message';
+import {User} from '../entity/User';
+import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from '../event/Client';
+import {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
+import {EventSource} from '../event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {PropertiesRepository} from '../properties/propertiesRepository';
+import {SelfRepository} from '../self/SelfRepository';
+import {ConversationRecord} from '../storage';
+import type {EventRecord, WithSender} from '../storage';
+import {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
+import {UserFilter} from '../user/userFilter';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 
 function withoutManualUnreadTimestamp<ConversationData extends ConversationRecord>(
   conversationData: ConversationData,
@@ -299,7 +294,6 @@ export class ConversationRepository {
     private readonly callingRepository: CallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly translate: Translate,
-    private readonly options: ConversationRepositoryOptions,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -1013,18 +1007,7 @@ export class ConversationRepository {
     connections: ConnectionEntity[],
     deadConnections: ConnectionEntity[] = [],
   ): Promise<Conversation[]> {
-    let localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
-
-    if (!this.options.isMarkAsUnreadFeatureEnabled) {
-      const hasManualUnreadMarkers = localConversations.some(conversationData => {
-        return !isUndefined(conversationData.manual_unread_timestamp);
-      });
-
-      if (hasManualUnreadMarkers) {
-        localConversations = localConversations.map(withoutManualUnreadTimestamp);
-        await this.conversationService.saveConversationsInDb(localConversations);
-      }
-    }
+    const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
 
     let conversationsData: any[];
 
@@ -1527,7 +1510,8 @@ export class ConversationRepository {
   }
 
   /**
-   * Get all the group conversations owned by self user's team from the local state.
+   * Get all group conversations from the self user's team in the local state.
+   * Conversations are excluded when the self user has no non-empty team ID.
    */
   public readonly getAllTeamGroupConversations = (): Conversation[] => {
     const selfUser = this.userState.self();
@@ -1544,7 +1528,7 @@ export class ConversationRepository {
   };
 
   /**
-   * Get all the group conversations owned by self user's team from the local state.
+   * Get all group conversations from the local state, regardless of team ownership.
    */
   public readonly getAllGroupConversations = (): Conversation[] => {
     return this.conversationState.conversations().filter(conversation => {
@@ -2728,10 +2712,7 @@ export class ConversationRepository {
     initialTimestamp = this.getLatestEventTimestamp(true),
   ): Conversation[] {
     const conversationData = payload as ConversationDatabaseData[];
-    const conversationsForMapping = this.options.isMarkAsUnreadFeatureEnabled
-      ? conversationData
-      : conversationData.map(withoutManualUnreadTimestamp);
-    const entities = ConversationMapper.mapConversations(conversationsForMapping, initialTimestamp, this.translate);
+    const entities = ConversationMapper.mapConversations(conversationData, initialTimestamp, this.translate);
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.userState.self());

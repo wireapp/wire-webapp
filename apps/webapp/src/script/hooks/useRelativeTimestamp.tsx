@@ -32,7 +32,7 @@ import {
   formatDayMonth,
   isThisYear,
   isYoungerThanMinute,
-} from 'Util/timeUtil';
+} from '../util/timeUtil';
 
 export interface RelativeTimestampLabels {
   justNow: string;

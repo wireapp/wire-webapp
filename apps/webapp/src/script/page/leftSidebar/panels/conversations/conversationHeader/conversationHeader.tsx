@@ -24,17 +24,6 @@ import {amplify} from 'amplify';
 
 import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {useCreateConversationModal} from 'Components/Modals/CreateConversation/hooks/useCreateConversationModal';
-import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
-import {User} from 'Repositories/entity/User';
-import {generatePermissionHelpers} from 'Repositories/user/userPermission';
-import {useConversationSearch} from 'src/script/page/leftSidebar/panels/conversations/hooks/useConversationSearch';
-import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEnterDown, handleEscDown, isTabKey} from 'Util/keyboardUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-
 import {
   button,
   collapsedHeader,
@@ -48,7 +37,17 @@ import {
   searchInputWrapperStyles,
 } from './conversationHeader.styles';
 
+import * as Icon from '../../../../../components/icon';
+import {useCreateConversationModal} from '../../../../../components/Modals/CreateConversation/hooks/useCreateConversationModal';
+import {ConversationLabel} from '../../../../../repositories/conversation/ConversationLabelRepository';
+import {User} from '../../../../../repositories/entity/User';
+import {generatePermissionHelpers} from '../../../../../repositories/user/userPermission';
+import {handleEnterDown, handleEscDown, isTabKey} from '../../../../../util/keyboardUtil';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 import {WebAppEvents} from '../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../rootProvider';
+import {useConversationSearch} from '../hooks/useConversationSearch';
+import {SidebarTabs} from '../useSidebarStore';
 
 export const conversationsPanelHeadingId = 'conversations-heading';
 

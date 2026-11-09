@@ -17,28 +17,20 @@
  *
  */
 
+import {FunctionComponent} from 'react';
+
 import {createClock} from '@enormora/clock/clock';
 import type {Clock} from '@enormora/clock/clock';
 import {isNull} from '@sindresorhus/is';
 // Polyfill "Object.entries" & "Object.values"
 import 'core-js/full/object';
 import 'core-js/full/reflect';
-
-// eslint-disable-next-line import/order
-import {FunctionComponent} from 'react';
-
 import {createRoot} from 'react-dom/client';
 import {Provider} from 'react-redux';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-
-import {initializeDataDog} from 'Util/dataDog';
-import {translate} from 'Util/localizerUtil';
-import type {Translate} from 'Util/localizerUtil';
-import {enableLogging} from 'Util/loggerUtil';
-import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import './configureEnvironment';
 import {configureStore} from './configureStore';
@@ -51,6 +43,11 @@ import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
+import {initializeDataDog} from '../util/dataDog';
+import {translate} from '../util/localizerUtil';
+import type {Translate} from '../util/localizerUtil';
+import {enableLogging} from '../util/loggerUtil';
+import {exposeWrapperGlobals} from '../util/wrapper';
 
 type AuthAppProps = {clock: Clock; translate: Translate};
 
@@ -68,6 +65,11 @@ const mainId = 'main';
 
 const clock = createClock();
 const apiClient = new APIClient({clock});
+function disposeAuthenticationClient(): void {
+  apiClient.dispose();
+}
+
+globalThis.addEventListener('unload', disposeAuthenticationClient);
 container.registerInstance(APIClient, apiClient);
 const core = container.resolve(Core);
 

@@ -22,44 +22,43 @@ import React, {useCallback, useEffect, useMemo, useState, type FunctionComponent
 import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/conversationReceiptModeUpdateData';
 import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
-import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
-import {SearchInput} from 'Components/SearchInput';
-import {TextInput} from 'Components/TextInput';
-import {InfoToggle} from 'Components/toggle/InfoToggle';
-import {UserSearchableList} from 'Components/UserSearchableList';
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {Config} from '../../../Config';
+import {isNonFederatingBackendsError} from '../../../core/errors';
+import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
+import {SidebarTabs, useSidebarStore} from '../../../page/leftSidebar/panels/conversations/useSidebarStore';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {ACCESS_STATE} from '../../../repositories/conversation/AccessState';
 import {
   ACCESS_TYPES,
   teamPermissionsForAccessState,
   toggleFeature,
-} from 'Repositories/conversation/ConversationAccessPermission';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {checkAppsFeatureAvailability} from 'Util/featureUtil';
-import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
-import {sortUsersByPriority} from 'Util/stringUtil';
-
-import {Config} from '../../../Config';
-import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
+} from '../../../repositories/conversation/ConversationAccessPermission';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {User} from '../../../repositories/entity/User';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {UserState} from '../../../repositories/user/userState';
+import {generateConversationUrl} from '../../../router/routeGenerator';
+import {createNavigate, createNavigateKeyboard} from '../../../router/routerBindings';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {checkAppsFeatureAvailability} from '../../../util/featureUtil';
+import {handleEnterDown, handleEscDown, isKeyboardEvent} from '../../../util/keyboardUtil';
+import {sortUsersByPriority} from '../../../util/stringUtil';
 import {WebAppEvents} from '../../../webAppEvents';
+import {FadingScrollbar} from '../../fadingScrollbar';
+import * as Icon from '../../icon';
+import {AppsDisabledNote} from '../../Note/AppsDisabledNote/AppsDisabledNote';
+import {SearchInput} from '../../SearchInput';
+import {TextInput} from '../../TextInput';
+import {InfoToggle} from '../../toggle/InfoToggle';
+import {UserSearchableList} from '../../UserSearchableList';
 import {getSharedDrivePermissionHint} from '../CreateConversation/utils';
+import {ModalComponent} from '../ModalComponent';
 import {PrimaryModal} from '../PrimaryModal';
 
 interface GroupCreationModalProps {

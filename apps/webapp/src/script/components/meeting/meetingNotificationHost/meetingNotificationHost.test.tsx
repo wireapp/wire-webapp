@@ -26,14 +26,14 @@ import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
 } from '../meetingNotificationStore/meetingNotificationStore';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Translate} from '../../../util/localizerUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
-jest.mock('Components/meeting/useJoinMeetingCall', () => {
+jest.mock('../useJoinMeetingCall', () => {
   return {
     useJoinMeetingCall: jest.fn(() => {
       return {

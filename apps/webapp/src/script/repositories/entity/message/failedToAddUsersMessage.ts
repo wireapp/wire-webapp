@@ -17,13 +17,11 @@
  *
  */
 
-import {AddUsersFailure} from '@wireapp/core/lib/conversation';
-
-import type {Translate} from 'Util/localizerUtil';
-
 import {Message} from './message';
 
+import {AddUsersFailure} from '../../../core/conversation';
 import {SuperType} from '../../../message/superType';
+import type {Translate} from '../../../util/localizerUtil';
 
 export class FailedToAddUsersMessage extends Message {
   constructor(

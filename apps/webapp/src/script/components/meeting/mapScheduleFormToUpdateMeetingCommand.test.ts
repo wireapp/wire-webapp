@@ -19,10 +19,10 @@
 
 import {maybe} from 'true-myth';
 
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {unwrap, unwrapErr} from '../../util/test/resultTestSupport';
 
 import {mapScheduleFormToUpdateMeetingCommand} from './mapScheduleFormToUpdateMeetingCommand';
-import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
+import type {ScheduleMeetingFormState} from './scheduleMeetingModal/scheduleMeetingTypes';
 
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
 const futureEndDate = new Date('2026-06-23T17:00:00.000Z');

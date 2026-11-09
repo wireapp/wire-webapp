@@ -7,9 +7,6 @@
     "paths": {
       "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
       "@enormora/clock/clock": ["../../node_modules/@enormora/clock/clock.entry-point.d.ts"],
-      "Components/*": ["./src/script/components/*"],
-      "Repositories/*": ["./src/script/repositories/*"],
-      "Util/*": ["./src/script/util/*"],
     }
   },
   "exclude": [

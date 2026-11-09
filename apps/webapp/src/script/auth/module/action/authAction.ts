@@ -26,17 +26,16 @@ import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api
 import {OAuthBody} from '@wireapp/api-client/lib/oauth/oAuthBody';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import type {TeamData} from '@wireapp/api-client/lib/team/';
-import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import {asyncNoop} from 'noop-esm';
-
-import {toError} from 'Util/toError';
-import {isAxiosError, isBackendError} from 'Util/typePredicateUtil';
 
 import {AuthActionCreator} from './creator/';
 import {LabeledError} from './labeledError';
 import {LocalStorageAction, LocalStorageKey} from './localStorageAction';
 
+import {LowDiskSpaceError} from '../../../core/storage/engine/error';
+import {toError} from '../../../util/toError';
+import {isAxiosError, isBackendError} from '../../../util/typePredicateUtil';
 import {currentLanguage} from '../../localeConfig';
 import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer';

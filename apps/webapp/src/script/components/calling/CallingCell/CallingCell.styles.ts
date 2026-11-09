@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {meetingNotificationHostCollapsedOffset} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost.styles';
+import {meetingNotificationHostCollapsedOffset} from '../../meeting/meetingNotificationHost/meetingNotificationHost.styles';
 
 const callingContainerBottomPadding = 20;
 

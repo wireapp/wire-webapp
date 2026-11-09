@@ -22,7 +22,7 @@ import {MutableRefObject, useLayoutEffect, useRef} from 'react';
 import {Virtualizer} from '@tanstack/react-virtual';
 import {Maybe} from 'true-myth';
 
-import {GroupedMessage, isMarker, Marker} from 'Components/messagesList/utils/virtualizedMessagesGroup';
+import {GroupedMessage, isMarker, Marker} from './virtualizedMessagesGroup';
 
 type ScrollAlign = 'start' | 'center' | 'end';
 

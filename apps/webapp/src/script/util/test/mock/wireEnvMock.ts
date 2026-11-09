@@ -19,7 +19,7 @@
 
 import type {ClientConfig} from '@wireapp/config';
 
-import {WireModule} from 'src/types/Wire.types';
+import {WireModule} from '../../../../types/Wire.types';
 
 const wire: WireModule = {
   app: {} as any,

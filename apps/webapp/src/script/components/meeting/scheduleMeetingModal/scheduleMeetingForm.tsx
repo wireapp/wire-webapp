@@ -37,9 +37,25 @@ import {
   TimePickerField,
 } from '@wireapp/react-ui-kit';
 
-import {MeetingParticipantsPicker} from 'Components/meeting/meetingParticipantsPicker';
-import {MeetingLinkForm} from 'Components/meeting/shared/meetingLinkForm/meetingLinkForm';
-import {useMeetingParticipants} from 'Components/meeting/shared/participants/useMeetingParticipants';
+import {
+  SCHEDULE_MEETING_RECURRENCE_OPTIONS,
+  SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS,
+} from './scheduleMeetingRecurrence';
+import {
+  type ScheduleMeetingFormDisplayErrors,
+  type ScheduleMeetingFormState,
+  type ScheduleMeetingMode,
+  scheduleMeetingModes,
+  type ScheduleMeetingRecurrenceOption,
+} from './scheduleMeetingTypes';
+
+import {currentLanguage} from '../../../auth/localeConfig';
+import {useApplicationContext} from '../../../page/rootProvider';
+import type {User} from '../../../repositories/entity/User';
+import {getRegionalDateLocale} from '../../../util/timeUtil';
+import {MeetingParticipantsPicker} from '../meetingParticipantsPicker';
+import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';
+import {useMeetingParticipants} from '../shared/participants/useMeetingParticipants';
 import {
   scheduleMeetingFormBottomWrapperCss,
   scheduleMeetingFormColumnCss,
@@ -53,23 +69,7 @@ import {
   scheduleMeetingTitleClearButtonStyles,
   scheduleMeetingTitleInputStyles,
   scheduleMeetingTitleInputWrapperStyles,
-} from 'Components/meeting/shared/styles/meetingForm.styles';
-import type {User} from 'Repositories/entity/User';
-import {currentLanguage} from 'src/script/auth/localeConfig';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getRegionalDateLocale} from 'src/script/util/timeUtil';
-
-import {
-  SCHEDULE_MEETING_RECURRENCE_OPTIONS,
-  SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS,
-} from './scheduleMeetingRecurrence';
-import {
-  type ScheduleMeetingFormDisplayErrors,
-  type ScheduleMeetingFormState,
-  type ScheduleMeetingMode,
-  scheduleMeetingModes,
-  type ScheduleMeetingRecurrenceOption,
-} from './scheduleMeetingTypes';
+} from '../shared/styles/meetingForm.styles';
 
 const millisecondsPerSecond = 1000;
 const secondsPerMinute = 60;

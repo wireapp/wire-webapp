@@ -21,25 +21,25 @@ import {FC, useCallback, useRef, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {ReactionType} from '@wireapp/core/lib/conversation';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {DownloadButton} from 'Components/messagesList/message/contentMessage/messageActions/downloadButton';
-import {useMessageActionsState} from 'Components/messagesList/message/contentMessage/messageActions/messageActions.state';
+import {ReactionType} from '../../../core/conversation';
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {isTabKey} from '../../../util/keyboardUtil';
+import type {Translate} from '../../../util/localizerUtil';
+import {DownloadButton} from '../../messagesList/message/contentMessage/messageActions/downloadButton';
+import {useMessageActionsState} from '../../messagesList/message/contentMessage/messageActions/messageActions.state';
 import {
   getActionsMenuCSS,
   getIconCSS,
   messageActionsMenuButton,
-} from 'Components/messagesList/message/contentMessage/messageActions/messageActions.styles';
-import {MessageReactions} from 'Components/messagesList/message/contentMessage/messageActions/messageReactions/messageReactions';
-import {ReplyButton} from 'Components/messagesList/message/contentMessage/messageActions/replyButton';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isTabKey} from 'Util/keyboardUtil';
-import type {Translate} from 'Util/localizerUtil';
+} from '../../messagesList/message/contentMessage/messageActions/messageActions.styles';
+import {MessageReactions} from '../../messagesList/message/contentMessage/messageActions/messageReactions/messageReactions';
+import {ReplyButton} from '../../messagesList/message/contentMessage/messageActions/replyButton';
 
 interface DetailViewModalFooterProps {
   messageEntity: ContentMessage;

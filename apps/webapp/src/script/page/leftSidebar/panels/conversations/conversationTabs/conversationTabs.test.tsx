@@ -22,20 +22,20 @@ import userEvent from '@testing-library/user-event';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {Config} from 'src/script/Config';
-import {Core} from 'src/script/service/coreSingleton';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {ConversationLabelRepository} from '../../../../../repositories/conversation/ConversationLabelRepository';
+import {User} from '../../../../../repositories/entity/User';
+import {TeamState} from '../../../../../repositories/team/TeamState';
+import {Config} from '../../../../../Config';
+import {Core} from '../../../../../service/coreSingleton';
+import {withThemeAndRootContext} from '../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import * as DataDog from 'Util/dataDog';
-import * as Environment from 'Util/environment';
-import {setStrings, translate} from 'Util/localizerUtil';
+} from '../../../../testSupport/rootContextTestSupport';
+import * as DataDog from '../../../../../util/dataDog';
+import * as Environment from '../../../../../util/environment';
+import {setStrings, translate} from '../../../../../util/localizerUtil';
 
 import en from '../../../../../../i18n/en-US.json';
 

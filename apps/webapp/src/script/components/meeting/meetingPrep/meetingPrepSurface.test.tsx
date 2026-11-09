@@ -21,13 +21,13 @@ import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {task} from 'true-myth';
 
-import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {User} from 'Repositories/entity/User';
+import {mediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
+import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import type {Translate} from 'Util/localizerUtil';
+} from '../../../page/testSupport/rootContextTestSupport';
+import type {Translate} from '../../../util/localizerUtil';
 
 import {MeetingPrepSurface} from './meetingPrepSurface';
 import {

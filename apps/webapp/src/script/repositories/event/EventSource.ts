@@ -17,7 +17,7 @@
  *
  */
 
-import {NotificationSource} from '@wireapp/core/lib/notification';
+import {NotificationSource} from '../../core/notification';
 
 enum WebAppEventSource {
   BACKEND_RESPONSE = 'backend_response',

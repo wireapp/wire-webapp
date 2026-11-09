@@ -66,13 +66,7 @@ type-check: build-libraries
     tsc --project ./libraries/api-client/tsconfig.type-check.json
     tsc --project ./libraries/commons/tsconfig.type-check.json
     tsc --project ./libraries/config/tsconfig.type-check.json
-    tsc --project ./libraries/core/tsconfig.type-check.json
     tsc --project ./libraries/react-ui-kit/tsconfig.type-check.json
-    tsc --project ./libraries/store-engine/tsconfig.type-check.json
-    tsc --project ./libraries/store-engine-dexie/tsconfig.type-check.json
-    tsc --project ./libraries/telemetry/tsconfig.type-check-esm.json
-    tsc --project ./libraries/telemetry/tsconfig.type-check-commonjs.json
-    tsc --project ./libraries/telemetry/tsconfig.type-check.json
 
 # Build workspace libraries required by dependent tasks such as type-checking and tests.
 [group('build')]
@@ -80,12 +74,7 @@ build-libraries:
     cd libraries/commons && tsc
     cd libraries/config && tsc
     cd libraries/react-ui-kit && tsc
-    cd libraries/store-engine && tsc
-    cd libraries/store-engine-dexie && tsc
-    cd libraries/telemetry && node bin/copyAssets.mts
-    cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json
     cd libraries/api-client && tsc
-    cd libraries/core && tsc
 
 # Compile the production server and copy its runtime assets.
 [group('build')]
@@ -97,7 +86,7 @@ build-server: build-libraries
 [group('build')]
 build-webapp-internal: build-libraries
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal rspack build --config rspack.config.mts
+    cd apps/webapp && PATH="node_modules/.bin:$PATH" WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal rspack build --config rspack.config.mts
 
 # Build and assemble the internal server deployment artifact as a ZIP.
 [group('build')]
@@ -116,13 +105,13 @@ package-server-public: build-server build-webapp-public
 [group('build')]
 build-webapp-development: build-libraries
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development rspack build --config rspack.config.dev.mts
+    cd apps/webapp && PATH="node_modules/.bin:$PATH" WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development rspack build --config rspack.config.dev.mts
 
 # Build the public production webapp with Rspack.
 [group('build')]
 build-webapp-public: build-libraries
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public rspack build --config rspack.config.public.mts
+    cd apps/webapp && PATH="node_modules/.bin:$PATH" WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public rspack build --config rspack.config.public.mts
 
 # Prepare compiled server output for local development after building its workspace dependencies.
 [group('development')]
@@ -141,12 +130,8 @@ develop: prepare-development-server
         "just run-development-server" \
         "just watch-library commons" \
         "just watch-library config" \
-        "just watch-library core" \
         "just watch-library api-client" \
-        "just watch-library react-ui-kit" \
-        "just watch-library store-engine" \
-        "just watch-library store-engine-dexie" \
-        "just watch-library-telemetry"
+        "just watch-library react-ui-kit"
 
 # Alternative to develop: build dependencies, select libraries, and start the server.
 [group('development')]
@@ -171,16 +156,10 @@ run-development-server:
 [group('development')]
 watch-library library:
     case {{ quote(library) }} in \
-        api-client|commons|config|core|react-ui-kit|store-engine|store-engine-dexie) ;; \
+        api-client|commons|config|react-ui-kit) ;; \
         *) echo "Unknown library: {{ quote(library) }}" >&2; exit 2 ;; \
     esac
     tsc --project {{ quote("libraries/" + library + "/tsconfig.json") }} --watch --preserveWatchOutput
-
-# Copy telemetry assets and watch both TypeScript module formats.
-[group('development')]
-watch-library-telemetry:
-    cd libraries/telemetry && node bin/copyAssets.mts
-    cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json --watch --preserveWatchOutput
 
 # Configure the webapp, generate its React icon components, and validate their types.
 [group('setup')]
@@ -212,7 +191,7 @@ e2e-ui *playwrightArguments: build-libraries
 # Run each Jest project separately to preserve its coverage thresholds.
 [group('testing')]
 test-ci: build-libraries
-    for jest_config_path in apps/*/jest.config.* libraries/*/jest.config.js; do \
+    for jest_config_path in apps/*/jest.config.* apps/webapp/test/core/jest.config.js libraries/*/jest.config.js; do \
         CI=true jest --config "${jest_config_path}" --ci --coverage --maxWorkers=2 || exit $?; \
     done
     CI=true jest --config tools/jest.config.js --ci --maxWorkers=2

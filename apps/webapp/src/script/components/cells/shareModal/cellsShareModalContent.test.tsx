@@ -23,11 +23,11 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {CellsShareModalContent} from './cellsShareModalContent';
 import type {JSX} from '@emotion/react/jsx-runtime';
@@ -40,7 +40,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 // Mock child components that have complex dependencies
-jest.mock('Components/cells/shareModal/cellsShareExpirationFields', () => {
+jest.mock('./cellsShareExpirationFields', () => {
   return {
     CellsShareExpirationFields: () => {
       return <div data-uie-name="expiration-fields">Expiration Fields Mock</div>;
@@ -48,7 +48,7 @@ jest.mock('Components/cells/shareModal/cellsShareExpirationFields', () => {
   };
 });
 
-jest.mock('Components/conversation/conversationCells/common/cellsTableLoader/cellsTableLoader', () => {
+jest.mock('../../conversation/conversationCells/common/cellsTableLoader/cellsTableLoader', () => {
   return {
     CellsTableLoader: () => {
       return <div data-uie-name="cells-table-loader">Loading...</div>;
@@ -56,7 +56,7 @@ jest.mock('Components/conversation/conversationCells/common/cellsTableLoader/cel
   };
 });
 
-jest.mock('Components/PasswordGeneratorButton', () => {
+jest.mock('../../PasswordGeneratorButton', () => {
   return {
     PasswordGeneratorButton: ({onGeneratePassword}: {onGeneratePassword: (password: string) => void}) => {
       return (

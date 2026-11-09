@@ -21,12 +21,12 @@ import {render} from '@testing-library/react';
 
 import {Runtime} from '@wireapp/commons';
 
-import {troubleshooterFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {translateForTest} from 'Util/test/translateForTest';
+import {troubleshooterFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../testSupport/rootContextTestSupport';
 
 import {Preferences} from './preferences';
 

@@ -19,15 +19,15 @@
 
 import {render} from '@testing-library/react';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {LinkPreview} from 'Repositories/entity/message/linkPreview';
-import {Text} from 'Repositories/entity/message/text';
-import {StatusType} from 'src/script/message/statusType';
+import {ContentMessage} from '../../../../../repositories/entity/message/contentMessage';
+import {LinkPreview} from '../../../../../repositories/entity/message/linkPreview';
+import {Text} from '../../../../../repositories/entity/message/text';
+import {StatusType} from '../../../../../message/statusType';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {LinkPreviewAsset} from './linkPreviewAssetComponent';
 

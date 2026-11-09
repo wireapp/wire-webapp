@@ -20,19 +20,19 @@
 import {render, screen, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {NOTIFICATION_STATE} from '../../../repositories/conversation/NotificationSetting';
+import {Conversation} from '../../../repositories/entity/Conversation';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {TestFactory} from 'test/helper/TestFactory';
+} from '../../testSupport/rootContextTestSupport';
+import {TestFactory} from '../../../../../test/helper/TestFactory';
 
 import {Notifications} from './notifications';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const testFactory = new TestFactory();
@@ -53,6 +53,10 @@ const getDefaultParams = (): GetDefaultParamsResult => {
 };
 
 describe('Notifications', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     await testFactory.exposeConversationActors();
   });

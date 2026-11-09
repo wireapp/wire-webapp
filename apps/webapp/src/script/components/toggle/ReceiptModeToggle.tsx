@@ -22,8 +22,7 @@ import {useRef, type FunctionComponent} from 'react';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import cx from 'classnames';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../page/rootProvider';
 import * as Icon from '../icon';
 
 interface ReceiptModeToggleProps {

@@ -26,12 +26,8 @@ export type DevelopmentLibrary = {
 export const developmentLibraries: readonly DevelopmentLibrary[] = [
   {name: 'react-ui-kit', value: 'react-ui-kit', checked: true},
   {name: 'api-client', value: 'api-client', checked: true},
-  {name: 'core', value: 'core'},
   {name: 'commons', value: 'commons'},
   {name: 'config', value: 'config'},
-  {name: 'store-engine', value: 'store-engine'},
-  {name: 'store-engine-dexie', value: 'store-engine-dexie'},
-  {name: 'telemetry', value: 'telemetry'},
 ];
 
 export type SelectedLibraryWatchCommandsOptions = {
@@ -58,10 +54,6 @@ export function getSelectedLibraryWatchCommands(options: SelectedLibraryWatchCom
       return selectedLibraryNames.has(library.value);
     })
     .map((library): string => {
-      if (library.value === 'telemetry') {
-        return 'just watch-library-telemetry';
-      }
-
       return `just watch-library ${library.value}`;
     });
 }

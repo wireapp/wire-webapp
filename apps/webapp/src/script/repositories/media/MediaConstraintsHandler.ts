@@ -22,12 +22,12 @@ import type {NonEmptyString} from '@sindresorhus/is/distribution/types';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {UserState} from 'Repositories/user/userState';
-import {getLogger, Logger} from 'Util/logger';
-
 import {parseSerializedAgcPreference} from './agcPreferenceStorage';
+import {mediaDevicesStore} from './useMediaDevicesStore';
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
+
+import {getLogger, Logger} from '../../util/logger';
+import {UserState} from '../user/userState';
 
 interface Config {
   CONSTRAINTS: {

@@ -24,20 +24,19 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {ListWrapper} from './listWrapper';
+
+import * as Icon from '../../../components/icon';
+import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
 import {
   ClientNotificationData,
   Notification,
   PreferenceNotificationRepository,
-} from 'Repositories/notification/PreferenceNotificationRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {canUseTroubleshooter} from 'Util/canUseTroubleshooter';
-
-import {ListWrapper} from './listWrapper';
-
+} from '../../../repositories/notification/PreferenceNotificationRepository';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {canUseTroubleshooter} from '../../../util/canUseTroubleshooter';
 import {WebAppEvents} from '../../../webAppEvents';
+import {useApplicationContext} from '../../rootProvider';
 import {ContentState, useAppState} from '../../useAppState';
 
 type PreferencesProps = {

@@ -27,22 +27,22 @@ import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {
   createTroubleshooterRepository,
   type TroubleshooterRepository,
-} from 'Repositories/troubleshooter/troubleshooterRepository';
+} from '../../../../repositories/troubleshooter/troubleshooterRepository';
 import {
   createAvsTroubleshooterService,
   createMockTroubleshooterService,
   MOCK_CONNECTION_DELAY_MILLISECONDS,
   MOCK_SCAN_DELAY_MILLISECONDS,
   type TroubleshooterService,
-} from 'Repositories/troubleshooter/troubleshooterService';
-import {Config} from 'src/script/Config';
+} from '../../../../repositories/troubleshooter/troubleshooterService';
+import {Config} from '../../../../Config';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import * as clipboard from 'Util/clipboardUtil';
-import * as utilities from 'Util/util';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../testSupport/rootContextTestSupport';
+import * as clipboard from '../../../../util/clipboardUtil';
+import * as utilities from '../../../../util/util';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {TroubleshootingPreferences} from './troubleshootingPreferences';
 

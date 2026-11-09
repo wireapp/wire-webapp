@@ -17,10 +17,10 @@
  *
  */
 
-import {getRequiredUserId, User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
-import {connectWithUser} from 'test/e2e_tests/utils/userActions';
+import {getRequiredUserId, User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, expect, withLogin} from '../../test.fixtures';
+import {connectWithUser} from '../../utils/userActions';
 
 test.describe('Cross Platform', () => {
   let userA: User;

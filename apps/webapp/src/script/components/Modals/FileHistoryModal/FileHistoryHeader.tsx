@@ -21,11 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   fileHistoryCloseButtonCss,
   fileHistoryHeaderContainerCss,
@@ -35,6 +30,11 @@ import {
 } from './FileHistoryModal.styles';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 import {FileInfo} from './types';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {FileTypeIcon} from '../../conversation/common/fileTypeIcon/fileTypeIcon';
+import {FileLoader} from '../../FileFullscreenModal/FileLoader/FileLoader';
+import * as Icon from '../../icon';
 
 export const FileHistoryHeader: FunctionComponent<{file?: FileInfo}> = ({file}: {file?: FileInfo}) => {
   const {translate} = useApplicationContext();

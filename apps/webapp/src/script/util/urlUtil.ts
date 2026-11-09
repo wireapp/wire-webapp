@@ -20,7 +20,7 @@
 import {isNonEmptyString, isNull} from '@sindresorhus/is';
 import type {NonEmptyString} from '@sindresorhus/is/distribution/types';
 
-import {includesString} from 'Util/stringUtil';
+import {includesString} from './stringUtil';
 
 export const appendParameter = (url: string, parameter: string): string => {
   const separator = includesString(url, '?') ? '&' : '?';

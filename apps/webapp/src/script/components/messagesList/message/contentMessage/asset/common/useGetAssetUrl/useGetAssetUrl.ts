@@ -19,13 +19,12 @@
 
 import {useState, useCallback, useEffect} from 'react';
 
-import {AssetError} from 'Repositories/assets/assetError';
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-
+import {useApplicationContext} from '../../../../../../../page/rootProvider';
+import {AssetError} from '../../../../../../../repositories/assets/assetError';
+import {AssetRemoteData} from '../../../../../../../repositories/assets/assetRemoteData';
+import {AssetTransferState} from '../../../../../../../repositories/assets/assetTransferState';
+import type {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
+import {getLogger} from '../../../../../../../util/logger';
 import {AssetUrl} from '../useAssetTransfer/useAssetTransfer';
 
 const logger = getLogger('useGetAssetUrl');

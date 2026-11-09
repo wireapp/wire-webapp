@@ -30,9 +30,6 @@ import {
   SharedDriveUploadStatusIcon,
 } from '@wireapp/react-ui-kit';
 
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {getFileExtension} from 'Util/util';
-
 import type {SharedDriveUploadStatus, SharedDriveUploadStatusKind} from './sharedDriveUploadStatus';
 import type {SharedDriveMoveStatus} from './sharedDriveUploadStatusContext';
 import {
@@ -64,6 +61,9 @@ import {
   sharedDriveUploadStatusPopupToggleStyles,
 } from './sharedDriveUploadStatusPopup.styles';
 
+import {getFileExtension} from '../../../util/util';
+import {FileTypeIcon} from '../common/fileTypeIcon/fileTypeIcon';
+
 const PROGRESS_PERCENTAGE_MAX = 100;
 
 type UploadActionState = boolean | ((uploadId: string) => boolean);
@@ -81,8 +81,11 @@ interface SharedDriveMoveActivityProps {
   readonly isExpanded: boolean;
   readonly toggleLabel: string;
   readonly dismissLabel: string;
+  readonly reviewLabel?: string;
+  readonly reviewingLabel?: string;
   readonly onToggle: () => void;
   readonly onDismiss: () => void;
+  readonly onReview?: () => void;
 }
 
 interface SharedDriveUploadStatusPopupProps {
@@ -448,12 +451,16 @@ export const SharedDriveUploadStatusPopup: FunctionComponent<
       isExpanded,
       toggleLabel,
       dismissLabel,
+      reviewLabel,
+      reviewingLabel,
       onToggle,
       onDismiss,
+      onReview,
     } = props;
     const rowStatusKind = getMoveRowStatusKind(move);
     const rowsId = 'shared-drive-move-status-rows';
     const isMoveWarning = move.kind !== 'processing' && move.kind !== 'completed';
+    const isReviewing = move.isReviewing === true;
 
     return (
       <div css={sharedDriveUploadStatusPopupStyles} data-uie-name="shared-drive-upload-status-popup">
@@ -472,6 +479,17 @@ export const SharedDriveUploadStatusPopup: FunctionComponent<
             </span>
           </div>
           <div css={sharedDriveUploadStatusPopupHeaderActionsStyles}>
+            {isMoveWarning && onReview !== undefined && reviewLabel !== undefined && (
+              <button
+                type="button"
+                css={sharedDriveUploadStatusPopupHeaderCancelStyles}
+                disabled={isReviewing}
+                aria-busy={isReviewing}
+                onClick={onReview}
+              >
+                {isReviewing ? (reviewingLabel ?? reviewLabel) : reviewLabel}
+              </button>
+            )}
             <button
               type="button"
               css={sharedDriveUploadStatusPopupHeaderCancelStyles}

@@ -20,43 +20,45 @@
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {MessageSendingState} from '@wireapp/core/lib/conversation';
+import {MessageSendingState} from '../../core/conversation';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {Account} from '@wireapp/core';
+import {Account} from '../../core';
 import {Confirmation, GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '../../webAppEvents';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AudioRepository} from 'Repositories/audio/audioRepository';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ClientState} from 'Repositories/client/ClientState';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Button} from 'Repositories/entity/message/button';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {Message} from 'Repositories/entity/message/message';
-import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {ClientEvent} from 'Repositories/event/Client';
+import {AssetRepository} from '../assets/assetRepository';
+import {AudioRepository} from '../audio/audioRepository';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {ClientEntity} from '../client/ClientEntity';
+import {ClientState} from '../client/ClientState';
+import {ConnectionEntity} from '../connection/connectionEntity';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {Conversation} from '../entity/Conversation';
+import {Button} from '../entity/message/button';
+import {CompositeMessage} from '../entity/message/compositeMessage';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {Message} from '../entity/message/message';
+import {Text} from '../entity/message/text';
+import {User} from '../entity/User';
+import {EventRepository} from '../event/EventRepository';
+import {ClientEvent} from '../event/Client';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {EventService} from 'Repositories/event/EventService';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {ReactionMap} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {ConversationError} from 'src/script/error/conversationError';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {generateQualifiedId} from 'test/helper/UserGenerator';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {EventService} from '../event/EventService';
+import {PropertiesRepository} from '../properties/propertiesRepository';
+import {ReactionMap} from '../storage';
+import {TeamState} from '../team/TeamState';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
+import {ConversationError} from '../../error/conversationError';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
+import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
+import {MessageTimer} from '../../core/conversation/messageTimer/messageTimer';
+import {generateQualifiedId} from '../../../../test/helper/UserGenerator';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {createUuid} from '../../util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationMapper} from './ConversationMapper';
@@ -109,7 +111,9 @@ async function buildMessageRepository(
   userState.self(selfUser);
   const clientState = new ClientState();
   clientState.currentClient = new ClientEntity(true, '');
-  const core = new Account();
+  const core = createCoreTestFixture({
+    service: {conversation: {send: jest.fn(), messageTimer: new MessageTimer()}},
+  });
 
   const teamState = new TeamState();
 
@@ -339,7 +343,7 @@ describe('MessageRepository', () => {
     });
 
     it('sends an edit multipart message if original message has multipart asset', async () => {
-      const {Multipart} = await import('Repositories/entity/message/multipart');
+      const {Multipart} = await import('../entity/message/multipart');
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
@@ -374,7 +378,7 @@ describe('MessageRepository', () => {
     });
 
     it('preserves attachments when editing multipart message', async () => {
-      const {Multipart} = await import('Repositories/entity/message/multipart');
+      const {Multipart} = await import('../entity/message/multipart');
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
@@ -412,7 +416,7 @@ describe('MessageRepository', () => {
     });
 
     it('handles empty attachments array when editing multipart message', async () => {
-      const {Multipart} = await import('Repositories/entity/message/multipart');
+      const {Multipart} = await import('../entity/message/multipart');
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
@@ -445,7 +449,7 @@ describe('MessageRepository', () => {
     });
 
     it('filters out falsy attachments when editing multipart message', async () => {
-      const {Multipart} = await import('Repositories/entity/message/multipart');
+      const {Multipart} = await import('../entity/message/multipart');
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);

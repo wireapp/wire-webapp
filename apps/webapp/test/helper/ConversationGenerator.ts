@@ -28,15 +28,18 @@ import {
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {LegalHoldStatus} from '@wireapp/core/lib/conversation/content';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {LegalHoldStatus} from '../../src/script/core/conversation/content';
+import {ConnectionEntity} from '../../src/script/repositories/connection/connectionEntity';
+import {
+  ConversationDatabaseData,
+  ConversationMapper,
+} from '../../src/script/repositories/conversation/ConversationMapper';
+import {ConversationStatus} from '../../src/script/repositories/conversation/ConversationStatus';
+import {ConversationVerificationState} from '../../src/script/repositories/conversation/ConversationVerificationState';
+import {Conversation} from '../../src/script/repositories/entity/Conversation';
+import {User} from '../../src/script/repositories/entity/User';
+import {translate} from '../../src/script/util/localizerUtil';
+import {createUuid} from '../../src/script/util/uuid';
 
 interface GenerateAPIConversationParams {
   id?: QualifiedId;

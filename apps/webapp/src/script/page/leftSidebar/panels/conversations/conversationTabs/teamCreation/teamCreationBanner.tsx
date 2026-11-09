@@ -23,12 +23,6 @@ import {amplify} from 'amplify';
 
 import {Button, ButtonVariant, IconButton} from '@wireapp/react-ui-kit';
 
-import {BannerPortal} from 'Components/bannerPortal/bannerPortal';
-import * as Icon from 'Components/icon';
-import {EventName} from 'Repositories/tracking/eventName';
-import {Segmentation} from 'Repositories/tracking/segmentation';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   bannerHeaderContainerCss,
   bannerWrapperCss,
@@ -40,7 +34,12 @@ import {
 } from './teamCreation.styles';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
+import {BannerPortal} from '../../../../../../components/bannerPortal/bannerPortal';
+import * as Icon from '../../../../../../components/icon';
+import {EventName} from '../../../../../../repositories/tracking/eventName';
+import {Segmentation} from '../../../../../../repositories/tracking/segmentation';
 import {WebAppEvents} from '../../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../../rootProvider';
 import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
 
 const Banner: FunctionComponent<{onClick: () => void}> = ({onClick}: {onClick: () => void}) => {

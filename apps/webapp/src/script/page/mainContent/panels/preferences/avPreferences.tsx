@@ -21,23 +21,25 @@ import {memo, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {AudioOutPreferences} from './avPreferences/audioOutPreferences';
 import {CallOptions} from './avPreferences/callOptions';
 import {CameraPreferences} from './avPreferences/cameraPreferences';
 import {MicrophonePreferences} from './avPreferences/microphonePreferences';
 import {SaveCallLogs} from './avPreferences/saveCallLogs';
+import {SendCallLogs} from './avPreferences/sendCallLogs';
 import {PreferencesPage} from './components/preferencesPage';
+import {PreferencesSection} from './components/preferencesSection';
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
+import {sendCallLogsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useInitializeMediaDevices} from '../../../../hooks/useInitializeMediaDevices';
+import type {CallingRepository} from '../../../../repositories/calling/CallingRepository';
+import {MediaConstraintsHandler} from '../../../../repositories/media/MediaConstraintsHandler';
+import {MediaDevicesHandler} from '../../../../repositories/media/MediaDevicesHandler';
+import type {MediaDeviceType} from '../../../../repositories/media/MediaDeviceType';
+import {MediaStreamHandler} from '../../../../repositories/media/MediaStreamHandler';
+import type {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
+import {useApplicationContext} from '../../../rootProvider';
 
 interface AVPreferencesProps {
   callingRepository: CallingRepository;
@@ -53,7 +55,7 @@ const AVPreferencesComponent: FunctionComponent<AVPreferencesProps> = ({
   callingRepository,
   deviceSupport,
 }: AVPreferencesProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const devicesHandler = container.resolve(MediaDevicesHandler);
   const constraintsHandler = container.resolve(MediaConstraintsHandler);
   const streamHandler = container.resolve(MediaStreamHandler);
@@ -101,7 +103,14 @@ const AVPreferencesComponent: FunctionComponent<AVPreferencesProps> = ({
           return callingRepository.refreshAudioInput();
         }}
       />
-      {callingRepository.supportsCalling && <SaveCallLogs {...{callingRepository}} />}
+      {callingRepository.supportsCalling && (
+        <PreferencesSection title={translate('preferencesOptionsCallLogs')}>
+          <SaveCallLogs callingRepository={callingRepository} />
+          {isFeatureToggleEnabled(sendCallLogsFeatureToggleName) && (
+            <SendCallLogs callingRepository={callingRepository} />
+          )}
+        </PreferencesSection>
+      )}
     </PreferencesPage>
   );
 };

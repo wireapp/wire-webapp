@@ -20,8 +20,8 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 import {Result} from 'true-myth';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode} from 'src/script/types/cellNode';
+import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../../../../../types/cellNode';
 
 import {useMoveCellsNode} from './useMoveCellsNode';
 

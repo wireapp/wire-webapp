@@ -21,12 +21,11 @@ import {isTruthy} from '@sindresorhus/is';
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {AssetAddEvent} from 'Repositories/conversation/EventBuilder';
-import {StoredEvent} from 'Repositories/storage';
-
 import {EventValidationError} from './EventValidationError';
 
+import {AssetTransferState} from '../../../../assets/assetTransferState';
+import {AssetAddEvent} from '../../../../conversation/EventBuilder';
+import {StoredEvent} from '../../../../storage';
 import {CONVERSATION, ClientEvent} from '../../../Client';
 import {DBOperation, EventHandler, HandledEvents} from '../types';
 

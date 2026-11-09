@@ -20,11 +20,11 @@
 import {render, screen} from '@testing-library/react';
 import ko from 'knockout';
 
-import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/callMessage';
+import {CallMessage as CallMessageEntity} from '../../../repositories/entity/message/callMessage';
 
 import {CallMessage} from './callMessage';
 
-jest.mock('Components/icon', () => {
+jest.mock('../../icon', () => {
   return {
     HangupIcon: () => {
       return <span>hangupIcon</span>;

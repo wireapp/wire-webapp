@@ -21,16 +21,15 @@ import {useCallback, KeyboardEvent, MouseEvent, useEffect, useState, type Functi
 
 import {isNonEmptyString, isNull} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {maybe} from 'true-myth';
 
 import {SharedDriveUploadCompletedIcon, SharedDriveUploadSpinnerIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
-import {KEY} from 'Util/keyboardUtil';
-
+import {stringifyQualifiedId} from '../../../core/util/qualifiedIdUtil';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {generateConversationUrl} from '../../../router/routeGenerator';
+import {createNavigate, createNavigateKeyboard} from '../../../router/routerBindings';
+import {KEY} from '../../../util/keyboardUtil';
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
 import {
   getRepresentativeSharedDriveUploadStatus,

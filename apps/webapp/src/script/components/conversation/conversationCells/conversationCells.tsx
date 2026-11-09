@@ -25,15 +25,6 @@ import {task} from 'true-myth';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {allowsAllFiles, hasAllowedExtension} from 'Util/fileTypeUtil';
-
 import {CellsHeader} from './cellsHeader/cellsHeader';
 import {CellsLoader} from './cellsLoader/cellsLoader';
 import {CellsPagination} from './cellsPagination/cellsPagination';
@@ -46,7 +37,13 @@ import {
 import {getCellsApiPath} from './common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from './common/getCellsFilesPath/getCellsFilesPath';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
-import {isInRecycleBin as isCurrentPathInRecycleBin, RECYCLE_BIN_PATH} from './common/recycleBin/recycleBin';
+import {openBreadcrumb} from './common/openBreadcrumb/openBreadcrumb';
+import {
+  isInRecycleBin as isCurrentPathInRecycleBin,
+  isRootRecycleBinPath,
+  RECYCLE_BIN_PATH,
+} from './common/recycleBin/recycleBin';
+import {refreshWithMissingBinFolderRecovery} from './common/recycleBin/refreshWithMissingBinFolderRecovery';
 import {useCellsSorting} from './common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
@@ -67,6 +64,14 @@ import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresigne
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 import {useSharedDriveFileDrop} from './useSharedDriveFileDrop';
 
+import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {UserRepository} from '../../../repositories/user/userRepository';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {allowsAllFiles, hasAllowedExtension} from '../../../util/fileTypeUtil';
 import {showFileDropzoneErrorModal} from '../useFilesUploadDropzone/showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 
 interface ConversationCellsProps {
@@ -101,6 +106,7 @@ export const ConversationCells = memo(
     const [folderDropResetKey, setFolderDropResetKey] = useState(0);
     const [selectionBarAnchor, setSelectionBarAnchor] = useState<HTMLDivElement | null>(null);
     const [emptyBinSelectionResetKey, setEmptyBinSelectionResetKey] = useState(0);
+    const [isEmptyBinInProgress, setIsEmptyBinInProgress] = useState(false);
     const onUploadFiles = (): void | undefined => {
       return uploadInput.current?.click();
     };
@@ -228,11 +234,21 @@ export const ConversationCells = memo(
           return error;
         },
         () => {
-          return refresh({preserveStatusOnError: true});
+          return refreshWithMissingBinFolderRecovery({
+            refresh: () => {
+              return refresh({preserveStatusOnError: true});
+            },
+            isInBinSubfolder: () => {
+              return isCurrentPathInRecycleBin() && !isRootRecycleBinPath();
+            },
+            navigateToBinRoot: () => {
+              openBreadcrumb({conversationQualifiedId, path: RECYCLE_BIN_PATH});
+            },
+          });
         },
       );
       return refreshResult.isOk && refreshResult.value;
-    }, [refresh]);
+    }, [conversationQualifiedId, refresh]);
 
     const handleRefreshAfterBulkMoveToBinOutcome = useCallback(async (): Promise<boolean> => {
       const [sourceResult, binResult] = await Promise.all([
@@ -393,6 +409,7 @@ export const ConversationCells = memo(
               onRefresh={handleRefresh}
               onRefreshAfterEmptyBinOutcome={handleRefreshAndReportSuccess}
               onEmptyBinSubmitted={handleEmptyBinSubmitted}
+              onEmptyBinInProgressChange={setIsEmptyBinInProgress}
               getCurrentCellsPath={getCellsFilesPath}
               conversationName={name}
               conversationQualifiedId={conversationQualifiedId}
@@ -428,7 +445,7 @@ export const ConversationCells = memo(
                 getDirectionFor={getDirectionFor}
                 isSortingEnabled={!isInRecycleBin}
                 onToggleSort={toggleSort}
-                selectionEnabled={!isSearchMode}
+                selectionEnabled={!isSearchMode && !isEmptyBinInProgress}
                 selectionScopeKey={`${conversationId}:${getCellsFilesPath()}:${isInRecycleBin ? 'bin' : 'files'}:${emptyBinSelectionResetKey}`}
                 selectionBarAnchor={selectionBarAnchor}
                 onFolderDropTargetChange={setActiveFolderDropTargetName}

@@ -17,11 +17,11 @@
  *
  */
 
-import {MemoryEngine} from '@wireapp/store-engine';
+import {MemoryEngine} from '../../core/storage/engine/memoryEngine';
 
-import {StorageService} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-import {createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
+import {StorageService} from '../storage';
+import {StorageSchemata} from '../storage/storageSchemata';
+import {createMessageAddEvent, toSavedEvent} from '../../../../test/helper/EventGenerator';
 
 import {EventService} from './EventService';
 

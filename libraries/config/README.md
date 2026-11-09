@@ -244,6 +244,7 @@ Notes:
 | `URL_SUPPORT_SHARED_DRIVE` | From `.env.defaults` | Shared Drive help URL | N/A |
 | `URL_SUPPORT_BUG_REPORT` | From `.env.defaults` | Bug report help URL | N/A |
 | `URL_SUPPORT_CALLING` | From `.env.defaults` | Calling support URL | N/A |
+| `URL_SUPPORT_CALL_ENCRYPTION` | From `.env.defaults` | Support article linked from the call encryption explainer | N/A |
 | `URL_SUPPORT_CAMERA_ACCESS_DENIED` | From `.env.defaults` | Camera permission denied help URL | N/A |
 | `URL_SUPPORT_CONTACT` | From `.env.defaults` | Contact support URL | N/A |
 | `URL_SUPPORT_DEVICE_ACCESS_DENIED` | From `.env.defaults` | Device access denied help URL | N/A |

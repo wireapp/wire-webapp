@@ -19,12 +19,12 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+} from '../../../../testSupport/rootContextTestSupport';
+import {createUuid} from '../../../../../util/uuid';
 
 import {ConnectionRequests} from './connectionRequests';
 

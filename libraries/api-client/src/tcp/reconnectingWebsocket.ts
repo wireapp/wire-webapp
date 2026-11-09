@@ -195,6 +195,7 @@ export class ReconnectingWebsocket {
 
   private readonly logger: logdown.Logger;
   private socket?: ReconnectingWebsocketWrapper;
+  private isConnectionRequested = false;
   private pingerId?: IntervalIdentifier;
   private connectingTimeoutId?: TimeoutIdentifier;
   private PING_INTERVAL = TimeUtil.TimeInMillis.SECOND * pingIntervalInSeconds;
@@ -349,7 +350,8 @@ export class ReconnectingWebsocket {
 
     // The ping is needed to keep the connection alive as long as possible.
     // Otherwise the connection would be closed after 1 min of inactivity and re-established.
-    if (this.isPingingEnabled) {
+    // PartySocket can invoke a queued URL provider even after its wrapper was closed.
+    if (this.isConnectionRequested && this.isPingingEnabled) {
       this.startPinging();
     }
 
@@ -370,7 +372,7 @@ export class ReconnectingWebsocket {
     );
     const socket = reconnectingSocket;
 
-    if (this.socket !== socket) {
+    if (!this.isConnectionRequested || this.socket !== socket) {
       return websocketUrl;
     }
 
@@ -515,6 +517,7 @@ export class ReconnectingWebsocket {
   }
 
   public connect(): void {
+    this.isConnectionRequested = true;
     this.logger.info('[WebSocketLifecycle] event=connect-requested');
     this.startBackFromSleepHandler();
     this.resetLongRunningRetrySequence();
@@ -649,6 +652,7 @@ export class ReconnectingWebsocket {
   }
 
   public disconnect(reason = 'Closed by client'): void {
+    this.isConnectionRequested = false;
     this.resetLongRunningRetrySequence();
     if (this.socket !== undefined) {
       const lifecycleReason = StringUtil.formatSafeLogValue(reason);

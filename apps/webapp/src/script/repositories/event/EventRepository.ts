@@ -26,8 +26,6 @@ import {
   ConversationOtrMessageAddEvent,
   ConversationMLSMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
-import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
-import {sequentialQueueOptions} from '@wireapp/core/lib/queue/sequentialQueueOptions';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
@@ -35,16 +33,6 @@ import PromiseQueue from 'p-queue';
 import {container} from 'tsyringe';
 
 import {Runtime, StringUtil} from '@wireapp/commons';
-import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '@wireapp/core';
-
-import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
-import {EventName} from 'Repositories/tracking/eventName';
-import {UserState} from 'Repositories/user/userState';
-import {getLogger, Logger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {toError} from 'Util/toError';
-import {isAxiosError} from 'Util/typePredicateUtil';
 
 import {ClientEvent} from './Client';
 import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
@@ -57,11 +45,22 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventHandlers/EventValidationError';
 
+import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '../../core';
+import {NotificationSource, HandledEventPayload} from '../../core/notification';
+import {sequentialQueueOptions} from '../../core/queue/sequentialQueueOptions';
 import {CryptographyError} from '../../error/cryptographyError';
 import {EventError} from '../../error/eventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {getLogger, Logger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {toError} from '../../util/toError';
+import {isAxiosError} from '../../util/typePredicateUtil';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {WebAppEvents} from '../../webAppEvents';
+import {ClientConversationEvent, EventBuilder} from '../conversation/EventBuilder';
+import {CryptographyMapper} from '../cryptography/CryptographyMapper';
+import {EventName} from '../tracking/eventName';
+import {UserState} from '../user/userState';
 
 const callEventLifetimeInSeconds = 30;
 const heartbeatIntervalInSeconds = 30;

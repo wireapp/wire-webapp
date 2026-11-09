@@ -17,17 +17,11 @@
  *
  */
 
-import {
-  connectWithUser,
-  createAndSaveBackup,
-  createGroup,
-  loginUser,
-  logOutUser,
-} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createAndSaveBackup, createGroup, loginUser, logOutUser} from '../../utils/userActions';
 
 import {User} from '../../data/user';
 import {test, expect, withLogin, LOGIN_TIMEOUT} from '../../test.fixtures';
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {PageManager} from '../../pageManager';
 
 const groupName = 'Critical Group';
 const personalMessage = 'Hello, this is a personal message!';

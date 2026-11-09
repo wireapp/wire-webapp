@@ -22,7 +22,7 @@ import {ReactElement, type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {SidebarTabs} from '../useSidebarStore';
 
 type ConversationTabActionProps =
   | {

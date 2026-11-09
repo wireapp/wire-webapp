@@ -17,7 +17,7 @@
  *
  */
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from '../../entity/Conversation';
 
 export type BuildMessageAddParams = {
   conversationEntity: Conversation;

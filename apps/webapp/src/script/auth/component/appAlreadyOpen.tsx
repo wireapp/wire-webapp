@@ -21,10 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
 
-import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Config} from '../../Config';
+import {useSingleInstance} from '../../hooks/useSingleInstance';
+import {useApplicationContext} from '../../page/rootProvider';
 
 interface AppAlreadyOpenProps {
   fullscreen?: boolean;

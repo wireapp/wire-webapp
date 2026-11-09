@@ -30,7 +30,7 @@ import {
   isPasteAction,
   isSpaceKey,
   isTabKey,
-} from 'Util/keyboardUtil';
+} from '../../../../../../util/keyboardUtil';
 
 const hasInputAlreadyFocused = (): boolean => {
   const activeElement = document.activeElement;

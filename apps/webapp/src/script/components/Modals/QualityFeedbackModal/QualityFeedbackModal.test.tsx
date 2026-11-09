@@ -24,24 +24,24 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '../../../webAppEvents';
 
-import {TestFactory} from 'test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/TestFactory';
 
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {User} from 'Repositories/entity/User';
-import {EventName} from 'Repositories/tracking/eventName';
-import {Segmentation} from 'Repositories/tracking/segmentation';
-import {UserState} from 'Repositories/user/userState';
+import {useCallAlertState} from '../../calling/useCallAlertState';
+import {CALL_QUALITY_FEEDBACK_KEY} from './constants';
+import {RatingListLabel} from './typings';
+import {Call} from '../../../repositories/calling/Call';
+import {CallingRepository} from '../../../repositories/calling/CallingRepository';
+import {User} from '../../../repositories/entity/User';
+import {EventName} from '../../../repositories/tracking/eventName';
+import {Segmentation} from '../../../repositories/tracking/segmentation';
+import {UserState} from '../../../repositories/user/userState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {
   buildMediaDevicesHandler,
@@ -51,7 +51,7 @@ import {
   withTheme,
 } from '../../../auth/util/test/testUtil';
 
-jest.mock('Repositories/tracking/telemetry.helpers', () => {
+jest.mock('../../../repositories/tracking/telemetry.helpers', () => {
   return {
     isTelemetryEnabledAtCurrentEnvironment: () => {
       return true;
@@ -60,6 +60,10 @@ jest.mock('Repositories/tracking/telemetry.helpers', () => {
 });
 
 describe('QualityFeedbackModal', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   function translateQualityFeedbackForTest(translationKey: Parameters<typeof translateForTest>[0]): string {
     switch (translationKey) {
       case 'qualityFeedback.skip':

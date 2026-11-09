@@ -18,9 +18,9 @@
  */
 
 import {FrameLocator} from 'playwright/test';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
-import {connectWithUser} from 'test/e2e_tests/utils/userActions';
+import {PageManager} from '../../pageManager';
+import {test, withLogin, expect} from '../../test.fixtures';
+import {connectWithUser} from '../../utils/userActions';
 
 test.describe('Link Preview', () => {
   test(

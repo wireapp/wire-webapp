@@ -24,19 +24,6 @@ import {Maybe, maybe} from 'true-myth';
 
 import {Button, ButtonVariant, CloseIcon, Loading} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {groupVideoBackgroundInitializingOverlay} from 'Components/calling/GroupVideoGridTile.styles';
-import {useShowLoadingOverlay} from 'Components/calling/useShowLoadingOverlay';
-import {VideoControlsSelect} from 'Components/calling/VideoControls/VideoControlsSelect/VideoControlsSelect';
-import {CameraIcon, CameraOffIcon, ChevronIcon, MicOffIcon, MicOnIcon} from 'Components/icon';
-import type {User} from 'Repositories/entity/User';
-import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {Config} from 'src/script/Config';
-import {renderNoCameraMessage} from 'src/script/page/mainContent/panels/preferences/avPreferences/cameraPreferences';
-import {InputLevel} from 'src/script/page/mainContent/panels/preferences/avPreferences/inputLevel';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {formatLocale} from 'Util/timeUtil';
-
 import {
   meetingPrepAvatarStyles,
   meetingPrepBodyStyles,
@@ -67,6 +54,19 @@ import type {
   RequestMeetingPrepPreview,
 } from './meetingPrepTypes';
 import {meetingPrepDeviceKinds, meetingPrepMediaKinds, meetingPrepPreviewErrors} from './meetingPrepTypes';
+
+import {Config} from '../../../Config';
+import {renderNoCameraMessage} from '../../../page/mainContent/panels/preferences/avPreferences/cameraPreferences';
+import {InputLevel} from '../../../page/mainContent/panels/preferences/avPreferences/inputLevel';
+import {useApplicationContext} from '../../../page/rootProvider';
+import type {User} from '../../../repositories/entity/User';
+import {useMediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
+import {formatLocale} from '../../../util/timeUtil';
+import {Avatar, AVATAR_SIZE} from '../../avatar';
+import {groupVideoBackgroundInitializingOverlay} from '../../calling/GroupVideoGridTile.styles';
+import {useShowLoadingOverlay} from '../../calling/useShowLoadingOverlay';
+import {VideoControlsSelect} from '../../calling/VideoControls/VideoControlsSelect/VideoControlsSelect';
+import {CameraIcon, CameraOffIcon, ChevronIcon, MicOffIcon, MicOnIcon} from '../../icon';
 
 export type MeetingPrepSurfaceProps = {
   meetingTitle: string;
@@ -174,11 +174,17 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
   const [cameraMenuOpen, setCameraMenuOpen] = useState(false);
   const microphoneMenuRef = useRef<HTMLDivElement | null>(null);
   const cameraMenuRef = useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const videoElementRef = useRef<HTMLVideoElement | null>(null);
   const isJoiningRef = useRef(false);
   const reportedCameraPermissionErrorRef = useRef(false);
   const reportedMicrophonePermissionErrorRef = useRef(false);
   const [isJoining, setIsJoining] = useState(false);
+
+  useEffect(() => {
+    closeButtonRef.current?.focus();
+  }, []);
+
   const {
     audioInputDevices,
     audioInputDeviceId,
@@ -424,6 +430,7 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
       <header css={meetingPrepHeaderStyles}>
         <button
           type="button"
+          ref={closeButtonRef}
           css={meetingPrepCloseButtonStyles}
           onClick={onCancel}
           disabled={isJoining}

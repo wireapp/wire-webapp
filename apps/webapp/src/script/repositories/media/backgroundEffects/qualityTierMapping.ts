@@ -17,9 +17,9 @@
  *
  */
 
-import {BackgroundEffectsQuality} from 'Repositories/media/useBackgroundEffectsStore';
-
 import {SELFIE_MULTICLASS_MODEL_PATH, SELFIE_SEGMENTER_MODEL_PATH} from './pipe/options';
+
+import {BackgroundEffectsQuality} from '../useBackgroundEffectsStore';
 
 export const qualityTierFromModel = (modelPath: string, enhancePerformance: boolean): BackgroundEffectsQuality => {
   if (modelPath === SELFIE_MULTICLASS_MODEL_PATH) {

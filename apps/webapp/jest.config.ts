@@ -19,11 +19,6 @@
 
 import type {Config} from 'jest';
 import {createRequire} from 'node:module';
-import {fileURLToPath} from 'url';
-import {dirname} from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 const rootJestConfiguration = createRequire(import.meta.url)('../../jest.config.js') as Pick<
   Config,
   'coverageReporters' | 'reporters'
@@ -49,7 +44,7 @@ const esmPackagesToTransform = [
 const config: Config = {
   displayName: 'webapp',
   preset: '../../jest.preset.js',
-  collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
+  collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*', '!src/script/core/**'],
   cacheDirectory: '../../target/jest/cache',
   coverageDirectory: '../../target/coverage/apps/webapp',
   coverageReporters: rootJestConfiguration.coverageReporters,
@@ -61,15 +56,11 @@ const config: Config = {
       statements: 48,
     },
   },
-  moduleDirectories: ['node_modules', __dirname],
   // Must be in sync with tsconfig.json >> paths
   moduleNameMapper: {
     '^@enormora/clock/clock$': '<rootDir>/../../node_modules/@enormora/clock/clock.entry-point.js',
     '^@enormora/clock/deterministic-clock$': '<rootDir>/../../node_modules/@enormora/clock/deterministic-clock.js',
     '^@enormora/fire-and-forget$': '<rootDir>/../../node_modules/@enormora/fire-and-forget/index.js',
-    'Components/(.*)': '<rootDir>/src/script/components/$1',
-    'Repositories/(.*)': '<rootDir>/src/script/repositories/$1',
-    'Util/(.*)': '<rootDir>/src/script/util/$1',
     '^react$': '<rootDir>/../../node_modules/react',
     '^react/(.*)$': '<rootDir>/../../node_modules/react/$1',
     '.*\\.glsl': 'jest-transform-stub',
@@ -81,7 +72,13 @@ const config: Config = {
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons', 'require', 'import', 'default'],
   },
-  testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc', '<rootDir>/test/e2e_tests'],
+  testPathIgnorePatterns: [
+    '<rootDir>/server',
+    '<rootDir>/.yalc',
+    '<rootDir>/test/e2e_tests',
+    '<rootDir>/src/script/core/',
+  ],
+  modulePathIgnorePatterns: ['<rootDir>/test/core/__mocks__/'],
   testRunner: 'jest-jasmine2',
   // Some dependencies are ESM and/or expose only package.json exports import conditions.
   // Jest still needs help resolving and transforming them in this CommonJS-ish test setup.

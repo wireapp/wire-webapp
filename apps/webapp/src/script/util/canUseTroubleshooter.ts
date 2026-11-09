@@ -20,7 +20,7 @@
 import {
   troubleshooterFeatureToggleName,
   type StartupFeatureToggleName,
-} from 'src/script/featureToggles/startupFeatureToggleNames';
+} from '../featureToggles/startupFeatureToggleNames';
 
 export const canUseTroubleshooter = (
   isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean,

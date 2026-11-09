@@ -19,12 +19,12 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {AddUsersFailure} from '@wireapp/core/lib/conversation';
 import {Task, task} from 'true-myth';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
+import type {AddUsersFailure} from '../../core/conversation';
+import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import type {Conversation} from '../../repositories/entity/Conversation';
+import type {User} from '../../repositories/entity/User';
 
 export const meetingConversationSyncErrors = {
   conversationNotFound: 'conversationNotFound',

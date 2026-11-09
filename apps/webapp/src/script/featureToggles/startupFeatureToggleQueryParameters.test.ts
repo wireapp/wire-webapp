@@ -61,24 +61,24 @@ describe('updateLocationSearchForStartupFeatureToggle', () => {
     );
   });
 
-  it('removes only the startup feature parameter when the last feature toggle is disabled', () => {
+  it('preserves an explicit empty selection and unrelated parameters when the last toggle is disabled', () => {
     const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
       locationSearch: `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}&foo=bar`,
       featureToggleName: applockRefactoredFeatureToggleName,
       shouldEnableFeatureToggle: false,
     });
 
-    expect(updatedLocationSearch).toBe('?foo=bar');
+    expect(updatedLocationSearch).toBe(`?${startupFeatureToggleQueryParameterName}=&foo=bar`);
   });
 
-  it('returns an empty search string when the last query parameter is removed', () => {
+  it('preserves an explicit empty selection when the last toggle is disabled', () => {
     const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
       locationSearch: `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}`,
       featureToggleName: applockRefactoredFeatureToggleName,
       shouldEnableFeatureToggle: false,
     });
 
-    expect(updatedLocationSearch).toBe('');
+    expect(updatedLocationSearch).toBe(`?${startupFeatureToggleQueryParameterName}=`);
   });
 
   it('ignores unknown feature names already present in query parameter when enabling a new toggle', () => {

@@ -17,7 +17,7 @@
  *
  */
 
-import {EventError} from 'src/script/error/eventError';
+import {EventError} from '../../../../../error/eventError';
 
 export class EventValidationError extends EventError {
   constructor(message: string) {

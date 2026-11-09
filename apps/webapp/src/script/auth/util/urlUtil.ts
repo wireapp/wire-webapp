@@ -21,34 +21,65 @@ import {isNonEmptyString, isNull} from '@sindresorhus/is';
 
 import {FORWARDED_QUERY_KEYS} from '../route';
 
+type ForwardedQueryParameterOptions = {
+  readonly locationSearch: string;
+  readonly additionalQueryParameters: Readonly<Record<string, string>>;
+  readonly allowedQueryParameterNames: readonly string[];
+};
+
+type AuthRedirectPathOptions = ForwardedQueryParameterOptions & {
+  readonly path: string;
+};
+
+function serializeForwardedQueryParameters(options: ForwardedQueryParameterOptions): string {
+  const {locationSearch, additionalQueryParameters, allowedQueryParameterNames} = options;
+  const forwardedQueryParameters = locationSearch
+    .replace(/^\?/, '')
+    .split('&')
+    .filter(isNonEmptyString)
+    .filter(queryParameter => {
+      const [queryParameterName = ''] = queryParameter.split('=');
+
+      return allowedQueryParameterNames.includes(queryParameterName);
+    });
+  const appendedQueryParameters = Object.entries(additionalQueryParameters).map(
+    ([queryParameterName, queryParameterValue]) => {
+      return `${queryParameterName}=${queryParameterValue}`;
+    },
+  );
+
+  return [...forwardedQueryParameters, ...appendedQueryParameters].join('&');
+}
+
+export function createAuthRedirectPath(options: AuthRedirectPathOptions): string {
+  const {path} = options;
+  const serializedQueryParameters = serializeForwardedQueryParameters(options);
+
+  return `${path}${isNonEmptyString(serializedQueryParameters) ? `?${serializedQueryParameters}` : ''}`;
+}
+
 export function getSearchParams(
   additionalParams: {[query: string]: string} = {},
   whitelistParams: string[] = FORWARDED_QUERY_KEYS,
 ): string {
-  const searchParams = window.location.search
-    .replace(/^\?/, '')
-    .split('&')
-    .filter(searchParam => {
-      return searchParam.length > 0;
-    })
-    .filter(searchParam => {
-      const paramName = searchParam.split('=')[0];
-      return whitelistParams.includes(paramName);
-    });
-  Object.entries(additionalParams).forEach(([query, value]) => {
-    searchParams.push(`${query}=${value}`);
+  return serializeForwardedQueryParameters({
+    locationSearch: window.location.search,
+    additionalQueryParameters: additionalParams,
+    allowedQueryParameterNames: whitelistParams,
   });
-
-  return searchParams.join('&');
 }
 
 export function pathWithParams(
   path: string,
-  additionalParams?: {[query: string]: string},
+  additionalParams: {[query: string]: string} = {},
   whitelistParams: string[] = FORWARDED_QUERY_KEYS,
 ): string {
-  const params = getSearchParams(additionalParams, whitelistParams);
-  return `${path}${isNonEmptyString(params) ? `?${params}` : ''}`;
+  return createAuthRedirectPath({
+    path,
+    locationSearch: window.location.search,
+    additionalQueryParameters: additionalParams,
+    allowedQueryParameterNames: whitelistParams,
+  });
 }
 
 export function hasURLParameter(parameterName: string): boolean {

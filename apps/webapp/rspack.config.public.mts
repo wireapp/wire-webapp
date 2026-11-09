@@ -16,7 +16,9 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
+import {rspack} from '@rspack/core';
 import type {Configuration} from '@rspack/core';
+import {isPlainObject} from '@sindresorhus/is';
 
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -26,14 +28,25 @@ import rspackConfiguration from './rspack.config.mts';
 const configFilePath = fileURLToPath(import.meta.url);
 const configDirectoryPath = path.dirname(configFilePath);
 const publicBuildPath = path.resolve(configDirectoryPath, 'src/script/publicBuild');
+const dataDogModulePath = path.resolve(configDirectoryPath, 'src/script/util/dataDog.ts');
+const escapedDataDogModulePath = dataDogModulePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const rspackCache = rspackConfiguration.cache;
+const rspackEntrypoints = rspackConfiguration.entry;
 
 if (typeof rspackCache !== 'object' || rspackCache.type !== 'persistent') {
   throw new Error('The public Rspack configuration requires the internal persistent cache settings.');
 }
 
+if (!isPlainObject(rspackEntrypoints)) {
+  throw new Error('The public Rspack configuration requires named entrypoints.');
+}
+
 export default {
   ...rspackConfiguration,
+  entry: {
+    ...rspackEntrypoints,
+    app: path.resolve(configDirectoryPath, 'src/script/main/releaseEntrypoint.tsx'),
+  },
   cache: {
     ...rspackCache,
     buildDependencies: [...(rspackCache.buildDependencies ?? []), configFilePath],
@@ -52,8 +65,14 @@ export default {
       ),
       '@datadog/browser-logs$': path.resolve(publicBuildPath, 'noopDataDogBrowserLogs.ts'),
       '@datadog/browser-rum$': path.resolve(publicBuildPath, 'noopDataDogBrowserRum.ts'),
-      'Util/dataDog$': path.resolve(publicBuildPath, 'noopDataDog.ts'),
       ...rspackConfiguration.resolve?.alias,
     },
   },
+  plugins: [
+    ...(rspackConfiguration.plugins ?? []),
+    new rspack.NormalModuleReplacementPlugin(
+      new RegExp(`^${escapedDataDogModulePath}$`),
+      path.resolve(publicBuildPath, 'noopDataDog.ts'),
+    ),
+  ],
 } satisfies Configuration;

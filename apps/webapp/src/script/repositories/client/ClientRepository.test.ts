@@ -22,20 +22,24 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Runtime} from '@wireapp/commons';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 
-import {User} from 'Repositories/entity/User';
-import {ClientRecord} from 'Repositories/storage/record/clientRecord';
-import {ClientError} from 'src/script/error/clientError';
-import {type Translate} from 'Util/localizerUtil';
+import {User} from '../entity/User';
+import {ClientRecord} from '../storage/record/clientRecord';
+import {ClientError} from '../../error/clientError';
+import {type Translate} from '../../util/localizerUtil';
 
 import {ClientRepository, ClientMapper, ClientEntity} from './.';
 
 import {entities} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ClientRepository', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   const originalPrimaryModalShow = PrimaryModal.show;
   const testFactory = new TestFactory();
   const clientId = '5021d77752286cac';

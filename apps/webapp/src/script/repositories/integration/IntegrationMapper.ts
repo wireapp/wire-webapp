@@ -20,11 +20,11 @@
 import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {UserType} from '@wireapp/api-client/lib/user';
 
-import {mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/assetMapper';
-import {User} from 'Repositories/entity/User';
-
 import {ProviderData, ProviderEntity} from './ProviderEntity';
 import {ServiceData, ServiceEntity} from './ServiceEntity';
+
+import {mapProfileAssets, updateUserEntityAssets} from '../assets/assetMapper';
+import {User} from '../entity/User';
 
 export const IntegrationMapper = {
   mapProviderFromObject: (providerData: ProviderData, providerEntity = new ProviderEntity()) => {

@@ -19,11 +19,10 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import {DeleteEvent, MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/EventBuilder';
-import type {EventRecord} from 'Repositories/storage/record/eventRecord';
-import {getLogger, Logger} from 'Util/logger';
-
 import {QuoteEntity} from '../../../message/quoteEntity';
+import {getLogger, Logger} from '../../../util/logger';
+import {DeleteEvent, MessageAddEvent, MultipartMessageAddEvent} from '../../conversation/EventBuilder';
+import type {EventRecord} from '../../storage/record/eventRecord';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';

@@ -22,23 +22,23 @@ import userEvent from '@testing-library/user-event';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
 
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {ConversationRepository} from 'src/script/repositories/conversation/ConversationRepository';
-import {Conversation} from 'src/script/repositories/entity/Conversation';
-import {User} from 'src/script/repositories/entity/User';
-import {IntegrationRepository} from 'src/script/repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'src/script/repositories/integration/ServiceEntity';
-import {SearchRepository} from 'src/script/repositories/search/searchRepository';
-import {TeamEntity} from 'src/script/repositories/team/TeamEntity';
-import {TeamRepository} from 'src/script/repositories/team/TeamRepository';
-import {TeamState} from 'src/script/repositories/team/TeamState';
-import {UserState} from 'src/script/repositories/user/userState';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../testSupport/rootContextTestSupport';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
+import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {SearchRepository} from '../../../repositories/search/searchRepository';
+import {TeamEntity} from '../../../repositories/team/TeamEntity';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {UserState} from '../../../repositories/user/userState';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {AddParticipants} from './addParticipants';
 

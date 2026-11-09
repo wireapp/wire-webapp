@@ -20,9 +20,9 @@
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
 
-import {MLSMigrationStatus} from 'src/script/mls/MLSMigration/migrationStatus';
-import {TestFactory} from 'test/helper/TestFactory';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {MLSMigrationStatus} from '../../../mls/MLSMigration/migrationStatus';
+import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols';
 
@@ -201,6 +201,10 @@ const evaluateProtocolsScenarios = [
 ] as const;
 
 describe('evaluateSelfSupportedProtocols', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   describe.each([{allActiveClientsMLSCapable: true}, {allActiveClientsMLSCapable: false}])(
     '%o',
     ({allActiveClientsMLSCapable}) => {

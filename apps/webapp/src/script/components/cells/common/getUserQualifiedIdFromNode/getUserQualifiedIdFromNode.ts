@@ -19,8 +19,9 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
+
+import {parseQualifiedId} from '../../../../core/util/qualifiedIdUtil';
 
 export const getUserQualifiedIdFromNode = (node: RestNode): QualifiedId | null => {
   const userQualifiedIdJson = node.UserMetadata?.find(metadata => {

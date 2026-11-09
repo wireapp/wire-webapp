@@ -23,12 +23,11 @@ import {isEmptyString, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/
 
 import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {TextInput} from 'Components/TextInput';
-import {useIsMounted} from 'Util/useIsMounted';
-
+import * as Icon from '../../../../../components/icon';
+import {TextInput} from '../../../../../components/TextInput';
 import {MotionDuration} from '../../../../../motion/MotionDuration';
 import {isEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
+import {useIsMounted} from '../../../../../util/useIsMounted';
 
 const inputFeedbackDurationMultiplier = 2;
 

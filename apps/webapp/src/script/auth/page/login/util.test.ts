@@ -23,7 +23,7 @@ import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api
 import {StatusCodes} from 'http-status-codes';
 import {Dispatch} from 'redux';
 
-import {APIClient} from 'src/script/service/apiClientSingleton';
+import {APIClient} from '../../../service/apiClientSingleton';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
@@ -146,6 +146,10 @@ describe('Login util', () => {
     let navigate: jest.MockedFunction<(route: string) => void>;
     let loginWithSSO: jest.MockedFunction<(code: string, password?: string) => Promise<void>>;
     let apiClient: APIClient;
+
+    afterEach(() => {
+      apiClient.dispose();
+    });
 
     beforeEach(() => {
       dispatchSpy = jest.fn();

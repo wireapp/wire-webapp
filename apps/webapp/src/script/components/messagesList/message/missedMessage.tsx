@@ -19,7 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useApplicationContext} from '../../../page/rootProvider';
 
 const MissedMessage: FunctionComponent = () => {
   const {translate} = useApplicationContext();

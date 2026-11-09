@@ -21,11 +21,10 @@ import {useState} from 'react';
 
 import {amplify} from 'amplify';
 
-import {StorageKey} from 'Repositories/storage';
-import {EventName} from 'Repositories/tracking/eventName';
-import {Config} from 'src/script/Config';
-import {loadValue, storeValue} from 'Util/storageUtil';
-
+import {Config} from '../../../Config';
+import {StorageKey} from '../../../repositories/storage';
+import {EventName} from '../../../repositories/tracking/eventName';
+import {loadValue, storeValue} from '../../../util/storageUtil';
 import {WebAppEvents} from '../../../webAppEvents';
 
 type UseFormatToolbarResult = {open: boolean; handleClick: () => void};

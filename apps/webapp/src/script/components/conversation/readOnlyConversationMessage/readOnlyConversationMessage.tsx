@@ -24,12 +24,12 @@ import ko from 'knockout';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {CONVERSATION_READONLY_STATE} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {replaceReactComponents} from '../../../util/localizerUtil/reactLocalizerUtil';
+import * as Icon from '../../icon';
 
 interface ReadOnlyConversationMessageProps {
   reloadApp: () => void;

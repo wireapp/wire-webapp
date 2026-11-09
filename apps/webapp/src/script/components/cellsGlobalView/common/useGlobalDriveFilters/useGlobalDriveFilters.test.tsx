@@ -24,17 +24,17 @@ import {container} from 'tsyringe';
 import type {
   FilterConfig,
   PopoverFilterConfig,
-} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {TeamState} from 'Repositories/team/TeamState';
+} from '../../../conversation/conversationCells/common/cellsFiltersBar/filterConfig';
+import type {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import type {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {TeamState} from '../../../../repositories/team/TeamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {Core} from 'src/script/service/coreSingleton';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../../page/testSupport/rootContextTestSupport';
+import {Core} from '../../../../service/coreSingleton';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {useGlobalDriveFilters} from './useGlobalDriveFilters';
 

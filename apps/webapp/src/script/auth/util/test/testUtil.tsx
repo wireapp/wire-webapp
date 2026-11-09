@@ -58,20 +58,20 @@ import sk from '../../../../i18n/sk-SK.json';
 import sl from '../../../../i18n/sl-SI.json';
 import tr from '../../../../i18n/tr-TR.json';
 import uk from '../../../../i18n/uk-UA.json';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
-import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {CallingRepository} from '../../../repositories/calling/CallingRepository';
+import {Participant} from '../../../repositories/calling/Participant';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {BackgroundEffectsController} from '../../../repositories/media/backgroundEffects/backgroundEffectsController';
+import {BackgroundEffectsHandler} from '../../../repositories/media/backgroundEffectsHandler';
+import {MediaDevicesHandler} from '../../../repositories/media/MediaDevicesHandler';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../../util/localizerUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {createUuid} from '../../../util/uuid';
 
 import {mapLanguage} from '../../localeConfig';
 import {Api, RootState} from '../../module/reducer';

@@ -25,20 +25,19 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Loading, QUERY} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {groupVideoBackgroundInitializingOverlay} from 'Components/calling/GroupVideoGridTile.styles';
-import * as Icon from 'Components/icon';
-import {Call} from 'Repositories/calling/Call';
-import type {Participant} from 'Repositories/calling/Participant';
-import type {Grid} from 'Repositories/calling/videoGridHandler';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {GroupVideoGridTile} from './GroupVideoGridTile';
+import {groupVideoBackgroundInitializingOverlay} from './GroupVideoGridTile.styles';
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
 import {useActiveWindowMatchMedia} from '../../hooks/useActiveWindowMatchMedia';
+import {useApplicationContext} from '../../page/rootProvider';
+import {Call} from '../../repositories/calling/Call';
+import type {Participant} from '../../repositories/calling/Participant';
+import type {Grid} from '../../repositories/calling/videoGridHandler';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {Avatar, AVATAR_SIZE} from '../avatar';
+import * as Icon from '../icon';
 
 const PARTICIPANTS_LIMITS = {
   TABLET: {SHORT: 2, MEDIUM: 4, TALL: 8},
