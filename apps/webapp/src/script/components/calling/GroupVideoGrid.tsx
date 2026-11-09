@@ -52,6 +52,7 @@ export interface GroupVideoGripProps {
   selfParticipant: Participant;
   call: Call;
   setMaximizedParticipant?: (participant: Participant | null) => void;
+  allowSelfVideoMinimize?: boolean;
 }
 
 interface RowsAndColumns extends CSSProperties {
@@ -73,7 +74,10 @@ interface GroupVideoThumbnailProps {
   readonly thumbnail: Participant;
   readonly minimized: boolean;
   readonly maximizedParticipant: Participant | null;
-  readonly selfParticipant: Participant;
+  readonly   selfParticipant: Participant;
+  allowMinimize: boolean;
+  isMinimized: boolean;
+  onToggleMinimized: () => void;
 }
 
 function GroupVideoThumbnail({
@@ -81,6 +85,9 @@ function GroupVideoThumbnail({
   minimized,
   maximizedParticipant,
   selfParticipant,
+  allowMinimize,
+  isMinimized,
+  onToggleMinimized,
 }: GroupVideoThumbnailProps): ReactNode {
   const thumbnail = useKoSubscribableChildren(thumbnailParticipant, [
     'hasActiveVideo',
@@ -100,8 +107,8 @@ function GroupVideoThumbnail({
 
   return (
     <>
-      {!isNullOrUndefined(thumbnail.videoStream) && maximizedParticipant === null && (
-        <GroupVideoThumbnailWrapper minimized={minimized}>
+      {!isMinimized && !isNullOrUndefined(thumbnail.videoStream) && maximizedParticipant === null && (
+        <GroupVideoThumbnailWrapper minimized={minimized} allowMinimize={allowMinimize}>
           <Video
             className="group-video__thumbnail-video"
             autoPlay
@@ -139,8 +146,8 @@ function GroupVideoThumbnail({
           )}
         </GroupVideoThumbnailWrapper>
       )}
-      {!thumbnail.hasActiveVideo && (
-        <GroupVideoThumbnailWrapper minimized={minimized}>
+      {!isMinimized && !thumbnail.hasActiveVideo && (
+        <GroupVideoThumbnailWrapper minimized={minimized} allowMinimize={allowMinimize}>
           <div
             css={{
               alignItems: 'center',
@@ -170,6 +177,33 @@ function GroupVideoThumbnail({
             />
           </div>
         </GroupVideoThumbnailWrapper>
+      )}
+      {allowMinimize && (
+        <button
+          type="button"
+          aria-label={isMinimized ? 'Restore self-video preview' : 'Minimize self-video preview'}
+          title={isMinimized ? 'Restore self-video preview' : 'Minimize self-video preview'}
+          onClick={onToggleMinimized}
+          data-uie-name={isMinimized ? 'restore-self-video-preview' : 'minimize-self-video-preview'}
+          css={{
+            alignItems: 'center',
+            backgroundColor: 'var(--background-fade-16)',
+            border: 0,
+            borderRadius: '50%',
+            color: 'var(--foreground)',
+            cursor: 'pointer',
+            display: 'flex',
+            height: 32,
+            justifyContent: 'center',
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            width: 32,
+            zIndex: 1,
+          }}
+        >
+          {isMinimized ? '+' : '−'}
+        </button>
       )}
     </>
   );
@@ -207,13 +241,11 @@ const calculateRowsAndColumns = (params: CalculateRowsAndColumsParams): RowsAndC
   return {'--columns': columns, '--rows': rows};
 };
 
-const GroupVideoThumbnailWrapper: FunctionComponent<{children?: ReactNode; minimized: boolean}> = ({
-  children,
-  minimized,
-}: {
+const GroupVideoThumbnailWrapper: FunctionComponent<{
   children?: ReactNode;
   minimized: boolean;
-}) => {
+  allowMinimize?: boolean;
+}> = ({children, minimized, allowMinimize = false}) => {
   return (
     <div
       className="group-video__thumbnail"
@@ -230,7 +262,7 @@ const GroupVideoThumbnailWrapper: FunctionComponent<{children?: ReactNode; minim
           : undefined
       }
       data-uie-name="self-video-thumbnail-wrapper"
-      aria-hidden="true"
+      aria-hidden={!allowMinimize}
     >
       {children}
     </div>
@@ -250,6 +282,7 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
   maximizedParticipant,
   call,
   setMaximizedParticipant,
+  allowSelfVideoMinimize = false,
 }: GroupVideoGripProps) => {
   const {translate} = useApplicationContext();
   const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
@@ -259,6 +292,7 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
   const isMedium = useActiveWindowMatchMedia(HEIGHT_QUERIES.MEDIUM);
   const isTall = useActiveWindowMatchMedia(HEIGHT_QUERIES.TALL);
 
+  const [isSelfVideoMinimized, setIsSelfVideoMinimized] = useState(false);
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(
     calculateRowsAndColumns({
       totalCount: grid?.grid.length,
@@ -390,6 +424,9 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
           minimized={minimized}
           maximizedParticipant={maximizedParticipant}
           selfParticipant={selfParticipant}
+          allowMinimize={allowSelfVideoMinimize}
+          isMinimized={allowSelfVideoMinimize && isSelfVideoMinimized}
+          onToggleMinimized={() => setIsSelfVideoMinimized(minimized => !minimized)}
         />
       )}
     </div>

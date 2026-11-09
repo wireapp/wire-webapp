@@ -195,6 +195,30 @@ describe('GroupVideoGrid', () => {
     expect(thumbnailMutedIcons).not.toHaveLength(0);
   });
 
+  it('minimizes and restores the local preview without changing its video stream', () => {
+    const participant = createMockParticipant('self', 'client', {});
+    const stream = createMediaStream();
+    participant.videoState(VIDEO_STATE.STARTED);
+    participant.videoStream(stream);
+
+    const props: GroupVideoGripProps = {
+      grid: {grid: [], thumbnail: participant},
+      maximizedParticipant: null,
+      selfParticipant: participant,
+      call: createMockCall(),
+      allowSelfVideoMinimize: true,
+    };
+    const {queryByTestId, getByRole} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
+
+    fireEvent.click(getByRole('button', {name: 'Minimize self-video preview'}));
+    expect(queryByTestId('self-video-thumbnail-wrapper')).not.toBeInTheDocument();
+    expect(participant.videoStream()).toBe(stream);
+
+    fireEvent.click(getByRole('button', {name: 'Restore self-video preview'}));
+    expect(queryByTestId('self-video-thumbnail-wrapper')).toBeInTheDocument();
+    expect(participant.videoStream()).toBe(stream);
+  });
+
   it('shows and hides the loading overlay while the raw thumbnail video is loading with background effects disabled', () => {
     const participant = createMockParticipant('userId', 'clientId', {});
     const videoStream = createMediaStream();
