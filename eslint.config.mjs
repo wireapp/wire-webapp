@@ -357,6 +357,13 @@ const productionConfigs = [
     },
   },
   {
+    files: ['apps/webapp/src/script/main/startApplication.tsx'],
+    rules: {
+      // Bootstrap imports must load reflection support before decorated modules.
+      'import/order': 'off',
+    },
+  },
+  {
     files: ['**/*.{ts,tsx,mts,cts}'],
     settings: {
       'import-x/extensions': typescriptImportResolutionExtensions,
@@ -1011,6 +1018,7 @@ const config = [
           vars: 'all',
           args: 'after-used',
           ignoreRestSiblings: true,
+          ignoreUsingDeclarations: true,
           argsIgnorePattern: '^_$',
           caughtErrors: 'all',
           caughtErrorsIgnorePattern: '^_$',

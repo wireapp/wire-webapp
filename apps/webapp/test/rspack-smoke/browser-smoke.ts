@@ -18,11 +18,14 @@
 
 import {expect, test} from '@playwright/test';
 import type {Page, Response} from '@playwright/test';
+import {isEmptyArray} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 import {match} from 'ts-pattern';
 import {Maybe} from 'true-myth';
 
 import {readFileSync} from 'node:fs';
+
+import {previewDefaultEnabledStartupFeatureToggleNames} from '../../src/script/featureToggles/startupFeatureToggleNames';
 
 type RuntimeDiagnostics = {
   readonly uncaughtPageErrors: string[];
@@ -110,18 +113,20 @@ function expectNoRuntimeFailures(options: RuntimeAssertionOptions): void {
 async function expectSuccessfulScripts(options: SuccessfulScriptsOptions): Promise<void> {
   const {diagnostics, buildProjectName, requiredScriptPaths} = options;
 
-  for (const scriptPath of requiredScriptPaths) {
-    await expect
-      .poll(
-        () => {
-          return Maybe.of(diagnostics.localScriptResponses.get(scriptPath));
-        },
-        {
-          message: `${buildProjectName} should load ${scriptPath}`,
-        },
-      )
-      .toEqual(Maybe.just(200));
-  }
+  await Promise.all(
+    requiredScriptPaths.map(async scriptPath => {
+      await expect
+        .poll(
+          () => {
+            return Maybe.of(diagnostics.localScriptResponses.get(scriptPath));
+          },
+          {
+            message: `${buildProjectName} should load ${scriptPath}`,
+          },
+        )
+        .toEqual(Maybe.just(200));
+    }),
+  );
 }
 
 test('loads the application entry points and redirects an unauthenticated visitor to authentication', async ({
@@ -143,7 +148,12 @@ test('loads the application entry points and redirects an unauthenticated visito
   });
 
   expect(documentStatus, `${testInfo.project.name} application document status`).toEqual(Maybe.just(200));
-  await expect(page).toHaveURL(/\/auth\/?(?:#\/)?$/);
+  await expect(page).toHaveURL(/\/auth\/?(?:\?[^#]*)?(?:#\/)?$/);
+  const expectedDefaultNames =
+    testInfo.project.name === 'rspack-internal' ? previewDefaultEnabledStartupFeatureToggleNames : [];
+  expect(new URL(page.url()).searchParams.get('enabled-features')).toBe(
+    isEmptyArray(expectedDefaultNames) ? null : expectedDefaultNames.join(','),
+  );
   await expectSuccessfulScripts({
     diagnostics,
     buildProjectName: testInfo.project.name,
@@ -159,6 +169,43 @@ test('loads the application entry points and redirects an unauthenticated visito
     ],
   });
   expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
+});
+
+test('bundles the application entrypoint selected for the artifact', async ({request}, testInfo) => {
+  const sourceMapResponse = await request.get('/min/app.js.map');
+  const sourceMapText = await sourceMapResponse.text();
+  const expectedEntrypoint = testInfo.project.name === 'rspack-internal' ? 'preview' : 'release';
+  const excludedEntrypoint = testInfo.project.name === 'rspack-internal' ? 'release' : 'preview';
+
+  expect(sourceMapResponse.ok()).toBe(true);
+  expect(sourceMapText).toContain(`/main/${expectedEntrypoint}Entrypoint.tsx`);
+  expect(sourceMapText).not.toContain(`/main/${excludedEntrypoint}Entrypoint.tsx`);
+});
+
+async function expectStartupSelectionSurvivesAuthentication(page: Page, selection: string): Promise<void> {
+  await page.goto(`/?enabled-features=${selection}&hl=en`);
+  await expect(page).toHaveURL(/\/auth\//);
+  expect(new URL(page.url()).searchParams.get('enabled-features')).toBe(selection);
+  expect(new URL(page.url()).searchParams.get('hl')).toBe('en');
+
+  await page.getByRole('button', {name: 'Log in'}).click();
+  await expect(page).toHaveURL(/#\/login$/);
+  expect(new URL(page.url()).searchParams.get('enabled-features')).toBe(selection);
+  await page.reload();
+  await expect(page.getByPlaceholder('Email or username')).toBeVisible();
+  expect(new URL(page.url()).searchParams.get('enabled-features')).toBe(selection);
+}
+
+test('preserves an explicit enabled feature through authentication navigation', async ({page}) => {
+  await expectStartupSelectionSurvivesAuthentication(page, 'for-tests-only');
+});
+
+test('preserves an explicit empty feature selection through authentication navigation', async ({page}) => {
+  await expectStartupSelectionSurvivesAuthentication(page, '');
+});
+
+test('preserves an unknown feature selection through authentication navigation', async ({page}) => {
+  await expectStartupSelectionSurvivesAuthentication(page, 'unknown-feature');
 });
 
 test('initializes authentication and navigates to an interactive login form', async ({page}, testInfo) => {

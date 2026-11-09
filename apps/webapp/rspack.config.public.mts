@@ -18,6 +18,7 @@
 
 import {rspack} from '@rspack/core';
 import type {Configuration} from '@rspack/core';
+import {isPlainObject} from '@sindresorhus/is';
 
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -30,13 +31,22 @@ const publicBuildPath = path.resolve(configDirectoryPath, 'src/script/publicBuil
 const dataDogModulePath = path.resolve(configDirectoryPath, 'src/script/util/dataDog.ts');
 const escapedDataDogModulePath = dataDogModulePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const rspackCache = rspackConfiguration.cache;
+const rspackEntrypoints = rspackConfiguration.entry;
 
 if (typeof rspackCache !== 'object' || rspackCache.type !== 'persistent') {
   throw new Error('The public Rspack configuration requires the internal persistent cache settings.');
 }
 
+if (!isPlainObject(rspackEntrypoints)) {
+  throw new Error('The public Rspack configuration requires named entrypoints.');
+}
+
 export default {
   ...rspackConfiguration,
+  entry: {
+    ...rspackEntrypoints,
+    app: path.resolve(configDirectoryPath, 'src/script/main/releaseEntrypoint.tsx'),
+  },
   cache: {
     ...rspackCache,
     buildDependencies: [...(rspackCache.buildDependencies ?? []), configFilePath],

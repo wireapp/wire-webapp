@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "private": true,
   "license": "GPL-3.0",
-  "main": "src/script/main/index.tsx",
+  "main": "src/script/main/previewEntrypoint.tsx",
   "dependencies": {
     "@datadog/browser-logs": "7.17.0",
     "@datadog/browser-rum": "7.17.0",

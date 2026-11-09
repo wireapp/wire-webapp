@@ -282,6 +282,8 @@ Rollback will be first-class:
 
 Feature flags are required for trunk-based development:
 
+- Startup feature toggles declare `previewDefaultEnabled` in their registry. Internal builds (Edge, Hosted Dev, and development distribution) and development builds (including local development) select `main/previewEntrypoint.tsx`; public builds (Beta, Production, public distribution, and maintenance distribution) select `main/releaseEntrypoint.tsx`. This selection happens at build time and does not depend on runtime environment configuration, preserving artifact promotion from Beta to Production.
+- Before authentication redirects or startup toggle resolution, the preview entrypoint's defaults initialize `enabled-features` only when that parameter is absent and defaults are nonempty. The release entrypoint supplies no defaults. Existing selections, including `enabled-features=`, remain authoritative. Developer settings and authentication navigation preserve an explicit empty selection so disabling the last feature does not restore preview defaults. Existing flags remain opted out until explicitly selected in the registry.
 - Incomplete or risky work must be hidden behind feature flags before it is merged to `main`.
 - Release branches validate the intended feature flag state for that release.
 - Feature flags are not automatically removed before merging to `main`.
