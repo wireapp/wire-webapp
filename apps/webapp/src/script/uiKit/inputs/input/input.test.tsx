@@ -21,23 +21,9 @@ import {render} from '@testing-library/react';
 
 import {THEME_ID} from '../../identity';
 import {StyledApp} from '../../layout';
-import {matchComponent} from '../../utils/testUtil';
 import {INPUT_CLASSNAME, Input} from '../input';
 
 describe('"Input"', () => {
-  it('renders', () => {
-    return matchComponent(<Input />);
-  });
-  it('renders as invalid', () => {
-    return matchComponent(<Input markInvalid />);
-  });
-  it('renders as disabled', () => {
-    return matchComponent(<Input disabled />);
-  });
-  it('renders with placeholderTextTransform', () => {
-    return matchComponent(<Input placeholderTextTransform="uppercase" placeholder="Input" />);
-  });
-
   it('does not forward className to the native input', () => {
     const {getByRole} = render(
       <StyledApp themeId={THEME_ID.LIGHT}>

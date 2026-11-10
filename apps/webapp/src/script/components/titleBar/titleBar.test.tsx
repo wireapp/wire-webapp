@@ -53,7 +53,9 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('../../uiKit/layout/matchMedia/matchMedia', () => {
   return {
-    ...jest.requireActual<typeof import('../../uiKit/layout/matchMedia/matchMedia')>('../../uiKit/layout/matchMedia/matchMedia'),
+    ...jest.requireActual<typeof import('../../uiKit/layout/matchMedia/matchMedia')>(
+      '../../uiKit/layout/matchMedia/matchMedia',
+    ),
     useMatchMedia: jest.fn(),
   };
 });

@@ -54,7 +54,9 @@ const useMatchMediaMock = useMatchMedia as jest.Mock;
 
 jest.mock('../../uiKit/layout/matchMedia/matchMedia', () => {
   return {
-    ...jest.requireActual<typeof import('../../uiKit/layout/matchMedia/matchMedia')>('../../uiKit/layout/matchMedia/matchMedia'),
+    ...jest.requireActual<typeof import('../../uiKit/layout/matchMedia/matchMedia')>(
+      '../../uiKit/layout/matchMedia/matchMedia',
+    ),
     useMatchMedia: jest.fn(),
   };
 });

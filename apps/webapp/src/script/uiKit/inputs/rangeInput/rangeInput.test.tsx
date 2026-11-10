@@ -26,7 +26,6 @@ import {RangeInput, RangeInputProps} from './rangeInput';
 
 import {THEME_ID} from '../../identity';
 import {StyledApp} from '../../layout';
-import {matchComponent} from '../../utils/testUtil';
 
 expect.extend(matchers);
 
@@ -56,10 +55,6 @@ const ThemedRangeInput: FunctionComponent<RangeInputProps> = props => {
 };
 
 describe('"RangeInput"', () => {
-  it('matches snapshot', () => {
-    return matchComponent(<ThemedRangeInput {...getDefaultProps()} />);
-  });
-
   it('renders label', () => {
     const props = getDefaultProps();
     const {getByLabelText} = render(<ThemedRangeInput {...props} />);

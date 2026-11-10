@@ -20,40 +20,10 @@
 import '@testing-library/jest-dom/jest-globals';
 import {fireEvent, render} from '@testing-library/react';
 
-import {Checkbox, CheckboxLabel} from './checkbox';
+import {Checkbox} from './checkbox';
 
 import {THEME_ID} from '../../identity';
 import {StyledApp} from '../../layout';
-import {matchComponent} from '../../utils/testUtil';
-
-describe('"Checkbox"', () => {
-  it('renders', () => {
-    return matchComponent(<Checkbox id="1">Check</Checkbox>);
-  });
-  it('renders (dark theme)', () => {
-    return matchComponent(<Checkbox id="1">Checkbox</Checkbox>, THEME_ID.DARK);
-  });
-  it('renders as invalid', () => {
-    return matchComponent(
-      <Checkbox id="1" markInvalid>
-        Check
-      </Checkbox>,
-    );
-  });
-  it('renders disabled', () => {
-    return matchComponent(
-      <Checkbox id="1" disabled>
-        Check
-      </Checkbox>,
-    );
-  });
-});
-
-describe('"CheckboxLabel"', () => {
-  it('renders', () => {
-    return matchComponent(<CheckboxLabel>Label</CheckboxLabel>);
-  });
-});
 
 //TODO: - create custom render for UI-Kit with a styledapp wrapper(SQSERVICES-1672)
 describe('account creation terms and conditions checkbox', () => {

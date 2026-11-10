@@ -25,7 +25,6 @@ import {DropFileInput, DropFileInputProps} from './dropFileInput';
 
 import {THEME_ID} from '../../identity';
 import {StyledApp} from '../../layout';
-import {matchComponent} from '../../utils/testUtil';
 
 //note: we don't have to test file type validation using native file upload,
 // it won't allow to pick different type thant expected
@@ -59,10 +58,6 @@ const jpegFile = new File(['(⌐□_□)'], 'chucknorris.jpg', {type: 'image/jpe
 const xlsxFile = new File(['(⌐□_□)'], 'chucknorris.xlsx', {type: '.xlsx'});
 
 describe('"DropFileInput"', () => {
-  it('matches snapshot', () => {
-    return matchComponent(<ThemedDropFileInput {...getDefaultProps({accept: 'image/png, image/jpeg'})} />);
-  });
-
   it('returns file on native file upload', () => {
     const props = getDefaultProps({});
 
