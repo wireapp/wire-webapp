@@ -20,6 +20,7 @@
 import {ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Decoder} from '@wireapp/commons/lib/base64/decoder';
+import {result} from 'true-myth';
 
 import {LogFactory, TimeUtil} from '@wireapp/commons';
 import {BufferedDecryptedMessage, ClientId, ConversationId, DecryptedMessage} from '@wireapp/core-crypto';
@@ -104,7 +105,21 @@ const handleBufferedMessage = (
     BufferedDecryptedMessage.TransientTargeted.instanceOf(bufferedMessage) ||
     BufferedDecryptedMessage.PersistedTargeted.instanceOf(bufferedMessage)
   ) {
-    return createHandledPayload(params.event, bufferedMessage.inner);
+    const payload = result.tryOrElse(
+      error => {
+        return error;
+      },
+      () => {
+        return createHandledPayload(params.event, bufferedMessage.inner);
+      },
+    );
+
+    if (payload.isErr) {
+      logger.warn('Discarding malformed buffered MLS message', payload.error);
+      return null;
+    }
+
+    return payload.value;
   }
 
   return null;

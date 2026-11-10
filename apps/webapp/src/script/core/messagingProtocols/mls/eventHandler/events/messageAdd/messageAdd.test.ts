@@ -233,4 +233,38 @@ describe('handleMLSMessageAdd', () => {
       }),
     ).resolves.toEqual([]);
   });
+
+  it('keeps valid buffered messages around a malformed plaintext', async () => {
+    const bufferedMessages = [
+      BufferedDecryptedMessage.ApplicationMessage.new({
+        identity,
+        plaintext: createPlaintext('valid-before'),
+        senderClientId,
+      }),
+      BufferedDecryptedMessage.Transient.new({
+        identity,
+        plaintext: new Uint8Array([10, 5, 1]),
+        senderClientId: secondarySenderClientId,
+      }),
+      BufferedDecryptedMessage.PersistedTargeted.new({
+        identity,
+        plaintext: createPlaintext('valid-after'),
+        senderClientId: secondarySenderClientId,
+      }),
+    ];
+    const mlsService = createMLSService(DecryptedMessage.Commit.new({bufferedMessages, identity, isActive: true}));
+
+    const payloads = await handleMLSMessageAdd({
+      event: createEvent(commitSenderQualifiedId),
+      groupId: 'Z3JvdXA=',
+      mlsService,
+      qualifiedConversationId,
+    });
+
+    expect(
+      payloads.map(payload => {
+        return payload.decryptedData?.messageId;
+      }),
+    ).toEqual(['valid-before', 'valid-after']);
+  });
 });
