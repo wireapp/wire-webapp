@@ -80,7 +80,10 @@ import {showBulkRestoreModal} from './restoreBinSelection/showBulkRestoreModal';
 import {useBulkRestore} from './restoreBinSelection/useBulkRestore';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
-import {driveBulkActionsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
+import {
+  driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
+} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import type {Conversation} from '../../../../repositories/entity/Conversation';
@@ -256,6 +259,7 @@ export const CellsTable = ({
   });
   const isSelectionEnabled =
     selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName) && canPerformAnyBulkAction;
+  const isBulkRestoreEnabled = isSelectionEnabled && isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName);
   const activeDriveDrag = useRef<CapturedDriveDrag | null>(null);
   const isDropMoveSubmitting = useRef(false);
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
@@ -818,7 +822,7 @@ export const CellsTable = ({
   const restoreResolution = resolveRestoreTargets({selectedNodes});
   const isBulkRestoreBlocking = bulkRestore.isPending || bulkRestore.reviewReason !== null;
   const canRestoreSelection =
-    isSelectionEnabled &&
+    isBulkRestoreEnabled &&
     selectedNodes.length > 0 &&
     selectedNodes.length === selectedNodeIds.size &&
     isInRecycleBin() &&

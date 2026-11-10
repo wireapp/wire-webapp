@@ -23,6 +23,7 @@ export const conversationListCollapseFeatureToggleName = 'conversation-list-coll
 export const forTestsOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
 export const driveBulkActionsFeatureToggleName = 'drive-bulk-actions';
+export const driveBulkRestoreFeatureToggleName = 'drive-bulk-restore';
 export const troubleshooterFeatureToggleName = 'troubleshooter';
 
 export const sendCallLogsFeatureToggleName = 'send-call-logs';
@@ -34,6 +35,7 @@ export const startupFeatureToggleRegistry = [
   {name: forTestsOnlyFeatureToggleName, previewDefaultEnabled: false},
   {name: disableMessagePreprocessingFeatureToggleName, previewDefaultEnabled: false},
   {name: driveBulkActionsFeatureToggleName, previewDefaultEnabled: true},
+  {name: driveBulkRestoreFeatureToggleName, previewDefaultEnabled: false},
   {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},
   {name: sendCallLogsFeatureToggleName, previewDefaultEnabled: false},
 ] as const;
