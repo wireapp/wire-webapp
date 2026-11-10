@@ -23,6 +23,7 @@ import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {PdfAssetPreview} from './pdfAssetPreview';
 import {RestrictedFile} from './restrictedFile/restrictedFile';
 
 import {useApplicationContext} from '../../../../../../page/rootProvider';
@@ -58,7 +59,10 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
-  const {downloadProgress} = useKoSubscribableChildren(asset, ['downloadProgress']);
+  const {downloadProgress, preview_resource: previewResource} = useKoSubscribableChildren(asset, [
+    'downloadProgress',
+    'preview_resource',
+  ]);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
@@ -66,6 +70,7 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   const fileName = trimFileExtension(assetFileName);
   const fileExtension = getFileExtension(assetFileName);
   const formattedFileSize = formatBytes(asset.file_size);
+  const hasPdfPreview = asset.file_type === 'application/pdf' && previewResource !== undefined;
 
   // This is a hack since we don't have a FileAsset available before it's
   // uploaded completely we have to check if there is upload progress to
@@ -97,7 +102,12 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   }
 
   return (
-    <div className="file-asset" data-uie-name="file-asset" data-uie-value={asset.file_name}>
+    <div
+      className="file-asset"
+      data-uie-name="file-asset"
+      data-uie-value={asset.file_name}
+      css={hasPdfPreview ? {maxWidth: '500px', alignSelf: 'flex-start'} : undefined}
+    >
       {hasHeader && <AssetHeader message={message} />}
 
       {isFileSharingReceivingEnabled ? (
@@ -178,6 +188,15 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
         </div>
       ) : (
         <RestrictedFile asset={asset} />
+      )}
+      {isFileSharingReceivingEnabled && isUploadedOrCancelled && hasPdfPreview && (
+        <PdfAssetPreview
+          key={previewResource.identifier}
+          resource={previewResource}
+          label={`${translate('conversationContextMenuDownload')} ${assetFileName}`}
+          tabIndex={messageFocusedTabIndex}
+          onDownload={onDownloadAsset}
+        />
       )}
     </div>
   );

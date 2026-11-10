@@ -17,7 +17,8 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {act, render, screen, waitFor} from '@testing-library/react';
+import {container} from 'tsyringe';
 import ko from 'knockout';
 
 import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
@@ -31,6 +32,10 @@ import {
 import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 import {FileAsset as FileAssetComponent} from './fileAsset';
+import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
+import {AssetRepository} from '../../../../../../repositories/assets/assetRepository';
+import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
+import {requireValueForTest} from '../../../../../../page/testSupport/rootContextTestSupport';
 
 describe('FileAssetComponent', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -82,6 +87,72 @@ describe('FileAssetComponent', () => {
       wrapper: rootProviderWrapper,
     });
     expect(queryByTestId('file')).toBeNull();
+  });
+
+  it.each([
+    ['disabled receiving', false, false, AssetTransferState.UPLOADED],
+    ['expired message', true, true, AssetTransferState.UPLOADED],
+    ['pending upload', true, false, AssetTransferState.UPLOAD_PENDING],
+    ['failed upload', true, false, AssetTransferState.UPLOAD_FAILED],
+  ] as const)('does not fetch PDF previews for %s', (_reason, receiving, expired, status) => {
+    const load = jest.spyOn(container.resolve(AssetRepository), 'load');
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_type = 'application/pdf';
+    asset.status(status);
+    asset.preview_resource(
+      new AssetRemoteData({
+        assetKey: 'preview',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
+    message.ephemeral_expires(expired);
+    message.status(StatusType.SENT);
+    const restrictedTeam = new TeamState();
+    jest.spyOn(restrictedTeam, 'isFileSharingReceivingEnabled').mockReturnValue(receiving);
+
+    render(<FileAssetComponent message={message} teamState={restrictedTeam} />, {wrapper: rootProviderWrapper});
+
+    expect(load).not.toHaveBeenCalled();
+    load.mockRestore();
+  });
+
+  it('removes the PDF preview and revokes its URL when the message expires', async () => {
+    const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])]);
+    const load = jest.spyOn(container.resolve(AssetRepository), 'load').mockResolvedValue(png);
+    URL.revokeObjectURL = jest.fn();
+    jest.spyOn(URL, 'createObjectURL').mockReturnValue('blob:expiry-preview');
+    const message = mockContentMessage('report.pdf');
+    message.status(StatusType.SENT);
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_type = 'application/pdf';
+    asset.status(AssetTransferState.UPLOADED);
+    asset.preview_resource(
+      new AssetRemoteData({
+        assetKey: 'preview',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+    const [callback] = requireValueForTest((IntersectionObserver as jest.Mock).mock.calls.at(-1));
+    act(() => {
+      return callback([{isIntersecting: true} as IntersectionObserverEntry], {} as IntersectionObserver);
+    });
+    await waitFor(() => {
+      return expect(screen.getAllByRole('button')).toHaveLength(2);
+    });
+
+    act(() => {
+      return message.ephemeral_expires(true);
+    });
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(URL.revokeObjectURL).toHaveBeenCalled();
+    load.mockRestore();
   });
 
   it('shows the file size in MB', () => {
