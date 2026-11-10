@@ -64,7 +64,6 @@ const isOutgoingQuote = (QuoteEntity: QuoteEntity): QuoteEntity is OutgoingQuote
 export const MessageWrapper: FunctionComponent<MessageParams> = ({
   message,
   conversation,
-  cancelPendingReadReceiptsForConversation,
   selfId,
   isFocused,
   isSelfTemporaryGuest,
@@ -183,17 +182,6 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
           return onClickDetails(message);
         },
         label: translate('conversationContextMenuDetails'),
-      });
-    }
-
-    if (!conversation.isSelfUserRemoved()) {
-      entries.push({
-        click: () => {
-          cancelPendingReadReceiptsForConversation(conversation);
-
-          return conversation.markUnreadFrom(message);
-        },
-        label: translate('conversationContextMenuMarkUnread'),
       });
     }
 

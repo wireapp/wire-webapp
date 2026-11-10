@@ -57,8 +57,6 @@ export interface ConversationRecord {
   id: string;
   initial_protocol?: CONVERSATION_PROTOCOL;
   is_guest: boolean;
-  /** Local-only message timestamp from which this conversation is manually unread. */
-  manual_unread_timestamp?: number;
   last_event_timestamp: number;
   last_read_timestamp: number;
   last_server_timestamp: number;
