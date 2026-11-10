@@ -49,7 +49,7 @@ describe.each(['password', 'SSO'] as const)('Meeting link login with %s', mode =
     window.history.replaceState(
       {},
       '',
-      '/auth/?meeting_domain=example.com&meeting_key=key&meeting_code=code&meeting_password=secret#/join-meeting',
+      '/auth/?meeting_domain=example.com&meeting_key=key&meeting_code=code#/join-meeting',
     );
   });
 
@@ -98,7 +98,7 @@ describe.each(['password', 'SSO'] as const)('Meeting link login with %s', mode =
         return store.dispatch(
           actionRoot.authAction.doFinalizeSSOLogin({
             clientType: ClientType.PERMANENT,
-            ...(link.kind === 'meeting' ? {meetingLink: link} : {}),
+            ...(link.kind === 'meeting' ? {meetingLink: link, password: 'secret'} : {}),
           }),
         );
       }
@@ -107,6 +107,9 @@ describe.each(['password', 'SSO'] as const)('Meeting link login with %s', mode =
           {email: 'test@example.com', password: 'login-password', clientType: ClientType.PERMANENT},
           'key',
           'code',
+          undefined,
+          undefined,
+          'secret',
         ),
       );
     };
@@ -125,7 +128,6 @@ describe.each(['password', 'SSO'] as const)('Meeting link login with %s', mode =
       domain: 'example.com',
       key: 'key',
       code: 'code',
-      password: 'secret',
     });
 
     await login();

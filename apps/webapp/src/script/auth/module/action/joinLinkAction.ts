@@ -69,7 +69,6 @@ export class JoinLinkAction {
         await apiClient.transport.http.sendJSON({
           method: 'get',
           url: `${meetingLinkUrl(link, apiClient.backendFeatures.version)}/code-check`,
-          params: isNullOrUndefined(link.password) ? undefined : {password: link.password},
           ...disableRetries,
         });
       } catch (error: unknown) {
@@ -113,7 +112,7 @@ export class JoinLinkAction {
         const response = await apiClient.transport.http.sendJSON<unknown>({
           method: 'post',
           url: `${meetingLinkUrl(link, apiClient.backendFeatures.version)}/join`,
-          params: {password: password ?? link.password},
+          params: password === undefined ? undefined : {password},
           ...disableRetries,
         });
         const destination = joinedMeetingDestinationSchema.parse(response.data);

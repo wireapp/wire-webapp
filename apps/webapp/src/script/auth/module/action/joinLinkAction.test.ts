@@ -27,7 +27,7 @@ import {ConversationActionCreator} from './creator';
 
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {initialRootState} from '../reducer';
-import {initialConversationState, conversationReducer} from '../reducer/conversationReducer';
+import {conversationReducer, initialConversationState} from '../reducer/conversationReducer';
 
 const link = {kind: 'meeting' as const, domain: 'example.com', key: 'key', code: 'code'};
 const metadata = {
@@ -98,23 +98,30 @@ describe('Join link actions', () => {
     expect(state.hasPassword).toBe(false);
   });
 
-  it('treats a password-protected link as valid and retries with a password', async () => {
+  it('requires an entered password for a password-protected meeting', async () => {
     const error = Object.assign(new BackendError('Password required', BackendErrorLabel.NOT_FOUND, 403), {
       label: 'invalid-meeting-password',
     });
     const {store, sendJSON} = createStore(
-      jest.fn().mockRejectedValueOnce(error).mockResolvedValueOnce({data: metadata}),
+      jest
+        .fn()
+        .mockRejectedValueOnce(error)
+        .mockResolvedValue({
+          data: {...metadata, qualified_conversation: {id: 'conversation-id', domain: 'example.com'}},
+        }),
     );
     await store.dispatch(joinLinkAction.doCheckJoinLink(link.key, link.code));
     expect(store.getActions()).toEqual([
       ConversationActionCreator.startConversationCodeCheck('meeting'),
       ConversationActionCreator.joinLinkPasswordRequired(),
     ]);
-    const url = new URL(window.location.href);
-    url.searchParams.set('meeting_password', 'secret');
-    window.history.replaceState({}, '', url);
     await store.dispatch(joinLinkAction.doCheckJoinLink(link.key, link.code));
-    expect(sendJSON).toHaveBeenLastCalledWith(expect.objectContaining({params: {password: 'secret'}}));
+    expect(sendJSON).toHaveBeenLastCalledWith(expect.objectContaining({method: 'get'}));
+    expect(sendJSON.mock.lastCall?.[0]).not.toHaveProperty('params');
+    await store.dispatch(joinLinkAction.doJoinMeetingLink(link, 'secret'));
+    expect(sendJSON).toHaveBeenLastCalledWith(
+      expect.objectContaining({method: 'post', params: {password: 'secret'}}),
+    );
   });
 
   it('joins the meeting and returns a qualified conversation without fabricating an event', async () => {

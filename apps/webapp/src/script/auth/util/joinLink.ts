@@ -28,7 +28,6 @@ export type MeetingLink = {
   domain: string;
   key: string;
   code: string;
-  password?: string;
 };
 
 export type JoinLink = {kind: typeof JOIN_LINK_KIND.CONVERSATION; key: string; code: string} | MeetingLink;
@@ -44,7 +43,6 @@ export function getJoinLink(search = window.location.search): JoinLink {
       domain: domain ?? '',
       key: key ?? '',
       code: code ?? '',
-      password: params.get(QUERY_KEY.MEETING_PASSWORD) ?? undefined,
     };
   }
   return {
