@@ -1777,7 +1777,7 @@ export class ConversationRepository {
   }
 
   private readonly onJoinLink = async (event: {
-    detail: {code: string; key: string; domain?: string | null; kind?: 'conversation' | 'meeting'; password?: string};
+    detail: {code: string; key: string; domain?: string | null; kind?: 'conversation' | 'meeting'};
   }): Promise<void> => {
     if (event.detail.kind === 'meeting') {
       const path = meetingJoinPath({...event.detail, domain: event.detail.domain ?? ''});
