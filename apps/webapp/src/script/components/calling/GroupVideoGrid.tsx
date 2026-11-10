@@ -183,12 +183,55 @@ function GroupVideoThumbnail({
             </div>
           )}
           {selfIsMuted && !minimized && (
-            <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
+            <span
+              className="group-video-grid__element__label__icon"
+              data-uie-name={isMinimized ? 'self-preview-muted-indicator' : 'status-call-audio-muted'}
+              css={
+                isMinimized
+                  ? {
+                      '&.group-video-grid__element__label__icon': {
+                        alignItems: 'center',
+                        bottom: 0,
+                        display: 'flex',
+                        height: 16,
+                        left: 0,
+                        margin: 0,
+                        padding: 0,
+                        width: 16,
+                        zIndex: 3,
+                      },
+                    }
+                  : undefined
+              }
+            >
               <Icon.MicOffIcon data-uie-name="mic-icon-off" />
             </span>
           )}
           {!isNullOrUndefined(selfHandRaisedAt) && !minimized && (
-            <span className="group-video-grid__element__label__hand_icon small" data-uie-name="status-call-audio-muted">
+            <span
+              className="group-video-grid__element__label__hand_icon small"
+              data-uie-name={isMinimized ? 'self-preview-hand-raised-indicator' : 'status-call-audio-muted'}
+              css={
+                isMinimized
+                  ? {
+                      '&&': {
+                        alignItems: 'center',
+                        backgroundColor: 'var(--background-fade-40)',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        fontSize: 12,
+                        height: 16,
+                        justifyContent: 'center',
+                        left: 0,
+                        margin: 0,
+                        top: 0,
+                        width: 16,
+                        zIndex: 3,
+                      },
+                    }
+                  : undefined
+              }
+            >
               ✋
             </span>
           )}
@@ -287,7 +330,7 @@ const GroupVideoThumbnailWrapper: FunctionComponent<{
       overflow: 'visible',
       right: 8,
       top: 8,
-      width: 36,
+      width: 68,
     };
   } else if (minimized) {
     thumbnailStyles = {

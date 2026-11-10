@@ -168,7 +168,7 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
               position: 'absolute',
               right: 12,
               top: 12,
-              width: 36,
+              width: 68,
               zIndex: 3,
             }
           : undefined
@@ -263,6 +263,51 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
           </div>
         )}
       </div>
+      {isSelfParticipant && isSelfPreviewMinimized && isMuted && (
+        <span
+          className="group-video-grid__element__label__icon"
+          css={{
+            '&.group-video-grid__element__label__icon': {
+              alignItems: 'center',
+              bottom: 0,
+              display: 'flex',
+              height: 16,
+              left: 0,
+              margin: 0,
+              padding: 0,
+              width: 16,
+              zIndex: 3,
+            },
+          }}
+          data-uie-name="self-preview-muted-indicator"
+        >
+          <Icon.MicOffIcon data-uie-name="mic-icon-off" />
+        </span>
+      )}
+      {isSelfParticipant && isSelfPreviewMinimized && handRaisedAt != null && (
+        <span
+          className="group-video-grid__element__label__hand_icon"
+          css={{
+            '&&': {
+              alignItems: 'center',
+              backgroundColor: 'var(--background-fade-40)',
+              borderRadius: '50%',
+              display: 'flex',
+              fontSize: 12,
+              height: 16,
+              justifyContent: 'center',
+              left: 0,
+              margin: 0,
+              top: 0,
+              width: 16,
+              zIndex: 3,
+            },
+          }}
+          data-uie-name="self-preview-hand-raised-indicator"
+        >
+          ✋
+        </span>
+      )}
       {isSelfParticipant && allowSelfPreviewMinimize && (
         <div data-uie-name="self-video-preview-window-header" css={{position: 'absolute', right: 4, top: 4, zIndex: 2}}>
           <button
