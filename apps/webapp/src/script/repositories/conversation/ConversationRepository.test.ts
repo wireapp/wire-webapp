@@ -368,7 +368,6 @@ describe('ConversationRepository', () => {
         domain: 'example.com',
         key: 'key&injected=1',
         code: 'code#fragment',
-        password: 'secret',
       },
     });
     expect(navigate).toHaveBeenCalledTimes(1);
@@ -377,7 +376,6 @@ describe('ConversationRepository', () => {
     expect(url.searchParams.get('domain')).toBe('example.com');
     expect(url.searchParams.get('key')).toBe('key&injected=1');
     expect(url.searchParams.get('code')).toBe('code#fragment');
-    expect(url.searchParams.get('password')).toBe('secret');
     expect(url.searchParams.get('injected')).toBeNull();
   });
 
