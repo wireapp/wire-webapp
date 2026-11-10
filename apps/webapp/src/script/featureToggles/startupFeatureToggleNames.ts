@@ -41,7 +41,7 @@ export const startupFeatureToggleRegistry = [
   {name: markAsUnreadFeatureToggleName, previewDefaultEnabled: true},
   {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},
   {name: sendCallLogsFeatureToggleName, previewDefaultEnabled: false},
-  {name: e2ePdfPreviewFeatureToggleName, previewDefaultEnabled: false},
+  {name: e2ePdfPreviewFeatureToggleName, previewDefaultEnabled: true},
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleRegistry)[number]['name'];

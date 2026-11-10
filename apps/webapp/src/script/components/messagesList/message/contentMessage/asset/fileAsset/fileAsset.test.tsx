@@ -32,6 +32,7 @@ import {
 import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 import {FileAsset as FileAssetComponent} from './fileAsset';
+import {createStartupFeatureTogglesFromLocationSearch} from '../../../../../../featureToggles/startupFeatureToggles';
 import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
 import {AssetRepository} from '../../../../../../repositories/assets/assetRepository';
 import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
@@ -39,7 +40,11 @@ import {requireValueForTest} from '../../../../../../page/testSupport/rootContex
 
 describe('FileAssetComponent', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
-    createRootContextValueForTest({translate: translateForTest}),
+    createRootContextValueForTest({
+      translate: translateForTest,
+      isFeatureToggleEnabled: createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview')
+        .isFeatureToggleEnabled,
+    }),
   );
 
   function mockContentMessage(fileName: string | undefined = 'test-file.log'): ContentMessage {
@@ -152,6 +157,32 @@ describe('FileAssetComponent', () => {
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
     expect(URL.revokeObjectURL).toHaveBeenCalled();
+    load.mockRestore();
+  });
+
+  it('does not fetch or display an available PDF preview when the feature flag is disabled', () => {
+    const load = jest.spyOn(container.resolve(AssetRepository), 'load');
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_type = 'application/pdf';
+    asset.status(AssetTransferState.UPLOADED);
+    asset.preview_resource(
+      new AssetRemoteData({
+        assetKey: 'preview',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
+    const disabledWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({translate: translateForTest}),
+    );
+
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: disabledWrapper});
+
+    expect(load).not.toHaveBeenCalled();
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.getByText('report')).toBeInTheDocument();
     load.mockRestore();
   });
 

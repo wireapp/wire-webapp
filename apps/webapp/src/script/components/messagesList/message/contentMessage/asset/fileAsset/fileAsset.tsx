@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 import {PdfAssetPreview} from './pdfAssetPreview';
 import {RestrictedFile} from './restrictedFile/restrictedFile';
 
+import {e2ePdfPreviewFeatureToggleName} from '../../../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
 import type {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
@@ -55,7 +56,7 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   isFocusable = true,
 }: FileAssetProps) => {
   const asset = message.getFirstAsset() as FileAssetType;
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
@@ -70,7 +71,10 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   const fileName = trimFileExtension(assetFileName);
   const fileExtension = getFileExtension(assetFileName);
   const formattedFileSize = formatBytes(asset.file_size);
-  const hasPdfPreview = asset.file_type === 'application/pdf' && previewResource !== undefined;
+  const hasPdfPreview =
+    isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName) &&
+    asset.file_type === 'application/pdf' &&
+    previewResource !== undefined;
 
   // This is a hack since we don't have a FileAsset available before it's
   // uploaded completely we have to check if there is upload progress to

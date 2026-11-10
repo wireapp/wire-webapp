@@ -30,7 +30,7 @@ import {updateLocationSearchForStartupFeatureToggle} from './startupFeatureToggl
 
 describe('initializeStartupFeatureToggleUrl', () => {
   it.each([
-    {description: 'Edge defaults', selection: '', preview: true, expected: false},
+    {description: 'Edge defaults', selection: '', preview: true, expected: true},
     {description: 'release defaults', selection: '', preview: false, expected: false},
     {description: 'release opt-in', selection: '?enabled-features=e2e-pdf-preview', preview: false, expected: true},
     {description: 'Edge explicit opt-out', selection: '?enabled-features=', preview: true, expected: false},
