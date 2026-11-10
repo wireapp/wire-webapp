@@ -54,6 +54,40 @@ describe('ObfuscationUtil', () => {
     }
     const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie);
     expect(cookie.value).not.toBe(obfuscatedCookie.value);
+    expect(obfuscatedCookie.value).toBe(`${cookie.value.slice(0, 20)}...`);
+    expect(obfuscatedCookie).not.toBe(cookie);
+    expect(obfuscatedCookie.key).toBe(cookie.key);
+    expect(obfuscatedCookie.domain).toBe(cookie.domain);
+    expect(obfuscatedCookie.path).toBe(cookie.path);
+    expect(obfuscatedCookie.httpOnly).toBe(cookie.httpOnly);
+    expect(obfuscatedCookie.secure).toBe(cookie.secure);
+  });
+
+  it.each([undefined, null])('returns a redacted cookie when cloning returns %s', clonedCookie => {
+    const originalValue = 'sensitive-cookie-value-that-must-not-be-logged';
+    const originalCookie = Object.assign(new ToughCookie({key: 'zuid', value: originalValue}), {
+      clone(): undefined | null {
+        return clonedCookie;
+      },
+    });
+
+    const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(originalCookie);
+
+    expect(obfuscatedCookie).toBeInstanceOf(ToughCookie);
+    expect(obfuscatedCookie).not.toBe(originalCookie);
+    expect(obfuscatedCookie.key).toBe('zuid');
+    expect(obfuscatedCookie.value).toBe('sensitive-cookie-val...');
+    expect(originalCookie.value).toBe(originalValue);
+  });
+
+  it('returns the original cookie when obfuscation is disabled even if cloning would fail', () => {
+    const originalCookie = Object.assign(new ToughCookie({value: 'session-cookie'}), {
+      clone(): undefined {
+        throw new Error('Disabled obfuscation must not clone the cookie');
+      },
+    });
+
+    expect(ObfuscationUtil.obfuscateCookie(originalCookie, false)).toBe(originalCookie);
   });
 
   it(`doesn't obfuscate a cookie when disabled`, () => {
