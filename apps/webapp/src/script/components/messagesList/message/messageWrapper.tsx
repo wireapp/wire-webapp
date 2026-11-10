@@ -42,6 +42,7 @@ import {SystemMessage} from './systemMessage';
 import {VerificationMessage} from './verificationMessage';
 
 import {ReactionType} from '../../../core/conversation';
+import {markAsUnreadFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from '../../../message/quoteEntity';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {AssetRepository} from '../../../repositories/assets/assetRepository';
@@ -64,6 +65,7 @@ const isOutgoingQuote = (QuoteEntity: QuoteEntity): QuoteEntity is OutgoingQuote
 export const MessageWrapper: FunctionComponent<MessageParams> = ({
   message,
   conversation,
+  cancelPendingReadReceiptsForConversation,
   selfId,
   isFocused,
   isSelfTemporaryGuest,
@@ -87,7 +89,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
 }: MessageParams) => {
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   type FindMessageResult = Promise<ContentMessage & {primary_key: string}>;
   const findMessage = async (conversation: Conversation, messageId: string): FindMessageResult => {
     const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
@@ -182,6 +184,17 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
           return onClickDetails(message);
         },
         label: translate('conversationContextMenuDetails'),
+      });
+    }
+
+    if (isFeatureToggleEnabled(markAsUnreadFeatureToggleName) && !conversation.isSelfUserRemoved()) {
+      entries.push({
+        click: () => {
+          cancelPendingReadReceiptsForConversation(conversation);
+
+          return conversation.markUnreadFrom(message);
+        },
+        label: translate('conversationContextMenuMarkUnread'),
       });
     }
 

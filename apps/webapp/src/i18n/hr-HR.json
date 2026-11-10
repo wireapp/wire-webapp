@@ -797,6 +797,7 @@
   "conversationContextMenuDownload": "Preuzimanje",
   "conversationContextMenuEdit": "Promjeni",
   "conversationContextMenuLike": "Sviđa mi se",
+  "conversationContextMenuMarkUnread": "Mark as unread from here",
   "conversationContextMenuReply": "Odgovor",
   "conversationContextMenuUnlike": "Ne sviđa mi se",
   "conversationCreateReceiptsEnabled": "Potvrde čitanja su uključene",

@@ -17,6 +17,8 @@
  *
  */
 
+import {isNumber, isUndefined} from '@sindresorhus/is';
+import {maybe as Maybe} from 'true-myth';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
 import {EventMapper} from '../../../repositories/conversation/EventMapper';
@@ -51,7 +53,7 @@ describe('MessagesGroup', () => {
       return eventMapper.mapJsonEvent(event, conversation) as Message;
     });
 
-    const groupedMessages = groupMessagesBySenderAndTime(allMessages, Infinity);
+    const groupedMessages = groupMessagesBySenderAndTime({messages: allMessages, lastReadTimestamp: Infinity});
     // We expect the number of groups to be the number of different senders + the group that contains all the message from user1
     expect(groupedMessages.length).toBe(nbOtherMessages + 1);
 
@@ -70,7 +72,7 @@ describe('MessagesGroup', () => {
       return eventMapper.mapJsonEvent(event, conversation) as Message;
     });
 
-    const groupedMessages = groupMessagesBySenderAndTime(allMessages, Infinity);
+    const groupedMessages = groupMessagesBySenderAndTime({messages: allMessages, lastReadTimestamp: Infinity});
     expect(groupedMessages).toHaveLength(2);
   });
 
@@ -90,12 +92,75 @@ describe('MessagesGroup', () => {
       return eventMapper.mapJsonEvent(event, conversation) as Message;
     });
 
-    const groupedMessages = groupMessagesBySenderAndTime(allMessages, lastReadTimestamp);
+    const groupedMessages = groupMessagesBySenderAndTime({messages: allMessages, lastReadTimestamp: lastReadTimestamp});
     expect(
       groupedMessages.findIndex(group => {
         return isMarker(group);
       }),
     ).toBe(nbReadMessages);
+  });
+
+  it('preserves ordinary grouping without a separator before the first loaded message', () => {
+    const messageEvent = createMessageAddEvent({overrides: {time: new Date(100).toISOString()}});
+    const message = eventMapper.mapJsonEvent(messageEvent, conversation) as Message;
+
+    const groupedMessages = groupMessagesBySenderAndTime({messages: [message], lastReadTimestamp: 0});
+
+    expect(
+      groupedMessages.some(group => {
+        return isMarker(group) && group.type === 'unread';
+      }),
+    ).toBe(false);
+  });
+
+  it('places the unread separator at the manually selected message', () => {
+    const messageEvents = [1, 2, 3].map(timestamp => {
+      return createMessageAddEvent({overrides: {time: new Date(timestamp).toISOString()}});
+    });
+    const messages = messageEvents.map(event => {
+      return eventMapper.mapJsonEvent(event, conversation) as Message;
+    });
+    const selectedMessage = messages[1];
+    expect(selectedMessage).toBeDefined();
+    if (isUndefined(selectedMessage)) {
+      return;
+    }
+    conversation.last_read_timestamp(0);
+
+    conversation.markUnreadFrom(selectedMessage);
+
+    const groupedMessages = groupMessagesBySenderAndTime({
+      messages: messages,
+      lastReadTimestamp: conversation.effectiveReadTimestamp(),
+      includeInitialUnreadSeparator: isNumber(conversation.manualUnreadTimestamp()),
+    });
+    const unreadSeparator = Maybe.find(group => {
+      return isMarker(group) && group.type === 'unread';
+    }, groupedMessages).unwrapOr(undefined);
+
+    expect(unreadSeparator).toEqual({type: 'unread', timestamp: selectedMessage.timestamp()});
+    conversation.clearManualUnreadMarker();
+  });
+
+  it('places the unread separator before the first loaded selected message', () => {
+    const messageEvent = createMessageAddEvent({overrides: {time: new Date(1).toISOString()}});
+    const selectedMessage = eventMapper.mapJsonEvent(messageEvent, conversation) as Message;
+    conversation.last_read_timestamp(0);
+
+    conversation.markUnreadFrom(selectedMessage);
+
+    const groupedMessages = groupMessagesBySenderAndTime({
+      messages: [selectedMessage],
+      lastReadTimestamp: conversation.effectiveReadTimestamp(),
+      includeInitialUnreadSeparator: isNumber(conversation.manualUnreadTimestamp()),
+    });
+    const unreadSeparator = Maybe.find(group => {
+      return isMarker(group) && group.type === 'unread';
+    }, groupedMessages).unwrapOr(undefined);
+
+    expect(unreadSeparator).toEqual({type: 'unread', timestamp: selectedMessage.timestamp()});
+    expect(groupedMessages[0]).toBe(unreadSeparator);
+    conversation.clearManualUnreadMarker();
   });
 
   it('adds markers for messages sent on different days', () => {
@@ -115,7 +180,7 @@ describe('MessagesGroup', () => {
       return eventMapper.mapJsonEvent(event, conversation) as Message;
     });
 
-    const groupedMessages = groupMessagesBySenderAndTime(allMessages, Infinity);
+    const groupedMessages = groupMessagesBySenderAndTime({messages: allMessages, lastReadTimestamp: Infinity});
     const firstMarkerIndex = groupedMessages.findIndex(group => {
       return isMarker(group);
     });
@@ -143,7 +208,7 @@ describe('MessagesGroup', () => {
       return eventMapper.mapJsonEvent(event, conversation) as Message;
     });
 
-    const groupedMessages = groupMessagesBySenderAndTime(allMessages, lastReadTimestamp);
+    const groupedMessages = groupMessagesBySenderAndTime({messages: allMessages, lastReadTimestamp: lastReadTimestamp});
     /* There should be :
       - one group for read messages from the sender
       - one marker for unread messages

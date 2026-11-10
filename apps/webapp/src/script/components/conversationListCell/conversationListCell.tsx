@@ -28,7 +28,7 @@ import React, {
 } from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
 
@@ -98,6 +98,7 @@ export const ConversationListCell: FunctionComponent<ConversationListCellProps> 
     isChannel,
     isGroupOrChannel,
     isGhostGroup,
+    manualUnreadTimestamp,
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'is1to1',
@@ -111,6 +112,7 @@ export const ConversationListCell: FunctionComponent<ConversationListCellProps> 
     'isChannel',
     'isGroupOrChannel',
     'isGhostGroup',
+    'manualUnreadTimestamp',
   ]);
 
   const guardCall = useNoInternetCallGuard({
@@ -149,6 +151,8 @@ export const ConversationListCell: FunctionComponent<ConversationListCellProps> 
 
   if (unreadMessagesCount > 0) {
     accessibilityParts.push(`${unreadMessagesCount} ${translate('conversationLabelUnread')}`);
+  } else if (isNumber(manualUnreadTimestamp)) {
+    accessibilityParts.push(translate('conversationLabelUnread'));
   }
 
   if (isMutedConversation) {

@@ -39,6 +39,7 @@ const DEBOUNCE = 500;
 
 type UseReadReceiptSenderResult = {
   addReadReceiptToBatch: (conversation: Conversation, message: Message) => void;
+  cancelPendingReadReceiptsForConversation: (conversation: Conversation) => void;
 };
 export const useReadReceiptSender = (options: UseReadReceiptSenderOptions): UseReadReceiptSenderResult => {
   const {messageSender, clock} = options;
@@ -73,6 +74,23 @@ export const useReadReceiptSender = (options: UseReadReceiptSenderOptions): UseR
     }
   }, [clock, messageSender]);
 
+  const cancelPendingReadReceiptsForConversation = useCallback(
+    (conversationToCancel: Conversation): void => {
+      readMessagesBuffer.current = readMessagesBuffer.current.filter(readMessage => {
+        return (
+          readMessage.conversation.id !== conversationToCancel.id ||
+          readMessage.conversation.domain !== conversationToCancel.domain
+        );
+      });
+
+      if (!isNonEmptyArray(readMessagesBuffer.current) && !isUndefined(flushTimer.current)) {
+        clock.clearTimeout(flushTimer.current);
+        flushTimer.current = undefined;
+      }
+    },
+    [clock],
+  );
+
   return {
     addReadReceiptToBatch: (conversation: Conversation, message: Message) => {
       // Check that the message has not already been batched for a future read receipt
@@ -92,5 +110,6 @@ export const useReadReceiptSender = (options: UseReadReceiptSenderOptions): UseR
       readMessagesBuffer.current = readMessagesBuffer.current.concat(entry);
       flushTimer.current = clock.setTimeout(flush, DEBOUNCE);
     },
+    cancelPendingReadReceiptsForConversation,
   };
 };

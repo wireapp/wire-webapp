@@ -797,6 +797,7 @@
   "conversationContextMenuDownload": "دانلود",
   "conversationContextMenuEdit": "ویرایش",
   "conversationContextMenuLike": "می‌پسندم",
+  "conversationContextMenuMarkUnread": "Mark as unread from here",
   "conversationContextMenuReply": "Reply",
   "conversationContextMenuUnlike": "نمی‌پسندم",
   "conversationCreateReceiptsEnabled": "Read receipts are on",
