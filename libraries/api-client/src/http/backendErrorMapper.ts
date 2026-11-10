@@ -40,7 +40,7 @@ import {
   MLSInvalidLeafNodeSignatureError,
   MLSStaleMessageError,
 } from '../conversation/';
-import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/';
+import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/teamError';
 import {QualifiedId, QualifiedIdSchema, UnconnectedUserError, UserIsUnknownError} from '../user/';
 
 import {BackendError, BackendErrorLabel} from './';
