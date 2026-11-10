@@ -22,15 +22,16 @@ import {FC, useState} from 'react';
 import {container} from 'tsyringe';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
-import {MultipleFilesIcon, PlayIcon} from '@wireapp/react-ui-kit';
-
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {isPreviewableImage} from 'Util/imageUtil';
-import {getFileExtension, getName} from 'Util/util';
 
 import {useGetMultipartAsset} from './multipartAssets/useGetMultipartAsset/useGetMultipartAsset';
+
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {MultipleFilesIcon} from '../../../../../uiKit/dataDisplay/icon/files/multipleFilesIcon';
+import {PlayIcon} from '../../../../../uiKit/dataDisplay/icon/playIcon';
+import {isPreviewableImage} from '../../../../../util/imageUtil';
+import {getFileExtension, getName} from '../../../../../util/util';
+import {FileTypeIcon} from '../../../../conversation/common/fileTypeIcon/fileTypeIcon';
+import {FileFullscreenModal} from '../../../../FileFullscreenModal/FileFullscreenModal';
 
 interface MultipartAssetPreviewProps {
   cellAssets: ICellAsset[];
@@ -100,9 +101,9 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
         style={{cursor: 'pointer'}}
         role="button"
         tabIndex={0}
-        onKeyDown={e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
+        onKeyDown={event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
             setIsModalOpen(true);
           }
         }}

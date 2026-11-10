@@ -16,32 +16,29 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, type RenderResult} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 import {container} from 'tsyringe';
 
-import en from 'I18n/en-US.json';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
-import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
-import {useJoinMeetingCall} from 'Components/meeting/useJoinMeetingCall';
+import en from '../../../../i18n/en-US.json';
+import {User} from '../../../repositories/entity/User';
+import {UserState} from '../../../repositories/user/userState';
+import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
+import {useJoinMeetingCall} from '../useJoinMeetingCall';
 import {MeetingNotificationCard} from './meetingNotificationCard';
-import {
-  type MeetingNotification,
-  MeetingNotificationKind,
-} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
-import {formatLocale} from 'Util/timeUtil';
-import {setStrings, translate, type Translate} from 'Util/localizerUtil';
-import type {Substitutions, TranslationKey} from 'Util/localizerUtil/translationTypes';
+import {type MeetingNotification, MeetingNotificationKind} from '../meetingNotificationStore/meetingNotificationStore';
+import {formatLocale} from '../../../util/timeUtil';
+import {setStrings, translate, type Translate} from '../../../util/localizerUtil';
+import type {Substitutions, TranslationKey} from '../../../util/localizerUtil/translationTypes';
 import type {ReactElement} from 'react';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import type {MainViewModel} from 'src/script/view_model/MainViewModel';
+} from '../../../page/testSupport/rootContextTestSupport';
+import type {MainViewModel} from '../../../view_model/MainViewModel';
 
-jest.mock('Components/meeting/useJoinMeetingCall', () => {
+jest.mock('../useJoinMeetingCall', () => {
   return {
     useJoinMeetingCall: jest.fn(),
   };
@@ -79,7 +76,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForNotificationTest, mainViewModel}),
 );
 
-const renderCard = (card: ReactElement) => {
+const renderCard = (card: ReactElement): RenderResult => {
   return render(<ThemeProvider>{card}</ThemeProvider>, {wrapper: rootProviderWrapper});
 };
 

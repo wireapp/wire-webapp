@@ -19,9 +19,9 @@
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStateHandler} from './ConversationStateHandler';
@@ -29,7 +29,13 @@ import type {ConversationService} from './ConversationService';
 
 import {Conversation} from '../entity/Conversation';
 
-function buildHandler() {
+type ConversationStateHandlerTestSetup = {
+  conversationService: jest.Mocked<Pick<ConversationService, 'deleteConversationCode' | 'putConversationAccess'>>;
+  translate: Translate;
+  handler: ConversationStateHandler;
+};
+
+function buildHandler(): ConversationStateHandlerTestSetup {
   const conversationService: jest.Mocked<
     Pick<ConversationService, 'deleteConversationCode' | 'putConversationAccess'>
   > = {
@@ -44,7 +50,7 @@ function buildHandler() {
   return {conversationService, translate, handler};
 }
 
-function buildConversation(inTeam: boolean) {
+function buildConversation(inTeam: boolean): Conversation {
   const conversation = new Conversation('conversation-id', 'wire.com', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   (conversation as any).inTeam = jest.fn(() => {
     return inTeam;

@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {wrapperStyles} from './fileCardActions.style';
 
@@ -25,6 +25,6 @@ interface FileCardActionsProps {
   children: ReactNode;
 }
 
-export const FileCardActions = ({children}: FileCardActionsProps) => {
+export const FileCardActions: FunctionComponent<FileCardActionsProps> = ({children}: FileCardActionsProps) => {
   return <div css={wrapperStyles}>{children}</div>;
 };

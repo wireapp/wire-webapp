@@ -23,7 +23,7 @@ import {getStorage} from './localStorage';
 
 import {Configuration} from '../Config';
 
-export function enableLogging(config: Configuration, search = window.location.search) {
+export function enableLogging(config: Configuration, search = window.location.search): void {
   const storage = getStorage();
   const namespace = new URLSearchParams(search).get('enableLogging');
   const force = config.FEATURE.ENABLE_DEBUG;

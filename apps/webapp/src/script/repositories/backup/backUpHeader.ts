@@ -17,7 +17,7 @@
  *
  */
 
-import sodium from 'libsodium-wrappers-sumo';
+import sodium, {from_string, memcmp, ready} from 'libsodium-wrappers-sumo';
 
 const passwordHashMemoryLimitInBytes = 33554432;
 const passwordHashOperationsLimit = 4;
@@ -35,6 +35,9 @@ export interface DecodedHeader {
   opslimit: number;
   memlimit: number;
 }
+
+type BackupHeaderReadResult = {decodedHeader: DecodedHeader; headerSize: number};
+type BackupHeaderDecodeResult = BackupHeaderReadResult & {decodingError: string | null};
 
 export const ENCRYPTED_BACKUP_FORMAT = 'WBUX';
 export const ENCRYPTED_BACKUP_VERSION = '03';
@@ -64,8 +67,8 @@ export class BackUpHeader {
     this.password = password;
   }
 
-  async encodeHeader() {
-    await sodium.ready;
+  async encodeHeader(): Promise<Uint8Array<ArrayBuffer>> {
+    await ready;
     const {
       BACKUP_HEADER_FORMAT_LENGTH,
       BACKUP_HEADER_EXTRA_GAP_LENGTH,
@@ -81,8 +84,8 @@ export class BackUpHeader {
       this.OPSLIMIT_INTERACTIVE_VALUE,
       this.MEMLIMIT_INTERACTIVE_VALUE,
     );
-    const formatBytes = sodium.from_string(this.format);
-    const versionBytes = sodium.from_string(this.version);
+    const formatBytes = from_string(this.format);
+    const versionBytes = from_string(this.version);
     const nonReadableByte = new Uint8Array([0x00]);
     const opslimitBytes = new Uint8Array(UNSIGNED_INT_LENGTH);
     const memlimitBytes = new Uint8Array(UNSIGNED_INT_LENGTH);
@@ -117,13 +120,11 @@ export class BackUpHeader {
     return nextPos;
   }
 
-  async decodeHeader(
-    encryptedDataSource: Uint8Array,
-  ): Promise<{decodingError: string | null; decodedHeader: DecodedHeader; headerSize: number}> {
+  async decodeHeader(encryptedDataSource: Uint8Array): Promise<BackupHeaderDecodeResult> {
     const dataSrc = new Uint8Array(encryptedDataSource);
     const {decodedHeader, headerSize} = this.readBackupHeader(dataSrc);
 
-    await sodium.ready;
+    await ready;
     // Sanity checks
     const expectedHashedUserId = this.hashUserId(
       this.userId,
@@ -141,9 +142,9 @@ export class BackUpHeader {
     decodedHeader: DecodedHeader,
     expectedHashedUserId: Uint8Array,
     storedHashedUserId: Uint8Array,
-  ) {
+  ): string | null {
     const {format, version} = decodedHeader;
-    if (!sodium.memcmp(expectedHashedUserId, storedHashedUserId)) {
+    if (!memcmp(expectedHashedUserId, storedHashedUserId)) {
       return ERROR_TYPES.INVALID_USER_ID;
     } else if (format !== this.format) {
       return ERROR_TYPES.INVALID_FORMAT;
@@ -153,8 +154,8 @@ export class BackUpHeader {
     return null;
   }
 
-  async generateChaCha20Key(header: DecodedHeader) {
-    await sodium.ready;
+  async generateChaCha20Key(header: DecodedHeader): Promise<Uint8Array<ArrayBufferLike>> {
+    await ready;
 
     return sodium.crypto_pwhash(
       this.PWD_HASH_OUTPUT_BYTES,
@@ -178,7 +179,7 @@ export class BackUpHeader {
     ) as Uint8Array;
   }
 
-  readBackupHeader(data: Uint8Array): {decodedHeader: DecodedHeader; headerSize: number} {
+  readBackupHeader(data: Uint8Array): BackupHeaderReadResult {
     const {
       BACKUP_HEADER_FORMAT_LENGTH,
       BACKUP_HEADER_EXTRA_GAP_LENGTH,

@@ -17,21 +17,56 @@
  *
  */
 
-import {act, render, screen, waitFor, within} from '@testing-library/react';
+import {act, render, screen, waitFor, within, type RenderResult} from '@testing-library/react';
+import type {FunctionComponent} from 'react';
+import {Maybe} from 'true-myth';
 import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
-import type {UploadState} from 'Repositories/cells/upload';
-import type {Translate} from 'Util/localizerUtil';
+import type {UploadState} from '../../../repositories/cells/upload';
+import type {Translate} from '../../../util/localizerUtil';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
+import {
+  SharedDriveUploadStatusProvider,
+  useSharedDriveUploadStatus,
+  type SharedDriveMoveStatus,
+} from './sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from './sharedDriveUploadStatusPopupHost';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const conversationQualifiedId = 'conversation@example.com';
 const otherConversationQualifiedId = 'other@example.com';
+const translateMoveSummaryForTest: Translate = (key, substitutions) => {
+  if (key === 'cells.bulkMove.movingItems') {
+    return `Moving ${substitutions?.count} items`;
+  }
+  if (key === 'cells.bulkMove.movedItems') {
+    return `Moved ${substitutions?.count} items`;
+  }
+  if (key === 'cells.uploadStatus.destination') {
+    return `to ${substitutions?.destination}`;
+  }
+  return translateForTest(key);
+};
+
+type TestMoveStatus = SharedDriveMoveStatus;
+
+const MoveStatusPollControl: FunctionComponent<{readonly status: TestMoveStatus}> = ({status}) => {
+  const {updateMoveStatus} = useSharedDriveUploadStatus();
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        return updateMoveStatus(status);
+      }}
+    >
+      Poll move status
+    </button>
+  );
+};
 
 const uploadSource = {blob: new Blob(['data']), name: 'report.pdf', contentType: 'application/pdf', size: 4};
 const uploadState: UploadState = {
@@ -79,12 +114,12 @@ const createController = (state: UploadState | readonly UploadState[] = uploadSt
     snapshots: jest.fn(scope => {
       return scope === conversationQualifiedId ? (Array.isArray(state) ? state : [state]) : [];
     }),
-    subscribe: jest.fn((_listener: () => void) => {
+    subscribe: jest.fn((_: () => void) => {
       return jest.fn();
     }),
     upload: jest.fn(),
     updateRefresh: jest.fn(),
-    cancel: jest.fn(async (_uploadId: string): Promise<void> => {
+    cancel: jest.fn(async (_: string): Promise<void> => {
       return undefined;
     }),
     retryUpload: jest.fn(),
@@ -108,19 +143,307 @@ const renderHost = (
   isEnabled = true,
   isFileTabActive = true,
   translate = translateForTest,
-) => {
+  moveStatus?: TestMoveStatus,
+): RenderResult => {
   return render(
-    <SharedDriveUploadStatusPopupHost
-      controller={controller}
-      conversationQualifiedId={scope}
-      isEnabled={isEnabled}
-      isFileTabActive={isFileTabActive}
-    />,
+    moveStatus ? (
+      <SharedDriveUploadStatusProvider initialMoveStatus={Maybe.just(moveStatus)}>
+        <MoveStatusPollControl status={moveStatus} />
+        <SharedDriveUploadStatusPopupHost
+          controller={controller}
+          conversationQualifiedId={scope}
+          isEnabled={isEnabled}
+          isFileTabActive={isFileTabActive}
+        />
+      </SharedDriveUploadStatusProvider>
+    ) : (
+      <SharedDriveUploadStatusPopupHost
+        controller={controller}
+        conversationQualifiedId={scope}
+        isEnabled={isEnabled}
+        isFileTabActive={isFileTabActive}
+      />
+    ),
     {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate}))},
   );
 };
 
 describe('SharedDriveUploadStatusPopupHost', () => {
+  it('uses the existing popup for indeterminate move status and prioritizes it over concurrent upload status', () => {
+    const controller = createController();
+    renderHost(controller, conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'move-job',
+      kind: 'processing',
+      items: [
+        {id: 'folder-1', name: 'Design reviews', isFolder: true},
+        {id: 'file-1', name: 'mockup.pdf', isFolder: false},
+        {id: 'file-2', name: 'notes.txt', isFolder: false},
+      ],
+      destinationPath: 'Design reviews',
+      action: 'move',
+    });
+
+    expect(document.querySelectorAll('[data-uie-name="shared-drive-upload-status-popup"]')).toHaveLength(1);
+    expect(screen.getByText('Moving 3 items')).toBeInTheDocument();
+    expect(screen.getByText('to Design reviews')).toBeInTheDocument();
+    expect(within(screen.getByRole('list')).getByText('Design reviews')).toBeInTheDocument();
+    expect(screen.getByText('mockup.pdf')).toBeInTheDocument();
+    expect(screen.getByText('notes.txt')).toBeInTheDocument();
+    const progress = screen.getByRole('progressbar', {name: 'cells.bulkMove.processing'});
+    expect(progress).not.toHaveAttribute('aria-valuenow');
+    expect(progress).not.toHaveAttribute('aria-valuemax');
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
+  });
+
+  it('shows restore progress with its own title, label and original-location destination', () => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'restore-job',
+      action: 'restore',
+      kind: 'processing',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+    });
+
+    expect(screen.getByText('cells.bulkRestore.status.restoring')).toBeInTheDocument();
+    expect(screen.getByText('to cells.bulkRestore.status.destination')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', {name: 'cells.bulkMove.processing'})).not.toHaveAttribute('aria-valuenow');
+  });
+
+  it('shows a completed restore with a full progress bar', () => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'restore-job',
+      action: 'restore',
+      kind: 'completed',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+    });
+
+    expect(screen.getByText('cells.bulkRestore.status.restored')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', {name: 'cells.bulkRestore.status.completed'})).toHaveAttribute(
+      'aria-valuenow',
+      '100',
+    );
+  });
+
+  it.each(['request-failed', 'partial', 'finished-unknown', 'failed', 'status-unknown'] as const)(
+    'announces a %s restore as needing review with the shared restore error',
+    kind => {
+      renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+        id: 'restore-job',
+        action: 'restore',
+        kind,
+        items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+        destinationPath: '',
+      });
+
+      expect(screen.getByText('cells.bulkRestore.status.needsReview')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('cells.restore.error');
+      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    },
+  );
+
+  it.each([
+    ['processing', 'cells.bulkDelete.status.deleting'],
+    ['completed', 'cells.bulkDelete.status.deleted'],
+  ] as const)('titles a %s permanent delete and shows no destination line', (kind, title) => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'delete-job',
+      action: 'permanentDelete',
+      kind,
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+    });
+
+    expect(screen.getByText(title)).toBeInTheDocument();
+    expect(screen.queryByText(/^to /)).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['request-failed', 'cells.bulkDelete.rejected'],
+    ['failed', 'cells.bulkDelete.jobFailed'],
+    ['finished-unknown', 'cells.bulkDelete.refreshFailed'],
+    ['status-unknown', 'cells.bulkDelete.timedOut'],
+    ['partial', 'cells.bulkDelete.stillVisible'],
+  ] as const)('announces a %s permanent delete with its delete-specific message', (kind, message) => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'delete-job',
+      action: 'permanentDelete',
+      kind,
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+    });
+
+    expect(screen.getByText('cells.bulkDelete.status.needsReview')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(message);
+  });
+
+  it.each([
+    ['processing', 'cells.emptyBin.status.processing'],
+    ['completed', 'cells.emptyBin.status.completed'],
+  ] as const)('titles a %s empty-Bin action and lists no items or destination', (kind, title) => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'empty-bin',
+      action: 'emptyBin',
+      kind,
+      items: [],
+      destinationPath: '',
+    });
+
+    expect(screen.getByText(title)).toBeInTheDocument();
+    expect(screen.queryAllByRole('listitem')).toHaveLength(0);
+    expect(screen.queryByText(/^to /)).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['request-failed', 'cells.emptyBin.status.lookup-error'],
+    ['partial', 'cells.emptyBin.status.partial'],
+    ['failed', 'cells.emptyBin.status.failed'],
+    ['status-unknown', 'cells.emptyBin.status.unknown'],
+    ['finished-unknown', 'cells.emptyBin.refreshFailed'],
+  ] as const)('announces a %s empty-Bin action with its existing message', (kind, message) => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'empty-bin',
+      action: 'emptyBin',
+      kind,
+      items: [],
+      destinationPath: '',
+    });
+
+    expect(screen.getByText('cells.emptyBin.status.needsReview')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(message);
+  });
+
+  it.each([
+    ['request-failed', 'cells.bulkMove.requestFailed'],
+    ['partial', 'cells.bulkMove.partialMoveWarning'],
+    ['finished-unknown', 'cells.bulkMove.finishedUnknown'],
+    ['failed', 'cells.bulkMove.allJobsFailed'],
+    ['status-unknown', 'cells.bulkMove.statusLookupUnknown'],
+  ] as const)('announces %s in the move status popup without showing progress', (kind, warning) => {
+    const controller = createController();
+    renderHost(controller, conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'move-job',
+      kind,
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: 'Design reviews',
+      action: 'move',
+    });
+
+    expect(screen.getByRole('alert')).toHaveTextContent(warning);
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    expect(screen.getByRole('listitem')).toHaveTextContent('mockup.pdf');
+    expect(screen.getByRole('listitem')).not.toHaveTextContent(/failed/i);
+  });
+
+  it('offers a review button for a restore that needs review and runs its callback', async () => {
+    const user = userEvent.setup();
+    const onReview = jest.fn();
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'restore-job',
+      action: 'restore',
+      kind: 'status-unknown',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+      onReview,
+    });
+
+    await user.click(screen.getByRole('button', {name: 'cells.bulkAction.refresh'}));
+
+    expect(onReview).toHaveBeenCalledTimes(1);
+  });
+
+  it('disables the review button and shows it is refreshing while the review runs', async () => {
+    const user = userEvent.setup();
+    const onReview = jest.fn();
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'restore-job',
+      action: 'restore',
+      kind: 'status-unknown',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+      onReview,
+      isReviewing: true,
+    });
+
+    const refreshingButton = screen.getByRole('button', {name: 'cells.bulkAction.refreshing'});
+    expect(refreshingButton).toBeDisabled();
+    await user.click(refreshingButton);
+
+    expect(onReview).not.toHaveBeenCalled();
+  });
+
+  it.each(['processing', 'completed'] as const)('does not offer the review button while %s', kind => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'restore-job',
+      action: 'restore',
+      kind,
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+      onReview: jest.fn(),
+    });
+
+    expect(screen.queryByRole('button', {name: 'cells.bulkAction.refresh'})).not.toBeInTheDocument();
+  });
+
+  it('does not offer the review button when the status has no review callback', () => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'move-job',
+      action: 'move',
+      kind: 'partial',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: 'Design reviews',
+    });
+
+    expect(screen.queryByRole('button', {name: 'cells.bulkAction.refresh'})).not.toBeInTheDocument();
+  });
+
+  it('keeps a dismissed pending move hidden across status updates without cancelling it', async () => {
+    const user = userEvent.setup();
+    const controller = createController();
+    renderHost(controller, conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'move-job',
+      kind: 'processing',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: 'Design reviews',
+      action: 'move',
+    });
+
+    await user.click(screen.getByRole('button', {name: 'fileCardDefaultCloseButtonLabel'}));
+    expect(screen.queryByText('Moving 1 items')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', {name: 'Poll move status'}));
+    expect(screen.queryByText('Moving 1 items')).not.toBeInTheDocument();
+    expect(controller.cancel).not.toHaveBeenCalled();
+  });
+
+  it('shows completion then resumes the upload status in the same popup after dismissal', async () => {
+    const user = userEvent.setup();
+    const controller = createController();
+    renderHost(controller, conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'move-job',
+      kind: 'completed',
+      items: [
+        {id: 'folder-1', name: 'Design reviews', isFolder: true},
+        {id: 'file-1', name: 'mockup.pdf', isFolder: false},
+        {id: 'file-2', name: 'notes.txt', isFolder: false},
+      ],
+      destinationPath: 'Design reviews',
+      action: 'move',
+    });
+
+    expect(screen.getByText('Moved 3 items')).toBeInTheDocument();
+    expect(screen.getAllByText('cells.bulkMove.completed')).toHaveLength(3);
+    const progress = screen.getByRole('progressbar', {name: 'cells.bulkMove.completed'});
+    expect(progress).toHaveAttribute('aria-valuemin', '0');
+    expect(progress).toHaveAttribute('aria-valuemax', '100');
+    expect(progress).toHaveAttribute('aria-valuenow', '100');
+    expect(document.querySelectorAll('[data-uie-name="shared-drive-upload-status-popup"]')).toHaveLength(1);
+    await user.click(screen.getByRole('button', {name: 'fileCardDefaultCloseButtonLabel'}));
+
+    expect(await screen.findByText('report.pdf')).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-uie-name="shared-drive-upload-status-popup"]')).toHaveLength(1);
+  });
+
   it('does not render when direct upload is disabled', () => {
     renderHost(createController(), conversationQualifiedId, false);
 
@@ -181,12 +504,10 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const view = renderHost(controller, conversationQualifiedId, true, true, translateAggregate);
 
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
-    const rows = view.getAllByTestId('shared-drive-upload-status-row');
+    const rows = view.getAllByRole('listitem');
     expect(rows).toHaveLength(7);
     expect(view.getByText('Uploading 7 items')).toBeInTheDocument();
-    expect(
-      within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {name: 'Cancel all'}),
-    ).toBeInTheDocument();
+    expect(within(view.getByRole('group')).getByRole('button', {name: 'Cancel all'})).toBeInTheDocument();
     expect(
       Array.from(rows).map(row => {
         return row.querySelector('strong')?.textContent;
@@ -231,7 +552,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const view = renderHost(controller, conversationQualifiedId, true, true, translateFolder);
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
 
-    const rows = view.getAllByTestId('shared-drive-upload-status-row');
+    const rows = view.getAllByRole('listitem');
     expect(rows).toHaveLength(1);
     expect(within(rows[0]).getByText('Marketing')).toBeInTheDocument();
     expect(within(rows[0]).getByText('Couldn’t upload 1 of 2 files')).toBeInTheDocument();
@@ -270,7 +591,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const view = renderHost(controller, conversationQualifiedId, true, true, translateFolder);
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
 
-    const row = view.getByTestId('shared-drive-upload-status-row');
+    const row = view.getByRole('listitem', {hidden: true});
     expect(within(row).getByText('Uploading 1 of 3 files…')).toBeInTheDocument();
     expect(within(row).getByRole('button', {name: 'conversationAssetUploadCancel'})).toBeInTheDocument();
     expect(within(row).queryByRole('button', {name: 'fileCardDefaultCloseButtonLabel'})).not.toBeInTheDocument();
@@ -304,7 +625,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
 
     await user.click(
-      within(view.getByTestId('shared-drive-upload-status-row')).getByRole('button', {
+      within(view.getByRole('listitem', {hidden: true})).getByRole('button', {
         name: 'conversationAssetUploadCancel',
       }),
     );
@@ -354,14 +675,14 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     controller.cancel.mockReturnValue(new Promise<void>(noop));
 
     const view = renderHost(controller, conversationQualifiedId);
-    const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+    const cancel = within(view.getByRole('group')).getByRole('button', {
       name: 'conversationAssetUploadCancel',
     });
     await user.click(cancel);
 
     expect(controller.cancel).toHaveBeenCalledWith('upload-1');
     expect(view.queryByRole('status')).toBeInTheDocument();
-    expect(view.queryByTestId('shared-drive-upload-status-popup')).toBeInTheDocument();
+    expect(view.queryByRole('status')).toBeInTheDocument();
   });
 
   it('keeps each row cancel disabled until its own batch cancellation settles', async () => {
@@ -389,11 +710,11 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
     await user.click(
-      within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      within(view.getByRole('group')).getByRole('button', {
         name: 'cells.uploadStatus.cancelAll',
       }),
     );
-    const rowCancels = view.getAllByTestId('shared-drive-upload-status-row').map(row => {
+    const rowCancels = view.getAllByRole('listitem').map(row => {
       return within(row).getByRole('button', {name: 'conversationAssetUploadCancel'});
     });
     expect(rowCancels).toHaveLength(2);
@@ -418,7 +739,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     controller.cancel.mockRejectedValue(new Error('cancellation failed'));
 
     const view = renderHost(controller, conversationQualifiedId);
-    const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+    const cancel = within(view.getByRole('group')).getByRole('button', {
       name: 'conversationAssetUploadCancel',
     });
     await user.click(cancel);
@@ -434,7 +755,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const controller = createController(uploadedState);
     const view = renderHost(controller, conversationQualifiedId);
 
-    const close = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+    const close = within(view.getByRole('group')).getByRole('button', {
       name: 'cells.uploadStatus.closeAriaLabel',
     });
     expect(close).toHaveTextContent('fileCardDefaultCloseButtonLabel');
@@ -449,7 +770,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const user = userEvent.setup();
     const controller = createController(uploadedState);
     const firstRender = renderHost(controller, conversationQualifiedId);
-    const close = within(firstRender.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+    const close = within(firstRender.getByRole('group')).getByRole('button', {
       name: 'cells.uploadStatus.closeAriaLabel',
     });
 
@@ -493,7 +814,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const view = renderHost(controller, conversationQualifiedId);
 
     await user.click(
-      within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      within(view.getByRole('group')).getByRole('button', {
         name: 'cells.uploadStatus.closeAriaLabel',
       }),
     );
@@ -572,7 +893,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const view = renderHost(controller, conversationQualifiedId);
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
 
-    const retryButtons = view.getAllByTestId('shared-drive-upload-status-row').map(row => {
+    const retryButtons = view.getAllByRole('listitem').map(row => {
       return within(row).getByRole('button', {name: 'conversationFilePreviewErrorRetry'});
     });
     await user.click(retryButtons[0]);
@@ -677,8 +998,11 @@ describe('SharedDriveUploadStatusPopupHost', () => {
         return notify();
       });
       expect(document.querySelectorAll('[data-uie-name="shared-drive-upload-status-popup"]')).toHaveLength(1);
-      expect(screen.getAllByTestId('shared-drive-upload-progress')).toHaveLength(1);
-      expect(screen.getAllByTestId('shared-drive-upload-uploading')).toHaveLength(1);
+      expect(screen.getAllByRole('progressbar')).toHaveLength(1);
+      const decorativeIcon = screen
+        .getByRole('listitem', {hidden: true})
+        .querySelector('[data-uie-name="shared-drive-upload-uploading"]');
+      expect(decorativeIcon).toHaveAttribute('aria-hidden', 'true');
       expect(screen.getByRole('progressbar', {name: 'report.pdf'})).toBe(progress);
       expect(progress).toHaveAttribute('aria-valuenow', `${nextProgress * 100}`);
       expect(progress).toHaveStyle({transform: `scaleX(${nextProgress})`});
@@ -720,7 +1044,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
   it('formats the source size in the expanded status copy', async () => {
     const user = userEvent.setup();
     const controller = createController();
-    const translate = (key: string, substitutions?: Record<string, string | number>) => {
+    const translate = (key: string, substitutions?: Record<string, string | number>): string => {
       return substitutions?.size ? `${key} ${substitutions.size}` : key;
     };
 
@@ -733,7 +1057,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
   it('uses queued copy for queued uploads', async () => {
     const user = userEvent.setup();
     const controller = createController(queuedState);
-    const translate = (key: string, substitutions?: Record<string, string | number>) => {
+    const translate = (key: string, substitutions?: Record<string, string | number>): string => {
       if (substitutions?.name) {
         return `${key} ${substitutions.name}`;
       }
@@ -775,7 +1099,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
     expect(screen.getByText('cells.uploadStatus.uploaded')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'cells.uploadStatus.expand'})).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.getByTestId('shared-drive-upload-status-row')).not.toBeVisible();
+    expect(screen.getByRole('listitem', {hidden: true})).not.toBeVisible();
   });
 
   it('preserves the expanded state while switching tabs', async () => {
@@ -784,7 +1108,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const view = renderHost(controller, conversationQualifiedId);
 
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
-    expect(view.getByTestId('shared-drive-upload-status-row')).toBeVisible();
+    expect(view.getByRole('listitem', {hidden: true})).toBeVisible();
 
     view.rerender(
       <SharedDriveUploadStatusPopupHost
@@ -806,7 +1130,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     );
 
     expect(view.getByRole('button', {name: 'cells.uploadStatus.collapse'})).toHaveAttribute('aria-expanded', 'true');
-    expect(view.getByTestId('shared-drive-upload-status-row')).toBeVisible();
+    expect(view.getByRole('listitem', {hidden: true})).toBeVisible();
   });
 
   it('does not show an upload from another conversation', () => {

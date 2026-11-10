@@ -19,16 +19,16 @@
 
 import React from 'react';
 
-import {act, fireEvent, render, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, waitFor, type RenderResult} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
-import {generateConversation} from 'test/helper/ConversationGenerator';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {User} from '../../../repositories/entity/User';
+import {generateConversation} from '../../../../../test/helper/ConversationGenerator';
+import {withTheme} from '../../../auth/util/test/testUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {LeaveGroupAdminModal} from './LeaveGroupAdminModal';
 import {useLeaveGroupAdminModalStore} from './useLeaveGroupAdminModalStore';
@@ -41,18 +41,15 @@ jest.mock('./AdminSearchInput', () => {
   };
 });
 
-const renderModal = () => {
-  return render(withTheme(<LeaveGroupAdminModal translate={translateForTest} />));
-};
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const renderModalWithRootProvider = () => {
+const renderModalWithRootProvider = (): RenderResult => {
   return render(withTheme(<LeaveGroupAdminModal translate={translateForTest} />), {wrapper: rootProviderWrapper});
 };
 
-const createEligibleUser = (id: string) => {
+const createEligibleUser = (id: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
   user.username(`user.${id}`);

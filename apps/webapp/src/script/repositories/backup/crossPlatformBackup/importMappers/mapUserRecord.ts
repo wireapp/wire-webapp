@@ -19,8 +19,7 @@
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {UserRecord} from 'Repositories/storage';
-
+import {UserRecord} from '../../../storage';
 import {BackupUser} from '../CPB.library';
 
 export const mapUserRecord = ({id: qualifiedId, name, handle}: BackupUser): UserRecord | null => {

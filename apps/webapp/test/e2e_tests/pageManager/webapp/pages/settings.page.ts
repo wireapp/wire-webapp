@@ -38,19 +38,19 @@ export class SettingsPage {
     this.profileLink = page.getByTestId('element-profile-link');
   }
 
-  async clickAudioVideoSettingsButton() {
+  async clickAudioVideoSettingsButton(): Promise<void> {
     await this.audioVideoButton.click();
   }
 
-  async clickAccountButton() {
+  async clickAccountButton(): Promise<void> {
     await this.accountButton.click();
   }
 
-  async clickOptionsButton() {
+  async clickOptionsButton(): Promise<void> {
     await this.optionsButton.click();
   }
 
-  async clickAboutButton() {
+  async clickAboutButton(): Promise<void> {
     await this.aboutButton.click();
   }
 }

@@ -22,10 +22,10 @@ import {fireEvent, render} from '@testing-library/react';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../testSupport/rootContextTestSupport';
 
 import {PanelHeader} from './panelHeader';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const goBackUie = 'back-button';
 const closeUie = 'do-close';

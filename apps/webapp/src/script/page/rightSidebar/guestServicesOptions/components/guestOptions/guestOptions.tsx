@@ -24,24 +24,22 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {RadioGroup} from 'Components/Radio';
-import {SelectText} from 'Components/SelectText';
-import {BaseToggle} from 'Components/toggle/BaseToggle';
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
-import {teamPermissionsForAccessState} from 'Repositories/conversation/ConversationAccessPermission';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {copyText} from 'Util/clipboardUtil';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
+import * as Icon from '../../../../../components/icon';
+import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
+import {RadioGroup} from '../../../../../components/Radio';
+import {SelectText} from '../../../../../components/SelectText';
+import {BaseToggle} from '../../../../../components/toggle/BaseToggle';
 import {Config} from '../../../../../Config';
+import {ACCESS_STATE} from '../../../../../repositories/conversation/AccessState';
+import {teamPermissionsForAccessState} from '../../../../../repositories/conversation/ConversationAccessPermission';
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {TeamRepository} from '../../../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../../../repositories/team/TeamState';
+import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
+import {copyText} from '../../../../../util/clipboardUtil';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {useApplicationContext} from '../../../../rootProvider';
 
 const COPY_LINK_CONFIRM_DURATION = 1500;
 
@@ -127,7 +125,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     ? translate('guestLinkDisabled')
     : translate('guestLinkDisabledByOtherTeam');
 
-  const toggleGuestAccess = async () => {
+  const toggleGuestAccess = async (): Promise<void> => {
     await toggleAccessState(
       teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES),
       translate('modalConversationRemoveGuestsMessage'),
@@ -135,7 +133,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     );
   };
 
-  const copyLink = async () => {
+  const copyLink = async (): Promise<void> => {
     if (!isLinkCopied) {
       await copyText(accessCode);
       setIsLinkCopied(true);
@@ -145,7 +143,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     }
   };
 
-  const revokeAccessCode = () => {
+  const revokeAccessCode = (): void => {
     PrimaryModal.show(
       PrimaryModal.type.CONFIRM,
       {
@@ -170,7 +168,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     );
   };
 
-  const openForcePasswordCopyModal = async (password: string) => {
+  const openForcePasswordCopyModal = async (password: string): Promise<void> => {
     PrimaryModal.show(
       PrimaryModal.type.CONFIRM,
       {
@@ -193,8 +191,8 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     );
   };
 
-  const createGuestLinkWithPassword = async () => {
-    const onCreate = async (password: string, didCopyPassword: boolean) => {
+  const createGuestLinkWithPassword = async (): Promise<void> => {
+    const onCreate = async (password: string, didCopyPassword: boolean): Promise<void> => {
       if (!didCopyPassword) {
         await openForcePasswordCopyModal(password);
         return;
@@ -234,7 +232,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     );
   };
 
-  const requestAccessCode = async (password?: string) => {
+  const requestAccessCode = async (password?: string): Promise<void> => {
     if (!isGuestEnabled && !isServicesEnabled) {
       await conversationRepository.stateHandler.changeAccessState(activeConversation, ACCESS_STATE.TEAM.GUEST_ROOM);
     }
@@ -246,7 +244,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     }
   };
 
-  const createLink = async () => {
+  const createLink = async (): Promise<void> => {
     if (optionPasswordSecured === PasswordPreference.PASSWORD_SECURED) {
       await createGuestLinkWithPassword();
       return;
@@ -287,7 +285,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     void initializeOptions();
   }, [initializeOptions]);
 
-  const saveOptionPasswordSecured = (preference: PasswordPreference) => {
+  const saveOptionPasswordSecured = (preference: PasswordPreference): void => {
     setOptionPasswordSecured(preference);
   };
 

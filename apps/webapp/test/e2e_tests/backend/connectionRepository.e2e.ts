@@ -18,11 +18,13 @@
  */
 
 import {BackendClientE2E} from './backendClient.e2e';
+import type {AxiosResponse} from 'axios';
 
 const domain = process.env.DOMAIN;
 
+type GetConnectionsListResult = Promise<AxiosResponse<any, {page_state: string}, {}, any>>;
 export class ConnectionRepositoryE2E extends BackendClientE2E {
-  async getConnectionsList(token: string) {
+  async getConnectionsList(token: string): GetConnectionsListResult {
     const response = await this.axiosInstance.post(
       'list-connections',
       {
@@ -38,7 +40,7 @@ export class ConnectionRepositoryE2E extends BackendClientE2E {
     return response;
   }
 
-  async sendConnectionRequest(token: string, inviteeId: string) {
+  async sendConnectionRequest(token: string, inviteeId: string): Promise<void> {
     await this.axiosInstance.post(
       `connections/${domain}/${inviteeId}`,
       {},
@@ -51,7 +53,7 @@ export class ConnectionRepositoryE2E extends BackendClientE2E {
     );
   }
 
-  async acceptConnectionRequest(token: string, connectionId: string) {
+  async acceptConnectionRequest(token: string, connectionId: string): Promise<void> {
     await this.axiosInstance.post(
       `connections/${domain}/${connectionId}`,
       {

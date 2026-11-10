@@ -17,27 +17,25 @@
  *
  */
 
-import {ChangeEvent, Fragment, useCallback, useId, useMemo, useState} from 'react';
-import type {ReactNode} from 'react';
+import {ChangeEvent, Fragment, useCallback, useId, useMemo, useState, type FunctionComponent, ReactNode} from 'react';
 
 import {isEmptyArray, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {ChevronDownIcon} from '@wireapp/react-ui-kit';
-
-import {InViewport} from 'Components/inViewport';
-import {collapseButton, collapseIcon} from 'Components/userList/userList.styles';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isEnterKey, isSpaceKey} from 'Util/keyboardUtil';
-
 import {UserListItem} from './components/userListItem';
+import {collapseButton, collapseIcon} from './userList.styles';
+
+import {useApplicationContext} from '../../page/rootProvider';
+import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import type {Conversation} from '../../repositories/entity/Conversation';
+import type {User} from '../../repositories/entity/User';
+import {TeamState} from '../../repositories/team/TeamState';
+import {ChevronDownIcon} from '../../uiKit/dataDisplay/icon/chevronDownIcon';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {isEnterKey, isSpaceKey} from '../../util/keyboardUtil';
+import {InViewport} from '../inViewport';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -73,7 +71,7 @@ interface UserListProps {
   onContactsOpenChange?: (isOpen: boolean) => void;
 }
 
-export const UserList = ({
+export const UserList: FunctionComponent<UserListProps> = ({
   onClick,
   conversationRepository,
   users,
@@ -222,7 +220,7 @@ export const UserList = ({
     const hasSelectedUsers = selectedUsersCount > 0;
 
     const isContactsOpen = controlledContactsOpen ?? internalContactsOpen;
-    const handleContactsOpenChange = (open: boolean) => {
+    const handleContactsOpenChange = (open: boolean): void => {
       if (controlledContactsOpen === undefined) {
         setInternalContactsOpen(open);
       }

@@ -17,11 +17,11 @@
  *
  */
 
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {PageManager} from '../../pageManager';
 
 import {expect, LOGIN_TIMEOUT, test, withLogin} from '../../test.fixtures';
 import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
-import {loginUser} from 'test/e2e_tests/utils/userActions';
+import {loginUser} from '../../utils/userActions';
 
 const appLockPassphrase = generateSecurePassword();
 

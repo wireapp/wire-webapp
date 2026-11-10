@@ -17,10 +17,12 @@
  *
  */
 
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
-const RestrictedAudio = () => {
+import {useApplicationContext} from '../../../../../../../page/rootProvider';
+import * as Icon from '../../../../../../icon';
+
+const RestrictedAudio: FunctionComponent = () => {
   const {translate} = useApplicationContext();
 
   return (

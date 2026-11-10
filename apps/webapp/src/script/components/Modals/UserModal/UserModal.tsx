@@ -17,27 +17,10 @@
  *
  */
 
-import {ReactNode, useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
-
-import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
-
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {EnrichedFields} from 'Components/panel/enrichedFields';
-import {UserActions} from 'Components/panel/userActions';
-import {UserDetails} from 'Components/panel/userDetails';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {useUserModalState} from './UserModal.state';
 import {
@@ -52,7 +35,23 @@ import {
 } from './UserModal.styles';
 
 import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {User} from '../../../repositories/entity/User';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {UserRepository} from '../../../repositories/user/userRepository';
 import {Core} from '../../../service/coreSingleton';
+import {Link, LinkVariant} from '../../../uiKit/typography/link/link';
+import {TabIndex} from '../../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../util/localizerUtil/translationTypes';
+import {FadingScrollbar} from '../../fadingScrollbar';
+import * as Icon from '../../icon';
+import {EnrichedFields} from '../../panel/enrichedFields';
+import {UserActions} from '../../panel/userActions';
+import {UserDetails} from '../../panel/userDetails';
+import {ModalComponent} from '../ModalComponent';
 
 export interface UserModalProps {
   userRepository: UserRepository;
@@ -110,7 +109,7 @@ interface UserModalUserActionsSectionProps {
   translate: Translate;
 }
 
-const UserModalUserActionsSection = ({
+const UserModalUserActionsSection: FunctionComponent<UserModalUserActionsSectionProps> = ({
   user,
   onAction,
   isSelfActivated,
@@ -153,7 +152,7 @@ interface UserModalWarningMessageProps {
   href: string;
 }
 
-const UserModalWarningMessage = ({
+const UserModalWarningMessage: FunctionComponent<UserModalWarningMessageProps> = ({
   content,
   href,
   linkText,
@@ -175,7 +174,9 @@ const UserModalWarningMessage = ({
   );
 };
 
-export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
+export const UnverifiedUserWarning: FunctionComponent<UnverifiedUserWarningProps> = ({
+  user,
+}: UnverifiedUserWarningProps) => {
   const {translate} = useApplicationContext();
   const learnMoreHref = Config.getConfig().URL.SUPPORT.PRIVACY_UNVERIFIED_USERS;
 
@@ -210,7 +211,7 @@ export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
   );
 };
 
-const UserModal = ({
+const UserModal: FunctionComponent<UserModalProps> = ({
   userRepository,
   selfUser,
   core = container.resolve(Core),
@@ -231,10 +232,10 @@ const UserModal = ({
   const [isShown, setIsShown] = useState<boolean>(false);
   const [userNotFound, setUserNotFound] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
-  const hide = () => {
+  const hide = (): void => {
     return setIsShown(false);
   };
-  const onModalClosed = () => {
+  const onModalClosed = (): void => {
     setUser(null);
     setUserNotFound(false);
     onClose?.();

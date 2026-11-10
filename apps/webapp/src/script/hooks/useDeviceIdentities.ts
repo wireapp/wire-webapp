@@ -21,17 +21,27 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
+import {stringifyQualifiedId} from '../core/util/qualifiedIdUtil';
 import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../e2eIdentity';
 import {Core} from '../service/coreSingleton';
 
-export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAfterEnrollment?: boolean) => {
+type UserIdentityState = {
+  deviceIdentities: WireIdentity[] | undefined;
+  status: MLSStatuses.VALID | MLSStatuses.NOT_ACTIVATED | undefined;
+  getDeviceIdentity: (deviceId: string) => WireIdentity | undefined;
+};
+
+export const useUserIdentity = (
+  userId: QualifiedId,
+  groupId?: string,
+  updateAfterEnrollment?: boolean,
+): UserIdentityState => {
   const core = container.resolve(Core);
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
-  const getDeviceIdentity = (deviceId: string) => {
+  const getDeviceIdentity = (deviceId: string): WireIdentity | undefined => {
     return deviceIdentities?.find(identity => {
       return identity.deviceId === deviceId;
     });

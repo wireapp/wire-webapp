@@ -17,11 +17,14 @@
  *
  */
 
-import {createColumnHelper} from '@tanstack/react-table';
+import {
+  createColumnHelper,
+  type ColumnDefBase,
+  type StringHeaderIdentifier,
+  type IdIdentifier,
+  type AccessorKeyColumnDefBase,
+} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
-
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode} from 'src/script/types/cellNode';
 
 import {CellsTableDateColumn} from './cellsTableDateColumn/cellsTableDateColumn';
 import {CellsTableNameColumn} from './cellsTableNameColumn/cellsTableNameColumn';
@@ -30,6 +33,9 @@ import {CellsTableRowOptions} from './cellsTableRowOptions/cellsTableRowOptions'
 import {CellsTableSharedColumn} from './cellsTableSharedColumn/cellsTableSharedColumn';
 import {CellsTagsColumn} from './cellsTagsColumn/cellsTagsColumn';
 
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../../types/cellNode';
+import {CellsSelectionCheckbox} from '../../../../cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
 import {CellsSortDirection} from '../../common/cellsSortIcon/cellsSortIcon';
 import {CellsTableSortableHeader} from '../../common/cellsTableSortableHeader/cellsTableSortableHeader';
 import {CellsSortField} from '../../common/useCellsSorting/useCellsSorting';
@@ -38,6 +44,7 @@ const columnHelper = createColumnHelper<CellNode>();
 
 interface CellsTableLabels {
   actions: string;
+  selectAllOnPage: string;
   created: string;
   name: string;
   owner: string;
@@ -57,6 +64,15 @@ export const getCellsTableDataCellLabels = (labels: CellsTableLabels): Record<st
   };
 };
 
+type GetCellsTableColumnsResult = (
+  | (ColumnDefBase<CellNode, unknown> & StringHeaderIdentifier)
+  | (ColumnDefBase<CellNode, unknown> & IdIdentifier<CellNode, unknown>)
+  | (AccessorKeyColumnDefBase<CellNode, string> & Partial<IdIdentifier<CellNode, string>>)
+  | (AccessorKeyColumnDefBase<CellNode, string[]> & Partial<IdIdentifier<CellNode, string[]>>)
+  | (AccessorKeyColumnDefBase<CellNode, number> & Partial<IdIdentifier<CellNode, number>>)
+  | (AccessorKeyColumnDefBase<CellNode, {alreadyShared: boolean; uuid?: string; url?: string} | undefined> &
+      Partial<IdIdentifier<CellNode, {alreadyShared: boolean; uuid?: string; url?: string} | undefined>>)
+)[];
 export const getCellsTableColumns = ({
   cellsRepository,
   conversationQualifiedId,
@@ -67,6 +83,11 @@ export const getCellsTableColumns = ({
   getDirectionFor,
   isSortingEnabled,
   onToggleSort,
+  selectedNodeIds,
+  onToggleSelection,
+  onTogglePageSelection,
+  isPageSelected,
+  selectionEnabled,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
@@ -77,8 +98,44 @@ export const getCellsTableColumns = ({
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
   isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
-}) => {
+  selectedNodeIds: Set<string>;
+  onToggleSelection: (nodeId: string, isSelected: boolean) => void;
+  onTogglePageSelection: (isSelected: boolean) => void;
+  isPageSelected: boolean;
+  selectionEnabled: boolean;
+}): GetCellsTableColumnsResult => {
   return [
+    ...(selectionEnabled
+      ? [
+          columnHelper.display({
+            id: 'selection',
+            size: 40,
+            header: () => {
+              return (
+                <CellsSelectionCheckbox
+                  id="all-on-page"
+                  name={labels.selectAllOnPage}
+                  isChecked={isPageSelected}
+                  onChange={onTogglePageSelection}
+                />
+              );
+            },
+            cell: info => {
+              const node = info.row.original;
+              return (
+                <CellsSelectionCheckbox
+                  id={node.id}
+                  name={node.name}
+                  isChecked={selectedNodeIds.has(node.id)}
+                  onChange={isSelected => {
+                    onToggleSelection(node.id, isSelected);
+                  }}
+                />
+              );
+            },
+          }),
+        ]
+      : []),
     columnHelper.accessor('name', {
       header: isSortingEnabled
         ? () => {

@@ -20,27 +20,31 @@
 import {render, screen, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {NOTIFICATION_STATE} from '../../../repositories/conversation/NotificationSetting';
+import {Conversation} from '../../../repositories/entity/Conversation';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {TestFactory} from 'test/helper/TestFactory';
+} from '../../testSupport/rootContextTestSupport';
+import {TestFactory} from '../../../../../test/helper/TestFactory';
 
 import {Notifications} from './notifications';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const testFactory = new TestFactory();
-let conversationRepository: ConversationRepository;
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-const getDefaultParams = () => {
+type GetDefaultParamsResult = {
+  onClose: jest.Mock<any, any, any>;
+  onGoBack: jest.Mock<any, any, any>;
+  repositories: ViewModelRepositories;
+};
+const getDefaultParams = (): GetDefaultParamsResult => {
   return {
     onClose: jest.fn(),
     onGoBack: jest.fn(),
@@ -49,8 +53,12 @@ const getDefaultParams = () => {
 };
 
 describe('Notifications', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
-    conversationRepository = await testFactory.exposeConversationActors();
+    await testFactory.exposeConversationActors();
   });
 
   it('has the correct input checked', () => {

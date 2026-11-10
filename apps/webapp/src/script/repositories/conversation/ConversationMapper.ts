@@ -38,19 +38,20 @@ import {isObject} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
-import {type Translate} from 'Util/localizerUtil';
-
-import {ACCESS_STATE} from './AccessState';
+import {ACCESS_STATE, type TEAM} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
+import {type Translate} from '../../util/localizerUtil';
+import {Conversation} from '../entity/Conversation';
+import {ConversationRecord} from '../storage/record/conversationRecord';
 
 const guestLinkAccessModeCount = 2;
+type TeamAccessState =
+  typeof TEAM.GUEST_ROOM | typeof TEAM.GUESTS_SERVICES | typeof TEAM.SERVICES | typeof TEAM.TEAM_ONLY;
 
 /** Conversation self data from the database. */
 export interface SelfStatusUpdateDatabaseData {
@@ -570,13 +571,16 @@ export class ConversationMapper {
       conversationsMap.set(conversationId, localConversation);
     }
 
-    for (let i = 0; i < foundRemoteConversations.length; i++) {
-      const remoteConversation = foundRemoteConversations[i];
+    for (let conversationIndex = 0; conversationIndex < foundRemoteConversations.length; conversationIndex++) {
+      const remoteConversation = foundRemoteConversations[conversationIndex];
       const conversationId = remoteConversation.qualified_id?.id;
       const localConversation = conversationsMap.get(conversationId);
 
       if (localConversation !== undefined) {
-        conversationsMap.set(conversationId, this.mergeSingleConversation(localConversation, remoteConversation, i));
+        conversationsMap.set(
+          conversationId,
+          this.mergeSingleConversation(localConversation, remoteConversation, conversationIndex),
+        );
         continue;
       }
 
@@ -585,7 +589,10 @@ export class ConversationMapper {
         domain: '',
       }) as ConversationDatabaseData;
 
-      conversationsMap.set(conversationId, this.mergeSingleConversation(localConversationData, remoteConversation, i));
+      conversationsMap.set(
+        conversationId,
+        this.mergeSingleConversation(localConversationData, remoteConversation, conversationIndex),
+      );
     }
 
     return Array.from(conversationsMap.values());
@@ -788,7 +795,7 @@ export class ConversationMapper {
     return conversationEntity.accessState(personalAccessState);
   }
 
-  private static mapAccessStateV2(accessRole: CONVERSATION_ACCESS_ROLE[]) {
+  private static mapAccessStateV2(accessRole: CONVERSATION_ACCESS_ROLE[]): TeamAccessState | undefined {
     if (!accessRole.includes(CONVERSATION_ACCESS_ROLE.TEAM_MEMBER)) {
       return undefined;
     }

@@ -17,7 +17,7 @@
  *
  */
 
-import {useId, useRef} from 'react';
+import {useId, useRef, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -35,7 +35,7 @@ interface BaseToggleProps {
 
 const defaultToggleName = 'base-toggle';
 
-const BaseToggle = ({
+const BaseToggle: FunctionComponent<BaseToggleProps> = ({
   extendedInfo,
   isChecked,
   isDisabled,
@@ -50,7 +50,7 @@ const BaseToggle = ({
   const labelUuid = useId();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleToggleChange = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleToggleChange = (event: React.MouseEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
     if (inputRef.current !== null) {
       setIsChecked(inputRef.current.checked);

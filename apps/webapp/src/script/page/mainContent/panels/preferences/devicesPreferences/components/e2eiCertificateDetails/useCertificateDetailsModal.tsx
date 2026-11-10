@@ -17,19 +17,19 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {ModalOptions} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {downloadFile} from 'Util/util';
+import {PrimaryModal, removeCurrentModal} from '../../../../../../../components/Modals/PrimaryModal';
+import {ModalOptions} from '../../../../../../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {downloadFile} from '../../../../../../../util/util';
+import {useApplicationContext} from '../../../../../../rootProvider';
 
 const COPY_MESSAGE_TIMEOUT = 3000;
 const DOWNLOAD_CERTIFICATE_TIMEOUT = 500;
 const CERTIFICATE_NAME = 'certificate.pem';
 const CERTIFICATE_TYPE = 'application/x-pem-file';
 
-const ModalMessageWrapper = ({message}: {message: string}) => {
+const ModalMessageWrapper: FunctionComponent<{message: string}> = ({message}: {message: string}) => {
   return (
     <div
       css={{

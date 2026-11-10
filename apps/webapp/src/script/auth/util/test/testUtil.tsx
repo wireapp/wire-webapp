@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {render} from '@testing-library/react';
+import {render, type RenderResult} from '@testing-library/react';
 import {CONVERSATION_TYPE, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -32,45 +32,47 @@ import {AnyAction} from 'redux';
 import {MockStoreEnhanced} from 'redux-mock-store';
 import {ThunkDispatch} from 'redux-thunk';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../uiKit/identity/theme/theme';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
-import cs from 'I18n/cs-CZ.json';
-import da from 'I18n/da-DK.json';
-import de from 'I18n/de-DE.json';
-import el from 'I18n/el-GR.json';
-import en from 'I18n/en-US.json';
-import es from 'I18n/es-ES.json';
-import et from 'I18n/et-EE.json';
-import fi from 'I18n/fi-FI.json';
-import fr from 'I18n/fr-FR.json';
-import hr from 'I18n/hr-HR.json';
-import hu from 'I18n/hu-HU.json';
-import it from 'I18n/it-IT.json';
-import lt from 'I18n/lt-LT.json';
-import nl from 'I18n/nl-NL.json';
-import pl from 'I18n/pl-PL.json';
-import pt from 'I18n/pt-BR.json';
-import ro from 'I18n/ro-RO.json';
-import ru from 'I18n/ru-RU.json';
-import si from 'I18n/si-LK.json';
-import sk from 'I18n/sk-SK.json';
-import sl from 'I18n/sl-SI.json';
-import tr from 'I18n/tr-TR.json';
-import uk from 'I18n/uk-UA.json';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
-import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import cs from '../../../../i18n/cs-CZ.json';
+import da from '../../../../i18n/da-DK.json';
+import de from '../../../../i18n/de-DE.json';
+import el from '../../../../i18n/el-GR.json';
+import en from '../../../../i18n/en-US.json';
+import es from '../../../../i18n/es-ES.json';
+import et from '../../../../i18n/et-EE.json';
+import fi from '../../../../i18n/fi-FI.json';
+import fr from '../../../../i18n/fr-FR.json';
+import hr from '../../../../i18n/hr-HR.json';
+import hu from '../../../../i18n/hu-HU.json';
+import it from '../../../../i18n/it-IT.json';
+import lt from '../../../../i18n/lt-LT.json';
+import nl from '../../../../i18n/nl-NL.json';
+import pl from '../../../../i18n/pl-PL.json';
+import pt from '../../../../i18n/pt-BR.json';
+import ro from '../../../../i18n/ro-RO.json';
+import ru from '../../../../i18n/ru-RU.json';
+import si from '../../../../i18n/si-LK.json';
+import sk from '../../../../i18n/sk-SK.json';
+import sl from '../../../../i18n/sl-SI.json';
+import tr from '../../../../i18n/tr-TR.json';
+import uk from '../../../../i18n/uk-UA.json';
+import {CallingRepository} from '../../../repositories/calling/CallingRepository';
+import {Participant} from '../../../repositories/calling/Participant';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {BackgroundEffectsController} from '../../../repositories/media/backgroundEffects/backgroundEffectsController';
+import {BackgroundEffectsHandler} from '../../../repositories/media/backgroundEffectsHandler';
+import {MediaDevicesHandler} from '../../../repositories/media/MediaDevicesHandler';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../../util/localizerUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {createUuid} from '../../../util/uuid';
 
 import {mapLanguage} from '../../localeConfig';
 import {Api, RootState} from '../../module/reducer';
@@ -104,7 +106,7 @@ const internalizationStrings = {
 const withStore = (
   children: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-) => {
+): JSX.Element => {
   return <Provider store={store}>{children}</Provider>;
 };
 
@@ -115,11 +117,11 @@ function withRouter(component: React.ReactNode): React.ReactElement {
 const rootContextValue = createRootContextValueForTest({translate});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-const loadLanguage = (language: string) => {
-  return require(`I18n/${mapLanguage(language)}.json`);
+const loadLanguage = (language: string): typeof en => {
+  return require(`../../../../i18n/${mapLanguage(language)}.json`);
 };
 
-export const withIntl = (component: React.ReactNode) => {
+export const withIntl = (component: React.ReactNode): JSX.Element => {
   setStrings(internalizationStrings);
 
   return (
@@ -143,18 +145,18 @@ export function withThemeAndRootContext(
 const wrapComponent = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-) => {
+): React.ReactElement => {
   return withRouter(withTheme(withStore(withIntl(component), store)));
 };
 
 export const mountComponent = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-) => {
+): RenderResult => {
   return render(wrapComponent(component, store));
 };
 
-export function generateUsers(nbUsers: number, domain: string) {
+export function generateUsers(nbUsers: number, domain: string): User[] {
   const users: User[] = [];
   for (let i = 0; i < nbUsers; i++) {
     const user = new User(createUuid(), domain, translateForTest);
@@ -174,7 +176,7 @@ export function generateUserClients(users: User[]): QualifiedUserClients {
   return userClients;
 }
 
-export function generateQualifiedIds(nbUsers: number, domain: string) {
+export function generateQualifiedIds(nbUsers: number, domain: string): QualifiedId[] {
   const users: QualifiedId[] = [];
   for (let i = 0; i < nbUsers; i++) {
     users.push({id: createUuid(), domain});
@@ -187,7 +189,7 @@ export const createConversation = (
   protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS,
   conversationId: QualifiedId = {id: createUuid(), domain: ''},
   groupId = 'group-id',
-) => {
+): Conversation => {
   const conversation = new Conversation(conversationId.id, conversationId.domain, protocol, translateForTest);
   conversation.participating_user_ets.push(new User(createUuid(), '', translateForTest));
   conversation.type(type);
@@ -197,7 +199,7 @@ export const createConversation = (
   return conversation;
 };
 
-export const createSelfParticipant = () => {
+export const createSelfParticipant = (): Participant => {
   const selfUser = new User('', '', translateForTest);
   selfUser.isMe = true;
   return new Participant(selfUser, 'client1');
@@ -218,14 +220,14 @@ const mediaDevices = {
   }),
 };
 
-export const buildMediaDevicesHandler = () => {
+export const buildMediaDevicesHandler = (): MediaDevicesHandler => {
   return {
     currentAvailableDeviceId: mediaDevices,
     setOnMediaDevicesRefreshHandler: jest.fn(),
   } as unknown as MediaDevicesHandler;
 };
 
-export const buildCallingRepository = () => {
+export const buildCallingRepository = (): CallingRepository => {
   const controller: BackgroundEffectsController = {
     getQuality: jest.fn(),
     getCapabilityInfo: jest.fn(),

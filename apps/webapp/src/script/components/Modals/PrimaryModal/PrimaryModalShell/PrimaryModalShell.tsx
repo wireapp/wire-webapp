@@ -17,14 +17,13 @@
  *
  */
 
-import {ReactNode, useEffect} from 'react';
+import {ReactNode, useEffect, type FunctionComponent} from 'react';
 
 import {Runtime} from '@wireapp/commons';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-
 import {largeModalStyles} from './PrimaryModalShell.styles';
 
+import {ModalComponent} from '../../ModalComponent';
 import {ModalSize} from '../PrimaryModalTypes';
 
 interface PrimaryModalShellProps {
@@ -38,7 +37,7 @@ interface PrimaryModalShellProps {
   container?: Element | DocumentFragment;
 }
 
-export const PrimaryModalShell = ({
+export const PrimaryModalShell: FunctionComponent<PrimaryModalShellProps> = ({
   isShown,
   title,
   dataUieName,
@@ -65,7 +64,7 @@ export const PrimaryModalShell = ({
       return undefined;
     }
 
-    const applyInertAttributes = (element: HTMLElement) => {
+    const applyInertAttributes = (element: HTMLElement): void => {
       element.setAttribute('aria-hidden', 'true');
       (element as any).inert = '';
       if (Runtime.isDesktopApp()) {
@@ -74,7 +73,7 @@ export const PrimaryModalShell = ({
       }
     };
 
-    const removeInertAttributes = (element: HTMLElement) => {
+    const removeInertAttributes = (element: HTMLElement): void => {
       element.removeAttribute('aria-hidden');
       delete (element as any).inert;
       if (Runtime.isDesktopApp()) {

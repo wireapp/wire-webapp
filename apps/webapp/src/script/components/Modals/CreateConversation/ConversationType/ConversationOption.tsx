@@ -17,7 +17,7 @@
  *
  */
 
-import {CheckRoundIcon, FlexBox} from '@wireapp/react-ui-kit';
+import type {FunctionComponent} from 'react';
 
 import {
   conversationOptionContainerCss,
@@ -25,6 +25,8 @@ import {
   conversationOptionNotSelectedCss,
 } from './ConversationType.styles';
 
+import {CheckRoundIcon} from '../../../../uiKit/dataDisplay/icon/checkRoundIcon';
+import {FlexBox} from '../../../../uiKit/layout/flexBox/flexBox';
 import {UpgradeBadge} from '../CreateConversationSteps/ConversationDetails/UpgradeBadge';
 
 interface ConversationOptionProps {
@@ -34,7 +36,12 @@ interface ConversationOptionProps {
   isUpgradeBannerVisible?: boolean;
 }
 
-export const ConversationOption = ({onClick, title, isSelected, isUpgradeBannerVisible}: ConversationOptionProps) => {
+export const ConversationOption: FunctionComponent<ConversationOptionProps> = ({
+  onClick,
+  title,
+  isSelected,
+  isUpgradeBannerVisible,
+}: ConversationOptionProps) => {
   return (
     <FlexBox css={conversationOptionContainerCss(isSelected)} onClick={onClick}>
       <FlexBox css={conversationOptionCss(isSelected)}>

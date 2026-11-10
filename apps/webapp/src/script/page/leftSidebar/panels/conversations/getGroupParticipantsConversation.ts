@@ -19,12 +19,12 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-
 import {SidebarTabs} from './useSidebarStore';
+
+import {ConversationLabel} from '../../../../repositories/conversation/ConversationLabelRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {SearchRepository} from '../../../../repositories/search/searchRepository';
 
 type GetGroupParticipantsConversationsParams = {
   currentTab: SidebarTabs;
@@ -46,12 +46,16 @@ export const getGroupParticipantsConversations = ({
   conversations,
   currentFolder,
   archivedConversations,
-}: GetGroupParticipantsConversationsParams) => {
+}: GetGroupParticipantsConversationsParams): Conversation[] => {
   const isFavoritesView = currentTab === SidebarTabs.FAVORITES;
   const isArchivesView = currentTab === SidebarTabs.ARCHIVES;
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
   const {query, isHandleQuery} = searchRepository.normalizeQuery(conversationsFilter);
+  if (query.length === 0) {
+    return [];
+  }
+
   let filteredGroup = conversationRepository.getGroupsByName(query, isHandleQuery);
 
   // Convert arrays to Sets for faster lookups

@@ -17,9 +17,7 @@
  *
  */
 
-import {memo} from 'react';
-
-import {Button, ButtonVariant, CallIcon} from '@wireapp/react-ui-kit';
+import {memo, type FunctionComponent} from 'react';
 
 import {
   joinButtonContainerStyles,
@@ -27,9 +25,12 @@ import {
   joinButtonStyles,
   participatingStatusIconStyles,
   participatingStatusStyles,
-} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingStatus/meetingStatus.styles';
-import {MeetingTemporalStatuses} from 'Components/meeting/utils/meetingStatusUtil';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+} from './meetingStatus.styles';
+
+import {useApplicationContext} from '../../../../../../page/rootProvider';
+import {CallIcon} from '../../../../../../uiKit/dataDisplay/icon/callIcon';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
+import {MeetingTemporalStatuses} from '../../../../utils/meetingStatusUtil';
 
 export interface MeetingStatusProps {
   temporalStatus: MeetingTemporalStatuses;
@@ -38,7 +39,12 @@ export interface MeetingStatusProps {
   isCallActive: boolean;
 }
 
-const MeetingStatusComponent = ({temporalStatus, joinMeeting, isJoinDisabled, isCallActive}: MeetingStatusProps) => {
+const MeetingStatusComponent: FunctionComponent<MeetingStatusProps> = ({
+  temporalStatus,
+  joinMeeting,
+  isJoinDisabled,
+  isCallActive,
+}: MeetingStatusProps) => {
   const {translate} = useApplicationContext();
 
   if (isCallActive) {

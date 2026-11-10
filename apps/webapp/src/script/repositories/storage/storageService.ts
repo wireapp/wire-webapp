@@ -18,20 +18,19 @@
  */
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import Dexie, {Transaction} from 'dexie';
+import {Dexie, Transaction} from 'dexie';
 import {singleton} from 'tsyringe';
 
-import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
-import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
-
-import {Logger, getLogger} from 'Util/logger';
-import {loadValue, storeValue} from 'Util/storageUtil';
-import {toError} from 'Util/toError';
-
 import {DexieDatabase} from './dexieDatabase';
+import {IndexedDBEngine} from './indexedDatabaseEngine';
 import {StorageSchemata} from './storageSchemata';
 
+import type {CRUDEngine} from '../../core/storage/engine/crudEngine';
+import {RecordNotFoundError} from '../../core/storage/engine/error';
 import {StorageError} from '../../error/storageError';
+import {Logger, getLogger} from '../../util/logger';
+import {loadValue, storeValue} from '../../util/storageUtil';
+import {toError} from '../../util/toError';
 
 const emptyStorageInteger = 0n;
 
@@ -99,7 +98,7 @@ export class StorageService {
       obj: Object,
       updatedObj: Object,
       transaction: Transaction,
-    ) => {
+    ): void => {
       transaction.on('complete', () => {
         this.dbListeners
           .filter(listener => {
@@ -285,7 +284,7 @@ export class StorageService {
     try {
       return await this.engine.read<T>(storeName, primaryKey);
     } catch (error: unknown) {
-      if (error instanceof StoreEngineError.RecordNotFoundError) {
+      if (error instanceof RecordNotFoundError) {
         return undefined;
       }
       this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);

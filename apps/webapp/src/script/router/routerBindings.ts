@@ -19,11 +19,10 @@
 
 import React from 'react';
 
-import {KEY} from 'Util/keyboardUtil';
-
 import {navigate} from './Router';
 
 import {useAppMainState, ViewType} from '../page/state';
+import {KEY} from '../util/keyboardUtil';
 
 export const createNavigate = (link: string) => {
   return (event?: React.MouseEvent<Element, MouseEvent>) => {
@@ -53,7 +52,7 @@ export const createNavigateKeyboard = (
   };
 };
 
-const setResponsiveView = () => {
+const setResponsiveView = (): void => {
   const {responsiveView} = useAppMainState.getState();
   responsiveView.setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
 };

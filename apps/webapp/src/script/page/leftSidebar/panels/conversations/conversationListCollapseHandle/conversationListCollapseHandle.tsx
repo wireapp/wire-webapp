@@ -17,8 +17,10 @@
  *
  */
 
-import {conversationsListHandleStyles} from 'src/script/page/leftSidebar/panels/conversations/conversations.styles';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
+
+import {useApplicationContext} from '../../../../rootProvider';
+import {conversationsListHandleStyles} from '../conversations.styles';
 
 type ConversationListCollapseHandleProps = {
   isCollapsed: boolean;
@@ -26,7 +28,7 @@ type ConversationListCollapseHandleProps = {
   onToggle: () => void;
 };
 
-export const ConversationListCollapseHandle = ({
+export const ConversationListCollapseHandle: FunctionComponent<ConversationListCollapseHandleProps> = ({
   isCollapsed,
   panelId,
   onToggle,

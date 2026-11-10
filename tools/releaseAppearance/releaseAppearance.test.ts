@@ -1,0 +1,233 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import assert from 'node:assert';
+
+import {Maybe} from 'true-myth';
+
+import {
+  deserializeReleaseAppearanceState,
+  mergeReleaseAppearanceComments,
+  mergeReleaseAppearanceState,
+  parseBetaCandidateTag,
+  parsePersistentMarkerComment,
+  parseProductionTag,
+  renderPersistentComment,
+  serializeReleaseAppearanceState,
+  validateSameReleaseVersion,
+} from './releaseAppearance.ts';
+import type {ReleaseAppearanceState} from './releaseAppearance.ts';
+
+function createReleaseAppearanceState(betaTag: Maybe<string>, productionTag: Maybe<string>): ReleaseAppearanceState {
+  return {beta: betaTag, production: productionTag};
+}
+
+describe('release tag parsing', () => {
+  it('parses strict SemVer Beta and stable Production tags', () => {
+    const betaCandidateResult = parseBetaCandidateTag('v1.1.0-beta.2');
+    const betaSeventeenResult = parseBetaCandidateTag('v2.0.0-beta.17');
+    const productionTagResult = parseProductionTag('v1.1.0');
+
+    assert(betaCandidateResult.isOk);
+    assert(betaSeventeenResult.isOk);
+    assert(productionTagResult.isOk);
+    expect(betaCandidateResult.value).toEqual({
+      release: {version: '1.1.0'},
+      candidateNumber: 2n,
+    });
+    expect(betaSeventeenResult.value).toEqual({
+      release: {version: '2.0.0'},
+      candidateNumber: 17n,
+    });
+    expect(productionTagResult.value).toEqual({release: {version: '1.1.0'}});
+    expect(validateSameReleaseVersion(betaCandidateResult.value, productionTagResult.value).isOk).toBe(true);
+  });
+
+  it('rejects mismatched SemVer versions', () => {
+    const betaCandidateResult = parseBetaCandidateTag('v1.4.0-beta.2');
+    const differentVersionResult = parseProductionTag('v1.5.0');
+
+    assert(betaCandidateResult.isOk);
+    assert(differentVersionResult.isOk);
+    expect(validateSameReleaseVersion(betaCandidateResult.value, differentVersionResult.value).isErr).toBe(true);
+  });
+
+  it('rejects invalid release tags', () => {
+    const invalidBetaTags = [
+      '2026-07-21-beta.1',
+      '2026-07-21.3-beta.0',
+      '2026-07-21.3-beta.01',
+      'release/2026-07-21.3-beta.1',
+      '2026-07-21.3-production',
+      'v1.1.0-beta.0',
+      'v1.1.0-beta.01',
+      'v1.1.0-alpha.1',
+      'v1.1.0-production',
+      'v1.1.0',
+    ];
+    const invalidProductionTags = [
+      '2026-07-21-production.1',
+      '2026-07-21.0-production',
+      '2026-07-21.3-beta.1',
+      'release/2026-07-21.3-production',
+      'v1.1.0-beta.1',
+      'v1.1.0-production',
+    ];
+
+    for (const invalidBetaTag of invalidBetaTags) {
+      expect(parseBetaCandidateTag(invalidBetaTag).isErr).toBe(true);
+    }
+
+    for (const invalidProductionTag of invalidProductionTags) {
+      expect(parseProductionTag(invalidProductionTag).isErr).toBe(true);
+    }
+  });
+});
+
+describe('release appearance state', () => {
+  it('converts between serialized optional fields and domain Maybe values', () => {
+    const serializedState = {
+      beta: 'v1.1.0-beta.1',
+      production: 'v1.0.0',
+    };
+
+    const domainState = deserializeReleaseAppearanceState(serializedState);
+
+    assert(domainState.beta.isJust);
+    expect(domainState.beta.value).toBe(serializedState.beta);
+    assert(domainState.production.isJust);
+    expect(domainState.production.value).toBe(serializedState.production);
+    expect(serializeReleaseAppearanceState(domainState)).toEqual(serializedState);
+  });
+
+  it('serializes and parses first appearances from different releases', () => {
+    const state = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.1'), Maybe.just('v1.0.0'));
+    const renderedComment = renderPersistentComment(state);
+
+    const parsedStateResult = parsePersistentMarkerComment(renderedComment);
+
+    assert(parsedStateResult.isOk);
+    assert(parsedStateResult.value.isJust);
+    const parsedState = parsedStateResult.value.value;
+    assert(parsedState.beta.isJust);
+    assert(parsedState.production.isJust);
+    expect(parsedState.beta.value).toBe('v1.1.0-beta.1');
+    expect(parsedState.production.value).toBe('v1.0.0');
+  });
+
+  it('parses SemVer persistent marker values without rewriting the stored identities', () => {
+    const serializedState = {
+      beta: 'v1.1.0-beta.1',
+      production: 'v1.1.0',
+    };
+    const markerComment = `<!-- wire-webapp-release-appearance:v1\n${JSON.stringify(serializedState)}\n-->`;
+
+    const parsedStateResult = parsePersistentMarkerComment(markerComment);
+
+    assert(parsedStateResult.isOk);
+    assert(parsedStateResult.value.isJust);
+    expect(serializeReleaseAppearanceState(parsedStateResult.value.value)).toEqual(serializedState);
+    expect(renderPersistentComment(parsedStateResult.value.value)).toContain('v1.1.0-beta.1');
+    expect(renderPersistentComment(parsedStateResult.value.value)).toContain('v1.1.0');
+  });
+
+  it('preserves immutable historical tag values in existing appearance comments', () => {
+    const historicalState = {
+      beta: '2026-08-01.1-beta.1',
+      production: '2026-08-08.1-production',
+    };
+    const markerComment = `<!-- wire-webapp-release-appearance:v1\n${JSON.stringify(historicalState)}\n-->`;
+
+    const parsedStateResult = parsePersistentMarkerComment(markerComment);
+
+    assert(parsedStateResult.isOk);
+    assert(parsedStateResult.value.isJust);
+    expect(serializeReleaseAppearanceState(parsedStateResult.value.value)).toEqual(historicalState);
+  });
+
+  it('preserves cross-release values during later Beta processing', () => {
+    const existingState = createReleaseAppearanceState(Maybe.just('v1.0.0-beta.1'), Maybe.just('v1.0.0'));
+    const desiredState = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.1'), Maybe.nothing<string>());
+
+    const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
+
+    expect(mergedState).toBe(existingState);
+  });
+
+  it('preserves cross-release values during later Production processing', () => {
+    const existingState = createReleaseAppearanceState(Maybe.just('v1.0.0-beta.1'), Maybe.just('v1.0.0'));
+    const desiredState = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.1'), Maybe.just('v1.1.0'));
+
+    const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
+
+    expect(mergedState).toBe(existingState);
+  });
+
+  it('fills only missing first-appearance values', () => {
+    const existingState = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.1'), Maybe.nothing<string>());
+    const desiredState = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.2'), Maybe.just('v1.1.0'));
+
+    const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
+
+    assert(mergedState.beta.isJust);
+    assert(mergedState.production.isJust);
+    expect(mergedState.beta.value).toBe('v1.1.0-beta.1');
+    expect(mergedState.production.value).toBe('v1.1.0');
+  });
+});
+
+describe('persistent release appearance comments', () => {
+  it('creates and updates persistent comments without changing unrelated comments', () => {
+    const unrelatedComment = 'Unrelated discussion';
+    const betaState = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.1'), Maybe.nothing<string>());
+    const productionState = createReleaseAppearanceState(Maybe.nothing<string>(), Maybe.just('v1.1.0'));
+    const existingComments = [unrelatedComment, renderPersistentComment(betaState)];
+
+    const mergedCommentsResult = mergeReleaseAppearanceComments(existingComments, productionState);
+
+    assert(mergedCommentsResult.isOk);
+    expect(mergedCommentsResult.value[0]).toBe(unrelatedComment);
+    const mergedMarkerComment = Maybe.of(mergedCommentsResult.value[1]);
+    assert(mergedMarkerComment.isJust);
+    expect(mergedMarkerComment.value).toMatch(/v1\.1\.0-beta\.1/);
+    expect(mergedMarkerComment.value).toMatch(/v1\.1\.0/);
+  });
+
+  it('rejects malformed and unknown persistent marker state', () => {
+    const malformedComments = [
+      '<!-- wire-webapp-release-appearance:v1\n{"beta":}\n-->',
+      '<!-- wire-webapp-release-appearance:v1\n{"beta":""}\n-->',
+      '<!-- wire-webapp-release-appearance:v1\n{"edge":"2026-07-21.3"}\n-->',
+      '<!-- wire-webapp-release-appearance:v2\n{"beta":"2026-07-21.3-beta.1"}\n-->',
+    ];
+
+    for (const malformedComment of malformedComments) {
+      expect(parsePersistentMarkerComment(malformedComment).isErr).toBe(true);
+    }
+  });
+
+  it('rejects duplicate persistent marker comments', () => {
+    const betaState = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.1'), Maybe.nothing<string>());
+    const markerComment = renderPersistentComment(betaState);
+
+    const mergeResult = mergeReleaseAppearanceComments([markerComment, markerComment], betaState);
+
+    expect(mergeResult.isErr).toBe(true);
+  });
+});

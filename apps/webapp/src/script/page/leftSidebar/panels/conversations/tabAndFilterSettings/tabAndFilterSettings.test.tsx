@@ -19,19 +19,19 @@
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
 
-import {Config} from 'src/script/Config';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {Config} from '../../../../../Config';
+import {withTheme} from '../../../../../auth/util/test/testUtil';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
+} from '../../../../testSupport/rootContextTestSupport';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 
 import {TabAndFilterSettings} from './tabAndFilterSettings';
 import {SidebarTabs, useSidebarStore} from '../useSidebarStore';
 
-jest.mock('Util/useChannelsFeatureFlag', () => {
+jest.mock('../../../../../util/useChannelsFeatureFlag', () => {
   return {
     useChannelsFeatureFlag: jest.fn(() => {
       return {

@@ -19,8 +19,8 @@
 
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
-import {Message} from 'Repositories/entity/message/message';
-import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
+import {Message} from '../../../repositories/entity/message/message';
+import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 const groupedMessageIntervalInSeconds = 30;
 
@@ -99,7 +99,7 @@ function shouldGroupMessagesByTimestamp(
   firstMessageTimestamp: number,
   previousMessageTimestamp: number,
   currentMessageTimestamp: number,
-) {
+): boolean {
   // Interval in seconds, within which messages are grouped together
   const GROUPED_MESSAGE_INTERVAL = groupedMessageIntervalInSeconds * TIME_IN_MILLIS.SECOND;
 

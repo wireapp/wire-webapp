@@ -17,22 +17,21 @@
  *
  */
 
-import {ReactNode, useEffect} from 'react';
+import {FunctionComponent, ReactNode, useEffect} from 'react';
 
 import cx from 'classnames';
 
 import {Runtime} from '@wireapp/commons';
 
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {afterRender} from 'Util/util';
-
 import {closeWarning, useWarningsState} from './WarningsState';
 import {CONFIG, TYPE} from './WarningsTypes';
 
+import * as Icon from '../../components/icon';
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {createReactTranslationMarker, renderReactTranslation} from '../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../util/localizerUtil/translationTypes';
+import {afterRender} from '../../util/util';
 
 interface WarningProps {
   readonly onRefresh: () => void;
@@ -80,7 +79,7 @@ function renderPermissionRequestWarningMessage(options: RenderPermissionRequestT
   );
 }
 
-const WarningsContainer = ({onRefresh}: WarningProps) => {
+const WarningsContainer: FunctionComponent<WarningProps> = ({onRefresh}) => {
   const {translate} = useApplicationContext();
   const name = useWarningsState(state => {
     return state.name;

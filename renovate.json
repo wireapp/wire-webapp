@@ -1,6 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", ":semanticCommitsDisabled"],
+  "constraints": {
+    "npm": "11.21.2"
+  },
   "labels": ["renovate", "semver:patch"],
   "timezone": "Europe/Berlin",
   "dependencyDashboard": true,
@@ -9,12 +12,40 @@
   "configMigration": true,
   "minimumReleaseAge": "3 days",
   "lockFileMaintenance": {
-    "enabled": false
+    "enabled": true
   },
   "packageRules": [
     {
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["dependencies", "devDependencies", "optionalDependencies"],
+      "rangeStrategy": "pin"
+    },
+    {
+      "description": "Keep library @types/node dependencies on Node 22 typings",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["libraries/**/package.json"],
+      "matchPackageNames": ["@types/node"],
+      "matchCurrentVersion": ">=22 <23",
+      "allowedVersions": ">=22 <23"
+    },
+    {
       "matchUpdateTypes": ["major"],
       "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Update the pinned Node.js runtime promptly",
+      "matchManagers": ["nvm"],
+      "matchFileNames": [".nvmrc"],
+      "matchDatasources": ["node-version"],
+      "groupName": "node runtime",
+      "minimumReleaseAge": null
+    },
+    {
+      "description": "Group Node.js package manifest pins with .nvmrc",
+      "matchPackageNames": ["node"],
+      "matchDatasources": ["node-version"],
+      "groupName": "node runtime",
+      "minimumReleaseAge": null
     },
     {
       "matchFileNames": ["apps/webapp/app-config/package.json"],
@@ -29,17 +60,20 @@
       "groupName": "docker images"
     },
     {
-      "matchPackageNames": ["quay.io/wire/mirror-images/playwright"],
-      "minimumReleaseAge": null
+      "description": "Update the production Node.js image and digest promptly",
+      "matchManagers": ["dockerfile"],
+      "matchFileNames": ["apps/server/Dockerfile"],
+      "matchDepTypes": ["final"],
+      "matchDatasources": ["docker"],
+      "matchDepNames": ["node"],
+      "groupName": "node runtime",
+      "minimumReleaseAge": null,
+      "pinDigests": true
     },
     {
-      "matchDepNames": ["playwright", "@playwright/test", "quay.io/wire/mirror-images/playwright"],
+      "matchDepNames": ["playwright", "@playwright/test", "mcr.microsoft.com/playwright"],
       "groupName": "playwright",
       "addLabels": ["run-e2e"]
-    },
-    {
-      "matchPackageNames": ["nx", "@nx/**"],
-      "groupName": "nx monorepo tooling"
     },
     {
       "extends": ["monorepo:typescript-eslint"],
@@ -52,7 +86,7 @@
         "@tony.ganchev/eslint-plugin-header",
         "eslint-import-resolver-typescript",
         "eslint-plugin-header",
-        "eslint-plugin-import",
+        "eslint-plugin-import-x",
         "eslint-plugin-jest",
         "eslint-plugin-jest-dom",
         "eslint-plugin-jsdoc",
@@ -67,7 +101,7 @@
       "groupName": "eslint tooling"
     },
     {
-      "matchPackageNames": ["jest", "@jest/**", "jest-*", "babel-jest", "@types/jest", "@nx/jest", "@swc/jest"],
+      "matchPackageNames": ["jest", "@jest/**", "jest-*", "babel-jest", "@types/jest", "@swc/jest"],
       "groupName": "jest ecosystem"
     },
     {
@@ -97,15 +131,6 @@
     },
     {
       "matchPackageNames": [
-        "webpack",
-        "webpack-cli",
-        "webpack-dev-middleware",
-        "webpack-hot-middleware",
-        "webpack-bundle-analyzer",
-        "workbox-webpack-plugin",
-        "copy-webpack-plugin",
-        "html-webpack-plugin",
-        "babel-loader",
         "css-loader",
         "less-loader",
         "postcss",
@@ -118,8 +143,7 @@
         "cssnano",
         "style-loader",
         "raw-loader",
-        "svg-inline-loader",
-        "@nx/webpack"
+        "svg-inline-loader"
       ],
       "groupName": "webapp build tooling"
     },

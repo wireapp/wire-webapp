@@ -28,31 +28,27 @@ import {
   useState,
   MouseEvent,
   KeyboardEvent,
+  type FunctionComponent,
 } from 'react';
 
 import {isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
 
-import {
-  TabIndex,
-  COLOR,
-  ContainerXS,
-  DeviceIcon,
-  FlexBox,
-  Form,
-  IconButton,
-  Input,
-  Line,
-  Small,
-  Text,
-  TrashIcon,
-} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isEnterKey} from 'Util/keyboardUtil';
-import {splitFingerprint} from 'Util/stringUtil';
-import {isBackendError} from 'Util/typePredicateUtil';
-
+import {useApplicationContext} from '../../page/rootProvider';
+import {DeviceIcon} from '../../uiKit/dataDisplay/icon/deviceIcon';
+import {TrashIcon} from '../../uiKit/dataDisplay/icon/trashIcon';
+import {COLOR} from '../../uiKit/identity/colors/colors';
+import {Form} from '../../uiKit/inputs/form/form';
+import {IconButton} from '../../uiKit/inputs/iconButton/iconButton';
+import {Input} from '../../uiKit/inputs/input/input';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {FlexBox} from '../../uiKit/layout/flexBox/flexBox';
+import {Line} from '../../uiKit/typography/line/line';
+import {Small, Text} from '../../uiKit/typography/text/text';
+import {TabIndex} from '../../uiKit/utils/enums';
+import {isEnterKey} from '../../util/keyboardUtil';
+import {splitFingerprint} from '../../util/stringUtil';
+import {isBackendError} from '../../util/typePredicateUtil';
 import {ValidationError} from '../module/action/validationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 
@@ -65,7 +61,14 @@ interface Props extends HTMLProps<HTMLDivElement> {
   clientError?: Error;
 }
 
-const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, requirePassword}: Props) => {
+const ClientItem: FunctionComponent<Props> = ({
+  selected,
+  onClientRemoval,
+  onClick,
+  client,
+  clientError,
+  requirePassword,
+}: Props) => {
   const {translate} = useApplicationContext();
   const passwordInput = useRef<HTMLInputElement>(null);
 
@@ -88,7 +91,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const [isOpen, setIsOpen] = useState(requirePassword && (isSelected || isAnimating));
 
-  const formatId = (id = '?') => {
+  const formatId = (id = '?'): string => {
     return splitFingerprint(id).join(' ');
   };
 
@@ -165,7 +168,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     return '?';
   };
 
-  const resetState = () => {
+  const resetState = (): void => {
     setAnimationStep(selected ? animationSteps : 0);
     setIsAnimating(false);
   };
@@ -175,7 +178,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     onClick(event);
   };
 
-  const onWrapperEnter = (event: KeyboardEvent) => {
+  const onWrapperEnter = (event: KeyboardEvent): void => {
     if (!isEnterKey(event)) {
       return;
     }
@@ -238,7 +241,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       });
   };
 
-  const onPasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const onPasswordChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setPassword(event.target.value);
     setIsValidPassword(true);
   };

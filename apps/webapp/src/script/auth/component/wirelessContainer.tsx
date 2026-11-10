@@ -17,16 +17,19 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {FormattedMessage} from 'react-intl';
 
-import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
-
-import {LogoFullIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {LogoFullIcon} from '../../components/icon';
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {CloseIcon} from '../../uiKit/dataDisplay/icon/closeIcon';
+import {Content} from '../../uiKit/layout/content/content';
+import {Footer} from '../../uiKit/layout/footer/footer';
+import {Header} from '../../uiKit/layout/header/header';
+import {Link} from '../../uiKit/typography/link/link';
+import {Small} from '../../uiKit/typography/text/text';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 
 interface WirelessContainerProps {
@@ -35,7 +38,11 @@ interface WirelessContainerProps {
   showCookiePolicyBanner?: boolean;
 }
 
-const WirelessContainer = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}: WirelessContainerProps) => {
+const WirelessContainer: FunctionComponent<WirelessContainerProps> = ({
+  showCookiePolicyBanner,
+  onCookiePolicyBannerClose,
+  children,
+}: WirelessContainerProps) => {
   const {translate} = useApplicationContext();
   return (
     <div

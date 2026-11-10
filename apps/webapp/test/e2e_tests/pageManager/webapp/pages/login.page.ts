@@ -18,7 +18,7 @@
  */
 
 import type {Page, Locator} from '@playwright/test';
-import type {User} from 'test/e2e_tests/data/user';
+import type {User} from '../../../data/user';
 
 export class LoginPage {
   readonly signInButton: Locator;
@@ -37,7 +37,7 @@ export class LoginPage {
     this.header = page.getByRole('heading');
   }
 
-  async login(user: Pick<User, 'email' | 'password'>, options?: {publicComputer?: boolean}) {
+  async login(user: Pick<User, 'email' | 'password'>, options?: {publicComputer?: boolean}): Promise<void> {
     await this.emailInput.fill(user.email);
     await this.passwordInput.fill(user.password);
 

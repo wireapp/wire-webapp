@@ -17,19 +17,10 @@
  *
  */
 
-import {ReactElement} from 'react';
+import {ReactElement, useState} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import {hasActiveGlobalDriveFilters} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
-import {useCellsSorting} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
 
 import {loadMoreWrapperStyles, wrapperStyles} from './cellsGlobalView.styles';
 import {CellsHeader} from './cellsHeader/cellsHeader';
@@ -38,10 +29,18 @@ import {CellsStateInfo} from './cellsStateInfo/cellsStateInfo';
 import {CellsTable} from './cellsTable/cellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useGlobalDriveFilters} from './common/useGlobalDriveFilters/useGlobalDriveFilters';
+import {getGlobalDriveSelectionProps} from './getGlobalDriveSelectionProps';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
 import {useApplicationContext} from '../../page/rootProvider';
+import {CellsRepository} from '../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {UserRepository} from '../../repositories/user/userRepository';
+import {UserState} from '../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {hasActiveGlobalDriveFilters} from '../conversation/conversationCells/common/driveFilters/driveFilters';
+import {useCellsSorting} from '../conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 
 interface CellsGlobalViewProps {
   cellsRepository?: CellsRepository;
@@ -59,6 +58,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
     userState = container.resolve(UserState),
   } = properties;
   const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const [selectionBarAnchor, setSelectionBarAnchor] = useState<HTMLDivElement | null>(null);
   const {nodes, status: nodesStatus, pagination} = useCellsStore();
 
   const {filters, filterState} = useGlobalDriveFilters({cellsRepository, conversationRepository, translate});
@@ -107,6 +107,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
         onRefresh={handleReload}
         searchStatus={nodesStatus}
         filters={filters}
+        onSelectionBarAnchorChange={setSelectionBarAnchor}
       />
       {emptySearchResults && (
         <CellsStateInfo
@@ -122,6 +123,8 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
           getDirectionFor={getDirectionFor}
           isSortingEnabled
           onToggleSort={toggleSort}
+          {...getGlobalDriveSelectionProps(searchValue, filterState)}
+          selectionBarAnchor={selectionBarAnchor}
         />
       )}
       {showNoFiles && (

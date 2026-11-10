@@ -17,17 +17,9 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {EventName} from 'Repositories/tracking/eventName';
-import {Segmentation} from 'Repositories/tracking/segmentation';
-import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {teamCreationModalBodyCss, teamCreationModalWrapperCss} from './teamCreation.styles';
 import {Confirmation} from './teamCreationSteps/confirmation';
@@ -35,6 +27,13 @@ import {Form} from './teamCreationSteps/form';
 import {Introduction} from './teamCreationSteps/introduction';
 import {Success} from './teamCreationSteps/success';
 import {useTeamCreationModal} from './useTeamCreationModal';
+
+import * as Icon from '../../../../../../components/icon';
+import {ModalComponent} from '../../../../../../components/Modals/ModalComponent';
+import {EventName} from '../../../../../../repositories/tracking/eventName';
+import {Segmentation} from '../../../../../../repositories/tracking/segmentation';
+import {WebAppEvents} from '../../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../../rootProvider';
 
 enum Step {
   Introduction = 'Introduction',
@@ -62,7 +61,7 @@ interface Props {
   userName: string;
 }
 
-export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
+export const TeamCreationModal: FunctionComponent<Props> = ({onClose, onSuccess, userName}: Props) => {
   const {translate} = useApplicationContext();
   const stepsSequence = Object.values(Step);
   const [currentStep, setCurrentStep] = useState<Step>(Step.Introduction);
@@ -75,7 +74,7 @@ export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
     [Step.Success]: translate('teamCreationSuccessCloseLabel'),
   } as const;
 
-  const nextStepHandler = () => {
+  const nextStepHandler = (): void => {
     const currentStepIndex = stepsSequence.indexOf(currentStep);
     const step = stepsSequence[currentStepIndex + 1] as Step;
     setCurrentStep(step);
@@ -87,7 +86,7 @@ export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
     }
   };
 
-  const previousStepHandler = () => {
+  const previousStepHandler = (): void => {
     const currentStepIndex = stepsSequence.indexOf(currentStep);
     const step = stepsSequence[currentStepIndex - 1] as Step;
     setCurrentStep(step);
@@ -99,7 +98,7 @@ export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
     }
   };
 
-  const closeModalHandler = () => {
+  const closeModalHandler = (): void => {
     if (currentStep === Step.Success) {
       onSuccess();
       return;

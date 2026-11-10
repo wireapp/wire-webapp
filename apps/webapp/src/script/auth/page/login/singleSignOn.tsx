@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isNull, isObject, isString, isUndefined} from '@sindresorhus/is';
 import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
@@ -27,33 +27,24 @@ import {connect} from 'react-redux';
 import {useParams} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
-import {
-  COLOR,
-  Column,
-  Columns,
-  Container,
-  ContainerXS,
-  H1,
-  IsMobile,
-  Link,
-  Logo,
-  Muted,
-  Overlay,
-  QUERY,
-  QueryKeys,
-  Text,
-  useMatchMedia,
-} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {LogoFullIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
-import {getLogger} from 'Util/logger';
-
 import {SingleSignOnForm} from './singleSignOnForm';
 
+import {LogoFullIcon} from '../../../components/icon';
 import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {COLOR} from '../../../uiKit/identity/colors/colors';
+import {Logo} from '../../../uiKit/identity/logo/logo';
+import {Column, Columns} from '../../../uiKit/layout/column/column';
+import {Container, ContainerXS} from '../../../uiKit/layout/container/container';
+import {IsMobile, useMatchMedia} from '../../../uiKit/layout/matchMedia/matchMedia';
+import {Overlay} from '../../../uiKit/surface/modal/overlay';
+import {H1} from '../../../uiKit/typography/heading/heading';
+import {Link} from '../../../uiKit/typography/link/link';
+import {Muted, Text} from '../../../uiKit/typography/text/text';
+import {QUERY, QueryKeys} from '../../../uiKit/utils/mediaQueries';
+import {calculateChildWindowPosition} from '../../../util/DOM/caculateChildWindowPosition';
+import {getLogger} from '../../../util/logger';
+import {WebAppEvents} from '../../../webAppEvents';
 import {AppAlreadyOpen} from '../../component/appAlreadyOpen';
 import {BackButton} from '../../component/backButton';
 import {RootState, bindActionCreators} from '../../module/reducer';
@@ -66,7 +57,9 @@ type Props = React.HTMLAttributes<HTMLDivElement>;
 
 const logger = getLogger('SingleSignOn');
 
-const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+const SingleSignOnComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
+  hasDefaultSSOCode,
+}: Props & ConnectedProps & DispatchProps) => {
   const {translate} = useApplicationContext();
   const ssoWindowRef = useRef<Window | null>(null);
   const params = useParams<{code?: string}>();
@@ -84,7 +77,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
       let onReceiveChildWindowMessage: ((event: MessageEvent) => void) | undefined = undefined;
       let onParentWindowClose: ((event: Event) => void) | undefined = undefined;
 
-      const onChildWindowClose = () => {
+      const onChildWindowClose = (): void => {
         clearInterval(timerId);
         if (!isUndefined(onReceiveChildWindowMessage)) {
           window.removeEventListener('message', onReceiveChildWindowMessage);
@@ -162,7 +155,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
 
       setIsOverlayOpen(true);
 
-      const closeSSOWindow = () => {
+      const closeSSOWindow = (): void => {
         amplify.publish(WebAppEvents.LIFECYCLE.SSO_WINDOW_CLOSE);
         ssoWindowRef.current?.close();
       };
@@ -191,7 +184,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
     });
   };
 
-  const focusChildWindow = () => {
+  const focusChildWindow = (): void => {
     amplify.publish(WebAppEvents.LIFECYCLE.SSO_WINDOW_FOCUS);
     ssoWindowRef.current?.focus();
   };
@@ -327,14 +320,16 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {hasDefaultSSOCode: boolean};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     hasDefaultSSOCode: AuthSelector.hasDefaultSSOCode(state),
   };
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators({}, dispatch);
 };
 

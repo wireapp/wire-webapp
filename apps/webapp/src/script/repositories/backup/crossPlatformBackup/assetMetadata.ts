@@ -17,10 +17,10 @@
  *
  */
 
-import {isObject} from 'src/script/guards/common';
-
 import {AssetMetaData, BackupMessageContent} from './CPB.library';
 import {AudioAsset, ImageAsset} from './CPB.types';
+
+import {isObject} from '../../../guards/common';
 
 const AssetContentType = {
   Image: ['image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/'],
@@ -93,7 +93,7 @@ const isImageAsset = (contentType: string, infoObject: unknown): infoObject is I
  * @param infoObject
  * @returns metadata for the asset
  */
-export const buildMetaData = (contentType: string, infoObject: unknown, metaObject: unknown) => {
+export const buildMetaData = (contentType: string, infoObject: unknown, metaObject: unknown): AssetMetaData | null => {
   let metaData: AssetMetaData | null;
 
   if (isAudioAsset(contentType, metaObject)) {

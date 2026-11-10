@@ -22,13 +22,12 @@ import {useEffect, useCallback, useRef, useState} from 'react';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {transformCellsNodes} from 'Components/cells/common/transformCellsNodes/transformCellsNodes';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-
 import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformToCellPagination} from './transformToCellPagination';
 
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {UserRepository} from '../../../../repositories/user/userRepository';
+import {transformCellsNodes} from '../../../cells/common/transformCellsNodes/transformCellsNodes';
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {isInRecycleBin} from '../common/recycleBin/recycleBin';
 import {CellsSort} from '../common/useCellsSorting/useCellsSorting';
@@ -49,6 +48,14 @@ interface CellsQueryState {
   sort: CellsSort | null;
 }
 
+interface RefreshOptions {
+  preserveStatusOnError?: boolean;
+}
+
+type UseGetAllCellsNodesResult = {
+  refresh: (options?: RefreshOptions) => Promise<boolean>;
+  setOffset: (nextOffset: number) => void;
+};
 export const useGetAllCellsNodes = ({
   cellsRepository,
   userRepository,
@@ -56,7 +63,7 @@ export const useGetAllCellsNodes = ({
   enabled,
   fireAndForgetInvoker,
   sort,
-}: UseGetAllCellsNodesProps) => {
+}: UseGetAllCellsNodesProps): UseGetAllCellsNodesResult => {
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [queryState, setQueryState] = useState<CellsQueryState>({offset: 0, sort});
 
@@ -85,70 +92,80 @@ export const useGetAllCellsNodes = ({
     return enabledRef.current && !requestVersionGate.current.isStale(requestVersion);
   }, []);
 
-  const fetchNodes = useCallback(async () => {
-    if (!enabledRef.current) {
-      return;
-    }
-
-    const requestVersion = requestVersionGate.current.next();
-
-    try {
-      setError(null);
-      setStatus('loading');
-
-      // Resolve the path fresh on every fetch (not memoized) so folder navigation works.
-      // Memoizing on [domain, id] froze it to the conversation root and broke navigation.
-      const result = await cellsRepository.getAllNodes({
-        path: getCellsApiPath({conversationQualifiedId: {domain, id}}),
-        limit: pageSize,
-        offset,
-        deleted: isInRecycleBin(),
-        sortBy: sort?.field,
-        sortDirection: sort?.direction,
-      });
-
-      if (!isCurrentFetchRequest(requestVersion)) {
-        return;
+  const fetchNodes = useCallback(
+    async ({preserveStatusOnError = false}: RefreshOptions = {}): Promise<boolean> => {
+      if (!enabledRef.current) {
+        return false;
       }
 
-      if (result.Nodes === undefined || result.Nodes.length === 0) {
-        setNodes({conversationId: id, nodes: []});
+      const requestVersion = requestVersionGate.current.next();
+      const priorStatus = preserveStatusOnError ? useCellsStore.getState().status : undefined;
+
+      try {
+        setError(null);
+        if (!preserveStatusOnError) {
+          setStatus('loading');
+        }
+
+        // Resolve the path fresh on every fetch (not memoized) so folder navigation works.
+        // Memoizing on [domain, id] froze it to the conversation root and broke navigation.
+        const result = await cellsRepository.getAllNodes({
+          path: getCellsApiPath({conversationQualifiedId: {domain, id}}),
+          limit: pageSize,
+          offset,
+          deleted: isInRecycleBin(),
+          sortBy: sort?.field,
+          sortDirection: sort?.direction,
+        });
+
+        if (!isCurrentFetchRequest(requestVersion)) {
+          return false;
+        }
+
+        if (result.Nodes === undefined || result.Nodes.length === 0) {
+          setNodes({conversationId: id, nodes: []});
+          setStatus('success');
+          setPagination({conversationId: id, pagination: null});
+          return true;
+        }
+
+        const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
+
+        if (!isCurrentFetchRequest(requestVersion)) {
+          return false;
+        }
+
+        // filter out draft nodes from results
+        const filteredNodes = result.Nodes.filter(node => {
+          return node.IsDraft !== true;
+        });
+
+        const transformedNodes = transformCellsNodes({nodes: filteredNodes, users});
+        setNodes({conversationId: id, nodes: transformedNodes});
+
+        const pagination = result.Pagination !== undefined ? transformToCellPagination(result.Pagination) : null;
+        setPagination({conversationId: id, pagination});
+
         setStatus('success');
-        setPagination({conversationId: id, pagination: null});
-        return;
+        return true;
+      } catch (error: unknown) {
+        if (!isCurrentFetchRequest(requestVersion)) {
+          return false;
+        }
+
+        setError(error instanceof Error ? error : new Error('Failed to fetch files', {cause: error}));
+        if (priorStatus !== undefined) {
+          setStatus(priorStatus);
+        } else {
+          setPagination({conversationId: id, pagination: null});
+          setStatus('error');
+        }
+        throw error;
       }
-
-      const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
-
-      if (!isCurrentFetchRequest(requestVersion)) {
-        return;
-      }
-
-      // filter out draft nodes from results
-      const filteredNodes = result.Nodes.filter(node => {
-        return node.IsDraft !== true;
-      });
-
-      const transformedNodes = transformCellsNodes({nodes: filteredNodes, users});
-      setNodes({conversationId: id, nodes: transformedNodes});
-
-      const pagination = result.Pagination !== undefined ? transformToCellPagination(result.Pagination) : null;
-      setPagination({conversationId: id, pagination});
-
-      setStatus('success');
-    } catch (error: unknown) {
-      if (!isCurrentFetchRequest(requestVersion)) {
-        return;
-      }
-
-      setError(error instanceof Error ? error : new Error('Failed to fetch files', {cause: error}));
-      setPagination({conversationId: id, pagination: null});
-      setStatus('error');
-      throw error;
-    }
-    // cellsRepository and userRepository are not dependencies because they're singletons
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, id, isCurrentFetchRequest, offset, pageSize, sort, setError, setNodes, setPagination, setStatus]);
+      // cellsRepository and userRepository are not dependencies because they're singletons
+    },
+    [domain, id, isCurrentFetchRequest, offset, pageSize, sort, setError, setNodes, setPagination, setStatus],
+  );
 
   const handleHashChange = useCallback((): void => {
     if (!enabled) {

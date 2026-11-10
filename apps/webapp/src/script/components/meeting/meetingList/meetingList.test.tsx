@@ -19,23 +19,23 @@
 
 import {useMemo} from 'react';
 
-import {act, fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen, type RenderResult} from '@testing-library/react';
 import type {Virtualizer} from '@tanstack/react-virtual';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {createStore} from 'zustand/vanilla';
+import {createStore, type StoreApi} from 'zustand/vanilla';
 
-import type {UseMeetingListVirtualizer} from 'Components/meeting/meetingList/useMeetingListVirtualizer';
-import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
-import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import type {UseMeetingListVirtualizer} from './useMeetingListVirtualizer';
+import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
+import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
+import type {MeetingSeries} from '../types/meetingSeries';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {MainViewModel} from '../../../view_model/MainViewModel';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {isMeetingListItemLastInDay, MeetingList, type MeetingListProps} from './meetingList';
 
@@ -109,7 +109,7 @@ const createMainViewModelForTest = (): MainViewModel => {
   } as MainViewModel;
 };
 
-const createMeetingStoreForTest = () => {
+const createMeetingStoreForTest = (): StoreApi<MeetingStoreState> => {
   return createStore<MeetingStoreState>(() => {
     return {
       meetingSeries: [],
@@ -133,7 +133,7 @@ const renderMeetingList = (
     Partial<Pick<MeetingListProps, 'selfUser' | 'onRefresh'>>,
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   useMeetingListVirtualizer = createUseMeetingListVirtualizerForTest(),
-) => {
+): RenderResult => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,

@@ -20,15 +20,12 @@
 import {isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
-import {openBreadcrumb} from 'Components/conversation/conversationCells/common/openBreadcrumb/openBreadcrumb';
-import {
-  getNodeRootParentPath,
-  RECYCLE_BIN_PATH,
-} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
-import {useCellsStore} from 'Components/conversation/conversationCells/common/useCellsStore/useCellsStore';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode} from 'src/script/types/cellNode';
+import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../../../../types/cellNode';
+import {getCellsApiPath} from '../../../../common/getCellsApiPath/getCellsApiPath';
+import {openBreadcrumb} from '../../../../common/openBreadcrumb/openBreadcrumb';
+import {getNodeRootParentPath, RECYCLE_BIN_PATH} from '../../../../common/recycleBin/recycleBin';
+import {useCellsStore} from '../../../../common/useCellsStore/useCellsStore';
 
 interface UseRestoreParentNodeProps {
   childNode: CellNode;
@@ -37,12 +34,13 @@ interface UseRestoreParentNodeProps {
   onError: () => void;
 }
 
+type UseRestoreParentNodeResult = {restoreParentNode: () => Promise<void>; rootParentName: string};
 export const useRestoreParentNode = ({
   childNode,
   conversationQualifiedId,
   cellsRepository,
   onError,
-}: UseRestoreParentNodeProps) => {
+}: UseRestoreParentNodeProps): UseRestoreParentNodeResult => {
   const {removeNode} = useCellsStore();
   const rootParentName = getNodeRootParentPath({nodePath: childNode.path});
   const path = getCellsApiPath({

@@ -17,17 +17,16 @@
  *
  */
 
-import {Fragment, ReactElement} from 'react';
+import {Fragment, ReactElement, type FunctionComponent} from 'react';
 
 import {isBoolean, isDate, isNonEmptyString, isNumber, isObject, isString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 
-import {ErrorMessage, Link} from '@wireapp/react-ui-kit';
-
-import {errorHandlerStrings} from 'Util/errorUtil';
-import {validationErrorStrings} from 'Util/validationUtil';
-
 import {Config} from '../../Config';
+import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
+import {Link} from '../../uiKit/typography/link/link';
+import {errorHandlerStrings} from '../../util/errorUtil';
+import {validationErrorStrings} from '../../util/validationUtil';
 
 interface ExceptionProps {
   errors: unknown[];
@@ -57,7 +56,7 @@ const toMessageInterpolationValues = (value: unknown): MessageInterpolationValue
   return entries.length > 0 ? Object.fromEntries(entries) : undefined;
 };
 
-const Exception = ({errors = []}: ExceptionProps) => {
+const Exception: FunctionComponent<ExceptionProps> = ({errors = []}: ExceptionProps) => {
   return (
     <Fragment>
       {errors.map(error => {

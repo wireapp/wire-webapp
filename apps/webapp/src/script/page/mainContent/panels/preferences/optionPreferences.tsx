@@ -17,27 +17,28 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {Theme} from 'Components/appContainer/hooks/useTheme';
-import {RadioGroup} from 'Components/Radio';
-import {RootFontSize, useRootFontSize} from 'Hooks/useRootFontSize';
-import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
+
+import {Theme} from '../../../../components/appContainer/hooks/useTheme';
+import {RadioGroup} from '../../../../components/Radio';
+import {Config} from '../../../../Config';
+import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
+import {User} from '../../../../repositories/entity/User';
+import {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../../../../repositories/properties/propertiesType';
+import {Checkbox, CheckboxLabel} from '../../../../uiKit/inputs/checkbox/checkbox';
+import {IndicatorRangeInput} from '../../../../uiKit/inputs/indicatorRangeInput/indicatorRangeInput';
+import {TabIndex} from '../../../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../../util/localizerUtil/translationTypes';
+import {WebAppEvents} from '../../../../webAppEvents';
+import {useApplicationContext} from '../../../rootProvider';
 
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
@@ -96,7 +97,10 @@ function renderEmojiReplaceDetail(options: RenderEmojiReplaceDetailOptions): Rea
   );
 }
 
-const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesProps) => {
+const OptionPreferences: FunctionComponent<OptionPreferencesProps> = ({
+  propertiesRepository,
+  selfUser,
+}: OptionPreferencesProps) => {
   const {translate} = useApplicationContext();
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {
@@ -121,7 +125,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
       setOptionMarkdownPreview(settings.interface.markdown_preview);
     };
 
-    const updateDarkMode = (newDarkMode: boolean) => {
+    const updateDarkMode = (newDarkMode: boolean): void => {
       return setOptionDarkMode(newDarkMode);
     };
 
@@ -134,45 +138,45 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
     };
   }, []);
 
-  const saveOptionAudioPreference = (audioPreference: AudioPreferenceValue) => {
+  const saveOptionAudioPreference = (audioPreference: AudioPreferenceValue): void => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.SOUND_ALERTS, audioPreference);
     setOptionAudio(audioPreference);
   };
 
-  const saveOptionEmojiPreference = (emojiPreference: boolean) => {
+  const saveOptionEmojiPreference = (emojiPreference: boolean): void => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE, emojiPreference);
     setOptionReplaceInlineEmoji(emojiPreference);
   };
 
-  const saveOptionNotificationsPreference = (notificationsPreference: NotificationPreferenceValue) => {
+  const saveOptionNotificationsPreference = (notificationsPreference: NotificationPreferenceValue): void => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.NOTIFICATIONS, notificationsPreference);
     setOptionNotifications(notificationsPreference);
   };
 
-  const saveMarkdownPreviewPreference = (markdownPreviewPreference: boolean) => {
+  const saveMarkdownPreviewPreference = (markdownPreviewPreference: boolean): void => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW, markdownPreviewPreference);
     setOptionMarkdownPreview(markdownPreviewPreference);
   };
 
-  const saveOptionSendPreviewsPreference = (sendPreviewsPreference: boolean) => {
+  const saveOptionSendPreviewsPreference = (sendPreviewsPreference: boolean): void => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     setOptionSendPreviews(sendPreviewsPreference);
   };
 
-  const saveOptionNewTheme = (useDarkMode: boolean) => {
+  const saveOptionNewTheme = (useDarkMode: boolean): void => {
     const newTheme: Theme = useDarkMode ? 'dark' : 'default';
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     setOptionDarkMode(useDarkMode);
   };
 
-  const saveOptionFontSize = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const saveOptionFontSize = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const index = parseInt(event.target.value);
     const fontSize = fontSizes[index];
     setSliderValue(index);
     setCurrentRootFontSize(fontSize);
   };
 
-  const handleOptionClick = (value: number) => {
+  const handleOptionClick = (value: number): void => {
     const fontSize = fontSizes[value];
     setSliderValue(value);
     setCurrentRootFontSize(fontSize);

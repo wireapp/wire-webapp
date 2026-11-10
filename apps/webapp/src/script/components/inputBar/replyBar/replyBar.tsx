@@ -17,24 +17,25 @@
  *
  */
 
-import {TabIndex} from '@wireapp/react-ui-kit';
+import type {FunctionComponent} from 'react';
 
-import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
-import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
-import * as Icon from 'Components/icon';
-import {AssetImage} from 'Components/image';
-import {MultipartAssetPreview} from 'Components/messagesList/message/contentMessage/asset/multipartAssetPreview';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {renderMessage} from 'Util/messageRenderer';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {TabIndex} from '../../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {renderMessage} from '../../../util/messageRenderer';
+import {RestrictedVideo} from '../../asset/RestrictedVideo';
+import {ParticipantMicOnIcon} from '../../calling/ParticipantMicOnIcon';
+import * as Icon from '../../icon';
+import {AssetImage} from '../../image';
+import {MultipartAssetPreview} from '../../messagesList/message/contentMessage/asset/multipartAssetPreview';
 
 interface ReplyBarProps {
   replyMessageEntity: ContentMessage;
   onCancel: () => void;
 }
 
-export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
+export const ReplyBar: FunctionComponent<ReplyBarProps> = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
   const {translate} = useApplicationContext();
   const {
     assets,

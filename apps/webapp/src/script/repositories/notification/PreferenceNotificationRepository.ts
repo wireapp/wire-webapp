@@ -25,13 +25,12 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import type {ClientEntity} from 'Repositories/client/ClientEntity';
-import type {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {loadValue, resetStoreValue, storeValue} from 'Util/storageUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {loadValue, resetStoreValue, storeValue} from '../../util/storageUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import type {ClientEntity} from '../client/ClientEntity';
+import type {User} from '../entity/User';
+import {PropertiesRepository} from '../properties/propertiesRepository';
 
 export type ClientNotificationData = {
   domain?: string;
@@ -49,6 +48,10 @@ interface GroupedNotifications {
   notification: Notification[];
   type: string;
 }
+type PreferenceNotificationRepositoryConfig = {
+  NOTIFICATION_TYPES: {NEW_CLIENT: string; READ_RECEIPTS_CHANGED: string};
+  STORAGE_KEY: string;
+};
 
 /**
  * Take care of storing and keeping track of all the notifications relative to the user preferences (read receipts config, active devices ...)
@@ -56,7 +59,7 @@ interface GroupedNotifications {
 export class PreferenceNotificationRepository {
   public readonly notifications: ko.ObservableArray<Notification>;
 
-  static get CONFIG() {
+  static get CONFIG(): PreferenceNotificationRepositoryConfig {
     return {
       NOTIFICATION_TYPES: {
         NEW_CLIENT: 'new-client',
@@ -114,7 +117,7 @@ export class PreferenceNotificationRepository {
       PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
       PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
     ];
-    const prio = (item: GroupedNotifications) => {
+    const prio = (item: GroupedNotifications): number => {
       return notificationPriorities.indexOf(item.type);
     };
     const notifications = this.notifications.removeAll();
@@ -125,8 +128,8 @@ export class PreferenceNotificationRepository {
       .map(([type, notification]) => {
         return {notification, type};
       })
-      .toSorted((a, b) => {
-        return prio(a) - prio(b);
+      .toSorted((firstNotification, secondNotification) => {
+        return prio(firstNotification) - prio(secondNotification);
       });
   }
 

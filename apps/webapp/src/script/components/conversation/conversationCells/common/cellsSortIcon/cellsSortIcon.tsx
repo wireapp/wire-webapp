@@ -17,9 +17,13 @@
  *
  */
 
-import {SortAscendingIcon, SortDescendingIcon, SortNeutralIcon} from '@wireapp/react-ui-kit';
+import type {FunctionComponent} from 'react';
 
 import {sortIconStyles} from './cellsSortIcon.styles';
+
+import {SortAscendingIcon} from '../../../../../uiKit/dataDisplay/icon/sortAscendingIcon';
+import {SortDescendingIcon} from '../../../../../uiKit/dataDisplay/icon/sortDescendingIcon';
+import {SortNeutralIcon} from '../../../../../uiKit/dataDisplay/icon/sortNeutralIcon';
 
 export type CellsSortDirection = 'asc' | 'desc';
 type CellsSortState = CellsSortDirection | 'none';
@@ -36,7 +40,7 @@ interface CellsSortIconProps {
   direction?: CellsSortDirection;
 }
 
-export const CellsSortIcon = ({direction}: CellsSortIconProps) => {
+export const CellsSortIcon: FunctionComponent<CellsSortIconProps> = ({direction}: CellsSortIconProps) => {
   const sortState = direction ?? DEFAULT_SORT_STATE;
   const SortIcon = SORT_ICON_BY_STATE[sortState];
 

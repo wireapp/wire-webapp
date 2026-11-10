@@ -20,11 +20,10 @@
 import {isTruthy} from '@sindresorhus/is';
 import type {Dexie, Transaction} from 'dexie';
 
-import {base64ToArray} from 'Util/util';
-
 import {ConversationRecord} from './record';
 
 import {categoryFromEvent} from '../../message/messageCategorization';
+import {base64ToArray} from '../../util/util';
 
 interface DexieSchema {
   schema: Record<string, string>;
@@ -32,8 +31,23 @@ interface DexieSchema {
   version: number;
 }
 
+type StorageObjectStore = {
+  readonly AMPLIFY: 'amplify';
+  readonly CLIENTS: 'clients';
+  readonly CONVERSATIONS: 'conversations';
+  readonly CONVERSATION_EVENTS: 'conversation_events';
+  readonly EVENTS: 'events';
+  readonly GROUP_IDS: 'group_ids';
+  readonly KEYS: 'keys';
+  readonly LAST_KEY_MATERIAL_UPDATE_DATES: 'last_key_material_update_dates';
+  readonly PENDING_PROPOSALS: 'pending_proposals';
+  readonly PRE_KEYS: 'prekeys';
+  readonly SESSIONS: 'sessions';
+  readonly USERS: 'users';
+};
+
 export class StorageSchemata {
-  static get OBJECT_STORE() {
+  static get OBJECT_STORE(): StorageObjectStore {
     return {
       AMPLIFY: 'amplify',
       CLIENTS: 'clients',

@@ -17,17 +17,18 @@
  *
  */
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {Translate} from 'Util/localizerUtil';
-import {renderElement} from 'Util/renderElement';
+import type {FunctionComponent} from 'react';
 
+import {SidebarTabs, useSidebarStore} from '../../../page/leftSidebar/panels/conversations/useSidebarStore';
+import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
+import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {Translate} from '../../../util/localizerUtil';
+import {renderElement} from '../../../util/renderElement';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {Avatar, AVATAR_SIZE} from '../../avatar';
+import * as Icon from '../../icon';
+import {ModalComponent} from '../ModalComponent';
 
 interface ServiceModalProps {
   translate: Translate;
@@ -38,7 +39,7 @@ interface ServiceModalProps {
   readonly avatarSize?: AVATAR_SIZE;
 }
 
-const ServiceModal = ({
+const ServiceModal: FunctionComponent<ServiceModalProps> = ({
   translate,
   service,
   avatarSize = AVATAR_SIZE.LARGE,
@@ -47,7 +48,7 @@ const ServiceModal = ({
 }: ServiceModalProps) => {
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
-  const onOpenService = () => {
+  const onOpenService = (): void => {
     onClose?.();
     setCurrentSidebarTab(SidebarTabs.RECENT);
     void actionsViewModel.open1to1ConversationWithService(service);

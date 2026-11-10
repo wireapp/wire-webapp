@@ -69,7 +69,13 @@ const env = dotenv.load(dotenvConfig) as Env;
 
 console.info('[Config] Environment loaded. APP_BASE:', Boolean(env.APP_BASE) ? 'SET' : 'NOT SET');
 
-function generateUrls() {
+type ServerUrls = {
+  base: string;
+  api: string;
+  ws: string;
+};
+
+function generateUrls(): ServerUrls {
   const federation = env.FEDERATION;
 
   if (!Boolean(federation)) {

@@ -26,9 +26,8 @@ import {noop} from 'noop-esm';
 import {Dispatch, UnknownAction} from 'redux';
 import {match, P} from 'ts-pattern';
 
-import {Config} from 'src/script/Config';
-import {APIClient} from 'src/script/service/apiClientSingleton';
-
+import {Config} from '../../../Config';
+import {APIClient} from '../../../service/apiClientSingleton';
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ValidationError} from '../../module/action/validationError';
 import {ConversationState} from '../../module/reducer/conversationReducer';
@@ -110,7 +109,7 @@ export const handleEnterpriseLogin = async ({
   dispatch: Dispatch;
   navigate: (route: string) => void;
   apiClient: APIClient;
-}) => {
+}): Promise<void> => {
   const ssoCodeResponse = await apiClient.api.account.getSSOCodeByEmail(email);
 
   if (isString(ssoCodeResponse.sso_code)) {

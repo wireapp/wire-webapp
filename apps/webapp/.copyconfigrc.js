@@ -25,7 +25,11 @@ const pkg = require(path.join(rootDir, 'package.json'));
 const appConfigPkg = require('./app-config/package.json');
 
 const {selectConfiguration} = require('./configuration-selection');
-require('dotenv').config({quiet: true});
+// Load repository environment files for direct setup calls too.
+require('dotenv').config({
+  path: [path.join(__dirname, '.env'), path.join(rootDir, '.env')],
+  quiet: true,
+});
 
 /**
  * Reads the tag at HEAD for the compatibility fallback.

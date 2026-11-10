@@ -17,6 +17,7 @@
  *
  */
 
+import type {Meeting, MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
 import type {MeetingsAPI} from '@wireapp/api-client/lib/meetings/meetingsApi';
 
 import type {MeetingsDataSource} from './meetingsDataSource';
@@ -24,23 +25,23 @@ import type {MeetingsDataSource} from './meetingsDataSource';
 export class MeetingsApiDataSource implements MeetingsDataSource {
   constructor(private readonly meetingsApi: MeetingsAPI) {}
 
-  createMeeting(...args: Parameters<MeetingsDataSource['createMeeting']>) {
+  createMeeting(...args: Parameters<MeetingsDataSource['createMeeting']>): Promise<MeetingWithConversation> {
     return this.meetingsApi.createMeeting(...args);
   }
 
-  deleteMeeting(...args: Parameters<MeetingsDataSource['deleteMeeting']>) {
+  deleteMeeting(...args: Parameters<MeetingsDataSource['deleteMeeting']>): Promise<void> {
     return this.meetingsApi.deleteMeeting(...args);
   }
 
-  getMeeting(...args: Parameters<MeetingsDataSource['getMeeting']>) {
+  getMeeting(...args: Parameters<MeetingsDataSource['getMeeting']>): Promise<Meeting> {
     return this.meetingsApi.getMeeting(...args);
   }
 
-  getMeetingsList(...args: Parameters<MeetingsDataSource['getMeetingsList']>) {
+  getMeetingsList(...args: Parameters<MeetingsDataSource['getMeetingsList']>): Promise<Meeting[]> {
     return this.meetingsApi.getMeetingsList(...args);
   }
 
-  updateMeeting(...args: Parameters<MeetingsDataSource['updateMeeting']>) {
+  updateMeeting(...args: Parameters<MeetingsDataSource['updateMeeting']>): Promise<MeetingWithConversation> {
     return this.meetingsApi.updateMeeting(...args);
   }
 }

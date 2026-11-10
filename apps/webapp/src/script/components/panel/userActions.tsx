@@ -17,35 +17,35 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {listCSS} from 'Components/panel/panelActions/panelActions.styles';
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
-import type {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import type {MenuItem} from './panelActions';
 import {PanelActions} from './panelActions';
+import {listCSS} from './panelActions/panelActions.styles';
 import {SingleAction} from './singleAction/singleAction';
 
+import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols/mls';
+import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conversations/useSidebarStore';
+import {useApplicationContext} from '../../page/rootProvider';
+import {ACCESS_STATE} from '../../repositories/conversation/AccessState';
+import type {ConversationRoleRepository} from '../../repositories/conversation/ConversationRoleRepository';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {Conversation} from '../../repositories/entity/Conversation';
+import type {User} from '../../repositories/entity/User';
+import {TeamState} from '../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import {WebAppEvents} from '../../webAppEvents';
+import * as Icon from '../icon';
+import {PrimaryModal} from '../Modals/PrimaryModal';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',
@@ -92,7 +92,7 @@ function createPlaceholder1to1Conversation(
   user: User,
   selfUser: User,
   translate: ReturnType<typeof useApplicationContext>['translate'],
-) {
+): Conversation {
   const userConnection = user.connection();
 
   if (isNullOrUndefined(userConnection)) {
@@ -112,7 +112,7 @@ function createPlaceholder1to1Conversation(
   return conversation;
 }
 
-const UserActions = ({
+const UserActions: FunctionComponent<UserActionsProps> = ({
   actionsViewModel,
   isSelfActivated,
   user,

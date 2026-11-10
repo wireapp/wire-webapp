@@ -20,8 +20,8 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import getSlug from 'speakingurl';
 
-import {randomElement} from 'Util/arrayUtil';
-import {getRandomNumber} from 'Util/numberUtil';
+import {randomElement} from '../../util/arrayUtil';
+import {getRandomNumber} from '../../util/numberUtil';
 
 const maximumRandomHandleDigit = 8;
 
@@ -53,7 +53,7 @@ const RANDOM_WORDS_2 = [
   ...['wasp', 'weasel', 'whale', 'wolf', 'wombat', 'yak', 'zebra'],
 ];
 
-const getRandomWordCombination = () => {
+const getRandomWordCombination = (): string => {
   return `${randomElement(RANDOM_WORDS_1)}${randomElement(RANDOM_WORDS_2)}`;
 };
 

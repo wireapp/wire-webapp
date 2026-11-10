@@ -20,6 +20,7 @@
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import type {DeterministicClock} from '@enormora/clock/deterministic-clock';
 import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
@@ -30,47 +31,47 @@ import {result} from 'true-myth';
 
 import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
-import {AudioRepository} from 'Repositories/audio/audioRepository';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ConnectionMapper} from 'Repositories/connection/connectionMapper';
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CallMessage} from 'Repositories/entity/message/callMessage';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {Location} from 'Repositories/entity/message/location';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import {Message} from 'Repositories/entity/message/message';
-import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
-import {PingMessage} from 'Repositories/entity/message/pingMessage';
-import {RenameMessage} from 'Repositories/entity/message/renameMessage';
-import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
-import {UserMapper} from 'Repositories/user/userMapper';
-import {UserState} from 'Repositories/user/userState';
-import 'src/script/localization/Localizer';
-import {CALL_MESSAGE_TYPE} from 'src/script/message/callMessageType';
-import {MentionEntity} from 'src/script/message/mentionEntity';
-import {QuoteEntity} from 'src/script/message/quoteEntity';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {ContentState, useAppState} from 'src/script/page/useAppState';
-import {entities, payload} from 'test/api/payloads';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {truncate} from 'Util/stringUtil';
-import {createUuid} from 'Util/uuid';
-import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {AudioRepository} from '../audio/audioRepository';
+import {CallingRepository} from '../calling/CallingRepository';
+import {CallingViewMode, CallState} from '../calling/CallState';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
+import {ConnectionEntity} from '../connection/connectionEntity';
+import {ConnectionMapper} from '../connection/connectionMapper';
+import {ConversationMapper} from '../conversation/ConversationMapper';
+import {ConversationState} from '../conversation/ConversationState';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
+import {Conversation} from '../entity/Conversation';
+import {CallMessage} from '../entity/message/callMessage';
+import {CompositeMessage} from '../entity/message/compositeMessage';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {Location} from '../entity/message/location';
+import {MediumImage} from '../entity/message/mediumImage';
+import {MemberMessage} from '../entity/message/memberMessage';
+import {Message} from '../entity/message/message';
+import {MessageTimerUpdateMessage} from '../entity/message/messageTimerUpdateMessage';
+import {PingMessage} from '../entity/message/pingMessage';
+import {RenameMessage} from '../entity/message/renameMessage';
+import {Text} from '../entity/message/text';
+import {User} from '../entity/User';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {BrowserPermissionStatus} from '../permission/BrowserPermissionStatus';
+import {UserMapper} from '../user/userMapper';
+import {UserState} from '../user/userState';
+import '../../localization/Localizer';
+import {CALL_MESSAGE_TYPE} from '../../message/callMessageType';
+import {MentionEntity} from '../../message/mentionEntity';
+import {QuoteEntity} from '../../message/quoteEntity';
+import {SystemMessageType} from '../../message/systemMessageType';
+import {ContentState, useAppState} from '../../page/useAppState';
+import {entities, payload} from '../../../../test/api/payloads';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {truncate} from '../../util/stringUtil';
+import {createUuid} from '../../util/uuid';
+import {createExecutingFireAndForgetInvokerForTest} from '../../page/testSupport/rootContextTestSupport';
 
 import {NotificationRepository} from './NotificationRepository';
 import {systemNotificationErrorKinds, type SystemNotificationApi} from '../../notification/systemNotificationTypes';
@@ -80,7 +81,14 @@ function buildNotificationRepository(
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   notificationApi?: SystemNotificationApi,
   fireAndForgetInvoker: FireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest(),
-) {
+): readonly [
+  NotificationRepository,
+  {
+    readonly userState: UserState;
+    readonly clock: DeterministicClock;
+    readonly fireAndForgetInvoker: FireAndForgetInvoker;
+  },
+] {
   const userState = container.resolve(UserState);
   const conversationRepository = {
     isMessageRead: jest.fn(async () => {
@@ -740,7 +748,7 @@ describe('NotificationRepository', () => {
 
   describe('reacts according to availability status', () => {
     let allMessageTypes: Record<string, any>;
-    function generateTextAsset() {
+    function generateTextAsset(): Text {
       const textEntity = new Text(createUuid(), 'hey there');
       return textEntity;
     }
@@ -1208,7 +1216,7 @@ describe('NotificationRepository', () => {
     const userId = {domain: '', id: createUuid()};
     const shouldNotifyInConversation = NotificationRepository.shouldNotifyInConversation;
 
-    function generateTextAsset(selfMentioned = false) {
+    function generateTextAsset(selfMentioned = false): Text {
       const mentionId = selfMentioned ? userId.id : createUuid();
 
       const textEntity = new Text(createUuid(), '@Gregor can you take a look?');

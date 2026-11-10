@@ -17,13 +17,15 @@
  *
  */
 
-import {isEmptyArray, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
+import type {FunctionComponent} from 'react';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {isEmptyArray, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 
 import {UploadAssetItem} from './components/uploadAssetItem';
 import {uploadAssetsContainer} from './uploadAssets.styles';
+
+import {AssetRepository} from '../../../repositories/assets/assetRepository';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 
 interface Props {
   assetRepository: AssetRepository;
@@ -31,7 +33,7 @@ interface Props {
   scrollToEnd?: () => void;
 }
 
-export const UploadAssets = ({assetRepository, conversationId, scrollToEnd}: Props) => {
+export const UploadAssets: FunctionComponent<Props> = ({assetRepository, conversationId, scrollToEnd}: Props) => {
   const {processQueue, uploadProgressQueue} = useKoSubscribableChildren(assetRepository, [
     'processQueue',
     'uploadProgressQueue',

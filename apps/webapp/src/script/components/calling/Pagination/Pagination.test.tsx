@@ -17,14 +17,14 @@
  *
  */
 
-import {render, fireEvent} from '@testing-library/react';
+import {render, fireEvent, type RenderResult} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {withTheme} from '../../../auth/util/test/testUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {Pagination} from './Pagination';
 
@@ -41,7 +41,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 describe('Pagination', () => {
   const onChangePageMock = jest.fn();
 
-  const renderPagination = (props = {}) => {
+  const renderPagination = (props = {}): RenderResult => {
     return render(
       withTheme(<Pagination totalPages={10} currentPage={0} onChangePage={onChangePageMock} {...props} />),
       {

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {devicePart} from './formattedId.styles';
 
 interface FormattedIdProps {
@@ -24,7 +26,10 @@ interface FormattedIdProps {
   smallPadding?: boolean;
 }
 
-export const FormattedId = ({idSlices, smallPadding = false}: FormattedIdProps) => {
+export const FormattedId: FunctionComponent<FormattedIdProps> = ({
+  idSlices,
+  smallPadding = false,
+}: FormattedIdProps) => {
   return (
     <>
       {idSlices.map((slice, index) => {

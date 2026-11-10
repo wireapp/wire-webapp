@@ -17,18 +17,11 @@
  *
  */
 
+import {useEffect, useState, type FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
-
-import {CellsSortDirection} from 'Components/conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
-import {
-  CellsSortField,
-  SORTABLE_COLUMN_FIELD,
-  toAriaSort,
-} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode} from 'src/script/types/cellNode';
+import {createPortal} from 'react-dom';
 
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
@@ -39,9 +32,22 @@ import {
   tableStyles,
   wrapperWithRowsStyles,
   wrapperStyles,
+  selectedTableCellRowStyles,
 } from './cellsTable.styles';
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
 import {FilePreviewProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
+
+import {driveBulkActionsFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../types/cellNode';
+import {CellsSelectionBar} from '../../cells/common/cellsSelectionBar/cellsSelectionBar';
+import {CellsSortDirection} from '../../conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
+import {
+  CellsSortField,
+  SORTABLE_COLUMN_FIELD,
+  toAriaSort,
+} from '../../conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 
 interface CellsTableProps {
   nodes: CellNode[];
@@ -49,6 +55,9 @@ interface CellsTableProps {
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
   isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
+  selectionEnabled: boolean;
+  selectionScopeKey: string;
+  selectionBarAnchor: HTMLElement | null;
 }
 
 interface CellsTableHeaderCellProps {
@@ -57,7 +66,11 @@ interface CellsTableHeaderCellProps {
   isSortingEnabled: boolean;
 }
 
-const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: CellsTableHeaderCellProps) => {
+const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
+  header,
+  getDirectionFor,
+  isSortingEnabled,
+}: CellsTableHeaderCellProps) => {
   const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
   const ariaSort = isSortingEnabled && isNonEmptyString(sortField) ? toAriaSort(getDirectionFor(sortField)) : undefined;
 
@@ -75,19 +88,67 @@ const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: Cells
   );
 };
 
-export const CellsTable = ({
+export const CellsTable: FunctionComponent<CellsTableProps> = ({
   nodes,
   cellsRepository,
   getDirectionFor,
   isSortingEnabled,
   onToggleSort,
+  selectionEnabled,
+  selectionScopeKey,
+  selectionBarAnchor,
 }: CellsTableProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
+  const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
+    return new Set();
+  });
+
+  useEffect(() => {
+    setSelectedNodeIds(new Set());
+  }, [isSelectionEnabled, selectionScopeKey]);
+
+  useEffect(() => {
+    const currentNodeIds = new Set<string>();
+    for (const node of nodes) {
+      currentNodeIds.add(node.id);
+    }
+    setSelectedNodeIds(currentSelection => {
+      const nextSelection = new Set(currentSelection);
+      for (const nodeId of currentSelection) {
+        if (!currentNodeIds.has(nodeId)) {
+          nextSelection.delete(nodeId);
+        }
+      }
+      return nextSelection.size === currentSelection.size ? currentSelection : nextSelection;
+    });
+  }, [nodes]);
+
+  const handleToggleSelection = (nodeId: string, isSelected: boolean): void => {
+    setSelectedNodeIds(currentSelection => {
+      const nextSelection = new Set(currentSelection);
+      if (isSelected) {
+        nextSelection.add(nodeId);
+      } else {
+        nextSelection.delete(nodeId);
+      }
+      return nextSelection;
+    });
+  };
   const cellLabels = getCellsTableDataCellLabels(translate);
 
   const table = useReactTable({
     data: nodes,
-    columns: getCellsTableColumns({cellsRepository, getDirectionFor, isSortingEnabled, onToggleSort, translate}),
+    columns: getCellsTableColumns({
+      cellsRepository,
+      getDirectionFor,
+      isSortingEnabled,
+      onToggleSort,
+      translate,
+      selectedNodeIds,
+      onToggleSelection: handleToggleSelection,
+      selectionEnabled: isSelectionEnabled,
+    }),
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -97,6 +158,17 @@ export const CellsTable = ({
   return (
     <FilePreviewProvider>
       <div css={tableWrapperStyles}>
+        {isSelectionEnabled &&
+          selectionBarAnchor !== null &&
+          createPortal(
+            <CellsSelectionBar
+              selectedCount={selectedNodeIds.size}
+              onClear={() => {
+                return setSelectedNodeIds(new Set());
+              }}
+            />,
+            selectionBarAnchor,
+          )}
         <table css={tableStyles}>
           <thead>
             {table.getHeaderGroups().map(headerGroup => {
@@ -120,7 +192,16 @@ export const CellsTable = ({
             <tbody>
               {rows.map(row => {
                 return (
-                  <tr key={row.id} css={tableCellRow}>
+                  <tr
+                    key={row.id}
+                    css={[
+                      tableCellRow,
+                      ...(isSelectionEnabled && selectedNodeIds.has(row.original.id)
+                        ? [selectedTableCellRowStyles]
+                        : []),
+                    ]}
+                    aria-selected={isSelectionEnabled && selectedNodeIds.has(row.original.id)}
+                  >
                     {row.getVisibleCells().map(cell => {
                       return (
                         <td

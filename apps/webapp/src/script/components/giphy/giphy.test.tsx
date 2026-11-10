@@ -19,18 +19,19 @@
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
 
-import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {GiphyRepository} from '../../repositories/extension/GiphyRepository';
+import {withTheme} from '../../auth/util/test/testUtil';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 
 import {Giphy, GiphyState} from '.';
 
 const inputValue = 'Yammy yammy';
-const getDefaultProps = () => {
+type GetDefaultPropsResult = {giphyRepository: GiphyRepository; inputValue: string; onClose: jest.Mock<any, any, any>};
+const getDefaultProps = (): GetDefaultPropsResult => {
   return {
     giphyRepository: {getGifs: jest.fn().mockResolvedValue([]), resetOffset: jest.fn()} as unknown as GiphyRepository,
     inputValue,
@@ -66,7 +67,18 @@ describe('Giphy', () => {
     fireEvent.click(closeButton);
   });
 
-  it('no giphys found', async () => {
+  it('shows a message and disables GIF actions when a search returns no results', async () => {
+    const props = {...getDefaultProps(), inputValue: 'int aa'};
+    const {findByText, getByRole} = render(withTheme(<Giphy {...props} />), {wrapper: rootProviderWrapper});
+
+    expect(await findByText('extensionsGiphyNoGifs')).toBeVisible();
+    expect(props.giphyRepository.getGifs).toHaveBeenCalledWith('int aa');
+    expect(getByRole('button', {name: 'accessibility.giphyModal.tryAnother'})).toBeDisabled();
+    expect(getByRole('button', {name: 'accessibility.giphyModal.sendGif'})).toBeDisabled();
+    expect(getByRole('button', {name: 'accessibility.giphyModal.close'})).toBeEnabled();
+  });
+
+  it('shows a message in the error state', async () => {
     const {getByText, getByTestId} = render(
       withTheme(<Giphy {...getDefaultProps()} defaultGiphyState={GiphyState.ERROR} />),
       {wrapper: rootProviderWrapper},

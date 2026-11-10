@@ -20,19 +20,18 @@
 import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {LinkPreview} from 'Repositories/entity/message/linkPreview';
-import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
-import {QuoteEntity} from 'src/script/message/quoteEntity';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';
+import {Text} from '../../../../repositories/entity/message/text';
+import {User} from '../../../../repositories/entity/User';
+import {QuoteEntity} from '../../../../message/quoteEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+} from '../../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../util/test/translateForTest';
+import {createUuid} from '../../../../util/uuid';
 
 import {ContentMessageComponent, ContentMessageProps} from './contentMessage';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -98,7 +97,7 @@ describe('message', () => {
     const quoteAsset = new Text('', textValue);
     spyOn(quoteAsset, 'render').and.returnValue(`<span>${quoteText}</span>`);
     quotedMessage.assets.push(quoteAsset);
-    const findMessage = () => {
+    const findMessage = (): Promise<ContentMessage> => {
       return Promise.resolve(quotedMessage);
     };
 

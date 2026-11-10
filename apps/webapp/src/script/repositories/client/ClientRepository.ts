@@ -28,19 +28,6 @@ import murmurhash from 'murmurhash';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
-import {ClientRecord} from 'Repositories/storage';
-import {StorageKey} from 'Repositories/storage/storageKey';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {loadValue} from 'Util/storageUtil';
-import {toError} from 'Util/toError';
-import {isAxiosError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 
 import {ClientEntity} from './ClientEntity';
 import {constructClientId, parseClientId} from './ClientIdUtil';
@@ -50,25 +37,38 @@ import {ClientState} from './ClientState';
 import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils';
 
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {loadValue} from '../../util/storageUtil';
+import {toError} from '../../util/toError';
+import {isAxiosError, isErrorWithCode, isErrorWithType} from '../../util/typePredicateUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {User} from '../entity/User';
+import {ClientRecord} from '../storage';
+import {StorageKey} from '../storage/storageKey';
 
 const loginHashSeed = 42;
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};
+type ClientRepositoryConfig = {AVERAGE_NUMBER_OF_CLIENTS: number};
 
 export class ClientRepository {
   private readonly logger: Logger;
   public selfUser: ko.Observable<User>;
 
-  static get CONFIG() {
+  static get CONFIG(): ClientRepositoryConfig {
     return {
       AVERAGE_NUMBER_OF_CLIENTS: 4,
     };
   }
 
-  static get PRIMARY_KEY_CURRENT_CLIENT() {
+  static get PRIMARY_KEY_CURRENT_CLIENT(): string {
     return 'local_identity';
   }
 
@@ -103,7 +103,7 @@ export class ClientRepository {
    * Delete the temporary client on the backend.
    * @returns Resolves when the temporary client was deleted on the backend
    */
-  private deleteLocalTemporaryClient() {
+  private deleteLocalTemporaryClient(): Promise<string> {
     const coreServices = this.core.service;
     if (isUndefined(coreServices)) {
       throw new Error('Core services are not initialized');
@@ -116,7 +116,7 @@ export class ClientRepository {
    * Load all known clients from the database.
    * @returns Resolves with all the clients found in the local database
    */
-  getAllClientsFromDb(): Promise<{[userId: string]: ClientEntity[]}> {
+  getAllClientsFromDb(): Promise<UserClientEntityMap> {
     return this.clientService.loadAllClientsFromDb().then(clientRecords => {
       // TODO(Federation): Add domain to identifier
       const recipients: {[userId: string]: ClientEntity[]} = {};

@@ -124,7 +124,7 @@ export class WebSocketClient extends EventEmitter {
     }
   }
 
-  private readonly onMessage = (data: string) => {
+  private readonly onMessage = (data: string): void => {
     if (!Boolean(data)) {
       this.logger.warn('Received empty message from WebSocket');
       return;
@@ -140,7 +140,7 @@ export class WebSocketClient extends EventEmitter {
     }
   };
 
-  private readonly onError = async (error: ErrorEvent, reconnectContext: WebSocketReconnectContext) => {
+  private readonly onError = async (error: ErrorEvent, reconnectContext: WebSocketReconnectContext): Promise<void> => {
     this.onStateChange(this.socket.getState());
     this.emit(WebSocketClient.TOPIC.ON_ERROR, error);
     try {
@@ -153,24 +153,24 @@ export class WebSocketClient extends EventEmitter {
     }
   };
 
-  private readonly onReconnect = async (reconnectContext: WebSocketReconnectContext) => {
+  private readonly onReconnect = async (reconnectContext: WebSocketReconnectContext): Promise<string> => {
     await this.waitForValidAccessTokenBeforeReconnect(reconnectContext);
     await this.verifyAuthenticatedSessionBeforeReconnect(reconnectContext);
 
     return this.buildWebSocketUrl(reconnectContext);
   };
 
-  private readonly onOpen = () => {
+  private readonly onOpen = (): void => {
     this.onStateChange(this.socket.getState());
   };
 
-  private readonly onClose = () => {
+  private readonly onClose = (): void => {
     this.abortHandler?.abort();
     this.bufferedMessages = [];
     this.onStateChange(this.socket.getState());
   };
 
-  private readonly onLongRunningRetry = (retryDetails: LongRunningRetryDetails) => {
+  private readonly onLongRunningRetry = (retryDetails: LongRunningRetryDetails): void => {
     this.emit(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, retryDetails);
   };
 
@@ -361,7 +361,7 @@ export class WebSocketClient extends EventEmitter {
    * When unlocking the websocket all buffered messages between
    * connecting the websocket and the unlocking the websocket will be emitted.
    */
-  public readonly unlock = () => {
+  public readonly unlock = (): void => {
     this.logger.info(`Unlocking WebSocket - Emitting "${this.bufferedMessages.length}" unprocessed messages`);
     this.isSocketLocked = false;
     for (const bufferedMessage of this.bufferedMessages) {
@@ -376,7 +376,7 @@ export class WebSocketClient extends EventEmitter {
    * This behaviour is needed in order to not miss any messages
    * during fetching notifications from the notification stream.
    */
-  public readonly lock = () => {
+  public readonly lock = (): void => {
     this.logger.info('Locking WebSocket');
     this.isSocketLocked = true;
   };
@@ -436,13 +436,13 @@ export class WebSocketClient extends EventEmitter {
     return websocketAddress;
   }
 
-  public useAsyncNotificationsSocket() {
+  public useAsyncNotificationsSocket(): void {
     this.useLegacySocket = false;
     // we shouldn't send ping to the new async notifications sockets otherwise the backend will close the connection
     this.socket.disablePinging();
   }
 
-  public acknowledgeMissedNotification() {
+  public acknowledgeMissedNotification(): void {
     const jsonEvent = JSON.stringify({
       type: AcknowledgeType.ACK_FULL_SYNC,
     });
@@ -450,7 +450,7 @@ export class WebSocketClient extends EventEmitter {
     this.socket.send(jsonEvent);
   }
 
-  public acknowledgeConsumableNotificationSynchronization(notification: ConsumableNotificationSynchronization) {
+  public acknowledgeConsumableNotificationSynchronization(notification: ConsumableNotificationSynchronization): void {
     const jsonEvent = JSON.stringify({
       type: AcknowledgeType.ACK,
       data: {
@@ -462,7 +462,7 @@ export class WebSocketClient extends EventEmitter {
     this.socket.send(jsonEvent);
   }
 
-  public acknowledgeNotification(notification: ConsumableNotificationEvent) {
+  public acknowledgeNotification(notification: ConsumableNotificationEvent): void {
     if (this.socket?.getState() !== WebSocket.OPEN) {
       return;
     }

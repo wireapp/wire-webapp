@@ -17,12 +17,12 @@
  *
  */
 
-import type {ReactNode} from 'react';
+import type {ReactNode, FunctionComponent} from 'react';
 
-import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/fileTypeRestrictedMessage';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from '../../../repositories/entity/message/fileTypeRestrictedMessage';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../util/localizerUtil/translationTypes';
 
 interface FileTypeRestrictedMessageProps {
   message: FileTypeRestrictedMessageEntity;
@@ -118,7 +118,9 @@ function renderFileTypeRestrictedMessage(options: RenderFileTypeRestrictedMessag
   );
 }
 
-const FileTypeRestrictedMessage = ({message}: FileTypeRestrictedMessageProps) => {
+const FileTypeRestrictedMessage: FunctionComponent<FileTypeRestrictedMessageProps> = ({
+  message,
+}: FileTypeRestrictedMessageProps) => {
   const {translate} = useApplicationContext();
   const translation = message.isIncoming
     ? {kind: 'incoming' as const, name: message.name}

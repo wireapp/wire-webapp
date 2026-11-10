@@ -17,12 +17,11 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {CloseIcon} from 'Components/icon';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {TabIndex} from '../../../../../../../uiKit/utils/enums';
+import {handleKeyDown, KEY} from '../../../../../../../util/keyboardUtil';
+import {CloseIcon} from '../../../../../../icon';
 
 const largeLoaderScale = 2;
 const completeProgressPercentage = 100;
@@ -34,13 +33,13 @@ interface AssetLoaderProps {
   onCancel: () => void;
 }
 
-const AssetLoader = ({large, loadProgress, onCancel}: AssetLoaderProps) => {
+const AssetLoader: FunctionComponent<AssetLoaderProps> = ({large, loadProgress, onCancel}: AssetLoaderProps) => {
   const elementScale = large === true ? largeLoaderScale : 1;
   const progress = `${loadProgress * elementScale} ${completeProgressPercentage * elementScale}`;
   const viewBoxSize = loaderViewBoxSize * elementScale;
   const viewBox = `0 0 ${viewBoxSize} ${viewBoxSize}`;
 
-  const onClick = (event: React.UIEvent) => {
+  const onClick = (event: React.UIEvent): void => {
     event.bubbles = false;
     onCancel();
   };

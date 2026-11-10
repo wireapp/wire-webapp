@@ -17,15 +17,9 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState, FormEvent} from 'react';
+import {useCallback, useEffect, useRef, useState, FormEvent, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-
-import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   buttonGroupStyles,
@@ -36,6 +30,12 @@ import {
   titleStyles,
 } from './linkDialog.styles';
 
+import {RootContextValue, useApplicationContext} from '../../../../../../page/rootProvider';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
+import {ErrorMessage} from '../../../../../../uiKit/inputs/errorMessage/errorMessage';
+import {Input} from '../../../../../../uiKit/inputs/input/input';
+import * as Icon from '../../../../../icon';
+import {ModalComponent} from '../../../../../Modals/ModalComponent';
 import {validateUrl} from '../../utils/url';
 
 interface LinkDialogProps {
@@ -57,7 +57,7 @@ interface FormErrors {
   text?: string;
 }
 
-export const LinkDialog = ({
+export const LinkDialog: FunctionComponent<LinkDialogProps> = ({
   onSubmit,
   onClose,
   initialUrl = '',
@@ -94,7 +94,7 @@ export const LinkDialog = ({
     }
   }, [isOpen, initialUrl, initialText, resetForm]);
 
-  const handleInputChange = ({event, field}: {event: FormEvent<HTMLInputElement>; field: keyof FormData}) => {
+  const handleInputChange = ({event, field}: {event: FormEvent<HTMLInputElement>; field: keyof FormData}): void => {
     const {value} = event.target as HTMLInputElement;
     setFormData(prev => {
       return {...prev, [field]: value};
@@ -110,7 +110,7 @@ export const LinkDialog = ({
     }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = (event: React.FormEvent): void => {
     event.preventDefault();
     event.stopPropagation();
     setIsSubmitted(true);

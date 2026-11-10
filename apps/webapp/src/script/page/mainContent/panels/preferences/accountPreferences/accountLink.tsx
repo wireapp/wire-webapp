@@ -17,11 +17,12 @@
  *
  */
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import type {FunctionComponent} from 'react';
 
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {copyText} from 'Util/clipboardUtil';
+import * as Icon from '../../../../../components/icon';
+import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
+import {copyText} from '../../../../../util/clipboardUtil';
+import {useApplicationContext} from '../../../../rootProvider';
 
 interface AccountLinkProps {
   'data-uie-name'?: string;
@@ -29,7 +30,7 @@ interface AccountLinkProps {
   value: string;
 }
 
-const AccountLink = ({label, value, ...rest}: AccountLinkProps) => {
+const AccountLink: FunctionComponent<AccountLinkProps> = ({label, value, ...rest}: AccountLinkProps) => {
   const {translate} = useApplicationContext();
 
   return (

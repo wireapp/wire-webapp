@@ -26,7 +26,7 @@ export type ActiveWindowState = {
   setActiveWindow: (newWindow: Window) => void;
 };
 
-export const useActiveWindowState = create<ActiveWindowState>((set, get) => {
+export const useActiveWindowState = create<ActiveWindowState>(set => {
   return {
     activeWindow: window,
     setActiveWindow: (newWindow: Window) => {
@@ -35,13 +35,13 @@ export const useActiveWindowState = create<ActiveWindowState>((set, get) => {
   };
 });
 
-export const useActiveWindow = (windowObj: Window | null) => {
+export const useActiveWindow = (windowObj: Window | null): void => {
   const {setActiveWindow} = useActiveWindowState();
 
   const windowRef = windowObj !== null ? windowObj : window;
 
   useEffect(() => {
-    const handleFocus = () => {
+    const handleFocus = (): void => {
       return setActiveWindow(windowRef);
     };
 

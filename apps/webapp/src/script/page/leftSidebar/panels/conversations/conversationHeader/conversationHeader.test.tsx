@@ -20,47 +20,80 @@
 import {createRef} from 'react';
 
 import userEvent from '@testing-library/user-event';
-import {render, screen} from '@testing-library/react';
+import {act, render, screen} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {createDeterministicClock, type DeterministicClock} from '@enormora/clock/deterministic-clock';
+
+import {User} from '../../../../../repositories/entity/User';
+import {withThemeAndRootContext} from '../../../../../auth/util/test/testUtil';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 
 import {ConversationHeaderComponent} from './conversationHeader';
 
 import {SidebarTabs} from '../useSidebarStore';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
-);
-
 describe('ConversationHeader', () => {
-  const renderHeader = ({onSearchTab = jest.fn(), onSearchEnterClick = jest.fn()} = {}) => {
+  type RenderHeaderResult = {
+    onSearchTab: jest.Mock<any, any, any>;
+    onSearchEnterClick: jest.Mock<any, any, any>;
+    onSearchChange: jest.Mock<any, any, any>;
+    clock: DeterministicClock;
+  };
+  const renderHeader = ({
+    onSearchTab = jest.fn(),
+    onSearchEnterClick = jest.fn(),
+    onSearchChange = jest.fn(),
+    hasSearchTabResult = jest.fn(() => {
+      return true;
+    }),
+    searchValue = 'search',
+    clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+  } = {}): RenderHeaderResult => {
+    const wrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({translate: translateForTest, clock}),
+    );
     render(
       withThemeAndRootContext(
         <ConversationHeaderComponent
           currentTab={SidebarTabs.RECENT}
           selfUser={new User('', '', translateForTest)}
           showSearchInput
-          searchValue="search"
-          setSearchValue={jest.fn()}
+          searchValue={searchValue}
+          onSearchChange={onSearchChange}
           searchInputPlaceholder="Search conversations"
           currentFolder={undefined}
           onSearchEnterClick={onSearchEnterClick}
           onSearchTab={onSearchTab}
+          hasSearchTabResult={hasSearchTabResult}
+          onBeforeSearchTab={jest.fn()}
           jumpToRecentSearch={jest.fn()}
           searchInputRef={createRef()}
         />,
-        rootProviderWrapper,
+        wrapper,
       ),
     );
 
-    return {onSearchTab, onSearchEnterClick};
+    return {onSearchTab, onSearchEnterClick, onSearchChange, clock};
   };
+
+  it('updates the search input without committing the query until the debounce expires', async () => {
+    const {clock, onSearchChange} = renderHeader();
+    const user = userEvent.setup();
+    const input = screen.getByRole('textbox');
+
+    await user.type(input, 'a');
+    expect(input).toHaveValue('searcha');
+    expect(onSearchChange).not.toHaveBeenCalled();
+
+    act(() => {
+      return clock.advanceByMilliseconds(200);
+    });
+    expect(onSearchChange).toHaveBeenCalledWith('searcha');
+  });
 
   it('delegates forward Tab from search to the first-result focus handler', async () => {
     const {onSearchTab} = renderHeader();

@@ -17,20 +17,23 @@
  *
  */
 
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import type {ConnectionState} from 'Repositories/connection/connectionState';
-import type {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import type {SelfRepository} from 'Repositories/self/SelfRepository';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {generateConversation} from 'test/helper/ConversationGenerator';
-import {generateUser} from 'test/helper/UserGenerator';
-import {translate} from 'Util/localizerUtil';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+
+import type {CallingRepository} from '../calling/CallingRepository';
+import type {ConnectionRepository} from '../connection/connectionRepository';
+import type {ConnectionState} from '../connection/connectionState';
+import type {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
+import type {PropertiesRepository} from '../properties/propertiesRepository';
+import type {SelfRepository} from '../self/SelfRepository';
+import type {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
+import type {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
+import {generateConversation} from '../../../../test/helper/ConversationGenerator';
+import {generateUser} from '../../../../test/helper/UserGenerator';
+import {translate} from '../../util/localizerUtil';
 
 jest.mock('./EventMapper', () => {
   return {EventMapper: jest.fn().mockReturnValue({})};
@@ -44,7 +47,40 @@ import type {MessageRepository} from './MessageRepository';
 import {Core} from '../../service/coreSingleton';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 
-function buildConversationRepository() {
+type TeamMemberLeaveTestDependencies = {
+  readonly conversationState: ConversationState;
+  readonly teamState: TeamState;
+  readonly userState: UserState;
+  readonly eventRepository: jest.Mocked<Pick<EventRepository, 'eventService' | 'injectEvent' | 'injectEvents'>>;
+  readonly callingRepository: CallingRepository;
+  readonly userRepository: jest.Mocked<Pick<UserRepository, 'on' | 'getUserById' | 'getUsersById'>>;
+  readonly teamRepository: TeamRepository;
+  readonly messageRepository: jest.Mocked<Pick<MessageRepository, 'setClientMismatchHandler'>>;
+  readonly conversationService: jest.Mocked<
+    Pick<
+      ConversationService,
+      | 'deleteConversation'
+      | 'deleteConversationFromDb'
+      | 'wipeMLSCapableConversation'
+      | 'postBots'
+      | 'saveConversationStateInDb'
+    >
+  >;
+  readonly core: Core;
+  readonly serverTimeHandler: typeof serverTimeHandler;
+};
+type TeamMemberLeaveTestFixture = readonly [ConversationRepository, TeamMemberLeaveTestDependencies];
+type EventInjectFunction = EventRepository['injectEvent'];
+type ClearConversationUsersFunction = ConversationRepository['clearUsersFromConversation'];
+type TeamMemberLeaveSpies = {
+  readonly injectSpy: jest.SpyInstance<ReturnType<EventInjectFunction>, Parameters<EventInjectFunction>>;
+  readonly clearSpy: jest.SpyInstance<
+    ReturnType<ClearConversationUsersFunction>,
+    Parameters<ClearConversationUsersFunction>
+  >;
+};
+
+function buildConversationRepository(): TeamMemberLeaveTestFixture {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
 
@@ -139,7 +175,7 @@ function buildConversationRepository() {
 function setupTeamMemberLeaveSpies(
   repo: ConversationRepository,
   eventRepo: jest.Mocked<Pick<EventRepository, 'injectEvent'>>,
-) {
+): TeamMemberLeaveSpies {
   eventRepo.injectEvent.mockResolvedValue(undefined);
   type ClearFn = ConversationRepository['clearUsersFromConversation'];
   const clearSpy = jest.spyOn(repo as unknown as {clearUsersFromConversation: ClearFn}, 'clearUsersFromConversation');
@@ -147,7 +183,59 @@ function setupTeamMemberLeaveSpies(
 }
 
 describe('ConversationRepository.teamMemberLeave', () => {
-  it('injects team leave events only for eligible conversations and cleans up user everywhere', async () => {
+  it.each([
+    [CONVERSATION_TYPE.ONE_TO_ONE, CONVERSATION_PROTOCOL.PROTEUS],
+    [CONVERSATION_TYPE.ONE_TO_ONE, CONVERSATION_PROTOCOL.MLS],
+    [CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.PROTEUS],
+    [CONVERSATION_TYPE.CONNECT, CONVERSATION_PROTOCOL.PROTEUS],
+  ])('preserves deleted participants in direct conversations (%s, %s)', async (type, protocol) => {
+    const [conversationRepository, deps] = buildConversationRepository();
+    const deletedUser = generateUser();
+    deletedUser.isDeleted = true;
+    const directConversation = generateConversation({
+      type,
+      protocol,
+      users: [deletedUser],
+      overwites: {team_id: 'teamB'},
+    });
+    const groupConversation = generateConversation({
+      name: 'Group',
+      users: [generateUser(), deletedUser],
+      overwites: {team_id: 'teamB'},
+    });
+    deps.userRepository.getUserById.mockResolvedValue(deletedUser);
+    deps.userRepository.getUsersById.mockImplementation(async (userIds = []) => {
+      return groupConversation.participating_user_ets().filter(user => {
+        return userIds.some(userId => {
+          return userId.id === user.id && userId.domain === user.domain;
+        });
+      });
+    });
+    deps.conversationState.conversations([directConversation, groupConversation]);
+    const {injectSpy} = setupTeamMemberLeaveSpies(conversationRepository, deps.eventRepository);
+
+    // Simulate the profile refresh discovering a deleted team member, including repeated opens.
+    await conversationRepository.teamMemberLeave('teamB', deletedUser.qualifiedId, 0);
+    await conversationRepository.teamMemberLeave('teamB', deletedUser.qualifiedId, 0);
+
+    expect(directConversation.participating_user_ids()).toEqual([deletedUser.qualifiedId]);
+    expect(directConversation.firstUserEntity()).toBe(deletedUser);
+    expect(directConversation.isConversationWithDeletedUser()).toBe(true);
+    if (type !== CONVERSATION_TYPE.CONNECT) {
+      expect(directConversation.is1to1()).toBe(true);
+      expect(directConversation.isReadOnlyConversation()).toBe(true);
+    }
+    // History has not loaded at startup; retaining the participant keeps the chat visible.
+    expect(directConversation.hasContentMessages()).toBe(false);
+    expect(deps.conversationState.visibleConversations()).toContain(directConversation);
+    expect(groupConversation.participating_user_ids()).not.toContainEqual(deletedUser.qualifiedId);
+    expect(injectSpy).toHaveBeenCalledTimes(1);
+    expect(injectSpy).toHaveBeenCalledWith(expect.objectContaining({conversation: groupConversation.id}));
+    expect(deps.conversationService.deleteConversation).not.toHaveBeenCalled();
+    expect(deps.conversationService.deleteConversationFromDb).not.toHaveBeenCalled();
+  });
+
+  it('injects team leave events only for eligible conversations and cleans up groups across teams', async () => {
     const [conversationRepository, deps] = buildConversationRepository();
     const userA = generateUser();
     const userB = generateUser();

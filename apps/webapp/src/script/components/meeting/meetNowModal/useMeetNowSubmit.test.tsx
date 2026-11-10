@@ -21,20 +21,20 @@ import type {ReactNode} from 'react';
 
 import {act, renderHook} from '@testing-library/react';
 import {task} from 'true-myth';
-import {createStore} from 'zustand/vanilla';
+import {createStore, type StoreApi} from 'zustand/vanilla';
 
-import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
-import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
-import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {ConversationState} from 'Repositories/conversation/ConversationState';
+import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
+import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
+import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
+import {meetingSubmitErrors} from '../meetingSubmitErrors';
+import type {ConversationState} from '../../../repositories/conversation/ConversationState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {MainViewModel} from '../../../view_model/MainViewModel';
+import {useWarningsState} from '../../../view_model/WarningsContainer/WarningsState';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {type MeetNowSubmitResult, meetNowSubmitResults, wasMeetNowMeetingCreated} from './meetNowTypes';
 import {useMeetNowSubmit} from './useMeetNowSubmit';
@@ -103,7 +103,7 @@ const createJoinTestMocks = ({
 const createMeetingStore = ({
   loadMeetings = jest.fn().mockResolvedValue(undefined),
   meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation})),
-}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'meetNowMeeting'>> = {}) => {
+}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'meetNowMeeting'>> = {}): StoreApi<MeetingStoreState> => {
   return createStore<MeetingStoreState>(() => {
     return {
       meetingSeries: [],
@@ -189,7 +189,7 @@ describe('useMeetNowSubmit', () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const meetNowMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.createFailed));
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
-    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
+    const {startAudio, mainViewModel} = createJoinTestMocks();
 
     const {result} = renderHook(
       () => {
@@ -215,7 +215,7 @@ describe('useMeetNowSubmit', () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const meetNowMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.addParticipantsFailed));
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
-    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
+    const {startAudio, mainViewModel} = createJoinTestMocks();
 
     const {result} = renderHook(
       () => {
@@ -241,7 +241,7 @@ describe('useMeetNowSubmit', () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const meetNowMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.conversationSetupFailed));
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
-    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
+    const {startAudio, mainViewModel} = createJoinTestMocks();
 
     const {result} = renderHook(
       () => {

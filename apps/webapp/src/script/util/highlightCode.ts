@@ -37,7 +37,7 @@ interface HighlightCodeParams {
   lang: string;
 }
 
-export const highlightCode = ({code, grammar, lang}: HighlightCodeParams) => {
+export const highlightCode = ({code, grammar, lang}: HighlightCodeParams): string => {
   return Prism.highlight(code, grammar, lang);
 };
 

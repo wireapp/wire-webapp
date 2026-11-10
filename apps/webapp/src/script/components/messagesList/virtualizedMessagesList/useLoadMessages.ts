@@ -22,10 +22,10 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {isUndefined} from '@sindresorhus/is';
 import {Virtualizer} from '@tanstack/react-virtual';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isLastReceivedMessage} from 'Util/conversationMessages';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {isLastReceivedMessage} from '../../../util/conversationMessages';
 
 const viewportCenterDivisor = 2;
 const messageLoadDebounceInMilliseconds = 100;
@@ -45,7 +45,7 @@ export const useLoadMessages = (
 ): void => {
   const {conversation, conversationRepository, itemsLength, shouldPullMessages, isConversationLoaded, parentElement} =
     properties;
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {clock, fireAndForgetInvoker} = useApplicationContext();
   const fillContainerByMessagesRef = useRef(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
 
@@ -102,7 +102,7 @@ export const useLoadMessages = (
       };
     }
 
-    const timeout = setTimeout(() => {
+    const timeout = clock.setTimeout(() => {
       if (!isConversationLoaded) {
         return;
       }
@@ -118,9 +118,9 @@ export const useLoadMessages = (
     }, messageLoadDebounceInMilliseconds);
 
     return () => {
-      return clearTimeout(timeout);
+      return clock.clearTimeout(timeout);
     };
-  }, [fireAndForgetInvoker, isConversationLoaded, isLoadingMessages, loadPrecedingMessages, virtualItems]);
+  }, [clock, fireAndForgetInvoker, isConversationLoaded, isLoadingMessages, loadPrecedingMessages, virtualItems]);
 
   // Load new messages when scrolling to the down
   useEffect(() => {
@@ -130,7 +130,7 @@ export const useLoadMessages = (
       };
     }
 
-    const timeout = setTimeout(() => {
+    const timeout = clock.setTimeout(() => {
       if (!isConversationLoaded) {
         return;
       }
@@ -146,9 +146,10 @@ export const useLoadMessages = (
     }, messageLoadDebounceInMilliseconds);
 
     return () => {
-      return clearTimeout(timeout);
+      return clock.clearTimeout(timeout);
     };
   }, [
+    clock,
     fireAndForgetInvoker,
     isConversationLoaded,
     isLoadingMessages,

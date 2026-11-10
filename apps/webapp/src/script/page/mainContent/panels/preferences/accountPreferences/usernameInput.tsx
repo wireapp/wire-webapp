@@ -17,19 +17,18 @@
  *
  */
 
-import {FormEvent, useState} from 'react';
+import {FormEvent, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {validateHandle} from 'Repositories/user/userHandleGenerator';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isErrorWithType} from 'Util/typePredicateUtil';
-
 import {AccountInput, useInputDone} from './accountInput';
 
 import {UserError} from '../../../../../error/userError';
+import {validateHandle} from '../../../../../repositories/user/userHandleGenerator';
+import {UserRepository} from '../../../../../repositories/user/userRepository';
+import {isErrorWithType} from '../../../../../util/typePredicateUtil';
+import {useApplicationContext} from '../../../../rootProvider';
 
 enum UserNameState {
   AVAILABLE = 'AVAILABLE',
@@ -44,7 +43,12 @@ interface UsernameInputProps {
   userRepository: UserRepository;
 }
 
-const UsernameInput = ({username, domain, userRepository, canEditProfile}: UsernameInputProps) => {
+const UsernameInput: FunctionComponent<UsernameInputProps> = ({
+  username,
+  domain,
+  userRepository,
+  canEditProfile,
+}: UsernameInputProps) => {
   const {translate} = useApplicationContext();
   const [errorState, setErrorState] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);

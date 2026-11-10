@@ -13,7 +13,7 @@
     "node_modules",
     "dist",
     "tmp",
-    "tools/release-appearance",
-    "tools/release-cli"
+    "tools/releaseAppearance",
+    "tools/releaseCli"
   ]
 }

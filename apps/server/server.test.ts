@@ -311,3 +311,19 @@ describe('server response caching', () => {
     });
   });
 });
+
+describe('server response security headers', () => {
+  it.each([
+    {requestPath: '/config.js', expectedStatus: 200},
+    {requestPath: '/version', expectedStatus: 200},
+    {requestPath: '/unknown-route', expectedStatus: 404},
+    {requestPath: '/robots.txt', expectedStatus: 200},
+  ])('does not expose the Express signature for $requestPath', async testCase => {
+    await withHttpServer(createClientConfiguration(), mainBuildMetadata, async baseUrl => {
+      const response = await requestHttpResponse(baseUrl, testCase.requestPath);
+
+      expect(response.statusCode).toBe(testCase.expectedStatus);
+      expect(response.headers['x-powered-by']).toBeUndefined();
+    });
+  });
+});

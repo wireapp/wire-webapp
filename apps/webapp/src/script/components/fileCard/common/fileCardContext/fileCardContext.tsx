@@ -17,7 +17,7 @@
  *
  */
 
-import {createContext, ReactNode, useContext} from 'react';
+import {createContext, ReactNode, useContext, type FunctionComponent} from 'react';
 
 interface FileCardContextValue {
   variant: 'small' | 'large';
@@ -33,11 +33,14 @@ interface FileCardContextProviderProps {
   children: ReactNode;
 }
 
-export const FileCardContextProvider = ({value, children}: FileCardContextProviderProps) => {
+export const FileCardContextProvider: FunctionComponent<FileCardContextProviderProps> = ({
+  value,
+  children,
+}: FileCardContextProviderProps) => {
   return <FileCardContext.Provider value={value}>{children}</FileCardContext.Provider>;
 };
 
-export const useFileCardContext = () => {
+export const useFileCardContext = (): FileCardContextValue => {
   const context = useContext(FileCardContext);
   if (context === null) {
     throw new Error('useFileCardContext must be used within a FileCardRoot');

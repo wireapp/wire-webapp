@@ -21,15 +21,12 @@ import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {
-  type AddNotificationInput,
-  MeetingNotificationKind,
-} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
-import {getMeetingInstanceAt} from 'Components/meeting/selectors/getMeetingInstancesInRange';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
+import {type AddNotificationInput, MeetingNotificationKind} from './meetingNotificationStore/meetingNotificationStore';
+import {getMeetingInstanceAt} from './selectors/getMeetingInstancesInRange';
+import type {MeetingSeries} from './types/meetingSeries';
 import {toMeetingIdKey} from './utils/toMeetingIdKey';
+
+import {matchQualifiedIds} from '../../util/qualifiedId';
 
 type MeetingNotificationLogger = {
   warn: (message: string, context?: unknown) => void;
@@ -69,7 +66,7 @@ export const createMeetingNotificationEventHandlers = ({
   dismissNotificationsForMeeting,
   logger,
 }: MeetingNotificationEventHandlersDependencies): MeetingNotificationEventHandlers => {
-  const getMeeting = (meetingId: QualifiedId) => {
+  const getMeeting = (meetingId: QualifiedId): MeetingSeries | undefined => {
     return getMeetingSeries().find(meeting => {
       return matchQualifiedIds(meeting.qualified_id, meetingId);
     });
@@ -80,7 +77,7 @@ export const createMeetingNotificationEventHandlers = ({
   const notifiedMeetings = new Set<string>();
   const cancelledMeetings = new Set<string>();
 
-  const notifyForMeeting = (kind: MeetingNotificationKind, meeting: MeetingSeries) => {
+  const notifyForMeeting = (kind: MeetingNotificationKind, meeting: MeetingSeries): void => {
     const notificationBase = {
       meetingTitle: meeting.title,
       meetingStartTime: meeting.series_start_date,
@@ -137,7 +134,7 @@ export const createMeetingNotificationEventHandlers = ({
     addCancellationNotificationForMeeting(meetingId);
   };
 
-  const retryPendingNotifications = () => {
+  const retryPendingNotifications = (): void => {
     for (const [key, meetingId] of pending) {
       const meeting = getMeeting(meetingId);
       if (isUndefined(meeting)) {

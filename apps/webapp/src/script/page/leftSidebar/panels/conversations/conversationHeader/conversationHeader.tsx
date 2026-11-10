@@ -17,23 +17,10 @@
  *
  */
 
-import {KeyboardEvent, MutableRefObject, useEffect} from 'react';
+import {KeyboardEvent, MutableRefObject, useEffect, type FunctionComponent} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
-
-import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import * as Icon from 'Components/icon';
-import {useCreateConversationModal} from 'Components/Modals/CreateConversation/hooks/useCreateConversationModal';
-import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
-import {User} from 'Repositories/entity/User';
-import {generatePermissionHelpers} from 'Repositories/user/userPermission';
-import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEnterDown, handleEscDown, isTabKey} from 'Util/keyboardUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
   button,
@@ -48,9 +35,25 @@ import {
   searchInputWrapperStyles,
 } from './conversationHeader.styles';
 
+import * as Icon from '../../../../../components/icon';
+import {useCreateConversationModal} from '../../../../../components/Modals/CreateConversation/hooks/useCreateConversationModal';
+import {ConversationLabel} from '../../../../../repositories/conversation/ConversationLabelRepository';
+import {User} from '../../../../../repositories/entity/User';
+import {generatePermissionHelpers} from '../../../../../repositories/user/userPermission';
+import {CircleCloseIcon} from '../../../../../uiKit/dataDisplay/icon/circleCloseIcon';
+import {SearchIcon} from '../../../../../uiKit/dataDisplay/icon/searchIcon';
+import {IconButton} from '../../../../../uiKit/inputs/iconButton/iconButton';
+import {Input} from '../../../../../uiKit/inputs/input/input';
+import {handleEnterDown, handleEscDown, isTabKey} from '../../../../../util/keyboardUtil';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
+import {WebAppEvents} from '../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../rootProvider';
+import {useConversationSearch} from '../hooks/useConversationSearch';
+import {SidebarTabs} from '../useSidebarStore';
+
 export const conversationsPanelHeadingId = 'conversations-heading';
 
-const focusSearchInputRef = (searchInputRef: MutableRefObject<HTMLInputElement | null>) => {
+const focusSearchInputRef = (searchInputRef: MutableRefObject<HTMLInputElement | null>): void => {
   requestAnimationFrame(() => {
     searchInputRef.current?.focus();
   });
@@ -60,34 +63,47 @@ interface ConversationHeaderProps {
   currentTab: SidebarTabs;
   selfUser: User;
   showSearchInput?: boolean;
-  searchValue?: string;
-  setSearchValue: (searchValue: string) => void;
+  searchValue: string;
+  onSearchChange: (searchValue: string) => void;
   searchInputPlaceholder: string;
   currentFolder?: ConversationLabel;
-  onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => void;
+  onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => boolean;
   onSearchTab: (event: KeyboardEvent<HTMLInputElement>) => void;
+  hasSearchTabResult: (query: string) => boolean;
+  onBeforeSearchTab: () => void;
   jumpToRecentSearch: () => void;
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
   isListCollapsed?: boolean;
   onExpandList?: () => void;
 }
 
-export const ConversationHeaderComponent = ({
+export const ConversationHeaderComponent: FunctionComponent<ConversationHeaderProps> = ({
   currentTab,
   selfUser,
   showSearchInput = false,
-  searchValue = '',
-  setSearchValue,
+  searchValue,
+  onSearchChange,
   currentFolder,
   searchInputPlaceholder,
   onSearchEnterClick,
   onSearchTab,
+  hasSearchTabResult,
+  onBeforeSearchTab,
   jumpToRecentSearch,
   searchInputRef,
   isListCollapsed = false,
   onExpandList,
 }: ConversationHeaderProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, clock} = useApplicationContext();
+  const {inputValue, changeInput, clear, enter, tab} = useConversationSearch({
+    clock,
+    filter: searchValue,
+    onSearch: onSearchChange,
+    onEnter: onSearchEnterClick,
+    onTab: onSearchTab,
+    hasTabResult: hasSearchTabResult,
+    onBeforeTab: onBeforeSearchTab,
+  });
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
   const {canCreateChannels, isChannelsEnabled} = useChannelsFeatureFlag();
   const canExternalUserCreateChannel = canCreateChannels && isChannelsEnabled && selfUser.isExternal();
@@ -106,21 +122,19 @@ export const ConversationHeaderComponent = ({
     [SidebarTabs.MEETINGS]: translate('meetings.navigation.title'),
   };
 
-  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    handleEscDown(event, () => {
-      return setSearchValue('');
-    });
+  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
+    handleEscDown(event, clear);
     handleEnterDown(event, () => {
-      return onSearchEnterClick(event);
+      return enter(event);
     });
 
     if (!event.shiftKey && isTabKey(event)) {
-      onSearchTab(event);
+      tab(event);
     }
   };
 
   useEffect(() => {
-    const onSearchShortcut = () => {
+    const onSearchShortcut = (): void => {
       onExpandList?.();
       jumpToRecentSearch();
       focusSearchInputRef(searchInputRef);
@@ -133,7 +147,7 @@ export const ConversationHeaderComponent = ({
     };
   }, [jumpToRecentSearch, onExpandList, searchInputRef]);
 
-  const showCreateConversationModal = () => {
+  const showCreateConversationModal = (): void => {
     if (isChannelsEnabled && canCreateChannels) {
       showModal();
     } else {
@@ -141,7 +155,7 @@ export const ConversationHeaderComponent = ({
     }
   };
 
-  const handleCollapsedSearchClick = () => {
+  const handleCollapsedSearchClick = (): void => {
     onExpandList?.();
     focusSearchInputRef(searchInputRef);
   };
@@ -214,23 +228,15 @@ export const ConversationHeaderComponent = ({
           onKeyDown={onKeyDown}
           ref={searchInputRef}
           className="label-1"
-          value={searchValue}
+          value={inputValue}
           onChange={event => {
-            return setSearchValue(event.currentTarget.value);
+            return changeInput(event.currentTarget.value);
           }}
           startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
           endContent={
-            isNonEmptyString(searchValue) ? (
-              <CircleCloseIcon
-                className="cursor-pointer"
-                onClick={() => {
-                  return setSearchValue('');
-                }}
-                css={closeIconStyles}
-              />
-            ) : (
-              searchValue
-            )
+            inputValue.length > 0 ? (
+              <CircleCloseIcon className="cursor-pointer" onClick={clear} css={closeIconStyles} />
+            ) : null
           }
           inputCSS={searchInputStyles}
           wrapperCSS={searchInputWrapperStyles}

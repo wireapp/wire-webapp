@@ -33,80 +33,12 @@ import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/li
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
-import {
-  GenericMessageType,
-  InCallEmojiType,
-  MessageSendingState,
-  MessageTargetMode,
-  ReactionType,
-  SendResult,
-} from '@wireapp/core/lib/conversation';
-import {
-  EditedTextContent,
-  FileMetaDataContent,
-  LinkPreviewContent,
-  LinkPreviewUploadedContent,
-  MultiPartContent,
-  TextContent,
-} from '@wireapp/core/lib/conversation/content';
-import * as MessageBuilder from '@wireapp/core/lib/conversation/message/messageBuilder';
-import {OtrMessage} from '@wireapp/core/lib/conversation/message/otrMessage';
-import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/textContentBuilder';
-import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/assetMetaDataBuilder';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {AudioRepository} from 'Repositories/audio/audioRepository';
-import {AudioType} from 'Repositories/audio/audioType';
-import {ClientState} from 'Repositories/client/ClientState';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
-import {EventTypeHandling} from 'Repositories/event/EventTypeHandling';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import type {EventRecord, ReactionMap} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserType} from 'Repositories/tracking/attribute';
-import {EventName} from 'Repositories/tracking/eventName';
-import * as trackingHelpers from 'Repositories/tracking/helpers';
-import {Segmentation} from 'Repositories/tracking/segmentation';
-import {protoFromType} from 'Repositories/user/availabilityMapper';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {
-  cancelSendingLinkPreview,
-  clearLinkPreviewSendingState,
-  shouldSendLinkPreviewForMessage,
-} from 'Util/linkPreviewSender';
-import {type Translate, Declension, joinNames} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {isMarkdownText} from 'Util/markdownUtil';
-import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {roundLogarithmic} from 'Util/numberUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {capitalizeFirstChar} from 'Util/stringUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {isBackendError, isErrorWithCode} from 'Util/typePredicateUtil';
-import {loadUrlBlob, supportsMLS} from 'Util/util';
-import {createUuid} from 'Util/uuid';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
@@ -117,7 +49,29 @@ import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
+import {
+  GenericMessageType,
+  InCallEmojiType,
+  MessageSendingState,
+  MessageTargetMode,
+  ReactionType,
+  SendResult,
+  type ConversationService,
+} from '../../core/conversation';
+import {
+  EditedTextContent,
+  FileMetaDataContent,
+  LinkPreviewContent,
+  LinkPreviewUploadedContent,
+  MultiPartContent,
+  TextContent,
+} from '../../core/conversation/content';
+import * as MessageBuilder from '../../core/conversation/message/messageBuilder';
+import {OtrMessage} from '../../core/conversation/message/otrMessage';
+import {TextContentBuilder} from '../../core/conversation/message/textContentBuilder';
+import {isQualifiedUserClients} from '../../core/util';
 import {ConversationError} from '../../error/conversationError';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
 import {MentionEntity} from '../../message/mentionEntity';
@@ -125,6 +79,54 @@ import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {
+  cancelSendingLinkPreview,
+  clearLinkPreviewSendingState,
+  shouldSendLinkPreviewForMessage,
+} from '../../util/linkPreviewSender';
+import {type Translate, Declension, joinNames} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {isMarkdownText} from '../../util/markdownUtil';
+import {areMentionsDifferent, isTextDifferent} from '../../util/messageComparator';
+import {roundLogarithmic} from '../../util/numberUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {capitalizeFirstChar} from '../../util/stringUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {isBackendError, isErrorWithCode} from '../../util/typePredicateUtil';
+import {loadUrlBlob, supportsMLS} from '../../util/util';
+import {createUuid} from '../../util/uuid';
+import {WebAppEvents} from '../../webAppEvents';
+import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from '../assets/assetMetaDataBuilder';
+import {AssetRepository} from '../assets/assetRepository';
+import {AssetTransferState} from '../assets/assetTransferState';
+import {AudioRepository} from '../audio/audioRepository';
+import {AudioType} from '../audio/audioType';
+import {ClientState} from '../client/ClientState';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {Conversation} from '../entity/Conversation';
+import {CompositeMessage} from '../entity/message/compositeMessage';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {FileAsset} from '../entity/message/fileAsset';
+import {Message} from '../entity/message/message';
+import {User} from '../entity/User';
+import {EventRepository} from '../event/EventRepository';
+import {EventService, type IdentifiedUpdatePayload} from '../event/EventService';
+import {EventTypeHandling} from '../event/EventTypeHandling';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {PropertiesRepository} from '../properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../properties/propertiesType';
+import type {EventRecord, ReactionMap} from '../storage';
+import {TeamState} from '../team/TeamState';
+import {UserType} from '../tracking/attribute';
+import {EventName} from '../tracking/eventName';
+import * as trackingHelpers from '../tracking/helpers';
+import {Segmentation} from '../tracking/segmentation';
+import {protoFromType} from '../user/availabilityMapper';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
+
+type OptimisticMessageEvent = Parameters<EventRepository['injectEvent']>[0];
 
 const conversationStatisticsRoundingFactor = 6;
 
@@ -183,6 +185,8 @@ type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingSta
 type StoredMessage = Message & {primary_key: string};
 type StoredContentMessage = ContentMessage & {primary_key: string};
 
+type AssetMetadataMessage = {message: GenericMessage; metaData: FileMetaDataContent};
+
 export class MessageRepository {
   private readonly logger: Logger;
   private readonly eventService: EventService;
@@ -190,7 +194,7 @@ export class MessageRepository {
   private isBlockingNotificationHandling: boolean;
   private onClientMismatch?: ClientMismatchHandlerFn;
 
-  private get coreServices() {
+  private get coreServices(): NonNullable<Core['service']> {
     const coreServices = this.core.service;
     if (isUndefined(coreServices)) {
       throw new Error('Core services are not initialized');
@@ -225,7 +229,7 @@ export class MessageRepository {
     this.initSubscriptions();
   }
 
-  private get conversationService() {
+  private get conversationService(): ConversationService {
     return this.coreServices.conversation;
   }
 
@@ -239,7 +243,7 @@ export class MessageRepository {
    * @param onClientMismatch - The function to be called when there is a mismatch. If this function resolves to 'false' then the sending will be cancelled
    * @return void
    */
-  public setClientMismatchHandler(onClientMismatch: ClientMismatchHandlerFn) {
+  public setClientMismatchHandler(onClientMismatch: ClientMismatchHandlerFn): void {
     this.onClientMismatch = onClientMismatch;
   }
 
@@ -253,7 +257,7 @@ export class MessageRepository {
     conversation: Conversation,
     allClients: QualifiedUserClients,
     consentType?: CONSENT_TYPE,
-  ) {
+  ): Promise<boolean | undefined> {
     const mismatch = {missing: allClients} as MessageSendingStatus;
     return this.onClientMismatch?.(mismatch, conversation, false, consentType);
   }
@@ -264,7 +268,7 @@ export class MessageRepository {
    * @note Temporarily do not allow sending messages when handling the notification stream
    * @param handlingState State of the notifications stream handling
    */
-  private readonly setNotificationHandlingState = (handlingState: NOTIFICATION_HANDLING_STATE) => {
+  private readonly setNotificationHandlingState = (handlingState: NOTIFICATION_HANDLING_STATE): void => {
     const updatedHandlingState = handlingState !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (this.isBlockingNotificationHandling !== updatedHandlingState) {
@@ -277,7 +281,7 @@ export class MessageRepository {
    * @param conversationEntity Conversation to send knock in
    * @returns Resolves after sending the knock
    */
-  public async sendPing(conversation: Conversation) {
+  public async sendPing(conversation: Conversation): Promise<SendAndInjectResult> {
     const ping = MessageBuilder.buildPingMessage({
       expectsReadConfirmation: this.expectReadReceipt(conversation),
       hotKnock: false,
@@ -297,7 +301,7 @@ export class MessageRepository {
     {conversation, message, mentions = [], linkPreview, quote, messageId}: TextMessagePayload,
     options?: {syncTimestamp?: boolean},
     isNewTextMessage = false,
-  ) {
+  ): Promise<SendAndInjectResult> {
     const textMessage = MessageBuilder.buildTextMessage(
       this.decorateTextMessage(
         {
@@ -392,7 +396,7 @@ export class MessageRepository {
   private async sendMultipartText(
     {conversation, message, messageId, attachments, linkPreview, mentions = [], quote}: MultipartMessagePayload,
     options?: {syncTimestamp?: boolean},
-  ) {
+  ): Promise<SendAndInjectResult> {
     const text = this.decorateTextMessage(
       {
         text: message,
@@ -412,7 +416,7 @@ export class MessageRepository {
     originalMessageId,
     mentions = [],
     quote,
-  }: EditMessagePayload) {
+  }: EditMessagePayload): Promise<SendAndInjectResult> {
     const editMessage = MessageBuilder.buildEditedTextMessage(
       this.decorateTextMessage(
         {
@@ -436,7 +440,7 @@ export class MessageRepository {
     originalMessageId,
     mentions = [],
     quote,
-  }: EditMultiPartMessagePayload) {
+  }: EditMultiPartMessagePayload): Promise<SendAndInjectResult> {
     const editedMessage = MessageBuilder.buildEditedMultipartMessage(
       attachments,
       this.decorateTextMessage(
@@ -591,7 +595,10 @@ export class MessageRepository {
     }
   }
 
-  private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}, conversationId: QualifiedId) {
+  private async handleLinkPreview(
+    textPayload: TextMessagePayload & {messageId: string},
+    conversationId: QualifiedId,
+  ): Promise<void> {
     // check if the user actually wants to send link previews
     if (
       !isTruthy(this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) ||
@@ -657,7 +664,7 @@ export class MessageRepository {
    *
    * @param conversationEntity Conversation to post the images
    */
-  public uploadImages(conversationEntity: Conversation, images: Blob[]) {
+  public uploadImages(conversationEntity: Conversation, images: Blob[]): void {
     this.uploadFiles(conversationEntity, images, true);
   }
 
@@ -668,7 +675,7 @@ export class MessageRepository {
    * @param files files
    * @param asImage whether or not the file should be treated as an image
    */
-  public uploadFiles(conversationEntity: Conversation, files: Blob[], asImage?: boolean) {
+  public uploadFiles(conversationEntity: Conversation, files: Blob[], asImage?: boolean): void {
     if (this.canUploadAssetsToConversation(conversationEntity)) {
       Array.from(files).forEach(file => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises -- Uploads are intentionally started without awaiting this batch.
@@ -682,7 +689,7 @@ export class MessageRepository {
    * @param conversationEntity Conversation to check
    * @returns Can assets be uploaded
    */
-  private canUploadAssetsToConversation(conversationEntity: Conversation) {
+  private canUploadAssetsToConversation(conversationEntity: Conversation): boolean {
     return (
       !isNullOrUndefined(conversationEntity) &&
       !conversationEntity.isRequest() &&
@@ -706,7 +713,7 @@ export class MessageRepository {
     originalId?: string,
   ): Promise<EventRecord | void> {
     const uploadStarted = Date.now();
-    const beforeUnload = (event: Event) => {
+    const beforeUnload = (event: Event): void => {
       event.preventDefault();
     };
 
@@ -778,7 +785,11 @@ export class MessageRepository {
    * @param messageId Id of the messsage in db to update
    * @returns Resolves when database was updated
    */
-  private async storeFileInDb(conversation: Conversation, messageId: string, file: Blob) {
+  private async storeFileInDb(
+    conversation: Conversation,
+    messageId: string,
+    file: Blob,
+  ): Promise<IdentifiedUpdatePayload | undefined> {
     try {
       const messageEntity = await this.getMessageInConversationById(conversation, messageId);
       messageEntity.fileData(file);
@@ -800,7 +811,10 @@ export class MessageRepository {
    * @param reason Failure reason
    * @returns Resolves when the message was updated
    */
-  private async updateMessageAsUploadFailed(message_et: StoredMessage, reason = AssetTransferState.UPLOAD_FAILED) {
+  private async updateMessageAsUploadFailed(
+    message_et: StoredMessage,
+    reason = AssetTransferState.UPLOAD_FAILED,
+  ): Promise<EventRecord | undefined> {
     if (!message_et.isContent()) {
       throw new Error(`Tried to update wrong message type as upload failed '${(message_et as any).super_type}'`);
     }
@@ -849,7 +863,7 @@ export class MessageRepository {
     file: File | Blob,
     allowImageDetection?: boolean,
     originalId?: string,
-  ) {
+  ): Promise<AssetMetadataMessage | null> {
     try {
       const metadata = await buildMetadata(file);
       const meta = {
@@ -880,7 +894,7 @@ export class MessageRepository {
     messageId: string,
     asImage: boolean,
     meta: FileMetaDataContent,
-  ) {
+  ): Promise<SendAndInjectResult> {
     const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
 
     const auditData: AssetAuditData | undefined = isAuditLogEnabled
@@ -940,7 +954,11 @@ export class MessageRepository {
    * @param reason Cause for the failed upload (optional)
    * @returns Resolves when the asset failure was sent
    */
-  private sendAssetUploadFailed(conversation: Conversation, messageId: string, reason = Asset.NotUploaded.FAILED) {
+  private sendAssetUploadFailed(
+    conversation: Conversation,
+    messageId: string,
+    reason = Asset.NotUploaded.FAILED,
+  ): Promise<SendAndInjectResult> {
     const payload = MessageBuilder.buildFileAbortMessage({reason}, messageId);
 
     return this.sendAndInjectMessage(payload, conversation);
@@ -1063,7 +1081,7 @@ export class MessageRepository {
         ? MessageBuilder.wrapInEphemeral(message, messageTimer)
         : message;
 
-    const injectOptimisticEvent = async () => {
+    const injectOptimisticEvent = async (): Promise<boolean> => {
       if (skipInjection !== true) {
         const clientId = this.clientState.currentClient?.id;
 
@@ -1084,10 +1102,10 @@ export class MessageRepository {
           clientId,
         });
         this.trackContributed(conversation, payload);
-        const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
+        const mappedEvent = (await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
           payload,
           optimisticEvent,
-        );
+        )) as OptimisticMessageEvent;
         await this.eventRepository.injectEvent(mappedEvent);
       }
       return silentDegradationWarning === true
@@ -1095,7 +1113,7 @@ export class MessageRepository {
         : this.requestUserSendingPermission(conversation, false, consentType);
     };
 
-    const handleSuccess = async ({sentAt, failedToSend}: SendResult) => {
+    const handleSuccess = async ({sentAt, failedToSend}: SendResult): Promise<void> => {
       const injectDelta = 10; // we want to make sure the message is injected slightly before it was received by the backend
       const sentTimestamp = new Date(sentAt).getTime() - injectDelta;
       const preMessageTimestamp = new Date(sentTimestamp).toISOString();
@@ -1160,7 +1178,7 @@ export class MessageRepository {
     }
   }
 
-  public updateUserReactions(reactions: ReactionMap, userId: QualifiedId, reaction: ReactionType) {
+  public updateUserReactions(reactions: ReactionMap, userId: QualifiedId, reaction: ReactionType): string {
     const userReactions = reactions
       .filter(([, users]) => {
         return users.some(user => {
@@ -1171,8 +1189,8 @@ export class MessageRepository {
         return reaction;
       });
     const updatedReactions = userReactions.includes(reaction)
-      ? userReactions.filter(r => {
-          return r !== reaction;
+      ? userReactions.filter(existingReaction => {
+          return existingReaction !== reaction;
         })
       : [...userReactions, reaction];
     return updatedReactions.join(',');
@@ -1183,7 +1201,7 @@ export class MessageRepository {
     message_et: ContentMessage,
     reaction: string,
     userId: QualifiedId,
-  ) {
+  ): Promise<SendAndInjectResult> | null {
     if (conversationEntity.isSelfUserRemoved()) {
       return null;
     }
@@ -1235,7 +1253,7 @@ export class MessageRepository {
    * @param conversation The conversation to send the message in
    * @returns Resolves after sending the session reset
    */
-  private async sendSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation) {
+  private async sendSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation): Promise<void> {
     const sessionReset = MessageBuilder.buildSessionResetMessage();
 
     const userClient = {[userId.domain]: {[userId.id]: [clientId]}};
@@ -1268,7 +1286,7 @@ export class MessageRepository {
     messageEntity: Message,
     type: Confirmation.Type,
     moreMessageEntities: Message[] = [],
-  ) {
+  ): Promise<void> {
     if (type === Confirmation.Type.READ && !supportsReadReceipts(conversationEntity)) {
       return;
     }
@@ -1323,19 +1341,23 @@ export class MessageRepository {
    * @returns Resolves after sending the reaction
    */
 
-  private async sendReactions(conversation: Conversation, messageEntity: Message, reactions: ReactionType) {
+  private async sendReactions(
+    conversation: Conversation,
+    messageEntity: Message,
+    reactions: ReactionType,
+  ): Promise<SendAndInjectResult> {
     const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: reactions});
 
     return this.sendAndInjectMessage(reaction, conversation);
   }
 
-  public async sendInCallEmoji(conversation: Conversation, emojis: InCallEmojiType) {
+  public async sendInCallEmoji(conversation: Conversation, emojis: InCallEmojiType): Promise<SendAndInjectResult> {
     const emojisMessage = MessageBuilder.buildInCallEmojiMessage({emojis});
 
     return this.sendAndInjectMessage(emojisMessage, conversation);
   }
 
-  public async sendInCallHandRaised(conversation: Conversation, isHandUp: boolean) {
+  public async sendInCallHandRaised(conversation: Conversation, isHandUp: boolean): Promise<SendAndInjectResult> {
     const handRaiseMessage = MessageBuilder.buildInCallHandRaiseMessage({isHandUp: isHandUp});
 
     return this.sendAndInjectMessage(handRaiseMessage, conversation);
@@ -1451,7 +1473,7 @@ export class MessageRepository {
     }
   }
 
-  private async sendToSelfConversations(payload: GenericMessage) {
+  private async sendToSelfConversations(payload: GenericMessage): Promise<void> {
     const selfConversations = this.conversationState.getSelfConversations(
       supportsMLS() && this.teamState.isMLSEnabled(),
     );
@@ -1519,7 +1541,7 @@ export class MessageRepository {
       });
       const messageEntity = await this.getMessageInConversationById(conversation, message.id);
       await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
-    } catch (error: unknown) {
+    } catch {
       message.waitingButtonId(undefined);
       return message.setButtonError(buttonId, this.translate('buttonActionError'));
     }
@@ -1549,7 +1571,7 @@ export class MessageRepository {
     return deleteCount;
   }
 
-  private readonly sendAvailabilityStatus = async (availability: Availability.Type) => {
+  private readonly sendAvailabilityStatus = async (availability: Availability.Type): Promise<void> => {
     const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
       [GenericMessageType.AVAILABILITY]: protoAvailability,
@@ -1601,7 +1623,7 @@ export class MessageRepository {
     eventId: string,
     isoDate?: string,
     failedToSend?: SendResult['failedToSend'],
-  ) {
+  ): Promise<IdentifiedUpdatePayload | undefined> {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = isNonEmptyArray(messageEntity.readReceipts()) ? StatusType.SEEN : StatusType.SENT;
@@ -1632,7 +1654,11 @@ export class MessageRepository {
     return undefined;
   }
 
-  private async updateMessageAsFailed(conversationEntity: Conversation, eventId: string, error: unknown) {
+  private async updateMessageAsFailed(
+    conversationEntity: Conversation,
+    eventId: string,
+    error: unknown,
+  ): Promise<IdentifiedUpdatePayload | undefined> {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const errorStatus =
@@ -1751,7 +1777,7 @@ export class MessageRepository {
     return message as StoredContentMessage;
   }
 
-  async ensureMessageSender(message: Message) {
+  async ensureMessageSender(message: Message): Promise<StoredContentMessage> {
     if (isNonEmptyString(message.from) && !isNonEmptyString(message.user().id)) {
       const user = await this.userRepository.getUserById({domain: message.user().domain, id: message.from});
       message.user(user);
@@ -1779,7 +1805,7 @@ export class MessageRepository {
    *
    * @param conversation Conversation to be marked as read
    */
-  public async markAsRead(conversation: Conversation) {
+  public async markAsRead(conversation: Conversation): Promise<void> {
     const timestamp = conversation.last_read_timestamp();
     const payload = MessageBuilder.buildLastReadMessage(conversation.qualifiedId, timestamp);
     await this.sendToSelfConversations(payload);
@@ -1796,7 +1822,7 @@ export class MessageRepository {
    *
    * @param countlyId Countly new ID
    */
-  public async sendCountlySync(countlyId: string) {
+  public async sendCountlySync(countlyId: string): Promise<void> {
     const payload = MessageBuilder.buildDataTransferMessage(countlyId);
     await this.sendToSelfConversations(payload);
     this.logger.info(`Sent countly sync message with ID ${countlyId}`);
@@ -1807,7 +1833,10 @@ export class MessageRepository {
    * @param payload
    * @returns
    */
-  public sendCallingMessageToSelfMLSConversation(payload: string, targetConversation: QualifiedId) {
+  public sendCallingMessageToSelfMLSConversation(
+    payload: string,
+    targetConversation: QualifiedId,
+  ): Promise<SendAndInjectResult> {
     return this.sendCallingMessage(this.conversationState.getSelfMLSConversation(), {
       content: payload,
       qualifiedConversationId: targetConversation,
@@ -1824,7 +1853,7 @@ export class MessageRepository {
     conversation: Conversation,
     payload: string | {content: string; qualifiedConversationId: QualifiedId},
     options: MessageSendingOptions = {},
-  ) {
+  ): Promise<SendAndInjectResult> {
     const objectPayload = typeof payload === 'string' ? {content: payload} : payload;
     const message = MessageBuilder.buildCallMessage(objectPayload);
 
@@ -1851,7 +1880,7 @@ export class MessageRepository {
    * @param genericMessage Protobuf message
    * @param callMessageEntity Optional call message
    */
-  private trackContributed(conversationEntity: Conversation, genericMessage: GenericMessage) {
+  private trackContributed(conversationEntity: Conversation, genericMessage: GenericMessage): void {
     const isEphemeral = genericMessage.content === GenericMessageType.EPHEMERAL;
 
     if (isEphemeral) {

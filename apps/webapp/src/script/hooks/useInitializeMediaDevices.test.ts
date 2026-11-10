@@ -19,18 +19,18 @@
 
 import {renderHook, waitFor} from '@testing-library/react';
 
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {MediaDevicesHandler} from '../repositories/media/MediaDevicesHandler';
+import {MediaStreamHandler} from '../repositories/media/MediaStreamHandler';
 
 import {useInitializeMediaDevices} from './useInitializeMediaDevices';
 
-const createDevicesHandler = (initializeMediaDevices = jest.fn().mockResolvedValue(undefined)) => {
+const createDevicesHandler = (initializeMediaDevices = jest.fn().mockResolvedValue(undefined)): MediaDevicesHandler => {
   return {
     initializeMediaDevices,
   } as unknown as MediaDevicesHandler;
 };
 
-const createStreamHandler = (requestMediaStreamAccess = jest.fn().mockResolvedValue(undefined)) => {
+const createStreamHandler = (requestMediaStreamAccess = jest.fn().mockResolvedValue(undefined)): MediaStreamHandler => {
   return {
     requestMediaStreamAccess,
   } as unknown as MediaStreamHandler;

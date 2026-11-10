@@ -19,8 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {CSS_VISUALLY_HIDDEN} from 'Util/cssMixin';
-
+import {CSS_VISUALLY_HIDDEN} from '../../../../../util/cssMixin';
 import {styleBreakpoint} from '../../../common/styleBreakpoint/styleBreakpoint';
 
 export const wrapperStyles: CSSObject = {

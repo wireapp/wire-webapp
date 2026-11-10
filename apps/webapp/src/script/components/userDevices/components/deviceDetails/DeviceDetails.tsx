@@ -17,34 +17,31 @@
  *
  */
 
-import {useEffect, useMemo, useState} from 'react';
-import type {ReactNode} from 'react';
+import {useEffect, useMemo, useState, type FunctionComponent, ReactNode} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import type {ClientRepository, ClientEntity} from 'Repositories/client';
-import {isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import type {User} from 'Repositories/entity/User';
-import {WireIdentity} from 'src/script/e2eIdentity';
-import {MLSDeviceDetails} from 'src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import type {Logger} from 'Util/logger';
-import {splitFingerprint} from 'Util/stringUtil';
-import {toError} from 'Util/toError';
-
 import {Config} from '../../../../Config';
+import {WireIdentity} from '../../../../e2eIdentity';
 import {MotionDuration} from '../../../../motion/MotionDuration';
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
+import {MLSDeviceDetails} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import type {ClientRepository, ClientEntity} from '../../../../repositories/client';
+import {isMLSConversation} from '../../../../repositories/conversation/ConversationSelectors';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import type {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
+import type {CryptographyRepository} from '../../../../repositories/cryptography/CryptographyRepository';
+import type {User} from '../../../../repositories/entity/User';
+import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../../util/localizerUtil/translationTypes';
+import type {Logger} from '../../../../util/logger';
+import {splitFingerprint} from '../../../../util/stringUtil';
+import {toError} from '../../../../util/toError';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;
@@ -123,7 +120,7 @@ function renderDeviceDetailsHeadline(options: RenderDeviceDetailsHeadlineOptions
   );
 }
 
-export const DeviceDetails = ({
+export const DeviceDetails: FunctionComponent<DeviceDetailsProps> = ({
   device,
   cryptographyRepository,
   user,
@@ -153,15 +150,15 @@ export const DeviceDetails = ({
     });
   }, [cryptographyRepository, device, user.qualifiedId]);
 
-  const clickToToggleDeviceVerification = () => {
+  const clickToToggleDeviceVerification = (): void => {
     const toggleVerified = !isVerified;
     clientRepository.verifyClient(user.qualifiedId, device, toggleVerified).catch((error: unknown) => {
       return logger.warn(`Failed to toggle client verification: ${toError(error).message}`);
     });
   };
 
-  const clickToResetSession = () => {
-    const _resetProgress = () => {
+  const clickToResetSession = (): void => {
+    const _resetProgress = (): number => {
       return window.setTimeout(() => {
         return setIsResettingSession(false);
       }, MotionDuration.LONG);

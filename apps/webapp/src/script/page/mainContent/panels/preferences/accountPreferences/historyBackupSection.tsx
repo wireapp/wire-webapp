@@ -19,13 +19,11 @@
 
 import {FC} from 'react';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import {BackupFileUpload} from 'Components/historyImport/backupFileUpload';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {ContentState} from 'src/script/page/useAppState';
-
+import {BackupFileUpload} from '../../../../../components/historyImport/backupFileUpload';
+import {Config} from '../../../../../Config';
+import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
+import {useApplicationContext} from '../../../../rootProvider';
+import {ContentState} from '../../../../useAppState';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface HistoryBackupSectionProps {
@@ -40,7 +38,7 @@ const {
 
 const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importFile, switchContent}) => {
   const {translate} = useApplicationContext();
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = event.target.files?.[0];
     if (file !== undefined) {
       importFile(file);

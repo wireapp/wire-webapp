@@ -17,8 +17,7 @@
  *
  */
 
-import {LinkIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {
   wrapperStyles,
@@ -28,11 +27,16 @@ import {
   iconStyles,
 } from './cellsTableSharedColumn.styles';
 
+import {useApplicationContext} from '../../../../../../page/rootProvider';
+import {LinkIcon} from '../../../../../icon';
+
 interface CellsTableSharedColumnProps {
   isShared: boolean;
 }
 
-export const CellsTableSharedColumn = ({isShared}: CellsTableSharedColumnProps) => {
+export const CellsTableSharedColumn: FunctionComponent<CellsTableSharedColumnProps> = ({
+  isShared,
+}: CellsTableSharedColumnProps) => {
   const {translate} = useApplicationContext();
 
   return (

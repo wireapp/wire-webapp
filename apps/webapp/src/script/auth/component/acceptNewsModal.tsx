@@ -17,22 +17,27 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {FormattedMessage} from 'react-intl';
 
-import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {COLOR} from '../../uiKit/identity/colors/colors';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Column, Columns} from '../../uiKit/layout/column/column';
+import {Container} from '../../uiKit/layout/container/container';
+import {Modal} from '../../uiKit/surface/modal/modal';
+import {H3} from '../../uiKit/typography/heading/heading';
+import {Link} from '../../uiKit/typography/link/link';
+import {Text} from '../../uiKit/typography/text/text';
 
 interface Props {
   onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDecline: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
+const AcceptNewsModal: FunctionComponent<Props> = ({onConfirm, onDecline}: Props) => {
   const {translate} = useApplicationContext();
   return (
     <Modal>

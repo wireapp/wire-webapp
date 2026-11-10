@@ -24,41 +24,41 @@ import {CONVERSATION_CELLS_STATE, CONVERSATION_TYPE} from '@wireapp/api-client/l
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {UserType} from '@wireapp/api-client/lib/user';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {TeamEntity} from 'Repositories/team/TeamEntity';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {ConnectionEntity} from '../../../repositories/connection/connectionEntity';
+import {ConnectionRepository} from '../../../repositories/connection/connectionRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {ConversationMapper} from '../../../repositories/conversation/ConversationMapper';
+import {ConversationRoleRepository} from '../../../repositories/conversation/ConversationRoleRepository';
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
+import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {SearchRepository} from '../../../repositories/search/searchRepository';
+import {SelfRepository} from '../../../repositories/self/SelfRepository';
+import {TeamEntity} from '../../../repositories/team/TeamEntity';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {UserState} from '../../../repositories/user/userState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import 'src/script/util/test/mock/localStorageMock';
-import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+} from '../../testSupport/rootContextTestSupport';
+import '../../../util/test/mock/localStorageMock';
+import {translate} from '../../../util/localizerUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {createUuid} from '../../../util/uuid';
 
 import {ConversationDetails} from './conversationDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
-import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {PanelState} from '../rightSidebar';
 
-jest.mock('Components/panel/enrichedFields', () => {
+jest.mock('../../../components/panel/enrichedFields', () => {
   return {
     useEnrichedFields: (): never[] => {
       return [];
@@ -77,7 +77,7 @@ jest.mock('Components/panel/enrichedFields', () => {
     __esModule: true,
   };
 });
-jest.mock('Components/panel/userDetails', () => {
+jest.mock('../../../components/panel/userDetails', () => {
   return {
     UserDetails: () => {
       return <div />;
@@ -100,7 +100,18 @@ const viewerPermissionRootProviderWrapper = createRootProviderWrapperForTest(
   }),
 );
 
-const getDefaultParams = () => {
+type GetDefaultParamsResult = {
+  actionsViewModel: ActionsViewModel;
+  conversationRepository: ConversationRepository;
+  integrationRepository: IntegrationRepository;
+  isFederated: boolean;
+  isVisible: boolean;
+  searchRepository: SearchRepository;
+  teamRepository: TeamRepository;
+  teamState: TeamState;
+  selfUser: User;
+};
+const getDefaultParams = (): GetDefaultParamsResult => {
   const conversationRoleRepository: Partial<ConversationRoleRepository> = {
     canAddParticipants: () => {
       return true;
@@ -164,10 +175,10 @@ const getDefaultParams = () => {
     isVisible: true,
     searchRepository,
     teamRepository: {
-      getRoleBadge: (userId: string) => {
+      getRoleBadge: () => {
         return '';
       },
-      updateTeamMembersByIds: (teamEntity: TeamEntity, memberIds?: string[], append?: boolean) => {
+      updateTeamMembersByIds: () => {
         return Promise.resolve();
       },
       isSelfConnectedTo: () => {
@@ -180,6 +191,10 @@ const getDefaultParams = () => {
 };
 
 describe('ConversationDetails', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     conversationRepository = await testFactory.exposeConversationActors();
     searchRepository = await testFactory.exposeSearchActors();
@@ -341,7 +356,7 @@ describe('ConversationDetails', () => {
       },
     ];
 
-    return tests.forEach(({expected, permission, conversationType}) => {
+    return tests.forEach(({expected, conversationType}) => {
       act(() => {
         conversation.type(conversationType);
       });

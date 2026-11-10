@@ -19,9 +19,9 @@
 
 import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 
-import {combinePermissions, hasPermissions} from 'Repositories/user/userPermission';
-
 import {ACCESS_STATE, TEAM} from './AccessState';
+
+import {combinePermissions, hasPermissions} from '../user/userPermission';
 
 const teamMemberPermissionBitPosition = 2;
 const servicePermissionBitPosition = 3;
@@ -82,7 +82,7 @@ export function hasAccessToFeature(feature: number, state: ACCESS_STATE): boolea
   return (feature & permissions) !== 0;
 }
 
-export function isGettingAccessToFeature(feature: number, prevState: ACCESS_STATE, current: ACCESS_STATE) {
+export function isGettingAccessToFeature(feature: number, prevState: ACCESS_STATE, current: ACCESS_STATE): boolean {
   return !hasAccessToFeature(feature, prevState) && hasAccessToFeature(feature, current);
 }
 
@@ -165,9 +165,9 @@ export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRigh
     //reverse so that the index reflects the number of significant figures for finding the feature
     .toReversed()
     //find the name of the feature with the correct sigfigs
-    .map((bit: '1' | '0', i) => {
+    .map((bit: '1' | '0', bitIndex) => {
       return Object.entries(ACCESS).find(([, bitmask]) => {
-        return bitmask === +bit << i;
+        return bitmask === +bit << bitIndex;
       })?.[0];
     })
     .forEach(feature => {

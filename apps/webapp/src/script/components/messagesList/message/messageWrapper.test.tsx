@@ -18,21 +18,22 @@
  */
 
 import {render} from '@testing-library/react';
+import type {ComponentProps} from 'react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
-import {User} from 'Repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {translateForTest} from 'Util/test/translateForTest';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {MemberMessage as MemberMessageEntity} from '../../../repositories/entity/message/memberMessage';
+import {User} from '../../../repositories/entity/User';
+import {withTheme} from '../../../auth/util/test/testUtil';
+import {SystemMessageType} from '../../../message/systemMessageType';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {generateUser} from 'test/helper/UserGenerator';
-import {createUuid} from 'Util/uuid';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {generateUser} from '../../../../../test/helper/UserGenerator';
+import {createUuid} from '../../../util/uuid';
 
 import {MessageWrapper} from './messageWrapper';
 
@@ -40,7 +41,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-function createMemberMessage(systemType: SystemMessageType, users?: User[]) {
+function createMemberMessage(systemType: SystemMessageType, users?: User[]): MemberMessageEntity {
   const message = new MemberMessageEntity(translateForTest);
   message.memberMessageType = systemType;
   const actor = generateUser();
@@ -60,7 +61,10 @@ function createMemberMessage(systemType: SystemMessageType, users?: User[]) {
   return message;
 }
 
-const createBaseProps = (conversation: Conversation, message: MemberMessageEntity) => {
+type CreateBasePropsResult = Omit<ComponentProps<typeof MessageWrapper>, 'message'> & {
+  message: MemberMessageEntity;
+};
+const createBaseProps = (conversation: Conversation, message: MemberMessageEntity): CreateBasePropsResult => {
   return {
     conversation,
     message,

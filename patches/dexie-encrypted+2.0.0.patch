@@ -1,0 +1,38 @@
+diff --git a/node_modules/dexie-encrypted/dist/installHooks.js b/node_modules/dexie-encrypted/dist/installHooks.js
+--- a/node_modules/dexie-encrypted/dist/installHooks.js
++++ b/node_modules/dexie-encrypted/dist/installHooks.js
+@@ -105,27 +105,13 @@ function installHooks(db, encryptionOptions, keyPromise, performEncryption, perf
+                                 if (!cursor) {
+                                     return cursor;
+                                 }
+-                                return Object.create(cursor, {
+-                                    continue: {
+-                                        get() {
+-                                            return cursor.continue;
+-                                        },
+-                                    },
+-                                    continuePrimaryKey: {
+-                                        get() {
+-                                            return cursor.continuePrimaryKey;
+-                                        },
+-                                    },
+-                                    key: {
+-                                        get() {
+-                                            return cursor.key;
+-                                        },
+-                                    },
+-                                    value: {
+-                                        get() {
+-                                            return decrypt(cursor.value);
+-                                        },
+-                                    },
++                                return new Proxy(cursor, {
++                                    get(target, prop) {
++                                        if (prop === 'value') {
++                                            return decrypt(target.value)
++                                        }
++                                        return target[prop]
++                                    }
+                                 });
+                             });
+                         },

@@ -21,7 +21,7 @@ import type {Self} from '@wireapp/api-client/lib/self/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {SelfActionCreator} from './creator/';
-import {toError} from 'Util/toError';
+import {toError} from '../../../util/toError';
 
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 
@@ -51,7 +51,7 @@ describe('SelfAction', () => {
         },
         teams: {
           team: {
-            getTeam: (teamId: string) => {
+            getTeam: () => {
               return Promise.resolve(team);
             },
           },
@@ -162,7 +162,7 @@ describe('SelfAction', () => {
     try {
       await store.dispatch(actionRoot.selfAction.doCheckPasswordState());
       fail();
-    } catch (backendError: unknown) {
+    } catch {
       // TODO: Check for thrown error with jest error helpers (`await expect(Promise).rejects.toThrow()`)
       expect(store.getActions()).toEqual([
         SelfActionCreator.startSetPasswordState(),

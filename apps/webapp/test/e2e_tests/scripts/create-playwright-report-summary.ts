@@ -28,7 +28,7 @@ let report: JSONReport;
 
 try {
   report = JSON.parse(readFileSync(jsonPath, 'utf-8'));
-} catch (error: unknown) {
+} catch {
   const errorMessage = `❌ Error: report.json not found at ${jsonPath} ❌`;
   writeFileSync('playwright-report-summary.txt', errorMessage);
   process.exit(1);
@@ -101,7 +101,7 @@ const testDetails = Object.values(testFilesToReport).reduce((acc, testFile) => {
   return acc;
 }, '');
 
-const formatDuration = (duration: number) => {
+const formatDuration = (duration: number): string => {
   const minutes = Math.floor(duration / 60000);
   const totalSeconds = Math.round((duration % 60000) / 1000);
   const seconds = totalSeconds % 60;

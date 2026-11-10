@@ -19,11 +19,11 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {backgroundEffectsStore} from '../../repositories/media/useBackgroundEffectsStore';
 
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 
-const createMediaStream = () => {
+const createMediaStream = (): MediaStream => {
   return {
     getVideoTracks: jest.fn(() => {
       return [];
@@ -31,7 +31,8 @@ const createMediaStream = () => {
   } as unknown as MediaStream;
 };
 
-const createProcessedVideoStream = (stream: MediaStream) => {
+type CreateProcessedVideoStreamResult = {stream: MediaStream; release: jest.Mock<any, any, any>};
+const createProcessedVideoStream = (stream: MediaStream): CreateProcessedVideoStreamResult => {
   return {
     stream,
     release: jest.fn(),

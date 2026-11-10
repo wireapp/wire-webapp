@@ -17,17 +17,19 @@
  *
  */
 
-import {IconButton, IconButtonVariant, ReloadIcon} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {buttonStyles} from './cellsRefresh.styles';
+
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {ReloadIcon} from '../../../../uiKit/dataDisplay/icon/reloadIcon';
+import {IconButton, IconButtonVariant} from '../../../../uiKit/inputs/iconButton/iconButton';
 
 interface CellsRefreshProps {
   onRefresh: () => void;
 }
 
-export const CellsRefresh = ({onRefresh}: CellsRefreshProps) => {
+export const CellsRefresh: FunctionComponent<CellsRefreshProps> = ({onRefresh}: CellsRefreshProps) => {
   const {translate} = useApplicationContext();
 
   return (

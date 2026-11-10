@@ -17,17 +17,17 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useEffect, type FunctionComponent} from 'react';
 
 import {FallbackProps} from 'react-error-boundary';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
+import {useApplicationContext} from '../../page/rootProvider';
+import {getLogger} from '../../util/logger';
+import {PrimaryModal} from '../Modals/PrimaryModal';
 
 const logger = getLogger('ErrorFallback');
 
-export const ErrorFallback = ({error, resetErrorBoundary}: FallbackProps) => {
+export const ErrorFallback: FunctionComponent<FallbackProps> = ({error, resetErrorBoundary}: FallbackProps) => {
   const {translate} = useApplicationContext();
 
   useEffect(() => {

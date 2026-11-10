@@ -28,6 +28,7 @@ export const listStyles: CSSObject = {
 };
 
 export const listItemStyles: CSSObject = {
+  display: 'flex',
   width: '100%',
 };
 
@@ -36,14 +37,39 @@ export const buttonStyles: CSSObject = {
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: '16px',
-  width: '100%',
+  flex: 1,
+  minWidth: 0,
   height: '48px',
   background: 'none',
   padding: '0 16px',
   border: 'none',
   borderBottom: '1px solid var(--border-color)',
 
-  '&:hover': {
+  '&:hover:not(:disabled)': {
+    background: 'var(--foreground-fade-8)',
+  },
+  '&:disabled': {
+    cursor: 'not-allowed',
+    opacity: 0.6,
+  },
+  '&[aria-pressed="true"]': {
+    background: 'var(--foreground-fade-8)',
+  },
+};
+
+export const navigateButtonStyles: CSSObject = {
+  display: 'inline-flex',
+  flexShrink: 0,
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '48px',
+  height: '48px',
+  border: 'none',
+  borderBottom: '1px solid var(--border-color)',
+  background: 'none',
+  cursor: 'pointer',
+
+  '&:hover, &:focus-visible': {
     background: 'var(--foreground-fade-8)',
   },
 };

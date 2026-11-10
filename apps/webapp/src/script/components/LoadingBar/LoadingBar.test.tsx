@@ -21,21 +21,13 @@ import {render} from '@testing-library/react';
 
 import {LoadingBar} from './LoadingBar';
 
-jest.mock('@wireapp/react-ui-kit', () => {
-  const originalModule = jest.requireActual('@wireapp/react-ui-kit');
-  return {
-    ...originalModule,
-    Loading: (properties: Record<string, unknown>) => {
-      return <div {...properties} />;
-    },
-  };
-});
-
 describe('LoadingBar', () => {
-  it('renders correct progress', async () => {
-    const props = {message: 'example', progress: 30};
+  it('renders the message and spinner', () => {
+    const message = 'example';
 
-    const {getByTestId} = render(<LoadingBar {...props} />);
+    const {getByTestId, getByText} = render(<LoadingBar message={message} />);
+
     expect(getByTestId('loading-bar-spinner')).toBeInTheDocument();
+    expect(getByText(message)).toBeVisible();
   });
 });

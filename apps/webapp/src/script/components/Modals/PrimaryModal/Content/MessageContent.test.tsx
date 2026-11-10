@@ -22,7 +22,7 @@ import assert from 'node:assert';
 import {render} from '@testing-library/react';
 import {isUndefined} from '@sindresorhus/is';
 
-import type {Translate} from 'Util/localizerUtil';
+import type {Translate} from '../../../../util/localizerUtil';
 
 import {MessageContent} from './MessageContent';
 import type {PrimaryModalTranslatedMessage} from '../PrimaryModalTranslatedMessage';

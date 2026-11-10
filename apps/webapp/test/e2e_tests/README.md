@@ -16,8 +16,8 @@ It will generate .env file with variables from 1Password
 
 ### Install dependencies
 
-1. Install JS dependencies: `yarn --immutable`
-2. Install Playwright dependencies: `yarn playwright install --with-deps`
+1. Install JS dependencies from the root with `npm clean-install`, then run `npx just setup`.
+2. Install Playwright dependencies: `npx playwright install --with-deps`
 
 _Note: If in doubt, refer to test jobs in [git actions workflows folder](/.github/workflows)._
 
@@ -38,14 +38,14 @@ Other important items: [test fixtures](/test/e2e_tests/test.fixtures.ts), [scrip
 
 CI/CD PR git actions job can be found [here](/.github/workflows/precommit-crit-flows.yml)
 
-[Playwright config can be found in the root folder of the repo](/playwright.config.ts)
+[Playwright config is in the webapp project](/apps/webapp/playwright.config.ts)
 
 ### Startup feature toggles
 
 Set startup feature toggles per page through `withLogin` options:
 
 ```typescript
-import {forTestsOnlyFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {forTestsOnlyFeatureToggleName} from '../../../../src/script/featureToggles/startupFeatureToggleNames';
 
 const enabledPage = await createPage(
   withLogin(userA, {
@@ -70,14 +70,21 @@ await pageManager.openLoginPage({
 ```
 
 Keys derive from the production `StartupFeatureToggleName` type, so arbitrary feature strings are not accepted.
-`true` enables a feature; `false` removes it from the URL. Omitted or `undefined` overrides leave its state unchanged.
+`true` enables a feature; `false` removes it from the selection. Omitting `startupFeatureToggles` preserves the URL
+and allows the tested artifact's defaults to apply. Providing an override object creates an explicit URL selection,
+starting with the existing URL selection or no features. Use `startupFeatureToggles: {}` on a bare URL to select no
+features, independently of preview defaults. Individual omitted or `undefined` entries preserve the URL selection;
+the helper never assumes preview defaults. Disabling the last feature preserves `enabled-features=`.
+The underlying `applyStartupFeatureToggleOverridesToUrl` adapter requires a `Maybe<StartupFeatureToggleOverrides>`:
+pass `Maybe.nothing()` to use artifact defaults or `Maybe.just(overrides)` for an explicit selection. The navigation
+methods convert their existing optional `startupFeatureToggles` option into `Maybe` at the boundary.
 Existing `baseUrl` and `confirmNewHistory` options still work with `withLogin`; navigation methods accept `baseUrl`
 in the options object.
 
-The pure URL adapter tests need no browser, backend, or credentials:
+The pure URL adapter tests need no browser, backend, or credentials. The root Just task builds workspace libraries before invoking Playwright:
 
 ```bash
-yarn nx run webapp:e2e --excludeTaskDependencies -- utils/startupFeatureToggleOverrides.spec.ts --workers=1 --reporter=line
+npx just e2e-test utils/startupFeatureToggleOverrides.spec.ts --workers=1 --reporter=line
 ```
 
 ### Running the tests
@@ -86,12 +93,12 @@ For hosted manual regression runs, use the logical company-facing Beta environme
 
 E2E tests can be run via
 
-1. Executing `yarn e2e-test` in the root folder of the repo. Running it with `--ui` flag will open Playwright app that can be handy for debugging. Providing `--grep "@{TAG_NAME}"` will result in running only tests with @{TAG_NAME}. For example:
+1. Run `npx just e2e-test` from the repository root. Use `npx just e2e-ui` to open the Playwright app. Providing `--grep "@{TAG_NAME}"` runs only tests with @{TAG_NAME}. For example:
 
 ```
-yarn e2e-test --grep "@regression"
+npx just e2e-test --grep "@regression"
 ```
 
-You can provide multiple tags with `--grep "@{TAG_NAME1}|@{TAG_NAME2}|@{TAG_NAME3}..."`
+You can provide multiple tags with `--grep "@{TAG_NAME1}|@{TAG_NAME2}|@{TAG_NAME3}..."`. The pattern is passed as one quoted Playwright argument, so `|` remains part of the regular expression.
 
 2. via VSCode extension in IDE.

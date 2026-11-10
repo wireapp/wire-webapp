@@ -17,32 +17,37 @@
  *
  */
 
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isEmptyString, isNull} from '@sindresorhus/is';
+import type {ChangePassword} from '@wireapp/api-client/lib/self';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Button, ContainerXS, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {toError} from 'Util/toError';
 
 import {Page} from './page';
 
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Form} from '../../uiKit/inputs/form/form';
+import {Input} from '../../uiKit/inputs/input/input';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {H1} from '../../uiKit/typography/heading/heading';
+import {Small} from '../../uiKit/typography/text/text';
+import {toError} from '../../util/toError';
 import {Exception} from '../component/exception';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/validationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {RootState, bindActionCreators, type ThunkAction} from '../module/reducer';
 import * as SelfSelector from '../module/selector/selfSelector';
 import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetPasswordComponent = ({
+const SetPasswordComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
   isSelfSSOUser,
   hasSelfPassword,
   doSetPassword,
@@ -145,7 +150,8 @@ const SetPasswordComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {hasSelfPassword: boolean; isFetching: boolean; isSelfSSOUser: boolean};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     hasSelfPassword: SelfSelector.hasSelfPassword(state),
     isFetching: SelfSelector.isFetching(state),
@@ -154,7 +160,8 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {doSetPassword: (changePassword: ChangePassword) => ThunkAction};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators(
     {
       doSetPassword: actionRoot.selfAction.doSetPassword,

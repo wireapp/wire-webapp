@@ -17,22 +17,9 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {Maybe} from 'true-myth';
-
-import {
-  CELLS_ACTION,
-  useCellsActionPermissions,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
-import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
-import {FullscreenModal} from 'Components/fullscreenModal/fullscreenModal';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {isFileEditable} from 'Util/fileTypeUtil';
-import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
-import {getBestPreviewSource} from 'Util/imageUtil';
-import {getFileExtensionFromUrl} from 'Util/util';
 
 import {FileEditor} from './FileEditor/FileEditor';
 import {useFileFullscreenModalSourceConversation} from './FileFullscreenModalSourceConversationContext';
@@ -40,6 +27,19 @@ import {FileHeader} from './FileHeader/FileHeader';
 import {FileLoader} from './FileLoader/FileLoader';
 import {ImageFileView} from './ImageFileView/ImageFileView';
 import {NoPreviewAvailable} from './NoPreviewAvailable/NoPreviewAvailable';
+import {PDFViewer} from './PdfViewer/PdfViewer';
+
+import type {Conversation} from '../../repositories/entity/Conversation';
+import {isFileEditable} from '../../util/fileTypeUtil';
+import {getFileTypeFromExtension} from '../../util/getFileTypeFromExtension/getFileTypeFromExtension';
+import {getBestPreviewSource} from '../../util/imageUtil';
+import {getFileExtensionFromUrl} from '../../util/util';
+import {
+  CELLS_ACTION,
+  useCellsActionPermissions,
+} from '../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {isInRecycleBin} from '../conversation/conversationCells/common/recycleBin/recycleBin';
+import {FullscreenModal} from '../fullscreenModal/fullscreenModal';
 
 type Status = 'loading' | 'unavailable' | 'success';
 
@@ -61,7 +61,7 @@ interface FileFullscreenModalProps {
   checkIsInRecycleBin?: () => boolean;
 }
 
-export const FileFullscreenModal = ({
+export const FileFullscreenModal: FunctionComponent<FileFullscreenModalProps> = ({
   id,
   isOpen,
   onClose,
@@ -87,13 +87,13 @@ export const FileFullscreenModal = ({
   const [refreshKey, setRefreshKey] = useState(0);
   const isEditable = isFileEditable(fileExtension);
 
-  const refreshModalContent = () => {
+  const refreshModalContent = (): void => {
     setRefreshKey(prev => {
       return prev + 1;
     });
   };
 
-  const onCloseModal = () => {
+  const onCloseModal = (): void => {
     setIsInEditMode(false);
     onClose();
   };
@@ -149,7 +149,7 @@ interface ModalContentProps {
   fileUrl?: string;
 }
 
-const ModalContent = ({
+const ModalContent: FunctionComponent<ModalContentProps> = ({
   fileExtension,
   filePreviewUrl,
   fileName,

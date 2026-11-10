@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState, Fragment, FormEvent, ReactNode} from 'react';
+import {useCallback, useEffect, useRef, useState, Fragment, FormEvent, ReactNode, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
@@ -25,24 +25,27 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Button, ButtonVariant, Checkbox, CheckboxLabel, Input, Link, LinkVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {ClientRepository} from 'Repositories/client';
-import {ClientState} from 'Repositories/client/ClientState';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
-import {AppLockState} from 'Repositories/user/appLockState';
-import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {ReactTranslationValueReplacement} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {applockStyles} from './appLock.styles';
+
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import * as Icon from '../../components/icon';
+import {ModalComponent} from '../../components/Modals/ModalComponent';
+import {Config} from '../../Config';
+import {ClientRepository} from '../../repositories/client';
+import {ClientState} from '../../repositories/client/ClientState';
+import {AppLockRepository} from '../../repositories/user/appLockRepository';
+import {AppLockState} from '../../repositories/user/appLockState';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {Checkbox, CheckboxLabel} from '../../uiKit/inputs/checkbox/checkbox';
+import {Input} from '../../uiKit/inputs/input/input';
+import {Link, LinkVariant} from '../../uiKit/typography/link/link';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import type {ReactTranslationValueReplacement} from '../../util/localizerUtil/reactLocalizerUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../util/localizerUtil/translationTypes';
+import {WebAppEvents} from '../../webAppEvents';
+import {useApplicationContext} from '../rootProvider';
 
 const millisecondsPerSecond = 1000;
 
@@ -146,7 +149,7 @@ interface AppLockProps {
   clientState?: ClientState;
 }
 
-const AppLock = ({
+const AppLock: FunctionComponent<AppLockProps> = ({
   clientRepository,
   clientState = container.resolve(ClientState),
   appLockState = container.resolve(AppLockState),
@@ -190,17 +193,17 @@ const AppLock = ({
     }),
   );
 
-  const getInactivityAppLockTimeoutInSeconds = () => {
+  const getInactivityAppLockTimeoutInSeconds = (): number => {
     const backendTimeout = appLockState.appLockInactivityTimeoutSecs();
     return Number.isFinite(backendTimeout) ? backendTimeout : DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC;
   };
 
-  const getScheduledAppLockTimeoutInSeconds = () => {
+  const getScheduledAppLockTimeoutInSeconds = (): number | null => {
     const configTimeout = Config.getConfig().FEATURE?.APPLOCK_SCHEDULED_TIMEOUT;
     return Number.isFinite(configTimeout) ? configTimeout : null;
   };
 
-  const isScheduledAppLockEnabled = () => {
+  const isScheduledAppLockEnabled = (): boolean => {
     return getScheduledAppLockTimeoutInSeconds() !== null;
   };
 
@@ -259,12 +262,12 @@ const AppLock = ({
     };
   }, [localAppLockState, isVisible]);
 
-  const showAppLock = () => {
+  const showAppLock = (): void => {
     setLocalAppLockState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
 
-  const onUnlock = async (event: FormEvent) => {
+  const onUnlock = async (event: FormEvent): Promise<void> => {
     event.preventDefault();
     const target = event.target as HTMLFormElement & {password: HTMLInputElement};
     const isCorrectCode = await appLockRepository.checkCode(target.password.value);
@@ -276,7 +279,7 @@ const AppLock = ({
     setUnlockError(translate('modalAppLockLockedError'));
   };
 
-  const startScheduledTimeout = () => {
+  const startScheduledTimeout = (): void => {
     if (isScheduledAppLockEnabled()) {
       window.clearTimeout(scheduledTimeoutId);
       const scheduledAppLockTimeoutInSeconds = getScheduledAppLockTimeoutInSeconds();
@@ -287,19 +290,19 @@ const AppLock = ({
     }
   };
 
-  const onSetCode = async (event: FormEvent) => {
+  const onSetCode = async (event: FormEvent): Promise<void> => {
     event.preventDefault();
     await appLockRepository.setCode(setupPassphrase);
     setIsVisible(false);
     startScheduledTimeout();
   };
 
-  const onLogout = (clearData: boolean) => {
+  const onLogout = (clearData: boolean): void => {
     appLockRepository.removeCode();
     amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
   };
 
-  const changePassphrase = () => {
+  const changePassphrase = (): void => {
     setLocalAppLockState(APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
@@ -311,32 +314,32 @@ const AppLock = ({
   const isSetupPassphraseLength = passwordRegexLength.test(setupPassphrase);
   const isSetupPassphraseSpecial = passwordRegexSpecial.test(setupPassphrase);
 
-  const clearUnlockError = () => {
+  const clearUnlockError = (): void => {
     return setUnlockError('');
   };
-  const onGoBack = () => {
+  const onGoBack = (): void => {
     return setLocalAppLockState(APPLOCK_STATE.LOCKED);
   };
-  const onClickForgot = () => {
+  const onClickForgot = (): void => {
     return setLocalAppLockState(APPLOCK_STATE.FORGOT);
   };
-  const onClickLogout = async () => {
+  const onClickLogout = async (): Promise<void> => {
     if (isTemporaryClient === true) {
       await clientRepository.logoutClient();
     } else {
       setLocalAppLockState(APPLOCK_STATE.LOGOUT);
     }
   };
-  const onClosed = () => {
+  const onClosed = (): void => {
     setLocalAppLockState(APPLOCK_STATE.NONE);
     setSetupPassphrase('');
   };
-  const onCancelAppLock = () => {
+  const onCancelAppLock = (): void => {
     appLockRepository.setEnabled(false);
     setIsVisible(false);
   };
 
-  const headerText = () => {
+  const headerText = (): string => {
     switch (localAppLockState) {
       case APPLOCK_STATE.SETUP_CHANGE:
         return translate('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME});
@@ -616,7 +619,7 @@ const AppLock = ({
   );
 };
 
-const ErrorMessage = ({message}: {message: string}) => {
+const ErrorMessage: FunctionComponent<{message: string}> = ({message}: {message: string}) => {
   return (
     <p className="modal__input__error" data-uie-name="label-applock-unlock-error">
       {message}

@@ -17,14 +17,13 @@
  *
  */
 
-import {createColumnHelper} from '@tanstack/react-table';
-
-import {CellsSortDirection} from 'Components/conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
-import {CellsTableSortableHeader} from 'Components/conversation/conversationCells/common/cellsTableSortableHeader/cellsTableSortableHeader';
-import {CellsSortField} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {RootContextValue} from 'src/script/page/rootProvider';
-import {CellNode} from 'src/script/types/cellNode';
+import {
+  createColumnHelper,
+  type ColumnDefBase,
+  type StringHeaderIdentifier,
+  type IdIdentifier,
+  type AccessorKeyColumnDefBase,
+} from '@tanstack/react-table';
 
 import {CellsConversationColumn} from './cellsConversationColumn/cellsConversationColumn';
 import {CellsTableOwnerColumn} from './cellsOwnerColumn/cellsOwnerColumn';
@@ -34,9 +33,27 @@ import {CellsTableRowOptions} from './cellsTableRowOptions/cellsTableRowOptions'
 import {CellsTableSharedColumn} from './cellsTableSharedColumn/cellsTableSharedColumn';
 import {CellsTableTagsColumn} from './cellsTableTagsColumn/cellsTableTagsColumn';
 
+import type {RootContextValue} from '../../../../page/rootProvider';
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../types/cellNode';
+import {CellsSelectionCheckbox} from '../../../cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
+import {CellsSortDirection} from '../../../conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
+import {CellsTableSortableHeader} from '../../../conversation/conversationCells/common/cellsTableSortableHeader/cellsTableSortableHeader';
+import {CellsSortField} from '../../../conversation/conversationCells/common/useCellsSorting/useCellsSorting';
+
 const columnHelper = createColumnHelper<CellNode>();
 
-const getCellsTableColumnLabels = (translate: RootContextValue['translate']) => {
+type GetCellsTableColumnLabelsResult = {
+  actions: string;
+  conversationName: string;
+  created: string;
+  name: string;
+  owner: string;
+  publicLink: string;
+  size: string;
+  tags: string;
+};
+const getCellsTableColumnLabels = (translate: RootContextValue['translate']): GetCellsTableColumnLabelsResult => {
   return {
     actions: translate('cells.tableRow.actions'),
     conversationName: translate('cells.tableRow.conversationName'),
@@ -65,22 +82,58 @@ export const getCellsTableDataCellLabels = (
   };
 };
 
+type GetCellsTableColumnsResult = (
+  | (ColumnDefBase<CellNode, unknown> & StringHeaderIdentifier)
+  | (ColumnDefBase<CellNode, unknown> & IdIdentifier<CellNode, unknown>)
+  | (AccessorKeyColumnDefBase<CellNode, string> & Partial<IdIdentifier<CellNode, string>>)
+  | (AccessorKeyColumnDefBase<CellNode, string[]> & Partial<IdIdentifier<CellNode, string[]>>)
+  | (AccessorKeyColumnDefBase<CellNode, number> & Partial<IdIdentifier<CellNode, number>>)
+  | (AccessorKeyColumnDefBase<CellNode, {alreadyShared: boolean; uuid?: string; url?: string} | undefined> &
+      Partial<IdIdentifier<CellNode, {alreadyShared: boolean; uuid?: string; url?: string} | undefined>>)
+)[];
 export const getCellsTableColumns = ({
   cellsRepository,
   translate,
   getDirectionFor,
   isSortingEnabled,
   onToggleSort,
+  selectedNodeIds,
+  onToggleSelection,
+  selectionEnabled,
 }: {
   cellsRepository: CellsRepository;
   translate: RootContextValue['translate'];
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
   isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
-}) => {
+  selectedNodeIds: Set<string>;
+  onToggleSelection: (nodeId: string, isSelected: boolean) => void;
+  selectionEnabled: boolean;
+}): GetCellsTableColumnsResult => {
   const labels = getCellsTableColumnLabels(translate);
 
   return [
+    ...(selectionEnabled
+      ? [
+          columnHelper.display({
+            id: 'selection',
+            size: 40,
+            cell: info => {
+              const node = info.row.original;
+              return (
+                <CellsSelectionCheckbox
+                  id={node.id}
+                  name={node.name}
+                  isChecked={selectedNodeIds.has(node.id)}
+                  onChange={isSelected => {
+                    onToggleSelection(node.id, isSelected);
+                  }}
+                />
+              );
+            },
+          }),
+        ]
+      : []),
     columnHelper.accessor('name', {
       header: isSortingEnabled
         ? () => {

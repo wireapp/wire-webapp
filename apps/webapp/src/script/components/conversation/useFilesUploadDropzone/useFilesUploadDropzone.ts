@@ -20,13 +20,7 @@
 import {useState} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {Accept, DropzoneInputProps, FileRejection, useDropzone} from 'react-dropzone';
-
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Config} from 'src/script/Config';
-import type {RootContextValue} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
+import {Accept, DropzoneInputProps, FileRejection, useDropzone, type DropzoneRootProps} from 'react-dropzone';
 
 import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
 import {createFileDropHandler} from './createFileDropHandler/createFileDropHandler';
@@ -34,6 +28,11 @@ import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 import {transformAcceptedFiles} from './transformAcceptedFiles/transformAcceptedFiles';
 
+import {Config} from '../../../Config';
+import type {RootContextValue} from '../../../page/rootProvider';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {getLogger} from '../../../util/logger';
 import {FileWithPreview, useFileUploadState} from '../useFilesUploadState/useFilesUploadState';
 import {buildCellsUploadPath} from '../utils/buildCellsUploadPath';
 import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';
@@ -61,6 +60,15 @@ interface UseFilesUploadDropzoneParams {
   buildFileMetadata?: typeof buildCellFileMetadata;
 }
 
+type UseFilesUploadDropzoneResult = {
+  getRootProps: <T extends DropzoneRootProps>(props?: T) => T;
+  getInputProps: (props?: DropzoneInputProps) => DropzoneInputProps | FolderUploadInputProps;
+  openAllFilesView: () => void;
+  openFolderView: () => void;
+  openImageFilesView: () => void;
+  handlePastedFile: (file: File) => Promise<void>;
+  isDragAccept: boolean;
+};
 export const useFilesUploadDropzone = ({
   isTeam,
   isDisabled,
@@ -70,7 +78,7 @@ export const useFilesUploadDropzone = ({
   translate,
   conversation = {id: '', qualifiedId: {id: '', domain: ''}},
   buildFileMetadata = buildCellFileMetadata,
-}: UseFilesUploadDropzoneParams) => {
+}: UseFilesUploadDropzoneParams): UseFilesUploadDropzoneResult => {
   const {addFiles, getFiles, updateFile} = useFileUploadState();
   const files = getFiles({conversationId: conversation.id});
 
@@ -120,7 +128,7 @@ export const useFilesUploadDropzone = ({
     },
   });
 
-  const getInputProps = (props: DropzoneInputProps = {}) => {
+  const getInputProps = (props: DropzoneInputProps = {}): DropzoneInputProps | FolderUploadInputProps => {
     const inputProps: DropzoneInputProps | FolderUploadInputProps = isFolderUploadMode
       ? {...props, directory: '', webkitdirectory: ''}
       : props;
@@ -135,7 +143,7 @@ export const useFilesUploadDropzone = ({
     maxSize: number,
     maxFiles: number,
     conversationId: string,
-  ) => {
+  ): Promise<void> => {
     const newFiles = [
       ...acceptedFiles,
       ...rejectedFiles.map(file => {
@@ -175,11 +183,11 @@ export const useFilesUploadDropzone = ({
     await uploadFiles(transformedAcceptedFiles);
   };
 
-  const handlePastedFile = async (file: File) => {
+  const handlePastedFile = async (file: File): Promise<void> => {
     await processIncomingFiles([file], [], files, MAX_SIZE, MAX_FILES, conversation.id);
   };
 
-  const uploadFile = async (file: FileWithPreview) => {
+  const uploadFile = async (file: FileWithPreview): Promise<void> => {
     // Temporary solution to handle the local development
     // TODO: remove this once we have a proper way to handle the domain per env
     const path = buildCellsUploadPath({
@@ -221,7 +229,7 @@ export const useFilesUploadDropzone = ({
     }
   };
 
-  const uploadFiles = async (files: FileWithPreview[]) => {
+  const uploadFiles = async (files: FileWithPreview[]): Promise<void> => {
     await Promise.all(
       files.map(async file => {
         await uploadFile(file);
@@ -229,7 +237,7 @@ export const useFilesUploadDropzone = ({
     );
   };
 
-  const attatchMetadataToFiles = async (files: FileWithPreview[]) => {
+  const attatchMetadataToFiles = async (files: FileWithPreview[]): Promise<void> => {
     await Promise.all(
       files.map(async file => {
         try {
@@ -253,23 +261,23 @@ export const useFilesUploadDropzone = ({
 
   // Using setTimeout to ensure state update is processed before opening the file dialog
   // This is necessary because react-dropzone's open() function needs the updated accept state
-  const delayedOpen = () => {
+  const delayedOpen = (): void => {
     setTimeout(open, 0);
   };
 
-  const openAllFilesView = () => {
+  const openAllFilesView = (): void => {
     setAccept(undefined);
     setIsFolderUploadMode(false);
     delayedOpen();
   };
 
-  const openFolderView = () => {
+  const openFolderView = (): void => {
     setAccept(undefined);
     setIsFolderUploadMode(true);
     delayedOpen();
   };
 
-  const openImageFilesView = () => {
+  const openImageFilesView = (): void => {
     setIsFolderUploadMode(false);
     setAccept({
       'image/*': IMAGE_FILE_TYPES,

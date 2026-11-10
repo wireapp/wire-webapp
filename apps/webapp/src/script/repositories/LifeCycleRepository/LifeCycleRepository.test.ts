@@ -19,17 +19,17 @@
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
-import {useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
-import {CacheRepository} from 'Repositories/cache/cacheRepository';
-import type {ClientRepository} from 'Repositories/client/ClientRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {EventRepository} from 'Repositories/event/EventRepository';
-import {StorageKey} from 'Repositories/storage/storageKey';
-import type {StorageRepository} from 'Repositories/storage/storageRepository';
-import type {UserRepository} from 'Repositories/user/userRepository';
+import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
+import {CacheRepository} from '../cache/cacheRepository';
+import type {ClientRepository} from '../client/ClientRepository';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {Conversation} from '../entity/Conversation';
+import type {EventRepository} from '../event/EventRepository';
+import {StorageKey} from '../storage/storageKey';
+import type {StorageRepository} from '../storage/storageRepository';
+import type {UserRepository} from '../user/userRepository';
 
 import {LifeCycleRepository, doSimpleRedirect, type LifeCycleDependencies} from './LifeCycleRepository';
 
@@ -229,7 +229,6 @@ describe('LifeCycleRepository', () => {
     beforeEach(() => {
       jest.spyOn(lifeCycleRepository, 'redirectToLogin').mockImplementation();
       jest.spyOn(CacheRepository, 'clearLocalStorage').mockReturnValue(['key1', 'key2']);
-      jest.spyOn(CacheRepository, 'clearCacheStorage').mockImplementation();
 
       (useTypingIndicatorState as any).getState = jest.fn().mockReturnValue({
         clearTypingUsers: jest.fn(),
@@ -470,19 +469,7 @@ describe('LifeCycleRepository', () => {
         });
       });
 
-      describe('cache and database deletion', () => {
-        it('should clear cache storage when clearing data', async () => {
-          await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, true);
-
-          expect(CacheRepository.clearCacheStorage).toHaveBeenCalled();
-        });
-
-        it('should not clear cache storage when not clearing data', async () => {
-          await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, false);
-
-          expect(CacheRepository.clearCacheStorage).not.toHaveBeenCalled();
-        });
-
+      describe('database deletion', () => {
         it('should delete database when clearing data', async () => {
           (mockDependencies.storageRepository.deleteDatabase as jest.Mock).mockResolvedValue(undefined);
 

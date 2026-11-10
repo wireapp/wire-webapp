@@ -17,26 +17,28 @@
  *
  */
 
-import {KeyboardEvent, MouseEvent as ReactMouseEvent} from 'react';
-
-import {MoreIcon} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {showContextMenu} from 'src/script/ui/contextMenu';
-import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
-import {setContextMenuPosition} from 'Util/util';
+import {KeyboardEvent, MouseEvent as ReactMouseEvent, type FunctionComponent} from 'react';
 
 import {buttonStyles, iconStyles} from './filePreviewErrorMoreButton.styles';
+
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {showContextMenu} from '../../../../../ui/contextMenu';
+import {MoreIcon} from '../../../../../uiKit/dataDisplay/icon/moreIcon';
+import {isSpaceOrEnterKey} from '../../../../../util/keyboardUtil';
+import {setContextMenuPosition} from '../../../../../util/util';
 
 interface FilePreviewErrorMoreButtonProps {
   onDelete: () => void;
   onRetry: () => void;
 }
 
-export const FilePreviewErrorMoreButton = ({onDelete, onRetry}: FilePreviewErrorMoreButtonProps) => {
+export const FilePreviewErrorMoreButton: FunctionComponent<FilePreviewErrorMoreButtonProps> = ({
+  onDelete,
+  onRetry,
+}: FilePreviewErrorMoreButtonProps) => {
   const {translate} = useApplicationContext();
 
-  const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
+  const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent): void => {
     const retryLabel = translate('conversationFilePreviewErrorRetry');
     const removeLabel = translate('conversationFilePreviewErrorRemove');
 
@@ -50,7 +52,7 @@ export const FilePreviewErrorMoreButton = ({onDelete, onRetry}: FilePreviewError
     });
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>): void => {
     if (isSpaceOrEnterKey(event.key)) {
       const newEvent = setContextMenuPosition(event);
       showOptionsMenu(newEvent);

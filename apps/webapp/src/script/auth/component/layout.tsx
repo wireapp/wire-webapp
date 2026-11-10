@@ -17,19 +17,20 @@
  *
  */
 
-import {ReactNode} from 'react';
-
-import {WavesPattern} from '@wireapp/react-ui-kit/lib/images/wavesPattern';
-
-import {Bold, COLOR_V2, FlexBox, Link, Logo, Text} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss} from './layout.styles';
 
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {COLOR_V2} from '../../uiKit/identity/colorsV2/colorsV2';
+import {Logo} from '../../uiKit/identity/logo/logo';
+import {WavesPattern} from '../../uiKit/images/wavesPattern';
+import {FlexBox} from '../../uiKit/layout/flexBox/flexBox';
+import {Link} from '../../uiKit/typography/link/link';
+import {Bold, Text} from '../../uiKit/typography/text/text';
 
-export const Layout = ({children}: {children: ReactNode}) => {
+export const Layout: FunctionComponent<{children: ReactNode}> = ({children}: {children: ReactNode}) => {
   const {translate} = useApplicationContext();
   return (
     <FlexBox css={bodyCss}>

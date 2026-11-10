@@ -17,17 +17,31 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
-import {CloseIcon} from '@wireapp/react-ui-kit';
+import {
+  dismissConversationViewerPermissionBanner,
+  getSessionStorage,
+  isConversationViewerPermissionBannerDismissed,
+} from './conversationViewerPermissionBannerStorage';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 
-export const ConversationViewerPermissionBanner = () => {
+interface ConversationViewerPermissionBannerProps {
+  conversationId: string;
+}
+
+export const ConversationViewerPermissionBanner: FunctionComponent<ConversationViewerPermissionBannerProps> = ({
+  conversationId,
+}) => {
   const {translate} = useApplicationContext();
   const sharedDriveSupportUrl = Config.getConfig().URL.SUPPORT.SHARED_DRIVE;
-  const [isVisible, setIsVisible] = useState(true);
+  const storage = getSessionStorage();
+  const [isVisible, setIsVisible] = useState(() => {
+    return !isConversationViewerPermissionBannerDismissed(storage, conversationId);
+  });
 
   if (!isVisible) {
     return null;
@@ -37,6 +51,7 @@ export const ConversationViewerPermissionBanner = () => {
     <div className="conversation-viewer-permission-banner" role="status">
       <div className="conversation-viewer-permission-banner__content">
         <span>{translate('conversationFileUploadRestrictedOverlayDescription')}</span>
+        <span>{translate('conversationViewerPermissionBannerMessagesAllowed')}</span>
         <a
           className="conversation-viewer-permission-banner__learn-more"
           href={sharedDriveSupportUrl}
@@ -52,7 +67,8 @@ export const ConversationViewerPermissionBanner = () => {
         className="conversation-viewer-permission-banner__close"
         aria-label={translate('accessibility.rightPanel.close')}
         onClick={() => {
-          return setIsVisible(false);
+          dismissConversationViewerPermissionBanner(storage, conversationId);
+          setIsVisible(false);
         }}
       >
         <CloseIcon />

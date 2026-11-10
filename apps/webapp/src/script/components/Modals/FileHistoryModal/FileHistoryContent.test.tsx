@@ -18,17 +18,18 @@
  */
 
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../uiKit/identity/theme/theme';
 
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {FileHistoryContent} from './FileHistoryContent';
 import {FileVersion} from './types';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 type RenderFileHistoryContent = (fileVersions: Record<string, FileVersion[]>) => ReturnType<typeof render>;
 

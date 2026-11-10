@@ -19,12 +19,12 @@
 
 import {useEffect} from 'react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {useAllCellsTagsStore} from '../useAllCellsTagsStore/useAllCellsTagsStore';
 
-export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
+type UseGetAllTagsResult = {tags: string[]; isLoading: boolean; error: Error | null};
+export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsRepository}): UseGetAllTagsResult => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const tags = useAllCellsTagsStore(state => {
     return state.tags;

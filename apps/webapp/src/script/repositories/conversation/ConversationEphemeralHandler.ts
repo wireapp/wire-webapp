@@ -23,24 +23,29 @@ import ko from 'knockout';
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import type {Message} from 'Repositories/entity/message/message';
-import {Text} from 'Repositories/entity/message/text';
-import type {EventService} from 'Repositories/event/EventService';
-import type {EventRecord} from 'Repositories/storage';
-import {getLogger, Logger} from 'Util/logger';
-import {clamp} from 'Util/numberUtil';
-import {obfuscate} from 'Util/stringUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {arrayToBase64, noop} from 'Util/util';
-
 import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
 import {ConversationMapper} from './ConversationMapper';
 
 import {EphemeralStatusType} from '../../message/ephemeralStatusType';
 import {StatusType} from '../../message/statusType';
+import {getLogger, Logger} from '../../util/logger';
+import {clamp} from '../../util/numberUtil';
+import {obfuscate} from '../../util/stringUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {arrayToBase64, noop} from '../../util/util';
+import type {Conversation} from '../entity/Conversation';
+import type {ContentMessage} from '../entity/message/contentMessage';
+import {MediumImage} from '../entity/message/mediumImage';
+import type {Message} from '../entity/message/message';
+import {Text} from '../entity/message/text';
+import type {EventService} from '../event/EventService';
+import type {EventRecord} from '../storage';
+
+type ConversationTimerRange = {MAX: TIME_IN_MILLIS; MIN: TIME_IN_MILLIS};
+type ConversationEphemeralHandlerConfig = {
+  INTERVAL_TIME: TIME_IN_MILLIS;
+  TIMER_RANGE: ConversationTimerRange;
+};
 
 export class ConversationEphemeralHandler extends AbstractConversationEventHandler {
   eventListeners: Record<string, (...args: any[]) => void>;
@@ -49,7 +54,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   timedMessages: ko.ObservableArray<ContentMessage>;
   timedMessagesSubscription: ko.Subscription;
 
-  static get CONFIG() {
+  static get CONFIG(): ConversationEphemeralHandlerConfig {
     return {
       INTERVAL_TIME: TIME_IN_MILLIS.SECOND,
       TIMER_RANGE: {

@@ -24,10 +24,10 @@ import {Maybe, toolbelt, type Result} from 'true-myth';
 
 import {act, render} from '@testing-library/react';
 
-import {MessageContent} from 'Components/inputBar/common/messageContent/messageContent';
-import {User} from 'Repositories/entity/User';
-import {unwrap} from 'Util/test/resultTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {MessageContent} from '../../common/messageContent/messageContent';
+import {User} from '../../../../repositories/entity/User';
+import {unwrap} from '../../../../util/test/resultTestSupport';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {RichTextEditor} from './richTextEditor';
 
@@ -56,10 +56,6 @@ const defaultRichTextEditorTestOptions: RichTextEditorTestOptions = {
   replaceEmojis: false,
   showMarkdownPreview: true,
 };
-
-function throwEditorError(error: unknown): never {
-  throw error;
-}
 
 function createTestUser(userName: string): User {
   const user = new User(`${userName}-id`, '', translateForTest);

@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {ConversationTabPanel} from '../conversationTabPanel/conversationTabPanel';
 
@@ -27,7 +27,7 @@ interface ConversationMessagesWrapperProps {
   children: ReactNode;
 }
 
-export const ConversationMessagesWrapper = ({
+export const ConversationMessagesWrapper: FunctionComponent<ConversationMessagesWrapperProps> = ({
   children,
   isCellsEnabled,
   isPanelHidden,

@@ -53,7 +53,7 @@ export const BlockquotePlugin = (): null => {
  * By default our Shift + Enter adds a new paragraph, which escapes the blockquote, prevents for adding multiline quotes.
  * This command will add a new line break instead of a new paragraph, which will keep the blockquote.
  */
-const registerBlockquoteEnterCommand = (editor: LexicalEditor) => {
+const registerBlockquoteEnterCommand = (editor: LexicalEditor): (() => void) => {
   return editor.registerCommand(
     KEY_ENTER_COMMAND,
     event => {
@@ -94,7 +94,7 @@ const registerBlockquoteEnterCommand = (editor: LexicalEditor) => {
  * Because we use a custom Shift + Enter for the blockquotes, we no longer have an abilitiy to escape a blockquote by pressing Shift + Enter (cause the above command adds a new line break).
  * This command will remove the last line break in the blockquote and add a new paragraph, which will escape the blockquote.
  */
-const registerBlockquoteBackspaceCommand = (editor: LexicalEditor) => {
+const registerBlockquoteBackspaceCommand = (editor: LexicalEditor): (() => void) => {
   return editor.registerCommand(
     KEY_BACKSPACE_COMMAND,
     event => {

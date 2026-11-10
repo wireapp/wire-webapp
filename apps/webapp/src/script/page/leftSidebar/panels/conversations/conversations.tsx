@@ -17,42 +17,21 @@
  *
  */
 
-import {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {
+  KeyboardEvent as ReactKeyBoardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FunctionComponent,
+} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 import {useShallow} from 'zustand/react/shallow';
-
-import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {MeetingNotificationHost} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost';
-import {useConversationFocus} from 'Hooks/useConversationFocus';
-import {CallState} from 'Repositories/calling/CallState';
-import {createLabel} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {EventName} from 'Repositories/tracking/eventName';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {Preferences} from 'src/script/page/leftSidebar/panels/preferences';
-import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/mainContent';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useAppMainState, ViewType} from 'src/script/page/state';
-import {ContentState, ListState, useAppState} from 'src/script/page/useAppState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {ConversationCallingView} from './conversationCallingView/conversationCallingView';
 import {ConversationHeader, conversationsPanelHeadingId} from './conversationHeader';
@@ -75,12 +54,39 @@ import {
   useSidebarStore,
 } from './useSidebarStore';
 
+import {MeetingNotificationHost} from '../../../../components/meeting/meetingNotificationHost/meetingNotificationHost';
 import {Config} from '../../../../Config';
+import {useConversationFocus} from '../../../../hooks/useConversationFocus';
+import {CallState} from '../../../../repositories/calling/CallState';
+import {createLabel} from '../../../../repositories/conversation/ConversationLabelRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import type {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
+import {IntegrationRepository} from '../../../../repositories/integration/IntegrationRepository';
+import {PreferenceNotificationRepository} from '../../../../repositories/notification/PreferenceNotificationRepository';
+import {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
+import {SearchRepository} from '../../../../repositories/search/searchRepository';
+import {TeamRepository} from '../../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../../repositories/team/TeamState';
+import {EventName} from '../../../../repositories/tracking/eventName';
+import {UserRepository} from '../../../../repositories/user/userRepository';
+import {UserState} from '../../../../repositories/user/userState';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {setHistoryParam} from '../../../../router/Router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
+import {useMatchMedia} from '../../../../uiKit/layout/matchMedia/matchMedia';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {useChannelsFeatureFlag} from '../../../../util/useChannelsFeatureFlag';
+import {useMeetingsFeatureFlag} from '../../../../util/useMeetingsFeatureFlag';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {WebAppEvents} from '../../../../webAppEvents';
+import {ANIMATED_PAGE_TRANSITION_DURATION} from '../../../mainContent';
+import {useApplicationContext} from '../../../rootProvider';
+import {useAppMainState, ViewType} from '../../../state';
+import {ContentState, ListState, useAppState} from '../../../useAppState';
 import {ListWrapper} from '../listWrapper';
+import {Preferences} from '../preferences';
 import {StartUI} from '../startUi';
 
 export const shouldClearDeepLinkForTab = (tab: SidebarTabs): boolean => {
@@ -106,7 +112,7 @@ type ConversationsProps = {
   isConversationListCollapseEnabled: boolean;
 };
 
-export const Conversations = ({
+export const Conversations: FunctionComponent<ConversationsProps> = ({
   integrationRepository,
   searchRepository,
   teamRepository,
@@ -148,6 +154,7 @@ export const Conversations = ({
   );
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
+  const [searchResetToken, setSearchResetToken] = useState(0);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
@@ -235,32 +242,39 @@ export const Conversations = ({
   const allConversations = [...conversations, ...archivedConversations];
   const draftConversations = useDraftConversations(allConversations);
 
-  const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
-    currentTab,
-    conversations,
-    conversationsFilter,
-    archivedConversations,
-    groupConversations,
-    directConversations,
-    favoriteConversations,
-    channelConversations,
-    isChannelsEnabled,
-    channelAndGroupConversations,
-    draftConversations,
-    searchInputPlaceholders: {
-      searchConversations: translate('searchConversations'),
-      searchGroupConversations: translate('searchGroupConversations'),
-      searchChannelConversations: translate('searchChannelConversations'),
-      searchDirectConversations: translate('searchDirectConversations'),
-      searchFavoriteConversations: translate('searchFavoriteConversations'),
-      searchArchivedConversations: translate('searchArchivedConversations'),
-      searchUnreadConversations: translate('searchUnreadConversations'),
-      searchMentionsConversations: translate('searchMentionsConversations'),
-      searchRepliesConversations: translate('searchRepliesConversations'),
-      searchDraftsConversations: translate('searchDraftsConversations'),
-      searchPingsConversations: translate('searchPingsConversations'),
-    },
-  });
+  const searchInputPlaceholders = {
+    searchConversations: translate('searchConversations'),
+    searchGroupConversations: translate('searchGroupConversations'),
+    searchChannelConversations: translate('searchChannelConversations'),
+    searchDirectConversations: translate('searchDirectConversations'),
+    searchFavoriteConversations: translate('searchFavoriteConversations'),
+    searchArchivedConversations: translate('searchArchivedConversations'),
+    searchUnreadConversations: translate('searchUnreadConversations'),
+    searchMentionsConversations: translate('searchMentionsConversations'),
+    searchRepliesConversations: translate('searchRepliesConversations'),
+    searchDraftsConversations: translate('searchDraftsConversations'),
+    searchPingsConversations: translate('searchPingsConversations'),
+  };
+
+  type GetTabConversationsForFilterResult = {conversations: Conversation[]; searchInputPlaceholder: string};
+  const getTabConversationsForFilter = (filter: string): GetTabConversationsForFilterResult => {
+    return getTabConversations({
+      currentTab,
+      conversations,
+      conversationsFilter: filter,
+      archivedConversations,
+      groupConversations,
+      directConversations,
+      favoriteConversations,
+      channelConversations,
+      isChannelsEnabled,
+      channelAndGroupConversations,
+      draftConversations,
+      searchInputPlaceholders,
+    });
+  };
+  const {conversations: currentTabConversations, searchInputPlaceholder} =
+    getTabConversationsForFilter(conversationsFilter);
 
   const currentFolder = labels
     .map(label => {
@@ -303,6 +317,35 @@ export const Conversations = ({
     groupParticipantsConversations,
     isGroupParticipantsVisible,
   ]);
+  const hasSearchTabResult = (query: string): boolean => {
+    const queryConversations = getTabConversationsForFilter(query).conversations;
+    const queryGroupParticipants = getGroupParticipantsConversations({
+      currentTab,
+      conversationRepository,
+      searchRepository,
+      conversationsFilter: query,
+      favoriteConversations,
+      conversations: queryConversations,
+      currentFolder,
+      archivedConversations,
+    });
+    const isQueryGroupParticipantsVisible =
+      isNonEmptyString(query) &&
+      ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
+      queryGroupParticipants.length > 0;
+
+    return (
+      getConversationFocusCandidates({
+        conversations: queryConversations,
+        conversationsFilter: query,
+        currentFolder,
+        currentTab,
+        groupParticipantsConversations: queryGroupParticipants,
+        isGroupParticipantsVisible: isQueryGroupParticipantsVisible,
+      }).length > 0
+    );
+  };
+
   const {
     currentFocus,
     focusMountedConversation,
@@ -343,7 +386,7 @@ export const Conversations = ({
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CONVERSATION_LIST_UNCOLLAPSE);
   }, [isConversationListCollapsed, setConversationListStatus]);
 
-  const toggleConversationList = () => {
+  const toggleConversationList = (): void => {
     const willCollapse = conversationListStatus === ConversationListStatus.EXPANDED;
     setConversationListStatus(willCollapse ? ConversationListStatus.COLLAPSED : ConversationListStatus.EXPANDED);
     amplify.publish(
@@ -353,7 +396,7 @@ export const Conversations = ({
   };
 
   useEffect(() => {
-    const handleConversationShow = (conversation?: Conversation) => {
+    const handleConversationShow = (conversation?: Conversation): void => {
       if (isNullOrUndefined(conversation)) {
         return;
       }
@@ -396,8 +439,54 @@ export const Conversations = ({
     };
   }, [activeConversation, openFolder]);
 
+  const onSearch = useCallback(
+    (searchValue: string) => {
+      setConversationsFilter(searchValue);
+      conversationListRef?.scrollTo(0, 0);
+    },
+    [conversationListRef],
+  );
+
+  const activateSearchResult = useCallback(
+    (event: ReactKeyBoardEvent<HTMLInputElement>) => {
+      const firstResult = conversationsForFocus[0];
+      if (isNullOrUndefined(firstResult)) {
+        return false;
+      }
+
+      createNavigateKeyboard(generateConversationUrl(firstResult.qualifiedId), true)(event);
+      scrollToConversation(firstResult.id);
+      return true;
+    },
+    [conversationsForFocus],
+  );
+
+  const focusSearchResult = useCallback(
+    (event: ReactKeyBoardEvent<HTMLInputElement>) => {
+      const firstResult = conversationsForFocus[0];
+      if (!isNonEmptyString(conversationsFilter) || isNullOrUndefined(firstResult)) {
+        return;
+      }
+
+      const wasMounted = focusMountedConversation(firstResult.id);
+      const wasFocused = wasMounted || focusConversation(firstResult.id);
+      if (wasFocused === false) {
+        return;
+      }
+
+      event.preventDefault();
+      if (wasMounted) {
+        setCurrentFocus(firstResult.id);
+      }
+    },
+    [conversationsFilter, conversationsForFocus, focusConversation, focusMountedConversation, setCurrentFocus],
+  );
+
   const clearConversationFilter = useCallback(() => {
-    return setConversationsFilter('');
+    setConversationsFilter('');
+    setSearchResetToken(previous => {
+      return previous + 1;
+    });
   }, []);
 
   const switchList = listViewModel.switchList;
@@ -464,7 +553,7 @@ export const Conversations = ({
   );
 
   useEffect(() => {
-    const openFavorites = () => {
+    const openFavorites = (): void => {
       return changeTab(SidebarTabs.FAVORITES);
     };
     conversationLabelRepository.addEventListener('conversation-favorited', openFavorites);
@@ -502,51 +591,6 @@ export const Conversations = ({
       }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
     },
     [listViewModel, setCurrentView],
-  );
-
-  const handleEnterSearchClick = useCallback(
-    (event: ReactKeyBoardEvent<HTMLDivElement>) => {
-      const firstFoundConversation = conversationsForFocus?.[0];
-
-      if (!isNullOrUndefined(firstFoundConversation)) {
-        createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
-        setConversationsFilter('');
-        scrollToConversation(firstFoundConversation.id);
-      }
-    },
-    [conversationsForFocus],
-  );
-
-  const handleSearchTab = useCallback(
-    (event: ReactKeyBoardEvent<HTMLInputElement>) => {
-      cancelPendingFocusRef.current?.();
-      const firstResult = conversationsForFocus[0];
-
-      if (!isNonEmptyString(conversationsFilter) || isNullOrUndefined(firstResult)) {
-        return;
-      }
-
-      const wasMounted = focusMountedConversation(firstResult.id);
-      const wasFocused = wasMounted || focusConversation(firstResult.id);
-
-      if (wasFocused === false) {
-        return;
-      }
-
-      event.preventDefault();
-      if (wasMounted) {
-        setCurrentFocus(firstResult.id);
-      }
-    },
-    [conversationsFilter, conversationsForFocus, focusConversation, focusMountedConversation, setCurrentFocus],
-  );
-
-  const onSearch = useCallback(
-    (searchValue: string) => {
-      setConversationsFilter(searchValue);
-      conversationListRef?.scrollTo(0, 0);
-    },
-    [conversationListRef],
   );
 
   const jumpToRecentSearch = useCallback(() => {
@@ -624,15 +668,20 @@ export const Conversations = ({
         id="conversations"
         headerElement={
           <ConversationHeader
+            key={`${currentTab}:${currentFolder?.id ?? ''}:${searchResetToken}`}
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
             showSearchInput={(showSearchInput && hasVisibleConversations) || isNonEmptyString(conversationsFilter)}
             searchValue={conversationsFilter}
-            setSearchValue={onSearch}
+            onSearchChange={onSearch}
             searchInputPlaceholder={searchInputPlaceholder}
-            onSearchEnterClick={handleEnterSearchClick}
-            onSearchTab={handleSearchTab}
+            onSearchEnterClick={activateSearchResult}
+            onSearchTab={focusSearchResult}
+            hasSearchTabResult={hasSearchTabResult}
+            onBeforeSearchTab={() => {
+              return cancelPendingFocusRef.current?.();
+            }}
             jumpToRecentSearch={jumpToRecentSearch}
             searchInputRef={searchInputRef}
             isListCollapsed={isConversationListCollapsed}

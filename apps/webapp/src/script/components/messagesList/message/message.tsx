@@ -17,31 +17,31 @@
  *
  */
 
-import React, {useLayoutEffect, useRef, useEffect} from 'react';
+import React, {useLayoutEffect, useRef, useEffect, type FunctionComponent} from 'react';
 
 import {isFunction, isNull} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {InViewport} from 'Components/inViewport';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {DecryptErrorMessage} from 'Repositories/entity/message/decryptErrorMessage';
-import type {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
-import {Message as BaseMessage} from 'Repositories/entity/message/message';
-import type {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {TeamState} from 'Repositories/team/TeamState';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
-import {isTabKey} from 'Util/keyboardUtil';
-
 import {ElementType, MessageDetails} from './contentMessage/asset/textMessageRenderer';
 import {MessageWrapper} from './messageWrapper';
 import {ScrollToElement} from './types';
 import {useMessageFocusedTabIndex} from './util';
+
+import type {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import type {Conversation} from '../../../repositories/entity/Conversation';
+import type {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import type {DecryptErrorMessage} from '../../../repositories/entity/message/decryptErrorMessage';
+import type {MemberMessage as MemberMessageEntity} from '../../../repositories/entity/message/memberMessage';
+import {Message as BaseMessage} from '../../../repositories/entity/message/message';
+import type {User} from '../../../repositories/entity/User';
+import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {TeamState} from '../../../repositories/team/TeamState';
+import type {UserRepository} from '../../../repositories/user/userRepository';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {getAllFocusableElements, setElementsTabIndex} from '../../../util/focusUtil';
+import {isTabKey} from '../../../util/keyboardUtil';
+import {InViewport} from '../../inViewport';
 
 export interface MessageActions {
   onClickAvatar: (user: User | ServiceEntity) => void;
@@ -85,7 +85,9 @@ export interface MessageParams extends MessageActions {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
 
-export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => {
+export const Message: FunctionComponent<MessageParams & {scrollTo?: ScrollToElement}> = (
+  props: MessageParams & {scrollTo?: ScrollToElement},
+) => {
   const {
     message,
     isHighlighted,
@@ -114,7 +116,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
     }
   }, [isHighlighted]);
 
-  const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
     // when a message is focused set its elements focusable
     if (!event.shiftKey && isTabKey(event)) {
       if (isNull(messageElementRef.current)) {

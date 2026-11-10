@@ -17,7 +17,8 @@
  *
  */
 
-import {Encoder, Decoder} from 'bazinga64';
+import {Encoder} from '@wireapp/commons/lib/base64/encoder';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 
 import {SystemCrypto, wrapSystemCrypto} from './systemCryptoWrapper';
 

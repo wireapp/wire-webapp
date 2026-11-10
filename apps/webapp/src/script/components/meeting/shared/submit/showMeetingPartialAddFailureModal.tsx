@@ -19,19 +19,19 @@
 
 import {isEmptyArray, isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {AddUsersFailure, AddUsersFailureReasons} from '../../../../core/conversation';
+import type {User} from '../../../../repositories/entity/User';
+import type {Translate, TranslationKey} from '../../../../util/localizerUtil';
+import {matchQualifiedIds} from '../../../../util/qualifiedId';
+import {PrimaryModal} from '../../../Modals/PrimaryModal';
 import type {
   PrimaryModalTranslatedCompatibilityReplacement,
   PrimaryModalTranslatedMessage,
   PrimaryModalTranslatedTranslation,
   PrimaryModalTranslatedValue,
-} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {getUserNameWithTranslate} from 'Components/UserName';
-import type {User} from 'Repositories/entity/User';
-import type {Translate, TranslationKey} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+} from '../../../Modals/PrimaryModal/PrimaryModalTypes';
+import {getUserNameWithTranslate} from '../../../UserName';
 
 const singularTranslationKeyByReason = {
   [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'failedToAddParticipantSingularNonFederatingBackends',

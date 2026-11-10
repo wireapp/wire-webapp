@@ -17,9 +17,9 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {connectWithUser, createGroup} from '../../utils/userActions';
 
 import {expect, test, withLogin} from '../../test.fixtures';
 

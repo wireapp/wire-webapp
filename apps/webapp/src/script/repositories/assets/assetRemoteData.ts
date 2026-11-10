@@ -18,8 +18,9 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {AssetUrlData} from '@wireapp/core/lib/conversation/assetService/assetService';
 import {noop} from 'noop-esm';
+
+import {AssetUrlData} from '../../core/conversation/assetService/assetService';
 
 /**
  * Callback function that receives download progress updates.
@@ -33,7 +34,6 @@ export type AssetRemoteDataParams = {
   otrKey?: Uint8Array;
   sha256?: Uint8Array;
   assetToken?: string;
-  forceCaching?: boolean;
 };
 
 /**
@@ -43,7 +43,6 @@ export class AssetRemoteData {
   public cancelDownload: () => void = noop;
   private progress: number = 0;
   private progressCallback?: ProgressCallback;
-  public readonly forceCaching: boolean;
   private readonly assetKey: string;
   private readonly assetDomain: string;
   public readonly otrKey?: Uint8Array;
@@ -58,7 +57,6 @@ export class AssetRemoteData {
    * @param otrKey - Optional OTR encryption key for decrypting the asset
    * @param sha256 - Optional SHA-256 hash for integrity verification
    * @param assetToken - Optional authentication token for accessing the asset
-   * @param forceCaching - Whether to force caching of the asset (default: false)
    */
   constructor(params: AssetRemoteDataParams) {
     this.assetKey = params.assetKey;
@@ -66,7 +64,6 @@ export class AssetRemoteData {
     this.otrKey = params.otrKey;
     this.sha256 = params.sha256;
     this.assetToken = params.assetToken;
-    this.forceCaching = params.forceCaching ?? false;
   }
 
   /**
@@ -77,7 +74,6 @@ export class AssetRemoteData {
       assetKey: this.assetKey,
       assetToken: this.assetToken,
       assetDomain: this.assetDomain,
-      forceCaching: this.forceCaching,
     };
   }
 

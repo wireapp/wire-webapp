@@ -17,12 +17,7 @@
  *
  */
 
-import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
-
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {openFolder} from 'Components/conversation/conversationCells/common/openFolder/openFolder';
-import {CellFile, CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {getFileExtension} from 'Util/util';
+import type {FunctionComponent} from 'react';
 
 import {
   desktopNameStyles,
@@ -33,6 +28,12 @@ import {
   wrapperStyles,
 } from './cellsTableNameColumn.styles';
 
+import {CellFile, CellNode, CellNodeType} from '../../../../../../types/cellNode';
+import {FolderIcon} from '../../../../../../uiKit/dataDisplay/icon/files/folderIcon';
+import {PlayIcon} from '../../../../../../uiKit/dataDisplay/icon/playIcon';
+import {getFileExtension} from '../../../../../../util/util';
+import {FileTypeIcon} from '../../../../common/fileTypeIcon/fileTypeIcon';
+import {openFolder} from '../../../common/openFolder/openFolder';
 import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
 interface CellsTableNameColumnProps {
@@ -40,7 +41,10 @@ interface CellsTableNameColumnProps {
   onCloseSearchView?: () => void;
 }
 
-export const CellsTableNameColumn = ({node, onCloseSearchView}: CellsTableNameColumnProps) => {
+export const CellsTableNameColumn: FunctionComponent<CellsTableNameColumnProps> = ({
+  node,
+  onCloseSearchView,
+}: CellsTableNameColumnProps) => {
   return (
     <>
       <span css={mobileNameStyles}>{node.name}</span>
@@ -55,7 +59,7 @@ export const CellsTableNameColumn = ({node, onCloseSearchView}: CellsTableNameCo
   );
 };
 
-const FileNameColumn = ({file}: {file: CellFile}) => {
+const FileNameColumn: FunctionComponent<{file: CellFile}> = ({file}: {file: CellFile}) => {
   const {id, handleOpenFile, selectedFile} = useCellsFilePreviewModal();
 
   const isImage = file.mimeType?.startsWith('image') === true;
@@ -91,15 +95,11 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
   );
 };
 
-const FolderNameColumn = ({
-  name,
-  path,
-  onCloseSearchView,
-}: {
+const FolderNameColumn: FunctionComponent<{
   name: string;
   path: string;
   onCloseSearchView?: () => void;
-}) => {
+}> = ({name, path, onCloseSearchView}: {name: string; path: string; onCloseSearchView?: () => void}) => {
   return (
     <>
       <FolderIcon width={24} height={24} />

@@ -91,7 +91,6 @@ export class AssetAPI {
   private getAssetShared(
     assetUrl: string,
     token?: string | null,
-    forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
   ): RequestCancelable<AssetResponse> {
     if (token !== null && token !== undefined && token.length > 0 && !isValidToken(token)) {
@@ -114,10 +113,6 @@ export class AssetAPI {
 
     if (token !== null && token !== undefined && token.length > 0) {
       config.params.asset_token = token;
-    }
-
-    if (forceCaching) {
-      config.params.forceCaching = forceCaching;
     }
 
     const handleRequest = async (): Promise<AssetResponse> => {
@@ -171,11 +166,12 @@ export class AssetAPI {
     }
 
     const metadata = JSON.stringify(metadataObject);
+    const metadataByteLength = new TextEncoder().encode(metadata).length;
 
     const body =
       `--${BOUNDARY}\r\n` +
       'Content-Type: application/json;charset=utf-8\r\n' +
-      `Content-length: ${metadata.length}\r\n` +
+      `Content-length: ${metadataByteLength}\r\n` +
       '\r\n' +
       `${metadata}\r\n` +
       `--${BOUNDARY}\r\n` +
@@ -230,14 +226,13 @@ export class AssetAPI {
     assetId: string,
     assetDomain: string,
     token?: string | null,
-    forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
-  ) {
+  ): RequestCancelable<AssetResponse> {
     if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
-    const isValidDomain = (domain: string) => {
+    const isValidDomain = (domain: string): boolean => {
       return !!Boolean(domain) && /^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-zA-Z]{2,}$/.test(domain);
     };
 
@@ -245,21 +240,21 @@ export class AssetAPI {
       throw new TypeError(`Invalid asset domain ${assetDomain}`);
     }
 
-    return this.getAssetShared(`/assets/${assetDomain}/${assetId}`, token, forceCaching, progressCallback);
+    return this.getAssetShared(`/assets/${assetDomain}/${assetId}`, token, progressCallback);
   }
 
   getServiceAsset(
     assetId: string,
     token?: string | null,
-    forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
-  ) {
+  ): RequestCancelable<AssetResponse> {
     if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
     const assetBaseUrl = `/bot/assets/${assetId}`;
-    return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
+
+    return this.getAssetShared(assetBaseUrl, token, progressCallback);
   }
 
   /**
@@ -269,11 +264,19 @@ export class AssetAPI {
    * @param options?
    * @param progressCallback? Will be called at every progress of the upload
    */
-  postAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
+  postAsset(
+    asset: Uint8Array,
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetUploadData> {
     return this.postAssetShared('/assets', asset, options, progressCallback);
   }
 
-  postServiceAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
+  postServiceAsset(
+    asset: Uint8Array,
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetUploadData> {
     return this.postAssetShared('/bot/assets', asset, options, progressCallback);
   }
 }

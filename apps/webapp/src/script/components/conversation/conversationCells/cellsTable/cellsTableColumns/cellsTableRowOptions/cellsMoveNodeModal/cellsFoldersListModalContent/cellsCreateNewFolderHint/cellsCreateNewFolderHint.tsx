@@ -17,17 +17,21 @@
  *
  */
 
-import {Button, ButtonVariant, PlusIcon} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {buttonStyles, iconStyles, textStyles, wrapperStyles} from './cellsCreateNewFolderHint.styles';
+
+import {useApplicationContext} from '../../../../../../../../../page/rootProvider';
+import {PlusIcon} from '../../../../../../../../../uiKit/dataDisplay/icon/plusIcon';
+import {Button, ButtonVariant} from '../../../../../../../../../uiKit/inputs/button/button';
 
 interface CellsCreateNewFolderHintProps {
   onCreate: () => void;
 }
 
-export const CellsCreateNewFolderHint = ({onCreate}: CellsCreateNewFolderHintProps) => {
+export const CellsCreateNewFolderHint: FunctionComponent<CellsCreateNewFolderHintProps> = ({
+  onCreate,
+}: CellsCreateNewFolderHintProps) => {
   const {translate} = useApplicationContext();
 
   return (

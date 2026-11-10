@@ -17,11 +17,13 @@
  *
  */
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {textStyles, wrapperStyles} from './cellsFolderListEmpty.styles';
 
-export const CellsFolderListEmpty = () => {
+import {useApplicationContext} from '../../../../../../../../../page/rootProvider';
+
+export const CellsFolderListEmpty: FunctionComponent = () => {
   const {translate} = useApplicationContext();
 
   return (

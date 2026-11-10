@@ -17,14 +17,10 @@
  *
  */
 
-import {useId} from 'react';
+import {useId, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-
-import {Ciphersuite} from '@wireapp/core';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   titleStyles,
@@ -35,13 +31,16 @@ import {
   protocolValueStyles,
 } from './conversationProtocolDetails.styles';
 
+import {Ciphersuite} from '../../../core';
+import {useApplicationContext} from '../../../page/rootProvider';
+
 interface ConversationProtocolDetailsProps {
   protocol: CONVERSATION_PROTOCOL;
   cipherSuite?: number;
   onProtocolActivated?: () => void;
 }
 
-export const ConversationProtocolDetails = ({
+export const ConversationProtocolDetails: FunctionComponent<ConversationProtocolDetailsProps> = ({
   protocol,
   cipherSuite,
   onProtocolActivated,

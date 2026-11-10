@@ -17,13 +17,24 @@
  *
  */
 
-import {type FormEvent, useMemo, useRef} from 'react';
+import {type FormEvent, useMemo, useRef, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, CallIcon, CloseIcon} from '@wireapp/react-ui-kit';
+import {MEET_NOW_FORM_ID, MeetNowForm} from './meetNowForm';
+import {meetNowModalWrapperStyles} from './meetNowModal.styles';
+import {wasMeetNowMeetingCreated} from './meetNowTypes';
+import {hasMeetNowFormErrors, useMeetNowModal} from './useMeetNowModal';
+import {useMeetNowSubmit} from './useMeetNowSubmit';
 
+import {useApplicationContext} from '../../../page/rootProvider';
+import {UserState} from '../../../repositories/user/userState';
+import {CallIcon} from '../../../uiKit/dataDisplay/icon/callIcon';
+import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {handleEscDown} from '../../../util/keyboardUtil';
+import {ModalComponent} from '../../Modals/ModalComponent';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -34,19 +45,9 @@ import {
   submitButtonIconStyles,
   submitButtonStyles,
   wrapperStyles,
-} from 'Components/meeting/shared/styles/meetingModalShell.styles';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown} from 'Util/keyboardUtil';
+} from '../shared/styles/meetingModalShell.styles';
 
-import {MEET_NOW_FORM_ID, MeetNowForm} from './meetNowForm';
-import {meetNowModalWrapperStyles} from './meetNowModal.styles';
-import {wasMeetNowMeetingCreated} from './meetNowTypes';
-import {hasMeetNowFormErrors, useMeetNowModal} from './useMeetNowModal';
-import {useMeetNowSubmit} from './useMeetNowSubmit';
-
-export const MeetNowModal = () => {
+export const MeetNowModal: FunctionComponent = () => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {
     isOpen,
@@ -75,12 +76,12 @@ export const MeetNowModal = () => {
     return isUndefined(errors.passwordConfirmation) ? undefined : translate(errors.passwordConfirmation);
   }, [errors.passwordConfirmation, translate]);
 
-  const dismissModal = () => {
+  const dismissModal = (): void => {
     close();
     reset();
   };
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     if (isSubmitting) {
       return;
     }
@@ -89,7 +90,7 @@ export const MeetNowModal = () => {
     dismissModal();
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
     const validationErrors = validate();

@@ -17,6 +17,8 @@
  *
  */
 
+import {isEmptyArray} from '@sindresorhus/is';
+
 /**
  * Wraps mentions in a given text with a <mention> tag.
  * It's useful cause it sets the mentions apart from the rest of the text.
@@ -31,4 +33,3 @@ export const wrapMentionsWithTags = (text: string, allMentions: string[]): strin
     return updatedText.split(mention).join(`<mention>${mention}</mention>`);
   }, text);
 };
-import {isEmptyArray} from '@sindresorhus/is';

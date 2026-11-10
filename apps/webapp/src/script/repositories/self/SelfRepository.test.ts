@@ -23,19 +23,28 @@ import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-c
 import {UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {ClientEntity} from 'Repositories/client';
-import {TestFactory} from 'test/helper/TestFactory';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {ClientEntity} from '../client';
+import {TestFactory} from '../../../../test/helper/TestFactory';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 import {SelfRepository} from './SelfRepository';
 import * as SelfSupportedProtocols from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {Core} from '../../service/coreSingleton';
+import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 
-const testFactory = new TestFactory();
+let testFactory: TestFactory;
 
-const generateMLSFeatureConfig = (supportedProtocols: CONVERSATION_PROTOCOL[]) => {
+type MLSFeatureConfig = {
+  allowedCipherSuites: number[];
+  defaultCipherSuite: number;
+  defaultProtocol: CONVERSATION_PROTOCOL;
+  protocolToggleUsers: string[];
+  supportedProtocols: CONVERSATION_PROTOCOL[];
+};
+
+const generateMLSFeatureConfig = (supportedProtocols: CONVERSATION_PROTOCOL[]): MLSFeatureConfig => {
   return {
     allowedCipherSuites: [1],
     defaultCipherSuite: 1,
@@ -46,6 +55,22 @@ const generateMLSFeatureConfig = (supportedProtocols: CONVERSATION_PROTOCOL[]) =
 };
 
 describe('SelfRepository', () => {
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
+  beforeEach(() => {
+    testFactory = new TestFactory(
+      createCoreTestFixture({
+        recurringTaskScheduler: {registerTask: jest.fn(), cancelTask: jest.fn()},
+        service: {client: {deleteClient: jest.fn()}, self: {putSupportedProtocols: jest.fn()}},
+      }),
+    );
+  });
+
+  afterEach(() => {
+    container.clearInstances();
+  });
   describe('initialisePeriodicSelfSupportedProtocolsCheck', () => {
     beforeAll(() => {
       jest.useFakeTimers();

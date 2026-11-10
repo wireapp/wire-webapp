@@ -17,9 +17,11 @@
  *
  */
 
-import {Bold} from '@wireapp/react-ui-kit';
+import type {FunctionComponent} from 'react';
 
 import {listStyles, numberActiveStyles, numberStyles} from './cellsPageList.styles';
+
+import {Bold} from '../../../../../uiKit/typography/text/text';
 
 interface CellsPageListProps {
   currentPage?: number;
@@ -31,7 +33,11 @@ const VISIBLE_PAGES_AROUND_CURRENT = 1;
 const VISIBLE_PAGES_AT_EDGES = 1;
 const MIN_PAGES_FOR_ELLIPSIS = 1;
 
-export const CellsPageList = ({currentPage = 0, numberOfPages = 1, goToPage}: CellsPageListProps) => {
+export const CellsPageList: FunctionComponent<CellsPageListProps> = ({
+  currentPage = 0,
+  numberOfPages = 1,
+  goToPage,
+}: CellsPageListProps) => {
   const lastPageIndex = numberOfPages - 1;
 
   const normalizedCurrent = Math.min(
@@ -47,30 +53,39 @@ export const CellsPageList = ({currentPage = 0, numberOfPages = 1, goToPage}: Ce
 
   return (
     <ul css={listStyles}>
-      {/* eslint-disable-next-line id-length */}
-      {Array.from({length: numberOfPages}, (_, index) => {
-        const isFirstOrLastPage = index === 0 || index === lastPageIndex;
-        const isBeforeCurrent = index === visibleStart - 1;
-        const isAfterCurrent = index === visibleEnd + 1;
-        const isInVisibleRange = index >= visibleStart && index <= visibleEnd;
+      {Array.from({length: numberOfPages}, (arrayElement, pageIndex) => {
+        const isFirstOrLastPage = pageIndex === 0 || pageIndex === lastPageIndex;
+        const isBeforeCurrent = pageIndex === visibleStart - 1;
+        const isAfterCurrent = pageIndex === visibleEnd + 1;
+        const isInVisibleRange = pageIndex >= visibleStart && pageIndex <= visibleEnd;
 
         if (isFirstOrLastPage) {
           return (
-            <PaginationPageNumber key={index} pageIndex={index} isCurrent={currentPage === index} goToPage={goToPage} />
+            <PaginationPageNumber
+              key={pageIndex}
+              pageIndex={pageIndex}
+              isCurrent={currentPage === pageIndex}
+              goToPage={goToPage}
+            />
           );
         }
 
         if (isBeforeCurrent && pagesBeforeCurrent > MIN_PAGES_FOR_ELLIPSIS) {
-          return <PaginationEllipsis key={`dots-start-${index}`} />;
+          return <PaginationEllipsis key={`dots-start-${pageIndex}`} />;
         }
 
         if (isAfterCurrent && pagesAfterCurrent > MIN_PAGES_FOR_ELLIPSIS) {
-          return <PaginationEllipsis key={`dots-end-${index}`} />;
+          return <PaginationEllipsis key={`dots-end-${pageIndex}`} />;
         }
 
         if (isInVisibleRange) {
           return (
-            <PaginationPageNumber key={index} pageIndex={index} isCurrent={currentPage === index} goToPage={goToPage} />
+            <PaginationPageNumber
+              key={pageIndex}
+              pageIndex={pageIndex}
+              isCurrent={currentPage === pageIndex}
+              goToPage={goToPage}
+            />
           );
         }
 
@@ -86,7 +101,11 @@ interface PaginationPageNumberProps {
   goToPage: (pageIndex: number) => void;
 }
 
-const PaginationPageNumber = ({pageIndex, isCurrent, goToPage}: PaginationPageNumberProps) => {
+const PaginationPageNumber: FunctionComponent<PaginationPageNumberProps> = ({
+  pageIndex,
+  isCurrent,
+  goToPage,
+}: PaginationPageNumberProps) => {
   const pageNumber = pageIndex + 1;
 
   if (isCurrent) {
@@ -115,7 +134,7 @@ const PaginationPageNumber = ({pageIndex, isCurrent, goToPage}: PaginationPageNu
   );
 };
 
-const PaginationEllipsis = () => {
+const PaginationEllipsis: FunctionComponent = () => {
   return (
     <li>
       <Bold css={numberStyles}>...</Bold>

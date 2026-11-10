@@ -19,30 +19,37 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes} from 'http-status-codes';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {SelfService} from 'Repositories/self/SelfService';
-import {TeamService} from 'Repositories/team/TeamService';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {generateUser} from 'test/helper/UserGenerator';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {Conversation} from '../entity/Conversation';
+import {SelfService} from '../self/SelfService';
+import {TeamService} from '../team/TeamService';
+import {UserRepository} from '../user/userRepository';
+import {generateUser} from '../../../../test/helper/UserGenerator';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
+import {createUuid} from '../../util/uuid';
 
 import {ConnectionEntity} from './connectionEntity';
 import {ConnectionRepository} from './connectionRepository';
+import type {User} from '../entity/User';
 import {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-function buildConnectionRepository(translate: Translate) {
+function buildConnectionRepository(translate: Translate): readonly [
+  ConnectionRepository,
+  {
+    readonly connectionState: ConnectionState;
+    readonly userRepository: UserRepository;
+    readonly connectionService: ConnectionService;
+  },
+] {
   const connectionState = new ConnectionState();
   const connectionService = new ConnectionService();
   const selfService = new SelfService();
@@ -54,7 +61,7 @@ function buildConnectionRepository(translate: Translate) {
   ] as const;
 }
 
-function createConnection() {
+function createConnection(): User {
   const user = generateUser();
   const connection = new ConnectionEntity();
   connection.userId = user.qualifiedId;
@@ -102,7 +109,7 @@ describe('ConnectionRepository', () => {
 
       connectionRepository.addConnectionEntity(requireValueForTest(user.connection()));
 
-      jest.spyOn(userRepository, 'refreshUser').mockImplementationOnce(async (uid: QualifiedId) => {
+      jest.spyOn(userRepository, 'refreshUser').mockImplementationOnce(async () => {
         user.isDeleted = true;
         return user;
       });

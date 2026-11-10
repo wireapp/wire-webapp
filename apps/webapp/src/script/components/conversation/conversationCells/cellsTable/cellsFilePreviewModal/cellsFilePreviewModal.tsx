@@ -17,10 +17,11 @@
  *
  */
 
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
+import type {FunctionComponent} from 'react';
 
+import type {Conversation} from '../../../../../repositories/entity/Conversation';
+import {getFileTypeFromExtension} from '../../../../../util/getFileTypeFromExtension/getFileTypeFromExtension';
+import {FileFullscreenModal} from '../../../../FileFullscreenModal/FileFullscreenModal';
 import {sortTagsAlphabetically} from '../../common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
@@ -30,7 +31,9 @@ interface CellsFilePreviewModalProps {
 
 // This component is duplicated across global view and conversation view
 // TODO: Abstract when it starts to grow / feels right
-export const CellsFilePreviewModal = ({sourceConversation}: CellsFilePreviewModalProps) => {
+export const CellsFilePreviewModal: FunctionComponent<CellsFilePreviewModalProps> = ({
+  sourceConversation,
+}: CellsFilePreviewModalProps) => {
   const {selectedFile, handleCloseFile, isEditMode} = useCellsFilePreviewModal();
   const isModalOpen = selectedFile !== null;
 
@@ -41,7 +44,7 @@ export const CellsFilePreviewModal = ({sourceConversation}: CellsFilePreviewModa
   const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags, conversationName} =
     selectedFile;
 
-  const getFileUrl = () => {
+  const getFileUrl = (): string | undefined => {
     const type = getFileTypeFromExtension(extension);
 
     if (['pdf', 'image'].includes(type)) {

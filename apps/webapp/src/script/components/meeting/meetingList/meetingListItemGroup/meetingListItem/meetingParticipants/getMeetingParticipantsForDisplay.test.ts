@@ -17,12 +17,12 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {User} from '../../../../../../repositories/entity/User';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 import {getMeetingParticipantsForDisplay} from './getMeetingParticipantsForDisplay';
 
-const createUser = (id: string, name: string) => {
+const createUser = (id: string, name: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(name);
   return user;

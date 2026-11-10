@@ -23,13 +23,13 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {GifImage} from './gifImage';
 
-import {GifImage} from 'Components/giphy/gifImage';
-import * as Icon from 'Components/icon';
-import {Gif, GiphyRepository} from 'Repositories/extension/GiphyRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useApplicationContext} from '../../page/rootProvider';
+import {Gif, GiphyRepository} from '../../repositories/extension/GiphyRepository';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {WebAppEvents} from '../../webAppEvents';
+import * as Icon from '../icon';
 
 const GIPHY_CLOSE_TIMEOUT = 350;
 
@@ -110,11 +110,11 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
     [giphyRepository, isErrorState],
   );
 
-  const onGridClick = async () => {
+  const onGridClick = async (): Promise<void> => {
     return getGifs(currentQuery);
   };
 
-  const onBackClick = () => {
+  const onBackClick = (): void => {
     if (currentGif !== null) {
       setGifs([currentGif]);
       setSelectedGif(currentGif);
@@ -122,7 +122,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
     }
   };
 
-  const onCloseClick = () => {
+  const onCloseClick = (): void => {
     requestAnimationFrame(() => {
       return setPlayAnimation(false);
     });
@@ -141,7 +141,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
     [getGifs],
   );
 
-  const getRandomGif = async () => {
+  const getRandomGif = async (): Promise<void> => {
     if (isErrorState) {
       return;
     }
@@ -159,7 +159,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
     }
   };
 
-  const onSend = () => {
+  const onSend = (): void => {
     if (selectedGif !== null) {
       amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SEND, selectedGif.animated, currentQuery);
       setSelectedGif(null);
@@ -265,7 +265,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
               </div>
             )}
 
-            {isErrorState && (
+            {(isErrorState || noSearchResults) && (
               <div className="gif-container-error">
                 <span className="gif-container-error-message" data-uie-name="giphy-error-message">
                   {translate('extensionsGiphyNoGifs')}

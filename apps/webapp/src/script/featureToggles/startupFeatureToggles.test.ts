@@ -24,27 +24,108 @@ import {
 } from './startupFeatureToggles';
 import {
   applockRefactoredFeatureToggleName,
+  callSecurityLineFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
-  sharedDriveDirectUploadFeatureToggleName,
+  driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
+  troubleshooterFeatureToggleName,
+  sendCallLogsFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
+  callSecurityLineFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
-  sharedDriveDirectUploadFeatureToggleName,
+  driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
+  troubleshooterFeatureToggleName,
+  sendCallLogsFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
+  it.each(['?enabled-features', '?enabled-features=', '?enabled-features=%20%2C%20'])(
+    'resolves an explicit empty selection to no enabled features: %s',
+    locationSearch => {
+      const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
+
+      expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+    },
+  );
+
   it('returns disabled toggles when the query parameter is missing', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar');
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(false);
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+  });
+
+  it('keeps the troubleshooter disabled by default', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch('');
+
+    expect(toggles.isFeatureToggleEnabled(troubleshooterFeatureToggleName)).toBe(false);
+  });
+
+  it('keeps the call security line disabled by default', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch('');
+
+    expect(toggles.isFeatureToggleEnabled(callSecurityLineFeatureToggleName)).toBe(false);
+  });
+
+  it('enables the call security line when selected in developer settings', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${callSecurityLineFeatureToggleName}`,
+    );
+
+    expect(toggles.isFeatureToggleEnabled(callSecurityLineFeatureToggleName)).toBe(true);
+  });
+
+  it('enables the troubleshooter when selected in developer settings', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${troubleshooterFeatureToggleName}`,
+    );
+
+    expect(toggles.isFeatureToggleEnabled(troubleshooterFeatureToggleName)).toBe(true);
+  });
+
+  it('keeps sending call logs disabled by default and enables it through developer settings', () => {
+    expect(
+      createStartupFeatureTogglesFromLocationSearch('').isFeatureToggleEnabled(sendCallLogsFeatureToggleName),
+    ).toBe(false);
+    const enabled = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${sendCallLogsFeatureToggleName}`,
+    );
+    expect(enabled.isFeatureToggleEnabled(sendCallLogsFeatureToggleName)).toBe(true);
+  });
+
+  it('keeps Drive bulk actions disabled by default', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('');
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(false);
+  });
+
+  it('enables Drive bulk actions when selected in developer settings', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(true);
+  });
+
+  it('keeps Drive bulk restore disabled until its separate toggle is enabled', () => {
+    const bulkActionsOnly = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName}`,
+    );
+    const bulkActionsWithRestore = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName},${driveBulkRestoreFeatureToggleName}`,
+    );
+
+    expect(bulkActionsOnly.isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName)).toBe(false);
+    expect(bulkActionsWithRestore.isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName)).toBe(true);
   });
 
   it('enables a whitelisted feature toggle when present in the query parameter', () => {
@@ -122,14 +203,6 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(disableMessagePreprocessingFeatureToggleName)).toBe(true);
   });
 
-  it('enables the shared drive direct upload feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${sharedDriveDirectUploadFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName)).toBe(true);
-  });
-
   it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${applockRefactoredFeatureToggleName} `,
@@ -169,10 +242,14 @@ describe('startupFeatureToggles', function () {
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       applockRefactoredFeatureToggleName,
+      callSecurityLineFeatureToggleName,
       conversationListCollapseFeatureToggleName,
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
-      sharedDriveDirectUploadFeatureToggleName,
+      driveBulkActionsFeatureToggleName,
+      driveBulkRestoreFeatureToggleName,
+      troubleshooterFeatureToggleName,
+      sendCallLogsFeatureToggleName,
     ]);
   });
 

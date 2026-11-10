@@ -17,11 +17,13 @@
  *
  */
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {wrapper} from './userBlockedBadge.styles';
 
-export const UserBlockedBadge = () => {
+import {useApplicationContext} from '../../../../page/rootProvider';
+
+export const UserBlockedBadge: FunctionComponent = () => {
   const {translate} = useApplicationContext();
 
   return <span css={wrapper}>{translate('userBlockedConnectionBadge')}</span>;

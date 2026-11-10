@@ -19,11 +19,12 @@
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {detectCapabilities, Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
-import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
-import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import {defaultOpts} from 'Repositories/media/backgroundEffects/pipe/options';
-import {deriveModelConfig} from 'Repositories/media/backgroundEffects/qualityTierMapping';
+import {detectCapabilities, Metrics, QualityMode} from './backgroundEffects';
+import {BackgroundEffectsController} from './backgroundEffects/backgroundEffectsController';
+import {CapabilityInfo} from './backgroundEffects/backgroundEffectsWorkerTypes';
+import {defaultOpts} from './backgroundEffects/pipe/options';
+import {deriveModelConfig} from './backgroundEffects/qualityTierMapping';
+import {BackgroundEffectsQuality, backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
@@ -31,15 +32,15 @@ import {
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
   loadBackgroundSource,
-} from 'Repositories/media/VideoBackgroundEffects';
-import {getStorage} from 'Util/localStorage';
-import {getLogger, Logger} from 'Util/logger';
+} from './VideoBackgroundEffects';
 
-import {BackgroundEffectsQuality, backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
+import {getStorage} from '../../util/localStorage';
+import {getLogger, Logger} from '../../util/logger';
 
 const millisecondsPerSecond = 1000;
 const percentageScale = 100;
 const maximumDisplayedUtilizationPercentage = 999;
+type BackgroundEffectApplicationResult = {applied: boolean; media: ReleasableMediaStream};
 
 export const TARGET_FPS = 15;
 export const DEBOUNCE_TIMER = 500;
@@ -52,7 +53,7 @@ const isVirtualEffect = (effect: BackgroundEffectSelection): boolean => {
   return effect.type === 'virtual' || effect.type === 'custom';
 };
 
-const getBlurStrength = (effect: BackgroundEffectSelection) => {
+const getBlurStrength = (effect: BackgroundEffectSelection): number => {
   return effect.type === 'blur' ? BLUR_STRENGTHS[effect.level] : BLUR_STRENGTHS.high;
 };
 
@@ -134,9 +135,7 @@ export class BackgroundEffectsHandler {
     });
   }
 
-  public async applyBackgroundEffect(
-    originalVideoStream: MediaStream,
-  ): Promise<{applied: boolean; media: ReleasableMediaStream}> {
+  public async applyBackgroundEffect(originalVideoStream: MediaStream): Promise<BackgroundEffectApplicationResult> {
     const {preferredEffect} = backgroundEffectsStore.getState();
 
     if (preferredEffect.type === 'none') {
@@ -359,7 +358,7 @@ export class BackgroundEffectsHandler {
     }
   }
 
-  private prefetch(url: string) {
+  private prefetch(url: string): void {
     const existingPrefetchLink = document.head.querySelector<HTMLLinkElement>(`link[rel="prefetch"][href="${url}"]`);
 
     if (existingPrefetchLink !== null) {

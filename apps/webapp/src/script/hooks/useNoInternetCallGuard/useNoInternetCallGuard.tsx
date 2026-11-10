@@ -19,10 +19,10 @@
 
 import {useCallback} from 'react';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {styles} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard.styles';
-import type {Translate} from 'Util/localizerUtil';
+import {styles} from './useNoInternetCallGuard.styles';
 
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import type {Translate} from '../../util/localizerUtil';
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 
@@ -33,7 +33,10 @@ export interface NoInternetCallGuardCopy {
   translate: Translate;
 }
 
-export const showCallNotEstablishedModal = (noInternetCallGuardCopy: NoInternetCallGuardCopy) => {
+type StartCall = () => void;
+type UseNoInternetCallGuardResult = (startCall: StartCall) => void;
+
+export const showCallNotEstablishedModal = (noInternetCallGuardCopy: NoInternetCallGuardCopy): void => {
   const {description, descriptionPoints, title, translate} = noInternetCallGuardCopy;
   const [firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint] = descriptionPoints;
 
@@ -59,7 +62,9 @@ export const showCallNotEstablishedModal = (noInternetCallGuardCopy: NoInternetC
   );
 };
 
-export const useNoInternetCallGuard = (noInternetCallGuardCopy: NoInternetCallGuardCopy) => {
+export const useNoInternetCallGuard = (
+  noInternetCallGuardCopy: NoInternetCallGuardCopy,
+): UseNoInternetCallGuardResult => {
   const {description, descriptionPoints, title, translate} = noInternetCallGuardCopy;
   const [firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint] = descriptionPoints;
   const warnings = useWarningsState(state => {
@@ -72,7 +77,7 @@ export const useNoInternetCallGuard = (noInternetCallGuardCopy: NoInternetCallGu
   }, [description, firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint, title, translate]);
 
   return useCallback(
-    (startCall: () => void) => {
+    (startCall: StartCall) => {
       if (visibleWarning === TYPE.NO_INTERNET) {
         showCallNotEstablishedMessage();
         return;

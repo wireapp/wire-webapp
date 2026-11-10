@@ -21,9 +21,9 @@ import {useCallback, useState} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {useAppNotification} from 'Components/appNotification/index';
-import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {useAppNotification} from '../../../../appNotification';
+import {FileWithPreview} from '../../../../conversation/useFilesUploadState/useFilesUploadState';
 
 type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -35,13 +35,14 @@ interface UseSendFilesProps {
   sendFilesErrorMessage: string;
 }
 
+type UseSendFilesResult = {sendFiles: () => Promise<void>; clearFiles: () => void; isLoading: boolean};
 export const useSendFiles = ({
   files,
   clearAllFiles,
   cellsRepository,
   conversationId,
   sendFilesErrorMessage,
-}: UseSendFilesProps) => {
+}: UseSendFilesProps): UseSendFilesResult => {
   const [status, setStatus] = useState<SendFilesStatus>('idle');
 
   const errorNotification = useAppNotification({

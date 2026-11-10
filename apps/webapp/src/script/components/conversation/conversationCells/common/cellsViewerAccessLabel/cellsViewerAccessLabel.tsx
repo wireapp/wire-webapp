@@ -17,16 +17,21 @@
  *
  */
 
-import {ViewerAccessIcon} from '@wireapp/react-ui-kit';
+import type {FunctionComponent} from 'react';
 
 import {viewerAccessLabelStyles} from './cellsViewerAccessLabel.styles';
+
+import {ViewerAccessIcon} from '../../../../../uiKit/dataDisplay/icon/viewerAccessIcon';
 
 interface CellsViewerAccessLabelProps {
   label: string;
   iconUieName?: string;
 }
 
-export const CellsViewerAccessLabel = ({label, iconUieName}: CellsViewerAccessLabelProps) => {
+export const CellsViewerAccessLabel: FunctionComponent<CellsViewerAccessLabelProps> = ({
+  label,
+  iconUieName,
+}: CellsViewerAccessLabelProps) => {
   return (
     <div css={viewerAccessLabelStyles}>
       <span data-uie-name={iconUieName} aria-hidden="true">

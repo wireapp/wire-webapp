@@ -17,10 +17,11 @@
  *
  */
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {videoStyles, iconWrapperStyles} from './videoPreviewCard.styles';
 
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {FilePreviewPlayButton} from '../common/filePreviewPlayButton/filePreviewPlayButton';
 import {MediaFilePreviewCard} from '../common/mediaFilePreviewCard/mediaFilePreviewCard';
 
@@ -32,7 +33,13 @@ interface VideoPreviewCardProps {
   uploadProgress: number;
 }
 
-export const VideoPreviewCard = ({src, onDelete, onRetry, isError, uploadProgress}: VideoPreviewCardProps) => {
+export const VideoPreviewCard: FunctionComponent<VideoPreviewCardProps> = ({
+  src,
+  onDelete,
+  onRetry,
+  isError,
+  uploadProgress,
+}: VideoPreviewCardProps) => {
   const {translate} = useApplicationContext();
 
   return (

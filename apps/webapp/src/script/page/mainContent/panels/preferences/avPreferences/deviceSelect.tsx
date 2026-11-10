@@ -17,14 +17,14 @@
  *
  */
 
-import {ComponentType} from 'react';
+import {ComponentType, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {Select} from '@wireapp/react-ui-kit';
-
 import {containerStyles, selectWrapperStyles} from './deviceSelect.styles';
+
+import {Select} from '../../../../../uiKit/inputs/select/select';
 
 const minimumDeviceCountForSelection = 2;
 
@@ -39,7 +39,7 @@ interface DeviceSelectProps {
   value: string;
 }
 
-const DeviceSelect = ({
+const DeviceSelect: FunctionComponent<DeviceSelectProps> = ({
   isRequesting = false,
   devices,
   value,
@@ -47,7 +47,6 @@ const DeviceSelect = ({
   icon: DeviceIcon,
   uieName,
   onChange,
-  title,
 }: DeviceSelectProps) => {
   const devicesList = devices.map(({deviceId, label}) => {
     return {

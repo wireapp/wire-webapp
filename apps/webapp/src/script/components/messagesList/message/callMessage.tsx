@@ -17,17 +17,19 @@
  *
  */
 
-import * as Icon from 'Components/icon';
-import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/callMessage';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+import type {FunctionComponent} from 'react';
 
 import {MessageTime} from './messageTime';
+
+import {CallMessage as CallMessageEntity} from '../../../repositories/entity/message/callMessage';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import * as Icon from '../../icon';
 
 interface CallMessageProps {
   message: CallMessageEntity;
 }
 
-const CallMessage = ({message}: CallMessageProps) => {
+const CallMessage: FunctionComponent<CallMessageProps> = ({message}: CallMessageProps) => {
   const {caption, unsafeSenderName, timestamp} = useKoSubscribableChildren(message, [
     'caption',
     'unsafeSenderName',

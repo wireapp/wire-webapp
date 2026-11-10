@@ -19,20 +19,10 @@
 
 import {amplify} from 'amplify';
 
-import {StorageKey} from 'Repositories/storage/storageKey';
-import {resetStoreValue} from 'Util/storageUtil';
+import {resetStoreValue} from '../../util/storageUtil';
+import {StorageKey} from '../storage/storageKey';
 
 export class CacheRepository {
-  public static CACHE_KEY = {
-    // Redefine name from "sw"
-    ASSETS: `asset-cache-v3`,
-  };
-
-  // Caution! When refactoring this code, make sure that it works in an "beforeunload" scenario!
-  static async clearCacheStorage(): Promise<boolean> {
-    return window.caches.delete(CacheRepository.CACHE_KEY.ASSETS);
-  }
-
   /**
    * Deletes cached data.
    *

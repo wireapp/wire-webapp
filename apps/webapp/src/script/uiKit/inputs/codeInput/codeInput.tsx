@@ -1,0 +1,237 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {useEffect, useState, type FunctionComponent} from 'react';
+import * as React from 'react';
+
+import {CSSObject} from '@emotion/react';
+import {isNonEmptyString} from '@sindresorhus/is';
+
+import {COLOR_V2} from '../../identity';
+import {Theme} from '../../identity/theme';
+import {noop} from '../../utils/util';
+import {InputProps, inputStyle} from '../input';
+
+const CodeInputWrapper: FunctionComponent<React.HTMLProps<HTMLDivElement>> = props => {
+  return (
+    <div
+      css={{
+        display: 'flex',
+        justifyContent: 'center',
+        flexDirection: 'column',
+      }}
+      {...props}
+    />
+  );
+};
+
+const codeInputLabelStyle: (theme: Theme) => CSSObject = theme => {
+  return {
+    color: COLOR_V2.GRAY_70,
+    textAlign: 'center',
+    marginBottom: '0.5rem',
+    fontSize: theme.fontSizes.base,
+    fontStyle: 'normal',
+    fontWeight: 400,
+    lineHeight: '1.5rem',
+    letterSpacing: '0.003rem',
+  };
+};
+
+export type DigitInputProps<T = HTMLInputElement> = InputProps<T>;
+
+const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => CSSObject = (theme, props) => {
+  return {
+    ...inputStyle(theme, props),
+    '& + &': {
+      marginLeft: 'min(19px, 2vw)',
+    },
+    '&:hover': {
+      boxShadow: `0 0 0 1px ${COLOR_V2.GRAY_60}`,
+    },
+    fontSize: theme.fontSizes.extraLarge,
+    lineHeight: '1.75rem',
+    borderRadius: '12px',
+    padding: 0,
+    textAlign: 'center',
+    width: 'min(48px, 13vw)',
+    height: '56px',
+  };
+};
+
+const DigitInput = React.forwardRef<HTMLInputElement, DigitInputProps<HTMLInputElement>>((props, ref) => {
+  return (
+    <input
+      ref={ref}
+      css={(theme: Theme) => {
+        return digitInputStyle(theme, props);
+      }}
+      {...props}
+    />
+  );
+});
+DigitInput.displayName = 'DigitInput';
+export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
+  autoFocus?: boolean;
+  digits?: number;
+  markInvalid?: boolean;
+  onCodeComplete?: (completeCode?: string) => void;
+  codeInputLabel?: string;
+  codePlaceholder?: string;
+}
+
+export const CodeInput: FunctionComponent<CodeInputProps> = ({
+  style,
+  digits = 6,
+  markInvalid,
+  onCodeComplete = noop,
+  disabled,
+  codeInputLabel,
+  codePlaceholder,
+}) => {
+  const [values, setValues] = useState(Array(digits).fill(''));
+  const inputs = Array(digits);
+
+  const forceSelection = (
+    event:
+      | React.MouseEvent<HTMLInputElement>
+      | React.TouchEvent<HTMLInputElement>
+      | React.KeyboardEvent<HTMLInputElement>
+      | React.FocusEvent<HTMLInputElement>,
+  ): void => {
+    const target = event.target as HTMLInputElement;
+    target.select();
+  };
+
+  const forceSelectionPreventDefault = (
+    event: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>,
+  ): void => {
+    forceSelection(event);
+    event.preventDefault();
+  };
+
+  const nextField = (currentFieldIndex: number): void => {
+    const nextFieldIndex = currentFieldIndex + 1;
+    if (nextFieldIndex < digits) {
+      inputs[nextFieldIndex].focus();
+    }
+  };
+
+  const previousField = (currentFieldIndex: number): void => {
+    if (currentFieldIndex > 0) {
+      inputs[currentFieldIndex - 1].focus();
+    }
+  };
+
+  const setValue = (fieldIndex: number, value: string): void => {
+    if (/^[0-9]?$/.test(value)) {
+      const valuesCopy = values.slice();
+      valuesCopy[fieldIndex] = value;
+      setValues(valuesCopy);
+      if (isNonEmptyString(value)) {
+        nextField(fieldIndex);
+      }
+    }
+  };
+
+  const handleKeyDown = (fieldIndex: number, {key}: React.KeyboardEvent<HTMLInputElement>): void => {
+    switch (key) {
+      case 'Backspace':
+        setValue(fieldIndex, '');
+        previousField(fieldIndex);
+        break;
+      case 'ArrowLeft':
+        previousField(fieldIndex);
+        break;
+      case 'ArrowRight':
+        nextField(fieldIndex);
+        break;
+    }
+    if (/^[0-9]$/.test(key)) {
+      setValue(fieldIndex, key);
+    }
+  };
+
+  const handlePaste = (fieldIndex: number, event: React.ClipboardEvent<HTMLInputElement>): void => {
+    const pastedValue = event.clipboardData.getData('Text');
+    const cleanedPaste = pastedValue.replace(/[^0-9]/g, '');
+    if (/^[0-9]+$/.test(cleanedPaste)) {
+      setValues(values.slice(0, fieldIndex).concat(cleanedPaste.split('')).slice(0, digits));
+    }
+  };
+
+  useEffect(() => {
+    const completeCode = values.join('');
+    if (completeCode.length === digits) {
+      onCodeComplete(completeCode);
+    }
+  }, [values]);
+
+  const labelId = React.useId();
+  const getDigitAriaLabel = (value: string): string => {
+    return Boolean(value) ? `${codePlaceholder}, ${value}` : `${codePlaceholder}`;
+  };
+
+  return (
+    <CodeInputWrapper role="group" aria-labelledby={labelId} style={style}>
+      <span id={labelId} css={codeInputLabelStyle}>
+        {codeInputLabel}
+      </span>
+      <div
+        css={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexWrap: 'nowrap',
+          width: '100%',
+        }}
+      >
+        {Array.from({length: digits}, (arrayElement, digitIndex) => {
+          return (
+            <DigitInput
+              key={digitIndex}
+              onPaste={event => {
+                return handlePaste(digitIndex, event);
+              }}
+              onFocus={forceSelection}
+              onMouseDown={forceSelectionPreventDefault}
+              onTouchStart={forceSelectionPreventDefault}
+              onKeyDown={event => {
+                return handleKeyDown(digitIndex, event);
+              }}
+              onKeyUp={forceSelection}
+              markInvalid={markInvalid}
+              ref={(node): void => {
+                inputs[digitIndex] = node;
+              }}
+              value={values[digitIndex]}
+              disabled={disabled}
+              id={`code-input-digit-${digitIndex}`}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="one-time-code"
+              aria-label={getDigitAriaLabel(values[digitIndex])}
+              aria-describedby={labelId}
+            />
+          );
+        })}
+      </div>
+    </CodeInputWrapper>
+  );
+};

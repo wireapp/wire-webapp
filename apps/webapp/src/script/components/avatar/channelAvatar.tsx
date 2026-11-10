@@ -17,11 +17,13 @@
  *
  */
 
-import {ChannelIcon, LockClosedIcon} from '@wireapp/react-ui-kit';
-
-import {getChannelAvatarColors} from 'Util/avatarUtil';
+import type {FunctionComponent} from 'react';
 
 import {channelAvatarContainerCss, channelAvatarIconCss, channelAvatarLockIconCss} from './channelAvatar.styles';
+
+import {ChannelIcon} from '../../uiKit/dataDisplay/icon/channelIcon';
+import {LockClosedIcon} from '../../uiKit/dataDisplay/icon/lockClosedIcon';
+import {getChannelAvatarColors} from '../../util/avatarUtil';
 
 const channelIconWidthInPixels = 16;
 const smallChannelIconWidthInPixels = 10;
@@ -35,7 +37,12 @@ interface ChannelAvatarProps {
   size?: ChannelAvatarSize;
 }
 
-export const ChannelAvatar = ({conversationID, className, isLocked = true, size = 'large'}: ChannelAvatarProps) => {
+export const ChannelAvatar: FunctionComponent<ChannelAvatarProps> = ({
+  conversationID,
+  className,
+  isLocked = true,
+  size = 'large',
+}: ChannelAvatarProps) => {
   const colorPalette = getChannelAvatarColors(conversationID);
   return (
     <div className={className} css={channelAvatarContainerCss({border: colorPalette.border, size})}>

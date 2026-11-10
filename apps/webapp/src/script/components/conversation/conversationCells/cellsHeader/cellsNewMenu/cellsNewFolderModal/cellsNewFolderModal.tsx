@@ -17,16 +17,17 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {FunctionComponent} from 'react';
 
-import {CellsNewNodeForm} from 'Components/conversation/conversationCells/common/cellsNewNodeForm/cellsNewNodeForm';
-import {useCellsNewFolderForm} from 'Components/conversation/conversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {descriptionStyles} from './cellsNewFolderModal.styles';
 
+import {useApplicationContext} from '../../../../../../page/rootProvider';
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {CellsModal} from '../../../common/cellsModal/cellsModal';
+import {CellsNewNodeForm} from '../../../common/cellsNewNodeForm/cellsNewNodeForm';
+import {useCellsNewFolderForm} from '../../../common/useCellsNewNodeForm/useCellsNewFolderForm';
 
 interface CellsNewFolderModalProps {
   isOpen: boolean;
@@ -37,7 +38,7 @@ interface CellsNewFolderModalProps {
   currentPath: string;
 }
 
-export const CellsNewFolderModal = ({
+export const CellsNewFolderModal: FunctionComponent<CellsNewFolderModalProps> = ({
   isOpen,
   onClose,
   cellsRepository,
@@ -55,7 +56,7 @@ export const CellsNewFolderModal = ({
     validationCopy: {
       genericError: translate('cells.newItemMenuModalForm.genericError'),
       alreadyExistsError: translate('cells.newItemMenuModalForm.alreadyExistsError'),
-      invalidCharactersError: translate('cells.newItemMenuModalForm.invalidCharactersError'),
+      invalidCharactersError: translate('cells.nodeName.invalidCharactersError'),
       maxLengthError: translate('cells.newItemMenuModalForm.maxLengthError'),
       nameRequired: translate('cells.newItemMenuModalForm.nameRequired'),
     },

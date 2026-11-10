@@ -38,7 +38,7 @@ export class EmailVerificationPage {
   }
 
   // Doesn't work with headless chromium
-  async enterVerificationCode(code: string) {
+  async enterVerificationCode(code: string): Promise<void> {
     if (code.length !== this.codeLength) {
       throw new Error('Verification code must be exactly 6 characters long');
     }
@@ -51,18 +51,18 @@ export class EmailVerificationPage {
     await this.page.keyboard.press('Enter');
   }
 
-  async clearCode() {
+  async clearCode(): Promise<void> {
     const inputs = await this.page.locator('input').all();
     for (let i = 0; i < this.codeLength; i++) {
       await inputs[i].focus();
       await this.page.keyboard.press('Backspace');
     }
   }
-  async pressSubmit() {
+  async pressSubmit(): Promise<void> {
     await this.page.getByRole('button', {name: 'Submit'}).click();
   }
 
-  async isEmailVerificationPageVisible() {
+  async isEmailVerificationPageVisible(): Promise<boolean> {
     await this.verificationCodeInputLabel.waitFor({state: 'visible'});
     return true;
   }

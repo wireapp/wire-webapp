@@ -18,15 +18,19 @@
  */
 
 import {isNonEmptyString, isNull} from '@sindresorhus/is';
+import type {NonEmptyString} from '@sindresorhus/is/distribution/types';
 
-import {includesString} from 'Util/stringUtil';
+import {includesString} from './stringUtil';
 
-export const appendParameter = (url: string, parameter: string) => {
+export const appendParameter = (url: string, parameter: string): string => {
   const separator = includesString(url, '?') ? '&' : '?';
   return `${url}${separator}${parameter}`;
 };
 
-export const getParameter = (parameterName: string, locationSearch = window.location.search) => {
+export const getParameter = (
+  parameterName: string,
+  locationSearch = window.location.search,
+): boolean | NonEmptyString | null => {
   const searchParameters = locationSearch.substring(1).split('&');
   for (const searchParam of searchParameters) {
     const [parameter, value] = searchParam.split('=');
@@ -74,7 +78,7 @@ export const cleanURL = (url: string = ''): string => {
   try {
     const {hostname, port, pathname, search, hash} = new URL(url);
     return `${hostname.replace(/^www./, '')}${isNonEmptyString(port) ? `:${port}` : ''}${pathname.replace(/\/$/, '')}${search}${hash}`;
-  } catch (error: unknown) {
+  } catch {
     return '';
   }
 };
@@ -116,13 +120,13 @@ export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
  * @param url URL to be prepended
  * @returns prepended URL
  */
-export const prependProtocol = (url: string) => {
+export const prependProtocol = (url: string): string => {
   return isNull(url.match(/^http[s]?:\/\//i)) ? `http://${url}` : url;
 };
 
 /**
  * Removes all URL parameters from the current URL
  */
-export const removeUrlParameters = () => {
+export const removeUrlParameters = (): void => {
   history.replaceState({}, '', `${location.origin}/${location.hash}`);
 };

@@ -19,7 +19,10 @@
 
 import {CSSObject} from '@emotion/react';
 
-const participantNameColor = (isActivelySpeaking: boolean, isAudioEstablished: boolean) => {
+const participantNameColor = (
+  isActivelySpeaking: boolean,
+  isAudioEstablished: boolean,
+): 'var(--gray-60)' | 'var(--app-bg-secondary)' | 'var(--white)' => {
   if (!isAudioEstablished) {
     return 'var(--gray-60)';
   }

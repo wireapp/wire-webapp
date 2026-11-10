@@ -29,7 +29,27 @@ interface UsePaginationProps {
   setOffset: (offset: number) => void;
 }
 
-export const useCellsPagination = ({pagination, conversationId, setOffset, currentNodesCount}: UsePaginationProps) => {
+type UseCellsPaginationResult = {
+  goToPage: (page: number) => void;
+  getPaginationProps: () => {
+    currentPage: number;
+    numberOfPages: number;
+    totalRows: number;
+    firstRow: number;
+    lastRow: number;
+    pageSize: number;
+    setPageSize: (page: number) => void;
+  };
+  currentPage: number;
+  totalPages: number;
+  totalRows: number;
+};
+export const useCellsPagination = ({
+  pagination,
+  conversationId,
+  setOffset,
+  currentNodesCount,
+}: UsePaginationProps): UseCellsPaginationResult => {
   const {clearAll, pageSize, setPageSize} = useCellsStore();
 
   const currentPage = pagination?.currentPage ?? 0;
@@ -58,7 +78,16 @@ export const useCellsPagination = ({pagination, conversationId, setOffset, curre
     };
   }, [clearAll, conversationId]);
 
-  const getPaginationProps = () => {
+  type GetPaginationPropsResult = {
+    currentPage: number;
+    numberOfPages: number;
+    totalRows: number;
+    firstRow: number;
+    lastRow: number;
+    pageSize: number;
+    setPageSize: (page: number) => void;
+  };
+  const getPaginationProps = (): GetPaginationPropsResult => {
     if (totalPages > 1) {
       return {
         currentPage: currentPage > 0 ? currentPage - 1 : 0,

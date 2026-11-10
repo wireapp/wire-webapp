@@ -17,33 +17,26 @@
  *
  */
 
-import {ComponentProps} from 'react';
+import {ComponentProps, type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {
-  BASE_DARK_COLOR,
-  BASE_LIGHT_COLOR,
-  Button,
-  ButtonVariant,
-  COLOR_V2,
-  Input,
-  Label,
-  Switch,
-} from '@wireapp/react-ui-kit';
 
-import {
-  CellsShareExpirationFields,
-  type CellsShareExpirationSelection,
-} from 'Components/cells/shareModal/cellsShareExpirationFields';
-import {CellsTableLoader} from 'Components/conversation/conversationCells/common/cellsTableLoader/cellsTableLoader';
-import {CopyToClipboardButton} from 'Components/copyToClipboardButton/copyToClipboardButton';
-import * as Icon from 'Components/icon';
-import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
-import {Config} from 'src/script/Config';
-import {type RootContextValue} from 'src/script/page/rootProvider';
+import {CellsShareExpirationFields, type CellsShareExpirationSelection} from './cellsShareExpirationFields';
+
+import {Config} from '../../../Config';
+import {type RootContextValue} from '../../../page/rootProvider';
+import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR_V2} from '../../../uiKit/identity/colorsV2/colorsV2';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {Input} from '../../../uiKit/inputs/input/input';
+import {Switch} from '../../../uiKit/inputs/switch/switch';
+import {Label} from '../../../uiKit/typography/label/label';
+import {CellsTableLoader} from '../../conversation/conversationCells/common/cellsTableLoader/cellsTableLoader';
+import {CopyToClipboardButton} from '../../copyToClipboardButton/copyToClipboardButton';
+import * as Icon from '../../icon';
+import {PasswordGeneratorButton} from '../../PasswordGeneratorButton';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 
@@ -178,7 +171,7 @@ const getDefaultLabels = (translate: RootContextValue['translate']): CellsShareM
   };
 };
 
-export const CellsShareModalContent = ({
+export const CellsShareModalContent: FunctionComponent<CellsShareModalContentProps> = ({
   translate,
   publicLinkDescription,
   labels,

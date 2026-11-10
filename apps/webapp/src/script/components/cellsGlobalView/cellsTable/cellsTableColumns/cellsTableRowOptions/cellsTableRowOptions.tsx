@@ -21,17 +21,16 @@ import {ReactElement} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
-
-import {openFolder} from 'Components/cellsGlobalView/common/openFolder/openFolder';
-import {useShouldRestrictGlobalDriveNodeActions} from 'Components/cellsGlobalView/common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {forcedDownloadFile} from 'Util/util';
-
 import {buttonStyles, iconStyles, textStyles} from './cellsTableRowOptions.styles';
 
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {CellNode, CellNodeType} from '../../../../../types/cellNode';
+import {MoreIcon} from '../../../../../uiKit/dataDisplay/icon/moreIcon';
+import {DropdownMenu} from '../../../../../uiKit/surface/dropdownMenu/dropdownMenu';
+import {forcedDownloadFile} from '../../../../../util/util';
+import {openFolder} from '../../../common/openFolder/openFolder';
+import {useShouldRestrictGlobalDriveNodeActions} from '../../../common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';
 import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 import {showShareModal} from '../cellsShareModal/cellsShareModal';
 
@@ -50,7 +49,9 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
   const shouldDisableRestrictedActions = useShouldRestrictGlobalDriveNodeActions(node);
   // DropdownMenu.Item disabled state is visual/ARIA only for native onClick handlers.
   // Keep restricted actions without a handler so viewer access cannot activate them.
-  const restrictedActionClickHandler = <ClickHandler extends () => void>(clickHandler: ClickHandler) => {
+  const restrictedActionClickHandler = <ClickHandler extends () => void>(
+    clickHandler: ClickHandler,
+  ): ClickHandler | undefined => {
     return shouldDisableRestrictedActions ? undefined : clickHandler;
   };
 

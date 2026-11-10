@@ -37,14 +37,14 @@ export class StartUIPage {
   }
 
   /** Search and select each of the provided usernames */
-  async selectUsers(...usernames: string[]) {
+  async selectUsers(...usernames: string[]): Promise<void> {
     for (const username of usernames) {
       await this.searchForUser(username);
       await this.searchResults.filter({hasText: username}).click();
     }
   }
 
-  private async searchForUser(username: string) {
+  private async searchForUser(username: string): Promise<void> {
     await this.searchInput.fill(username);
   }
 }

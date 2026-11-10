@@ -17,18 +17,7 @@
  *
  */
 
-import React from 'react';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {UserStatusBadges} from 'Components/badge';
-import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/callParticipantsListItem/CallParticipantsListItemHandRaiseIcon';
-import {Participant} from 'Repositories/calling/Participant';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {setContextMenuPosition} from 'Util/util';
+import React, {type FunctionComponent} from 'react';
 
 import {CallParticipantItemContent} from './CallParticipantItemContent';
 import {
@@ -37,7 +26,17 @@ import {
   callParticipantAvatar,
   callParticipantConnecting,
 } from './CallParticipantsListItem.styles';
+import {CallParticipantsListItemHandRaiseIcon} from './CallParticipantsListItemHandRaiseIcon';
 import {CallParticipantStatusIcons} from './CallParticipantStatusIcons';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {Participant} from '../../../repositories/calling/Participant';
+import {TabIndex} from '../../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
+import {setContextMenuPosition} from '../../../util/util';
+import {Avatar, AVATAR_SIZE} from '../../avatar';
+import {UserStatusBadges} from '../../badge';
 
 interface CallParticipantsListItemProps {
   callParticipant: Participant;
@@ -48,7 +47,7 @@ interface CallParticipantsListItemProps {
   handRaisedAt?: number | null;
 }
 
-export const CallParticipantsListItem = ({
+export const CallParticipantsListItem: FunctionComponent<CallParticipantsListItemProps> = ({
   callParticipant,
   isSelfVerified = false,
   showContextMenu,
@@ -68,7 +67,7 @@ export const CallParticipantsListItem = ({
     isExternal,
   } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'name', 'isExternal']);
 
-  const handleContextKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleContextKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
     handleKeyDown({
       event,
       callback: () => {

@@ -33,7 +33,15 @@ export function getClientMLSConfig(
   getFeatures = () => {
     return teamFeatures;
   },
-) {
+):
+  | {
+      keyingMaterialUpdateThreshold: number | undefined;
+      getNbKeyPackages: () => number;
+      defaultCiphersuite: number;
+      ciphersuites: number[];
+      skipInitIdentity: boolean;
+    }
+  | undefined {
   const keyingMaterialUpdateThreshold = Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD;
   const mlsConfig = getMLSConfig(teamFeatures);
   const willEnrollE2ei = !isUndefined(getE2EIConfig(teamFeatures));

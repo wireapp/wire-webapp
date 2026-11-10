@@ -17,22 +17,13 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useEffect, type FunctionComponent} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {match, P} from 'ts-pattern';
 import {container} from 'tsyringe';
-
-import {Button, ButtonVariant, CallIcon, CalendarIcon} from '@wireapp/react-ui-kit';
-
-import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
-import {useJoinMeetingCall} from 'Components/meeting/useJoinMeetingCall';
-import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import type {Translate, TranslationKey} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {formatLocale, formatTimeShort} from 'Util/timeUtil';
 
 import {
   meetingNotificationCardActionsStyles,
@@ -45,8 +36,18 @@ import {
   meetingNotificationViewBtnStyles,
 } from './meetingNotificationCard.styles';
 
+import {useApplicationContext} from '../../../page/rootProvider';
+import {UserState} from '../../../repositories/user/userState';
 import {navigate} from '../../../router/Router';
+import {CalendarIcon} from '../../../uiKit/dataDisplay/icon/calendarIcon';
+import {CallIcon} from '../../../uiKit/dataDisplay/icon/callIcon';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import type {Translate, TranslationKey} from '../../../util/localizerUtil';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
+import {formatLocale, formatTimeShort} from '../../../util/timeUtil';
 import {type MeetingNotification, MeetingNotificationKind} from '../meetingNotificationStore/meetingNotificationStore';
+import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
+import {useJoinMeetingCall} from '../useJoinMeetingCall';
 
 type MeetingNotificationCardProps = MeetingNotification & {
   onDismiss: () => void;
@@ -62,7 +63,7 @@ type MeetingNotificationJoinButtonProps = {
   onCallJoined?: () => void;
 };
 
-const MeetingNotificationJoinButton = ({
+const MeetingNotificationJoinButton: FunctionComponent<MeetingNotificationJoinButtonProps> = ({
   meetingTitle,
   meetingStartTime,
   qualifiedId,
@@ -111,7 +112,7 @@ const notificationLabels = {
   [MeetingNotificationKind.REMINDER]: 'meetings.notifications.reminder',
 } as const satisfies Record<MeetingNotificationKind, TranslationKey>;
 
-const getOrganizer = (qualifiedCreator: QualifiedId) => {
+const getOrganizer = (qualifiedCreator: QualifiedId): string => {
   return (
     container
       .resolve(UserState)
@@ -123,11 +124,15 @@ const getOrganizer = (qualifiedCreator: QualifiedId) => {
   );
 };
 
-const getMeetingTime = (meetingStartTime: string) => {
+const getMeetingTime = (meetingStartTime: string): string => {
   return formatLocale(meetingStartTime, 'PP, p');
 };
 
-const MeetingNotificationOrganizerAndTimeMetadata = ({
+const MeetingNotificationOrganizerAndTimeMetadata: FunctionComponent<{
+  qualifiedCreator: QualifiedId;
+  meetingStartTime: string;
+  translate: Translate;
+}> = ({
   qualifiedCreator,
   meetingStartTime,
   translate,
@@ -148,13 +153,10 @@ const MeetingNotificationOrganizerAndTimeMetadata = ({
   );
 };
 
-const MeetingNotificationMetadata = ({
-  notification,
-  translate,
-}: {
+const MeetingNotificationMetadata: FunctionComponent<{
   notification: MeetingNotification;
   translate: Translate;
-}) => {
+}> = ({notification, translate}: {notification: MeetingNotification; translate: Translate}) => {
   return match(notification)
     .with(
       {
@@ -203,10 +205,12 @@ const MeetingNotificationMetadata = ({
     .exhaustive();
 };
 
-export const MeetingNotificationCard = (notification: MeetingNotificationCardProps) => {
+export const MeetingNotificationCard: FunctionComponent<MeetingNotificationCardProps> = (
+  notification: MeetingNotificationCardProps,
+) => {
   const {translate} = useApplicationContext();
   const {kind, meetingTitle, id, onDismiss} = notification;
-  const primaryAction = () => {
+  const primaryAction = (): JSX.Element | null => {
     if (kind === MeetingNotificationKind.CANCELLED) {
       return null;
     }

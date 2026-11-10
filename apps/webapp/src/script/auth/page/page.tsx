@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {TeamData} from '@wireapp/api-client/lib/team';
@@ -37,15 +37,15 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
   withSideBar?: boolean;
 }
 
-const hasInvalidAccountData = (account: RegistrationDataState) => {
+const hasInvalidAccountData = (account: RegistrationDataState): boolean => {
   return !isNonEmptyString(account.name) || !isNonEmptyString(account.email) || !isNonEmptyString(account.password);
 };
 
-const hasInvalidTeamData = ({team}: {team?: TeamData}) => {
+const hasInvalidTeamData = ({team}: {team?: TeamData}): boolean => {
   return team === undefined || !isNonEmptyString(team.name);
 };
 
-const PageComponent = ({
+const PageComponent: FunctionComponent<Props & ConnectedProps> = ({
   hasAccountData,
   hasTeamData,
   isAuthenticated,
@@ -70,7 +70,8 @@ const PageComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {account: RegistrationDataState; isStateAuthenticated: boolean};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     account: AuthSelector.getAccount(state),
     isStateAuthenticated: AuthSelector.isAuthenticated(state),

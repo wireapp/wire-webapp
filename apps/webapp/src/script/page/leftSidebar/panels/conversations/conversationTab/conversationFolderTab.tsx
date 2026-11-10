@@ -17,25 +17,21 @@
  *
  */
 
-import {ReactElement, useMemo} from 'react';
+import {ReactElement, useMemo, type FunctionComponent} from 'react';
 
 import {isNan, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import * as Icons from 'Components/icon';
-import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Config} from 'src/script/Config';
-import {useFolderStore} from 'src/script/page/leftSidebar/panels/conversations/useFoldersStore';
-import {
-  SidebarStatus,
-  SidebarTabs,
-  useSidebarStore,
-} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+import * as Icons from '../../../../../components/icon';
+import {Config} from '../../../../../Config';
+import {createLabel, LabelType} from '../../../../../repositories/conversation/ConversationLabelRepository';
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {ContextMenuEntry, showContextMenu} from '../../../../../ui/contextMenu';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {useApplicationContext} from '../../../../rootProvider';
+import {useFolderStore} from '../useFoldersStore';
+import {SidebarStatus, SidebarTabs, useSidebarStore} from '../useSidebarStore';
 
 interface ConversationFolderTabProps {
   title: string;
@@ -52,7 +48,7 @@ interface ConversationFolderTabProps {
 
 const CONTEXT_MENU_OFFSET_PIXELS = 4;
 
-export const ConversationFolderTab = ({
+export const ConversationFolderTab: FunctionComponent<ConversationFolderTabProps> = ({
   title,
   label,
   type,
@@ -69,7 +65,7 @@ export const ConversationFolderTab = ({
   const {conversationLabelRepository} = conversationRepository;
   const isSideBarOpen = sidebarStatus === SidebarStatus.OPEN;
 
-  function toggleFolder(folderId: string) {
+  function toggleFolder(folderId: string): void {
     openFolder(folderId);
     onChangeTab(type, folderId);
   }
@@ -98,7 +94,7 @@ export const ConversationFolderTab = ({
     );
   }, [translate]);
 
-  function openFoldersContextMenu(event: React.MouseEvent<HTMLButtonElement>) {
+  function openFoldersContextMenu(event: React.MouseEvent<HTMLButtonElement>): void {
     const entries: ContextMenuEntry[] = folders.map(folder => {
       return {
         click: () => {
@@ -118,7 +114,7 @@ export const ConversationFolderTab = ({
     showContextMenu({event, entries, identifier: 'navigation-folders-menu', placeholder});
   }
 
-  function handleToggleFoldersTab(event: React.MouseEvent<HTMLButtonElement>) {
+  function handleToggleFoldersTab(event: React.MouseEvent<HTMLButtonElement>): void {
     if (isSideBarOpen) {
       toggleFoldersTab();
       return;
@@ -127,7 +123,7 @@ export const ConversationFolderTab = ({
     openFoldersContextMenu(event);
   }
 
-  function getTotalUnreadConversationMessages(conversations: Conversation[]) {
+  function getTotalUnreadConversationMessages(conversations: Conversation[]): number {
     let total = 0;
 
     conversations.forEach(conversation => {

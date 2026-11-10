@@ -17,21 +17,20 @@
  *
  */
 
-import {ReactNode} from 'react';
-
-import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {headerStyles, headingStyles, closeButtonStyles} from './cellsModalHeader.styles';
 
+import {useApplicationContext} from '../../../../../../page/rootProvider';
+import {CloseIcon} from '../../../../../../uiKit/dataDisplay/icon/closeIcon';
+import {IconButton, IconButtonVariant} from '../../../../../../uiKit/inputs/iconButton/iconButton';
 import {useCellsModal} from '../cellsModalContext/cellsModalContext';
 
 interface CellsModalHeaderProps {
   children: ReactNode;
 }
 
-export const CellsModalHeader = ({children}: CellsModalHeaderProps) => {
+export const CellsModalHeader: FunctionComponent<CellsModalHeaderProps> = ({children}: CellsModalHeaderProps) => {
   const {onClose} = useCellsModal();
   const {translate} = useApplicationContext();
 

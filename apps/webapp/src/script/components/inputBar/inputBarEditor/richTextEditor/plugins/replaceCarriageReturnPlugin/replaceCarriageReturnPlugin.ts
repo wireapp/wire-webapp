@@ -23,7 +23,7 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {mergeRegister} from '@lexical/utils';
 import {COMMAND_PRIORITY_LOW, PASTE_COMMAND, TextNode} from 'lexical';
 
-function replaceCarriageReturnWithLineFeed(input: string) {
+function replaceCarriageReturnWithLineFeed(input: string): string {
   // Replace \r\n (Windows CRLF) first, then any remaining standalone \r (old Mac CR)
   return input.replaceAll(/\r\n/g, '\n').replaceAll(/\r/g, '\n');
 }

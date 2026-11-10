@@ -21,18 +21,17 @@ import {FEDERATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 import {debounce} from 'underscore';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
-
 import {
   getUsersToDeleteFromFederatedConversations,
   getFederationDeleteEventUpdates,
 } from './ConversationFederationUtils';
 
+import {ServerTimeHandler} from '../../../../time/serverTimeHandler';
+import {ConversationState} from '../../../conversation/ConversationState';
+import {ConversationStatus} from '../../../conversation/ConversationStatus';
+import {EventBuilder} from '../../../conversation/EventBuilder';
+import {Conversation} from '../../../entity/Conversation';
+import {User} from '../../../entity/User';
 import {EventProcessor, IncomingEvent} from '../../EventProcessor';
 import {EventRepository} from '../../EventRepository';
 
@@ -46,7 +45,7 @@ export class FederationEventProcessor implements EventProcessor {
     private conversationState: ConversationState = container.resolve(ConversationState),
   ) {}
 
-  async processEvent(event: IncomingEvent) {
+  async processEvent(event: IncomingEvent): Promise<void> {
     const {type} = event;
 
     switch (type) {
@@ -124,14 +123,14 @@ export class FederationEventProcessor implements EventProcessor {
     }
   }, federationEventDebounceInMilliseconds);
 
-  private async removeDeletedFederationUsers(conversation: Conversation, users: User[]) {
+  private async removeDeletedFederationUsers(conversation: Conversation, users: User[]): Promise<void> {
     if (users.length === 0) {
       return;
     }
     await this.removeMembers(conversation, users);
   }
 
-  private async insertFederationStopSystemMessage(conversation: Conversation, domains: string[]) {
+  private async insertFederationStopSystemMessage(conversation: Conversation, domains: string[]): Promise<void> {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const event = EventBuilder.buildFederationStop(conversation, this.selfUser, domains, currentTimestamp);
     await this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
@@ -142,7 +141,7 @@ export class FederationEventProcessor implements EventProcessor {
    * @param conversation the conversation in which we want to remove users
    * @param users the users to remove from the conversation
    */
-  private async removeMembers(conversation: Conversation, users: User[]) {
+  private async removeMembers(conversation: Conversation, users: User[]): Promise<void> {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const event = EventBuilder.buildMemberLeave(
       conversation,

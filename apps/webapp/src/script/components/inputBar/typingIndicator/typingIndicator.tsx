@@ -17,9 +17,7 @@
  *
  */
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {
   dotOneStyles,
@@ -32,6 +30,10 @@ import {
 } from './typingIndicator.styles';
 import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
 
+import {useApplicationContext} from '../../../page/rootProvider';
+import {Avatar, AVATAR_SIZE} from '../../avatar';
+import * as Icon from '../../icon';
+
 const MAX_VISIBLE_TYPING_USERS = 3;
 const TWO_TYPING_USERS = 2;
 const ADDITIONAL_TYPING_USER_OFFSET = 1;
@@ -40,7 +42,7 @@ export interface TypingIndicatorProps {
   conversationId: string;
 }
 
-export const TypingIndicator = ({conversationId}: TypingIndicatorProps) => {
+export const TypingIndicator: FunctionComponent<TypingIndicatorProps> = ({conversationId}: TypingIndicatorProps) => {
   const {translate} = useApplicationContext();
   const users = useTypingIndicatorState(state => {
     return state.getTypingUsersInConversation(conversationId);

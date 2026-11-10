@@ -29,13 +29,15 @@ const fileTransferAssetsDir = path.join(e2eRootDir, 'assets/filetransfer');
 
 export const ImageQRCodeFileName = 'qrcode.jpg';
 
-const getQRCodeValue = async (imageBuffer: Buffer) => {
+const getQRCodeValue = async (imageBuffer: Buffer): Promise<string> => {
   const image = await Jimp.read(imageBuffer);
   const qrCode = new QRCode();
-  return await new Promise((resolve, reject) => {
-    qrCode.callback = (err: any, value: any) => {
-      if (err) {
-        reject(err);
+  return await new Promise<string>((resolve, reject) => {
+    qrCode.callback = (error, value) => {
+      if (error !== null && error !== undefined) {
+        reject(error);
+      } else if (value === null || value === undefined) {
+        reject(new Error('No QR code was found in the image.'));
       } else {
         resolve(value.result);
       }
@@ -44,11 +46,11 @@ const getQRCodeValue = async (imageBuffer: Buffer) => {
   });
 };
 
-export const getImageFilePath = () => {
+export const getImageFilePath = (): string => {
   return path.join(fileTransferAssetsDir, ImageQRCodeFileName);
 };
 
-export const getLocalQRCodeValue = async (imageFilePath: string) => {
+export const getLocalQRCodeValue = async (imageFilePath: string): Promise<string> => {
   const imageBuffer = await readLocalFile(imageFilePath);
   if (!imageBuffer) {
     throw new Error(`Image file not found at path: ${imageFilePath}`);
@@ -57,6 +59,6 @@ export const getLocalQRCodeValue = async (imageFilePath: string) => {
   return await getQRCodeValue(imageBuffer);
 };
 
-export const getQRCodeValueFromScreenshot = async (screenshot: Buffer) => {
+export const getQRCodeValueFromScreenshot = async (screenshot: Buffer): Promise<string> => {
   return await getQRCodeValue(screenshot);
 };

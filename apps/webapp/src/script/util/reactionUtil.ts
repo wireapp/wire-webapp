@@ -20,9 +20,9 @@
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {ReactionMap, UserReactionMap} from 'Repositories/storage';
-
 import {matchQualifiedIds} from './qualifiedId';
+
+import {ReactionMap, UserReactionMap} from '../repositories/storage';
 
 function isReactionMap(reactions: UserReactionMap | ReactionMap): reactions is ReactionMap {
   return Array.isArray(reactions);
@@ -38,8 +38,8 @@ export function userReactionMapToReactionMap(userReactions: UserReactionMap | Re
   }
   return Object.entries(userReactions).reduce<ReactionMap>((acc, [userId, reactions]) => {
     reactions.split(',').forEach(reaction => {
-      const existingReaction = acc.find(([r]) => {
-        return r === reaction;
+      const existingReaction = acc.find(([existingReactionName]) => {
+        return existingReactionName === reaction;
       });
       const qualifiedId = {id: userId, domain: ''};
       if (!isUndefined(existingReaction)) {
@@ -52,7 +52,11 @@ export function userReactionMapToReactionMap(userReactions: UserReactionMap | Re
   }, []);
 }
 
-export function addReaction(reactions: ReactionMap, reactionsStr: string, userId: QualifiedId) {
+export function addReaction(
+  reactions: ReactionMap,
+  reactionsStr: string,
+  userId: QualifiedId,
+): [reaction: string, userIds: {domain: string; id: string}[]][] {
   const userReactions = reactionsStr.split(',');
 
   // First step is to remove all of this user's reactions
@@ -70,8 +74,8 @@ export function addReaction(reactions: ReactionMap, reactionsStr: string, userId
       return isNonEmptyString(reaction);
     })
     .forEach(reaction => {
-      const existingEntry = filteredReactions.find(([r]) => {
-        return r === reaction;
+      const existingEntry = filteredReactions.find(([existingReactionName]) => {
+        return existingReactionName === reaction;
       });
       if (!isUndefined(existingEntry)) {
         existingEntry[1].push(userId);

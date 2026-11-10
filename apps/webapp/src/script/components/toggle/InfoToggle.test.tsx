@@ -19,7 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../auth/util/test/testUtil';
 
 import {InfoToggle} from './InfoToggle';
 

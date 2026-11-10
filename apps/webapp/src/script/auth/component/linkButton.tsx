@@ -17,9 +17,10 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
-import {LinkProps, linkStyle, Theme} from '@wireapp/react-ui-kit';
+import {Theme} from '../../uiKit/identity/theme/theme';
+import {LinkProps, linkStyle} from '../../uiKit/typography/link/link';
 
 const linkButtonStyle = {
   background: 'none',
@@ -28,7 +29,9 @@ const linkButtonStyle = {
   padding: 0,
 };
 
-const LinkButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+const LinkButton: FunctionComponent<React.ButtonHTMLAttributes<HTMLButtonElement>> = (
+  props: React.ButtonHTMLAttributes<HTMLButtonElement>,
+) => {
   return (
     <button
       type="button"

@@ -17,15 +17,15 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {ProgressBar} from 'Components/ProgressBar';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {uploadingProgressText} from './uploadAssetItem.styles';
+
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {AssetRepository} from '../../../../../repositories/assets/assetRepository';
+import {ProgressBar} from '../../../../ProgressBar';
 
 interface Props {
   assetRepository: AssetRepository;
@@ -33,7 +33,7 @@ interface Props {
   scrollToEnd?: () => void;
 }
 
-export const UploadAssetItem = ({assetRepository, message, scrollToEnd}: Props) => {
+export const UploadAssetItem: FunctionComponent<Props> = ({assetRepository, message, scrollToEnd}: Props) => {
   const {translate} = useApplicationContext();
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -51,7 +51,7 @@ export const UploadAssetItem = ({assetRepository, message, scrollToEnd}: Props) 
     };
   }, [assetRepository, message, scrollToEnd]);
 
-  const cancelUpload = async () => {
+  const cancelUpload = async (): Promise<void> => {
     await assetRepository.cancelUpload(message.messageId);
   };
 

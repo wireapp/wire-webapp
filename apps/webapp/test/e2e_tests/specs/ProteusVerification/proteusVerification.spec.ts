@@ -17,15 +17,15 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
-import {connectWithUser, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, expect, withLogin, Team, LOGIN_TIMEOUT} from '../../test.fixtures';
+import {connectWithUser, createGroup, sendConnectionRequest} from '../../utils/userActions';
 
 const verifyCrossDeviceTrust = async (
   userAPages: PageManager['webapp']['pages'],
   userBPages: PageManager['webapp']['pages'],
-) => {
+): Promise<void> => {
   for (const userPages of [userAPages, userBPages]) {
     await userPages.conversation().clickConversationInfoButton();
     await userPages.conversationDetails().devicesButton.click();

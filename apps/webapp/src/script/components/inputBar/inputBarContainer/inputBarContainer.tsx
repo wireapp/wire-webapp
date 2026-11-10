@@ -17,19 +17,18 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {useAppMainState} from 'src/script/page/state';
-
+import {useAppMainState} from '../../../page/state';
 import {IgnoreOutsideClickWrapper} from '../util/clickHandlers';
 
 interface InputBarContainerProps {
   children: ReactNode;
 }
 
-export const InputBarContainer = ({children}: InputBarContainerProps) => {
+export const InputBarContainer: FunctionComponent<InputBarContainerProps> = ({children}: InputBarContainerProps) => {
   const {rightSidebar} = useAppMainState.getState();
   const lastItem = rightSidebar.history.length - 1;
   const currentState = rightSidebar.history[lastItem];

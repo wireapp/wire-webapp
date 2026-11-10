@@ -19,17 +19,17 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
+import {getCommonMessageUpdates} from './getCommonMessageUpdates';
+
+import {EventError} from '../../../../../error/eventError';
 import {
   CompositeMessageAddEvent,
   MessageAddEvent,
   MultipartMessageAddEvent,
-} from 'Repositories/conversation/EventBuilder';
-import {StoredEvent} from 'Repositories/storage';
-import {EventError} from 'src/script/error/eventError';
-
-import {getCommonMessageUpdates} from './getCommonMessageUpdates';
-
+} from '../../../../conversation/EventBuilder';
+import {StoredEvent} from '../../../../storage';
 import {ClientEvent, CONVERSATION} from '../../../Client';
+import type {IdentifiedUpdatePayload} from '../../../EventService';
 import {EventHandler, HandledEvents} from '../types';
 
 function throwValidationError(message: string): never {
@@ -37,6 +37,7 @@ function throwValidationError(message: string): never {
 }
 
 export type EditableEvent = MessageAddEvent | MultipartMessageAddEvent | CompositeMessageAddEvent;
+type UpdatedEditableEvent = EditableEvent & Pick<IdentifiedUpdatePayload, 'primary_key'>;
 
 function validateEditEvent(
   originalEvent: HandledEvents | undefined,
@@ -73,7 +74,7 @@ function getUpdatesForEditMessage(originalEvent: StoredEvent<EditableEvent>, new
   return {...newEvent, ...commonUpdates, edited_time: newEvent.time, reactions: {}};
 }
 
-function computeEventUpdates(originalEvent: StoredEvent<EditableEvent>, newEvent: EditableEvent) {
+function computeEventUpdates(originalEvent: StoredEvent<EditableEvent>, newEvent: EditableEvent): UpdatedEditableEvent {
   const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
   const updates = getUpdatesForEditMessage(originalEvent, newEvent);
 

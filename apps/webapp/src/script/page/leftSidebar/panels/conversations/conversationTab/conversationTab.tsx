@@ -17,12 +17,12 @@
  *
  */
 
-import {ReactElement} from 'react';
+import {ReactElement, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {SidebarTabs} from '../useSidebarStore';
 
 type ConversationTabActionProps =
   | {
@@ -50,7 +50,7 @@ type ConversationTabProps = {
   onBlur?: React.FocusEventHandler<HTMLButtonElement>;
 } & ConversationTabActionProps;
 
-export const ConversationTab = ({
+export const ConversationTab: FunctionComponent<ConversationTabProps> = ({
   title,
   label,
   type,

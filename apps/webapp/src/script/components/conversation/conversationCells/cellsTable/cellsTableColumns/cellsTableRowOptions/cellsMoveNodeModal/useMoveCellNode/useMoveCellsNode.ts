@@ -17,58 +17,77 @@
  *
  */
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Result, result, task} from 'true-myth';
 
-import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
-import {openBreadcrumb} from 'Components/conversation/conversationCells/common/openBreadcrumb/openBreadcrumb';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode} from 'src/script/types/cellNode';
+import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../../../../../types/cellNode';
+import {getCellsApiPath} from '../../../../../common/getCellsApiPath/getCellsApiPath';
 
 interface UseMoveCellsNodeProps {
   cellsRepository: CellsRepository;
   nodeToMove: CellNode;
   conversationQualifiedId: QualifiedId;
   currentPath: string;
-  onClose: () => void;
+  isOpen: boolean;
 }
 
+type UseMoveCellsNodeResult = {
+  handleMove: () => Promise<Result<void, unknown>>;
+  movingDisabled: boolean;
+  status: 'idle' | 'loading' | 'success' | 'error';
+};
 export const useMoveCellsNode = ({
   cellsRepository,
   nodeToMove,
   conversationQualifiedId,
   currentPath,
-  onClose,
-}: UseMoveCellsNodeProps) => {
+  isOpen,
+}: UseMoveCellsNodeProps): UseMoveCellsNodeResult => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  const moveNode = async ({currentPath, targetPath}: {currentPath: string; targetPath: string}) => {
-    setStatus('loading');
-    try {
-      await cellsRepository.moveNode({
-        currentPath,
-        targetPath,
-      });
-      setStatus('success');
-    } catch (error: unknown) {
-      setStatus('error');
+  useEffect(() => {
+    if (isOpen) {
+      setStatus('idle');
     }
+  }, [isOpen]);
+
+  const moveNode = async ({
+    currentPath,
+    targetPath,
+  }: {
+    currentPath: string;
+    targetPath: string;
+  }): Promise<Result<void, unknown>> => {
+    setStatus('loading');
+    const moveResult = await task.tryOrElse(
+      error => {
+        return error;
+      },
+      () => {
+        return cellsRepository.moveNode({currentPath, targetPath});
+      },
+    );
+
+    if (moveResult.isErr) {
+      setStatus('error');
+      return result.err(moveResult.error);
+    }
+
+    setStatus('success');
+    return result.ok(undefined);
   };
 
   const nodeToMoveParent = nodeToMove.path.split('/').slice(0, -1).join('/');
   const targetPath = getCellsApiPath({conversationQualifiedId, currentPath});
   const movingDisabled = nodeToMoveParent === targetPath;
 
-  const handleMove = async () => {
-    await moveNode({
+  const handleMove = (): Promise<Result<void, unknown>> => {
+    return moveNode({
       currentPath: nodeToMove.path,
       targetPath,
-    });
-    onClose();
-    openBreadcrumb({
-      conversationQualifiedId,
-      path: currentPath,
     });
   };
 

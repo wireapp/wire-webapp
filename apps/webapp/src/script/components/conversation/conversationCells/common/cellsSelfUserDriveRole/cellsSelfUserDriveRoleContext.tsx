@@ -17,7 +17,7 @@
  *
  */
 
-import {createContext, type ReactNode, useCallback, useContext} from 'react';
+import {createContext, type ReactNode, useCallback, useContext, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
@@ -106,7 +106,10 @@ interface CellsSelfUserDriveRoleProviderProps {
   selfUserDriveRole: CellsSelfUserDriveRole;
 }
 
-export const CellsSelfUserDriveRoleProvider = ({children, selfUserDriveRole}: CellsSelfUserDriveRoleProviderProps) => {
+export const CellsSelfUserDriveRoleProvider: FunctionComponent<CellsSelfUserDriveRoleProviderProps> = ({
+  children,
+  selfUserDriveRole,
+}: CellsSelfUserDriveRoleProviderProps) => {
   return (
     <CellsSelfUserDriveRoleContext.Provider value={selfUserDriveRole}>
       {children}
@@ -118,7 +121,7 @@ export const useCellsSelfUserDriveRole = (): CellsSelfUserDriveRole => {
   return useContext(CellsSelfUserDriveRoleContext);
 };
 
-export const useCellsActionPermissions = () => {
+export const useCellsActionPermissions = (): ((action: CellsAction) => boolean) => {
   const selfUserDriveRole = useCellsSelfUserDriveRole();
 
   return useCallback(

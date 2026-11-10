@@ -21,24 +21,23 @@ import {fireEvent, render, waitFor, act} from '@testing-library/react';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {LinkPreview} from 'Repositories/entity/message/linkPreview';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {MessageCategory} from 'src/script/message/messageCategory';
+import {AssetRepository} from '../../../../repositories/assets/assetRepository';
+import {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {FileAsset} from '../../../../repositories/entity/message/fileAsset';
+import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';
+import {MediumImage} from '../../../../repositories/entity/message/mediumImage';
+import {Text} from '../../../../repositories/entity/message/text';
+import {User} from '../../../../repositories/entity/User';
+import {withTheme} from '../../../../auth/util/test/testUtil';
+import {MessageCategory} from '../../../../message/messageCategory';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+} from '../../../testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../util/test/translateForTest';
+import {createUuid} from '../../../../util/uuid';
 
 import {Collection} from './collection';
 import {FullSearch} from './fullSearch';
@@ -61,7 +60,7 @@ jest.mock('./collectionItem', () => {
   };
 });
 
-const createImageMessage = (timestamp: number = Date.now()) => {
+const createImageMessage = (timestamp: number = Date.now()): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   message.timestamp(timestamp);
   const image = new MediumImage(createUuid());
@@ -70,7 +69,7 @@ const createImageMessage = (timestamp: number = Date.now()) => {
   return message;
 };
 
-const createFileMessage = () => {
+const createFileMessage = (): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const file = new FileAsset(createUuid());
   message.assets.push(file);
@@ -78,7 +77,7 @@ const createFileMessage = () => {
   return message;
 };
 
-const createLinkMessage = () => {
+const createLinkMessage = (): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const link = new Text(createUuid(), 'term');
   link.previews.push(new LinkPreview({}));
@@ -87,14 +86,14 @@ const createLinkMessage = () => {
   return message;
 };
 
-function createTextMessage(text: string) {
+function createTextMessage(text: string): ContentMessage {
   const message = new ContentMessage(createUuid(), translateForTest);
   message.assets.push(new Text(createUuid(), text));
   message.category = MessageCategory.TEXT;
   return message;
 }
 
-const createAudioMessage = () => {
+const createAudioMessage = (): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const audio = new FileAsset(createUuid());
   audio.isAudio = () => {

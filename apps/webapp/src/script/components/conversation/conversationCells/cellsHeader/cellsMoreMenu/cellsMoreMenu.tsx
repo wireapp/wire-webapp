@@ -17,14 +17,17 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {DropdownMenu, IconButton, IconButtonVariant, MoreIcon, TrashIcon} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonStyles, itemStyles} from './cellsMoreMenu.styles';
 
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {MoreIcon} from '../../../../../uiKit/dataDisplay/icon/moreIcon';
+import {TrashIcon} from '../../../../../uiKit/dataDisplay/icon/trashIcon';
+import {IconButton, IconButtonVariant} from '../../../../../uiKit/inputs/iconButton/iconButton';
+import {DropdownMenu} from '../../../../../uiKit/surface/dropdownMenu/dropdownMenu';
 import {openBreadcrumb} from '../../common/openBreadcrumb/openBreadcrumb';
 import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';
 
@@ -32,7 +35,7 @@ interface CellsMoreMenuProps {
   conversationQualifiedId: QualifiedId;
 }
 
-export const CellsMoreMenu = ({conversationQualifiedId}: CellsMoreMenuProps) => {
+export const CellsMoreMenu: FunctionComponent<CellsMoreMenuProps> = ({conversationQualifiedId}: CellsMoreMenuProps) => {
   const {translate} = useApplicationContext();
   return (
     <DropdownMenu>

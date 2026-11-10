@@ -17,19 +17,18 @@
  *
  */
 
-import {
-  ButtonsGroup,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  IconButton,
-  SidebarActiveIcon,
-  SidebarInactiveIcon,
-} from '@wireapp/react-ui-kit';
-
-import {ZoomInIcon, ZoomOutIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {buttonStyles, pageNumberStyles, wrapperStyles} from './PdfControls.styles';
+
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {ChevronDownIcon} from '../../../../uiKit/dataDisplay/icon/chevronDownIcon';
+import {ChevronUpIcon} from '../../../../uiKit/dataDisplay/icon/chevronUpIcon';
+import {SidebarActiveIcon} from '../../../../uiKit/dataDisplay/icon/sidebarActiveIcon';
+import {SidebarInactiveIcon} from '../../../../uiKit/dataDisplay/icon/sidebarInactiveIcon';
+import {ButtonsGroup} from '../../../../uiKit/inputs/buttonsGroup/buttonsGroup';
+import {IconButton} from '../../../../uiKit/inputs/iconButton/iconButton';
+import {ZoomInIcon, ZoomOutIcon} from '../../../icon';
 
 interface PdfControlsProps {
   sidebarOpen: boolean;
@@ -46,7 +45,7 @@ interface PdfControlsProps {
 const MIN_ZOOM_SCALE = 1;
 const MAX_ZOOM_SCALE = 2;
 
-export const PdfControls = ({
+export const PdfControls: FunctionComponent<PdfControlsProps> = ({
   sidebarOpen,
   onToggleSidebar,
   scale,

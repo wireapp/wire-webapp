@@ -17,10 +17,11 @@
  *
  */
 
-import {FileCard} from 'Components/fileCard/fileCard';
+import type {FunctionComponent} from 'react';
 
 import {wrapperStyles} from './filePreviewCard.styles';
 
+import {FileCard} from '../../../fileCard/fileCard';
 import {FilePreviewDeleteButton} from '../common/filePreviewDeleteButton/filePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/filePreviewErrorMoreButton/filePreviewErrorMoreButton';
 
@@ -34,7 +35,7 @@ interface FilePreviewCardProps {
   uploadProgress: number;
 }
 
-export const FilePreviewCard = ({
+export const FilePreviewCard: FunctionComponent<FilePreviewCardProps> = ({
   extension,
   name,
   size,

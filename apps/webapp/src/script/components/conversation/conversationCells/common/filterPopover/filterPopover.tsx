@@ -17,13 +17,9 @@
  *
  */
 
-import {ReactNode, useCallback, useMemo, useState} from 'react';
+import {ReactNode, useCallback, useMemo, useState, type FunctionComponent} from 'react';
 
 import {Button, Dialog, DialogTrigger, Popover} from 'react-aria-components';
-
-import {Checkbox, CheckboxLabel, CircleCloseIcon, SearchIcon} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   badgeStyles,
@@ -45,6 +41,11 @@ import {
   startContentStyles,
   triggerButtonStyles,
 } from './filterPopover.styles';
+
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {CircleCloseIcon} from '../../../../../uiKit/dataDisplay/icon/circleCloseIcon';
+import {SearchIcon} from '../../../../../uiKit/dataDisplay/icon/searchIcon';
+import {Checkbox, CheckboxLabel} from '../../../../../uiKit/inputs/checkbox/checkbox';
 
 export interface FilterItem {
   id: string;
@@ -80,7 +81,7 @@ interface FilterPopoverProps {
   singleSelect: boolean;
 }
 
-export const FilterPopover = ({
+export const FilterPopover: FunctionComponent<FilterPopoverProps> = ({
   triggerLabel,
   items,
   selectedIds,

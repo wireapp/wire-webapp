@@ -21,9 +21,10 @@ import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode} from 'src/script/types/cellNode';
-import {getFileExtension, trimFileExtension} from 'Util/util';
+import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
+import {CellNode, CellNodeType} from '../../../../../../../../types/cellNode';
+import {getFileExtension, trimFileExtension} from '../../../../../../../../util/util';
+import {isValidCellsNodeName} from '../../../../../common/cellsNodeNameValidator';
 
 interface UseCellsRenameFormProps {
   node: CellNode;
@@ -36,26 +37,40 @@ interface UseCellsRenameFormProps {
   };
 }
 
-const INVALID_CHARACTERS = ['/', '.'];
-
-export const useCellsRenameForm = ({node, cellsRepository, onSuccess, renameNodeCopy}: UseCellsRenameFormProps) => {
-  const [name, setName] = useState(trimFileExtension(node.name));
+type UseCellsRenameFormResult = {
+  name: string;
+  error: string | null;
+  isSubmitting: boolean;
+  isDisabled: boolean;
+  handleRename: (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => Promise<void>;
+  handleNameChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleClearName: () => void;
+};
+export const useCellsRenameForm = ({
+  node,
+  cellsRepository,
+  onSuccess,
+  renameNodeCopy,
+}: UseCellsRenameFormProps): UseCellsRenameFormResult => {
+  const originalName = node.type === CellNodeType.FILE ? trimFileExtension(node.name) : node.name;
+  const [name, setName] = useState(originalName);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const originalBaseName = trimFileExtension(node.name);
   const normalizedName = name.trim();
-  const hasInvalidCharacters = INVALID_CHARACTERS.some(char => {
-    return normalizedName.includes(char);
-  });
-  const isDisabled = isSubmitting || normalizedName === originalBaseName || normalizedName.length === 0;
+  const hasInvalidCharacters = !isValidCellsNodeName(normalizedName);
+  const isDisabled = isSubmitting || normalizedName === originalName || normalizedName.length === 0;
 
-  const buildNewName = (baseName: string) => {
+  const buildNewName = (baseName: string): string => {
+    if (node.type === CellNodeType.FOLDER) {
+      return baseName;
+    }
+
     const extension = getFileExtension(node.name);
     return isNonEmptyString(extension) ? `${baseName}.${extension}` : baseName;
   };
 
-  const renameNode = async (name: string) => {
+  const renameNode = async (name: string): Promise<void> => {
     try {
       await cellsRepository.renameNode({currentPath: node.path, newName: buildNewName(name)});
       onSuccess();
@@ -64,7 +79,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess, renameNode
     }
   };
 
-  const handleRename = async (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
+  const handleRename = async (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>): Promise<void> => {
     event.preventDefault();
 
     if (isDisabled) {
@@ -93,14 +108,14 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess, renameNode
     }
   };
 
-  const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleNameChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setName(event.currentTarget.value);
     if (error === renameNodeCopy.nameRequired || error === renameNodeCopy.invalidCharacters) {
       setError(null);
     }
   };
 
-  const handleClearName = () => {
+  const handleClearName = (): void => {
     setName('');
     setError(null);
   };

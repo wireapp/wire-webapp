@@ -20,12 +20,11 @@
 import {isNonEmptyArray} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {Message as MessageEntity} from 'Repositories/entity/message/message';
-import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateMessage';
-import {SystemMessage} from 'Repositories/entity/message/systemMessage';
-import {ClientEvent} from 'Repositories/event/Client';
-
 import {isMemberMessage} from '../../../guards/Message';
+import {Message as MessageEntity} from '../../../repositories/entity/message/message';
+import {ProtocolUpdateMessage} from '../../../repositories/entity/message/protocolUpdateMessage';
+import {SystemMessage} from '../../../repositories/entity/message/systemMessage';
+import {ClientEvent} from '../../../repositories/event/Client';
 
 /**
  * Filters out duplicated system messages.
@@ -33,7 +32,7 @@ import {isMemberMessage} from '../../../guards/Message';
  * @param messages - messages to filter
  * @returns filtered messages
  */
-const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
+const filterDuplicatedSystemMessages = (messages: MessageEntity[]): MessageEntity[] => {
   return messages.reduce<MessageEntity[]>((uniqMessages, currentMessage) => {
     if (isMemberMessage(currentMessage)) {
       const typesToFilter = [
@@ -49,8 +48,8 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
           case ClientEvent.CONVERSATION.GROUP_CREATION:
             // Dont show duplicated group creation messages
             if (
-              uniqMemberMessages.some(m => {
-                return m.type === currentMessage.type;
+              uniqMemberMessages.some(message => {
+                return message.type === currentMessage.type;
               })
             ) {
               return uniqMessages;
@@ -103,12 +102,12 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
   }, []);
 };
 
-const filterHiddenMessages = (messages: MessageEntity[]) => {
+const filterHiddenMessages = (messages: MessageEntity[]): MessageEntity[] => {
   return messages.filter(message => {
     return message.visible();
   });
 };
 
-export const filterMessages = (messages: MessageEntity[]) => {
+export const filterMessages = (messages: MessageEntity[]): MessageEntity[] => {
   return filterHiddenMessages(filterDuplicatedSystemMessages(messages));
 };

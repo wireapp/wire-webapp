@@ -17,10 +17,10 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {generateUser} from 'test/helper/UserGenerator';
-import {createUuid} from 'Util/uuid';
+import {User} from '../entity/User';
+import {UserRepository} from '../user/userRepository';
+import {generateUser} from '../../../../test/helper/UserGenerator';
+import {createUuid} from '../../util/uuid';
 
 import {SearchRepository} from './searchRepository';
 
@@ -28,9 +28,18 @@ import {randomInt} from '../../auth/util/randomUtil';
 import {generateUsers} from '../../auth/util/test/testUtil';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
-function buildSearchRepository() {
+type SerializedSearchUser = {name: string; username: string};
+
+function buildSearchRepository(): readonly [
+  SearchRepository,
+  {
+    readonly userRepository: jest.Mocked<UserRepository>;
+    readonly core: jest.Mocked<Core>;
+    readonly apiClient: jest.Mocked<APIClient>;
+  },
+] {
   const userRepository = {
     getUsersById: jest.fn((): User[] => {
       return [];
@@ -271,7 +280,7 @@ describe('SearchRepository', () => {
   });
 });
 
-function createUser(handle: string | undefined, name: string | undefined) {
+function createUser(handle: string | undefined, name: string | undefined): User {
   const user = new User('', '', translateForTest);
   if (handle) {
     user.username(handle);
@@ -281,6 +290,6 @@ function createUser(handle: string | undefined, name: string | undefined) {
   }
   return user;
 }
-function serializeUser(userEntity: User) {
+function serializeUser(userEntity: User): SerializedSearchUser {
   return {name: userEntity.name(), username: userEntity.username()};
 }

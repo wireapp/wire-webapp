@@ -22,9 +22,11 @@ import {useEffect, useState} from 'react';
 import {isNull} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 
-import {getConnectionQualityHander} from 'Util/connectionQualityHandler';
+import {getConnectionQualityHander} from '../util/connectionQualityHandler';
 
-export const useConnectionQuality = () => {
+type ConnectionQualityState = {isSlow: boolean};
+
+export const useConnectionQuality = (): ConnectionQualityState => {
   const [isSlow, setIsSlow] = useState(false);
 
   useEffect(() => {

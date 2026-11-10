@@ -17,12 +17,7 @@
  *
  */
 
-import {Button, Text} from '@wireapp/react-ui-kit';
-
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
+import type {FunctionComponent} from 'react';
 
 import {
   teamCreationBodyCss,
@@ -31,9 +26,16 @@ import {
   teamCreationWrapperCss,
 } from './conversationHistory.styles';
 
-export const TeamCreationBanner = () => {
+import {Config} from '../../../Config';
+import {Button} from '../../../uiKit/inputs/button/button';
+import {Text} from '../../../uiKit/typography/text/text';
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
+import {safeWindowOpen} from '../../../util/sanitizationUtil';
+import {useApplicationContext} from '../../rootProvider';
+
+export const TeamCreationBanner: FunctionComponent = () => {
   const {translate} = useApplicationContext();
-  const navigateToUpgradePlan = () => {
+  const navigateToUpgradePlan = (): void => {
     safeWindowOpen(Config.getConfig().URL.TEAMS_BASE);
   };
 

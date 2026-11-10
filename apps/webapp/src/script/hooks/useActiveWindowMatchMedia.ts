@@ -17,11 +17,10 @@
  *
  */
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
+import {useWindow} from '../components/calling/useWindow';
+import {useMatchMedia} from '../uiKit/layout/matchMedia/matchMedia';
 
-import {useWindow} from 'Components/calling/useWindow';
-
-export const useActiveWindowMatchMedia = (mediaQuery: string) => {
+export const useActiveWindowMatchMedia = (mediaQuery: string): boolean => {
   const activeWindow = useWindow();
 
   return useMatchMedia(mediaQuery, activeWindow);

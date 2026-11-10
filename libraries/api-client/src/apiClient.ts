@@ -17,6 +17,8 @@
  *
  */
 
+import {isFunction, isUndefined} from '@sindresorhus/is';
+import 'core-js/actual/symbol/dispose';
 import logdown from 'logdown';
 
 import {EventEmitter} from 'events';
@@ -173,7 +175,8 @@ export type BackendVersionResponse = {
   domain: string;
 };
 
-export class APIClient extends EventEmitter {
+/** Owns a cookie subscription until disposal, independently of session and WebSocket state. */
+export class APIClient extends EventEmitter implements Disposable {
   private readonly logger: logdown.Logger;
 
   // APIs
@@ -187,7 +190,6 @@ export class APIClient extends EventEmitter {
   public config: Config & APIClientConfiguration;
   public backendFeatures: BackendFeatures;
 
-  // Store reference to cookie listener for cleanup
   private cookieRefreshListener?: (cookie?: Cookie) => void;
 
   public static BACKEND = Backend;
@@ -203,12 +205,6 @@ export class APIClient extends EventEmitter {
     this.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, (accessToken: AccessTokenData) => {
       return this.emit(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, accessToken);
     });
-    // Store the listener reference so we can remove it on disconnect
-    this.cookieRefreshListener = (cookie?: Cookie) => {
-      return this.emit(APIClient.TOPIC.COOKIE_REFRESH, cookie);
-    };
-    CookieStore.emitter.on(CookieStore.TOPIC.COOKIE_REFRESH, this.cookieRefreshListener);
-
     this.logger = LogFactory.getLogger('@wireapp/api-client/Client');
 
     const httpClient = new HttpClient(this.config, this.accessTokenStore);
@@ -216,7 +212,7 @@ export class APIClient extends EventEmitter {
       wallClock: this.config.wallClock,
     });
 
-    const onInvalidCredentials = async (error: InvalidTokenError | MissingCookieError) => {
+    const onInvalidCredentials = async (error: InvalidTokenError | MissingCookieError): Promise<void> => {
       try {
         await this.logout({skipLogoutRequest: true});
       } finally {
@@ -233,6 +229,12 @@ export class APIClient extends EventEmitter {
     };
     this.backendFeatures = this.computeBackendFeatures(MINIMUM_API_VERSION);
     this.api = this.configureApis(this.backendFeatures);
+    this.cookieRefreshListener = this.forwardCookieRefresh.bind(this);
+    CookieStore.emitter.on(CookieStore.TOPIC.COOKIE_REFRESH, this.cookieRefreshListener);
+  }
+
+  private forwardCookieRefresh(cookie?: Cookie): void {
+    this.emit(APIClient.TOPIC.COOKIE_REFRESH, cookie);
   }
 
   private configureApis(backendFeatures: BackendFeatures): Apis {
@@ -324,7 +326,7 @@ export class APIClient extends EventEmitter {
     const availableVersions = allowDev ? [...supported, ...development] : supported;
     const compatibleVersion = this.findHighestCompatibleVersion(availableVersions, min, max);
 
-    if (compatibleVersion === undefined) {
+    if (isUndefined(compatibleVersion)) {
       throw new Error(
         `No compatible API version in range [${min}-${max}]. ` + `Backend supports: [${supported.join(', ')}]`,
       );
@@ -350,8 +352,8 @@ export class APIClient extends EventEmitter {
     const inRangeVersions = versions.filter(version => {
       return version >= min && version <= max;
     });
-    const [highestVersion] = inRangeVersions.toSorted((a, b) => {
-      return b - a;
+    const [highestVersion] = inRangeVersions.toSorted((firstVersion, secondVersion) => {
+      return secondVersion - firstVersion;
     });
     return highestVersion;
   }
@@ -411,6 +413,7 @@ export class APIClient extends EventEmitter {
     return this.init(clientType, CookieStore.getCookie());
   }
 
+  /** Ends the current session while keeping the client and its cookie subscription available for another login. */
   public async logout(options: {skipLogoutRequest: boolean} = {skipLogoutRequest: false}): Promise<void> {
     try {
       this.disconnect('Closed by client logout');
@@ -446,12 +449,27 @@ export class APIClient extends EventEmitter {
     return this.context;
   }
 
+  /** Disconnects only the WebSocket transport; HTTP requests and cookie notifications remain active. */
   public disconnect(reason?: string): void {
     this.transport.ws.disconnect(reason);
-    // Remove the cookie refresh listener to prevent memory leaks
-    if (this.cookieRefreshListener !== undefined) {
+  }
+
+  /**
+   * Permanently releases the cookie subscription and disconnects the WebSocket. Repeated calls are safe.
+   * Each call retries WebSocket cleanup, including after a previous cleanup failure.
+   * Does not log out or cancel in-flight HTTP requests. Disposed clients must not be reused.
+   */
+  public dispose(): void {
+    if (isFunction(this.cookieRefreshListener)) {
       CookieStore.emitter.off(CookieStore.TOPIC.COOKIE_REFRESH, this.cookieRefreshListener);
+      this.cookieRefreshListener = undefined;
     }
+
+    this.disconnect('Closed by client disposal');
+  }
+
+  public [Symbol.dispose](): void {
+    this.dispose();
   }
 
   public get clientId(): string | undefined {

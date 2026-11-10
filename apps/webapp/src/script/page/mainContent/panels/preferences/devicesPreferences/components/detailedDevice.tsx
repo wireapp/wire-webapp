@@ -17,12 +17,14 @@
  *
  */
 
-import {DeviceVerificationBadges} from 'Components/badge';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {E2EIHandler, WireIdentity} from 'src/script/e2eIdentity';
+import type {FunctionComponent} from 'react';
 
 import {MLSDeviceDetails} from './mlsDeviceDetails';
 import {ProteusDeviceDetails} from './proteusDeviceDetails';
+
+import {DeviceVerificationBadges} from '../../../../../../components/badge';
+import {E2EIHandler, WireIdentity} from '../../../../../../e2eIdentity';
+import {ClientEntity} from '../../../../../../repositories/client/ClientEntity';
 
 export interface DeviceProps {
   device: ClientEntity;
@@ -32,7 +34,7 @@ export interface DeviceProps {
   isProteusVerified?: boolean;
 }
 
-export const DetailedDevice = ({
+export const DetailedDevice: FunctionComponent<DeviceProps> = ({
   device,
   fingerprint,
   isCurrentDevice,
@@ -40,7 +42,7 @@ export const DetailedDevice = ({
   isProteusVerified,
 }: DeviceProps) => {
   const isE2eiEnabled = E2EIHandler.getInstance().isE2EIEnabled();
-  const getIdentity = () => {
+  const getIdentity = (): WireIdentity | undefined => {
     return getDeviceIdentity?.(device.id);
   };
 

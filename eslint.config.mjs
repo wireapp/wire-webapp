@@ -7,8 +7,9 @@ import * as emotionPlugin from '@emotion/eslint-plugin';
 import stylisticPlugin from '@stylistic/eslint-plugin';
 import typescriptPlugin from '@typescript-eslint/eslint-plugin';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import {createTypeScriptImportResolver} from 'eslint-import-resolver-typescript';
 import betterStyledComponentsPlugin from 'eslint-plugin-better-styled-components';
-import importPlugin from 'eslint-plugin-import';
+import importPlugin, {createNodeResolver} from 'eslint-plugin-import-x';
 import jestPlugin from 'eslint-plugin-jest';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import noUnsanitizedPlugin from 'eslint-plugin-no-unsanitized';
@@ -42,53 +43,65 @@ const magicNumberOptions = {
 
 const ignores = [
   '.git/',
+  'target/',
+  'config/',
+  'temp/',
   'docs/',
   'bin/',
   '**/node_modules/',
+  '**/.yalc/',
   'apps/webapp/assets/',
   'resource/',
   '**/dist/**',
   '**/build/**',
   '**/coverage/**',
+  '**/test-results/',
+  '**/playwright-report/',
+  '**/blob-report/',
+  '**/playwright/.cache/',
   'apps/webapp/resource/',
   '**/*.config.*',
   'apps/webapp/*.config.*',
+  '!apps/webapp/jest.config.ts',
+  '!apps/webapp/playwright.config.ts',
+  '!apps/webapp/playwright.rspack.config.ts',
+  '!apps/webapp/rspack.config.mts',
+  '!apps/webapp/rspack.config.dev.mts',
+  '!apps/webapp/rspack.config.public.mts',
+  '!libraries/config/src/client.config.ts',
+  '!libraries/config/src/server.config.ts',
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
-  'apps/webapp/src/sw.js',
   'apps/server/bin/copy_server_assets.js',
-  'apps/server/coverage/',
   'apps/server/dist/',
   'apps/server/node_modules/',
   'apps/webapp/src/ext/',
   'apps/webapp/src/script/localization/**/webapp*.js',
   'apps/webapp/src/worker/',
   'apps/webapp/src/script/components/icon.tsx',
-  '**/storybook-static/',
-  '**/.storybook/',
-  'apps/webapp/playwright-report/',
-  'libraries/core/lib/',
   'libraries/api-client/lib/',
-  'libraries/core/.tmp/',
   'libraries/config/lib/',
-  'libraries/react-ui-kit/lib/',
   'libraries/*/lib/',
-  'libraries/react-ui-kit/emotion.d.ts',
+  'apps/webapp/src/script/uiKit/emotion.d.ts',
 ];
 
 const productionFileIgnorePatterns = [
   'apps/webapp/test/**',
-  'libraries/core/src/test/**',
   '**/test/**',
   '**/__mocks__/**',
   '*.js',
   '**/setupTests.*',
   '**/*.test.*',
   '**/*.spec.*',
-  '**/*.stories.*',
   '**/jest.setup.*',
   'apps/webapp/.copyconfigrc.js',
-  'libraries/react-ui-kit/emotion.d.ts',
+  'apps/webapp/jest.config.ts',
+  'apps/webapp/playwright.config.ts',
+  'apps/webapp/playwright.rspack.config.ts',
+  'apps/webapp/rspack.config*.mts',
+  'libraries/config/src/client.config.ts',
+  'libraries/config/src/server.config.ts',
+  'apps/webapp/src/script/uiKit/emotion.d.ts',
 ];
 
 function addProductionFileIgnores(configuration) {
@@ -102,15 +115,29 @@ const legacySettings = {
   react: {
     version: 'detect',
   },
-  'import/parsers': {
-    '@typescript-eslint/parser': ['.js', '.jsx', '.ts', '.tsx', '.mts'],
+};
+
+const importResolutionExtensions = ['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.mts', '.cts'];
+const typescriptImportResolutionExtensions = ['.ts', '.tsx', '.cts', '.mts', '.js', '.jsx', '.cjs', '.mjs'];
+const importTypeScriptResolver = createTypeScriptImportResolver({
+  alwaysTryTypes: true,
+});
+const importNodeResolver = createNodeResolver({extensions: importResolutionExtensions});
+const webappImportResolvers = [
+  importNodeResolver,
+  createTypeScriptImportResolver({
+    alwaysTryTypes: true,
+    project: './apps/webapp/tsconfig.json',
+  }),
+];
+
+const importSettings = {
+  'import-x/extensions': importResolutionExtensions,
+  'import-x/external-module-folders': ['node_modules', 'node_modules/@types'],
+  'import-x/parsers': {
+    '@typescript-eslint/parser': ['.ts', '.tsx', '.mts', '.cts'],
   },
-  'import/resolver': {
-    typescript: {
-      alwaysTryTypes: true,
-      paths: './tsconfig.json',
-    },
-  },
+  'import-x/resolver-next': [importNodeResolver, importTypeScriptResolver],
 };
 
 const legacyRules = {
@@ -149,12 +176,6 @@ const legacyRules = {
   'no-nested-ternary': 'error',
   'no-unneeded-ternary': 'error',
   'no-unused-expressions': 'error',
-  '@typescript-eslint/no-unused-vars': [
-    'error',
-    {
-      args: 'none',
-    },
-  ],
   'no-useless-return': 'error',
   'no-var': 'error',
   'one-var': ['error', 'never'],
@@ -183,7 +204,22 @@ const legacyRules = {
   strict: ['error', 'global'],
   'unused-imports/no-unused-imports': 'error',
   'import/no-unresolved': 'error',
+  'import/named': 'error',
+  'import/namespace': ['error', {allowComputed: true}],
+  'import/default': 'error',
+  'import/export': 'error',
+  'import/no-duplicates': 'error',
   'import/no-default-export': 'error',
+  'import/no-deprecated': 'error',
+  'import/no-dynamic-require': 'error',
+  'import/newline-after-import': 'error',
+  'import/first': 'error',
+  'import/no-absolute-path': 'error',
+  'import/no-webpack-loader-syntax': 'error',
+  'import/no-self-import': 'error',
+  'import/no-amd': 'error',
+  'import/no-mutable-exports': 'error',
+  'import/no-empty-named-blocks': 'error',
   'import/order': [
     'error',
     {
@@ -223,30 +259,6 @@ const productionPlugins = {
   'unused-imports': unusedImportsPlugin,
   'header-tony': headerPlugin,
 };
-const webappImportOrderRule = [
-  'error',
-  {
-    groups: ['external', 'builtin', 'internal', 'sibling', 'parent', 'index'],
-    pathGroups: [
-      {pattern: 'react', group: 'external', position: 'before'},
-      {pattern: '@wireapp/*', group: 'internal', position: 'before'},
-      // One group for all webapp TS path aliases — alphabetize sorts Components/…/Util/…/src/…
-      {
-        pattern: '{apps,Components,Hooks,I18n,Repositories,Resource,src,Util}/**',
-        group: 'internal',
-        position: 'after',
-      },
-    ],
-    pathGroupsExcludedImportTypes: ['react', '@wireapp/*'],
-    'newlines-between': 'always',
-    alphabetize: {
-      order: 'asc',
-      caseInsensitive: true,
-    },
-    warnOnUnassignedImports: true,
-  },
-];
-
 const strictBooleanExpressionsRule = [
   'error',
   {
@@ -324,10 +336,15 @@ const productionConfigs = [
   jestRecommendedProductionConfig,
   jsxA11yPlugin.flatConfigs.recommended,
   typescriptPlugin.configs['flat/eslint-recommended'],
-  importPlugin.flatConfigs.recommended,
-  importPlugin.flatConfigs.typescript,
   reactPlugin.configs.flat.recommended,
   reactPlugin.configs.flat['jsx-runtime'],
+  {
+    files: ['apps/webapp/src/**/*.{jsx,tsx}'],
+    rules: {
+      'react/forbid-dom-props': ['warn', {forbid: ['data-testid']}],
+      'react/forbid-component-props': ['warn', {forbid: ['data-testid']}],
+    },
+  },
   eslintConfigPrettier,
   {
     plugins: productionPlugins,
@@ -336,6 +353,22 @@ const productionConfigs = [
       ...legacyRules,
       'no-unsanitized/property': 'error',
       'no-unsanitized/method': 'error',
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/main/startApplication.tsx'],
+    rules: {
+      // Bootstrap imports must load reflection support before decorated modules.
+      'import/order': 'off',
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    settings: {
+      'import-x/extensions': typescriptImportResolutionExtensions,
+    },
+    rules: {
+      'import/named': 'off',
     },
   },
   {
@@ -381,9 +414,34 @@ const productionConfigs = [
   },
   {
     files: [
+      'apps/webapp/rspack.config.mts',
+      'apps/webapp/rspack.config.dev.mts',
+      'apps/webapp/rspack.config.public.mts',
+    ],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/webapp/tsconfig.rspack.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+    rules: {
+      // Rspack's config loader requires default exports for these configuration files.
+      'import/no-default-export': 'off',
+    },
+  },
+  {
+    files: [
       '**/*.{ts,tsx}',
-      'tools/release-cli/webappVersionSynchronization.mts',
-      'tools/release-cli/pullRequestSemverPolicy.mts',
+      'tools/releaseCli/webappVersionSynchronization.mts',
+      'tools/releaseCli/pullRequestSemverPolicy.mts',
     ],
     languageOptions: {
       parser: tsParser,
@@ -452,20 +510,13 @@ const productionConfigs = [
           },
         },
       ],
-      'id-length': 'warn',
+      'id-length': ['error', {min: 2, properties: 'never'}],
       'no-restricted-syntax': restrictedSyntaxRule,
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
-        {
-          argsIgnorePattern: '^(_?err(or)?|error)$',
-          varsIgnorePattern: '^(_?err(or)?|error)$',
-        },
-      ],
       '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
       '@typescript-eslint/array-type': [
         'error',
@@ -482,18 +533,60 @@ const productionConfigs = [
       'no-empty': 'error',
     },
     settings: {
-      'import/resolver': {
-        typescript: {
-          alwaysTryTypes: true,
-        },
-        node: {
-          extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      'import-x/resolver-next': [
+        createNodeResolver({extensions: typescriptImportResolutionExtensions}),
+        importTypeScriptResolver,
+      ],
+    },
+  },
+  {
+    files: ['apps/webapp/jest.config.ts'],
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ['apps/webapp/jest.config.ts'],
         },
       },
     },
   },
   {
-    files: ['tools/release-cli/**/*.mts'],
+    files: ['apps/webapp/playwright.config.ts', 'apps/webapp/playwright.rspack.config.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: './apps/webapp/tsconfig.playwright.json',
+        projectService: false,
+      },
+    },
+  },
+  {
+    files: [
+      'tools/buildArtifact/**/*.ts',
+      'tools/development/**/*.ts',
+      'tools/maintenanceRelease/**/*.ts',
+      'tools/productionDistribution/**/*.ts',
+      'tools/releaseSummary/**/*.ts',
+      'tools/runtimeVerification/**/*.ts',
+      'tools/serverPackaging/**/*.ts',
+      'tools/testReporting/**/*.ts',
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.tools.json',
+        projectService: false,
+      },
+    },
+  },
+  {
+    files: ['tools/releaseGithub/**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.tools.json',
+        projectService: false,
+      },
+    },
+  },
+  {
+    files: ['tools/releaseCli/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.release-cli.json',
@@ -502,7 +595,16 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/build-artifact/**/*.mts', 'tools/runtime-verification/**/*.mts'],
+    files: ['tools/releaseCli/**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.release-cli.json',
+        projectService: false,
+      },
+    },
+  },
+  {
+    files: ['tools/buildArtifact/**/*.mts', 'tools/configuration/**/*.mts', 'tools/runtimeVerification/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.tools.json',
@@ -524,15 +626,9 @@ const productionConfigs = [
   {
     files: [
       'apps/server/**/*.{ts,tsx}',
+      'tools/configuration/**/*.{ts,mts}',
       'libraries/api-client/**/*.{ts,tsx}',
       'libraries/commons/**/*.{ts,tsx}',
-      'libraries/certificate-check/**/*.{ts,tsx}',
-      'libraries/core/**/*.{ts,tsx}',
-      'libraries/copy-config/**/*.{ts,tsx}',
-      'libraries/license-collector/**/*.{ts,tsx}',
-      'libraries/store-engine/**/*.{ts,tsx}',
-      'libraries/store-engine-dexie/**/*.{ts,tsx}',
-      'libraries/react-ui-kit/**/*.{ts,tsx}',
     ],
     rules: {
       '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
@@ -572,19 +668,9 @@ const productionConfigs = [
   },
   {
     files: ['apps/webapp/**/*.{ts,tsx}'],
-    settings: {
-      'import/resolver': {
-        typescript: {
-          alwaysTryTypes: true,
-          project: './apps/webapp/tsconfig.json',
-        },
-      },
-    },
     rules: {
-      // Webapp path aliases (Util/*, Components/*, …) resolve to lowercase dirs on disk.
+      // Webapp path aliases resolve to lowercase dirs on disk.
       'import/no-unresolved': ['error', {caseSensitive: false}],
-      // Pin alias import order so Linux CI and macOS agree on webapp path aliases.
-      'import/order': webappImportOrderRule,
     },
   },
   {
@@ -601,7 +687,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['libraries/react-ui-kit/**/*.{ts,tsx}'],
+    files: ['apps/webapp/src/script/uiKit/**/*.{ts,tsx}'],
     rules: {
       'import/no-default-export': 'off',
     },
@@ -617,9 +703,9 @@ const productionConfigs = [
       'no-restricted-imports': [
         'error',
         {
-          paths: [
+          patterns: [
             {
-              name: 'src/script/page/RootProvider',
+              group: ['../**/page/rootProvider'],
               importNames: ['useApplicationContext'],
               message: 'This modal is rendered outside RootProvider. Pass required dependencies explicitly instead.',
             },
@@ -629,20 +715,14 @@ const productionConfigs = [
     },
   },
   {
-    files: ['apps/webapp/src/script/page/components/WindowTitleUpdater.ts'],
+    files: ['apps/webapp/src/script/page/components/windowTitleUpdater.ts'],
     rules: {
       'no-restricted-imports': [
         'error',
         {
           paths: [
             {
-              name: 'src/script/page/RootProvider',
-              importNames: ['useApplicationContext'],
-              message:
-                'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
-            },
-            {
-              name: '../RootProvider',
+              name: '../rootProvider',
               importNames: ['useApplicationContext'],
               message:
                 'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
@@ -715,15 +795,12 @@ const testTypeScriptFilePatterns = [
   'libraries/**/*.spec.ts',
   'apps/**/*.spec.*.ts',
   'libraries/**/*.spec.*.ts',
-  'apps/**/*.stories.ts',
-  'libraries/**/*.stories.ts',
-  'apps/**/*.stories.*.ts',
-  'libraries/**/*.stories.*.ts',
   'apps/**/setupTests.ts',
   'libraries/**/setupTests.ts',
   'apps/**/jest.setup.ts',
   'libraries/**/jest.setup.ts',
   'tools/**/*.test.ts',
+  'tools/**/*.test.mts',
 ];
 
 const testTsxFilePatterns = testTypeScriptFilePatterns.map(filePattern => filePattern.replaceAll('.ts', '.tsx'));
@@ -741,10 +818,6 @@ const testJavaScriptFilePatterns = [
   'libraries/**/*.spec.js',
   'apps/**/*.spec.*.js',
   'libraries/**/*.spec.*.js',
-  'apps/**/*.stories.js',
-  'libraries/**/*.stories.js',
-  'apps/**/*.stories.*.js',
-  'libraries/**/*.stories.*.js',
   'apps/**/setupTests.js',
   'libraries/**/setupTests.js',
   'apps/**/jest.setup.js',
@@ -761,10 +834,6 @@ const testJavaScriptFilePatterns = [
   'libraries/**/*.spec.cjs',
   'apps/**/*.spec.*.cjs',
   'libraries/**/*.spec.*.cjs',
-  'apps/**/*.stories.cjs',
-  'libraries/**/*.stories.cjs',
-  'apps/**/*.stories.*.cjs',
-  'libraries/**/*.stories.*.cjs',
   'apps/**/setupTests.cjs',
   'libraries/**/setupTests.cjs',
   'apps/**/jest.setup.cjs',
@@ -781,10 +850,6 @@ const testJavaScriptFilePatterns = [
   'libraries/**/*.spec.mjs',
   'apps/**/*.spec.*.mjs',
   'libraries/**/*.spec.*.mjs',
-  'apps/**/*.stories.mjs',
-  'libraries/**/*.stories.mjs',
-  'apps/**/*.stories.*.mjs',
-  'libraries/**/*.stories.*.mjs',
   'apps/**/setupTests.mjs',
   'libraries/**/setupTests.mjs',
   'apps/**/jest.setup.mjs',
@@ -813,7 +878,152 @@ const testLinterOptions = {
 const config = [
   {ignores},
   {linterOptions: repositoryLinterOptions},
+  {
+    files: ['**/*.{js,jsx,cjs,mjs,ts,tsx,mts,cts}'],
+    plugins: {
+      import: importPlugin,
+    },
+    settings: importSettings,
+    rules: {
+      'import/no-named-as-default-member': 'error',
+      'import/no-named-as-default': 'error',
+    },
+  },
   ...productionConfigs,
+  {
+    files: ['apps/webapp/jest.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/webapp/tsconfig.eslint.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['apps/webapp/playwright.config.ts', 'apps/webapp/playwright.rspack.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/webapp/tsconfig.playwright.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+  },
+  {
+    files: [
+      'apps/webapp/rspack.config.mts',
+      'apps/webapp/rspack.config.dev.mts',
+      'apps/webapp/rspack.config.public.mts',
+    ],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/webapp/tsconfig.rspack.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+    rules: {
+      // Rspack's config loader requires default exports for these configuration files.
+      'import/no-default-export': 'off',
+    },
+  },
+  {
+    files: ['libraries/config/src/client.config.ts', 'libraries/config/src/server.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    plugins: {
+      '@typescript-eslint': typescriptPlugin,
+    },
+    rules: {
+      '@typescript-eslint/explicit-function-return-type': [
+        'error',
+        {
+          allowExpressions: true,
+          allowTypedFunctionExpressions: true,
+        },
+      ],
+    },
+  },
+  {
+    files: ['apps/webapp/**/*.{ts,tsx}'],
+    settings: {
+      'import-x/resolver-next': webappImportResolvers,
+    },
+  },
+  {
+    // These adapters intentionally consume legacy event and reaction shapes for stored-data compatibility.
+    files: [
+      'apps/webapp/src/script/message/messageHasher.ts',
+      'apps/webapp/src/script/repositories/conversation/EventBuilder/EventBuilder.ts',
+      'apps/webapp/src/script/repositories/conversation/EventMapper.ts',
+      'apps/webapp/src/script/repositories/event/EventService.ts',
+      'apps/webapp/src/script/util/reactionUtil.ts',
+    ],
+    rules: {
+      'import/no-deprecated': 'off',
+    },
+  },
+  {
+    // Keep this computed require so the bundler includes the selected locale JSON module.
+    files: ['apps/webapp/src/script/auth/page/root.tsx'],
+    rules: {
+      'import/no-dynamic-require': 'off',
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    rules: {
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          vars: 'all',
+          args: 'after-used',
+          ignoreRestSiblings: true,
+          ignoreUsingDeclarations: true,
+          argsIgnorePattern: '^_$',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_$',
+        },
+      ],
+    },
+  },
   {
     files: ['**/*.{ts,tsx,mts}'],
     rules: {

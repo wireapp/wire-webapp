@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useLayoutEffect, useMemo} from 'react';
+import {useEffect, useLayoutEffect, useMemo, type FunctionComponent} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
@@ -26,35 +26,6 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
-
-import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
-import {ChooseScreen} from 'Components/calling/ChooseScreen';
-import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
-import {ConfigToolbar} from 'Components/configToolbar/configToolbar';
-import {ErrorFallback} from 'Components/errorFallback';
-import {CreateConversationModal} from 'Components/Modals/CreateConversation/CreateConversaionModal';
-import {FileHistoryModal} from 'Components/Modals/FileHistoryModal/FileHistoryModal';
-import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
-import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {showUserModal, UserModal} from 'Components/Modals/UserModal';
-import {useActiveWindow} from 'Hooks/useActiveWindow';
-import {useInitializeRootFontSize} from 'Hooks/useRootFontSize';
-import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
-import {showInitialModal} from 'Repositories/user/availabilityModal';
-import {UserState} from 'Repositories/user/userState';
-import {isUUID} from 'src/script/auth/util/stringUtil';
-import {Config} from 'src/script/Config';
-import {canUseMeetings} from 'Util/canUseMeetings';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 
 import {AppLock} from './appLock';
 import {useE2EIFeatureConfigUpdate} from './components/featureConfigChange/featureConfigChangeHandler/features/useE2eIFeatureConfigUpdate';
@@ -69,14 +40,50 @@ import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
+import {isUUID} from '../auth/util/stringUtil';
+import {CallingContainer} from '../components/calling/CallingOverlayContainer';
+import {ChooseScreen} from '../components/calling/ChooseScreen';
+import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
+import {ConfigToolbar} from '../components/configToolbar/configToolbar';
+import {ErrorFallback} from '../components/errorFallback';
+import {CreateConversationModal} from '../components/Modals/CreateConversation/CreateConversaionModal';
+import {FileHistoryModal} from '../components/Modals/FileHistoryModal/FileHistoryModal';
+import {GroupCreationModal} from '../components/Modals/GroupCreation/GroupCreationModal';
+import {LegalHoldModal} from '../components/Modals/LegalHoldModal/LegalHoldModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {showUserModal, UserModal} from '../components/Modals/UserModal';
+import {Config} from '../Config';
+import {useActiveWindow} from '../hooks/useActiveWindow';
+import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
+import {isMLSSupportedByEnvironment} from '../mls/isMLSSupportedByEnvironment';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
+import {finaliseMigrationOfMixedConversations} from '../mls/MLSMigration/migrationFinaliser';
+import {
+  initialiseMigrationOfProteusConversations,
+  joinUnestablishedMixedConversations,
+} from '../mls/MLSMigration/migrationInitialiser';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import {User} from '../repositories/entity/User';
+import {TeamState} from '../repositories/team/TeamState';
+import {AppLockRepository} from '../repositories/user/appLockRepository';
+import {showInitialModal} from '../repositories/user/availabilityModal';
+import {UserState} from '../repositories/user/userState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRouterClock, configureRoutes, navigate} from '../router/Router';
 import {Core} from '../service/coreSingleton';
+import {THEME_ID} from '../uiKit/identity/theme/theme';
+import {useMatchMedia} from '../uiKit/layout/matchMedia/matchMedia';
+import {StyledApp} from '../uiKit/layout/styledApp/styledApp';
+import {QUERY} from '../uiKit/utils/mediaQueries';
+import {canUseMeetings} from '../util/canUseMeetings';
+import {useKoSubscribableChildren} from '../util/componentUtil';
+import {isDetachedCallingFeatureEnabled} from '../util/isDetachedCallingFeatureEnabled';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
+import {WebAppEvents} from '../webAppEvents';
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;
@@ -96,7 +103,7 @@ type AppMainProps = {
   readonly locked: boolean;
 };
 
-export const AppMain = (properties: AppMainProps) => {
+export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProps) => {
   const {
     app,
     fireAndForgetInvoker,
@@ -154,7 +161,7 @@ export const AppMain = (properties: AppMainProps) => {
 
   const {currentTab} = useSidebarStore();
 
-  const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams, compareEntityId = false) => {
+  const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams, compareEntityId = false): void => {
     const isDifferentState = currentState !== panelState;
     const isDifferentId = compareEntityId && currentEntity?.id !== params?.entity?.id;
 
@@ -177,8 +184,8 @@ export const AppMain = (properties: AppMainProps) => {
   const isMobileLeftSidebarView = currentView == ViewType.MOBILE_LEFT_SIDEBAR;
   const isMobileCentralColumnView = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
 
-  const initializeApp = async () => {
-    const showMostRecentConversation = () => {
+  const initializeApp = async (): Promise<void> => {
+    const showMostRecentConversation = (): void => {
       const isShowingConversation = useAppState.getState().isShowingConversation();
       if (!isShowingConversation) {
         return;
@@ -209,7 +216,7 @@ export const AppMain = (properties: AppMainProps) => {
       window.history.replaceState(historyState, '', window.location.hash);
     }
 
-    const showConversationMessages = (conversationId: string, domain = apiContext.domain ?? '') => {
+    const showConversationMessages = (conversationId: string, domain = apiContext.domain ?? ''): void => {
       void mainView.content.showConversation({id: conversationId, domain});
     };
 
@@ -217,7 +224,7 @@ export const AppMain = (properties: AppMainProps) => {
       conversationId: string,
       domain = apiContext.domain ?? '',
       path: string | string[] = '',
-    ) => {
+    ): Promise<void> => {
       const pathString = Array.isArray(path) ? path.join('/') : path;
 
       await mainView.content.showConversation(
@@ -226,7 +233,7 @@ export const AppMain = (properties: AppMainProps) => {
       );
     };
 
-    const showUserProfile = (param1: string, param2?: string) => {
+    const showUserProfile = (param1: string, param2?: string): void => {
       // If param1 is a UUID, it's the userId, otherwise param2 must be the userId
       const userId = isUUID(param1) ? param1 : param2;
       let domain = param1;
@@ -283,6 +290,9 @@ export const AppMain = (properties: AppMainProps) => {
       '/preferences/av': () => {
         return mainView.list.openPreferencesAudioVideo();
       },
+      '/preferences/troubleshooting': () => {
+        return mainView.list.openPreferences(ContentState.PREFERENCES_TROUBLESHOOTING);
+      },
       '/preferences/devices': () => {
         return mainView.list.openPreferencesDevices();
       },
@@ -328,6 +338,23 @@ export const AppMain = (properties: AppMainProps) => {
       conversationRepository: repositories.conversation,
       getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
       refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
+      dependencies: {
+        isMLSSupportedByEnvironment,
+        registerTask: core.recurringTaskScheduler.registerTask,
+        initialiseMigrationOfProteusConversations: (conversations, selfUserId) => {
+          return initialiseMigrationOfProteusConversations(conversations, selfUserId, repositories.conversation);
+        },
+        joinUnestablishedMixedConversations: (conversations, selfUserId) => {
+          return joinUnestablishedMixedConversations(conversations, repositories.conversation, selfUserId, {core});
+        },
+        finaliseMigrationOfMixedConversations: conversations => {
+          return finaliseMigrationOfMixedConversations(
+            conversations,
+            repositories.conversation.updateConversationProtocol,
+            repositories.team.getTeamMLSMigrationStatus,
+          );
+        },
+      },
     });
   };
 

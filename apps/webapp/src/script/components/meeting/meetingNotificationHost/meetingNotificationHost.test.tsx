@@ -17,23 +17,23 @@
  *
  */
 
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, type RenderResult} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 
 import {MeetingNotificationHost} from './meetingNotificationHost';
 import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
 } from '../meetingNotificationStore/meetingNotificationStore';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Translate} from '../../../util/localizerUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
-jest.mock('Components/meeting/useJoinMeetingCall', () => {
+jest.mock('../useJoinMeetingCall', () => {
   return {
     useJoinMeetingCall: jest.fn(() => {
       return {
@@ -60,14 +60,14 @@ const translateForCountTest: Translate = (_key, substitutions) => {
   return '';
 };
 
-const getHost = () => {
+const getHost = (): Element | null => {
   return document.querySelector('.meeting-notification-host');
 };
-const getList = () => {
+const getList = (): HTMLElement | null => {
   return document.getElementById('meeting-notification-list');
 };
 
-const renderHost = (isStandalone = true, translate: Translate = translateForTest) => {
+const renderHost = (isStandalone = true, translate: Translate = translateForTest): RenderResult => {
   return render(
     <ThemeProvider>
       <MeetingNotificationHost isStandalone={isStandalone} />

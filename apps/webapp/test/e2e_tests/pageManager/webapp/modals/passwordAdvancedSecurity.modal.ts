@@ -30,15 +30,15 @@ export class PasswordAdvancedSecurityModal extends BaseModal {
     this.passwordInput = this.modal.getByRole('textbox');
   }
 
-  async clickBackUpNow() {
+  async clickBackUpNow(): Promise<void> {
     await this.actionButton.click();
   }
 
-  async clickCancel() {
+  async clickCancel(): Promise<void> {
     await this.cancelButton.click();
   }
 
-  async enterPassword(password: string) {
+  async enterPassword(password: string): Promise<void> {
     await this.passwordInput.fill(password);
   }
 }

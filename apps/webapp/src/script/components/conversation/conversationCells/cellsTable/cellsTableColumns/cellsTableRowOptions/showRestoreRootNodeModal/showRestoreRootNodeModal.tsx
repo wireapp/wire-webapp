@@ -17,20 +17,22 @@
  *
  */
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {RootContextValue} from 'src/script/page/rootProvider';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {RootContextValue} from '../../../../../../../page/rootProvider';
+import {CellNode, CellNodeType} from '../../../../../../../types/cellNode';
+import {replaceReactComponents} from '../../../../../../../util/localizerUtil/reactLocalizerUtil';
+import {PrimaryModal} from '../../../../../../Modals/PrimaryModal';
 
 export const showRestoreRootNodeModal = ({
   node,
   onRestoreNode,
+  modalId,
   translate,
 }: {
   node: CellNode;
   onRestoreNode: () => void;
+  modalId?: string;
   translate: RootContextValue['translate'];
-}) => {
+}): void => {
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
     {
@@ -63,7 +65,7 @@ export const showRestoreRootNodeModal = ({
             : translate('cells.restoreRootNodeModal.folder.headline'),
       },
     },
-    undefined,
+    modalId,
     translate,
   );
 };

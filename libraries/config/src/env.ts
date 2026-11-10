@@ -306,6 +306,9 @@ export type Env = {
 
   URL_SUPPORT_CALLING: string;
 
+  /** Support article explaining how calls are end-to-end encrypted (call security line) */
+  URL_SUPPORT_CALL_ENCRYPTION: string;
+
   URL_SUPPORT_CAMERA_ACCESS_DENIED: string;
 
   URL_SUPPORT_CONTACT: string;

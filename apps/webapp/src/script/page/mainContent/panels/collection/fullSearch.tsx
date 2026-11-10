@@ -20,20 +20,23 @@
 import {useEffect, useMemo, useRef} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyArray, isNonEmptyString, isNull, isNumber} from '@sindresorhus/is';
-
-import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
-
-import type {Message} from 'Repositories/entity/message/message';
-import {getSearchRegex} from 'Repositories/search/fullTextSearch';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isScrolledBottom} from 'Util/scrollHelpers';
-import {useEffectRef} from 'Util/useEffectRef';
-import {noop} from 'Util/util';
 
 import {FullSearchItem} from './fullSearch/fullSearchItem';
 import type {FullSearchProvider} from './fullSearch/useFullSearch';
 import {useFullSearch} from './fullSearch/useFullSearch';
+
+import type {Message} from '../../../../repositories/entity/message/message';
+import {getSearchRegex} from '../../../../repositories/search/fullTextSearch';
+import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';
+import {SearchIcon} from '../../../../uiKit/dataDisplay/icon/searchIcon';
+import {Input} from '../../../../uiKit/inputs/input/input';
+import {InputSubmitCombo} from '../../../../uiKit/inputs/inputSubmitCombo/inputSubmitCombo';
+import {isScrolledBottom} from '../../../../util/scrollHelpers';
+import {useEffectRef} from '../../../../util/useEffectRef';
+import {noop} from '../../../../util/util';
+import {useApplicationContext} from '../../../rootProvider';
 
 const MAX_VISIBLE_MESSAGES = 30;
 const PRE_MARKED_OFFSET = 20;
@@ -68,7 +71,7 @@ type FullSearchProps = {
   searchProvider: FullSearchProvider;
 };
 
-function FullSearch(props: FullSearchProps) {
+function FullSearch(props: FullSearchProps): JSX.Element {
   const {searchProvider, click = noop, change = noop} = props;
   const {translate} = useApplicationContext();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -83,7 +86,7 @@ function FullSearch(props: FullSearchProps) {
 
   useEffect(() => {
     const parent = element?.closest('.collection-list') as HTMLDivElement;
-    const onScroll = () => {
+    const onScroll = (): void => {
       const showAdditionalMessages = isScrolledBottom(parent) && isNonEmptyArray(messages);
       if (showAdditionalMessages) {
         setMessageCount(currentCount => {

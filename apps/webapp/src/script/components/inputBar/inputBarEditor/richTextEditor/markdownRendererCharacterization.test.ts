@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-import {renderMessage} from 'Util/messageRenderer';
+import {renderMessage} from '../../../../util/messageRenderer';
 
 import {createWireLexicalEditorTestHarness} from './testSupport/createWireLexicalEditorTestHarness';
 

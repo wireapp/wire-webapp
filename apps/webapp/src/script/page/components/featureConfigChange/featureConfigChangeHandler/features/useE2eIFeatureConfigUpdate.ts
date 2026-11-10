@@ -22,13 +22,13 @@ import {useEffect} from 'react';
 import type {Clock} from '@enormora/clock/clock';
 import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
+import {configureE2EI} from './e2eIdentity';
+
 import {
   FeatureUpdateType,
   detectTeamFeatureUpdate,
-} from 'Repositories/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-
-import {configureE2EI} from './e2eIdentity';
+} from '../../../../../repositories/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
+import {TeamRepository} from '../../../../../repositories/team/TeamRepository';
 
 export function useE2EIFeatureConfigUpdate(teamRepository: TeamRepository, clock: Clock): void {
   useEffect(() => {

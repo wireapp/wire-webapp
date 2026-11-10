@@ -34,16 +34,24 @@ interface UseCellsNewNodeFormBaseProps {
   isOpen?: boolean;
 }
 
-const defaultNameNormalizer = (value: string) => {
+const defaultNameNormalizer = (value: string): string => {
   return value;
 };
 
+type UseCellsNewNodeFormBaseResult = {
+  name: string;
+  error: string | null;
+  isSubmitting: boolean;
+  handleSubmit: (formEvent: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => Promise<void>;
+  handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleClear: () => void;
+};
 export const useCellsNewNodeFormBase = ({
   createNode,
   validationCopy,
   normalizeNameForCreation = defaultNameNormalizer,
   isOpen = true,
-}: UseCellsNewNodeFormBaseProps) => {
+}: UseCellsNewNodeFormBaseProps): UseCellsNewNodeFormBaseResult => {
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,7 +66,7 @@ export const useCellsNewNodeFormBase = ({
     setIsSubmitting(false);
   }, [isOpen]);
 
-  const handleSubmit = async (formEvent: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (formEvent: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>): Promise<void> => {
     formEvent.preventDefault();
 
     if (isSubmitting) {
@@ -94,14 +102,14 @@ export const useCellsNewNodeFormBase = ({
     }
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setName(event.currentTarget.value);
     if (isClientSideNodeNameError(error, validationCopy).unwrapOr(false)) {
       setError(null);
     }
   };
 
-  const handleClear = () => {
+  const handleClear = (): void => {
     setName('');
     setError(null);
   };

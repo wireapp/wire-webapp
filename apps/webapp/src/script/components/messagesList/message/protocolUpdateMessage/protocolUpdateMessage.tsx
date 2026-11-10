@@ -17,14 +17,15 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import * as Icon from 'Components/icon';
-import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/protocolUpdateMessage';
-import {SystemMessage} from 'Repositories/entity/message/systemMessage';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {type Translate} from 'Util/localizerUtil';
-
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from '../../../../repositories/entity/message/protocolUpdateMessage';
+import {SystemMessage} from '../../../../repositories/entity/message/systemMessage';
+import {type Translate} from '../../../../util/localizerUtil';
+import * as Icon from '../../../icon';
 import {SystemMessageBase} from '../systemMessage/systemMessageBase';
 import {renderMlsSystemMessageCaption} from '../systemMessage/systemMessageCaption';
 
@@ -32,13 +33,15 @@ interface ProtocolUpdateMessageProps {
   message: ProtocolUpdateMessageEntity;
 }
 
-const createSystemMessage = (caption: string, translate: Translate) => {
+const createSystemMessage = (caption: string, translate: Translate): SystemMessage => {
   const message = new SystemMessage(translate);
   message.caption = caption;
   return message;
 };
 
-export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => {
+export const ProtocolUpdateMessage: FunctionComponent<ProtocolUpdateMessageProps> = ({
+  message,
+}: ProtocolUpdateMessageProps) => {
   const {translate} = useApplicationContext();
   if (message.protocol === CONVERSATION_PROTOCOL.MIXED) {
     const messages = [

@@ -23,21 +23,21 @@ import userEvent from '@testing-library/user-event';
 import React, {KeyboardEventHandler, MouseEventHandler, ReactNode} from 'react';
 import type {FunctionComponent} from 'react';
 
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../../../../uiKit/identity/theme/theme';
 
-import type {AssetUrl} from 'Components/messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer';
-import type {GetAssetUrl, ImageLogger} from 'Components/image';
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {User} from 'Repositories/entity/User';
+import type {AssetUrl} from '../common/useAssetTransfer/useAssetTransfer';
+import type {GetAssetUrl, ImageLogger} from '../../../../../image';
+import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
+import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
+import {MediumImage} from '../../../../../../repositories/entity/message/mediumImage';
+import {User} from '../../../../../../repositories/entity/User';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 import {ImageAsset, ImageAssetProps} from './imageAsset';
 
@@ -48,7 +48,7 @@ function buildImageLoggerMock(): ImageLoggerMock {
   return {error: jest.fn()};
 }
 
-jest.mock('Components/inViewport', () => {
+jest.mock('../../../../../inViewport', () => {
   interface MockInViewportProps {
     'aria-label'?: string;
     children: ReactNode;
@@ -127,14 +127,13 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
     return image;
   }
 
-  const createDefaultMessage = () => {
+  const createDefaultMessage = (): ContentMessage => {
     const message = new ContentMessage(undefined, translateForTest);
     mockUser.name('Test User');
     message.user(mockUser);
@@ -174,7 +173,6 @@ describe('image-asset', () => {
           assetKey: 'remote',
           assetDomain: 'test-domain.wire.com',
           assetToken: '',
-          forceCaching: false,
         }),
       );
     });
@@ -192,7 +190,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -221,7 +218,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -346,7 +342,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -388,7 +383,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -428,7 +422,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -455,7 +448,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -483,7 +475,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -511,7 +502,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 

@@ -17,10 +17,10 @@
  *
  */
 
-import {ChangeEvent, FormEvent} from 'react';
-import {act, renderHook} from '@testing-library/react';
+import {ChangeEvent, FormEvent, type MouseEvent} from 'react';
+import {act, renderHook, type RenderHookResult} from '@testing-library/react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 
 import {useCellsNewFileForm} from './useCellsNewFileForm';
 import type {CellsFileType} from './useCellsNewFileForm';
@@ -29,14 +29,14 @@ describe('useCellsNewFileForm', () => {
   const validationCopy = {
     genericError: 'cells.newItemMenuModalForm.genericError',
     alreadyExistsError: 'cells.newItemMenuModalForm.alreadyExistsError',
-    invalidCharactersError: 'cells.newItemMenuModalForm.invalidCharactersError',
+    invalidCharactersError: 'cells.nodeName.invalidCharactersError',
     maxLengthError: 'cells.newItemMenuModalForm.maxLengthError',
     nameRequired: 'cells.newItemMenuModalForm.nameRequired',
   };
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let onSuccess: jest.Mock;
 
-  const createEvent = () => {
+  const createEvent = (): FormEvent<HTMLFormElement> => {
     return {preventDefault: jest.fn()} as unknown as FormEvent<HTMLFormElement>;
   };
 
@@ -49,7 +49,18 @@ describe('useCellsNewFileForm', () => {
     onSuccess = jest.fn();
   });
 
-  const renderUseCellsNewFileForm = (fileType: CellsFileType = 'document') => {
+  type RenderUseCellsNewFileFormResult = RenderHookResult<
+    {
+      name: string;
+      error: string | null;
+      isSubmitting: boolean;
+      handleSubmit: (formEvent: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => Promise<void>;
+      handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
+      handleClear: () => void;
+    },
+    unknown
+  >;
+  const renderUseCellsNewFileForm = (fileType: CellsFileType = 'document'): RenderUseCellsNewFileFormResult => {
     return renderHook(() => {
       return useCellsNewFileForm({
         fileType,

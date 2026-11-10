@@ -17,27 +17,26 @@
  *
  */
 
-import {useEffect} from 'react';
-
-import {SuccessShield} from '@wireapp/react-ui-kit/lib/images/successShield';
-
-import {ActionLinkButton, FlexBox, Text} from '@wireapp/react-ui-kit';
-
-import {Config} from 'src/script/Config';
-import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useEffect, type FunctionComponent} from 'react';
 
 import {Page} from './page';
 import {styles} from './success.styles';
 
+import {Config} from '../../Config';
+import {replaceBrowserLocation} from '../../navigation/browserLocation';
+import {useApplicationContext} from '../../page/rootProvider';
+import {SuccessShield} from '../../uiKit/images/successShield';
+import {FlexBox} from '../../uiKit/layout/flexBox/flexBox';
+import {ActionLinkButton} from '../../uiKit/typography/actionLink/actionLink';
+import {Text} from '../../uiKit/typography/text/text';
 import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {PageView, resetTelemetrySession, trackTelemetryPageView} from '../util/trackingUtil';
 import {pathWithParams} from '../util/urlUtil';
 
-export const Success = () => {
+export const Success: FunctionComponent = () => {
   const {translate} = useApplicationContext();
-  const secureOpen = (url: string) => {
+  const secureOpen = (url: string): void => {
     replaceBrowserLocation(url);
   };
 

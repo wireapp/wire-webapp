@@ -17,7 +17,7 @@
  *
  */
 
-import {handleEscDown} from 'Util/keyboardUtil';
+import type {FunctionComponent} from 'react';
 
 import {ConfirmDiscardModal} from './ConversationType/ConfirmDiscardModal';
 import {createConversationModalWrapperCss} from './CreateConversation.styles';
@@ -29,17 +29,18 @@ import {CreateConversationSteps} from './CreateConversationSteps/CreateConversat
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
 import {ConversationType} from './types';
 
+import {handleEscDown} from '../../../util/keyboardUtil';
 import {ModalComponent} from '../ModalComponent';
 
-export const CreateConversationModal = () => {
+export const CreateConversationModal: FunctionComponent = () => {
   const {isOpen, hideModal, setIsConfirmDiscardModalOpen, setConversationType, gotoPreviousStep, discardTrigger} =
     useCreateConversationModal();
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     setIsConfirmDiscardModalOpen(false);
   };
 
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     if (discardTrigger === 'modalClose') {
       hideModal();
       return;

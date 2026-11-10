@@ -1,6 +1,6 @@
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, withLogin, expect} from '../../test.fixtures';
 
 test.describe('Invites', () => {
   let user: User;

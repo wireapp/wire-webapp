@@ -23,10 +23,11 @@ import {$getSelection, $isRangeSelection} from 'lexical';
 
 import {isListNode} from '../common/isListNode/isListNode';
 
-export const useListState = () => {
+type UseListStateResult = {formatList: (listType: 'unordered' | 'ordered') => void};
+export const useListState = (): UseListStateResult => {
   const [editor] = useLexicalComposerContext();
 
-  const formatList = (listType: 'unordered' | 'ordered') => {
+  const formatList = (listType: 'unordered' | 'ordered'): void => {
     editor.update(() => {
       const selection = $getSelection();
 

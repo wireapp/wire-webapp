@@ -17,18 +17,18 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, type RenderResult} from '@testing-library/react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Config} from 'src/script/Config';
-import {translateForTest} from 'Util/test/translateForTest';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {Config} from '../../../Config';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {withTheme} from '../../../auth/util/test/testUtil';
 
 import {ControlButtons} from './controlButtons';
 
@@ -115,7 +115,7 @@ describe('ControlButtons', () => {
     expect(queryByTitle('tooltipConversationFile')).toBe(null);
   });
 
-  const renderCellsControls = (cellsState: CONVERSATION_CELLS_STATE) => {
+  const renderCellsControls = (cellsState: CONVERSATION_CELLS_STATE): RenderResult => {
     spyOn(Config, 'getConfig').and.returnValue({
       FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*'], ENABLE_CELLS: true},
     });

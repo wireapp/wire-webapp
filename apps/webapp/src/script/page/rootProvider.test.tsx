@@ -26,8 +26,8 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {applockRefactoredFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from './testSupport/rootContextTestSupport';
-import {RootContext, RootContextValue, RootProvider, useApplicationContext, useMainViewModel} from './rootProvider';
-import {translateForTest} from 'Util/test/translateForTest';
+import {RootContext, RootContextValue, useApplicationContext, useMainViewModel} from './rootProvider';
+import {translateForTest} from '../util/test/translateForTest';
 
 interface WrapperProperties {
   children: ReactNode;

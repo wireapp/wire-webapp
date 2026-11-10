@@ -17,19 +17,18 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Runtime} from '@wireapp/commons';
 
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {User} from 'Repositories/entity/User';
-import {Translate} from 'Util/localizerUtil';
-import {renderElement} from 'Util/renderElement';
-
 import {Config} from '../../../Config';
+import {User} from '../../../repositories/entity/User';
+import {Translate} from '../../../util/localizerUtil';
+import {renderElement} from '../../../util/renderElement';
+import * as Icon from '../../icon';
+import {ModalComponent} from '../ModalComponent';
 
 interface InviteModalProps {
   translate: Translate;
@@ -39,7 +38,7 @@ interface InviteModalProps {
 
 const {BRAND_NAME: brandName} = Config.getConfig();
 
-const InviteModal = ({translate, selfUser, onClose}: InviteModalProps) => {
+const InviteModal: FunctionComponent<InviteModalProps> = ({translate, selfUser, onClose}: InviteModalProps) => {
   const [isInviteMessageSelected, setIsInviteMessageSelected] = useState<boolean>(false);
   const userName = selfUser.username();
   const inviteMessage = isNonEmptyString(userName)
@@ -51,19 +50,19 @@ const InviteModal = ({translate, selfUser, onClose}: InviteModalProps) => {
     ? translate('inviteHintSelected', {metaKey})
     : translate('inviteHintUnselected', {metaKey});
 
-  const onTextClick = () => {
+  const onTextClick = (): void => {
     return setIsInviteMessageSelected(true);
   };
-  const onBlur = () => {
+  const onBlur = (): void => {
     return setIsInviteMessageSelected(false);
   };
 
-  const onClick = (ev: React.MouseEvent<HTMLTextAreaElement, MouseEvent>) => {
+  const onClick = (ev: React.MouseEvent<HTMLTextAreaElement, MouseEvent>): void => {
     (ev.target as HTMLTextAreaElement).select();
     onTextClick();
   };
 
-  const onFocus = (ev: React.FocusEvent<HTMLTextAreaElement, Element>) => {
+  const onFocus = (ev: React.FocusEvent<HTMLTextAreaElement, Element>): void => {
     ev.target.select();
     onTextClick();
   };

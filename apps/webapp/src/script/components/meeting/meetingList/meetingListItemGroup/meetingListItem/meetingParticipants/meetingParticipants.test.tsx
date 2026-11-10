@@ -20,20 +20,20 @@
 import {act, fireEvent, render, screen} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../../../../uiKit/identity/theme/theme';
 import {container} from 'tsyringe';
 
-import {User} from 'Repositories/entity/User';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {UserState} from 'Repositories/user/userState';
-import {setStrings, translate} from 'Util/localizerUtil';
-import en from 'I18n/en-US.json';
+import {User} from '../../../../../../repositories/entity/User';
+import {Conversation} from '../../../../../../repositories/entity/Conversation';
+import {ConversationState} from '../../../../../../repositories/conversation/ConversationState';
+import {UserState} from '../../../../../../repositories/user/userState';
+import {setStrings, translate} from '../../../../../../util/localizerUtil';
+import en from '../../../../../../../i18n/en-US.json';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../../page/testSupport/rootContextTestSupport';
 import {MeetingParticipants} from './meetingParticipants';
 
 const qualifiedConversation: QualifiedId = {id: 'conversation-id', domain: 'example.com'};

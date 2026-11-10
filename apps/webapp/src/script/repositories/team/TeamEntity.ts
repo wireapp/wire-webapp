@@ -20,8 +20,8 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import ko from 'knockout';
 
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {isValidAsset} from 'Util/validationUtil';
+import {isValidAsset} from '../../util/validationUtil';
+import {AssetRemoteData} from '../assets/assetRemoteData';
 
 export class TeamEntity {
   creator?: string;
@@ -45,7 +45,7 @@ export class TeamEntity {
 
     try {
       hasIcon = isNonEmptyString(this.icon) && isValidAsset(this.icon);
-    } catch (error: unknown) {
+    } catch {
       // ignore error
     }
 

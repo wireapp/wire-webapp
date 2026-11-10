@@ -21,13 +21,13 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS, type FeatureMLSMigration} from '@wireapp/api-client/lib/team';
 import {Maybe, Task, task} from 'true-myth';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isMixedConversation, isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 import {useManualMigrationStore} from './useManualMigrationStore';
+
+import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {isMixedConversation, isMLSConversation} from '../../repositories/conversation/ConversationSelectors';
+import type {Conversation} from '../../repositories/entity/Conversation';
+import type {User} from '../../repositories/entity/User';
 
 export const canManuallyMigrateConversation = (
   conversation: Conversation,
@@ -87,7 +87,10 @@ export const manuallyMigrateConversation = ({
       cause: Maybe.of(cause),
     };
   };
-  const update = (current: Conversation, protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS) => {
+  const update = (
+    current: Conversation,
+    protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS,
+  ): Task<Conversation, ManualMigrationFailure> => {
     return task.tryOrElse(
       cause => {
         return failure(protocol === CONVERSATION_PROTOCOL.MIXED ? 'initialise' : 'finalise', cause);

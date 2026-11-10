@@ -17,9 +17,14 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {useCallback, useState, type Dispatch, type SetStateAction} from 'react';
 
-export const useCellExpirationToggle = () => {
+type UseCellExpirationToggleResult = {
+  isEnabled: boolean;
+  toggle: () => void;
+  setIsEnabled: Dispatch<SetStateAction<boolean>>;
+};
+export const useCellExpirationToggle = (): UseCellExpirationToggleResult => {
   const [isEnabled, setIsEnabled] = useState(false);
 
   const toggle = useCallback(() => {

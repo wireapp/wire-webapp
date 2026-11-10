@@ -19,17 +19,22 @@
 
 import {useCallback} from 'react';
 
-import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {
-  type DeleteMeetingModalMode,
-  showDeleteMeetingModal,
-} from 'Components/meeting/shared/delete/showDeleteMeetingModal';
-import {submitDeleteMeeting} from 'Components/meeting/shared/submit/submitDeleteMeeting';
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useMeetingStore} from './meetingStore/meetingStoreProvider';
+import {type DeleteMeetingModalMode, showDeleteMeetingModal} from './shared/delete/showDeleteMeetingModal';
+import {submitDeleteMeeting} from './shared/submit/submitDeleteMeeting';
+import type {MeetingInstance} from './types/meetingInstance';
 
-export const useDeleteMeeting = () => {
+import {useApplicationContext} from '../../page/rootProvider';
+import type {User} from '../../repositories/entity/User';
+
+type UseDeleteMeetingResult = {
+  openDeleteMeetingModal: (
+    meetingInstance: MeetingInstance,
+    mode: DeleteMeetingModalMode,
+    selfUser: User | undefined,
+  ) => void;
+};
+export const useDeleteMeeting = (): UseDeleteMeetingResult => {
   const {translate, fireAndForgetInvoker} = useApplicationContext();
   const deleteMeetingForMe = useMeetingStore(state => {
     return state.deleteMeetingForMe;

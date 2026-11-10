@@ -21,11 +21,11 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import sodium, {ready} from 'libsodium-wrappers-sumo';
 import {container, singleton} from 'tsyringe';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {Translate} from 'Util/localizerUtil';
-
 import {AppLockState} from './appLockState';
 import {UserState} from './userState';
+
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import type {Translate} from '../../util/localizerUtil';
 
 const APP_LOCK_STORAGE = 'app_lock';
 const APP_LOCK_ENABLED_STORAGE = 'app_lock_enabled';
@@ -120,7 +120,7 @@ export class AppLockRepository {
     window.removeEventListener('storage', this.handlePassphraseStorageEvent);
   };
 
-  disableFeature = () => {
+  disableFeature = (): void => {
     this.appLockState.isActivatedInPreferences(false);
     window.localStorage.removeItem(this.getEnabledStorageKey());
     if (!this.appLockState.isAppLockEnforced()) {
@@ -128,7 +128,7 @@ export class AppLockRepository {
     }
   };
 
-  setEnabled = (enabled: boolean) => {
+  setEnabled = (enabled: boolean): void => {
     if (enabled) {
       window.localStorage.setItem(this.getEnabledStorageKey(), 'true');
       this.appLockState.isActivatedInPreferences(true);
@@ -170,7 +170,7 @@ export class AppLockRepository {
     this.appLockState.hasPassphrase(true);
   };
 
-  removeCode = () => {
+  removeCode = (): void => {
     this.stopPassphraseObserver();
     window.localStorage.removeItem(this.getPassphraseStorageKey());
     this.appLockState.hasPassphrase(false);

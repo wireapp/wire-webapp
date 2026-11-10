@@ -17,24 +17,26 @@
  *
  */
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {RootContextValue} from 'src/script/page/rootProvider';
-import {CellNodeType, CellNode} from 'src/script/types/cellNode';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
-
 import {modalContentStyles} from './showRestoreNestedNodeModal.styles';
+
+import type {RootContextValue} from '../../../../../../../page/rootProvider';
+import {CellNodeType, CellNode} from '../../../../../../../types/cellNode';
+import {replaceReactComponents} from '../../../../../../../util/localizerUtil/reactLocalizerUtil';
+import {PrimaryModal} from '../../../../../../Modals/PrimaryModal';
 
 export const showRestoreNestedNodeModal = ({
   node,
   onRestoreNode,
   parentNodeName,
+  modalId,
   translate,
 }: {
   node: CellNode;
   onRestoreNode: () => void;
   parentNodeName: string;
+  modalId?: string;
   translate: RootContextValue['translate'];
-}) => {
+}): void => {
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
     {
@@ -70,7 +72,7 @@ export const showRestoreNestedNodeModal = ({
             : translate('cells.restoreNestedNodeModal.folder.headline'),
       },
     },
-    undefined,
+    modalId,
     translate,
   );
 };

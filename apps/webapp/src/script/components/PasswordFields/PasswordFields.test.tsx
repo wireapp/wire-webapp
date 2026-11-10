@@ -18,8 +18,8 @@
 
 import {fireEvent, render, screen} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {withTheme} from '../../auth/util/test/testUtil';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {PasswordFields} from './PasswordFields';
 

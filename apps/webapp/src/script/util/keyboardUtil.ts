@@ -39,7 +39,10 @@ export const KEY = {
   TAB: 'Tab',
 } as const;
 
-export const isOneOfKeys = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent, expectedKeys: string[] = []) => {
+export const isOneOfKeys = (
+  keyboardEvent: KeyboardEvent | ReactKeyboardEvent,
+  expectedKeys: string[] = [],
+): boolean => {
   expectedKeys = expectedKeys.map(key => {
     return key.toLowerCase();
   });
@@ -57,7 +60,7 @@ export const isPageUpDownKey = (keyboardEvent: KeyboardEvent): boolean => {
   return isOneOfKeys(keyboardEvent, [KEY.PAGE_UP, KEY.PAGE_DOWN]);
 };
 
-export const isKey = (keyboardEvent?: KeyboardEvent | ReactKeyboardEvent, expectedKey = '') => {
+export const isKey = (keyboardEvent?: KeyboardEvent | ReactKeyboardEvent, expectedKey = ''): boolean => {
   const eventKey = keyboardEvent?.key?.toLowerCase() ?? '';
   return eventKey === expectedKey.toLowerCase();
 };
@@ -111,7 +114,7 @@ export const handleKeyDown = ({
   event: ReactKeyboardEvent<Element> | KeyboardEvent;
   callback: (event?: ReactKeyboardEvent<Element> | KeyboardEvent) => void;
   keys: (typeof KEY)[keyof typeof KEY][];
-}) => {
+}): boolean => {
   if (keys.includes(event.key as (typeof KEY)[keyof typeof KEY])) {
     if ('preventDefault' in event) {
       event.preventDefault();

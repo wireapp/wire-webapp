@@ -42,7 +42,7 @@ function isAssemblyScope(value: unknown): value is AssemblyScope {
 }
 
 function resolveWebappBuildOutputPath(buildVariant: BuildVariant): string {
-  return path.resolve(workspaceRootPath, `apps/webapp/dist/${buildVariant}`);
+  return path.resolve(workspaceRootPath, 'apps/webapp/dist', buildVariant);
 }
 
 function assertPathExists(requiredPath: string): void {

@@ -23,21 +23,20 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from 'Repositories/calling/CallState';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {Participant} from 'Repositories/calling/Participant';
-import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {ChooseScreen} from './ChooseScreen';
 import {FullscreenVideoCall} from './FullscreenVideoCall';
+import {useCallAlertState} from './useCallAlertState';
 
+import {Call} from '../../repositories/calling/Call';
+import {CallingRepository} from '../../repositories/calling/CallingRepository';
+import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from '../../repositories/calling/CallState';
+import {LEAVE_CALL_REASON} from '../../repositories/calling/enum/LeaveCallReason';
+import {Participant} from '../../repositories/calling/Participant';
+import {useVideoGrid} from '../../repositories/calling/videoGridHandler';
+import {MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler';
+import {useMediaDevicesStore} from '../../repositories/media/useMediaDevicesStore';
+import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
 interface CallingContainerProps {
@@ -98,13 +97,13 @@ function CallingContainerWithJoinedCall({
 
   const videoGrid = useVideoGrid(joinedCall);
 
-  const changePage = (newPage: number, call: Call) => {
+  const changePage = (newPage: number, call: Call): void => {
     return callingRepository.changeCallPage(call, newPage);
   };
 
   const {clearShowAlert} = useCallAlertState();
 
-  const leave = (call: Call) => {
+  const leave = (call: Call): void => {
     callingRepository.setViewModeMinimized();
     callingRepository.leaveCall(call.conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
     callState.activeCallViewTab(CallViewTab.ALL);
@@ -112,11 +111,11 @@ function CallingContainerWithJoinedCall({
     clearShowAlert();
   };
 
-  const setMaximizedParticipant = (call: Call, participant: Participant | null) => {
+  const setMaximizedParticipant = (call: Call, participant: Participant | null): void => {
     call.maximizedParticipant(participant);
   };
 
-  const setActiveCallViewTab = (tab: CallViewTab) => {
+  const setActiveCallViewTab = (tab: CallViewTab): void => {
     callState.activeCallViewTab(tab);
     if (tab === CallViewTab.ALL) {
       callingRepository.requestCurrentPageVideoStreams(joinedCall);
@@ -131,42 +130,42 @@ function CallingContainerWithJoinedCall({
     };
   });
 
-  const switchCameraInput = (deviceId: string) => {
+  const switchCameraInput = (deviceId: string): void => {
     setVideoInputDeviceId(deviceId);
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await callingRepository.refreshVideoInput();
     });
   };
 
-  const switchMicrophoneInput = (deviceId: string) => {
+  const switchMicrophoneInput = (deviceId: string): void => {
     setAudioInputDeviceId(deviceId);
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await callingRepository.refreshAudioInput();
     });
   };
 
-  const switchSpeakerOutput = (deviceId: string) => {
+  const switchSpeakerOutput = (deviceId: string): void => {
     setAudioOutputDeviceId(deviceId);
     callingRepository.refreshAudioOutput();
   };
 
-  const sendEmoji = (emoji: string, call: Call) => {
+  const sendEmoji = (emoji: string, call: Call): void => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await callingRepository.sendInCallEmoji(emoji, call);
     });
   };
 
-  const sendHandRaised = (isHandUp: boolean, call: Call) => {
+  const sendHandRaised = (isHandUp: boolean, call: Call): void => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await callingRepository.sendInCallHandRaised(isHandUp, call);
     });
   };
 
-  const toggleCamera = (call: Call) => {
+  const toggleCamera = (call: Call): void => {
     return callingRepository.toggleCamera(call);
   };
 
-  const toggleMute = (call: Call, muteState: boolean) => {
+  const toggleMute = (call: Call, muteState: boolean): void => {
     return callingRepository.muteCall(call, muteState);
   };
 
@@ -176,7 +175,7 @@ function CallingContainerWithJoinedCall({
     return null;
   }
 
-  const toggleScreenShare = (call: Call) => {
+  const toggleScreenShare = (call: Call): void => {
     toggleScreenshare(call, DesktopScreenShareMenu.DETACHED_WINDOW);
   };
 

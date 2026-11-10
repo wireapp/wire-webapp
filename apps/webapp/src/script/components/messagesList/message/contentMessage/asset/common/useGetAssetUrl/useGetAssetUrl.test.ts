@@ -19,18 +19,18 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import {AssetError} from 'Repositories/assets/assetError';
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {AssetError} from '../../../../../../../repositories/assets/assetError';
+import {AssetRemoteData} from '../../../../../../../repositories/assets/assetRemoteData';
+import {AssetTransferState} from '../../../../../../../repositories/assets/assetTransferState';
+import type {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../../../page/testSupport/rootContextTestSupport';
 
 import {useGetAssetUrl} from './useGetAssetUrl';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
 
 type Result = {current: {url: string | undefined; isLoading: boolean; isError: boolean}} | undefined;
 type UseGetAssetUrlEnabledState = {
@@ -54,7 +54,6 @@ describe('useGetAssetUrl', () => {
         assetKey: 'mock-asset-key',
         assetDomain: 'mock-asset-domain',
         assetToken: 'mock-asset-token',
-        forceCaching: true,
       }),
     ),
   } as unknown as FileAsset;

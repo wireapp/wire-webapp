@@ -17,18 +17,26 @@
  *
  */
 
-import {Button, Container, H2, Link, Modal, Text} from '@wireapp/react-ui-kit';
-
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {buttonCss, containerCss, headerCss, linkCss} from './accountAlreadyExistsModal.styles';
+
+import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Container} from '../../uiKit/layout/container/container';
+import {Modal} from '../../uiKit/surface/modal/modal';
+import {H2} from '../../uiKit/typography/heading/heading';
+import {Link} from '../../uiKit/typography/link/link';
+import {Text} from '../../uiKit/typography/text/text';
 
 interface AccountAlreadyExistsModalProps {
   onClose: () => void;
 }
 
-export const AccountAlreadyExistsModal = ({onClose}: AccountAlreadyExistsModalProps) => {
+export const AccountAlreadyExistsModal: FunctionComponent<AccountAlreadyExistsModalProps> = ({
+  onClose,
+}: AccountAlreadyExistsModalProps) => {
   const {translate} = useApplicationContext();
   const {CHANGE_EMAIL_ADDRESS: changeEmailAddressUrl, DELETE_PERSONAL_ACCOUNT: deletePersonalAccountUrl} =
     Config.getConfig().URL.SUPPORT;

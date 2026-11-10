@@ -17,10 +17,10 @@
  *
  */
 
-import {ChangeEvent, FormEvent} from 'react';
-import {act, renderHook} from '@testing-library/react';
+import {ChangeEvent, FormEvent, type MouseEvent} from 'react';
+import {act, renderHook, type RenderHookResult} from '@testing-library/react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 
 import {useCellsNewFolderForm} from './useCellsNewFolderForm';
 
@@ -28,14 +28,14 @@ describe('useCellsNewFolderForm', () => {
   const validationCopy = {
     genericError: 'cells.newItemMenuModalForm.genericError',
     alreadyExistsError: 'cells.newItemMenuModalForm.alreadyExistsError',
-    invalidCharactersError: 'cells.newItemMenuModalForm.invalidCharactersError',
+    invalidCharactersError: 'cells.nodeName.invalidCharactersError',
     maxLengthError: 'cells.newItemMenuModalForm.maxLengthError',
     nameRequired: 'cells.newItemMenuModalForm.nameRequired',
   };
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let onSuccess: jest.Mock;
 
-  const createEvent = () => {
+  const createEvent = (): FormEvent<HTMLFormElement> => {
     return {preventDefault: jest.fn()} as unknown as FormEvent<HTMLFormElement>;
   };
 
@@ -48,7 +48,18 @@ describe('useCellsNewFolderForm', () => {
     onSuccess = jest.fn();
   });
 
-  const renderUseCellsNewFolderForm = () => {
+  type RenderUseCellsNewFolderFormResult = RenderHookResult<
+    {
+      name: string;
+      error: string | null;
+      isSubmitting: boolean;
+      handleSubmit: (formEvent: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => Promise<void>;
+      handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
+      handleClear: () => void;
+    },
+    unknown
+  >;
+  const renderUseCellsNewFolderForm = (): RenderUseCellsNewFolderFormResult => {
     return renderHook(() => {
       return useCellsNewFolderForm({
         cellsRepository: mockCellsRepository,
@@ -75,6 +86,22 @@ describe('useCellsNewFolderForm', () => {
     expect(mockCellsRepository.createFolder).toHaveBeenCalledTimes(1);
     expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
     expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows an error and does not call onSuccess when folder creation fails', async () => {
+    mockCellsRepository.createFolder.mockRejectedValue(new Error('create failed'));
+    const {result} = renderUseCellsNewFolderForm();
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'New folder'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.error).toBe(validationCopy.genericError);
+    expect(onSuccess).not.toHaveBeenCalled();
   });
 
   it('preserves provided folder name and does not append file metadata', async () => {

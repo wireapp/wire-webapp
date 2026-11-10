@@ -38,24 +38,6 @@ import {partition} from 'underscore';
 
 import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {User} from 'Repositories/entity/User';
-import {EventSource} from 'Repositories/event/EventSource';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {IntegrationMapper} from 'Repositories/integration/IntegrationMapper';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/user/userPermission';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {Config} from 'src/script/Config';
-import {Environment} from 'Util/environment';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {loadDataUrl} from 'Util/util';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamMapper} from './TeamMapper';
@@ -63,13 +45,32 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
 
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {Config} from '../../Config';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
 import {APIClient} from '../../service/apiClientSingleton';
+import {Environment} from '../../util/environment';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {loadDataUrl} from '../../util/util';
+import {WebAppEvents} from '../../webAppEvents';
+import {AssetRepository} from '../assets/assetRepository';
+import {User} from '../entity/User';
+import {EventSource} from '../event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {IntegrationMapper} from '../integration/IntegrationMapper';
+import {ServiceEntity} from '../integration/ServiceEntity';
+import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/userPermission';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 
 const teamRefreshIntervalInMinutes = 5;
 const minimumDesktopDownloadPathMinorVersion = 20;
 const minimumDesktopDownloadPathMajorVersion = 3;
+type TeamInitializationResult = {team: TeamEntity | undefined; features: FeatureList; members: QualifiedId[]};
+type UpdatedFeatureConfig = {newFeatureList: FeatureList; prevFeatureList?: FeatureList};
 
 export const HAS_PERSISTED_SUPPORTED_PROTOCOLS = 'HAS_PERSISTED_SUPPORTED_PROTOCOLS';
 
@@ -133,7 +134,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     );
   }
 
-  private updatePersistedSupportedProtocols() {
+  private updatePersistedSupportedProtocols(): void {
     localStorage.setItem(HAS_PERSISTED_SUPPORTED_PROTOCOLS, 'true');
   }
 
@@ -142,9 +143,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
    * @param teamId the Id of the team to init
    * @param contacts all the contacts the self user has, team members will be deduced from it.
    */
-  async initTeam(
-    teamId?: string,
-  ): Promise<{team: TeamEntity | undefined; features: FeatureList; members: QualifiedId[]}> {
+  async initTeam(teamId?: string): Promise<TeamInitializationResult> {
     const team = await this.getTeam();
     // get the fresh feature config from backend
     const featureResult = await this.getSafeTeamFeatures(true);
@@ -188,7 +187,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     return {team, features: newFeatureList, members};
   }
 
-  private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {
+  private async updateFeatureConfig(): Promise<UpdatedFeatureConfig> {
     const prevFeatureList = this.teamState.teamFeatures();
     const featureResult = await this.getSafeTeamFeatures(false);
     if (featureResult === undefined) {
@@ -286,7 +285,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   }
 
   private readonly scheduleTeamRefresh = async (): Promise<void> => {
-    const updateTeam = async () => {
+    const updateTeam = async (): Promise<void> => {
       try {
         updateRemoteConfigLogger.info('Updating team-settings');
         await this.getTeam();
@@ -305,7 +304,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     });
   };
 
-  private showReloadAppModal = () => {
+  private showReloadAppModal = (): void => {
     PrimaryModal.show(
       PrimaryModal.type.CONFIRM,
       {
@@ -656,7 +655,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     return this.teamService.getTeamById(teamId);
   }
 
-  private async onDelete(eventJson: TeamDeleteEvent | TeamMemberLeaveEvent) {
+  private async onDelete(eventJson: TeamDeleteEvent | TeamMemberLeaveEvent): Promise<void> {
     const {team: teamId} = eventJson;
     if (this.teamState.isTeam() && this.teamState.team().id === teamId) {
       this.teamState.isTeamDeleted(true);
@@ -664,7 +663,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }
   }
 
-  private onDeleteConversation(eventJson: TeamConversationDeleteEvent) {
+  private onDeleteConversation(eventJson: TeamConversationDeleteEvent): void {
     const {
       data: {conv: conversationId},
     } = eventJson;
@@ -692,7 +691,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     await this.updateFeatureConfig();
   };
 
-  private async onMemberLeave(eventJson: TeamMemberLeaveEvent) {
+  private async onMemberLeave(eventJson: TeamMemberLeaveEvent): Promise<void> {
     const {
       data: {user: userId},
       team: teamId,

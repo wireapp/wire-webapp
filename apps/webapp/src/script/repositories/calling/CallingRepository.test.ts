@@ -22,6 +22,8 @@ import {
   DefaultConversationRoleName,
   GROUP_CONVERSATION_TYPE,
 } from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
@@ -34,6 +36,7 @@ import {container} from 'tsyringe';
 import {
   CALL_TYPE,
   CONV_TYPE,
+  ERROR,
   QUALITY,
   REASON,
   STATE as CALL_STATE,
@@ -42,45 +45,50 @@ import {
   type WcallAudioCbrChangeHandler,
 } from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {CallingEvent} from 'Repositories/event/CallingEvent';
-import {CALL} from 'Repositories/event/Client';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {MediaType} from 'Repositories/media/MediaType';
-import {UserRepository} from 'Repositories/user/userRepository';
-import type {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
-import {TestFactory} from 'test/helper/TestFactory';
-import {createUuid} from 'Util/uuid';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {Conversation} from '../entity/Conversation';
+import {CryptographyMapper} from '../cryptography/CryptographyMapper';
+import {User} from '../entity/User';
+import {CallingEvent} from '../event/CallingEvent';
+import {CALL} from '../event/Client';
+import {EventRepository} from '../event/EventRepository';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {MediaType} from '../media/MediaType';
+import {UserRepository} from '../user/userRepository';
+import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {TestFactory} from '../../../../test/helper/TestFactory';
+import {createUuid} from '../../util/uuid';
 
 import {Call} from './Call';
 import {CallingRepository, MediaStreamQuery, setupDetachedWindowExternalLinksClick} from './CallingRepository';
 import {CallingViewMode, CallState, MuteState} from './CallState';
 import {type NetworkQuality, UNKNOWN_NETWORK_QUALITY} from './calling.schema';
+import assert from 'node:assert';
+
+import {parseSerializedCallingMessage} from './callingMessage.schema';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
-import {useActiveWindowState} from 'Hooks/useActiveWindow';
+import {useActiveWindowState} from '../../hooks/useActiveWindow';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {Core} from '../../service/coreSingleton';
+import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
-import {translateForTest} from 'Util/test/translateForTest';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {BackgroundEffectsHandler, ReleasableMediaStream} from 'Repositories/media/backgroundEffectsHandler';
+import {translateForTest} from '../../util/test/translateForTest';
+import {MessageRepository} from '../conversation/MessageRepository';
+import {MediaStreamHandler} from '../media/MediaStreamHandler';
+import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {BackgroundEffectsHandler, ReleasableMediaStream} from '../media/backgroundEffectsHandler';
 import {APIClient} from '../../service/apiClientSingleton';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Translate} from 'Util/localizerUtil';
+import {ConversationState} from '../conversation/ConversationState';
+import {Translate} from '../../util/localizerUtil';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {BackgroundEffectSelection} from '../media/VideoBackgroundEffects';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {NoAudioInputError} from '../../error/noAudioInputError';
 
 type AudioFlowStat = {
@@ -90,6 +98,12 @@ type AudioFlowStat = {
   kind?: string;
   mediaType?: string;
 };
+type CallingRepositoryTestSetup = {
+  callState: CallState;
+  conversationState: ConversationState;
+  repository: CallingRepository;
+};
+type AudioStatsResult = {bytesFlowing: number; id: string | undefined};
 
 function createCallingRepositoryForTest({
   backgroundEffectsHandler = {} as BackgroundEffectsHandler,
@@ -121,7 +135,7 @@ function createCallingRepositoryForTest({
   userRepository?: UserRepository;
   apiClient?: APIClient;
   sftHttpClient?: Pick<typeof axios, 'post'>;
-} = {}) {
+} = {}): CallingRepositoryTestSetup {
   return {
     callState,
     conversationState,
@@ -144,12 +158,7 @@ function createCallingRepositoryForTest({
   };
 }
 
-const translateWithPrefixForTest: Translate = (
-  translationKey,
-  _substitutions,
-  _dangerousSubstitutions,
-  _skipEscape,
-) => {
+const translateWithPrefixForTest: Translate = translationKey => {
   return `translated:${translationKey}`;
 };
 
@@ -245,7 +254,11 @@ function createSftCallingFixture(): SftCallingFixture {
 }
 
 describe('CallingRepository', () => {
-  const testFactory = new TestFactory();
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
+  let testFactory: TestFactory;
   let callingRepository: CallingRepository;
   let wCall: Wcall;
   let wUser: number;
@@ -253,7 +266,19 @@ describe('CallingRepository', () => {
   selfUser.isMe = true;
   const clientId = createUuid();
 
-  beforeAll(() => {
+  beforeEach(() => {
+    testFactory = new TestFactory(
+      createCoreTestFixture({
+        backendFeatures: {isFederated: false},
+        service: {
+          subconversation: {
+            joinConferenceSubconversation: jest.fn(),
+            leaveConferenceSubconversation: jest.fn(),
+            subscribeToEpochUpdates: jest.fn(),
+          },
+        },
+      }),
+    );
     return testFactory.exposeCallingActors().then(injectedCallingRepository => {
       callingRepository = injectedCallingRepository;
       return callingRepository.initAvs(selfUser, clientId).then(avsApi => {
@@ -268,6 +293,7 @@ describe('CallingRepository', () => {
     callingRepository['conversationState'].conversations([]);
     callingRepository.destroy();
     jest.restoreAllMocks();
+    container.clearInstances();
   });
 
   afterAll(() => {
@@ -366,17 +392,25 @@ describe('CallingRepository', () => {
       expect(sftResponse).toHaveBeenLastCalledWith(avsUser, 200, responseBody, responseBody.length, requestContext);
     });
 
-    it('trusts the Rust override instead of the original backend SFT lists without mutating the response', async () => {
+    it('trusts the Staging override instead of the original backend SFT lists without mutating the response', async () => {
       const {repository, requestConfig, sendRequest, postSftRequest, configUpdate, backendConfig, avsUser} =
         createSftCallingFixture();
-      repository['isOnAvsRustSft'] = true;
+      repository['isOnAvsStagingSft'] = true;
       await requestConfig();
-      const rustSftServers = [{urls: ['https://rust-sft.stars.wire.link']}];
+      const stagingSftServers = [{urls: ['https://sft.calling-staging-v01.zinfra.io']}];
+      const stagingSftServerAll = [
+        {
+          urls: ['https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0'],
+        },
+        {
+          urls: ['https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1'],
+        },
+      ];
 
       expect(configUpdate).toHaveBeenLastCalledWith(
         avsUser,
         0,
-        JSON.stringify({...backendConfig, sft_servers: rustSftServers, sft_servers_all: rustSftServers}),
+        JSON.stringify({...backendConfig, sft_servers: stagingSftServers, sft_servers_all: stagingSftServerAll}),
       );
       expect(backendConfig.sft_servers).toEqual([{urls: ['https://initial.example.com']}]);
       expect(backendConfig.sft_servers_all).toEqual([{urls: ['https://joinable.example.com:8443']}]);
@@ -386,7 +420,7 @@ describe('CallingRepository', () => {
 
       expect(postSftRequest).not.toHaveBeenCalled();
 
-      await sendRequest('https://rust-sft.stars.wire.link/sft/conversation-id');
+      await sendRequest('https://sft.calling-staging-v01.zinfra.io/sfts/conversation-id');
 
       expect(postSftRequest).toHaveBeenCalledTimes(1);
     });
@@ -416,6 +450,121 @@ describe('CallingRepository', () => {
   });
 
   describe('onCallEvent', () => {
+    it.each([
+      {avsResult: 0, expectedWarnings: 0},
+      {avsResult: ERROR.UNKNOWN_PROTOCOL, expectedWarnings: 1},
+    ])('forwards version 4.0 to AVS returning $avsResult', async ({avsResult, expectedWarnings}) => {
+      const conversation = createConversation();
+      callingRepository['conversationState'].conversations.push(conversation);
+      const recvMsg = jest.spyOn(wCall, 'recvMsg').mockReturnValue(avsResult);
+      const warnOutdatedClient = jest
+        .spyOn(
+          callingRepository as unknown as {warnOutdatedClient: (conversationId: QualifiedId) => void},
+          'warnOutdatedClient',
+        )
+        .mockImplementation(noop);
+      const content = {
+        type: CALL_MESSAGE_TYPE.CONF_START as const,
+        version: '4.0',
+        resp: false,
+        sessid: 'session',
+        secret: 'c2VjcmV0',
+        seqno: '0',
+        sft_url: 'https://sft.example',
+        timestamp: '1',
+        future: {codecs: ['example']},
+      };
+      const parsed = parseSerializedCallingMessage(JSON.stringify(content));
+      assert(parsed.isOk);
+      const event: CallingEvent = {
+        content: parsed.value,
+        conversation: conversation.id,
+        qualified_conversation: conversation.qualifiedId,
+        from: 'sender',
+        sender: 'client',
+        time: '2026-01-01T00:00:00.000Z',
+        type: CALL.E_CALL,
+      };
+
+      await callingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+
+      expect(recvMsg).toHaveBeenCalledTimes(1);
+      expect(JSON.parse(recvMsg.mock.calls[0][1])).toEqual(content);
+      expect(warnOutdatedClient).toHaveBeenCalledTimes(expectedWarnings);
+    });
+
+    it.each([
+      ['oversized string', JSON.stringify({type: 'SETUP', version: '4.0', sdp: 'a'.repeat(65_537)})],
+      ['deep nesting', '{"type":"CONFSTART","version":"4.0","future":' + '['.repeat(17) + '0' + ']'.repeat(17) + '}'],
+    ])('discards an unfamiliar-version %s before AVS', async (_name, content) => {
+      const conversation = createConversation();
+      callingRepository['conversationState'].conversations.push(conversation);
+      const recvMsg = jest.spyOn(wCall, 'recvMsg').mockReturnValue(0);
+      const mapper = new CryptographyMapper(container.resolve(Core));
+      const mapped = await mapper.mapGenericMessage(
+        new GenericMessage({messageId: createUuid(), calling: new Calling({content})}),
+        {
+          conversation: conversation.id,
+          qualified_conversation: conversation.qualifiedId,
+          from: 'sender',
+          time: '2026-01-01T00:00:00.000Z',
+          type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+          data: {sender: 'client', recipient: 'self-client', text: ''},
+        },
+      );
+      if (mapped && mapped.type === CALL.E_CALL) {
+        await callingRepository.onCallEvent(
+          {
+            content: mapped.content,
+            conversation: mapped.conversation,
+            qualified_conversation: conversation.qualifiedId,
+            from: mapped.from,
+            sender: 'client',
+            time: mapped.time,
+            type: CALL.E_CALL,
+          },
+          EventRepository.SOURCE.WEB_SOCKET,
+        );
+      }
+
+      expect(mapped).toBeUndefined();
+      expect(recvMsg).not.toHaveBeenCalled();
+    });
+
+    it('forwards validated CONFCHECK messages to AVS', async () => {
+      const conversation = createConversation();
+      callingRepository['conversationState'].conversations.push(conversation);
+      const recvMsg = jest.spyOn(wCall, 'recvMsg').mockReturnValue(0);
+      const content = {
+        type: CALL_MESSAGE_TYPE.CONF_CHECK,
+        version: '3.0',
+        resp: true,
+        sessid: 'session',
+        secret: 'c2VjcmV0',
+        seqno: '0',
+        sft_url: 'https://sft.example',
+        timestamp: '1',
+      };
+      const parsed = parseSerializedCallingMessage(JSON.stringify(content));
+      assert(parsed.isOk);
+
+      await callingRepository.onCallEvent(
+        {
+          content: parsed.value,
+          conversation: conversation.id,
+          qualified_conversation: conversation.qualifiedId,
+          from: 'sender',
+          sender: 'client',
+          time: '2026-01-01T00:00:00.000Z',
+          type: CALL.E_CALL,
+        },
+        EventRepository.SOURCE.WEB_SOCKET,
+      );
+
+      expect(recvMsg).toHaveBeenCalledTimes(1);
+      expect(JSON.parse(recvMsg.mock.calls[0][1])).toEqual(content);
+    });
+
     it('does mute itself when remote muted message arrives', async () => {
       const conversation = createConversation();
       const selfParticipant = createSelfParticipant();
@@ -555,6 +704,56 @@ describe('CallingRepository', () => {
       expect(callingRepository.muteCall).not.toHaveBeenCalled();
       expect(wCall.recvMsg).not.toHaveBeenCalled();
     });
+  });
+
+  it.each([1, 256, 257, 500])('sends valid moderator-mute batches for %s same-domain users', count => {
+    const conversation = createConversation();
+    callingRepository['conversationState'].conversations.push(conversation);
+    const sendCallingMessage = jest
+      .spyOn(callingRepository['messageRepository'], 'sendCallingMessage')
+      .mockResolvedValue({} as Awaited<ReturnType<MessageRepository['sendCallingMessage']>>);
+    const participants = Array.from({length: count}, (_, index) => {
+      return new Participant(new User(`user-${index}`, 'example.com', translateForTest), `client-${index}`);
+    });
+
+    callingRepository.sendModeratorMute(conversation.qualifiedId, participants);
+
+    expect(sendCallingMessage).toHaveBeenCalledTimes(Math.ceil(count / 256));
+    const receivedUsers: string[] = [];
+    for (const [targetConversation, serialized, options] of sendCallingMessage.mock.calls) {
+      assert(typeof serialized === 'string');
+      const parsed = parseSerializedCallingMessage(serialized);
+      assert(parsed.isOk);
+      assert(parsed.value.type === CALL_MESSAGE_TYPE.REMOTE_MUTE);
+      const targets = parsed.value.data.targets;
+      expect(targetConversation).toBe(conversation);
+      expect(options).toEqual({nativePush: true, recipients: targets});
+      const users = Object.keys(targets['example.com']);
+      expect(users.length).toBeLessThanOrEqual(256);
+      for (const user of users) {
+        expect(targets['example.com'][user]).toEqual([`client-${user.slice('user-'.length)}`]);
+      }
+      receivedUsers.push(...users);
+    }
+    expect(receivedUsers).toEqual(
+      participants.map(participant => {
+        return participant.user.id;
+      }),
+    );
+  });
+
+  it('preserves version 3.0 in outgoing AVS messages', async () => {
+    const conversation = createConversation();
+    callingRepository['conversationState'].conversations.push(conversation);
+    const sendCallingMessage = jest
+      .spyOn(callingRepository['messageRepository'], 'sendCallingMessage')
+      .mockResolvedValue({} as Awaited<ReturnType<MessageRepository['sendCallingMessage']>>);
+    const payload = JSON.stringify({resp: false, sessid: 'session', type: CALL_MESSAGE_TYPE.CANCEL, version: '3.0'});
+
+    await callingRepository['sendCallingMessage'](conversation.qualifiedId, payload);
+
+    expect(sendCallingMessage).toHaveBeenCalledWith(conversation, payload, undefined);
+    expect(JSON.parse(sendCallingMessage.mock.calls[0][1] as string).version).toBe('3.0');
   });
 
   describe('startCall', () => {
@@ -1241,7 +1440,7 @@ describe('CallingRepository', () => {
     const userId = 'user-id';
     const remoteClientId = 'client-id';
 
-    const qualityInfo = (quality: NetworkQuality) => {
+    const qualityInfo = (quality: NetworkQuality): string => {
       return JSON.stringify({
         quality,
         rtt: 80,
@@ -1718,7 +1917,7 @@ describe('CallingRepository ISO', () => {
 
       expect(callingRepo['callState'].calls().length).toBe(0);
 
-      callingRepo.onIncomingCall(call => {
+      callingRepo.onIncomingCall(() => {
         expect(callingRepo['callState'].calls().length).toBe(1);
 
         return Promise.resolve();
@@ -1726,7 +1925,17 @@ describe('CallingRepository ISO', () => {
       await callingRepo.onCallEvent(event, '');
     });
 
-    const setupIncomingCallContext = async () => {
+    type IncomingCallContext = {
+      callingRepo: CallingRepository;
+      conversation: Conversation;
+      incomingCallCallback: jest.Mock;
+      rejectSpy: jest.SpyInstance;
+      sendIncomingSetup: (setupReceivedAt: number) => Promise<void>;
+      setCurrentTimestamp: (timestamp: number) => void;
+      triggerIncomingh: (shouldRing: 0 | 1) => void;
+    };
+
+    const setupIncomingCallContext = async (): Promise<IncomingCallContext> => {
       let currentTimestamp = 1_700_000_000_000;
       const selfUser = new User(createUuid(), '', translateForTest);
       selfUser.isMe = true;
@@ -1761,7 +1970,7 @@ describe('CallingRepository ISO', () => {
         sendIncomingSetup: async (setupReceivedAt: number) => {
           await callingRepo.onCallEvent(
             {
-              content: {resp: false, type: CALL_MESSAGE_TYPE.SETUP, version: '3.0'},
+              content: {resp: false, sessid: 'test-session', sdp: '', type: CALL_MESSAGE_TYPE.SETUP, version: '3.0'},
               conversation: conversation.id,
               from: createUuid(),
               sender: createUuid(),
@@ -1918,7 +2127,7 @@ describe.skip('E2E audio call', () => {
           );
         },
       );
-    return client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+    return client.initAvs(user, 'device').then(({wCall: wCallInstance}) => {
       remoteWuser = createAutoAnsweringWuser(wCallInstance, client);
       wCall = wCallInstance;
     });
@@ -2074,7 +2283,7 @@ describe('init AVS state', () => {
   it('start polling', done => {
     const nowMock = jest.spyOn(Date, 'now');
     nowMock.mockReturnValue(0);
-    client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+    client.initAvs(user, 'device').then(({wCall: wCallInstance}) => {
       createAutoAnsweringWuser(wCallInstance, client);
       jest.spyOn(wCallInstance, 'setBackground');
       jest.spyOn(wCallInstance, 'poll');
@@ -2090,7 +2299,7 @@ describe('init AVS state', () => {
   it('set info that app was in background to AVS', done => {
     const nowMock = jest.spyOn(Date, 'now');
     nowMock.mockReturnValue(0);
-    client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+    client.initAvs(user, 'device').then(({wCall: wCallInstance}) => {
       createAutoAnsweringWuser(wCallInstance, client);
       jest.spyOn(wCallInstance, 'setBackground');
       jest.spyOn(wCallInstance, 'poll');
@@ -2106,7 +2315,7 @@ describe('init AVS state', () => {
   it('set info that app was in background to AVS fails', done => {
     const nowMock = jest.spyOn(Date, 'now');
     nowMock.mockReturnValue(0);
-    client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+    client.initAvs(user, 'device').then(({wCall: wCallInstance}) => {
       createAutoAnsweringWuser(wCallInstance, client);
       jest.spyOn(wCallInstance, 'setBackground').mockImplementation(() => {
         throw new Error('AVS set background fails');
@@ -2123,7 +2332,7 @@ describe('init AVS state', () => {
   });
 });
 
-const createLinkInsideDetachedWindow = (detachedWindow: Window, target = '_blank') => {
+const createLinkInsideDetachedWindow = (detachedWindow: Window, target = '_blank'): HTMLAnchorElement => {
   detachedWindow.document.body.innerHTML = `<a href="https://wire.com" target="${target}">Wire</a>`;
 
   return requireValueForTest(detachedWindow.document.querySelector('a'));
@@ -3481,8 +3690,8 @@ describe('set background effect', () => {
   });
 });
 
-function extractAudioStats(stats: {stats: RTCStatsReport}[]) {
-  const audioStats: {bytesFlowing: number; id: string | undefined}[] = [];
+function extractAudioStats(stats: {stats: RTCStatsReport}[]): AudioStatsResult[] {
+  const audioStats: AudioStatsResult[] = [];
   stats.forEach(userStats => {
     userStats.stats.forEach(data => {
       const audioStat = data as AudioFlowStat;
@@ -3497,7 +3706,7 @@ function extractAudioStats(stats: {stats: RTCStatsReport}[]) {
   return audioStats;
 }
 
-function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: CallingRepository) {
+function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: CallingRepository): number {
   const selfUserId = createUuid();
   const selfClientId = createUuid();
   const sendMsg = (
@@ -3508,7 +3717,7 @@ function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: Calling
     targets: string | null,
     _unused: string | null,
     payload: string,
-  ) => {
+  ): number => {
     const event: CallingEvent = {
       content: JSON.parse(payload) as CallingEvent['content'],
       conversation: conversationId,
@@ -3521,11 +3730,11 @@ function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: Calling
     return 0;
   };
 
-  const incoming = (conversationId: string) => {
+  const incoming = (conversationId: string): number => {
     return wCall.answer(wUser, conversationId, CALL_TYPE.NORMAL, 0);
   };
 
-  const requestConfig = () => {
+  const requestConfig = (): number => {
     setTimeout(() => {
       wCall.configUpdate(wUser, 0, JSON.stringify({ice_servers: []}));
     });

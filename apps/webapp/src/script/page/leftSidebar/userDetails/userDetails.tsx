@@ -17,22 +17,20 @@
  *
  */
 
-import {memo} from 'react';
+import {memo, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {UserVerificationBadges} from 'Components/badge';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import * as styles from './userDetails.styles';
 
+import {Avatar, AVATAR_SIZE} from '../../../components/avatar';
+import {UserVerificationBadges} from '../../../components/badge';
+import {LegalHoldDot} from '../../../components/LegalHoldDot';
+import {User} from '../../../repositories/entity/User';
 import {AvailabilityContextMenu} from '../../../ui/availabilityContextMenu';
+import {TabIndex} from '../../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {useApplicationContext} from '../../rootProvider';
 
 interface AvailabilityStateButtonWrapperProps {
   children: React.ReactElement;
@@ -40,7 +38,7 @@ interface AvailabilityStateButtonWrapperProps {
   showAvailabilityContextMenu: (event: MouseEvent) => void;
 }
 
-const AvailabilityStateButtonWrapper = ({
+const AvailabilityStateButtonWrapper: FunctionComponent<AvailabilityStateButtonWrapperProps> = ({
   children,
   isTeam = false,
   showAvailabilityContextMenu,
@@ -66,7 +64,12 @@ interface UserDetailsProps {
   isSideBarOpen?: boolean;
 }
 
-const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = false}: UserDetailsProps) => {
+const UserDetailsComponent: FunctionComponent<UserDetailsProps> = ({
+  user,
+  isTeam = false,
+  groupId,
+  isSideBarOpen = false,
+}: UserDetailsProps) => {
   const {translate} = useApplicationContext();
   const {
     name: userName,
@@ -77,7 +80,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
-  const showAvailabilityContextMenu = (event: MouseEvent) => {
+  const showAvailabilityContextMenu = (event: MouseEvent): void => {
     AvailabilityContextMenu.show(event, 'left-list-availability-menu', {
       none: translate('userAvailabilityNone'),
       available: translate('userAvailabilityAvailable'),

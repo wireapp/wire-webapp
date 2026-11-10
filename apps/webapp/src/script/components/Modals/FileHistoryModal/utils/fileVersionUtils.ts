@@ -19,10 +19,15 @@
 
 import {RestVersion} from 'cells-sdk-ts';
 
-import type {Translate} from 'Util/localizerUtil';
-import {calculateDaysDifference, formatDateKey, formatTime, getDayPrefix, TIME_IN_MILLIS} from 'Util/timeUtil';
-import {formatBytes} from 'Util/util';
-
+import type {Translate} from '../../../../util/localizerUtil';
+import {
+  calculateDaysDifference,
+  formatDateKey,
+  formatTime,
+  getDayPrefix,
+  TIME_IN_MILLIS,
+} from '../../../../util/timeUtil';
+import {formatBytes} from '../../../../util/util';
 import {FileVersion} from '../types';
 
 type RestVersionWithOptionalFields = Partial<RestVersion>;

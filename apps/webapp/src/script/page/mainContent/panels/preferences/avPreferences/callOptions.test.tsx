@@ -19,15 +19,15 @@
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../../testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
-import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import type {MediaConstraintsHandler} from '../../../../../repositories/media/MediaConstraintsHandler';
+import type {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 
 import {CallOptions} from './callOptions';
 
@@ -52,7 +52,11 @@ function createPropertiesRepositoryForTest(): PropertiesRepository {
   } as unknown as PropertiesRepository;
 }
 
-function renderCallOptions(parameters: RenderCallOptionsParameters = {}) {
+type RenderCallOptionsResult = {
+  constraintsHandler: MediaConstraintsHandler;
+  refreshAudioInput: jest.Mock<Promise<MediaStream>, any, any>;
+};
+function renderCallOptions(parameters: RenderCallOptionsParameters = {}): RenderCallOptionsResult {
   const {hasActiveCall = false, agcPreference = false} = parameters;
   const constraintsHandler = {
     getAgcPreference: jest.fn(() => {

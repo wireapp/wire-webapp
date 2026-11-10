@@ -171,7 +171,7 @@ export class BillingAPI {
     return response.data;
   }
 
-  public async subscribe(teamId: string, planId: string) {
+  public async subscribe(teamId: string, planId: string): Promise<Subscription> {
     const config: AxiosRequestConfig = {
       data: {planId},
       method: 'put',
@@ -182,7 +182,7 @@ export class BillingAPI {
     return response.data;
   }
 
-  public async getCurrentSubscription(teamId: string, planId: string) {
+  public async getCurrentSubscription(teamId: string, planId: string): Promise<Subscription> {
     const config: AxiosRequestConfig = {
       data: {planId},
       method: 'GET',

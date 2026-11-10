@@ -22,12 +22,12 @@ import ko from 'knockout';
 
 import type {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
-import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {AssetType} from 'Repositories/assets/assetType';
-import {Logger, getLogger} from 'Util/logger';
-
 import {Asset} from './asset';
+
+import {Logger, getLogger} from '../../../util/logger';
+import type {AssetRemoteData} from '../../assets/assetRemoteData';
+import {AssetTransferState} from '../../assets/assetTransferState';
+import {AssetType} from '../../assets/assetType';
 
 type AssetMetaData = (ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaData | ProtobufAsset.IVideoMetaData) & {
   duration?: number;

@@ -20,27 +20,25 @@
 import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
-import {CacheRepository} from 'Repositories/cache/cacheRepository';
-import type {ClientRepository} from 'Repositories/client/ClientRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {EventRepository} from 'Repositories/event/EventRepository';
-import {StorageKey} from 'Repositories/storage/storageKey';
-import type {StorageRepository} from 'Repositories/storage/storageRepository';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
-import {getLogger, Logger} from 'Util/logger';
-import {includesString} from 'Util/stringUtil';
-import {appendParameter} from 'Util/urlUtil';
-
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {URLParameter} from '../../auth/urlParameter';
+import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
 import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';
+import {replaceBrowserLocation} from '../../navigation/browserLocation';
 import type {Core} from '../../service/coreSingleton';
+import {getLogger, Logger} from '../../util/logger';
+import {includesString} from '../../util/stringUtil';
+import {appendParameter} from '../../util/urlUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import {CacheRepository} from '../cache/cacheRepository';
+import type {ClientRepository} from '../client/ClientRepository';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {EventRepository} from '../event/EventRepository';
+import {StorageKey} from '../storage/storageKey';
+import type {StorageRepository} from '../storage/storageRepository';
+import type {UserRepository} from '../user/userRepository';
 
 const LogoutConfig = {
   LOGIN_REDIRECT_STORAGE_KEY: 'LOGIN_REDIRECT_KEY',
@@ -343,17 +341,14 @@ export class LifeCycleRepository {
   };
 
   /**
-   * Cleans up persistent storage (cache and database) when user requests complete data removal.
+   * Cleans up persistent database storage when user requests complete data removal.
    */
   private readonly cleanupPersistentStorage = async (shouldClearAllData: boolean): Promise<void> => {
     if (!shouldClearAllData) {
       this.logger.debug('Persistent storage cleanup skipped: full data removal not requested.');
       return;
     }
-    this.logger.info('Initiating persistent storage cleanup: clearing cache and deleting database.');
-
-    // Clear cache storage, not a blocking operation therefore not awaited
-    void CacheRepository.clearCacheStorage();
+    this.logger.info('Initiating persistent storage cleanup: deleting database.');
 
     // Delete database with error handling
     try {

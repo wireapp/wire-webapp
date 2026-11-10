@@ -17,15 +17,7 @@
  *
  */
 
-import React from 'react';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {UserInfo} from 'Components/UserInfo';
-import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {capitalizeFirstChar} from 'Util/stringUtil';
+import React, {type FunctionComponent} from 'react';
 
 import {
   selfIndicator,
@@ -36,6 +28,13 @@ import {
   wrapper,
 } from './CallParticipantItemContent.styles';
 
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {User} from '../../../../repositories/entity/User';
+import {TabIndex} from '../../../../uiKit/utils/enums';
+import {capitalizeFirstChar} from '../../../../util/stringUtil';
+import * as Icon from '../../../icon';
+import {UserInfo} from '../../../UserInfo';
+
 interface CallParticipantItemContentProps {
   user: User;
   isAudioEstablished: boolean;
@@ -44,7 +43,7 @@ interface CallParticipantItemContentProps {
   onDropdownClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const CallParticipantItemContent = ({
+export const CallParticipantItemContent: FunctionComponent<CallParticipantItemContentProps> = ({
   user,
   isAudioEstablished,
   isSelf = false,

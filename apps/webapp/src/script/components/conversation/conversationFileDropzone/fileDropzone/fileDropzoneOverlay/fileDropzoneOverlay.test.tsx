@@ -17,15 +17,16 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../../../uiKit/identity/theme/theme';
 
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {FileDropzoneOverlay} from './fileDropzoneOverlay';
 
@@ -33,7 +34,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const renderOverlay = (mode: 'upload' | 'restricted') => {
+const renderOverlay = (mode: 'upload' | 'restricted'): RenderResult => {
   return render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <FileDropzoneOverlay isActive mode={mode} />

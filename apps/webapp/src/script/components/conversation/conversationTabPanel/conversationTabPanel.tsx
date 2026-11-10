@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -27,7 +27,11 @@ interface ConversationTabPanelProps {
   children: ReactNode;
 }
 
-export const ConversationTabPanel = ({id, isActive, children}: ConversationTabPanelProps) => {
+export const ConversationTabPanel: FunctionComponent<ConversationTabPanelProps> = ({
+  id,
+  isActive,
+  children,
+}: ConversationTabPanelProps) => {
   return (
     <div
       id={`conversation-tabpanel-${id}`}

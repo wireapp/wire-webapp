@@ -46,46 +46,46 @@ export class AppLockModal {
     this.proceedToLogoutButton = this.appLockModal.getByTestId('go-proceed-to-logout');
   }
 
-  async setPasscode(passcode: string) {
+  async setPasscode(passcode: string): Promise<void> {
     await this.lockPasscodeInput.fill(passcode);
     await this.appLockActionButton.click();
     await expect(this.appLockModal).toBeHidden();
   }
 
-  async unlockAppWithPasscode(passcode: string) {
+  async unlockAppWithPasscode(passcode: string): Promise<void> {
     await this.unlockPasscodeInput.fill(passcode);
     await this.appLockActionButton.click();
   }
 
-  async checkClearData() {
+  async checkClearData(): Promise<void> {
     await this.clearDataCheckbox.dispatchEvent('click');
   }
 
-  async isVisible() {
+  async isVisible(): Promise<boolean> {
     await this.appLockModal.waitFor({state: 'visible'});
     return await this.appLockModal.isVisible();
   }
 
-  async isHidden() {
+  async isHidden(): Promise<boolean> {
     await this.appLockModal.waitFor({state: 'hidden'});
     return await this.appLockModal.isHidden();
   }
 
-  async getAppLockModalText() {
+  async getAppLockModalText(): Promise<string> {
     return (await this.appLockModalText.textContent()) ?? '';
   }
 
-  async getAppLockModalHeader() {
+  async getAppLockModalHeader(): Promise<string | null> {
     return await this.appLockModalHeader.textContent();
   }
 
-  async clickForgotPassphrase() {
+  async clickForgotPassphrase(): Promise<void> {
     await this.forgotPassphraseButton.click();
   }
-  async clickReset() {
+  async clickReset(): Promise<void> {
     await this.appLockActionButton.click();
   }
-  async clickProceedToLogout() {
+  async clickProceedToLogout(): Promise<void> {
     await this.proceedToLogoutButton.click();
   }
 }

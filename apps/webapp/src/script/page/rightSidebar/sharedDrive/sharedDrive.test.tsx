@@ -21,13 +21,13 @@ import {render} from '@testing-library/react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {UserType} from '@wireapp/api-client/lib/user';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {SharedDrive} from './sharedDrive';
 
@@ -35,7 +35,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const createUser = ({id, name, teamId}: {id: string; name: string; teamId: string}) => {
+const createUser = ({id, name, teamId}: {id: string; name: string; teamId: string}): User => {
   const user = new User(id, '', translateForTest);
   user.name(name);
   user.teamId = teamId;

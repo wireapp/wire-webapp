@@ -17,11 +17,10 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
-import {FileCard} from 'Components/fileCard/fileCard';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../../../../page/rootProvider';
+import {FileCard} from '../../../../../../../fileCard/fileCard';
 import {hollowWrapperButtonStyles} from '../../multipartAssets.styles';
 import {FileAssetOptions} from '../common/fileAssetOptions/fileAssetOptions';
 import {FilePreviewModal} from '../common/filePreviewModal/filePreviewModal';
@@ -40,7 +39,7 @@ interface FileAssetSmallProps {
   id: string;
 }
 
-export const FileAssetSmall = ({
+export const FileAssetSmall: FunctionComponent<FileAssetSmallProps> = ({
   src,
   extension,
   name,
@@ -57,12 +56,12 @@ export const FileAssetSmall = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isInEditMode, setIsInEditMode] = useState(false);
 
-  const showModal = (isEditMode?: boolean) => {
+  const showModal = (isEditMode?: boolean): void => {
     setIsOpen(true);
     setIsInEditMode(isEditMode === true);
   };
 
-  const hideModal = () => {
+  const hideModal = (): void => {
     setIsOpen(false);
     setIsInEditMode(false);
   };

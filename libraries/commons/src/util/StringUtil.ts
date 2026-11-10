@@ -29,7 +29,7 @@ export function capitalize(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-export function pluralize(text: string, times: number, options?: {postfix: string}) {
+export function pluralize(text: string, times: number, options?: {postfix: string}): string {
   const postfix = isNonEmptyString(options?.postfix) ? options.postfix : 's';
   return `${text}${times === 1 ? '' : postfix}`;
 }
@@ -65,7 +65,7 @@ export function serializeArgs(args: any[]): any[] {
     } else if (typeof arg === 'object' && arg !== null) {
       try {
         result = safeJsonStringify(arg);
-      } catch (e) {
+      } catch {
         result = '[Unserializable Object]';
       }
     } else {

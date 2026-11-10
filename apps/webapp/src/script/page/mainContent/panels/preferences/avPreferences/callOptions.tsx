@@ -17,21 +17,19 @@
  *
  */
 
-import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-
 import {Config} from '../../../../../Config';
+import type {MediaConstraintsHandler} from '../../../../../repositories/media/MediaConstraintsHandler';
+import type {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../../../../../repositories/properties/propertiesType';
+import {Checkbox, CheckboxLabel} from '../../../../../uiKit/inputs/checkbox/checkbox';
+import {getLogger} from '../../../../../util/logger';
+import {WebAppEvents} from '../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../rootProvider';
 import {PreferencesSection} from '../components/preferencesSection';
 
 const logger = getLogger('CallOptions');
@@ -43,7 +41,7 @@ interface CallOptionsProps {
   refreshAudioInput: () => Promise<MediaStream>;
 }
 
-const CallOptions = ({
+const CallOptions: FunctionComponent<CallOptionsProps> = ({
   constraintsHandler,
   hasActiveCall,
   propertiesRepository,
@@ -66,7 +64,7 @@ const CallOptions = ({
   );
 
   useEffect(() => {
-    const updateProperties = ({settings}: WebappProperties) => {
+    const updateProperties = ({settings}: WebappProperties): void => {
       setVbrEncoding(!isCbrEncodingEnforced && settings.call.enable_vbr_encoding);
     };
 

@@ -19,8 +19,8 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
-import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
+import {BackgroundSource} from '../../VideoBackgroundEffects';
+import {getSafeLogger} from '../helper/logger';
 
 const opaqueAlphaChannel = 255;
 const defaultBackgroundBlueChannel = 243;

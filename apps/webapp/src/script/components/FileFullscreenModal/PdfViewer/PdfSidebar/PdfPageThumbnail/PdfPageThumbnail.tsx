@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Thumbnail} from 'react-pdf';
 
 import {containerStyles, pageNumberStyle, thumbnailWrapperStyles} from './PdfPageThumbnail.styles';
@@ -31,7 +33,12 @@ interface PdfPageThumbnailProps {
   onClick: () => void;
 }
 
-export const PdfPageThumbnail = ({index, sidebarOpen, isActive, onClick}: PdfPageThumbnailProps) => {
+export const PdfPageThumbnail: FunctionComponent<PdfPageThumbnailProps> = ({
+  index,
+  sidebarOpen,
+  isActive,
+  onClick,
+}: PdfPageThumbnailProps) => {
   return (
     <div data-page={index + 1} css={containerStyles(sidebarOpen)}>
       <div css={thumbnailWrapperStyles(isActive)}>

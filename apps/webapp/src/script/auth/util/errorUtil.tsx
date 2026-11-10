@@ -22,10 +22,9 @@ import {ReactElement} from 'react';
 import {isBoolean, isDate, isNonEmptyString, isNumber, isObject, isString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 
-import {ErrorMessage} from '@wireapp/react-ui-kit';
-
-import {errorHandlerStrings} from 'Util/errorUtil';
-import {validationErrorStrings} from 'Util/validationUtil';
+import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
+import {errorHandlerStrings} from '../../util/errorUtil';
+import {validationErrorStrings} from '../../util/validationUtil';
 
 type LabelledErrorValue = {
   label: string;

@@ -76,7 +76,7 @@ export class TypeaheadOption {
     this.setRefElement = this.setRefElement.bind(this);
   }
 
-  setRefElement(element: HTMLElement | null) {
+  setRefElement(element: HTMLElement | null): void {
     this.ref = {current: element};
   }
 }
@@ -94,7 +94,7 @@ export type MenuRenderFn<TOption extends TypeaheadOption> = (
   matchingString: string,
 ) => ReactPortal | ReactElement | null;
 
-const scrollToOption = <TOption extends TypeaheadOption>(index: number, options: TOption[]) => {
+const scrollToOption = <TOption extends TypeaheadOption>(index: number, options: TOption[]): void => {
   const selectedOption = options[index];
   const element = selectedOption !== undefined ? selectedOption.ref?.current : undefined;
   element?.scrollIntoView({block: 'nearest'});
@@ -129,7 +129,7 @@ function tryToPositionRange(leadOffset: number, range: Range): boolean {
   try {
     range.setStart(anchorNode, startOffset);
     range.setEnd(anchorNode, endOffset);
-  } catch (error: unknown) {
+  } catch {
     return false;
   }
 
@@ -154,9 +154,9 @@ function getQueryTextForSearch(editor: LexicalEditor): string | null {
  */
 function getFullMatchOffset(documentText: string, entryText: string, offset: number): number {
   let triggerOffset = offset;
-  for (let i = triggerOffset; i <= entryText.length; i++) {
-    if (documentText.substr(-i) === entryText.substr(0, i)) {
-      triggerOffset = i;
+  for (let matchLength = triggerOffset; matchLength <= entryText.length; matchLength++) {
+    if (documentText.substr(-matchLength) === entryText.substr(0, matchLength)) {
+      triggerOffset = matchLength;
     }
   }
   return triggerOffset;
@@ -213,7 +213,7 @@ function isSelectionOnEntityBoundary(editor: LexicalEditor, offset: number): boo
   });
 }
 
-function startTransition(callback: () => void) {
+function startTransition(callback: () => void): void {
   if (typeof React.startTransition === 'function') {
     React.startTransition(callback);
   } else {
@@ -253,7 +253,7 @@ function useDynamicPositioning(
   targetElement: HTMLElement | null,
   onReposition: () => void,
   onVisibilityChange?: (isInView: boolean) => void,
-) {
+): void {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     // Trigger initial positioning
@@ -266,7 +266,7 @@ function useDynamicPositioning(
       const rootScrollParent = rootElement != null ? getScrollParent(rootElement, false) : document.body;
       let ticking = false;
       let previousIsInView = isTriggerVisibleInNearestScrollContainer(targetElement, rootScrollParent);
-      const handleScroll = function () {
+      const handleScroll = function (): void {
         if (!ticking) {
           window.requestAnimationFrame(() => {
             onReposition();
@@ -626,7 +626,7 @@ export function TypeaheadMenuPlugin<TOption extends TypeaheadOption>({
     if (resolution === null && menuVisible) {
       setMenuVisible(false);
     }
-    const updateListener = () => {
+    const updateListener = (): void => {
       editor.getEditorState().read(() => {
         const range = document.createRange();
         const selection = $getSelection();

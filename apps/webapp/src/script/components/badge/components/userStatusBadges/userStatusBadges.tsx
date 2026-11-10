@@ -17,16 +17,23 @@
  *
  */
 
-import {Fragment} from 'react';
+import {Fragment, type FunctionComponent} from 'react';
 
-import {Tooltip} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
 import {badgesWrapper, icon} from './userStatusBadges.styles';
 
-function createBadgeToComponentMap(translate: RootContextValue['translate']) {
+import {RootContextValue, useApplicationContext} from '../../../../page/rootProvider';
+import {Tooltip} from '../../../../uiKit/dataDisplay/tooltip/tooltip';
+import * as Icon from '../../../icon';
+
+type CreateBadgeToComponentMapResult = {
+  readonly guest: () => JSX.Element;
+  readonly federated: () => JSX.Element;
+  readonly external: () => JSX.Element;
+  readonly verified: () => JSX.Element;
+};
+function createBadgeToComponentMap(translate: RootContextValue['translate']): CreateBadgeToComponentMapResult {
   return {
     guest: () => {
       return (
@@ -66,10 +73,10 @@ interface UserStatusBadgesProps {
   config: {[key in BadgeKey]?: boolean};
 }
 
-export const UserStatusBadges = ({config}: UserStatusBadgesProps) => {
+export const UserStatusBadges: FunctionComponent<UserStatusBadgesProps> = ({config}: UserStatusBadgesProps) => {
   const {translate} = useApplicationContext();
   const badgeToComponentMap = createBadgeToComponentMap(translate);
-  const badges = Object.entries(config).filter(([_badge, shouldShow]) => {
+  const badges = Object.entries(config).filter(([, shouldShow]) => {
     return shouldShow;
   });
   const badgesCount = badges.length;

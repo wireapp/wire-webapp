@@ -23,6 +23,8 @@ import {UserType} from '@wireapp/api-client/lib/user';
 import {Config} from '../../../Config';
 import type {RootState} from '../reducer';
 
+type ConsentMap = Record<number, number>;
+
 const unsetSelf: Self = {
   accent_id: undefined,
   assets: [],
@@ -37,13 +39,13 @@ const unsetSelf: Self = {
   type: UserType.REGULAR,
 };
 
-export const getConsents = (state: RootState) => {
+export const getConsents = (state: RootState): ConsentMap => {
   return state.selfState.consents ?? {};
 };
-export const getSelf = (state: RootState) => {
+export const getSelf = (state: RootState): Self => {
   return state.selfState.self ?? unsetSelf;
 };
-export const getSelfError = (state: RootState) => {
+export const getSelfError = (state: RootState): Error | null => {
   return state.selfState.error;
 };
 export const getSelfHandle = (state: RootState): string | undefined => {
@@ -58,33 +60,33 @@ export const getSelfName = (state: RootState): string | undefined => {
 export const getSelfTeamId = (state: RootState): string | undefined => {
   return getSelf(state).team;
 };
-export const hasSelfHandle = (state: RootState) => {
+export const hasSelfHandle = (state: RootState): boolean => {
   const selfHandle = getSelfHandle(state);
   return selfHandle !== undefined && selfHandle.length > 0;
 };
-export const hasSelfEmail = (state: RootState) => {
+export const hasSelfEmail = (state: RootState): boolean => {
   const selfEmail = getSelfEmail(state);
   return selfEmail !== undefined && selfEmail.length > 0;
 };
-export const hasSelfPassword = (state: RootState) => {
+export const hasSelfPassword = (state: RootState): boolean => {
   return state.selfState.hasPassword;
 };
-export const isFetching = (state: RootState) => {
+export const isFetching = (state: RootState): boolean => {
   return state.selfState.fetching;
 };
-export const isSSOUser = (state: RootState) => {
+export const isSSOUser = (state: RootState): boolean => {
   return getSelf(state).sso_id !== undefined;
 };
-export const isNoPasswordSSO = (state: RootState) => {
+export const isNoPasswordSSO = (state: RootState): boolean => {
   const subject = getSelf(state).sso_id?.subject;
   return subject !== undefined && subject.length > 0;
 };
-export const isTemporaryGuest = (state: RootState) => {
+export const isTemporaryGuest = (state: RootState): boolean => {
   return getSelf(state).expires_at !== undefined;
 };
-const getConsent = (state: RootState, consentType: number) => {
+const getConsent = (state: RootState, consentType: number): number => {
   return getConsents(state)[consentType];
 };
-export const hasUnsetConsent = (state: RootState, consentType: number) => {
+export const hasUnsetConsent = (state: RootState, consentType: number): boolean => {
   return !Config.getConfig().FEATURE.CHECK_CONSENT ? false : getConsent(state, consentType) === undefined;
 };

@@ -17,13 +17,12 @@
  *
  */
 
-import {useState} from 'react';
-
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useState, type FunctionComponent} from 'react';
 
 import {iconWrapperStyles, videoStyles} from './videoAssetSmall.styles';
 
+import {useApplicationContext} from '../../../../../../../../page/rootProvider';
+import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
 import {FilePreviewPlayButton} from '../../common/filePreviewPlayButton/filePreviewPlayButton';
 import {MediaFilePreviewCard} from '../../common/mediaFilePreviewCard/mediaFilePreviewCard';
 import {hollowWrapperButtonStyles} from '../../multipartAssets.styles';
@@ -39,7 +38,7 @@ interface VideoAssetSmallProps {
   id: string;
 }
 
-export const VideoAssetSmall = ({
+export const VideoAssetSmall: FunctionComponent<VideoAssetSmallProps> = ({
   src,
   isLoading,
   isError,

@@ -17,14 +17,18 @@
  *
  */
 
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
+
+import {useApplicationContext} from '../../../../page/rootProvider';
+import * as Icon from '../../../icon';
 
 interface CellImageUploadButtonProps {
   onClick: () => void;
 }
 
-export const CellImageUploadButton = ({onClick}: CellImageUploadButtonProps) => {
+export const CellImageUploadButton: FunctionComponent<CellImageUploadButtonProps> = ({
+  onClick,
+}: CellImageUploadButtonProps) => {
   const {translate} = useApplicationContext();
 
   return (

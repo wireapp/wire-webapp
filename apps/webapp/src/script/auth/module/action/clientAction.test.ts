@@ -21,7 +21,7 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {ClientType} from '@wireapp/api-client/lib/client';
 import type {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
-import type {Account} from '@wireapp/core';
+import type {Account} from '../../../core';
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 

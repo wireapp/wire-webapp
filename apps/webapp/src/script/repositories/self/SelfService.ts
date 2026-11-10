@@ -24,6 +24,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {UserUpdate} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
+import type {SelfService as CoreSelfService} from '../../core/self';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 
@@ -33,7 +34,7 @@ export class SelfService {
     private readonly core = container.resolve(Core),
   ) {}
 
-  private get coreSelfService() {
+  private get coreSelfService(): CoreSelfService {
     const selfService = this.core.service?.self;
     if (isNullOrUndefined(selfService)) {
       throw new Error('Self service not available');

@@ -19,9 +19,9 @@
 
 import {useMemo} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
+import {TabIndex} from '../../../../uiKit/utils/enums';
 
-const useMessageFocusedTabIndex = (isMessageFocused: boolean) => {
+const useMessageFocusedTabIndex = (isMessageFocused: boolean): TabIndex => {
   const tabIndex = useMemo(() => {
     return isMessageFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE;
   }, [isMessageFocused]);

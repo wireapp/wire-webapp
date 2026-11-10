@@ -48,7 +48,7 @@ const skipFirstCall = (fn: (...args: unknown[]) => void) => {
 export const useResizeObserver = (
   callback: (element: Element | HTMLDivElement) => void,
   element?: Element | HTMLDivElement | null,
-) => {
+): void => {
   // We need to use a layout effect here as we want to make sure the observer is set up (and removed!) before the component is rendered
   useLayoutEffect(() => {
     if (isNullOrUndefined(element)) {

@@ -31,7 +31,18 @@ function createEvent(files: readonly File[]): ChangeEvent<HTMLInputElement> {
   return {target: {files, value: 'selected'}} as unknown as ChangeEvent<HTMLInputElement>;
 }
 
-function createDependencies() {
+type CreateDependenciesResult = {
+  fireAndForgetInvoker: FireAndForgetInvoker;
+  sharedDriveUploadController: SharedDriveUploadController;
+  onRefresh: jest.Mock<any, any, any>;
+  onReject: jest.Mock<any, any, any>;
+  conversationQualifiedId: string;
+  isUploadFilesEnabled: boolean;
+  isInRecycleBin: boolean;
+  maxFileSize: number;
+  isAcceptedFile: jest.Mock<boolean, [_: File], any>;
+};
+function createDependencies(): CreateDependenciesResult {
   const fireAndForgetInvoker: FireAndForgetInvoker = {
     fireAndForget: jest.fn(),
     waitUntilAllSettled: jest.fn().mockResolvedValue(undefined),
@@ -52,13 +63,13 @@ function createDependencies() {
     isUploadFilesEnabled: true,
     isInRecycleBin: false,
     maxFileSize: 100,
-    isAcceptedFile: jest.fn((_file: File) => {
+    isAcceptedFile: jest.fn((_: File) => {
       return true;
     }),
   };
 }
 
-function getUploadAction(fireAndForgetInvoker: FireAndForgetInvoker) {
+function getUploadAction(fireAndForgetInvoker: FireAndForgetInvoker): () => Promise<unknown> {
   return (fireAndForgetInvoker.fireAndForget as jest.MockedFunction<FireAndForgetInvoker['fireAndForget']>).mock
     .calls[0][0];
 }
@@ -138,21 +149,42 @@ describe('handleSharedDriveUploadInput', () => {
     expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
   });
 
-  it('preserves intentional dotfiles when selected', async () => {
+  it('rejects files starting with a dot before dispatching upload', () => {
     const dotFile = new File(['content'], '.env');
     const dependencies = createDependencies();
 
     handleSharedDriveUploadInput(createEvent([dotFile]), {...dependencies, uploadPath});
 
-    const uploadAction = getUploadAction(dependencies.fireAndForgetInvoker);
-    await uploadAction();
-    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
-      [dotFile],
-      uploadPath,
-      dependencies.onRefresh,
-      conversationQualifiedId,
-    );
+    expect(dependencies.onReject).toHaveBeenCalledWith({reason: 'invalidName', invalidFiles: [dotFile]});
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
   });
+
+  it.each(['invalid/name.txt', 'invalid\\name.txt', 'invalid"name.txt'])(
+    'rejects files containing forbidden characters: %s',
+    fileName => {
+      const invalidFile = new File(['content'], fileName);
+      const dependencies = createDependencies();
+
+      handleSharedDriveUploadInput(createEvent([invalidFile]), {...dependencies, uploadPath});
+
+      expect(dependencies.onReject).toHaveBeenCalledWith({reason: 'invalidName', invalidFiles: [invalidFile]});
+      expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(['Reports/.hidden/document.txt', 'Reports/invalid\\name.txt', 'Reports/invalid"name.txt'])(
+    'rejects invalid folder path segments before dispatching upload: %s',
+    relativePath => {
+      const file = new File(['content'], 'document.txt');
+      Object.defineProperty(file, 'webkitRelativePath', {value: relativePath});
+      const dependencies = createDependencies();
+
+      handleSharedDriveUploadInput(createEvent([file]), {...dependencies, uploadPath});
+
+      expect(dependencies.onReject).toHaveBeenCalledWith({reason: 'invalidName', invalidFiles: [file]});
+      expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+    },
+  );
 
   it('rejects invalid selected files before dispatching upload', () => {
     const validFile = new File(['valid'], 'valid.txt');

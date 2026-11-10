@@ -25,18 +25,17 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import type {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ROLE as TEAM_ROLE} from 'Repositories/user/userPermission';
-import type {Translate} from 'Util/localizerUtil';
-import {clamp} from 'Util/numberUtil';
-import {getFirstChar} from 'Util/stringUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {ACCENT_ID} from '../../../Config';
+import type {Translate} from '../../../util/localizerUtil';
+import {clamp} from '../../../util/numberUtil';
+import {getFirstChar} from '../../../util/stringUtil';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
+import {WebAppEvents} from '../../../webAppEvents';
+import type {AssetRemoteData} from '../../assets/assetRemoteData';
+import type {ClientEntity} from '../../client/ClientEntity';
+import {ConnectionEntity} from '../../connection/connectionEntity';
+import {ROLE as TEAM_ROLE} from '../../user/userPermission';
 
 const guestExpirationThresholdInSeconds = 10;
 const singleNameInitialsLength = 2;
@@ -46,6 +45,16 @@ const ninetyMinuteDisplayThresholdInMinutes = 90;
 const minutesPerHour = 60;
 const ninetyMinuteDurationInHours = 1.5;
 const urgentExpirationThresholdInMinutes = 120;
+
+type UserAccentColorPalette = Record<(typeof ACCENT_ID)[keyof typeof ACCENT_ID], string>;
+type UserManagedBy = {SCIM: string; WIRE: string};
+type TemporaryGuestConfiguration = {
+  EXPIRATION_INTERVAL: TIME_IN_MILLIS;
+  EXPIRATION_THRESHOLD: number;
+  LIFETIME: TIME_IN_MILLIS;
+};
+type UserConfiguration = {MANAGED_BY: UserManagedBy; TEMPORARY_GUEST: TemporaryGuestConfiguration};
+type SerializedUser = {availability: Availability.Type; domain: string; id: string};
 
 export class User {
   private expirationIntervalId?: number;
@@ -118,7 +127,7 @@ export class User {
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
   public readonly supportedProtocols: ko.Observable<null | CONVERSATION_PROTOCOL[]>;
 
-  public static get ACCENT_COLOR() {
+  public static get ACCENT_COLOR(): UserAccentColorPalette {
     return {
       [ACCENT_ID.BLUE]: 'var(--blue-500)',
       [ACCENT_ID.GREEN]: 'var(--green-500)',
@@ -129,7 +138,7 @@ export class User {
     };
   }
 
-  static get CONFIG() {
+  static get CONFIG(): UserConfiguration {
     return {
       MANAGED_BY: {
         SCIM: 'scim',
@@ -308,7 +317,7 @@ export class User {
     return this.isFederated ? `@${this.username()}@${this.domain}` : `@${this.username()}`;
   }
 
-  markConnectionAsUnknown() {
+  markConnectionAsUnknown(): void {
     this.connection()?.status(ConnectionStatus.UNKNOWN);
   }
 
@@ -342,7 +351,7 @@ export class User {
     });
   }
 
-  serialize() {
+  serialize(): SerializedUser {
     return {
       availability: this.availability(),
       domain: this.domain,

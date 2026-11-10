@@ -19,16 +19,16 @@
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
-import {EventMapper} from 'Repositories/conversation/EventMapper';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/message';
-import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
-import {translate} from 'Util/localizerUtil';
-import {getRandomNumber} from 'Util/numberUtil';
-import {createUuid} from 'Util/uuid';
+import {EventMapper} from '../../../repositories/conversation/EventMapper';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {Message} from '../../../repositories/entity/message/message';
+import {createGroupCreationEvent, createMessageAddEvent} from '../../../../../test/helper/EventGenerator';
+import {translate} from '../../../util/localizerUtil';
+import {getRandomNumber} from '../../../util/numberUtil';
+import {createUuid} from '../../../util/uuid';
 
 import {groupMessagesBySenderAndTime, isMarker} from './messagesGroup';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('MessagesGroup', () => {
@@ -51,7 +51,7 @@ describe('MessagesGroup', () => {
       return eventMapper.mapJsonEvent(event, conversation) as Message;
     });
 
-    const groupedMessages = groupMessagesBySenderAndTime(allMessages, 0);
+    const groupedMessages = groupMessagesBySenderAndTime(allMessages, Infinity);
     // We expect the number of groups to be the number of different senders + the group that contains all the message from user1
     expect(groupedMessages.length).toBe(nbOtherMessages + 1);
 
@@ -70,7 +70,7 @@ describe('MessagesGroup', () => {
       return eventMapper.mapJsonEvent(event, conversation) as Message;
     });
 
-    const groupedMessages = groupMessagesBySenderAndTime(allMessages, 0);
+    const groupedMessages = groupMessagesBySenderAndTime(allMessages, Infinity);
     expect(groupedMessages).toHaveLength(2);
   });
 

@@ -17,23 +17,12 @@
  *
  */
 
-import type {ReactNode} from 'react';
+import type {ReactNode, FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {
-  AlertIcon,
-  ChevronIcon,
-  CloseIcon,
-  FolderIcon,
-  ReloadIcon,
-  SharedDriveUploadStatusIcon,
-} from '@wireapp/react-ui-kit';
-
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {getFileExtension} from 'Util/util';
-
 import type {SharedDriveUploadStatus, SharedDriveUploadStatusKind} from './sharedDriveUploadStatus';
+import type {SharedDriveMoveStatus} from './sharedDriveUploadStatusContext';
 import {
   sharedDriveUploadStatusPopupContentStyles,
   sharedDriveUploadStatusPopupDeterminateProgressStyles,
@@ -52,6 +41,7 @@ import {
   sharedDriveUploadStatusPopupRowIconStyles,
   sharedDriveUploadStatusPopupRowLeadingStyles,
   sharedDriveUploadStatusPopupRowStatusStyles,
+  sharedDriveUploadStatusPopupMoveAlertStyles,
   sharedDriveUploadStatusPopupRowStyles,
   sharedDriveUploadStatusPopupRowsStyles,
   sharedDriveUploadStatusPopupRowTextStyles,
@@ -62,6 +52,15 @@ import {
   sharedDriveUploadStatusPopupToggleStyles,
 } from './sharedDriveUploadStatusPopup.styles';
 
+import {AlertIcon} from '../../../uiKit/dataDisplay/icon/alertIcon';
+import {ChevronIcon} from '../../../uiKit/dataDisplay/icon/chevronIcon';
+import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
+import {FolderIcon} from '../../../uiKit/dataDisplay/icon/files/folderIcon';
+import {ReloadIcon} from '../../../uiKit/dataDisplay/icon/reloadIcon';
+import {SharedDriveUploadStatusIcon} from '../../../uiKit/dataDisplay/icon/sharedDriveUploadStatusIcon';
+import {getFileExtension} from '../../../util/util';
+import {FileTypeIcon} from '../common/fileTypeIcon/fileTypeIcon';
+
 const PROGRESS_PERCENTAGE_MAX = 100;
 
 type UploadActionState = boolean | ((uploadId: string) => boolean);
@@ -69,6 +68,22 @@ type UploadActionState = boolean | ((uploadId: string) => boolean);
 const getProgressTransform = (progress: number): string => {
   return `scaleX(${Math.min(1, Math.max(0, progress))})`;
 };
+
+interface SharedDriveMoveActivityProps {
+  readonly move: SharedDriveMoveStatus;
+  readonly title: string;
+  readonly statusLabel: string;
+  readonly statusMessage: string;
+  readonly destination: string;
+  readonly isExpanded: boolean;
+  readonly toggleLabel: string;
+  readonly dismissLabel: string;
+  readonly reviewLabel?: string;
+  readonly reviewingLabel?: string;
+  readonly onToggle: () => void;
+  readonly onDismiss: () => void;
+  readonly onReview?: () => void;
+}
 
 interface SharedDriveUploadStatusPopupProps {
   /** The representative status used for the collapsed header and backwards compatibility. */
@@ -99,6 +114,16 @@ interface SharedDriveUploadStatusPopupProps {
 
 const isActionPending = (state: UploadActionState, uploadId: string): boolean => {
   return typeof state === 'function' ? state(uploadId) : state;
+};
+
+const getMoveRowStatusKind = (move: SharedDriveMoveStatus): SharedDriveUploadStatusKind => {
+  if (move.kind === 'processing') {
+    return 'uploading';
+  }
+  if (move.kind === 'completed') {
+    return 'uploaded';
+  }
+  return 'queued';
 };
 
 const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
@@ -141,6 +166,34 @@ const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
   );
 };
 
+interface SharedDriveStatusRowLeadingProps {
+  readonly icon: ReactNode;
+  readonly name: string;
+  readonly status: string;
+  readonly kind: SharedDriveUploadStatusKind;
+}
+
+const SharedDriveStatusRowLeading: FunctionComponent<SharedDriveStatusRowLeadingProps> = ({
+  icon,
+  name,
+  status,
+  kind,
+}) => {
+  return (
+    <div css={sharedDriveUploadStatusPopupRowLeadingStyles}>
+      {icon}
+      <div css={sharedDriveUploadStatusPopupRowTextStyles}>
+        <strong css={sharedDriveUploadStatusPopupRowFileNameStyles} title={name}>
+          {name}
+        </strong>
+        <span css={sharedDriveUploadStatusPopupRowStatusStyles(kind)} title={status}>
+          {status}
+        </span>
+      </div>
+    </div>
+  );
+};
+
 const renderProgress = (upload: SharedDriveUploadStatus, isExpanded: boolean): ReactNode => {
   if (upload.isTransferActive && upload.hasProgress) {
     return (
@@ -152,7 +205,6 @@ const renderProgress = (upload: SharedDriveUploadStatus, isExpanded: boolean): R
         aria-valuenow={Math.round(upload.progress * PROGRESS_PERCENTAGE_MAX)}
         css={sharedDriveUploadStatusPopupDeterminateProgressStyles(isExpanded)}
         style={{transform: getProgressTransform(upload.progress)}}
-        data-testid="shared-drive-upload-progress"
         data-uie-name="shared-drive-upload-progress"
       />
     );
@@ -164,17 +216,22 @@ const renderProgress = (upload: SharedDriveUploadStatus, isExpanded: boolean): R
         role="progressbar"
         aria-label={upload.fileName}
         css={sharedDriveUploadStatusPopupProgressStyles(isExpanded)}
-        data-testid="shared-drive-upload-progress"
         data-uie-name="shared-drive-upload-progress"
       />
     );
   }
 
   if (upload.kind !== 'queued') {
+    const isUploaded = upload.kind === 'uploaded';
     return (
       <div
+        role={isUploaded ? 'progressbar' : undefined}
+        aria-label={isUploaded ? upload.fileName : undefined}
+        aria-valuemin={isUploaded ? 0 : undefined}
+        aria-valuemax={isUploaded ? PROGRESS_PERCENTAGE_MAX : undefined}
+        aria-valuenow={isUploaded ? PROGRESS_PERCENTAGE_MAX : undefined}
+        aria-hidden={isUploaded ? undefined : true}
         css={sharedDriveUploadStatusPopupProgressStyles(isExpanded, upload.kind)}
-        data-testid="shared-drive-upload-progress"
         data-uie-name="shared-drive-upload-progress"
       />
     );
@@ -183,7 +240,7 @@ const renderProgress = (upload: SharedDriveUploadStatus, isExpanded: boolean): R
   return null;
 };
 
-export const SharedDriveUploadStatusPopup = ({
+const SharedDriveUploadStatusPopupContent: FunctionComponent<SharedDriveUploadStatusPopupProps> = ({
   upload,
   uploads = [upload],
   aggregateKind = upload.kind,
@@ -217,9 +274,10 @@ export const SharedDriveUploadStatusPopup = ({
   return (
     <div css={sharedDriveUploadStatusPopupStyles} data-uie-name="shared-drive-upload-status-popup">
       <div
+        role="group"
+        aria-labelledby="shared-drive-upload-status-title"
         css={sharedDriveUploadStatusPopupContentStyles}
         data-uie-name="shared-drive-upload-status-header"
-        data-testid="shared-drive-upload-status-header"
       >
         <div
           className="shared-drive-upload-status-popup__header-text"
@@ -227,7 +285,7 @@ export const SharedDriveUploadStatusPopup = ({
           role="status"
           aria-live="polite"
         >
-          <strong css={sharedDriveUploadStatusPopupTitleStyles} title={title}>
+          <strong id="shared-drive-upload-status-title" css={sharedDriveUploadStatusPopupTitleStyles} title={title}>
             {title}
           </strong>
           <span css={sharedDriveUploadStatusPopupDestinationStyles} title={destination}>
@@ -282,6 +340,8 @@ export const SharedDriveUploadStatusPopup = ({
       {isExpanded && renderProgress(upload, true)}
       <div
         id={statusRowId}
+        role="list"
+        aria-labelledby="shared-drive-upload-status-title"
         css={sharedDriveUploadStatusPopupRowsStyles}
         data-uie-name="shared-drive-upload-status-rows"
         hidden={!isExpanded}
@@ -291,20 +351,15 @@ export const SharedDriveUploadStatusPopup = ({
             <div
               key={row.uploadId}
               css={sharedDriveUploadStatusPopupRowStyles}
-              data-testid="shared-drive-upload-status-row"
+              role="listitem"
               data-uie-name="shared-drive-upload-status-row"
             >
-              <div css={sharedDriveUploadStatusPopupRowLeadingStyles}>
-                {statusIcon(row)}
-                <div css={sharedDriveUploadStatusPopupRowTextStyles}>
-                  <strong css={sharedDriveUploadStatusPopupRowFileNameStyles} title={row.fileName}>
-                    {row.fileName}
-                  </strong>
-                  <span css={sharedDriveUploadStatusPopupRowStatusStyles(row.kind)} title={rowStatusLabel(row)}>
-                    {rowStatusLabel(row)}
-                  </span>
-                </div>
-              </div>
+              <SharedDriveStatusRowLeading
+                icon={statusIcon(row)}
+                name={row.fileName}
+                status={rowStatusLabel(row)}
+                kind={row.kind}
+              />
               <div
                 css={
                   row.kind === 'failed'
@@ -365,4 +420,146 @@ export const SharedDriveUploadStatusPopup = ({
       {!isExpanded && aggregateKind !== 'queued' && renderProgress(upload, false)}
     </div>
   );
+};
+
+const moveItemIcon = (item: SharedDriveMoveStatus['items'][number]): ReactNode => {
+  if (item.isFolder) {
+    return <FolderIcon css={sharedDriveUploadStatusPopupRowIconStyles} aria-hidden="true" />;
+  }
+
+  const fileExtension = getFileExtension(item.name);
+  return (
+    <div css={sharedDriveUploadStatusPopupRowIconStyles} aria-hidden="true">
+      <FileTypeIcon extension={isNonEmptyString(fileExtension) ? fileExtension : 'pdf'} size={24} />
+    </div>
+  );
+};
+
+export const SharedDriveUploadStatusPopup: FunctionComponent<
+  SharedDriveUploadStatusPopupProps | SharedDriveMoveActivityProps
+> = props => {
+  if ('move' in props) {
+    const {
+      move,
+      title,
+      statusLabel,
+      statusMessage,
+      destination,
+      isExpanded,
+      toggleLabel,
+      dismissLabel,
+      reviewLabel,
+      reviewingLabel,
+      onToggle,
+      onDismiss,
+      onReview,
+    } = props;
+    const rowStatusKind = getMoveRowStatusKind(move);
+    const rowsId = 'shared-drive-move-status-rows';
+    const isMoveWarning = move.kind !== 'processing' && move.kind !== 'completed';
+    const isReviewing = move.isReviewing === true;
+
+    return (
+      <div css={sharedDriveUploadStatusPopupStyles} data-uie-name="shared-drive-upload-status-popup">
+        <div
+          role="group"
+          aria-labelledby="shared-drive-move-status-title"
+          css={sharedDriveUploadStatusPopupContentStyles}
+          data-uie-name="shared-drive-upload-status-header"
+        >
+          <div css={sharedDriveUploadStatusPopupTextStyles} role="status" aria-live="polite">
+            <strong id="shared-drive-move-status-title" css={sharedDriveUploadStatusPopupTitleStyles} title={title}>
+              {title}
+            </strong>
+            <span css={sharedDriveUploadStatusPopupDestinationStyles} title={destination}>
+              {destination}
+            </span>
+          </div>
+          <div css={sharedDriveUploadStatusPopupHeaderActionsStyles}>
+            {isMoveWarning && onReview !== undefined && reviewLabel !== undefined && (
+              <button
+                type="button"
+                css={sharedDriveUploadStatusPopupHeaderCancelStyles}
+                disabled={isReviewing}
+                aria-busy={isReviewing}
+                onClick={onReview}
+              >
+                {isReviewing ? (reviewingLabel ?? reviewLabel) : reviewLabel}
+              </button>
+            )}
+            <button
+              type="button"
+              css={sharedDriveUploadStatusPopupHeaderCancelStyles}
+              aria-label={dismissLabel}
+              onClick={onDismiss}
+            >
+              {dismissLabel}
+            </button>
+            <button
+              type="button"
+              css={sharedDriveUploadStatusPopupToggleStyles}
+              aria-label={toggleLabel}
+              aria-expanded={isExpanded}
+              aria-controls={rowsId}
+              onClick={onToggle}
+            >
+              <ChevronIcon
+                direction={isExpanded ? 'down' : 'up'}
+                css={sharedDriveUploadStatusPopupToggleIconStyles}
+                color="currentColor"
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+        </div>
+        {isMoveWarning && (
+          <p role="alert" css={sharedDriveUploadStatusPopupMoveAlertStyles}>
+            {statusMessage}
+          </p>
+        )}
+        {move.kind === 'processing' && (
+          <div
+            role="progressbar"
+            aria-label={statusLabel}
+            css={sharedDriveUploadStatusPopupProgressStyles(isExpanded)}
+            data-uie-name="shared-drive-move-progress"
+          />
+        )}
+        {move.kind === 'completed' && (
+          <div
+            role="progressbar"
+            aria-label={statusLabel}
+            aria-valuemin={0}
+            aria-valuemax={PROGRESS_PERCENTAGE_MAX}
+            aria-valuenow={PROGRESS_PERCENTAGE_MAX}
+            css={sharedDriveUploadStatusPopupProgressStyles(isExpanded, 'uploaded')}
+            data-uie-name="shared-drive-move-progress"
+          />
+        )}
+        <div
+          id={rowsId}
+          role="list"
+          aria-labelledby="shared-drive-move-status-title"
+          css={sharedDriveUploadStatusPopupRowsStyles}
+          hidden={!isExpanded}
+        >
+          {move.items.map(item => {
+            return (
+              <div key={item.id} css={sharedDriveUploadStatusPopupRowStyles} role="listitem">
+                <SharedDriveStatusRowLeading
+                  icon={moveItemIcon(item)}
+                  name={item.name}
+                  status={statusLabel}
+                  kind={rowStatusKind}
+                />
+                <div css={sharedDriveUploadStatusPopupRowActionsStyles} aria-hidden="true" />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  return <SharedDriveUploadStatusPopupContent {...props} />;
 };

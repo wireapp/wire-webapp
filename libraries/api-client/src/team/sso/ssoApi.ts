@@ -55,7 +55,7 @@ export class SSOAPI {
     return await this.client.sendJSON(config);
   }
 
-  public async updateDomainRedirect({domain, backend, domainRedirect}: VerifyDomainRedirectConfig) {
+  public async updateDomainRedirect({domain, backend, domainRedirect}: VerifyDomainRedirectConfig): Promise<unknown> {
     const config: AxiosRequestConfig = {
       data: {
         backend,

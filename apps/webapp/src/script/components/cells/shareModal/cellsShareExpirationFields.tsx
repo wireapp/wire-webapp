@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import {DateValue, getLocalTimeZone, today} from '@internationalized/date';
 import {isNull, isNullOrUndefined, isNonEmptyString, isUndefined} from '@sindresorhus/is';
@@ -38,8 +38,6 @@ import {
   I18nProvider,
   Popover,
 } from 'react-aria-components';
-
-import {Label, Select, type Option} from '@wireapp/react-ui-kit';
 
 import {
   calendarButtonStyles,
@@ -68,6 +66,9 @@ import {
   expirationErrorTextStyles,
   timeSelectMenuPortalStyles,
 } from './cellsShareExpirationStyles';
+
+import {Select, type Option} from '../../../uiKit/inputs/select/select';
+import {Label} from '../../../uiKit/typography/label/label';
 
 const hoursPerHalfDay = 12;
 const twelveHourClockOffset = 11;
@@ -98,7 +99,8 @@ export interface CellsShareExpirationSelection {
   time: Option | null;
 }
 
-const parseTimeLabel = (value: string | number) => {
+type ParseTimeLabelResult = {hour24: number; minutes: number};
+const parseTimeLabel = (value: string | number): ParseTimeLabelResult => {
   const [timePart, periodPart] = `${value}`.trim().split(' ');
   const [hourPart, minutePart] = (isNonEmptyString(timePart) ? timePart : '').split(':');
   const hour = Number(hourPart);
@@ -131,8 +133,8 @@ export const getNextHourDateTime = (): Date => {
 };
 
 const buildTimeOptions = (): Option[] => {
-  return Array.from({length: 96}, (_, index) => {
-    const totalMinutes = index * timeOptionIntervalInMinutes;
+  return Array.from({length: 96}, (arrayElement, timeOptionIndex) => {
+    const totalMinutes = timeOptionIndex * timeOptionIntervalInMinutes;
     const hour24 = Math.floor(totalMinutes / minutesPerHour);
     const minutes = totalMinutes % minutesPerHour;
     const label = formatTimeLabel(hour24, minutes);
@@ -157,7 +159,7 @@ const getInitialState = (dateTime: Date | null | undefined): {time: Option; date
   };
 };
 
-export const CellsShareExpirationFields = ({
+export const CellsShareExpirationFields: FunctionComponent<CellsShareExpirationFieldsProps> = ({
   labels,
   errorText,
   dateTime,

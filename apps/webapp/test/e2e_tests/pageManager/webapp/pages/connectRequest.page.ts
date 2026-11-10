@@ -26,7 +26,7 @@ export class ConnectRequestPage {
     this.connectButton = page.locator('[data-uie-name="connect-request"] [data-uie-name="do-accept"]');
   }
 
-  async clickConnectButton() {
+  async clickConnectButton(): Promise<void> {
     await this.connectButton.click();
   }
 }

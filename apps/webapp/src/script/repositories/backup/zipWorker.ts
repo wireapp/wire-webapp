@@ -29,7 +29,9 @@ type Payload =
   | {type: 'zip'; files: Record<string, ArrayBuffer | string>; encrytionKey?: Uint8Array}
   | {type: 'unzip'; bytes: ArrayBuffer; encrytionKey?: Uint8Array; headerLength?: number};
 
-export async function handleZipEvent(payload: Payload) {
+export async function handleZipEvent(
+  payload: Payload,
+): Promise<Uint8Array<ArrayBufferLike> | Record<string, Uint8Array<ArrayBufferLike>>> {
   const zip = new JSZip();
   const encrytionKey = payload.encrytionKey;
   switch (payload.type) {
@@ -106,7 +108,11 @@ async function encryptFile(fileContent: Uint8Array, encryptionKey: Uint8Array): 
 }
 
 // Decrypt a file
-async function decryptFile(encryptedDataSource: Uint8Array, encryptionKey: Uint8Array, headerLength: number) {
+async function decryptFile(
+  encryptedDataSource: Uint8Array,
+  encryptionKey: Uint8Array,
+  headerLength: number,
+): Promise<Uint8Array<ArrayBufferLike>> {
   await ready;
 
   const metaDataHeader = headerLength;

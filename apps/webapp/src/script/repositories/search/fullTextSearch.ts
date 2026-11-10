@@ -19,7 +19,7 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {escapeRegex} from 'Util/sanitizationUtil';
+import {escapeRegex} from '../../util/sanitizationUtil';
 
 export const getSearchRegex = (query: string): RegExp => {
   const delimiter = ' ';

@@ -27,7 +27,13 @@ type InvokeRouteOptions = ClientVersionCheckRouteOverrides & {
   readonly clientAssetVersion: string | undefined;
 };
 
-function createClientVersionCheckRouteDependencies(overrides: ClientVersionCheckRouteOverrides = {}) {
+type ClientVersionCheckRouteTestDependencies = Parameters<typeof createClientVersionCheckRoute>[0] & {
+  readonly get: jest.Mock;
+};
+
+function createClientVersionCheckRouteDependencies(
+  overrides: ClientVersionCheckRouteOverrides = {},
+): ClientVersionCheckRouteTestDependencies {
   const get = jest.fn();
   const router = {get} as unknown as Router;
 

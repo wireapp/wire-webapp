@@ -20,43 +20,45 @@
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {container} from 'tsyringe';
 
-import type {AssetRepository} from 'Repositories/assets/assetRepository';
-import type {AudioRepository} from 'Repositories/audio/audioRepository';
-import type {BackupRepository} from 'Repositories/backup/backupRepository';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {ClientRepository} from 'Repositories/client';
-import type {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import type {EventRepository} from 'Repositories/event/EventRepository';
-import type {GiphyRepository} from 'Repositories/extension/GiphyRepository';
-import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import type {LifeCycleRepository} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
-import type {NotificationRepository} from 'Repositories/notification/NotificationRepository';
-import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import type {SearchRepository} from 'Repositories/search/searchRepository';
-import type {SelfRepository} from 'Repositories/self/SelfRepository';
-import type {StorageRepository} from 'Repositories/storage';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import type {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {type Translate} from 'Util/localizerUtil';
-
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
+import type {AssetRepository} from '../repositories/assets/assetRepository';
+import type {AudioRepository} from '../repositories/audio/audioRepository';
+import type {BackupRepository} from '../repositories/backup/backupRepository';
+import type {CallingRepository} from '../repositories/calling/CallingRepository';
+import {CellsRepository} from '../repositories/cells/cellsRepository';
+import type {ClientRepository} from '../repositories/client';
+import type {ConnectionRepository} from '../repositories/connection/connectionRepository';
+import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import type {MessageRepository} from '../repositories/conversation/MessageRepository';
+import type {CryptographyRepository} from '../repositories/cryptography/CryptographyRepository';
+import type {EventRepository} from '../repositories/event/EventRepository';
+import type {GiphyRepository} from '../repositories/extension/GiphyRepository';
+import type {IntegrationRepository} from '../repositories/integration/IntegrationRepository';
+import type {LifeCycleRepository} from '../repositories/LifeCycleRepository/LifeCycleRepository';
+import {MediaDevicesHandler} from '../repositories/media/MediaDevicesHandler';
+import {MediaStreamHandler} from '../repositories/media/MediaStreamHandler';
+import type {MeetingsRepository} from '../repositories/meetings/meetingsRepository';
+import type {NotificationRepository} from '../repositories/notification/NotificationRepository';
+import type {PreferenceNotificationRepository} from '../repositories/notification/PreferenceNotificationRepository';
+import type {PropertiesRepository} from '../repositories/properties/propertiesRepository';
+import type {SearchRepository} from '../repositories/search/searchRepository';
+import type {SelfRepository} from '../repositories/self/SelfRepository';
+import type {StorageRepository} from '../repositories/storage';
+import type {TeamRepository} from '../repositories/team/TeamRepository';
+import {TeamState} from '../repositories/team/TeamState';
+import type {EventTrackingRepository} from '../repositories/tracking/eventTrackingRepository';
+import type {UserRepository} from '../repositories/user/userRepository';
+import {UserState} from '../repositories/user/userState';
 import {Core} from '../service/coreSingleton';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import {type Translate} from '../util/localizerUtil';
+
+type MainViewModelPanelConfig = {BREAKPOINT: number; WIDTH: number};
+type MainViewModelConfig = {PANEL: MainViewModelPanelConfig};
 
 export interface ViewModelRepositories {
   asset: AssetRepository;
@@ -94,7 +96,7 @@ export class MainViewModel {
   private readonly core = container.resolve(Core);
   readonly translate: Translate;
 
-  static get CONFIG() {
+  static get CONFIG(): MainViewModelConfig {
     return {
       PANEL: {
         BREAKPOINT: 1000,
@@ -103,7 +105,7 @@ export class MainViewModel {
     };
   }
 
-  get isFederated() {
+  get isFederated(): boolean {
     return this.core.backendFeatures.isFederated;
   }
 

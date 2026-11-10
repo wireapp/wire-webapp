@@ -17,14 +17,16 @@
  *
  */
 
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
+
+import {useApplicationContext} from '../../../../page/rootProvider';
+import * as Icon from '../../../icon';
 
 interface GiphyButtonProps {
   onGifClick: () => void;
 }
 
-export const GiphyButton = ({onGifClick}: GiphyButtonProps) => {
+export const GiphyButton: FunctionComponent<GiphyButtonProps> = ({onGifClick}: GiphyButtonProps) => {
   const {translate} = useApplicationContext();
 
   return (

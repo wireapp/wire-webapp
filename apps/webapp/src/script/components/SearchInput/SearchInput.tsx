@@ -17,16 +17,15 @@
  *
  */
 
-import React, {useEffect, useLayoutEffect, useRef} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import type {User} from 'Repositories/entity/User';
-import {MAX_HANDLE_LENGTH} from 'Repositories/user/userHandleGenerator';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isEnterKey} from 'Util/keyboardUtil';
-
+import {useApplicationContext} from '../../page/rootProvider';
+import type {User} from '../../repositories/entity/User';
+import {MAX_HANDLE_LENGTH} from '../../repositories/user/userHandleGenerator';
+import {isEnterKey} from '../../util/keyboardUtil';
 import * as Icon from '../icon';
 
 interface SearchInputProps {
@@ -39,7 +38,7 @@ interface SearchInputProps {
   setInput: (input: string) => void;
 }
 
-export const SearchInput = ({
+export const SearchInput: FunctionComponent<SearchInputProps> = ({
   onEnter,
   input,
   selectedUsers = [],

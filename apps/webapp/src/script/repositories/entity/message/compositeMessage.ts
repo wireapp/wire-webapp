@@ -19,9 +19,9 @@
 
 import ko from 'knockout';
 
-import type {Translate} from 'Util/localizerUtil';
-
 import {ContentMessage} from './contentMessage';
+
+import type {Translate} from '../../../util/localizerUtil';
 
 export class CompositeMessage extends ContentMessage {
   errorButtonId: ko.Observable<string | undefined>;

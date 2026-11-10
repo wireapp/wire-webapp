@@ -41,7 +41,7 @@ let routes: Routes = {};
 /**
  * Matches the current URL path against configured routes and triggers the appropriate handler.
  */
-const parseRoute = () => {
+const parseRoute = (): void | Promise<void> => {
   const pathFromHash = window.location.hash.replace('#', '');
   const currentPath = isNonEmptyString(pathFromHash) ? pathFromHash : '/';
 
@@ -108,7 +108,7 @@ export const configureRoutes = (routeDefinitions: Routes): void => {
   window.addEventListener('hashchange', parseRoute);
   parseRoute();
 };
-export const navigate = (path: string) => {
+export const navigate = (path: string): void => {
   const isDeferred = setHistoryParam(path);
   if (!isDeferred) {
     parseRoute();

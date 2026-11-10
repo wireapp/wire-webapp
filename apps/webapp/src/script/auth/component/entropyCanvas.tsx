@@ -17,7 +17,7 @@
  *
  */
 
-import {MouseEvent, useRef, useEffect, useState} from 'react';
+import {MouseEvent, useRef, useEffect, useState, type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {isNull} from '@sindresorhus/is';
@@ -49,7 +49,7 @@ type Point = {
   y: number;
 };
 
-const EntropyCanvas = (props: CanvasProps) => {
+const EntropyCanvas: FunctionComponent<CanvasProps> = (props: CanvasProps) => {
   const {sizeX, sizeY, onProgress, css, minEntropyBits, minFrames, ariaLabel, ...rest} = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [percent, setPercent] = useState(0);
@@ -71,7 +71,7 @@ const EntropyCanvas = (props: CanvasProps) => {
     }
   }, [clearInterval, percent]);
 
-  const onMouseLeave = () => {
+  const onMouseLeave = (): void => {
     onProgress(entropy, percent, true);
     pauseInterval();
     // add null value to prevent render artifacts when the mouse leaves on one side and enters at a different position
@@ -79,7 +79,7 @@ const EntropyCanvas = (props: CanvasProps) => {
     setLastPoint(null);
   };
 
-  const draw = (ctx: CanvasRenderingContext2D) => {
+  const draw = (ctx: CanvasRenderingContext2D): void => {
     if (isNull(previousPoint) || isNull(lastPoint)) {
       return;
     }
@@ -105,7 +105,7 @@ const EntropyCanvas = (props: CanvasProps) => {
     draw(context);
   }, [lastPoint]);
 
-  const onMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {
+  const onMouseMove = (event: MouseEvent<HTMLCanvasElement>): void => {
     startInterval();
     const boundingRect = event.currentTarget?.getBoundingClientRect();
     const drawPoint: Point = {

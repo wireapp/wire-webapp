@@ -54,7 +54,7 @@ const $shouldIndentListItem = (selection: RangeSelection): boolean => {
   });
 };
 
-export const registerListItemTabIndentation = (editor: LexicalEditor) => {
+export const registerListItemTabIndentation = (editor: LexicalEditor): (() => void) => {
   return editor.registerCommand<KeyboardEvent>(
     KEY_TAB_COMMAND,
     event => {

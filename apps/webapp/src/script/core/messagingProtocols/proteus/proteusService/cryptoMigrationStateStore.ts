@@ -1,0 +1,60 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {noop} from 'noop-esm';
+
+type MigrationStorage = Storage | {setItem: typeof noop; getItem: typeof noop; removeItem: typeof noop};
+
+function getLocalStorage(): MigrationStorage {
+  try {
+    return window.localStorage;
+  } catch {
+    return {setItem: noop, getItem: noop, removeItem: noop};
+  }
+}
+
+const MIGRATION_READY_STATE = '1';
+
+const getQualifiedSessionsReadyKey = (dbName: string): `${string}-qualified-sessions-ready` => {
+  return `${dbName}-qualified-sessions-ready` as const;
+};
+
+const markMigrationReady = (getKey: (dbName: string) => string) => {
+  return (dbName: string) => {
+    const key = getKey(dbName);
+    const localStorage = getLocalStorage();
+    localStorage.setItem(key, MIGRATION_READY_STATE);
+  };
+};
+
+const isMigrationReady = (getKey: (dbName: string) => string) => {
+  return (dbName: string) => {
+    const key = getKey(dbName);
+    const localStorage = getLocalStorage();
+    const value = localStorage.getItem(key);
+    return value !== null && value === MIGRATION_READY_STATE;
+  };
+};
+
+export const cryptoMigrationStore = {
+  qualifiedSessions: {
+    isReady: isMigrationReady(getQualifiedSessionsReadyKey),
+    markAsReady: markMigrationReady(getQualifiedSessionsReadyKey),
+  },
+};

@@ -45,6 +45,8 @@ on:
         required: true
       WIRE_DEPLOYOHOLICS_WEBHOOK_URL:
         required: false
+      WIRE_DEPLOYOHOLICS_TOKEN:
+        required: false
       TESTINY_API_KEY:
         required: false
     outputs:
@@ -65,7 +67,7 @@ concurrency:
 jobs:
   deploy_to_aws:
     name: Deploy to precommit
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 25
     env:
       AWS_REGION: eu-central-1
@@ -198,7 +200,7 @@ jobs:
 
   notify_deployoholics:
     name: Notify Deployoholics about failed critical flow
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [deploy_to_aws, e2e_tests]
     if: ${{ always() && inputs.notify_deployoholics_on_failure && needs.e2e_tests.result == 'failure' }}
     permissions:
@@ -215,8 +217,8 @@ jobs:
       - name: Announce failed critical flow
         uses: ./.github/actions/notify-deployoholics
         with:
-          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
-          status: failure
+          deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
           text: |
             ❌ Playwright Critical Flow failed ❌
 

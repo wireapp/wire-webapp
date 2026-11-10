@@ -19,13 +19,18 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {getLogger} from 'Util/logger';
+import {MediaDevicesHandler} from '../repositories/media/MediaDevicesHandler';
+import {MediaStreamHandler} from '../repositories/media/MediaStreamHandler';
+import {getLogger} from '../util/logger';
 
 const logger = getLogger('useInitializeMediaDevices');
 
-export const useInitializeMediaDevices = (devicesHandler: MediaDevicesHandler, streamHandler: MediaStreamHandler) => {
+type MediaDeviceInitializationState = {areMediaDevicesInitialized: boolean};
+
+export const useInitializeMediaDevices = (
+  devicesHandler: MediaDevicesHandler,
+  streamHandler: MediaStreamHandler,
+): MediaDeviceInitializationState => {
   const [areMediaDevicesInitialized, setAreMediaDevicesInitialized] = useState(false);
 
   const initializeMediaDevices = useCallback(async () => {

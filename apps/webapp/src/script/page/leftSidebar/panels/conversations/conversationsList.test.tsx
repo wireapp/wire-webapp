@@ -37,27 +37,31 @@ jest.mock('@tanstack/react-virtual', () => {
 
 import {createRef} from 'react';
 
-import {act, fireEvent, render} from '@testing-library/react';
+import {act, fireEvent, render, type RenderResult} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
 
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {CallState} from '../../../../repositories/calling/CallState';
+import {
+  ConversationLabel,
+  ConversationLabelRepository,
+} from '../../../../repositories/conversation/ConversationLabelRepository';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
+import {translateForTest} from '../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {ListViewModel} from 'src/script/view_model/ListViewModel';
+} from '../../../testSupport/rootContextTestSupport';
+import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 import {ConversationsList} from './conversationsList';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
-const create1to1Conversation = (userName: string) => {
+const create1to1Conversation = (userName: string): Conversation => {
   const conversation = new Conversation(userName, 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const user = new User('id', 'domain', translateForTest);
   user.name(userName);
@@ -101,7 +105,7 @@ describe('ConversationsList', () => {
     useSidebarStore.setState({currentTab: SidebarTabs.RECENT});
   });
 
-  const renderComponent = (conversations: Conversation[], searchFilter: string = '', isEmpty = false) => {
+  const renderComponent = (conversations: Conversation[], searchFilter: string = '', isEmpty = false): RenderResult => {
     return render(
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
@@ -124,6 +128,60 @@ describe('ConversationsList', () => {
       {wrapper: rootProviderWrapper},
     );
   };
+
+  it('keeps the latest keyboard handler on other rows when focus changes', () => {
+    const conversations = ['Alice', 'Bob', 'Charlie'].map(create1to1Conversation);
+    currentFocus = conversations[0].id;
+
+    const renderList = (): JSX.Element => {
+      return (
+        <ConversationsList
+          conversationLabelRepository={conversationLabelRepository}
+          conversations={conversations}
+          conversationFocusCandidates={conversations}
+          conversationsFilter=""
+          listViewModel={listViewModel}
+          connectRequests={connectRequests}
+          conversationState={conversationState}
+          callState={callState}
+          currentFocus={currentFocus}
+          currentFolder={currentFolder}
+          resetConversationFocus={resetConversationFocus}
+          handleArrowKeyDown={handleArrowKeyDown}
+          clearSearchFilter={clearSearchFilter}
+          groupParticipantsConversations={[]}
+          isGroupParticipantsVisible={false}
+          isEmpty={false}
+        />
+      );
+    };
+    const {container, rerender} = render(renderList(), {wrapper: rootProviderWrapper});
+    const buttonFor = (conversation: Conversation): HTMLElement | null => {
+      return container.querySelector<HTMLElement>(
+        `[data-uie-uid="${conversation.id}"] [data-uie-name="go-open-conversation"]`,
+      );
+    };
+
+    expect(buttonFor(conversations[0])).toHaveAttribute('tabindex', '0');
+
+    const previousArrowHandler = handleArrowKeyDown;
+    handleArrowKeyDown = jest.fn(() => {
+      return jest.fn();
+    });
+    currentFocus = conversations[1].id;
+    rerender(renderList());
+
+    expect(buttonFor(conversations[0])).toHaveAttribute('tabindex', '-1');
+    expect(buttonFor(conversations[1])).toHaveAttribute('tabindex', '0');
+
+    const unaffectedButton = buttonFor(conversations[2]);
+    expect(unaffectedButton).not.toBeNull();
+    if (unaffectedButton) {
+      fireEvent.keyDown(unaffectedButton, {key: 'ArrowDown'});
+    }
+    expect(handleArrowKeyDown).toHaveBeenCalledWith(conversations[2].id);
+    expect(previousArrowHandler).not.toHaveBeenCalledWith(conversations[2].id);
+  });
 
   it("should render all 1:1 conversations if there's no search filter", async () => {
     const userNames = ['Alice', 'Bob', 'Charlie'];

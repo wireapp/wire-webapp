@@ -17,11 +17,12 @@
  *
  */
 
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
+import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
 import {FormattedMessage} from 'react-intl';
@@ -29,39 +30,29 @@ import {connect} from 'react-redux';
 import {useNavigate} from 'react-router';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
-import {
-  ActionLinkButton,
-  Button,
-  ButtonVariant,
-  Checkbox,
-  CheckboxLabel,
-  CodeInput,
-  Column,
-  Columns,
-  Container,
-  ContainerXS,
-  FlexBox,
-  Form,
-  Heading,
-  IsMobile,
-  Label,
-  Link,
-  LinkVariant,
-  Loading,
-  QUERY,
-  QueryKeys,
-  Text,
-  useMatchMedia,
-} from '@wireapp/react-ui-kit';
-
-import {LogoFullIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-import {isBackendError} from 'Util/typePredicateUtil';
 
 import {separator} from './login.styles';
 
+import {LogoFullIcon} from '../../../components/icon';
 import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {Checkbox, CheckboxLabel} from '../../../uiKit/inputs/checkbox/checkbox';
+import {CodeInput} from '../../../uiKit/inputs/codeInput/codeInput';
+import {Form} from '../../../uiKit/inputs/form/form';
+import {Column, Columns} from '../../../uiKit/layout/column/column';
+import {Container, ContainerXS} from '../../../uiKit/layout/container/container';
+import {FlexBox} from '../../../uiKit/layout/flexBox/flexBox';
+import {IsMobile, useMatchMedia} from '../../../uiKit/layout/matchMedia/matchMedia';
+import {ActionLinkButton} from '../../../uiKit/typography/actionLink/actionLink';
+import {Heading} from '../../../uiKit/typography/heading/heading';
+import {Label} from '../../../uiKit/typography/label/label';
+import {Link, LinkVariant} from '../../../uiKit/typography/link/link';
+import {Text} from '../../../uiKit/typography/text/text';
+import {QUERY, QueryKeys} from '../../../uiKit/utils/mediaQueries';
+import {getLogger} from '../../../util/logger';
+import {isBackendError} from '../../../util/typePredicateUtil';
 import {AccountAlreadyExistsModal} from '../../component/accountAlreadyExistsModal';
 import {AppAlreadyOpen} from '../../component/appAlreadyOpen';
 import {BackButton} from '../../component/backButton';
@@ -74,6 +65,7 @@ import {actionRoot} from '../../module/action';
 import {LabeledError} from '../../module/action/labeledError';
 import {ValidationError} from '../../module/action/validationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
+import type {LoginDataState, RegistrationDataState} from '../../module/reducer/authReducer';
 import * as AuthSelector from '../../module/selector/authSelector';
 import * as ConversationSelector from '../../module/selector/conversationSelector';
 import {QUERY_KEY, ROUTE} from '../../route';
@@ -84,13 +76,14 @@ import {getPrefixedSSOCode} from '../../util/urlUtil';
 import {EntropyContainer} from '../entropyContainer';
 import {Page} from '../page';
 import {styles} from '../verifyEmailCode.styles';
+
 type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
 };
 
 const logger = getLogger('Login');
 
-const LoginComponent = ({
+const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
   authError,
   resetAuthError,
   doCheckConversationCode,
@@ -244,7 +237,7 @@ const LoginComponent = ({
     formLoginData: Partial<LoginData>,
     validationErrors: Error[] = [],
     conversationPassword?: string,
-  ) => {
+  ): Promise<void> => {
     setValidationErrors(validationErrors);
 
     if (
@@ -359,7 +352,7 @@ const LoginComponent = ({
     }
   };
 
-  const resendTwoFactorCode = async () => {
+  const resendTwoFactorCode = async (): Promise<void> => {
     try {
       const email = twoFactorLoginData?.email;
       if (isNonEmptyString(email)) {
@@ -372,7 +365,7 @@ const LoginComponent = ({
     }
   };
 
-  const submitTwoFactorLogin = (code?: string) => {
+  const submitTwoFactorLogin = (code?: string): void => {
     setVerificationCode(code ?? '');
     setTwoFactorSubmitError('');
     // Do not auto submit if already failed once
@@ -381,11 +374,11 @@ const LoginComponent = ({
     }
   };
 
-  const storeEntropy = async (entropyData: Uint8Array) => {
+  const storeEntropy = async (entropyData: Uint8Array): Promise<void> => {
     onEntropyGenerated.current?.(entropyData);
   };
 
-  const submitJoinCodeWithPassword = async (password: string) => {
+  const submitJoinCodeWithPassword = async (password: string): Promise<void> => {
     if (conversationSubmitData === null) {
       setIsLinkPasswordModalOpen(false);
       return;
@@ -393,7 +386,7 @@ const LoginComponent = ({
     await handleSubmit(conversationSubmitData, [], password);
   };
 
-  const hideAccountAlreadyExistsModal = () => {
+  const hideAccountAlreadyExistsModal = (): void => {
     setIsAccountAlreadyExistsModalOpen(false);
     return navigate(ROUTE.HISTORY_INFO);
   };
@@ -619,7 +612,18 @@ const LoginComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {
+  defaultSSOCode: string | undefined;
+  isFetching: boolean;
+  conversationError: (Error & {label?: string; code?: number; message?: string}) | null;
+  isSendingTwoFactorCode: boolean;
+  loginData: LoginDataState;
+  authError: Error | null;
+  conversationInfo: ConversationJoinData | null;
+  conversationInfoFetching: boolean;
+  account: RegistrationDataState;
+};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
     isFetching: AuthSelector.isFetching(state),
@@ -634,7 +638,32 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+type MapDispatchToPropsResult = {
+  doCheckConversationCode: (key: string, code: string, uri?: string | undefined) => Promise<void>;
+  doInit: (options?: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean} | undefined) => Promise<void>;
+  doInitializeClient: (
+    clientType: ClientType,
+    password?: string | undefined,
+    verificationCode?: string | undefined,
+    entropyData?: Uint8Array<ArrayBufferLike> | undefined,
+  ) => Promise<void>;
+  doLogin: (loginData: LoginData, getEntropy?: (() => Promise<Uint8Array>) | undefined) => Promise<void>;
+  doLoginAndJoin: (
+    loginData: LoginData,
+    key: string,
+    code: string,
+    uri?: string | undefined,
+    getEntropy?: (() => Promise<Uint8Array>) | undefined,
+    password?: string | undefined,
+  ) => Promise<void>;
+  doSendTwoFactorCode: (email: string) => Promise<void>;
+  doSetLocalStorage: (key: string, value: any) => Promise<void>;
+  pushEntropyData: (entropy: Uint8Array<ArrayBufferLike>) => Promise<void>;
+  pushLoginData: (loginData: Partial<LoginDataState>) => Promise<void>;
+  resetAuthError: () => Promise<void>;
+  doGetConversationInfoByCode: (key: string, code: string) => Promise<ConversationJoinData | undefined>;
+};
+const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
     doCheckConversationCode: (...args: Parameters<typeof actionRoot.conversationAction.doCheckConversationCode>) => {
       return dispatch(actionRoot.conversationAction.doCheckConversationCode(...args));

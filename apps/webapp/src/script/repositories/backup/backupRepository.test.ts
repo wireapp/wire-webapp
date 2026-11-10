@@ -22,20 +22,21 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 import {omit} from 'underscore';
 
-import {generateConversation} from 'test/helper/ConversationGenerator';
-import {TestFactory} from 'test/helper/TestFactory';
-import {generateAPIUser} from 'test/helper/UserGenerator';
+import {generateConversation} from '../../../../test/helper/ConversationGenerator';
+import {TestFactory} from '../../../../test/helper/TestFactory';
+import {generateAPIUser} from '../../../../test/helper/UserGenerator';
 
-import {User} from 'Repositories/entity/User';
-import {ClientEvent} from 'Repositories/event/Client';
-import {StorageService} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-import {noop} from 'Util/util';
-import {createUuid} from 'Util/uuid';
-import {WebWorker} from 'Util/worker';
+import {User} from '../entity/User';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {ClientEvent} from '../event/Client';
+import {StorageService} from '../storage';
+import {StorageSchemata} from '../storage/storageSchemata';
+import {noop} from '../../util/util';
+import {createUuid} from '../../util/uuid';
+import {WebWorker} from '../../util/worker';
 
 import {Filename} from './backup.types';
-import {BackUpHeader, DecodedHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './backUpHeader';
+import {BackUpHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './backUpHeader';
 import {BackupRepository} from './backupRepository';
 import {BackupService} from './backupService';
 import {CancelError, DifferentAccountError, IncompatiblePlatformError} from './error';
@@ -45,7 +46,7 @@ import {handleZipEvent} from './zipWorker';
 
 import {Config} from '../../Config';
 import {DatabaseTypes, createStorageEngine} from '../../service/storeEngineProvider';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 
@@ -76,14 +77,20 @@ const messages = [
   },
 ];
 
-async function buildBackupRepository() {
+type BackupRepositoryTestDependencies = {
+  readonly backupService: BackupService;
+  readonly conversationRepository: ConversationRepository;
+  readonly storageService: StorageService;
+};
+type BackupRepositoryTestFixture = readonly [BackupRepository, BackupRepositoryTestDependencies];
+
+async function buildBackupRepository(testFactory: TestFactory): Promise<BackupRepositoryTestFixture> {
   const storageService = container.resolve(StorageService);
   const engine = await createStorageEngine('test', DatabaseTypes.PERMANENT);
   storageService.init(engine);
 
   const backupService = new BackupService(storageService);
 
-  const testFactory = new TestFactory();
   const conversationRepository = await testFactory.exposeConversationActors();
 
   jest.spyOn(conversationRepository, 'mapConversations').mockImplementation(conversations => {
@@ -107,11 +114,18 @@ function createBlobFromUint8Array(zipData: Uint8Array<ArrayBufferLike>): Blob {
 }
 
 describe('BackupRepository', () => {
+  let testFactory: TestFactory;
+
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     jest.spyOn(WebWorker.prototype, 'post').mockImplementation(handleZipEvent as any);
   });
 
   beforeEach(() => {
+    testFactory = new TestFactory();
     jest.spyOn(Config, 'getConfig').mockReturnValue({
       FEATURE: {
         ENABLE_CROSS_PLATFORM_BACKUP_EXPORT: false,
@@ -121,7 +135,7 @@ describe('BackupRepository', () => {
 
   describe('createMetaData', () => {
     it('creates backup metadata', async () => {
-      const [, {backupService}] = await buildBackupRepository();
+      const [, {backupService}] = await buildBackupRepository(testFactory);
       jest.useFakeTimers();
       const freezedTime = new Date();
       jest.setSystemTime(freezedTime);
@@ -156,7 +170,7 @@ describe('BackupRepository', () => {
     });
 
     it('cancels export', async () => {
-      const [backupRepository, {storageService}] = await buildBackupRepository();
+      const [backupRepository, {storageService}] = await buildBackupRepository(testFactory);
       const password = '';
       await Promise.all([
         ...messages.map(message => {
@@ -201,7 +215,7 @@ describe('BackupRepository', () => {
       ],
       [{otr_key: {'0': 1, '1': 2}}, {otr_key: new Uint8Array([1, 2])}],
     ])('preserves legacy JSON record truthiness for %p', async (eventContent, expectedEventContent) => {
-      const [backupRepository, {backupService}] = await buildBackupRepository();
+      const [backupRepository, {backupService}] = await buildBackupRepository(testFactory);
       const user = new User('user1', '', translateForTest);
       const importEntities = jest.spyOn(backupService, 'importEntities').mockResolvedValue(1);
       const restoredEvent = {
@@ -246,7 +260,7 @@ describe('BackupRepository', () => {
         },
       ],
     ])(`fails if metadata doesn't match`, async ({metaChanges, expectedError}) => {
-      const [backupRepository, {backupService}] = await buildBackupRepository();
+      const [backupRepository, {backupService}] = await buildBackupRepository(testFactory);
 
       const meta = {
         ...createMetaData(new User('user1', '', translateForTest), 'client1', backupService),
@@ -265,7 +279,7 @@ describe('BackupRepository', () => {
     });
 
     it('successfully imports a backup', async () => {
-      const [backupRepository, {backupService, conversationRepository}] = await buildBackupRepository();
+      const [backupRepository, {backupService, conversationRepository}] = await buildBackupRepository(testFactory);
       const user = new User('user1', '', translateForTest);
       const mockedDBVersion = 20;
       jest.spyOn(backupService, 'getDatabaseVersion').mockReturnValue(mockedDBVersion);
@@ -329,7 +343,7 @@ describe('BackupRepository', () => {
       const user = new User('user1', '', translateForTest);
       const mockHashedUserId = new Uint8Array(32);
       const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
-      const mockGenerateChaCha20Key = jest.fn().mockImplementation((header: DecodedHeader) => {
+      const mockGenerateChaCha20Key = jest.fn().mockImplementation(() => {
         return new Uint8Array(32);
       });
       const mockSalt = new Uint8Array(16);
@@ -351,7 +365,7 @@ describe('BackupRepository', () => {
       jest.spyOn(BackUpHeader.prototype, 'readBackupHeader').mockImplementation(mockReadBackupHeader);
       jest.spyOn(WebWorker.prototype, 'post').mockResolvedValue(new Uint8Array([1, 2, 3]));
 
-      const [backupRepository] = await buildBackupRepository();
+      const [backupRepository] = await buildBackupRepository(testFactory);
       await (backupRepository as any).compressHistoryFiles(
         user,
         clientId,
@@ -378,7 +392,7 @@ describe('BackupRepository', () => {
       const clientId = 'ClientId';
       const user = new User('user1', '', translateForTest);
       const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
-      const mockGenerateChaCha20Key = jest.fn().mockImplementation(_header => {
+      const mockGenerateChaCha20Key = jest.fn().mockImplementation(() => {
         return new Uint8Array(32);
       });
 
@@ -387,7 +401,7 @@ describe('BackupRepository', () => {
       jest.spyOn(BackUpHeader.prototype, 'generateChaCha20Key').mockImplementation(mockGenerateChaCha20Key);
       jest.spyOn(WebWorker.prototype, 'post').mockResolvedValue(new Uint8Array([1, 2, 3]));
 
-      const [backupRepository] = await buildBackupRepository();
+      const [backupRepository] = await buildBackupRepository(testFactory);
       await (backupRepository as any).compressHistoryFiles(
         user,
         clientId,
@@ -411,7 +425,7 @@ describe('BackupRepository', () => {
       const user = new User('user1', '', translateForTest);
       jest.spyOn(WebWorker.prototype, 'post').mockResolvedValue(new Uint8Array([1, 2, 3]));
 
-      const [backupRepository] = await buildBackupRepository();
+      const [backupRepository] = await buildBackupRepository(testFactory);
       const result = await (backupRepository as any).compressHistoryFiles(
         user,
         clientId,

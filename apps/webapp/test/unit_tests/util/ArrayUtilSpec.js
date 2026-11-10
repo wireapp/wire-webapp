@@ -17,7 +17,16 @@
  *
  */
 
-import {chunk, getNextItem, interpolate, isLastItem, iterateIndex, uniquify, flatten, partition} from 'Util/arrayUtil';
+import {
+  chunk,
+  getNextItem,
+  interpolate,
+  isLastItem,
+  iterateIndex,
+  uniquify,
+  flatten,
+  partition,
+} from '../../../src/script/util/arrayUtil';
 
 describe('ArrayUtil', () => {
   describe('chunk', () => {

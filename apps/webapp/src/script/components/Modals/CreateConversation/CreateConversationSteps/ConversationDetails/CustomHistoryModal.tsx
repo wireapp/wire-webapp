@@ -17,14 +17,18 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNan} from '@sindresorhus/is';
 
-import {Button, ButtonVariant, FlexBox, Input, Select, Text} from '@wireapp/react-ui-kit';
-
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
-
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
+import {Input} from '../../../../../uiKit/inputs/input/input';
+import {Select} from '../../../../../uiKit/inputs/select/select';
+import {FlexBox} from '../../../../../uiKit/layout/flexBox/flexBox';
+import {Text} from '../../../../../uiKit/typography/text/text';
+import {handleEscDown, handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
+import {ModalComponent} from '../../../ModalComponent';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory, HistorySharingUnit} from '../../types';
 import {getChatHistorySharingUnitOptions} from '../../utils';
@@ -37,7 +41,7 @@ import {
   customHistorySharingButtonCss,
 } from '../CreateConversationSteps.styles';
 
-export const CustomHistoryModal = () => {
+export const CustomHistoryModal: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {
     setIsCustomHistoryModalOpen,
@@ -51,13 +55,13 @@ export const CustomHistoryModal = () => {
 
   const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(translate, historySharingQuantity);
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     setHistorySharingQuantity(1);
     setHistorySharingUnit(HistorySharingUnit.Days);
     setIsCustomHistoryModalOpen(false);
   };
 
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     setIsCustomHistoryModalOpen(false);
     setChatHistory(ChatHistory.Custom);
   };

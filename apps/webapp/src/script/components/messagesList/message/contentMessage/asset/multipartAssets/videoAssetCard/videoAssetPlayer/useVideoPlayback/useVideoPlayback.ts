@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useCallback, useRef, SyntheticEvent} from 'react';
+import {useState, useCallback, useRef, SyntheticEvent, type RefObject} from 'react';
 
 import {isEmptyString, isUndefined} from '@sindresorhus/is';
 
@@ -31,7 +31,17 @@ interface UseVideoPlaybackProps {
 
 type PlayabilityStatus = 'not-checked' | 'playable' | 'unplayable';
 
-export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybackProps) => {
+type UseVideoPlaybackResult = {
+  currentTime: number;
+  isPlaying: boolean;
+  isError: boolean;
+  isPlayedRef: RefObject<boolean>;
+  handleTimeUpdate: () => void;
+  handlePlay: () => Promise<void>;
+  handlePause: () => void;
+  handleError: (event: SyntheticEvent<HTMLVideoElement>) => void;
+};
+export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybackProps): UseVideoPlaybackResult => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isError, setIsError] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);

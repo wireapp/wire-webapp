@@ -17,16 +17,23 @@
  *
  */
 
-import {FormEvent, useState} from 'react';
+import {FormEvent, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {Button, COLOR, Container, ErrorMessage, Form, H2, Input, Link, Modal, Text} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {COLOR} from '../../uiKit/identity/colors/colors';
+import {Button} from '../../uiKit/inputs/button/button';
+import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
+import {Form} from '../../uiKit/inputs/form/form';
+import {Input} from '../../uiKit/inputs/input/input';
+import {Container} from '../../uiKit/layout/container/container';
+import {Modal} from '../../uiKit/surface/modal/modal';
+import {H2} from '../../uiKit/typography/heading/heading';
+import {Link} from '../../uiKit/typography/link/link';
+import {Text} from '../../uiKit/typography/text/text';
 
 export interface JoinGuestLinkPasswordModalProps {
   onSubmitPassword: (password: string) => void;
@@ -36,7 +43,7 @@ export interface JoinGuestLinkPasswordModalProps {
   onClose: () => void;
 }
 
-const JoinGuestLinkPasswordModal = ({
+const JoinGuestLinkPasswordModal: FunctionComponent<JoinGuestLinkPasswordModalProps> = ({
   error,
   onClose,
   isLoading,
@@ -46,12 +53,12 @@ const JoinGuestLinkPasswordModal = ({
   const {translate} = useApplicationContext();
   const [passwordValue, setPasswordValue] = useState<string>('');
 
-  const onSubmit = (event: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
+  const onSubmit = (event: FormEvent<HTMLFormElement | HTMLButtonElement>): void => {
     event.preventDefault();
     onSubmitPassword(passwordValue);
   };
 
-  const Error = () => {
+  const Error: FunctionComponent = () => {
     if (error?.code === HTTP_STATUS.FORBIDDEN || error?.code === HTTP_STATUS.BAD_REQUEST) {
       return <ErrorMessage>{translate('guestLinkPasswordModal.passwordIncorrect')}</ErrorMessage>;
     }

@@ -64,7 +64,7 @@ function getRandomWordCombination(): string {
 }
 
 function generateHandleVariations(handle: string, numberOfVariations: number = DEFAULT_NUMBER_VARIATIONS): string[] {
-  return Array.from(Array(numberOfVariations), (_, index) => {
+  return Array.from(Array(numberOfVariations), (arrayElement, index) => {
     const digitCount = index + 1;
     return appendRandomDigits(handle.slice(0, MAX_HANDLE_LENGTH - digitCount), digitCount);
   });

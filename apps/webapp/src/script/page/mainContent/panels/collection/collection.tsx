@@ -19,33 +19,33 @@
 
 import {useEffect, useState} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
-
-import {ChevronIcon, SecondaryButton} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import * as Icon from 'Components/icon';
-import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate} from 'src/script/router/routerBindings';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {CollectionDetails} from './collectionDetails';
 import {CollectionSection} from './collectionSection';
 import {FullSearch} from './fullSearch';
 import {Category, isOfCategory} from './utils';
 
+import * as Icon from '../../../../components/icon';
+import {showDetailViewModal} from '../../../../components/Modals/DetailViewModal';
+import {Config} from '../../../../Config';
 import {MessageCategory} from '../../../../message/messageCategory';
+import {AssetRepository} from '../../../../repositories/assets/assetRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {User} from '../../../../repositories/entity/User';
+import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {createNavigate} from '../../../../router/routerBindings';
+import {ChevronIcon} from '../../../../uiKit/dataDisplay/icon/chevronIcon';
+import {SecondaryButton} from '../../../../uiKit/inputs/secondaryButton/secondaryButton';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {WebAppEvents} from '../../../../webAppEvents';
+import {useApplicationContext} from '../../../rootProvider';
 
 type CollectionProps = {
   conversation: Conversation;
@@ -84,7 +84,7 @@ function splitIntoCategories(messages: ContentMessage[]): Categories {
   );
 }
 
-function Collection(props: CollectionProps) {
+function Collection(props: CollectionProps): JSX.Element {
   const {conversation, conversationRepository, assetRepository, messageRepository, selfUser} = props;
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [searchTerm, setSearchTerm] = useState('');
@@ -99,13 +99,13 @@ function Collection(props: CollectionProps) {
   }, [conversation, conversationRepository]);
 
   useEffect(() => {
-    const addItem = (message: ContentMessage) => {
+    const addItem = (message: ContentMessage): void => {
       setMessages(oldMessages => {
         return [message].concat(oldMessages);
       });
     };
 
-    const removeItem = (messageId: string, conversationId: string) => {
+    const removeItem = (messageId: string, conversationId: string): void => {
       if (conversation.id !== conversationId) {
         // A message from a different converation, nothing to do
         return;
@@ -117,7 +117,7 @@ function Collection(props: CollectionProps) {
       });
     };
 
-    const removeMessage = (message: ContentMessage) => {
+    const removeMessage = (message: ContentMessage): void => {
       removeItem(message.id, message.conversation_id);
     };
 
@@ -134,7 +134,7 @@ function Collection(props: CollectionProps) {
   const categories = splitIntoCategories(messages);
   const {images, audio, links, files} = categories;
 
-  const onImageClick = (message: ContentMessage) => {
+  const onImageClick = (message: ContentMessage): void => {
     showDetailViewModal({
       assetRepository,
       conversationRepository,

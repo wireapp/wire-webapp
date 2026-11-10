@@ -17,13 +17,12 @@
  *
  */
 
-import {useMemo} from 'react';
-
-import {Select} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useMemo, type FunctionComponent} from 'react';
 
 import {wrapperStyles, labelStyles, selectWrapperStyles, selectStyles} from './cellsPageSizeSelect.styles';
+
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {Select} from '../../../../../uiKit/inputs/select/select';
 
 const options = [
   {value: '10', label: '10'},
@@ -37,7 +36,10 @@ interface CellsPageSizeSelectProps {
   onSizeChange: ({value}: {value: string}) => void;
 }
 
-export const CellsPageSizeSelect = ({pageSize, onSizeChange}: CellsPageSizeSelectProps) => {
+export const CellsPageSizeSelect: FunctionComponent<CellsPageSizeSelectProps> = ({
+  pageSize,
+  onSizeChange,
+}: CellsPageSizeSelectProps) => {
   const {translate} = useApplicationContext();
   const currentOption = useMemo(() => {
     return {value: `${pageSize}`, label: `${pageSize}`};

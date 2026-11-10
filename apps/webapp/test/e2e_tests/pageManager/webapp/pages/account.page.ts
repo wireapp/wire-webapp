@@ -19,6 +19,7 @@
 
 import {Page, Locator} from '@playwright/test';
 
+type PrivacySectionResult = Locator & {appLock: {checkbox: Locator; label: Locator}};
 export class AccountPage {
   private readonly page: Page;
 
@@ -73,7 +74,7 @@ export class AccountPage {
   }
 
   /** Locator for the privacy section within the account settings, including utils for the options inside it */
-  get privacySection() {
+  get privacySection(): PrivacySectionResult {
     const section = this.page.getByRole('group', {name: 'Privacy'});
     return Object.assign(section, {
       appLock: {
@@ -83,49 +84,49 @@ export class AccountPage {
     });
   }
 
-  async clickBackUpButton() {
+  async clickBackUpButton(): Promise<void> {
     await this.backUpButton.click();
   }
 
-  async clickDeleteAccountButton() {
+  async clickDeleteAccountButton(): Promise<void> {
     await this.deleteAccountButton.click();
   }
 
-  async clickRestoreBackupButton() {
+  async clickRestoreBackupButton(): Promise<void> {
     await this.restoreBackupButton.click();
   }
 
-  async toggleSendUsageData() {
+  async toggleSendUsageData(): Promise<void> {
     await this.sendUsageDataCheckbox.click();
   }
 
-  async toggleReceiveNewsletter() {
+  async toggleReceiveNewsletter(): Promise<void> {
     await this.receiveNewsletterCheckbox.click();
   }
 
-  async toggleTypingIndicator() {
+  async toggleTypingIndicator(): Promise<void> {
     await this.typingIndicator.click();
   }
 
-  async isSendUsageDataEnabled() {
+  async isSendUsageDataEnabled(): Promise<boolean> {
     return this.sendUsageDataCheckbox.isChecked();
   }
 
-  async clickLogoutButton() {
+  async clickLogoutButton(): Promise<void> {
     await this.logoutButton.click();
   }
 
-  async isDisplayedEmailEquals(expectedEmail: string) {
+  async isDisplayedEmailEquals(expectedEmail: string): Promise<boolean> {
     await this.emailDisplay.isVisible();
     const displayedEmail = await this.emailDisplay.textContent();
     return displayedEmail === expectedEmail;
   }
 
-  async clickResetPasswordButton() {
+  async clickResetPasswordButton(): Promise<void> {
     await this.resetPasswordButton.click();
   }
 
-  async uploadProfilePicture(imagePath: string) {
+  async uploadProfilePicture(imagePath: string): Promise<void> {
     const [filePicker] = await Promise.all([
       this.page.waitForEvent('filechooser'),
       this.page.getByLabel('Change your picture').click(),
@@ -133,29 +134,29 @@ export class AccountPage {
     await filePicker.setFiles(imagePath);
   }
 
-  async changeEmailAddress(newEmail: string) {
+  async changeEmailAddress(newEmail: string): Promise<void> {
     await this.editEmailButton.click();
     await this.emailInput.fill(newEmail);
     await this.emailInput.press('Enter');
   }
 
-  async changeName(newName: string) {
+  async changeName(newName: string): Promise<void> {
     await this.editDisplayNameButton.click();
     await this.displayNameInput.fill(newName);
     await this.displayNameInput.press('Enter');
   }
 
-  async changeUserName(newUserName: string) {
+  async changeUserName(newUserName: string): Promise<void> {
     await this.editUserNameButton.click();
     await this.userNameInput.fill(newUserName);
     await this.userNameInput.press('Enter');
   }
 
-  statusOption(status: 'Away' | 'Busy' | 'Available' | 'None') {
+  statusOption(status: 'Away' | 'Busy' | 'Available' | 'None'): Locator {
     return this.page.getByRole('button', {name: new RegExp(`${status}`, 'i')});
   }
 
-  async selectStatus(status: 'Away' | 'Busy' | 'Available' | 'None') {
+  async selectStatus(status: 'Away' | 'Busy' | 'Available' | 'None'): Promise<void> {
     await this.statusOption(status).click();
   }
 }

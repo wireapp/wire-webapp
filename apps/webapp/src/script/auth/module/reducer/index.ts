@@ -22,7 +22,6 @@ import {AnyAction, bindActionCreators as bindActionCreatorsRedux} from 'redux';
 import type {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
 
 import type {APIClient} from '@wireapp/api-client';
-import type {Account} from '@wireapp/core';
 
 import {AuthState, authReducer, initialAuthState} from './authReducer';
 import {ClientState, clientReducer, initialClientState} from './clientReducer';
@@ -32,6 +31,7 @@ import {LanguageState, initialLanguageState, languageReducer} from './languageRe
 import {SelfState, initialSelfState, selfReducer} from './selfReducer';
 
 import type {Configuration} from '../../../Config';
+import type {Account} from '../../../core';
 import type {ActionRoot} from '../action';
 
 export type Api = {

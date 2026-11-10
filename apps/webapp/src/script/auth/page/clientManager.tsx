@@ -17,29 +17,37 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
+import type {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil, StringUtil, Runtime} from '@wireapp/commons';
-import {Button, ButtonVariant, ContainerXS, Muted, QUERY, Text, useMatchMedia, useTimeout} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Page} from './page';
 
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
+import {Muted, Text} from '../../uiKit/typography/text/text';
+import {QUERY} from '../../uiKit/utils/mediaQueries';
+import {useTimeout} from '../../uiKit/utils/useTimeout';
 import {ClientList} from '../component/clientList';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {RootState, bindActionCreators, type ThunkAction} from '../module/reducer';
 import {QUERY_KEY} from '../route';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
+const ClientManagerComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
+  doGetAllClients,
+  doLogout,
+}: Props & ConnectedProps & DispatchProps) => {
   const {translate} = useApplicationContext();
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
@@ -67,7 +75,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
     }
   }, [SFAcode, doGetAllClients, startTimeout]);
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
       await doLogout();
     } catch {
@@ -122,7 +130,11 @@ const mapStateToProps = (): RootState extends never ? never : {} => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {
+  doGetAllClients: () => ThunkAction<Promise<RegisteredClient[]>>;
+  doLogout: () => ThunkAction;
+};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators(
     {
       doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,

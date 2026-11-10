@@ -17,9 +17,9 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {expect, test, Team, withLogin} from 'test/e2e_tests/test.fixtures';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {expect, test, Team, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup, sendConnectionRequest} from '../../utils/userActions';
 import {UserProfileModal} from '../../pageManager/webapp/modals/userProfile.modal';
 
@@ -34,7 +34,11 @@ type ProfileModalOptions = {
   showOpenProfileButton?: boolean;
 };
 
-async function verifyUserProfileModal(profileModal: UserProfileModal, user: User, options: ProfileModalOptions) {
+async function verifyUserProfileModal(
+  profileModal: UserProfileModal,
+  user: User,
+  options: ProfileModalOptions,
+): Promise<void> {
   await test.step(`Verify user profile modal for ${user.fullName}`, async () => {
     await expect(profileModal.modal).toBeVisible();
     await expect(profileModal.participantFullname).toContainText(user.fullName);

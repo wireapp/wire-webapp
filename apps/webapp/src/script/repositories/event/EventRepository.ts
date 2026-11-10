@@ -22,11 +22,10 @@ import {
   CONVERSATION_EVENT,
   MEETING_EVENT,
   USER_EVENT,
+  type BackendEvent,
   ConversationOtrMessageAddEvent,
   ConversationMLSMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
-import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
-import {sequentialQueueOptions} from '@wireapp/core/lib/queue/sequentialQueueOptions';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
@@ -34,17 +33,6 @@ import PromiseQueue from 'p-queue';
 import {container} from 'tsyringe';
 
 import {Runtime, StringUtil} from '@wireapp/commons';
-import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '@wireapp/core';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
-import {EventName} from 'Repositories/tracking/eventName';
-import {UserState} from 'Repositories/user/userState';
-import {getLogger, Logger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {toError} from 'Util/toError';
-import {isAxiosError} from 'Util/typePredicateUtil';
 
 import {ClientEvent} from './Client';
 import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
@@ -57,15 +45,44 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventHandlers/EventValidationError';
 
+import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '../../core';
+import {NotificationSource, HandledEventPayload} from '../../core/notification';
+import {sequentialQueueOptions} from '../../core/queue/sequentialQueueOptions';
 import {CryptographyError} from '../../error/cryptographyError';
 import {EventError} from '../../error/eventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {getLogger, Logger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {toError} from '../../util/toError';
+import {isAxiosError} from '../../util/typePredicateUtil';
 import {Warnings} from '../../view_model/WarningsContainer';
+import {WebAppEvents} from '../../webAppEvents';
+import {ClientConversationEvent, EventBuilder} from '../conversation/EventBuilder';
+import {CryptographyMapper} from '../cryptography/CryptographyMapper';
+import {EventName} from '../tracking/eventName';
+import {UserState} from '../user/userState';
 
 const callEventLifetimeInSeconds = 30;
 const heartbeatIntervalInSeconds = 30;
 const outdatedMessageDecryptionErrorCode = 208;
 const duplicateMessageDecryptionErrorCode = 209;
+
+type IgnoredEventErrorType =
+  | (typeof CryptographyError.TYPE)[keyof typeof CryptographyError.TYPE]
+  | (typeof EventError.TYPE)[keyof typeof EventError.TYPE];
+type NotificationBatches = {INITIAL: number; MAX: number; SUBSEQUENT: number};
+type EventRepositoryConfig = {
+  E_CALL_EVENT_LIFETIME: number;
+  HEARTBEAT_INTERVAL: number;
+  IGNORED_ERRORS: IgnoredEventErrorType[];
+  NOTIFICATION_BATCHES: NotificationBatches;
+};
+type EventRepositorySource = {
+  BACKEND_RESPONSE: typeof EventSource.BACKEND_RESPONSE;
+  INJECTED: typeof EventSource.INJECTED;
+  STREAM: typeof EventSource.NOTIFICATION_STREAM;
+  WEB_SOCKET: typeof EventSource.WEBSOCKET;
+};
 
 type WebSocketConnectTrigger =
   'initial' | 'online' | 'focus' | 'visibility' | 'heartbeat-closed' | 'heartbeat-unhealthy';
@@ -84,7 +101,7 @@ export class EventRepository {
 
   private eventQueue: PromiseQueue = new PromiseQueue({autoStart: true, ...sequentialQueueOptions});
 
-  static get CONFIG() {
+  static get CONFIG(): EventRepositoryConfig {
     return {
       E_CALL_EVENT_LIFETIME: TIME_IN_MILLIS.SECOND * callEventLifetimeInSeconds,
       HEARTBEAT_INTERVAL: TIME_IN_MILLIS.SECOND * heartbeatIntervalInSeconds,
@@ -105,7 +122,7 @@ export class EventRepository {
   }
 
   // TODO: Will be replaced with "EventSource"
-  static get SOURCE() {
+  static get SOURCE(): EventRepositorySource {
     return {
       BACKEND_RESPONSE: EventSource.BACKEND_RESPONSE,
       INJECTED: EventSource.INJECTED,
@@ -132,7 +149,7 @@ export class EventRepository {
    * Those middleware are run sequentially one after the other. Thus the order at which they are defined matters.
    * When one middleware fails the entire even handling process will stop and no further middleware will be executed.
    */
-  setEventProcessMiddlewares(middlewares: EventMiddleware[]) {
+  setEventProcessMiddlewares(middlewares: EventMiddleware[]): void {
     this.eventProcessMiddlewares = middlewares;
   }
 
@@ -141,7 +158,7 @@ export class EventRepository {
    * They will all be executed in parallel. If one processor fails the other ones are not impacted
    * @param processors
    */
-  setEventProcessors(processors: EventProcessor[]) {
+  setEventProcessors(processors: EventProcessor[]): void {
     this.eventProcessors = processors;
   }
 
@@ -149,7 +166,7 @@ export class EventRepository {
   // WebSocket handling
   //##############################################################################
 
-  private readonly updateConnectivityStatus = (state: ConnectionState) => {
+  private readonly updateConnectivityStatus = (state: ConnectionState): void => {
     this.logger.log('Websocket connection state changed to', state);
     switch (state) {
       case ConnectionState.CONNECTING: {
@@ -183,7 +200,10 @@ export class EventRepository {
    * this function will process any incoming event. It is being queued in case 2 events arrive at the same time.
    * Processing events should happen sequentially (thus the queue)
    */
-  private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
+  private readonly handleIncomingEvent = async (
+    payload: HandledEventPayload,
+    source: NotificationSource,
+  ): Promise<void> => {
     return this.eventQueue.add(async () => {
       try {
         await this.handleEvent(payload, source);
@@ -203,7 +223,7 @@ export class EventRepository {
    *
    * @param events decrypted events
    */
-  async importEvents(events: [HandledEventPayload]) {
+  async importEvents(events: [HandledEventPayload]): Promise<void> {
     for await (const event of events) {
       await this.handleIncomingEvent(event, NotificationSource.NOTIFICATION_STREAM);
     }
@@ -236,7 +256,7 @@ export class EventRepository {
       return `connectCycleId=${connectCycleId} connectionInProgress=${connectionInProgress} notificationState=${getNotificationHandlingStateName(this.notificationHandlingState())} navigatorOnline=${navigator.onLine} visibility=${document.visibilityState} focused=${document.hasFocus()}`;
     };
 
-    const connect = async (trigger: WebSocketConnectTrigger) => {
+    const connect = async (trigger: WebSocketConnectTrigger): Promise<void> => {
       if (connectionInProgress) {
         this.logger.debug(
           `[WebSocketLifecycle] layer=event-repository event=connect-skip trigger=${trigger} ${getBrowserConnectionContext()} reason=connection-in-progress`,
@@ -286,7 +306,7 @@ export class EventRepository {
       }
     };
 
-    const handleOnline = () => {
+    const handleOnline = (): void => {
       if (!navigator.onLine) {
         return;
       }
@@ -295,7 +315,7 @@ export class EventRepository {
       void connect('online');
     };
 
-    const verifyConnectionHealthAndReconnect = async (trigger: 'focus' | 'visibility' | 'heartbeat') => {
+    const verifyConnectionHealthAndReconnect = async (trigger: 'focus' | 'visibility' | 'heartbeat'): Promise<void> => {
       if (!navigator.onLine) {
         this.logger.debug(
           `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=offline ${getBrowserConnectionContext()}`,
@@ -367,7 +387,7 @@ export class EventRepository {
       }
     };
 
-    const handleOffline = () => {
+    const handleOffline = (): void => {
       this.logger.warn('Internet connection lost');
       actualDisconnect();
       Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
@@ -375,7 +395,7 @@ export class EventRepository {
 
     if (Runtime.isElectron()) {
       // In Electron, use window focus events instead of visibilitychange
-      const handleFocus = () => {
+      const handleFocus = (): void => {
         if (navigator.onLine) {
           this.logger.info('Window focused, verifying connection...');
           void verifyConnectionHealthAndReconnect('focus');
@@ -388,7 +408,7 @@ export class EventRepository {
       });
     } else {
       // In browser, use visibilitychange
-      const handleVisibilityChange = () => {
+      const handleVisibilityChange = (): void => {
         if (document.visibilityState === 'visible' && navigator.onLine) {
           this.logger.info('Tab became visible, verifying connection...');
           void verifyConnectionHealthAndReconnect('visibility');
@@ -462,7 +482,7 @@ export class EventRepository {
     return undefined;
   }
 
-  private async handleTimeDrift() {
+  private async handleTimeDrift(): Promise<void> {
     try {
       const time = await this.notificationService.getServerTime();
       this.serverTimeHandler.computeTimeOffset(time);
@@ -493,7 +513,7 @@ export class EventRepository {
     }
   }
 
-  private readonly triggerMissedSystemEventMessageRendering = async (missedNotificationId: string) => {
+  private readonly triggerMissedSystemEventMessageRendering = async (missedNotificationId: string): Promise<void> => {
     const notificationId = await this.notificationService.getMissedIdFromDb();
     const shouldUpdatePersistedId = missedNotificationId !== notificationId;
     if (shouldUpdatePersistedId) {
@@ -520,7 +540,10 @@ export class EventRepository {
   // Notification/Event handling
   //##############################################################################
 
-  async injectEvents(events: (ClientConversationEvent | IncomingEvent)[], source: EventSource = EventSource.INJECTED) {
+  async injectEvents(
+    events: (ClientConversationEvent | IncomingEvent)[],
+    source: EventSource = EventSource.INJECTED,
+  ): Promise<void> {
     for (const event of events) {
       await this.injectEvent(event, source);
     }
@@ -561,7 +584,7 @@ export class EventRepository {
    * @param event Mapped event to be distributed
    * @param source Source of notification
    */
-  private async distributeEvent(event: IncomingEvent, source: EventSource) {
+  private async distributeEvent(event: IncomingEvent, source: EventSource): Promise<void> {
     await Promise.all(
       this.eventProcessors.map(processor => {
         return processor.processEvent(event, source);
@@ -632,7 +655,10 @@ export class EventRepository {
    * @param source Source of event
    * @returns Resolves with the saved record or the plain event if the event was skipped
    */
-  private async handleEvent({event, decryptedData, decryptionError}: ProcessedEventPayload, source: EventSource) {
+  private async handleEvent(
+    {event, decryptedData, decryptionError}: ProcessedEventPayload,
+    source: EventSource,
+  ): Promise<void | BackendEvent> {
     const validationResult = validateEvent(
       event as {time: string; type: CONVERSATION_EVENT | USER_EVENT},
       source,
@@ -690,7 +716,7 @@ export class EventRepository {
     }
 
     if (isTruthy(decryptedData)) {
-      return await new CryptographyMapper().mapGenericMessage(decryptedData, event);
+      return (await new CryptographyMapper().mapGenericMessage(decryptedData, event)) as IncomingEvent | undefined;
     }
 
     return undefined;
@@ -703,7 +729,7 @@ export class EventRepository {
    * @param source Source of event
    * @returns Resolves with the saved record or `true` if the event was skipped
    */
-  private async processEvent(event: IncomingEvent | ClientConversationEvent, source: EventSource) {
+  private async processEvent(event: IncomingEvent | ClientConversationEvent, source: EventSource): Promise<void> {
     try {
       for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
         event = await eventProcessMiddleware.processEvent(event, source);
@@ -726,7 +752,7 @@ export class EventRepository {
    * @param source Source of event
    * @returns The distributed event
    */
-  private async handleEventDistribution(event: IncomingEvent, source: EventSource) {
+  private async handleEventDistribution(event: IncomingEvent, source: EventSource): Promise<void> {
     const eventDate = this.getIsoDateFromEvent(event);
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && isNonEmptyString(eventDate);

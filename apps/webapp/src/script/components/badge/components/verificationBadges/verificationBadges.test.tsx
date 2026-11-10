@@ -19,15 +19,15 @@
 
 import {render} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {MLSStatuses} from 'src/script/e2eIdentity';
+import {withTheme} from '../../../../auth/util/test/testUtil';
+import {MLSStatuses} from '../../../../e2eIdentity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../page/testSupport/rootContextTestSupport';
 
 import {VerificationBadges} from './verificationBadges';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);

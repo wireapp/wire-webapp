@@ -22,9 +22,16 @@ import {SidebarTabs, useSidebarStore} from '../page/leftSidebar/panels/conversat
 import {createExecutingFireAndForgetInvokerForTest} from '../page/testSupport/rootContextTestSupport';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
 import * as Router from '../router/Router';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../util/test/translateForTest';
 
-const createListViewModel = () => {
+type ListViewModelTestTeamRepository = {getTeam: jest.Mock<Promise<unknown>, []>};
+type ListViewModelTestFixture = {
+  readonly fireAndForgetInvoker: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
+  readonly listViewModel: ListViewModel;
+  readonly teamRepository: ListViewModelTestTeamRepository;
+};
+
+const createListViewModel = (): ListViewModelTestFixture => {
   const switchContent = jest.fn((contentState: ContentState) => {
     useAppState.setState({contentState});
   });
@@ -39,7 +46,7 @@ const createListViewModel = () => {
     isFederated: false,
   } as unknown as ConstructorParameters<typeof ListViewModel>[0];
 
-  const teamRepository = {getTeam: jest.fn().mockResolvedValue(undefined)};
+  const teamRepository: ListViewModelTestTeamRepository = {getTeam: jest.fn().mockResolvedValue(undefined)};
   const repositories = {
     calling: {},
     conversation: {},
@@ -137,6 +144,7 @@ describe('ListViewModel', () => {
     [ContentState.PREFERENCES_ABOUT, '/preferences/about'],
     [ContentState.PREFERENCES_ACCOUNT, '/preferences/account'],
     [ContentState.PREFERENCES_AV, '/preferences/av'],
+    [ContentState.PREFERENCES_TROUBLESHOOTING, '/preferences/troubleshooting'],
     [ContentState.PREFERENCES_DEVICES, '/preferences/devices'],
     [ContentState.PREFERENCES_OPTIONS, '/preferences/options'],
   ])('maps preference %s to its deep link', (contentState, path) => {

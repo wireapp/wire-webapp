@@ -40,7 +40,8 @@ type FormatTypes =
   | 'codeBlock'
   | 'link';
 
-export const useToolbarState = () => {
+type UseToolbarStateResult = {activeFormats: FormatTypes[]};
+export const useToolbarState = (): UseToolbarStateResult => {
   const [editor] = useLexicalComposerContext();
 
   const [activeFormats, setActiveFormats] = useState<FormatTypes[]>([]);

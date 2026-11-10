@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       production_tag:
-        description: 'Existing verified immutable Production tag to repair'
+        description: 'Existing verified immutable Production tag to repair, for example 2026-10-06.1-production or v1.1.0'
         required: true
         type: string
       source_run_id:
@@ -36,7 +36,7 @@ permissions: {}
 jobs:
   validate_repair:
     name: Validate Production repair request
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     outputs:
@@ -50,6 +50,15 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
           ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install workflow tooling dependencies
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Validate repair confirmation and resolve annotated tag
         id: resolve_tag
@@ -70,10 +79,7 @@ jobs:
             exit 1
           fi
 
-          if [[ ! "${PRODUCTION_TAG}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[1-9][0-9]*-production$ ]]; then
-            echo "production_tag must match YYYY-MM-DD.N-production: ${PRODUCTION_TAG}" >&2
-            exit 1
-          fi
+          node ./tools/releaseCli/releaseMetadataCli.mts validate-webapp-production-tag "${PRODUCTION_TAG}" >/dev/null
 
           git ls-remote --exit-code --tags origin "refs/tags/${PRODUCTION_TAG}" >/dev/null
           git fetch --no-tags origin "refs/tags/${PRODUCTION_TAG}:refs/tags/${PRODUCTION_TAG}"
@@ -111,7 +117,7 @@ jobs:
 
   notify_repair_failure:
     name: Notify Production repair failure
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [validate_repair, publish_distribution]
     if: ${{ always() && (needs.validate_repair.result == 'failure' || needs.publish_distribution.result == 'failure') }}
     permissions:
@@ -129,8 +135,8 @@ jobs:
       - name: Announce Production repair failure
         uses: ./.github/actions/notify-deployoholics
         with:
-          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
-          status: failure
+          deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
           text: |
             ❌ Production distribution repair failed ❌
 

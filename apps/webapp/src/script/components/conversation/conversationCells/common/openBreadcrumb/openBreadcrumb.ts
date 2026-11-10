@@ -21,8 +21,8 @@ import {MouseEvent as ReactMouseEvent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate} from 'src/script/router/routerBindings';
+import {generateConversationUrl} from '../../../../../router/routeGenerator';
+import {createNavigate} from '../../../../../router/routerBindings';
 
 interface OpenBreadcrumbParams {
   conversationQualifiedId: QualifiedId;
@@ -30,7 +30,7 @@ interface OpenBreadcrumbParams {
   event?: ReactMouseEvent<Element, MouseEvent>;
 }
 
-export const openBreadcrumb = ({conversationQualifiedId, path, event}: OpenBreadcrumbParams) => {
+export const openBreadcrumb = ({conversationQualifiedId, path, event}: OpenBreadcrumbParams): void => {
   createNavigate(
     generateConversationUrl({
       id: conversationQualifiedId.id,

@@ -17,20 +17,22 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {connect} from 'react-redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
-import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
-
-import {LogoIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {afterRender} from 'Util/util';
 
 import {Page} from './page';
 
+import {LogoIcon} from '../../components/icon';
+import {useApplicationContext} from '../../page/rootProvider';
+import {COLOR} from '../../uiKit/identity/colors/colors';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {FlexBox} from '../../uiKit/layout/flexBox/flexBox';
+import {Text} from '../../uiKit/typography/text/text';
+import {afterRender} from '../../util/util';
 import {actionRoot} from '../module/action';
 import {ThunkDispatch} from '../module/reducer';
 import {QUERY_KEY} from '../route';
@@ -38,7 +40,10 @@ import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 const REDIRECT_DELAY = 5000;
 const REDIRECTION_CIRCLE_CIRCUMFERENCE = 377;
-const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
+const CustomEnvironmentRedirectComponent: FunctionComponent<DispatchProps> = ({
+  doNavigate,
+  doSendNavigationEvent,
+}: DispatchProps) => {
   const {translate} = useApplicationContext();
   const [destinationUrl, setDestinationUrl] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -131,7 +136,11 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+type MapDispatchToPropsResult = {
+  doNavigate: (url: string) => void;
+  doSendNavigationEvent: (url: string) => Promise<void>;
+};
+const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
     doNavigate: (...args: Parameters<typeof actionRoot.navigationAction.doNavigate>) => {
       return dispatch(actionRoot.navigationAction.doNavigate(...args));

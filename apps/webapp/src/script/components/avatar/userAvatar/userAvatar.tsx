@@ -17,21 +17,20 @@
  *
  */
 
-import {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
-import {COLOR} from '@wireapp/react-ui-kit';
 
-import {AvailabilityIcon} from 'Components/availabilityIcon/index';
-import {useUserName} from 'Components/UserName';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
+import {useApplicationContext} from '../../../page/rootProvider';
+import {User} from '../../../repositories/entity/User';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {COLOR} from '../../../uiKit/identity/colors/colors';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {AvailabilityIcon} from '../../availabilityIcon';
+import {useUserName} from '../../UserName';
 import {AVATAR_SIZE, STATE} from '../avatar';
 import {AvatarBackground} from '../avatarBackground';
 import {AvatarBadge} from '../avatarBadge';
@@ -70,7 +69,7 @@ const getIconSize = (size: AVATAR_SIZE): string => {
   return '16px';
 };
 
-export const UserAvatar = ({
+export const UserAvatar: FunctionComponent<UserAvatarProps> = ({
   participant,
   avatarSize,
   avatarAlt = '',

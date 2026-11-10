@@ -19,9 +19,8 @@
 
 import {useId} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyString} from '@sindresorhus/is';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {
   radioDescriptionStyles,
@@ -31,6 +30,8 @@ import {
   radioOptionHorizontalStyles,
   radioOptionStyles,
 } from './RadioGroup.styles';
+
+import {TabIndex} from '../../uiKit/utils/enums';
 
 interface RadioGroupProps<T> {
   ariaLabelledBy: string;
@@ -59,7 +60,7 @@ const RadioGroup = <T extends string | number>({
   selectedValue,
   horizontal,
   disabled = false,
-}: RadioGroupProps<T>) => {
+}: RadioGroupProps<T>): JSX.Element => {
   const radioId = useId();
 
   return (

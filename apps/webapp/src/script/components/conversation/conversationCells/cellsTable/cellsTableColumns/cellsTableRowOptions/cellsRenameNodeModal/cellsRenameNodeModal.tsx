@@ -17,13 +17,15 @@
  *
  */
 
-import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import type {FunctionComponent} from 'react';
 
 import {CellsRenameForm} from './cellsRenameForm/cellsRenameForm';
 import {useCellsRenameForm} from './useCellsRenameNodeForm/useCellsRenameNodeForm';
+
+import {useApplicationContext} from '../../../../../../../page/rootProvider';
+import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
+import {CellNode, CellNodeType} from '../../../../../../../types/cellNode';
+import {CellsModal} from '../../../../common/cellsModal/cellsModal';
 
 interface CellsRenameNodeModalProps {
   isOpen: boolean;
@@ -33,7 +35,7 @@ interface CellsRenameNodeModalProps {
   onRefresh: () => void;
 }
 
-export const CellsRenameNodeModal = ({
+export const CellsRenameNodeModal: FunctionComponent<CellsRenameNodeModalProps> = ({
   isOpen,
   onClose,
   node,
@@ -50,7 +52,7 @@ export const CellsRenameNodeModal = ({
     },
     renameNodeCopy: {
       error: translate('cells.renameNodeModal.error'),
-      invalidCharacters: translate('cells.renameNodeModal.invalidCharacters'),
+      invalidCharacters: translate('cells.nodeName.invalidCharactersError'),
       nameRequired: translate('cells.renameNodeModal.nameRequired'),
     },
   });

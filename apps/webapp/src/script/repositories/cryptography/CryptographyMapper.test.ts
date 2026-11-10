@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {GenericMessageType} from '@wireapp/core/lib/conversation';
+import {GenericMessageType} from '../../core/conversation';
 import {isObject} from 'underscore';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import Long from 'long';
@@ -31,6 +31,7 @@ import {
   Cleared,
   ClientAction,
   External,
+  Ephemeral,
   GenericMessage,
   Knock,
   LastRead,
@@ -42,13 +43,77 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 
-import {ClientEvent} from 'Repositories/event/Client';
-import {CryptographyError} from 'src/script/error/cryptographyError';
-import {arrayToBase64} from 'Util/util';
-import {createUuid} from 'Util/uuid';
+import {ClientEvent} from '../event/Client';
+import {CryptographyError} from '../../error/cryptographyError';
+import {arrayToBase64} from '../../util/util';
+import {createUuid} from '../../util/uuid';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
+
+type MappedGenericMessageTestResult = Awaited<ReturnType<CryptographyMapper['mapGenericMessage']>>;
+type MappedAssetTestInfo = {height: unknown; name: unknown; tag: unknown; width: unknown};
+type MappedAssetTestMetadata = {duration: unknown; loudness: unknown};
+type MappedLocationTestData = {latitude: unknown; longitude: unknown; name: unknown; zoom: unknown};
+type MappedGenericMessageTestData = {
+  availability: unknown;
+  buttonId: unknown;
+  cleared_timestamp: unknown;
+  content: unknown;
+  content_length: unknown;
+  content_type: unknown;
+  conversation_id: unknown;
+  conversationId: unknown;
+  info: MappedAssetTestInfo;
+  key: unknown;
+  legal_hold_status: unknown;
+  last_read_timestamp: unknown;
+  location: MappedLocationTestData;
+  message_id: unknown;
+  messageId: unknown;
+  meta: MappedAssetTestMetadata;
+  otr_key: {length: unknown};
+  preview_otr_key: {length: unknown};
+  preview_sha256: {length: unknown};
+  reaction: unknown;
+  reason: unknown;
+  sha256: {length: unknown};
+  token: unknown;
+};
+type MappedGenericMessageTestEvent = {
+  conversation: string;
+  content: unknown;
+  data: MappedGenericMessageTestData;
+  from: string;
+  id: string;
+  qualified_from: unknown;
+  time: string;
+  type: string;
+};
+type MappedCallingTestEvent = {
+  content: unknown;
+  conversation: string;
+  from: string;
+  id: string;
+  time: string;
+  type: typeof ClientEvent.CALL.E_CALL;
+};
+
+function requireMappedMessageData(mappedEvent: MappedGenericMessageTestResult): MappedGenericMessageTestEvent {
+  if (!isObject(mappedEvent) || !('data' in mappedEvent) || !isObject(mappedEvent.data)) {
+    throw new Error('Expected a mapped event with object data');
+  }
+
+  return mappedEvent as unknown as MappedGenericMessageTestEvent;
+}
+
+function requireMappedCallingEvent(mappedEvent: MappedGenericMessageTestResult): MappedCallingTestEvent {
+  if (!isObject(mappedEvent) || mappedEvent.type !== ClientEvent.CALL.E_CALL) {
+    throw new Error('Expected a mapped calling event');
+  }
+
+  return mappedEvent as unknown as MappedCallingTestEvent;
+}
 
 describe('CryptographyMapper', () => {
   const coreMock = {
@@ -78,6 +143,45 @@ describe('CryptographyMapper', () => {
   });
 
   describe('"mapGenericMessage"', () => {
+    it.each(['not-json', JSON.stringify({type: 'CANCEL', version: '3.0'})])(
+      'skips invalid calling content inside an ephemeral wrapper: %s',
+      async content => {
+        // Calling is outside the current protobuf's ephemeral field set, but
+        // the mapper interprets the wrapper as a generic message at runtime.
+        const ephemeral = Object.assign(
+          new GenericMessage({messageId: createUuid(), calling: new Calling({content})}),
+          {
+            expireAfterMillis: Long.fromNumber(5_000),
+          },
+        );
+        const genericMessage = new GenericMessage({
+          messageId: createUuid(),
+          ephemeral,
+        });
+
+        expect(ephemeral.content).toBe(GenericMessageType.CALLING);
+        await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toBeUndefined();
+      },
+    );
+
+    it('preserves valid ephemeral content and its expiry', async () => {
+      const messageId = createUuid();
+      const genericMessage = new GenericMessage({
+        messageId,
+        ephemeral: new Ephemeral({
+          expireAfterMillis: Long.fromNumber(5_000),
+          text: new Text({content: 'temporary message'}),
+        }),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toMatchObject({
+        id: messageId,
+        ephemeral_expires: 5_000,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+        data: {content: 'temporary message'},
+      });
+    });
+
     it.each([
       [0, 0],
       [NaN, 0],
@@ -96,7 +200,7 @@ describe('CryptographyMapper', () => {
           }),
         }),
       });
-      const mappedEvent = await mapper.mapGenericMessage(message, event);
+      const mappedEvent = requireMappedMessageData(await mapper.mapGenericMessage(message, event));
 
       expect(mappedEvent.data.meta.duration).toBe(expectedDuration);
       expect(mappedEvent.data.meta.loudness).toEqual(new Uint8Array(0));
@@ -154,7 +258,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
@@ -186,7 +291,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
@@ -225,7 +331,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
@@ -247,7 +354,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
@@ -268,7 +376,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
@@ -301,7 +410,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
@@ -321,7 +431,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.USER.AVAILABILITY);
         expect(event_json.conversation).toBe(event.conversation);
@@ -345,7 +456,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(CONVERSATION_EVENT.MEMBER_UPDATE);
         expect(event_json.conversation).toBe(event.conversation);
@@ -369,7 +481,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_HIDDEN);
         expect(event_json.conversation).toBe(event.conversation);
@@ -388,7 +501,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_DELETE);
         expect(event_json.conversation).toBe(event.conversation);
@@ -427,7 +541,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
@@ -450,7 +565,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.KNOCK);
         expect(event_json.conversation).toBe(event.conversation);
@@ -483,7 +599,7 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      const mappedEvent = await mapper.mapGenericMessage(genericMessage, optimisticEvent);
+      const mappedEvent = requireMappedMessageData(await mapper.mapGenericMessage(genericMessage, optimisticEvent));
 
       expect(mappedEvent.data.legal_hold_status).toBe(expectedLegalHoldStatus);
     });
@@ -498,7 +614,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(CONVERSATION_EVENT.MEMBER_UPDATE);
         expect(event_json.conversation).toBe(event.conversation);
@@ -522,7 +639,8 @@ describe('CryptographyMapper', () => {
         messageId,
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.REACTION);
         expect(event_json.conversation).toBe(event.conversation);
@@ -540,7 +658,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_ADD);
         expect(event_json.conversation).toBe(event.conversation);
@@ -554,7 +673,9 @@ describe('CryptographyMapper', () => {
     it('rejects with an error if no generic message is provided', done => {
       mapper
         .mapGenericMessage(undefined as any, {id: 'ABC'} as any)
-        .then(done.fail)
+        .then(() => {
+          done.fail('Expected the mapper to reject without a generic message');
+        })
         .catch((error: unknown) => {
           if (!(error instanceof CryptographyError)) {
             throw error;
@@ -582,7 +703,7 @@ describe('CryptographyMapper', () => {
         external: new External({otrKey: keyBytes, sha256}),
         messageId: createUuid(),
       });
-      const event_json = await mapper.mapGenericMessage(external_message, event);
+      const event_json = requireMappedMessageData(await mapper.mapGenericMessage(external_message, event));
 
       expect(event_json.data.content).toBe(plaintext);
       expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_ADD);
@@ -597,7 +718,8 @@ describe('CryptographyMapper', () => {
         }),
         messageId: createUuid(),
       });
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.BUTTON_ACTION);
         expect(event_json.conversation).toBe(event.conversation);
@@ -625,7 +747,7 @@ describe('CryptographyMapper', () => {
         external: new External({otrKey: keyBytes, sha256}),
         messageId: createUuid(),
       });
-      const event_json = await mapper.mapGenericMessage(external_message, event);
+      const event_json = requireMappedMessageData(await mapper.mapGenericMessage(external_message, event));
 
       expect(isObject(event_json)).toBeTruthy();
       expect(event_json.type).toBe(ClientEvent.CONVERSATION.KNOCK);
@@ -647,7 +769,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.LOCATION);
         expect(event_json.conversation).toBe(event.conversation);
@@ -673,7 +796,8 @@ describe('CryptographyMapper', () => {
         reaction,
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedMessageData(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.REACTION);
         expect(event_json.conversation).toBe(event.conversation);
@@ -685,12 +809,12 @@ describe('CryptographyMapper', () => {
       });
     });
 
-    it('resolves with a mapped calling message', () => {
+    it.each(['3.0', '4.0', '4'.repeat(16)])('resolves with a mapped calling message at version %s', version => {
       const content_message = {
         resp: false,
         sessid: 'asd2',
         type: 'CANCEL',
-        version: '3.0',
+        version,
       };
 
       const calling = new Calling({content: JSON.stringify(content_message)});
@@ -699,7 +823,8 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+      return mapper.mapGenericMessage(generic_message, event).then(unmappedEventJson => {
+        const event_json = requireMappedCallingEvent(unmappedEventJson);
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CALL.E_CALL);
         expect(event_json.conversation).toBe(event.conversation);
@@ -708,6 +833,131 @@ describe('CryptographyMapper', () => {
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.content).toEqual(content_message);
       });
+    });
+
+    it.each([
+      ['REMOTE_MUTE', {data: {targets: {domain: {user: ['client']}}}, type: 'REMOTEMUTE'}],
+      ['REMOTE_KICK', {type: 'REMOTEKICK'}],
+    ])('maps the moderator %s payload emitted by CallingRepository', async (_name, content_message) => {
+      const calling = new Calling({content: JSON.stringify(content_message)});
+      const genericMessage = new GenericMessage({
+        [GenericMessageType.CALLING]: calling,
+        messageId: createUuid(),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toMatchObject({
+        type: ClientEvent.CALL.E_CALL,
+        content: content_message,
+      });
+    });
+
+    it.each(['CONFSTART', 'CONFCHECK'])('accepts %s when AVS omits an empty sfts list', async type => {
+      const content_message = {
+        resp: false,
+        secret: 'c2VjcmV0',
+        seqno: '0',
+        sessid: 'session',
+        sft_url: 'https://sft.example',
+        timestamp: '1',
+        type,
+        version: '3.0',
+      };
+      const calling = new Calling({content: JSON.stringify(content_message)});
+      const genericMessage = new GenericMessage({
+        [GenericMessageType.CALLING]: calling,
+        messageId: createUuid(),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toMatchObject({
+        type: ClientEvent.CALL.E_CALL,
+        content: content_message,
+      });
+    });
+
+    it.each([
+      ['CONFCONN', {}],
+      ['CONFPART', {should_start: false, timestamp: '1', seqno: '0', entropy: '', participants: []}],
+      ['CONFSTREAMS', {mode: 'list', streams: []}],
+      ['ALERT', {level: 1, descr: 'alert'}],
+      ['PING', {}],
+      ['DEVPAIR_PUBLISH', {ice_servers: [], sdp: '', username: 'user'}],
+      ['DEVPAIR_ACCEPT', {sdp: ''}],
+    ])('discards unsupported calling message type %s', async (type, fields) => {
+      const calling = new Calling({
+        content: JSON.stringify({resp: false, sessid: 'session', version: '3.0', type, ...fields}),
+      });
+      const genericMessage = new GenericMessage({
+        [GenericMessageType.CALLING]: calling,
+        messageId: createUuid(),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toBeUndefined();
+    });
+
+    it('maps an unfamiliar protocol version without requiring the 3.0 field set', async () => {
+      const content_message = {type: 'CONFSTART', version: '4.0', future: {codecs: ['example']}};
+      const calling = new Calling({content: JSON.stringify(content_message)});
+      const genericMessage = new GenericMessage({
+        [GenericMessageType.CALLING]: calling,
+        messageId: createUuid(),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toMatchObject({
+        type: ClientEvent.CALL.E_CALL,
+        content: content_message,
+      });
+    });
+
+    it('accepts CONFKEY at the 256-key limit', async () => {
+      const content_message = {
+        keys: new Array(256).fill({idx: 0, data: 'key'}),
+        resp: false,
+        sessid: 'session',
+        type: 'CONFKEY',
+        version: '3.0',
+      };
+      const calling = new Calling({content: JSON.stringify(content_message)});
+      const genericMessage = new GenericMessage({
+        [GenericMessageType.CALLING]: calling,
+        messageId: createUuid(),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toMatchObject({
+        type: ClientEvent.CALL.E_CALL,
+        content: content_message,
+      });
+    });
+
+    it.each([
+      ['not-json', 'malformed JSON'],
+      [
+        JSON.stringify({
+          keys: new Array(257).fill({idx: 0, data: 'key'}),
+          resp: false,
+          sessid: 'session',
+          type: 'CONFKEY',
+          version: '3.0',
+        }),
+        'oversized key arrays',
+      ],
+      ['[]', 'non-object JSON'],
+      [
+        JSON.stringify({resp: false, sessid: 'session', type: 'CANCEL', version: '3.0', unknown: true}),
+        'unknown fields',
+      ],
+      [JSON.stringify({resp: false, sessid: 'session', type: 'UNKNOWN', version: '3.0'}), 'unknown message types'],
+      [JSON.stringify({sessid: 'session', type: 'CANCEL', version: '3.0'}), 'missing fields'],
+      [JSON.stringify({resp: 'false', sessid: 'session', type: 'CANCEL', version: '3.0'}), 'incorrect field types'],
+      [JSON.stringify({resp: false, sessid: 'x'.repeat(128), type: 'CANCEL', version: '3.0'}), 'oversized strings'],
+      [JSON.stringify({resp: false, sessid: 'session', type: 'CANCEL', version: '4'.repeat(17)}), 'oversized versions'],
+    ])('discards calling messages with %s', async (serializedContent, _) => {
+      const calling = new Calling({content: serializedContent});
+      const genericMessage = new GenericMessage({
+        [GenericMessageType.CALLING]: calling,
+        messageId: createUuid(),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toBeUndefined();
     });
   });
 });

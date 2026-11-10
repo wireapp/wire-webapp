@@ -17,19 +17,21 @@
  *
  */
 
-import {AlertIcon} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {wrapperStyles, iconStyles, textStyles} from './videoAssetError.styles';
 
+import {useApplicationContext} from '../../../../../../../../../page/rootProvider';
+import {AlertIcon} from '../../../../../../../../../uiKit/dataDisplay/icon/alertIcon';
 import {VideoAssetPlaceholder} from '../common/videoAssetPlaceholder/videoAssetPlaceholder';
 
 interface VideoAssetErrorProps {
   isFileShareRestricted: boolean;
 }
 
-export const VideoAssetError = ({isFileShareRestricted}: VideoAssetErrorProps) => {
+export const VideoAssetError: FunctionComponent<VideoAssetErrorProps> = ({
+  isFileShareRestricted,
+}: VideoAssetErrorProps) => {
   const {translate} = useApplicationContext();
   const message = isFileShareRestricted
     ? translate('conversationVideoAssetRestricted')

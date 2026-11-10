@@ -24,7 +24,8 @@ const MIN_ZOOM = 1.0;
 const MAX_ZOOM = 2.0;
 const INITIAL_ZOOM = 1.0;
 
-export const useZoomControls = () => {
+type UseZoomControlsResult = {scale: number; zoomIn: () => void; zoomOut: () => void};
+export const useZoomControls = (): UseZoomControlsResult => {
   const [scale, setScale] = useState(INITIAL_ZOOM);
 
   return {

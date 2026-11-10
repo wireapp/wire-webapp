@@ -17,16 +17,17 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isOddInteger} from '@sindresorhus/is';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {Text} from 'Repositories/entity/message/text';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {formatDateShort} from 'Util/timeUtil';
+import {Avatar, AVATAR_SIZE} from '../../../../../components/avatar';
+import type {ContentMessage} from '../../../../../repositories/entity/message/contentMessage';
+import type {Text} from '../../../../../repositories/entity/message/text';
+import {TabIndex} from '../../../../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
+import {formatDateShort} from '../../../../../util/timeUtil';
 
 interface FullSearchItemProps {
   formatText: (text: string) => {matches: number; parts: string[]};
@@ -34,7 +35,11 @@ interface FullSearchItemProps {
   onClick: () => void;
 }
 
-const FullSearchItem = ({message, onClick, formatText}: FullSearchItemProps) => {
+const FullSearchItem: FunctionComponent<FullSearchItemProps> = ({
+  message,
+  onClick,
+  formatText,
+}: FullSearchItemProps) => {
   const {user, timestamp} = useKoSubscribableChildren(message, ['user', 'timestamp']);
   const {name} = useKoSubscribableChildren(user, ['name']);
   const {parts, matches} = formatText((message.getFirstAsset() as Text).text);

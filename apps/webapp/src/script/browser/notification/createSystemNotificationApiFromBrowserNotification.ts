@@ -22,15 +22,16 @@ import {amplify} from 'amplify';
 import {result} from 'true-myth';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {
   type SystemNotificationApi,
+  type SystemNotificationError,
   systemNotificationErrorKinds,
   type SystemNotificationPermission,
   toSystemNotificationError,
-} from 'src/script/notification/systemNotificationTypes';
-import {getLogger} from 'Util/logger';
+} from '../../notification/systemNotificationTypes';
+import {getLogger} from '../../util/logger';
+import {WebAppEvents} from '../../webAppEvents';
 
 type SystemNotificationLogger = {
   warn: (message: string, context?: unknown) => void;
@@ -97,7 +98,7 @@ export const createSystemNotificationApiFromBrowserNotification = ({
         // close we asked for would be reported twice.
         let closeReported = false;
 
-        const reportClose = () => {
+        const reportClose = (): void => {
           if (closeReported) {
             return;
           }
@@ -106,7 +107,7 @@ export const createSystemNotificationApiFromBrowserNotification = ({
           onClose();
         };
 
-        const closeNotification = () => {
+        const closeNotification = (): result.Result<void, SystemNotificationError> => {
           const closeAttempt = result.tryOrElse(
             toSystemNotificationError(systemNotificationErrorKinds.closeFailed),
             () => {

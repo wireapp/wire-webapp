@@ -138,7 +138,7 @@ describe('Entropy', () => {
   // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
   it('makes sense when input data contains no movement (only x, y no t)', () => {
     const data = new EntropyData();
-    [...Array(300)].forEach((_, i) => {
+    [...Array(300)].forEach(() => {
       data.addFrame({t: 0, x: 0, y: 0});
     });
     expect(data.entropyBits).toBe(0);
@@ -147,7 +147,7 @@ describe('Entropy', () => {
   // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
   it('makes sense with input data being only a simple toggle (only x, y no t)', () => {
     const data = new EntropyData();
-    [...Array(150)].forEach((_, i) => {
+    [...Array(150)].forEach(() => {
       data.addFrame({t: 0, x: 0, y: 0});
       data.addFrame({t: 0, x: 0, y: 1});
     });
@@ -158,7 +158,7 @@ describe('Entropy', () => {
   // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
   it('makes sense with input data being a simple big jump (only x, y no t)', () => {
     const data = new EntropyData();
-    [...Array(150)].forEach((_, i) => {
+    [...Array(150)].forEach(() => {
       data.addFrame({t: 0, x: 0, y: 0});
       data.addFrame({t: 0, x: 127, y: 128});
     });
@@ -169,7 +169,7 @@ describe('Entropy', () => {
   // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
   it('makes sense with with inputdata being a simple linear movement (only x, y no t)', () => {
     const data = new EntropyData();
-    [...Array(3)].forEach((_, i) => {
+    [...Array(3)].forEach(() => {
       [...Array(100)].forEach((_, j) => {
         data.addFrame({t: 0, x: j + 78, y: j * 2 + 28});
       });
@@ -181,7 +181,7 @@ describe('Entropy', () => {
   // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
   it('makes sense with input data building a simple square from 4 points (only x, y no t)', () => {
     const data = new EntropyData();
-    [...Array(75)].forEach((_, i) => {
+    [...Array(75)].forEach(() => {
       data.addFrame({t: 0, x: 0, y: 0});
       data.addFrame({t: 0, x: 0, y: 10});
       data.addFrame({t: 0, x: 10, y: 10});
@@ -194,7 +194,7 @@ describe('Entropy', () => {
   // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
   it('makes sense with input data building a simple square from 20 points (only x, y no t)', () => {
     const data = new EntropyData();
-    [...Array(15)].forEach((_, i) => {
+    [...Array(15)].forEach(() => {
       data.addFrame({t: 0, x: 0, y: 0});
       data.addFrame({t: 0, x: 0, y: 2});
       data.addFrame({t: 0, x: 0, y: 4});

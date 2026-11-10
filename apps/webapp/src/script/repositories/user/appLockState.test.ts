@@ -19,11 +19,10 @@
 
 import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import {container} from 'tsyringe';
-import ko from 'knockout';
 
-import {TeamState} from 'Repositories/team/TeamState';
-import {TeamEntity} from 'Repositories/team/TeamEntity';
-import {Config} from 'src/script/Config';
+import {TeamState} from '../team/TeamState';
+import {TeamEntity} from '../team/TeamEntity';
+import {Config} from '../../Config';
 import {AppLockState} from './appLockState';
 
 describe('AppLockState', () => {

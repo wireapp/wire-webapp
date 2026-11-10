@@ -19,28 +19,28 @@
 
 import assert from 'node:assert';
 
-import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {AddUsersFailure, AddUsersFailureReasons} from '../../../../core/conversation';
 import {createElement} from 'react';
 
 import {render} from '@testing-library/react';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {MessageContent} from 'Components/Modals/PrimaryModal/Content/MessageContent';
-import en from 'I18n/en-US.json';
-import {User} from 'Repositories/entity/User';
-import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
+import {PrimaryModal} from '../../../Modals/PrimaryModal';
+import {MessageContent} from '../../../Modals/PrimaryModal/Content/MessageContent';
+import en from '../../../../../i18n/en-US.json';
+import {User} from '../../../../repositories/entity/User';
+import {generateQualifiedIds} from '../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../../../util/localizerUtil';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {showMeetingPartialAddFailureModal} from './showMeetingPartialAddFailureModal';
 
 setStrings({en});
 
-const createUser = (qualifiedId: {id: string; domain: string}, name: string) => {
+const createUser = (qualifiedId: {id: string; domain: string}, name: string): User => {
   const user = new User(qualifiedId.id, qualifiedId.domain, translateForTest);
   user.name(name);
   return user;

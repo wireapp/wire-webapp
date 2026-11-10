@@ -21,7 +21,7 @@ import {FC} from 'react';
 
 import {CSSObject, css} from '@emotion/react';
 
-import {getEmojiUnicode} from 'Util/emojiUtil';
+import {getEmojiUnicode} from '../../../../../../util/emojiUtil';
 
 interface EmojiImgProps {
   emoji: string;

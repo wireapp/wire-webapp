@@ -20,17 +20,16 @@
 import {isFunction, isNullOrUndefined, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import type {Data as OpenGraphResult} from 'open-graph';
 
-import {deArrayify} from 'Util/arrayUtil';
-import {getLogger} from 'Util/logger';
-import {truncate} from 'Util/stringUtil';
-import {base64ToArray, getContentTypeFromDataUrl} from 'Util/util';
-import {isTweetUrl} from 'Util/validationUtil';
-
 import {isBlacklisted} from './blackList';
 import {getFirstLinkWithOffset} from './helpers';
 import {LinkPreviewError} from './LinkPreviewError';
 
 import {Config} from '../../../Config';
+import {deArrayify} from '../../../util/arrayUtil';
+import {getLogger} from '../../../util/logger';
+import {truncate} from '../../../util/stringUtil';
+import {base64ToArray, getContentTypeFromDataUrl} from '../../../util/util';
+import {isTweetUrl} from '../../../util/validationUtil';
 
 type LinkPreviewContent = {
   image?: {

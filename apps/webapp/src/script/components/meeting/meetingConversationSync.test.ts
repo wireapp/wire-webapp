@@ -21,24 +21,24 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task} from 'true-myth';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
-import {unwrapErr} from 'Util/test/resultTestSupport';
+import {Conversation} from '../../repositories/entity/Conversation';
+import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {User} from '../../repositories/entity/User';
+import {translateForTest} from '../../util/test/translateForTest';
+import {unwrapErr} from '../../util/test/resultTestSupport';
 
 import {meetingConversationSyncErrors, syncMeetingConversationParticipants} from './meetingConversationSync';
 
 const qualifiedConversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
 const groupId = 'group-id';
 
-const createUser = (id: string) => {
+const createUser = (id: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
   return user;
 };
 
-const createConversation = (epoch = 0) => {
+const createConversation = (epoch = 0): Conversation => {
   const conversation = new Conversation(
     qualifiedConversationId.id,
     qualifiedConversationId.domain,
@@ -63,7 +63,7 @@ describe('syncMeetingConversationParticipants', () => {
     safeAddUsers?: jest.Mock;
     safeRemoveMembers?: jest.Mock;
     safeGetConversationById?: jest.Mock;
-  } = {}) => {
+  } = {}): ConversationRepository => {
     return {
       safeGetConversationById,
       establishMeetingConversation,

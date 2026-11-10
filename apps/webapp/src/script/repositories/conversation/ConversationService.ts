@@ -22,6 +22,7 @@ import type {
   CONVERSATION_ACCESS_ROLE,
   Conversation as BackendConversation,
   ConversationCode,
+  MLS1to1Conversation,
   CONVERSATION_ACCESS,
   RemoteConversations,
   ADD_PERMISSION,
@@ -32,8 +33,9 @@ import type {
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
 } from '@wireapp/api-client/lib/conversation/data';
-import {ConversationProtocolUpdateEvent} from '@wireapp/api-client/lib/event';
-import type {
+import {
+  ConversationProtocolUpdateEvent,
+  type ConversationAddPermissionUpdateEvent,
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
   ConversationEvent,
@@ -45,25 +47,25 @@ import type {
 } from '@wireapp/api-client/lib/event';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
-import {ClientEvent} from 'Repositories/event/Client';
-import type {EventService} from 'Repositories/event/EventService';
-import {getSearchRegex} from 'Repositories/search/fullTextSearch';
-import type {EventRecord} from 'Repositories/storage';
-import {StorageService} from 'Repositories/storage';
-import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-import {getLogger} from 'Util/logger';
-
 import {MLSCapableConversation} from './ConversationSelectors';
 
+import type {ConversationService as CoreConversationService} from '../../core/conversation';
+import {MLSServiceEvents} from '../../core/messagingProtocols/mls';
 import {MessageCategory} from '../../message/messageCategory';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
+import {getLogger} from '../../util/logger';
+import type {Conversation as ConversationEntity} from '../entity/Conversation';
+import {ClientEvent} from '../event/Client';
+import type {EventService} from '../event/EventService';
+import {getSearchRegex} from '../search/fullTextSearch';
+import type {EventRecord} from '../storage';
+import {StorageService} from '../storage';
+import {ConversationRecord} from '../storage/record/conversationRecord';
+import {StorageSchemata} from '../storage/storageSchemata';
 
 const minimumLegacyAccessRoleBackendVersion = 3;
 const remoteConversationLookbackInDays = 30;
@@ -90,19 +92,19 @@ type SearchableConversationEvent = EventRecord & {
 };
 type ConversationSearchEventLoader = Pick<EventService, 'loadEventsWithCategory'>;
 
-function waitForNextSearchBatch() {
+function waitForNextSearchBatch(): Promise<void> {
   return new Promise<void>(resolve => {
     return setTimeout(resolve, 0);
   });
 }
 
-function createSearchAbortError() {
+function createSearchAbortError(): Error {
   const error = new Error('Conversation search aborted');
   error.name = 'AbortError';
   return error;
 }
 
-function throwIfSearchAborted(abortSignal?: AbortSignal) {
+function throwIfSearchAborted(abortSignal?: AbortSignal): void {
   if (abortSignal?.aborted === true) {
     throw createSearchAbortError();
   }
@@ -186,7 +188,7 @@ export class ConversationService {
     this.eventService = eventService;
   }
 
-  private get coreConversationService() {
+  private get coreConversationService(): CoreConversationService {
     const conversationService = this.core.service?.conversation;
 
     if (isUndefined(conversationService)) {
@@ -204,7 +206,7 @@ export class ConversationService {
    * Retrieves all the conversations of a user.
    * @returns Resolves with the conversation information
    */
-  async getAllConversations() {
+  async getAllConversations(): Promise<RemoteConversations> {
     return this.coreConversationService.getConversations();
   }
 
@@ -454,7 +456,10 @@ export class ConversationService {
     return this.apiClient.api.teams.conversation.deleteConversation(teamId, conversationId);
   }
 
-  putAddPermission(conversationId: QualifiedId, addPermission: ADD_PERMISSION) {
+  putAddPermission(
+    conversationId: QualifiedId,
+    addPermission: ADD_PERMISSION,
+  ): Promise<ConversationAddPermissionUpdateEvent> {
     return this.apiClient.api.conversation.putAddPermission(conversationId, addPermission);
   }
 
@@ -508,8 +513,8 @@ export class ConversationService {
         .filter(record => {
           return record.time.toString() >= min_date.toISOString();
         })
-        .toSorted((a, b) => {
-          return a.time - b.time;
+        .toSorted((firstRecord, secondRecord) => {
+          return firstRecord.time - secondRecord.time;
         });
     }
 
@@ -628,18 +633,18 @@ export class ConversationService {
    * Wipes MLS conversation in corecrypto and deletes the conversation state.
    * @param mlsConversation mls conversation
    */
-  async wipeMLSCapableConversation(conversation: MLSCapableConversation) {
+  async wipeMLSCapableConversation(conversation: MLSCapableConversation): Promise<void> {
     const {groupId} = conversation;
     await this.coreConversationService.wipeMLSConversation(groupId);
   }
 
-  public addMLSConversationRecoveredListener(onRecovered: (conversationId: QualifiedId) => void) {
+  public addMLSConversationRecoveredListener(onRecovered: (conversationId: QualifiedId) => void): void {
     this.coreConversationService.on('MLSConversationRecovered', ({conversationId}) => {
       return onRecovered(conversationId);
     });
   }
 
-  public addMLSEventDistributedListener(onDistributed: (events: any, time: string) => void) {
+  public addMLSEventDistributedListener(onDistributed: (events: any, time: string) => void): void {
     // Listen to the MLS distributed event to handle events that were distributed
     this.coreConversationService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, ({events, time}) => {
       return onDistributed(events, time);
@@ -660,7 +665,7 @@ export class ConversationService {
     conversationId: QualifiedId;
     selfUserId: QualifiedId;
     qualifiedUsers: QualifiedId[];
-  }) => {
+  }): Promise<void> => {
     return this.coreConversationService.tryEstablishingMLSGroup(params);
   };
 
@@ -681,7 +686,7 @@ export class ConversationService {
     return this.coreConversationService.isMLSGroupEstablishedLocally(groupId);
   }
 
-  async getMLS1to1Conversation(userId: QualifiedId) {
+  async getMLS1to1Conversation(userId: QualifiedId): Promise<MLS1to1Conversation> {
     return this.coreConversationService.getMLS1to1Conversation(userId);
   }
 }

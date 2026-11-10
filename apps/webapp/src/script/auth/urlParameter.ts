@@ -17,7 +17,7 @@
  *
  */
 
-// TODO: Deprecated. Should be replaced with "QUERY_KEY" from "src/script/auth/route"
+// TODO: Deprecated. Should be replaced with "QUERY_KEY" from "./route"
 export enum URLParameter {
   ENVIRONMENT = 'env',
   LOCALE = 'hl',

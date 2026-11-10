@@ -17,17 +17,20 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {container} from 'tsyringe';
 
-import {CallingCell} from 'Components/calling/CallingCell';
-import {meetingCallingViewStyles} from 'Components/meeting/meetingCallingView/meetingCallingView.styles';
-import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
-import {CallState} from 'Repositories/calling/CallState';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {meetingCallingViewStyles} from './meetingCallingView.styles';
 
-export const MeetingCallingView = () => {
+import {useApplicationContext, useMainViewModel} from '../../../page/rootProvider';
+import {CallState} from '../../../repositories/calling/CallState';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {CallingCell} from '../../calling/CallingCell';
+import {useMeetingNotificationStore} from '../meetingNotificationStore/meetingNotificationStore';
+
+export const MeetingCallingView: FunctionComponent = () => {
   const {mainViewModel} = useApplicationContext();
   const {calling: callingViewModel} = useMainViewModel();
   const {properties: propertiesRepository} = mainViewModel.content.repositories;

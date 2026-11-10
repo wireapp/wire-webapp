@@ -17,11 +17,13 @@
  *
  */
 
-import {Loading} from '@wireapp/react-ui-kit';
+import type {FunctionComponent} from 'react';
 
 import {wrapperStyles} from './PrimaryModalLoading.styles';
 
-export const PrimaryModalLoading = () => {
+import {Loading} from '../../../../uiKit/dataDisplay/loading/loading';
+
+export const PrimaryModalLoading: FunctionComponent = () => {
   return (
     <div css={wrapperStyles}>
       <Loading />

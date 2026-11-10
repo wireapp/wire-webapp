@@ -26,29 +26,13 @@ import React, {
   useCallback,
   useRef,
   RefObject,
+  type FunctionComponent,
 } from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {useDebouncedCallback} from 'use-debounce';
-
-import {WIDTH} from '@wireapp/react-ui-kit';
-
-import {ConversationListCell} from 'Components/conversationListCell';
-import type {RegisterConversationElement} from 'Hooks/useConversationFocus';
-import {Call} from 'Repositories/calling/Call';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isKeyboardEvent} from 'Util/keyboardUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {isConversationEntity} from 'Util/typePredicateUtil';
 
 import {ConnectionRequests} from './connectionRequests';
 import {
@@ -59,16 +43,102 @@ import {
   virtualizationStyles,
 } from './conversationsList.styles';
 import {getConversationsToDisplay} from './helpers';
+import {useSidebarStore} from './useSidebarStore';
 
+import {ConversationListCell} from '../../../../components/conversationListCell';
+import type {RegisterConversationElement} from '../../../../hooks/useConversationFocus';
+import {Call} from '../../../../repositories/calling/Call';
+import {CallState} from '../../../../repositories/calling/CallState';
+import {
+  ConversationLabel,
+  ConversationLabelRepository,
+} from '../../../../repositories/conversation/ConversationLabelRepository';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
+import {WIDTH} from '../../../../uiKit/layout/sizes/sizes';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {isKeyboardEvent} from '../../../../util/keyboardUtil';
+import {matchQualifiedIds} from '../../../../util/qualifiedId';
+import {isConversationEntity} from '../../../../util/typePredicateUtil';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {useApplicationContext} from '../../../rootProvider';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState} from '../../../useAppState';
 
 const CONVERSATION_ROW_HEIGHT = 56;
 const CONVERSATION_CLICK_DEBOUNCE_DIVISOR = 2;
 type FocusConversation = (conversationId: string) => boolean | 'pending';
+type ConversationClickEvent = ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>;
+
+type ConversationRowHandlers = {
+  handleArrowKeyDown: (conversationId: string) => (event: React.KeyboardEvent) => void;
+  onConversationClick: (conversation: Conversation) => (event: ConversationClickEvent) => void;
+  resetConversationFocus: () => void;
+  answerCall: (conversation: Conversation) => Promise<void>;
+  openContextMenu: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
+};
+
+type ConversationRowProps = {
+  conversation: Conversation;
+  isFocused: boolean;
+  isActive: boolean;
+  showJoinButton: boolean;
+  handlersRef: RefObject<ConversationRowHandlers>;
+  registerConversationElement?: RegisterConversationElement;
+  virtualStart?: number;
+  virtualSize?: number;
+};
+
+const ConversationRow = React.memo(
+  ({
+    conversation,
+    isFocused,
+    isActive,
+    showJoinButton,
+    handlersRef,
+    registerConversationElement,
+    virtualStart,
+    virtualSize,
+  }: ConversationRowProps) => {
+    return (
+      <ConversationListCell
+        conversation={conversation}
+        dataUieName="item-conversation"
+        isFocused={isFocused}
+        isSelected={() => {
+          return isActive;
+        }}
+        showJoinButton={showJoinButton}
+        registerConversationElement={registerConversationElement}
+        handleArrowKeyDown={event => {
+          return handlersRef.current.handleArrowKeyDown(conversation.id)(event);
+        }}
+        onClick={event => {
+          return handlersRef.current.onConversationClick(conversation)(event);
+        }}
+        resetConversationFocus={() => {
+          return handlersRef.current.resetConversationFocus();
+        }}
+        onJoinCall={conversation => {
+          return handlersRef.current.answerCall(conversation);
+        }}
+        rightClick={(conversation, event) => {
+          return handlersRef.current.openContextMenu(conversation, event);
+        }}
+        listItemCss={virtualStart !== undefined ? virtualizationStyles : undefined}
+        listItemStyle={
+          virtualStart !== undefined && virtualSize !== undefined
+            ? {height: `${virtualSize}px`, transform: `translateY(${virtualStart}px)`}
+            : undefined
+        }
+      />
+    );
+  },
+);
+ConversationRow.displayName = 'ConversationRow';
 
 interface ConversationsListProps {
   callState: CallState;
@@ -94,7 +164,7 @@ interface ConversationsListProps {
   cancelPendingFocusRef?: RefObject<(() => void) | null>;
 }
 
-export const ConversationsList = ({
+export const ConversationsList: FunctionComponent<ConversationsListProps> = ({
   conversations,
   conversationsFilter,
   conversationFocusCandidates,
@@ -158,7 +228,7 @@ export const ConversationsList = ({
     [joinableCalls],
   );
 
-  const onConnectionRequestClick = () => {
+  const onConnectionRequestClick = (): void => {
     setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
@@ -361,19 +431,40 @@ export const ConversationsList = ({
     [debouncedOnConversationClick],
   );
 
-  const getCommonConversationCellProps = (conversation: Conversation) => {
-    return {
-      isFocused: currentFocus === conversation.id,
-      handleArrowKeyDown: handleArrowKeyDown(conversation.id),
-      registerConversationElement,
+  // Keep event handlers fresh without invalidating every mounted row on a focus change.
+  const rowHandlersRef = useRef<ConversationRowHandlers>({
+    handleArrowKeyDown,
+    onConversationClick,
+    resetConversationFocus,
+    answerCall,
+    openContextMenu,
+  });
+  useLayoutEffect(() => {
+    rowHandlersRef.current = {
+      handleArrowKeyDown,
+      onConversationClick,
       resetConversationFocus,
-      dataUieName: 'item-conversation',
+      answerCall,
+      openContextMenu,
+    };
+  });
+
+  type GetCommonConversationRowPropsResult = {
+    conversation: Conversation;
+    isFocused: boolean;
+    isActive: boolean;
+    showJoinButton: boolean;
+    handlersRef: React.RefObject<ConversationRowHandlers>;
+    registerConversationElement: RegisterConversationElement | undefined;
+  };
+  const getCommonConversationRowProps = (conversation: Conversation): GetCommonConversationRowPropsResult => {
+    return {
       conversation,
-      onClick: onConversationClick(conversation),
-      isSelected: isActiveConversation,
-      onJoinCall: answerCall,
-      rightClick: openContextMenu,
+      isFocused: currentFocus === conversation.id,
+      isActive: isActiveConversation(conversation),
       showJoinButton: hasJoinableCall(conversation),
+      handlersRef: rowHandlersRef,
+      registerConversationElement,
     };
   };
 
@@ -412,7 +503,7 @@ export const ConversationsList = ({
           className="group-participants-conversations"
         >
           {groupParticipantsConversations.map(conversation => {
-            return <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation)} />;
+            return <ConversationRow key={conversation.id} {...getCommonConversationRowProps(conversation)} />;
           })}
         </ul>
       </li>
@@ -474,14 +565,11 @@ export const ConversationsList = ({
 
           if (isConversationEntity(conversation)) {
             return (
-              <ConversationListCell
+              <ConversationRow
                 key={virtualItem.key}
-                listItemCss={virtualizationStyles}
-                listItemStyle={{
-                  height: `${virtualItem.size}px`,
-                  transform: `translateY(${virtualItem.start}px)`,
-                }}
-                {...getCommonConversationCellProps(conversation)}
+                virtualStart={virtualItem.start}
+                virtualSize={virtualItem.size}
+                {...getCommonConversationRowProps(conversation)}
               />
             );
           }

@@ -19,23 +19,11 @@
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../../auth/util/test/testUtil';
 
 import {FileHistoryModal} from './FileHistoryModal';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 import {useFileVersions} from './hooks/useFileVersions';
-
-// jest.mock('@wireapp/react-ui-kit', () => {
-//   const actualModule = jest.requireActual('@wireapp/react-ui-kit');
-//
-//   return {
-//     ...actualModule,
-//     Button: ({children, showLoading, ...properties}: any) => (
-//       <button {...properties}>{showLoading ? null : children}</button>
-//     ),
-//     Loading: () => null,
-//   };
-// });
 
 jest.mock('./hooks/useFileHistoryModal');
 jest.mock('./hooks/useFileVersions');
@@ -53,7 +41,7 @@ jest.mock('./FileHistoryContent', () => {
     },
   };
 });
-jest.mock('Components/FileFullscreenModal/FileLoader/FileLoader', () => {
+jest.mock('../../FileFullscreenModal/FileLoader/FileLoader', () => {
   return {
     FileLoader: () => {
       return <div data-uie-name="file-loader">Loading...</div>;

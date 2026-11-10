@@ -17,10 +17,13 @@
  *
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import type {DomainData} from '@wireapp/api-client/lib/account/domainData';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
+import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data';
+import type {ConversationEvent} from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
@@ -29,19 +32,25 @@ import {Navigate, useNavigate} from 'react-router';
 import {container} from 'tsyringe';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
-import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {APIClient} from 'src/script/service/apiClientSingleton';
-import {isBackendError} from 'Util/typePredicateUtil';
 
 import {buildDomainRedirectUrl, handleEnterpriseLogin, handleSSOBackendError, requiresPasswordModal} from './util';
 
 import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {APIClient} from '../../../service/apiClientSingleton';
+import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
+import {Button} from '../../../uiKit/inputs/button/button';
+import {Checkbox, CheckboxLabel} from '../../../uiKit/inputs/checkbox/checkbox';
+import {ErrorMessage} from '../../../uiKit/inputs/errorMessage/errorMessage';
+import {Form} from '../../../uiKit/inputs/form/form';
+import {Input} from '../../../uiKit/inputs/input/input';
+import {InputBlock} from '../../../uiKit/inputs/inputBlock/inputBlock';
+import {isBackendError} from '../../../util/typePredicateUtil';
 import {JoinGuestLinkPasswordModal} from '../../component/joinGuestLinkPasswordModal';
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ValidationError} from '../../module/action/validationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
+import type {LoginDataState, RegistrationDataState} from '../../module/reducer/authReducer';
 import * as AuthSelector from '../../module/selector/authSelector';
 import * as ConversationSelector from '../../module/selector/conversationSelector';
 import {QUERY_KEY, ROUTE} from '../../route';
@@ -55,9 +64,11 @@ interface SingleSignOnFormProps {
   initialCode?: string;
 }
 
+type RenderStatusMessageResult = ReturnType<typeof parseError> | ReturnType<typeof parseValidationErrors>;
+
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
-const SingleSignOnFormComponent = ({
+const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & ConnectedProps & DispatchProps> = ({
   initialCode,
   isFetching,
   authError,
@@ -74,15 +85,17 @@ const SingleSignOnFormComponent = ({
   doGetConversationInfoByCode,
   doNavigate,
   pushAccountRegistrationData,
+  pushLoginData,
   account,
+  loginData,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
-  const {translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const codeOrMailInput = useRef<HTMLInputElement>(null);
   const [codeOrMail, setCodeOrMail] = useState(account.email ?? '');
   const [disableInput, setDisableInput] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [clientType, setClientType] = useState<ClientType>(ClientType.PERMANENT);
+  const {clientType} = loginData;
   const [ssoError, setSsoError] = useState<BackendError | null>(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
   const [validationError, setValidationError] = useState<unknown>();
@@ -149,11 +162,11 @@ const SingleSignOnFormComponent = ({
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
     if (queryClientType === ClientType.TEMPORARY) {
-      setClientType(ClientType.TEMPORARY);
-    } else {
-      setClientType(ClientType.PERMANENT);
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await pushLoginData({clientType: ClientType.TEMPORARY});
+      });
     }
-  }, [doCheckConversationCode, doGetConversationInfoByCode]);
+  }, [fireAndForgetInvoker, pushLoginData]);
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON);
@@ -189,7 +202,7 @@ const SingleSignOnFormComponent = ({
     }
   }, [codeOrMail, initialCode]);
 
-  const onCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onCodeChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setCodeOrMail(event.target.value);
     setIsCodeOrMailInputValid(true);
   };
@@ -291,7 +304,7 @@ const SingleSignOnFormComponent = ({
     }
   }, [codeOrMail, handleSubmit, initialCode, shouldAutoLogin]);
 
-  const stripPrefix = (prefixedCode: string) => {
+  const stripPrefix = (prefixedCode: string): string => {
     return prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');
   };
 
@@ -309,11 +322,11 @@ const SingleSignOnFormComponent = ({
     ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
     : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`;
 
-  const submitJoinCodeWithPassword = async (password?: string) => {
+  const submitJoinCodeWithPassword = async (password?: string): Promise<void> => {
     await handleSubmit(undefined, password);
   };
 
-  const renderStatusMessage = () => {
+  const renderStatusMessage = (): RenderStatusMessageResult => {
     if (validationError !== null && validationError !== undefined) {
       return parseValidationErrors([validationError]);
     }
@@ -393,7 +406,10 @@ const SingleSignOnFormComponent = ({
             name="enter-public-computer-sso-sign-in"
             id="enter-public-computer-sso-sign-in"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setClientType(event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT);
+              const isChecked = event.target.checked;
+              fireAndForgetInvoker.fireAndForget(async () => {
+                await pushLoginData({clientType: isChecked ? ClientType.TEMPORARY : ClientType.PERMANENT});
+              });
             }}
             checked={clientType === ClientType.TEMPORARY}
             data-uie-name="enter-public-computer-sso-sign-in"
@@ -409,7 +425,16 @@ const SingleSignOnFormComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {
+  isFetching: boolean;
+  account: RegistrationDataState;
+  authError: Error | null;
+  conversationError: (Error & {label?: string; code?: number; message?: string}) | null;
+  conversationInfo: ConversationJoinData | null;
+  conversationInfoFetching: boolean;
+  loginData: LoginDataState;
+};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     isFetching: AuthSelector.isFetching(state),
     account: AuthSelector.getAccount(state),
@@ -417,11 +442,29 @@ const mapStateToProps = (state: RootState) => {
     conversationError: ConversationSelector.getError(state),
     conversationInfo: ConversationSelector.conversationInfo(state),
     conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
+    loginData: AuthSelector.getLoginData(state),
   };
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+type MapDispatchToPropsResult = {
+  doCheckConversationCode: (key: string, code: string, uri?: string | undefined) => Promise<void>;
+  doFinalizeSSOLogin: (args_0: {clientType: ClientType}) => Promise<void>;
+  doGetDomainInfo: (domain: string) => Promise<DomainData>;
+  doJoinConversationByCode: (
+    key: string,
+    code: string,
+    uri?: string | undefined,
+    password?: string | undefined,
+  ) => Promise<ConversationEvent>;
+  doGetConversationInfoByCode: (key: string, code: string) => Promise<ConversationJoinData | undefined>;
+  doNavigate: (url: string) => void;
+  resetAuthError: () => Promise<void>;
+  validateSSOCode: (code: string) => Promise<void>;
+  pushAccountRegistrationData: (registration: Partial<RegistrationDataState>) => Promise<void>;
+  pushLoginData: (loginData: Partial<LoginDataState>) => Promise<void>;
+};
+const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
     doCheckConversationCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doCheckConversationCode>) => {
       return dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(...args));
@@ -453,6 +496,9 @@ const mapDispatchToProps = (dispatch: ThunkDispatch) => {
     },
     pushAccountRegistrationData: (...args: Parameters<typeof ROOT_ACTIONS.authAction.pushAccountRegistrationData>) => {
       return dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(...args));
+    },
+    pushLoginData: (...args: Parameters<typeof ROOT_ACTIONS.authAction.pushLoginData>) => {
+      return dispatch(ROOT_ACTIONS.authAction.pushLoginData(...args));
     },
   };
 };

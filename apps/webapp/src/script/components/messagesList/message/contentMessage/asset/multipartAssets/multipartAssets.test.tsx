@@ -21,19 +21,20 @@ import {render, screen, waitFor, act} from '@testing-library/react';
 import {RestNode} from 'cells-sdk-ts';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../../../../uiKit/identity/theme/theme';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../../page/testSupport/rootContextTestSupport';
 
 import {MultipartAssets} from './multipartAssets';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 
-jest.mock('Hooks/useInView/useInView', () => {
+jest.mock('../../../../../../hooks/useInView/useInView', () => {
   return {
     useInView: (): {elementRef: {current: null}; hasBeenInView: boolean} => {
       return {

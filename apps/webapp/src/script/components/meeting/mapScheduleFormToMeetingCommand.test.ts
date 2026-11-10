@@ -20,19 +20,19 @@
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {maybe} from 'true-myth';
 
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {User} from '../../repositories/entity/User';
+import {translateForTest} from '../../util/test/translateForTest';
+import {unwrap, unwrapErr} from '../../util/test/resultTestSupport';
 
 import {mapScheduleFormToMeetingCommand} from './mapScheduleFormToMeetingCommand';
-import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
+import type {ScheduleMeetingFormState} from './scheduleMeetingModal/scheduleMeetingTypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
 const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
 const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(fixedNow.getTime()) * 1_000n});
 
-const createUser = (id: string) => {
+const createUser = (id: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
   return user;

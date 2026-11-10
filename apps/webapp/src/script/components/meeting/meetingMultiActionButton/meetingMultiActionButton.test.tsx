@@ -19,16 +19,21 @@
 
 import {fireEvent, render, screen} from '@testing-library/react';
 
-import {translateForTest} from 'Util/test/translateForTest';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {MeetingMultiActionButton, MeetingMultiActionButtonProps} from './meetingMultiActionButton';
 
-const createTestProps = () => {
+type CreateTestPropsResult = {
+  props: MeetingMultiActionButtonProps;
+  handleMeetNow: jest.Mock<any, any, any>;
+  handleScheduleMeeting: jest.Mock<any, any, any>;
+};
+const createTestProps = (): CreateTestPropsResult => {
   const handleMeetNow = jest.fn();
   const handleScheduleMeeting = jest.fn();
 

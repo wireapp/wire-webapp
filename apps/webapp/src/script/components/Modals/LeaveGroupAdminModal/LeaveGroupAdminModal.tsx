@@ -17,16 +17,9 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {isNonEmptyObject, isNullOrUndefined} from '@sindresorhus/is';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {handleEscDown} from 'Util/keyboardUtil';
-import type {Translate} from 'Util/localizerUtil';
 
 import {AdminSearchInput} from './AdminSearchInput';
 import {
@@ -40,11 +33,19 @@ import {
 } from './styles';
 import {useLeaveGroupAdminModalStore} from './useLeaveGroupAdminModalStore';
 
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {handleEscDown} from '../../../util/keyboardUtil';
+import type {Translate} from '../../../util/localizerUtil';
+import * as Icon from '../../icon';
+import {ModalComponent} from '../ModalComponent';
+
 interface LeaveGroupAdminModalProps {
   readonly translate: Translate;
 }
 
-export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => {
+export const LeaveGroupAdminModal: FunctionComponent<LeaveGroupAdminModalProps> = ({
+  translate,
+}: LeaveGroupAdminModalProps) => {
   const {isOpen, params, selectedUser, clearContent, isLoading, hide, setSelectedUser, setClearContent, setIsLoading} =
     useLeaveGroupAdminModalStore();
 
@@ -57,11 +58,11 @@ export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => 
   const hasEligibleUsers = eligibleUsers.length > 0;
   const canLeave = hasEligibleUsers && selectedUser !== null;
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     return hide();
   };
 
-  const handleLeave = async () => {
+  const handleLeave = async (): Promise<void> => {
     setIsLoading(true);
     try {
       if (isNonEmptyObject(selectedUser)) {
@@ -75,12 +76,12 @@ export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => 
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     hide();
     onDelete();
   };
 
-  const handleUserSelect = (user: typeof selectedUser) => {
+  const handleUserSelect = (user: typeof selectedUser): void => {
     setSelectedUser(user);
   };
 

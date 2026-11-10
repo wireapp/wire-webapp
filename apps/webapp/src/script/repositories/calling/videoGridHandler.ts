@@ -19,19 +19,19 @@
 
 import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {Call} from './Call';
 import type {Participant} from './Participant';
 
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+
 const participantPairSize = 2;
 
-export interface Grid {
+export type Grid = {
   grid: Participant[];
   thumbnail: Participant | null;
-}
+};
 
-export function getGrid(call: Call | undefined) {
+export function getGrid(call: Call | undefined): Grid {
   if (call === undefined) {
     return {
       grid: [],
@@ -51,7 +51,7 @@ export function getGrid(call: Call | undefined) {
   };
 }
 
-export function updateVideoGrid(call: Call | undefined, setGrid: Dispatch<SetStateAction<Grid>>) {
+export function updateVideoGrid(call: Call | undefined, setGrid: Dispatch<SetStateAction<Grid>>): void {
   if (call === undefined) {
     return;
   }
@@ -67,28 +67,28 @@ export const useVideoGrid = (call: Call): Grid => {
   const {participants, currentPage, pages} = useKoSubscribableChildren(call, ['participants', 'currentPage', 'pages']);
 
   useEffect(() => {
-    const updateGrid = () => {
+    const updateGrid = (): void => {
       return updateVideoGrid(call, setGrid);
     };
     updateGrid();
-    const nameSubscriptions = participants?.map(p => {
-      return p.user.name.subscribe(updateGrid);
+    const nameSubscriptions = participants?.map(participant => {
+      return participant.user.name.subscribe(updateGrid);
     });
-    const videoSubscriptions = participants?.map(p => {
-      return p.isSendingVideo.subscribe(updateGrid);
+    const videoSubscriptions = participants?.map(participant => {
+      return participant.isSendingVideo.subscribe(updateGrid);
     });
-    const screenShareSubscriptions = participants?.map(p => {
-      return p.sharesScreen.subscribe(updateGrid);
+    const screenShareSubscriptions = participants?.map(participant => {
+      return participant.sharesScreen.subscribe(updateGrid);
     });
     return () => {
-      nameSubscriptions?.forEach(s => {
-        s.dispose();
+      nameSubscriptions?.forEach(subscription => {
+        subscription.dispose();
       });
-      videoSubscriptions?.forEach(s => {
-        s.dispose();
+      videoSubscriptions?.forEach(subscription => {
+        subscription.dispose();
       });
-      screenShareSubscriptions?.forEach(s => {
-        s.dispose();
+      screenShareSubscriptions?.forEach(subscription => {
+        subscription.dispose();
       });
     };
   }, [participants, participants?.length, call, currentPage, pages?.length]);

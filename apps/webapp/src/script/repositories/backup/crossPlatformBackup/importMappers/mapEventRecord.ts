@@ -19,11 +19,10 @@
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {ClientEvent} from 'Repositories/event/Client';
-import {EventRecord} from 'Repositories/storage';
-import {MessageCategory} from 'src/script/message/messageCategory';
-
 import {CPBLogger} from '..';
+import {MessageCategory} from '../../../../message/messageCategory';
+import {ClientEvent} from '../../../event/Client';
+import {EventRecord} from '../../../storage';
 import {BackupMessageContent, BackupMessage} from '../CPB.library';
 
 // Type definition for common message fields
@@ -71,8 +70,8 @@ const mapCommonMessageFields = ({
 // Helper function to transform an Int8Array to an object
 const transformArrayToObject = (array: Int8Array): {[key: number]: number} => {
   const object: {[key: number]: number} = {};
-  for (let i = 0; i < array.length; i++) {
-    object[i] = array[i];
+  for (let byteIndex = 0; byteIndex < array.length; byteIndex++) {
+    object[byteIndex] = array[byteIndex];
   }
   return object;
 };

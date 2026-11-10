@@ -30,12 +30,12 @@ export class RequestResetPasswordPage {
     this.goBackToLoginButton = page.getByTestId('do-go-back-to-login');
   }
 
-  async requestPasswordResetForEmail(email: string) {
+  async requestPasswordResetForEmail(email: string): Promise<void> {
     await this.emailInput.fill(email);
     await this.resetPasswordButton.click();
   }
 
-  async clickGoBackToLoginButton() {
+  async clickGoBackToLoginButton(): Promise<void> {
     await this.goBackToLoginButton.click();
   }
 }

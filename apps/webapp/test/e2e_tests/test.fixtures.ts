@@ -196,7 +196,7 @@ export const withGuestUser = (link: string, guestName: string): PagePlugin => {
 export const createUser = async (
   api: ApiManagerE2E,
   options?: {disableTelemetry?: boolean} & Parameters<typeof getUser>[0],
-) => {
+): Promise<User> => {
   const {disableTelemetry = true} = options ?? {};
 
   const user = getUser(options);
@@ -210,6 +210,11 @@ export const createUser = async (
   return user;
 };
 
+type CreateTeamResult = Promise<{
+  teamId: any;
+  owner: User;
+  addTeamMember: (member: User, options?: {role?: keyof typeof Role}) => Promise<void>;
+}>;
 export const createTeam = async (
   api: ApiManagerE2E,
   teamName: string,
@@ -224,7 +229,7 @@ export const createTeam = async (
       sso?: boolean;
     };
   },
-) => {
+): CreateTeamResult => {
   const owner = await createUser(api);
 
   const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);

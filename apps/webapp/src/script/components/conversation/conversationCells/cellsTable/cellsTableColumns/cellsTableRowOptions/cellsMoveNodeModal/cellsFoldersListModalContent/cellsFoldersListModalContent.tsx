@@ -17,11 +17,9 @@
  *
  */
 
-import {isNonEmptyArray} from '@sindresorhus/is';
+import type {FunctionComponent} from 'react';
 
-import {CellsBreadcrumbs} from 'Components/conversation/conversationCells/common/cellsBreadcrumbs/cellsBreadcrumbs';
-import {getBreadcrumbsFromPath} from 'Components/conversation/conversationCells/common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {isNonEmptyArray} from '@sindresorhus/is';
 
 import {CellsCreateNewFolderHint} from './cellsCreateNewFolderHint/cellsCreateNewFolderHint';
 import {CellsFolderList} from './cellsFolderList/cellsFolderList';
@@ -29,40 +27,60 @@ import {CellsFolderListEmpty} from './cellsFolderListEmpty/cellsFolderListEmpty'
 import {CellsFolderListLoading} from './cellsFolderListLoading/cellsFolderListLoading';
 import {breadcrumbsWrapperStyles, listWrapperStyles} from './cellsFoldersListModalContent.styles';
 
+import {useApplicationContext} from '../../../../../../../../page/rootProvider';
+import {CellsBreadcrumbs} from '../../../../../common/cellsBreadcrumbs/cellsBreadcrumbs';
+import {getBreadcrumbsFromPath} from '../../../../../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
+
 interface CellsFoldersListModalContentProps {
-  items: {id: string; name: string; path: string}[];
-  status: 'idle' | 'loading' | 'success' | 'error';
-  shouldShowLoadingSpinner: boolean;
   conversationName: string;
-  currentPath: string;
-  onPathChange: (path: string) => void;
-  onChangeModalContent: (content: 'move' | 'create') => void;
+  destination: {
+    folders: {id: string; name: string; path: string}[];
+    status: 'idle' | 'loading' | 'success' | 'error';
+    shouldShowLoadingSpinner: boolean;
+    currentPath: string;
+    handlePathChange: (path: string) => void;
+    onChangeModalContent?: (content: 'move' | 'create') => void;
+    handleDestinationSelect?: (path: string) => void;
+    selectedDestinationPath?: string;
+    disabledDestinationPaths?: readonly string[];
+    disabledDestinationLabels?: Readonly<Record<string, string>>;
+  };
+  getCurrentPathFromFolder?: (path: string) => string;
 }
 
-export const CellsFoldersListModalContent = ({
-  items,
-  status,
-  shouldShowLoadingSpinner,
+export const CellsFoldersListModalContent: FunctionComponent<CellsFoldersListModalContentProps> = ({
   conversationName,
-  currentPath,
-  onPathChange,
-  onChangeModalContent,
+  destination: {
+    folders: items,
+    status,
+    shouldShowLoadingSpinner,
+    currentPath,
+    handlePathChange: onPathChange,
+    onChangeModalContent,
+    handleDestinationSelect: onSelectDestination,
+    selectedDestinationPath,
+    disabledDestinationPaths,
+    disabledDestinationLabels,
+  },
+  getCurrentPathFromFolder,
 }: CellsFoldersListModalContentProps) => {
   const {translate} = useApplicationContext();
   const breadcrumbs = getBreadcrumbsFromPath({
-    baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
+    baseCrumb: translate('cells.breadcrumb.files', {conversationName}, undefined, true),
     currentPath,
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
 
   const shouldDisplayEmptyItems = status === 'success' && !isNonEmptyArray(items);
+  const shouldDisplayFolders = status === 'success' && isNonEmptyArray(items);
+  const shouldDisplayLoading = ['idle', 'loading'].includes(status);
 
-  const handleFolderNavigate = (path: string) => {
-    const newPath = path.split('/').slice(1).join('/');
+  const handleFolderNavigate = (path: string): void => {
+    const newPath = getCurrentPathFromFolder?.(path) ?? path.split('/').slice(1).join('/');
     onPathChange(newPath);
   };
 
-  const handleBreadcrumbClick = (item: {name: string}) => {
+  const handleBreadcrumbClick = (item: {name: string}): void => {
     const path =
       breadcrumbs.find(crumb => {
         return crumb.name === item.name;
@@ -75,18 +93,33 @@ export const CellsFoldersListModalContent = ({
       <div css={breadcrumbsWrapperStyles}>
         <CellsBreadcrumbs items={breadcrumbs} maxNotCombinedItems={3} onItemClick={handleBreadcrumbClick} />
       </div>
-      <div css={listWrapperStyles}>
-        {shouldShowLoadingSpinner && <CellsFolderListLoading />}
+      <div css={listWrapperStyles} aria-busy={status === 'loading'}>
+        {shouldDisplayLoading &&
+          (shouldShowLoadingSpinner ? (
+            <CellsFolderListLoading />
+          ) : (
+            <p role="status">{translate('cells.moveNodeModal.loading')}</p>
+          ))}
+        {status === 'error' && <p role="alert">{translate('cells.newItemMenuModalForm.genericError')}</p>}
         {shouldDisplayEmptyItems && <CellsFolderListEmpty />}
-        {!shouldShowLoadingSpinner && !shouldDisplayEmptyItems && (
-          <CellsFolderList items={items} onNavigate={handleFolderNavigate} />
+        {shouldDisplayFolders && (
+          <CellsFolderList
+            items={items}
+            onNavigate={handleFolderNavigate}
+            onSelectDestination={onSelectDestination}
+            selectedDestinationPath={selectedDestinationPath}
+            disabledDestinationPaths={disabledDestinationPaths}
+            disabledDestinationLabels={disabledDestinationLabels}
+          />
         )}
       </div>
-      <CellsCreateNewFolderHint
-        onCreate={() => {
-          return onChangeModalContent('create');
-        }}
-      />
+      {onChangeModalContent !== undefined && (
+        <CellsCreateNewFolderHint
+          onCreate={() => {
+            return onChangeModalContent('create');
+          }}
+        />
+      )}
     </>
   );
 };

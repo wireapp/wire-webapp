@@ -19,13 +19,14 @@
 
 import {fireEvent, render, screen} from '@testing-library/react';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../../uiKit/identity/theme/theme';
 
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {FileDropzone} from './fileDropzone';
 
@@ -33,7 +34,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const renderFileDropzone = (isFileDropAllowed: boolean) => {
+const renderFileDropzone = (isFileDropAllowed: boolean): void => {
   const result = render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <FileDropzone isDragAccept isFileDropAllowed={isFileDropAllowed} rootProps={{}} inputProps={{}}>

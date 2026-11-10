@@ -23,16 +23,16 @@ import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
-import {UserList} from 'Components/userList/userList';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {translateForTest} from 'Util/test/translateForTest';
+import {UserList} from './userList';
+import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import type {Translate} from '../../util/localizerUtil/translationTypes';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {withTheme, withThemeAndRootContext} from '../../auth/util/test/testUtil';
@@ -44,6 +44,10 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 describe('UserList', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     conversationRepository = await testFactory.exposeConversationActors();
   });
@@ -61,7 +65,7 @@ describe('UserList', () => {
     });
     const props = {
       conversationRepository,
-      onSelectUser: (user: User) => {
+      onSelectUser: () => {
         return jest.fn();
       },
       selfUser: user,

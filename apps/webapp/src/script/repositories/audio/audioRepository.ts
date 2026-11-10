@@ -22,14 +22,13 @@ import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/da
 import {amplify} from 'amplify';
 import {noop} from 'noop-esm';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {getLogger, Logger} from 'Util/logger';
-
 import {AudioPlayingType} from './audioPlayingType';
 import {AudioType} from './audioType';
+
+import {getLogger, Logger} from '../../util/logger';
+import {WebAppEvents} from '../../webAppEvents';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {mediaDevicesStore} from '../media/useMediaDevicesStore';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Playback outcomes define their existing numeric values inline. */
 enum AUDIO_PLAY_PERMISSION {
@@ -79,7 +78,7 @@ export class AudioRepository {
     return audioElement;
   }
 
-  private updateSinkIds() {
+  private updateSinkIds(): void {
     const currentOutputDevice = mediaDevicesStore.getState().audio.output.activeId;
     if (!isNonEmptyString(currentOutputDevice)) {
       return;

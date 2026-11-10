@@ -17,15 +17,16 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
-import type {ClientEntity} from 'Repositories/client/ClientEntity';
-import type {User} from 'Repositories/entity/User';
-import {WireIdentity} from 'src/script/e2eIdentity';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {Config} from '../../../../Config';
+import {WireIdentity} from '../../../../e2eIdentity';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import type {ClientEntity} from '../../../../repositories/client/ClientEntity';
+import type {User} from '../../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {DeviceCard} from '../deviceCard';
 
 interface DeviceListProps {
@@ -36,7 +37,13 @@ interface DeviceListProps {
   user: User;
 }
 
-export const DeviceList = ({user, getDeviceIdentity, noPadding, clients, clickOnDevice}: DeviceListProps) => {
+export const DeviceList: FunctionComponent<DeviceListProps> = ({
+  user,
+  getDeviceIdentity,
+  noPadding,
+  clients,
+  clickOnDevice,
+}: DeviceListProps) => {
   const {translate} = useApplicationContext();
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
 

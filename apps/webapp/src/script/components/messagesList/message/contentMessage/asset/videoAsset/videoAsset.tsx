@@ -17,26 +17,26 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
-
-import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
-import {AssetError} from 'Repositories/assets/assetError';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {formatSeconds} from 'Util/timeUtil';
-import {useEffectRef} from 'Util/useEffectRef';
-
+import {useApplicationContext} from '../../../../../../page/rootProvider';
+import {AssetError} from '../../../../../../repositories/assets/assetError';
+import {AssetRepository} from '../../../../../../repositories/assets/assetRepository';
+import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
+import type {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
+import type {FileAsset as FileAssetType} from '../../../../../../repositories/entity/message/fileAsset';
+import {TeamState} from '../../../../../../repositories/team/TeamState';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
+import {TabIndex} from '../../../../../../uiKit/utils/enums';
+import {useTimeout} from '../../../../../../uiKit/utils/useTimeout';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
+import {formatSeconds} from '../../../../../../util/timeUtil';
+import {useEffectRef} from '../../../../../../util/useEffectRef';
+import {RestrictedVideo} from '../../../../../asset/RestrictedVideo';
 import {MediaButton} from '../common/mediaButton/mediaButton';
 import {SeekBar} from '../common/seekBar/seekBar';
 import {AssetUrl, useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
@@ -52,7 +52,7 @@ interface VideoAssetProps {
 
 const hideControlsDelayMilliseconds = 2000;
 
-const VideoAsset = ({
+const VideoAsset: FunctionComponent<VideoAssetProps> = ({
   message,
   isQuote,
   teamState = container.resolve(TeamState),
@@ -242,7 +242,7 @@ const VideoAsset = ({
     }
   }, [videoElement, videoSrc]);
 
-  const syncVideoTimeRest = () => {
+  const syncVideoTimeRest = (): void => {
     if (!isUndefined(videoElement)) {
       setVideoTimeRest(videoElement.duration - videoElement.currentTime);
     }

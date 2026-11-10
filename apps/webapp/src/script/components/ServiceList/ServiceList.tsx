@@ -17,11 +17,14 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
-import {ServiceListItem} from 'Components/ServiceList/components/ServiceListItem';
-import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {ServiceListItem} from './components/ServiceListItem';
+
+import {useApplicationContext} from '../../page/rootProvider';
+import type {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 
 enum MODE {
   COMPACT = 'ServiceList.MODE.COMPACT',
@@ -36,7 +39,7 @@ interface ServiceListProps {
   dataUieName?: string;
 }
 
-export const ServiceList = ({
+export const ServiceList: FunctionComponent<ServiceListProps> = ({
   onServiceClick,
   isSearching = false,
   mode = MODE.DEFAULT,

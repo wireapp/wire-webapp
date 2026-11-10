@@ -20,15 +20,15 @@
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CallMessage} from 'Repositories/entity/message/callMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {PingMessage} from 'Repositories/entity/message/pingMessage';
-import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
-import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {Conversation} from '../entity/Conversation';
+import {CallMessage} from '../entity/message/callMessage';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {PingMessage} from '../entity/message/pingMessage';
+import {Text} from '../entity/message/text';
+import {User} from '../entity/User';
+import {translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {createUuid} from '../../util/uuid';
 
 import {generateCellState} from './ConversationCellState';
 import {ConversationStatusIcon} from './ConversationStatusIcon';

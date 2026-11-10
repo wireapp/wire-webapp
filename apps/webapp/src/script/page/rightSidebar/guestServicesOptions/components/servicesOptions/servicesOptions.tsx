@@ -19,15 +19,15 @@
 
 import {FC} from 'react';
 
-import {BaseToggle} from 'Components/toggle/BaseToggle';
-import {ACCESS_TYPES} from 'Repositories/conversation/ConversationAccessPermission';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {checkAppsFeatureAvailability} from 'Util/featureUtil';
-
 import {serviceOptionContainer} from './serviceOptions.styles';
+
+import {BaseToggle} from '../../../../../components/toggle/BaseToggle';
+import {ACCESS_TYPES} from '../../../../../repositories/conversation/ConversationAccessPermission';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {TeamState} from '../../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {checkAppsFeatureAvailability} from '../../../../../util/featureUtil';
+import {useApplicationContext} from '../../../../rootProvider';
 
 interface ServicesOptionsProps {
   activeConversation: Conversation;
@@ -60,7 +60,7 @@ const ServicesOptions: FC<ServicesOptionsProps> = ({
 
   const displayAppsToggle = isAppsFeatureEnabled || isServicesEnabled;
 
-  const toggleServicesAccessState = () => {
+  const toggleServicesAccessState = (): void => {
     toggleAccessState(ACCESS_TYPES.SERVICE, translate('modalConversationRemoveAppsMessage'), hasService);
   };
 

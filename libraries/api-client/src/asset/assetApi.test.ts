@@ -93,24 +93,6 @@ describe('AssetAPI', () => {
       );
     });
 
-    it('should include forceCaching parameter when true', async () => {
-      mockSendRequest.mockResolvedValue({
-        data: mockArrayBuffer,
-        headers: {},
-        status: StatusCode.OK,
-        statusText: 'OK',
-        config: {},
-      });
-
-      await assetAPI.getAsset(validAssetId, validDomain, null, true).response;
-
-      expect(mockSendRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          params: expect.objectContaining({forceCaching: true}),
-        }),
-      );
-    });
-
     it('should throw TypeError for invalid asset ID', () => {
       expect(() => {
         return assetAPI.getAsset('invalid id!', validDomain);
@@ -133,24 +115,23 @@ describe('AssetAPI', () => {
       await expect(request.response).rejects.toThrow('Asset download got cancelled.');
     });
 
-    it('should handle progress callback', async () => {
+    it('passes the progress callback as the final argument', async () => {
       const progressCallback = jest.fn();
-      mockSendRequest.mockResolvedValue({
-        data: mockArrayBuffer,
-        headers: {},
-        status: StatusCode.OK,
-        statusText: 'OK',
-        config: {},
+      mockSendRequest.mockImplementation(async requestConfig => {
+        requestConfig.onDownloadProgress({loaded: 1, total: 2});
+
+        return {
+          data: mockArrayBuffer,
+          headers: {},
+          status: StatusCode.OK,
+          statusText: 'OK',
+          config: {},
+        };
       });
 
-      await assetAPI.getAsset(validAssetId, validDomain, null, false, progressCallback).response;
+      await assetAPI.getAsset(validAssetId, validDomain, null, progressCallback).response;
 
-      expect(mockSendRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          onDownloadProgress: expect.any(Function),
-          onUploadProgress: expect.any(Function),
-        }),
-      );
+      expect(progressCallback).toHaveBeenCalledWith(0.5);
     });
   });
 
@@ -292,6 +273,31 @@ describe('AssetAPI', () => {
       expect(bodyString).toContain('Content-MD5:');
       expect(bodyString).toMatch(/--Frontier.*\r\n/);
     });
+
+    it.each(['Moenchsjochhuette.txt', 'Mönchsjochhütte.txt'])(
+      'declares the correct metadata length for filename %s',
+      async filename => {
+        mockSendRequest.mockResolvedValue({data: mockUploadResponse});
+
+        await assetAPI.postAsset(mockAssetData, {
+          auditData: {
+            conversationId: {domain: validDomain, id: validAssetId},
+            filename,
+            filetype: 'text/plain',
+          },
+        }).response;
+
+        const body: Buffer = mockSendRequest.mock.calls[0][0].data;
+        const metadataStart = body.indexOf('\r\n\r\n') + 4;
+        const metadataHeaders = body.toString('utf8', 0, metadataStart);
+        const declaredLength = Number(metadataHeaders.match(/Content-length: (\d+)/)?.[1]);
+        const metadataEnd = metadataStart + declaredLength;
+        const metadata = JSON.parse(body.toString('utf8', metadataStart, metadataEnd));
+
+        expect(metadata.filename).toBe(filename);
+        expect(body.toString('utf8', metadataEnd, metadataEnd + 2)).toBe('\r\n');
+      },
+    );
 
     it('should handle progress callback', async () => {
       const progressCallback = jest.fn();

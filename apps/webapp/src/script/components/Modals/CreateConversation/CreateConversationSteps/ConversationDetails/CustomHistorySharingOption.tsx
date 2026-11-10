@@ -17,7 +17,7 @@
  *
  */
 
-import {ChevronIcon, FlexBox, Option} from '@wireapp/react-ui-kit';
+import type {FunctionComponent} from 'react';
 
 import {
   customHistorySharingOptionContainerCss,
@@ -26,6 +26,9 @@ import {
 } from './ConversationDetails.styles';
 import {UpgradeBadge} from './UpgradeBadge';
 
+import {ChevronIcon} from '../../../../../uiKit/dataDisplay/icon/chevronIcon';
+import {Option} from '../../../../../uiKit/inputs/select/select';
+import {FlexBox} from '../../../../../uiKit/layout/flexBox/flexBox';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory} from '../../types';
 
@@ -34,7 +37,10 @@ interface ChatHistorySharingOptionProps {
   isPremiumUser: boolean;
 }
 
-export const CustomHistorySharingOption = ({option, isPremiumUser}: ChatHistorySharingOptionProps) => {
+export const CustomHistorySharingOption: FunctionComponent<ChatHistorySharingOptionProps> = ({
+  option,
+  isPremiumUser,
+}: ChatHistorySharingOptionProps) => {
   const {chatHistory} = useCreateConversationModal();
 
   return (

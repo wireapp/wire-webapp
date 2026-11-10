@@ -21,7 +21,7 @@ import {act, render} from '@testing-library/react';
 
 import {SeekBar} from './seekBar';
 
-const createAudioElement = (currentTime: number, maxTime: number) => {
+const createAudioElement = (currentTime: number, maxTime: number): HTMLAudioElement => {
   const audioElement = document.createElement('audio');
   Object.defineProperty(audioElement, 'duration', {
     get: () => {
@@ -32,7 +32,7 @@ const createAudioElement = (currentTime: number, maxTime: number) => {
   return audioElement;
 };
 
-const getProgress = (element: HTMLElement) => {
+const getProgress = (element: HTMLElement): string | undefined => {
   return element.getAttribute('style')?.replace(/--seek-bar-progress: (.*);/, '$1');
 };
 
@@ -50,7 +50,7 @@ describe('SeekBar', () => {
 
     const mediaSeekBar = getByTestId('asset-control-media-seek-bar');
 
-    const checkProgress = (currentTime: number, expectation: string) => {
+    const checkProgress = (currentTime: number, expectation: string): void => {
       props.mediaElement.currentTime = currentTime;
       act(() => {
         audioElement.dispatchEvent(new Event('timeupdate'));

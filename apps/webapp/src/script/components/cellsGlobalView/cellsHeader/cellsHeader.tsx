@@ -17,14 +17,17 @@
  *
  */
 
-import {CellsFiltersBar} from 'Components/conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
-import type {FilterConfig} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './cellsHeader.styles';
 import {CellsRefresh} from './cellsRefresh/cellsRefresh';
 import {CellsSearch} from './cellsSearch/cellsSeach';
 
+import {driveBulkActionsFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {selectionBarAnchorStyles} from '../../cells/common/cellsSelectionBar/cellsSelectionBar.styles';
+import {CellsFiltersBar} from '../../conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
+import type {FilterConfig} from '../../conversation/conversationCells/common/cellsFiltersBar/filterConfig';
 import {CellsTableLoader} from '../common/cellsTableLoader/cellsTableLoader';
 
 interface CellsHeaderProps {
@@ -34,17 +37,20 @@ interface CellsHeaderProps {
   onRefresh: () => void;
   searchStatus: 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
   filters: FilterConfig[];
+  onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
 }
 
-export const CellsHeader = ({
+export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   searchValue,
   onSearch,
   onClearSearch,
   onRefresh,
   searchStatus,
   filters,
+  onSelectionBarAnchorChange,
 }: CellsHeaderProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName) && searchValue.length === 0;
 
   return (
     <header css={wrapperStyles}>
@@ -58,6 +64,7 @@ export const CellsHeader = ({
         {searchStatus === 'loading' && <CellsTableLoader />}
         {searchStatus === 'error' && <p>{translate('cells.search.failed')}</p>}
       </div>
+      {isSelectionBarEnabled && <div css={selectionBarAnchorStyles} ref={onSelectionBarAnchorChange} />}
     </header>
   );
 };

@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "es2024",
+    "lib": ["ES2024"],
+    "types": ["node", "jest"],
+    "rootDir": "..",
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "../../target/buildcache/release-appearance-type-check.tsbuildinfo"
+  },
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules", "dist", "tmp"]
+}

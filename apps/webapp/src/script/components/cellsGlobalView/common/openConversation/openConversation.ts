@@ -19,11 +19,11 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {useSidebarStore, SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate} from 'src/script/router/routerBindings';
+import {useSidebarStore, SidebarTabs} from '../../../../page/leftSidebar/panels/conversations/useSidebarStore';
+import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {createNavigate} from '../../../../router/routerBindings';
 
-export const openConversation = (conversationQualifiedId: QualifiedId) => {
+export const openConversation = (conversationQualifiedId: QualifiedId): void => {
   const store = useSidebarStore.getState();
   store.setCurrentTab(SidebarTabs.RECENT);
   createNavigate(generateConversationUrl(conversationQualifiedId))();

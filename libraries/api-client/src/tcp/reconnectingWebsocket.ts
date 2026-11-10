@@ -156,7 +156,7 @@ export function createPartysocketCompatibleWebSocketConstructor(
         return;
       }
 
-      const wrappedListener = (event: Event) => {
+      const wrappedListener = (event: Event): void => {
         listener(normalizeMessageEventForPartysocket(event));
       };
       wrappedMessageListeners.set(listener as WebSocketEventListener, wrappedListener);
@@ -195,6 +195,7 @@ export class ReconnectingWebsocket {
 
   private readonly logger: logdown.Logger;
   private socket?: ReconnectingWebsocketWrapper;
+  private isConnectionRequested = false;
   private pingerId?: IntervalIdentifier;
   private connectingTimeoutId?: TimeoutIdentifier;
   private PING_INTERVAL = TimeUtil.TimeInMillis.SECOND * pingIntervalInSeconds;
@@ -279,7 +280,7 @@ export class ReconnectingWebsocket {
     });
   };
 
-  private readonly internalOnError = (error: ErrorEvent) => {
+  private readonly internalOnError = (error: ErrorEvent): void => {
     const reconnectContext = this.getReconnectContext();
     const errorEvent = error as ErrorEvent & {readonly error?: unknown; readonly message?: unknown};
     let errorCandidate: unknown = errorEvent;
@@ -297,7 +298,7 @@ export class ReconnectingWebsocket {
     }
   };
 
-  private readonly internalOnMessage = (event: MessageEvent) => {
+  private readonly internalOnMessage = (event: MessageEvent): void => {
     const data = buffer.bufferToString(event.data);
 
     if (data === PingMessage.PONG) {
@@ -318,7 +319,7 @@ export class ReconnectingWebsocket {
     this.onMessage?.(data);
   };
 
-  private readonly internalOnOpen = (event: Event) => {
+  private readonly internalOnOpen = (event: Event): void => {
     const reconnectContext = this.getReconnectContext();
     const durationInMilliseconds = this.getActiveAttemptDurationInMilliseconds();
     this.logger.info(
@@ -349,7 +350,8 @@ export class ReconnectingWebsocket {
 
     // The ping is needed to keep the connection alive as long as possible.
     // Otherwise the connection would be closed after 1 min of inactivity and re-established.
-    if (this.isPingingEnabled) {
+    // PartySocket can invoke a queued URL provider even after its wrapper was closed.
+    if (this.isConnectionRequested && this.isPingingEnabled) {
       this.startPinging();
     }
 
@@ -370,7 +372,7 @@ export class ReconnectingWebsocket {
     );
     const socket = reconnectingSocket;
 
-    if (this.socket !== socket) {
+    if (!this.isConnectionRequested || this.socket !== socket) {
       return websocketUrl;
     }
 
@@ -381,7 +383,7 @@ export class ReconnectingWebsocket {
     return websocketUrl;
   };
 
-  private readonly internalOnClose = (event: CloseEvent) => {
+  private readonly internalOnClose = (event: CloseEvent): void => {
     const reason = Boolean(event?.reason) ? StringUtil.formatSafeLogValue(event.reason) : 'none';
     this.logger.info(
       `[WebSocketLifecycle] event=socket-close ${this.getActiveLifecycleContext()} state=${getWebSocketStateName(this.getState())} code=${event?.code ?? 'unknown'} wasClean=${event?.wasClean ?? 'unknown'} durationMs=${this.getActiveAttemptDurationInMilliseconds()} reason=${reason}`,
@@ -515,6 +517,7 @@ export class ReconnectingWebsocket {
   }
 
   public connect(): void {
+    this.isConnectionRequested = true;
     this.logger.info('[WebSocketLifecycle] event=connect-requested');
     this.startBackFromSleepHandler();
     this.resetLongRunningRetrySequence();
@@ -635,7 +638,7 @@ export class ReconnectingWebsocket {
         resolve(false);
       }, timeoutMs);
 
-      const resolveHealthCheck = (isHealthy: boolean) => {
+      const resolveHealthCheck = (isHealthy: boolean): void => {
         this.options.wallClock.clearTimeout(timeoutId);
         resolve(isHealthy);
       };
@@ -649,6 +652,7 @@ export class ReconnectingWebsocket {
   }
 
   public disconnect(reason = 'Closed by client'): void {
+    this.isConnectionRequested = false;
     this.resetLongRunningRetrySequence();
     if (this.socket !== undefined) {
       const lifecycleReason = StringUtil.formatSafeLogValue(reason);
@@ -693,7 +697,7 @@ export class ReconnectingWebsocket {
     });
   }
 
-  private resolvePendingHealthChecks(isHealthy: boolean) {
+  private resolvePendingHealthChecks(isHealthy: boolean): void {
     this.pendingHealthChecks.forEach(resolve => {
       resolve(isHealthy);
     });

@@ -17,33 +17,35 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {useSelector} from 'react-redux';
 import {useNavigate} from 'react-router';
 
-import {Button, ButtonVariant, Container, Text} from '@wireapp/react-ui-kit';
-
-import {LogoFullIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './customBackend.styles';
 import {Page} from './page';
 
+import {LogoFullIcon} from '../../components/icon';
+import {useApplicationContext} from '../../page/rootProvider';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {Container} from '../../uiKit/layout/container/container';
+import {Text} from '../../uiKit/typography/text/text';
 import * as AuthSelector from '../module/selector/authSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {getSearchParams, navigateTo} from '../util/urlUtil';
 
-export const CustomBackend = () => {
+export const CustomBackend: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const navigate = useNavigate();
   const {customBackendURL: url} = useSelector(AuthSelector.getAccount);
 
-  const navigateToIndex = () => {
+  const navigateToIndex = (): void => {
     navigate(ROUTE.SSO);
   };
 
-  const onConnect = () => {
+  const onConnect = (): void => {
     if (isNonEmptyString(url)) {
       const welcomeUrl = pathWithParams(url, {[QUERY_KEY.SSO_AUTO_LOGIN]: true});
       navigateTo(

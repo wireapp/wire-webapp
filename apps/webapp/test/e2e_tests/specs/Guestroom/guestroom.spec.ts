@@ -1,8 +1,8 @@
 import {Page} from 'playwright/test';
-import {getUser, User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, Team, LOGIN_TIMEOUT, withGuestUser} from 'test/e2e_tests/test.fixtures';
-import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {getUser, User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, expect, withLogin, Team, LOGIN_TIMEOUT, withGuestUser} from '../../test.fixtures';
+import {createGroup, sendConnectionRequest} from '../../utils/userActions';
 
 /**
  * Navigates through the UI to generate a guest invitation link for a specific group.
@@ -13,7 +13,11 @@ import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActio
  * * @returns A promise that resolves to the generated guest link string.
  */
 
-const generateGroupGuestsLink = async (pages: PageManager['webapp']['pages'], groupName: string, password?: string) => {
+const generateGroupGuestsLink = async (
+  pages: PageManager['webapp']['pages'],
+  groupName: string,
+  password?: string,
+): Promise<string> => {
   await pages.conversationList().getConversation(groupName).open();
   await pages.conversation().toggleGroupInformation();
   await pages.conversationDetails().openGuestOptions();
@@ -588,8 +592,7 @@ test.describe('Guestroom', () => {
     password: process.env.SSO_CLAIMED_USER_PASSWORD,
   });
 
-  // Todo: This test is skipped because of disabled Okta account [WPB-26999]
-  test.skip(
+  test(
     'I want to join guestroom invite with enterprise login',
     {tag: ['@TC-3477', '@regression']},
     async ({context, createPage}) => {

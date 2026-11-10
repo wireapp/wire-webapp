@@ -19,10 +19,10 @@
 
 import {amplify} from 'amplify';
 
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {StorageKey, StorageRepository} from 'Repositories/storage';
+import {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {StorageKey, StorageRepository} from '../../../../repositories/storage';
 
 export const DRAFT_STATE_CHANGED_EVENT = 'conversation.draft-changed';
 
@@ -87,7 +87,8 @@ export const loadDraftState = async (
 
   let messageReply = null;
 
-  const loadMessage = async (messageId: string) => {
+  type LoadMessageResult = Promise<ContentMessage & {primary_key: string}>;
+  const loadMessage = async (messageId: string): LoadMessageResult => {
     const messageFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
     const message =
       messageFromId ?? (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));

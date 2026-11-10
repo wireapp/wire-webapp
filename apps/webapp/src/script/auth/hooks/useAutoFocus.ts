@@ -33,7 +33,7 @@ export const useAutoFocus = ({
   preventScroll = true,
   cursorAtEnd = true,
   shouldFocus = true,
-}: UseAutoFocusProps) => {
+}: UseAutoFocusProps): void => {
   useEffect(() => {
     // Early return if should not focus
     if (!shouldFocus) {

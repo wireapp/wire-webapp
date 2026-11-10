@@ -22,11 +22,15 @@ import {useCallback, useEffect, useState} from 'react';
 import {isNull} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {WebAppEvents} from '../../../../webAppEvents';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-
-export const useMessageReply = () => {
+type UseMessageReplyResult = {
+  isReplying: boolean;
+  replyMessageEntity: ContentMessage | null;
+  replyMessage: (messageEntity: ContentMessage | null) => void;
+};
+export const useMessageReply = (): UseMessageReplyResult => {
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
 
   const replyMessage = useCallback((messageEntity: ContentMessage | null) => {

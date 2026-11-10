@@ -21,6 +21,7 @@ import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import type {ApplicationObservability} from '../observability/applicationObservability';
+
 export type ApplicationServices = {
   readonly applicationObservability: ApplicationObservability;
   readonly clock: Clock;
@@ -30,15 +31,15 @@ export type ApplicationServices = {
 type CreateApplicationServicesDependencies = {
   readonly createApplicationObservability: () => ApplicationObservability;
   readonly clock: Clock;
-  readonly createFireAndForgetInvoker: () => FireAndForgetInvoker;
+  readonly fireAndForgetInvoker: FireAndForgetInvoker;
 };
 
 export function createApplicationServices(dependencies: CreateApplicationServicesDependencies): ApplicationServices {
-  const {createApplicationObservability, clock, createFireAndForgetInvoker} = dependencies;
+  const {createApplicationObservability, clock, fireAndForgetInvoker} = dependencies;
 
   return {
     applicationObservability: createApplicationObservability(),
     clock,
-    fireAndForgetInvoker: createFireAndForgetInvoker(),
+    fireAndForgetInvoker,
   };
 }

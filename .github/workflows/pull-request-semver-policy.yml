@@ -3,7 +3,6 @@ name: Pull request SemVer policy
 
 on:
   pull_request:
-    branches: [main, release/*, maintenance/*]
     types: [opened, reopened, synchronize, labeled, unlabeled, edited]
   merge_group:
     branches: [main, release/*, maintenance/*]
@@ -17,7 +16,7 @@ concurrency:
 jobs:
   pull-request-semver-policy:
     name: Pull request SemVer policy
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read # required for checkout; labels come from the event payload
     steps:
@@ -39,15 +38,12 @@ jobs:
 
       - name: Install policy tooling dependencies
         if: ${{ github.event_name == 'pull_request' }}
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        # Production-only focus still executes the root postinstall, which requires Nx.
-        # Skip builds explicitly to avoid running workspace setup or building the WebApp.
-        run: ./bin/yarn install --immutable --mode=skip-build
+        # Skip lifecycle scripts because policy analysis does not need WebApp configuration.
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Validate pull request release impact
         if: ${{ github.event_name == 'pull_request' }}
         env:
           TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
           PULL_REQUEST_LABELS_JSON: ${{ toJSON(github.event.pull_request.labels.*.name) }}
-        run: node ./tools/release-cli/pullRequestSemverPolicy.mts
+        run: node ./tools/releaseCli/pullRequestSemverPolicy.mts

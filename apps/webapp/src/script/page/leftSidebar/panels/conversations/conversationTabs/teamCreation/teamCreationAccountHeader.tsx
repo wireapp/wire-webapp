@@ -17,10 +17,7 @@
  *
  */
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {
   bannerHeaderContainerCss,
@@ -30,7 +27,11 @@ import {
 } from './teamCreation.styles';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
-export const TeamCreationAccountHeader = () => {
+import * as Icon from '../../../../../../components/icon';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
+import {useApplicationContext} from '../../../../../rootProvider';
+
+export const TeamCreationAccountHeader: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {showModal} = useTeamCreationModal();
 

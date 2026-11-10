@@ -17,24 +17,21 @@
  *
  */
 
-import {MouseEvent} from 'react';
+import {MouseEvent, type FunctionComponent} from 'react';
 
-import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
+import {getMeetingActionEntries} from './getMeetingActionEntries';
+import {iconContainerStyle, iconStyles} from './meetingAction.styles';
 
-import {getMeetingActionEntries} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/getMeetingActionEntries';
-import {
-  iconContainerStyle,
-  iconStyles,
-} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingAction.styles';
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import {useDeleteMeeting} from 'Components/meeting/useDeleteMeeting';
-import {useEditMeeting} from 'Components/meeting/useEditMeeting';
-import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
-import {canEditMeeting} from 'Components/meeting/utils/canEditMeeting';
-import type {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../../page/rootProvider';
+import type {User} from '../../../../../../repositories/entity/User';
 import {showContextMenu} from '../../../../../../ui/contextMenu';
+import {MoreIcon} from '../../../../../../uiKit/dataDisplay/icon/moreIcon';
+import {IconButton} from '../../../../../../uiKit/inputs/iconButton/iconButton';
+import type {MeetingInstance} from '../../../../types/meetingInstance';
+import {useDeleteMeeting} from '../../../../useDeleteMeeting';
+import {useEditMeeting} from '../../../../useEditMeeting';
+import {canDeleteMeetingForAll, canDeleteMeetingForMe} from '../../../../utils/canDeleteMeeting';
+import {canEditMeeting} from '../../../../utils/canEditMeeting';
 
 interface MeetingActionProps {
   meetingInstance: MeetingInstance;
@@ -43,12 +40,17 @@ interface MeetingActionProps {
   isJoinDisabled: boolean;
 }
 
-export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDisabled}: MeetingActionProps) => {
+export const MeetingAction: FunctionComponent<MeetingActionProps> = ({
+  meetingInstance,
+  selfUser,
+  joinMeeting,
+  isJoinDisabled,
+}: MeetingActionProps) => {
   const {translate, clock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
   const {openDeleteMeetingModal} = useDeleteMeeting();
 
-  const handleActionButton = (event: MouseEvent<HTMLElement>) => {
+  const handleActionButton = (event: MouseEvent<HTMLElement>): void => {
     if (selfUser === undefined) {
       return;
     }

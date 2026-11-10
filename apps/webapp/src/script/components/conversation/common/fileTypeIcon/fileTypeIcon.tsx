@@ -17,34 +17,31 @@
  *
  */
 
-import {ComponentType, CSSProperties} from 'react';
-
-import {
-  SVGIconProps,
-  PdfFileIcon,
-  ImageFileIcon,
-  VideoFileIcon,
-  AudioFileIcon,
-  DocumentFileIcon,
-  PresentationFileIcon,
-  SpreadsheetFileIcon,
-  TextFileIcon,
-  CodeFileIcon,
-  ArchiveFileIcon,
-  OtherFileIcon,
-} from '@wireapp/react-ui-kit/lib';
-
-import {FileType} from 'Util/getFileTypeFromExtension/fileType';
-import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
+import {ComponentType, CSSProperties, type FunctionComponent} from 'react';
 
 import {iconStyles, wrapperStyles} from './fileTypeIcon.styles';
+
+import {ArchiveFileIcon} from '../../../../uiKit/dataDisplay/icon/files/archiveFileIcon';
+import {AudioFileIcon} from '../../../../uiKit/dataDisplay/icon/files/audioFileIcon';
+import {CodeFileIcon} from '../../../../uiKit/dataDisplay/icon/files/codeFileIcon';
+import {DocumentFileIcon} from '../../../../uiKit/dataDisplay/icon/files/documentFileIcon';
+import {ImageFileIcon} from '../../../../uiKit/dataDisplay/icon/files/imageFileIcon';
+import {OtherFileIcon} from '../../../../uiKit/dataDisplay/icon/files/otherFileIcon';
+import {PdfFileIcon} from '../../../../uiKit/dataDisplay/icon/files/pdfFileIcon';
+import {PresentationFileIcon} from '../../../../uiKit/dataDisplay/icon/files/presentationFileIcon';
+import {SpreadsheetFileIcon} from '../../../../uiKit/dataDisplay/icon/files/spreadsheetFileIcon';
+import {TextFileIcon} from '../../../../uiKit/dataDisplay/icon/files/textFileIcon';
+import {VideoFileIcon} from '../../../../uiKit/dataDisplay/icon/files/videoFileIcon';
+import {SVGIconProps} from '../../../../uiKit/dataDisplay/icon/svgIcon';
+import {FileType} from '../../../../util/getFileTypeFromExtension/fileType';
+import {getFileTypeFromExtension} from '../../../../util/getFileTypeFromExtension/getFileTypeFromExtension';
 
 interface FileTypeIconProps {
   extension: string;
   size?: number;
 }
 
-export const FileTypeIcon = ({extension, size = 16}: FileTypeIconProps) => {
+export const FileTypeIcon: FunctionComponent<FileTypeIconProps> = ({extension, size = 16}: FileTypeIconProps) => {
   const type = getFileTypeFromExtension(extension);
   const Icon = fileIcons[type];
 

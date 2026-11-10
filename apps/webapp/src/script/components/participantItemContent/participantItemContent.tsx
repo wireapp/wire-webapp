@@ -17,17 +17,10 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import ko from 'knockout';
-
-import {UserBlockedBadge, UserVerificationBadges} from 'Components/badge';
-import * as Icon from 'Components/icon';
-import {UserInfo} from 'Components/UserInfo';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {
   contentInfoWrapper,
@@ -40,6 +33,13 @@ import {
   contentText,
   wrapper,
 } from './participantItem.styles';
+
+import {User} from '../../repositories/entity/User';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {UserBlockedBadge, UserVerificationBadges} from '../badge';
+import * as Icon from '../icon';
+import {UserInfo} from '../UserInfo';
 
 interface ParticipantItemContentProps {
   /** the conversation context in which we are displaying the user (will enable e2ei verification badges) */
@@ -56,7 +56,7 @@ interface ParticipantItemContentProps {
 
 const servicePlaceholder = {isBlocked: ko.observable(false)};
 
-export const ParticipantItemContent = ({
+export const ParticipantItemContent: FunctionComponent<ParticipantItemContentProps> = ({
   groupId,
   participant,
   shortDescription = '',

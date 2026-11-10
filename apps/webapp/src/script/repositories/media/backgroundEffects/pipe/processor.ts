@@ -20,7 +20,7 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {setTimeout} from 'worker-timers';
 
-import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
+import {getSafeLogger} from '../helper/logger';
 
 const defaultFramesPerSecond = 15;
 const millisecondsPerSecond = 1000;
@@ -60,7 +60,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
     }
     let timestamp = 0;
     let frameDuration = millisecondsPerSecond / defaultFramesPerSecond;
-    const close = () => {
+    const close = (): void => {
       video.pause();
       video.srcObject = null;
       video.src = '';
@@ -84,8 +84,8 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
         }
         const delta = performance.now() - timestamp;
         if (delta < frameDuration) {
-          await new Promise(r => {
-            return setTimeout(r, frameDuration - delta);
+          await new Promise(resolve => {
+            return setTimeout(resolve, frameDuration - delta);
           });
         }
         timestamp = performance.now();
@@ -105,7 +105,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
           controller.enqueue(
             new VideoFrame(canvas, {timestamp: Math.round(performance.now() * microsecondsPerMillisecond)}),
           ); // µs
-        } catch (e: unknown) {
+        } catch {
           running = false;
           close();
         }
@@ -130,17 +130,17 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
       }
 
       return new Promise<void>((resolve, reject) => {
-        const cleanup = () => {
+        const cleanup = (): void => {
           video.removeEventListener('loadeddata', onLoaded);
           video.removeEventListener('error', onError);
         };
 
-        const onLoaded = () => {
+        const onLoaded = (): void => {
           cleanup();
           resolve();
         };
 
-        const onError = () => {
+        const onError = (): void => {
           cleanup();
           reject(video.error ?? new Error('Video failed to load'));
         };

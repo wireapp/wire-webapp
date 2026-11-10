@@ -19,7 +19,7 @@
 
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
+import {AssetTransferState} from '../../src/script/repositories/assets/assetTransferState';
 import {
   AssetAddEvent,
   DeleteEvent,
@@ -29,13 +29,13 @@ import {
   MessageAddEvent,
   MultipartMessageAddEvent,
   ReactionEvent,
-} from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CONVERSATION} from 'Repositories/event/Client';
+} from '../../src/script/repositories/conversation/EventBuilder';
+import {Conversation} from '../../src/script/repositories/entity/Conversation';
+import {CONVERSATION} from '../../src/script/repositories/event/Client';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {StatusType} from 'src/script/message/statusType';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {StatusType} from '../../src/script/message/statusType';
+import {translate} from '../../src/script/util/localizerUtil';
+import {createUuid} from '../../src/script/util/uuid';
 
 export function createMessageAddEvent({
   text = '',

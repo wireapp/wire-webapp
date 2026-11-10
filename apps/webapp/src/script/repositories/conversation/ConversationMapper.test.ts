@@ -37,11 +37,11 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {BaseError} from 'src/script/error/baseError';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {Conversation} from '../entity/Conversation';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {BaseError} from '../../error/baseError';
+import {translate} from '../../util/localizerUtil';
+import {createUuid} from '../../util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationDatabaseData, ConversationMapper, SelfStatusUpdateDatabaseData} from './ConversationMapper';
@@ -51,39 +51,39 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {entities, payload} from '../../../../test/api/payloads';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ConversationMapper', () => {
   describe('mapConversations', () => {
     it('throws an error for unexpected parameters', () => {
-      const functionCallUndefinedParam = () => {
+      const functionCallUndefinedParam = (): Conversation[] => {
         //@ts-expect-error
         return ConversationMapper.mapConversations();
       };
 
       expect(functionCallUndefinedParam).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
-      const functionCallEmtpyArray = () => {
+      const functionCallEmtpyArray = (): Conversation[] => {
         return ConversationMapper.mapConversations([], 1, translate);
       };
 
       expect(functionCallEmtpyArray).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
-      const functionCallWrongType = () => {
+      const functionCallWrongType = (): Conversation[] => {
         //@ts-expect-error
         return ConversationMapper.mapConversations('Conversation');
       };
 
       expect(functionCallWrongType).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
-      const functionCallUndefinedInArray = () => {
+      const functionCallUndefinedInArray = (): Conversation[] => {
         // @ts-expect-error intentionally exercises an invalid array item
         return ConversationMapper.mapConversations([undefined], 1, translate);
       };
 
       expect(functionCallUndefinedInArray).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
-      const functionCallStringInArray = () => {
+      const functionCallStringInArray = (): Conversation[] => {
         //@ts-expect-error
         return ConversationMapper.mapConversations(['Conversation']);
       };

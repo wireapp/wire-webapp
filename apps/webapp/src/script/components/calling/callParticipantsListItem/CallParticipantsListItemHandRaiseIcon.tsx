@@ -19,20 +19,23 @@
 
 import {useEffect, useState} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
-import {InviteIcon, Tooltip} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {formatDuration} from 'Util/timeUtil';
-
 import {toolTipStyles} from './CallParticipantsListItemHandRaiseIcon.styles';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {InviteIcon} from '../../../uiKit/dataDisplay/icon/inviteIcon';
+import {Tooltip} from '../../../uiKit/dataDisplay/tooltip/tooltip';
+import {formatDuration} from '../../../util/timeUtil';
 
 interface CallParticipantsListItemHandRaiseIconProps {
   handRaisedAt: number;
 }
 
-export function CallParticipantsListItemHandRaiseIcon({handRaisedAt}: CallParticipantsListItemHandRaiseIconProps) {
+export function CallParticipantsListItemHandRaiseIcon({
+  handRaisedAt,
+}: CallParticipantsListItemHandRaiseIconProps): JSX.Element | null {
   const {translate} = useApplicationContext();
   const [duration, setDuration] = useState<string>();
 

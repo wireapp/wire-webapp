@@ -17,12 +17,7 @@
  *
  */
 
-import {CSSProperties, useState} from 'react';
-
-import {AlertIcon} from '@wireapp/react-ui-kit';
-
-import {FileCard} from 'Components/fileCard/fileCard';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {CSSProperties, useState, type FunctionComponent} from 'react';
 
 import {
   contentWrapperStyles,
@@ -34,6 +29,9 @@ import {
   loaderIconStyles,
 } from './fileAssetWithPreview.styles';
 
+import {useApplicationContext} from '../../../../../../../../page/rootProvider';
+import {AlertIcon} from '../../../../../../../../uiKit/dataDisplay/icon/alertIcon';
+import {FileCard} from '../../../../../../../fileCard/fileCard';
 import {FileAssetOptions} from '../common/fileAssetOptions/fileAssetOptions';
 import {FilePreviewModal} from '../common/filePreviewModal/filePreviewModal';
 
@@ -51,7 +49,7 @@ interface FileAssetWithPreviewProps {
   id: string;
 }
 
-export const FileAssetWithPreview = ({
+export const FileAssetWithPreview: FunctionComponent<FileAssetWithPreviewProps> = ({
   id,
   src,
   extension,
@@ -73,12 +71,12 @@ export const FileAssetWithPreview = ({
   const shouldDisplayLoading = (hasImagePreview ? !isImageLoaded : isLoading) && !isError;
   const shouldDisplayPreviewError = isError || (!isLoading && !hasImagePreview);
 
-  const showModal = (isEditMode?: boolean) => {
+  const showModal = (isEditMode?: boolean): void => {
     setIsOpen(true);
     setIsInEditMode(isEditMode === true);
   };
 
-  const hideModal = () => {
+  const hideModal = (): void => {
     setIsOpen(false);
     setIsInEditMode(false);
   };

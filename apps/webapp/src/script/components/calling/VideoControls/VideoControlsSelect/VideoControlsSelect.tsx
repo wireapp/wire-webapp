@@ -17,14 +17,13 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
-import {Select} from '@wireapp/react-ui-kit';
+import {selectGroupStyles} from './VideoControlsSelect.styles';
 
-import {selectGroupStyles} from 'Components/calling/VideoControls/VideoControlsSelect/VideoControlsSelect.styles';
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {Select} from '../../../../uiKit/inputs/select/select';
+import * as Icon from '../../../icon';
 import {
   videoOptionInlineMenuStyles,
   videoOptionLabelIconStyles,
@@ -69,7 +68,7 @@ type VideoOptionLabelProps = {
   };
 };
 
-const VideoOptionLabel = ({option}: VideoOptionLabelProps) => {
+const VideoOptionLabel: FunctionComponent<VideoOptionLabelProps> = ({option}: VideoOptionLabelProps) => {
   if (option.icon == null) {
     return <>{option.label}</>;
   }
@@ -82,7 +81,7 @@ const VideoOptionLabel = ({option}: VideoOptionLabelProps) => {
   );
 };
 
-export const VideoControlsSelect = ({
+export const VideoControlsSelect: FunctionComponent<VideoControlsSelectProps> = ({
   value,
   id,
   dataUieName,

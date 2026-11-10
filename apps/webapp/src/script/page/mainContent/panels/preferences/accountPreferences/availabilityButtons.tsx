@@ -17,17 +17,18 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/serialize';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {availabilityStatus} from 'Util/availabilityStatus';
 
 import {ContextMenuEntry} from '../../../../../ui/contextMenu';
+import {availabilityStatus} from '../../../../../util/availabilityStatus';
+import {WebAppEvents} from '../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../rootProvider';
 
 interface AvailabilityInputProps {
   availability: Availability.Type;
@@ -40,7 +41,7 @@ const headerStyles: CSSObject = {
   textAlign: 'center',
 };
 
-const AvailabilityButtons = ({availability}: AvailabilityInputProps) => {
+const AvailabilityButtons: FunctionComponent<AvailabilityInputProps> = ({availability}: AvailabilityInputProps) => {
   const {translate} = useApplicationContext();
   const entries: ContextMenuEntry[] = [
     {

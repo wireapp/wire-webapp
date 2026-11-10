@@ -17,18 +17,20 @@
  *
  */
 
-import type {UploadSource} from 'Repositories/cells/upload';
+import type {UploadSource} from '../../../repositories/cells/upload';
 
 import {
   getRepresentativeSharedDriveUploadStatus,
   getSharedDriveUploadAggregateKind,
   getSharedDriveUploadDisplayStatuses,
   toSharedDriveUploadStatus,
+  type SharedDriveUploadFileStatus,
 } from './sharedDriveUploadStatus';
 
 const source: UploadSource = {blob: new Blob(['data']), name: 'report.pdf', contentType: 'application/pdf', size: 4};
 const conversationQualifiedId = 'conversation@example.com';
-const state = (kind: string) => {
+type StateResult = {progress?: number | undefined; kind: string; identity: {uploadId: string}; source: UploadSource};
+const state = (kind: string): StateResult => {
   return {
     kind,
     identity: {uploadId: 'upload-1'},
@@ -37,7 +39,7 @@ const state = (kind: string) => {
   };
 };
 
-const statusFor = (uploadState: unknown) => {
+const statusFor = (uploadState: unknown): SharedDriveUploadFileStatus => {
   const status = toSharedDriveUploadStatus(uploadState as never, conversationQualifiedId);
   if (!status) {
     throw new Error('Expected upload status');

@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   pull_from_crowdin:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout
@@ -24,23 +24,20 @@ jobs:
           ref: main
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install JS dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install && npx just setup
 
       - name: Download translations and create PR
         uses: crowdin/github-action@7ca9c452bfe9197d3bb7fa83a4d7e2b0c9ae835d
         env:
           GITHUB_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
-          CROWDIN_PROJECT_ID: 342359
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.WEBTEAM_CROWDIN_TOKEN }}
           INPUT_DEBUG_MODE: false
         with:
           upload_sources: false
@@ -51,13 +48,11 @@ jobs:
           localization_branch_name: 'translations'
           pull_request_base_branch_name: 'main'
           pull_request_title: 'Update translations'
+          pull_request_labels: 'semver:patch'
           commit_message: 'Update translations'
           github_user_name: otto-the-bot
           github_user_email: webapp+otto@wire.com
-          token: ${{ secrets.WEBTEAM_CROWDIN_TOKEN }}
-          source: '/apps/webapp/src/i18n/en-US.json'
-          translation: '/apps/webapp/src/i18n/%locale%.json'
-          base_path: '.'
+          config: crowdin.yaml
 
       - name: Validate downloaded translation markers
-        run: ./bin/yarn nx run webapp:validate-translations
+        run: npx just translate-validate

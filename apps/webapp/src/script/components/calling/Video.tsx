@@ -18,13 +18,13 @@
  */
 
 // https://github.com/facebook/react/issues/11163#issuecomment-628379291
-import {VideoHTMLAttributes, useEffect, useRef} from 'react';
+import {VideoHTMLAttributes, useEffect, useRef, type FunctionComponent} from 'react';
 
 type VideoProps = VideoHTMLAttributes<HTMLVideoElement> & {
   srcObject: MediaStream;
 };
 
-const Video = ({srcObject, ...props}: VideoProps) => {
+const Video: FunctionComponent<VideoProps> = ({srcObject, ...props}: VideoProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {

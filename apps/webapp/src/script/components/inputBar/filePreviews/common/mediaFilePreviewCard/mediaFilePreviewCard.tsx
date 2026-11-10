@@ -17,11 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
-
-import {AlertIcon} from '@wireapp/react-ui-kit';
-
-import {FileCard} from 'Components/fileCard/fileCard';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {
   alertIconStyles,
@@ -31,6 +27,8 @@ import {
   wrapperStyles,
 } from './mediaFilePreviewCard.styles';
 
+import {AlertIcon} from '../../../../../uiKit/dataDisplay/icon/alertIcon';
+import {FileCard} from '../../../../fileCard/fileCard';
 import {FilePreviewDeleteButton} from '../filePreviewDeleteButton/filePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../filePreviewErrorMoreButton/filePreviewErrorMoreButton';
 
@@ -43,7 +41,7 @@ interface MediaFilePreviewCardProps {
   uploadProgress: number;
 }
 
-export const MediaFilePreviewCard = ({
+export const MediaFilePreviewCard: FunctionComponent<MediaFilePreviewCardProps> = ({
   label,
   onDelete,
   onRetry,

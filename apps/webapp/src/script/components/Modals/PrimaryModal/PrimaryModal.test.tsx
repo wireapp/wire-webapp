@@ -19,17 +19,17 @@
 
 import {render, fireEvent, act} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {PrimaryModalComponent} from './PrimaryModal';
 import {PrimaryModalType} from './PrimaryModalTypes';
 
-import {PrimaryModal, removeCurrentModal} from '.';
-import {translateForTest} from 'Util/test/translateForTest';
+import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '.';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
@@ -38,6 +38,55 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 describe('PrimaryModal', () => {
   beforeEach(() => {
     removeCurrentModal();
+  });
+
+  it('replaces confirmation with a loading modal and lets Escape dismiss it', () => {
+    const close = jest.fn();
+    render(withTheme(<PrimaryModalComponent translate={translateForTest} />), {wrapper: rootProviderWrapper});
+    act(() => {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {close, text: {title: 'Confirm'}}, 'upload', translateForTest);
+      PrimaryModal.replace(
+        PrimaryModal.type.LOADING,
+        {
+          preventClose: true,
+          hideCloseBtn: true,
+          text: {title: 'Sending'},
+        },
+        translateForTest,
+      );
+    });
+    expect(usePrimaryModalState.getState().currentModalId).toBe('upload');
+    expect(usePrimaryModalState.getState().currentModalContent.currentType).toBe(PrimaryModal.type.LOADING);
+    expect(close).not.toHaveBeenCalled();
+    fireEvent.keyDown(document, {key: 'Escape'});
+    expect(usePrimaryModalState.getState().currentModalId).toBeNull();
+  });
+
+  it('places an optional force choice after the actions and submits the selected value', () => {
+    const action = jest.fn();
+    const {getByTestId, getByRole} = render(withTheme(<PrimaryModalComponent translate={translateForTest} />), {
+      wrapper: rootProviderWrapper,
+    });
+    act(() => {
+      PrimaryModal.show(
+        PrimaryModal.type.OPTION,
+        {
+          optionPosition: 'after-actions',
+          optionVariant: 'warning',
+          text: {title: 'Send logs', option: 'Force export'},
+          primaryAction: {text: 'Send', action},
+        },
+        undefined,
+        translateForTest,
+      );
+    });
+    const checkbox = getByRole('checkbox');
+    const button = getByTestId('do-action');
+    expect(button.compareDocumentPosition(checkbox) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(checkbox).not.toBeChecked();
+    fireEvent.click(checkbox);
+    fireEvent.click(button);
+    expect(action).toHaveBeenCalledWith(true);
   });
 
   describe('Confirm', () => {
@@ -109,7 +158,7 @@ describe('PrimaryModal', () => {
     });
 
     it('uses the provided translate function for default secondary action copy', async () => {
-      const translate = (translationKey: string) => {
+      const translate = (translationKey: string): string => {
         return `translated:${translationKey}`;
       };
       const {getSecondaryActionButton} = renderPrimaryModal({
@@ -234,7 +283,7 @@ describe('PrimaryModal', () => {
 
   describe('SessionReset', () => {
     it('uses the provided translate function for generated modal content', async () => {
-      const translate = (translationKey: string) => {
+      const translate = (translationKey: string): string => {
         return `translated:${translationKey}`;
       };
       const {getByText} = render(withTheme(<PrimaryModalComponent translate={translateForTest} />), {
@@ -260,6 +309,16 @@ type RenderPrimaryModalParameters = {
   type: PrimaryModalType;
 };
 
+type RenderPrimaryModalResult = {
+  getPrimaryActionButton: () => HTMLElement;
+  getSecondaryActionButton: () => HTMLElement;
+  getCloseButton: () => HTMLElement | null;
+  getErrorMessages: () => HTMLElement[];
+  getPasswordInput: () => HTMLElement;
+  getInput: () => HTMLElement;
+  getGeneratePasswordButton: () => HTMLElement;
+  getConfirmPasswordInput: () => HTMLElement;
+};
 const renderPrimaryModal = ({
   hideCloseButton,
   primaryAction,
@@ -267,7 +326,7 @@ const renderPrimaryModal = ({
   secondaryActionText,
   translate,
   type,
-}: RenderPrimaryModalParameters) => {
+}: RenderPrimaryModalParameters): RenderPrimaryModalResult => {
   const {getByTestId, getAllByTestId, queryByTestId, getByLabelText} = render(
     withTheme(<PrimaryModalComponent translate={translateForTest} />),
     {

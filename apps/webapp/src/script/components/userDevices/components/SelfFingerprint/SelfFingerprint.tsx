@@ -17,21 +17,19 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {ClientState} from 'Repositories/client/ClientState';
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {splitFingerprint} from 'Util/stringUtil';
-
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {ClientState} from '../../../../repositories/client/ClientState';
+import type {CryptographyRepository} from '../../../../repositories/cryptography/CryptographyRepository';
+import {splitFingerprint} from '../../../../util/stringUtil';
+import {WebAppEvents} from '../../../../webAppEvents';
 import {DeviceCard} from '../deviceCard';
 
 interface SelfFingerprintProps {
@@ -40,7 +38,7 @@ interface SelfFingerprintProps {
   noPadding: boolean;
 }
 
-export const SelfFingerprint = ({
+export const SelfFingerprint: FunctionComponent<SelfFingerprintProps> = ({
   cryptographyRepository,
   noPadding,
   clientState = container.resolve(ClientState),

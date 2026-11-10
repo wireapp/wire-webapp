@@ -17,23 +17,21 @@
  *
  */
 
-import {useLayoutEffect, useMemo, useRef} from 'react';
+import {useLayoutEffect, useMemo, useRef, type FunctionComponent} from 'react';
 
 import {SerializedStyles, css} from '@emotion/react';
 import {isNull} from '@sindresorhus/is';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {ScrollToElement} from 'Components/messagesList/message/types';
-import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
-import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {dayMarkerStyle, baseMarkerStyle, notVirtualizedMarkerStyle} from './marker.styles';
 import {getMessagesGroupLabel} from './marker.utils';
 
 import {Config} from '../../../../Config';
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../../hooks/useRelativeTimestamp';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {TabIndex} from '../../../../uiKit/utils/enums';
 import {Marker} from '../../utils/messagesGroup';
 import {MessageTime} from '../messageTime';
+import {ScrollToElement} from '../types';
 
 const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   day: dayMarkerStyle,
@@ -46,7 +44,7 @@ interface Props {
   index?: number;
 }
 
-export const MarkerComponent = ({marker, scrollTo, measureElement, index}: Props) => {
+export const MarkerComponent: FunctionComponent<Props> = ({marker, scrollTo, measureElement, index}: Props) => {
   const {translate} = useApplicationContext();
   const elementRef = useRef<HTMLDivElement | null>(null);
 

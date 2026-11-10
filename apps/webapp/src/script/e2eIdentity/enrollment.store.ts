@@ -18,7 +18,8 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
+
+import {constructFullyQualifiedClientId} from '../core/util/fullyQualifiedClientIdUtils';
 
 const e2eActivatedAtKey = 'e2eActivatedAt';
 const e2eTimer = 'e2eTimer';
@@ -40,7 +41,7 @@ interface EnrollmentStore {
 
 export const getEnrollmentStore = ({id: userId, domain}: QualifiedId, clientId: string): EnrollmentStore => {
   const clientStoreId = constructFullyQualifiedClientId(userId, clientId, domain);
-  const constructKey = (key: string) => {
+  const constructKey = (key: string): string => {
     return `${clientStoreId}_${key}`;
   };
 

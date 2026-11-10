@@ -20,10 +20,10 @@
 import type {Conversation as BackendConversation} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {ClientEvent} from 'Repositories/event/Client';
-import type {EventService} from 'Repositories/event/EventService';
-import type {EventRecord, StorageService} from 'Repositories/storage';
-import {StatusType} from 'src/script/message/statusType';
+import {ClientEvent} from '../event/Client';
+import type {EventService} from '../event/EventService';
+import type {EventRecord, StorageService} from '../storage';
+import {StatusType} from '../../message/statusType';
 
 import {MessageCategory} from '../../message/messageCategory';
 import type {APIClient} from '../../service/apiClientSingleton';
@@ -262,7 +262,7 @@ describe('ConversationService', () => {
   describe('getSafeConversationById', () => {
     const conversationId: QualifiedId = {id: 'conv-id', domain: 'wire.com'};
 
-    const makeService = (getConversation: jest.Mock) => {
+    const makeService = (getConversation: jest.Mock): ConversationService => {
       const apiClient = {
         api: {conversation: {getConversation}},
       } as unknown as APIClient;

@@ -17,12 +17,9 @@
  *
  */
 
-import type {MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {
-  type ScheduleMeetingMode,
-  scheduleMeetingModes,
-} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
-import type {TranslationKey} from 'Util/localizerUtil';
+import type {TranslationKey} from '../../../../util/localizerUtil';
+import type {MeetingSubmitErrors} from '../../meetingSubmitErrors';
+import {type ScheduleMeetingMode, scheduleMeetingModes} from '../../scheduleMeetingModal/scheduleMeetingTypes';
 
 export type MeetingSubmitErrorTranslationKeys = {
   titleKey: TranslationKey;

@@ -17,53 +17,13 @@
  *
  */
 
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 import classNames from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {
-  BlurHighIcon,
-  BlurLowIcon,
-  CircleIcon,
-  EmojiIcon,
-  GridIcon,
-  ImageIcon,
-  MoreIcon,
-  QUERY,
-  RaiseHandIcon,
-  TabIndex,
-} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import * as Icon from 'Components/icon';
-import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
-import {useUserPropertyValue} from 'Hooks/useUserProperty';
-import {Call} from 'Repositories/calling/Call';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
-import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {
-  BackgroundEffectSelection,
-  DEFAULT_BACKGROUND_EFFECT,
-  DEFAULT_BUILTIN_BACKGROUND_ID,
-} from 'Repositories/media/VideoBackgroundEffects';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {TeamState} from 'Repositories/team/TeamState';
-import {Config} from 'src/script/Config';
-import {isCallViewOption} from 'src/script/guards/CallView';
-import {isMediaDevice} from 'src/script/guards/MediaDevice';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
-import {CallViewTab} from 'src/script/view_model/CallingViewModel';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, isEscapeKey, KEY} from 'Util/keyboardUtil';
 
 import {EmojisBar} from './EmojisBar/EmojisBar';
 import {VideoCallCancelButton} from './VideoCallCancelButton/VideoCallCancelButton';
@@ -79,6 +39,44 @@ import {
   videoOptionsSheetStyles,
 } from './VideoControls.styles';
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
+
+import {Config} from '../../../Config';
+import {isCallViewOption} from '../../../guards/CallView';
+import {isMediaDevice} from '../../../guards/MediaDevice';
+import {useActiveWindowMatchMedia} from '../../../hooks/useActiveWindowMatchMedia';
+import {useUserPropertyValue} from '../../../hooks/useUserProperty';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {Call} from '../../../repositories/calling/Call';
+import {CallingViewMode, CallState} from '../../../repositories/calling/CallState';
+import {Participant} from '../../../repositories/calling/Participant';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../../repositories/media/MediaDevicesHandler';
+import {useBackgroundEffectsStore} from '../../../repositories/media/useBackgroundEffectsStore';
+import {useMediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
+import {
+  BackgroundEffectSelection,
+  DEFAULT_BACKGROUND_EFFECT,
+  DEFAULT_BUILTIN_BACKGROUND_ID,
+} from '../../../repositories/media/VideoBackgroundEffects';
+import {PropertiesRepository} from '../../../repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../../../repositories/properties/propertiesType';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {ContextMenuEntry, showContextMenu} from '../../../ui/contextMenu';
+import {BlurHighIcon} from '../../../uiKit/dataDisplay/icon/blurHighIcon';
+import {BlurLowIcon} from '../../../uiKit/dataDisplay/icon/blurLowIcon';
+import {CircleIcon} from '../../../uiKit/dataDisplay/icon/circleIcon';
+import {EmojiIcon} from '../../../uiKit/dataDisplay/icon/emojiIcon';
+import {GridIcon} from '../../../uiKit/dataDisplay/icon/gridIcon';
+import {ImageIcon} from '../../../uiKit/dataDisplay/icon/imageIcon';
+import {MoreIcon} from '../../../uiKit/dataDisplay/icon/moreIcon';
+import {RaiseHandIcon} from '../../../uiKit/dataDisplay/icon/raiseHandIcon';
+import {TabIndex} from '../../../uiKit/utils/enums';
+import {QUERY} from '../../../uiKit/utils/mediaQueries';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {handleKeyDown, isEscapeKey, KEY} from '../../../util/keyboardUtil';
+import {CallViewTab} from '../../../view_model/CallingViewModel';
+import {WebAppEvents} from '../../../webAppEvents';
+import * as Icon from '../../icon';
 
 type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';
 
@@ -115,10 +113,13 @@ const mapEffectToValue = (effect: BackgroundEffectSelection): BackgroundOptionVa
 /**
  * Maps video input devices to select options.
  */
+type MapVideoInputDevicesResult =
+  | {label: string; value: string; dataUieName: string; id: string}[]
+  | {label: string; value: string; dataUieName: string; id: string; isDisabled: boolean}[];
 const mapVideoInputDevices = (
   devices: (MediaDeviceInfo | ElectronDesktopCapturerSource)[],
   translate: ReturnType<typeof useApplicationContext>['translate'],
-) => {
+): MapVideoInputDevicesResult => {
   if (devices.length === 0) {
     return [
       {
@@ -179,7 +180,7 @@ interface VideoControlsProps {
   isWebGLAvailable: boolean;
 }
 
-export const VideoControls = ({
+export const VideoControls: FunctionComponent<VideoControlsProps> = ({
   activeCallViewTab,
   call,
   propertiesRepository,
@@ -359,7 +360,7 @@ export const VideoControls = ({
     setSelectedAudioOptions(getSelectedAudioOptions());
   }, [getSelectedAudioOptions]);
 
-  const updateAudioOptions = (selectedOption: string, input: boolean) => {
+  const updateAudioOptions = (selectedOption: string, input: boolean): void => {
     const [selectedMicrophone, selectedSpeaker] = selectedAudioOptions;
     const microphone = input
       ? (allMicrophones.options.find(({value}) => {
@@ -400,7 +401,7 @@ export const VideoControls = ({
    *
    * @param selectedOption - Selected option value (device ID).
    */
-  const updateCameraOptions = (selectedOption: string) => {
+  const updateCameraOptions = (selectedOption: string): void => {
     const camera =
       cameraOptions[0].options.find(({value}) => {
         return value === selectedOption;
@@ -500,7 +501,7 @@ export const VideoControls = ({
     if (!videoOptionsOpen) {
       return undefined;
     }
-    const handlePointerDown = (event: MouseEvent) => {
+    const handlePointerDown = (event: MouseEvent): void => {
       const target = event.target as Node;
       if (
         videoOptionsMenuRef.current?.contains(target) === true ||
@@ -510,7 +511,7 @@ export const VideoControls = ({
       }
       setVideoOptionsOpen(false);
     };
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
       if (isEscapeKey(event)) {
         setVideoOptionsOpen(false);
       }
@@ -524,11 +525,11 @@ export const VideoControls = ({
     };
   }, [activeWindow, videoOptionsOpen]);
 
-  const handleEmojiClick = (selectedEmoji: string) => {
+  const handleEmojiClick = (selectedEmoji: string): void => {
     return sendEmoji(selectedEmoji, call);
   };
 
-  const onMoreInteractionsMenuClick = (event: React.MouseEvent) => {
+  const onMoreInteractionsMenuClick = (event: React.MouseEvent): void => {
     const mobileEntires: ContextMenuEntry[] = isMobile
       ? [
           {

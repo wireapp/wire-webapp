@@ -17,12 +17,11 @@
  *
  */
 
-import {ChangeEvent, FormEvent} from 'react';
-
-import {TextInput} from 'Components/TextInput';
+import {ChangeEvent, FormEvent, type FunctionComponent} from 'react';
 
 import {inputWrapperStyles} from './cellsNewNodeForm.styles';
 
+import {TextInput} from '../../../../TextInput';
 import {useInputAutoFocus} from '../useInputAutoFocus/useInputAutoFocus';
 
 interface CellsNewNodeFormProps {
@@ -36,7 +35,7 @@ interface CellsNewNodeFormProps {
   isOpen: boolean;
 }
 
-export const CellsNewNodeForm = ({
+export const CellsNewNodeForm: FunctionComponent<CellsNewNodeFormProps> = ({
   label,
   placeholder,
   onSubmit,

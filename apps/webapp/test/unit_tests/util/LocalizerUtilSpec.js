@@ -17,7 +17,7 @@
  *
  */
 
-import {getSelfName, translate, setStrings, joinNames} from 'Util/localizerUtil';
+import {getSelfName, translate, setStrings, joinNames} from '../../../src/script/util/localizerUtil';
 
 describe('LocalizerUtil', () => {
   describe('translate', () => {

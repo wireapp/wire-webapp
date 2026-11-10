@@ -19,15 +19,17 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
+import type {ObservableArray} from 'knockout';
 
-import {MixedConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TestFactory} from 'test/helper/TestFactory';
-import {generateUser} from 'test/helper/UserGenerator';
-import {createUuid} from 'Util/uuid';
+import {MixedConversation, MLSConversation} from '../../../repositories/conversation/ConversationSelectors';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import type {User} from '../../../repositories/entity/User';
+import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {generateUser} from '../../../../../test/helper/UserGenerator';
+import {createUuid} from '../../../util/uuid';
 
 import {finaliseMigrationOfMixedConversations} from './migrationFinaliser';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const createMixedConversation = (): MixedConversation => {
   const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MIXED, translateForTest);
@@ -47,7 +49,7 @@ const changeConversationProtocolToMLS = (conversation: MixedConversation): MLSCo
 const injectParticipantsIntoConversation = (
   conversation: Conversation,
   {doAllSupportMLS}: {doAllSupportMLS: boolean},
-) => {
+): ObservableArray<User> => {
   const usersSupportingMLS = Array(5)
     .fill(0)
     .map(() => {
@@ -68,6 +70,10 @@ const injectParticipantsIntoConversation = (
 const testFactory = new TestFactory();
 
 describe('finaliseMigrationOfMixedConversations', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   it('should finalise when finaliseRegardlessAfter date arrived', async () => {
     const conversationRepository = await testFactory.exposeConversationActors();
     const teamRepository = await testFactory.exposeTeamActors();

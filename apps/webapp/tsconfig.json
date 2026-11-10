@@ -17,30 +17,7 @@
     "outDir": "../../dist/apps/webapp",
     "paths": {
       "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
-      "Components/*": ["./src/script/components/*"],
-      "Hooks/*": ["./src/script/hooks/*"],
-      "I18n/*": ["./src/i18n/*"],
-      "Repositories/*": ["./src/script/repositories/*"],
-      "Resource/*": ["./resource/*"],
-      "Util/*": ["./src/script/util/*"],
-      "apps/*": ["apps/*"],
-      "@wireapp/api-client/lib/*": ["../../libraries/api-client/src/*"],
-      "@wireapp/api-client": ["../../libraries/api-client/src/apiClient.ts"],
-      "@wireapp/core/lib/*": ["../../libraries/core/src/*"],
-      "@wireapp/core": ["../../libraries/core/src/index.ts"],
-      "@wireapp/react-ui-kit/lib/*": ["../../libraries/react-ui-kit/src/*"],
-      "@wireapp/react-ui-kit/lib": ["../../libraries/react-ui-kit/src/index.ts"],
-      "@wireapp/react-ui-kit": ["../../libraries/react-ui-kit/src/index.ts"],
-      "@wireapp/commons/lib/*": ["../../libraries/commons/src/*"],
-      "@wireapp/commons": ["../../libraries/commons/src/index.ts"],
-      "@wireapp/webapp-events": ["../../libraries/webapp-events/src/index.ts"],
-      "@wireapp/store-engine/lib/*": ["../../libraries/store-engine/src/*"],
-      "@wireapp/store-engine": ["../../libraries/store-engine/src/index.ts"],
-      "@wireapp/store-engine-dexie": ["../../libraries/store-engine-dexie/src/index.ts"],
-      "@wireapp/config": ["../../libraries/config/src/index.ts"],
-      "@wireapp/telemetry": ["../../libraries/telemetry/src/index.ts"]
     },
-    "rootDirs": ["src"],
     "target": "ESNext",
     "strict": true,
     "strictPropertyInitialization": false,
@@ -48,5 +25,5 @@
   },
   "types": ["@types/wicg-file-system-access", "jest", "@testing-library/jest-dom"],
   "include": ["bin/**/*", "src/**/*", "test/**/*"],
-  "exclude": ["node_modules", "../server/", "src/sw.js", "src/worker/"]
+  "exclude": ["node_modules", "../server/", "src/worker/"]
 }

@@ -17,14 +17,7 @@
  *
  */
 
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {AdminlessDeleteReminderMessage as AdminlessDeleteReminderMessageEntity} from 'Repositories/entity/message/adminlessDeleteReminderMessage';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
-import {formatLocale} from 'Util/timeUtil';
+import type {FunctionComponent} from 'react';
 
 import {
   adminlessDeleteReminderContainerCss,
@@ -33,11 +26,21 @@ import {
   adminlessDeleteReminderTextContainerCss,
 } from './adminlessDeleteReminderMessage.styles';
 
+import {Config} from '../../../../Config';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {AdminlessDeleteReminderMessage as AdminlessDeleteReminderMessageEntity} from '../../../../repositories/entity/message/adminlessDeleteReminderMessage';
+import {Link, LinkVariant} from '../../../../uiKit/typography/link/link';
+import {replaceReactComponents} from '../../../../util/localizerUtil/reactLocalizerUtil';
+import {formatLocale} from '../../../../util/timeUtil';
+import * as Icon from '../../../icon';
+
 interface AdminlessDeleteReminderMessageProps {
   message: AdminlessDeleteReminderMessageEntity;
 }
 
-export const AdminlessDeleteReminderMessage = ({message}: AdminlessDeleteReminderMessageProps) => {
+export const AdminlessDeleteReminderMessage: FunctionComponent<AdminlessDeleteReminderMessageProps> = ({
+  message,
+}: AdminlessDeleteReminderMessageProps) => {
   const {translate} = useApplicationContext();
 
   const caption = translate(

@@ -19,24 +19,27 @@
 
 import type {ComponentProps} from 'react';
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+} from '../../../../../../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../../../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {isFileEditable} from 'Util/fileTypeUtil';
+} from '../../../../../../../../../page/testSupport/rootContextTestSupport';
+import {isFileEditable} from '../../../../../../../../../util/fileTypeUtil';
 
 import {FileAssetOptions} from './fileAssetOptions';
 
-const renderFileAssetOptions = (properties: ComponentProps<typeof FileAssetOptions>, {isViewer = false} = {}) => {
+const renderFileAssetOptions = (
+  properties: ComponentProps<typeof FileAssetOptions>,
+  {isViewer = false} = {},
+): RenderResult => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: key => {

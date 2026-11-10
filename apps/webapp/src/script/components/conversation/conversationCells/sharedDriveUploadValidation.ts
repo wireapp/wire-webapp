@@ -17,9 +17,12 @@
  *
  */
 
-import {Result} from 'true-myth';
+import {Maybe, Result} from 'true-myth';
 
-export type SharedDriveUploadRejectionReason = 'empty' | 'notAccepted' | 'notAllowed' | 'recycleBin' | 'tooLarge';
+import {isValidCellsNodePath} from './common/cellsNodeNameValidator';
+
+export type SharedDriveUploadRejectionReason =
+  'empty' | 'invalidName' | 'notAccepted' | 'notAllowed' | 'recycleBin' | 'tooLarge';
 
 export interface SharedDriveUploadRejection {
   readonly reason: SharedDriveUploadRejectionReason;
@@ -59,6 +62,13 @@ export const validateSharedDriveUploadFiles = (
 
   if (files.length === 0) {
     return Result.err({reason: 'empty', invalidFiles: []});
+  }
+
+  const invalidNameFiles = files.filter(file => {
+    return !isValidCellsNodePath(file.name, Maybe.of(file.webkitRelativePath));
+  });
+  if (invalidNameFiles.length > 0) {
+    return Result.err({reason: 'invalidName', invalidFiles: invalidNameFiles});
   }
 
   const invalidTypeFiles = files.filter(file => {

@@ -17,23 +17,10 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
-
-import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-
-import {useAppNotification} from 'Components/appNotification/index';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {trackCallQualityFeedback} from 'Repositories/tracking/helpers';
-import {UserState} from 'Repositories/user/userState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import type {Translate} from 'Util/localizerUtil';
-import {getLogger} from 'Util/logger';
 
 import {CALL_QUALITY_FEEDBACK_KEY, CALL_SURVEY_MUTE_INTERVAL, ratingListItems} from './constants';
 import {
@@ -46,6 +33,19 @@ import {
   title,
   wrapper,
 } from './QualityFeedbackModal.styles';
+import {RatingListLabel} from './typings';
+
+import {CallingRepository} from '../../../repositories/calling/CallingRepository';
+import {trackCallQualityFeedback} from '../../../repositories/tracking/helpers';
+import {UserState} from '../../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {Checkbox, CheckboxLabel} from '../../../uiKit/inputs/checkbox/checkbox';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import type {Translate} from '../../../util/localizerUtil';
+import {getLogger} from '../../../util/logger';
+import {useAppNotification} from '../../appNotification';
+import {useCallAlertState} from '../../calling/useCallAlertState';
+import {ModalComponent} from '../ModalComponent';
 
 const logger = getLogger('CallQualityFeedback');
 
@@ -54,7 +54,7 @@ interface Props {
   translate: Translate;
 }
 
-export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
+export const QualityFeedbackModal: FunctionComponent<Props> = ({callingRepository, translate}: Props) => {
   const userState = container.resolve(UserState);
   const {conversationId} = useCallAlertState();
   const call = !isNullOrUndefined(conversationId) ? callingRepository.findCall(conversationId) : undefined;
@@ -76,7 +76,7 @@ export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
     return null;
   }
 
-  const handleCloseModal = ({skipNotification = false} = {}) => {
+  const handleCloseModal = ({skipNotification = false} = {}): void => {
     try {
       const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
       const currentStorageData =
@@ -98,13 +98,13 @@ export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
     }
   };
 
-  const sendQualityFeedback = (score: number) => {
+  const sendQualityFeedback = (score: number): void => {
     trackCallQualityFeedback({call, score, label: RatingListLabel.ANSWERED});
 
     handleCloseModal();
   };
 
-  const skipQualityFeedback = () => {
+  const skipQualityFeedback = (): void => {
     trackCallQualityFeedback({call, label: RatingListLabel.DISMISSED});
     handleCloseModal({skipNotification: true});
   };

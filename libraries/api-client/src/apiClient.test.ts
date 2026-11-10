@@ -21,7 +21,10 @@ import {AccentColor} from '@wireapp/commons/lib';
 import nock from 'nock';
 
 import {APIClient} from './apiClient';
+import {AccessTokenData} from './auth/accessTokenData';
 import {AuthAPI} from './auth/authApi';
+import {Cookie} from './auth/cookie';
+import {CookieStore} from './auth/cookieStore';
 import {ClientType} from './client';
 import {Config, MINIMUM_API_VERSION} from './config';
 import {BackendErrorLabel, StatusCode} from './http';
@@ -33,15 +36,17 @@ const testConfig: Config = {urls: APIClient.BACKEND.PRODUCTION};
 const apiClients: APIClient[] = [];
 
 describe('APIClient', () => {
-  afterAll(() => {
+  afterEach(() => {
+    jest.restoreAllMocks();
     apiClients.forEach(client => {
-      client.disconnect();
+      client.dispose();
     });
+    apiClients.length = 0;
   });
 
   const baseUrl = APIClient.BACKEND.PRODUCTION.rest;
 
-  let accessTokenData = {
+  let accessTokenData: AccessTokenData = {
     access_token:
       'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDP' +
       'OBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86' +
@@ -71,17 +76,242 @@ describe('APIClient', () => {
     nock(baseUrl).get(SelfAPI.URL.SELF).reply(StatusCode.OK, selfExample);
   });
 
-  describe('constructor', () => {
-    it('constructs a client with production backend and StoreEngine by default', () => {
+  describe('cookie refresh lifecycle', () => {
+    const refreshedCookie = new Cookie('session-cookie', '2099-01-01T00:00:00.000Z');
+    let previousCookie: Cookie | undefined;
+
+    beforeEach(() => {
+      previousCookie = CookieStore.getCookie();
+    });
+
+    afterEach(() => {
+      apiClients.forEach(client => {
+        client.dispose();
+      });
+      CookieStore.setCookie(previousCookie);
+    });
+
+    function createCookieRefreshClient(): APIClient {
       const client = new APIClient(testConfig);
       apiClients.push(client);
+      jest.spyOn(client.transport.ws, 'connect').mockReturnValue(client.transport.ws);
+
+      return client;
+    }
+
+    it('forwards cookies before opening a WebSocket', () => {
+      const client = createCookieRefreshClient();
+      const onCookieRefresh = jest.fn();
+      client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+
+      CookieStore.setCookie(refreshedCookie);
+
+      expect(onCookieRefresh.mock.calls).toEqual([[refreshedCookie]]);
+    });
+
+    it('releases each subscription across repeated client creation and disposal', () => {
+      const initialListenerCount = CookieStore.emitter.listenerCount(CookieStore.TOPIC.COOKIE_REFRESH);
+      const onCookieRefresh = jest.fn();
+      const lifecycleRepetitions = 50;
+
+      for (let repetition = 0; repetition < lifecycleRepetitions; repetition++) {
+        const client = createCookieRefreshClient();
+        client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+        client.dispose();
+        client.dispose();
+      }
+      CookieStore.setCookie(refreshedCookie);
+
+      expect(onCookieRefresh).not.toHaveBeenCalled();
+      expect(CookieStore.emitter.listenerCount(CookieStore.TOPIC.COOKIE_REFRESH)).toBe(initialListenerCount);
+    });
+
+    it('keeps notifications active across WebSocket disconnects and reconnects without duplicates', () => {
+      const client = createCookieRefreshClient();
+      const onCookieRefresh = jest.fn();
+      client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+
+      client.disconnect();
+      CookieStore.setCookie(refreshedCookie);
+      expect(onCookieRefresh.mock.calls).toEqual([[refreshedCookie]]);
+
+      client.connect();
+      client.connect();
+      CookieStore.setCookie(refreshedCookie);
+      client.disconnect();
+      client.connect();
+      CookieStore.setCookie(refreshedCookie);
+
+      expect(onCookieRefresh.mock.calls).toEqual([[refreshedCookie], [refreshedCookie], [refreshedCookie]]);
+    });
+
+    it('disposes only its own subscription without changing the shared cookie', () => {
+      const firstClient = createCookieRefreshClient();
+      const secondClient = createCookieRefreshClient();
+      const onFirstCookieRefresh = jest.fn();
+      const onSecondCookieRefresh = jest.fn();
+      firstClient.on(APIClient.TOPIC.COOKIE_REFRESH, onFirstCookieRefresh);
+      secondClient.on(APIClient.TOPIC.COOKIE_REFRESH, onSecondCookieRefresh);
+
+      CookieStore.setCookie(refreshedCookie);
+      firstClient.dispose();
+      expect(CookieStore.getCookie()).toBe(refreshedCookie);
+      CookieStore.deleteCookie();
+
+      expect(onFirstCookieRefresh.mock.calls).toEqual([[refreshedCookie]]);
+      expect(onSecondCookieRefresh.mock.calls).toEqual([[refreshedCookie], [undefined]]);
+    });
+
+    it.each(['dispose', Symbol.dispose] as const)(
+      'stops cookie notifications even if %s fails and permits cleanup to be retried',
+      disposalMethod => {
+        const client = createCookieRefreshClient();
+        const onCookieRefresh = jest.fn();
+        client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+        const disconnectFailure = new Error('WebSocket disconnection failed');
+        jest.spyOn(client.transport.ws, 'disconnect').mockImplementationOnce(() => {
+          throw disconnectFailure;
+        });
+
+        expect(() => {
+          client[disposalMethod]();
+        }).toThrow(disconnectFailure);
+        CookieStore.setCookie(refreshedCookie);
+        expect(onCookieRefresh).not.toHaveBeenCalled();
+
+        expect(() => {
+          client[disposalMethod]();
+          client[disposalMethod]();
+        }).not.toThrow();
+        CookieStore.setCookie(refreshedCookie);
+        expect(onCookieRefresh).not.toHaveBeenCalled();
+      },
+    );
+
+    it('releases its cookie subscription and disconnects through the Disposable protocol', () => {
+      const client = createCookieRefreshClient();
+      const disposable: Disposable = client;
+      const onCookieRefresh = jest.fn();
+      const disconnect = jest.spyOn(client.transport.ws, 'disconnect');
+      client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+
+      disposable[Symbol.dispose]();
+      disposable[Symbol.dispose]();
+      CookieStore.setCookie(refreshedCookie);
+
+      expect(onCookieRefresh).not.toHaveBeenCalled();
+      expect(disconnect.mock.calls).toEqual([['Closed by client disposal'], ['Closed by client disposal']]);
+    });
+
+    it('automatically releases its cookie subscription at scope exit', () => {
+      const initialListenerCount = CookieStore.emitter.listenerCount(CookieStore.TOPIC.COOKIE_REFRESH);
+      const onCookieRefresh = jest.fn();
+
+      {
+        using client = new APIClient(testConfig);
+        client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+        CookieStore.setCookie(refreshedCookie);
+        expect(onCookieRefresh.mock.calls).toEqual([[refreshedCookie]]);
+        onCookieRefresh.mockClear();
+      }
+      CookieStore.setCookie(refreshedCookie);
+
+      expect(onCookieRefresh).not.toHaveBeenCalled();
+      expect(CookieStore.emitter.listenerCount(CookieStore.TOPIC.COOKIE_REFRESH)).toBe(initialListenerCount);
+    });
+
+    it('automatically releases its cookie subscription when a scope throws', () => {
+      const initialListenerCount = CookieStore.emitter.listenerCount(CookieStore.TOPIC.COOKIE_REFRESH);
+      const onCookieRefresh = jest.fn();
+      const scopeFailure = new Error('Resource scope failed');
+
+      expect(() => {
+        using client = new APIClient(testConfig);
+        client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+
+        throw scopeFailure;
+      }).toThrow(scopeFailure);
+      CookieStore.setCookie(refreshedCookie);
+
+      expect(onCookieRefresh).not.toHaveBeenCalled();
+      expect(CookieStore.emitter.listenerCount(CookieStore.TOPIC.COOKIE_REFRESH)).toBe(initialListenerCount);
+    });
+
+    it('delivers notifications when initializing an HTTP-only session after disconnect', async () => {
+      const client = createCookieRefreshClient();
+      const onCookieRefresh = jest.fn();
+      client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+      jest.spyOn(client.transport.http, 'refreshAccessToken').mockResolvedValue(accessTokenData);
+      client.disconnect();
+
+      await client.init(ClientType.NONE, refreshedCookie);
+
+      expect(onCookieRefresh.mock.calls).toEqual([[refreshedCookie]]);
+    });
+
+    it('delivers cookie deletion and login notifications across logout and repeated login', async () => {
+      const client = createCookieRefreshClient();
+      const onCookieRefresh = jest.fn();
+      client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+      jest.spyOn(client.api.auth, 'postLogout').mockResolvedValue(undefined);
+      jest.spyOn(client.api.self, 'getSelf').mockResolvedValue(selfExample);
+      jest.spyOn(client.api.auth, 'postLogin').mockImplementation(async () => {
+        CookieStore.setCookie(refreshedCookie);
+
+        return accessTokenData;
+      });
+      const loginCredentials = {clientType: ClientType.NONE, email: 'user@example.com', password: 'password'};
+
+      await client.logout();
+      expect(onCookieRefresh.mock.calls).toEqual([[undefined]]);
+
+      await client.login(loginCredentials);
+      await client.login(loginCredentials);
+
+      expect(onCookieRefresh.mock.calls).toEqual([[undefined], [refreshedCookie], [undefined], [refreshedCookie]]);
+    });
+
+    it('keeps notifications active when logging in with a token after disconnect', async () => {
+      const client = createCookieRefreshClient();
+      const onCookieRefresh = jest.fn();
+      client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+      client.disconnect();
+
+      await client.loginWithToken(accessTokenData.access_token);
+      CookieStore.setCookie(refreshedCookie);
+
+      expect(onCookieRefresh.mock.calls).toEqual([[refreshedCookie]]);
+    });
+
+    it('delivers cookie notifications when registration replaces an existing session', async () => {
+      const client = createCookieRefreshClient();
+      const onCookieRefresh = jest.fn();
+      client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+      client.context = {clientType: ClientType.NONE, userId: accessTokenData.user};
+      jest.spyOn(client.api.auth, 'postLogout').mockResolvedValue(undefined);
+      jest.spyOn(client.api.self, 'getSelf').mockResolvedValue(selfExample);
+      jest.spyOn(client.transport.http, 'refreshAccessToken').mockResolvedValue(accessTokenData);
+      jest.spyOn(client.api.auth, 'postRegister').mockImplementation(async () => {
+        CookieStore.setCookie(refreshedCookie);
+
+        return selfExample;
+      });
+
+      await client.register({name: 'Example User', email: 'user@example.com', password: 'password'});
+
+      expect(onCookieRefresh.mock.calls).toEqual([[undefined], [refreshedCookie], [refreshedCookie]]);
+    });
+  });
+
+  describe('constructor', () => {
+    it('constructs a client with production backend and StoreEngine by default', () => {
+      using client = new APIClient(testConfig);
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs StoreEngine when only the URLs is provided', () => {
-      const client = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
-      apiClients.push(client);
+      using client = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
@@ -340,15 +570,11 @@ describe('APIClient', () => {
       const testError = new Error('Test rejection');
 
       jest.spyOn(client.api.auth, 'postLogout').mockReturnValue(Promise.reject(testError));
-      const disconnectSpy = jest.spyOn(client, 'disconnect').mockReturnValue();
       jest.spyOn(client['accessTokenStore'], 'delete').mockReturnValue(Promise.resolve(undefined));
       jest.spyOn(client['logger'], 'warn').mockReturnValue(undefined);
 
       await client.logout();
       expect(client['logger'].warn).toHaveBeenCalledWith(testError);
-
-      // Restore the mock so afterAll can properly clean up
-      disconnectSpy.mockRestore();
     });
 
     it('skips request when told to', async () => {
@@ -356,15 +582,11 @@ describe('APIClient', () => {
       apiClients.push(client);
 
       jest.spyOn(client.api.auth, 'postLogout');
-      const disconnectSpy = jest.spyOn(client, 'disconnect').mockReturnValue();
       jest.spyOn(client['accessTokenStore'], 'delete').mockReturnValue(Promise.resolve(undefined));
       jest.spyOn(client['logger'], 'warn').mockReturnValue(undefined);
 
       await client.logout({skipLogoutRequest: true});
       expect(client['logger'].warn).not.toHaveBeenCalled();
-
-      // Restore the mock so afterAll can properly clean up
-      disconnectSpy.mockRestore();
     });
   });
 

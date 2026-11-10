@@ -17,18 +17,18 @@
  *
  */
 
-import {ReactNode} from 'react';
-
-import {InfoIcon} from 'Components/icon';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {ContainerStyle, ContentStyle, HeaderStyle} from './Note.styles';
+
+import {InfoIcon} from '../icon';
 
 interface NoteProps {
   title: string;
   children?: ReactNode;
 }
 
-const Note = ({title, children}: NoteProps) => {
+const Note: FunctionComponent<NoteProps> = ({title, children}: NoteProps) => {
   return (
     <div css={ContainerStyle}>
       <div css={HeaderStyle}>

@@ -17,21 +17,19 @@
  *
  */
 
-import {MouseEvent, KeyboardEvent} from 'react';
+import {MouseEvent, KeyboardEvent, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {DeviceVerificationBadges} from 'Components/badge';
-import * as Icon from 'Components/icon';
-import {ClientEntity} from 'Repositories/client';
-import {WireIdentity} from 'src/script/e2eIdentity';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {splitFingerprint} from 'Util/stringUtil';
-
+import {DeviceVerificationBadges} from '../../../../../../../components/badge';
+import * as Icon from '../../../../../../../components/icon';
+import {WireIdentity} from '../../../../../../../e2eIdentity';
+import {ClientEntity} from '../../../../../../../repositories/client';
+import {TabIndex} from '../../../../../../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../../../../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../../../../../util/keyboardUtil';
+import {splitFingerprint} from '../../../../../../../util/stringUtil';
+import {useApplicationContext} from '../../../../../../rootProvider';
 import {FormattedId} from '../formattedId';
 
 interface DeviceProps {
@@ -43,7 +41,14 @@ interface DeviceProps {
   deviceNumber: number;
 }
 
-export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, deviceNumber}: DeviceProps) => {
+export const Device: FunctionComponent<DeviceProps> = ({
+  device,
+  isSSO,
+  onSelect,
+  onRemove,
+  getDeviceIdentity,
+  deviceNumber,
+}: DeviceProps) => {
   const {translate} = useApplicationContext();
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const verifiedLabel = isVerified
@@ -53,16 +58,16 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
 
   const deviceIdentity = getDeviceIdentity?.(device.id);
 
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: MouseEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
     onRemove(device);
   };
 
-  const handleKeyPress = (event: KeyboardEvent<HTMLButtonElement>) => {
+  const handleKeyPress = (event: KeyboardEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
   };
 
-  const onDeviceSelect = () => {
+  const onDeviceSelect = (): void => {
     return onSelect(device);
   };
 

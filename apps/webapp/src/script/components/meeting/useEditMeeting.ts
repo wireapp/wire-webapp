@@ -19,15 +19,17 @@
 
 import {useCallback} from 'react';
 
-import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {useScheduleMeetingModal} from 'Components/meeting/scheduleMeetingModal/useScheduleMeetingModal';
-import {getScheduleMeetingSubmitErrorTranslationKeys} from 'Components/meeting/shared/submit/meetingSubmitErrorKeys';
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useMeetingStore} from './meetingStore/meetingStoreProvider';
+import {meetingSubmitErrors} from './meetingSubmitErrors';
+import {useScheduleMeetingModal} from './scheduleMeetingModal/useScheduleMeetingModal';
+import {getScheduleMeetingSubmitErrorTranslationKeys} from './shared/submit/meetingSubmitErrorKeys';
+import type {MeetingInstance} from './types/meetingInstance';
 
-export const useEditMeeting = () => {
+import {useApplicationContext} from '../../page/rootProvider';
+import {PrimaryModal} from '../Modals/PrimaryModal';
+
+type UseEditMeetingResult = {editMeeting: (meetingInstance: MeetingInstance) => Promise<void>};
+export const useEditMeeting = (): UseEditMeetingResult => {
   const {translate} = useApplicationContext();
   const loadMeetingForEdit = useMeetingStore(state => {
     return state.loadMeetingForEdit;

@@ -17,14 +17,15 @@
  *
  */
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
-import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
-import {GroupAvatar, ChannelAvatar} from 'Components/avatar';
-import type {FilterItem} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
+import {stringifyQualifiedId} from '../../../../../core/util/qualifiedIdUtil';
+import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import type {Conversation} from '../../../../../repositories/entity/Conversation';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
+import {GroupAvatar, ChannelAvatar} from '../../../../avatar';
+import type {FilterItem} from '../cellsFiltersBar/filterConfig';
 
 export const getDriveEnabledConversationFilterId = (conversation: Conversation): string => {
   return stringifyQualifiedId(conversation.qualifiedId);
@@ -36,7 +37,7 @@ export const getDriveEnabledConversations = (conversationRepository: Conversatio
   });
 };
 
-const getConversationFilterStartContent = (conversation: Conversation, isChannelsEnabled: boolean) => {
+const getConversationFilterStartContent = (conversation: Conversation, isChannelsEnabled: boolean): JSX.Element => {
   return conversation.isChannel() && isChannelsEnabled ? (
     <ChannelAvatar
       conversationID={conversation.id}

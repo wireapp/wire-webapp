@@ -11,11 +11,11 @@ on:
           - beta
           - production
       release_tag:
-        description: 'Existing immutable release tag appropriate for the selected stage'
+        description: 'Existing immutable SemVer tag: vX.Y.Z-beta.N for Beta or vX.Y.Z for Production'
         required: true
         type: string
       promoted_beta_tag:
-        description: 'Existing promoted Beta tag; required only for Production'
+        description: 'Existing vX.Y.Z-beta.N tag from the same release; required only for Production'
         required: false
         default: ''
         type: string
@@ -26,7 +26,7 @@ concurrency:
 jobs:
   dry_run_release_appearance_comments:
     name: Plan release appearance comments
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read # required to check out and inspect release history
       pull-requests: read # required to discover merged pull requests
@@ -48,19 +48,14 @@ jobs:
             exit 1
           fi
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Fetch tags
         run: git fetch --tags origin
@@ -119,7 +114,7 @@ jobs:
           else
             release_appearance_command_arguments=(production "${RELEASE_TAG}" "${RELEASE_COMMIT}" "${PROMOTED_BETA_TAG}" --dry-run)
           fi
-          node tools/release-cli/releaseAppearanceCommand.mts "${release_appearance_command_arguments[@]}"
+          node tools/releaseCli/releaseAppearanceCommand.mts "${release_appearance_command_arguments[@]}"
 
       - name: Confirm read-only issue permissions
         if: ${{ always() }}

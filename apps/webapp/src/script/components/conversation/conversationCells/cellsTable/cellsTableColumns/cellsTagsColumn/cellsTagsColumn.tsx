@@ -17,17 +17,18 @@
  *
  */
 
-import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
+import type {FunctionComponent} from 'react';
 
 import {wrapperStyles} from './cellsTagsColumn.styles';
 
+import {BadgesWithTooltip} from '../../../../../../uiKit/dataDisplay/badgesWithTooltip/badgesWithTooltip';
 import {sortTagsAlphabetically} from '../../../common/sortTagsAlphabetically/sortTagsAlphabetically';
 
 interface CellsTagsColumnProps {
   tags: string[];
 }
 
-export const CellsTagsColumn = ({tags}: CellsTagsColumnProps) => {
+export const CellsTagsColumn: FunctionComponent<CellsTagsColumnProps> = ({tags}: CellsTagsColumnProps) => {
   if (tags.length === 0) {
     return null;
   }

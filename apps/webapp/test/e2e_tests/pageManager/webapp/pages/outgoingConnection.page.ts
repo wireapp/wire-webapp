@@ -18,7 +18,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {escapeHtml} from 'test/e2e_tests/utils/userDataProcessor';
+import {escapeHtml} from '../../../utils/userDataProcessor';
 
 export class OutgoingConnectionPage {
   private readonly page: Page;
@@ -31,7 +31,7 @@ export class OutgoingConnectionPage {
     this.uniqueUsernameOutgoing = this.page.locator('.message-connected-username.label-username');
   }
 
-  getPendingConnectionIconLocator(fullName: string) {
+  getPendingConnectionIconLocator(fullName: string): Locator {
     return this.page
       .getByTestId('item-conversation')
       .and(this.page.locator(`[data-uie-value="${escapeHtml(fullName)}"]`))

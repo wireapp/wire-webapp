@@ -16,10 +16,10 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {expect, test} from 'test/e2e_tests/test.fixtures';
-import {createOngoingMeetingWindow, meetingWindowWithinPastEditPeriod} from 'test/e2e_tests/utils/meetingTime.util';
-import {createMeetingsTeam, loginMeetingsUsers} from 'test/e2e_tests/utils/meetings.util';
+import {PageManager} from '../../pageManager';
+import {expect, test} from '../../test.fixtures';
+import {createOngoingMeetingWindow, meetingWindowWithinPastEditPeriod} from '../../utils/meetingTime.util';
+import {createMeetingsTeam, loginMeetingsUsers} from '../../utils/meetings.util';
 
 const MEETING_TITLE = 'Team sync';
 const UPDATED_MEETING_TITLE = 'Updated team sync';
@@ -490,7 +490,7 @@ test.describe('Meetings', () => {
   });
 
   test.describe('Call', () => {
-    test('host can start a large Meet now call without a confirmation dialog', async ({
+    test('host can start a large Meet now call through the prep modal without an extra confirmation dialog', async ({
       createUser,
       createTeam,
       createPage,
@@ -508,6 +508,13 @@ test.describe('Meetings', () => {
         }),
       );
 
+      await expect(meetings.meetingPrepModal).toBeVisible();
+      await expect(
+        meetings.meetingPrepModal.getByRole('heading', {name: LARGE_MEETING_TITLE, exact: true}),
+      ).toBeVisible();
+      await expect(ownerPages.calling().callCell).toBeHidden();
+      await meetings.meetingPrepModal.getByRole('button', {name: 'Join', exact: true}).click();
+      await expect(meetings.meetingPrepModal).toBeHidden();
       await expect(ownerModals.withoutTitle().modal).toBeHidden();
       await expect(ownerPages.calling().callCell).toBeVisible();
     });

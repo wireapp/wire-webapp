@@ -19,34 +19,56 @@
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {ClientAction, GenericMessage} from '@wireapp/protocol-messaging';
-import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
-import {EventMapper} from 'Repositories/conversation/EventMapper';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {CryptographyMapper} from '../../../cryptography/CryptographyMapper';
+import {EventMapper} from '../../../conversation/EventMapper';
+import {SystemMessageType} from '../../../../message/systemMessageType';
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {EventError} from 'src/script/error/eventError';
+import {AssetTransferState} from '../../../assets/assetTransferState';
+import {ConversationState} from '../../../conversation/ConversationState';
+import {Conversation} from '../../../entity/Conversation';
+import {User} from '../../../entity/User';
+import {EventError} from '../../../../error/eventError';
 import {
   createAssetAddEvent,
   createMemberLeaveEvent,
   createMessageAddEvent,
   toSavedEvent,
-} from 'test/helper/EventGenerator';
-import {createUuid} from 'Util/uuid';
+} from '../../../../../../test/helper/EventGenerator';
+import {createUuid} from '../../../../util/uuid';
 
 import {EventStorageMiddleware} from './EventStorageMiddleware';
 
 import {ClientEvent} from '../../Client';
 import {EventService} from '../../EventService';
 import {EventSource} from '../../EventSource';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-function buildEventStorageMiddleware() {
+type MappedSessionResetEvent = Extract<
+  NonNullable<Awaited<ReturnType<CryptographyMapper['mapGenericMessage']>>>,
+  {type: typeof ClientEvent.CONVERSATION.SESSION_RESET}
+>;
+
+function requireMappedSessionResetEvent(
+  mappedEvent: Awaited<ReturnType<CryptographyMapper['mapGenericMessage']>>,
+): MappedSessionResetEvent {
+  if (mappedEvent === undefined || mappedEvent.type !== ClientEvent.CONVERSATION.SESSION_RESET) {
+    throw new Error('Expected a mapped session-reset event');
+  }
+
+  return mappedEvent;
+}
+
+function buildEventStorageMiddleware(): readonly [
+  EventStorageMiddleware,
+  {
+    readonly eventService: jest.Mocked<EventService>;
+    readonly conversationState: jest.Mocked<ConversationState>;
+    readonly selfUser: User;
+  },
+] {
   const eventService = {
     saveEvent: jest.fn(event => {
       return event;
@@ -70,6 +92,36 @@ function buildEventStorageMiddleware() {
 
 describe('EventStorageMiddleware', () => {
   describe('processEvent', () => {
+    it.each([
+      [EventSource.WEBSOCKET, '😀 Team'],
+      [EventSource.WEBSOCKET, '👩🏽‍💻 Café'],
+      [EventSource.WEBSOCKET, ''],
+      [EventSource.BACKEND_RESPONSE, '👩🏽‍💻 Café'],
+      [EventSource.NOTIFICATION_STREAM, '👩🏽‍💻 Café'],
+    ])('persists the Unicode group name from %s for %s', async (source, name) => {
+      const [middleware, {eventService}] = buildEventStorageMiddleware();
+      const event = {
+        id: 'rename-event-id',
+        type: CONVERSATION_EVENT.RENAME as const,
+        conversation: 'conversation-id',
+        from: 'renaming-user-id',
+        time: '2026-10-05T09:00:00.000Z',
+        data: {
+          name: source === EventSource.WEBSOCKET ? String.fromCharCode(...new TextEncoder().encode(name)) : name,
+        },
+      };
+
+      const storedEvent = await middleware.processEvent(event, source);
+
+      expect(eventService.saveEvent).toHaveBeenCalledWith({...event, data: {name}});
+      const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const message = new EventMapper(undefined, translateForTest).mapJsonEvent(
+        JSON.parse(JSON.stringify(storedEvent)),
+        conversation,
+      );
+      expect(message).toMatchObject({name, system_message_type: SystemMessageType.CONVERSATION_RENAME});
+    });
+
     it('persists an empty event ID without querying for a duplicate', async () => {
       const [middleware, {eventService}] = buildEventStorageMiddleware();
       const event = createMessageAddEvent({overrides: {id: ''}});
@@ -94,7 +146,9 @@ describe('EventStorageMiddleware', () => {
           GenericMessage.create({messageId: 'reset-id', clientAction: ClientAction.RESET_SESSION}),
         ).finish(),
       );
-      const mappedEvent = await new CryptographyMapper().mapGenericMessage(decodedMessage, incomingEvent);
+      const mappedEvent = requireMappedSessionResetEvent(
+        await new CryptographyMapper().mapGenericMessage(decodedMessage, incomingEvent),
+      );
       const storedEvent = await middleware.processEvent(mappedEvent, EventSource.WEBSOCKET);
 
       expect(eventService.saveEvent).toHaveBeenCalledWith(mappedEvent);

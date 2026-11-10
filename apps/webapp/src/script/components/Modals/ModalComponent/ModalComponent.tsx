@@ -25,10 +25,6 @@ import weakMemoize from '@emotion/weak-memoize';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {createPortal} from 'react-dom';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {noop, preventFocusOutside} from 'Util/util';
-
 import {
   ModalContentStyles,
   ModalContentVisibleStyles,
@@ -36,6 +32,8 @@ import {
   ModalOverlayVisibleStyles,
 } from './ModalComponent.styles';
 
+import {TabIndex} from '../../../uiKit/utils/enums';
+import {noop, preventFocusOutside} from '../../../util/util';
 import {LoadingIcon} from '../../icon';
 
 interface ModalComponentProps extends HTMLProps<HTMLDivElement> {
@@ -70,7 +68,7 @@ const ModalComponent = ({
   children,
   onKeyDown,
   ...rest
-}: ModalComponentProps) => {
+}: ModalComponentProps): React.ReactPortal | null => {
   const [displayNone, setDisplayNone] = useState<boolean>(!isShown);
   const hasVisibleClass = isShown && !displayNone;
   const isMounting = useRef<boolean>(true);
@@ -82,7 +80,7 @@ const ModalComponent = ({
       ? ((container as HTMLElement).ownerDocument ?? document)
       : document;
 
-    const trapFocus = (event: KeyboardEvent) => {
+    const trapFocus = (event: KeyboardEvent): void => {
       return preventFocusOutside(event, trapId, targetDocument);
     };
 

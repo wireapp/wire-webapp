@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, type RefObject} from 'react';
 
 interface UseInViewOptions {
   /** The root element to use as the viewport, defaults to browser viewport */
@@ -28,7 +28,15 @@ interface UseInViewOptions {
   threshold?: number | number[];
 }
 
-export const useInView = <Element extends HTMLElement = HTMLDivElement>(options: UseInViewOptions = {}) => {
+type UseInViewResult<Element extends HTMLElement> = {
+  elementRef: RefObject<Element | null>;
+  isInView: boolean;
+  hasBeenInView: boolean;
+};
+
+export const useInView = <Element extends HTMLElement = HTMLDivElement>(
+  options: UseInViewOptions = {},
+): UseInViewResult<Element> => {
   const [isInView, setIsInView] = useState(false);
   const [hasBeenInView, setHasBeenInView] = useState(false);
   const elementRef = useRef<Element | null>(null);

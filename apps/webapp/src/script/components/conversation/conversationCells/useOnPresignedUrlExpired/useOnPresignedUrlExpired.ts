@@ -17,8 +17,7 @@
  *
  */
 
-import {useDatePassed} from 'Hooks/useDatePassed/useDatePassed';
-
+import {useDatePassed} from '../../../../hooks/useDatePassed/useDatePassed';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 // Every node has a url to its destination, which expires after some time.
@@ -30,7 +29,7 @@ export const useOnPresignedUrlExpired = ({
 }: {
   refreshCallback: () => void;
   conversationId: string;
-}) => {
+}): void => {
   const {getNodes} = useCellsStore();
 
   const nodes = getNodes({conversationId});

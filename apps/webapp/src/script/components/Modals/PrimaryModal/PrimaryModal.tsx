@@ -22,14 +22,6 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, use
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {ErrorMessage} from '@wireapp/react-ui-kit';
-
-import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {Config} from 'src/script/Config';
-import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
-import type {Translate} from 'Util/localizerUtil';
-import {isValidPassword} from 'Util/stringUtil';
 
 import {CheckboxOption} from './CheckboxOption/CheckboxOption';
 import {MessageContent} from './Content/MessageContent';
@@ -46,6 +38,14 @@ import {PrimaryModalShell} from './PrimaryModalShell/PrimaryModalShell';
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
 import {SecondaryButton} from './SecondaryButton/SecondaryButton';
+
+import {Config} from '../../../Config';
+import {ErrorMessage} from '../../../uiKit/inputs/errorMessage/errorMessage';
+import {isEnterKey, isEscapeKey} from '../../../util/keyboardUtil';
+import type {Translate} from '../../../util/localizerUtil';
+import {isValidPassword} from '../../../util/stringUtil';
+import {CopyToClipboardButton} from '../../copyToClipboardButton';
+import {FadingScrollbar} from '../../fadingScrollbar';
 
 interface PrimaryModalComponentProps {
   readonly translate: Translate;
@@ -102,6 +102,9 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     allButtonsFullWidth = false,
     primaryBtnFirst = false,
     size = 'small',
+    bodyCSS = {},
+    optionPosition = 'before-actions',
+    optionVariant = 'default',
     container,
   } = content;
 
@@ -117,7 +120,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
 
   const isPasswordRequired = hasPasswordWithRules || isGuestLinkPassword;
 
-  const onModalHidden = () => {
+  const onModalHidden = (): void => {
     updateCurrentModalContent(defaultContent);
     updateInputValue('');
     setPasswordValue('');
@@ -130,7 +133,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     setIsFormSubmitted(false);
   };
 
-  const isPasswordOptional = () => {
+  const isPasswordOptional = (): boolean => {
     const skipValidation = passwordOptional && passwordInput.trim().length === 0;
     if (skipValidation) {
       return true;
@@ -156,7 +159,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
   const passwordGuestLinkActionEnabled =
     (!isGuestLinkPassword || passwordValue.trim().length > 0) && areGuestLinkPasswordsValid;
 
-  const isPrimaryActionDisabled = (disabled: boolean | undefined) => {
+  const isPrimaryActionDisabled = (disabled: boolean | undefined): boolean => {
     if (disabled === true) {
       return true;
     }
@@ -197,7 +200,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     };
   };
 
-  const confirm = () => {
+  const confirm = (): void => {
     const action = content?.primaryAction?.action;
     if (isNullOrUndefined(action)) {
       return;
@@ -230,7 +233,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     action();
   };
 
-  const onOptionChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const onOptionChange = (event: ChangeEvent<HTMLInputElement>): void => {
     updateOptionChecked(event.target.checked);
     if (primaryActionButtonRef.current !== null) {
       primaryActionButtonRef.current.focus();
@@ -353,7 +356,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
         hideCloseBtn={hideCloseBtn}
         closeAction={closeAction}
       />
-      <FadingScrollbar className="modal__body">
+      <FadingScrollbar className="modal__body" css={bodyCSS}>
         <MessageContent message={message} translatedMessage={translatedMessage} translate={translate} />
 
         {isGuestLinkPassword && (
@@ -432,12 +435,27 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
 
         {errorMessage !== undefined && errorMessage !== '' && <div className="modal__input__error">{errorMessage}</div>}
 
-        {isOption && <CheckboxOption isChecked={optionChecked} onChange={onOptionChange} label={checkboxLabel} />}
+        {isOption && optionPosition === 'before-actions' && (
+          <CheckboxOption
+            isChecked={optionChecked}
+            onChange={onOptionChange}
+            label={checkboxLabel}
+            variant={optionVariant}
+          />
+        )}
 
         {showLoadingIndicator ? (
           <PrimaryModalLoading />
         ) : (
           <PrimaryModalButtons isColumn={hasMultipleSecondary || allButtonsFullWidth}>{buttons}</PrimaryModalButtons>
+        )}
+        {isOption && optionPosition === 'after-actions' && (
+          <CheckboxOption
+            isChecked={optionChecked}
+            onChange={onOptionChange}
+            label={checkboxLabel}
+            variant={optionVariant}
+          />
         )}
       </FadingScrollbar>
     </PrimaryModalShell>

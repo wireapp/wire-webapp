@@ -19,7 +19,7 @@
 
 import {Router} from 'express';
 
-export const AppleAssociationRoute = () => {
+export const AppleAssociationRoute = (): Router => {
   return Router().get('/apple-app-site-association', (_req, res) => {
     const response = {
       webcredentials: {

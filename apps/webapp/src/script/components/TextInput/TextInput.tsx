@@ -21,13 +21,13 @@ import React, {forwardRef, useEffect} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isTabKey} from 'Util/keyboardUtil';
-
 import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
+
+import {useApplicationContext} from '../../page/rootProvider';
+import {CheckIcon} from '../../uiKit/dataDisplay/icon/checkIcon';
+import {COLOR} from '../../uiKit/identity/colors/colors';
+import {isTabKey} from '../../util/keyboardUtil';
+import * as Icon from '../icon';
 
 interface UserInputProps {
   autoFocus?: boolean;

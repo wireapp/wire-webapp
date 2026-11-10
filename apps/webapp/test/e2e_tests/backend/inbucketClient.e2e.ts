@@ -17,9 +17,10 @@
  *
  */
 
-import axios, {AxiosInstance} from 'axios';
+import axios, {AxiosInstance, type AxiosResponse} from 'axios';
 import {User} from '../data/user';
 
+type GetLatestEmailResult = Promise<AxiosResponse<{subject: string; body: {text: string}}, any, {}, any>>;
 export class InbucketClientE2E {
   private readonly axiosInstance: AxiosInstance;
   private readonly inbucketUsername;
@@ -41,7 +42,7 @@ export class InbucketClientE2E {
     this.authHeader = `Basic ${this.encodedCredentials}`;
   }
 
-  async getVerificationCode(email: string) {
+  async getVerificationCode(email: string): Promise<string> {
     let verificationCode;
 
     let timeout = 0;
@@ -60,22 +61,22 @@ export class InbucketClientE2E {
     return verificationCode as string;
   }
 
-  async getAccountDeletionURL(email: string) {
+  async getAccountDeletionURL(email: string): Promise<string> {
     const deletionUrlRegex = 'https://[a-zA-Z_0-9.=-]+/d/\\?key=[a-zA-Z_0-9.\\-\\\\&_=]+';
     return this.getMatchingURLFromEmailBody(email, deletionUrlRegex);
   }
 
-  async getAccountActivationURL(email: string) {
+  async getAccountActivationURL(email: string): Promise<string> {
     const accountActivationRegex = 'https://[a-zA-Z_0-9.=-]+/verify/\\?key=[a-zA-Z_0-9.\\-\\\\&_=]+';
     return this.getMatchingURLFromEmailBody(email, accountActivationRegex);
   }
 
-  async getResetPasswordURL(email: string) {
+  async getResetPasswordURL(email: string): Promise<string> {
     const resetLinkRegex = 'https://[a-zA-Z_0-9.=-]+/reset/\\?key=[a-zA-Z_0-9.\\-\\\\&_=]+';
     return this.getMatchingURLFromEmailBody(email, resetLinkRegex);
   }
 
-  async isTeamInvitationEmailReceived(inviteeEmail: string, inviterEmail: string) {
+  async isTeamInvitationEmailReceived(inviteeEmail: string, inviterEmail: string): Promise<boolean> {
     const timeoutLimit = 30000;
     const delayBetweenAttempts = 500;
     const maxAttempts = timeoutLimit / delayBetweenAttempts;
@@ -97,7 +98,7 @@ export class InbucketClientE2E {
     return false;
   }
 
-  async isPaymentConfirmationEmailReceived(teamOwner: User) {
+  async isPaymentConfirmationEmailReceived(teamOwner: User): Promise<boolean> {
     const timeoutLimit = 30000;
     const delayBetweenAttempts = 500;
     const maxAttempts = timeoutLimit / delayBetweenAttempts;
@@ -140,7 +141,7 @@ export class InbucketClientE2E {
     return false;
   }
 
-  private async getMatchingURLFromEmailBody(email: string, regex: string) {
+  private async getMatchingURLFromEmailBody(email: string, regex: string): Promise<string> {
     let matchingUrl;
 
     let timeout = 0;
@@ -166,7 +167,7 @@ export class InbucketClientE2E {
     return matchingUrl;
   }
 
-  async getLatestEmail(email: string) {
+  async getLatestEmail(email: string): GetLatestEmailResult {
     return await this.axiosInstance.get<{subject: string; body: {text: string}}>(`/api/v1/mailbox/${email}/latest`, {
       headers: {
         Authorization: this.authHeader,

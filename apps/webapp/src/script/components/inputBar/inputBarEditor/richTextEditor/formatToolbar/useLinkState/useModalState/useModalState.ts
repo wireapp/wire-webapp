@@ -19,7 +19,8 @@
 
 import {useMemo, useState} from 'react';
 
-export const useModalState = () => {
+type UseModalStateResult = {isOpen: boolean; open: () => void; close: () => void};
+export const useModalState = (): UseModalStateResult => {
   const [isOpen, setIsOpen] = useState(false);
 
   return useMemo(() => {

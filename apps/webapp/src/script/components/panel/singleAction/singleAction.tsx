@@ -17,11 +17,13 @@
  *
  */
 
-import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {singleActionButtonStyle} from './singleAction.styles';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {FlexBox} from '../../../uiKit/layout/flexBox/flexBox';
 
 interface MenuItem {
   click: () => void;
@@ -36,7 +38,11 @@ interface SingleActionProps {
   oneButtonPerRow?: boolean;
 }
 
-const SingleAction = ({item, onCancel, oneButtonPerRow = false}: SingleActionProps) => {
+const SingleAction: FunctionComponent<SingleActionProps> = ({
+  item,
+  onCancel,
+  oneButtonPerRow = false,
+}: SingleActionProps) => {
   const {translate} = useApplicationContext();
   return (
     <FlexBox

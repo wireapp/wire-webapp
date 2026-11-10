@@ -20,23 +20,38 @@
 import {render} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
-import * as Icon from 'Components/icon';
-import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {translateForTest} from 'Util/test/translateForTest';
+import * as Icon from '../../../../../components/icon';
+import {createLabel, LabelType} from '../../../../../repositories/conversation/ConversationLabelRepository';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {TestFactory} from 'test/helper/TestFactory';
+} from '../../../../testSupport/rootContextTestSupport';
+import {TestFactory} from '../../../../../../../test/helper/TestFactory';
 
 import {ConversationFolderTab} from './conversationFolderTab';
 
 import {SidebarTabs} from '../useSidebarStore';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import type {JSX} from '@emotion/react/jsx-runtime';
+import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 
-const getProps = async (conversations: Conversation[] = []) => {
-  const testFactory = new TestFactory();
+type GetPropsResult = Promise<{
+  props: {
+    title: string;
+    label: string;
+    type: SidebarTabs;
+    conversationTabIndex: number;
+    onChangeTab: (..._args: unknown[]) => void;
+    Icon: JSX.Element;
+    conversationRepository: ConversationRepository;
+    unreadConversations: Conversation[];
+    dataUieName: string;
+  };
+  conversationRepository: ConversationRepository;
+}>;
+async function getProps(testFactory: TestFactory, conversations: Conversation[] = []): GetPropsResult {
   const conversationRepository = await testFactory.exposeConversationActors();
 
   conversationRepository['conversationState'].conversations(conversations);
@@ -55,20 +70,24 @@ const getProps = async (conversations: Conversation[] = []) => {
     },
     conversationRepository,
   };
-};
+}
 
 describe('ConversationFolderTab', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),
   );
   it('should render empty folders list', async () => {
-    const {props} = await getProps();
+    using testFactory = new TestFactory();
+
+    const {props} = await getProps(testFactory);
     const {getByText} = render(<ConversationFolderTab {...props} />, {wrapper: rootProviderWrapper});
 
     expect(getByText('conversationFoldersEmptyText')).toBeDefined();
   });
 
   it('should list custom folders only', async () => {
+    using testFactory = new TestFactory();
+
     const favoriteConversation = new Conversation('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     favoriteConversation.name('favoriteConversation');
 
@@ -80,7 +99,10 @@ describe('ConversationFolderTab', () => {
     );
     customFolderConversation.name('customFolderConversation');
 
-    const {props, conversationRepository} = await getProps([favoriteConversation, customFolderConversation]);
+    const {props, conversationRepository} = await getProps(testFactory, [
+      favoriteConversation,
+      customFolderConversation,
+    ]);
     conversationRepository['conversationLabelRepository'].addConversationToFavorites(favoriteConversation);
 
     const customFolderName = 'customFolder';

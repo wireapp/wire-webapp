@@ -17,9 +17,9 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, Team} from 'test/e2e_tests/test.fixtures';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, expect, withLogin, Team} from '../../test.fixtures';
 import {connectWithUser, createGroup} from '../../utils/userActions';
 
 test.describe('Ping', () => {

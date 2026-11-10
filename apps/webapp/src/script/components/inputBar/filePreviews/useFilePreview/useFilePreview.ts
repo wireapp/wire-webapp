@@ -20,12 +20,12 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {FileWithPreview, useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
-import {buildCellsUploadPath} from 'Components/conversation/utils/buildCellsUploadPath';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
+import {Config} from '../../../../Config';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {getFileExtension, trimFileExtension, formatBytes} from '../../../../util/util';
+import {FileWithPreview, useFileUploadState} from '../../../conversation/useFilesUploadState/useFilesUploadState';
+import {buildCellsUploadPath} from '../../../conversation/utils/buildCellsUploadPath';
 
 interface FilePreviewParams {
   file: FileWithPreview;
@@ -34,7 +34,20 @@ interface FilePreviewParams {
   conversationQualifiedId: QualifiedId;
 }
 
-export const useFilePreview = ({file, cellsRepository, conversationId, conversationQualifiedId}: FilePreviewParams) => {
+type UseFilePreviewResult = {
+  name: string;
+  extension: string;
+  size: string;
+  isError: boolean;
+  handleDelete: () => void;
+  handleRetry: () => Promise<void>;
+};
+export const useFilePreview = ({
+  file,
+  cellsRepository,
+  conversationId,
+  conversationQualifiedId,
+}: FilePreviewParams): UseFilePreviewResult => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const {deleteFile, updateFile} = useFileUploadState();
 
@@ -47,12 +60,12 @@ export const useFilePreview = ({file, cellsRepository, conversationId, conversat
 
   const transformedName = isError ? `Upload failed: ${name}` : name;
 
-  const cancelUpload = () => {
+  const cancelUpload = (): void => {
     cellsRepository.cancelUpload(file.id);
     deleteFile({conversationId, fileId: file.id});
   };
 
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     if (isNonEmptyString(file.preview)) {
       URL.revokeObjectURL(file.preview);
     }
@@ -68,7 +81,7 @@ export const useFilePreview = ({file, cellsRepository, conversationId, conversat
     });
   };
 
-  const handleRetry = async () => {
+  const handleRetry = async (): Promise<void> => {
     try {
       updateFile({conversationId, fileId: file.id, data: {uploadStatus: 'uploading'}});
       const path = buildCellsUploadPath({
@@ -88,7 +101,7 @@ export const useFilePreview = ({file, cellsRepository, conversationId, conversat
         fileId: file.id,
         data: {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'},
       });
-    } catch (error: unknown) {
+    } catch {
       updateFile({conversationId, fileId: file.id, data: {uploadStatus: 'error'}});
     }
   };

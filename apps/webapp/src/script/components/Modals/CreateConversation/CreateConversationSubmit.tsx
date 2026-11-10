@@ -17,17 +17,18 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {useCreateConversation} from './hooks/useCreateConversation';
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
 import {getNonFederatingParticipantsModalCopy} from './utils';
 
-export const CreateConversationSubmit = () => {
+import {useApplicationContext} from '../../../page/rootProvider';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+
+export const CreateConversationSubmit: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {error, conversationName} = useCreateConversationModal();
   const nonFederatingParticipantsModalCopy = getNonFederatingParticipantsModalCopy(translate);

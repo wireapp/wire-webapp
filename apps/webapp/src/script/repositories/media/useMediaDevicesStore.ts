@@ -22,7 +22,7 @@ import {useStore} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
 
-import type {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
+import type {ElectronDesktopCapturerSource} from './MediaDevicesHandler';
 
 export const defaultAudioInputId = 'default';
 export const defaultAudioOutputId = 'default';
@@ -112,7 +112,7 @@ export type MediaDevicesState = {
 };
 
 export const mediaDevicesStore = createStore<MediaDevicesState>()(
-  immer<MediaDevicesState>((set, get) => {
+  immer<MediaDevicesState>(set => {
     return {
       audio: {
         input: {devices: [], activeId: defaultAudioInputId, preferredId: defaultAudioInputId, supported: false},

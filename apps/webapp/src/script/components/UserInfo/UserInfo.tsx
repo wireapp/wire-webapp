@@ -17,16 +17,16 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
-import {selfIndicator} from 'Components/participantItemContent/participantItem.styles';
-import {UserName} from 'Components/UserName';
-import {User} from 'Repositories/entity/User';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {KEY} from 'Util/keyboardUtil';
+import {User} from '../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {KEY} from '../../util/keyboardUtil';
+import {selfIndicator} from '../participantItemContent/participantItem.styles';
+import {UserName} from '../UserName';
 
 interface UserInfoProps {
   user: User;
@@ -45,7 +45,7 @@ const buttonCommonStyles: CSSObject = {
   textTransform: 'uppercase',
 };
 
-export const UserInfo = ({
+export const UserInfo: FunctionComponent<UserInfoProps> = ({
   user,
   className,
   dataUieName,
@@ -57,7 +57,7 @@ export const UserInfo = ({
 }: UserInfoProps) => {
   const {name} = useKoSubscribableChildren(user, ['name']);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>): void => {
     const {key} = event;
     if (key === KEY.ENTER || key === KEY.SPACE) {
       const {top, left, height} = (event.target as Element).getBoundingClientRect();

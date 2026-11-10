@@ -19,8 +19,6 @@
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
-import type {Translate} from 'Util/localizerUtil';
-
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {
   filterSharedDriveUploadFiles,
@@ -28,6 +26,8 @@ import {
   type SharedDriveUploadRejectionReason,
   validateSharedDriveUploadFiles,
 } from './sharedDriveUploadValidation';
+
+import type {Translate} from '../../../util/localizerUtil';
 
 export type SharedDriveDropRejectionReason = SharedDriveUploadRejectionReason | 'readFailed';
 export type SharedDriveDropRejection =
@@ -115,6 +115,14 @@ export const getSharedDriveDropRejectionFeedback = (
       title: translate('conversationFileUploadFailedHeading'),
       message: translate('sharedDriveDropUnsupportedFileMessage'),
       invalidFiles: [...invalidFiles],
+    };
+  }
+
+  if (reason === 'invalidName') {
+    return {
+      title: translate('conversationFileUploadFailedHeading'),
+      message: translate('cells.nodeName.invalidCharactersError'),
+      invalidFiles: [],
     };
   }
 

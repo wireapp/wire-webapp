@@ -17,10 +17,7 @@
  *
  */
 
-import {Link, LinkVariant, ShieldIcon} from '@wireapp/react-ui-kit';
-
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {
   e2eMessageContainerCss,
@@ -32,11 +29,18 @@ import {
   e2eMessageContentLinkCss,
 } from './e2eEncryptionMessage.styles';
 
+import {Config} from '../../../../Config';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {ShieldIcon} from '../../../../uiKit/dataDisplay/icon/shieldIcon';
+import {Link, LinkVariant} from '../../../../uiKit/typography/link/link';
+
 interface E2eEncryptionMessageProps {
   isCellsConversation: boolean;
 }
 
-export const E2eEncryptionMessage = ({isCellsConversation}: E2eEncryptionMessageProps) => {
+export const E2eEncryptionMessage: FunctionComponent<E2eEncryptionMessageProps> = ({
+  isCellsConversation,
+}: E2eEncryptionMessageProps) => {
   const {translate} = useApplicationContext();
 
   return (

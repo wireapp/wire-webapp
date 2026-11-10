@@ -19,30 +19,39 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import configureStore from 'redux-mock-store';
+import createMockStore, {type MockStoreCreator} from 'redux-mock-store';
 import {withExtraArgument} from 'redux-thunk';
 
-import {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '@wireapp/api-client';
 import type {TypeUtil} from '@wireapp/commons';
-import {Account} from '@wireapp/core';
+import type {Account} from '../../../core';
 
 import {ActionRoot, actionRoot} from '../../module/action/';
 import type {RootState, ThunkDispatch} from '../../module/reducer';
 
-interface MockStoreParameters {
-  clock?: Clock;
-  actions?: TypeUtil.RecursivePartial<ActionRoot>;
-  apiClient?: TypeUtil.RecursivePartial<APIClient>;
-  core?: TypeUtil.RecursivePartial<Account>;
-  getConfig?: () => any;
-  localStorage?: Storage;
-}
+type MockStoreOptions = {
+  readonly clock?: Clock;
+  readonly actions?: TypeUtil.RecursivePartial<ActionRoot>;
+  readonly apiClient?: TypeUtil.RecursivePartial<APIClient>;
+  readonly core?: TypeUtil.RecursivePartial<Account>;
+  readonly getConfig?: () => MockAuthConfig;
+  readonly localStorage?: Storage;
+};
 
-const defaultActions = actionRoot;
-const defaultClient = new APIClient({urls: APIClient.BACKEND.STAGING});
-const defaultCore = new Account(defaultClient);
-const defaultLocalStorage = window.localStorage;
-const defaultGetConfig = () => {
+type MockAuthConfig = {
+  APP_INSTANCE_ID: string;
+  FEATURE: {
+    CHECK_CONSENT: boolean;
+    DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
+    ENABLE_ACCOUNT_REGISTRATION: boolean;
+    ENABLE_DEBUG: boolean;
+    ENABLE_SSO: boolean;
+  };
+};
+
+type MockStoreMiddleware = NonNullable<Parameters<typeof createMockStore>[0]>[number];
+
+function defaultGetConfig(): MockAuthConfig {
   return {
     APP_INSTANCE_ID: 'app-id',
     FEATURE: {
@@ -53,36 +62,29 @@ const defaultGetConfig = () => {
       ENABLE_SSO: true,
     },
   };
-};
+}
 
-export const mockStoreFactory = (
-  parameters: MockStoreParameters = {
-    actions: defaultActions,
-    apiClient: defaultClient,
-    core: defaultCore,
-    getConfig: defaultGetConfig,
-    localStorage: defaultLocalStorage,
-  },
-) => {
+export function mockStoreFactory(
+  options: MockStoreOptions = {},
+): MockStoreCreator<TypeUtil.RecursivePartial<RootState>, ThunkDispatch> {
   const {
-    actions,
-    apiClient,
-    core,
-    getConfig,
-    localStorage,
+    actions = actionRoot,
+    apiClient = {},
+    core = {},
+    getConfig = defaultGetConfig,
+    localStorage = window.localStorage,
     clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
-  } = parameters;
-  if (core) {
-    (core as any).apiClient = apiClient;
-  }
-  return configureStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
+  } = options;
+
+  return createMockStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
+    // redux-mock-store declares Redux 4 middleware while redux-thunk uses Redux 5.
     withExtraArgument({
       clock,
       actions,
       apiClient,
       core,
-      getConfig: getConfig || defaultGetConfig,
+      getConfig,
       localStorage,
-    }) as any,
+    }) as unknown as MockStoreMiddleware,
   ]);
-};
+}

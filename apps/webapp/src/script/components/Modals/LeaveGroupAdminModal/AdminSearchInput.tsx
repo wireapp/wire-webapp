@@ -17,14 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {FormatOptionLabelMeta} from 'react-select';
-
-import {Option, Select} from '@wireapp/react-ui-kit';
-
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import type {User} from 'Repositories/entity/User';
-import type {Translate} from 'Util/localizerUtil';
 
 import {
   checkboxStyles,
@@ -41,6 +38,11 @@ import {
   userNameStyles,
 } from './styles';
 
+import type {User} from '../../../repositories/entity/User';
+import {Option, Select} from '../../../uiKit/inputs/select/select';
+import type {Translate} from '../../../util/localizerUtil';
+import {Avatar, AVATAR_SIZE} from '../../avatar';
+
 interface AdminSearchInputProps {
   readonly translate: Translate;
   clearContent: boolean;
@@ -50,7 +52,7 @@ interface AdminSearchInputProps {
   onUserSelect: (user: User | null) => void;
 }
 
-export const AdminSearchInput = ({
+export const AdminSearchInput: FunctionComponent<AdminSearchInputProps> = ({
   translate,
   clearContent,
   eligibleUsers,
@@ -67,7 +69,7 @@ export const AdminSearchInput = ({
       }) ?? null)
     : null;
 
-  const handleChange = (option: Option | null) => {
+  const handleChange = (option: Option | null): void => {
     if (isNullOrUndefined(option)) {
       onUserSelect(null);
       return;
@@ -80,7 +82,7 @@ export const AdminSearchInput = ({
     }
   };
 
-  const formatOptionLabel = (option: Option, meta: FormatOptionLabelMeta<Option>) => {
+  const formatOptionLabel = (option: Option, meta: FormatOptionLabelMeta<Option>): JSX.Element => {
     const user = eligibleUsers.find(usr => {
       return usr.id === option.value;
     });

@@ -17,18 +17,20 @@
  *
  */
 
-import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
+import type {FunctionComponent} from 'react';
 
+import {buttonStyles, iconStyles} from './fileAssetOptions.styles';
+
+import {useApplicationContext} from '../../../../../../../../../page/rootProvider';
+import {MoreIcon} from '../../../../../../../../../uiKit/dataDisplay/icon/moreIcon';
+import {DropdownMenu} from '../../../../../../../../../uiKit/surface/dropdownMenu/dropdownMenu';
+import {isFileEditable} from '../../../../../../../../../util/fileTypeUtil';
+import {forcedDownloadFile, getFileNameWithExtension} from '../../../../../../../../../util/util';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isFileEditable} from 'Util/fileTypeUtil';
-import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
-
-import {buttonStyles, iconStyles} from './fileAssetOptions.styles';
+} from '../../../../../../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {useFileHistoryModal} from '../../../../../../../../Modals/FileHistoryModal/hooks/useFileHistoryModal';
 
 interface FileAssetOptionsProps {
   src?: string;
@@ -38,7 +40,13 @@ interface FileAssetOptionsProps {
   id: string;
 }
 
-export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOptionsProps) => {
+export const FileAssetOptions: FunctionComponent<FileAssetOptionsProps> = ({
+  id,
+  onOpen,
+  src,
+  name,
+  extension,
+}: FileAssetOptionsProps) => {
   const {translate} = useApplicationContext();
   const canPerformCellsAction = useCellsActionPermissions();
   const fileNameWithExtension = getFileNameWithExtension(name, extension);

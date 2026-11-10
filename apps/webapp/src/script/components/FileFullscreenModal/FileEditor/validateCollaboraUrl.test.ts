@@ -18,7 +18,7 @@
  */
 
 import {Maybe} from 'true-myth';
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {unwrap, unwrapErr} from '../../../util/test/resultTestSupport';
 
 import {validateCollaboraUrl} from './validateCollaboraUrl';
 

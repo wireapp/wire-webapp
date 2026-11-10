@@ -29,25 +29,24 @@ import {
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {loadFeatureConfig, saveFeatureConfig} from './featureConfigChangeNotifier.store';
+
+import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';
 import type {
   PrimaryModalTranslatedComponent,
   PrimaryModalTranslatedTranslation,
   PrimaryModalTranslatedValue,
-} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {type TranslationKey} from 'Util/localizerUtil';
-import {getLogger} from 'Util/logger';
-import {formatDuration} from 'Util/timeUtil';
-
-import {loadFeatureConfig, saveFeatureConfig} from './featureConfigChangeNotifier.store';
-
+} from '../../../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {ButtonAction} from '../../../../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from '../../../../Config';
+import {TeamState} from '../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {type TranslationKey} from '../../../../util/localizerUtil';
+import {getLogger} from '../../../../util/logger';
+import {formatDuration} from '../../../../util/timeUtil';
+import {WebAppEvents} from '../../../../webAppEvents';
+import {useApplicationContext} from '../../../rootProvider';
 
 type Features =
   | 'FileSharing'

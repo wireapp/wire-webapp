@@ -20,12 +20,12 @@
 import {isNonEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
 import type {MessageSendingStatus, QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClientsUtil';
-import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {difference, intersection} from 'underscore';
 
-import {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import {flattenUserMap} from '../../core/conversation/message/userClientsUtil';
+import {isQualifiedUserClients} from '../../core/util';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {User} from '../entity/User';
 
 type UserClient = {clients: string[]; userId: QualifiedId};
 
@@ -50,13 +50,12 @@ type ClientDiff = {
 export function extractClientDiff(
   {deleted = {}, redundant = {}, missing = {}}: Partial<MessageSendingStatus>,
   users?: User[],
-  defaultDomain: string = '',
 ): ClientDiff {
   const allDeleted = {...deleted, ...redundant} as QualifiedUserClients;
   const deletedClients = flattenUserMap(allDeleted);
   const missingClients = flattenUserMap(missing);
 
-  const toClientDiff = ({userId, data}: {data: string[]; userId: QualifiedId}) => {
+  const toClientDiff = ({userId, data}: {data: string[]; userId: QualifiedId}): UserClient => {
     return {clients: data, userId};
   };
 

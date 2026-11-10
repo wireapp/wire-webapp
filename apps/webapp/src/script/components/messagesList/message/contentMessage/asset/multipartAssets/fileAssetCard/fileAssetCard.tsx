@@ -17,10 +17,12 @@
  *
  */
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {FileAssetSmall} from './fileAssetSmall/fileAssetSmall';
 import {FileAssetWithPreview} from './fileAssetWithPreview/fileAssetWithPreview';
+
+import {useApplicationContext} from '../../../../../../../page/rootProvider';
 
 interface FileAssetCardProps {
   src?: string;
@@ -37,7 +39,7 @@ interface FileAssetCardProps {
   id: string;
 }
 
-export const FileAssetCard = ({
+export const FileAssetCard: FunctionComponent<FileAssetCardProps> = ({
   src,
   variant,
   extension,

@@ -45,23 +45,6 @@ import {container} from 'tsyringe';
 import {Cancelable, debounce} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {ClientRepository} from 'Repositories/client';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
-import {ConversationRepository, CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
-import {isProteusTeam1to1Conversation, isSelfConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
-import {TeamState} from 'Repositories/team/TeamState';
-import type {Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {truncate} from 'Util/stringUtil';
 
 import {CallMessage} from './message/callMessage';
 import type {ContentMessage} from './message/contentMessage';
@@ -69,11 +52,27 @@ import type {Message} from './message/message';
 import {PingMessage} from './message/pingMessage';
 import type {User} from './User';
 
+import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/Message';
 import {StatusType} from '../../message/statusType';
 import {ContentState, useAppState} from '../../page/useAppState';
+import type {Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {truncate} from '../../util/stringUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import {ClientRepository} from '../client';
+import {ConnectionEntity} from '../connection/connectionEntity';
+import {ACCESS_STATE} from '../conversation/AccessState';
+import {ConversationRepository, CONVERSATION_READONLY_STATE} from '../conversation/ConversationRepository';
+import {isProteusTeam1to1Conversation, isSelfConversation} from '../conversation/ConversationSelectors';
+import {ConversationStatus} from '../conversation/ConversationStatus';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
+import {ConversationRecord} from '../storage/record/conversationRecord';
+import {TeamState} from '../team/TeamState';
 
 const userSearchDebounceInMilliseconds = 100;
 const decimalRadix = 10;
@@ -750,13 +749,13 @@ export class Conversation {
     return {domain: this.domain, id: this.id};
   }
 
-  private hasInitializedUsers() {
+  private hasInitializedUsers(): boolean {
     const hasMappedUsers =
       isNonEmptyArray(this.participating_user_ets()) || isEmptyArray(this.participating_user_ids());
     return !isUndefined(this.selfUser()) && hasMappedUsers;
   }
 
-  private _initSubscriptions() {
+  private _initSubscriptions(): void {
     [
       this.archivedState,
       this.readOnlyState,
@@ -809,7 +808,7 @@ export class Conversation {
     }
   }
 
-  public isAdmin(userId: QualifiedId) {
+  public isAdmin(userId: QualifiedId): boolean {
     return this.roles()[userId.id] === DefaultConversationRoleName.WIRE_ADMIN;
   }
 
@@ -886,10 +885,10 @@ export class Conversation {
       return;
     }
 
-    const messageWithLinkPreview = () => {
+    const messageWithLinkPreview = (): Message => {
       return this._findDuplicate(messageEntity.id, messageEntity.from);
     };
-    const editedMessage = () => {
+    const editedMessage = (): Message | undefined => {
       const replacingMessageId = (messageEntity as ContentMessage).replacing_message_id;
       return replacingMessageId !== undefined ? this._findDuplicate(replacingMessageId, messageEntity.from) : undefined;
     };

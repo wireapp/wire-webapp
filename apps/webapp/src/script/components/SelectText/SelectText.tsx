@@ -17,13 +17,12 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {TabIndex} from '../../uiKit/utils/enums';
+import {handleKeyDown, KEY} from '../../util/keyboardUtil';
 
 interface SelectTextProps {
   text: string;
@@ -31,8 +30,12 @@ interface SelectTextProps {
   dataUieName?: string;
 }
 
-export const SelectText = ({text, className = '', dataUieName = 'select-text'}: SelectTextProps) => {
-  const onClick = ({currentTarget}: React.UIEvent) => {
+export const SelectText: FunctionComponent<SelectTextProps> = ({
+  text,
+  className = '',
+  dataUieName = 'select-text',
+}: SelectTextProps) => {
+  const onClick = ({currentTarget}: React.UIEvent): void => {
     if (typeof window.getSelection === 'function') {
       const selectionRange = document.createRange();
       selectionRange.selectNode(currentTarget);

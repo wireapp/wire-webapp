@@ -19,16 +19,14 @@
 
 import {act, renderHook, waitFor} from '@testing-library/react';
 import ko from 'knockout';
-import {noop} from 'noop-esm';
 
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {AssetRemoteData} from '../../../../../../../repositories/assets/assetRemoteData';
+import {AssetRepository} from '../../../../../../../repositories/assets/assetRepository';
+import {AssetTransferState} from '../../../../../../../repositories/assets/assetTransferState';
+import {ContentMessage} from '../../../../../../../repositories/entity/message/contentMessage';
+import {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
+import {createUuid} from '../../../../../../../util/uuid';
 
 import {useAssetTransfer} from './useAssetTransfer';
 
@@ -49,7 +47,6 @@ describe('useAssetTransfer', () => {
     assetKey: 'assetKey',
     assetDomain: 'domain',
     assetToken: 'assetToken',
-    forceCaching: false,
   });
 
   beforeEach(() => {

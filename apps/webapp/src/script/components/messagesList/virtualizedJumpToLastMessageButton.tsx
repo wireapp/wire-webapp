@@ -17,19 +17,21 @@
  *
  */
 
-import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
+import type {FunctionComponent} from 'react';
 
-import {
-  jumpToLastMessageButtonStyles,
-  jumpToLastMessageChevronStyles,
-} from 'Components/messagesList/messageList.styles';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {jumpToLastMessageButtonStyles, jumpToLastMessageChevronStyles} from './messageList.styles';
+
+import {useApplicationContext} from '../../page/rootProvider';
+import {ChevronIcon} from '../../uiKit/dataDisplay/icon/chevronIcon';
+import {IconButton} from '../../uiKit/inputs/iconButton/iconButton';
 
 interface VirtualizedJumpToLastMessageButtonProps {
   onGoToLastMessage: () => void;
 }
 
-export const VirtualizedJumpToLastMessageButton = ({onGoToLastMessage}: VirtualizedJumpToLastMessageButtonProps) => {
+export const VirtualizedJumpToLastMessageButton: FunctionComponent<VirtualizedJumpToLastMessageButtonProps> = ({
+  onGoToLastMessage,
+}: VirtualizedJumpToLastMessageButtonProps) => {
   const {translate} = useApplicationContext();
   return (
     <IconButton

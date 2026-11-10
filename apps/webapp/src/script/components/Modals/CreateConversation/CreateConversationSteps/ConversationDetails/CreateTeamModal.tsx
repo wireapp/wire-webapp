@@ -17,12 +17,7 @@
  *
  */
 
-import {Button, Text} from '@wireapp/react-ui-kit';
-
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {useTeamCreationModal} from 'src/script/page/leftSidebar/panels/conversations/conversationTabs/teamCreation/useTeamCreationModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
+import type {FunctionComponent} from 'react';
 
 import {
   salesModalBodyButtonCss,
@@ -33,9 +28,15 @@ import {
   salesModalWrapperCss,
 } from './ConversationDetails.styles';
 
+import {useTeamCreationModal} from '../../../../../page/leftSidebar/panels/conversations/conversationTabs/teamCreation/useTeamCreationModal';
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {Button} from '../../../../../uiKit/inputs/button/button';
+import {Text} from '../../../../../uiKit/typography/text/text';
+import {handleEscDown, handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
+import {ModalComponent} from '../../../ModalComponent';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 
-export const CreateTeamModal = () => {
+export const CreateTeamModal: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {
     isCreateTeamModalOpen,
@@ -44,11 +45,11 @@ export const CreateTeamModal = () => {
   } = useCreateConversationModal();
   const {showModal: showTeamCreationModal} = useTeamCreationModal();
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     setIsCreateTeamModalOpen(false);
   };
 
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     setIsCreateTeamModalOpen(false);
     hideConversationCreationModal();
     showTeamCreationModal();

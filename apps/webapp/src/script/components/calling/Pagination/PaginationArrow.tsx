@@ -17,12 +17,14 @@
  *
  */
 
-import {ChevronIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import type {FunctionComponent} from 'react';
 
 import {chevronLeftStyles, chevronRightStyles, iconButtonStyles} from './Pagination.styles';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {ChevronIcon} from '../../../uiKit/dataDisplay/icon/chevronIcon';
+import {IconButton, IconButtonVariant} from '../../../uiKit/inputs/iconButton/iconButton';
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
 
 interface PaginationArrowProps {
   onClick: () => void;
@@ -31,7 +33,12 @@ interface PaginationArrowProps {
   'data-uie-name': string;
 }
 
-export const PaginationArrow = ({onClick, disabled, direction, 'data-uie-name': uieName}: PaginationArrowProps) => {
+export const PaginationArrow: FunctionComponent<PaginationArrowProps> = ({
+  onClick,
+  disabled,
+  direction,
+  'data-uie-name': uieName,
+}: PaginationArrowProps) => {
   const {translate} = useApplicationContext();
   const ariaLabel =
     direction === 'left' ? translate('paginationLeftArrowAriaLabel') : translate('paginationRightArrowAriaLabel');

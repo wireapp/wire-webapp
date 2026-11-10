@@ -17,33 +17,38 @@
  *
  */
 
-import {useRef} from 'react';
+import {type FunctionComponent, useCallback, useRef} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {maybe} from 'true-myth';
 
-import {modalWrapperStyles} from 'Components/meeting/shared/styles/meetingModalShell.styles';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
-import {handleEscDown} from 'Util/keyboardUtil';
-
 import {MeetingPrepSurface} from './meetingPrepSurface';
-import type {RequestMeetingPrepPreview} from './meetingPrepTypes';
+import {type MeetingPrepDeviceKind, meetingPrepDeviceKinds, type RequestMeetingPrepPreview} from './meetingPrepTypes';
 import {useMeetingPrepModal} from './useMeetingPrepModal';
 
+import {useApplicationContext} from '../../../page/rootProvider';
+import type {CallMediaChoice} from '../../../repositories/calling/callMediaChoice';
+import type {User} from '../../../repositories/entity/User';
+import {handleEscDown} from '../../../util/keyboardUtil';
+import {captureModalFocusContext} from '../../../util/modalFocusUtil';
+import {showNoAudioInputModal, showNoCameraModal} from '../../calling/devicePermissionModals';
+import {ModalComponent} from '../../Modals/ModalComponent';
+import {modalWrapperStyles} from '../shared/styles/meetingModalShell.styles';
+
 export type MeetingPrepModalProps = {
-  participantName: string;
+  participant: User;
   requestPreviewStream: RequestMeetingPrepPreview;
   releasePreviewStream: (stream: MediaStream) => void;
   joinMeeting: (qualifiedConversationId: QualifiedId, media: CallMediaChoice) => Promise<boolean>;
 };
 
-export const MeetingPrepModal = ({
-  participantName,
+export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
+  participant,
   requestPreviewStream,
   releasePreviewStream,
   joinMeeting,
 }: MeetingPrepModalProps) => {
+  const {translate} = useApplicationContext();
   const session = useMeetingPrepModal(state => {
     return state.session;
   });
@@ -52,12 +57,28 @@ export const MeetingPrepModal = ({
   });
   const isJoiningRef = useRef(false);
 
-  const requestClose = () => {
+  const requestClose = (): void => {
     if (isJoiningRef.current) {
       return;
     }
     close();
   };
+
+  const handlePermissionDenied = useCallback(
+    (kind: MeetingPrepDeviceKind): void => {
+      const focusContext = captureModalFocusContext();
+      const modalFocusContext = {
+        container: focusContext.container,
+        close: focusContext.createFocusRestorationCallback(),
+      };
+      if (kind === meetingPrepDeviceKinds.camera) {
+        showNoCameraModal(translate, modalFocusContext);
+      } else {
+        showNoAudioInputModal(translate, modalFocusContext);
+      }
+    },
+    [translate],
+  );
 
   return (
     <ModalComponent
@@ -74,8 +95,9 @@ export const MeetingPrepModal = ({
         <MeetingPrepSurface
           meetingTitle={session.value.meetingTitle}
           meetingStartTime={session.value.meetingStartTime}
-          participantName={participantName}
+          participant={participant}
           onCancel={requestClose}
+          onPermissionDenied={handlePermissionDenied}
           onJoin={async choice => {
             isJoiningRef.current = true;
             try {

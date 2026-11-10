@@ -19,6 +19,7 @@
 
 import {AxiosHeaders} from 'axios';
 import {
+  BackgroundActionInfoNameEnum,
   NodeServiceApi,
   LookupFilterMetaFilter,
   RestLookupRequest,
@@ -33,6 +34,7 @@ import {
   RestIncomingNode,
   RestNodeLocator,
   RestActionOptionsCopyMove,
+  RestBackgroundAction,
   RestNamespaceValuesResponse,
   GetByUuidFlagsEnum,
 } from 'cells-sdk-ts';
@@ -62,6 +64,31 @@ const uploadNetworkRetryConfig = {
     retries: 3,
   },
 } as const;
+
+// A lost response does not mean the mutation failed. Never replay a bulk mutation automatically.
+const bulkMutationNetworkRetryConfig = {
+  'axios-retry': {
+    retries: 0,
+  },
+} as const;
+
+const getNodeUuidLocators = (uuids: readonly string[]): RestNodeLocator[] => {
+  const uniqueUuids = [
+    ...new Set(
+      uuids.filter(uuid => {
+        return uuid.trim().length > 0;
+      }),
+    ),
+  ];
+
+  if (uniqueUuids.length === 0) {
+    throw new Error('At least one non-empty node UUID is required');
+  }
+
+  return uniqueUuids.map(Uuid => {
+    return {Uuid};
+  });
+};
 
 // Each selected tag is sent as its own metadata filter with the `Should` operation so the
 // backend applies OR semantics across tags (a node matching any selected tag is returned).
@@ -121,7 +148,7 @@ export class CellsAPI {
     cellsConfig: CellsConfig;
     httpClient?: HttpClient;
     storageService?: CellsStorage;
-  }) {
+  }): void {
     const http = httpClient !== undefined ? httpClient : this.getHttpClient({cellsConfig});
 
     this.storageService =
@@ -134,7 +161,7 @@ export class CellsAPI {
     this.client = new NodeServiceApi(undefined, undefined, http.client);
   }
 
-  private getHttpClient({cellsConfig}: {cellsConfig: CellsConfig}) {
+  private getHttpClient({cellsConfig}: {cellsConfig: CellsConfig}): HttpClient {
     const baseHttpClientConfig = {
       ...this.httpClientConfig,
       urls: {...this.httpClientConfig.urls, rest: cellsConfig.pydio.url + cellsConfig.pydio.segment},
@@ -323,6 +350,27 @@ export class CellsAPI {
     return result.data;
   }
 
+  async deleteNodes({
+    uuids,
+    permanently = false,
+  }: {
+    uuids: readonly string[];
+    permanently?: boolean;
+  }): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction(
+      'delete',
+      {Nodes: getNodeUuidLocators(uuids), DeleteOptions: {PermanentDelete: permanently}},
+      undefined,
+      bulkMutationNetworkRetryConfig,
+    );
+
+    return result.data;
+  }
+
   async moveNode({
     currentPath,
     targetPath,
@@ -344,12 +392,65 @@ export class CellsAPI {
     return result.data;
   }
 
+  async getBackgroundActionInfo({
+    name,
+    jobUuid,
+  }: {
+    name: BackgroundActionInfoNameEnum;
+    jobUuid: string;
+  }): Promise<RestBackgroundAction> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.backgroundActionInfo(name, jobUuid);
+    return result.data;
+  }
+
+  async moveNodes({
+    currentPaths,
+    targetPath,
+  }: {
+    currentPaths: RestNodeLocator['Path'][];
+    targetPath: RestActionOptionsCopyMove['TargetPath'];
+  }): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction('move', {
+      Nodes: currentPaths.map(Path => {
+        return {Path};
+      }),
+      CopyMoveOptions: {TargetIsParent: true, TargetPath: targetPath},
+      AwaitStatus: 'Finished',
+      AwaitTimeout: '5000ms',
+    });
+
+    return result.data;
+  }
+
   async restoreNode({uuid}: {uuid: string}): Promise<RestPerformActionResponse> {
     if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
     const result = await this.client.performAction('restore', {Nodes: [{Uuid: uuid}]});
+
+    return result.data;
+  }
+
+  async restoreNodes({uuids}: {uuids: readonly string[]}): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction(
+      'restore',
+      {Nodes: getNodeUuidLocators(uuids)},
+      undefined,
+      bulkMutationNetworkRetryConfig,
+    );
 
     return result.data;
   }

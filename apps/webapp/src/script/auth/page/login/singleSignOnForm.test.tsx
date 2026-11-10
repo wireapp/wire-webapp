@@ -17,12 +17,21 @@
  *
  */
 
-import {fireEvent, waitFor} from '@testing-library/react';
+import {fireEvent, render, waitFor} from '@testing-library/react';
+import {ClientType} from '@wireapp/api-client/lib/client';
 
 import {TypeUtil} from '@wireapp/commons';
 import {noop} from 'noop-esm';
+import {Provider} from 'react-redux';
+import {HashRouter as Router} from 'react-router';
 
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createExecutingFireAndForgetInvokerForTest,
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+  requireValueForTest,
+} from '../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {SingleSignOnForm} from './singleSignOnForm';
 
@@ -32,18 +41,7 @@ import {ValidationError} from '../../module/action/validationError';
 import {initialRootState} from '../../module/reducer';
 import {ROUTE, QUERY_KEY} from '../../route';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
-import {mountComponent} from '../../util/test/testUtil';
-
-jest.mock('@wireapp/react-ui-kit', () => {
-  const actualModule = jest.requireActual('@wireapp/react-ui-kit');
-
-  return {
-    ...actualModule,
-    Loading: () => {
-      return null;
-    },
-  };
-});
+import {mountComponent, withIntl, withThemeAndRootContext} from '../../util/test/testUtil';
 
 const codeOrEmailInputId = 'enter-code';
 const submitButtonId = 'do-sso-sign-in';
@@ -58,7 +56,7 @@ describe('SingleSignOnForm', () => {
       },
     });
 
-    const doLogin = jasmine.createSpy().and.returnValue((code: string) => {
+    const doLogin = jasmine.createSpy().and.returnValue(() => {
       return Promise.resolve();
     });
     const initialCode = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';
@@ -93,7 +91,7 @@ describe('SingleSignOnForm', () => {
     });
 
     const historyPushSpy = spyOn(history, 'pushState');
-    const doLogin = jasmine.createSpy().and.returnValue((code: string) => {
+    const doLogin = jasmine.createSpy().and.returnValue(() => {
       return Promise.resolve();
     });
     const code = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';
@@ -262,17 +260,20 @@ describe('SingleSignOnForm', () => {
           },
         }}
       />,
-      mockStoreFactory()(initialRootState),
+      mockStoreFactory()({
+        ...initialRootState,
+        authState: {...initialRootState.authState, loginData: {clientType: ClientType.TEMPORARY}},
+      }),
     );
 
     const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
     const submitButton = getByTestId(submitButtonId) as HTMLInputElement;
     const temporaryCheckbox = getByTestId(temporaryCheckboxId) as HTMLInputElement;
 
+    expect(temporaryCheckbox.checked).toBe(true);
     expect(submitButton.disabled).toBe(true);
 
     fireEvent.change(codeOrEmailInput, {target: {value: email}});
-    fireEvent.click(temporaryCheckbox);
 
     expect(submitButton.disabled).toBe(false);
 
@@ -281,6 +282,49 @@ describe('SingleSignOnForm', () => {
     await waitFor(() => {
       expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
       expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledWith(expectedHost);
+    });
+  });
+
+  it('stores the public computer choice in the shared login data', async () => {
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_DOMAIN_DISCOVERY: true,
+      },
+    });
+    spyOn(actionRoot.authAction, 'pushLoginData').and.returnValue(() => {
+      return Promise.resolve();
+    });
+
+    const rootProviderWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
+        translate: translateForTest,
+      }),
+    );
+
+    const {getByTestId} = render(
+      <Router>
+        {withThemeAndRootContext(
+          <Provider store={mockStoreFactory()(initialRootState)}>
+            {withIntl(
+              <SingleSignOnForm
+                {...{
+                  doLogin: () => {
+                    return Promise.resolve();
+                  },
+                }}
+              />,
+            )}
+          </Provider>,
+          rootProviderWrapper,
+        )}
+      </Router>,
+    );
+
+    fireEvent.click(getByTestId(temporaryCheckboxId));
+
+    await waitFor(() => {
+      expect(actionRoot.authAction.pushLoginData).toHaveBeenCalledWith({clientType: ClientType.TEMPORARY});
     });
   });
 });

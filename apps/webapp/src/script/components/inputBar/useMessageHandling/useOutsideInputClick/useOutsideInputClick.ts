@@ -19,14 +19,14 @@
 
 import {useEffect} from 'react';
 
-import {handleClickOutsideOfInputBar} from 'Components/inputBar/util/clickHandlers';
+import {handleClickOutsideOfInputBar} from '../../util/clickHandlers';
 
 interface UseOutsideInputClickParams {
   isEditing: boolean;
   callback: () => void;
 }
 
-export const useOutsideInputClick = ({isEditing, callback}: UseOutsideInputClickParams) => {
+export const useOutsideInputClick = ({isEditing, callback}: UseOutsideInputClickParams): void => {
   useEffect(() => {
     const onWindowClick = (event: Event): void => {
       return handleClickOutsideOfInputBar(event, () => {

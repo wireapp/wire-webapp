@@ -21,17 +21,16 @@ import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {ConversationVerificationBadges} from 'Components/badge';
-import * as Icon from 'Components/icon';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isEnterKey} from 'Util/keyboardUtil';
-import {removeLineBreaks} from 'Util/stringUtil';
-
+import {ConversationVerificationBadges} from '../../../../../components/badge';
+import * as Icon from '../../../../../components/icon';
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {User} from '../../../../../repositories/entity/User';
+import {ServiceEntity} from '../../../../../repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {isEnterKey} from '../../../../../util/keyboardUtil';
+import {removeLineBreaks} from '../../../../../util/stringUtil';
+import {useApplicationContext} from '../../../../rootProvider';
 import {GroupDetails} from '../groupDetails/groupDetails';
 
 interface ConversationDetailsHeaderProps {
@@ -68,19 +67,19 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
   const [groupName, setGroupName] = useState(displayName);
 
-  const clickToEditGroupName = () => {
+  const clickToEditGroupName = (): void => {
     if (isActiveGroupParticipant) {
       setIsEditingName(true);
     }
   };
 
-  const renameConversation = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  const renameConversation = (event: ChangeEvent<HTMLTextAreaElement>): void => {
     const {value: currentValue} = event.target;
 
     setGroupName(currentValue);
   };
 
-  const handleRenameConversation = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleRenameConversation = (event: KeyboardEvent<HTMLTextAreaElement>): void => {
     if (isEnterKey(event)) {
       event.preventDefault();
       const {value: currentValue} = event.currentTarget;

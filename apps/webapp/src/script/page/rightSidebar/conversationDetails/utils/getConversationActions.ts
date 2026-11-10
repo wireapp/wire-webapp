@@ -20,17 +20,15 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import * as Icon from 'Components/icon';
-import {MenuItem} from 'Components/panel/panelActions';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import * as UserPermission from 'Repositories/user/userPermission';
-import type {RootContextValue} from 'src/script/page/rootProvider';
-
+import * as Icon from '../../../../components/icon';
+import {MenuItem} from '../../../../components/panel/panelActions';
 import {Config} from '../../../../Config';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import * as UserPermission from '../../../../repositories/user/userPermission';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';
+import {WebAppEvents} from '../../../../webAppEvents';
+import type {RootContextValue} from '../../../rootProvider';
 
 interface GetConversationActionsParams {
   conversationEntity: Conversation;
@@ -63,7 +61,7 @@ const getConversationActions = ({
   const isSingleUser = is1to1Action || conversationEntity.isRequest();
   const userEntity = conversationEntity.firstUserEntity();
 
-  const getNextConversation = () => {
+  const getNextConversation = (): Conversation | undefined => {
     return conversationRepository.getNextConversation(conversationEntity);
   };
   const userPermissions = UserPermission.generatePermissionHelpers(teamRole);

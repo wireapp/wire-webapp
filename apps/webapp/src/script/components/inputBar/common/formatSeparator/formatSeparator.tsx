@@ -17,12 +17,14 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
 interface FormatSeparatorProps {
   isEditing?: boolean;
 }
 
-export const FormatSeparator = ({isEditing = false}: FormatSeparatorProps) => {
+export const FormatSeparator: FunctionComponent<FormatSeparatorProps> = ({isEditing = false}: FormatSeparatorProps) => {
   return <div className={cx('input-bar-control-separator', {'input-bar-control-separator--editing': isEditing})} />;
 };

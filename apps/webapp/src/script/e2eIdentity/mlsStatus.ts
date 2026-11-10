@@ -17,7 +17,7 @@
  *
  */
 
-import {DeviceStatus} from '@wireapp/core/lib/messagingProtocols/mls';
+import {DeviceStatus} from '../core/messagingProtocols/mls';
 
 export enum MLSStatuses {
   VALID = 'valid',
@@ -33,6 +33,6 @@ const statusMap: Record<DeviceStatus, MLSStatuses> = {
   [DeviceStatus.Revoked]: MLSStatuses.REVOKED,
 };
 
-export const mapMLSStatus = (status?: DeviceStatus) => {
+export const mapMLSStatus = (status?: DeviceStatus): MLSStatuses => {
   return status === undefined ? MLSStatuses.NOT_ACTIVATED : statusMap[status];
 };

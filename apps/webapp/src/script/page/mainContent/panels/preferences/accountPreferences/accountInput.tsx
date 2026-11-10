@@ -21,14 +21,12 @@ import {FC, InputHTMLAttributes, useEffect, useRef, useState} from 'react';
 
 import {isEmptyString, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {TextInput} from 'Components/TextInput';
-import {useIsMounted} from 'Util/useIsMounted';
-
+import * as Icon from '../../../../../components/icon';
+import {TextInput} from '../../../../../components/TextInput';
 import {MotionDuration} from '../../../../../motion/MotionDuration';
+import {IconButton, IconButtonVariant} from '../../../../../uiKit/inputs/iconButton/iconButton';
 import {isEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
+import {useIsMounted} from '../../../../../util/useIsMounted';
 
 const inputFeedbackDurationMultiplier = 2;
 
@@ -50,11 +48,12 @@ interface AccountInputProps extends InputHTMLAttributes<HTMLInputElement> {
   valueUie?: string;
 }
 
-export const useInputDone = () => {
+type UseInputDoneResult = {done: () => void; isDone: boolean};
+export const useInputDone = (): UseInputDoneResult => {
   const [isDone, setIsDone] = useState(false);
   const isMounted = useIsMounted();
 
-  const done = () => {
+  const done = (): void => {
     if (isMounted()) {
       setIsDone(true);
     }
@@ -95,7 +94,7 @@ const AccountInput: FC<AccountInputProps> = ({
   }, [value]);
 
   useEffect(() => {
-    const handleClickOutside = (event: any) => {
+    const handleClickOutside = (event: any): void => {
       if (inputWrapperRef.current !== null && !inputWrapperRef.current.contains(event.target)) {
         setInput(value);
         setIsEditingExternal?.(false);
@@ -110,7 +109,7 @@ const AccountInput: FC<AccountInputProps> = ({
     };
   }, []);
 
-  const updateInput = (value: string) => {
+  const updateInput = (value: string): void => {
     if (isNonEmptyString(allowedChars)) {
       value = value.replace(new RegExp(`[^${allowedChars}]`, 'g'), '');
     }

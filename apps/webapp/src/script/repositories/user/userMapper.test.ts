@@ -21,16 +21,16 @@ import {UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {User} from 'Repositories/entity/User';
-import {ACCENT_ID} from 'src/script/Config';
-import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {entities, payload} from 'test/api/payloads';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {User} from '../entity/User';
+import {ACCENT_ID} from '../../Config';
+import {serverTimeHandler} from '../../time/serverTimeHandler';
+import {entities, payload} from '../../../../test/api/payloads';
+import {translate} from '../../util/localizerUtil';
+import {createUuid} from '../../util/uuid';
 
 import {UserMapper} from './userMapper';
-import type {UserRecord} from 'Repositories/storage';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {UserRecord} from '../storage';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('User Mapper', () => {
   const mapper = new UserMapper(serverTimeHandler, translate);
@@ -198,7 +198,7 @@ describe('User Mapper', () => {
       const user_et = new User('', '', translateForTest);
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
-      const functionCall = () => {
+      const functionCall = (): User => {
         return mapper.updateUserFromObject(user_et, data, '');
       };
 

@@ -17,18 +17,20 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
-
-import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import {VerificationBadges} from 'Components/badge';
-import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/e2eIdentity';
-import {useCertificateStatus} from 'src/script/hooks/useCertificateStatus';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
 
 import {styles} from './e2eiCertificateDetails.styles';
 import {useCertificateDetailsModal} from './useCertificateDetailsModal';
+
+import {VerificationBadges} from '../../../../../../../components/badge';
+import {E2EIHandler, MLSStatuses, WireIdentity} from '../../../../../../../e2eIdentity';
+import {useCertificateStatus} from '../../../../../../../hooks/useCertificateStatus';
+import {Button, ButtonVariant} from '../../../../../../../uiKit/inputs/button/button';
+import {TabIndex} from '../../../../../../../uiKit/utils/enums';
+import {getLogger} from '../../../../../../../util/logger';
+import {useApplicationContext} from '../../../../../../rootProvider';
 
 const logger = getLogger('E2EICertificateDetails');
 
@@ -37,7 +39,10 @@ interface E2EICertificateDetailsProps {
   isCurrentDevice?: boolean;
 }
 
-export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertificateDetailsProps) => {
+export const E2EICertificateDetails: FunctionComponent<E2EICertificateDetailsProps> = ({
+  identity,
+  isCurrentDevice,
+}: E2EICertificateDetailsProps) => {
   const {translate} = useApplicationContext();
   const [certificate, status] = useCertificateStatus(identity, isCurrentDevice);
 
@@ -45,7 +50,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
 
   const showModal = useCertificateDetailsModal(certificate ?? '');
 
-  const getCertificate = async () => {
+  const getCertificate = async (): Promise<void> => {
     try {
       await E2EIHandler.getInstance().enroll({resetTimers: true});
     } catch (error: unknown) {

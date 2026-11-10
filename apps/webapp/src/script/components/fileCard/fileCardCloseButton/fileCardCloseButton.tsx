@@ -17,18 +17,22 @@
  *
  */
 
-import {CloseIcon} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {FunctionComponent} from 'react';
 
 import {buttonStyles} from './fileCardCloseButton.styles';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 
 interface FileCardCloseButtonProps {
   label?: string;
   onClose: () => void;
 }
 
-export const FileCardCloseButton = ({label, onClose}: FileCardCloseButtonProps) => {
+export const FileCardCloseButton: FunctionComponent<FileCardCloseButtonProps> = ({
+  label,
+  onClose,
+}: FileCardCloseButtonProps) => {
   const {translate} = useApplicationContext();
   const closeButtonLabel = label ?? translate('fileCardDefaultCloseButtonLabel');
 

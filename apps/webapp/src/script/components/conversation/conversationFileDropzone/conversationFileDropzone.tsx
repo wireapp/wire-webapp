@@ -17,15 +17,15 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
-import {DropzoneInputProps, DropzoneRootProps} from 'react-dropzone/.';
-
-import {DropFileArea} from 'Components/dropFileArea';
-import {incomingCssClass, removeAnimationsClass} from 'Util/util';
+import {DropzoneInputProps, DropzoneRootProps} from 'react-dropzone';
 
 import {FileDropzone} from './fileDropzone/fileDropzone';
+
+import {incomingCssClass, removeAnimationsClass} from '../../../util/util';
+import {DropFileArea} from '../../dropFileArea';
 
 interface ConversationFileDropzoneProps {
   isCellsEnabled: boolean;
@@ -40,7 +40,7 @@ interface ConversationFileDropzoneProps {
   children: ReactNode;
 }
 
-export const ConversationFileDropzone = ({
+export const ConversationFileDropzone: FunctionComponent<ConversationFileDropzoneProps> = ({
   isCellsEnabled,
   isConversationFileDropzoneEnabled,
   isConversationLoaded,

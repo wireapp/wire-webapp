@@ -19,17 +19,18 @@
 
 import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
+import {Maybe} from 'true-myth';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
+import {CellNode, CellNodeType} from '../../../../../../../../types/cellNode';
+import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
 import {useCellsRenameForm} from './useCellsRenameNodeForm';
 
 describe('useCellsRenameForm', () => {
   const renameNodeCopy = {
     error: 'cells.renameNodeModal.error',
-    invalidCharacters: 'cells.renameNodeModal.invalidCharacters',
+    invalidCharacters: 'cells.nodeName.invalidCharactersError',
     nameRequired: 'cells.renameNodeModal.nameRequired',
   };
   let mockCellsRepository: jest.Mocked<CellsRepository>;
@@ -41,6 +42,7 @@ describe('useCellsRenameForm', () => {
       name: 'Folder',
       path: '/Folder',
       sizeMb: '0',
+      sizeBytes: Maybe.nothing(),
       extension: '',
       uploadedAtTimestamp: 0,
       owner: 'owner-id',
@@ -54,7 +56,7 @@ describe('useCellsRenameForm', () => {
     };
   };
 
-  const createEvent = () => {
+  const createEvent = (): FormEvent<HTMLFormElement> => {
     return {preventDefault: jest.fn()} as unknown as FormEvent<HTMLFormElement>;
   };
 
@@ -107,6 +109,29 @@ describe('useCellsRenameForm', () => {
     });
   });
 
+  it('shows the full dotted folder name and preserves its suffix when renamed', async () => {
+    const node = createNode({name: 'folder.E', path: '/folder.E'});
+    const {result} = renderHook(() => {
+      return useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy});
+    });
+
+    expect(result.current.name).toBe('folder.E');
+    expect(result.current.isDisabled).toBe(true);
+
+    act(() => {
+      result.current.handleNameChange({currentTarget: {value: 'renamed.E'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleRename(createEvent());
+    });
+
+    expect(mockCellsRepository.renameNode).toHaveBeenCalledWith({
+      currentPath: '/folder.E',
+      newName: 'renamed.E',
+    });
+  });
+
   it('disables saving when the trimmed name matches the original', () => {
     const node = createNode({name: 'Folder'});
     const {result} = renderHook(() => {
@@ -139,7 +164,7 @@ describe('useCellsRenameForm', () => {
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
-  it('shows error when name contains invalid character "."', async () => {
+  it('allows dots when they are not at the beginning of the name', async () => {
     const node = createNode();
     const {result} = renderHook(() => {
       return useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy});
@@ -147,6 +172,28 @@ describe('useCellsRenameForm', () => {
 
     act(() => {
       result.current.handleNameChange({currentTarget: {value: 'New.Folder'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleRename(createEvent());
+    });
+
+    expect(result.current.error).toBeNull();
+    expect(mockCellsRepository.renameNode).toHaveBeenCalledWith({
+      currentPath: '/Folder',
+      newName: 'New.Folder',
+    });
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows error when the name starts with a dot', async () => {
+    const node = createNode();
+    const {result} = renderHook(() => {
+      return useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy});
+    });
+
+    act(() => {
+      result.current.handleNameChange({currentTarget: {value: '.hidden'}} as ChangeEvent<HTMLInputElement>);
     });
 
     await act(async () => {

@@ -1,0 +1,68 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {developmentLibraries, getSelectedLibraryWatchCommands} from './libraryWatchRecipes';
+
+describe('getSelectedLibraryWatchCommands', () => {
+  it('returns commands for selected libraries and keeps the existing defaults', () => {
+    const actualCommands = getSelectedLibraryWatchCommands({
+      libraryNames: ['api-client', 'config'],
+    });
+    const defaultSelections = developmentLibraries
+      .filter((library): boolean => {
+        return library.checked === true;
+      })
+      .map((library): string => {
+        return library.value;
+      });
+
+    expect(actualCommands).toEqual(['just watch-library api-client', 'just watch-library config']);
+    expect(defaultSelections).toEqual(['api-client']);
+  });
+
+  it('rejects unknown library names', () => {
+    expect(() => {
+      getSelectedLibraryWatchCommands({libraryNames: ['missing']});
+    }).toThrow('Unknown development library selection: missing');
+  });
+
+  it('rejects the removed storage engine workspace', () => {
+    expect(() => {
+      getSelectedLibraryWatchCommands({libraryNames: ['store-engine']});
+    }).toThrow('Unknown development library selection: store-engine');
+  });
+
+  it('rejects the removed core workspace', () => {
+    expect(() => {
+      getSelectedLibraryWatchCommands({libraryNames: ['core']});
+    }).toThrow('Unknown development library selection: core');
+  });
+
+  it('rejects the removed telemetry workspace', () => {
+    expect(() => {
+      getSelectedLibraryWatchCommands({libraryNames: ['telemetry']});
+    }).toThrow('Unknown development library selection: telemetry');
+  });
+
+  it('rejects the relocated UI kit as a library selection', () => {
+    expect(() => {
+      getSelectedLibraryWatchCommands({libraryNames: ['react-ui-kit']});
+    }).toThrow('Unknown development library selection: react-ui-kit');
+  });
+});

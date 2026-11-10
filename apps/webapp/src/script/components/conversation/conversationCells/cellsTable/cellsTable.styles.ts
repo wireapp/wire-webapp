@@ -32,6 +32,145 @@ export const wrapperWithRowsStyles: CSSObject = {
   marginBottom: 'auto',
 };
 
+export const selectionBarContainerStyles: CSSObject = {
+  position: 'relative',
+  width: '100%',
+  height: '42px',
+  pointerEvents: 'none',
+};
+
+export const moveOutcomeMessageStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  margin: '0 0 12px',
+  padding: '12px 16px',
+  border: '1px solid var(--border-color)',
+  borderRadius: '8px',
+  backgroundColor: 'var(--foreground-fade-8)',
+  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-small)',
+  lineHeight: 1.5,
+};
+
+export const selectionBarStyles: CSSObject = {
+  position: 'absolute',
+  zIndex: 1,
+  inset: 0,
+  display: 'flex',
+  width: '100%',
+  minWidth: 0,
+  height: '42px',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '0 8px',
+  borderRadius: '12px',
+  background: 'linear-gradient(var(--accent-color-fade-16), var(--accent-color-fade-16)), var(--modal-bg)',
+  color: 'var(--main-color)',
+  pointerEvents: 'auto',
+
+  '@media (forced-colors: active)': {
+    background: 'Highlight',
+    color: 'HighlightText',
+  },
+};
+
+export const selectionActionsStyles: CSSObject = {
+  display: 'flex',
+  flexShrink: 0,
+  alignItems: 'center',
+  gap: '8px',
+  marginLeft: 'auto',
+};
+
+export const clearSelectionButtonStyles: CSSObject = {
+  flexShrink: 0,
+  display: 'inline-flex',
+  width: '32px',
+  height: '32px',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 0,
+  border: 0,
+  borderRadius: '50%',
+  background: 'transparent',
+  color: 'inherit',
+  cursor: 'pointer',
+
+  '&:hover, &:focus-visible': {
+    backgroundColor: 'var(--accent-color-fade-24)',
+  },
+
+  '&:focus-visible': {
+    outline: '2px solid currentColor',
+    outlineOffset: '2px',
+  },
+};
+
+export const selectionCountStyles: CSSObject = {
+  minWidth: 0,
+  overflow: 'hidden',
+  fontWeight: 'var(--font-weight-semibold)',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+};
+
+export const selectionSizeStyles: CSSObject = {
+  minWidth: 0,
+  maxWidth: '30%',
+  overflow: 'hidden',
+  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-medium)',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+
+  '@media (forced-colors: active)': {
+    color: 'inherit',
+  },
+};
+
+export const bulkActionButtonStyles: CSSObject = {
+  flexShrink: 0,
+  display: 'inline-flex',
+  minHeight: '30px',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '4px',
+  padding: '0 12px',
+  border: '1px solid var(--border-color)',
+  borderRadius: '16px',
+  background: 'var(--modal-bg)',
+  color: 'var(--main-color)',
+  cursor: 'pointer',
+
+  '&:hover, &:focus-visible': {
+    backgroundColor: 'var(--accent-color-fade-24)',
+  },
+
+  '&:focus-visible': {
+    outline: '2px solid currentColor',
+    outlineOffset: '2px',
+  },
+
+  '@media (forced-colors: active)': {
+    borderColor: 'ButtonText',
+    background: 'ButtonFace',
+    color: 'ButtonText',
+  },
+};
+
+export const bulkMoveToBinButtonStyles: CSSObject = {
+  ...bulkActionButtonStyles,
+  borderColor: 'transparent',
+  background: 'var(--danger-color)',
+  color: 'var(--main-color)',
+
+  '&:hover, &:focus-visible': {
+    background: 'var(--danger-color)',
+    opacity: 0.9,
+  },
+};
+
 export const tableStyles: CSSObject = {
   width: '100%',
   borderCollapse: 'collapse',
@@ -52,6 +191,11 @@ export const headerCellStyles: CSSObject = {
   [`@media (max-width: ${styleBreakpoint}px)`]: {
     display: 'none',
   },
+};
+
+export const selectionHeaderCellStyles: CSSObject = {
+  ...headerCellStyles,
+  paddingLeft: '12px',
 };
 
 export const tableCellStyles: CSSObject = {
@@ -90,6 +234,16 @@ export const tableActionsCellStyles: CSSObject = {
     marginTop: '8px',
     borderRadius: '0',
     width: '100% !important',
+  },
+};
+
+export const selectedTableCellRowStyles: CSSObject = {
+  backgroundColor: 'var(--accent-color-fade-16)',
+  '&[aria-selected="true"]:hover': {
+    backgroundColor: 'var(--accent-color-fade-16)',
+  },
+  'body.theme-dark &[aria-selected="true"]:hover': {
+    backgroundColor: 'var(--accent-color-fade-16)',
   },
 };
 

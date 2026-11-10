@@ -23,20 +23,30 @@ import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 
 import {randomUUID} from 'crypto';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {User} from 'Repositories/entity/User';
-import {ROLE} from 'Repositories/user/userPermission';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
+import {AssetRepository} from '../assets/assetRepository';
+import {User} from '../entity/User';
+import {ROLE} from '../user/userPermission';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamRepository} from './TeamRepository';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
-function buildConnectionRepository() {
+type TeamRepositoryTestDependencies = {
+  readonly userState: UserState;
+  readonly teamState: TeamState;
+  readonly userRepository: UserRepository;
+  readonly assetRepository: AssetRepository;
+  readonly teamService: TeamService;
+  readonly translate: jest.Mock<string, [translationKey: string]>;
+};
+type TeamRepositoryTestFixture = readonly [TeamRepository, TeamRepositoryTestDependencies];
+
+function buildConnectionRepository(): TeamRepositoryTestFixture {
   const team = new TeamEntity(randomUUID());
   const userState = new UserState();
   const selfUser = new User('self-id', 'self-domain', translateForTest);

@@ -20,10 +20,10 @@
 import {isNonEmptyArray, isNumber, isTruthy} from '@sindresorhus/is';
 import {isObject} from 'underscore';
 
-import {ClientEvent} from 'Repositories/event/Client';
-import {EventRecord} from 'Repositories/storage/record/eventRecord';
-
 import {MessageCategory} from './messageCategory';
+
+import {ClientEvent} from '../repositories/event/Client';
+import {EventRecord} from '../repositories/storage/record/eventRecord';
 
 const _checkAsset = (event: any): MessageCategory | void => {
   const {data: eventData, type: eventType} = event;
@@ -102,7 +102,7 @@ export const categoryFromEvent = (event: Partial<EventRecord>): MessageCategory 
     }
 
     return category;
-  } catch (error: unknown) {
+  } catch {
     return MessageCategory.UNDEFINED;
   }
 };

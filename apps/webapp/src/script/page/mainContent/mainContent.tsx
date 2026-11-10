@@ -17,33 +17,12 @@
  *
  */
 
-import {ReactNode, useEffect, useRef, useState} from 'react';
+import {ReactNode, useEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
-
-import {CellsGlobalView} from 'Components/cellsGlobalView/cellsGlobalView';
-import {ConnectRequests} from 'Components/connectRequests/index';
-import {Conversation} from 'Components/conversation';
-import {HistoryExport} from 'Components/historyExport';
-import {HistoryImport} from 'Components/historyImport';
-import * as Icon from 'Components/icon';
-import {Meetings} from 'Components/meeting/meetings';
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {ClientState} from 'Repositories/client/ClientState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'Repositories/entity/User';
-import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
-import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
-import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
-import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {Collection} from './panels/collection';
 import {AboutPreferences} from './panels/preferences/aboutPreferences';
@@ -51,14 +30,37 @@ import {AccountPreferences} from './panels/preferences/accountPreferences';
 import {AVPreferences} from './panels/preferences/avPreferences';
 import {DevicesPreferences} from './panels/preferences/devicesPreferences';
 import {OptionPreferences} from './panels/preferences/optionPreferences';
+import {TroubleshootingPreferences} from './panels/preferences/troubleshootingPreferences';
 
+import {CellsGlobalView} from '../../components/cellsGlobalView/cellsGlobalView';
+import {ConnectRequests} from '../../components/connectRequests';
+import {Conversation} from '../../components/conversation';
+import {HistoryExport} from '../../components/historyExport';
+import {HistoryImport} from '../../components/historyImport';
+import * as Icon from '../../components/icon';
+import {Meetings} from '../../components/meeting/meetings';
+import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {ClientState} from '../../repositories/client/ClientState';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {User} from '../../repositories/entity/User';
+import {MediaDeviceType} from '../../repositories/media/MediaDeviceType';
+import {useMediaDevicesStore} from '../../repositories/media/useMediaDevicesStore';
+import {TeamState} from '../../repositories/team/TeamState';
+import {createTroubleshooterRepository} from '../../repositories/troubleshooter/troubleshooterRepository';
+import {createMockTroubleshooterService} from '../../repositories/troubleshooter/troubleshooterService';
+import {AppLockRepository} from '../../repositories/user/appLockRepository';
+import {UserState} from '../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {useMeetingsFeatureFlag} from '../../util/useMeetingsFeatureFlag';
+import {incomingCssClass, removeAnimationsClass} from '../../util/util';
 import {RightSidebarParams} from '../appMain';
 import {PanelState} from '../rightSidebar';
+import {useApplicationContext} from '../rootProvider';
 import {ContentState, useAppState} from '../useAppState';
 
 export const ANIMATED_PAGE_TRANSITION_DURATION = 500;
 
-const Animated = ({children, ...rest}: {children: ReactNode}) => {
+const Animated: FunctionComponent<{children: ReactNode}> = ({children, ...rest}: {children: ReactNode}) => {
   const nodeRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -84,7 +86,7 @@ interface MainContentProps {
   reloadApp: () => void;
 }
 
-const MainContent = ({
+const MainContent: FunctionComponent<MainContentProps> = ({
   appLockRepository,
   openRightSidebar,
   isRightSidebarOpen = false,
@@ -93,7 +95,10 @@ const MainContent = ({
   reloadApp,
 }: MainContentProps) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const {mainViewModel, translate} = useApplicationContext();
+  const {mainViewModel, translate, clock} = useApplicationContext();
+  const troubleshooterRepository = useMemo(() => {
+    return createTroubleshooterRepository(createMockTroubleshooterService(clock), clock);
+  }, [clock]);
 
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
@@ -149,6 +154,7 @@ const MainContent = ({
     [ContentState.PREFERENCES_ABOUT]: translate('accessibility.headings.preferencesAbout'),
     [ContentState.PREFERENCES_ACCOUNT]: translate('accessibility.headings.preferencesAccount'),
     [ContentState.PREFERENCES_AV]: translate('accessibility.headings.preferencesAV'),
+    [ContentState.PREFERENCES_TROUBLESHOOTING]: translate('accessibility.headings.preferencesTroubleshooting'),
     [ContentState.PREFERENCES_DEVICES]: translate('accessibility.headings.preferencesDevices'),
     [ContentState.PREFERENCES_OPTIONS]: translate('accessibility.headings.preferencesOptions'),
     [ContentState.WATERMARK]: translate('accessibility.headings.noConversation'),
@@ -156,7 +162,7 @@ const MainContent = ({
 
   const title = statesTitle[contentState];
 
-  const onFileUpload = (file: File) => {
+  const onFileUpload = (file: File): void => {
     switchContent(ContentState.HISTORY_IMPORT);
     setUploadedFile(file);
   };
@@ -223,6 +229,16 @@ const MainContent = ({
                   propertiesRepository={repositories.properties}
                   deviceSupport={deviceSupport}
                 />
+              </div>
+            )}
+
+            {contentState === ContentState.PREFERENCES_TROUBLESHOOTING && (
+              <div
+                id="preferences-troubleshooting"
+                className={cx('preferences-page', incomingCssClass)}
+                ref={removeAnimationsClass}
+              >
+                <TroubleshootingPreferences repository={troubleshooterRepository} />
               </div>
             )}
 

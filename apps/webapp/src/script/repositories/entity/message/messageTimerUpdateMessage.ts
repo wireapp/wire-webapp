@@ -20,13 +20,12 @@
 import {isNan, isNull} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
-import {type Translate} from 'Util/localizerUtil';
-import {formatDuration} from 'Util/timeUtil';
-
 import {SystemMessage} from './systemMessage';
 
 import {SystemMessageType} from '../../../message/systemMessageType';
+import {type Translate} from '../../../util/localizerUtil';
+import {formatDuration} from '../../../util/timeUtil';
+import {ConversationEphemeralHandler} from '../../conversation/ConversationEphemeralHandler';
 
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number | null;
@@ -43,7 +42,7 @@ export class MessageTimerUpdateMessage extends SystemMessage {
   }
 }
 
-const getCaption = (messageTimer: number | null, isSelfUser: boolean, translate: Translate) => {
+const getCaption = (messageTimer: number | null, isSelfUser: boolean, translate: Translate): string => {
   if (!isNull(messageTimer) && messageTimer !== 0 && !isNan(messageTimer)) {
     const timeString = formatDuration(messageTimer, translate).text;
     return isSelfUser

@@ -17,18 +17,20 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNullOrUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {StackedAvatars} from 'Components/avatar';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {wrapperStyles} from './meetingParticipants.styles';
 import {useMeetingConversation} from './useMeetingConversation';
 import {useMeetingParticipants} from './useMeetingParticipants';
+
+import {useApplicationContext} from '../../../../../../page/rootProvider';
+import type {Conversation} from '../../../../../../repositories/entity/Conversation';
+import type {User} from '../../../../../../repositories/entity/User';
+import {matchQualifiedIds} from '../../../../../../util/qualifiedId';
+import {StackedAvatars} from '../../../../../avatar';
 
 interface MeetingParticipantsProps {
   qualifiedConversation: QualifiedId;
@@ -42,11 +44,15 @@ interface MeetingParticipantsContentProps {
   isOngoing: boolean;
 }
 
-const MeetingParticipantsContent = ({conversation, qualifiedCreator, isOngoing}: MeetingParticipantsContentProps) => {
+const MeetingParticipantsContent: FunctionComponent<MeetingParticipantsContentProps> = ({
+  conversation,
+  qualifiedCreator,
+  isOngoing,
+}: MeetingParticipantsContentProps) => {
   const {translate} = useApplicationContext();
   const participants = useMeetingParticipants(conversation, qualifiedCreator);
   const avatarRingColor = isOngoing ? 'var(--accent-color-highlight)' : 'var(--text-input-background)';
-  const getParticipantLabel = (participant: User, name: string) => {
+  const getParticipantLabel = (participant: User, name: string): string => {
     return matchQualifiedIds(participant.qualifiedId, qualifiedCreator)
       ? translate(
           'meetings.participant.nameWithOrganizer',
@@ -76,7 +82,7 @@ const MeetingParticipantsContent = ({conversation, qualifiedCreator, isOngoing}:
   );
 };
 
-export const MeetingParticipants = ({
+export const MeetingParticipants: FunctionComponent<MeetingParticipantsProps> = ({
   qualifiedConversation,
   qualifiedCreator,
   isOngoing = false,

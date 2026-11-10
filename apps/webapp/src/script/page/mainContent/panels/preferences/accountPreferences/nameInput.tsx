@@ -17,11 +17,13 @@
  *
  */
 
-import {UserRepository} from 'Repositories/user/userRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
+import type {FunctionComponent} from 'react';
 
 import {AccountInput, useInputDone} from './accountInput';
+
+import {UserRepository} from '../../../../../repositories/user/userRepository';
+import {getLogger} from '../../../../../util/logger';
+import {useApplicationContext} from '../../../../rootProvider';
 
 interface NameInputProps {
   canEditProfile: boolean;
@@ -30,7 +32,7 @@ interface NameInputProps {
 }
 const logger = getLogger('NameInput');
 
-const NameInput = ({name, userRepository, canEditProfile}: NameInputProps) => {
+const NameInput: FunctionComponent<NameInputProps> = ({name, userRepository, canEditProfile}: NameInputProps) => {
   const nameInputDone = useInputDone();
   const {translate} = useApplicationContext();
 

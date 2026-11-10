@@ -14,28 +14,53 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
  */
 
-import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
-
-import {APIClient} from '../../service/apiClientSingleton';
+import {FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
+import type {AxiosResponse} from 'axios';
 
 import {TeamService} from './TeamService';
+import {APIClient} from '../../service/apiClientSingleton';
 
-describe('TeamService', () => {
-  it('rejects when fetching team features fails', async () => {
-    const getAllFeatures = jest.fn().mockRejectedValue(new Error('Backend unavailable'));
-    const apiClient = {api: {teams: {feature: {getAllFeatures}}}} as unknown as APIClient;
-    const service = new TeamService(apiClient);
-    await expect(service.getAllTeamFeatures()).rejects.toThrow('Backend unavailable');
+describe('TeamService feature responses', () => {
+  it.each([FEATURE_STATUS.ENABLED, FEATURE_STATUS.DISABLED])(
+    'returns the explicitly supplied %s feature response through the real API client',
+    async status => {
+      using apiClient = new APIClient();
+      const teamService = new TeamService(apiClient);
+      const featureResponse: FeatureList = {fileSharing: {status}};
+      const sendJSON = jest
+        .spyOn(apiClient.transport.http, 'sendJSON')
+        .mockResolvedValue({data: featureResponse} as AxiosResponse<FeatureList>);
+
+      const actualFeatures = await teamService.getAllTeamFeatures();
+
+      expect(actualFeatures).toEqual(featureResponse);
+      expect(sendJSON).toHaveBeenCalledTimes(1);
+      expect(sendJSON).toHaveBeenCalledWith({method: 'get', url: '/feature-configs'});
+    },
+  );
+
+  it('rejects with the original error when the explicitly controlled HTTP request fails', async () => {
+    using apiClient = new APIClient();
+    const teamService = new TeamService(apiClient);
+    const error = new Error('Feature endpoint unavailable');
+    jest.spyOn(apiClient.transport.http, 'sendJSON').mockRejectedValue(error);
+
+    await expect(teamService.getAllTeamFeatures()).rejects.toBe(error);
   });
 
   it('provides compatibility defaults for initial loading', () => {
-    const service = new TeamService({} as APIClient);
+    using apiClient = new APIClient();
+    const teamService = new TeamService(apiClient);
+    const defaults = teamService.getDefaultTeamFeatures();
 
-    expect(service.getDefaultTeamFeatures().appLock).toEqual({
+    expect(defaults.appLock).toEqual({
       status: FEATURE_STATUS.ENABLED,
       config: {enforceAppLock: false, inactivityTimeoutSecs: 60},
     });
+    expect(defaults.fileSharing).toEqual({status: FEATURE_STATUS.ENABLED});
+    expect(defaults.mls).toBeUndefined();
   });
 });

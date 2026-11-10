@@ -17,10 +17,10 @@
  *
  */
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {RootContextValue} from 'src/script/page/rootProvider';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {RootContextValue} from '../../../../../../../page/rootProvider';
+import {CellNode, CellNodeType} from '../../../../../../../types/cellNode';
+import {replaceReactComponents} from '../../../../../../../util/localizerUtil/reactLocalizerUtil';
+import {PrimaryModal} from '../../../../../../Modals/PrimaryModal';
 
 export const showDeletePermanentlyModal = ({
   node,
@@ -30,7 +30,7 @@ export const showDeletePermanentlyModal = ({
   node: CellNode;
   onDeletePermanently: (uuid: string) => void;
   translate: RootContextValue['translate'];
-}) => {
+}): void => {
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
     {

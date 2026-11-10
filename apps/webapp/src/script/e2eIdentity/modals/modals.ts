@@ -20,18 +20,17 @@
 import {isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {
   ModalOptions,
   PrimaryModalTranslatedComponent,
   PrimaryModalTranslatedTranslation,
   PrimaryModalTranslatedValue,
   PrimaryModalType,
-} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {Config} from 'src/script/Config';
-import type {Translate, TranslationKey} from 'Util/localizerUtil';
+} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {Config} from '../../Config';
+import type {Translate, TranslationKey} from '../../util/localizerUtil';
+import {WebAppEvents} from '../../webAppEvents';
 
 const hideSecondaryBtn = {hideSecondary: true};
 const hideCloseBtn = {hideCloseBtn: true, preventClose: true};
@@ -132,6 +131,11 @@ export enum ModalType {
   DOWNLOAD_PATH_CHANGED = 'download_path_changed',
 }
 
+type GetModalOptionsResult = {
+  modalOptions: ModalOptions;
+  modalType: PrimaryModalType.ACKNOWLEDGE | PrimaryModalType.CONFIRM | PrimaryModalType.LOADING;
+};
+
 interface GetModalOptions {
   type: ModalType;
   primaryActionFn?: () => void;
@@ -161,7 +165,7 @@ export const getModalOptions = (
     extraParams,
   }: GetModalOptions,
   translate: Translate,
-) => {
+): GetModalOptionsResult => {
   if (isUndefined(secondaryActionFn)) {
     hideSecondary = true;
   }

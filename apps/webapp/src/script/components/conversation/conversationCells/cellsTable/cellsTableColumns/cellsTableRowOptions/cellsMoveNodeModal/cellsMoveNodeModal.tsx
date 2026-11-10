@@ -17,21 +17,24 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
-import {CellsNewNodeForm} from 'Components/conversation/conversationCells/common/cellsNewNodeForm/cellsNewNodeForm';
-import {getCellsFilesPath} from 'Components/conversation/conversationCells/common/getCellsFilesPath/getCellsFilesPath';
-import {useCellsNewFolderForm} from 'Components/conversation/conversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode} from 'src/script/types/cellNode';
-
 import {CellsFoldersListModalContent} from './cellsFoldersListModalContent/cellsFoldersListModalContent';
+import {LegacyCellsMoveNodeModal} from './legacy/legacyCellsMoveNodeModal';
 import {useGetCellsFolders} from './useGetCellsFolders/useGetCellsFolders';
 import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
+
+import {driveBulkActionsFeatureToggleName} from '../../../../../../../featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from '../../../../../../../page/rootProvider';
+import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../../../../types/cellNode';
+import {CellsModal} from '../../../../common/cellsModal/cellsModal';
+import {CellsNewNodeForm} from '../../../../common/cellsNewNodeForm/cellsNewNodeForm';
+import {getCellsFilesPath} from '../../../../common/getCellsFilesPath/getCellsFilesPath';
+import {openBreadcrumb} from '../../../../common/openBreadcrumb/openBreadcrumb';
+import {useCellsNewFolderForm} from '../../../../common/useCellsNewNodeForm/useCellsNewFolderForm';
 
 interface CellsMoveNodeModalProps {
   isOpen: boolean;
@@ -40,17 +43,19 @@ interface CellsMoveNodeModalProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   nodeToMove: CellNode;
+  navigateToPath?: (params: {conversationQualifiedId: QualifiedId; path: string}) => void;
 }
 
-export const CellsMoveNodeModal = ({
+const FlaggedCellsMoveNodeModal: FunctionComponent<CellsMoveNodeModalProps> = ({
   nodeToMove,
   isOpen,
   onClose,
   cellsRepository,
   conversationQualifiedId,
   conversationName,
+  navigateToPath = openBreadcrumb,
 }: CellsMoveNodeModalProps) => {
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {clock, fireAndForgetInvoker, translate} = useApplicationContext();
   const [currentPath, setCurrentPath] = useState(() => {
     return getCellsFilesPath();
   });
@@ -63,10 +68,11 @@ export const CellsMoveNodeModal = ({
     currentPath,
     enabled: isOpen,
     fireAndForgetInvoker,
+    clock,
   });
 
   const {
-    handleMove,
+    handleMove: handleMoveOperation,
     movingDisabled,
     status: moveNodeStatus,
   } = useMoveCellsNode({
@@ -74,7 +80,7 @@ export const CellsMoveNodeModal = ({
     nodeToMove,
     conversationQualifiedId,
     currentPath,
-    onClose,
+    isOpen,
   });
 
   const {
@@ -96,7 +102,7 @@ export const CellsMoveNodeModal = ({
     validationCopy: {
       genericError: translate('cells.newItemMenuModalForm.genericError'),
       alreadyExistsError: translate('cells.newItemMenuModalForm.alreadyExistsError'),
-      invalidCharactersError: translate('cells.newItemMenuModalForm.invalidCharactersError'),
+      invalidCharactersError: translate('cells.nodeName.invalidCharactersError'),
       maxLengthError: translate('cells.newItemMenuModalForm.maxLengthError'),
       nameRequired: translate('cells.newItemMenuModalForm.nameRequired'),
     },
@@ -110,6 +116,16 @@ export const CellsMoveNodeModal = ({
 
   const isMoveLoading = moveNodeStatus === 'loading';
 
+  const handleMove = async (): Promise<void> => {
+    const moveResult = await handleMoveOperation();
+    if (moveResult.isErr) {
+      return;
+    }
+
+    navigateToPath({conversationQualifiedId, path: currentPath});
+    onClose();
+  };
+
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
       <CellsModal.Header>
@@ -120,21 +136,24 @@ export const CellsMoveNodeModal = ({
       {activeModalContent === 'move' ? (
         <>
           <CellsFoldersListModalContent
-            items={folders}
-            status={status}
-            shouldShowLoadingSpinner={shouldShowLoadingSpinner}
             conversationName={conversationName}
-            currentPath={currentPath}
-            onPathChange={setCurrentPath}
-            onChangeModalContent={setActiveModalContent}
+            destination={{
+              folders,
+              status,
+              shouldShowLoadingSpinner,
+              currentPath,
+              handlePathChange: setCurrentPath,
+              onChangeModalContent: setActiveModalContent,
+            }}
           />
+          {moveNodeStatus === 'error' && <p role="alert">{translate('cells.newItemMenuModalForm.genericError')}</p>}
           <CellsModal.Actions>
             <CellsModal.SecondaryButton onClick={onClose}>
               {translate('cells.moveNodeModal.cancelButton')}
             </CellsModal.SecondaryButton>
             <CellsModal.PrimaryButton
               onClick={handleMove}
-              isDisabled={movingDisabled || shouldShowLoadingSpinner || isMoveLoading}
+              isDisabled={status !== 'success' || movingDisabled || isMoveLoading}
               isLoading={isMoveLoading}
             >
               {translate('cells.moveNodeModal.moveButton')}
@@ -169,4 +188,14 @@ export const CellsMoveNodeModal = ({
       )}
     </CellsModal>
   );
+};
+
+export const CellsMoveNodeModal: FunctionComponent<CellsMoveNodeModalProps> = (props: CellsMoveNodeModalProps) => {
+  const {isFeatureToggleEnabled} = useApplicationContext();
+
+  if (!isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)) {
+    return <LegacyCellsMoveNodeModal {...props} />;
+  }
+
+  return <FlaggedCellsMoveNodeModal {...props} />;
 };

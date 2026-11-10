@@ -19,17 +19,17 @@
 
 import {render} from '@testing-library/react';
 
-import {Config} from 'src/script/Config';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {Config} from '../../../../../Config';
+import {withThemeAndRootContext} from '../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
+} from '../../../../testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../../../../util/localizerUtil';
 
-import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import type {MediaStreamHandler} from '../../../../../repositories/media/MediaStreamHandler';
 
-import en from 'I18n/en-US.json';
+import en from '../../../../../../i18n/en-US.json';
 
 import {CameraPreferences} from './cameraPreferences';
 

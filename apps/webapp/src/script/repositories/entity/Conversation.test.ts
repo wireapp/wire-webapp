@@ -20,19 +20,20 @@
 //@ts-check
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import type {Connection} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ConnectionMapper} from 'Repositories/connection/connectionMapper';
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import 'src/script/localization/Localizer';
-import {StatusType} from 'src/script/message/statusType';
-import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {ClientEntity} from '../client/ClientEntity';
+import {ConnectionMapper} from '../connection/connectionMapper';
+import {ConversationMapper} from '../conversation/ConversationMapper';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
+import '../../localization/Localizer';
+import {StatusType} from '../../message/statusType';
+import {translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {createUuid} from '../../util/uuid';
 
 import {Conversation} from './Conversation';
 import {ContentMessage} from './message/contentMessage';
@@ -55,7 +56,7 @@ describe('Conversation', () => {
   const second_timestamp = new Date('2017-09-26T10:27:18.837Z').getTime();
   const third_timestamp = new Date('2017-09-26T11:29:21.837Z').getTime();
 
-  function createMessageForTest(id: string = createUuid()) {
+  function createMessageForTest(id: string = createUuid()): Message {
     return new Message(id, undefined, translateForTest);
   }
 
@@ -63,7 +64,7 @@ describe('Conversation', () => {
     conversationId: string = '',
     domain: string = '',
     protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS,
-  ) {
+  ): Conversation {
     return new Conversation(conversationId, domain, protocol, translate);
   }
 
@@ -988,8 +989,7 @@ describe('Conversation', () => {
     it('updates the participating user IDs with the user ID of the other party', () => {
       const connector_user_id = 'b43b376d-7b5a-4d77-89be-81a02892db8c';
 
-      /** @type {import('@wireapp/api-client/lib/connection/').Connection} */
-      const payload_connection = {
+      const payload_connection: Connection = {
         conversation: '15a7f358-8eba-4b8e-bcf2-61a08eb53349',
         from: '616cbbeb-1360-4e17-b333-e000662257bd',
         last_update: '2017-05-10T11:34:18.396Z',

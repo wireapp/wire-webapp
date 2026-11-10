@@ -17,11 +17,11 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {loginUser} from 'test/e2e_tests/utils/userActions';
+import {User} from '../../data/user';
+import {loginUser} from '../../utils/userActions';
 
 import {test, expect, LOGIN_TIMEOUT, Team} from '../../test.fixtures';
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {PageManager} from '../../pageManager';
 
 test.describe('2FA for teams', () => {
   let team: Team;

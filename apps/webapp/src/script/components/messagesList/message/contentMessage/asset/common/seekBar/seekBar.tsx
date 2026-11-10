@@ -17,12 +17,12 @@
  *
  */
 
-import React, {CSSProperties, useEffect, useState} from 'react';
+import React, {CSSProperties, useEffect, useState, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
-import {clamp} from 'Util/numberUtil';
+import {clamp} from '../../../../../../../util/numberUtil';
+import {useMessageFocusedTabIndex} from '../../../../util';
 
 const percentageScale = 100;
 const decimalRadix = 10;
@@ -39,7 +39,7 @@ export interface SeekBarCSS extends CSSProperties {
   '--seek-bar-progress': string;
 }
 
-const SeekBar = ({
+const SeekBar: FunctionComponent<SeekBarProps> = ({
   dark: darkMode,
   disabled,
   mediaElement,
@@ -53,7 +53,7 @@ const SeekBar = ({
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   useEffect(() => {
-    const onTimeUpdate = () => {
+    const onTimeUpdate = (): void => {
       if (mediaElement.currentTime > mediaElement.duration) {
         mediaElement.currentTime = mediaElement.duration;
       }
@@ -61,7 +61,7 @@ const SeekBar = ({
       setProgress(value);
     };
 
-    const onEnded = () => {
+    const onEnded = (): void => {
       setProgress(percentageScale);
     };
 
