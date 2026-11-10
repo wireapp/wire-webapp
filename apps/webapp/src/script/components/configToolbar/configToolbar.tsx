@@ -25,8 +25,6 @@ import keyboardjs from 'keyboardjs';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
-import {Button, Input, Switch} from '@wireapp/react-ui-kit';
-
 import {CallLogsUploadSettings} from './callLogsUploadSettings';
 import {wrapperStyles} from './configToolbar.styles';
 import {openDebugToolbarEventName} from './debugToolbarEvents';
@@ -37,6 +35,9 @@ import {updateLocationSearchForStartupFeatureToggle} from '../../featureToggles/
 import {useClickOutside} from '../../hooks/useClickOutside';
 import {useApplicationContext} from '../../page/rootProvider';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Input} from '../../uiKit/inputs/input/input';
+import {Switch} from '../../uiKit/inputs/switch/switch';
 import {CoreCryptoLogLevel} from '../../util/debugUtil';
 import {getLogger} from '../../util/logger';
 

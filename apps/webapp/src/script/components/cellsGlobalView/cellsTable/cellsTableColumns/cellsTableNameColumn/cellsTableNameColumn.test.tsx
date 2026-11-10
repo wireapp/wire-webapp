@@ -20,7 +20,8 @@
 import {render, type RenderResult} from '@testing-library/react';
 import {Maybe} from 'true-myth';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../../../uiKit/identity/theme/theme';
 
 import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {

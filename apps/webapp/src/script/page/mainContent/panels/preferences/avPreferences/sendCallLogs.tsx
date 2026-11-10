@@ -23,8 +23,6 @@ import type {CSSObject} from '@emotion/react';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {
   callLogsModalBodyStyles,
   confirmationMessageStyles,
@@ -44,6 +42,7 @@ import {
 } from '../../../../../repositories/calling/callLogsService';
 import {useCallLogsUploadSettings} from '../../../../../repositories/calling/callLogsUploadSettings';
 import {UserState} from '../../../../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
 import {useApplicationContext} from '../../../../rootProvider';
 
 interface SendCallLogsProps {

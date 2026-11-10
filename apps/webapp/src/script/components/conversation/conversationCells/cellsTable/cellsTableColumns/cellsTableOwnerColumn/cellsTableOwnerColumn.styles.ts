@@ -19,8 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {ellipsis} from '@wireapp/react-ui-kit';
-
+import {ellipsis} from '../../../../../../uiKit/utils/util';
 import {styleBreakpoint} from '../../../common/styleBreakpoint/styleBreakpoint';
 
 export const wrapperStyles: CSSObject = {

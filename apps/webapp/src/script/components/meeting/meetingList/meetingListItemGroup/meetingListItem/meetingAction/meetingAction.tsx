@@ -19,14 +19,14 @@
 
 import {MouseEvent, type FunctionComponent} from 'react';
 
-import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
-
 import {getMeetingActionEntries} from './getMeetingActionEntries';
 import {iconContainerStyle, iconStyles} from './meetingAction.styles';
 
 import {useApplicationContext} from '../../../../../../page/rootProvider';
 import type {User} from '../../../../../../repositories/entity/User';
 import {showContextMenu} from '../../../../../../ui/contextMenu';
+import {MoreIcon} from '../../../../../../uiKit/dataDisplay/icon/moreIcon';
+import {IconButton} from '../../../../../../uiKit/inputs/iconButton/iconButton';
 import type {MeetingInstance} from '../../../../types/meetingInstance';
 import {useDeleteMeeting} from '../../../../useDeleteMeeting';
 import {useEditMeeting} from '../../../../useEditMeeting';

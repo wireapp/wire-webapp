@@ -19,9 +19,8 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import * as Icon from '../../../../../components/icon';
+import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
 import {copyText} from '../../../../../util/clipboardUtil';
 import {useApplicationContext} from '../../../../rootProvider';
 

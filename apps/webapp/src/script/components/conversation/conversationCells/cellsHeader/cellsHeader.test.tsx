@@ -25,7 +25,8 @@ import userEvent from '@testing-library/user-event';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {JobsTaskStatus, TreeNodeType} from 'cells-sdk-ts';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../../uiKit/identity/theme/theme';
 
 import en from '../../../../../i18n/en-US.json';
 

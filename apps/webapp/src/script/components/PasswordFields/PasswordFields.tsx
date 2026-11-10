@@ -20,11 +20,12 @@
 import type {FunctionComponent} from 'react';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {ErrorMessage, Input} from '@wireapp/react-ui-kit';
 
 import {errorMessageStyles} from './PasswordFields.styles';
 
 import {Config} from '../../Config';
+import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
+import {Input} from '../../uiKit/inputs/input/input';
 import type {Translate} from '../../util/localizerUtil';
 
 export interface PasswordFieldsProps {

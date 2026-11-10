@@ -19,14 +19,15 @@
 
 import type {FunctionComponent} from 'react';
 
-import {CircleCloseIcon, SearchIcon} from '@wireapp/react-ui-kit';
-
 import {
   clearButtonStyles,
   searchFieldStyles,
   searchIconStyles,
   searchNativeInputStyles,
 } from './cellsSearchInput.styles';
+
+import {CircleCloseIcon} from '../../uiKit/dataDisplay/icon/circleCloseIcon';
+import {SearchIcon} from '../../uiKit/dataDisplay/icon/searchIcon';
 
 interface CellsSearchInputProps {
   value: string;

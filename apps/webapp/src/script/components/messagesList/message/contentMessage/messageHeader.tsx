@@ -22,8 +22,6 @@ import {type ReactElement} from 'react';
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Tooltip} from '@wireapp/react-ui-kit';
-
 import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './messageHeader.styles';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
@@ -31,6 +29,7 @@ import {ContentMessage} from '../../../../repositories/entity/message/contentMes
 import {DeleteMessage} from '../../../../repositories/entity/message/deleteMessage';
 import {User} from '../../../../repositories/entity/User';
 import {ServiceEntity} from '../../../../repositories/integration/ServiceEntity';
+import {Tooltip} from '../../../../uiKit/dataDisplay/tooltip/tooltip';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {AVATAR_SIZE, Avatar} from '../../../avatar';
 import {UserBlockedBadge} from '../../../badge';

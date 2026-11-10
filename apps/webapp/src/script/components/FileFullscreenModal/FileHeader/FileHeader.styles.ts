@@ -19,8 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2, ellipsis} from '@wireapp/react-ui-kit';
-
+import {COLOR_V2} from '../../../uiKit/identity/colorsV2/colorsV2';
+import {ellipsis} from '../../../uiKit/utils/util';
 import {fileHeaderHeight} from '../common/fileHeaderHeight';
 
 export const headerStyles: CSSObject = {

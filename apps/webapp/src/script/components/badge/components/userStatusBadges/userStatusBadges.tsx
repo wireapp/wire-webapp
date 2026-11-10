@@ -21,11 +21,10 @@ import {Fragment, type FunctionComponent} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
 
-import {Tooltip} from '@wireapp/react-ui-kit';
-
 import {badgesWrapper, icon} from './userStatusBadges.styles';
 
 import {RootContextValue, useApplicationContext} from '../../../../page/rootProvider';
+import {Tooltip} from '../../../../uiKit/dataDisplay/tooltip/tooltip';
 import * as Icon from '../../../icon';
 
 type CreateBadgeToComponentMapResult = {

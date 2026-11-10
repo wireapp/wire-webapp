@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {overlayPortalZIndex} from '@wireapp/react-ui-kit';
+import {overlayPortalZIndex} from '../../../uiKit/utils/overlayPortal';
 
 export const wrapperStyles: CSSObject = {
   width: '100%',

@@ -22,8 +22,6 @@ import {useCallback, useEffect, useRef, useState, type FunctionComponent} from '
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {Maybe, maybe} from 'true-myth';
 
-import {Button, ButtonVariant, TrashIcon} from '@wireapp/react-ui-kit';
-
 import {
   actionStyles,
   confirmationContentStyles,
@@ -37,6 +35,8 @@ import {getEmptyBinStatusKind, type EmptyBinStatus} from './getEmptyBinStatusKin
 import {driveBulkActionsFeatureToggleName} from '../../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../../page/rootProvider';
 import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {TrashIcon} from '../../../../../uiKit/dataDisplay/icon/trashIcon';
+import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
 import {
   getCellsBackgroundActionEvidence,
   observeCellsBackgroundActionJobs,

@@ -19,8 +19,7 @@
 
 import type {ReactElement, ChangeEvent, FormEvent, FunctionComponent} from 'react';
 
-import {Input} from '@wireapp/react-ui-kit';
-
+import {Input} from '../../../../uiKit/inputs/input/input';
 import type {Translate} from '../../../../util/localizerUtil';
 
 interface PasswordAdvancedSecurityFormProps {

@@ -24,8 +24,6 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {amplify} from 'amplify';
 
-import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
-
 import {ConversationDetailsOption} from './conversationDetailsOption';
 
 import {
@@ -41,6 +39,11 @@ import {supportsReadReceipts} from '../../../../../repositories/conversation/Con
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {User} from '../../../../../repositories/entity/User';
 import {TeamState} from '../../../../../repositories/team/TeamState';
+import {CollectionIcon} from '../../../../../uiKit/dataDisplay/icon/collectionIcon';
+import {HideIcon} from '../../../../../uiKit/dataDisplay/icon/hideIcon';
+import {HistoryIcon} from '../../../../../uiKit/dataDisplay/icon/historyIcon';
+import {LockClosedIcon} from '../../../../../uiKit/dataDisplay/icon/lockClosedIcon';
+import {UnlockedIcon} from '../../../../../uiKit/dataDisplay/icon/unlockedIcon';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {replaceReactComponents} from '../../../../../util/localizerUtil/reactLocalizerUtil';
 import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';

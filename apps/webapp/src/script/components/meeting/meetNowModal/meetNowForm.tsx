@@ -21,13 +21,15 @@ import {type FormEvent, useEffect, useRef, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {CircleCloseIcon, ErrorMessage, getOverlayPortalContainer, Input} from '@wireapp/react-ui-kit';
-
 import {meetNowFormLayoutStyles} from './meetNowModal.styles';
 import type {MeetNowFormState} from './meetNowTypes';
 
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
+import {CircleCloseIcon} from '../../../uiKit/dataDisplay/icon/circleCloseIcon';
+import {ErrorMessage} from '../../../uiKit/inputs/errorMessage/errorMessage';
+import {Input} from '../../../uiKit/inputs/input/input';
+import {getOverlayPortalContainer} from '../../../uiKit/utils/overlayPortal';
 import {MeetingParticipantsPicker} from '../meetingParticipantsPicker';
 import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';
 import {useMeetingParticipants} from '../shared/participants/useMeetingParticipants';

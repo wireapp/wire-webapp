@@ -19,11 +19,14 @@
 
 import React, {useEffect, useState, type FunctionComponent} from 'react';
 
-import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/react-ui-kit';
-
 import {styles} from './entropyContainer.styles';
 
 import {useApplicationContext} from '../../page/rootProvider';
+import {CheckRoundIcon} from '../../uiKit/dataDisplay/icon/checkRoundIcon';
+import {Button} from '../../uiKit/inputs/button/button';
+import {ContainerSM} from '../../uiKit/layout/container/container';
+import {H1} from '../../uiKit/typography/heading/heading';
+import {Muted, Text} from '../../uiKit/typography/text/text';
 import {EntropyData} from '../../util/entropy';
 import {handleEnterDown} from '../../util/keyboardUtil';
 import {EntropyCanvas} from '../component/entropyCanvas';

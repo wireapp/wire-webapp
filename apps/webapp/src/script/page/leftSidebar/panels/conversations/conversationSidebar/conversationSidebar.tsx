@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
-
 import {
   conversationsSidebarHandleIconStyles,
   conversationsSidebarHandleStyles,
@@ -32,6 +30,8 @@ import {ConversationRepository} from '../../../../../repositories/conversation/C
 import {ConversationState} from '../../../../../repositories/conversation/ConversationState';
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {User} from '../../../../../repositories/entity/User';
+import {ChevronIcon} from '../../../../../uiKit/dataDisplay/icon/chevronIcon';
+import {IconButton} from '../../../../../uiKit/inputs/iconButton/iconButton';
 import {ContentState} from '../../../../useAppState';
 import {UserDetails} from '../../../userDetails';
 import {ConversationTabs} from '../conversationTabs';

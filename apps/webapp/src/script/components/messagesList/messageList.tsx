@@ -22,8 +22,6 @@ import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} fr
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {JumpToLastMessageButton} from './jumpToLastMessageButton';
 import {Message, MessageActions} from './message';
 import {MarkerComponent} from './message/marker';
@@ -46,6 +44,7 @@ import {Message as MessageEntity} from '../../repositories/entity/message/messag
 import {User} from '../../repositories/entity/User';
 import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import type {UserRepository} from '../../repositories/user/userRepository';
+import {TabIndex} from '../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isLastReceivedMessage} from '../../util/conversationMessages';
 import {onHitTopOrBottom} from '../../util/DOM/onHitTopOrBottom';

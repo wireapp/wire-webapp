@@ -19,11 +19,10 @@
 
 import type {FunctionComponent} from 'react';
 
-import {CloseIcon} from '@wireapp/react-ui-kit';
-
 import {buttonStyles} from './fileCardCloseButton.styles';
 
 import {useApplicationContext} from '../../../page/rootProvider';
+import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 
 interface FileCardCloseButtonProps {
   label?: string;

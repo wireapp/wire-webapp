@@ -19,8 +19,6 @@
 
 import {ReactNode, type FunctionComponent} from 'react';
 
-import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
-
 import {
   errorIconStyles,
   errorTextStyles,
@@ -31,6 +29,7 @@ import {
 } from './mediaFilePreviewCard.styles';
 
 import {useApplicationContext} from '../../../../../../../../page/rootProvider';
+import {UnavailableFileIcon} from '../../../../../../../../uiKit/dataDisplay/icon/unavailableFileIcon';
 
 interface MediaFilePreviewCardProps {
   label: string;

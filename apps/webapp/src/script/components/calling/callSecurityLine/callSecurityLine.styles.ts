@@ -19,7 +19,7 @@
 
 import {CSSObject, keyframes} from '@emotion/react';
 
-import {media} from '@wireapp/react-ui-kit';
+import {media} from '../../../uiKit/utils/mediaQueries';
 
 const easeOutQuint = 'cubic-bezier(0.22, 1, 0.36, 1)';
 

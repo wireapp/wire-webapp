@@ -22,12 +22,11 @@ import {ChangeEvent, useCallback, useEffect, useRef, useState, type FunctionComp
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-
 import {Config} from '../../../../../Config';
 import type {MediaConstraintsHandler} from '../../../../../repositories/media/MediaConstraintsHandler';
 import type {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../../repositories/properties/propertiesType';
+import {Checkbox, CheckboxLabel} from '../../../../../uiKit/inputs/checkbox/checkbox';
 import {getLogger} from '../../../../../util/logger';
 import {WebAppEvents} from '../../../../../webAppEvents';
 import {useApplicationContext} from '../../../../rootProvider';

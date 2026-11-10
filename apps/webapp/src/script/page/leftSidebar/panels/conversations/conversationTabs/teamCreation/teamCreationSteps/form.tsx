@@ -19,11 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Button, ButtonVariant, Input} from '@wireapp/react-ui-kit';
-
 import {StepProps} from './stepProps';
 import {modalButtonsCss} from './teamCreationSteps.styles';
 
+import {Button, ButtonVariant} from '../../../../../../../uiKit/inputs/button/button';
+import {Input} from '../../../../../../../uiKit/inputs/input/input';
 import {useApplicationContext} from '../../../../../../rootProvider';
 import {buttonCss} from '../teamCreation.styles';
 

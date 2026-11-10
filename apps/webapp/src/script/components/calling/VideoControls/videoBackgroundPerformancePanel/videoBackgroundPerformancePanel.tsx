@@ -22,8 +22,6 @@ import {ReactNode, useCallback, useEffect, useMemo, useState, type FunctionCompo
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
-import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
-
 import {areCapabilityInfosEqual} from './capabilityInformationValidator';
 import {
   buttonBaseStyles,
@@ -46,6 +44,9 @@ import {QualityMode} from '../../../../repositories/media/backgroundEffects';
 import {CapabilityInfo} from '../../../../repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import type {BackgroundEffectsHandler} from '../../../../repositories/media/backgroundEffectsHandler';
 import {RenderMetrics, useBackgroundEffectsStore} from '../../../../repositories/media/useBackgroundEffectsStore';
+import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';
+import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
+import {Option, Select} from '../../../../uiKit/inputs/select/select';
 
 type PerformancePanelProps = {
   backgroundEffectsHandler: BackgroundEffectsHandler;

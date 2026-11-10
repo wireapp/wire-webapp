@@ -21,8 +21,6 @@ import {useEffect, useId, useRef, useState, type FunctionComponent} from 'react'
 
 import {Maybe} from 'true-myth';
 
-import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
-
 import {ConversationProtocolDetails} from './conversationProtocolDetails';
 import {
   migrationButtonStyles,
@@ -45,6 +43,8 @@ import type {ConversationRepository} from '../../../repositories/conversation/Co
 import type {Conversation} from '../../../repositories/entity/Conversation';
 import type {User} from '../../../repositories/entity/User';
 import type {TeamState} from '../../../repositories/team/TeamState';
+import {COLOR} from '../../../uiKit/identity/colors/colors';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {errorHandlerStrings} from '../../../util/errorUtil';
 import type {TranslationKey} from '../../../util/localizerUtil';

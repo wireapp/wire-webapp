@@ -21,13 +21,12 @@ import type {FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {useCreateConversation} from './hooks/useCreateConversation';
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
 import {getNonFederatingParticipantsModalCopy} from './utils';
 
 import {useApplicationContext} from '../../../page/rootProvider';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 
 export const CreateConversationSubmit: FunctionComponent = () => {
   const {translate} = useApplicationContext();

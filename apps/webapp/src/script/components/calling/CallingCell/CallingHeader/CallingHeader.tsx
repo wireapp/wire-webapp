@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {TabIndex, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
-
 import {
   callAvatar,
   callDescription,
@@ -35,6 +33,8 @@ import {
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {User} from '../../../../repositories/entity/User';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
+import {IconButton, IconButtonVariant} from '../../../../uiKit/inputs/iconButton/iconButton';
+import {TabIndex} from '../../../../uiKit/utils/enums';
 import {isDetachedCallingFeatureEnabled} from '../../../../util/isDetachedCallingFeatureEnabled';
 import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from '../../../avatar';
 import * as Icon from '../../../icon';
