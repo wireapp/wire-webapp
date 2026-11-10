@@ -10,7 +10,6 @@
 /target/
 /apps/webapp/resource
 CHANGELOG.md
-!docs/ADRs/uiKit/CHANGELOG.md
 node_modules
 npm-debug.log
 
