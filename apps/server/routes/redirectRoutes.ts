@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import express, {type Request, type Response} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Maybe, maybe} from 'true-myth';
@@ -65,22 +65,12 @@ export function redirectToJoinConversation(request: Request, response: Response)
   sendJoinRedirect(response, createJoinConversationRedirectUrl(request.query));
 }
 
-export function createJoinMeetingRedirectUrl(
-  query: JoinRedirectQuery & {readonly domain?: unknown; readonly password?: unknown},
-): Maybe<string> {
-  const {key, code, domain, password} = query;
-  if (
-    !isNonEmptyString(key) ||
-    !isNonEmptyString(code) ||
-    !isNonEmptyString(domain) ||
-    (!isNullOrUndefined(password) && typeof password !== 'string')
-  ) {
+export function createJoinMeetingRedirectUrl(query: JoinRedirectQuery & {readonly domain?: unknown}): Maybe<string> {
+  const {key, code, domain} = query;
+  if (!isNonEmptyString(key) || !isNonEmptyString(code) || !isNonEmptyString(domain)) {
     return Maybe.nothing();
   }
   const params = new URLSearchParams({meeting_domain: domain, meeting_key: key, meeting_code: code});
-  if (typeof password === 'string') {
-    params.set('meeting_password', password);
-  }
   return Maybe.just(`/auth/?${params.toString()}#/join-meeting`);
 }
 
