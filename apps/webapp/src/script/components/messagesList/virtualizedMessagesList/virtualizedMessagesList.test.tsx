@@ -19,7 +19,7 @@
 
 import type {ComponentProps} from 'react';
 
-import {render} from '@testing-library/react';
+import {act, render} from '@testing-library/react';
 import type {useVirtualizer as useVirtualizerFunction, Virtualizer} from '@tanstack/react-virtual';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
@@ -29,6 +29,7 @@ import {AssetRepository} from '../../../repositories/assets/assetRepository';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
 import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
@@ -52,9 +53,9 @@ function createMessageListProperties(): ComponentProps<typeof VirtualizedMessage
     messageRepository: {} as MessageRepository,
     selfUser: new User('self', '', translateForTest),
     parentElement: document.createElement('div'),
+    conversationLastReadTimestamp: {current: 0},
     isConversationLoaded: false,
     isMsgElementsFocusable: false,
-    cancelPendingReadReceiptsForConversation: noop,
     cancelConnectionRequest: noop,
     getVisibleCallback: () => {
       return undefined;
@@ -76,6 +77,68 @@ function createMessageListProperties(): ComponentProps<typeof VirtualizedMessage
 }
 
 describe('VirtualizedMessagesList', () => {
+  it.each([
+    {
+      description: 'preserves the opening unread separator when the live read timestamp advances',
+      updatesReadBoundary: false,
+      expectedItemKeys: ['message-message-10', 'marker-unread-20-20-20', 'message-message-20', 'message-message-30'],
+    },
+    {
+      description: 'regroups unchanged messages when the read boundary advances before a render',
+      updatesReadBoundary: true,
+      expectedItemKeys: ['message-message-10', 'message-message-20', 'message-message-30'],
+    },
+  ])('$description', options => {
+    const {updatesReadBoundary, expectedItemKeys} = options;
+    const virtualizerModule = jest.requireActual<VirtualizerModule>('@tanstack/react-virtual');
+    const useVirtualizer = jest.spyOn(virtualizerModule, 'useVirtualizer');
+    const properties = createMessageListProperties();
+    const sender = new User('sender', '', translateForTest);
+    properties.conversation.last_read_timestamp(10);
+    properties.conversationLastReadTimestamp.current = 10;
+    properties.conversation.messages_unordered(
+      [10, 20, 30].map(timestamp => {
+        const message = new ContentMessage(`message-${timestamp}`, translateForTest);
+        message.timestamp(timestamp);
+        message.from = sender.id;
+        message.user(sender);
+
+        return message;
+      }),
+    );
+    const renderedList = render(<VirtualizedMessagesList {...properties} />, {
+      wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest})),
+    });
+
+    try {
+      const originalMessages = properties.conversation.messages();
+      const [initialVirtualizerOptions] = requireValueForTest(useVirtualizer.mock.calls.at(-1));
+      const initialItemKey = requireValueForTest(initialVirtualizerOptions.getItemKey);
+      expect(initialVirtualizerOptions.count).toBe(4);
+      expect(initialItemKey(1)).toBe('marker-unread-20-20-20');
+
+      act(() => {
+        properties.conversation.last_read_timestamp(30);
+        if (updatesReadBoundary) {
+          properties.conversationLastReadTimestamp.current = 30;
+        }
+      });
+      renderedList.rerender(<VirtualizedMessagesList {...properties} />);
+
+      const [updatedVirtualizerOptions] = requireValueForTest(useVirtualizer.mock.calls.at(-1));
+      const updatedItemKey = requireValueForTest(updatedVirtualizerOptions.getItemKey);
+      const actualItemKeys = Array.from({length: updatedVirtualizerOptions.count}, (_item, index) => {
+        return updatedItemKey(index);
+      });
+
+      expect(properties.conversation.messages()).toBe(originalMessages);
+      expect(actualItemKeys).toEqual(expectedItemKeys);
+    } finally {
+      renderedList.unmount();
+      useVirtualizer.mockRestore();
+    }
+  });
+
   it.each([
     {cachedHeightPixels: undefined, expectedHeightPixels: 50},
     {cachedHeightPixels: 0, expectedHeightPixels: 50},
