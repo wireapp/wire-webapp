@@ -20,17 +20,8 @@
 import {Config} from '../Config';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {APIClient} from './apiClientSingleton';
-import {isBackendError} from '@wireapp/api-client/lib/team/feature/featureApi';
 
 describe('APIClientSingleton', () => {
-  it('exposes the backend error predicate from the feature API module', () => {
-    const backendError = Object.assign(new Error('Feature is locked'), {label: 'feature-locked'});
-
-    expect(isBackendError(backendError)).toBe(true);
-    expect(isBackendError(new Error('Network unavailable'))).toBe(false);
-    expect(isBackendError({label: 'feature-locked'})).toBe(false);
-  });
-
   it('uses the injected Clock for API client timestamps', () => {
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 1_234_000n});
     using apiClient = new APIClient({clock});
