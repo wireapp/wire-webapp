@@ -17,7 +17,7 @@
  *
  */
 
-import {getJoinLink, clearMeetingJoinParameters} from './joinLink';
+import {clearMeetingJoinParameters, getJoinLink} from './joinLink';
 import {getSearchParams} from './urlUtil';
 
 import {buildDomainRedirectUrl} from '../page/login/util';
@@ -38,27 +38,20 @@ describe('meeting join context', () => {
       domain: 'example.com',
       key: 'key',
       code: 'code',
-      password: undefined,
     });
   });
   it('retains meeting context through authentication and cross-backend SSO redirects', () => {
-    window.history.replaceState(
-      {},
-      '',
-      '/auth/?meeting_domain=example.com&meeting_key=key&meeting_code=code&meeting_password=secret',
-    );
+    window.history.replaceState({}, '', '/auth/?meeting_domain=example.com&meeting_key=key&meeting_code=code');
     const params = new URLSearchParams(getSearchParams());
     expect(params.get('meeting_domain')).toBe('example.com');
-    expect(params.get('meeting_password')).toBe('secret');
     const sso = new URL(buildDomainRedirectUrl('https://sso.example.com/auth', '', ClientType.TEMPORARY));
     expect(sso.searchParams.get('meeting_key')).toBe('key');
-    expect(sso.searchParams.get('meeting_password')).toBe('secret');
   });
   it('removes credentials after success while preserving unrelated URL state', () => {
     window.history.replaceState(
       {},
       '',
-      '/auth/?hl=de&meeting_domain=example.com&meeting_key=key&meeting_code=code&meeting_password=secret#/login',
+      '/auth/?hl=de&meeting_domain=example.com&meeting_key=key&meeting_code=code#/login',
     );
     clearMeetingJoinParameters();
     expect(window.location.search).toBe('?hl=de');
