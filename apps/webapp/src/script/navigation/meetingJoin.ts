@@ -17,14 +17,13 @@
  *
  */
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
 export interface NativeMeetingLink {
   domain: string;
   key: string;
   code: string;
-  password?: string;
 }
 
 export function meetingJoinPath(link: NativeMeetingLink): Maybe<string> {
@@ -32,8 +31,5 @@ export function meetingJoinPath(link: NativeMeetingLink): Maybe<string> {
     return Maybe.nothing();
   }
   const params = new URLSearchParams({domain: link.domain, key: link.key, code: link.code});
-  if (!isNullOrUndefined(link.password)) {
-    params.set('password', link.password);
-  }
   return Maybe.just(`/meeting-join?${params.toString()}`);
 }
