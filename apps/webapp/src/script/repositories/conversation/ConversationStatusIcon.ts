@@ -21,7 +21,6 @@ export enum ConversationStatusIcon {
   ACTIVE_CALL = 'active-call',
   GHOST_GROUP = 'ghost-group',
   MISSED_CALL = 'missed-call',
-  MANUAL_UNREAD = 'manual-unread',
   MUTED = 'muted',
   NONE = 'none',
   PENDING_CONNECTION = 'pending',

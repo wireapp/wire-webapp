@@ -38,7 +38,6 @@ export interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
-  cancelPendingReadReceiptsForConversation: (conversation: Conversation) => void;
   getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | undefined;
   invitePeople: (conversation: Conversation) => void;
   messageActions: {

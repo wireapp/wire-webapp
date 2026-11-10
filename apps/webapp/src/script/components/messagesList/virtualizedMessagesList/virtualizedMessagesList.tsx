@@ -17,7 +17,16 @@
  *
  */
 
-import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
+import {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FunctionComponent,
+} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
@@ -38,7 +47,6 @@ import {MessagesListParams} from '../messageList.types';
 import {UploadAssets} from '../uploadAssets';
 import {verticallyCenterMessage} from '../utils/helpers';
 import {filterMessages} from '../utils/messagesFilter';
-import {useConversationReadBoundary} from '../utils/useConversationReadBoundary';
 import {useLoadConversation} from '../utils/useLoadConversation';
 import {useScrollToLastUnreadMessage} from '../utils/useScrollToLastUnreadMessage';
 import {
@@ -56,6 +64,7 @@ const MARKER_ESTIMATE = 56;
 
 interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen' | 'onLoading'> {
   parentElement: HTMLDivElement;
+  conversationLastReadTimestamp: MutableRefObject<number>;
   onLoading: (isLoading: boolean) => void;
 }
 
@@ -85,7 +94,6 @@ async function loadMessagesForTimestampSelection(options: LoadMessagesForTimesta
 
 export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   conversation,
-  cancelPendingReadReceiptsForConversation,
   parentElement,
   assetRepository,
   selfUser,
@@ -105,6 +113,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   messageActions,
   isMsgElementsFocusable,
   setMsgElementsFocusable,
+  conversationLastReadTimestamp,
   updateConversationLastRead,
   onLoading,
   isConversationLoaded,
@@ -136,14 +145,9 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   });
 
   const filteredMessages = filterMessages(allMessages);
-  const {
-    timestamp: conversationLastReadTimestamp,
-    timestampReference: conversationLastReadTimestampReference,
-    setTimestamp: setConversationLastReadTimestamp,
-  } = useConversationReadBoundary(conversation);
 
   const groupedMessages = useMemo(() => {
-    return groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp);
+    return groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
   }, [conversationLastReadTimestamp, filteredMessages]);
 
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
@@ -203,7 +207,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   const {loadConversation} = useLoadConversation({
     conversation,
     conversationRepository,
-    conversationLastReadTimestamp: conversationLastReadTimestampReference,
+    conversationLastReadTimestamp,
     onLoading,
   });
 
@@ -211,7 +215,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   useScrollToLastUnreadMessage(virtualizer, {
     isConversationLoaded,
     groupedMessages,
-    conversationLastReadTimestamp: conversationLastReadTimestampReference,
+    conversationLastReadTimestamp,
   });
 
   // Hook for loading preceding / following messages when user scrolls to top / bottom
@@ -283,8 +287,6 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   }, [groupedMessages, highlightedMessage]);
 
   const onJumpToLastMessageClick = async (): Promise<void> => {
-    // jumping to the latest message is an explicit "read" action, resume auto-read
-    conversation.clearManualUnreadMarker();
     setHighlightedMessage(undefined);
     conversation.initialMessage(undefined);
 
@@ -297,8 +299,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
 
     const newestMessage = allMessages.at(-1);
     if (!isUndefined(newestMessage)) {
-      conversationLastReadTimestampReference.current = newestMessage.timestamp();
-      setConversationLastReadTimestamp(newestMessage.timestamp());
+      conversationLastReadTimestamp.current = newestMessage.timestamp();
     }
 
     const scrollTimeout = setTimeout(() => {
@@ -386,7 +387,6 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
                   hideHeader={item.shouldGroup}
                   messageActions={messageActions}
                   conversation={conversation}
-                  cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
                   hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                   isLastDeliveredMessage={lastDeliveredMessage?.id === item.message.id}
                   isHighlighted={

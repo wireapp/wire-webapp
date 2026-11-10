@@ -44,7 +44,7 @@ export const useLoadConversation = ({
   const loadConversation = async (conversationToLoad: Conversation): Promise<MessageEntity[]> => {
     onLoading(true);
     try {
-      conversationLastReadTimestamp.current = conversationToLoad.effectiveReadTimestamp();
+      conversationLastReadTimestamp.current = conversationToLoad.last_read_timestamp();
       await conversationRepository.updateParticipatingUserEntities(conversationToLoad, false, true);
 
       const initialMessage = conversationToLoad.initialMessage();

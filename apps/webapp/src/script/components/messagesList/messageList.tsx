@@ -19,7 +19,7 @@
 
 import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {JumpToLastMessageButton} from './jumpToLastMessageButton';
@@ -30,7 +30,6 @@ import {UploadAssets} from './uploadAssets';
 import {filterMessages} from './utils/messagesFilter';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
-import {useConversationReadBoundary} from './utils/useConversationReadBoundary';
 
 import {useRoveFocus} from '../../hooks/useRoveFocus';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
@@ -60,7 +59,6 @@ interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
-  cancelPendingReadReceiptsForConversation: (conversation: Conversation) => void;
   getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | undefined;
   invitePeople: (convesation: Conversation) => void;
   messageActions: {
@@ -87,7 +85,6 @@ interface MessagesListParams {
 export const MessagesList: FC<MessagesListParams> = ({
   assetRepository,
   conversation,
-  cancelPendingReadReceiptsForConversation,
   selfUser,
   conversationRepository,
   messageRepository,
@@ -132,13 +129,12 @@ export const MessagesList: FC<MessagesListParams> = ({
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
-  const {timestamp: conversationLastReadTimestamp, setTimestamp: setConversationLastReadTimestamp} =
-    useConversationReadBoundary(conversation);
+  const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
   const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
 
-  const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp);
+  const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
 
   const [messagesContainer, setMessagesContainer] = useState<HTMLDivElement | null>(null);
 
@@ -211,6 +207,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   useEffect(() => {
     onLoading(true);
     setLoaded(false);
+    conversationLastReadTimestamp.current = conversation.last_read_timestamp();
     loadConversation(conversation, conversation.initialMessage()).then(() => {
       setTimeout(() => {
         setLoaded(true);
@@ -271,12 +268,6 @@ export const MessagesList: FC<MessagesListParams> = ({
 
   const jumpToLastMessage = (): void => {
     if (conversation !== undefined) {
-      // jumping to the latest message is an explicit "read" action, resume auto-read
-      conversation.clearManualUnreadMarker();
-      const newestMessage = conversation.getNewestMessage();
-      if (!isUndefined(newestMessage)) {
-        setConversationLastReadTimestamp(newestMessage.timestamp());
-      }
       // clean up anything like search result
       setHighlightedMessage(undefined);
       conversation.initialMessage(undefined);
@@ -346,7 +337,6 @@ export const MessagesList: FC<MessagesListParams> = ({
                   hideHeader={message.timestamp() !== firstMessageTimestamp}
                   messageActions={messageActions}
                   conversation={conversation}
-                  cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
                   hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                   isLastDeliveredMessage={isLastDeliveredMessage}
                   isHighlighted={isHighlighted}
