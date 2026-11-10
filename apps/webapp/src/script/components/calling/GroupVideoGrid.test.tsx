@@ -276,6 +276,11 @@ describe('GroupVideoGrid', () => {
     expect(remoteParticipant.videoStream()).toBe(remoteStream);
     expect(container.querySelector('[data-uie-name="self-preview-muted-indicator"]')).toBeVisible();
     expect(container.querySelector('[data-uie-name="self-preview-hand-raised-indicator"]')).toBeVisible();
+    expect(
+      requireValueForTest(
+        container.querySelector<HTMLElement>('[data-uie-name="grids-wrapper"]'),
+      ).style.getPropertyValue('--columns'),
+    ).toBe('1');
 
     fireEvent.click(getByRole('button', {name: 'videoCallOverlayRestoreSelfVideo'}));
     expect(container.querySelector('.group-video-grid__element-video')).toBeInTheDocument();

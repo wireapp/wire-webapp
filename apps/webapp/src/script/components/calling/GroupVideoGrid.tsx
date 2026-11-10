@@ -139,7 +139,11 @@ function GroupVideoThumbnail({
         '@media (hover: none)': {opacity: 1},
       }}
     >
-      {isMinimized ? <Icon.FullscreenIcon aria-hidden="true" /> : <Icon.MinusIcon aria-hidden="true" />}
+      {isMinimized ? (
+        <Icon.FullscreenIcon aria-hidden="true" css={{'&& path': {fill: 'currentColor'}}} />
+      ) : (
+        <Icon.MinusIcon aria-hidden="true" />
+      )}
     </button>
   );
   const selfVideoWindowHeader = allowMinimize && (
@@ -206,7 +210,7 @@ function GroupVideoThumbnail({
                   : undefined
               }
             >
-              <Icon.MicOffIcon data-uie-name="mic-icon-off" />
+              <Icon.MicOffIcon css={{'&& path': {fill: 'currentColor'}}} data-uie-name="mic-icon-off" />
             </span>
           )}
           {!isNullOrUndefined(selfHandRaisedAt) && !minimized && (
@@ -222,6 +226,7 @@ function GroupVideoThumbnail({
                         borderRadius: 0,
                         color: 'var(--white)',
                         display: 'flex',
+                        filter: 'grayscale(1) brightness(2)',
                         fontSize: 14,
                         height: 16,
                         justifyContent: 'center',
@@ -416,17 +421,25 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
   };
 
   const participants = (isNullOrUndefined(maximizedParticipant) ? grid.grid : [maximizedParticipant]).filter(Boolean);
+  const visibleParticipantCount = isSelfVideoMinimized
+    ? Math.max(
+        1,
+        participants.filter(participant => {
+          return participant !== selfParticipant;
+        }).length,
+      )
+    : participants.length;
 
   useEffect(() => {
     setRowsAndColumns(
       calculateRowsAndColumns({
-        totalCount: participants.length,
+        totalCount: visibleParticipantCount,
         isTablet: isTablet,
         isDesktop: isDesktop,
         isShort: isShort,
       }),
     );
-  }, [participants.length, isTablet, isDesktop, isShort]);
+  }, [visibleParticipantCount, isTablet, isDesktop, isShort]);
 
   useEffect(() => {
     const setParticipantsForDevice = (limits: {

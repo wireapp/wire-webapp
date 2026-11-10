@@ -296,6 +296,7 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
               borderRadius: 0,
               color: 'var(--white)',
               display: 'flex',
+              filter: 'grayscale(1) brightness(2)',
               fontSize: 14,
               height: 16,
               justifyContent: 'center',
@@ -346,7 +347,7 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
             }}
           >
             {isSelfPreviewMinimized ? (
-              <Icon.FullscreenIcon aria-hidden="true" />
+              <Icon.FullscreenIcon aria-hidden="true" css={{'&& path': {fill: 'currentColor'}}} />
             ) : (
               <Icon.MinusIcon aria-hidden="true" />
             )}
