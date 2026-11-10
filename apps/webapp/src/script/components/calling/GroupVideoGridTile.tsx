@@ -161,14 +161,14 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
       css={
         isSelfParticipant && isSelfPreviewMinimized
           ? {
-              backgroundColor: 'transparent',
-              borderRadius: 0,
-              height: 36,
+              backgroundColor: 'var(--gray-95)',
+              borderRadius: 20,
+              height: 40,
               overflow: 'visible',
               position: 'absolute',
               right: 12,
               top: 12,
-              width: 68,
+              width: 72,
               zIndex: 3,
             }
           : undefined
@@ -269,10 +269,12 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
           css={{
             '&.group-video-grid__element__label__icon': {
               alignItems: 'center',
-              bottom: 0,
+              backgroundColor: 'transparent',
+              bottom: 4,
+              color: 'var(--white)',
               display: 'flex',
               height: 16,
-              left: 0,
+              left: 4,
               margin: 0,
               padding: 0,
               width: 16,
@@ -281,7 +283,7 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
           }}
           data-uie-name="self-preview-muted-indicator"
         >
-          <Icon.MicOffIcon data-uie-name="mic-icon-off" />
+          <Icon.MicOffIcon css={{'&& path': {fill: 'currentColor'}}} data-uie-name="mic-icon-off" />
         </span>
       )}
       {isSelfParticipant && isSelfPreviewMinimized && handRaisedAt != null && (
@@ -290,15 +292,16 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
           css={{
             '&&': {
               alignItems: 'center',
-              backgroundColor: 'var(--background-fade-40)',
-              borderRadius: '50%',
+              backgroundColor: 'transparent',
+              borderRadius: 0,
+              color: 'var(--white)',
               display: 'flex',
-              fontSize: 12,
+              fontSize: 14,
               height: 16,
               justifyContent: 'center',
-              left: 0,
+              left: 4,
               margin: 0,
-              top: 0,
+              top: 4,
               width: 16,
               zIndex: 3,
             },
@@ -321,10 +324,10 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
             data-uie-name={isSelfPreviewMinimized ? 'restore-self-video-preview' : 'minimize-self-video-preview'}
             css={{
               alignItems: 'center',
-              backgroundColor: 'var(--background-fade-40)',
+              backgroundColor: 'transparent',
               border: 0,
-              borderRadius: '50%',
-              color: 'var(--foreground)',
+              borderRadius: 4,
+              color: isSelfPreviewMinimized ? 'var(--white)' : 'var(--foreground)',
               cursor: 'pointer',
               display: 'flex',
               height: 32,
@@ -335,8 +338,8 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
               transition: 'opacity 120ms ease-out',
               '.group-video-grid__element:hover &, .group-video-grid__element:focus-within &': {opacity: 1},
               '&:focus-visible': {
-                outline: '2px solid var(--foreground)',
-                outlineOffset: -2,
+                outline: '2px solid var(--white)',
+                outlineOffset: 2,
                 opacity: 1,
               },
               '@media (hover: none)': {opacity: 1},

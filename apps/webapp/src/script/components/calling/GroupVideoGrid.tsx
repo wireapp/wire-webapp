@@ -118,10 +118,10 @@ function GroupVideoThumbnail({
       data-uie-name={isMinimized ? 'restore-self-video-preview' : 'minimize-self-video-preview'}
       css={{
         alignItems: 'center',
-        backgroundColor: 'var(--background-fade-40)',
+        backgroundColor: 'transparent',
         border: 0,
-        borderRadius: '50%',
-        color: 'var(--foreground)',
+        borderRadius: 4,
+        color: isMinimized ? 'var(--white)' : 'var(--foreground)',
         cursor: 'pointer',
         display: 'flex',
         height: 32,
@@ -132,8 +132,8 @@ function GroupVideoThumbnail({
         transition: 'opacity 120ms ease-out',
         '.group-video__thumbnail:hover &, .group-video__thumbnail:focus-within &': {opacity: 1},
         '&:focus-visible': {
-          outline: '2px solid var(--foreground)',
-          outlineOffset: -2,
+          outline: '2px solid var(--white)',
+          outlineOffset: 2,
           opacity: 1,
         },
         '@media (hover: none)': {opacity: 1},
@@ -189,12 +189,14 @@ function GroupVideoThumbnail({
               css={
                 isMinimized
                   ? {
-                      '&.group-video-grid__element__label__icon': {
+                      '&&': {
                         alignItems: 'center',
-                        bottom: 0,
+                        backgroundColor: 'transparent',
+                        bottom: 4,
+                        color: 'var(--white)',
                         display: 'flex',
                         height: 16,
-                        left: 0,
+                        left: 4,
                         margin: 0,
                         padding: 0,
                         width: 16,
@@ -216,15 +218,16 @@ function GroupVideoThumbnail({
                   ? {
                       '&&': {
                         alignItems: 'center',
-                        backgroundColor: 'var(--background-fade-40)',
-                        borderRadius: '50%',
+                        backgroundColor: 'transparent',
+                        borderRadius: 0,
+                        color: 'var(--white)',
                         display: 'flex',
-                        fontSize: 12,
+                        fontSize: 14,
                         height: 16,
                         justifyContent: 'center',
-                        left: 0,
+                        left: 4,
                         margin: 0,
-                        top: 0,
+                        top: 4,
                         width: 16,
                         zIndex: 3,
                       },
@@ -321,16 +324,17 @@ const GroupVideoThumbnailWrapper: FunctionComponent<{
   let thumbnailStyles: CSSObject | undefined;
   if (selfPreviewMinimized) {
     thumbnailStyles = {
-      backgroundColor: 'transparent',
+      backgroundColor: 'var(--gray-95)',
+      borderRadius: 20,
       bottom: 'unset',
       boxShadow: 'none',
-      height: 36,
+      height: 40,
       maxHeight: 'none',
       maxWidth: 'none',
       overflow: 'visible',
       right: 8,
       top: 8,
-      width: 68,
+      width: 72,
     };
   } else if (minimized) {
     thumbnailStyles = {
