@@ -45,31 +45,40 @@ describe('MediaStreamHandler', () => {
   });
 
   describe('requestMediaStream', () => {
+    const requestedMediaStream = {
+      getTracks: () => {
+        return [];
+      },
+    } as unknown as MediaStream;
+
     it('requests audio streams', async () => {
-      spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(new MediaStream()));
+      spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(requestedMediaStream));
 
-      await streamHandler.requestMediaStream(true, false, false, true);
+      const mediaStream = await streamHandler.requestMediaStream(true, false, false, true);
 
+      expect(mediaStream).toBe(requestedMediaStream);
       expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
         jasmine.objectContaining({audio: enhancedAudioConstraints, video: undefined}),
       );
     });
 
     it('requests video streams', async () => {
-      spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(new MediaStream()));
+      spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(requestedMediaStream));
 
-      await streamHandler.requestMediaStream(false, true, false, true);
+      const mediaStream = await streamHandler.requestMediaStream(false, true, false, true);
 
+      expect(mediaStream).toBe(requestedMediaStream);
       expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
         jasmine.objectContaining({audio: undefined, video: jasmine.any(Object)}),
       );
     });
 
     it('requests audio and video streams', async () => {
-      spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(new MediaStream()));
+      spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(requestedMediaStream));
 
-      await streamHandler.requestMediaStream(true, true, false, true);
+      const mediaStream = await streamHandler.requestMediaStream(true, true, false, true);
 
+      expect(mediaStream).toBe(requestedMediaStream);
       expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
         jasmine.objectContaining({audio: enhancedAudioConstraints, video: jasmine.any(Object)}),
       );

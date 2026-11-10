@@ -33,8 +33,6 @@ import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 import {useShallow} from 'zustand/react/shallow';
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
-
 import {ConversationCallingView} from './conversationCallingView/conversationCallingView';
 import {ConversationHeader, conversationsPanelHeadingId} from './conversationHeader';
 import {ConversationListCollapseHandle} from './conversationListCollapseHandle';
@@ -77,6 +75,7 @@ import {UserState} from '../../../../repositories/user/userState';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {setHistoryParam} from '../../../../router/Router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
+import {useMatchMedia} from '../../../../uiKit/layout/matchMedia/matchMedia';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {useChannelsFeatureFlag} from '../../../../util/useChannelsFeatureFlag';
 import {useMeetingsFeatureFlag} from '../../../../util/useMeetingsFeatureFlag';

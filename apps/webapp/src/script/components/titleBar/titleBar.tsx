@@ -25,8 +25,6 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
-
 import {useConversationCall} from '../../hooks/useConversationCall';
 import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {RightSidebarParams} from '../../page/appMain';
@@ -39,6 +37,11 @@ import {ConversationFilter} from '../../repositories/conversation/ConversationFi
 import {Conversation} from '../../repositories/entity/Conversation';
 import {User} from '../../repositories/entity/User';
 import {TeamState} from '../../repositories/team/TeamState';
+import {CallIcon} from '../../uiKit/dataDisplay/icon/callIcon';
+import {IconButton, IconButtonVariant} from '../../uiKit/inputs/iconButton/iconButton';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
+import {TabIndex} from '../../uiKit/utils/enums';
+import {QUERY} from '../../uiKit/utils/mediaQueries';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../util/keyboardUtil';
 import {createReactTranslationMarker, renderReactTranslation} from '../../util/localizerUtil/reactLocalizerUtil';

@@ -21,8 +21,6 @@ import {useCallback, useState, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
-
 import {CellsMoveNodeModal} from './cellsMoveNodeModal/cellsMoveNodeModal';
 import {CellsRenameNodeModal} from './cellsRenameNodeModal/cellsRenameNodeModal';
 import {buttonStyles, iconStyles, textStyles} from './cellsTableRowOptions.styles';
@@ -38,6 +36,8 @@ import {useRestoreParentNode} from './useRestoreParentNode/useRestoreParentNode'
 import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {CellNode, CellNodeType} from '../../../../../../types/cellNode';
+import {MoreIcon} from '../../../../../../uiKit/dataDisplay/icon/moreIcon';
+import {DropdownMenu} from '../../../../../../uiKit/surface/dropdownMenu/dropdownMenu';
 import {isFileEditable} from '../../../../../../util/fileTypeUtil';
 import {forcedDownloadFile} from '../../../../../../util/util';
 import {useAppNotification} from '../../../../../appNotification/appNotification';

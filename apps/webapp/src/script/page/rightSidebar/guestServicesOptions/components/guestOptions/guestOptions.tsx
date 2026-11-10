@@ -24,8 +24,6 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import * as Icon from '../../../../../components/icon';
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {RadioGroup} from '../../../../../components/Radio';
@@ -38,6 +36,7 @@ import {ConversationRepository} from '../../../../../repositories/conversation/C
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {TeamRepository} from '../../../../../repositories/team/TeamRepository';
 import {TeamState} from '../../../../../repositories/team/TeamState';
+import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
 import {copyText} from '../../../../../util/clipboardUtil';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {useApplicationContext} from '../../../../rootProvider';

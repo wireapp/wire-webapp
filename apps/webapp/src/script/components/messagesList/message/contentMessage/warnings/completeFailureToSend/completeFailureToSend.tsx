@@ -21,10 +21,10 @@ import type {FunctionComponent, ReactNode} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
-
 import {Config} from '../../../../../../Config';
 import {useApplicationContext} from '../../../../../../page/rootProvider';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
+import {Link, LinkVariant} from '../../../../../../uiKit/typography/link/link';
 import {
   createReactTranslationMarker,
   renderReactTranslation,

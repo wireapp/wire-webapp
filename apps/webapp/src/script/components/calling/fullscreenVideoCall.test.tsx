@@ -19,7 +19,8 @@
 
 import {act, render, waitFor} from '@testing-library/react';
 
-import {QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
+import {QUERY} from '../../uiKit/utils/mediaQueries';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {noop} from 'noop-esm';
 
 import {Call} from '../../repositories/calling/Call';
@@ -51,9 +52,11 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;
 
-jest.mock('@wireapp/react-ui-kit', () => {
+jest.mock('../../uiKit/layout/matchMedia/matchMedia', () => {
   return {
-    ...(jest.requireActual('@wireapp/react-ui-kit') as any),
+    ...jest.requireActual<typeof import('../../uiKit/layout/matchMedia/matchMedia')>(
+      '../../uiKit/layout/matchMedia/matchMedia',
+    ),
     useMatchMedia: jest.fn(),
   };
 });

@@ -34,8 +34,6 @@ import {useVirtualizer} from '@tanstack/react-virtual';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {WIDTH} from '@wireapp/react-ui-kit';
-
 import {ConnectionRequests} from './connectionRequests';
 import {
   conversationsList,
@@ -60,6 +58,7 @@ import {Conversation} from '../../../../repositories/entity/Conversation';
 import {User} from '../../../../repositories/entity/User';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
+import {WIDTH} from '../../../../uiKit/layout/sizes/sizes';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {isKeyboardEvent} from '../../../../util/keyboardUtil';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';

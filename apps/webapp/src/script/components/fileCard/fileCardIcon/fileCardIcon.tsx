@@ -19,10 +19,10 @@
 
 import type {FunctionComponent} from 'react';
 
-import {AlertIcon, UnavailableFileIcon} from '@wireapp/react-ui-kit';
-
 import {errorIconStyles, unavailableIconStyles} from './fileCardIcon.styles';
 
+import {AlertIcon} from '../../../uiKit/dataDisplay/icon/alertIcon';
+import {UnavailableFileIcon} from '../../../uiKit/dataDisplay/icon/unavailableFileIcon';
 import {FileTypeIcon} from '../../conversation/common/fileTypeIcon/fileTypeIcon';
 import {useFileCardContext} from '../common/fileCardContext/fileCardContext';
 

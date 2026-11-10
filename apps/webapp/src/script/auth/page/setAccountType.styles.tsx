@@ -19,7 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2, WIDTH} from '@wireapp/react-ui-kit';
+import {COLOR_V2} from '../../uiKit/identity/colorsV2/colorsV2';
+import {WIDTH} from '../../uiKit/layout/sizes/sizes';
 
 const breakpoints = [WIDTH.TABLET_MAX, WIDTH.DESKTOP_MAX];
 

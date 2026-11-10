@@ -19,11 +19,9 @@
 
 import {UIEvent, useCallback, useEffect, useMemo, useState, type ReactElement} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
-
-import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {
   searchResultsHeadingStyles,
@@ -55,7 +53,6 @@ import {ConversationViewerPermissionBanner} from './conversationViewerPermission
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './readOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
-import {withAutoReadGuard} from './utils/autoReadGuard';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 import {parseAccountDeepLink} from './utils/parseAccountDeepLink';
 
@@ -79,6 +76,7 @@ import {Message} from '../../repositories/entity/message/message';
 import {User} from '../../repositories/entity/User';
 import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {TeamState} from '../../repositories/team/TeamState';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isLastReceivedMessage} from '../../util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from '../../util/fileTypeUtil';
@@ -195,10 +193,7 @@ function ConversationContent({
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  const {addReadReceiptToBatch, cancelPendingReadReceiptsForConversation} = useReadReceiptSender({
-    messageSender: repositories.message,
-    clock,
-  });
+  const {addReadReceiptToBatch} = useReadReceiptSender({messageSender: repositories.message, clock});
 
   useEffect(() => {
     if (!isVirtualizedMessagesListEnabled) {
@@ -618,15 +613,6 @@ function ConversationContent({
 
       const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
       const isNotOwnMessage = !messageEntity.user().isMe;
-      const manualUnreadTimestamp = conversationEntity.manualUnreadTimestamp();
-
-      if (isNumber(manualUnreadTimestamp) && messageTimestamp >= manualUnreadTimestamp) {
-        callbacks.push(
-          withAutoReadGuard(conversationEntity, () => {
-            conversationEntity.clearManualUnreadMarker();
-          }),
-        );
-      }
 
       let shouldSendReadReceipt = false;
 
@@ -644,21 +630,17 @@ function ConversationContent({
       }
 
       if (isLastReceivedMessage(messageEntity, conversationEntity)) {
-        callbacks.push(
-          withAutoReadGuard(conversationEntity, () => {
-            return updateConversationLastRead(conversationEntity, messageEntity);
-          }),
-        );
+        callbacks.push(() => {
+          return updateConversationLastRead(conversationEntity, messageEntity);
+        });
       }
 
       if (isUnreadMessage && isNotOwnMessage) {
-        callbacks.push(withAutoReadGuard(conversationEntity, updateLastRead));
+        callbacks.push(updateLastRead);
         if (shouldSendReadReceipt) {
-          callbacks.push(
-            withAutoReadGuard(conversationEntity, () => {
-              return addReadReceiptToBatch(conversationEntity, messageEntity);
-            }),
-          );
+          callbacks.push(() => {
+            return addReadReceiptToBatch(conversationEntity, messageEntity);
+          });
         }
       }
 
@@ -856,7 +838,6 @@ function ConversationContent({
                 setMsgElementsFocusable={setMsgElementsFocusable}
                 isRightSidebarOpen={isRightSidebarOpen}
                 updateConversationLastRead={updateConversationLastRead}
-                cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
               />
 
               {showViewerPermission && !isFileTabActive && (

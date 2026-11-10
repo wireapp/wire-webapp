@@ -81,9 +81,8 @@ const ignores = [
   'apps/webapp/src/script/components/icon.tsx',
   'libraries/api-client/lib/',
   'libraries/config/lib/',
-  'libraries/react-ui-kit/lib/',
   'libraries/*/lib/',
-  'libraries/react-ui-kit/emotion.d.ts',
+  'apps/webapp/src/script/uiKit/emotion.d.ts',
 ];
 
 const productionFileIgnorePatterns = [
@@ -102,7 +101,7 @@ const productionFileIgnorePatterns = [
   'apps/webapp/rspack.config*.mts',
   'libraries/config/src/client.config.ts',
   'libraries/config/src/server.config.ts',
-  'libraries/react-ui-kit/emotion.d.ts',
+  'apps/webapp/src/script/uiKit/emotion.d.ts',
 ];
 
 function addProductionFileIgnores(configuration) {
@@ -340,7 +339,7 @@ const productionConfigs = [
   reactPlugin.configs.flat.recommended,
   reactPlugin.configs.flat['jsx-runtime'],
   {
-    files: ['apps/webapp/src/**/*.{jsx,tsx}', 'libraries/react-ui-kit/src/**/*.{jsx,tsx}'],
+    files: ['apps/webapp/src/**/*.{jsx,tsx}'],
     rules: {
       'react/forbid-dom-props': ['warn', {forbid: ['data-testid']}],
       'react/forbid-component-props': ['warn', {forbid: ['data-testid']}],
@@ -354,6 +353,13 @@ const productionConfigs = [
       ...legacyRules,
       'no-unsanitized/property': 'error',
       'no-unsanitized/method': 'error',
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/main/startApplication.tsx'],
+    rules: {
+      // Bootstrap imports must load reflection support before decorated modules.
+      'import/order': 'off',
     },
   },
   {
@@ -623,7 +629,6 @@ const productionConfigs = [
       'tools/configuration/**/*.{ts,mts}',
       'libraries/api-client/**/*.{ts,tsx}',
       'libraries/commons/**/*.{ts,tsx}',
-      'libraries/react-ui-kit/**/*.{ts,tsx}',
     ],
     rules: {
       '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
@@ -682,7 +687,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['libraries/react-ui-kit/**/*.{ts,tsx}'],
+    files: ['apps/webapp/src/script/uiKit/**/*.{ts,tsx}'],
     rules: {
       'import/no-default-export': 'off',
     },
@@ -1011,6 +1016,7 @@ const config = [
           vars: 'all',
           args: 'after-used',
           ignoreRestSiblings: true,
+          ignoreUsingDeclarations: true,
           argsIgnorePattern: '^_$',
           caughtErrors: 'all',
           caughtErrorsIgnorePattern: '^_$',

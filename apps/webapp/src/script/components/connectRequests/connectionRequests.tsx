@@ -22,14 +22,15 @@ import {useEffect, useRef, type FunctionComponent} from 'react';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
-
 import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from '../../page/rootProvider';
 import {useAppMainState, ViewType} from '../../page/state';
 import {User} from '../../repositories/entity/User';
 import {TeamState} from '../../repositories/team/TeamState';
 import {UserState} from '../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {IconButton, IconButtonVariant} from '../../uiKit/inputs/iconButton/iconButton';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import {UserClassifiedBar} from '../classifiedBar/classifiedBar';

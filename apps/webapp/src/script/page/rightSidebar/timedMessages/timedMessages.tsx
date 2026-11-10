@@ -21,13 +21,12 @@ import {FC, useEffect, useState} from 'react';
 
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import {RadioGroup} from '../../../components/Radio';
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {TeamState} from '../../../repositories/team/TeamState';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {formatDuration} from '../../../util/timeUtil';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';

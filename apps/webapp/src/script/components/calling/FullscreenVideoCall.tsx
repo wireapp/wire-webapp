@@ -25,17 +25,6 @@ import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {
-  Checkbox,
-  CheckboxLabel,
-  CloseDetachedWindowIcon,
-  IconButton,
-  IconButtonVariant,
-  OpenDetachedWindowIcon,
-  QUERY,
-  TabIndex,
-} from '@wireapp/react-ui-kit';
-
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {CallSecurityLine} from './callSecurityLine/callSecurityLine';
 import {Duration} from './Duration';
@@ -73,6 +62,12 @@ import type {BackgroundEffectSelection} from '../../repositories/media/VideoBack
 import {BUILTIN_BACKGROUNDS} from '../../repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
 import {TeamState} from '../../repositories/team/TeamState';
+import {CloseDetachedWindowIcon} from '../../uiKit/dataDisplay/icon/closeDetachedWindowIcon';
+import {OpenDetachedWindowIcon} from '../../uiKit/dataDisplay/icon/openDetachedWindowIcon';
+import {Checkbox, CheckboxLabel} from '../../uiKit/inputs/checkbox/checkbox';
+import {IconButton, IconButtonVariant} from '../../uiKit/inputs/iconButton/iconButton';
+import {TabIndex} from '../../uiKit/utils/enums';
+import {QUERY} from '../../uiKit/utils/mediaQueries';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from '../../util/isDetachedCallingFeatureEnabled';
 import {handleKeyDown, isTabKey, KEY} from '../../util/keyboardUtil';

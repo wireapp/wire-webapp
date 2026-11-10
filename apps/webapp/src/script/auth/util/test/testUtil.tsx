@@ -32,7 +32,8 @@ import {AnyAction} from 'redux';
 import {MockStoreEnhanced} from 'redux-mock-store';
 import {ThunkDispatch} from 'redux-thunk';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../uiKit/identity/theme/theme';
 import type {JSX} from '@emotion/react/jsx-runtime';
 
 import cs from '../../../../i18n/cs-CZ.json';

@@ -21,7 +21,7 @@ import {act, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {useState, type FunctionComponent} from 'react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../../../uiKit/identity/theme/theme';
 import {Maybe} from 'true-myth';
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {

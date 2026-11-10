@@ -132,7 +132,7 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
     },
     devtool: 'source-map',
     entry: {
-      app: path.resolve(scriptPath, 'main/index.tsx'),
+      app: path.resolve(scriptPath, 'main/previewEntrypoint.tsx'),
       auth: path.resolve(authPath, 'main.tsx'),
       checkBrowser: path.resolve(browserCheckPath, 'checkBrowser.ts'),
     },

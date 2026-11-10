@@ -21,14 +21,15 @@ import {useState, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-kit';
-
 import {CellsNewFileModal} from './cellsNewFileModal/cellsNewFileModal';
 import {CellsNewFolderModal} from './cellsNewFolderModal/cellsNewFolderModal';
 import {buttonStyles, iconStyles} from './cellsNewMenu.styles';
 
 import {useApplicationContext} from '../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {PlusIcon} from '../../../../../uiKit/dataDisplay/icon/plusIcon';
+import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
+import {DropdownMenu} from '../../../../../uiKit/surface/dropdownMenu/dropdownMenu';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,

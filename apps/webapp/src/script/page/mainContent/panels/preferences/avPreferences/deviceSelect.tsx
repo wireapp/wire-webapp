@@ -22,9 +22,9 @@ import {ComponentType, type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {Select} from '@wireapp/react-ui-kit';
-
 import {containerStyles, selectWrapperStyles} from './deviceSelect.styles';
+
+import {Select} from '../../../../../uiKit/inputs/select/select';
 
 const minimumDeviceCountForSelection = 2;
 

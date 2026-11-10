@@ -17,17 +17,15 @@
  *
  */
 
-import {fireEvent, render} from '@testing-library/react';
+import {render} from '@testing-library/react';
 import type {ComponentProps} from 'react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from '../../../repositories/entity/Conversation';
-import {ContentMessage as ContentMessageEntity} from '../../../repositories/entity/message/contentMessage';
 import {MemberMessage as MemberMessageEntity} from '../../../repositories/entity/message/memberMessage';
-import {Text} from '../../../repositories/entity/message/text';
 import {User} from '../../../repositories/entity/User';
-import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
+import {withTheme} from '../../../auth/util/test/testUtil';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {
@@ -64,16 +62,12 @@ function createMemberMessage(systemType: SystemMessageType, users?: User[]): Mem
 }
 
 type CreateBasePropsResult = Omit<ComponentProps<typeof MessageWrapper>, 'message'> & {
-  message: MemberMessageEntity | ContentMessageEntity;
+  message: MemberMessageEntity;
 };
-const createBaseProps = (
-  conversation: Conversation,
-  message: MemberMessageEntity | ContentMessageEntity,
-): CreateBasePropsResult => {
+const createBaseProps = (conversation: Conversation, message: MemberMessageEntity): CreateBasePropsResult => {
   return {
     conversation,
     message,
-    cancelPendingReadReceiptsForConversation: jest.fn(),
     selfId: {id: createUuid(), domain: 'test.wire.link'},
     isFocused: false,
     isSelfTemporaryGuest: false,
@@ -257,76 +251,6 @@ describe('MessageWrapper', () => {
 
       expect(getByTitle('conversationCellsConversationEnabledEditor')).toBeInTheDocument();
       expect(getByText('conversationDetailsActionTimedMessagesDisabled')).toBeInTheDocument();
-    });
-  });
-
-  describe('Mark as unread context menu entry', () => {
-    type RenderContentMessageResult = ReturnType<typeof render> & {
-      readonly cancelPendingReadReceiptsForConversation: jest.MockedFunction<(conversation: Conversation) => void>;
-      readonly conversation: Conversation;
-      readonly markUnreadFrom: jest.SpiedFunction<Conversation['markUnreadFrom']>;
-      readonly message: ContentMessageEntity;
-      readonly actionOrder: string[];
-    };
-
-    function renderContentMessage(): RenderContentMessageResult {
-      const conversation = new Conversation(
-        createUuid(),
-        'test.wire.link',
-        CONVERSATION_PROTOCOL.PROTEUS,
-        translateForTest,
-      );
-      const message = new ContentMessageEntity(createUuid(), translateForTest);
-      message.timestamp(1_000);
-      message.user(generateUser());
-      message.addAsset(new Text(createUuid(), 'hello'));
-      const actionOrder: string[] = [];
-      const markUnreadFrom = jest.spyOn(conversation, 'markUnreadFrom').mockImplementation(() => {
-        actionOrder.push('mark unread');
-      });
-      const cancelPendingReadReceiptsForConversation = jest.fn((conversationToCancel: Conversation): void => {
-        expect(conversationToCancel).toBe(conversation);
-        actionOrder.push('cancel pending receipts');
-      });
-      const props = {
-        ...createBaseProps(conversation, message),
-        cancelPendingReadReceiptsForConversation,
-        isFocused: true,
-      };
-
-      const view = render(withThemeAndRootContext(<MessageWrapper {...props} />, rootProviderWrapper));
-      fireEvent.click(view.getByLabelText('accessibility.conversationContextMenuOpenLabel'));
-
-      return {
-        ...view,
-        cancelPendingReadReceiptsForConversation,
-        conversation,
-        markUnreadFrom,
-        message,
-        actionOrder,
-      };
-    }
-
-    afterEach(() => {
-      jest.restoreAllMocks();
-    });
-
-    it('marks the conversation as unread from the message when the entry is clicked', () => {
-      const {getByText, actionOrder, cancelPendingReadReceiptsForConversation, conversation, markUnreadFrom, message} =
-        renderContentMessage();
-
-      fireEvent.click(getByText('conversationContextMenuMarkUnread'));
-
-      expect(cancelPendingReadReceiptsForConversation).toHaveBeenCalledWith(conversation);
-      expect(markUnreadFrom).toHaveBeenCalledWith(message);
-      expect(actionOrder).toEqual(['cancel pending receipts', 'mark unread']);
-    });
-
-    it('offers the entry by default', () => {
-      const {queryByText, cancelPendingReadReceiptsForConversation} = renderContentMessage();
-
-      expect(queryByText('conversationContextMenuMarkUnread')).toBeInTheDocument();
-      expect(cancelPendingReadReceiptsForConversation).not.toHaveBeenCalled();
     });
   });
 });

@@ -18,7 +18,7 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {createFireAndForgetInvoker, type FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {asyncNoop} from 'noop-esm';
 
@@ -31,26 +31,52 @@ describe('createApplicationServices', () => {
     const applicationObservability: ApplicationObservability = {
       reportApplicationStartup: jest.fn(asyncNoop),
     };
-    const fireAndForgetInvoker = {
+    const fireAndForgetInvoker: FireAndForgetInvoker = {
       fireAndForget: jest.fn(),
       waitUntilAllSettled: jest.fn(asyncNoop),
-    } as FireAndForgetInvoker;
+    };
     const createApplicationObservability = jest.fn(() => {
       return applicationObservability;
-    });
-    const createFireAndForgetInvoker = jest.fn(() => {
-      return fireAndForgetInvoker;
     });
     const applicationServices = createApplicationServices({
       createApplicationObservability,
       clock,
-      createFireAndForgetInvoker,
+      fireAndForgetInvoker,
     });
 
     expect(applicationServices.applicationObservability).toBe(applicationObservability);
     expect(applicationServices.clock).toBe(clock);
     expect(applicationServices.fireAndForgetInvoker).toBe(fireAndForgetInvoker);
     expect(createApplicationObservability).toHaveBeenCalledTimes(1);
-    expect(createFireAndForgetInvoker).toHaveBeenCalledTimes(1);
+  });
+
+  it('reuses the bootstrap invoker for cleanup and application consumers', async () => {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const applicationObservability: ApplicationObservability = {reportApplicationStartup: jest.fn(asyncNoop)};
+    const reportError = jest.fn();
+    const fireAndForgetInvoker = createFireAndForgetInvoker({reportError});
+    const cleanupFailure = new Error('Legacy cleanup failed');
+    const consumerFailure = new Error('Application action failed');
+
+    fireAndForgetInvoker.fireAndForget(async () => {
+      throw cleanupFailure;
+    });
+    const applicationServices = createApplicationServices({
+      clock,
+      fireAndForgetInvoker,
+      createApplicationObservability() {
+        return applicationObservability;
+      },
+    });
+    applicationServices.fireAndForgetInvoker.fireAndForget(async () => {
+      throw consumerFailure;
+    });
+
+    await applicationServices.fireAndForgetInvoker.waitUntilAllSettled();
+
+    expect(applicationServices.fireAndForgetInvoker).toBe(fireAndForgetInvoker);
+    expect(reportError).toHaveBeenCalledTimes(2);
+    expect(reportError).toHaveBeenCalledWith(cleanupFailure);
+    expect(reportError).toHaveBeenCalledWith(consumerFailure);
   });
 });

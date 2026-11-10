@@ -24,8 +24,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 import ko from 'knockout';
 
-import {OutlineCheck} from '@wireapp/react-ui-kit';
-
 import {ContentAsset} from './asset';
 import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './contentMessage.styles';
 import {MessageActionsMenu} from './messageActions/messageActions';
@@ -47,6 +45,7 @@ import {ContentMessage} from '../../../../repositories/entity/message/contentMes
 import type {FileAsset as FileAssetType} from '../../../../repositories/entity/message/fileAsset';
 import type {User} from '../../../../repositories/entity/User';
 import {ContextMenuEntry} from '../../../../ui/contextMenu';
+import {OutlineCheck} from '../../../../uiKit/dataDisplay/icon/outlineCheck';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {getMessageAriaLabel} from '../../../../util/conversationMessages';
 import {FileFullscreenModalSourceConversationProvider} from '../../../FileFullscreenModal/FileFullscreenModalSourceConversationContext';

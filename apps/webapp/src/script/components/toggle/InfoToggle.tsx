@@ -22,7 +22,7 @@ import {ReactNode, useId, type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {ViewerAccessIcon} from '@wireapp/react-ui-kit';
+import {ViewerAccessIcon} from '../../uiKit/dataDisplay/icon/viewerAccessIcon';
 
 interface InfoToggleProps {
   dataUieName: string;

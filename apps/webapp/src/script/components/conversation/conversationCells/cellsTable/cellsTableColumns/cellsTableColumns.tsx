@@ -44,6 +44,7 @@ const columnHelper = createColumnHelper<CellNode>();
 
 interface CellsTableLabels {
   actions: string;
+  selectAllOnPage: string;
   created: string;
   name: string;
   owner: string;
@@ -84,6 +85,8 @@ export const getCellsTableColumns = ({
   onToggleSort,
   selectedNodeIds,
   onToggleSelection,
+  onTogglePageSelection,
+  isPageSelected,
   selectionEnabled,
 }: {
   cellsRepository: CellsRepository;
@@ -97,6 +100,8 @@ export const getCellsTableColumns = ({
   onToggleSort: (field: CellsSortField) => void;
   selectedNodeIds: Set<string>;
   onToggleSelection: (nodeId: string, isSelected: boolean) => void;
+  onTogglePageSelection: (isSelected: boolean) => void;
+  isPageSelected: boolean;
   selectionEnabled: boolean;
 }): GetCellsTableColumnsResult => {
   return [
@@ -105,6 +110,16 @@ export const getCellsTableColumns = ({
           columnHelper.display({
             id: 'selection',
             size: 40,
+            header: () => {
+              return (
+                <CellsSelectionCheckbox
+                  id="all-on-page"
+                  name={labels.selectAllOnPage}
+                  isChecked={isPageSelected}
+                  onChange={onTogglePageSelection}
+                />
+              );
+            },
             cell: info => {
               const node = info.row.original;
               return (

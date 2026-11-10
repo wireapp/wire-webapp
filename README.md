@@ -135,6 +135,8 @@ Run `npx just test-ci` to execute each Jest project with coverage and its existi
 
 Core tests retain a separate Node Jest project in `apps/webapp/test/core/jest.config.js`, with minimum coverage of 49% branches, 53% functions, and 62% lines/statements. Run it directly with `npx jest --config apps/webapp/test/core/jest.config.js --coverage`. Its original discovery patterns still exclude `encryptedStore.test.node.ts`. Webapp tests and coverage exclude the core tree; explicit service fixtures remain in `src/script/util/test/createCoreTestFixture.ts`.
 
+UI-kit components live in `apps/webapp/src/script/uiKit/` and are compiled and watched directly by Rspack. Import individual source modules using relative paths. Their behavior tests retain a separate jsdom/SWC Jest project in `apps/webapp/test/uiKit/jest.config.js`. Run it with `npx jest --config apps/webapp/test/uiKit/jest.config.js --coverage`; `just test-ci` also runs it. Webapp test discovery and coverage exclude this tree to avoid counting it twice. The Emotion theme augmentation lives beside the components in `emotion.d.ts` and is included by the webapp TypeScript configurations.
+
 Asset encryption uses the browser crypto implementation explicitly. Node asset tests pass the Node implementation through the existing asset functions and `AssetService` constructor. Core source changes are compiled and watched directly by Rspack, without a separate library build or watcher.
 
 Other useful tasks:

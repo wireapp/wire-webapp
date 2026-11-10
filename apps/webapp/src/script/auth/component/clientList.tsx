@@ -26,10 +26,11 @@ import {connect} from 'react-redux';
 import {useNavigate} from 'react-router';
 
 import {UrlUtil} from '@wireapp/commons';
-import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 
 import {ClientItem} from './clientItem';
 
+import {Loading} from '../../uiKit/dataDisplay/loading/loading';
+import {ContainerXS} from '../../uiKit/layout/container/container';
 import {getLogger} from '../../util/logger';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import * as LocalStorageAction from '../module/action/localStorageAction';

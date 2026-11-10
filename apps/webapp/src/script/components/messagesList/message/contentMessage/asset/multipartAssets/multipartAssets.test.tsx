@@ -21,7 +21,8 @@ import {render, screen, waitFor, act} from '@testing-library/react';
 import {RestNode} from 'cells-sdk-ts';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../../../../uiKit/identity/theme/theme';
 
 import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {

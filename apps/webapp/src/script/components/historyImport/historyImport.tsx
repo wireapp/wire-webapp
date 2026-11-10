@@ -21,8 +21,6 @@ import {useCallback, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {BackupFileUpload} from './backupFileUpload';
 
 import {Config} from '../../Config';
@@ -38,6 +36,7 @@ import {
   InvalidPassword,
 } from '../../repositories/backup/error';
 import {User} from '../../repositories/entity/User';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
 import {checkBackupEncryption} from '../../util/backupUtil';
 import {getLogger} from '../../util/logger';
 import {loadFileBuffer} from '../../util/util';

@@ -28,11 +28,9 @@ import React, {
 } from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {CellDescription} from './components/cellDescription';
 import {StatusIcon} from './components/statusIcon';
@@ -43,6 +41,7 @@ import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoIn
 import {useApplicationContext} from '../../page/rootProvider';
 import type {Conversation} from '../../repositories/entity/Conversation';
 import {MediaType} from '../../repositories/media/MediaType';
+import {TabIndex} from '../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isKey, isOneOfKeys, KEY} from '../../util/keyboardUtil';
 import {useChannelsFeatureFlag} from '../../util/useChannelsFeatureFlag';
@@ -99,7 +98,6 @@ export const ConversationListCell: FunctionComponent<ConversationListCellProps> 
     isChannel,
     isGroupOrChannel,
     isGhostGroup,
-    manualUnreadTimestamp,
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'is1to1',
@@ -113,7 +111,6 @@ export const ConversationListCell: FunctionComponent<ConversationListCellProps> 
     'isChannel',
     'isGroupOrChannel',
     'isGhostGroup',
-    'manualUnreadTimestamp',
   ]);
 
   const guardCall = useNoInternetCallGuard({
@@ -152,8 +149,6 @@ export const ConversationListCell: FunctionComponent<ConversationListCellProps> 
 
   if (unreadMessagesCount > 0) {
     accessibilityParts.push(`${unreadMessagesCount} ${translate('conversationLabelUnread')}`);
-  } else if (isNumber(manualUnreadTimestamp)) {
-    accessibilityParts.push(translate('conversationLabelUnread'));
   }
 
   if (isMutedConversation) {

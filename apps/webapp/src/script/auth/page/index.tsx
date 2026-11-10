@@ -27,7 +27,6 @@ import {AnyAction, Dispatch} from 'redux';
 import {container} from 'tsyringe';
 
 import {UrlUtil} from '@wireapp/commons';
-import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
 import {Page} from './page';
 
@@ -37,6 +36,10 @@ import {useSingleInstance} from '../../hooks/useSingleInstance';
 import '../../localization/Localizer';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Core} from '../../service/coreSingleton';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {Text} from '../../uiKit/typography/text/text';
 import {isDataDogEnabled} from '../../util/dataDog';
 import {getWebEnvironment} from '../../util/environment';
 import {actionRoot} from '../module/action';

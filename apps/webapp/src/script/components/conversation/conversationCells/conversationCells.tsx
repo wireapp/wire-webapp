@@ -23,8 +23,6 @@ import {isNonEmptyArray} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {task} from 'true-myth';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {CellsHeader} from './cellsHeader/cellsHeader';
 import {CellsLoader} from './cellsLoader/cellsLoader';
 import {CellsPagination} from './cellsPagination/cellsPagination';
@@ -37,7 +35,13 @@ import {
 import {getCellsApiPath} from './common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from './common/getCellsFilesPath/getCellsFilesPath';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
-import {isInRecycleBin as isCurrentPathInRecycleBin, RECYCLE_BIN_PATH} from './common/recycleBin/recycleBin';
+import {openBreadcrumb} from './common/openBreadcrumb/openBreadcrumb';
+import {
+  isInRecycleBin as isCurrentPathInRecycleBin,
+  isRootRecycleBinPath,
+  RECYCLE_BIN_PATH,
+} from './common/recycleBin/recycleBin';
+import {refreshWithMissingBinFolderRecovery} from './common/recycleBin/refreshWithMissingBinFolderRecovery';
 import {useCellsSorting} from './common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
@@ -64,6 +68,7 @@ import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {UserRepository} from '../../../repositories/user/userRepository';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {allowsAllFiles, hasAllowedExtension} from '../../../util/fileTypeUtil';
 import {showFileDropzoneErrorModal} from '../useFilesUploadDropzone/showFileDropzoneErrorModal/showFileDropzoneErrorModal';
@@ -228,11 +233,21 @@ export const ConversationCells = memo(
           return error;
         },
         () => {
-          return refresh({preserveStatusOnError: true});
+          return refreshWithMissingBinFolderRecovery({
+            refresh: () => {
+              return refresh({preserveStatusOnError: true});
+            },
+            isInBinSubfolder: () => {
+              return isCurrentPathInRecycleBin() && !isRootRecycleBinPath();
+            },
+            navigateToBinRoot: () => {
+              openBreadcrumb({conversationQualifiedId, path: RECYCLE_BIN_PATH});
+            },
+          });
         },
       );
       return refreshResult.isOk && refreshResult.value;
-    }, [refresh]);
+    }, [conversationQualifiedId, refresh]);
 
     const handleRefreshAfterBulkMoveToBinOutcome = useCallback(async (): Promise<boolean> => {
       const [sourceResult, binResult] = await Promise.all([

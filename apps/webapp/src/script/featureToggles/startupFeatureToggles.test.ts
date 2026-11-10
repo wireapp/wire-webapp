@@ -28,6 +28,7 @@ import {
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
   startupFeatureToggleNames,
@@ -41,11 +42,21 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
+  it.each(['?enabled-features', '?enabled-features=', '?enabled-features=%20%2C%20'])(
+    'resolves an explicit empty selection to no enabled features: %s',
+    locationSearch => {
+      const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
+
+      expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+    },
+  );
+
   it('returns disabled toggles when the query parameter is missing', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar');
 
@@ -103,6 +114,18 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(true);
+  });
+
+  it('keeps Drive bulk restore disabled until its separate toggle is enabled', () => {
+    const bulkActionsOnly = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName}`,
+    );
+    const bulkActionsWithRestore = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName},${driveBulkRestoreFeatureToggleName}`,
+    );
+
+    expect(bulkActionsOnly.isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName)).toBe(false);
+    expect(bulkActionsWithRestore.isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName)).toBe(true);
   });
 
   it('enables a whitelisted feature toggle when present in the query parameter', () => {
@@ -224,6 +247,7 @@ describe('startupFeatureToggles', function () {
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
       driveBulkActionsFeatureToggleName,
+      driveBulkRestoreFeatureToggleName,
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,
     ]);

@@ -23,8 +23,6 @@ import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {FormatOptionLabelMeta} from 'react-select';
 
-import {Option, Select} from '@wireapp/react-ui-kit';
-
 import {
   checkboxStyles,
   clearContentLabelStyles,
@@ -41,6 +39,7 @@ import {
 } from './styles';
 
 import type {User} from '../../../repositories/entity/User';
+import {Option, Select} from '../../../uiKit/inputs/select/select';
 import type {Translate} from '../../../util/localizerUtil';
 import {Avatar, AVATAR_SIZE} from '../../avatar';
 

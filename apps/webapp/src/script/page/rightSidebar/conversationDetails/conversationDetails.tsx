@@ -26,8 +26,6 @@ import type {ConversationRenameEvent, ConversationReceiptModeUpdateEvent} from '
 import {UserType} from '@wireapp/api-client/lib/user';
 import {noop} from 'noop-esm';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {ConversationDetailsHeader} from './components/conversationDetailsHeader';
 import {ConversationDetailsOptions} from './components/conversationDetailsOptions';
 import {ConversationDetailsParticipants} from './components/conversationDetailsParticipants';
@@ -50,6 +48,7 @@ import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {Shortcut} from '../../../ui/shortcut';
 import {ShortcutType} from '../../../ui/shortcutType';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {sortUsersByPriority} from '../../../util/stringUtil';
 import {formatDuration} from '../../../util/timeUtil';

@@ -32,10 +32,10 @@ export const statusStyles: CSSObject = {
 };
 
 export const emptyBinButtonStyles: CSSObject = {
-  backgroundColor: 'var(--danger-color)',
-  border: 'none',
+  backgroundColor: 'var(--modal-bg)',
+  border: '1px solid var(--border-color)',
   borderRadius: '16px',
-  color: 'var(--text-input-background)',
+  color: 'var(--main-color)',
   fontSize: '14px',
   fontWeight: 700,
   gap: '4px',
@@ -47,12 +47,11 @@ export const emptyBinButtonStyles: CSSObject = {
   '& > svg': {
     fill: 'currentColor',
   },
-  '&:hover, &:active': {
-    backgroundColor: 'var(--danger-color)',
+  '&:hover': {
+    backgroundColor: 'var(--accent-color-fade-24)',
   },
-  '&:focus': {
-    backgroundColor: 'var(--danger-color)',
-    border: '1px solid var(--accent-color-focus)',
+  '&:active': {
+    backgroundColor: 'var(--accent-color-fade-24)',
   },
   '&:focus-visible': {
     outline: '2px solid var(--accent-color-focus)',
@@ -61,6 +60,11 @@ export const emptyBinButtonStyles: CSSObject = {
   '&:disabled': {
     backgroundColor: 'var(--button-tertiary-disabled-bg)',
     color: 'var(--text-input-placeholder)',
+  },
+  '@media (forced-colors: active)': {
+    borderColor: 'ButtonText',
+    background: 'ButtonFace',
+    color: 'ButtonText',
   },
 };
 

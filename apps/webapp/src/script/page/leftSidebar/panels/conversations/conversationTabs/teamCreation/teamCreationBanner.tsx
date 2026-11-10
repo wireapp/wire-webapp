@@ -21,8 +21,6 @@ import {useState, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {Button, ButtonVariant, IconButton} from '@wireapp/react-ui-kit';
-
 import {
   bannerHeaderContainerCss,
   bannerWrapperCss,
@@ -38,6 +36,8 @@ import {BannerPortal} from '../../../../../../components/bannerPortal/bannerPort
 import * as Icon from '../../../../../../components/icon';
 import {EventName} from '../../../../../../repositories/tracking/eventName';
 import {Segmentation} from '../../../../../../repositories/tracking/segmentation';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
+import {IconButton} from '../../../../../../uiKit/inputs/iconButton/iconButton';
 import {WebAppEvents} from '../../../../../../webAppEvents';
 import {useApplicationContext} from '../../../../../rootProvider';
 import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';

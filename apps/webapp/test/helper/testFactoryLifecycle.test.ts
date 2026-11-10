@@ -50,38 +50,60 @@ describe('TestFactory resource ownership', () => {
     return factory;
   }
 
-  it('disposes its own client after another factory replaces the container registrations', () => {
-    const firstFactory = createFactory();
-    const firstClient = container.resolve(APIClient);
-    const onFirstCookieRefresh = jest.fn();
-    firstClient.on(APIClient.TOPIC.COOKIE_REFRESH, onFirstCookieRefresh);
-    const secondFactory = createFactory();
-    const secondClient = container.resolve(APIClient);
-    const onSecondCookieRefresh = jest.fn();
-    secondClient.on(APIClient.TOPIC.COOKIE_REFRESH, onSecondCookieRefresh);
+  it.each(['dispose', Symbol.dispose] as const)(
+    'disposes its own client through %s after another factory replaces the container registrations',
+    disposalMethod => {
+      const firstFactory = createFactory();
+      const firstClient = container.resolve(APIClient);
+      const onFirstCookieRefresh = jest.fn();
+      firstClient.on(APIClient.TOPIC.COOKIE_REFRESH, onFirstCookieRefresh);
+      const secondFactory = createFactory();
+      const secondClient = container.resolve(APIClient);
+      const onSecondCookieRefresh = jest.fn();
+      secondClient.on(APIClient.TOPIC.COOKIE_REFRESH, onSecondCookieRefresh);
 
-    CookieStore.setCookie(refreshedCookie);
-    firstFactory.dispose();
-    firstFactory.dispose();
-    CookieStore.setCookie(refreshedCookie);
-    secondFactory.dispose();
-    CookieStore.deleteCookie();
+      CookieStore.setCookie(refreshedCookie);
+      firstFactory[disposalMethod]();
+      firstFactory[disposalMethod]();
+      expect(container.resolve(APIClient)).toBe(secondClient);
+      CookieStore.setCookie(refreshedCookie);
+      secondFactory[disposalMethod]();
+      expect(container.resolve(APIClient)).toBe(secondClient);
+      CookieStore.deleteCookie();
 
-    expect(onFirstCookieRefresh.mock.calls).toEqual([[refreshedCookie]]);
-    expect(onSecondCookieRefresh.mock.calls).toEqual([[refreshedCookie], [refreshedCookie]]);
-  });
+      expect(onFirstCookieRefresh.mock.calls).toEqual([[refreshedCookie]]);
+      expect(onSecondCookieRefresh.mock.calls).toEqual([[refreshedCookie], [refreshedCookie]]);
+    },
+  );
 
-  it('releases clients across repeated factory creation and disposal', () => {
+  it('releases clients across repeated factory creation and scope exit', () => {
     const onCookieRefresh = jest.fn();
     const lifecycleRepetitions = 50;
 
     for (let repetition = 0; repetition < lifecycleRepetitions; repetition++) {
-      const factory = createFactory();
+      using factory = new TestFactory();
+      factories.push(factory);
       container.resolve(APIClient).on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
-      factory.dispose();
     }
     CookieStore.setCookie(refreshedCookie);
 
     expect(onCookieRefresh).not.toHaveBeenCalled();
+  });
+
+  it('releases its client when a scope exits because of an exception', () => {
+    const onCookieRefresh = jest.fn();
+    const scopeError = new Error('Factory scope failed');
+
+    expect(() => {
+      using factory = new TestFactory();
+      factories.push(factory);
+      container.resolve(APIClient).on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
+      CookieStore.setCookie(refreshedCookie);
+
+      throw scopeError;
+    }).toThrow(scopeError);
+    CookieStore.deleteCookie();
+
+    expect(onCookieRefresh.mock.calls).toEqual([[refreshedCookie]]);
   });
 });
