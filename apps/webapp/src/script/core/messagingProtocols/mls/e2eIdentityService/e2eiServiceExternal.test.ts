@@ -152,9 +152,17 @@ async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTes
   ] as const;
 }
 
-function generateCoreCryptoIdentity({userId, deviceId = getUUID()}: {userId: string; deviceId?: string}): WireIdentity {
+function generateCoreCryptoIdentity({
+  userId,
+  deviceId = getUUID(),
+  domain = 'elna.wire.link',
+}: {
+  userId: string;
+  deviceId?: string;
+  domain?: string;
+}): WireIdentity {
   return {
-    clientId: createMLSClientId({id: userId, domain: 'elna.wire.link'}, deviceId),
+    clientId: createMLSClientId({id: userId, domain}, deviceId),
     status: DeviceStatus.Valid,
     thumbprint: 'mNyAo88vAF5s7v0UWBNxlQKxP3dfT91A-4PbuzEA5uQ',
     credentialType: CredentialType.X509,
@@ -264,6 +272,56 @@ describe('E2EIServiceExternal', () => {
 
       expect(userIdentities?.get(stringifyQualifiedId(user1))).toHaveLength(3);
       expect(userIdentities?.get(stringifyQualifiedId(user2))).toHaveLength(1);
+    });
+
+    it('keeps identities and basic devices separated for the same user id on different domains', async () => {
+      const [service, {coreCrypto, mlsService}] = await buildE2EIService('usersIdentitiesFederatedDomains');
+      const sharedUserId = '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534';
+      const userOnFirstDomain = {domain: 'first.example.com', id: sharedUserId};
+      const userOnSecondDomain = {domain: 'second.example.com', id: sharedUserId};
+      const firstX509DeviceId = '1111111111111111';
+      const firstBasicDeviceId = '1212121212121212';
+      const secondX509DeviceId = '2222222222222222';
+      const secondBasicDeviceId = '2323232323232323';
+      const firstIdentity = generateCoreCryptoIdentity({
+        userId: sharedUserId,
+        deviceId: firstX509DeviceId,
+        domain: userOnFirstDomain.domain,
+      });
+      const secondIdentity = generateCoreCryptoIdentity({
+        userId: sharedUserId,
+        deviceId: secondX509DeviceId,
+        domain: userOnSecondDomain.domain,
+      });
+      coreCrypto.getUserIdentities.mockResolvedValue(
+        new Map([[new Uuid(sharedUserId), [firstIdentity, secondIdentity]]]),
+      );
+      coreCrypto.getClientIds.mockResolvedValue([
+        createMLSClientId(userOnFirstDomain, firstX509DeviceId),
+        createMLSClientId(userOnFirstDomain, firstBasicDeviceId),
+        createMLSClientId(userOnSecondDomain, secondX509DeviceId),
+        createMLSClientId(userOnSecondDomain, secondBasicDeviceId),
+      ]);
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(true);
+
+      const userIdentities = await service.getUsersIdentities(groupId, [userOnFirstDomain, userOnSecondDomain]);
+
+      expect(
+        userIdentities?.get(stringifyQualifiedId(userOnFirstDomain))?.map(identity => {
+          return identity.clientId;
+        }),
+      ).toEqual([
+        `${sharedUserId}:${firstX509DeviceId}@${userOnFirstDomain.domain}`,
+        `${sharedUserId}:${firstBasicDeviceId}@${userOnFirstDomain.domain}`,
+      ]);
+      expect(
+        userIdentities?.get(stringifyQualifiedId(userOnSecondDomain))?.map(identity => {
+          return identity.clientId;
+        }),
+      ).toEqual([
+        `${sharedUserId}:${secondX509DeviceId}@${userOnSecondDomain.domain}`,
+        `${sharedUserId}:${secondBasicDeviceId}@${userOnSecondDomain.domain}`,
+      ]);
     });
   });
 

@@ -211,19 +211,24 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
             return [];
           }
 
+          const parsedClientId = parseFullQualifiedClientId(clientId);
+          if (parsedClientId.user !== userId.id || parsedClientId.domain !== userId.domain) {
+            return [];
+          }
+
           return [
             {
               ...identity,
               clientId,
-              deviceId: parseFullQualifiedClientId(clientId).client,
+              deviceId: parsedClientId.client,
               qualifiedUserId: userId,
             },
           ];
         });
 
       const basicMLSDevices = allUsersMLSDevices
-        .filter(({user}) => {
-          return user === userId.id;
+        .filter(({domain, user}) => {
+          return user === userId.id && domain === userId.domain;
         })
         // filtering devices that have a valid identity
         .filter(({client}) => {
