@@ -87,6 +87,7 @@ async function buildService(dbName: string): Promise<InternalServiceTestSetup> {
     generateKeyPackage: jest.fn(),
     getKeyPackages: jest.fn().mockResolvedValue([]),
     removeKeyPackage: jest.fn(),
+    removeKeyPackagesFor: jest.fn(),
     setConversationCredential: jest.fn(),
   } as unknown as jest.Mocked<CoreCryptoContext>;
 
@@ -298,6 +299,46 @@ describe('E2EIServiceInternal', () => {
         latestCredential,
         undefined,
       );
+    });
+
+    it('removes valid key packages belonging to every previous X509 credential when refreshing', async () => {
+      const {context, coreCrypto, service} = await buildService('internalRemovePreviousCredentialKeyPackages');
+      const olderCredential = createCredentialRef(100n);
+      const latestCredential = createCredentialRef(300n);
+      coreCrypto.findCredentials.mockResolvedValue([olderCredential, latestCredential]);
+
+      const acquisition = createAcquisition();
+      acquisition.finalize.mockResolvedValue({} as Credential);
+      jest
+        .spyOn(X509CredentialAcquisition, 'newFromCredentialRef')
+        .mockResolvedValue(
+          acquisition as unknown as Awaited<ReturnType<typeof X509CredentialAcquisition.newFromCredentialRef>>,
+        );
+      const newCredentialRef = createCredentialRef(500n);
+      context.addCredential.mockResolvedValue(newCredentialRef);
+      const validPreviousCredentialKeyPackage = {
+        cipherSuite: () => {
+          return cipherSuite;
+        },
+        isValid: () => {
+          return true;
+        },
+      } as unknown as KeyPackageRef;
+      context.getKeyPackages.mockResolvedValue([validPreviousCredentialKeyPackage]);
+      context.generateKeyPackage.mockResolvedValue({
+        serialize: () => {
+          return new Uint8Array();
+        },
+      } as unknown as KeyPackage);
+
+      await service.generateCertificate(true, noConversations, cipherSuite);
+
+      expect(context.removeKeyPackagesFor).toHaveBeenCalledTimes(2);
+      expect(context.removeKeyPackagesFor).toHaveBeenNthCalledWith(1, olderCredential);
+      expect(context.removeKeyPackagesFor).toHaveBeenNthCalledWith(2, latestCredential);
+      expect(context.removeKeyPackage).not.toHaveBeenCalledWith(validPreviousCredentialKeyPackage);
+      expect(context.generateKeyPackage).toHaveBeenCalledTimes(keyPackagesAmount);
+      expect(context.generateKeyPackage).toHaveBeenCalledWith(newCredentialRef);
     });
 
     it('does not use the credential rotation flow without a stored X509 credential', async () => {

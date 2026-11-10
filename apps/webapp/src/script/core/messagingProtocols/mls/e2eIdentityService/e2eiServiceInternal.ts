@@ -72,7 +72,29 @@ export class E2EIServiceInternal {
     cipherSuite: Ciphersuite,
   ): Promise<CertificateGenerationResult> {
     const pkiEnvironment = await this.getPkiEnvironment();
-    const acquisition = await this.createAcquisition(pkiEnvironment, refresh, cipherSuite);
+    const previousCredentialRefs = refresh
+      ? await task
+          .tryOrElse(
+            error => {
+              return error;
+            },
+            () => {
+              return this.coreCryptoClient.findCredentials({
+                cipherSuite,
+                credentialType: CredentialType.X509,
+              });
+            },
+          )
+          .match({
+            Resolved: credentials => {
+              return Promise.resolve(credentials);
+            },
+            Rejected: error => {
+              return Promise.reject(error);
+            },
+          })
+      : [];
+    const acquisition = await this.createAcquisition(pkiEnvironment, refresh, cipherSuite, previousCredentialRefs);
 
     const credential = await acquisition.finalize();
 
@@ -81,7 +103,7 @@ export class E2EIServiceInternal {
 
     const credentialRef = await this.storeCredential(credential);
     await this.setConversationCredentials(credentialRef, getAllConversations);
-    const keyPackages = await this.generateKeyPackages(credentialRef, cipherSuite);
+    const keyPackages = await this.generateKeyPackages(credentialRef, cipherSuite, previousCredentialRefs);
 
     await this.enrollmentStorage.deletePendingAcquisitionSnapshot();
 
@@ -106,6 +128,7 @@ export class E2EIServiceInternal {
     pkiEnvironment: PkiEnvironment,
     refresh: boolean,
     cipherSuite: Ciphersuite,
+    previousCredentialRefs: CredentialRef[],
   ): Promise<X509CredentialAcquisition> {
     // The hook that persists the snapshot has already run: we are coming back from the identity provider.
     const pendingSnapshot = await this.enrollmentStorage.getPendingAcquisitionSnapshot();
@@ -119,7 +142,7 @@ export class E2EIServiceInternal {
       return new X509CredentialAcquisition(pkiEnvironment, config);
     }
 
-    const credentialRef = await this.getLatestX509CredentialRef(cipherSuite).match({
+    const credentialRef = await this.getLatestX509CredentialRef(cipherSuite, previousCredentialRefs).match({
       Resolved: value => {
         return Promise.resolve(value);
       },
@@ -146,37 +169,29 @@ export class E2EIServiceInternal {
     };
   }
 
-  private getLatestX509CredentialRef(cipherSuite: Ciphersuite): Task<CredentialRef, unknown> {
-    return task
-      .tryOrElse(
-        error => {
-          return error;
+  private getLatestX509CredentialRef(
+    cipherSuite: Ciphersuite,
+    credentials: CredentialRef[],
+  ): Task<CredentialRef, Error> {
+    const latestCredential = credentials.reduce<Maybe<CredentialRef>>((latest, credential) => {
+      return latest.match({
+        Just: current => {
+          return credential.earliestValidity() > current.earliestValidity() ? Maybe.just(credential) : latest;
         },
-        () => {
-          return this.coreCryptoClient.findCredentials({cipherSuite, credentialType: CredentialType.X509});
+        Nothing: () => {
+          return Maybe.just(credential);
         },
-      )
-      .andThen(credentials => {
-        const latestCredential = credentials.reduce<Maybe<CredentialRef>>((latest, credential) => {
-          return latest.match({
-            Just: current => {
-              return credential.earliestValidity() > current.earliestValidity() ? Maybe.just(credential) : latest;
-            },
-            Nothing: () => {
-              return Maybe.just(credential);
-            },
-          });
-        }, Maybe.nothing());
-
-        return latestCredential.match({
-          Just: credential => {
-            return task.resolve(credential);
-          },
-          Nothing: () => {
-            return task.reject(new Error(`No X509 credential found for cipher suite ${cipherSuite}`));
-          },
-        });
       });
+    }, Maybe.nothing());
+
+    return latestCredential.match({
+      Just: credential => {
+        return task.resolve(credential);
+      },
+      Nothing: () => {
+        return task.reject(new Error(`No X509 credential found for cipher suite ${cipherSuite}`));
+      },
+    });
   }
 
   private storeCredential(credential: Credential): Promise<CredentialRef> {
@@ -229,8 +244,16 @@ export class E2EIServiceInternal {
     });
   }
 
-  private async generateKeyPackages(credentialRef: CredentialRef, cipherSuite: Ciphersuite): Promise<Uint8Array[]> {
+  private async generateKeyPackages(
+    credentialRef: CredentialRef,
+    cipherSuite: Ciphersuite,
+    previousCredentialRefs: CredentialRef[],
+  ): Promise<Uint8Array[]> {
     return this.coreCryptoClient.transaction(async cx => {
+      for (const previousCredentialRef of previousCredentialRefs) {
+        await cx.removeKeyPackagesFor(previousCredentialRef);
+      }
+
       const storedKeyPackages = await cx.getKeyPackages();
       for (const keyPackage of storedKeyPackages) {
         if (keyPackage.cipherSuite() === cipherSuite && !keyPackage.isValid()) {
