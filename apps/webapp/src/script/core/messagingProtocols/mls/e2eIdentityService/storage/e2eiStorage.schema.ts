@@ -32,20 +32,13 @@ export const InitialDataSchema = z.object({
 });
 export type InitialData = z.infer<typeof InitialDataSchema>;
 
-const AcmeChallengeSchema = z.object({
-  delegate: z.instanceof(Uint8Array),
-  url: z.string(),
-  target: z.string(),
+/**
+ * An X509 credential acquisition that has been interrupted by an identity provider redirect.
+ *
+ * Only the serialized acquisition is kept: CoreCrypto owns every other piece of the enrollment
+ * state, so there is no need to duplicate it here.
+ */
+export const PendingEnrollmentDataSchema = z.object({
+  acquisitionSnapshot: z.instanceof(Uint8Array),
 });
-export const EnrollmentFlowDataSchema = z.object({
-  handle: z.instanceof(Uint8Array),
-  orderUrl: z.string().url(),
-  authorization: z.object({
-    keyauth: z.string(),
-    dpopChallenge: AcmeChallengeSchema,
-    oidcChallenge: AcmeChallengeSchema,
-  }),
-  nonce: z.string(),
-});
-export type EnrollmentFlowData = z.infer<typeof EnrollmentFlowDataSchema>;
-export type UnidentifiedEnrollmentFlowData = Omit<EnrollmentFlowData, 'handle'>;
+export type PendingEnrollmentData = z.infer<typeof PendingEnrollmentDataSchema>;

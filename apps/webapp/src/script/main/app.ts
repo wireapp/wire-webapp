@@ -691,7 +691,6 @@ export class App {
         conversationRepository.initMLSConversationRecoveredListener();
         conversationRepository.initMLSEventDistributedListener();
         conversationRepository.registerMLSConversationVerificationStateHandler(
-          selfUser.qualifiedId.domain,
           this.updateConversationE2EIVerificationState,
           this.showClientCertificateRevokedWarning,
         );

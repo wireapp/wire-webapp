@@ -19,237 +19,36 @@
 
 import axios, {AxiosInstance} from 'axios';
 
-import {LogFactory} from '@wireapp/commons';
+import {FederationCrossSignedCertificatesResponseSchema, LocalCertificateRootResponseSchema} from './schema';
 
-import {
-  GetDirectoryReturnValue,
-  GetInitialNonceReturnValue,
-  PostJoseRequestParams,
-  PostJoseRequestReturnValue,
-} from './acmeService.types';
-import {
-  AuthorizationResponseSchema,
-  DirectoryResponseSchema,
-  NewAccountResponseSchema,
-  NewOrderResponseSchema,
-  ResponseHeaderLocation,
-  ResponseHeaderLocationSchema,
-  ResponseHeaderNonce,
-  ResponseHeaderNonceSchema,
-  CheckStatusOfOrderResponseSchema,
-  DpopChallengeResponseSchema,
-  FinalizeOrderResponseSchema,
-  OidcChallengeResponseSchema,
-  GetCertificateResponseSchema,
-  LocalCertificateRootResponseSchema,
-  FederationCrossSignedCertificatesResponseSchema,
-  CrlResponseSchema,
-  NewAccountResponseData,
-  NewOrderResponseData,
-  AuthorizationResponseData,
-  DpopChallengeResponseData,
-  OidcChallengeResponseData,
-  CheckStatusOfOrderResponseData,
-  FinalizeOrderResponseData,
-  GetCertificateResponseData,
-} from './schema';
-
-import {AcmeChallenge, AcmeDirectory} from '../../e2eiService.types';
-
+/**
+ * Fetches the certificates that a Wire deployment publishes next to its ACME server.
+ *
+ * The ACME protocol itself is implemented by CoreCrypto (through the PKI environment hooks), so
+ * only the deployment specific certificate endpoints are left here.
+ */
 export class AcmeService {
-  private logger = LogFactory.getLogger('@wireapp/core/AcmeService');
   private readonly axiosInstance: AxiosInstance = axios.create();
   private readonly url = {
     ROOTS: '/roots.pem',
-    CRL: '/crl',
-    PROXY_CRL: '/proxyCrl',
     FEDERATION: '/federation',
   } as const;
 
-  constructor(private discoveryUrl: string) {}
+  constructor(private readonly discoveryUrl: string) {}
 
   private get acmeBaseUrl(): string {
     const {origin} = new URL(this.discoveryUrl);
     return origin;
   }
 
-  // ############ Internal Functions ############
-
-  private extractNonce(headers: any): ResponseHeaderNonce['replay-nonce'] {
-    return ResponseHeaderNonceSchema.parse(headers)['replay-nonce'];
-  }
-
-  private extractLocation(headers: any): ResponseHeaderLocation['location'] {
-    return ResponseHeaderLocationSchema.parse(headers).location;
-  }
-
-  private async postJoseRequest<T>({
-    payload,
-    schema,
-    url,
-    shouldGetLocation = false,
-  }: PostJoseRequestParams<T>): Promise<PostJoseRequestReturnValue<T>> {
-    const {data, headers} = await this.axiosInstance.post(url, payload, {
-      headers: {
-        'Content-Type': 'application/jose+json',
-      },
-    });
-    const nonce = this.extractNonce(headers);
-    const accountData = schema.parse(data);
-    return {
-      data: accountData,
-      nonce,
-      location: shouldGetLocation ? this.extractLocation(headers) : undefined,
-    };
-  }
-
-  // ############ Public Functions ############
-
-  public async getDirectory(): GetDirectoryReturnValue {
-    try {
-      const {data} = await this.axiosInstance.get(this.discoveryUrl);
-      const directory = DirectoryResponseSchema.parse(data);
-      return new TextEncoder().encode(JSON.stringify(directory));
-    } catch (error: unknown) {
-      this.logger.error('Error while receiving Directory', error);
-      return undefined;
-    }
-  }
-
-  public async getSelfCRL(): Promise<{crl: Uint8Array; url: string}> {
-    const url = `${this.acmeBaseUrl}${this.url.CRL}`;
-
-    const {data} = await this.axiosInstance.get(url, {
-      responseType: 'arraybuffer',
-    });
-
-    const crl = CrlResponseSchema.parse(data);
-    const crlUint8Array = new Uint8Array(crl);
-
-    const fixedUrl = url.replace('https://', 'http://');
-    return {url: fixedUrl, crl: crlUint8Array};
-  }
-
   public async getLocalCertificateRoot(): Promise<string> {
     const {data} = await this.axiosInstance.get(`${this.acmeBaseUrl}${this.url.ROOTS}`);
-    const localCertificateRoot = LocalCertificateRootResponseSchema.parse(data);
-    return localCertificateRoot;
-  }
-
-  public async getCRLFromDistributionPoint(distributionPointUrl: string): Promise<Uint8Array> {
-    const {data} = await this.axiosInstance.get(`${this.acmeBaseUrl}${this.url.PROXY_CRL}/${distributionPointUrl}`, {
-      responseType: 'arraybuffer',
-    });
-
-    const crl = CrlResponseSchema.parse(data);
-    const crlUint8Array = new Uint8Array(crl);
-
-    return crlUint8Array;
+    return LocalCertificateRootResponseSchema.parse(data);
   }
 
   public async getFederationCrossSignedCertificates(): Promise<string[]> {
     const {data} = await this.axiosInstance.get(`${this.acmeBaseUrl}${this.url.FEDERATION}`);
     const federationCrossSignedCertificates = FederationCrossSignedCertificatesResponseSchema.parse(data);
     return federationCrossSignedCertificates.crts;
-  }
-
-  public async getInitialNonce(url: AcmeDirectory['newNonce']): GetInitialNonceReturnValue {
-    try {
-      const {headers} = await this.axiosInstance.head(url);
-      const nonce = this.extractNonce(headers);
-      return nonce;
-    } catch (error: unknown) {
-      this.logger.error('Error while receiving intial Nonce', error);
-      return undefined;
-    }
-  }
-
-  public async createNewAccount(
-    url: AcmeDirectory['newAccount'],
-    payload: Uint8Array,
-  ): Promise<PostJoseRequestReturnValue<NewAccountResponseData>> {
-    return this.postJoseRequest({
-      payload,
-      schema: NewAccountResponseSchema,
-      url,
-    });
-  }
-
-  public async createNewOrder(
-    url: AcmeDirectory['newOrder'],
-    payload: Uint8Array,
-  ): Promise<PostJoseRequestReturnValue<NewOrderResponseData>> {
-    return this.postJoseRequest({
-      payload,
-      schema: NewOrderResponseSchema,
-      url,
-      shouldGetLocation: true,
-    });
-  }
-
-  public async getAuthorization(
-    url: string,
-    payload: Uint8Array,
-  ): Promise<PostJoseRequestReturnValue<AuthorizationResponseData>> {
-    return this.postJoseRequest({
-      payload,
-      schema: AuthorizationResponseSchema,
-      url,
-    });
-  }
-
-  public async validateDpopChallenge(
-    url: AcmeChallenge['url'],
-    payload: Uint8Array,
-  ): Promise<PostJoseRequestReturnValue<DpopChallengeResponseData>> {
-    return this.postJoseRequest({
-      payload,
-      schema: DpopChallengeResponseSchema,
-      url,
-    });
-  }
-
-  public async validateOidcChallenge(
-    url: AcmeChallenge['url'],
-    payload: Uint8Array,
-  ): Promise<PostJoseRequestReturnValue<OidcChallengeResponseData>> {
-    return this.postJoseRequest({
-      payload,
-      schema: OidcChallengeResponseSchema,
-      url,
-    });
-  }
-
-  public async checkStatusOfOrder(
-    url: string,
-    payload: Uint8Array,
-  ): Promise<PostJoseRequestReturnValue<CheckStatusOfOrderResponseData>> {
-    return this.postJoseRequest({
-      payload,
-      schema: CheckStatusOfOrderResponseSchema,
-      url,
-    });
-  }
-
-  public async finalizeOrder(
-    url: string,
-    payload: Uint8Array,
-  ): Promise<PostJoseRequestReturnValue<FinalizeOrderResponseData>> {
-    return this.postJoseRequest({
-      payload,
-      schema: FinalizeOrderResponseSchema,
-      url,
-    });
-  }
-
-  public async getCertificate(
-    url: string,
-    payload: Uint8Array,
-  ): Promise<PostJoseRequestReturnValue<GetCertificateResponseData>> {
-    return this.postJoseRequest({
-      payload,
-      schema: GetCertificateResponseSchema,
-      url,
-    });
   }
 }
