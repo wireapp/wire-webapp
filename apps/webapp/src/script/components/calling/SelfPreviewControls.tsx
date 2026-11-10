@@ -50,7 +50,7 @@ const SelfPreviewControls = ({isMuted, isHandRaised, restoreLabel, onRestore}: S
         <span
           aria-hidden="true"
           data-uie-name="self-preview-muted-indicator"
-          css={{alignItems: 'center', display: 'flex'}}
+          css={{alignItems: 'center', backgroundColor: 'transparent', display: 'flex'}}
         >
           <Icon.MicOffIcon css={{'&& path': {fill: 'currentColor'}}} />
         </span>
@@ -59,7 +59,7 @@ const SelfPreviewControls = ({isMuted, isHandRaised, restoreLabel, onRestore}: S
         <span
           aria-hidden="true"
           data-uie-name="self-preview-hand-raised-indicator"
-          css={{filter: 'grayscale(1) brightness(2)', fontSize: 14, lineHeight: 1}}
+          css={{backgroundColor: 'transparent', filter: 'grayscale(1) brightness(2)', fontSize: 14, lineHeight: 1}}
         >
           ✋
         </span>
@@ -85,6 +85,8 @@ const SelfPreviewControls = ({isMuted, isHandRaised, restoreLabel, onRestore}: S
           justifyContent: 'flex-start',
           padding: 0,
           width: 32,
+          transition: 'opacity 120ms ease-out',
+          '&:hover': {opacity: 0.8},
           '&:focus-visible': {
             outline: '2px solid var(--white)',
             outlineOffset: 2,

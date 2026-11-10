@@ -162,8 +162,8 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
       css={
         isSelfParticipant && isSelfPreviewMinimized
           ? {
-              backgroundColor: 'var(--gray-95)',
-              borderRadius: 20,
+              backgroundColor: 'transparent',
+              borderRadius: 0,
               height: 40,
               overflow: 'visible',
               position: 'absolute',
@@ -265,7 +265,18 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
         )}
       </div>
       {isSelfParticipant && allowSelfPreviewMinimize && (
-        <div data-uie-name="self-video-preview-window-header" css={{position: 'absolute', right: 4, top: 4, zIndex: 2}}>
+        <div
+          data-uie-name="self-video-preview-window-header"
+          css={{
+            backgroundColor: 'transparent',
+            border: 0,
+            boxShadow: 'none',
+            position: 'absolute',
+            right: 4,
+            top: 4,
+            zIndex: 2,
+          }}
+        >
           {isSelfPreviewMinimized ? (
             <SelfPreviewControls
               isMuted={isMuted}

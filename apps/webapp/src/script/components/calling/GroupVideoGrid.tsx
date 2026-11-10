@@ -148,7 +148,18 @@ function GroupVideoThumbnail({
     </button>
   );
   const selfVideoWindowHeader = allowMinimize && (
-    <div data-uie-name="self-video-preview-window-header" css={{position: 'absolute', right: 4, top: 4, zIndex: 2}}>
+    <div
+      data-uie-name="self-video-preview-window-header"
+      css={{
+        backgroundColor: 'transparent',
+        border: 0,
+        boxShadow: 'none',
+        position: 'absolute',
+        right: 4,
+        top: 4,
+        zIndex: 2,
+      }}
+    >
       {isMinimized ? (
         <SelfPreviewControls
           isMuted={selfIsMuted}
@@ -292,8 +303,9 @@ const GroupVideoThumbnailWrapper: FunctionComponent<{
   let thumbnailStyles: CSSObject | undefined;
   if (selfPreviewMinimized) {
     thumbnailStyles = {
-      backgroundColor: 'var(--gray-95)',
-      borderRadius: 20,
+      backgroundColor: 'transparent',
+      border: 0,
+      borderRadius: 0,
       bottom: 'unset',
       boxShadow: 'none',
       height: 40,
