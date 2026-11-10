@@ -18,10 +18,10 @@
  */
 
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {fireEvent, render, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, waitFor, type RenderResult} from '@testing-library/react';
 import {Provider} from 'react-redux';
 import {HashRouter} from 'react-router';
-import {applyMiddleware, combineReducers, legacy_createStore, type Reducer} from 'redux';
+import {applyMiddleware, combineReducers, legacy_createStore, type Reducer, type Store} from 'redux';
 import {withExtraArgument} from 'redux-thunk';
 
 import {ConversationJoin} from './conversationJoin';
@@ -32,7 +32,7 @@ import {SingleSignOnForm} from './login/singleSignOnForm';
 import {Config} from '../../Config';
 import {actionRoot} from '../module/action';
 import {SelfActionCreator, type AppActions} from '../module/action/creator';
-import {initialRootState, reducers, type RootState} from '../module/reducer';
+import {initialRootState, reducers, type RootState, type ThunkDispatch} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent, withIntl, withTheme} from '../util/test/testUtil';
 
@@ -136,31 +136,27 @@ describe('meeting links in the existing auth flow', () => {
     });
   });
 
-  it('retries a guest meeting password with the existing registration behavior', async () => {
-    const wrongPassword = Object.assign(new BackendError('Wrong password', undefined, 403), {
-      label: 'invalid-meeting-password',
-    });
-    let joins = 0;
-    const sendJSON = jest.fn().mockImplementation(async request => {
-      if (request.method === 'get') {
-        throw wrongPassword;
-      }
-      if (request.method === 'post' && joins++ === 0) {
-        throw wrongPassword;
-      }
-      return {data: {...metadata, qualified_conversation: conversation}};
-    });
+  type RealJoinSetup = {
+    store: Store<RootState, AppActions>;
+    register: jest.Mock;
+    logout: jest.Mock;
+    renderPage: () => RenderResult;
+  };
+
+  const setupRealReducerJoin = (sendJSON: jest.Mock, initialState: RootState = initialRootState): RealJoinSetup => {
     const register = jest.fn().mockResolvedValue(undefined);
+    const logout = jest.fn().mockResolvedValue(undefined);
     const reduce = combineReducers(reducers);
     const rootReducer: Reducer<RootState, AppActions> = (state, action) => {
       return reduce(state, action);
     };
     const store = legacy_createStore(
       rootReducer,
+      initialState,
       applyMiddleware(
         withExtraArgument({
           apiClient: {backendFeatures: {version: 19}, transport: {http: {sendJSON}}},
-          core: {register, logout: jest.fn().mockResolvedValue(undefined)},
+          core: {register, logout},
           actions: {
             ...actionRoot,
             selfAction: {
@@ -190,15 +186,37 @@ describe('meeting links in the existing auth flow', () => {
         }),
       ),
     );
-    const page = render(
-      <Provider store={store}>
-        <HashRouter>{withTheme(withIntl(<ConversationJoin />))}</HashRouter>
-      </Provider>,
-    );
-    await waitFor(() => {
-      return expect(store.getState().conversationState.hasPassword).toBe(true);
+    const renderPage = (): RenderResult => {
+      return render(
+        <Provider store={store}>
+          <HashRouter>{withTheme(withIntl(<ConversationJoin />))}</HashRouter>
+        </Provider>,
+      );
+    };
+    return {store, register, logout, renderPage};
+  };
+
+  const wrongPassword = (): BackendError & {label: string} => {
+    return Object.assign(new BackendError('Wrong password', undefined, 403), {label: 'invalid-meeting-password'});
+  };
+
+  const setupPasswordRetry = async (): Promise<RealJoinSetup & {page: RenderResult; getJoins: () => number}> => {
+    let joins = 0;
+    const sendJSON = jest.fn().mockImplementation(async request => {
+      if (request.method === 'get') {
+        throw wrongPassword();
+      }
+      if (request.method === 'post' && joins++ === 0) {
+        throw wrongPassword();
+      }
+      return {data: {...metadata, qualified_conversation: conversation}};
     });
-    fireEvent.change(page.getByTestId('enter-name'), {target: {value: 'Guest'}});
+    const setup = setupRealReducerJoin(sendJSON);
+    const page = setup.renderPage();
+    await waitFor(() => {
+      return expect(setup.store.getState().conversationState.hasPassword).toBe(true);
+    });
+    fireEvent.change(page.getByTestId('enter-name'), {target: {value: 'Alice'}});
     fireEvent.click(page.getByTestId('do-accept-terms'));
     fireEvent.click(page.getByTestId('do-join-as-guest'));
     fireEvent.change(page.getByTestId('guest-link-join-password-input'), {target: {value: 'wrong-password'}});
@@ -206,15 +224,99 @@ describe('meeting links in the existing auth flow', () => {
     await waitFor(() => {
       return expect(joins).toBe(1);
     });
+    expect(setup.register).toHaveBeenCalledTimes(1);
+    expect(setup.register).toHaveBeenCalledWith(expect.objectContaining({name: 'Alice'}), expect.anything());
+    return {
+      ...setup,
+      page,
+      getJoins: () => {
+        return joins;
+      },
+    };
+  };
 
+  const submitCorrectPassword = async (page: RenderResult): Promise<void> => {
     fireEvent.change(page.getByTestId('guest-link-join-password-input'), {target: {value: 'correct-password'}});
     fireEvent.click(page.getByTestId('guest-link-join-submit-button'));
-
     await waitFor(() => {
       return expect(window.location.search).toBe('');
     });
-    expect(joins).toBe(2);
+  };
+
+  it('reuses registration when the name is unchanged on the same mount', async () => {
+    const {page, register, getJoins} = await setupPasswordRetry();
+    await submitCorrectPassword(page);
+    expect(getJoins()).toBe(2);
+    expect(register).toHaveBeenCalledTimes(1);
+  });
+
+  it('registers the new name on a password retry on the same mount', async () => {
+    const {page, register, getJoins} = await setupPasswordRetry();
+    fireEvent.change(page.getByTestId('enter-name'), {target: {value: 'Bob'}});
+    await submitCorrectPassword(page);
+    expect(getJoins()).toBe(2);
     expect(register).toHaveBeenCalledTimes(2);
+    expect(register).toHaveBeenLastCalledWith(expect.objectContaining({name: 'Bob'}), expect.anything());
+  });
+
+  it('reuses registration when only surrounding whitespace changes', async () => {
+    const {page, register, getJoins} = await setupPasswordRetry();
+    fireEvent.change(page.getByTestId('enter-name'), {target: {value: ' Alice '}});
+    await submitCorrectPassword(page);
+    expect(getJoins()).toBe(2);
+    expect(register).toHaveBeenCalledTimes(1);
+  });
+
+  it('registers again after remounting', async () => {
+    const {page, renderPage, register, getJoins} = await setupPasswordRetry();
+    page.unmount();
+    const remountedPage = renderPage();
+    await waitFor(() => {
+      return expect(remountedPage.getByTestId('do-join-as-guest')).toBeInTheDocument();
+    });
+    fireEvent.change(remountedPage.getByTestId('enter-name'), {target: {value: 'Remounted Guest'}});
+    fireEvent.click(remountedPage.getByTestId('do-accept-terms'));
+    fireEvent.click(remountedPage.getByTestId('do-join-as-guest'));
+    await submitCorrectPassword(remountedPage);
+    expect(getJoins()).toBe(2);
+    expect(register).toHaveBeenCalledTimes(2);
+    expect(register).toHaveBeenLastCalledWith(expect.objectContaining({name: 'Remounted Guest'}), expect.anything());
+  });
+
+  it('registers again after logout', async () => {
+    const {page, store, register, logout, getJoins} = await setupPasswordRetry();
+    expect(store.getState().authState.isAuthenticated).toBe(true);
+    await act(async () => {
+      await (store.dispatch as ThunkDispatch)(actionRoot.authAction.doLogout());
+    });
+    expect(logout).toHaveBeenCalled();
+    expect(store.getState().authState.isAuthenticated).toBe(false);
+    await submitCorrectPassword(page);
+    expect(getJoins()).toBe(2);
+    expect(register).toHaveBeenCalledTimes(2);
+  });
+
+  it('registers the entered name when a temporary guest session was restored', async () => {
+    const sendJSON = jest.fn().mockResolvedValue({data: {...metadata, qualified_conversation: conversation}});
+    const {register, renderPage} = setupRealReducerJoin(sendJSON, {
+      ...initialRootState,
+      authState: {...initialRootState.authState, isAuthenticated: true},
+      selfState: {
+        ...initialRootState.selfState,
+        self: {...initialRootState.selfState.self, name: 'Old', expires_at: '2099-01-01T12:00:00Z'},
+      },
+    });
+    const page = renderPage();
+    await waitFor(() => {
+      return expect(sendJSON).toHaveBeenCalledWith(expect.objectContaining({method: 'get'}));
+    });
+    fireEvent.change(page.getByTestId('enter-name'), {target: {value: 'New'}});
+    fireEvent.click(page.getByTestId('do-accept-terms'));
+    fireEvent.click(page.getByTestId('do-join-as-guest'));
+    await waitFor(() => {
+      return expect(register).toHaveBeenCalledWith(expect.objectContaining({name: 'New'}), expect.anything());
+    });
+    expect(register).toHaveBeenCalledTimes(1);
   });
 
   it('waits for a meeting password before automatic SSO and does not automatically retry a wrong password', async () => {
