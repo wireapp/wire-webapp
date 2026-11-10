@@ -28,6 +28,7 @@ export const markAsUnreadFeatureToggleName = 'mark-as-unread';
 export const troubleshooterFeatureToggleName = 'troubleshooter';
 
 export const sendCallLogsFeatureToggleName = 'send-call-logs';
+export const minimizeSelfViewFeatureToggleName = 'minimize-self-view';
 
 export const startupFeatureToggleRegistry = [
   {name: applockRefactoredFeatureToggleName, previewDefaultEnabled: false},
@@ -40,6 +41,7 @@ export const startupFeatureToggleRegistry = [
   {name: markAsUnreadFeatureToggleName, previewDefaultEnabled: true},
   {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},
   {name: sendCallLogsFeatureToggleName, previewDefaultEnabled: false},
+  {name: minimizeSelfViewFeatureToggleName, previewDefaultEnabled: false},
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleRegistry)[number]['name'];
@@ -69,3 +71,28 @@ export function selectPreviewDefaultEnabledStartupFeatureToggleNames(
 
 export const previewDefaultEnabledStartupFeatureToggleNames: readonly StartupFeatureToggleName[] =
   selectPreviewDefaultEnabledStartupFeatureToggleNames(startupFeatureToggleRegistry);
+
+// Matches EDGE_WEBAPP_URL in .github/workflows/publish-main.yml; APP_BASE is the runtime identity source.
+const WIRE_EDGE_APP_BASE_ORIGIN = 'https://wire-webapp-edge.wire.com';
+
+export function selectDefaultEnabledStartupFeatureToggleNames(options: {
+  readonly appBaseUrl: string;
+  readonly defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[];
+}): readonly StartupFeatureToggleName[] {
+  const {appBaseUrl, defaultEnabledFeatureToggleNames} = options;
+  let appBaseOrigin: string;
+
+  try {
+    appBaseOrigin = new URL(appBaseUrl).origin;
+  } catch {
+    return defaultEnabledFeatureToggleNames;
+  }
+
+  if (appBaseOrigin !== WIRE_EDGE_APP_BASE_ORIGIN) {
+    return defaultEnabledFeatureToggleNames;
+  }
+
+  return defaultEnabledFeatureToggleNames.includes(minimizeSelfViewFeatureToggleName)
+    ? defaultEnabledFeatureToggleNames
+    : [...defaultEnabledFeatureToggleNames, minimizeSelfViewFeatureToggleName];
+}

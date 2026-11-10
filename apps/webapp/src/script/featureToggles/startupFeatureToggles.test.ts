@@ -32,6 +32,7 @@ import {
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
+  minimizeSelfViewFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
 } from './startupFeatureToggleNames';
@@ -47,6 +48,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
+  minimizeSelfViewFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -78,6 +80,17 @@ describe('startupFeatureToggles', function () {
     const toggles = createStartupFeatureTogglesFromLocationSearch('');
 
     expect(toggles.isFeatureToggleEnabled(troubleshooterFeatureToggleName)).toBe(false);
+  });
+
+  it('keeps self-view minimization disabled by default and enables it via the startup URL', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    expect(disabled.isFeatureToggleEnabled(minimizeSelfViewFeatureToggleName)).toBe(false);
+
+    const enabled = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${minimizeSelfViewFeatureToggleName}`,
+    );
+    expect(enabled.isFeatureToggleEnabled(minimizeSelfViewFeatureToggleName)).toBe(true);
+    expect(enabled.enabledFeatureToggleNames).toEqual([minimizeSelfViewFeatureToggleName]);
   });
 
   it('keeps the call security line disabled by default', () => {
@@ -261,6 +274,7 @@ describe('startupFeatureToggles', function () {
       markAsUnreadFeatureToggleName,
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,
+      minimizeSelfViewFeatureToggleName,
     ]);
   });
 

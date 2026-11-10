@@ -45,7 +45,10 @@ import {VideoControls} from './VideoControls/VideoControls';
 
 import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
 import {Config} from '../../Config';
-import {callSecurityLineFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {
+  callSecurityLineFeatureToggleName,
+  minimizeSelfViewFeatureToggleName,
+} from '../../featureToggles/startupFeatureToggleNames';
 import {useActiveWindowMatchMedia} from '../../hooks/useActiveWindowMatchMedia';
 import {useToggleState} from '../../hooks/useToggleState';
 import {useApplicationContext} from '../../page/rootProvider';
@@ -178,6 +181,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {BRAND_NAME: brandName, URL: configUrls} = Config.getConfig();
   const isCallSecurityLineEnabled = isFeatureToggleEnabled(callSecurityLineFeatureToggleName);
+  const isSelfViewMinimizationEnabled = isFeatureToggleEnabled(minimizeSelfViewFeatureToggleName);
   const callEncryptionSupportUrl = configUrls.SUPPORT.CALL_ENCRYPTION;
 
   const {selfUser, roles} = useKoSubscribableChildren(conversation, ['selfUser', 'roles']);
@@ -442,7 +446,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
                 : videoGrid
             }
             call={call}
-            allowSelfVideoMinimize
+            allowSelfVideoMinimize={isSelfViewMinimizationEnabled}
             setMaximizedParticipant={participant => {
               return setMaximizedParticipant(call, participant);
             }}

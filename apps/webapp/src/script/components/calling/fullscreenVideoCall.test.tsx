@@ -43,7 +43,10 @@ import {
   createRootProviderWrapperForTest,
 } from '../../page/testSupport/rootContextTestSupport';
 import {translate} from '../../util/localizerUtil';
-import {callSecurityLineFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {
+  callSecurityLineFeatureToggleName,
+  minimizeSelfViewFeatureToggleName,
+} from '../../featureToggles/startupFeatureToggleNames';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 import {useCallAlertState} from './useCallAlertState';
@@ -148,16 +151,71 @@ describe('fullscreenVideoCall', () => {
     });
   });
 
-  it('shows the self-video preview control for a one-on-one call when alert state is stale', () => {
+  it('keeps the one-on-one self preview unchanged when minimization is disabled by default', () => {
     const props = createProps();
+    props.videoGrid = {grid: [], thumbnail: props.call.getSelfParticipant()};
+
+    const {container, queryByRole} = render(withTheme(<FullscreenVideoCall {...props} />), {
+      wrapper: rootProviderWrapper,
+    });
+
+    expect(queryByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'})).toBeNull();
+    expect(container.querySelector('[data-uie-name="self-preview-minimized-controls"]')).toBeNull();
+    expect(container.querySelector('[data-uie-name="self-video-thumbnail-wrapper"]')).toBeInTheDocument();
+  });
+
+  it('keeps the remote group tile visible without self-preview controls by default', () => {
+    const props = createProps();
+    const remoteParticipant = new Participant(new User('remote', '', translateForTest), 'remote-client');
+    props.videoGrid = {grid: [props.call.getSelfParticipant(), remoteParticipant], thumbnail: null};
+
+    const {getByRole, queryByRole, container} = render(withTheme(<FullscreenVideoCall {...props} />), {
+      wrapper: rootProviderWrapper,
+    });
+
+    expect(queryByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'})).toBeNull();
+    expect(container.querySelector('[data-user-id="remote"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="self-preview-minimized-controls"]')).toBeNull();
+    expect(getByRole('button', {name: 'Focus video remote'})).toBeVisible();
+  });
+
+  it('shows the self-preview control when enabled even if the call alert state is stale', () => {
     act(() => {
       useCallAlertState.setState({isGroupCall: true});
     });
+    const props = createProps();
     props.videoGrid = {grid: [], thumbnail: props.call.getSelfParticipant()};
+    const featureEnabledWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: featureName => {
+          return featureName === minimizeSelfViewFeatureToggleName;
+        },
+      }),
+    );
 
-    const {getByRole} = render(withTheme(<FullscreenVideoCall {...props} />), {wrapper: rootProviderWrapper});
+    const {getByRole} = render(withThemeAndRootContext(<FullscreenVideoCall {...props} />, featureEnabledWrapper));
 
-    expect(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'})).toBeDefined();
+    expect(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'})).toBeInTheDocument();
+  });
+
+  it('shows the self-tile control without hiding the remote tile when enabled in a group call', () => {
+    const props = createProps();
+    const remoteParticipant = new Participant(new User('remote', '', translateForTest), 'remote-client');
+    props.videoGrid = {grid: [props.call.getSelfParticipant(), remoteParticipant], thumbnail: null};
+    const featureEnabledWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: featureName => {
+          return featureName === minimizeSelfViewFeatureToggleName;
+        },
+      }),
+    );
+
+    const {getByRole} = render(withThemeAndRootContext(<FullscreenVideoCall {...props} />, featureEnabledWrapper));
+
+    expect(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'})).toBeInTheDocument();
+    expect(getByRole('button', {name: 'Focus video remote'})).toBeVisible();
   });
 
   it('has no active speaker toggle for calls with more less than 3 participants', () => {

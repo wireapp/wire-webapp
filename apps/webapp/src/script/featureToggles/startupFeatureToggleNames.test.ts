@@ -22,13 +22,58 @@ import {
   driveBulkActionsFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
   markAsUnreadFeatureToggleName,
+  minimizeSelfViewFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   previewDefaultEnabledStartupFeatureToggleNames,
+  selectDefaultEnabledStartupFeatureToggleNames,
   selectPreviewDefaultEnabledStartupFeatureToggleNames,
   sendCallLogsFeatureToggleName,
   startupFeatureToggleNames,
   startupFeatureToggleRegistry,
 } from './startupFeatureToggleNames';
+
+describe('selectDefaultEnabledStartupFeatureToggleNames', () => {
+  it('enables self-view minimization by default only for the configured Wire Edge origin', () => {
+    const edgeDefaults = selectDefaultEnabledStartupFeatureToggleNames({
+      appBaseUrl: 'https://wire-webapp-edge.wire.com/',
+      defaultEnabledFeatureToggleNames: [],
+    });
+    const otherEnvironmentDefaults = selectDefaultEnabledStartupFeatureToggleNames({
+      appBaseUrl: 'https://app.wire.com/',
+      defaultEnabledFeatureToggleNames: [],
+    });
+    const similarHostDefaults = selectDefaultEnabledStartupFeatureToggleNames({
+      appBaseUrl: 'https://wire-webapp-edge.wire.com.example.org/',
+      defaultEnabledFeatureToggleNames: [],
+    });
+
+    expect(edgeDefaults).toEqual([minimizeSelfViewFeatureToggleName]);
+    expect(otherEnvironmentDefaults).toEqual([]);
+    expect(similarHostDefaults).toEqual([]);
+  });
+
+  it('preserves existing defaults without adding duplicate Edge defaults', () => {
+    const defaults = [minimizeSelfViewFeatureToggleName, driveBulkActionsFeatureToggleName] as const;
+
+    expect(
+      selectDefaultEnabledStartupFeatureToggleNames({
+        appBaseUrl: 'https://wire-webapp-edge.wire.com/',
+        defaultEnabledFeatureToggleNames: defaults,
+      }),
+    ).toEqual(defaults);
+  });
+
+  it('preserves existing defaults for an invalid application base URL', () => {
+    const defaults = [driveBulkActionsFeatureToggleName] as const;
+
+    expect(
+      selectDefaultEnabledStartupFeatureToggleNames({
+        appBaseUrl: '',
+        defaultEnabledFeatureToggleNames: defaults,
+      }),
+    ).toEqual(defaults);
+  });
+});
 
 describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
   it('enables Mark as unread by default in preview builds', () => {
@@ -85,6 +130,14 @@ describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
       previewDefaultEnabled: false,
     });
     expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(driveBulkRestoreFeatureToggleName);
+  });
+
+  it('keeps self-view minimization explicitly disabled by default', () => {
+    expect(startupFeatureToggleRegistry).toContainEqual({
+      name: minimizeSelfViewFeatureToggleName,
+      previewDefaultEnabled: false,
+    });
+    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(minimizeSelfViewFeatureToggleName);
   });
 
   it('keeps the test-only flag explicitly opted out of preview defaults', () => {

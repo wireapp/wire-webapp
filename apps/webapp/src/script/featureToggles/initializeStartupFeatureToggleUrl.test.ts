@@ -23,6 +23,8 @@ import {
   sendCallLogsFeatureToggleName,
   markAsUnreadFeatureToggleName,
   previewDefaultEnabledStartupFeatureToggleNames,
+  minimizeSelfViewFeatureToggleName,
+  selectDefaultEnabledStartupFeatureToggleNames,
 } from './startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from './startupFeatureToggles';
 import {updateLocationSearchForStartupFeatureToggle} from './startupFeatureToggleQueryParameters';
@@ -74,6 +76,38 @@ describe('initializeStartupFeatureToggleUrl', () => {
       'https://example.com/app?return=a+b&filter=one&filter=two&enabled-features=for-tests-only%2Csend-call-logs#preferences',
     );
     expect(url.href).toBe('https://example.com/app?return=a%20b&filter=one&filter=two#preferences');
+  });
+
+  it('initializes the self-view default for Wire Edge but preserves an explicit opt-out', () => {
+    const edgeDefaults = selectDefaultEnabledStartupFeatureToggleNames({
+      appBaseUrl: 'https://wire-webapp-edge.wire.com/',
+      defaultEnabledFeatureToggleNames: [],
+    });
+    const replaceUrl = jest.fn();
+
+    initializeStartupFeatureToggleUrl({
+      url: new URL('https://wire-webapp-edge.wire.com/'),
+      defaultEnabledFeatureToggleNames: edgeDefaults,
+      replaceUrl,
+    });
+
+    expect(replaceUrl).toHaveBeenCalledWith(
+      `https://wire-webapp-edge.wire.com/?enabled-features=${minimizeSelfViewFeatureToggleName}`,
+    );
+
+    const explicitOptOutReplaceUrl = jest.fn();
+    initializeStartupFeatureToggleUrl({
+      url: new URL('https://wire-webapp-edge.wire.com/?enabled-features='),
+      defaultEnabledFeatureToggleNames: edgeDefaults,
+      replaceUrl: explicitOptOutReplaceUrl,
+    });
+
+    expect(explicitOptOutReplaceUrl).not.toHaveBeenCalled();
+    expect(
+      createStartupFeatureTogglesFromLocationSearch('?enabled-features=').isFeatureToggleEnabled(
+        minimizeSelfViewFeatureToggleName,
+      ),
+    ).toBe(false);
   });
 
   it.each([
