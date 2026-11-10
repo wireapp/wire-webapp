@@ -4217,7 +4217,9 @@ describe('CellsTable restoring selected Bin items', () => {
       expect(
         screen.getByRole('button', {name: translateSelectionForTest('cells.options.deletePermanently')}),
       ).toBeInTheDocument();
-      expect(screen.queryByRole('button', {name: translateSelectionForTest('cells.options.restore')})).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', {name: translateSelectionForTest('cells.options.restore')}),
+      ).not.toBeInTheDocument();
       expect(repository.restoreNodes).not.toHaveBeenCalled();
     },
   );
