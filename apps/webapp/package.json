@@ -1,6 +1,6 @@
 {
   "name": "@wireapp/webapp",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "license": "GPL-3.0",
   "main": "src/script/main/previewEntrypoint.tsx",
