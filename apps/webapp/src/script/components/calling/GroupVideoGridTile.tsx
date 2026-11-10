@@ -32,6 +32,7 @@ import {
   groupVideoPauseOverlayLabel,
   groupVideoTileWrapper,
 } from './GroupVideoGridTile.styles';
+import {SelfPreviewControls} from './SelfPreviewControls';
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
@@ -263,95 +264,51 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
           </div>
         )}
       </div>
-      {isSelfParticipant && isSelfPreviewMinimized && isMuted && (
-        <span
-          className="group-video-grid__element__label__icon"
-          css={{
-            '&.group-video-grid__element__label__icon': {
-              alignItems: 'center',
-              backgroundColor: 'transparent',
-              bottom: 4,
-              color: 'var(--white)',
-              display: 'flex',
-              height: 16,
-              left: 4,
-              margin: 0,
-              padding: 0,
-              width: 16,
-              zIndex: 3,
-            },
-          }}
-          data-uie-name="self-preview-muted-indicator"
-        >
-          <Icon.MicOffIcon css={{'&& path': {fill: 'currentColor'}}} data-uie-name="mic-icon-off" />
-        </span>
-      )}
-      {isSelfParticipant && isSelfPreviewMinimized && handRaisedAt != null && (
-        <span
-          className="group-video-grid__element__label__hand_icon"
-          css={{
-            '&&': {
-              alignItems: 'center',
-              backgroundColor: 'transparent',
-              borderRadius: 0,
-              color: 'var(--white)',
-              display: 'flex',
-              filter: 'grayscale(1) brightness(2)',
-              fontSize: 14,
-              height: 16,
-              justifyContent: 'center',
-              left: 4,
-              margin: 0,
-              top: 4,
-              width: 16,
-              zIndex: 3,
-            },
-          }}
-          data-uie-name="self-preview-hand-raised-indicator"
-        >
-          ✋
-        </span>
-      )}
       {isSelfParticipant && allowSelfPreviewMinimize && (
         <div data-uie-name="self-video-preview-window-header" css={{position: 'absolute', right: 4, top: 4, zIndex: 2}}>
-          <button
-            type="button"
-            aria-label={isSelfPreviewMinimized ? restoreSelfPreviewLabel : minimizeSelfPreviewLabel}
-            title={isSelfPreviewMinimized ? restoreSelfPreviewLabel : minimizeSelfPreviewLabel}
-            onClick={event => {
-              event.stopPropagation();
-              onToggleSelfPreviewMinimized();
-            }}
-            data-uie-name={isSelfPreviewMinimized ? 'restore-self-video-preview' : 'minimize-self-video-preview'}
-            css={{
-              alignItems: 'center',
-              backgroundColor: 'transparent',
-              border: 0,
-              borderRadius: 4,
-              color: isSelfPreviewMinimized ? 'var(--white)' : 'var(--foreground)',
-              cursor: 'pointer',
-              display: 'flex',
-              height: 32,
-              justifyContent: 'center',
-              opacity: isSelfPreviewMinimized ? 1 : 0,
-              padding: 6,
-              width: 32,
-              transition: 'opacity 120ms ease-out',
-              '.group-video-grid__element:hover &, .group-video-grid__element:focus-within &': {opacity: 1},
-              '&:focus-visible': {
-                outline: '2px solid var(--white)',
-                outlineOffset: 2,
-                opacity: 1,
-              },
-              '@media (hover: none)': {opacity: 1},
-            }}
-          >
-            {isSelfPreviewMinimized ? (
-              <Icon.FullscreenIcon aria-hidden="true" css={{'&& path': {fill: 'currentColor'}}} />
-            ) : (
+          {isSelfPreviewMinimized ? (
+            <SelfPreviewControls
+              isMuted={isMuted}
+              isHandRaised={handRaisedAt != null}
+              restoreLabel={restoreSelfPreviewLabel}
+              onRestore={onToggleSelfPreviewMinimized}
+            />
+          ) : (
+            <button
+              type="button"
+              aria-label={minimizeSelfPreviewLabel}
+              title={minimizeSelfPreviewLabel}
+              onClick={event => {
+                event.stopPropagation();
+                onToggleSelfPreviewMinimized();
+              }}
+              data-uie-name="minimize-self-video-preview"
+              css={{
+                alignItems: 'center',
+                backgroundColor: 'transparent',
+                border: 0,
+                borderRadius: 4,
+                color: 'var(--foreground)',
+                cursor: 'pointer',
+                display: 'flex',
+                height: 32,
+                justifyContent: 'center',
+                opacity: 0,
+                padding: 6,
+                width: 32,
+                transition: 'opacity 120ms ease-out',
+                '.group-video-grid__element:hover &, .group-video-grid__element:focus-within &': {opacity: 1},
+                '&:focus-visible': {
+                  outline: '2px solid var(--white)',
+                  outlineOffset: 2,
+                  opacity: 1,
+                },
+                '@media (hover: none)': {opacity: 1},
+              }}
+            >
               <Icon.MinusIcon aria-hidden="true" />
-            )}
-          </button>
+            </button>
+          )}
         </div>
       )}
     </div>

@@ -228,8 +228,12 @@ describe('GroupVideoGrid', () => {
     expect(selfPreview).not.toBeVisible();
     expect(remoteVideo).toBeVisible();
     expect(remoteParticipant.videoStream()).toBe(remoteStream);
-    expect(container.querySelector('[data-uie-name="self-preview-muted-indicator"]')).toBeVisible();
-    expect(container.querySelector('[data-uie-name="self-preview-hand-raised-indicator"]')).toBeVisible();
+    const selfPreviewControls = requireValueForTest(
+      container.querySelector('[data-uie-name="self-preview-minimized-controls"]'),
+    );
+    expect(selfPreviewControls.querySelector('[data-uie-name="self-preview-muted-indicator"]')).toBeVisible();
+    expect(selfPreviewControls.querySelector('[data-uie-name="self-preview-hand-raised-indicator"]')).toBeVisible();
+    expect(selfPreviewControls.querySelector('[data-uie-name="restore-self-video-preview"]')).toBeVisible();
     expect(queryByTestId('self-video-preview-window-header')).toBeInTheDocument();
     expect(participant.videoStream()).toBe(stream);
 
@@ -274,8 +278,12 @@ describe('GroupVideoGrid', () => {
     expect(getByRole('button', {name: 'videoCallOverlayRestoreSelfVideo'})).toBeInTheDocument();
     expect(selfParticipant.videoStream()).toBe(stream);
     expect(remoteParticipant.videoStream()).toBe(remoteStream);
-    expect(container.querySelector('[data-uie-name="self-preview-muted-indicator"]')).toBeVisible();
-    expect(container.querySelector('[data-uie-name="self-preview-hand-raised-indicator"]')).toBeVisible();
+    const selfPreviewControls = requireValueForTest(
+      container.querySelector('[data-uie-name="self-preview-minimized-controls"]'),
+    );
+    expect(selfPreviewControls.querySelector('[data-uie-name="self-preview-muted-indicator"]')).toBeVisible();
+    expect(selfPreviewControls.querySelector('[data-uie-name="self-preview-hand-raised-indicator"]')).toBeVisible();
+    expect(selfPreviewControls.querySelector('[data-uie-name="restore-self-video-preview"]')).toBeVisible();
     expect(
       requireValueForTest(
         container.querySelector<HTMLElement>('[data-uie-name="grids-wrapper"]'),

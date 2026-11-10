@@ -24,6 +24,7 @@ import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
 import {groupVideoBackgroundInitializingOverlay} from './GroupVideoGridTile.styles';
+import {SelfPreviewControls} from './SelfPreviewControls';
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
@@ -148,7 +149,16 @@ function GroupVideoThumbnail({
   );
   const selfVideoWindowHeader = allowMinimize && (
     <div data-uie-name="self-video-preview-window-header" css={{position: 'absolute', right: 4, top: 4, zIndex: 2}}>
-      {selfVideoToggleControl}
+      {isMinimized ? (
+        <SelfPreviewControls
+          isMuted={selfIsMuted}
+          isHandRaised={!isNullOrUndefined(selfHandRaisedAt)}
+          restoreLabel={restoreLabel}
+          onRestore={onToggleMinimized}
+        />
+      ) : (
+        selfVideoToggleControl
+      )}
     </div>
   );
 
@@ -186,60 +196,13 @@ function GroupVideoThumbnail({
               <Loading size={32} />
             </div>
           )}
-          {selfIsMuted && !minimized && (
-            <span
-              className="group-video-grid__element__label__icon"
-              data-uie-name={isMinimized ? 'self-preview-muted-indicator' : 'status-call-audio-muted'}
-              css={
-                isMinimized
-                  ? {
-                      '&&': {
-                        alignItems: 'center',
-                        backgroundColor: 'transparent',
-                        bottom: 4,
-                        color: 'var(--white)',
-                        display: 'flex',
-                        height: 16,
-                        left: 4,
-                        margin: 0,
-                        padding: 0,
-                        width: 16,
-                        zIndex: 3,
-                      },
-                    }
-                  : undefined
-              }
-            >
-              <Icon.MicOffIcon css={{'&& path': {fill: 'currentColor'}}} data-uie-name="mic-icon-off" />
+          {selfIsMuted && !minimized && !isMinimized && (
+            <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
+              <Icon.MicOffIcon data-uie-name="mic-icon-off" />
             </span>
           )}
-          {!isNullOrUndefined(selfHandRaisedAt) && !minimized && (
-            <span
-              className="group-video-grid__element__label__hand_icon small"
-              data-uie-name={isMinimized ? 'self-preview-hand-raised-indicator' : 'status-call-audio-muted'}
-              css={
-                isMinimized
-                  ? {
-                      '&&': {
-                        alignItems: 'center',
-                        backgroundColor: 'transparent',
-                        borderRadius: 0,
-                        color: 'var(--white)',
-                        display: 'flex',
-                        filter: 'grayscale(1) brightness(2)',
-                        fontSize: 14,
-                        height: 16,
-                        justifyContent: 'center',
-                        left: 4,
-                        margin: 0,
-                        top: 4,
-                        width: 16,
-                        zIndex: 3,
-                      },
-                    }
-                  : undefined
-              }
-            >
+          {!isNullOrUndefined(selfHandRaisedAt) && !minimized && !isMinimized && (
+            <span className="group-video-grid__element__label__hand_icon small" data-uie-name="status-call-audio-muted">
               ✋
             </span>
           )}
@@ -262,12 +225,12 @@ function GroupVideoThumbnail({
               visibility: isMinimized ? 'hidden' : 'visible',
             }}
           >
-            {selfIsMuted && !minimized && (
+            {selfIsMuted && !minimized && !isMinimized && (
               <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
                 <Icon.MicOffIcon data-uie-name="mic-icon-off" />
               </span>
             )}
-            {!isNullOrUndefined(selfHandRaisedAt) && !minimized && (
+            {!isNullOrUndefined(selfHandRaisedAt) && !minimized && !isMinimized && (
               <span
                 className="group-video-grid__element__label__hand_icon small"
                 data-uie-name="status-call-audio-muted"
