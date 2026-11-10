@@ -368,6 +368,18 @@ const _getStateGhostGroup: ConversationCellStateDefinition = {
   },
 };
 
+const _getStateManualUnread: ConversationCellStateDefinition = {
+  description: (conversationEntity: Conversation, translate: Translate) => {
+    return _accumulateSummary(conversationEntity, translate, conversationEntity.showNotificationsMentionsAndReplies());
+  },
+  icon: () => {
+    return ConversationStatusIcon.MANUAL_UNREAD;
+  },
+  match: (conversationEntity: Conversation) => {
+    return isNumber(conversationEntity.manualUnreadTimestamp());
+  },
+};
+
 const _getStateUnreadMessage: ConversationCellStateDefinition = {
   description: (conversationEntity: Conversation, translate: Translate): string => {
     const unreadState = conversationEntity.unreadState();
@@ -467,6 +479,7 @@ export const generateCellState = (
   const states = [
     _getStateRemoved,
     _getStateGhostGroup,
+    _getStateManualUnread,
     _getStateMuted,
     _getStateAlert,
     _getStateGroupActivity,

@@ -961,6 +961,196 @@ describe('Conversation', () => {
     });
   });
 
+  describe('manual unread marker', () => {
+    type ManualUnreadMarkerConversationSetup = {
+      readonly otherFirst: ContentMessage;
+      readonly ownSecond: ContentMessage;
+      readonly otherThird: ContentMessage;
+    };
+
+    function createContentMessage(timestamp: number, user: User): ContentMessage {
+      const message = new ContentMessage(createUuid(), translateForTest);
+      message.timestamp(timestamp);
+      message.user(user);
+      message.addAsset(new Text(createUuid(), 'text'));
+
+      return message;
+    }
+
+    function setupConversation(): ManualUnreadMarkerConversationSetup {
+      const otherFirst = createContentMessage(first_timestamp, other_user);
+      const ownSecond = createContentMessage(second_timestamp, self_user);
+      const otherThird = createContentMessage(third_timestamp, other_user);
+      conversation_et.selfUser(self_user);
+      conversation_et.last_server_timestamp(third_timestamp);
+      conversation_et.last_event_timestamp(third_timestamp);
+      conversation_et.last_read_timestamp(third_timestamp);
+      conversation_et.messages_unordered.push(otherFirst, ownSecond, otherThird);
+
+      return {otherFirst, ownSecond, otherThird};
+    }
+
+    function setupConversationWithOwnLastMessage(): ContentMessage {
+      const ownLastMessage = createContentMessage(third_timestamp, self_user);
+      conversation_et.selfUser(self_user);
+      conversation_et.last_server_timestamp(third_timestamp);
+      conversation_et.last_event_timestamp(third_timestamp);
+      conversation_et.last_read_timestamp(third_timestamp);
+      conversation_et.messages_unordered.push(ownLastMessage);
+
+      return ownLastMessage;
+    }
+
+    it('stores the selected timestamp locally without changing the synchronized read timestamp', () => {
+      const {otherFirst} = setupConversation();
+
+      conversation_et.markUnreadFrom(otherFirst);
+
+      expect(conversation_et.last_read_timestamp()).toBe(third_timestamp);
+      expect(conversation_et.manualUnreadTimestamp()).toBe(first_timestamp);
+      expect(conversation_et.effectiveReadTimestamp()).toBe(first_timestamp - 1);
+      expect(conversation_et.isAutoReadSuppressed()).toBe(true);
+    });
+
+    it('includes incoming messages after the marker across intervening own messages', () => {
+      const {otherFirst, otherThird} = setupConversation();
+
+      conversation_et.markUnreadFrom(otherFirst);
+
+      expect(conversation_et.unreadState().allMessages).toEqual([otherThird, otherFirst]);
+      expect(conversation_et.hasUnread()).toBe(true);
+    });
+
+    it.each([NOTIFICATION_STATE.NOTHING, NOTIFICATION_STATE.MENTIONS_AND_REPLIES])(
+      'keeps a manually unread own last message unread when notifications use state %s',
+      notificationState => {
+        const ownLastMessage = setupConversationWithOwnLastMessage();
+        conversation_et.last_read_timestamp(second_timestamp);
+        conversation_et.mutedState(notificationState);
+
+        conversation_et.markUnreadFrom(ownLastMessage);
+
+        expect(conversation_et.unreadState().allMessages).toEqual([]);
+        expect(conversation_et.hasUnread()).toBe(true);
+        expect(conversation_et.effectiveReadTimestamp()).toBe(third_timestamp - 1);
+        expect(conversation_et.last_read_timestamp()).toBe(second_timestamp);
+      },
+    );
+
+    it('stops at the own message boundary when not marked as unread', () => {
+      const {otherFirst, otherThird} = setupConversation();
+      conversation_et.last_read_timestamp(first_timestamp - 1);
+
+      expect(conversation_et.unreadState().allMessages).toEqual([otherThird]);
+      expect(conversation_et.unreadState().allMessages).not.toContain(otherFirst);
+    });
+
+    it('is not cleared by a rejected read timestamp beyond the marker but behind the canonical timestamp', () => {
+      const {otherFirst} = setupConversation();
+      conversation_et.markUnreadFrom(otherFirst);
+
+      conversation_et.setTimestamp(second_timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
+
+      expect(conversation_et.manualUnreadTimestamp()).toBe(first_timestamp);
+      expect(conversation_et.isAutoReadSuppressed()).toBe(true);
+      expect(conversation_et.last_read_timestamp()).toBe(third_timestamp);
+    });
+
+    it('is not cleared when the canonical read timestamp is repeated', () => {
+      const {otherFirst} = setupConversation();
+      conversation_et.markUnreadFrom(otherFirst);
+
+      conversation_et.setTimestamp(third_timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
+
+      expect(conversation_et.manualUnreadTimestamp()).toBe(first_timestamp);
+      expect(conversation_et.isAutoReadSuppressed()).toBe(true);
+      expect(conversation_et.last_read_timestamp()).toBe(third_timestamp);
+    });
+
+    it('is cleared when the canonical read timestamp advances through the marker', () => {
+      const {otherFirst} = setupConversation();
+      conversation_et.markUnreadFrom(otherFirst);
+
+      conversation_et.setTimestamp(third_timestamp + 1, Conversation.TIMESTAMP_TYPE.LAST_READ);
+
+      expect(conversation_et.manualUnreadTimestamp()).toBeUndefined();
+      expect(conversation_et.isAutoReadSuppressed()).toBe(false);
+      expect(conversation_et.last_read_timestamp()).toBe(third_timestamp + 1);
+    });
+
+    it('is not cleared by a forced stale timestamp update', () => {
+      const {otherFirst} = setupConversation();
+      conversation_et.markUnreadFrom(otherFirst);
+
+      conversation_et.setTimestamp(second_timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ, true);
+
+      expect(conversation_et.manualUnreadTimestamp()).toBe(first_timestamp);
+      expect(conversation_et.last_read_timestamp()).toBe(second_timestamp);
+    });
+
+    it('is not cleared when history containing own messages is loaded', () => {
+      const {otherFirst} = setupConversation();
+      conversation_et.markUnreadFrom(otherFirst);
+
+      conversation_et.addMessages([createContentMessage(third_timestamp, self_user)]);
+
+      expect(conversation_et.manualUnreadTimestamp()).toBe(first_timestamp);
+      expect(conversation_et.last_read_timestamp()).toBe(third_timestamp);
+    });
+
+    it('resumes auto-read but keeps the marker when the conversation is released', () => {
+      const {otherFirst} = setupConversation();
+      conversation_et.markUnreadFrom(otherFirst);
+
+      conversation_et.release();
+
+      expect(conversation_et.isAutoReadSuppressed()).toBe(false);
+      expect(conversation_et.manualUnreadTimestamp()).toBe(first_timestamp);
+      expect(conversation_et.messages().length).toBe(3);
+    });
+
+    it('clears after the selected own message is read again after reopening', () => {
+      const ownLastMessage = setupConversationWithOwnLastMessage();
+      conversation_et.markUnreadFrom(ownLastMessage);
+
+      conversation_et.release();
+      conversation_et.clearManualUnreadMarkerIfReadThrough(ownLastMessage.timestamp());
+
+      expect(conversation_et.manualUnreadTimestamp()).toBeUndefined();
+      expect(conversation_et.hasUnread()).toBe(false);
+    });
+
+    it('clears when a new own message advances read state', () => {
+      const {otherFirst} = setupConversation();
+      const newOwnMessage = createContentMessage(third_timestamp + 1, self_user);
+      conversation_et.last_server_timestamp(third_timestamp + 2);
+      conversation_et.markUnreadFrom(otherFirst);
+
+      conversation_et.updateTimestamps(newOwnMessage);
+
+      expect(conversation_et.manualUnreadTimestamp()).toBeUndefined();
+      expect(conversation_et.last_read_timestamp()).toBe(third_timestamp + 1);
+    });
+
+    it('clears manually without changing the canonical timestamp when jumping to latest', () => {
+      const ownLastMessage = setupConversationWithOwnLastMessage();
+      conversation_et.markUnreadFrom(ownLastMessage);
+
+      conversation_et.clearManualUnreadMarker();
+
+      expect(conversation_et.manualUnreadTimestamp()).toBeUndefined();
+      expect(conversation_et.last_read_timestamp()).toBe(third_timestamp);
+    });
+
+    it('is persisted when serializing the conversation', () => {
+      const {otherFirst} = setupConversation();
+      conversation_et.markUnreadFrom(otherFirst);
+
+      expect(conversation_et.serialize().manual_unread_timestamp).toBe(first_timestamp);
+      expect(conversation_et.serialize().last_read_timestamp).toBe(third_timestamp);
+    });
+  });
+
   describe('_incrementTimeOnly', () => {
     it('should update only to newer timestamps', () => {
       //@ts-ignore
