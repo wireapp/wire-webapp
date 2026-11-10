@@ -34,6 +34,7 @@ import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVe
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {Config, Configuration} from '../../Config';
+import {markAsUnreadFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {useAppSoftLock} from '../../hooks/useAppSoftLock';
 import {useSingleInstance} from '../../hooks/useSingleInstance';
@@ -88,6 +89,7 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
     translate,
   } = properties;
   setAppLocale();
+  const isMarkAsUnreadFeatureEnabled = isFeatureToggleEnabled(markAsUnreadFeatureToggleName);
   const app = useMemo(() => {
     return new App(
       container.resolve(Core),
@@ -96,8 +98,9 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
       translate,
       clock,
       fireAndForgetInvoker,
+      {isMarkAsUnreadFeatureEnabled},
     );
-  }, [config, fireAndForgetInvoker, translate, clock]);
+  }, [config, fireAndForgetInvoker, translate, clock, isMarkAsUnreadFeatureEnabled]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;

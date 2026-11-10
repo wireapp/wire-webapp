@@ -19,11 +19,13 @@
 
 import type {ComponentProps} from 'react';
 
-import {act, render} from '@testing-library/react';
+import {act, fireEvent, render} from '@testing-library/react';
 import type {useVirtualizer as useVirtualizerFunction, Virtualizer} from '@tanstack/react-virtual';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
+
+import {withTheme} from '../../../auth/util/test/testUtil';
 
 import {AssetRepository} from '../../../repositories/assets/assetRepository';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
@@ -53,7 +55,7 @@ function createMessageListProperties(): ComponentProps<typeof VirtualizedMessage
     messageRepository: {} as MessageRepository,
     selfUser: new User('self', '', translateForTest),
     parentElement: document.createElement('div'),
-    conversationLastReadTimestamp: {current: 0},
+    cancelPendingReadReceiptsForConversation: noop,
     isConversationLoaded: false,
     isMsgElementsFocusable: false,
     cancelConnectionRequest: noop,
@@ -77,6 +79,28 @@ function createMessageListProperties(): ComponentProps<typeof VirtualizedMessage
 }
 
 describe('VirtualizedMessagesList', () => {
+  it('clears the manual unread marker when jumping to the latest message', () => {
+    const properties = createMessageListProperties();
+    const selectedMessage = new ContentMessage('selected-message', translateForTest);
+    selectedMessage.timestamp(100);
+    selectedMessage.user(new User('sender', '', translateForTest));
+    properties.conversation.messages_unordered([selectedMessage]);
+    properties.conversation.last_read_timestamp(200);
+    properties.conversation.markUnreadFrom(selectedMessage);
+    properties.isConversationLoaded = true;
+    jest.spyOn(properties.conversation, 'hasLastReceivedMessageLoaded').mockReturnValue(true);
+    const renderedList = render(withTheme(<VirtualizedMessagesList {...properties} />), {
+      wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest})),
+    });
+
+    fireEvent.click(renderedList.getByRole('button', {name: 'jumpToLastMessage'}));
+
+    expect(properties.conversation.manualUnreadTimestamp()).toBeUndefined();
+    expect(properties.conversation.isAutoReadSuppressed()).toBe(false);
+    expect(properties.conversation.last_read_timestamp()).toBe(200);
+    renderedList.unmount();
+    jest.restoreAllMocks();
+  });
   it.each([
     {
       description: 'preserves the opening unread separator when the live read timestamp advances',
@@ -84,7 +108,7 @@ describe('VirtualizedMessagesList', () => {
       expectedItemKeys: ['message-message-10', 'marker-unread-20-20-20', 'message-message-20', 'message-message-30'],
     },
     {
-      description: 'regroups unchanged messages when the read boundary advances before a render',
+      description: 'regroups unchanged messages when a manual marker is cleared after reading',
       updatesReadBoundary: true,
       expectedItemKeys: ['message-message-10', 'message-message-20', 'message-message-30'],
     },
@@ -95,7 +119,6 @@ describe('VirtualizedMessagesList', () => {
     const properties = createMessageListProperties();
     const sender = new User('sender', '', translateForTest);
     properties.conversation.last_read_timestamp(10);
-    properties.conversationLastReadTimestamp.current = 10;
     properties.conversation.messages_unordered(
       [10, 20, 30].map(timestamp => {
         const message = new ContentMessage(`message-${timestamp}`, translateForTest);
@@ -106,6 +129,9 @@ describe('VirtualizedMessagesList', () => {
         return message;
       }),
     );
+    if (updatesReadBoundary) {
+      properties.conversation.markUnreadFrom(requireValueForTest(properties.conversation.messages().at(1)));
+    }
     const renderedList = render(<VirtualizedMessagesList {...properties} />, {
       wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest})),
     });
@@ -120,7 +146,7 @@ describe('VirtualizedMessagesList', () => {
       act(() => {
         properties.conversation.last_read_timestamp(30);
         if (updatesReadBoundary) {
-          properties.conversationLastReadTimestamp.current = 30;
+          properties.conversation.clearManualUnreadMarker();
         }
       });
       renderedList.rerender(<VirtualizedMessagesList {...properties} />);

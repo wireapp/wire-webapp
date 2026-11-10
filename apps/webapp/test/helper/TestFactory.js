@@ -373,6 +373,7 @@ export class TestFactory {
       callingRepository,
       serverTimeHandler,
       translate,
+      {isMarkAsUnreadFeatureEnabled: false},
       userRepository['userState'],
       teamRepository['teamState'],
       conversationState,

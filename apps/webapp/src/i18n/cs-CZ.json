@@ -797,6 +797,7 @@
   "conversationContextMenuDownload": "Stáhnout",
   "conversationContextMenuEdit": "Upravit",
   "conversationContextMenuLike": "Líbí",
+  "conversationContextMenuMarkUnread": "Mark as unread from here",
   "conversationContextMenuReply": "Odpověď",
   "conversationContextMenuUnlike": "Nelíbí",
   "conversationCreateReceiptsEnabled": "Read receipts are on",

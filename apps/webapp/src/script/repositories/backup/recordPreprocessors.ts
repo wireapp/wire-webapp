@@ -32,6 +32,7 @@ export function preprocessConversations(conversations: ConversationRecord[]): Co
     // On a new device, no conversation can be verified since the device has no verified connections with other users.
     // We need to delete that property to be sure we don't wrongly display a conversation as verified.
     delete (conversation as any).verification_state;
+    delete conversation.manual_unread_timestamp;
     return conversation;
   });
 }

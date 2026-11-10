@@ -18,11 +18,47 @@
  */
 
 import {initializeStartupFeatureToggleUrl} from './initializeStartupFeatureToggleUrl';
-import {forTestsOnlyFeatureToggleName, sendCallLogsFeatureToggleName} from './startupFeatureToggleNames';
+import {
+  forTestsOnlyFeatureToggleName,
+  sendCallLogsFeatureToggleName,
+  markAsUnreadFeatureToggleName,
+  previewDefaultEnabledStartupFeatureToggleNames,
+} from './startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from './startupFeatureToggles';
 import {updateLocationSearchForStartupFeatureToggle} from './startupFeatureToggleQueryParameters';
 
 describe('initializeStartupFeatureToggleUrl', () => {
+  it.each([
+    {description: 'Edge defaults', selection: '', preview: true, expectedEnabled: true},
+    {description: 'release defaults', selection: '', preview: false, expectedEnabled: false},
+    {
+      description: 'release opt-in',
+      selection: '?enabled-features=mark-as-unread',
+      preview: false,
+      expectedEnabled: true,
+    },
+    {
+      description: 'Edge explicit selection',
+      selection: '?enabled-features=for-tests-only',
+      preview: true,
+      expectedEnabled: false,
+    },
+    {description: 'Edge empty selection', selection: '?enabled-features=', preview: true, expectedEnabled: false},
+  ])('resolves Mark as unread with $description', options => {
+    const {selection, preview, expectedEnabled} = options;
+    let initializedUrl = new URL(`https://example.com/${selection}`);
+    initializeStartupFeatureToggleUrl({
+      url: initializedUrl,
+      defaultEnabledFeatureToggleNames: preview ? previewDefaultEnabledStartupFeatureToggleNames : [],
+      replaceUrl(url) {
+        initializedUrl = new URL(url);
+      },
+    });
+    const toggles = createStartupFeatureTogglesFromLocationSearch(initializedUrl.search);
+
+    expect(toggles.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(expectedEnabled);
+    expect(toggles.isFeatureToggleEnabled(forTestsOnlyFeatureToggleName)).toBe(selection.includes('for-tests-only'));
+  });
   it('initializes injected defaults while preserving the original URL, unrelated parameters, and fragment', () => {
     const url = new URL('https://example.com/app?return=a%20b&filter=one&filter=two#preferences');
     const replaceUrl = jest.fn();

@@ -797,6 +797,7 @@
   "conversationContextMenuDownload": "Descarcă",
   "conversationContextMenuEdit": "Editează",
   "conversationContextMenuLike": "Apreciază",
+  "conversationContextMenuMarkUnread": "Mark as unread from here",
   "conversationContextMenuReply": "Reply",
   "conversationContextMenuUnlike": "Nu-mi mai place",
   "conversationCreateReceiptsEnabled": "Read receipts are on",
