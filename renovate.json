@@ -12,7 +12,7 @@
   "configMigration": true,
   "minimumReleaseAge": "3 days",
   "lockFileMaintenance": {
-    "enabled": false
+    "enabled": true
   },
   "packageRules": [
     {
