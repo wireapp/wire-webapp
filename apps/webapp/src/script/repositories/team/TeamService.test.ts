@@ -42,14 +42,25 @@ describe('TeamService feature responses', () => {
     },
   );
 
-  it('uses legacy defaults when the explicitly controlled HTTP request fails', async () => {
+  it('rejects with the original error when the explicitly controlled HTTP request fails', async () => {
     using apiClient = new APIClient();
     const teamService = new TeamService(apiClient);
-    jest.spyOn(apiClient.transport.http, 'sendJSON').mockRejectedValue(new Error('Feature endpoint unavailable'));
+    const error = new Error('Feature endpoint unavailable');
+    jest.spyOn(apiClient.transport.http, 'sendJSON').mockRejectedValue(error);
 
-    const actualFeatures = await teamService.getAllTeamFeatures();
+    await expect(teamService.getAllTeamFeatures()).rejects.toBe(error);
+  });
 
-    expect(actualFeatures.fileSharing).toEqual({status: FEATURE_STATUS.ENABLED});
-    expect(actualFeatures.mls).toBeUndefined();
+  it('provides compatibility defaults for initial loading', () => {
+    using apiClient = new APIClient();
+    const teamService = new TeamService(apiClient);
+    const defaults = teamService.getDefaultTeamFeatures();
+
+    expect(defaults.appLock).toEqual({
+      status: FEATURE_STATUS.ENABLED,
+      config: {enforceAppLock: false, inactivityTimeoutSecs: 60},
+    });
+    expect(defaults.fileSharing).toEqual({status: FEATURE_STATUS.ENABLED});
+    expect(defaults.mls).toBeUndefined();
   });
 });
