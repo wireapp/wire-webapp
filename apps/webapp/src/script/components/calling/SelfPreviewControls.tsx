@@ -39,10 +39,10 @@ const SelfPreviewControls = ({isMuted, isHandRaised, restoreLabel, onRestore}: S
         boxSizing: 'border-box',
         color: 'var(--white)',
         display: 'flex',
-        gap: 6,
+        gap: 8,
         height: 40,
         justifyContent: 'center',
-        padding: '4px 8px',
+        padding: '4px 0 4px 8px',
         width: 'fit-content',
       }}
     >
@@ -82,7 +82,8 @@ const SelfPreviewControls = ({isMuted, isHandRaised, restoreLabel, onRestore}: S
           cursor: 'pointer',
           display: 'flex',
           height: 32,
-          justifyContent: 'flex-start',
+          justifyContent: 'center',
+          marginLeft: -8,
           padding: 0,
           width: 32,
           transition: 'opacity 120ms ease-out',
