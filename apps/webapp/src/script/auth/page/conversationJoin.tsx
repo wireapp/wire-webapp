@@ -69,6 +69,7 @@ const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & Disp
   setLastEventDate,
   doLogout,
   selfName,
+  isAuthenticatedTemporaryGuest,
   conversationError,
   hasLoadedClients,
   isFetchingAuth,
@@ -81,6 +82,7 @@ const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & Disp
 }: Props & ConnectedProps & DispatchProps) => {
   const {translate} = useApplicationContext();
   const nameInput = useRef<HTMLInputElement>(null);
+  const registeredGuestName = useRef<string | undefined>(undefined);
 
   const [accentColor] = useState(AccentColor.STRONG_BLUE);
   const [isJoinGuestLinkPasswordModalOpen, setIsJoinGuestLinkPasswordModalOpen] = useState<boolean>(false);
@@ -182,19 +184,22 @@ const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & Disp
       if (!isNonEmptyString(conversationCode) || !isNonEmptyString(conversationKey)) {
         throw Error('Conversation code or key missing');
       }
-      const name = enteredName?.trim();
-      const registrationData = {
-        accent_id: accentColor.id,
-        expires_in: expiresIn,
-        name,
-      };
-      await doRegisterWireless(
-        registrationData as RegisterData,
-        {
-          shouldInitializeClient: true,
-        },
-        entropyData,
-      );
+      const name = enteredName.trim();
+      if (registeredGuestName.current !== name || !isAuthenticatedTemporaryGuest) {
+        const registrationData = {
+          accent_id: accentColor.id,
+          expires_in: expiresIn,
+          name,
+        };
+        await doRegisterWireless(
+          registrationData as RegisterData,
+          {
+            shouldInitializeClient: true,
+          },
+          entropyData,
+        );
+        registeredGuestName.current = name;
+      }
       await getConversationInfoAndJoin(password);
     } catch (error: unknown) {
       setIsSubmitingName(false);
@@ -341,6 +346,7 @@ type MapStateToPropsResult = {
   hasLoadedClients: boolean;
   isFetchingConversation: boolean;
   isTemporaryGuest: boolean;
+  isAuthenticatedTemporaryGuest: boolean;
   selfName: string | false | undefined;
   conversationError: (Error & {label?: string; code?: number; message?: string}) | null;
   conversationInfo: ConversationJoinData | null;
@@ -354,6 +360,7 @@ const mapStateToProps = (state: RootState): MapStateToPropsResult => {
     hasLoadedClients: ClientSelector.hasLoadedClients(state),
     isFetchingConversation: ConversationSelector.isFetching(state),
     isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
+    isAuthenticatedTemporaryGuest: AuthSelector.isAuthenticated(state) && SelfSelector.isTemporaryGuest(state),
     selfName: !SelfSelector.isTemporaryGuest(state) && SelfSelector.getSelfName(state),
     conversationError: ConversationSelector.getError(state),
     conversationInfo: ConversationSelector.conversationInfo(state),
