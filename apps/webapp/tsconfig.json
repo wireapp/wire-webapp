@@ -16,8 +16,8 @@
     "noEmitOnError": true,
     "outDir": "../../dist/apps/webapp",
     "paths": {
-      "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
-    },
+      "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"]
+   },
     "target": "ESNext",
     "strict": true,
     "strictPropertyInitialization": false,
