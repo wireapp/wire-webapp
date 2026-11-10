@@ -28,6 +28,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {queueProposal} from './incomingProposalsQueue';
 
 import {HandledEventPayload} from '../../../../../notification';
+import {parseFullQualifiedClientId} from '../../../../../util/fullyQualifiedClientIdUtils';
 import {MLSService} from '../../../mlsService/mlsService';
 
 const logger = LogFactory.getLogger('@wireapp/core/mls/messageAdd');
@@ -49,9 +50,15 @@ const createHandledPayload = (
   {plaintext, senderClientId}: PlaintextMessage,
 ): HandledEventPayload => {
   const decodedSenderClientId = new TextDecoder().decode(senderClientId.copyBytes());
+  const {domain, user} = parseFullQualifiedClientId(decodedSenderClientId);
 
   return {
-    event: {...event, senderClientId: decodedSenderClientId},
+    event: {
+      ...event,
+      from: user,
+      qualified_from: {domain, id: user},
+      senderClientId: decodedSenderClientId,
+    },
     decryptedData: GenericMessage.decode(plaintext),
   };
 };

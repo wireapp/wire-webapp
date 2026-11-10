@@ -45,6 +45,8 @@ const secondarySenderClientId = createMLSClientId(
   '0000000000000002',
 );
 const encodedSecondarySenderClientId = `${secondarySenderUserId}:2@example.com`;
+const commitSenderUserId = 'f5ed8bba-54ca-43d0-a76f-c080ac832a50';
+const commitSenderQualifiedId = {id: commitSenderUserId, domain: 'commit.example.com'};
 const identity: WireIdentity = {
   credentialType: CredentialType.Basic,
   status: DeviceStatus.Valid,
@@ -55,12 +57,13 @@ const createPlaintext = (messageId: string): Uint8Array => {
   return GenericMessage.encode(GenericMessage.create({messageId})).finish();
 };
 
-const createEvent = (): ConversationMLSMessageAddEvent => {
+const createEvent = (sender = {id: senderUserId, domain: 'example.com'}): ConversationMLSMessageAddEvent => {
   return {
     conversation: qualifiedConversationId.id,
     data: '',
-    from: senderUserId,
+    from: sender.id,
     qualified_conversation: qualifiedConversationId,
+    qualified_from: sender,
     senderClientId: '',
     time: '2026-01-01T00:00:00.000Z',
     type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
@@ -92,14 +95,20 @@ describe('handleMLSMessageAdd', () => {
     const mlsService = createMLSService(createMessage({identity, plaintext, senderClientId}));
 
     const payloads = await handleMLSMessageAdd({
-      event: createEvent(),
+      event: createEvent(commitSenderQualifiedId),
       groupId: 'Z3JvdXA=',
       mlsService,
       qualifiedConversationId,
     });
 
     expect(payloads).toHaveLength(1);
-    expect(payloads[0]?.event).toEqual(expect.objectContaining({senderClientId: encodedSenderClientId}));
+    expect(payloads[0]?.event).toEqual(
+      expect.objectContaining({
+        from: senderUserId,
+        qualified_from: {id: senderUserId, domain: 'example.com'},
+        senderClientId: encodedSenderClientId,
+      }),
+    );
     expect(payloads[0]?.decryptedData?.messageId).toBe('message-id');
   });
 
@@ -167,7 +176,7 @@ describe('handleMLSMessageAdd', () => {
     });
 
     const payloads = await handleMLSMessageAdd({
-      event: createEvent(),
+      event: createEvent(commitSenderQualifiedId),
       groupId: 'Z3JvdXA=',
       mlsService,
       qualifiedConversationId,
@@ -184,10 +193,26 @@ describe('handleMLSMessageAdd', () => {
         return payload.event;
       }),
     ).toEqual([
-      expect.objectContaining({senderClientId: encodedSenderClientId}),
-      expect.objectContaining({senderClientId: encodedSecondarySenderClientId}),
-      expect.objectContaining({senderClientId: encodedSenderClientId}),
-      expect.objectContaining({senderClientId: encodedSecondarySenderClientId}),
+      expect.objectContaining({
+        from: senderUserId,
+        qualified_from: {id: senderUserId, domain: 'example.com'},
+        senderClientId: encodedSenderClientId,
+      }),
+      expect.objectContaining({
+        from: secondarySenderUserId,
+        qualified_from: {id: secondarySenderUserId, domain: 'example.com'},
+        senderClientId: encodedSecondarySenderClientId,
+      }),
+      expect.objectContaining({
+        from: senderUserId,
+        qualified_from: {id: senderUserId, domain: 'example.com'},
+        senderClientId: encodedSenderClientId,
+      }),
+      expect.objectContaining({
+        from: secondarySenderUserId,
+        qualified_from: {id: secondarySenderUserId, domain: 'example.com'},
+        senderClientId: encodedSecondarySenderClientId,
+      }),
     ]);
     expect(mlsService.handlePendingProposals).toHaveBeenCalledWith({
       delayInMs: 3_000,
