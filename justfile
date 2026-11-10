@@ -27,11 +27,11 @@ lint-duplication:
 stylesheet-lint:
     cd apps/webapp && prettier --ignore-path ../../.prettierignore --check "**/*.less" && stylelint --ignore-path .gitignore "**/*.less"
 
-# Lint the repository with ESLint's flat config and the temporary 287-warning budget.
+# Lint the repository with ESLint's flat config and the temporary 279-warning budget.
 [arg("fix", long, value="true")]
 [group('lint')]
 eslint fix="false":
-    eslint . --config eslint.config.mjs --max-warnings=287 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
+    eslint . --config eslint.config.mjs --max-warnings=279 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
 
 # Run all repository lint checks, including ESLint, Prettier, Stylelint, and duplication.
 [group('lint')]
