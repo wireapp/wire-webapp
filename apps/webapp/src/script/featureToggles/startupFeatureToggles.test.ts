@@ -29,6 +29,7 @@ import {
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
+  markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
   startupFeatureToggleNames,
@@ -43,11 +44,20 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
+  markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
+  it('keeps Mark as unread disabled by default for release builds and allows explicit opt-in', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch('?enabled-features=mark-as-unread');
+
+    expect(disabled.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(false);
+    expect(enabled.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(true);
+    expect(enabled.enabledFeatureToggleNames).toEqual([markAsUnreadFeatureToggleName]);
+  });
   it.each(['?enabled-features', '?enabled-features=', '?enabled-features=%20%2C%20'])(
     'resolves an explicit empty selection to no enabled features: %s',
     locationSearch => {
@@ -248,6 +258,7 @@ describe('startupFeatureToggles', function () {
       disableMessagePreprocessingFeatureToggleName,
       driveBulkActionsFeatureToggleName,
       driveBulkRestoreFeatureToggleName,
+      markAsUnreadFeatureToggleName,
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,
     ]);

@@ -21,6 +21,7 @@ import {
   applockRefactoredFeatureToggleName,
   driveBulkActionsFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
+  markAsUnreadFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   previewDefaultEnabledStartupFeatureToggleNames,
   selectPreviewDefaultEnabledStartupFeatureToggleNames,
@@ -30,6 +31,13 @@ import {
 } from './startupFeatureToggleNames';
 
 describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
+  it('enables Mark as unread by default in preview builds', () => {
+    expect(startupFeatureToggleRegistry).toContainEqual({
+      name: markAsUnreadFeatureToggleName,
+      previewDefaultEnabled: true,
+    });
+    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(markAsUnreadFeatureToggleName);
+  });
   it('selects enabled definitions and excludes disabled definitions in registry order', () => {
     const featureDefinitions = [
       {name: applockRefactoredFeatureToggleName, previewDefaultEnabled: true},
