@@ -4,8 +4,8 @@ import {Maybe} from 'true-myth';
 
 import {
   createJoinConversationRedirectUrl,
-  redirectToJoinConversation,
   createJoinMeetingRedirectUrl,
+  redirectToJoinConversation,
   redirectToJoinMeeting,
 } from './redirectRoutes';
 
@@ -115,7 +115,6 @@ describe('meeting join redirect', () => {
       domain: 'example.com',
       key: 'key&other=unsafe',
       code: 'code#fragment',
-      password: 'secret',
     }).unwrapOr('');
     const url = new URL(value, 'https://app.example.com');
     expect(url.pathname).toBe('/auth/');
@@ -123,7 +122,6 @@ describe('meeting join redirect', () => {
     expect(url.searchParams.get('meeting_domain')).toBe('example.com');
     expect(url.searchParams.get('meeting_key')).toBe('key&other=unsafe');
     expect(url.searchParams.get('meeting_code')).toBe('code#fragment');
-    expect(url.searchParams.get('meeting_password')).toBe('secret');
     expect(url.searchParams.get('join_key')).toBeNull();
     expect(url.searchParams.get('other')).toBeNull();
   });
@@ -134,7 +132,6 @@ describe('meeting join redirect', () => {
     {domain: ['a', 'b'], key: 'key', code: 'code'},
     {domain: 'example.com', key: {}, code: 'code'},
     {domain: 'example.com', key: 'key', code: ['a', 'b']},
-    {domain: 'example.com', key: 'key', code: 'code', password: ['a', 'b']},
   ])('rejects malformed meeting queries: %j', query => {
     const {response, sendStatus, redirect} = createJoinRedirectResponse();
     redirectToJoinMeeting(createJoinRedirectRequest(query), response);
