@@ -37,6 +37,7 @@ import type {Grid} from '../../repositories/calling/videoGridHandler';
 import {Loading} from '../../uiKit/dataDisplay/loading/loading';
 import {QUERY} from '../../uiKit/utils/mediaQueries';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
+import type {TranslationKey} from '../../util/localizerUtil';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import * as Icon from '../icon';
 
@@ -363,6 +364,19 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
 
   const [isSelfVideoMinimized, setIsSelfVideoMinimized] = useState(false);
   const {translate} = useApplicationContext();
+  // FormatJS extracts t({id, defaultMessage}); runtime strings still use the application localizer.
+  // eslint-disable-next-line id-length -- `t` is the configured FormatJS extraction function.
+  const t = ({id}: {id: TranslationKey; defaultMessage: string}): string => {
+    return translate(id);
+  };
+  const minimizeSelfPreviewLabel = t({
+    id: 'videoCallOverlayMinimizeSelfVideo',
+    defaultMessage: 'Minimize self-video preview',
+  });
+  const restoreSelfPreviewLabel = t({
+    id: 'videoCallOverlayRestoreSelfVideo',
+    defaultMessage: 'Restore self-video preview',
+  });
 
   useEffect(() => {
     setIsSelfVideoMinimized(false);
@@ -498,8 +512,8 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
               onTileDoubleClick={doubleClickedOnVideo}
               isSelfPreviewMinimized={isSelfVideoMinimized}
               allowSelfPreviewMinimize={allowSelfVideoMinimize}
-              minimizeSelfPreviewLabel={translate('videoCallOverlayMinimizeSelfVideo')}
-              restoreSelfPreviewLabel={translate('videoCallOverlayRestoreSelfVideo')}
+              minimizeSelfPreviewLabel={minimizeSelfPreviewLabel}
+              restoreSelfPreviewLabel={restoreSelfPreviewLabel}
               onToggleSelfPreviewMinimized={() => {
                 return setIsSelfVideoMinimized(minimized => {
                   return !minimized;
@@ -516,8 +530,8 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
           maximizedParticipant={maximizedParticipant}
           selfParticipant={selfParticipant}
           allowMinimize={allowSelfVideoMinimize}
-          minimizeLabel={translate('videoCallOverlayMinimizeSelfVideo')}
-          restoreLabel={translate('videoCallOverlayRestoreSelfVideo')}
+          minimizeLabel={minimizeSelfPreviewLabel}
+          restoreLabel={restoreSelfPreviewLabel}
           isMinimized={allowSelfVideoMinimize && isSelfVideoMinimized}
           onToggleMinimized={() => {
             return setIsSelfVideoMinimized(minimized => {
