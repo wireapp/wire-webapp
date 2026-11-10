@@ -25,6 +25,7 @@ import {useInView} from '../../../../../../hooks/useInView/useInView';
 import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
 import {AssetRepository} from '../../../../../../repositories/assets/assetRepository';
 import {loadFileBuffer} from '../../../../../../util/util';
+import {FileCard} from '../../../../../fileCard/fileCard';
 
 interface PdfAssetPreviewProps {
   resource: AssetRemoteData;
@@ -100,33 +101,17 @@ export const PdfAssetPreview = ({
   return (
     <div ref={elementRef} css={{width: '100%'}}>
       {url !== undefined && url !== failedUrl && (
-        <button
-          type="button"
-          aria-label={label}
-          tabIndex={tabIndex}
-          onClick={onDownload}
-          css={{
-            display: 'block',
-            width: '100%',
-            marginTop: '12px',
-            padding: 0,
-            aspectRatio: '16/9',
-            overflow: 'hidden',
-            border: '1px solid var(--border-color)',
-            borderRadius: '10px',
-            backgroundColor: 'var(--foreground-fade-8)',
-            cursor: 'pointer',
-          }}
-        >
-          <img
+        <div css={{marginTop: '12px'}}>
+          <FileCard.Preview
             src={url}
-            alt=""
-            css={{width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top'}}
-            onError={() => {
+            aria-label={label}
+            tabIndex={tabIndex}
+            onClick={onDownload}
+            onImageError={() => {
               return setFailedUrl(url);
             }}
           />
-        </button>
+        </div>
       )}
     </div>
   );

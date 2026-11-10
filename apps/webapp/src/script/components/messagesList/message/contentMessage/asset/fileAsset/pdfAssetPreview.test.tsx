@@ -72,6 +72,26 @@ describe('PdfAssetPreview', () => {
     expect(download).toHaveBeenCalledTimes(1);
   });
 
+  it('hides a thumbnail that the browser cannot display without retrying its download', async () => {
+    const loadAsset = jest.fn().mockResolvedValue(png);
+    render(
+      <PdfAssetPreview
+        resource={makeResource()}
+        label="Download report.pdf"
+        onDownload={jest.fn()}
+        tabIndex={0}
+        loadAsset={loadAsset}
+      />,
+    );
+    enterViewport();
+    await screen.findByRole('button', {name: 'Download report.pdf'});
+
+    fireEvent.error(screen.getByRole('presentation'));
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(loadAsset).toHaveBeenCalledTimes(1);
+  });
+
   it('releases the decrypted preview URL and cancels its request on unmount', async () => {
     const resource = makeResource();
     const cancel = jest.fn();
