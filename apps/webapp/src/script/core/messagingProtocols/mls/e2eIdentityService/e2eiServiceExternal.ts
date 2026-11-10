@@ -483,13 +483,24 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
         return error;
       },
       () => {
-        return this.coreCryptoClient.transaction(cx => {
-          return cx.checkCredentials();
+        return this.coreCryptoClient.transaction(async cx => {
+          const checkResult = await task.tryOrElse(
+            error => {
+              return error;
+            },
+            () => {
+              return cx.checkCredentials();
+            },
+          );
+
+          if (checkResult.isErr && !isCoreCryptoMLSInvalidCredentialsError(checkResult.error)) {
+            return Promise.reject(checkResult.error);
+          }
         });
       },
     );
 
-    if (outcome.isErr && !isCoreCryptoMLSInvalidCredentialsError(outcome.error)) {
+    if (outcome.isErr) {
       this.logger.warn('Failed to check X509 credentials', {error: outcome.error});
       return;
     }
