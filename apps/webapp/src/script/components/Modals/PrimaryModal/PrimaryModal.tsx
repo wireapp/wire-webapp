@@ -326,6 +326,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
       ref={primaryActionButtonRef}
       onClick={performAction(confirm, closeOnConfirm ?? false)}
       disabled={isPrimaryActionDisabled(primaryAction.disabled)}
+      isDestructive={primaryAction.isDestructive}
       fullWidth={hasMultipleSecondary || allButtonsFullWidth}
     >
       {primaryAction.text}

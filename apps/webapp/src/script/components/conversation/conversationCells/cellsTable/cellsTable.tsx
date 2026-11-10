@@ -42,7 +42,6 @@ import {CellsBulkMoveToBinConfirmationModal} from './cellsBulkMoveToBinConfirmat
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
   bulkActionButtonStyles,
-  bulkMoveToBinButtonStyles,
   clearSelectionButtonStyles,
   folderDropOverlayDescriptionStyles,
   folderDropOverlayFolderNameStyles,
@@ -1317,6 +1316,7 @@ export const CellsTable = ({
                                 action: () => {
                                   void handlePermanentDelete(nodeIds, selectionScopeKey, path);
                                 },
+                                isDestructive: true,
                                 text: translate('cells.deletePermanentlyModal.button'),
                               },
                               text: {
@@ -1370,7 +1370,7 @@ export const CellsTable = ({
                     )}
                     {canMoveSelectionToBin && (
                       <button
-                        css={bulkMoveToBinButtonStyles}
+                        css={bulkActionButtonStyles}
                         type="button"
                         aria-haspopup="dialog"
                         onClick={() => {
