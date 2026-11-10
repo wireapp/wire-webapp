@@ -19,7 +19,7 @@
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {task} from 'true-myth';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../../../uiKit/identity/theme/theme';
 import {act, fireEvent, render, screen} from '@testing-library/react';
 
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';

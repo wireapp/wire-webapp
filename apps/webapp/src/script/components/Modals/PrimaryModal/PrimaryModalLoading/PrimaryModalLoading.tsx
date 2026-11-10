@@ -19,9 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Loading} from '@wireapp/react-ui-kit';
-
 import {wrapperStyles} from './PrimaryModalLoading.styles';
+
+import {Loading} from '../../../../uiKit/dataDisplay/loading/loading';
 
 export const PrimaryModalLoading: FunctionComponent = () => {
   return (

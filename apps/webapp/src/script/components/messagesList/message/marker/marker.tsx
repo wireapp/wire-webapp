@@ -22,14 +22,13 @@ import {useLayoutEffect, useMemo, useRef, type FunctionComponent} from 'react';
 import {SerializedStyles, css} from '@emotion/react';
 import {isNull} from '@sindresorhus/is';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {dayMarkerStyle, baseMarkerStyle, notVirtualizedMarkerStyle} from './marker.styles';
 import {getMessagesGroupLabel} from './marker.utils';
 
 import {Config} from '../../../../Config';
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../../hooks/useRelativeTimestamp';
 import {useApplicationContext} from '../../../../page/rootProvider';
+import {TabIndex} from '../../../../uiKit/utils/enums';
 import {Marker} from '../../utils/messagesGroup';
 import {MessageTime} from '../messageTime';
 import {ScrollToElement} from '../types';

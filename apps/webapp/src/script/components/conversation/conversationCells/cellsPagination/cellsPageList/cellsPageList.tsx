@@ -19,9 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Bold} from '@wireapp/react-ui-kit';
-
 import {listStyles, numberActiveStyles, numberStyles} from './cellsPageList.styles';
+
+import {Bold} from '../../../../../uiKit/typography/text/text';
 
 interface CellsPageListProps {
   currentPage?: number;

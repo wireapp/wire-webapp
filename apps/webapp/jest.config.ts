@@ -44,7 +44,12 @@ const esmPackagesToTransform = [
 const config: Config = {
   displayName: 'webapp',
   preset: '../../jest.preset.js',
-  collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*', '!src/script/core/**'],
+  collectCoverageFrom: [
+    'src/script/**/*.{ts,tsx}',
+    '!src/script/util/test/**/*.*',
+    '!src/script/core/**',
+    '!src/script/uiKit/**',
+  ],
   cacheDirectory: '../../target/jest/cache',
   coverageDirectory: '../../target/coverage/apps/webapp',
   coverageReporters: rootJestConfiguration.coverageReporters,
@@ -77,6 +82,7 @@ const config: Config = {
     '<rootDir>/.yalc',
     '<rootDir>/test/e2e_tests',
     '<rootDir>/src/script/core/',
+    '<rootDir>/src/script/uiKit/',
   ],
   modulePathIgnorePatterns: ['<rootDir>/test/core/__mocks__/'],
   testRunner: 'jest-jasmine2',

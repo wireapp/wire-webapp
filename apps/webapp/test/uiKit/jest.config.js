@@ -17,19 +17,18 @@
  *
  */
 
-const rootJestConfiguration = require('../../jest.config.js');
+const rootJestConfiguration = require('../../../../jest.config.js');
 
 module.exports = {
-  displayName: 'react-ui-kit-lib',
+  rootDir: '../..',
+  roots: ['<rootDir>/src/script/uiKit'],
+  displayName: 'ui-kit',
   testEnvironment: 'jsdom',
   clearMocks: true,
   cacheDirectory: '../../target/jest/cache',
-  coverageDirectory: '../../target/coverage/libraries/react-ui-kit',
+  coverageDirectory: '../../target/coverage/apps/webapp/uiKit',
   coverageReporters: rootJestConfiguration.coverageReporters,
-  testMatch: ['<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
-  testPathIgnorePatterns: ['lib/'],
-  coveragePathIgnorePatterns: ['lib/'],
-  modulePathIgnorePatterns: ['lib/'],
+  testMatch: ['<rootDir>/src/script/uiKit/**/?(*.)+(spec|test).[jt]s?(x)'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
   transform: {
     '^.+\\.(js|jsx)$': '@swc/jest',

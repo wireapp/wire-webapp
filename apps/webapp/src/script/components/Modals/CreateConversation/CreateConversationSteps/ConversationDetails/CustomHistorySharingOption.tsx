@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {ChevronIcon, FlexBox, Option} from '@wireapp/react-ui-kit';
-
 import {
   customHistorySharingOptionContainerCss,
   customHistorySharingOptionLeftSectionCss,
@@ -28,6 +26,9 @@ import {
 } from './ConversationDetails.styles';
 import {UpgradeBadge} from './UpgradeBadge';
 
+import {ChevronIcon} from '../../../../../uiKit/dataDisplay/icon/chevronIcon';
+import {Option} from '../../../../../uiKit/inputs/select/select';
+import {FlexBox} from '../../../../../uiKit/layout/flexBox/flexBox';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory} from '../../types';
 

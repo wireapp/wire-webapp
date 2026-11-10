@@ -21,10 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {User} from '../../../../repositories/entity/User';
+import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {Avatar, AVATAR_SIZE} from '../../../avatar';
 import {UserClassifiedBar} from '../../../classifiedBar/classifiedBar';

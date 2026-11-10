@@ -23,8 +23,6 @@ import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindr
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
-
 import {
   searchResultsHeadingStyles,
   searchResultsOverlayStyles,
@@ -79,6 +77,7 @@ import {Message} from '../../repositories/entity/message/message';
 import {User} from '../../repositories/entity/User';
 import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {TeamState} from '../../repositories/team/TeamState';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isLastReceivedMessage} from '../../util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from '../../util/fileTypeUtil';

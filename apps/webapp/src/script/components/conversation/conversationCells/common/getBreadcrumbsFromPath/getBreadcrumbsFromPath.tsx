@@ -19,8 +19,7 @@
 
 import type {JSX} from '@emotion/react/jsx-runtime';
 
-import {TrashIcon} from '@wireapp/react-ui-kit';
-
+import {TrashIcon} from '../../../../../uiKit/dataDisplay/icon/trashIcon';
 import {RECYCLE_BIN_PATH} from '../recycleBin/recycleBin';
 
 type GetBreadcrumbsFromPathResult = (

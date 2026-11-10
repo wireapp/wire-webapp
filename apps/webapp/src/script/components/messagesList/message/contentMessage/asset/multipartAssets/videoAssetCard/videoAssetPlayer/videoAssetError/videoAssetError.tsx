@@ -19,11 +19,10 @@
 
 import type {FunctionComponent} from 'react';
 
-import {AlertIcon} from '@wireapp/react-ui-kit';
-
 import {wrapperStyles, iconStyles, textStyles} from './videoAssetError.styles';
 
 import {useApplicationContext} from '../../../../../../../../../page/rootProvider';
+import {AlertIcon} from '../../../../../../../../../uiKit/dataDisplay/icon/alertIcon';
 import {VideoAssetPlaceholder} from '../common/videoAssetPlaceholder/videoAssetPlaceholder';
 
 interface VideoAssetErrorProps {

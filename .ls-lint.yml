@@ -1043,45 +1043,45 @@ ls:
   apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/steps/dpopChallenge:
     .ts: camelCase
     .types.ts: camelCase
-  libraries/react-ui-kit/src/images:
+  apps/webapp/src/script/uiKit/images:
     .dir: camelCase
     .tsx: camelCase
-  libraries/react-ui-kit/src/dataDisplay:
+  apps/webapp/src/script/uiKit/dataDisplay:
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
     .test.tsx: camelCase
-  libraries/react-ui-kit/src/identity:
+  apps/webapp/src/script/uiKit/identity:
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
     .test.tsx: camelCase
-  libraries/react-ui-kit/src/navigation:
-    .dir: camelCase
-    .ts: camelCase
-    .tsx: camelCase
-    .styles.ts: camelCase
-    .test.tsx: camelCase
-  libraries/react-ui-kit/src/surface:
+  apps/webapp/src/script/uiKit/navigation:
     .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
     .test.tsx: camelCase
-  libraries/react-ui-kit/src/layout:
+  apps/webapp/src/script/uiKit/surface:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/uiKit/layout:
     .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
     .test.tsx: camelCase
-  libraries/react-ui-kit/src/typography:
+  apps/webapp/src/script/uiKit/typography:
     .ts: camelCase
     .tsx: camelCase
     .style.ts: camelCase
     .test.tsx: camelCase
-  libraries/react-ui-kit/src/utils:
+  apps/webapp/src/script/uiKit/utils:
     .ts: camelCase
     .tsx: camelCase
-  libraries/react-ui-kit/src/inputs/{button,buttonGroup,buttonLink,buttonsGroup,checkbox,codeInput,comboboxSelect,datePickerField,dateTimePickerField,dropFileInput,errorMessage,form,iconButton,indicatorRangeInput,input,inputBlock,inputLabel,inputSubmitCombo,rangeInput,roundIconButton,secondaryButton,select,shakeBox,switch,textArea,timePickerField}:
+  apps/webapp/src/script/uiKit/inputs/{button,buttonGroup,buttonLink,buttonsGroup,checkbox,codeInput,comboboxSelect,datePickerField,dateTimePickerField,dropFileInput,errorMessage,form,iconButton,indicatorRangeInput,input,inputBlock,inputLabel,inputSubmitCombo,rangeInput,roundIconButton,secondaryButton,select,shakeBox,switch,textArea,timePickerField}:
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase

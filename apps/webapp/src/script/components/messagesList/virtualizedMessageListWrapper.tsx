@@ -22,10 +22,10 @@ import {useRef, type FunctionComponent} from 'react';
 import {isNull} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {MessagesListParams} from './messageList.types';
 import {VirtualizedMessagesList} from './virtualizedMessagesList/virtualizedMessagesList';
+
+import {TabIndex} from '../../uiKit/utils/enums';
 
 export const VirtualizedMessageListWrapper: FunctionComponent<MessagesListParams> = ({
   assetRepository,

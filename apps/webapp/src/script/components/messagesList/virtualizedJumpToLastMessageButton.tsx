@@ -19,11 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
-import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
-
 import {jumpToLastMessageButtonStyles, jumpToLastMessageChevronStyles} from './messageList.styles';
 
 import {useApplicationContext} from '../../page/rootProvider';
+import {ChevronIcon} from '../../uiKit/dataDisplay/icon/chevronIcon';
+import {IconButton} from '../../uiKit/inputs/iconButton/iconButton';
 
 interface VirtualizedJumpToLastMessageButtonProps {
   onGoToLastMessage: () => void;

@@ -33,7 +33,7 @@ describe('getSelectedLibraryWatchCommands', () => {
       });
 
     expect(actualCommands).toEqual(['just watch-library api-client', 'just watch-library config']);
-    expect(defaultSelections).toEqual(['react-ui-kit', 'api-client']);
+    expect(defaultSelections).toEqual(['api-client']);
   });
 
   it('rejects unknown library names', () => {
@@ -58,5 +58,11 @@ describe('getSelectedLibraryWatchCommands', () => {
     expect(() => {
       getSelectedLibraryWatchCommands({libraryNames: ['telemetry']});
     }).toThrow('Unknown development library selection: telemetry');
+  });
+
+  it('rejects the relocated UI kit as a library selection', () => {
+    expect(() => {
+      getSelectedLibraryWatchCommands({libraryNames: ['react-ui-kit']});
+    }).toThrow('Unknown development library selection: react-ui-kit');
   });
 });

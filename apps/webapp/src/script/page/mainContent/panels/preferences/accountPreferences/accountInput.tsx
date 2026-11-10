@@ -21,11 +21,10 @@ import {FC, InputHTMLAttributes, useEffect, useRef, useState} from 'react';
 
 import {isEmptyString, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
-
 import * as Icon from '../../../../../components/icon';
 import {TextInput} from '../../../../../components/TextInput';
 import {MotionDuration} from '../../../../../motion/MotionDuration';
+import {IconButton, IconButtonVariant} from '../../../../../uiKit/inputs/iconButton/iconButton';
 import {isEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
 import {useIsMounted} from '../../../../../util/useIsMounted';
 

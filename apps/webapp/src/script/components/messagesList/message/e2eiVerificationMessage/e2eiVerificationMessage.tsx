@@ -22,8 +22,6 @@ import type {ReactNode, FunctionComponent} from 'react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe} from 'true-myth';
 
-import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
-
 import {MessageIcon, IconInfo, Link as LinkStyles} from './e2eiVerificationMessage.styles';
 
 import {Config} from '../../../../Config';
@@ -32,6 +30,8 @@ import {E2EIVerificationMessageType} from '../../../../message/e2eiVerificationM
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from '../../../../repositories/entity/message/e2eiVerificationMessage';
+import {MLSVerified} from '../../../../uiKit/dataDisplay/icon/mlsVerified';
+import {Link, LinkVariant} from '../../../../uiKit/typography/link/link';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from '../../../../util/localizerUtil/reactLocalizerUtil';
 import type {ReactTranslationValueReplacement} from '../../../../util/localizerUtil/reactLocalizerUtil';

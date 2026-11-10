@@ -35,8 +35,6 @@ import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
 import {Maybe, maybe} from 'true-myth';
 
-import {ArrowIcon, Button, ButtonVariant, CloseIcon, TrashIcon, UploadIcon} from '@wireapp/react-ui-kit';
-
 import {bulkMoveReducer} from './bulkMoveState';
 import {CellsBulkMovePreviewModal} from './cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
 import {normalizeCellsPath} from './cellsBulkMovePreviewModal/normalizeCellsPath';
@@ -87,6 +85,11 @@ import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import type {Conversation} from '../../../../repositories/entity/Conversation';
 import {CellNode, CellNodeType} from '../../../../types/cellNode';
+import {ArrowIcon} from '../../../../uiKit/dataDisplay/icon/arrowIcon';
+import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';
+import {TrashIcon} from '../../../../uiKit/dataDisplay/icon/trashIcon';
+import {UploadIcon} from '../../../../uiKit/dataDisplay/icon/uploadIcon';
+import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
 import {formatBytes} from '../../../../util/util';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '../../../Modals/PrimaryModal';
 import {

@@ -22,8 +22,6 @@ import React, {useState, type FunctionComponent} from 'react';
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-
 import {CALL_QUALITY_FEEDBACK_KEY, CALL_SURVEY_MUTE_INTERVAL, ratingListItems} from './constants';
 import {
   buttonStyle,
@@ -40,6 +38,8 @@ import {RatingListLabel} from './typings';
 import {CallingRepository} from '../../../repositories/calling/CallingRepository';
 import {trackCallQualityFeedback} from '../../../repositories/tracking/helpers';
 import {UserState} from '../../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {Checkbox, CheckboxLabel} from '../../../uiKit/inputs/checkbox/checkbox';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import type {Translate} from '../../../util/localizerUtil';
 import {getLogger} from '../../../util/logger';

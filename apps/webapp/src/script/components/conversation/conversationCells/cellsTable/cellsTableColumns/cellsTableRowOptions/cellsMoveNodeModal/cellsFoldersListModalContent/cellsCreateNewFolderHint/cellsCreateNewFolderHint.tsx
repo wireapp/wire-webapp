@@ -19,11 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Button, ButtonVariant, PlusIcon} from '@wireapp/react-ui-kit';
-
 import {buttonStyles, iconStyles, textStyles, wrapperStyles} from './cellsCreateNewFolderHint.styles';
 
 import {useApplicationContext} from '../../../../../../../../../page/rootProvider';
+import {PlusIcon} from '../../../../../../../../../uiKit/dataDisplay/icon/plusIcon';
+import {Button, ButtonVariant} from '../../../../../../../../../uiKit/inputs/button/button';
 
 interface CellsCreateNewFolderHintProps {
   onCreate: () => void;

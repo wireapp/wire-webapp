@@ -23,11 +23,11 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
-import {COLOR} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from '../../../page/rootProvider';
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
+import {COLOR} from '../../../uiKit/identity/colors/colors';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {AvailabilityIcon} from '../../availabilityIcon';
 import {useUserName} from '../../UserName';

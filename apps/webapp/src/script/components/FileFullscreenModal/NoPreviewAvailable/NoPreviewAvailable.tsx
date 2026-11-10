@@ -19,9 +19,8 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Button} from '@wireapp/react-ui-kit';
-
 import {useApplicationContext} from '../../../page/rootProvider';
+import {Button} from '../../../uiKit/inputs/button/button';
 import {forcedDownloadFile, getFileNameWithExtension} from '../../../util/util';
 import {
   CELLS_ACTION,

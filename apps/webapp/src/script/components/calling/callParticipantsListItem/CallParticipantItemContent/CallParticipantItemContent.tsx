@@ -19,8 +19,6 @@
 
 import React, {type FunctionComponent} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {
   selfIndicator,
   ellipsis,
@@ -32,6 +30,7 @@ import {
 
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {User} from '../../../../repositories/entity/User';
+import {TabIndex} from '../../../../uiKit/utils/enums';
 import {capitalizeFirstChar} from '../../../../util/stringUtil';
 import * as Icon from '../../../icon';
 import {UserInfo} from '../../../UserInfo';

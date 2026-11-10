@@ -22,8 +22,6 @@ import {useState, type JSX} from 'react';
 import {Maybe, task} from 'true-myth';
 import {useStore} from 'zustand';
 
-import {Button, ButtonVariant, ComputerIcon, Loading, NetworkBuildingIcon, WireLogoIcon} from '@wireapp/react-ui-kit';
-
 import {PreferencesPage} from './components/preferencesPage';
 import {DiagnosticStatusIcon as StatusIcon} from './troubleshooting/diagnosticStatusIcon';
 import * as styles from './troubleshooting/troubleshooting.styles';
@@ -35,6 +33,11 @@ import type {
   DiagnosticResult,
 } from '../../../../repositories/troubleshooter/troubleshooterRepository';
 import type {CheckId, CheckStatus} from '../../../../repositories/troubleshooter/troubleshooterService';
+import {ComputerIcon} from '../../../../uiKit/dataDisplay/icon/computerIcon';
+import {NetworkBuildingIcon} from '../../../../uiKit/dataDisplay/icon/networkBuildingIcon';
+import {WireLogoIcon} from '../../../../uiKit/dataDisplay/icon/wireLogoIcon';
+import {Loading} from '../../../../uiKit/dataDisplay/loading/loading';
+import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
 import {copyText} from '../../../../util/clipboardUtil';
 import {downloadBlob} from '../../../../util/util';
 import {useApplicationContext} from '../../../rootProvider';

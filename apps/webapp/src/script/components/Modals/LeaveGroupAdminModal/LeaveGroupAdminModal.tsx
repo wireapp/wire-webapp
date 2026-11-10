@@ -21,8 +21,6 @@ import React, {type FunctionComponent} from 'react';
 
 import {isNonEmptyObject, isNullOrUndefined} from '@sindresorhus/is';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {AdminSearchInput} from './AdminSearchInput';
 import {
   actionGroupStyles,
@@ -35,6 +33,7 @@ import {
 } from './styles';
 import {useLeaveGroupAdminModalStore} from './useLeaveGroupAdminModalStore';
 
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {handleEscDown} from '../../../util/keyboardUtil';
 import type {Translate} from '../../../util/localizerUtil';
 import * as Icon from '../../icon';

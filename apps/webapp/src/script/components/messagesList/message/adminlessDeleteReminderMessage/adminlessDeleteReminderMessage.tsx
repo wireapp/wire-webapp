@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
-
 import {
   adminlessDeleteReminderContainerCss,
   adminlessDeleteReminderIconCss,
@@ -31,6 +29,7 @@ import {
 import {Config} from '../../../../Config';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {AdminlessDeleteReminderMessage as AdminlessDeleteReminderMessageEntity} from '../../../../repositories/entity/message/adminlessDeleteReminderMessage';
+import {Link, LinkVariant} from '../../../../uiKit/typography/link/link';
 import {replaceReactComponents} from '../../../../util/localizerUtil/reactLocalizerUtil';
 import {formatLocale} from '../../../../util/timeUtil';
 import * as Icon from '../../../icon';

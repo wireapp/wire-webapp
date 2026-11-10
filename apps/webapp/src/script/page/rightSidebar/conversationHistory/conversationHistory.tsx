@@ -21,8 +21,6 @@ import {useState, type FunctionComponent} from 'react';
 
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
-import {FlexBox, Input, Select} from '@wireapp/react-ui-kit';
-
 import {
   conversationHistoryContainerCss,
   conversationHistoryCustomCss,
@@ -40,6 +38,9 @@ import {
 import {RadioGroup} from '../../../components/Radio';
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
+import {Input} from '../../../uiKit/inputs/input/input';
+import {Select} from '../../../uiKit/inputs/select/select';
+import {FlexBox} from '../../../uiKit/layout/flexBox/flexBox';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';

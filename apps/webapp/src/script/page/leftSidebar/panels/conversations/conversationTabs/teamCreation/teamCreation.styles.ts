@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {media} from '@wireapp/react-ui-kit';
+import {media} from '../../../../../../uiKit/utils/mediaQueries';
 
 export const teamUpgradeBannerHeaderCss: CSSObject = {
   lineHeight: 'var(--line-height-small-plus)',

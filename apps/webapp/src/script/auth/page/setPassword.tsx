@@ -26,12 +26,17 @@ import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Button, ContainerXS, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
 
 import {Page} from './page';
 
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Form} from '../../uiKit/inputs/form/form';
+import {Input} from '../../uiKit/inputs/input/input';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {H1} from '../../uiKit/typography/heading/heading';
+import {Small} from '../../uiKit/typography/text/text';
 import {toError} from '../../util/toError';
 import {Exception} from '../component/exception';
 import {actionRoot} from '../module/action';

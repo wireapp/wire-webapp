@@ -8,10 +8,10 @@ For licensing information, see the attached LICENSE file and the list of third-p
 
 ## React UI Kit
 
-### Installation
+### Development
 
 ```bash
-npm install
+rtk npx jest --config apps/webapp/test/uiKit/jest.config.js
 ```
 
 ### Creating New Components
@@ -20,7 +20,7 @@ When creating a new component, follow these guidelines:
 
 1. **Choose the Right Category**
 
-   - Place your component in the appropriate category folder under `src/`:
+   - Place your component in the appropriate category folder under `apps/webapp/src/script/uiKit/`:
      - `dataDisplay/`: For data visualization components (tables, lists)
      - `identity/`: Design system, theme, colors, etc.
      - `inputs/`: For form controls and input elements
@@ -33,7 +33,7 @@ When creating a new component, follow these guidelines:
 2. **Component Structure** Create a folder for your component with the files it needs:
 
    ```
-   src/
+   uiKit/
    └── inputs/
        └── button/
            ├── button.tsx
@@ -57,7 +57,7 @@ When creating a new component, follow these guidelines:
 5. **Index File (index.ts)**
    - Export the component
    - Export its public types and utilities
-   - Re-export it from the relevant category and package entry points when it belongs in the public API
+   - Prefer direct relative imports for consumers; do not add new barrel exports
 
 Example:
 

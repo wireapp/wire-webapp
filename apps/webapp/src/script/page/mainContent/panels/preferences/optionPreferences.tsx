@@ -21,8 +21,6 @@ import React, {useEffect, useState, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
-
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 
@@ -33,6 +31,9 @@ import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
 import {User} from '../../../../repositories/entity/User';
 import {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../repositories/properties/propertiesType';
+import {Checkbox, CheckboxLabel} from '../../../../uiKit/inputs/checkbox/checkbox';
+import {IndicatorRangeInput} from '../../../../uiKit/inputs/indicatorRangeInput/indicatorRangeInput';
+import {TabIndex} from '../../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from '../../../../util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from '../../../../util/localizerUtil/translationTypes';

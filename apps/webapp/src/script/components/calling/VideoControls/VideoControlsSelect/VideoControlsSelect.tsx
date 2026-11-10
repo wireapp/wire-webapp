@@ -19,11 +19,10 @@
 
 import React, {type FunctionComponent} from 'react';
 
-import {Select} from '@wireapp/react-ui-kit';
-
 import {selectGroupStyles} from './VideoControlsSelect.styles';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
+import {Select} from '../../../../uiKit/inputs/select/select';
 import * as Icon from '../../../icon';
 import {
   videoOptionInlineMenuStyles,

@@ -22,8 +22,6 @@ import {type RefObject, useCallback, useEffect, useMemo, useState, type Function
 import {isNonEmptyArray} from '@sindresorhus/is';
 import {isSameDay, startOfDay} from 'date-fns';
 
-import {Button, ButtonVariant, Loading} from '@wireapp/react-ui-kit';
-
 import {
   meetingDayHeaderStyles,
   meetingListContainerStyles,
@@ -43,6 +41,8 @@ import {useMeetingListVirtualizer, type UseMeetingListVirtualizer} from './useMe
 
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
+import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 import {emptyListContainerStyles} from '../emptyMeetingList/emptyListStyles';
 import {EmptyMeetingList} from '../emptyMeetingList/emptyMeetingList';

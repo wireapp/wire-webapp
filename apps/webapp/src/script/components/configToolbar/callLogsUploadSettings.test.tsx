@@ -20,7 +20,7 @@
 import {act, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {Maybe} from 'true-myth';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../uiKit/identity/theme/theme';
 
 import {
   callLogsServerAddressSchema,

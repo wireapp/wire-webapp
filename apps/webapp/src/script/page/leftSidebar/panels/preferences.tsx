@@ -22,7 +22,6 @@ import React, {useEffect, type FunctionComponent} from 'react';
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {ListWrapper} from './listWrapper';
 
@@ -35,6 +34,7 @@ import {
   PreferenceNotificationRepository,
 } from '../../../repositories/notification/PreferenceNotificationRepository';
 import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {WebAppEvents} from '../../../webAppEvents';
 import {useApplicationContext} from '../../rootProvider';
 import {ContentState, useAppState} from '../../useAppState';

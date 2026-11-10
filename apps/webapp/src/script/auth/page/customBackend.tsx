@@ -24,13 +24,14 @@ import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {useSelector} from 'react-redux';
 import {useNavigate} from 'react-router';
 
-import {Button, ButtonVariant, Container, Text} from '@wireapp/react-ui-kit';
-
 import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './customBackend.styles';
 import {Page} from './page';
 
 import {LogoFullIcon} from '../../components/icon';
 import {useApplicationContext} from '../../page/rootProvider';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {Container} from '../../uiKit/layout/container/container';
+import {Text} from '../../uiKit/typography/text/text';
 import * as AuthSelector from '../module/selector/authSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {getSearchParams, navigateTo} from '../util/urlUtil';

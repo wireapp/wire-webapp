@@ -28,8 +28,6 @@ import {connect} from 'react-redux';
 import {HashRouter as Router, Navigate, Route, Routes} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
-import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-
 import {ClientManager} from './clientManager';
 import {ConversationJoin} from './conversationJoin';
 import {ConversationJoinInvalid} from './conversationJoinInvalid';
@@ -52,6 +50,10 @@ import {VerifyEmailLink} from './verifyEmailLink';
 import type englishMessages from '../../../i18n/en-US.json';
 import {Config} from '../../Config';
 import {RootProvider} from '../../page/rootProvider';
+import {Loading} from '../../uiKit/dataDisplay/loading/loading';
+import {THEME_ID} from '../../uiKit/identity/theme/theme';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {StyledApp} from '../../uiKit/layout/styledApp/styledApp';
 import type {Translate} from '../../util/localizerUtil';
 import {getLogger} from '../../util/logger';
 import {MainViewModel} from '../../view_model/MainViewModel';

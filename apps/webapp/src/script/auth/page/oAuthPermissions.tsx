@@ -29,21 +29,6 @@ import {connect} from 'react-redux';
 import {container} from 'tsyringe';
 
 import {
-  Button,
-  ButtonVariant,
-  ContainerXS,
-  Text,
-  Paragraph,
-  Box,
-  Link,
-  LinkVariant,
-  COLOR_V2,
-  H2,
-  QUERY,
-  useMatchMedia,
-} from '@wireapp/react-ui-kit';
-
-import {
   boxCSS,
   buttonCSS,
   buttonsCSS,
@@ -63,6 +48,16 @@ import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {AssetRemoteData} from '../../repositories/assets/assetRemoteData';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
+import {COLOR_V2} from '../../uiKit/identity/colorsV2/colorsV2';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {Box} from '../../uiKit/layout/box/box';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
+import {H2} from '../../uiKit/typography/heading/heading';
+import {Link, LinkVariant} from '../../uiKit/typography/link/link';
+import {Paragraph} from '../../uiKit/typography/paragraph/paragraph';
+import {Text} from '../../uiKit/typography/text/text';
+import {QUERY} from '../../uiKit/utils/mediaQueries';
 import {handleEscDown, handleKeyDown, KEY} from '../../util/keyboardUtil';
 import {toError} from '../../util/toError';
 import {loadDataUrl} from '../../util/util';

@@ -19,8 +19,6 @@
 
 import type {ReactNode} from 'react';
 
-import {ShieldIcon} from '@wireapp/react-ui-kit';
-
 import {
   conversationFeatureContainerCss,
   conversationFeatureCss,
@@ -29,6 +27,7 @@ import {
 } from './ConversationType.styles';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
+import {ShieldIcon} from '../../../../uiKit/dataDisplay/icon/shieldIcon';
 import {createReactTranslationMarker, renderReactTranslation} from '../../../../util/localizerUtil/reactLocalizerUtil';
 import type {
   ReactTranslationComponentReplacement,

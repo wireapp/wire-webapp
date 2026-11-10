@@ -19,14 +19,14 @@
 
 import type {FunctionComponent} from 'react';
 
-import {CheckRoundIcon, FlexBox} from '@wireapp/react-ui-kit';
-
 import {
   conversationOptionContainerCss,
   conversationOptionCss,
   conversationOptionNotSelectedCss,
 } from './ConversationType.styles';
 
+import {CheckRoundIcon} from '../../../../uiKit/dataDisplay/icon/checkRoundIcon';
+import {FlexBox} from '../../../../uiKit/layout/flexBox/flexBox';
 import {UpgradeBadge} from '../CreateConversationSteps/ConversationDetails/UpgradeBadge';
 
 interface ConversationOptionProps {

@@ -19,10 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
-
 import {wrapperStyles} from './cellsTableTagsColumn.styles';
 
+import {BadgesWithTooltip} from '../../../../../uiKit/dataDisplay/badgesWithTooltip/badgesWithTooltip';
 import {sortTagsAlphabetically} from '../../../../conversation/conversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
 
 interface CellsTableTagsColumnProps {

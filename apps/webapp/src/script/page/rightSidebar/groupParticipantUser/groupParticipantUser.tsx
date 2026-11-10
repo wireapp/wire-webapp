@@ -23,8 +23,6 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
 import {amplify} from 'amplify';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {EnrichedFields} from '../../../components/panel/enrichedFields';
@@ -38,6 +36,7 @@ import {User} from '../../../repositories/entity/User';
 import {ClientEvent} from '../../../repositories/event/Client';
 import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {TeamState} from '../../../repositories/team/TeamState';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
