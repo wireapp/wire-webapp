@@ -71,12 +71,7 @@
       "pinDigests": true
     },
     {
-      "matchPackageNames": ["quay.io/wire/mirror-images/playwright"],
-      "minimumReleaseAge": null,
-      "pinDigests": true
-    },
-    {
-      "matchDepNames": ["playwright", "@playwright/test", "quay.io/wire/mirror-images/playwright"],
+      "matchDepNames": ["playwright", "@playwright/test", "mcr.microsoft.com/playwright"],
       "groupName": "playwright",
       "addLabels": ["run-e2e"]
     },
