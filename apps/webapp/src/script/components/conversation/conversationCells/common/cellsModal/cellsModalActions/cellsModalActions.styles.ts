@@ -19,6 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {destructiveButtonStyles as sharedDestructiveButtonStyles} from '../../../../../../uiKit/inputs/button/destructiveButtonStyles';
+
 export const actionsWrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
@@ -31,4 +33,9 @@ export const actionsWrapperStyles: CSSObject = {
 export const buttonStyles: CSSObject = {
   width: '100%',
   margin: '0',
+};
+
+export const destructiveActionButtonStyles: CSSObject = {
+  ...buttonStyles,
+  ...sharedDestructiveButtonStyles,
 };

@@ -374,6 +374,7 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
               return void handleConfirm();
             }}
             isDisabled={isSubmitting}
+            isDestructive
           >
             {translate('cells.emptyBin.confirm')}
           </CellsModal.PrimaryButton>

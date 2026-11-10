@@ -69,6 +69,9 @@ const light: () => CSSObject = () => {
 
     // General
     '--danger-color': COLOR_V2.RED_LIGHT_500,
+    '--danger-button-bg': COLOR_V2.RED_LIGHT_500,
+    '--danger-button-hover-bg': COLOR_V2.RED_LIGHT_600,
+    '--danger-button-active-bg': COLOR_V2.RED_LIGHT_700,
     '--success-color': COLOR_V2.GREEN_LIGHT_500,
     '--app-bg': COLOR_V2.GRAY_10,
     '--main-color': COLOR.BLACK,
@@ -183,6 +186,9 @@ const dark: () => CSSObject = () => {
 
     // General
     '--danger-color': COLOR_V2.RED_DARK_500,
+    '--danger-button-bg': COLOR_V2.RED_DARK_700,
+    '--danger-button-hover-bg': COLOR_V2.RED_DARK_800,
+    '--danger-button-active-bg': COLOR_V2.RED_DARK_900,
     '--success-color': COLOR_V2.GREEN_DARK_500,
     '--app-bg': COLOR_V2.GRAY_95,
     '--main-color': COLOR.WHITE,
