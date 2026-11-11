@@ -86,7 +86,7 @@ build-server:
     tsc --project apps/server/tsconfig.build.json --outDir apps/server/build/server
     WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/server node apps/server/bin/copy_server_assets.js
 
-# Build the opt-in production server bundle without changing deployment output.
+# Type-check and bundle the production server with its runtime assets.
 [group('build')]
 build-server-bundle:
     tsc --project apps/server/tsconfig.build.json --noEmit
@@ -96,7 +96,7 @@ build-server-bundle:
 # Assemble the bundle with an existing webapp build and its shared metadata.
 [group('build')]
 assemble-server-bundle variant="public": build-server-bundle
-    node apps/server/bin/assembleBuild.mts {{variant}} bundle
+    node apps/server/bin/assembleBuild.mts {{variant}} artifact
 
 # Start the assembled bundle outside the repository with no installed packages.
 [group('testing')]
@@ -111,13 +111,13 @@ build-webapp-internal:
 
 # Build and assemble the internal server deployment artifact as a ZIP.
 [group('build')]
-package-server-internal: build-server build-webapp-internal
+package-server-internal: build-server-bundle build-webapp-internal
     node apps/server/bin/assembleBuild.mts internal artifact
     node tools/serverPackaging/zip.js
 
 # Build, verify, and package the public server deployment artifact as a ZIP.
 [group('build')]
-package-server-public: build-server build-webapp-public
+package-server-public: build-server-bundle build-webapp-public
     node apps/server/bin/assembleBuild.mts public artifact
     node tools/buildArtifact/verifyPublicProductionBundle.ts
     node tools/serverPackaging/zip.js
@@ -236,7 +236,7 @@ translate-download:
 validate-build-artifact:
     node tools/buildArtifact/validateBuildArtifact.mts
 
-# Start the extracted ZIP with only lockfile-pinned server production dependencies.
+# Start the extracted ZIP outside the repository with no installed packages.
 [group('testing')]
 verify-server-package:
     node tools/serverPackaging/verifyServerPackage.mts

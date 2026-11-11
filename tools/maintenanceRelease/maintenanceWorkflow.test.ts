@@ -18,10 +18,12 @@
  */
 
 import assert from 'node:assert';
-import {readFileSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
 import path from 'node:path';
 
-import {isArray, isPlainObject} from '@sindresorhus/is';
+import {isArray, isPlainObject, isString} from '@sindresorhus/is';
 import {load} from 'js-yaml';
 
 function findWorkflowStep(steps: readonly unknown[], expectedStepId: string): Record<string, unknown> | undefined {
@@ -174,6 +176,59 @@ describe('maintenance distribution workflow boundaries', () => {
     expect(maintenanceBuildScript).toContain('npx just package-server-public');
     expect(maintenanceBuildScript).not.toContain('./bin/yarn');
     expect(maintenanceBuildScript).not.toContain('nx run');
+  });
+
+  it('archives bundled maintenance artifacts without source manifests or an npm installation context', () => {
+    const workflowDocument = load(
+      readFileSync(path.join(process.cwd(), '.github/workflows/release-maintenance-webapp.yml'), 'utf8'),
+    );
+    assert(isPlainObject(workflowDocument));
+    assert(isPlainObject(workflowDocument.jobs));
+    const buildJob = workflowDocument.jobs.build_maintenance_artifact;
+    assert(isPlainObject(buildJob));
+    assert(isArray(buildJob.steps));
+    const contextAssemblyStep = findWorkflowStep(buildJob.steps, 'artifact_metadata');
+    assert(contextAssemblyStep !== undefined);
+    assert(isString(contextAssemblyStep.run));
+    const checksumStepOffset = contextAssemblyStep.run.indexOf('\nartifact_checksum=');
+    assert(checksumStepOffset > 0);
+
+    const fixtureDirectory = mkdtempSync(path.join(tmpdir(), 'maintenance-context-'));
+    try {
+      const sourceDirectory = path.join(fixtureDirectory, 'source');
+      mkdirSync(path.join(sourceDirectory, 'apps/server/dist/dbs'), {recursive: true});
+      writeFileSync(path.join(sourceDirectory, 'apps/server/dist/dbs/GeoLite2-Country.mmdb'), 'country database');
+      writeFileSync(path.join(sourceDirectory, 'apps/server/dist/index.js'), 'server bundle');
+      writeFileSync(path.join(sourceDirectory, 'apps/server/Dockerfile'), 'FROM scratch');
+      writeFileSync(path.join(sourceDirectory, 'run.sh'), 'node --enable-source-maps /dist/index.js');
+      writeFileSync(path.join(sourceDirectory, '.env.defaults'), 'BACKEND_NAME=example');
+      writeFileSync(path.join(sourceDirectory, 'package.json'), 'must stay out of the context');
+      writeFileSync(
+        path.join(sourceDirectory, 'justfile'),
+        'package-server-public: build-server-bundle build-webapp-public',
+      );
+
+      execFileSync('bash', ['-c', contextAssemblyStep.run.slice(0, checksumStepOffset)], {
+        cwd: sourceDirectory,
+        env: {...process.env, RUNNER_TEMP: fixtureDirectory},
+      });
+
+      const archivePath = path.join(fixtureDirectory, 'maintenance-distribution/maintenance-docker-context.tar.gz');
+      const archiveEntries = execFileSync('tar', ['-tzf', archivePath], {encoding: 'utf8'}).trim().split('\n');
+      expect(archiveEntries).toEqual(
+        expect.arrayContaining([
+          './apps/server/Dockerfile',
+          './apps/server/dist/index.js',
+          './run.sh',
+          './.env.defaults',
+        ]),
+      );
+      expect(archiveEntries).not.toContain('./package.json');
+      expect(archiveEntries).not.toContain('./apps/server/package.json');
+      expect(archiveEntries).not.toContain('./package-lock.json');
+    } finally {
+      rmSync(fixtureDirectory, {recursive: true, force: true});
+    }
   });
 
   it('uses the same serialized distribution workflow for safe recovery', () => {

@@ -5,20 +5,10 @@ RUN apk add --no-cache dumb-init git bash
 
 WORKDIR /app
 
-# npm workspace metadata
-COPY package.json package-lock.json .npmrc ./
-COPY apps/server/package.json ./apps/server/package.json
-
-# Install only server production deps
-RUN npm clean-install --omit=dev --workspace=@wireapp/server --include-workspace-root=false --ignore-scripts
-
 # Copy built server artifacts and runtime files
 COPY apps/server/dist /dist
 COPY run.sh .env.defaults ./
 COPY .env.defaults /dist/.env.defaults
-
-ENV NODE_PATH=/app/node_modules
-ENV PATH=/app/node_modules/.bin:$PATH
 
 EXPOSE 8080
 

@@ -35,7 +35,6 @@ if (!fs.existsSync(S3_PATH)) {
 }
 const output = fs.createWriteStream(path.join(S3_PATH, 'ebs.zip'));
 
-archive.file(path.join(SERVER_PATH, 'package.json'), {name: 'package.json'});
 archive.file(path.join(ROOT_PATH, '.env.defaults'), {name: '.env.defaults'});
 archive.file(path.join(SERVER_PATH, 'Procfile'), {name: 'Procfile'});
 // Archive dist directory but exclude s3 subdirectory
