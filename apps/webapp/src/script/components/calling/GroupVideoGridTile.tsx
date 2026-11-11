@@ -19,8 +19,6 @@
 
 import {KeyboardEvent, type FunctionComponent} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {VIDEO_STATE} from '@wireapp/avs';
 
 import {
@@ -37,6 +35,7 @@ import {
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../page/rootProvider';
 import type {Participant} from '../../repositories/calling/Participant';
 import {Loading} from '../../uiKit/dataDisplay/loading/loading';

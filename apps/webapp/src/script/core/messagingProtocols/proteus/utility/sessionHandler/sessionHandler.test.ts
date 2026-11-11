@@ -17,10 +17,14 @@
  *
  */
 
-import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
+import {nodePlatform} from '../../../../../apiClient/shims/node/platform';
 
-import {APIClient} from '@wireapp/api-client';
+import type {QualifiedUserClients} from '../../../../../apiClient/conversation/qualifiedUserClients';
+import type {UserClients} from '../../../../../apiClient/conversation/userClients';
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
+import {QualifiedUserPreKeyBundleMap} from '../../../../../apiClient/user/userPreKeyBundleMap';
+
+import {APIClient} from '../../../../../apiClient/apiClient';
 
 import {constructSessionId, initSession, initSessions} from './sessionHandler';
 
@@ -70,7 +74,7 @@ describe('SessionHandler', () => {
   let apiClient: APIClient;
 
   beforeEach(() => {
-    apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+    apiClient = new APIClient({platform: nodePlatform, urls: APIClient.BACKEND.STAGING});
     jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockImplementation(generatePrekeys);
   });
 

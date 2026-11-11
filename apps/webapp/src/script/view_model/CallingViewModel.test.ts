@@ -18,7 +18,7 @@
  */
 
 import {STATE} from '@wireapp/avs';
-import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {GROUP_CONVERSATION_TYPE} from '../apiClient/conversation/conversation';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {LEAVE_CALL_REASON} from '../repositories/calling/enum/LeaveCallReason';
@@ -35,7 +35,7 @@ import {
 } from './CallingViewModel.mocks';
 import {AudioType} from '../repositories/audio/audioType';
 import {translateForTest} from '../util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../apiClient/team/feature/featureList.types';
 
 describe('CallingViewModel', () => {
   const originalPrimaryModalShow = PrimaryModal.show;

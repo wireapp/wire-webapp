@@ -18,7 +18,6 @@
  */
 
 import {isNan, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
@@ -28,6 +27,7 @@ import {CallingEpochCache} from './CallingEpochCache';
 import {MuteState} from './CallState';
 import type {ClientId, Participant} from './Participant';
 
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {Config} from '../../Config';
 import {chunk, getDifference, partition} from '../../util/arrayUtil';
 import {getLogger, Logger} from '../../util/logger';

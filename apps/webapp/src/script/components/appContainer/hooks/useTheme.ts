@@ -17,8 +17,7 @@
  *
  */
 
-import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
-
+import type {WebappProperties} from '../../../apiClient/user/data/userPropertiesSetData';
 import {useUserPropertyChange} from '../../../hooks/useUserProperty';
 import {WebAppEvents} from '../../../webAppEvents';
 

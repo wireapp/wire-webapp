@@ -18,7 +18,8 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
+
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 export function constructClientId(userId: QualifiedId, clientId: string): string {
   const id = typeof userId === 'string' ? userId : userId.id;

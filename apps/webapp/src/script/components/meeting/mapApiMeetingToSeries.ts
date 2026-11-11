@@ -17,12 +17,13 @@
  *
  */
 
-import type {Meeting as ApiMeeting} from '@wireapp/api-client/lib/meetings/meeting';
 import {differenceInMilliseconds, isAfter, isValid, parseISO} from 'date-fns';
 import {result, Result} from 'true-myth';
 
 import {mapMeetingRecurrenceToOption} from './scheduleMeetingModal/scheduleMeetingRecurrence';
 import type {MeetingSeries} from './types/meetingSeries';
+
+import type {Meeting as ApiMeeting} from '../../apiClient/meetings/meeting';
 
 export type MapApiMeetingToSeriesError =
   'invalidStartTime' | 'invalidEndTime' | 'endNotAfterStart' | 'invalidRecurrenceUntil';

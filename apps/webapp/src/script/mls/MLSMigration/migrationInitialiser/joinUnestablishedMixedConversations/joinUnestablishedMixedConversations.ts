@@ -17,8 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {Account} from '../../../../core';
 import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
 import {isMixedConversation, MixedConversation} from '../../../../repositories/conversation/ConversationSelectors';

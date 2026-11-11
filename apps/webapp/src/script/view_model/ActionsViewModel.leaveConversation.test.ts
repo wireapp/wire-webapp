@@ -18,8 +18,8 @@
  */
 
 import ko from 'knockout';
-import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
-import {FEATURE_KEY, FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
+import {DefaultConversationRoleName} from '../apiClient/conversation/conversationRole';
+import {FEATURE_KEY, FEATURE_STATUS, type FeatureList} from '../apiClient/team/feature/featureList.types';
 
 import {useLeaveGroupAdminModalStore} from '../components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
@@ -39,7 +39,7 @@ import {createUuid} from '../util/uuid';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {MainViewModel} from './MainViewModel';
-import {UserType} from '@wireapp/api-client/lib/user';
+import {UserType} from '../apiClient/user/user';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 

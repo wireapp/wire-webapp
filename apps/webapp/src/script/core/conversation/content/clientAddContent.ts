@@ -17,7 +17,7 @@
  *
  */
 
-import {RegisteredClient} from '@wireapp/api-client/lib/client';
+import {RegisteredClient} from '../../../apiClient/client/registeredClient';
 
 export interface ClientAddContent {
   client: RegisteredClient;

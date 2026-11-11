@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {CredentialType, E2eiConversationState} from '../../../../core/messagingProtocols/mls';
 import {asyncNoop, noop} from 'noop-esm';
 import {container} from 'tsyringe';

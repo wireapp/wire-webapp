@@ -58,7 +58,7 @@ Prerequisites:
 1. Run `npx just develop`; Just builds the workspace libraries and server output, then starts the Express server, its TypeScript watcher, and watchers for the WebApp's upstream libraries. Rspack compiles the WebApp in memory and serves it at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
 1. Server TypeScript changes are recompiled with `tsc --watch`; `node --watch` restarts the compiled Express server when its output changes. `concurrently` stops sibling processes if any watcher exits.
 1. `npx just develop-watch` is an alternative to `npx just develop`: it starts the server with libraries you select interactively. Choose one development command; do not run `develop-watch` alongside `develop`.
-1. To watch one library without the server, run `npx just watch-library api-client`.
+1. To watch one library without the server, run `npx just watch-library commons`.
 1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
    `FEATURE_CHECK_CONSENT="false"` to the env file
 
@@ -134,6 +134,8 @@ npx just test
 Run `npx just test-ci` to execute each Jest project with coverage and its existing project-specific thresholds. CI uses this command inside the network-isolation wrapper and uploads HTML and LCOV reports for the webapp, server, core, and API client. Use `npx just test-watch` for watch mode.
 
 Core tests retain a separate Node Jest project in `apps/webapp/test/core/jest.config.js`, with minimum coverage of 49% branches, 53% functions, and 62% lines/statements. Run it directly with `npx jest --config apps/webapp/test/core/jest.config.js --coverage`. Its original discovery patterns still exclude `encryptedStore.test.node.ts`. Webapp tests and coverage exclude the core tree; explicit service fixtures remain in `src/script/util/test/createCoreTestFixture.ts`.
+
+API-client source lives in `apps/webapp/src/script/apiClient/` and is compiled and watched directly by Rspack. Import individual source modules using relative paths. Browser adapters are passed at the webapp construction boundaries; Node tests pass the Node adapters explicitly. Its separate Node Jest project is `apps/webapp/test/apiClient/jest.config.js`: run `npx jest --config apps/webapp/test/apiClient/jest.config.js --coverage`. Webapp test discovery and coverage exclude this tree, and core coverage excludes it too. Coverage thresholds remain 50% branches, 40% functions, and 53% lines/statements. `tsconfig.api-client.json` preserves the source's stricter checks without emitting a separate library build. `APIClient.VERSION` retains the final standalone SDK version, `27.96.0`, independently of the webapp release version.
 
 UI-kit components live in `apps/webapp/src/script/uiKit/` and are compiled and watched directly by Rspack. Import individual source modules using relative paths. Their behavior tests retain a separate jsdom/SWC Jest project in `apps/webapp/test/uiKit/jest.config.js`. Run it with `npx jest --config apps/webapp/test/uiKit/jest.config.js --coverage`; `just test-ci` also runs it. Webapp test discovery and coverage exclude this tree to avoid counting it twice. The Emotion theme augmentation lives beside the components in `emotion.d.ts` and is included by the webapp TypeScript configurations.
 

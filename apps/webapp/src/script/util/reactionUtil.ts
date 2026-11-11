@@ -18,10 +18,10 @@
  */
 
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {matchQualifiedIds} from './qualifiedId';
 
+import type {QualifiedId} from '../apiClient/user/qualifiedId';
 import {ReactionMap, UserReactionMap} from '../repositories/storage';
 
 function isReactionMap(reactions: UserReactionMap | ReactionMap): reactions is ReactionMap {

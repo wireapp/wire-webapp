@@ -18,7 +18,6 @@
  */
 
 import {isNonEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
@@ -33,6 +32,7 @@ import {
   ProteusConversation,
 } from './ConversationSelectors';
 
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {matchQualifiedIds} from '../../util/qualifiedId';
 import {sortGroupsByLastEvent} from '../../util/util';
 import {Conversation} from '../entity/Conversation';

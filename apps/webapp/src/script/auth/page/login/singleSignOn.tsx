@@ -20,7 +20,6 @@
 import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isNull, isObject, isString, isUndefined} from '@sindresorhus/is';
-import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import {connect} from 'react-redux';
@@ -29,6 +28,8 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {SingleSignOnForm} from './singleSignOnForm';
 
+import {BackendError} from '../../../apiClient/http/backendError';
+import {SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {LogoFullIcon} from '../../../components/icon';
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';

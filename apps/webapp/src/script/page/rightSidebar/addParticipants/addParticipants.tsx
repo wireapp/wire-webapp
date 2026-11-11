@@ -20,9 +20,9 @@
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {isEmptyArray, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {SearchInput} from '../../../components/SearchInput';

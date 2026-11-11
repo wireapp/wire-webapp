@@ -18,8 +18,13 @@
  */
 
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
-import {CONVERSATION_TYPE, DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL, FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
+import {DefaultConversationRoleName} from '../../../apiClient/conversation/conversationRole';
+import {
+  CONVERSATION_PROTOCOL,
+  FEATURE_STATUS,
+  type FeatureList,
+} from '../../../apiClient/team/feature/featureList.types';
 import ko from 'knockout';
 import {task} from 'true-myth';
 import {asyncNoop, noop} from 'noop-esm';

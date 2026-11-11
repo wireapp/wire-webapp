@@ -36,7 +36,7 @@ import {
   isMarker,
 } from './virtualizedMessagesGroup';
 import {translateForTest} from '../../../util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 describe('MessagesGroup', () => {
   const eventMapper = new EventMapper(undefined, translate);

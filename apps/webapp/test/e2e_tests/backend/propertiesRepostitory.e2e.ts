@@ -17,7 +17,7 @@
  *
  */
 
-import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
+import type {WebappProperties} from '../../../src/script/apiClient/user/data/userPropertiesSetData';
 
 import {TypeUtil} from '@wireapp/commons';
 

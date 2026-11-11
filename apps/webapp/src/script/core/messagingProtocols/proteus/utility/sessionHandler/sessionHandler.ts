@@ -25,16 +25,16 @@ import {
   isObject,
   isUndefined,
 } from '@sindresorhus/is';
-import {PreKey} from '@wireapp/api-client/lib/auth';
-import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {Logger} from 'logdown';
 
-import {APIClient} from '@wireapp/api-client';
-
 import {SessionId} from './sessionHandler.types';
 
+import {APIClient} from '../../../../../apiClient/apiClient';
+import {PreKey} from '../../../../../apiClient/auth/preKey';
+import {QualifiedUserClients} from '../../../../../apiClient/conversation/qualifiedUserClients';
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
+import {QualifiedUserPreKeyBundleMap} from '../../../../../apiClient/user/userPreKeyBundleMap';
 import {flattenUserMap} from '../../../../conversation/message/userClientsUtil';
 import {CryptoClient} from '../../proteusService/cryptoClient';
 

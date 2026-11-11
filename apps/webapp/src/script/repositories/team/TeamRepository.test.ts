@@ -17,9 +17,10 @@
  *
  */
 
-import {CollaboratorPermission, TeamCollaborator} from '@wireapp/api-client/lib/team';
-import {FeatureList, FEATURE_STATUS, CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team/feature/';
-import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
+import {CollaboratorPermission, TeamCollaborator} from '../../apiClient/team/team/collaborator/teamCollaborator';
+import {FeatureList, FEATURE_STATUS, CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {UserType} from '../../apiClient/user/user';
 
 import {randomUUID} from 'crypto';
 

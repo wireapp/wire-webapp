@@ -1,0 +1,50 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import SparkMD5 from 'spark-md5';
+
+// Note: In favour of 'TextDecoder' which is not supported in MS Edge
+export const bufferToString = (buffer: ArrayBuffer): string => {
+  let binaryString = '';
+  const bytes = new Uint8Array(buffer);
+
+  for (let index = 0; index < bytes.length; index++) {
+    const byte = bytes[index];
+
+    if (byte === undefined) {
+      continue;
+    }
+
+    binaryString += String.fromCharCode(byte);
+  }
+
+  return binaryString;
+};
+
+export const base64MD5FromBuffer = (buffer: ArrayBuffer): string => {
+  return window.btoa(SparkMD5.ArrayBuffer.hash(buffer, true));
+};
+
+export function concatToBuffer(...items: readonly (string | Uint8Array)[]): Blob {
+  return new Blob(
+    items.map(item => {
+      return typeof item === 'string' ? item : new Uint8Array(item);
+    }),
+  );
+}

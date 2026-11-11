@@ -18,8 +18,6 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {Dexie} from 'dexie';
 import {container} from 'tsyringe';
 
@@ -27,6 +25,8 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 import {StorageError} from '../../error/storageError';

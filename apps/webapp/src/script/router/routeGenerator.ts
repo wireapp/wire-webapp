@@ -18,7 +18,8 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {QualifiedId} from '../apiClient/user/qualifiedId';
 
 export const generateConversationUrl = ({id, domain, filePath}: QualifiedId & {filePath?: string}): string => {
   let baseUrl = `/conversation/${id}`;

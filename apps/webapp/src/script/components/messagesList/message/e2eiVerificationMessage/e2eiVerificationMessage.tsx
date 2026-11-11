@@ -19,11 +19,11 @@
 
 import type {ReactNode, FunctionComponent} from 'react';
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe} from 'true-myth';
 
 import {MessageIcon, IconInfo, Link as LinkStyles} from './e2eiVerificationMessage.styles';
 
+import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {Config} from '../../../../Config';
 import {E2EIHandler} from '../../../../e2eIdentity';
 import {E2EIVerificationMessageType} from '../../../../message/e2eiVerificationMessageType';

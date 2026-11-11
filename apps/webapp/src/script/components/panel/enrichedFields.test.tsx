@@ -18,7 +18,7 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import type {RichInfo} from '@wireapp/api-client/lib/user/';
+import type {RichInfo} from '../../apiClient/user/richInfo';
 
 import {User} from '../../repositories/entity/User';
 import {RichProfileRepository} from '../../repositories/user/richProfileRepository';

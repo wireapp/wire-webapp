@@ -17,9 +17,9 @@
  *
  */
 
-import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {result, task} from 'true-myth';
 import {container} from 'tsyringe';
 

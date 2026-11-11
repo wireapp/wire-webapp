@@ -18,9 +18,10 @@
  */
 
 import {isTruthy, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_EVENT, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
-import {UserType, type QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {CONVERSATION_EVENT, ConversationMemberJoinEvent} from '../../../apiClient/event/conversationEvent';
+import {type QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {UserType} from '../../../apiClient/user/user';
 import {getLogger, Logger} from '../../../util/logger';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';

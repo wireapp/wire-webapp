@@ -18,8 +18,8 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {Config} from '../../../../Config';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';

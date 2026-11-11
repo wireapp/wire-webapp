@@ -17,10 +17,10 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId, User} from '@wireapp/api-client/lib/user';
-
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../apiClient/apiClient';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {User} from '../../apiClient/user/user';
 
 // Type definition for the UsersResponse from the API (not exported by api-client)
 type UsersResponse = {

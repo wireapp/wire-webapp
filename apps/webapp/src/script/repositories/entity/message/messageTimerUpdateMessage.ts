@@ -18,10 +18,10 @@
  */
 
 import {isNan, isNull} from '@sindresorhus/is';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {SystemMessage} from './systemMessage';
 
+import {CONVERSATION_EVENT} from '../../../apiClient/event/conversationEvent';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate} from '../../../util/localizerUtil';
 import {formatDuration} from '../../../util/timeUtil';

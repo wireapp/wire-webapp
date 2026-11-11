@@ -19,7 +19,7 @@
 
 import {render, type RenderResult} from '@testing-library/react';
 
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
 
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {Config} from '../../../Config';

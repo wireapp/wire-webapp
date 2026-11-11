@@ -17,11 +17,13 @@
  *
  */
 
-import type {ChangePassword, ConsentType, Self} from '@wireapp/api-client/lib/self/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {SelfActionCreator} from './creator/';
 
+import type {ChangePassword} from '../../../apiClient/self/changePassword';
+import type {ConsentType} from '../../../apiClient/self/consentType';
+import type {Self} from '../../../apiClient/self/self';
 import {Environment} from '../../../util/environment';
 import {getLogger} from '../../../util/logger';
 import {toError} from '../../../util/toError';

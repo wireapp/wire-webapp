@@ -17,7 +17,7 @@
  *
  */
 
-import {PreKey} from '@wireapp/api-client/lib/auth';
+import {PreKey} from '../../../../../apiClient/auth/preKey';
 
 export type InitialPrekeys = {prekeys: PreKey[]; lastPrekey: PreKey};
 

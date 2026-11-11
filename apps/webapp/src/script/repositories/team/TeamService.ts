@@ -17,18 +17,20 @@
  *
  */
 
-import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/conversationRole';
-import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
-import {FEATURE_STATUS, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
-import type {TeamInvitation} from '@wireapp/api-client/lib/team/invitation/teamInvitation';
-import {TeamMigrationPayload} from '@wireapp/api-client/lib/team/invitation/teamMigrationPayload';
-import type {LegalHoldMemberData} from '@wireapp/api-client/lib/team/legalhold/';
-import type {MemberData, Members} from '@wireapp/api-client/lib/team/member/';
-import type {Services} from '@wireapp/api-client/lib/team/service/';
-import type {TeamCollaborator, TeamData} from '@wireapp/api-client/lib/team/team/';
-import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
+import type {ConversationRolesList} from '../../apiClient/conversation/conversationRole';
+import type {FeatureList} from '../../apiClient/team/feature/featureList.types';
+import {FEATURE_STATUS, FEATURE_KEY} from '../../apiClient/team/feature/featureList.types';
+import type {TeamInvitation} from '../../apiClient/team/invitation/teamInvitation';
+import {TeamMigrationPayload} from '../../apiClient/team/invitation/teamMigrationPayload';
+import type {LegalHoldMemberData} from '../../apiClient/team/legalhold/legalHoldMemberStatus';
+import type {MemberData} from '../../apiClient/team/member/memberData';
+import type {Members} from '../../apiClient/team/member/members';
+import type {Services} from '../../apiClient/team/service/services';
+import type {TeamCollaborator} from '../../apiClient/team/team/collaborator/teamCollaborator';
+import type {TeamData} from '../../apiClient/team/team/teamData';
+import type {User as APIClientUser} from '../../apiClient/user/user';
 import {APIClient} from '../../service/apiClientSingleton';
 
 export class TeamService {

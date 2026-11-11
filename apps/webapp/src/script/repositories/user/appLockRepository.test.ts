@@ -29,7 +29,7 @@ import {AppLockState} from './appLockState';
 import {UserState} from './userState';
 import {TeamEntity} from '../team/TeamEntity';
 import {TeamState} from '../team/TeamState';
-import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 
 const mockCryptoPwhashStr = jest.fn();
 const mockCryptoPwhashStrVerify = jest.fn();

@@ -22,10 +22,6 @@
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
-import {Context} from '@wireapp/api-client/lib/auth';
-import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
-import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import 'core-js/full/reflect';
 import pWaitFor from 'p-wait-for';
@@ -40,6 +36,11 @@ import {refreshApplication} from './applicationRefresh';
 import {reportStartupFailure} from './reportStartupFailure';
 
 import '../../style/default.less';
+import {Context} from '../apiClient/auth/context';
+import {ClientClassification} from '../apiClient/client/clientClassification';
+import {ClientType} from '../apiClient/client/clientType';
+import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {createBrowserSystemNotificationApi} from '../browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';

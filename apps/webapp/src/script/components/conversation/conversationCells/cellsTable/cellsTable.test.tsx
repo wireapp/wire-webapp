@@ -23,7 +23,8 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
 
-import {BackendError, StatusCode} from '@wireapp/api-client/lib/http/';
+import {BackendError} from '../../../../apiClient/http/backendError';
+import {StatusCode} from '../../../../apiClient/http';
 import {ThemeProvider, themes, THEME_ID} from '../../../../uiKit/identity/theme/theme';
 import {PrimaryModalComponent} from '../../../Modals/PrimaryModal/PrimaryModal';
 import {JobsTaskStatus} from 'cells-sdk-ts';

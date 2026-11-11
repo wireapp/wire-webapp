@@ -18,10 +18,10 @@
  */
 
 import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, task} from 'true-myth';
 import {match, P} from 'ts-pattern';
 
+import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {Account, MLSService} from '../core';
 import {ConversationRepository} from '../repositories/conversation/ConversationRepository';
 import {

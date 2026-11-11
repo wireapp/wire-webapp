@@ -20,7 +20,6 @@
 import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyArray, isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -30,6 +29,8 @@ import {ValidationUtil} from '@wireapp/commons';
 import {styles} from './accountForm.styles';
 import {Exception} from './exception';
 
+import {BackendError} from '../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button} from '../../uiKit/inputs/button/button';

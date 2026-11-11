@@ -17,11 +17,10 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
-
 import {normalizeCellsPath} from './cellsBulkMovePreviewModal/normalizeCellsPath';
 import {isBulkMoveValid} from './cellsBulkMovePreviewModal/validateBulkMove';
 
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {CellNode, CellNodeType} from '../../../../types/cellNode';
 
 export const INTERNAL_DRIVE_DRAG_TYPE = 'application/x-wire-drive-nodes';

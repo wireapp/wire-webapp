@@ -17,10 +17,9 @@
  *
  */
 
-import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
-
 import {TranslationKey} from './localizerUtil';
 
+import {BackendErrorLabel, SyntheticErrorLabel} from '../apiClient/http/backendErrorLabel';
 import {LabeledError} from '../auth/module/action/labeledError';
 
 export const errorHandlerStrings: Record<string, TranslationKey> = {

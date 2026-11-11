@@ -17,13 +17,14 @@
  *
  */
 
-import {VerificationActionType} from '@wireapp/api-client/lib/auth/verificationActionType';
-import {ClientType} from '@wireapp/api-client/lib/client/';
-import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
+import {VerificationActionType} from '../../../apiClient/auth/verificationActionType';
+import {ClientType} from '../../../apiClient/client/clientType';
+import {BackendError} from '../../../apiClient/http/backendError';
+import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import type {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '../../../apiClient/apiClient';
 import type {TypeUtil} from '@wireapp/commons';
 
 import {AuthActionCreator} from './creator/';

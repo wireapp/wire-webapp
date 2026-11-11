@@ -24,7 +24,6 @@ import {
   type IdIdentifier,
   type AccessorKeyColumnDefBase,
 } from '@tanstack/react-table';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsTableDateColumn} from './cellsTableDateColumn/cellsTableDateColumn';
 import {CellsTableNameColumn} from './cellsTableNameColumn/cellsTableNameColumn';
@@ -33,6 +32,7 @@ import {CellsTableRowOptions} from './cellsTableRowOptions/cellsTableRowOptions'
 import {CellsTableSharedColumn} from './cellsTableSharedColumn/cellsTableSharedColumn';
 import {CellsTagsColumn} from './cellsTagsColumn/cellsTagsColumn';
 
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {CellNode} from '../../../../../types/cellNode';
 import {CellsSelectionCheckbox} from '../../../../cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';

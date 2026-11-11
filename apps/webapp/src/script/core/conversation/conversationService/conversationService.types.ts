@@ -17,14 +17,15 @@
  *
  */
 
-import {QualifiedUserClients, MessageSendingStatus, Conversation} from '@wireapp/api-client/lib/conversation';
-import {ConversationEvent, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {MessageSendingState} from '..';
+import {Conversation} from '../../../apiClient/conversation/conversation';
+import {MessageSendingStatus} from '../../../apiClient/conversation/messageSendingStatus';
+import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
+import {ConversationEvent, ConversationMemberJoinEvent} from '../../../apiClient/event/conversationEvent';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 
 export enum MessageTargetMode {
   NONE,

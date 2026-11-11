@@ -19,7 +19,7 @@
 
 import {act, render} from '@testing-library/react';
 import {isNull, isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../core/conversation';
 import {StyledApp} from '../../../uiKit/layout/styledApp/styledApp';
 import {THEME_ID} from '../../../uiKit/identity/theme/theme';

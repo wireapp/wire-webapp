@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 import {GenericMessageType} from '../../core/conversation';
 import {isObject} from 'underscore';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';

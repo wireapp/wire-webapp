@@ -19,9 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
+import {ClientClassification} from '../../../../apiClient/client/clientClassification';
 import {WireIdentity} from '../../../../e2eIdentity';
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 import {useApplicationContext} from '../../../../page/rootProvider';

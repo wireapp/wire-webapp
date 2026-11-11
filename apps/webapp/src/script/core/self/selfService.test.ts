@@ -17,9 +17,11 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {nodePlatform} from '../../apiClient/shims/node/platform';
 
-import {APIClient} from '@wireapp/api-client';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+
+import {APIClient} from '../../apiClient/apiClient';
 
 import {SelfService} from './selfService';
 
@@ -35,7 +37,7 @@ describe('SelfService', () => {
     let apiClient: APIClient;
 
     beforeEach(() => {
-      apiClient = new APIClient({urls: MOCK_BACKEND});
+      apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
       apiClient.backendFeatures.supportsMLS = true;
     });
 

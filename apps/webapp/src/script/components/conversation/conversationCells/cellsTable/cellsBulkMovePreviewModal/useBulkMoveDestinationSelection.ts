@@ -19,10 +19,9 @@
 
 import {useCallback, useMemo, useState} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
-
 import {normalizeCellsPath} from './normalizeCellsPath';
 
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {CellNode, CellNodeType} from '../../../../../types/cellNode';

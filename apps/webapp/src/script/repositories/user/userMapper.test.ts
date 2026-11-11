@@ -17,7 +17,7 @@
  *
  */
 
-import {UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
+import {UserAsset, UserAssetType} from '../../apiClient/user/userAsset';
 
 import {Availability} from '@wireapp/protocol-messaging';
 

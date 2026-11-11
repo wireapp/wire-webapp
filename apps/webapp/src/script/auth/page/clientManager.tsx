@@ -20,7 +20,6 @@
 import React, {useEffect, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
@@ -28,6 +27,7 @@ import {UrlUtil, StringUtil, Runtime} from '@wireapp/commons';
 
 import {Page} from './page';
 
+import type {RegisteredClient} from '../../apiClient/client/registeredClient';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';

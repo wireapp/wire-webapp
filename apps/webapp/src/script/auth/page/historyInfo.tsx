@@ -19,8 +19,6 @@
 
 import React, {useEffect, type FunctionComponent} from 'react';
 
-import {ClientType} from '@wireapp/api-client/lib/client/index';
-import type {RegisteredClient} from '@wireapp/api-client/lib/client/registeredClient';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
@@ -28,6 +26,8 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {Page} from './page';
 
+import {ClientType} from '../../apiClient/client/clientType';
+import type {RegisteredClient} from '../../apiClient/client/registeredClient';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button} from '../../uiKit/inputs/button/button';

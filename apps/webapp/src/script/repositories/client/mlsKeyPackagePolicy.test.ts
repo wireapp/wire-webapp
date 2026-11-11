@@ -18,7 +18,7 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
+import {FEATURE_STATUS, type FeatureList} from '../../apiClient/team/feature/featureList.types';
 
 import {getMLSKeyPackageUploadAmount} from './mlsKeyPackagePolicy';
 

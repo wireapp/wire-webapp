@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../src/script/apiClient/team/feature/featureList.types';
 import {
   ConversationLabelRepository,
   LabelType,

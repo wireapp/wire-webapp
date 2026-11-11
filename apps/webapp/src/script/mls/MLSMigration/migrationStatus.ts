@@ -18,7 +18,9 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {FeatureMLSMigration, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
+
+import {FeatureMLSMigration} from '../../apiClient/team/feature/featureList.schema';
+import {FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 
 const hasMigrationStartTimeArrived = (mlsMigrationFeature: FeatureMLSMigration): boolean => {
   if (isNullOrUndefined(mlsMigrationFeature)) {

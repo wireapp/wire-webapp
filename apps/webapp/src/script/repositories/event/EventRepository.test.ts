@@ -18,7 +18,10 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {BackendEvent, CONVERSATION_EVENT, MEETING_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {BackendEvent} from '../../apiClient/event/backendEvent';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
+import {MEETING_EVENT} from '../../apiClient/event/meetingEvent';
+import {USER_EVENT} from '../../apiClient/event/userEvent';
 import {ConnectionState} from '../../core';
 import {WebAppEvents} from '../../webAppEvents';
 import {amplify} from 'amplify';

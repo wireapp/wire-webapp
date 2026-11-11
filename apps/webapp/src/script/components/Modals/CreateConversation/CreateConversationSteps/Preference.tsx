@@ -19,9 +19,9 @@
 
 import {useEffect, type FunctionComponent} from 'react';
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {Config} from '../../../../Config';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {TeamState} from '../../../../repositories/team/TeamState';

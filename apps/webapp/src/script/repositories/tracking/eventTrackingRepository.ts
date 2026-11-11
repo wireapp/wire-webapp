@@ -18,8 +18,6 @@
  */
 
 import {isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
-import {HttpClient, LongRunningRetryDetails} from '@wireapp/api-client/lib/http';
-import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -33,6 +31,8 @@ import {
 } from './telemetry.helpers';
 import {UserData} from './userData';
 
+import {HttpClient, LongRunningRetryDetails} from '../../apiClient/http/httpClient';
+import {WebSocketClient} from '../../apiClient/tcp/webSocketClient';
 import {URLParameter} from '../../auth/urlParameter';
 import {Config} from '../../Config';
 import {APIClient} from '../../service/apiClientSingleton';

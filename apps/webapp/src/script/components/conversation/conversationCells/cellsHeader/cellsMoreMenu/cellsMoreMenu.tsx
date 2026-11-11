@@ -19,10 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {buttonStyles, itemStyles} from './cellsMoreMenu.styles';
 
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../../../../page/rootProvider';
 import {MoreIcon} from '../../../../../uiKit/dataDisplay/icon/moreIcon';
 import {TrashIcon} from '../../../../../uiKit/dataDisplay/icon/trashIcon';

@@ -19,9 +19,9 @@
 
 import {useMemo} from 'react';
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
+import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 import {ConversationState} from '../../../../../../repositories/conversation/ConversationState';
 import type {Conversation} from '../../../../../../repositories/entity/Conversation';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';

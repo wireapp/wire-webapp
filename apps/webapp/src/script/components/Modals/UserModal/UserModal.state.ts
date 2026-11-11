@@ -17,9 +17,9 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {create} from 'zustand';
 
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {noop} from '../../../util/util';
 
 type UserModalState = {

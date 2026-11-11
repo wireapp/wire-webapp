@@ -19,7 +19,7 @@
 
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import ko from 'knockout';
 
 import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';

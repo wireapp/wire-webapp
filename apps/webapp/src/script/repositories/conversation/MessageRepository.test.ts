@@ -17,9 +17,9 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
+import {CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {MessageSendingState} from '../../core/conversation';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
@@ -44,7 +44,7 @@ import {Text} from '../entity/message/text';
 import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
 import {ClientEvent} from '../event/Client';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {RECEIPT_MODE} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
 import {EventService} from '../event/EventService';
 import {PropertiesRepository} from '../properties/propertiesRepository';
 import {ReactionMap} from '../storage';

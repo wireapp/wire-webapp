@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 const serializeQualifiedId = ({id, domain}: QualifiedId): string => {
   return `${id}@${domain}`;

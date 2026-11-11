@@ -18,7 +18,7 @@
  */
 
 import {act, render, waitFor} from '@testing-library/react';
-import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team/feature';
+import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '../../../../apiClient/team/feature/featureList.types';
 import {Runtime} from '@wireapp/commons/lib/util/Runtime';
 
 import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';

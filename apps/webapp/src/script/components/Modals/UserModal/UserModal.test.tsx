@@ -18,7 +18,7 @@
  */
 
 import {act, render, waitFor} from '@testing-library/react';
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {ConnectionStatus} from '../../../apiClient/connection/connectionStatus';
 
 import en from '../../../../i18n/en-US.json';
 import {ConnectionEntity} from '../../../repositories/connection/connectionEntity';

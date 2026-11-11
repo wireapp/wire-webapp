@@ -21,7 +21,6 @@ import {useRef, useState} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNan, isNonEmptyString} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task} from 'true-myth';
 
 import {EmojiChar} from './emojiChar';
@@ -36,6 +35,7 @@ import {
   userBoldStyle,
 } from './messageReactions.styles';
 
+import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 import type {User} from '../../../../../../repositories/entity/User';
 import {Tooltip} from '../../../../../../uiKit/dataDisplay/tooltip/tooltip';
 import {getEmojiTitleFromEmojiUnicode} from '../../../../../../util/emojiUtil';

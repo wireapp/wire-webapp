@@ -18,9 +18,9 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {Task} from 'true-myth';
 
+import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {LEAVE_CALL_REASON} from '../../../../repositories/calling/enum/LeaveCallReason';
 import {meetingConversationSyncErrors} from '../../meetingConversationSync';
 import {

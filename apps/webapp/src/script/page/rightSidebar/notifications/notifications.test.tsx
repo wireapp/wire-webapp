@@ -33,7 +33,7 @@ import {Notifications} from './notifications';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {translateForTest} from '../../../util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 const testFactory = new TestFactory();
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});

@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import type {Translate} from '../../util/localizerUtil';

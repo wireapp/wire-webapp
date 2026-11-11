@@ -18,16 +18,17 @@
  */
 
 import {isEmptyArray, isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
-import {UserType, QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import type {MainViewModel} from './MainViewModel';
 
+import {ConnectionStatus} from '../apiClient/connection/connectionStatus';
+import {DefaultConversationRoleName} from '../apiClient/conversation/conversationRole';
+import {BackendErrorLabel} from '../apiClient/http/backendErrorLabel';
+import {FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../apiClient/user/qualifiedId';
+import {UserType} from '../apiClient/user/user';
 import {useLeaveGroupAdminModalStore} from '../components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '../components/Modals/PrimaryModal';
 import {CellsRepository} from '../repositories/cells/cellsRepository';

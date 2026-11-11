@@ -18,7 +18,8 @@
  */
 
 import {fireEvent, render, RenderResult} from '@testing-library/react';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {BackendError} from '../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import {noop} from 'noop-esm';
 import {Provider} from 'react-redux';
 import {HashRouter as Router} from 'react-router';

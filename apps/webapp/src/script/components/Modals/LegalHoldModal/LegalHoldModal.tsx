@@ -20,12 +20,12 @@
 import {FC, ReactNode, useCallback, useEffect, useRef, useState} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {LegalHoldMemberStatus} from '@wireapp/api-client/lib/team/legalhold/';
 import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {useLegalHoldModalState} from './LegalHoldModal.state';
 
+import {LegalHoldMemberStatus} from '../../../apiClient/team/legalhold/legalHoldMemberStatus';
 import {useUserDevicesHistory} from '../../../hooks/useUserDevicesHistory';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {ClientRepository} from '../../../repositories/client';

@@ -17,9 +17,9 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {ClientId, DeviceId, Uuid} from '@wireapp/core-crypto';
+
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 
 const textEncoder = new TextEncoder();
 

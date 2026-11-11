@@ -18,8 +18,6 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team/feature/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -28,6 +26,13 @@ import {TypedEventEmitter} from '@wireapp/commons';
 import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
+import {
+  CONVERSATION_PROTOCOL,
+  FEATURE_KEY,
+  FEATURE_STATUS,
+  FeatureList,
+} from '../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {Core} from '../../service/coreSingleton';
 import {Logger, getLogger} from '../../util/logger';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';

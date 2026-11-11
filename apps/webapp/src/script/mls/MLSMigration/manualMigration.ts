@@ -18,12 +18,13 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL, FEATURE_STATUS, type FeatureMLSMigration} from '@wireapp/api-client/lib/team';
 import {Maybe, Task, task} from 'true-myth';
 
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 import {useManualMigrationStore} from './useManualMigrationStore';
 
+import {type FeatureMLSMigration} from '../../apiClient/team/feature/featureList.schema';
+import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import {isMixedConversation, isMLSConversation} from '../../repositories/conversation/ConversationSelectors';
 import type {Conversation} from '../../repositories/entity/Conversation';

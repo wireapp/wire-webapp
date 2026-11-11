@@ -20,9 +20,9 @@
 import {useCallback, KeyboardEvent, MouseEvent, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNull} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {maybe} from 'true-myth';
 
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {stringifyQualifiedId} from '../../../core/util/qualifiedIdUtil';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {generateConversationUrl} from '../../../router/routeGenerator';

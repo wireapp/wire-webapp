@@ -20,9 +20,9 @@
 import {FC, useCallback, useEffect} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
 import {amplify} from 'amplify';
 
+import {DefaultConversationRoleName as DefaultRole} from '../../../apiClient/conversation/conversationRole';
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {EnrichedFields} from '../../../components/panel/enrichedFields';

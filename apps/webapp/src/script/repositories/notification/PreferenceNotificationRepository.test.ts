@@ -17,7 +17,7 @@
  *
  */
 
-import {USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {USER_EVENT} from '../../apiClient/event/userEvent';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 

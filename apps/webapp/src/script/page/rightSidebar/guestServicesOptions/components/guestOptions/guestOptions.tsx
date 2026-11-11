@@ -20,10 +20,10 @@
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {CONVERSATION_CELLS_STATE} from '../../../../../apiClient/conversation/conversation';
 import * as Icon from '../../../../../components/icon';
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {RadioGroup} from '../../../../../components/Radio';

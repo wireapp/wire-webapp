@@ -17,9 +17,10 @@
  *
  */
 
-import {DomainRedirect} from '@wireapp/api-client/lib/account/domainRedirect';
-import {ClientType} from '@wireapp/api-client/lib/client';
-import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
+import {DomainRedirect} from '../../../apiClient/account/domainRedirect';
+import {ClientType} from '../../../apiClient/client/clientType';
+import {BackendError} from '../../../apiClient/http/backendError';
+import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {StatusCodes} from 'http-status-codes';
 import {Dispatch} from 'redux';
 

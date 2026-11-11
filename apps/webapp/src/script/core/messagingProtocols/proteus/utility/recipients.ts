@@ -17,11 +17,10 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client/lib/apiClient';
-import {QualifiedUserClientMap} from '@wireapp/api-client/lib/client';
-import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
+import {APIClient} from '../../../../apiClient/apiClient';
+import {QualifiedUserClientMap} from '../../../../apiClient/client/qualifiedPublicClients';
+import {QualifiedUserClients} from '../../../../apiClient/conversation/qualifiedUserClients';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {getConversationQualifiedMembers} from '../../../conversation/conversationService/utility/getConversationQualifiedMembers';
 import {flattenUserMap, nestUsersList} from '../../../conversation/message/userClientsUtil';
 import {isQualifiedUserClients} from '../../../util';

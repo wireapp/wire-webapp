@@ -18,24 +18,6 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import type {AddedClient, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client';
-import {
-  UserEvent,
-  UserLegalHoldDisableEvent,
-  UserLegalHoldRequestEvent,
-  USER_EVENT,
-  UserUpdateEvent,
-} from '@wireapp/api-client/lib/event';
-import type {BackendError, TraceState} from '@wireapp/api-client/lib/http';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {ConsentType} from '@wireapp/api-client/lib/self/';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {QualifiedHandle, User as APIClientUser} from '@wireapp/api-client/lib/user';
-import {
-  QualifiedId,
-  UserAsset as APIClientUserAsset,
-  UserAssetType as APIClientUserAssetType,
-} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
@@ -50,6 +32,24 @@ import {UserMapper} from './userMapper';
 import type {UserService} from './userService';
 import {UserState} from './userState';
 
+import type {PublicClient} from '../../apiClient/client/publicClient';
+import type {AddedClient, RegisteredClient} from '../../apiClient/client/registeredClient';
+import {
+  UserEvent,
+  UserLegalHoldDisableEvent,
+  UserLegalHoldRequestEvent,
+  USER_EVENT,
+  UserUpdateEvent,
+} from '../../apiClient/event/userEvent';
+import type {BackendError} from '../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import type {TraceState} from '../../apiClient/http/traceState';
+import {ConsentType} from '../../apiClient/self/consentType';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import type {QualifiedHandle} from '../../apiClient/user/qualifiedHandle';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import type {User as APIClientUser} from '../../apiClient/user/user';
+import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '../../apiClient/user/userAsset';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {Config} from '../../Config';

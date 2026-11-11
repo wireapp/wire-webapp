@@ -17,7 +17,7 @@
  *
  */
 
-import {FeatureList, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature';
+import {FeatureList, FEATURE_KEY, FEATURE_STATUS} from '../../../src/script/apiClient/team/feature/featureList.types';
 
 import {BackendClientE2E} from './backendClient.e2e';
 

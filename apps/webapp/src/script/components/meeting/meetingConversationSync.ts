@@ -18,9 +18,9 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Task, task} from 'true-myth';
 
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import type {AddUsersFailure} from '../../core/conversation';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import type {Conversation} from '../../repositories/entity/Conversation';

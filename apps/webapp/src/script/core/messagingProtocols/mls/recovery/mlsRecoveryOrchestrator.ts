@@ -18,13 +18,13 @@
  */
 
 import {isEmptyObject, isFunction, isObject, isUndefined} from '@sindresorhus/is';
-import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {LogFactory} from '@wireapp/commons';
 
 import {DomainMlsError, DomainMlsErrorType, MlsErrorMapper} from './mlsErrorMapper';
 
+import {SUBCONVERSATION_ID} from '../../../../apiClient/conversation/subconversation';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {BaseCreateConversationResponse} from '../../../conversation';
 
 /** Context captured when epoch-mismatch recovery is triggered, for structured debugging. */

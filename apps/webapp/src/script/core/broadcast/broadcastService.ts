@@ -17,11 +17,11 @@
  *
  */
 
-import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-
-import {APIClient} from '@wireapp/api-client';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
+import {APIClient} from '../../apiClient/apiClient';
+import {MessageSendingStatus} from '../../apiClient/conversation/messageSendingStatus';
+import {QualifiedUserClients} from '../../apiClient/conversation/qualifiedUserClients';
 import {sendMessage} from '../conversation/message/messageSender';
 import {MessageService} from '../conversation/message/messageService';
 import {flattenUserMap} from '../conversation/message/userClientsUtil';

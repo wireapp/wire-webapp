@@ -1,27 +1,9 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true,
+    "noEmit": true
   },
-  "include": [
-    "apps/webapp/src/**/*",
-    "apps/webapp/test/**/*",
-    "apps/server/**/*.ts",
-    "libraries/api-client/src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "coverage",
-    "tmp",
-    "apps/server/dist",
-    "apps/webapp/dist",
-    "libraries/api-client/lib",
-    "libraries/api-client/.tmp"
-  ],
-  "references": [
-    { "path": "./apps/webapp" },
-    { "path": "./apps/server" },
-    { "path": "./libraries/api-client" }
-  ]
+  "include": ["apps/webapp/src/**/*", "apps/webapp/test/**/*", "apps/server/**/*.ts"],
+  "exclude": ["node_modules", "dist", "coverage", "tmp", "apps/server/dist", "apps/webapp/dist"],
+  "references": [{"path": "./apps/webapp"}, {"path": "./apps/server"}]
 }

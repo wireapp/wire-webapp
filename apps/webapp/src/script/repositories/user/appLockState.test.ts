@@ -17,7 +17,7 @@
  *
  */
 
-import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 import {container} from 'tsyringe';
 
 import {TeamState} from '../team/TeamState';

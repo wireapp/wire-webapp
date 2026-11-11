@@ -19,19 +19,19 @@
 
 import {useEffect, useRef} from 'react';
 
-import {
-  FeatureList,
-  FeatureWithoutConfig,
-  FEATURE_KEY,
-  FEATURE_STATUS,
-  SELF_DELETING_TIMEOUT,
-} from '@wireapp/api-client/lib/team/feature/';
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
 
 import {loadFeatureConfig, saveFeatureConfig} from './featureConfigChangeNotifier.store';
 
+import {FeatureWithoutConfig} from '../../../../apiClient/team/feature/featureList.schema';
+import {
+  FeatureList,
+  FEATURE_KEY,
+  FEATURE_STATUS,
+  SELF_DELETING_TIMEOUT,
+} from '../../../../apiClient/team/feature/featureList.types';
 import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';
 import type {
   PrimaryModalTranslatedComponent,

@@ -17,10 +17,10 @@
  *
  */
 
-import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
-
 import {buildUpdateMeetingRecurrence} from './scheduleMeetingModal/scheduleMeetingRecurrence';
 import type {UpdateMeetingCommand} from './shared/types/meetingCommandTypes';
+
+import type {UpdateMeeting} from '../../apiClient/meetings/updateMeeting';
 
 export const mapUpdateCommandToUpdateMeeting = (command: UpdateMeetingCommand): UpdateMeeting => {
   return {

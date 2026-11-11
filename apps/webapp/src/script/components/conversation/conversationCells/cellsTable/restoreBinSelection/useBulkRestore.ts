@@ -21,11 +21,11 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import type {RestoreTarget} from './resolveRestoreTargets';
 import {runBulkRestore, type BulkRestoreDependencies, type BulkRestoreOutcome} from './runBulkRestore';
 
+import type {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {observeCellsBackgroundActionJobs} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import {createBulkJobPollingPolicy} from '../../common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';

@@ -22,7 +22,7 @@ import {developmentLibraries, getSelectedLibraryWatchCommands} from './libraryWa
 describe('getSelectedLibraryWatchCommands', () => {
   it('returns commands for selected libraries and keeps the existing defaults', () => {
     const actualCommands = getSelectedLibraryWatchCommands({
-      libraryNames: ['api-client', 'config'],
+      libraryNames: ['commons', 'config'],
     });
     const defaultSelections = developmentLibraries
       .filter((library): boolean => {
@@ -32,8 +32,14 @@ describe('getSelectedLibraryWatchCommands', () => {
         return library.value;
       });
 
-    expect(actualCommands).toEqual(['just watch-library api-client', 'just watch-library config']);
-    expect(defaultSelections).toEqual(['api-client']);
+    expect(actualCommands).toEqual(['just watch-library commons', 'just watch-library config']);
+    expect(defaultSelections).toEqual([]);
+  });
+
+  it('rejects the relocated API client as a library selection', () => {
+    expect(() => {
+      getSelectedLibraryWatchCommands({libraryNames: ['api-client']});
+    }).toThrow('Unknown development library selection: api-client');
   });
 
   it('rejects unknown library names', () => {

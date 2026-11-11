@@ -17,10 +17,10 @@
  *
  */
 
-import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
+import {FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 import {Config} from '../../Config';
 import {TeamState} from '../team/TeamState';
 

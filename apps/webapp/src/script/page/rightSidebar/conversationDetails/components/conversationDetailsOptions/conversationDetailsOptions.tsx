@@ -20,12 +20,12 @@
 import {type ReactElement} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {amplify} from 'amplify';
 
 import {ConversationDetailsOption} from './conversationDetailsOption';
 
+import {CONVERSATION_CELLS_STATE} from '../../../../../apiClient/conversation/conversation';
+import {RECEIPT_MODE} from '../../../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   getSelfUserDriveRole,

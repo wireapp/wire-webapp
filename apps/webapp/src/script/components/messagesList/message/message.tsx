@@ -20,7 +20,6 @@
 import React, {useLayoutEffect, useRef, useEffect, type FunctionComponent} from 'react';
 
 import {isFunction, isNull} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
 import {ElementType, MessageDetails} from './contentMessage/asset/textMessageRenderer';
@@ -28,6 +27,7 @@ import {MessageWrapper} from './messageWrapper';
 import {ScrollToElement} from './types';
 import {useMessageFocusedTabIndex} from './util';
 
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import type {MessageRepository} from '../../../repositories/conversation/MessageRepository';
 import type {Conversation} from '../../../repositories/entity/Conversation';
 import type {ContentMessage} from '../../../repositories/entity/message/contentMessage';

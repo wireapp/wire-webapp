@@ -20,11 +20,11 @@
 import {useEffect, useId, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {RichInfoField} from '@wireapp/api-client/lib/user/richInfo';
 import {container} from 'tsyringe';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
+import type {RichInfoField} from '../../apiClient/user/richInfo';
 import {RootContextValue, useApplicationContext} from '../../page/rootProvider';
 import type {User} from '../../repositories/entity/User';
 import {RichProfileRepository} from '../../repositories/user/richProfileRepository';

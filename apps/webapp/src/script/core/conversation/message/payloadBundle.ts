@@ -17,12 +17,13 @@
  *
  */
 
-import {ConversationEventData, TeamEventData, UserEventData} from '@wireapp/api-client/lib/event';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {Message} from './message';
 import {MessageSendingState} from './message.types';
 
+import {ConversationEventData} from '../../../apiClient/event/conversationEvent';
+import {TeamEventData} from '../../../apiClient/event/teamEvent';
+import {UserEventData} from '../../../apiClient/event/userEvent';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {NotificationSource} from '../../notification';
 import {ConversationContent} from '../content';
 

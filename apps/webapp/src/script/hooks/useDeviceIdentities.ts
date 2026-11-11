@@ -20,10 +20,10 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
+import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {stringifyQualifiedId} from '../core/util/qualifiedIdUtil';
 import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../e2eIdentity';
 import {Core} from '../service/coreSingleton';

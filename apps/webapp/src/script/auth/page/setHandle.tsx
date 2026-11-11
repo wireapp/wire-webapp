@@ -20,8 +20,6 @@
 import React, {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
-import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {connect} from 'react-redux';
 import {useLocation} from 'react-router';
 
@@ -29,6 +27,8 @@ import {Runtime} from '@wireapp/commons';
 
 import {Page} from './page';
 
+import {BackendErrorLabel, SyntheticErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {ConsentType} from '../../apiClient/self/consentType';
 import {useApplicationContext} from '../../page/rootProvider';
 import {StorageKey} from '../../repositories/storage';
 import {navigate} from '../../router/Router';
