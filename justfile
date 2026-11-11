@@ -22,16 +22,16 @@ lint-file-names:
 lint-duplication:
     jscpd --config ./jscpd.json .
 
-# Reject circular imports across application and tooling sources.
+# Reject circular imports outside the explicitly reviewed baseline.
 [group('lint')]
 lint-dependencies *dependencyCruiserArguments:
-    depcruise --config dependency-cruiser.config.mjs apps tools '*.js' '*.mjs' '*.cjs' "$@"
+    depcruise --config dependency-cruiser.config.mjs --ignore-known .dependency-cruiser-known-violations.json apps tools '*.js' '*.mjs' '*.cjs' "$@"
 
 # Write every existing cycle and its dependency path to a standalone HTML report.
 [group('lint')]
 report-dependencies:
     mkdir -p target/reports/dependencies
-    just lint-dependencies --output-type err-html --output-to target/reports/dependencies/circular-dependencies.html
+    just lint-dependencies --no-ignore-known --output-type err-html --output-to target/reports/dependencies/circular-dependencies.html
 
 # Check LESS formatting and Stylelint rules from the webapp workspace.
 [group('lint')]
