@@ -28,7 +28,6 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 import {generateConfig as generateClientConfig} from '../server/configuration/client.config.ts';
-import {generateConfig as generateServerConfig} from '../server/configuration/server.config.ts';
 import {parseBuildMetadata} from '../server/configuration/buildMetadata.ts';
 import type {BuildMetadata} from '../server/configuration/buildMetadata.ts';
 import type {Env} from '../server/configuration/env.ts';
@@ -76,16 +75,15 @@ function createTemplateParameters(): Record<string, string> {
     urls: environmentUrls,
   };
   const clientConfig = generateClientConfig(commonConfig, environment);
-  const serverConfig = generateServerConfig(commonConfig, environment);
 
   return {
     VERSION: clientConfig.VERSION,
     ASSET_VERSION: clientConfig.ASSET_VERSION,
     BRAND_NAME: clientConfig.BRAND_NAME,
     APP_BASE: clientConfig.APP_BASE,
-    OPEN_GRAPH_TITLE: serverConfig.OPEN_GRAPH.TITLE,
-    OPEN_GRAPH_DESCRIPTION: serverConfig.OPEN_GRAPH.DESCRIPTION,
-    OPEN_GRAPH_IMAGE_URL: serverConfig.OPEN_GRAPH.IMAGE_URL,
+    OPEN_GRAPH_TITLE: environment.OPEN_GRAPH_TITLE,
+    OPEN_GRAPH_DESCRIPTION: environment.OPEN_GRAPH_DESCRIPTION,
+    OPEN_GRAPH_IMAGE_URL: environment.OPEN_GRAPH_IMAGE_URL,
   };
 }
 
