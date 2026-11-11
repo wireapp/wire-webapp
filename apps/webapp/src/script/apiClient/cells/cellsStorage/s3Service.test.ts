@@ -29,6 +29,7 @@ import {createAbortableXhrHttpHandler, MAX_QUEUE_SIZE, PART_SIZE, S3Service} fro
 import {AccessTokenStore} from '../../auth/accessTokenStore';
 import {HttpClient} from '../../http';
 import {cellsConfigMock} from '../../mocks/cells';
+import {nodePlatform} from '../../shims/node/platform';
 import {CellsAPI} from '../cellsApi';
 
 jest.mock('@aws-sdk/client-s3', () => {
@@ -214,6 +215,7 @@ describe('S3Service', () => {
         accessTokenStore: accessTokenStore as unknown as AccessTokenStore,
       });
       const api = new CellsAPI({
+        cookie: nodePlatform.cookie,
         accessTokenStore: accessTokenStore as unknown as AccessTokenStore,
         httpClientConfig: {
           urls: {rest: 'https://cells.example.test', name: 'cells', ws: 'wss://cells.example.test'},
