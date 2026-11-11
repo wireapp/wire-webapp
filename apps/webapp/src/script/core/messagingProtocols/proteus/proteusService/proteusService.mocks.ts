@@ -18,6 +18,7 @@
  */
 
 import {ClientType} from '@wireapp/api-client/lib/client';
+import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
 
 import {APIClient} from '@wireapp/api-client';
 
@@ -33,7 +34,7 @@ const createdApiClients: APIClient[] = [];
 export const buildProteusService = async (): Promise<
   [ProteusService, {apiClient: APIClient; cryptoClient: CryptoClient}]
 > => {
-  const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+  const apiClient = new APIClient({platform: nodePlatform, urls: APIClient.BACKEND.STAGING});
   createdApiClients.push(apiClient);
 
   apiClient.context = {

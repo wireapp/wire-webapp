@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '../shims/node/platform';
+
 import type {CloseEvent, ErrorEvent} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
 
@@ -145,6 +147,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     const {backFromSleepHandler, registrations} = createBackFromSleepHandlerTestDependencies();
 
     new ReconnectingWebsocket(jest.fn(), {
+      platform: nodePlatform.websocket,
       backFromSleepHandler: Maybe.just(backFromSleepHandler),
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
@@ -161,6 +164,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     const newSocket = createMockSocket(WEBSOCKET_STATE.CONNECTING);
     const websocketFactory = createMockWebsocketFactory(oldSocket, newSocket);
     const websocket = new ReconnectingWebsocket(jest.fn(), {
+      platform: nodePlatform.websocket,
       backFromSleepHandler: Maybe.just(backFromSleepHandler),
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
@@ -184,6 +188,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     const socket = createMockSocket(WEBSOCKET_STATE.CONNECTING);
     const onReconnect = jest.fn().mockResolvedValue('wss://example.test/await');
     const websocket = new ReconnectingWebsocket(onReconnect, {
+      platform: nodePlatform.websocket,
       backFromSleepHandler: Maybe.nothing(),
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
@@ -212,6 +217,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
   it('passes the active reconnect context to the socket-open callback', async () => {
     const socket = createMockSocket(WEBSOCKET_STATE.CONNECTING);
     const websocket = new ReconnectingWebsocket(jest.fn().mockResolvedValue('wss://example.invalid/await'), {
+      platform: nodePlatform.websocket,
       backFromSleepHandler: Maybe.nothing(),
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
@@ -236,6 +242,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
   it('passes the active reconnect context to the socket-error callback and logs a safe error', async () => {
     const socket = createMockSocket(WEBSOCKET_STATE.CONNECTING);
     const websocket = new ReconnectingWebsocket(jest.fn().mockResolvedValue('wss://example.invalid/await'), {
+      platform: nodePlatform.websocket,
       backFromSleepHandler: Maybe.nothing(),
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
@@ -270,6 +277,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     const newSocket = createMockSocket(WEBSOCKET_STATE.CONNECTING);
     const websocketFactory = createMockWebsocketFactory(oldSocket, newSocket);
     const websocket = new ReconnectingWebsocket(jest.fn(), {
+      platform: nodePlatform.websocket,
       backFromSleepHandler: Maybe.just(backFromSleepHandler),
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
@@ -293,6 +301,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     const newSocket = createMockSocket(WEBSOCKET_STATE.CONNECTING);
     const websocketFactory = createMockWebsocketFactory(oldSocket, newSocket);
     const websocket = new ReconnectingWebsocket(jest.fn(), {
+      platform: nodePlatform.websocket,
       backFromSleepHandler: Maybe.just(backFromSleepHandler),
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
@@ -324,6 +333,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     const staleMessage = {data: Buffer.from('stale message', 'utf-8')} as MessageEvent;
     const activeMessage = {data: Buffer.from('active message', 'utf-8')} as MessageEvent;
     const websocket = new ReconnectingWebsocket(jest.fn(), {
+      platform: nodePlatform.websocket,
       backFromSleepHandler: Maybe.just(backFromSleepHandler),
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
@@ -351,6 +361,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
   it('does not throw or reconnect when back from sleep is detected without a socket instance', () => {
     const {backFromSleepHandler, registrations} = createBackFromSleepHandlerTestDependencies();
     new ReconnectingWebsocket(jest.fn(), {
+      platform: nodePlatform.websocket,
       backFromSleepHandler: Maybe.just(backFromSleepHandler),
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
@@ -366,6 +377,7 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     const {backFromSleepHandler, stopBackFromSleepHandler} = createBackFromSleepHandlerTestDependencies();
     const socket = createMockSocket(WEBSOCKET_STATE.OPEN);
     const websocket = new ReconnectingWebsocket(jest.fn(), {
+      platform: nodePlatform.websocket,
       backFromSleepHandler: Maybe.just(backFromSleepHandler),
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),

@@ -17,8 +17,6 @@
  *
  */
 
-import {Cookie as ToughCookie} from 'tough-cookie';
-
 import {AccessTokenData} from '../auth';
 
 const obfuscationLengthLimit = 20;
@@ -33,18 +31,6 @@ const obfuscateAccessToken = (accessToken: AccessTokenData, enabled = true): Acc
   return accessToken;
 };
 
-function obfuscateCookie(cookie: ToughCookie, enabled = true): ToughCookie {
-  if (enabled) {
-    const obfuscatedCookie = cookie.clone() ?? new ToughCookie({key: cookie.key});
-    obfuscatedCookie.value = `${cookie.value.substr(0, obfuscationLengthLimit)}...`;
-
-    return obfuscatedCookie;
-  }
-
-  return cookie;
-}
-
 export const ObfuscationUtil = {
   obfuscateAccessToken,
-  obfuscateCookie,
 };

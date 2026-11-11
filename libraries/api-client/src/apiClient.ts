@@ -54,6 +54,7 @@ import {MeetingsAPI} from './meetings/meetingsApi';
 import {NotificationAPI} from './notification/';
 import {OAuthAPI} from './oauth/oAuthApi';
 import {ObfuscationUtil} from './obfuscation';
+import type {ApiClientPlatform} from './platform';
 import {SelfAPI} from './self/';
 import {ServiceProviderAPI} from './serviceProvider';
 import {ServicesAPI} from './services';
@@ -101,7 +102,7 @@ const defaultConfig = {
     setTimeout: globalThis.setTimeout.bind(globalThis),
   },
   urls: Backend.PRODUCTION,
-} as Config & APIClientConfiguration;
+} satisfies Config & Pick<APIClientConfiguration, 'wallClock'>;
 
 export interface APIClient {
   on(event: TOPIC.ON_LOGOUT, listener: (error: InvalidTokenError) => void): this;
@@ -112,10 +113,14 @@ export interface APIClient {
 }
 
 export type APIClientConfiguration = {
+  readonly platform: ApiClientPlatform;
   readonly wallClock: ReconnectingWebsocketWallClock;
 };
 
-export type APIClientConstructorConfiguration = Config & Partial<APIClientConfiguration>;
+export type APIClientConstructorConfiguration = Partial<Config> &
+  Partial<Pick<APIClientConfiguration, 'wallClock'>> & {
+    readonly platform: ApiClientPlatform;
+  };
 
 type Apis = {
   account: AccountAPI;
@@ -198,7 +203,7 @@ export class APIClient extends EventEmitter implements Disposable {
 
   public static VERSION = version;
 
-  constructor(config?: APIClientConstructorConfiguration) {
+  constructor(config: APIClientConstructorConfiguration) {
     super();
     this.config = {...defaultConfig, ...config};
     this.accessTokenStore = new AccessTokenStore();
@@ -207,9 +212,10 @@ export class APIClient extends EventEmitter implements Disposable {
     });
     this.logger = LogFactory.getLogger('@wireapp/api-client/Client');
 
-    const httpClient = new HttpClient(this.config, this.accessTokenStore);
+    const httpClient = new HttpClient(this.config, this.accessTokenStore, {cookie: this.config.platform.cookie});
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient, {
       wallClock: this.config.wallClock,
+      platform: this.config.platform.websocket,
     });
 
     const onInvalidCredentials = async (error: InvalidTokenError | MissingCookieError): Promise<void> => {
@@ -240,12 +246,13 @@ export class APIClient extends EventEmitter implements Disposable {
   private configureApis(backendFeatures: BackendFeatures): Apis {
     this.logger.info('configuring APIs with config:', backendFeatures);
 
-    const assetAPI = new AssetAPI(this.transport.http);
+    const assetAPI = new AssetAPI(this.transport.http, this.config.platform.buffer);
 
     // Prevents the CellsAPI from being initialized multiple times
     if (this.cellsApi === null) {
       this.cellsApi = new CellsAPI({
         httpClientConfig: this.config,
+        cookie: this.config.platform.cookie,
         accessTokenStore: this.accessTokenStore,
       });
     }
@@ -253,7 +260,7 @@ export class APIClient extends EventEmitter implements Disposable {
     return {
       account: new AccountAPI(this.transport.http),
       asset: assetAPI,
-      auth: new AuthAPI(this.transport.http),
+      auth: new AuthAPI(this.transport.http, this.config.platform.cookie),
       services: new ServicesAPI(this.transport.http, assetAPI),
       broadcast: new BroadcastAPI(this.transport.http),
       cells: this.cellsApi,

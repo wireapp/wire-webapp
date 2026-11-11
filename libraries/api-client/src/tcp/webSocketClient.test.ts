@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '../shims/node/platform';
+
 import {WebSocketClient} from './webSocketClient';
 import {ReconnectingWebsocketWallClock, WebSocketReconnectContext} from './reconnectingWebsocket';
 import {noop} from 'noop-esm';
@@ -128,9 +130,7 @@ function createWebSocketClient(
   client: WebSocketHttpClient,
   wallClock: ReconnectingWebsocketWallClock,
 ): WebSocketClient {
-  return new WebSocketClient(baseUrl, client, {
-    wallClock,
-  });
+  return new WebSocketClient(baseUrl, client, {platform: nodePlatform.websocket, wallClock});
 }
 
 function createWebSocketClientWithTestWallClock(baseUrl: string, client: WebSocketHttpClient): WebSocketClient {

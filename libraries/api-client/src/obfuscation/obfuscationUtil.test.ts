@@ -21,6 +21,7 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {Cookie as ToughCookie} from 'tough-cookie';
 
 import {ObfuscationUtil} from './obfuscationUtil';
+import {obfuscateCookie} from '../shims/node/obfuscateCookie';
 
 import {AccessTokenData} from '../auth';
 
@@ -52,7 +53,7 @@ describe('ObfuscationUtil', () => {
     if (isNullOrUndefined(cookie)) {
       throw new Error('Expected test cookie to be available');
     }
-    const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie);
+    const obfuscatedCookie = obfuscateCookie(cookie);
     expect(cookie.value).not.toBe(obfuscatedCookie.value);
     expect(obfuscatedCookie.value).toBe(`${cookie.value.slice(0, 20)}...`);
     expect(obfuscatedCookie).not.toBe(cookie);
@@ -71,7 +72,7 @@ describe('ObfuscationUtil', () => {
       },
     });
 
-    const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(originalCookie);
+    const obfuscatedCookie = obfuscateCookie(originalCookie);
 
     expect(obfuscatedCookie).toBeInstanceOf(ToughCookie);
     expect(obfuscatedCookie).not.toBe(originalCookie);
@@ -87,7 +88,7 @@ describe('ObfuscationUtil', () => {
       },
     });
 
-    expect(ObfuscationUtil.obfuscateCookie(originalCookie, false)).toBe(originalCookie);
+    expect(obfuscateCookie(originalCookie, false)).toBe(originalCookie);
   });
 
   it(`doesn't obfuscate a cookie when disabled`, () => {
@@ -95,7 +96,7 @@ describe('ObfuscationUtil', () => {
     if (isNullOrUndefined(cookie)) {
       throw new Error('Expected test cookie to be available');
     }
-    const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie, false);
+    const obfuscatedCookie = obfuscateCookie(cookie, false);
     expect(cookie.value).toBe(obfuscatedCookie.value);
   });
 });

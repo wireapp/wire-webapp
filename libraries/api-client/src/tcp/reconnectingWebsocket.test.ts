@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '../shims/node/platform';
+
 import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
 import {once} from 'events';
 import type {CloseEvent, ErrorEvent} from 'partysocket/ws';
@@ -214,6 +216,7 @@ describe('ReconnectingWebsocket', () => {
     },
   };
   const defaultReconnectingWebsocketTestOptions: ReconnectingWebsocketTestOptions = {
+    platform: nodePlatform.websocket,
     backFromSleepHandler: Maybe.nothing(),
     pingInterval: Maybe.nothing<number>(),
     wallClock: testWallClock,
@@ -1269,6 +1272,7 @@ describe('ReconnectingWebsocket', () => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
       const customInterval = 10000;
       const RWS = createRWS(onReconnect, {
+        platform: nodePlatform.websocket,
         backFromSleepHandler: Maybe.nothing(),
         pingInterval: Maybe.just(customInterval),
         wallClock: testWallClock,
@@ -1514,6 +1518,7 @@ describe('ReconnectingWebsocket', () => {
     it('sends ping automatically at intervals', done => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
       const RWS = createRWS(onReconnect, {
+        platform: nodePlatform.websocket,
         backFromSleepHandler: Maybe.nothing(),
         pingInterval: Maybe.just(200),
         wallClock: testWallClock,
@@ -1536,6 +1541,7 @@ describe('ReconnectingWebsocket', () => {
     it('triggers reconnect after unanswered ping timeout', done => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
       const RWS = createRWS(onReconnect, {
+        platform: nodePlatform.websocket,
         backFromSleepHandler: Maybe.nothing(),
         pingInterval: Maybe.just(100),
         wallClock: testWallClock,

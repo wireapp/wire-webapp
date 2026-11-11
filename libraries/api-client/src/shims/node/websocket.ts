@@ -17,6 +17,12 @@
  *
  */
 
-const WebSocketNode = require('ws');
+import NodeWebSocket from 'ws';
+
+import type {WebSocketConstructor} from '../../platform';
+
+// ws implements the event-listener API used by Partysocket. Its declarations also
+// include Node-only message types, so adapt the constructor at this boundary.
+const WebSocketNode = NodeWebSocket as unknown as WebSocketConstructor;
 
 export {WebSocketNode};

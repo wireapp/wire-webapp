@@ -45,6 +45,7 @@ import {
   ConsumableNotificationSchema,
   ConsumableNotificationSynchronization,
 } from '../notification/consumableNotification';
+import type {WebSocketPlatform} from '../platform';
 
 enum TOPIC {
   ON_ERROR = 'WebSocketClient.TOPIC.ON_ERROR',
@@ -70,6 +71,7 @@ export interface WebSocketClient {
 export type OnConnect = (abortHandler: AbortController, reconnectContext: WebSocketReconnectContext) => void;
 
 export type WebSocketClientOptions = {
+  readonly platform: WebSocketPlatform;
   readonly wallClock: ReconnectingWebsocketWallClock;
 };
 
@@ -100,6 +102,7 @@ export class WebSocketClient extends EventEmitter {
     this.client = client;
     this.wallClock = options.wallClock;
     this.socket = new ReconnectingWebsocket(this.onReconnect, {
+      platform: options.platform,
       backFromSleepHandler: Maybe.nothing(),
       pingInterval: Maybe.nothing(),
       wallClock: options.wallClock,

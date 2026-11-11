@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '../node/platform';
+
 import {AxiosHeaders, AxiosResponse} from 'axios';
 import nock from 'nock';
 
@@ -63,7 +65,9 @@ describe('browser cookies', () => {
     const request = nock(backendUrl, {badheaders: ['Cookie']})
       .post('/access')
       .reply(200, {access_token: 'new-token'});
-    const httpClient = new HttpClient({urls: {name: 'test', rest: backendUrl, ws: ''}}, new AccessTokenStore());
+    const httpClient = new HttpClient({urls: {name: 'test', rest: backendUrl, ws: ''}}, new AccessTokenStore(), {
+      cookie: nodePlatform.cookie,
+    });
 
     const response = await sendRequestWithCookie<{access_token: string}>(httpClient, {
       method: 'post',

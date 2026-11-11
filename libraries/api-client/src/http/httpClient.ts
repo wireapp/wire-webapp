@@ -44,7 +44,7 @@ import {
 import {Config} from '../config';
 import {BackendError, ConnectionState, ContentType, StatusCode, mapBackendError} from '../http/';
 import {ObfuscationUtil} from '../obfuscation';
-import {sendRequestWithCookie} from '../shims/node/cookie';
+import type {CookiePlatform} from '../platform';
 
 const unauthorizedStatusCode = 401;
 const forbiddenStatusCode = 403;
@@ -72,6 +72,7 @@ export type HttpClientDependencies = {
 };
 
 export type HttpClientConfiguration = {
+  readonly cookie: CookiePlatform;
   readonly dependencies?: HttpClientDependencies;
 };
 
@@ -105,7 +106,7 @@ export class HttpClient extends EventEmitter {
   constructor(
     private readonly config: Config,
     public accessTokenStore: AccessTokenStore,
-    httpClientConfiguration: HttpClientConfiguration = {},
+    private readonly httpClientConfiguration: HttpClientConfiguration,
   ) {
     super();
     const {dependencies = {}} = httpClientConfiguration;
@@ -366,7 +367,7 @@ export class HttpClient extends EventEmitter {
         `${expiredAccessToken.token_type} ${decodeURIComponent(expiredAccessToken.access_token)}`,
       );
     }
-    const response = await sendRequestWithCookie<AccessTokenData>(this, config);
+    const response = await this.httpClientConfiguration.cookie.sendRequestWithCookie<AccessTokenData>(this, config);
 
     return response.data;
   }

@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+
 import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 
@@ -70,7 +72,7 @@ describe('SessionHandler', () => {
   let apiClient: APIClient;
 
   beforeEach(() => {
-    apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+    apiClient = new APIClient({platform: nodePlatform, urls: APIClient.BACKEND.STAGING});
     jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockImplementation(generatePrekeys);
   });
 

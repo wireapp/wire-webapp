@@ -18,6 +18,7 @@
  */
 
 import {createClock, type Clock, type IntervalIdentifier, type TimeoutIdentifier} from '@enormora/clock/clock';
+import {browserPlatform} from '@wireapp/api-client/lib/shims/browser/platform';
 import type {ReconnectingWebsocketWallClock} from '@wireapp/api-client/lib/tcp';
 import {singleton} from 'tsyringe';
 
@@ -60,6 +61,7 @@ export class APIClient extends APIClientUnconfigured {
     };
 
     const unconfiguredApiClientConfiguration = {
+      platform: browserPlatform,
       headers: {
         [wireClientHeaderName]: wireClientIdentifier,
         [wireClientVersionHeaderName]: webAppConfiguration.VERSION,

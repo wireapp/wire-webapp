@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+
 import {SUBCONVERSATION_ID, Subconversation} from '@wireapp/api-client/lib/conversation';
 import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -69,7 +71,7 @@ const getSubconversationResponse = ({
 const apiClients: APIClient[] = [];
 
 const buildSubconversationService = async (isFederated = false): Promise<SubconversationServiceTestSetup> => {
-  const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+  const apiClient = new APIClient({platform: nodePlatform, urls: APIClient.BACKEND.STAGING});
   apiClients.push(apiClient);
   apiClient.backendFeatures.isFederated = isFederated;
 

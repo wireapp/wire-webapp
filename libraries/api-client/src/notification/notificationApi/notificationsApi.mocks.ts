@@ -21,6 +21,7 @@ import {NotificationAPI} from './notificationApi';
 
 import {AccessTokenStore} from '../../auth';
 import {HttpClient} from '../../http';
+import {nodePlatform} from '../../shims/node/platform';
 
 const domain = 'https://test.zinfra.io';
 const testConfig = {urls: {rest: domain, ws: '', name: 'test'}};
@@ -78,7 +79,7 @@ const mockedResultData = {
   time: '2022-10-18T08:34:45Z',
 };
 
-const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
+const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {cookie: nodePlatform.cookie});
 
 const notificationAPI = new NotificationAPI(client);
 

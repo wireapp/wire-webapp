@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '../shims/node/platform';
+
 import {AxiosResponse} from 'axios';
 import {
   NodeServiceApi,
@@ -91,6 +93,7 @@ describe('CellsAPI', () => {
     testFile = new File([TEST_FILE_CONTENT], TEST_FILE_NAME, {type: TEST_FILE_TYPE}) as File;
 
     cellsAPI = new CellsAPI({
+      cookie: nodePlatform.cookie,
       accessTokenStore: {} as AccessTokenStore,
       httpClientConfig: {
         urls: {
@@ -112,6 +115,7 @@ describe('CellsAPI', () => {
     (S3Service as jest.Mock).mockClear();
 
     const api = new CellsAPI({
+      cookie: nodePlatform.cookie,
       accessTokenStore: {} as AccessTokenStore,
       httpClientConfig: {
         urls: {
@@ -840,6 +844,7 @@ describe('CellsAPI', () => {
 
     it('rejects calls before initialization without sending a request', async () => {
       const uninitializedAPI = new CellsAPI({
+        cookie: nodePlatform.cookie,
         accessTokenStore: {} as AccessTokenStore,
         httpClientConfig: {} as never,
       });

@@ -34,7 +34,7 @@ import {
   RequestCancelable,
   SyntheticErrorLabel,
 } from '../http/';
-import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
+import type {BufferPlatform} from '../platform';
 import {unsafeAlphanumeric} from '../shims/node/random';
 import {QualifiedId, RequestCancellationError} from '../user';
 
@@ -84,7 +84,10 @@ const assetDownloadRetryConfig = {
 export class AssetAPI {
   private readonly logger: logdown.Logger;
 
-  constructor(private readonly client: HttpClient) {
+  constructor(
+    private readonly client: HttpClient,
+    private readonly buffer: Pick<BufferPlatform, 'base64MD5FromBuffer' | 'concatToBuffer'>,
+  ) {
     this.logger = LogFactory.getLogger('@wireapp/api-client/AssetAPI');
   }
 
@@ -177,7 +180,7 @@ export class AssetAPI {
       `--${BOUNDARY}\r\n` +
       'Content-Type: application/octet-stream\r\n' +
       `Content-length: ${asset.length}\r\n` +
-      `Content-MD5: ${base64MD5FromBuffer(asset.buffer as ArrayBuffer)}\r\n` +
+      `Content-MD5: ${this.buffer.base64MD5FromBuffer(asset.buffer as ArrayBuffer)}\r\n` +
       '\r\n';
 
     const footer = `\r\n--${BOUNDARY}--\r\n`;
@@ -186,7 +189,7 @@ export class AssetAPI {
 
     const config: AxiosRequestConfig = {
       cancelToken: cancelSource.token,
-      data: concatToBuffer(body, asset, footer),
+      data: this.buffer.concatToBuffer(body, asset, footer),
       headers: {
         'Content-Type': `multipart/mixed; boundary=${BOUNDARY}`,
       },

@@ -24,8 +24,7 @@ import {Maybe} from 'true-myth';
 
 import {LogFactory, StringUtil, TimeUtil} from '@wireapp/commons';
 
-import * as buffer from '../shims/node/buffer';
-import {WebSocketNode} from '../shims/node/websocket';
+import type {WebSocketConstructor, WebSocketPlatform} from '../platform';
 import {BackFromSleepDetails, onBackFromSleep} from '../utils/backFromSleepHandler/backFromSleepHandler';
 
 const connectingTimeoutInSeconds = 20;
@@ -87,7 +86,6 @@ type ReconnectingWebsocketWrapper = Pick<
 
 type TimeoutIdentifier = ReturnType<typeof globalThis.setTimeout>;
 type WebSocketEventListener = (event: Event) => void;
-type WebSocketConstructor = new (url: string, protocols?: string | string[]) => WebSocket;
 type WebSocketWithEventListeners = WebSocket & {
   addEventListener: WebSocket['addEventListener'];
   removeEventListener: WebSocket['removeEventListener'];
@@ -102,6 +100,7 @@ export type ReconnectingWebsocketWallClock = {
 };
 
 type ReconnectingWebsocketOptions = {
+  readonly platform: WebSocketPlatform;
   readonly backFromSleepHandler: Maybe<BackFromSleepHandler>;
   readonly pingInterval: Maybe<number>;
   readonly wallClock: ReconnectingWebsocketWallClock;
@@ -184,7 +183,6 @@ export function createPartysocketCompatibleWebSocketConstructor(
 
 export class ReconnectingWebsocket {
   private static readonly RECONNECTING_OPTIONS: Options = {
-    WebSocket: createPartysocketCompatibleWebSocketConstructor(WebSocketNode),
     connectionTimeout: TimeUtil.TimeInMillis.SECOND * connectionTimeoutInSeconds,
     debug: false,
     maxReconnectionDelay: TimeUtil.TimeInMillis.SECOND * maximumReconnectionDelayInSeconds,
@@ -299,7 +297,7 @@ export class ReconnectingWebsocket {
   };
 
   private readonly internalOnMessage = (event: MessageEvent): void => {
-    const data = buffer.bufferToString(event.data);
+    const data = this.options.platform.bufferToString(event.data);
 
     if (data === PingMessage.PONG) {
       this.logger.debug(`[WebSocketLifecycle] event=pong-received ${this.getActiveLifecycleContext()}`);
@@ -688,11 +686,10 @@ export class ReconnectingWebsocket {
         return websocketFactory();
       },
       Nothing: () => {
-        return new PartySocketWebSocket(
-          this.internalOnReconnect,
-          undefined,
-          ReconnectingWebsocket.RECONNECTING_OPTIONS,
-        );
+        return new PartySocketWebSocket(this.internalOnReconnect, undefined, {
+          ...ReconnectingWebsocket.RECONNECTING_OPTIONS,
+          WebSocket: createPartysocketCompatibleWebSocketConstructor(this.options.platform.WebSocket),
+        });
       },
     });
   }

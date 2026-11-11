@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '../shims/node/platform';
+
 import {AssetAPI} from './assetApi';
 import {AssetUploadData} from './assetApi.schema';
 import {AssetRetentionPolicy} from './assetRetentionPolicy';
@@ -40,7 +42,7 @@ describe('AssetAPI', () => {
       sendRequest: mockSendRequest,
     } as unknown as jest.Mocked<HttpClient>;
 
-    assetAPI = new AssetAPI(mockHttpClient);
+    assetAPI = new AssetAPI(mockHttpClient, nodePlatform.buffer);
   });
 
   afterEach(() => {

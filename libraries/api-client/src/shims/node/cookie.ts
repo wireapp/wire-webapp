@@ -23,10 +23,11 @@ import {Cookie as ToughCookie} from 'tough-cookie';
 
 import {LogFactory} from '@wireapp/commons';
 
+import {obfuscateCookie} from './obfuscateCookie';
+
 import {Cookie} from '../../auth/';
 import {CookieStore} from '../../auth/cookieStore';
 import {HttpClient} from '../../http/';
-import {ObfuscationUtil} from '../../obfuscation';
 
 const logger = LogFactory.getLogger('@wireapp/api-client/shims/node/cookie');
 
@@ -43,10 +44,7 @@ export const retrieveCookie = async <T>(response: AxiosResponse<T>): Promise<T> 
     for (const cookie of cookies) {
       const cookieString = getCookieExpiration(cookie.expires);
       CookieStore.setCookie(new Cookie(cookie.value, cookieString));
-      logger.info(
-        `Saved internal cookie. It will expire on "${cookieString}".`,
-        ObfuscationUtil.obfuscateCookie(cookie),
-      );
+      logger.info(`Saved internal cookie. It will expire on "${cookieString}".`, obfuscateCookie(cookie));
     }
   }
 

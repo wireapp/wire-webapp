@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '../../shims/node/platform';
+
 import {AxiosResponse} from 'axios';
 
 import {randomUUID} from 'crypto';
@@ -37,7 +39,7 @@ const mockedAccessTokenStore: Partial<AccessTokenStore> = {
   },
 };
 
-const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
+const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {cookie: nodePlatform.cookie});
 
 jest.spyOn(client, 'sendJSON').mockImplementation(() => {
   return Promise.resolve<AxiosResponse>({

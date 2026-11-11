@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client';
 import {
   Conversation,
@@ -151,7 +153,7 @@ describe('ConversationService', () => {
   });
 
   async function buildConversationService(coreDatabase?: CoreDatabase): Promise<ConversationServiceTestSetup> {
-    const client = new APIClient({urls: APIClient.BACKEND.STAGING});
+    const client = new APIClient({platform: nodePlatform, urls: APIClient.BACKEND.STAGING});
     apiClients.push(client);
     jest.spyOn(client.api.conversation, 'postMlsMessage').mockReturnValue(
       Promise.resolve({
@@ -853,7 +855,7 @@ describe('ConversationService', () => {
     });
 
     it('defers MLS epoch recovery during notification replay and runs recovery after LIVE', async () => {
-      const client = new APIClient({urls: APIClient.BACKEND.STAGING});
+      const client = new APIClient({platform: nodePlatform, urls: APIClient.BACKEND.STAGING});
       apiClients.push(client);
       jest.spyOn(client.api.conversation, 'postMlsMessage').mockResolvedValue({
         events: [],

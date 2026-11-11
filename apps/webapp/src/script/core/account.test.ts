@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+
 import {AuthAPI} from '@wireapp/api-client/lib/auth';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {
@@ -85,7 +87,7 @@ const MOCK_BACKEND = {
 const apiClients: APIClient[] = [];
 
 async function createAccount(): Promise<{account: Account; apiClient: APIClient}> {
-  const apiClient = new APIClient({urls: MOCK_BACKEND});
+  const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
   apiClients.push(apiClient);
   const account = new Account(apiClient);
   await account['initServices']({
@@ -271,7 +273,7 @@ describe('Account', () => {
 
   describe('"login"', () => {
     it('logs in with correct credentials', async () => {
-      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
       apiClients.push(apiClient);
       const account = new Account(apiClient);
 
@@ -287,7 +289,7 @@ describe('Account', () => {
     });
 
     it('does not log in with incorrect credentials', async () => {
-      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
       apiClients.push(apiClient);
       const account = new Account(apiClient);
       let backendError;

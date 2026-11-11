@@ -48,6 +48,7 @@ import {S3Service} from './cellsStorage/s3Service';
 
 import {AccessTokenStore} from '../auth';
 import {HttpClient} from '../http';
+import type {CookiePlatform} from '../platform';
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -123,19 +124,23 @@ export class CellsAPI {
   private readonly logger: logdown.Logger;
   private accessTokenStore: AccessTokenStore;
   private httpClientConfig: HttpClient['config'];
+  private readonly cookie: CookiePlatform;
   private storageService: CellsStorage | null;
   private client: NodeServiceApi | null;
 
   constructor({
     accessTokenStore,
     httpClientConfig,
+    cookie,
   }: {
     accessTokenStore: AccessTokenStore;
     httpClientConfig: HttpClient['config'];
+    readonly cookie: CookiePlatform;
   }) {
     this.logger = LogFactory.getLogger('@wireapp/api-client/CellsAPI');
     this.accessTokenStore = accessTokenStore;
     this.httpClientConfig = httpClientConfig;
+    this.cookie = cookie;
     this.storageService = null;
     this.client = null;
   }
@@ -175,10 +180,11 @@ export class CellsAPI {
           headers: {...baseHttpClientConfig.headers, Authorization: `Bearer ${cellsConfig.pydio.apiKey}`},
         },
         this.accessTokenStore,
+        {cookie: this.cookie},
       );
     }
 
-    const http = new HttpClient(baseHttpClientConfig, this.accessTokenStore);
+    const http = new HttpClient(baseHttpClientConfig, this.accessTokenStore, {cookie: this.cookie});
 
     // Add axios interceptor to automatically add Authorization header to every request
     // Althouht the HttpClient handles the authorization already (see _sendRequest), as we pass a custom axios instance to the NodeServiceApi, we need to add it manually

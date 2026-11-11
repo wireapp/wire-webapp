@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '../shims/node/platform';
+
 import assert from 'assert';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import nock from 'nock';
@@ -90,7 +92,9 @@ describe('HttpClient', () => {
 
       nock(testConfig.urls.rest).get(AuthAPI.URL.ACCESS).reply(StatusCode.OK, mockedAccessTokenStore.accessTokenData);
 
-      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        cookie: nodePlatform.cookie,
+      });
       client.refreshAccessToken = () => {
         const accessTokenData = mockedAccessTokenStore.accessTokenData;
         if (isNullOrUndefined(accessTokenData)) {
@@ -110,7 +114,9 @@ describe('HttpClient', () => {
         message: 'Invalid token',
       });
 
-      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        cookie: nodePlatform.cookie,
+      });
       client.refreshAccessToken = () => {
         return Promise.reject(new Error('Should not refresh access token'));
       };
@@ -134,7 +140,9 @@ describe('HttpClient', () => {
       message: 'Missing cookie',
     });
 
-    const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
+    const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+      cookie: nodePlatform.cookie,
+    });
 
     client.refreshAccessToken = () => {
       return Promise.reject(new Error('Should not refresh access token'));
@@ -157,7 +165,9 @@ describe('HttpClient', () => {
         [Date.now() + 100_000, true],
       ] as const
     ).forEach(([expirationDate, expected]) => {
-      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        cookie: nodePlatform.cookie,
+      });
 
       it(`returns the validation state (${JSON.stringify(expirationDate)})`, () => {
         mockedAccessTokenStore.tokenExpirationDate = expirationDate;
@@ -181,6 +191,7 @@ describe('HttpClient', () => {
       async ({retryableStatusCode}) => {
         const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
         const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+          cookie: nodePlatform.cookie,
           dependencies: httpClientDependenciesForTest,
         });
         const response = createAxiosResponseForTest({ok: true});
@@ -201,6 +212,7 @@ describe('HttpClient', () => {
     it('skips incremental retry backoff when the request opts out', async () => {
       const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        cookie: nodePlatform.cookie,
         dependencies: httpClientDependenciesForTest,
       });
       const tooManyRequestsError = createRetryableBackendError(StatusCode.TOO_MANY_REQUESTS);
@@ -224,6 +236,7 @@ describe('HttpClient', () => {
     it('retries 500 backend errors with incremental retry backoff', async () => {
       const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        cookie: nodePlatform.cookie,
         dependencies: httpClientDependenciesForTest,
       });
       const response = createAxiosResponseForTest({ok: true});
@@ -243,6 +256,7 @@ describe('HttpClient', () => {
     it('does not retry 503 Service Unavailable backend errors', async () => {
       const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        cookie: nodePlatform.cookie,
         dependencies: httpClientDependenciesForTest,
       });
       const serviceUnavailableError = new BackendError(
@@ -261,6 +275,7 @@ describe('HttpClient', () => {
     it('does not retry non-retryable backend errors with incremental retry backoff', async () => {
       const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        cookie: nodePlatform.cookie,
         dependencies: httpClientDependenciesForTest,
       });
       const nonRetryableBackendError = new BackendError('Bad request', undefined, StatusCode.BAD_REQUEST);
@@ -275,6 +290,7 @@ describe('HttpClient', () => {
     it('restarts with the initial retry delay after the retry backoff is reset', async () => {
       const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        cookie: nodePlatform.cookie,
         dependencies: httpClientDependenciesForTest,
       });
       const response = createAxiosResponseForTest({ok: true});
@@ -315,6 +331,7 @@ describe('HttpClient', () => {
         return 1 as unknown as ReturnType<typeof globalThis.setTimeout>;
       });
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        cookie: nodePlatform.cookie,
         dependencies: {
           clearTimeout,
           setTimeout,
@@ -360,6 +377,7 @@ describe('HttpClient', () => {
         return 1 as unknown as ReturnType<typeof globalThis.setTimeout>;
       });
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        cookie: nodePlatform.cookie,
         dependencies: {
           clearTimeout,
           setTimeout,

@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from './platform';
+
 import {AxiosHeaders, AxiosResponse} from 'axios';
 import nock from 'nock';
 
@@ -55,7 +57,9 @@ describe('sendRequestWithCookie', () => {
     })
       .post('/access')
       .reply(200, {access_token: 'new-token'});
-    const httpClient = new HttpClient({urls: {name: 'test', rest: backendUrl, ws: ''}}, new AccessTokenStore());
+    const httpClient = new HttpClient({urls: {name: 'test', rest: backendUrl, ws: ''}}, new AccessTokenStore(), {
+      cookie: nodePlatform.cookie,
+    });
 
     const response = await sendRequestWithCookie<{access_token: string}>(httpClient, {
       headers: {'Wire-Client': 'test-client'},
@@ -76,7 +80,9 @@ describe('sendRequestWithCookie', () => {
       const request = nock(backendUrl, {badheaders: ['Cookie']})
         .post('/access')
         .reply(200, {access_token: 'new-token'});
-      const httpClient = new HttpClient({urls: {name: 'test', rest: backendUrl, ws: ''}}, new AccessTokenStore());
+      const httpClient = new HttpClient({urls: {name: 'test', rest: backendUrl, ws: ''}}, new AccessTokenStore(), {
+        cookie: nodePlatform.cookie,
+      });
 
       const response = await sendRequestWithCookie<{access_token: string}>(httpClient, {
         method: 'post',

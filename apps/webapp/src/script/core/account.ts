@@ -42,6 +42,7 @@ import {
   ConsumableNotificationEvent,
   ConsumableNotificationSynchronization,
 } from '@wireapp/api-client/lib/notification/consumableNotification';
+import {browserPlatform} from '@wireapp/api-client/lib/shims/browser/platform';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
 import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
@@ -226,7 +227,7 @@ export class Account extends TypedEventEmitter<Events> {
    * @param accountOptions
    */
   constructor(
-    apiClient: APIClient = new APIClient(),
+    apiClient: APIClient = new APIClient({platform: browserPlatform}),
     private readonly options: AccountOptions = {
       nbPrekeys: 100,
       coreCryptoConfig: {wasmFilePath: '', enabled: false},

@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+
 import {ClientType, MLSPublicKeyAlgorithmKeys, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {
   MLSGroupOutOfSyncError,
@@ -166,7 +168,7 @@ const createKeyPackageRef = ({
 };
 
 const createMLSService = async (): Promise<MLSServiceTestSetup> => {
-  const apiClient = new APIClient();
+  const apiClient = new APIClient({platform: nodePlatform});
   apiClients.push(apiClient);
   const basicCredentialRef = createCredentialRef(CredentialType.Basic);
   const transactionContext = {

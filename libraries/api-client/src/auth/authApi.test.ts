@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '../shims/node/platform';
+
 import {AxiosHeaders} from 'axios';
 
 import {APIClient} from '../apiClient';
@@ -25,7 +27,7 @@ import {StatusCode} from '../http';
 
 describe('AuthAPI', () => {
   it('sets the client to permanent', async () => {
-    using apiClient = new APIClient();
+    using apiClient = new APIClient({platform: nodePlatform});
 
     const data = {
       clientType: ClientType.PERMANENT,
@@ -60,7 +62,7 @@ describe('AuthAPI', () => {
   });
 
   it('sets the client to temporary', async () => {
-    using apiClient = new APIClient();
+    using apiClient = new APIClient({platform: nodePlatform});
 
     const data = {
       clientType: ClientType.TEMPORARY,

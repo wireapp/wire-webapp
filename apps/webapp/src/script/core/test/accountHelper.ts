@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+
 import type {Account as AccountType} from '../account';
 
 const {ClientType} = require('@wireapp/api-client/lib/client');
@@ -35,7 +37,7 @@ module.exports = {
     };
     const backend = APIClient.BACKEND.STAGING;
     const engine = await StoreHelper.createMemoryEngine(email);
-    const apiClient = new APIClient({store: engine, urls: backend});
+    const apiClient = new APIClient({platform: nodePlatform, store: engine, urls: backend});
     const account = new Account(apiClient);
     await account.login(login);
     await account.listen();

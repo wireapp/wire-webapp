@@ -25,11 +25,14 @@ import {RegisterData} from './registerData';
 import {AccessTokenData, LoginData} from '../auth/';
 import {ClientType} from '../client/';
 import {HttpClient} from '../http/';
-import {retrieveCookie, sendRequestWithCookie} from '../shims/node/cookie';
+import type {CookiePlatform} from '../platform';
 import {User} from '../user/';
 
 export class AuthAPI {
-  constructor(private readonly client: HttpClient) {}
+  constructor(
+    private readonly client: HttpClient,
+    private readonly cookie: CookiePlatform,
+  ) {}
 
   public static readonly URL = {
     ACCESS: '/access',
@@ -94,7 +97,7 @@ export class AuthAPI {
     };
 
     const response = await this.client.sendJSON<AccessTokenData>(config);
-    return retrieveCookie(response);
+    return this.cookie.retrieveCookie(response);
   }
 
   public async postLogout(): Promise<void> {
@@ -104,7 +107,7 @@ export class AuthAPI {
       withCredentials: true,
     };
 
-    await sendRequestWithCookie(this.client, config);
+    await this.cookie.sendRequestWithCookie(this.client, config);
   }
 
   public async postRegister(userAccount: RegisterData): Promise<User> {
@@ -116,7 +119,7 @@ export class AuthAPI {
     };
 
     const response = await this.client.sendJSON<User>(config);
-    return retrieveCookie(response);
+    return this.cookie.retrieveCookie(response);
   }
 
   public async putEmail(emailData: {email: string}): Promise<void> {

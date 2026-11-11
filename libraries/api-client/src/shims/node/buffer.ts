@@ -27,10 +27,10 @@ export const base64MD5FromBuffer = (buffer: ArrayBuffer): string => {
   return createHash('md5').update(Buffer.from(buffer)).digest('base64');
 };
 
-export const concatToBuffer = (...items: any[]): Buffer<ArrayBuffer> => {
+export function concatToBuffer(...items: readonly (string | Uint8Array)[]): Buffer<ArrayBuffer> {
   return Buffer.concat(
     items.map(item => {
       return Buffer.from(item);
     }),
   );
-};
+}

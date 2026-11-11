@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+
 import {
   MessageSendingStatus,
   OTRRecipients,
@@ -95,7 +97,7 @@ const apiClients: APIClient[] = [];
 const buildMessageService = async (): Promise<
   readonly [MessageService, {readonly apiClient: APIClient; readonly proteusService: ProteusService}]
 > => {
-  const apiClient = new APIClient();
+  const apiClient = new APIClient({platform: nodePlatform});
   apiClients.push(apiClient);
   const [proteusService] = await buildProteusService();
   const messageService = new MessageService(apiClient, proteusService);

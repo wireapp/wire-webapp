@@ -17,6 +17,8 @@
  *
  */
 
+import {nodePlatform} from './shims/node/platform';
+
 import {AccentColor} from '@wireapp/commons/lib';
 import nock from 'nock';
 
@@ -92,7 +94,7 @@ describe('APIClient', () => {
     });
 
     function createCookieRefreshClient(): APIClient {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       jest.spyOn(client.transport.ws, 'connect').mockReturnValue(client.transport.ws);
 
@@ -208,7 +210,7 @@ describe('APIClient', () => {
       const onCookieRefresh = jest.fn();
 
       {
-        using client = new APIClient(testConfig);
+        using client = new APIClient({...testConfig, platform: nodePlatform});
         client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
         CookieStore.setCookie(refreshedCookie);
         expect(onCookieRefresh.mock.calls).toEqual([[refreshedCookie]]);
@@ -226,7 +228,7 @@ describe('APIClient', () => {
       const scopeFailure = new Error('Resource scope failed');
 
       expect(() => {
-        using client = new APIClient(testConfig);
+        using client = new APIClient({...testConfig, platform: nodePlatform});
         client.on(APIClient.TOPIC.COOKIE_REFRESH, onCookieRefresh);
 
         throw scopeFailure;
@@ -305,26 +307,26 @@ describe('APIClient', () => {
 
   describe('constructor', () => {
     it('constructs a client with production backend and StoreEngine by default', () => {
-      using client = new APIClient(testConfig);
+      using client = new APIClient({...testConfig, platform: nodePlatform});
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs StoreEngine when only the URLs is provided', () => {
-      using client = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
+      using client = new APIClient({platform: nodePlatform, urls: APIClient.BACKEND.PRODUCTION});
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs URLs when only the StoreEngine is provided', () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs an http client with incremental retry backoff support', () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
 
       apiClients.push(client);
 
@@ -337,7 +339,7 @@ describe('APIClient', () => {
       nock(baseUrl)
         .get('/api-version')
         .reply(200, {supported: [MINIMUM_API_VERSION, MINIMUM_API_VERSION + 1]});
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       let errorMessage;
       try {
@@ -351,7 +353,7 @@ describe('APIClient', () => {
 
     it("throws error if backend doesn't support /api-version endpoint", async () => {
       nock(baseUrl).get('/api-version').reply(404);
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       let errorMessage;
       try {
@@ -364,7 +366,7 @@ describe('APIClient', () => {
     });
 
     it('uses highest common version', async () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       jest
         .spyOn(client.transport.http, 'sendRequest')
@@ -379,7 +381,7 @@ describe('APIClient', () => {
     });
 
     it('uses dev version if available and requested', async () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       jest.spyOn(client.transport.http, 'sendRequest').mockReturnValue({
         data: {supported: [MINIMUM_API_VERSION, MINIMUM_API_VERSION + 1], development: [MINIMUM_API_VERSION + 2]},
@@ -395,7 +397,7 @@ describe('APIClient', () => {
     });
 
     it('ignores dev version if not requested', async () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       jest.spyOn(client.transport.http, 'sendRequest').mockReturnValue({
         data: {supported: [MINIMUM_API_VERSION, MINIMUM_API_VERSION + 1], development: [MINIMUM_API_VERSION + 2]},
@@ -411,7 +413,7 @@ describe('APIClient', () => {
     });
 
     it('ignores dev version if not listed in the supported versions', async () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       jest.spyOn(client.transport.http, 'sendRequest').mockReturnValue({
         data: {supported: [MINIMUM_API_VERSION, MINIMUM_API_VERSION + 1], development: [MINIMUM_API_VERSION + 2]},
@@ -427,7 +429,7 @@ describe('APIClient', () => {
     });
 
     it('returns the backend federation state', async () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       jest
         .spyOn(client.transport.http, 'sendRequest')
@@ -511,7 +513,7 @@ describe('APIClient', () => {
     });
 
     it('creates a context from a successful login', async () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       const context = await client.login(loginData);
       expect(context.userId).toBe(accessTokenData.user);
@@ -519,7 +521,7 @@ describe('APIClient', () => {
     });
 
     it('can login after a logout', async () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       await client.login(loginData);
       return client.logout();
@@ -538,7 +540,7 @@ describe('APIClient', () => {
 
       nock(baseUrl).post(AuthAPI.URL.ACCESS).reply(StatusCode.OK, accessTokenData);
 
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       const context = await client.login(loginData);
       expect(context.userId).toBe(accessTokenData.user);
@@ -556,7 +558,7 @@ describe('APIClient', () => {
     });
 
     it('can logout a user', async () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
 
       client.context = await client['createContext']('3721e5d3-558d-45ac-b476-b4a64a8f74c1', ClientType.TEMPORARY);
@@ -565,7 +567,7 @@ describe('APIClient', () => {
     });
 
     it('ignores errors', async () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
       const testError = new Error('Test rejection');
 
@@ -578,7 +580,7 @@ describe('APIClient', () => {
     });
 
     it('skips request when told to', async () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
 
       jest.spyOn(client.api.auth, 'postLogout');
@@ -608,7 +610,7 @@ describe('APIClient', () => {
     });
 
     it('automatically gets an access token after registration', async () => {
-      const client = new APIClient(testConfig);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
       apiClients.push(client);
 
       const context = await client.register(registerData);
