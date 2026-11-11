@@ -1,58 +1,14 @@
-# @wireapp/config
+# Application configuration
 
-Shared configuration library for Wire webapp and server.
+`client.config.ts`, `env.ts`, and `config.types.ts` define the browser-safe client configuration. `buildMetadata.ts` owns the shared metadata contract, parsing, validation, and version resolution. Browser and tooling consumers import these files directly.
 
-## Overview
+`server.config.ts` contains Node.js filesystem and logging dependencies. The server compiles all configuration modules with its own sources into `configuration/` beside `index.js`; deployment needs no internal package. Keep browser imports pointed at the individual browser-safe files.
 
-This library contains environment variable type definitions and configuration generators used by both the webapp and server applications. It provides:
-
-- `Env` type - Type definition for all environment variables
-- `ClientConfig` type - Configuration object passed to the webapp client
-- `ServerConfig` type - Configuration object used by the Node.js server
-- `generateClientConfig()` - Function to generate client config from environment variables
-- `generateServerConfig()` - Function to generate server config from environment variables
-
-## Installation
-
-This package is part of the npm workspace. Depend on its current semver range so npm links the local package:
-
-```json
-{
-  "dependencies": {
-    "@wireapp/config": "^1.0.0"
-  }
-}
-```
-
-## Usage
-
-### Importing Types
-
-```typescript
-import type {Env, ClientConfig, ServerConfig} from '@wireapp/config';
-```
-
-### Generating Configuration
-
-```typescript
-import {generateClientConfig, generateServerConfig} from '@wireapp/config';
-
-// Generate client configuration
-const clientConfig = generateClientConfig(
-  {version: '1.0.0', env: 'production', urls: {...}},
-  env
-);
-
-// Generate server configuration
-const serverConfig = generateServerConfig(
-  {version: '1.0.0', env: 'production', urls: {...}},
-  env
-);
-```
+The server generator retains its adjacent `robots/` lookup and disallow fallback. Server-root robots assets do not override that fallback. Certificate resolution retains working-directory precedence: `certificate/` first, then `apps/server/dist/certificate/`, with explicit environment paths taking precedence.
 
 ## Environment Variables
 
-The `Env` type defines all supported environment variables. This section documents environment variables **currently used by this library's config generators** (`src/client.config.ts` and `src/server.config.ts`), including effective default values and purpose.
+The `Env` type defines all supported environment variables. This section documents environment variables **currently used by the configuration generators** (`client.config.ts` and `server.config.ts`), including effective default values and purpose.
 
 ### Configuration sources and priority
 
@@ -98,7 +54,7 @@ If `FEDERATION` is not set, `APP_BASE`, `BACKEND_REST`, and `BACKEND_WS` must re
 
 Notes:
 
-- Defaults below are based on generator behavior in `src/client.config.ts` and `src/server.config.ts`.
+- Defaults below are based on generator behavior in `client.config.ts` and `server.config.ts`.
 - Where an environment variable is read directly without fallback logic, the value is expected to come from deployment env files (for example `.env.defaults`/`.env`).
 - `From .env.defaults` means the value is expected from environment files and is present in repository defaults.
 - `No default in .env.defaults` means the value must be provided per deployment/environment.
@@ -273,27 +229,3 @@ Notes:
 | `URL_SUPPORT_CHANGE_EMAIL_ADDRESS` | From `.env.defaults` | Change email support URL | N/A |
 | `URL_SUPPORT_DELETE_PERSONAL_ACCOUNT` | From `.env.defaults` | Delete personal account support URL | N/A |
 | `URL_SUPPORT_REMOVE_TEAM_MEMBER` | From `.env.defaults` | Remove team member support URL | N/A |
-
-## Development
-
-### Build
-
-```bash
-npx tsc --project libraries/config/tsconfig.json
-```
-
-### Type Check
-
-```bash
-npx just type-check
-```
-
-### Lint
-
-```bash
-npx just eslint
-```
-
-## License
-
-GPL-3.0

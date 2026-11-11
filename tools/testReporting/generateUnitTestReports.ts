@@ -33,7 +33,7 @@ export type TestableProject = {
   readonly jestConfigFile: string;
   readonly name: string;
   readonly root: string;
-  readonly type: 'app' | 'lib' | 'tool';
+  readonly type: 'app' | 'tool';
 };
 
 export type JestTestCommand = {
@@ -172,8 +172,6 @@ export function findTestableProjects(jestConfigOutput: string, workspaceRoot: st
 
     if (projectRoot.startsWith('apps/')) {
       projectType = 'app';
-    } else if (projectRoot.startsWith('libraries/')) {
-      projectType = 'lib';
     } else {
       projectType = 'tool';
     }

@@ -31,7 +31,6 @@
     "@tanstack/react-virtual": "3.14.26",
     "@wireapp/avs": "10.5.19",
     "@wireapp/avs-debugger": "0.0.7",
-    "@wireapp/config": "1.0.0",
     "@wireapp/core-crypto": "11.0.0",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/kalium-backup": "0.0.4",

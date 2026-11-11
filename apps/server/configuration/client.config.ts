@@ -17,8 +17,8 @@
  *
  */
 
-import {ConfigGeneratorParams} from './config.types';
-import {Env} from './env';
+import type {ConfigGeneratorParams} from './config.types';
+import type {Env} from './env';
 
 // The configuration contract is intentionally inferred and exposed through ReturnType<typeof generateConfig>.
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type

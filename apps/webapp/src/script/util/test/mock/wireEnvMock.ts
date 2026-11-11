@@ -17,7 +17,7 @@
  *
  */
 
-import type {ClientConfig} from '@wireapp/config';
+import type {ClientConfig} from '../../../../../../server/configuration/client.config';
 
 import {WireModule} from '../../../../types/Wire.types';
 

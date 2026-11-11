@@ -26,7 +26,12 @@ import {mkdirSync, writeFileSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import {createBuildMetadata, isBuildMetadataInput, type BuildMetadataInput, resolveBuildVersion} from '@wireapp/config';
+import {
+  createBuildMetadata,
+  isBuildMetadataInput,
+  type BuildMetadataInput,
+  resolveBuildVersion,
+} from '../configuration/buildMetadata.ts';
 
 const DEFAULT_METADATA_FILE_PATH = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../dist/version.json');
 const JSON_INDENTATION_SPACES = 2;

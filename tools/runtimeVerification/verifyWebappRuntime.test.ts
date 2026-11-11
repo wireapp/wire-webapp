@@ -18,7 +18,7 @@
  */
 
 import {validateBuildMetadataResponse, validateRuntimeResponses} from './validateRuntimeResponses';
-import type {BuildMetadata} from '@wireapp/config';
+import type {BuildMetadata} from '../../apps/server/configuration/buildMetadata.ts';
 
 const mainBuildMetadata: BuildMetadata = {
   version: 'main-bdb93c9',

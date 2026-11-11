@@ -23,9 +23,9 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 - `apps/webapp/`: React client (Rspack internal, public production, and development), plus E2E tests and i18n files
 - `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
-- `libraries/config/`: `@wireapp/config` package - centralized environment configuration management with type-safe configuration loading and validation
+- `apps/server/configuration/`: configuration generators, environment contracts, and browser-safe build metadata functions
 - `apps/webapp/src/script/core/`: communication core handling authentication, WebSocket connections, protocol messaging, and shared storage engines
-- Root-level tooling (`justfile`, npm workspaces, and `tools/`) provides commands shared by apps and libraries
+- Root-level tooling (`justfile`, npm workspaces, and `tools/`) provides commands for both applications
 
 Use `npx just --list` to discover repository tasks, including builds, development, type checks, unit tests, linting, E2E, and translation management.
 
@@ -55,10 +55,8 @@ Prerequisites:
 1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
    - `127.0.0.1 local.zinfra.io` (to connect with the staging backend)
    - `127.0.0.1 local.imai.wire.link` (to connect with the imai backend)
-1. Run `npx just develop`; Just builds the workspace libraries and server output, then starts the Express server, its TypeScript watcher, and watchers for the WebApp's upstream libraries. Rspack compiles the WebApp in memory and serves it at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
+1. Run `npx just develop`; Just builds the server output, then starts the Express server and its TypeScript watcher. Rspack compiles the WebApp in memory and serves it at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
 1. Server TypeScript changes are recompiled with `tsc --watch`; `node --watch` restarts the compiled Express server when its output changes. `concurrently` stops sibling processes if any watcher exits.
-1. `npx just develop-watch` is an alternative to `npx just develop`: it starts the server with libraries you select interactively. Choose one development command; do not run `develop-watch` alongside `develop`.
-1. To watch the remaining config library without the server, run `npx just watch-library config`. Commons sources are part of the WebApp and are watched by Rspack.
 1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
    `FEATURE_CHECK_CONSENT="false"` to the env file
 
@@ -74,7 +72,7 @@ If you would like your browser to trust the certificate from "local.wire.com"/"l
 
 The application can be configured to connect to different environments by modifying the following environment variables in your `.env` file:
 
-For the full environment variable reference, see [Environment Variables](https://github.com/wireapp/wire-webapp/blob/main/libraries/config/README.md#environment-variables).
+For the full environment variable reference, see [Environment Variables](https://github.com/wireapp/wire-webapp/blob/main/apps/server/configuration/README.md#environment-variables).
 
 **Staging:**
 
@@ -111,19 +109,21 @@ Build a one-shot development-mode WebApp bundle with `npx just build-webapp-deve
 Rspack is the sole application bundler for internal and public production builds and local development. Jest continues to use Babel.
 
 1. Build only the internal Rspack WebApp assets: `npx just build-webapp-internal`
-1. Compile the production server and copy its runtime assets: `npx just build-server` (writes to `apps/server/build/server` after building workspace libraries)
+1. Compile the production server and copy its runtime assets: `npx just build-server` (writes to `apps/server/build/server`)
 1. Build and package the default internal Rspack release: `npx just package-server-internal`
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
 1. Build and package the default public Rspack release: `npx just package-server-public`
 1. Start the server output from `apps/server/dist` (or build a Docker image with `npx just docker <tag>`)
 
-`npx just build-server` compiles with the server TypeScript project and copies the server runtime assets, including the telemetry embed and compiled local workspace dependencies. It does not remove an existing `apps/server/build/server` directory.
+`npx just build-server` clears `apps/server/build/server`, compiles the server and configuration together, and copies the server runtime assets, including the telemetry embed.
 
 Telemetry's TypeScript implementation lives in `apps/webapp/src/script/telemetry`. The server copies the unmodified `countly-sdk-web/lib/countly.min.js` build dependency directly to `libs/wire/telemetry/embed.js`. Both HTML templates load this standalone SDK before the application bundles; telemetry initializes only when explicitly requested by the application.
 
 **Note:** The `zip` command has been deprecated. Packaging is integrated into the build process via `npx just package-server-internal`.
 
 ## Testing
+
+Configuration tests live alongside the generators and metadata functions in `apps/server/configuration/` and run with the server Jest project. Run `npx just test --selectProjects server` to check them. After packaging, `npx just verify-server-package` installs only server production dependencies in a temporary fixture, starts the extracted ZIP, and checks `/version` and `/config.js`.
 
 Run all unit tests:
 

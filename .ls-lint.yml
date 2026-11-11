@@ -17,7 +17,7 @@ ls:
     .js: camelCase
     .test.ts: camelCase
     .sh: camelCase
-  libraries/config/src:
+  apps/server/configuration:
     .dir: camelCase
     .ts: camelCase
     .spec.ts: camelCase

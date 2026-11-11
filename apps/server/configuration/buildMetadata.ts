@@ -106,7 +106,9 @@ export function resolveAssetVersion(version: string, commitSha: string): string 
 }
 
 export function getShortCommitSha(commitSha: string): string {
-  return commitSha.slice(0, shortCommitShaLength) || 'unknown';
+  const shortCommitSha = commitSha.slice(0, shortCommitShaLength);
+
+  return shortCommitSha.length > 0 ? shortCommitSha : 'unknown';
 }
 
 export function resolveBuildVersion(explicitVersion: Maybe<string>, commitSha: string): string {

@@ -87,7 +87,6 @@ jobs:
           cache: 'npm'
 
       - run: npm clean-install && npx just setup
-      - run: npx just build-libraries
 
       - name: Install unzip for 1Password CLI setup
         run: |
@@ -126,7 +125,6 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm clean-install && npx just setup
-      - run: npx just build-libraries
 
       - name: Compute shards
         id: computeShards
@@ -182,9 +180,6 @@ jobs:
 
       - name: Install dependencies
         run: npm clean-install && npx just setup
-
-      - name: Build Playwright library dependencies
-        run: npx just build-libraries
 
       - name: Install 1Password CLI
         run: |

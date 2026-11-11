@@ -17,7 +17,7 @@
  *
  */
 
-import type {BuildMetadata} from '@wireapp/config';
+import type {BuildMetadata} from '../../apps/server/configuration/buildMetadata.ts';
 
 export function formatBuildArtifactMetadataOutputs(metadata: BuildMetadata): string {
   return [

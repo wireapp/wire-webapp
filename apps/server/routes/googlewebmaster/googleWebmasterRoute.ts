@@ -19,7 +19,7 @@
 
 import {Router} from 'express';
 
-import type {ServerConfig} from '@wireapp/config';
+import type {ServerConfig} from '../../configuration/server.config';
 
 export const GoogleWebmasterRoute = (config: ServerConfig): Router => {
   if (Boolean(config.GOOGLE_WEBMASTER_ID)) {

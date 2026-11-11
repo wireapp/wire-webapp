@@ -21,14 +21,6 @@
       "rangeStrategy": "pin"
     },
     {
-      "description": "Keep library @types/node dependencies on Node 22 typings",
-      "matchManagers": ["npm"],
-      "matchFileNames": ["libraries/**/package.json"],
-      "matchPackageNames": ["@types/node"],
-      "matchCurrentVersion": ">=22 <23",
-      "allowedVersions": ">=22 <23"
-    },
-    {
       "matchUpdateTypes": ["major"],
       "dependencyDashboardApproval": true
     },

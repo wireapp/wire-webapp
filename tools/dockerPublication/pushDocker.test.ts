@@ -303,7 +303,7 @@ describe('pushDocker metadata', () => {
 
     assert.match(dockerfileContents, /COPY package\.json package-lock\.json \.npmrc \.\//);
     assert.match(dockerfileContents, /COPY apps\/server\/package\.json \.\/apps\/server\/package\.json/);
-    assert.match(dockerfileContents, /COPY libraries\/config\/package\.json \.\/libraries\/config\/package\.json/);
+    assert.doesNotMatch(dockerfileContents, /libraries\//);
     assert.match(
       dockerfileContents,
       /RUN npm clean-install --omit=dev --workspace=@wireapp\/server --include-workspace-root=false --ignore-scripts/,

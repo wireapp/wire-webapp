@@ -5,6 +5,7 @@
     "moduleResolution": "nodenext",
     "types": ["node"],
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "incremental": true,
     "tsBuildInfoFile": "../../../target/buildcache/server-bin-type-check.tsbuildinfo"
   },

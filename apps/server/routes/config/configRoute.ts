@@ -19,8 +19,8 @@
 
 import {Router} from 'express';
 
-import type {ClientConfig, ServerConfig} from '@wireapp/config';
-
+import type {ClientConfig} from '../../configuration/client.config';
+import type {ServerConfig} from '../../configuration/server.config';
 import {setNonCacheHeaders} from '../../http/setNonCacheHeaders';
 import {replaceHostname} from '../../util/hostnameReplacer';
 

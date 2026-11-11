@@ -20,9 +20,8 @@
 import {isNonEmptyString, isPlainObject} from '@sindresorhus/is';
 import {Result} from 'true-myth';
 
-import {isBuildMetadata} from '@wireapp/config';
-import type {BuildMetadata} from '@wireapp/config';
-
+import {isBuildMetadata} from '../../apps/server/configuration/buildMetadata.ts';
+import type {BuildMetadata} from '../../apps/server/configuration/buildMetadata.ts';
 import {isLegacyTimestampBuildVersion} from '../buildArtifact/legacyBuildMetadata.ts';
 import {parseWebAppProductionRelease} from '../releaseMetadata/webappProductionRelease.ts';
 

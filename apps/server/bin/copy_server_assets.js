@@ -22,13 +22,11 @@
 const fs = require('fs-extra');
 const path = require('path');
 const {copyTelemetryAsset} = require('../../../tools/serverPackaging/telemetryAssets.ts');
-const {findLocalWorkspaceDependencyPackages} = require('../../../tools/serverPackaging/workspaceDependencies.ts');
 
 const srcFolder = '../';
 const serverOutputDirectory = path.resolve(
   process.env.WIRE_WEBAPP_SERVER_OUTPUT_PATH ?? path.resolve(__dirname, '../dist'),
 );
-const librariesDirectory = path.resolve(__dirname, '../../../libraries');
 
 const assetFolders = ['.ebextensions/', 'robots/', 'templates/', 'certificate'];
 
@@ -37,61 +35,3 @@ assetFolders.forEach(assetFolder => {
 });
 
 copyTelemetryAsset(serverOutputDirectory);
-
-// Bundle all local workspace dependencies for deployment.
-const serverPackageJson = require('../package.json');
-const workspacePackages = fs
-  .readdirSync(librariesDirectory, {withFileTypes: true})
-  .filter(libraryDirectory => {
-    return libraryDirectory.isDirectory();
-  })
-  .map(libraryDirectory => {
-    return path.join(librariesDirectory, libraryDirectory.name);
-  })
-  .flatMap(workspacePackageDirectory => {
-    const packageManifestPath = path.join(workspacePackageDirectory, 'package.json');
-
-    if (!fs.existsSync(packageManifestPath)) {
-      return [];
-    }
-
-    return [
-      {
-        directoryPath: workspacePackageDirectory,
-        manifest: fs.readJsonSync(packageManifestPath),
-      },
-    ];
-  });
-const workspaceDependencyPackages = findLocalWorkspaceDependencyPackages({
-  dependencies: serverPackageJson.dependencies || {},
-  workspacePackages,
-});
-
-console.log(
-  'Bundling workspace dependencies:',
-  workspaceDependencyPackages.map(workspacePackage => workspacePackage.manifest.name).join(', '),
-);
-
-workspaceDependencyPackages.forEach(workspacePackage => {
-  const dependencyName = workspacePackage.manifest.name;
-  const libraryPath = workspacePackage.directoryPath;
-  // Copy the package to node_modules preserving structure
-  const packageDest = path.resolve(serverOutputDirectory, 'node_modules', dependencyName);
-
-  console.log(`  - Bundling ${dependencyName} from ${libraryPath}`);
-
-  // Ensure the directory exists
-  fs.ensureDirSync(packageDest);
-
-  // Copy package.json
-  const pkgSrc = path.join(libraryPath, 'package.json');
-  fs.copySync(pkgSrc, path.join(packageDest, 'package.json'));
-
-  // Copy the compiled lib directory (preserving the lib folder structure)
-  const libSrc = path.join(libraryPath, 'lib');
-  if (fs.existsSync(libSrc)) {
-    fs.copySync(libSrc, path.join(packageDest, 'lib'));
-  } else {
-    throw new Error(`Compiled lib directory not found for ${dependencyName} at ${libSrc}. Did you run the build?`);
-  }
-});
