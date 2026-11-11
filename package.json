@@ -45,6 +45,7 @@
     "cosmiconfig": "9.0.2",
     "countly-sdk-web": "24.11.4",
     "cross-env": "10.1.0",
+    "dependency-cruiser": "18.7.2",
     "eslint": "9.39.5",
     "eslint-config-prettier": "10.1.8",
     "eslint-import-resolver-typescript": "4.4.5",
