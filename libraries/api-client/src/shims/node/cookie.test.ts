@@ -18,11 +18,14 @@
  */
 
 import {AxiosHeaders, AxiosResponse} from 'axios';
+import nock from 'nock';
 
-import {getCookieExpiration, retrieveCookie} from './cookie';
+import {getCookieExpiration, retrieveCookie, sendRequestWithCookie} from './cookie';
 
+import {AccessTokenStore} from '../../auth/accessTokenStore';
 import {Cookie} from '../../auth/cookie';
 import {CookieStore} from '../../auth/cookieStore';
+import {HttpClient} from '../../http/httpClient';
 
 describe('getCookieExpiration', () => {
   it.each([null, 'Infinity'] as const)('represents %s expiration as Infinity', expires => {
@@ -36,6 +39,54 @@ describe('getCookieExpiration', () => {
 
     expect(getCookieExpiration(expirationDate)).toBe(expirationDate.toString());
   });
+});
+
+describe('sendRequestWithCookie', () => {
+  afterEach(() => {
+    CookieStore.deleteCookie();
+    nock.cleanAll();
+  });
+
+  it('sends a stored session cookie and preserves existing request headers', async () => {
+    CookieStore.setCookie(new Cookie('stored-session', 'Infinity'));
+    const backendUrl = 'https://node-cookie.example';
+    const request = nock(backendUrl, {
+      reqheaders: {Cookie: 'zuid=stored-session', 'Wire-Client': 'test-client'},
+    })
+      .post('/access')
+      .reply(200, {access_token: 'new-token'});
+    const httpClient = new HttpClient({urls: {name: 'test', rest: backendUrl, ws: ''}}, new AccessTokenStore());
+
+    const response = await sendRequestWithCookie<{access_token: string}>(httpClient, {
+      headers: {'Wire-Client': 'test-client'},
+      method: 'post',
+      url: '/access',
+    });
+
+    expect(response.data).toEqual({access_token: 'new-token'});
+    expect(response.config.withCredentials).toBe(true);
+    expect(request.isDone()).toBe(true);
+  });
+
+  it.each([undefined, new Cookie('expired-session', 'Thu, 01 Jan 1970 00:00:00 GMT')])(
+    'does not send a missing or expired session cookie (%s)',
+    async cookie => {
+      CookieStore.setCookie(cookie);
+      const backendUrl = 'https://node-cookie.example';
+      const request = nock(backendUrl, {badheaders: ['Cookie']})
+        .post('/access')
+        .reply(200, {access_token: 'new-token'});
+      const httpClient = new HttpClient({urls: {name: 'test', rest: backendUrl, ws: ''}}, new AccessTokenStore());
+
+      const response = await sendRequestWithCookie<{access_token: string}>(httpClient, {
+        method: 'post',
+        url: '/access',
+      });
+
+      expect(response.data).toEqual({access_token: 'new-token'});
+      expect(request.isDone()).toBe(true);
+    },
+  );
 });
 
 describe('retrieveCookie', () => {
