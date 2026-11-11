@@ -17,12 +17,12 @@
  *
  */
 
-import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+import {nodePlatform} from '../../../apiClient/shims/node/platform';
 
 import {v4 as uuidv4} from 'uuid';
 import {noop} from 'noop-esm';
 
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../../apiClient/apiClient';
 
 import {AssetService} from './assetService';
 import {crypto as nodeCrypto} from '../../cryptography/assetCryptography/crypto.node';

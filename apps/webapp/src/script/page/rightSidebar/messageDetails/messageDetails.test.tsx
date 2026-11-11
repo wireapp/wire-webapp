@@ -18,7 +18,7 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
@@ -37,7 +37,7 @@ import {createUuid} from '../../../util/uuid';
 import {MessageDetails} from './messageDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;

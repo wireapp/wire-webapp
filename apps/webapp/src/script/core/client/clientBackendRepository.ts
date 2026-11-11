@@ -17,9 +17,9 @@
  *
  */
 
-import {CreateClientPayload, RegisteredClient, UpdateClientPayload} from '@wireapp/api-client/lib/client';
-
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../apiClient/apiClient';
+import {CreateClientPayload, UpdateClientPayload} from '../../apiClient/client/newClient';
+import {RegisteredClient} from '../../apiClient/client/registeredClient';
 
 export class ClientBackendRepository {
   constructor(private readonly apiClient: APIClient) {}

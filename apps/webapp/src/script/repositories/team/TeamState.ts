@@ -18,15 +18,15 @@
  */
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {Backend} from '@wireapp/api-client/lib/env';
-import {Role} from '@wireapp/api-client/lib/team';
-import {FEATURE_STATUS, FeatureList, SELF_DELETING_TIMEOUT} from '@wireapp/api-client/lib/team/feature/';
-import {UserType} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
 import {TeamEntity} from './TeamEntity';
 
+import {Backend} from '../../apiClient/env/backend';
+import {FEATURE_STATUS, FeatureList, SELF_DELETING_TIMEOUT} from '../../apiClient/team/feature/featureList.types';
+import {Role} from '../../apiClient/team/member/role';
+import {UserType} from '../../apiClient/user/user';
 import {Config} from '../../Config';
 import {sortUsersByPriority} from '../../util/stringUtil';
 import {Conversation} from '../entity/Conversation';

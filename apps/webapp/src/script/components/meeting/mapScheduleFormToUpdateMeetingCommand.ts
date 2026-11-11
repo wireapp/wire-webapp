@@ -17,7 +17,6 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {type Maybe, Result, result} from 'true-myth';
 
 import {ScheduleFormErrors} from './scheduleFormErrors';
@@ -28,6 +27,7 @@ import type {
 } from './scheduleMeetingModal/scheduleMeetingTypes';
 import type {UpdateMeetingCommand} from './shared/types/meetingCommandTypes';
 
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import type {User} from '../../repositories/entity/User';
 
 export type MapScheduleFormToUpdateMeetingCommandParams = {

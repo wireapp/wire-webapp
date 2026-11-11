@@ -17,28 +17,32 @@
  *
  */
 
-import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+import {nodePlatform} from '../../../../apiClient/shims/node/platform';
 
-import {ClientType, MLSPublicKeyAlgorithmKeys, RegisteredClient} from '@wireapp/api-client/lib/client';
+import {ClientType} from '../../../../apiClient/client/clientType';
+import {MLSPublicKeyAlgorithmKeys} from '../../../../apiClient/client/clientApi';
+import {RegisteredClient} from '../../../../apiClient/client/registeredClient';
 import {
   MLSGroupOutOfSyncError,
   MLSInvalidLeafNodeIndexError,
   MLSInvalidLeafNodeSignatureError,
   MLSStaleMessageError,
-} from '@wireapp/api-client/lib/conversation';
+} from '../../../../apiClient/conversation/conversationError';
 import {
   CONVERSATION_EVENT,
   ConversationMLSMessageAddEvent,
   ConversationMLSWelcomeEvent,
-} from '@wireapp/api-client/lib/event';
-import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/lib/http';
+} from '../../../../apiClient/event/conversationEvent';
+import {BackendError} from '../../../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../../../apiClient/http/backendErrorLabel';
+import {StatusCode} from '../../../../apiClient/http';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 
 import {randomUUID, UUID} from 'crypto';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../../../apiClient/apiClient';
 import {
   CipherSuite as Ciphersuite,
   ClientId,
@@ -88,7 +92,7 @@ jest.mock('./mlsDeviceStatus', () => {
   };
 });
 
-jest.createMockFromModule('@wireapp/api-client');
+jest.createMockFromModule('../../../../apiClient/apiClient');
 
 function createUserId(): {id: UUID; domain: string} {
   return {id: randomUUID(), domain: ''};

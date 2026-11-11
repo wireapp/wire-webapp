@@ -17,10 +17,11 @@
  *
  */
 
-import {MLSPublicKeyAlgorithmKeys} from '@wireapp/api-client/lib/client';
 import {result, type Result} from 'true-myth';
 
 import {CipherSuite as Ciphersuite} from '@wireapp/core-crypto';
+
+import {MLSPublicKeyAlgorithmKeys} from '../../../../../apiClient/client/clientApi';
 
 /**
  * depending on the ciphersuite used, the signature algorithm used is different. We need to keep a mapping of the ciphersuite to the signature algorithm

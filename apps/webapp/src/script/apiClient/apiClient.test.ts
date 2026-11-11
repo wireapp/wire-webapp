@@ -38,6 +38,10 @@ const testConfig: Config = {urls: APIClient.BACKEND.PRODUCTION};
 const apiClients: APIClient[] = [];
 
 describe('APIClient', () => {
+  it('retains the final standalone SDK version independently of webapp releases', () => {
+    expect(APIClient.VERSION).toBe('27.96.0');
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
     apiClients.forEach(client => {

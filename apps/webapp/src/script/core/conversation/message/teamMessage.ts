@@ -17,15 +17,13 @@
  *
  */
 
-import {
-  TeamConversationCreateData,
-  TeamConversationDeleteData,
-  TeamMemberJoinData,
-  TeamMemberLeaveData,
-  TeamUpdateData,
-} from '@wireapp/api-client/lib/team/data';
-
 import {BasePayloadBundle, PayloadBundleType} from './payloadBundle';
+
+import {TeamConversationCreateData} from '../../../apiClient/team/data/teamConversationCreateData';
+import {TeamConversationDeleteData} from '../../../apiClient/team/data/teamConversationDeleteData';
+import {TeamMemberJoinData} from '../../../apiClient/team/data/teamMemberJoinData';
+import {TeamMemberLeaveData} from '../../../apiClient/team/data/teamMemberLeaveData';
+import {TeamUpdateData} from '../../../apiClient/team/data/teamUpdateData';
 
 export interface TeamConversationCreateMessage extends BasePayloadBundle {
   content: TeamConversationCreateData;

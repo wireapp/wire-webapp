@@ -17,9 +17,9 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
-import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/lib/event';
-import {UserConnectionData} from '@wireapp/api-client/lib/user/data';
+import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
+import {USER_EVENT, UserConnectionEvent} from '../../apiClient/event/userEvent';
+import {UserConnectionData} from '../../apiClient/user/data/userConnectionData';
 
 import {UserMapper} from './userMapper';
 

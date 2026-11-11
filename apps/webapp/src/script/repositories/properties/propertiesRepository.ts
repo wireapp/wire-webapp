@@ -19,15 +19,19 @@
 
 import createDeepmerge from '@fastify/deepmerge';
 import {isNan, isPlainObject} from '@sindresorhus/is';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {ConsentType} from '@wireapp/api-client/lib/self/';
-import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import type {PropertiesService} from './propertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
 
+import {RECEIPT_MODE} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {ConsentType} from '../../apiClient/self/consentType';
+import {
+  AudioPreference,
+  NotificationPreference,
+  WebappProperties,
+} from '../../apiClient/user/data/userPropertiesSetData';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {PrimaryModalType} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from '../../Config';

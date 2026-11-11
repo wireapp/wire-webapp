@@ -20,10 +20,10 @@
 import {useEffect} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
-import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
 import {configureE2EI} from './e2eIdentity';
 
+import {FEATURE_KEY, FeatureList} from '../../../../../apiClient/team/feature/featureList.types';
 import {
   FeatureUpdateType,
   detectTeamFeatureUpdate,

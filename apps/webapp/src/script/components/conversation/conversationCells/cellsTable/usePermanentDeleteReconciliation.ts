@@ -20,9 +20,10 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
-import {BackendError, StatusCode} from '@wireapp/api-client/lib/http/';
 import {maybe} from 'true-myth';
 
+import {StatusCode} from '../../../../apiClient/http';
+import {BackendError} from '../../../../apiClient/http/backendError';
 import type {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {
   checkCellsBackgroundActionJobs,

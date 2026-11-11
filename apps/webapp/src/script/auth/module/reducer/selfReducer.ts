@@ -17,9 +17,8 @@
  *
  */
 
-import type {Self} from '@wireapp/api-client/lib/self/';
-import {UserType} from '@wireapp/api-client/lib/user';
-
+import type {Self} from '../../../apiClient/self/self';
+import {UserType} from '../../../apiClient/user/user';
 import {AppActions, AUTH_ACTION, SELF_ACTION} from '../action/creator/';
 
 export interface SelfState {

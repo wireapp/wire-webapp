@@ -17,8 +17,8 @@
  *
  */
 
-import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {MemberLeaveReason} from '../../src/script/apiClient/conversation/data/conversationMemberLeaveData';
+import {CONVERSATION_EVENT} from '../../src/script/apiClient/event/conversationEvent';
 import {AssetTransferState} from '../../src/script/repositories/assets/assetTransferState';
 import {
   AssetAddEvent,
@@ -32,7 +32,7 @@ import {
 } from '../../src/script/repositories/conversation/EventBuilder';
 import {Conversation} from '../../src/script/repositories/entity/Conversation';
 import {CONVERSATION} from '../../src/script/repositories/event/Client';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../src/script/apiClient/team/feature/featureList.types';
 import {StatusType} from '../../src/script/message/statusType';
 import {translate} from '../../src/script/util/localizerUtil';
 import {createUuid} from '../../src/script/util/uuid';

@@ -18,15 +18,15 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {SUBCONVERSATION_ID, Subconversation} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
-import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 
 import {generateSubconversationStoreKey} from './subconversationUtil';
 
+import {APIClient} from '../../../apiClient/apiClient';
+import {SUBCONVERSATION_ID, Subconversation} from '../../../apiClient/conversation/subconversation';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {CoreDatabase} from '../../storage/coreDb';
 import {constructFullyQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';

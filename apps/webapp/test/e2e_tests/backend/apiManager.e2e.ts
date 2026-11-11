@@ -17,7 +17,7 @@
  *
  */
 
-import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
+import {FEATURE_KEY} from '../../../src/script/apiClient/team/feature/featureList.types';
 import {isUndefined} from '@sindresorhus/is';
 import {AxiosResponse} from 'axios';
 

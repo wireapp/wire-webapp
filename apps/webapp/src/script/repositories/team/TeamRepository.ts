@@ -18,19 +18,6 @@
  */
 
 import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {ConversationRolesList} from '@wireapp/api-client/lib/conversation';
-import type {
-  TeamConversationDeleteEvent,
-  TeamDeleteEvent,
-  TeamEvent,
-  TeamFeatureConfigurationUpdateEvent,
-  TeamMemberLeaveEvent,
-} from '@wireapp/api-client/lib/event';
-import {TEAM_EVENT} from '@wireapp/api-client/lib/event/teamEvent';
-import {FEATURE_KEY, FeatureList, CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
-import type {PermissionsData} from '@wireapp/api-client/lib/team/member/permissionsData';
-import type {TeamData} from '@wireapp/api-client/lib/team/team/teamData';
-import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {task} from 'true-myth';
 import {container} from 'tsyringe';
@@ -45,6 +32,25 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
 
+import {ConversationRolesList} from '../../apiClient/conversation/conversationRole';
+import type {
+  TeamConversationDeleteEvent,
+  TeamDeleteEvent,
+  TeamEvent,
+  TeamFeatureConfigurationUpdateEvent,
+  TeamMemberLeaveEvent,
+} from '../../apiClient/event/teamEvent';
+import {TEAM_EVENT} from '../../apiClient/event/teamEvent';
+import {
+  FEATURE_KEY,
+  FeatureList,
+  CONVERSATION_PROTOCOL,
+  FEATURE_STATUS,
+} from '../../apiClient/team/feature/featureList.types';
+import type {PermissionsData} from '../../apiClient/team/member/permissionsData';
+import type {TeamData} from '../../apiClient/team/team/teamData';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {UserType} from '../../apiClient/user/user';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';

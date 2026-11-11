@@ -17,18 +17,15 @@
  *
  */
 
-import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+import {nodePlatform} from '../../../apiClient/shims/node/platform';
 
-import {
-  MessageSendingStatus,
-  OTRRecipients,
-  QualifiedOTRRecipients,
-  QualifiedUserClients,
-} from '@wireapp/api-client/lib/conversation';
+import {MessageSendingStatus} from '../../../apiClient/conversation/messageSendingStatus';
+import {OTRRecipients, QualifiedOTRRecipients} from '../../../apiClient/conversation/otrRecipients';
+import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
 import {StatusCodes} from 'http-status-codes';
 import {v4 as uuidv4} from 'uuid';
 
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../../apiClient/apiClient';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 import {MessageService} from './messageService';

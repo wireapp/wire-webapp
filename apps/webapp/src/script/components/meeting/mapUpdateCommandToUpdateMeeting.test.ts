@@ -17,7 +17,7 @@
  *
  */
 
-import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
+import {MeetingRecurrenceFrequency} from '../../apiClient/meetings/meetingRecurrence';
 import {maybe} from 'true-myth';
 
 import {User} from '../../repositories/entity/User';

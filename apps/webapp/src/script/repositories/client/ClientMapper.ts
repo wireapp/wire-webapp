@@ -17,11 +17,11 @@
  *
  */
 
-import type {PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client';
-
 import {ClientEntity} from './ClientEntity';
 import {parseClientId} from './ClientIdUtil';
 
+import type {PublicClient} from '../../apiClient/client/publicClient';
+import type {RegisteredClient} from '../../apiClient/client/registeredClient';
 import {isClientRecord, isClientWithMLSPublicKeys} from '../../util/typePredicateUtil';
 import {ClientRecord} from '../storage';
 

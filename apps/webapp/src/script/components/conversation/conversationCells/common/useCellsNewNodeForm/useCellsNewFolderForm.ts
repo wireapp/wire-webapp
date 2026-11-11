@@ -19,11 +19,10 @@
 
 import type {FormEvent, MouseEvent, ChangeEvent} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {CellsNewNodeFormValidationCopy} from './cellsNodeFormUtils';
 import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
 
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 

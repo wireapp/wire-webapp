@@ -17,10 +17,11 @@
  *
  */
 
-import {QualifiedUserClients, MessageSendingStatus, NewConversation} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
+import {MessageSendingStatus} from '../../../../apiClient/conversation/messageSendingStatus';
+import {NewConversation} from '../../../../apiClient/conversation/newConversation';
+import {QualifiedUserClients} from '../../../../apiClient/conversation/qualifiedUserClients';
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {AddUsersParams, MessageSendingOptions, SendCommonParams} from '../../../conversation';
 
 export interface NewClient {

@@ -17,11 +17,11 @@
  *
  */
 
-import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+import {nodePlatform} from '../../apiClient/shims/node/platform';
 
-import {Notification} from '@wireapp/api-client/lib/notification';
+import {Notification} from '../../apiClient/notification/notification';
 
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../apiClient/apiClient';
 import {MemoryEngine} from '../storage/engine/memoryEngine';
 
 import {ConversationService} from '../conversation';

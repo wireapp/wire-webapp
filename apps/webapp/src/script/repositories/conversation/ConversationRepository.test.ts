@@ -21,21 +21,21 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {faker} from '@faker-js/faker';
 import {waitFor} from '@testing-library/react';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
-import {ClientClassification} from '@wireapp/api-client/lib/client/';
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {ClientClassification} from '../../apiClient/client/clientClassification';
+import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
 import {
   ADD_PERMISSION,
   Conversation as BackendConversation,
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
-  RemoteConversations,
   MLSConversation as BackendMLSConversation,
   CONVERSATION_CELLS_STATE,
   GROUP_CONVERSATION_TYPE,
-} from '@wireapp/api-client/lib/conversation';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import type {ValidatedMeetingConversation} from '@wireapp/api-client/lib/conversation/conversationSchema';
+} from '../../apiClient/conversation/conversation';
+import {RemoteConversations} from '../../apiClient/conversation/remoteConversations';
+import {RECEIPT_MODE} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import type {ValidatedMeetingConversation} from '../../apiClient/conversation/conversationSchema';
 import {
   ConversationProtocolUpdateEvent,
   ConversationCreateEvent,
@@ -46,10 +46,11 @@ import {
   CONVERSATION_EVENT,
   ConversationMLSWelcomeEvent,
   ConversationMLSResetEvent,
-} from '@wireapp/api-client/lib/event/';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+} from '../../apiClient/event/conversationEvent';
+import {BackendError} from '../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';

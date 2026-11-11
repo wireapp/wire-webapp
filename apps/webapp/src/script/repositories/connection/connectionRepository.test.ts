@@ -17,8 +17,9 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
+import {BackendError} from '../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import {amplify} from 'amplify';
 import {StatusCodes} from 'http-status-codes';
 
@@ -40,7 +41,7 @@ import {ConnectionRepository} from './connectionRepository';
 import type {User} from '../entity/User';
 import {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
 function buildConnectionRepository(translate: Translate): readonly [
   ConnectionRepository,

@@ -18,14 +18,6 @@
  */
 
 import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
-import {
-  CONVERSATION_EVENT,
-  MEETING_EVENT,
-  USER_EVENT,
-  type BackendEvent,
-  ConversationOtrMessageAddEvent,
-  ConversationMLSMessageAddEvent,
-} from '@wireapp/api-client/lib/event';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
@@ -45,6 +37,14 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventHandlers/EventValidationError';
 
+import {type BackendEvent} from '../../apiClient/event/backendEvent';
+import {
+  CONVERSATION_EVENT,
+  ConversationOtrMessageAddEvent,
+  ConversationMLSMessageAddEvent,
+} from '../../apiClient/event/conversationEvent';
+import {MEETING_EVENT} from '../../apiClient/event/meetingEvent';
+import {USER_EVENT} from '../../apiClient/event/userEvent';
 import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '../../core';
 import {NotificationSource, HandledEventPayload} from '../../core/notification';
 import {sequentialQueueOptions} from '../../core/queue/sequentialQueueOptions';

@@ -20,12 +20,12 @@
 import type {FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {wrapperStyles} from './meetingParticipants.styles';
 import {useMeetingConversation} from './useMeetingConversation';
 import {useMeetingParticipants} from './useMeetingParticipants';
 
+import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../../../../../page/rootProvider';
 import type {Conversation} from '../../../../../../repositories/entity/Conversation';
 import type {User} from '../../../../../../repositories/entity/User';

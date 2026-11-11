@@ -17,11 +17,11 @@
  *
  */
 
-import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+import {nodePlatform} from '../../apiClient/shims/node/platform';
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../apiClient/apiClient';
 
 import {SelfService} from './selfService';
 

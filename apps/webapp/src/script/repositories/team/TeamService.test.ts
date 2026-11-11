@@ -17,7 +17,7 @@
  *
  */
 
-import {FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
+import {FEATURE_STATUS, FeatureList} from '../../apiClient/team/feature/featureList.types';
 import type {AxiosResponse} from 'axios';
 
 import {TeamService} from './TeamService';

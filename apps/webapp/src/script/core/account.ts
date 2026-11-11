@@ -21,39 +21,12 @@ import {createClock} from '@enormora/clock';
 import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {
-  RegisterData,
-  AUTH_COOKIE_KEY,
-  AUTH_TABLE_NAME,
-  Context,
-  Cookie,
-  CookieStore,
-  LoginData,
-  PreKey,
-} from '@wireapp/api-client/lib/auth';
-import {ClientCapability, ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
-import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
-import * as Events from '@wireapp/api-client/lib/event';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-import {Notification} from '@wireapp/api-client/lib/notification';
-import {
-  ConsumableEvent,
-  ConsumableNotification,
-  ConsumableNotificationEvent,
-  ConsumableNotificationSynchronization,
-} from '@wireapp/api-client/lib/notification/consumableNotification';
-import {browserPlatform} from '@wireapp/api-client/lib/shims/browser/platform';
-import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
-import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
-import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {once} from 'lodash';
 import logdown from 'logdown';
 import {asyncNoop, noop} from 'noop-esm';
 import {TimeoutError} from 'p-queue';
 
-import {APIClient, BackendFeatures} from '@wireapp/api-client';
 import {LogFactory, StringUtil, TypedEventEmitter} from '@wireapp/commons';
 import type {CoreCryptoLogLevel} from '@wireapp/core-crypto';
 
@@ -107,6 +80,34 @@ import {TeamService} from './team/';
 import {UserService} from './user/';
 import {LocalStorageStore} from './util/localStorageStore';
 import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
+
+import {APIClient, BackendFeatures} from '../apiClient/apiClient';
+import {Context} from '../apiClient/auth/context';
+import {Cookie} from '../apiClient/auth/cookie';
+import {CookieStore} from '../apiClient/auth/cookieStore';
+import {AUTH_COOKIE_KEY, AUTH_TABLE_NAME} from '../apiClient/auth/index';
+import {LoginData} from '../apiClient/auth/loginData';
+import {PreKey} from '../apiClient/auth/preKey';
+import {RegisterData} from '../apiClient/auth/registerData';
+import {ClientCapability} from '../apiClient/client/clientCapability';
+import {ClientClassification} from '../apiClient/client/clientClassification';
+import {ClientType} from '../apiClient/client/clientType';
+import {RegisteredClient} from '../apiClient/client/registeredClient';
+import {SUBCONVERSATION_ID} from '../apiClient/conversation/subconversation';
+import * as Events from '../apiClient/event';
+import {CONVERSATION_EVENT} from '../apiClient/event/conversationEvent';
+import {
+  ConsumableEvent,
+  ConsumableNotification,
+  ConsumableNotificationEvent,
+  ConsumableNotificationSynchronization,
+} from '../apiClient/notification/consumableNotification';
+import {Notification} from '../apiClient/notification/notification';
+import {browserPlatform} from '../apiClient/shims/browser/platform';
+import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '../apiClient/tcp/reconnectingWebsocket';
+import {WebSocketClient} from '../apiClient/tcp/webSocketClient';
+import {FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../apiClient/user/qualifiedId';
 
 type CryptoClientWithProtocol =
   readonly [CryptoClientType.CORE_CRYPTO, CoreCryptoWrapper] | readonly [CryptoClientType.CRYPTOBOX, CryptoboxWrapper];

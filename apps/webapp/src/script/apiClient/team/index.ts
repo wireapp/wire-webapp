@@ -17,21 +17,21 @@
  *
  */
 
-export {NewTeamInvitation, TeamInvitation, TeamInvitationAPI, TeamInvitationChunk} from './invitation/';
+export {type NewTeamInvitation, type TeamInvitation, TeamInvitationAPI, type TeamInvitationChunk} from './invitation/';
 export {LegalHoldAPI} from './legalhold/';
-export {MemberAPI, MemberData, Members, Permissions, PermissionsData, Role} from './member/';
+export {MemberAPI, type MemberData, type Members, Permissions, type PermissionsData, Role} from './member/';
 export {
   CollaboratorPermission,
-  NewTeamData,
+  type NewTeamData,
   TeamAPI,
-  TeamChunkData,
-  TeamCollaborator,
-  TeamData,
-  TeamInfo,
-  UpdateTeamData,
+  type TeamChunkData,
+  type TeamCollaborator,
+  type TeamData,
+  type TeamInfo,
+  type UpdateTeamData,
 } from './team/';
-export {PaymentAPI, PaymentData} from './payment/';
-export {ServiceAPI, Service, ServiceWhitelistData} from './service/';
+export {PaymentAPI, type PaymentData} from './payment/';
+export {ServiceAPI, type Service, type ServiceWhitelistData} from './service/';
 export {TeamError, InviteEmailInUseError, InvalidInvitationCodeError, ServiceNotFoundError} from './teamError';
 
 export * from './billing/';

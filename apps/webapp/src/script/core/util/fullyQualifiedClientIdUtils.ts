@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedUserClientMap} from '@wireapp/api-client/lib/client';
+import {QualifiedUserClientMap} from '../../apiClient/client/qualifiedPublicClients';
 
 type UserId = string;
 type ClientId = string;

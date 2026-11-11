@@ -19,9 +19,9 @@
 
 import {useRef, type FunctionComponent} from 'react';
 
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import cx from 'classnames';
 
+import {RECEIPT_MODE} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
 import {useApplicationContext} from '../../page/rootProvider';
 import * as Icon from '../icon';
 

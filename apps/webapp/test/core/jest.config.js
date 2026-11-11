@@ -45,6 +45,7 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!(true-myth|uuid|noop-esm|p-queue|p-timeout|eventemitter3|@sindresorhus/is|@faker-js/faker|@enormora/clock|@enormora/fire-and-forget)/)',
   ],
+  coveragePathIgnorePatterns: ['<rootDir>/src/script/apiClient/'],
   coverageDirectory: '../../target/coverage/apps/webapp/core',
   coverageThreshold: {
     global: {

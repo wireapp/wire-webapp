@@ -19,9 +19,9 @@
 
 import {ChangeEvent, useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
-import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 
+import type {WebappProperties} from '../../../../../apiClient/user/data/userPropertiesSetData';
 import {Config} from '../../../../../Config';
 import type {MediaConstraintsHandler} from '../../../../../repositories/media/MediaConstraintsHandler';
 import type {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';

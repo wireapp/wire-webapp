@@ -1,4 +1,4 @@
-import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../../apiClient/team/feature/featureList.types';
 import {TeamState} from '../../../repositories/team/TeamState';
 import ko from 'knockout';
 import {GroupCreationModal} from './GroupCreationModal';

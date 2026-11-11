@@ -20,7 +20,6 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {noop} from 'noop-esm';
 import type {Result} from 'true-myth';
 import {container} from 'tsyringe';
@@ -34,6 +33,7 @@ import {
   type JoinMeetingCallError,
 } from './joinMeetingCall';
 
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {Config} from '../../Config';
 import {
   showCallNotEstablishedModal,

@@ -18,7 +18,6 @@
  */
 
 import {isFunction, isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -43,6 +42,7 @@ import type {PingMessage} from './pingMessage';
 import type {SystemMessage} from './systemMessage';
 import type {VerificationMessage} from './verificationMessage';
 
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {EphemeralStatusType} from '../../../message/ephemeralStatusType';
 import type {MessageCategory} from '../../../message/messageCategory';
 import {StatusType} from '../../../message/statusType';

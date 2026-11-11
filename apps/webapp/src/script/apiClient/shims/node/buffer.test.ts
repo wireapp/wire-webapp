@@ -17,7 +17,7 @@
  *
  */
 
-import {base64MD5FromBuffer, bufferToString} from './buffer';
+import {base64MD5FromBuffer, bufferToString, concatToBuffer} from './buffer';
 
 describe('"base64MD5FromBuffer"', () => {
   it('can generate base64 encoded md5 hash from buffer', () => {
@@ -37,5 +37,15 @@ describe('"bufferToString"', () => {
     const stringExpected = 'Wire';
 
     expect(stringResult).toBe(stringExpected);
+  });
+});
+
+describe('concatToBuffer', () => {
+  it('preserves multipart strings and binary bytes in a Node Buffer', () => {
+    const multipartBody = concatToBuffer('header', new Uint8Array([0, 128, 255]), 'footer');
+    const expectedBytes = Buffer.from([104, 101, 97, 100, 101, 114, 0, 128, 255, 102, 111, 111, 116, 101, 114]);
+
+    expect(Buffer.isBuffer(multipartBody)).toBe(true);
+    expect(multipartBody).toEqual(expectedBytes);
   });
 });

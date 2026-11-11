@@ -17,9 +17,11 @@
  *
  */
 
-const rootJestConfiguration = require('../../jest.config.js');
+const rootJestConfiguration = require('../../../../jest.config.js');
 
 module.exports = {
+  rootDir: '../..',
+  roots: ['<rootDir>/src/script/apiClient'],
   displayName: 'api-client-lib',
   testEnvironment: 'node',
   clearMocks: true,
@@ -29,7 +31,7 @@ module.exports = {
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
   transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|uuid|noop-esm|@sindresorhus/is)/)'],
-  coverageDirectory: '../../target/coverage/libraries/api-client',
+  coverageDirectory: '../../target/coverage/apps/webapp/apiClient',
   coverageReporters: rootJestConfiguration.coverageReporters,
   coverageThreshold: {
     global: {
@@ -39,7 +41,10 @@ module.exports = {
       statements: 53,
     },
   },
-  testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
+  testMatch: [
+    '<rootDir>/src/script/apiClient/**/__tests__/**/*.[jt]s?(x)',
+    '<rootDir>/src/script/apiClient/**/?(*.)+(spec|test).[jt]s?(x)',
+  ],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
   reporters: rootJestConfiguration.reporters,
 };

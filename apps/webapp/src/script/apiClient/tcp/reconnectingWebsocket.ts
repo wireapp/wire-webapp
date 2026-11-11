@@ -688,7 +688,7 @@ export class ReconnectingWebsocket {
       Nothing: () => {
         return new PartySocketWebSocket(this.internalOnReconnect, undefined, {
           ...ReconnectingWebsocket.RECONNECTING_OPTIONS,
-          WebSocket: createPartysocketCompatibleWebSocketConstructor(this.options.platform.WebSocket),
+          WebSocket: this.options.platform.WebSocket,
         });
       },
     });

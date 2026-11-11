@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 import {AssetService} from '../conversation';
 import {LinkPreviewContent} from '../conversation/content';

@@ -17,17 +17,14 @@
  *
  */
 
-import {
-  FeatureList,
-  MemberData,
-  Members,
-  NewTeamData,
-  TeamChunkData,
-  TeamData,
-  UpdateTeamData,
-} from '@wireapp/api-client/lib/team';
-
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../apiClient/apiClient';
+import {FeatureList} from '../../apiClient/team/feature/featureList.types';
+import {MemberData} from '../../apiClient/team/member/memberData';
+import {Members} from '../../apiClient/team/member/members';
+import {NewTeamData} from '../../apiClient/team/team/newTeamData';
+import {TeamChunkData} from '../../apiClient/team/team/teamChunkData';
+import {TeamData} from '../../apiClient/team/team/teamData';
+import {UpdateTeamData} from '../../apiClient/team/team/updateTeamData';
 
 const teamCacheDurationInMilliseconds = 86_400_000;
 

@@ -17,7 +17,7 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
 import {Conversation} from '../../entity/Conversation';
@@ -33,7 +33,7 @@ import {EventBuilder} from './EventBuilder';
 
 import {EventMapper} from '../EventMapper';
 import {translateForTest} from '../../../util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 describe('EventBuilder', () => {
   let event_mapper: EventMapper = new EventMapper(undefined, translate);

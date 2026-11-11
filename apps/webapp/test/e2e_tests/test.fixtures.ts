@@ -23,8 +23,8 @@ import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
 import {PageManager, WebAppNavigationOptions} from './pageManager';
 import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
-import {Role} from '@wireapp/api-client/lib/team';
-import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
+import {Role} from '../../src/script/apiClient/team/member/role';
+import {FEATURE_KEY} from '../../src/script/apiClient/team/feature/featureList.types';
 import {BrigRepositoryE2E} from './backend/brigRepository.e2e';
 
 export type PagePlugin = (page: Page) => void | Promise<void>;

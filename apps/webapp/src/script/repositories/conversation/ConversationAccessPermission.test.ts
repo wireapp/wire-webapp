@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '../../apiClient/conversation/conversation';
 
 import {ACCESS_STATE, TEAM} from './AccessState';
 import {

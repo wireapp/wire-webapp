@@ -17,8 +17,8 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../../apiClient/team/feature/featureList.types';
 import type {ObservableArray} from 'knockout';
 
 import {MixedConversation, MLSConversation} from '../../../repositories/conversation/ConversationSelectors';

@@ -18,12 +18,13 @@
  */
 
 import {isString, isUndefined} from '@sindresorhus/is';
-import {ACCESS_TYPE, FEATURE_KEY, FEATURE_STATUS, Role} from '@wireapp/api-client/lib/team';
-import type {FeatureList} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from './componentUtil';
 
+import {ACCESS_TYPE, FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
+import type {FeatureList} from '../apiClient/team/feature/featureList.types';
+import {Role} from '../apiClient/team/member/role';
 import {Config} from '../Config';
 import {ConversationState} from '../repositories/conversation/ConversationState';
 import {TeamState} from '../repositories/team/TeamState';

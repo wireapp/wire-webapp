@@ -17,32 +17,27 @@
  *
  */
 
-import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+import {nodePlatform} from '../../../apiClient/shims/node/platform';
 
-import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client';
-import {
-  Conversation,
-  MLSConversation,
-  MLSStaleMessageError,
-  MLSGroupOutOfSyncError,
-  Subconversation,
-  SUBCONVERSATION_ID,
-} from '@wireapp/api-client/lib/conversation';
+import {ClientClassification} from '../../../apiClient/client/clientClassification';
+import {ClientType} from '../../../apiClient/client/clientType';
+import {Conversation, MLSConversation} from '../../../apiClient/conversation/conversation';
+import {MLSStaleMessageError, MLSGroupOutOfSyncError} from '../../../apiClient/conversation/conversationError';
+import {Subconversation, SUBCONVERSATION_ID} from '../../../apiClient/conversation/subconversation';
 import {
   CONVERSATION_EVENT,
   ConversationMLSMessageAddEvent,
   ConversationMLSWelcomeEvent,
-  MEETING_EVENT,
-  MeetingCreateEvent,
-} from '@wireapp/api-client/lib/event';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+} from '../../../apiClient/event/conversationEvent';
+import {MEETING_EVENT, MeetingCreateEvent} from '../../../apiClient/event/meetingEvent';
+import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {noop} from 'noop-esm';
 import {Result, task} from 'true-myth';
 
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../../apiClient/apiClient';
 import {CoreCryptoError, MlsError} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 

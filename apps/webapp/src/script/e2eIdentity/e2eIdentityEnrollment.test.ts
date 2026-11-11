@@ -40,7 +40,7 @@ import {getEnrollmentStore} from './enrollment.store';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 import {translateForTest} from '../util/test/translateForTest';
 import {createCoreTestFixture} from '../util/test/createCoreTestFixture';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../apiClient/team/feature/featureList.types';
 
 jest.mock('./oidcService', () => {
   return {

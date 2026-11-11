@@ -18,12 +18,12 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data/conversationJoinData';
-import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {ConversationActionCreator} from './creator/';
 
+import type {ConversationJoinData} from '../../../apiClient/conversation/data/conversationJoinData';
+import type {ConversationEvent} from '../../../apiClient/event/conversationEvent';
 import {toError} from '../../../util/toError';
 import {isBackendError} from '../../../util/typePredicateUtil';
 import type {ThunkAction} from '../reducer';

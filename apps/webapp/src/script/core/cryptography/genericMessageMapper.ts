@@ -18,10 +18,10 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 
 import {LogFactory} from '@wireapp/commons';
 
+import {ConversationOtrMessageAddEvent} from '../../apiClient/event/conversationEvent';
 import {GenericMessageType, MessageSendingState, PayloadBundle, PayloadBundleType} from '../conversation';
 import {
   AssetContent,

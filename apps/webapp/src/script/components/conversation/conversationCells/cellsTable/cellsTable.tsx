@@ -30,7 +30,6 @@ import {
 } from 'react';
 
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
 import {Maybe, maybe} from 'true-myth';
@@ -79,6 +78,7 @@ import {showBulkRestoreModal} from './restoreBinSelection/showBulkRestoreModal';
 import {useBulkRestore} from './restoreBinSelection/useBulkRestore';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {
   driveBulkActionsFeatureToggleName,
   driveBulkRestoreFeatureToggleName,

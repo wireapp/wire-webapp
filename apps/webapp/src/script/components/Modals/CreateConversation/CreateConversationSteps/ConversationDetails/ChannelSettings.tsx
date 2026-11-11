@@ -19,12 +19,12 @@
 
 import type {FunctionComponent} from 'react';
 
-import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
 import {channelSettingsTextCss} from './ConversationDetails.styles';
 import {CustomHistorySharingOption} from './CustomHistorySharingOption';
 
+import {ADD_PERMISSION} from '../../../../../apiClient/conversation/conversation';
 import {useApplicationContext} from '../../../../../page/rootProvider';
 import {TeamState} from '../../../../../repositories/team/TeamState';
 import {Option, Select} from '../../../../../uiKit/inputs/select/select';

@@ -19,9 +19,9 @@
 
 import React, {type FunctionComponent} from 'react';
 
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {container} from 'tsyringe';
 
+import {RECEIPT_MODE} from '../../../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
 import {Config} from '../../../../../Config';
 import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 import {AppLockRepository} from '../../../../../repositories/user/appLockRepository';

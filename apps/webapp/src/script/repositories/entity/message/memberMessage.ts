@@ -18,13 +18,13 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {SystemMessage} from './systemMessage';
 
+import {MemberLeaveReason} from '../../../apiClient/conversation/data/conversationMemberLeaveData';
+import {CONVERSATION_EVENT} from '../../../apiClient/event/conversationEvent';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {SuperType} from '../../../message/superType';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate, Declension, getUserName} from '../../../util/localizerUtil';

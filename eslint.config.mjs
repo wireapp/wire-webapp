@@ -79,7 +79,6 @@ const ignores = [
   'apps/webapp/src/script/localization/**/webapp*.js',
   'apps/webapp/src/worker/',
   'apps/webapp/src/script/components/icon.tsx',
-  'libraries/api-client/lib/',
   'libraries/config/lib/',
   'libraries/*/lib/',
   'apps/webapp/src/script/uiKit/emotion.d.ts',
@@ -627,7 +626,7 @@ const productionConfigs = [
     files: [
       'apps/server/**/*.{ts,tsx}',
       'tools/configuration/**/*.{ts,mts}',
-      'libraries/api-client/**/*.{ts,tsx}',
+      'apps/webapp/src/script/apiClient/**/*.{ts,tsx}',
       'libraries/commons/**/*.{ts,tsx}',
     ],
     rules: {

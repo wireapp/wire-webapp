@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 
 type UserMap<T> = {[userId: string]: T};
 type QualifiedUserMap<T> = {[domain: string]: UserMap<T>};

@@ -21,7 +21,6 @@ import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
 import ky from 'ky';
 import {container} from 'tsyringe';
@@ -30,6 +29,7 @@ import {getOtherInstanceAction} from './getOtherInstanceAction';
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
+import {ClientType} from '../../apiClient/client/clientType';
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';

@@ -17,21 +17,20 @@
  *
  */
 
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+
 import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
-  DefaultConversationRoleName,
   GROUP_CONVERSATION_TYPE,
   ADD_PERMISSION,
-} from '@wireapp/api-client/lib/conversation';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-
+} from '../../../apiClient/conversation/conversation';
+import {DefaultConversationRoleName} from '../../../apiClient/conversation/conversationRole';
+import {RECEIPT_MODE} from '../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {CONVERSATION_READONLY_STATE} from '../../conversation/ConversationRepository';
 import {ConversationStatus} from '../../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';

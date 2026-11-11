@@ -17,10 +17,9 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {CoreCryptoError, ProteusError} from '@wireapp/core-crypto';
 
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {DecryptionError} from '../../../../errors/decryptionError';
 
 export const ProteusErrors = {

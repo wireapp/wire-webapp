@@ -20,11 +20,6 @@
 import {useEffect, useState, useRef, FormEvent, type FunctionComponent} from 'react';
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import type {RegisterData} from '@wireapp/api-client/lib/auth';
-import type {RegisteredClient} from '@wireapp/api-client/lib/client';
-import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data';
-import type {ConversationEvent} from '@wireapp/api-client/lib/event';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router';
 
@@ -36,6 +31,11 @@ import {EntropyContainer} from './entropyContainer';
 import {Login} from './login/login';
 import {Page} from './page';
 
+import type {RegisterData} from '../../apiClient/auth/registerData';
+import type {RegisteredClient} from '../../apiClient/client/registeredClient';
+import type {ConversationJoinData} from '../../apiClient/conversation/data/conversationJoinData';
+import type {ConversationEvent} from '../../apiClient/event/conversationEvent';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Column, Columns} from '../../uiKit/layout/column/column';

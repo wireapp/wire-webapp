@@ -18,7 +18,6 @@
  */
 
 import {isEmptyArray, isNonEmptyArray, isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
 import {IAttachment, ICellAsset} from '@wireapp/protocol-messaging';
@@ -26,6 +25,7 @@ import {IAttachment, ICellAsset} from '@wireapp/protocol-messaging';
 import {Asset} from './asset';
 import type {LinkPreview} from './linkPreview';
 
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import type {MentionEntity} from '../../../message/mentionEntity';
 import {renderMessage} from '../../../util/messageRenderer';
 import {AssetType} from '../../assets/assetType';

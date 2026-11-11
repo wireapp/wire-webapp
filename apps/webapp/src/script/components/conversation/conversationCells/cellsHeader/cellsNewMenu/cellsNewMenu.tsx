@@ -19,12 +19,11 @@
 
 import {useState, type FunctionComponent} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {CellsNewFileModal} from './cellsNewFileModal/cellsNewFileModal';
 import {CellsNewFolderModal} from './cellsNewFolderModal/cellsNewFolderModal';
 import {buttonStyles, iconStyles} from './cellsNewMenu.styles';
 
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {PlusIcon} from '../../../../../uiKit/dataDisplay/icon/plusIcon';

@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
+import {MeetingRecurrenceFrequency} from '../../../apiClient/meetings/meetingRecurrence';
 
 import {mapMeetingRecurrenceToOption, mapRecurrenceOptionToMeetingRecurrence} from './scheduleMeetingRecurrence';
 

@@ -22,7 +22,7 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import createMockStore, {type MockStoreCreator} from 'redux-mock-store';
 import {withExtraArgument} from 'redux-thunk';
 
-import type {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '../../../apiClient/apiClient';
 import type {TypeUtil} from '@wireapp/commons';
 import type {Account} from '../../../core';
 

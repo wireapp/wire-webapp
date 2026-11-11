@@ -28,11 +28,6 @@ import {
   isTruthy,
   isUndefined,
 } from '@sindresorhus/is';
-import {AssetAuditData} from '@wireapp/api-client/lib/asset';
-import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
@@ -49,6 +44,13 @@ import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
+import {AssetAuditData} from '../../apiClient/asset/assetApi';
+import {MessageSendingStatus} from '../../apiClient/conversation/messageSendingStatus';
+import {QualifiedUserClients} from '../../apiClient/conversation/qualifiedUserClients';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {RequestCancellationError} from '../../apiClient/user/userError';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {

@@ -17,9 +17,8 @@
  *
  */
 
-import {Connection} from '@wireapp/api-client/lib/connection';
-
 import {ClientActionType} from '..';
+import {Connection} from '../../../apiClient/connection/connection';
 
 import {
   AssetContent,

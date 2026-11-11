@@ -18,8 +18,9 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
 
+import type {QualifiedUserClients} from '../apiClient/conversation/qualifiedUserClients';
+import type {UserClients} from '../apiClient/conversation/userClients';
 import {isQualifiedUserClients} from '../core/util';
 
 export const removeClientFromUserClientMap = (

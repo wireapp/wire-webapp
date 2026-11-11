@@ -19,12 +19,13 @@
 
 import {useState} from 'react';
 
-import {ADD_PERMISSION, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/conversation';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import {ADD_PERMISSION, GROUP_CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation';
+import {RECEIPT_MODE} from '../../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {mapToConversationProtocol} from '../../../../apiClient/team/feature/featureList.helper';
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {isNonFederatingBackendsError} from '../../../../core/errors';
 import {useSidebarStore, SidebarTabs} from '../../../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from '../../../../page/rootProvider';

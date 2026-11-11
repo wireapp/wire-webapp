@@ -18,9 +18,10 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
 import {NotificationSource} from './notificationSource.types';
+
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 
 /**
  * Event types that can be handled locally (API response or pre-app init) and then

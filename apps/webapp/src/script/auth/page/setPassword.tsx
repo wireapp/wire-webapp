@@ -20,7 +20,6 @@
 import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isEmptyString, isNull} from '@sindresorhus/is';
-import type {ChangePassword} from '@wireapp/api-client/lib/self';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
@@ -29,6 +28,7 @@ import {ValidationUtil} from '@wireapp/commons';
 
 import {Page} from './page';
 
+import type {ChangePassword} from '../../apiClient/self/changePassword';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button} from '../../uiKit/inputs/button/button';

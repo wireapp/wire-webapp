@@ -29,43 +29,6 @@ import {
   isTruthy,
   isUndefined,
 } from '@sindresorhus/is';
-import {
-  ADD_PERMISSION,
-  Conversation as BackendConversation,
-  CONVERSATION_CELLS_STATE,
-  CONVERSATION_TYPE,
-  DefaultConversationRoleName as DefaultRole,
-  MessageSendingStatus,
-  NewConversation,
-  RemoteConversations,
-} from '@wireapp/api-client/lib/conversation';
-import type {ValidatedMeetingConversation} from '@wireapp/api-client/lib/conversation/conversationSchema';
-import {
-  ConversationReceiptModeUpdateData,
-  MemberLeaveReason,
-  RECEIPT_MODE,
-} from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/conversationTypingData';
-import {
-  CONVERSATION_EVENT,
-  ConversationAddPermissionUpdateEvent,
-  ConversationCreateEvent,
-  ConversationCreateMeetingEvent,
-  ConversationEvent,
-  ConversationMemberJoinEvent,
-  ConversationMemberLeaveEvent,
-  ConversationMemberUpdateEvent,
-  ConversationMessageTimerUpdateEvent,
-  ConversationMLSResetEvent,
-  ConversationProtocolUpdateEvent,
-  ConversationReceiptModeUpdateEvent,
-  ConversationRenameEvent,
-  ConversationTypingEvent,
-} from '@wireapp/api-client/lib/event';
-import type {BackendError} from '@wireapp/api-client/lib/http/';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {asyncNoop, noop} from 'noop-esm';
@@ -127,6 +90,43 @@ import {isSelfInitiatedConversationLeave} from './isSelfInitiatedConversationLea
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
+import {
+  ADD_PERMISSION,
+  Conversation as BackendConversation,
+  CONVERSATION_CELLS_STATE,
+  CONVERSATION_TYPE,
+} from '../../apiClient/conversation/conversation';
+import {DefaultConversationRoleName as DefaultRole} from '../../apiClient/conversation/conversationRole';
+import type {ValidatedMeetingConversation} from '../../apiClient/conversation/conversationSchema';
+import {MemberLeaveReason} from '../../apiClient/conversation/data/conversationMemberLeaveData';
+import {
+  ConversationReceiptModeUpdateData,
+  RECEIPT_MODE,
+} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {CONVERSATION_TYPING} from '../../apiClient/conversation/data/conversationTypingData';
+import {MessageSendingStatus} from '../../apiClient/conversation/messageSendingStatus';
+import {NewConversation} from '../../apiClient/conversation/newConversation';
+import {RemoteConversations} from '../../apiClient/conversation/remoteConversations';
+import {
+  CONVERSATION_EVENT,
+  ConversationAddPermissionUpdateEvent,
+  ConversationCreateEvent,
+  ConversationCreateMeetingEvent,
+  ConversationEvent,
+  ConversationMemberJoinEvent,
+  ConversationMemberLeaveEvent,
+  ConversationMemberUpdateEvent,
+  ConversationMessageTimerUpdateEvent,
+  ConversationMLSResetEvent,
+  ConversationProtocolUpdateEvent,
+  ConversationReceiptModeUpdateEvent,
+  ConversationRenameEvent,
+  ConversationTypingEvent,
+} from '../../apiClient/event/conversationEvent';
+import type {BackendError} from '../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {TYPING_TIMEOUT, useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';

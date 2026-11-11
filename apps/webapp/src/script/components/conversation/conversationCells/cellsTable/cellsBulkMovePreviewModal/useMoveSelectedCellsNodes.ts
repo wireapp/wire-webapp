@@ -19,12 +19,12 @@
 
 import {useRef, useState} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {RestPerformActionResponse} from 'cells-sdk-ts';
 import {Result, result, task} from 'true-myth';
 
 import {isBulkMoveValid} from './validateBulkMove';
 
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {CellNode} from '../../../../../types/cellNode';
 import {

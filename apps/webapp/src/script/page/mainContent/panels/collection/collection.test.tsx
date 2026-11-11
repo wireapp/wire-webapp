@@ -41,7 +41,7 @@ import {createUuid} from '../../../../util/uuid';
 
 import {Collection} from './collection';
 import {FullSearch} from './fullSearch';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 
 jest.mock('./collectionDetails', () => {
   return {

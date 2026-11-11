@@ -19,8 +19,7 @@
 
 import React, {useEffect, useState, type FunctionComponent} from 'react';
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
-
+import {ConnectionStatus} from '../../../../../../apiClient/connection/connectionStatus';
 import {Avatar, AVATAR_SIZE} from '../../../../../../components/avatar';
 import {User} from '../../../../../../repositories/entity/User';
 import {TabIndex} from '../../../../../../uiKit/utils/enums';

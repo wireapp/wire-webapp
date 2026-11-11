@@ -22,7 +22,7 @@ import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNull, isUndefined} from '@sindresorhus/is';
 import 'core-js/full/reflect';
 
-import {ClientType} from '@wireapp/api-client/lib/client/';
+import {ClientType} from '../apiClient/client/clientType';
 
 import {createRoot} from 'react-dom/client';
 import {Maybe} from 'true-myth';

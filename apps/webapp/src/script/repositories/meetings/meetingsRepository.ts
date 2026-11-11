@@ -17,13 +17,14 @@
  *
  */
 
-import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
-import type {Meeting, MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
-import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Task, task} from 'true-myth';
 
 import type {MeetingsDataSource} from './meetingsDataSource';
+
+import type {CreateMeeting} from '../../apiClient/meetings/createMeeting';
+import type {Meeting, MeetingWithConversation} from '../../apiClient/meetings/meeting';
+import type {UpdateMeeting} from '../../apiClient/meetings/updateMeeting';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 export class MeetingsRepository {
   constructor(private readonly dataSource: MeetingsDataSource) {}

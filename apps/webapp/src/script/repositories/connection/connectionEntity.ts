@@ -17,9 +17,10 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
+
+import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 export class ConnectionEntity {
   conversationId: QualifiedId;

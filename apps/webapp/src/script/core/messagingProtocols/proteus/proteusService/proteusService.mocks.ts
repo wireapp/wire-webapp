@@ -17,15 +17,13 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/lib/client';
-import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
-
-import {APIClient} from '@wireapp/api-client';
-
 import {CryptoClient} from './cryptoClient';
 import {CoreCryptoWrapper} from './cryptoClient/coreCryptoWrapper/coreCryptoWrapper';
 import {ProteusService} from './proteusService';
 
+import {APIClient} from '../../../../apiClient/apiClient';
+import {ClientType} from '../../../../apiClient/client/clientType';
+import {nodePlatform} from '../../../../apiClient/shims/node/platform';
 import {getUUID} from '../../../test/payloadHelper';
 import {createMemoryEngine} from '../../../test/storeHelper';
 

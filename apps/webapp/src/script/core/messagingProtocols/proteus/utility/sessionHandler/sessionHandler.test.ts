@@ -17,12 +17,14 @@
  *
  */
 
-import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+import {nodePlatform} from '../../../../../apiClient/shims/node/platform';
 
-import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
+import type {QualifiedUserClients} from '../../../../../apiClient/conversation/qualifiedUserClients';
+import type {UserClients} from '../../../../../apiClient/conversation/userClients';
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
+import {QualifiedUserPreKeyBundleMap} from '../../../../../apiClient/user/userPreKeyBundleMap';
 
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../../../../apiClient/apiClient';
 
 import {constructSessionId, initSession, initSessions} from './sessionHandler';
 

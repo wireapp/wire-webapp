@@ -18,12 +18,13 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import type {TraceState} from '@wireapp/api-client/lib/http/';
-import type {Consent, Self} from '@wireapp/api-client/lib/self/';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {UserUpdate} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
+import type {TraceState} from '../../apiClient/http/traceState';
+import type {Consent} from '../../apiClient/self/consent';
+import type {Self} from '../../apiClient/self/self';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import type {UserUpdate} from '../../apiClient/user/userUpdate';
 import type {SelfService as CoreSelfService} from '../../core/self';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';

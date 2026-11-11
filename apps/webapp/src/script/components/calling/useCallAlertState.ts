@@ -17,8 +17,9 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {create} from 'zustand';
+
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 type CallAlertState = {
   showAlert: boolean;

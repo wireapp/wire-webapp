@@ -17,10 +17,10 @@
  *
  */
 
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {USER_EVENT, UserUpdateEvent} from '@wireapp/api-client/lib/event';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
+import {RECEIPT_MODE} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {USER_EVENT, UserUpdateEvent} from '../../apiClient/event/userEvent';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import type {User as APIClientUser} from '../../apiClient/user/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 

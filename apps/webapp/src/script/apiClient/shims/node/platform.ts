@@ -17,6 +17,17 @@
  *
  */
 
-const WebSocketBrowser = window.WebSocket;
+import {base64MD5FromBuffer, bufferToString, concatToBuffer} from './buffer';
+import {retrieveCookie, sendRequestWithCookie} from './cookie';
+import {WebSocketNode} from './websocket';
 
-export {WebSocketBrowser};
+import type {ApiClientPlatform} from '../../platform';
+import {createPartysocketCompatibleWebSocketConstructor} from '../../tcp/reconnectingWebsocket';
+
+const partysocketWebSocket = createPartysocketCompatibleWebSocketConstructor(WebSocketNode) ?? WebSocketNode;
+
+export const nodePlatform: ApiClientPlatform = {
+  buffer: {base64MD5FromBuffer, bufferToString, concatToBuffer},
+  cookie: {retrieveCookie, sendRequestWithCookie},
+  websocket: {WebSocket: partysocketWebSocket, bufferToString},
+};

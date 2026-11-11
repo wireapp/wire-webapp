@@ -18,11 +18,6 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {Connection, ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {UserConnectionEvent, USER_EVENT, UserEvent} from '@wireapp/api-client/lib/event/';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {UserConnectionData, UserUpdateData} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -31,6 +26,13 @@ import {ConnectionMapper} from './connectionMapper';
 import type {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
 
+import {Connection} from '../../apiClient/connection/connection';
+import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
+import {UserConnectionEvent, USER_EVENT, UserEvent} from '../../apiClient/event/userEvent';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import type {UserConnectionData} from '../../apiClient/user/data/userConnectionData';
+import type {UserUpdateData} from '../../apiClient/user/data/userUpdateData';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {SystemMessageType} from '../../message/systemMessageType';

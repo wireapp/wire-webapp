@@ -17,8 +17,6 @@
  *
  */
 
-import {ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {result} from 'true-myth';
 
@@ -28,6 +26,8 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {queueProposal} from './incomingProposalsQueue';
 
+import {ConversationMLSMessageAddEvent} from '../../../../../../apiClient/event/conversationEvent';
+import {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 import {HandledEventPayload} from '../../../../../notification';
 import {parseFullQualifiedClientId} from '../../../../../util/fullyQualifiedClientIdUtils';
 import {MLSService} from '../../../mlsService/mlsService';

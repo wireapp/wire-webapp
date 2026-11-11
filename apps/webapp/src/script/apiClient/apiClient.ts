@@ -80,7 +80,9 @@ import {UserGroupAPI} from './userGroups/';
 const minimumMlsBackendVersion = 5;
 const minimumGuestLinkPasswordBackendVersion = 4;
 
-const {version}: {version: string} = require('../package.json');
+// Retain the final standalone SDK version for callers of APIClient.VERSION.
+// This is distinct from the webapp release version and is no longer independently versioned.
+const version = '27.96.0';
 
 enum TOPIC {
   ACCESS_TOKEN_REFRESH = 'APIClient.TOPIC.ACCESS_TOKEN_REFRESH',

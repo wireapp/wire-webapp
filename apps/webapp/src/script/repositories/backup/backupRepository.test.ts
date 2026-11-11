@@ -18,7 +18,7 @@
  */
 
 import {isUint8Array, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
 import {container} from 'tsyringe';
 import {omit} from 'underscore';
 

@@ -17,13 +17,15 @@
  *
  */
 
-import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+import {nodePlatform} from '../../../apiClient/shims/node/platform';
 
-import {SUBCONVERSATION_ID, Subconversation} from '@wireapp/api-client/lib/conversation';
-import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/lib/http';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {SUBCONVERSATION_ID, Subconversation} from '../../../apiClient/conversation/subconversation';
+import {BackendError} from '../../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
+import {StatusCode} from '../../../apiClient/http';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../../apiClient/apiClient';
 
 import {SubconversationService} from './subconversationService';
 

@@ -21,7 +21,7 @@ import type {ComponentProps} from 'react';
 
 import {act, fireEvent, render} from '@testing-library/react';
 import type {useVirtualizer as useVirtualizerFunction, Virtualizer} from '@tanstack/react-virtual';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
 

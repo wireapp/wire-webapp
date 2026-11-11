@@ -18,8 +18,8 @@
  */
 
 import {render} from '@testing-library/react';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {UserType} from '@wireapp/api-client/lib/user';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {UserType} from '../../../apiClient/user/user';
 
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {User} from '../../../repositories/entity/User';

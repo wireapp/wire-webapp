@@ -17,32 +17,32 @@
  *
  */
 
-import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+import {nodePlatform} from '../apiClient/shims/node/platform';
 
-import {AuthAPI} from '@wireapp/api-client/lib/auth';
+import {AuthAPI} from '../apiClient/auth/authApi';
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {
-  ClientAPI,
-  ClientCapability,
-  ClientClassification,
-  ClientType,
-  RegisteredClient,
-} from '@wireapp/api-client/lib/client';
-import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/config';
-import {ConversationAPI} from '@wireapp/api-client/lib/conversation';
-import {BackendEvent} from '@wireapp/api-client/lib/event';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {NotificationAPI} from '@wireapp/api-client/lib/notification';
-import {ConsumableEvent} from '@wireapp/api-client/lib/notification/consumableNotification';
-import {Self, SelfAPI} from '@wireapp/api-client/lib/self';
-import {UserType} from '@wireapp/api-client/lib/user';
-import {ReconnectingWebsocket} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
+import {ClientAPI} from '../apiClient/client/clientApi';
+import {ClientCapability} from '../apiClient/client/clientCapability';
+import {ClientClassification} from '../apiClient/client/clientClassification';
+import {ClientType} from '../apiClient/client/clientType';
+import {RegisteredClient} from '../apiClient/client/registeredClient';
+import {MINIMUM_API_VERSION} from '../apiClient/config';
+import {ConversationAPI} from '../apiClient/conversation/conversationApi/conversationApi';
+import {BackendEvent} from '../apiClient/event/backendEvent';
+import {BackendError} from '../apiClient/http/backendError';
+import {BackendErrorLabel} from '../apiClient/http/backendErrorLabel';
+import {NotificationAPI} from '../apiClient/notification/notificationApi/notificationApi';
+import {ConsumableEvent} from '../apiClient/notification/consumableNotification';
+import {Self} from '../apiClient/self/self';
+import {SelfAPI} from '../apiClient/self/selfApi';
+import {UserType} from '../apiClient/user/user';
+import {ReconnectingWebsocket} from '../apiClient/tcp/reconnectingWebsocket';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {WS} from 'jest-websocket-mock';
 import nock, {cleanAll} from 'nock';
 import {v4 as uuidv4} from 'uuid';
 
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../apiClient/apiClient';
 import {AccentColor, ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 

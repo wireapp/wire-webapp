@@ -21,9 +21,9 @@ import {ReactNode} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
+import {MemberLeaveReason} from '../../../../apiClient/conversation/data/conversationMemberLeaveData';
+import {CONVERSATION_EVENT} from '../../../../apiClient/event/conversationEvent';
 import {Config} from '../../../../Config';
 import {SystemMessageType} from '../../../../message/systemMessageType';
 import {useApplicationContext, type RootContextValue} from '../../../../page/rootProvider';

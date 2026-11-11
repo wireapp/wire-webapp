@@ -17,13 +17,13 @@
  *
  */
 
-import {nodePlatform} from '@wireapp/api-client/lib/shims/node/platform';
+import {nodePlatform} from '../../apiClient/shims/node/platform';
 
 import type {Account as AccountType} from '../account';
 
-const {ClientType} = require('@wireapp/api-client/lib/client');
+const {ClientType} = require('../../apiClient/client');
 
-const {APIClient} = require('@wireapp/api-client');
+const {APIClient} = require('../../apiClient/apiClient');
 const {Account} = require('..');
 
 const StoreHelper = require('./storeHelper');

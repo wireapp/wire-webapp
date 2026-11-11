@@ -20,10 +20,6 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {LoginData} from '@wireapp/api-client/lib/auth';
-import {ClientType} from '@wireapp/api-client/lib/client/index';
-import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data';
-import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
@@ -33,6 +29,11 @@ import {Runtime, UrlUtil} from '@wireapp/commons';
 
 import {separator} from './login.styles';
 
+import {LoginData} from '../../../apiClient/auth/loginData';
+import {ClientType} from '../../../apiClient/client/clientType';
+import type {ConversationJoinData} from '../../../apiClient/conversation/data/conversationJoinData';
+import {BackendError} from '../../../apiClient/http/backendError';
+import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {LogoFullIcon} from '../../../components/icon';
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';

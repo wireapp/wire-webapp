@@ -18,7 +18,7 @@
  */
 
 import {act, renderHook} from '@testing-library/react';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {Message} from '../../../repositories/entity/message/message';

@@ -17,14 +17,6 @@
  *
  */
 
-import {base64MD5FromBuffer, bufferToString, concatToBuffer} from './buffer';
-import {retrieveCookie, sendRequestWithCookie} from './cookie';
-import {WebSocketNode} from './websocket';
+const WebSocketBrowser = globalThis.WebSocket;
 
-import type {ApiClientPlatform} from '../../platform';
-
-export const nodePlatform: ApiClientPlatform = {
-  buffer: {base64MD5FromBuffer, bufferToString, concatToBuffer},
-  cookie: {retrieveCookie, sendRequestWithCookie},
-  websocket: {WebSocket: WebSocketNode, bufferToString},
-};
+export {WebSocketBrowser};

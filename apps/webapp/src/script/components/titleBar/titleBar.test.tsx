@@ -18,7 +18,7 @@
  */
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {isNull} from '@sindresorhus/is';
@@ -49,7 +49,7 @@ import {TestFactory} from '../../../../test/helper/TestFactory';
 import {PanelState} from '../../page/rightSidebar/rightSidebar';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {translateForTest} from '../../util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
 jest.mock('../../uiKit/layout/matchMedia/matchMedia', () => {
   return {

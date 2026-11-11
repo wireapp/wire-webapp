@@ -18,8 +18,6 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {MessageSendingStatus, QualifiedOTRRecipients, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 import {uuidToBytes} from '@wireapp/commons/lib/util/StringUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosError} from 'axios';
@@ -27,10 +25,14 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {merge} from 'lodash';
 import Long from 'long';
 
-import {APIClient} from '@wireapp/api-client';
-
 import {flattenUserMap} from './userClientsUtil';
 
+import {APIClient} from '../../../apiClient/apiClient';
+import {MessageSendingStatus} from '../../../apiClient/conversation/messageSendingStatus';
+import {QualifiedOTRRecipients} from '../../../apiClient/conversation/otrRecipients';
+import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {QualifiedUserPreKeyBundleMap} from '../../../apiClient/user/userPreKeyBundleMap';
 import type {EncryptionResult, ProteusService} from '../../messagingProtocols/proteus';
 import {isQualifiedIdArray} from '../../util';
 

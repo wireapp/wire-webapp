@@ -20,9 +20,9 @@
 import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNull} from '@sindresorhus/is';
-import {LoginData} from '@wireapp/api-client/lib/auth';
 import {useSelector} from 'react-redux';
 
+import {LoginData} from '../../apiClient/auth/loginData';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Loading} from '../../uiKit/dataDisplay/loading/loading';
 import {Button} from '../../uiKit/inputs/button/button';

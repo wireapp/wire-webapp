@@ -20,8 +20,8 @@
 import assert from 'node:assert';
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {MEETING_EVENT} from '@wireapp/api-client/lib/event';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {MEETING_EVENT} from '../../../apiClient/event/meetingEvent';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {WebAppEvents} from '../../../webAppEvents';
 import {amplify} from 'amplify';
 import {noop} from 'noop-esm';
