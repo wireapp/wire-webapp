@@ -25,6 +25,7 @@ import type {createPdfPreview} from './pdfPreview';
 
 import {APIClient} from '../../apiClient/apiClient';
 import {AssetRetentionPolicy} from '../../apiClient/asset/assetRetentionPolicy';
+import {nodePlatform} from '../../apiClient/shims/node/platform';
 import {RequestCancellationError} from '../../apiClient/user/userError';
 import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 import {AssetService} from '../../core/conversation/assetService/assetService';
@@ -94,7 +95,7 @@ describe('encrypted PDF uploads', () => {
   });
 
   it('uploads only ciphertext and decrypts the preview with its independent key', async () => {
-    using apiClient = new APIClient();
+    using apiClient = new APIClient({platform: nodePlatform});
     const service = new AssetService(apiClient);
     const post = jest.spyOn(apiClient.api.asset, 'postAsset').mockImplementation(() => {
       return {
