@@ -36,7 +36,6 @@ import {WebAppEvents} from '../../webAppEvents';
 import {CacheRepository} from '../cache/cacheRepository';
 import type {ClientRepository} from '../client/ClientRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {User} from '../entity/User';
 import type {EventRepository} from '../event/EventRepository';
 import {StorageKey} from '../storage/storageKey';
 import type {StorageRepository} from '../storage/storageRepository';
@@ -247,7 +246,10 @@ export class LifeCycleRepository {
     // Handle cookie label preservation
     const currentUser = this.dependencies.userRepository['userState'].self();
     if (isTruthy(currentUser)) {
-      const cookieLabelsToPreserve = this.determineCookieLabelsToPreserve(currentUser, shouldClearAllData);
+      const cookieLabelsToPreserve = this.determineCookieLabelsToPreserve(
+        Maybe.of(currentUser.email()),
+        shouldClearAllData,
+      );
       storageKeysToPreserve.push(...cookieLabelsToPreserve);
 
       // Clear localStorage selectively, keeping conversation input for session expiry
@@ -289,11 +291,9 @@ export class LifeCycleRepository {
    * Determines which cookie labels should be preserved during logout.
    * User's own cookie label is deleted only when explicitly clearing all data.
    */
-  private readonly determineCookieLabelsToPreserve = (currentUser: User, shouldClearAllData: boolean): string[] => {
+  private readonly determineCookieLabelsToPreserve = (email: Maybe<string>, shouldClearAllData: boolean): string[] => {
     this.logger.debug('Determining which cookie labels to preserve during logout.');
-    const userCookieLabelKey = this.dependencies.clientRepository.constructCookieLabelKey(
-      Maybe.of(currentUser.email()),
-    );
+    const userCookieLabelKey = this.dependencies.clientRepository.constructCookieLabelKey(email);
     const allStorageKeys = Object.keys(amplify.store());
 
     return allStorageKeys.filter(storageKey => {

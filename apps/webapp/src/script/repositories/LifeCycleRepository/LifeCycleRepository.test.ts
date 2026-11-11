@@ -18,7 +18,6 @@
  */
 
 import {amplify} from 'amplify';
-import {ClientType} from '@wireapp/api-client/lib/client/';
 
 import {WebAppEvents} from '../../webAppEvents';
 
@@ -245,16 +244,13 @@ describe('LifeCycleRepository', () => {
       const user = new User('user-without-email', '', translateForTest);
       jest.mocked(mockDependencies.userRepository['userState'].self).mockReturnValue(user);
       Object.assign(mockDependencies.clientRepository, {
+        loadCurrentClientType: jest.fn(),
         selfUser: () => {
           return user;
         },
       });
       (mockDependencies.clientRepository.constructCookieLabelKey as jest.Mock).mockImplementation(login => {
-        return ClientRepository.prototype.constructCookieLabelKey.call(
-          mockDependencies.clientRepository,
-          login,
-          ClientType.PERMANENT,
-        );
+        return ClientRepository.prototype.constructCookieLabelKey.call(mockDependencies.clientRepository, login);
       });
 
       await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, shouldClearAllData);
