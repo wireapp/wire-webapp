@@ -69,7 +69,7 @@
     "jest-environment-jsdom": "30.5.2",
     "jest-silent-reporter": "0.6.0",
     "js-yaml": "4.3.2",
-    "jscpd": "5.4.2",
+    "jscpd": "5.4.3",
     "jsdom": "29.1.1",
     "jszip": "3.10.2",
     "nock": "14.0.17",
