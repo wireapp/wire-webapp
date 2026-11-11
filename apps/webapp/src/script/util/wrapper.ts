@@ -19,10 +19,9 @@
 
 import {amplify} from 'amplify';
 
-import {Runtime} from '@wireapp/commons';
-
 import {Environment} from './environment';
 
+import {Runtime} from '../commons/util/Runtime';
 import {ROLE} from '../repositories/user/userPermission';
 import {WebAppEvents} from '../webAppEvents';
 

@@ -36,8 +36,8 @@ import {
 import {BackendError} from '../../../../apiClient/http/backendError';
 import {BackendErrorLabel} from '../../../../apiClient/http/backendErrorLabel';
 import {StatusCode} from '../../../../apiClient/http';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
-import {Decoder} from '@wireapp/commons/lib/base64/decoder';
+import {TimeInMillis} from '../../../../commons/util/TimeUtil';
+import {Decoder} from '../../../../commons/base64/decoder';
 
 import {randomUUID, UUID} from 'crypto';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';

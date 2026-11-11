@@ -23,13 +23,12 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
-
 import type {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
+import {Runtime} from '../commons/util/Runtime';
 import {PrimaryModal, usePrimaryModalState} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {

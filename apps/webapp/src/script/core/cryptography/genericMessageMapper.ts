@@ -19,9 +19,8 @@
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {LogFactory} from '@wireapp/commons';
-
 import {ConversationOtrMessageAddEvent} from '../../apiClient/event/conversationEvent';
+import {LogFactory} from '../../commons/LogFactory';
 import {GenericMessageType, MessageSendingState, PayloadBundle, PayloadBundleType} from '../conversation';
 import {
   AssetContent,

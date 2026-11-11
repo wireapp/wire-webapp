@@ -50,7 +50,6 @@ format:
         --ignore-path .gitignore \
         --ignore-path apps/server/.gitignore \
         --ignore-path apps/webapp/.gitignore \
-        --ignore-path libraries/commons/.gitignore \
         .
 
 # Type-check all application and library configurations in sequence.
@@ -64,13 +63,13 @@ type-check: build-libraries
     tsc --project ./apps/server/tsconfig.type-check.json
     tsc --project ./apps/server/bin/tsconfig.json
     tsc --project ./apps/webapp/tsconfig.api-client.json
-    tsc --project ./libraries/commons/tsconfig.type-check.json
+    tsc --project ./apps/webapp/tsconfig.commons.json
+    tsc --project ./apps/webapp/tsconfig.commons-tests.json
     tsc --project ./libraries/config/tsconfig.type-check.json
 
 # Build workspace libraries required by dependent tasks such as type-checking and tests.
 [group('build')]
 build-libraries:
-    cd libraries/commons && tsc
     cd libraries/config && tsc
 
 # Compile the production server and copy its runtime assets.
@@ -125,7 +124,6 @@ develop: prepare-development-server
     concurrently --raw --kill-others \
         "just watch-server-typescript" \
         "just run-development-server" \
-        "just watch-library commons" \
         "just watch-library config"
 
 # Alternative to develop: build dependencies, select libraries, and start the server.
@@ -151,7 +149,7 @@ run-development-server:
 [group('development')]
 watch-library library:
     case {{ quote(library) }} in \
-        commons|config) ;; \
+        config) ;; \
         *) echo "Unknown library: {{ quote(library) }}" >&2; exit 2 ;; \
     esac
     tsc --project {{ quote("libraries/" + library + "/tsconfig.json") }} --watch --preserveWatchOutput
@@ -186,7 +184,7 @@ e2e-ui *playwrightArguments: build-libraries
 # Run each Jest project separately to preserve its coverage thresholds.
 [group('testing')]
 test-ci: build-libraries
-    for jest_config_path in apps/*/jest.config.* apps/webapp/test/core/jest.config.js apps/webapp/test/uiKit/jest.config.js apps/webapp/test/apiClient/jest.config.js libraries/*/jest.config.js; do \
+    for jest_config_path in apps/*/jest.config.* apps/webapp/test/core/jest.config.js apps/webapp/test/uiKit/jest.config.js apps/webapp/test/apiClient/jest.config.js apps/webapp/test/commons/jest.config.js libraries/*/jest.config.js; do \
         CI=true jest --config "${jest_config_path}" --ci --coverage --maxWorkers=2 || exit $?; \
     done
     CI=true jest --config tools/jest.config.js --ci --maxWorkers=2

@@ -21,7 +21,7 @@ import {SUBCONVERSATION_ID} from '../../../../apiClient/conversation/subconversa
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {noop} from 'noop-esm';
 
-import {LogFactory} from '@wireapp/commons';
+import {LogFactory} from '../../../../commons/LogFactory';
 
 import {DomainMlsError, MlsErrorMapper} from './mlsErrorMapper';
 import {

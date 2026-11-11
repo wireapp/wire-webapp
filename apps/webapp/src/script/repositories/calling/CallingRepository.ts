@@ -46,7 +46,6 @@ import {
   WcallMember,
 } from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
-import {Runtime} from '@wireapp/commons';
 
 import {Call, SerializedConversationId} from './Call';
 import {NetworkQualityInfo, NetworkQualityInfoSchema, UNKNOWN_NETWORK_QUALITY} from './calling.schema';
@@ -66,6 +65,7 @@ import {QualifiedUserClients} from '../../apiClient/conversation/qualifiedUserCl
 import {FEATURE_KEY} from '../../apiClient/team/feature/featureList.types';
 import type {WebappProperties} from '../../apiClient/user/data/userPropertiesSetData';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {Runtime} from '../../commons/util/Runtime';
 import {showNoAudioInputModal, showNoCameraModal} from '../../components/calling/devicePermissionModals';
 import {useCallAlertState} from '../../components/calling/useCallAlertState';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';

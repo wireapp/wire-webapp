@@ -40,12 +40,11 @@ import {
 } from 'cells-sdk-ts';
 import logdown from 'logdown';
 
-import {LogFactory} from '@wireapp/commons';
-
 import {Node, NodeVersions, RestNodeSchema, RestNodeVersionsSchema} from './cellsApi.schema';
 import {CellsStorage} from './cellsStorage/cellsStorage';
 import {S3Service} from './cellsStorage/s3Service';
 
+import {LogFactory} from '../../commons/LogFactory';
 import {AccessTokenStore} from '../auth';
 import {HttpClient} from '../http';
 import type {CookiePlatform} from '../platform';

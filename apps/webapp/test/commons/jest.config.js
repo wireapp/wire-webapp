@@ -17,9 +17,11 @@
  *
  */
 
-const rootJestConfiguration = require('../../jest.config.js');
+const rootJestConfiguration = require('../../../../jest.config.js');
 
 module.exports = {
+  rootDir: '../..',
+  roots: ['<rootDir>/src/script/commons'],
   displayName: 'commons-lib',
   testEnvironment: 'jsdom',
   clearMocks: true,
@@ -29,12 +31,11 @@ module.exports = {
   },
   transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is)/)'],
   cacheDirectory: '../../target/jest/cache',
-  coverageDirectory: '../../target/coverage/libraries/commons',
+  coverageDirectory: '../../target/coverage/apps/webapp/commons',
   coverageReporters: rootJestConfiguration.coverageReporters,
   testMatch: [
-    '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
-    '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
-    '<rootDir>/spec/**/*.[jt]s?(x)',
+    '<rootDir>/src/script/commons/**/__tests__/**/*.[jt]s?(x)',
+    '<rootDir>/src/script/commons/**/?(*.)+(spec|test).[jt]s?(x)',
   ],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
   reporters: rootJestConfiguration.reporters,

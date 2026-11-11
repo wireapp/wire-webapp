@@ -99,12 +99,26 @@ export function createJestConfigCommand(): JestTestCommand {
   };
 }
 
-function findJestConfigFile(projectRoot: string, workspaceRoot: string): string {
+type FindJestConfigFileOptions = {
+  readonly projectRoot: string;
+  readonly workspaceRoot: string;
+  readonly projectSourceDirectories: readonly string[];
+};
+
+function findJestConfigFile(options: FindJestConfigFileOptions): string {
+  const {projectRoot, workspaceRoot, projectSourceDirectories} = options;
   const projectDirectory = join(workspaceRoot, projectRoot);
+  const dedicatedConfigFiles = projectSourceDirectories
+    .filter((sourceDirectory): boolean => {
+      return sourceDirectory !== projectDirectory;
+    })
+    .map((sourceDirectory): string => {
+      return join(projectDirectory, 'test', basename(sourceDirectory), 'jest.config.js');
+    });
   const candidateConfigFiles =
     projectRoot === '.'
       ? [join(workspaceRoot, 'tools/jest.config.js')]
-      : [join(projectDirectory, 'jest.config.js'), join(projectDirectory, 'jest.config.ts')];
+      : [...dedicatedConfigFiles, join(projectDirectory, 'jest.config.js'), join(projectDirectory, 'jest.config.ts')];
 
   for (const candidateConfigFile of candidateConfigFiles) {
     if (existsSync(candidateConfigFile)) {
@@ -148,6 +162,8 @@ export function findTestableProjects(jestConfigOutput: string, workspaceRoot: st
     }
 
     const projectRoot = relative(workspaceRoot, rootDirectory).split(sep).join('/') || '.';
+    const projectRoots = projectConfigurationRecord['roots'];
+    const projectSourceDirectories = isArray(projectRoots) ? projectRoots.filter(isString) : [];
     const displayName = projectConfigurationRecord['displayName'];
     const displayNameRecord = isObject(displayName) ? (displayName as Record<string, unknown>) : undefined;
     const projectDisplayName = displayNameRecord?.['name'];
@@ -163,7 +179,7 @@ export function findTestableProjects(jestConfigOutput: string, workspaceRoot: st
     }
 
     return {
-      jestConfigFile: findJestConfigFile(projectRoot, workspaceRoot),
+      jestConfigFile: findJestConfigFile({projectRoot, workspaceRoot, projectSourceDirectories}),
       name: projectName,
       root: projectRoot,
       type: projectType,

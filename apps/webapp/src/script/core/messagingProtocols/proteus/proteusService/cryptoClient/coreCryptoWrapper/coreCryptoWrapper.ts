@@ -18,11 +18,9 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import {Encoder} from '@wireapp/commons/lib/base64/encoder';
 import {deleteDB} from 'idb';
 import {result, task, type Result, type Task} from 'true-myth';
 
-import {LogFactory} from '@wireapp/commons';
 import {
   CoreCrypto,
   CoreCryptoLogLevel,
@@ -43,6 +41,8 @@ import {removeCoreCryptoOpfsDatabase} from './coreCryptoOpfsStorage';
 import {PrekeyTracker} from './prekeysTracker';
 
 import {PreKey} from '../../../../../../apiClient/auth/preKey';
+import {Encoder} from '../../../../../../commons/base64/encoder';
+import {LogFactory} from '../../../../../../commons/LogFactory';
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
 import type {CRUDEngine} from '../../../../../storage/engine/crudEngine';
 import {CoreCryptoConfig} from '../../../../common.types';

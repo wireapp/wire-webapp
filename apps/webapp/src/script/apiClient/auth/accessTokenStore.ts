@@ -22,8 +22,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {EventEmitter} from 'events';
 
-import {LogFactory} from '@wireapp/commons';
-
+import {LogFactory} from '../../commons/LogFactory';
 import {AccessTokenData} from '../auth/';
 
 const millisecondsPerSecond = 1000;

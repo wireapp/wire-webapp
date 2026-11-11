@@ -18,12 +18,8 @@
  */
 
 import {isNonEmptyArray} from '@sindresorhus/is';
-import {Converter} from '@wireapp/commons/lib/base64/converter';
-import {Decoder} from '@wireapp/commons/lib/base64/decoder';
-import {Encoder} from '@wireapp/commons/lib/base64/encoder';
 import {Task, result, task} from 'true-myth';
 
-import {LogFactory, TimeUtil, TypedEventEmitter} from '@wireapp/commons';
 import {
   CipherSuite as Ciphersuite,
   ClientId as CoreCryptoClientId,
@@ -73,6 +69,12 @@ import {
   ConversationMLSWelcomeEvent,
 } from '../../../../apiClient/event/conversationEvent';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import {Converter} from '../../../../commons/base64/converter';
+import {Decoder} from '../../../../commons/base64/decoder';
+import {Encoder} from '../../../../commons/base64/encoder';
+import {LogFactory} from '../../../../commons/LogFactory';
+import {TypedEventEmitter} from '../../../../commons/TypedEventEmitter/TypedEventEmitter';
+import {TimeUtil} from '../../../../commons/util';
 import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';
 import type {HandledEventPayload} from '../../../notification';
 import {CoreDatabase} from '../../../storage/coreDb';

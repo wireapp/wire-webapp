@@ -19,7 +19,7 @@
 
 import type {WebappProperties} from '../../../src/script/apiClient/user/data/userPropertiesSetData';
 
-import {TypeUtil} from '@wireapp/commons';
+import {TypeUtil} from '../../../src/script/commons/util';
 
 import {BackendClientE2E} from './backendClient.e2e';
 

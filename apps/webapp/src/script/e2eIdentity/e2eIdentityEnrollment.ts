@@ -23,8 +23,6 @@ import {amplify} from 'amplify';
 import {SigninResponse} from 'oidc-client-ts';
 import {container} from 'tsyringe';
 
-import {TypedEventEmitter} from '@wireapp/commons';
-
 import {
   hasActiveCertificate,
   getActiveWireIdentity,
@@ -37,6 +35,7 @@ import {getModalOptions, ModalType} from './modals';
 import {OIDCService} from './oidcService';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 
+import {TypedEventEmitter} from '../commons/TypedEventEmitter/TypedEventEmitter';
 import {PrimaryModal, removeCurrentModal} from '../components/Modals/PrimaryModal';
 import {CredentialType, type E2EIServiceExternal} from '../core/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '../core/util/lowPrecisionTaskScheduler';

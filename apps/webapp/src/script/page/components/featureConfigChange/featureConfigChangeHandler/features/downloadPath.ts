@@ -17,9 +17,8 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
-
 import {FEATURE_KEY, FeatureList} from '../../../../../apiClient/team/feature/featureList.types';
+import {Runtime} from '../../../../../commons/util/Runtime';
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {ModalType, getModalOptions} from '../../../../../e2eIdentity/modals';
 import type {Translate} from '../../../../../util/localizerUtil';

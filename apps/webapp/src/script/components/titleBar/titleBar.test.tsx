@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {isNull} from '@sindresorhus/is';
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime} from '../../commons/util/Runtime';
 import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {WebAppEvents} from '../../webAppEvents';
 

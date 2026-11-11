@@ -20,13 +20,13 @@
 import type {FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {useSelector} from 'react-redux';
 import {useNavigate} from 'react-router';
 
 import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './customBackend.styles';
 import {Page} from './page';
 
+import {pathWithParams} from '../../commons/util/UrlUtil';
 import {LogoFullIcon} from '../../components/icon';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';

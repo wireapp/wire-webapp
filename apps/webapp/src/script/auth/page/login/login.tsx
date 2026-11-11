@@ -25,8 +25,6 @@ import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router';
 
-import {Runtime, UrlUtil} from '@wireapp/commons';
-
 import {separator} from './login.styles';
 
 import {LoginData} from '../../../apiClient/auth/loginData';
@@ -34,6 +32,8 @@ import {ClientType} from '../../../apiClient/client/clientType';
 import type {ConversationJoinData} from '../../../apiClient/conversation/data/conversationJoinData';
 import {BackendError} from '../../../apiClient/http/backendError';
 import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
+import {UrlUtil} from '../../../commons/util';
+import {Runtime} from '../../../commons/util/Runtime';
 import {LogoFullIcon} from '../../../components/icon';
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';

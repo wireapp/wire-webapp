@@ -20,7 +20,7 @@
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {FEATURE_STATUS, type FeatureList} from '../../apiClient/team/feature/featureList.types';
-import {TypedEventEmitter} from '@wireapp/commons';
+import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
 
 import {getMLSKeyPackageUploadAmount} from './mlsKeyPackagePolicy';
 import {subscribeToMLSKeyPackageUpdates} from './subscribeToMLSKeyPackageUpdates';

@@ -23,12 +23,11 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {connect} from 'react-redux';
 import {useLocation} from 'react-router';
 
-import {Runtime} from '@wireapp/commons';
-
 import {Page} from './page';
 
 import {BackendErrorLabel, SyntheticErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import {ConsentType} from '../../apiClient/self/consentType';
+import {Runtime} from '../../commons/util/Runtime';
 import {useApplicationContext} from '../../page/rootProvider';
 import {StorageKey} from '../../repositories/storage';
 import {navigate} from '../../router/Router';

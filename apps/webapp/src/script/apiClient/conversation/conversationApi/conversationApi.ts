@@ -17,7 +17,6 @@
  *
  */
 
-import {chunk} from '@wireapp/commons/lib/util/ArrayUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosRequestConfig, AxiosResponse, isAxiosError} from 'axios';
 
@@ -37,6 +36,7 @@ import {
   QualifiedConversationIds,
   RemoteConversations,
 } from '..';
+import {chunk} from '../../../commons/util/ArrayUtil';
 import {BackendFeatures} from '../../apiClient';
 import {
   ConversationAccessUpdateEvent,

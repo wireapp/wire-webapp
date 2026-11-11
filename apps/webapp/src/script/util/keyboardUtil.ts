@@ -21,7 +21,7 @@ import type {KeyboardEvent as ReactKeyboardEvent, SyntheticEvent as ReactEvent} 
 
 import {isString} from '@sindresorhus/is';
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime} from '../commons/util/Runtime';
 
 export const KEY = {
   ARROW_DOWN: Runtime.isEdge() ? 'Down' : 'ArrowDown',

@@ -627,7 +627,7 @@ const productionConfigs = [
       'apps/server/**/*.{ts,tsx}',
       'tools/configuration/**/*.{ts,mts}',
       'apps/webapp/src/script/apiClient/**/*.{ts,tsx}',
-      'libraries/commons/**/*.{ts,tsx}',
+      'apps/webapp/src/script/commons/**/*.{ts,tsx}',
     ],
     rules: {
       '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,

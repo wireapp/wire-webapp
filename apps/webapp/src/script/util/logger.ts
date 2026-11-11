@@ -17,7 +17,7 @@
  *
  */
 
-import {LogFactory, Logger} from '@wireapp/commons';
+import {LogFactory, type Logger} from '../commons/LogFactory';
 
 const LOGGER_NAMESPACE = '@wireapp/webapp';
 
@@ -28,4 +28,5 @@ function getLogger(name: string): Logger {
   });
 }
 
-export {getLogger, LOGGER_NAMESPACE, Logger};
+export {getLogger, LOGGER_NAMESPACE};
+export type {Logger};

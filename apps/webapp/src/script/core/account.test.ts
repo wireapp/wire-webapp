@@ -43,7 +43,7 @@ import nock, {cleanAll} from 'nock';
 import {v4 as uuidv4} from 'uuid';
 
 import {APIClient} from '../apiClient/apiClient';
-import {AccentColor, ValidationUtil} from '@wireapp/commons';
+import {AccentColor, ValidationUtil} from '../commons/util';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 // Mock ConversationService to avoid requiring MLSService in constructor during tests

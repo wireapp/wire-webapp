@@ -20,13 +20,10 @@
 import React, {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect, useDispatch} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
 import {container} from 'tsyringe';
-
-import {Runtime, UrlUtil} from '@wireapp/commons';
 
 import {buildDomainRedirectUrl, handleEnterpriseLogin, handleSSOBackendError, requiresPasswordModal} from './util';
 
@@ -36,6 +33,9 @@ import type {ConversationJoinData} from '../../../apiClient/conversation/data/co
 import type {ConversationEvent} from '../../../apiClient/event/conversationEvent';
 import {BackendError} from '../../../apiClient/http/backendError';
 import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
+import {UrlUtil} from '../../../commons/util';
+import {Runtime} from '../../../commons/util/Runtime';
+import {isValidEmail, PATTERN} from '../../../commons/util/ValidationUtil';
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {APIClient} from '../../../service/apiClientSingleton';

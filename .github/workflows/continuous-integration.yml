@@ -388,6 +388,7 @@ jobs:
             target/coverage/apps/server
             target/coverage/apps/webapp/core
             target/coverage/apps/webapp/apiClient
+            target/coverage/apps/webapp/commons
 
   public-production-package:
     runs-on: ubuntu-26.04

@@ -22,10 +22,10 @@ import ansiRegex from 'ansi-regex';
 import * as fs from 'fs-extra';
 import logdown from 'logdown';
 
-import * as os from 'os';
+import os from 'os';
 import * as path from 'path';
 
-import {Runtime} from './util';
+import {Runtime} from './util/Runtime';
 import {serializeArgs} from './util/StringUtil';
 
 const colorChannelValueCount = 256;

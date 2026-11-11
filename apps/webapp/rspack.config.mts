@@ -328,7 +328,7 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       fallback: {
         crypto: false,
         fs: false,
-        os: fileURLToPath(import.meta.resolve('os-browserify')),
+        os: fileURLToPath(import.meta.resolve('os-browserify/browser.js')),
         path: fileURLToPath(import.meta.resolve('path-browserify')),
       },
       modules: [authPath, 'node_modules'],

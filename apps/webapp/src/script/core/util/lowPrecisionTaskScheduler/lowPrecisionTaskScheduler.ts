@@ -17,7 +17,7 @@
  *
  */
 
-import {LogFactory} from '@wireapp/commons';
+import {LogFactory} from '../../../commons/LogFactory';
 
 interface IntervalTask {
   firingDate: number;

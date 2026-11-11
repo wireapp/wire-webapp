@@ -24,8 +24,6 @@ import {Maybe} from 'true-myth';
 
 import {EventEmitter} from 'events';
 
-import {LogFactory, StringUtil} from '@wireapp/commons';
-
 import {AcknowledgeType} from './acknowledgeEvent.types';
 import {
   LongRunningRetryDetails,
@@ -35,6 +33,8 @@ import {
   WEBSOCKET_STATE,
 } from './reconnectingWebsocket';
 
+import {LogFactory} from '../../commons/LogFactory';
+import {StringUtil} from '../../commons/util';
 import {AuthAPI, InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
 import {MINIMUM_API_VERSION} from '../config';
 import {HttpClient, NetworkError} from '../http/';

@@ -17,10 +17,8 @@
  *
  */
 
-import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {Maybe, Task, result, task} from 'true-myth';
 
-import {LogFactory} from '@wireapp/commons';
 import {
   ConversationId,
   CredentialRef,
@@ -34,6 +32,8 @@ import {Ciphersuite, CoreCrypto, CredentialType} from './e2eiService.types';
 import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 import {InitialData} from './storage/e2eiStorage.schema';
 
+import {Decoder} from '../../../../commons/base64/decoder';
+import {LogFactory} from '../../../../commons/LogFactory';
 import {CoreDatabase} from '../../../storage/coreDb';
 import {createMLSClientId} from '../utils/mlsId';
 

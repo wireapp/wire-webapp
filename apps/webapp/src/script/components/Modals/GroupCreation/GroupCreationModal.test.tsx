@@ -10,7 +10,7 @@ import {WebAppEvents} from '../../../webAppEvents';
 import {mountComponent} from '../../../auth/util/test/testUtil';
 import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
 import {initialRootState} from '../../../auth/module/reducer';
-import {TypeUtil} from '@wireapp/commons';
+import {TypeUtil} from '../../../commons/util';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {createRootContextValueForTest} from '../../../page/testSupport/rootContextTestSupport';
