@@ -29,14 +29,24 @@ import {ClientCapabilityData} from '../../apiClient/client/clientCapabilityData'
 import {ClientType} from '../../apiClient/client/clientType';
 import {CreateClientPayload} from '../../apiClient/client/newClient';
 import {RegisteredClient} from '../../apiClient/client/registeredClient';
+import {BackendError} from '../../apiClient/http/backendError';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {LogFactory} from '../../commons/LogFactory';
 import type {ProteusService} from '../messagingProtocols/proteus';
 import {InitialPrekeys} from '../messagingProtocols/proteus/proteusService/cryptoClient';
 import {wipeCoreCryptoDb} from '../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
 import type {CRUDEngine} from '../storage/engine/crudEngine';
+import {RecordNotFoundError} from '../storage/engine/error';
 
 import {ClientInfo, ClientBackendRepository, ClientDatabaseRepository} from './';
+
+/** `HttpClient` turns error responses with a body into a `BackendError`, other failures stay an `AxiosError`. */
+const isNotFoundError = (error: unknown): boolean => {
+  if (error instanceof BackendError) {
+    return Number(error.code) === StatusCodes.NOT_FOUND;
+  }
+  return axios.isAxiosError(error) && error.response?.status === StatusCodes.NOT_FOUND;
+};
 
 export interface MetaClient extends RegisteredClient {
   domain?: string;
@@ -102,8 +112,13 @@ export class ClientService {
   private async getLocalClient(): Promise<MetaClient | undefined> {
     try {
       return await this.database.getLocalClient();
-    } catch {
-      return undefined;
+    } catch (error: unknown) {
+      // Only a missing record means there is no local client. Any other failure (e.g. the database cannot be
+      // opened because the disk is full) must not be mistaken for a removed client.
+      if (error instanceof RecordNotFoundError) {
+        return undefined;
+      }
+      throw error;
     }
   }
 
@@ -112,6 +127,7 @@ export class ClientService {
    * Will return undefined if the client is not found in the database or if the client does not exist on the backend.
    * If the client doesn't exist on backend it will purge the database and return undefined.
    * If the client is found on the backend it will update the local client in the database and return it.
+   * Any other failure (database error, network error, ...) is thrown.
    *
    * @return the loaded client or undefined
    */
@@ -126,8 +142,10 @@ export class ClientService {
       const remoteClient = await this.apiClient.api.client.getClient(loadedClient.id);
       return this.database.updateLocalClient(remoteClient);
     } catch (error: unknown) {
-      const notFoundOnBackend = axios.isAxiosError(error) ? error.response?.status === StatusCodes.NOT_FOUND : false;
-      if (notFoundOnBackend && this.storeEngine !== undefined) {
+      if (!isNotFoundError(error)) {
+        throw error;
+      }
+      if (this.storeEngine !== undefined) {
         const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
         await this.proteusService.wipe();
         // The MLS/CoreCrypto keystore is scoped to the user (not the client id), so it survives
