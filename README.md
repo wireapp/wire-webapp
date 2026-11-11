@@ -25,7 +25,9 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
 - `apps/server/configuration/`: configuration generators, environment contracts, and browser-safe build metadata functions
 - `apps/webapp/src/script/core/`: communication core handling authentication, WebSocket connections, protocol messaging, and shared storage engines
-- Root-level tooling (`justfile`, npm workspaces, and `tools/`) provides commands for both applications
+- Root-level tooling (`justfile` and `tools/`) provides commands for both applications. Webapp dependencies live in the root `package.json` and `package-lock.json`; only `apps/server` remains an npm workspace to preserve production dependency installation.
+
+The browser keeps Ky 1.x as `ky`; release tooling imports its existing Ky 2.x dependency as `ky-release` because its HTTP error handling uses `error.data`. Unifying those versions requires a separate compatibility migration. Commander remains on the root tooling's 15.x version; the former webapp 14.x declaration had no application or tooling imports.
 
 Use `npx just --list` to discover repository tasks, including builds, development, type checks, unit tests, linting, E2E, and translation management.
 

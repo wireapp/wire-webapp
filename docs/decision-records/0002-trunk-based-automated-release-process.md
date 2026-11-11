@@ -176,9 +176,11 @@ Historical date-based Production tags and artifacts remain readable only at docu
 
 ### WebApp package version synchronization
 
-The `version` fields in root `package.json` and `apps/webapp/package.json` represent the latest synchronized stable Production WebApp version. They are repository metadata and do not allocate releases; `apps/server/package.json` is unrelated.
+The `version` field in root `package.json` and the corresponding top-level and root-package versions in `package-lock.json` represent the latest synchronized stable Production WebApp version. They are repository metadata and do not allocate releases; `apps/server/package.json` is unrelated.
 
-After Hosted Production is runtime-verified, the immutable `vX.Y.Z` tag exists, distribution succeeds, and the GitHub Release handoff completes, the workflow attempts package synchronization as post-release bookkeeping. It updates both package versions to exactly `X.Y.Z` and opens or reuses an Otto pull request on `webapp-version-X.Y.Z`. The PR follows normal `main` review and CI requirements; the workflow does not wait for it to merge.
+After Hosted Production is runtime-verified, the immutable `vX.Y.Z` tag exists, distribution succeeds, and the GitHub Release handoff completes, the workflow attempts package synchronization as post-release bookkeeping. It updates the root package version and both root lockfile version fields to exactly `X.Y.Z`, preserving dependency metadata and the server workspace version. It opens or reuses an Otto pull request on `webapp-version-X.Y.Z`. The PR follows normal `main` review and CI requirements; the workflow does not wait for it to merge.
+
+Synchronization branches must contain exactly one normal commit based on `main` history and change only `package.json` and `package-lock.json`, with precisely the expected version changes.
 
 The synchronization marker is the durable mapping from the stable Production tag to the package version. Repeating the same synchronization is idempotent. A synchronization PR reconciles the `semver:none` impact label when it is open. Synchronization failure does not change the completed Production release, block later releases, or move the stable tag; the independent synchronization workflow retries it after the underlying issue is resolved. Synchronization may catch up across missed package versions, but it cannot downgrade package metadata.
 
