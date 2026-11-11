@@ -17,8 +17,6 @@
  *
  */
 
-import {LogFactory} from '@wireapp/commons';
-
 import {CryptoClient, InitialPrekeys} from './cryptoClient';
 import {cryptoMigrationStore} from './cryptoMigrationStateStore';
 import {generateDecryptionError} from './decryptionErrorGenerator';
@@ -44,6 +42,7 @@ import {QualifiedUserClients} from '../../../../apiClient/conversation/qualified
 import type {ConversationOtrMessageAddEvent} from '../../../../apiClient/event/conversationEvent';
 import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import type {QualifiedUserPreKeyBundleMap} from '../../../../apiClient/user/userPreKeyBundleMap';
+import {LogFactory} from '../../../../commons/LogFactory';
 import {
   AddUsersFailureReasons,
   ProteusCreateConversationResponse,

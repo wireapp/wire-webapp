@@ -19,8 +19,7 @@
 
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
-import {Runtime} from '@wireapp/commons';
-
+import {Runtime} from '../../../../commons/util/Runtime';
 import type {CapabilityInfo} from '../backgroundEffectsWorkerTypes';
 
 export function isDocumentAvailable(): boolean {

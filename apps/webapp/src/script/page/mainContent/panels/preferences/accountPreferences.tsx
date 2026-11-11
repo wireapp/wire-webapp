@@ -23,8 +23,6 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
-
 import {AccountInput} from './accountPreferences/accountInput';
 import {AccountLink} from './accountPreferences/accountLink';
 import {AccountSecuritySection} from './accountPreferences/accountSecuritySection';
@@ -40,6 +38,7 @@ import {UsernameInput} from './accountPreferences/usernameInput';
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 
+import {Runtime} from '../../../../commons/util/Runtime';
 import {UserVerificationBadges} from '../../../../components/badge';
 import {ErrorFallback} from '../../../../components/errorFallback';
 import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';

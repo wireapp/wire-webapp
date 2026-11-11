@@ -19,9 +19,9 @@
 
 import {EventEmitter} from 'events';
 
-import {Runtime} from '@wireapp/commons';
-
 import {Cookie} from './cookie';
+
+import {Runtime} from '../../commons/util/Runtime';
 
 const maximumCookieStoreListeners = 20;
 

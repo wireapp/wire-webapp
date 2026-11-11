@@ -28,7 +28,7 @@ import {createRoot} from 'react-dom/client';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime} from '../commons/util/Runtime';
 
 import {createApplicationServices} from './createApplicationServices';
 import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';

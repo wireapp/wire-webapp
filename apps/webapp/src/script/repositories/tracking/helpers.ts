@@ -20,12 +20,11 @@
 import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {Runtime} from '@wireapp/commons';
-
 import {ConversationType, UserType, PlatformType} from './attribute';
 import {EventName} from './eventName';
 import {Segmentation} from './segmentation';
 
+import {Runtime} from '../../commons/util/Runtime';
 import {RatingListLabel} from '../../components/Modals/QualityFeedbackModal/typings';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {WebAppEvents} from '../../webAppEvents';

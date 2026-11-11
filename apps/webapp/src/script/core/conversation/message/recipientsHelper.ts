@@ -17,10 +17,9 @@
  *
  */
 
-import {Encoder} from '@wireapp/commons/lib/base64/encoder';
-
 import {OTRClientMap} from '../../../apiClient/conversation/otrClientMap';
 import {OTRRecipients} from '../../../apiClient/conversation/otrRecipients';
+import {Encoder} from '../../../commons/base64/encoder';
 
 export function recipientsToBase64(recipients: OTRRecipients<Uint8Array>): OTRRecipients<string> {
   return Object.fromEntries(

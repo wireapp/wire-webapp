@@ -22,10 +22,10 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {connect} from 'react-redux';
 
-import {Runtime, UrlUtil} from '@wireapp/commons';
-
 import {Page} from './page';
 
+import {UrlUtil} from '../../commons/util';
+import {Runtime} from '../../commons/util/Runtime';
 import {LogoIcon} from '../../components/icon';
 import {useApplicationContext} from '../../page/rootProvider';
 import {COLOR} from '../../uiKit/identity/colors/colors';

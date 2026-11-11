@@ -30,8 +30,6 @@ import {pdfjs} from 'react-pdf';
 import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
-
 import {refreshApplication} from './applicationRefresh';
 import {reportStartupFailure} from './reportStartupFailure';
 
@@ -43,6 +41,7 @@ import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '../apiClient/team/featur
 import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {createBrowserSystemNotificationApi} from '../browser/notification/createSystemNotificationApiFromBrowserNotification';
+import {Runtime} from '../commons/util/Runtime';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config, Configuration} from '../Config';
 import {EVENTS as CoreEvents} from '../core/account';

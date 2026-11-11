@@ -24,7 +24,7 @@ import {CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
 import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
+import {RecursivePartial} from '../../../commons/util/TypeUtil';
 import ko from 'knockout';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';

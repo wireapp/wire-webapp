@@ -24,11 +24,10 @@ import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
-import {ValidationUtil} from '@wireapp/commons';
-
 import {Page} from './page';
 
 import type {ChangePassword} from '../../apiClient/self/changePassword';
+import {ValidationUtil} from '../../commons/util';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button} from '../../uiKit/inputs/button/button';

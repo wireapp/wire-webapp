@@ -24,13 +24,12 @@ import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
-import {ValidationUtil} from '@wireapp/commons';
-
 import {styles} from './accountForm.styles';
 import {Exception} from './exception';
 
 import {BackendError} from '../../apiClient/http/backendError';
 import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {ValidationUtil} from '../../commons/util';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button} from '../../uiKit/inputs/button/button';

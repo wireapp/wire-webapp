@@ -21,10 +21,9 @@ import React, {useEffect, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {Runtime} from '@wireapp/commons';
-
 import {ListWrapper} from './listWrapper';
 
+import {Runtime} from '../../../commons/util/Runtime';
 import * as Icon from '../../../components/icon';
 import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
 import {troubleshooterFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';

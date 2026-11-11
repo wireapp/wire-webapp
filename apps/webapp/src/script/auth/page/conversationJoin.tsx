@@ -23,8 +23,6 @@ import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router';
 
-import {UrlUtil} from '@wireapp/commons';
-
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './conversationJoinComponents';
 import {ConversationJoinFull} from './conversationJoinInvalid';
 import {EntropyContainer} from './entropyContainer';
@@ -36,6 +34,7 @@ import type {RegisteredClient} from '../../apiClient/client/registeredClient';
 import type {ConversationJoinData} from '../../apiClient/conversation/data/conversationJoinData';
 import type {ConversationEvent} from '../../apiClient/event/conversationEvent';
 import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {UrlUtil} from '../../commons/util';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Column, Columns} from '../../uiKit/layout/column/column';

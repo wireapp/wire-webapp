@@ -20,8 +20,7 @@
 import {StatusCodes as StatusCode} from 'http-status-codes';
 import {z} from 'zod';
 
-import {LogFactory} from '@wireapp/commons';
-
+import {LogFactory} from '../../commons/LogFactory';
 import {
   IdentifierExistsError,
   InvalidCredentialsError,

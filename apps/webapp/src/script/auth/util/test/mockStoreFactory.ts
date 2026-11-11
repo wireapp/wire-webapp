@@ -23,7 +23,7 @@ import createMockStore, {type MockStoreCreator} from 'redux-mock-store';
 import {withExtraArgument} from 'redux-thunk';
 
 import type {APIClient} from '../../../apiClient/apiClient';
-import type {TypeUtil} from '@wireapp/commons';
+import type {TypeUtil} from '../../../commons/util';
 import type {Account} from '../../../core';
 
 import {ActionRoot, actionRoot} from '../../module/action/';

@@ -17,7 +17,6 @@
  *
  */
 
-import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {NotificationBackendRepository} from './notificationBackendRepository';
@@ -28,6 +27,8 @@ import {isOutdatedNotificationStreamEvent} from './outdatedNotificationStreamEve
 import {APIClient} from '../../apiClient/apiClient';
 import {BackendEvent} from '../../apiClient/event/backendEvent';
 import {Notification} from '../../apiClient/notification/notification';
+import {LogFactory} from '../../commons/LogFactory';
+import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../coreError';
 import {DecryptionError} from '../errors/decryptionError';

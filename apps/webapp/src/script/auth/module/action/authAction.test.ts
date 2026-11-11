@@ -21,11 +21,11 @@ import {VerificationActionType} from '../../../apiClient/auth/verificationAction
 import {ClientType} from '../../../apiClient/client/clientType';
 import {BackendError} from '../../../apiClient/http/backendError';
 import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
-import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
+import {RecursivePartial} from '../../../commons/util/TypeUtil';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import type {APIClient} from '../../../apiClient/apiClient';
-import type {TypeUtil} from '@wireapp/commons';
+import type {TypeUtil} from '../../../commons/util';
 
 import {AuthActionCreator} from './creator/';
 

@@ -19,7 +19,7 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {mls} from '@wireapp/protocol-messaging/web/mls';
-import {Encoder} from '@wireapp/commons/lib/base64/encoder';
+import {Encoder} from '../../../../commons/base64/encoder';
 
 import {CommitBundle, RatchetTreeType, GroupInfoEncryptionType, Welcome} from '@wireapp/core-crypto';
 

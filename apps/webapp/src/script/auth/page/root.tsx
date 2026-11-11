@@ -22,7 +22,6 @@ import {FunctionComponent, ReactNode, useEffect, useMemo} from 'react';
 import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString} from '@sindresorhus/is';
-import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Navigate, Route, Routes} from 'react-router';
@@ -48,6 +47,7 @@ import {VerifyEmailCode} from './verifyEmailCode';
 import {VerifyEmailLink} from './verifyEmailLink';
 
 import type englishMessages from '../../../i18n/en-US.json';
+import {pathWithParams} from '../../commons/util/UrlUtil';
 import {Config} from '../../Config';
 import {RootProvider} from '../../page/rootProvider';
 import {Loading} from '../../uiKit/dataDisplay/loading/loading';

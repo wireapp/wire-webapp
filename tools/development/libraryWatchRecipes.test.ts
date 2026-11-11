@@ -22,7 +22,7 @@ import {developmentLibraries, getSelectedLibraryWatchCommands} from './libraryWa
 describe('getSelectedLibraryWatchCommands', () => {
   it('returns commands for selected libraries and keeps the existing defaults', () => {
     const actualCommands = getSelectedLibraryWatchCommands({
-      libraryNames: ['commons', 'config'],
+      libraryNames: ['config'],
     });
     const defaultSelections = developmentLibraries
       .filter((library): boolean => {
@@ -32,7 +32,7 @@ describe('getSelectedLibraryWatchCommands', () => {
         return library.value;
       });
 
-    expect(actualCommands).toEqual(['just watch-library commons', 'just watch-library config']);
+    expect(actualCommands).toEqual(['just watch-library config']);
     expect(defaultSelections).toEqual([]);
   });
 
@@ -40,6 +40,12 @@ describe('getSelectedLibraryWatchCommands', () => {
     expect(() => {
       getSelectedLibraryWatchCommands({libraryNames: ['api-client']});
     }).toThrow('Unknown development library selection: api-client');
+  });
+
+  it('rejects the relocated commons as a library selection', () => {
+    expect(() => {
+      getSelectedLibraryWatchCommands({libraryNames: ['commons']});
+    }).toThrow('Unknown development library selection: commons');
   });
 
   it('rejects unknown library names', () => {

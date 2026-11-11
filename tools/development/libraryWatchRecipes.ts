@@ -23,10 +23,7 @@ export type DevelopmentLibrary = {
   readonly checked?: boolean;
 };
 
-export const developmentLibraries: readonly DevelopmentLibrary[] = [
-  {name: 'commons', value: 'commons'},
-  {name: 'config', value: 'config'},
-];
+export const developmentLibraries: readonly DevelopmentLibrary[] = [{name: 'config', value: 'config'}];
 
 export type SelectedLibraryWatchCommandsOptions = {
   readonly libraryNames: readonly string[];

@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.type-check.json",
+  "compilerOptions": {
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "tsBuildInfoFile": "../../target/buildcache/webapp-commons-type-check.tsbuildinfo"
+  },
+  "include": ["src/script/commons/**/*.ts", "src/script/commons/**/*.d.ts"],
+  "exclude": ["node_modules", "**/*.test.ts", "src/script/commons/base64/test"]
+}

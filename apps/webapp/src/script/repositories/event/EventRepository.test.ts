@@ -25,7 +25,7 @@ import {USER_EVENT} from '../../apiClient/event/userEvent';
 import {ConnectionState} from '../../core';
 import {WebAppEvents} from '../../webAppEvents';
 import {amplify} from 'amplify';
-import {Runtime} from '@wireapp/commons';
+import {Runtime} from '../../commons/util/Runtime';
 
 import {ClientConversationEvent} from '../conversation/EventBuilder';
 import {Warnings} from '../../view_model/WarningsContainer';

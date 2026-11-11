@@ -29,7 +29,7 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {result} from 'true-myth';
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime} from '../../commons/util/Runtime';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '../../webAppEvents';
 

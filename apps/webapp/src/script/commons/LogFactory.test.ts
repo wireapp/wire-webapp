@@ -28,8 +28,8 @@ import {getSafeErrorDetails, redactSensitiveData, sanitizeLogMessage} from './ut
 describe('LogFactory', () => {
   describe('createLoggerName', () => {
     it('provides a convenient solution to get a nice logger name', () => {
-      const loggerName = LogFactory.createLoggerName('LogFactory', '@wireapp/commons', '::');
-      expect(loggerName).toBe('@wireapp/commons::LogFactory');
+      const loggerName = LogFactory.createLoggerName('LogFactory', 'example', '::');
+      expect(loggerName).toBe('example::LogFactory');
     });
 
     it('does not add empty strings to the logger name', () => {
@@ -62,7 +62,7 @@ describe('LogFactory', () => {
   });
 
   describe('writeMessage', () => {
-    const logDir = path.join(__dirname, '../../.temp');
+    const logDir = fs.mkdtempSync(path.join(os.tmpdir(), 'webapp-commons-'));
 
     afterEach(() => {
       return fs.remove(logDir);

@@ -23,12 +23,11 @@ import {isBoolean, isString} from '@sindresorhus/is';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router';
 
-import {UrlUtil} from '@wireapp/commons';
-
 import {ClientItem} from './clientItem';
 
 import {ClientType} from '../../apiClient/client/clientType';
 import type {RegisteredClient} from '../../apiClient/client/registeredClient';
+import {UrlUtil} from '../../commons/util';
 import {Loading} from '../../uiKit/dataDisplay/loading/loading';
 import {ContainerXS} from '../../uiKit/layout/container/container';
 import {getLogger} from '../../util/logger';

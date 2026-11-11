@@ -17,9 +17,8 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
-
 import {EffectMode, Metrics, QualityMode} from '..';
+import {Runtime} from '../../../../commons/util/Runtime';
 import {BackgroundSource} from '../../VideoBackgroundEffects';
 
 export type ProcessVideoTrackOptions = {

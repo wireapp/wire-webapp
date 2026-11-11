@@ -19,7 +19,7 @@
 
 import {isNumber, isUndefined} from '@sindresorhus/is';
 import {maybe as Maybe} from 'true-myth';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {TimeInMillis} from '../../../commons/util/TimeUtil';
 
 import {EventMapper} from '../../../repositories/conversation/EventMapper';
 import {Conversation} from '../../../repositories/entity/Conversation';

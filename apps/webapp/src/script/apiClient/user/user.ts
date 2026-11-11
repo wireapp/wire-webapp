@@ -17,11 +17,10 @@
  *
  */
 
-import {AccentColor} from '@wireapp/commons';
-
 import {App} from './app';
 import {QualifiedId} from './qualifiedId';
 
+import {AccentColor} from '../../commons/util';
 import {ServiceRef} from '../conversation/';
 import {Picture} from '../self/';
 import {CONVERSATION_PROTOCOL} from '../team';

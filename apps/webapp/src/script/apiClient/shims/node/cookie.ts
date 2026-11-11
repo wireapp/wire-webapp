@@ -21,10 +21,9 @@ import {isNull, isNullOrUndefined} from '@sindresorhus/is';
 import {AxiosHeaders, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {Cookie as ToughCookie} from 'tough-cookie';
 
-import {LogFactory} from '@wireapp/commons';
-
 import {obfuscateCookie} from './obfuscateCookie';
 
+import {LogFactory} from '../../../commons/LogFactory';
 import {Cookie} from '../../auth/';
 import {CookieStore} from '../../auth/cookieStore';
 import {HttpClient} from '../../http/';

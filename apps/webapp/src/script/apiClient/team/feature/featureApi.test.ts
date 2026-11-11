@@ -17,7 +17,7 @@
  *
  */
 
-import {LogFactory} from '@wireapp/commons';
+import {LogFactory} from '../../../commons/LogFactory';
 
 import {HttpClient} from '../../http';
 import {FeatureAPI, isBackendError} from './featureApi';

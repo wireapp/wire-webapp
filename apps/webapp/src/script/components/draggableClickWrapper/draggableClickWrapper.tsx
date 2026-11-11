@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime} from '../../commons/util/Runtime';
 
 interface DraggableClickWrapperProps<Element extends HTMLElement> {
   children: React.ReactElement<React.HTMLAttributes<Element>>;

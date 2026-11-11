@@ -23,7 +23,6 @@ import {task} from 'true-myth';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
-import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {TeamEntity} from './TeamEntity';
@@ -51,6 +50,8 @@ import type {PermissionsData} from '../../apiClient/team/member/permissionsData'
 import type {TeamData} from '../../apiClient/team/team/teamData';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {UserType} from '../../apiClient/user/user';
+import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
+import {Runtime} from '../../commons/util/Runtime';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';

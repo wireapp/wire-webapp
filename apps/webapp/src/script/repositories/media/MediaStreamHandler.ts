@@ -20,13 +20,12 @@
 import {isObject, isString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
-
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {isMediaStreamReadDeviceError, MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
 
+import {Runtime} from '../../commons/util/Runtime';
 import {MediaError} from '../../error/mediaError';
 import {NoAudioInputError} from '../../error/noAudioInputError';
 import {PermissionError} from '../../error/permissionError';

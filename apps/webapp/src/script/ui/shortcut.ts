@@ -20,10 +20,9 @@
 import {amplify} from 'amplify';
 import keyboardJS from 'keyboardjs';
 
-import {Runtime} from '@wireapp/commons';
-
 import {ShortcutType} from './shortcutType';
 
+import {Runtime} from '../commons/util/Runtime';
 import {capitalizeFirstChar, includesString} from '../util/stringUtil';
 import {WebAppEvents} from '../webAppEvents';
 

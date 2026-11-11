@@ -18,7 +18,7 @@
  */
 
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {TimeInMillis} from '../../../../commons/util/TimeUtil';
 import axios from 'axios';
 import {task} from 'true-myth';
 

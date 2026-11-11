@@ -24,8 +24,6 @@ import ko from 'knockout';
 import murmurhash from 'murmurhash';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
-
 import {ClientEntity} from './ClientEntity';
 import {constructClientId, parseClientId} from './ClientIdUtil';
 import {ClientMapper} from './ClientMapper';
@@ -39,6 +37,7 @@ import {RegisteredClient} from '../../apiClient/client/registeredClient';
 import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '../../apiClient/event/userEvent';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {Runtime} from '../../commons/util/Runtime';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';

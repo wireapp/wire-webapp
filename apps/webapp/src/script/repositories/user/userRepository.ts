@@ -23,7 +23,6 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {flatten, uniq} from 'underscore';
 
-import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {showAvailabilityModal} from './availabilityModal';
@@ -51,6 +50,8 @@ import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import type {User as APIClientUser} from '../../apiClient/user/user';
 import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '../../apiClient/user/userAsset';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
+import {type AccentColor} from '../../commons/util';
 import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
