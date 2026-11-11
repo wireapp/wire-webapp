@@ -21,8 +21,8 @@ import fs from 'fs-extra';
 import logdown from 'logdown';
 import path from 'path';
 
-import {ConfigGeneratorParams} from './config.types';
-import {Env} from './env';
+import type {ConfigGeneratorParams} from './config.types';
+import type {Env} from './env';
 
 const ROBOTS_DIR = path.join(__dirname, 'robots');
 const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');

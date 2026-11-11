@@ -22,9 +22,10 @@ import dotenv from 'dotenv-extended';
 import {existsSync, readFileSync} from 'fs';
 import path from 'path';
 
-import {generateClientConfig, generateServerConfig, Env} from '@wireapp/config';
-
 import {loadBuildMetadata} from './buildMetadata';
+import {generateConfig as generateClientConfig} from './configuration/client.config';
+import {Env} from './configuration/env';
+import {generateConfig as generateServerConfig} from './configuration/server.config';
 
 function readBuildMetadataFile(metadataFilePath: string): string {
   return readFileSync(metadataFilePath, 'utf8');

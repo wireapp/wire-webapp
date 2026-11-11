@@ -20,12 +20,12 @@
 import {isNonEmptyString, isPlainObject} from '@sindresorhus/is';
 import {Result} from 'true-myth';
 
-import {isBuildMetadata} from '@wireapp/config';
-import type {BuildMetadata} from '@wireapp/config';
-
 import {validateBuildArtifactMetadata} from './buildArtifactMetadata.ts';
 import type {BuildArtifactHtmlDocument} from './buildArtifactMetadata.ts';
 import {isLegacyTimestampBuildVersion} from './legacyBuildMetadata.ts';
+
+import {isBuildMetadata} from '../../apps/server/configuration/buildMetadata.ts';
+import type {BuildMetadata} from '../../apps/server/configuration/buildMetadata.ts';
 
 export type LegacyBuildMetadata = {
   readonly version: string;

@@ -1,6 +1,5 @@
 {
   "extends": "../../tsconfig.base.json",
-  "references": [{"path": "../../libraries/config"}],
   "compilerOptions": {
     "module": "nodenext",
     "moduleResolution": "nodenext",

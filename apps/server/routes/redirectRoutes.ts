@@ -22,8 +22,8 @@ import express, {type Request, type Response} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Maybe, maybe} from 'true-myth';
 
-import type {BuildMetadata, ServerConfig} from '@wireapp/config';
-
+import type {BuildMetadata} from '../configuration/buildMetadata';
+import type {ServerConfig} from '../configuration/server.config';
 import {setNonCacheHeaders} from '../http/setNonCacheHeaders';
 import * as BrowserUtil from '../util/browserUtil';
 

@@ -18,7 +18,7 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {type BuildMetadata} from '@wireapp/config';
+import {type BuildMetadata} from '../../../../server/configuration/buildMetadata';
 import {task, type Task} from 'true-myth';
 
 import {

@@ -83,7 +83,6 @@ describe('generate-unit-test-reports', (): void => {
   it.each([
     ['apps/webapp', 'apps/webapp/jest.config.ts'],
     ['apps/server', 'apps/server/jest.config.js'],
-    ['libraries/config', 'libraries/config/jest.config.js'],
   ])('preserves Jest configuration discovery for %s', (projectRoot, expectedConfigFile): void => {
     const workspaceRoot = resolve(__dirname, '../..');
     const rootDirectory = resolve(workspaceRoot, projectRoot);
@@ -206,12 +205,12 @@ describe('generate-unit-test-reports', (): void => {
 
   it('continues after failures and returns a failing result for the failed project', async (): Promise<void> => {
     const testableProjects = [
-      {jestConfigFile: 'libraries/first/jest.config.js', name: 'first-project', root: 'libraries/first', type: 'lib'},
+      {jestConfigFile: 'apps/first/jest.config.js', name: 'first-project', root: 'apps/first', type: 'app'},
       {
-        jestConfigFile: 'libraries/second/jest.config.js',
+        jestConfigFile: 'apps/second/jest.config.js',
         name: 'second-project',
-        root: 'libraries/second',
-        type: 'lib',
+        root: 'apps/second',
+        type: 'app',
       },
     ] satisfies readonly TestableProject[];
     const executedProjectNames: string[] = [];
@@ -221,9 +220,7 @@ describe('generate-unit-test-reports', (): void => {
       async (command, commandArguments) => {
         expect(command).toBe('npx');
 
-        const projectName = commandArguments.includes('libraries/first/jest.config.js')
-          ? 'first-project'
-          : 'second-project';
+        const projectName = commandArguments.includes('apps/first/jest.config.js') ? 'first-project' : 'second-project';
         executedProjectNames.push(projectName);
 
         return {exitCode: projectName === 'first-project' ? 1 : 0, output: `${projectName} output`};

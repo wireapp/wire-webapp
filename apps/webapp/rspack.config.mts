@@ -27,8 +27,11 @@ import {readFileSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import {generateClientConfig, generateServerConfig, parseBuildMetadata} from '@wireapp/config';
-import type {BuildMetadata, Env} from '@wireapp/config';
+import {generateConfig as generateClientConfig} from '../server/configuration/client.config.ts';
+import {generateConfig as generateServerConfig} from '../server/configuration/server.config.ts';
+import {parseBuildMetadata} from '../server/configuration/buildMetadata.ts';
+import type {BuildMetadata} from '../server/configuration/buildMetadata.ts';
+import type {Env} from '../server/configuration/env.ts';
 
 type EnvironmentUrls = {
   readonly base: string;
@@ -145,7 +148,7 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       rules: [
         {
           test: /\.[jt]sx?$/,
-          include: scriptPath,
+          include: [scriptPath, path.resolve(rootPath, 'apps/server/configuration/buildMetadata.ts')],
           exclude: /node_modules/,
           use: {
             loader: 'builtin:swc-loader',

@@ -17,28 +17,28 @@
  *
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import {existsSync, readFileSync} from 'node:fs';
+import {join, resolve} from 'node:path';
 
 describe('Environment files', () => {
-  const rootPath = path.resolve(__dirname, '../../../');
+  const rootPath = resolve(__dirname, '../../../');
 
   describe('.env.defaults', () => {
     it('should exist in the repository root', () => {
-      const envDefaultsPath = path.join(rootPath, '.env.defaults');
-      expect(fs.existsSync(envDefaultsPath)).toBe(true);
+      const envDefaultsPath = join(rootPath, '.env.defaults');
+      expect(existsSync(envDefaultsPath)).toBe(true);
     });
 
     it('should be readable', () => {
-      const envDefaultsPath = path.join(rootPath, '.env.defaults');
+      const envDefaultsPath = join(rootPath, '.env.defaults');
       expect(() => {
-        fs.readFileSync(envDefaultsPath, 'utf8');
+        readFileSync(envDefaultsPath, 'utf8');
       }).not.toThrow();
     });
 
     it('should contain required environment variables', () => {
-      const envDefaultsPath = path.join(rootPath, '.env.defaults');
-      const content = fs.readFileSync(envDefaultsPath, 'utf8');
+      const envDefaultsPath = join(rootPath, '.env.defaults');
+      const content = readFileSync(envDefaultsPath, 'utf8');
 
       const requiredVars = [
         'APP_BASE',
@@ -58,20 +58,20 @@ describe('Environment files', () => {
 
   describe('.env.localhost', () => {
     it('should exist in the repository root', () => {
-      const envLocalhostPath = path.join(rootPath, '.env.localhost');
-      expect(fs.existsSync(envLocalhostPath)).toBe(true);
+      const envLocalhostPath = join(rootPath, '.env.localhost');
+      expect(existsSync(envLocalhostPath)).toBe(true);
     });
 
     it('should be readable', () => {
-      const envLocalhostPath = path.join(rootPath, '.env.localhost');
+      const envLocalhostPath = join(rootPath, '.env.localhost');
       expect(() => {
-        fs.readFileSync(envLocalhostPath, 'utf8');
+        readFileSync(envLocalhostPath, 'utf8');
       }).not.toThrow();
     });
 
     it('should contain development-specific overrides', () => {
-      const envLocalhostPath = path.join(rootPath, '.env.localhost');
-      const content = fs.readFileSync(envLocalhostPath, 'utf8');
+      const envLocalhostPath = join(rootPath, '.env.localhost');
+      const content = readFileSync(envLocalhostPath, 'utf8');
 
       expect(content).toMatch(/PORT=/);
       expect(content).toMatch(/APP_BASE=/);
@@ -79,18 +79,18 @@ describe('Environment files', () => {
     });
 
     it('should have FEATURE_ENABLE_DEBUG set to true', () => {
-      const envLocalhostPath = path.join(rootPath, '.env.localhost');
-      const content = fs.readFileSync(envLocalhostPath, 'utf8');
+      const envLocalhostPath = join(rootPath, '.env.localhost');
+      const content = readFileSync(envLocalhostPath, 'utf8');
 
       expect(content).toMatch(/FEATURE_ENABLE_DEBUG="true"/);
     });
   });
 
   describe('Environment file location', () => {
-    it('should not have .env files in libraries/config directory', () => {
-      const oldConfigPath = path.join(rootPath, 'libraries/config');
-      const envInConfig = fs.existsSync(path.join(oldConfigPath, '.env'));
-      const envLocalhostInConfig = fs.existsSync(path.join(oldConfigPath, '.env.localhost'));
+    it('should not have .env files in apps/server/configuration directory', () => {
+      const oldConfigPath = join(rootPath, 'apps/server/configuration');
+      const envInConfig = existsSync(join(oldConfigPath, '.env'));
+      const envLocalhostInConfig = existsSync(join(oldConfigPath, '.env.localhost'));
 
       expect(envInConfig).toBe(false);
       expect(envLocalhostInConfig).toBe(false);
