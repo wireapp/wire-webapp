@@ -21,7 +21,8 @@ import {ReactNode} from 'react';
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../uiKit/identity/theme/theme';
 
 import {translateForTest} from '../../../util/test/translateForTest';
 import {

@@ -17,8 +17,6 @@
  *
  */
 
-import {CallIcon, EditIcon, TrashIcon} from '@wireapp/react-ui-kit';
-
 import {
   contextMenuDangerItemIconStyles,
   contextMenuDangerItemStyles,
@@ -28,6 +26,9 @@ import {MEETING_ACTION_TRANSLATION_KEYS} from './meetingActionTranslationKeys';
 
 import type {User} from '../../../../../../repositories/entity/User';
 import type {ContextMenuEntry} from '../../../../../../ui/contextMenu';
+import {CallIcon} from '../../../../../../uiKit/dataDisplay/icon/callIcon';
+import {EditIcon} from '../../../../../../uiKit/dataDisplay/icon/editIcon';
+import {TrashIcon} from '../../../../../../uiKit/dataDisplay/icon/trashIcon';
 import type {Translate} from '../../../../../../util/localizerUtil';
 import type {MeetingInstance} from '../../../../types/meetingInstance';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from '../../../../utils/canDeleteMeeting';

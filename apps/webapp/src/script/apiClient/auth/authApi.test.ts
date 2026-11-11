@@ -1,0 +1,98 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {nodePlatform} from '../shims/node/platform';
+
+import {AxiosHeaders} from 'axios';
+
+import {APIClient} from '../apiClient';
+import {ClientType} from '../client/clientType';
+import {StatusCode} from '../http';
+
+describe('AuthAPI', () => {
+  it('sets the client to permanent', async () => {
+    using apiClient = new APIClient({platform: nodePlatform});
+
+    const data = {
+      clientType: ClientType.PERMANENT,
+      email: 'email@example.com',
+      password: 'email@example.com',
+    };
+
+    jest.spyOn(apiClient.transport.http, 'sendJSON').mockReturnValue(
+      Promise.resolve({
+        config: {headers: new AxiosHeaders()},
+        data: '',
+        headers: {},
+        status: StatusCode.OK,
+        statusText: 'OK',
+      }),
+    );
+
+    await apiClient.api.auth.postLogin(data);
+
+    expect(apiClient.transport.http.sendJSON).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: {
+          clientType: undefined,
+          email: data.email,
+          password: data.password,
+        },
+        params: {
+          persist: true,
+        },
+      }),
+    );
+  });
+
+  it('sets the client to temporary', async () => {
+    using apiClient = new APIClient({platform: nodePlatform});
+
+    const data = {
+      clientType: ClientType.TEMPORARY,
+      email: 'email@example.com',
+      password: 'email@example.com',
+    };
+
+    jest.spyOn(apiClient.transport.http, 'sendJSON').mockReturnValue(
+      Promise.resolve({
+        config: {headers: new AxiosHeaders()},
+        data: '',
+        headers: {},
+        status: StatusCode.OK,
+        statusText: 'OK',
+      }),
+    );
+
+    await apiClient.api.auth.postLogin(data);
+
+    expect(apiClient.transport.http.sendJSON).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: {
+          clientType: undefined,
+          email: data.email,
+          password: data.password,
+        },
+        params: {
+          persist: false,
+        },
+      }),
+    );
+  });
+});

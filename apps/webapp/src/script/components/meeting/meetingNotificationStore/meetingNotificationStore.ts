@@ -17,10 +17,10 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {match} from 'ts-pattern';
 import {create} from 'zustand';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
 
 export enum MeetingNotificationKind {

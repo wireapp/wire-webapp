@@ -22,20 +22,31 @@ lint-file-names:
 lint-duplication:
     jscpd --config ./jscpd.json .
 
-# Check LESS formatting and Stylelint rules from the webapp workspace.
+# Reject circular imports outside the explicitly reviewed baseline.
+[group('lint')]
+lint-dependencies *dependencyCruiserArguments:
+    depcruise --config dependency-cruiser.config.mjs --ignore-known .dependency-cruiser-known-violations.json apps tools '*.js' '*.mjs' '*.cjs' "$@"
+
+# Write every existing cycle and its dependency path to a standalone HTML report.
+[group('lint')]
+report-dependencies:
+    mkdir -p target/reports/dependencies
+    just lint-dependencies --no-ignore-known --output-type err-html --output-to target/reports/dependencies/circular-dependencies.html
+
+# Check LESS formatting and Stylelint rules from the webapp source directory.
 [group('lint')]
 stylesheet-lint:
     cd apps/webapp && prettier --ignore-path ../../.prettierignore --check "**/*.less" && stylelint --ignore-path .gitignore "**/*.less"
 
-# Lint the repository with ESLint's flat config and the temporary 287-warning budget.
+# Lint the repository with ESLint's flat config and the temporary 279-warning budget.
 [arg("fix", long, value="true")]
 [group('lint')]
 eslint fix="false":
-    eslint . --config eslint.config.mjs --max-warnings=287 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
+    eslint . --config eslint.config.mjs --max-warnings=279 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
 
-# Run all repository lint checks, including ESLint, Prettier, Stylelint, and duplication.
+# Run all repository lint checks, including circular dependencies.
 [group('lint')]
-lint: eslint format-check stylesheet-lint lint-duplication
+lint: eslint format-check stylesheet-lint lint-duplication lint-dependencies
 
 # Check changed files with Prettier against BASE_REF and HEAD_REF.
 [group('format')]
@@ -50,50 +61,33 @@ format:
         --ignore-path .gitignore \
         --ignore-path apps/server/.gitignore \
         --ignore-path apps/webapp/.gitignore \
-        --ignore-path libraries/commons/.gitignore \
         .
 
-# Type-check all application and library configurations in sequence.
+# Type-check all application and tooling configurations in sequence.
 [group('type-check')]
-type-check: build-libraries
+type-check:
     tsc --project ./tsconfig.tools.type-check.json
     tsc --project ./tools/releaseAppearance/tsconfig.json
     tsc --project ./tsconfig.release-cli.json
     tsc --project ./apps/webapp/tsconfig.type-check.json
     tsc --project ./apps/webapp/tsconfig.rspack.json
+    tsc --project ./apps/server/tsconfig.build.json --noEmit
     tsc --project ./apps/server/tsconfig.type-check.json
     tsc --project ./apps/server/bin/tsconfig.json
-    tsc --project ./libraries/api-client/tsconfig.type-check.json
-    tsc --project ./libraries/commons/tsconfig.type-check.json
-    tsc --project ./libraries/config/tsconfig.type-check.json
-    tsc --project ./libraries/core/tsconfig.type-check.json
-    tsc --project ./libraries/react-ui-kit/tsconfig.type-check.json
-    tsc --project ./libraries/store-engine/tsconfig.type-check.json
-    tsc --project ./libraries/telemetry/tsconfig.type-check-esm.json
-    tsc --project ./libraries/telemetry/tsconfig.type-check-commonjs.json
-    tsc --project ./libraries/telemetry/tsconfig.type-check.json
-
-# Build workspace libraries required by dependent tasks such as type-checking and tests.
-[group('build')]
-build-libraries:
-    cd libraries/commons && tsc
-    cd libraries/config && tsc
-    cd libraries/react-ui-kit && tsc
-    cd libraries/store-engine && tsc
-    cd libraries/telemetry && node bin/copyAssets.mts
-    cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json
-    cd libraries/api-client && tsc
-    cd libraries/core && tsc
+    tsc --project ./apps/webapp/tsconfig.api-client.json
+    tsc --project ./apps/webapp/tsconfig.commons.json
+    tsc --project ./apps/webapp/tsconfig.commons-tests.json
 
 # Compile the production server and copy its runtime assets.
 [group('build')]
-build-server: build-libraries
-    tsc --project apps/server/tsconfig.json --outDir apps/server/build/server
+build-server:
+    rimraf apps/server/build/server
+    tsc --project apps/server/tsconfig.build.json --outDir apps/server/build/server
     WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/server node apps/server/bin/copy_server_assets.js
 
 # Build the internal production webapp with Rspack.
 [group('build')]
-build-webapp-internal: build-libraries
+build-webapp-internal:
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
     cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal rspack build --config rspack.config.mts
 
@@ -112,48 +106,36 @@ package-server-public: build-server build-webapp-public
 
 # Build the development webapp with Rspack.
 [group('build')]
-build-webapp-development: build-libraries
+build-webapp-development:
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
     cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development rspack build --config rspack.config.dev.mts
 
 # Build the public production webapp with Rspack.
 [group('build')]
-build-webapp-public: build-libraries
+build-webapp-public:
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
     cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public rspack build --config rspack.config.public.mts
 
-# Prepare compiled server output for local development after building its workspace dependencies.
+# Prepare compiled server output for local development with its runtime assets.
 [group('development')]
-prepare-development-server: build-libraries
+prepare-development-server:
     rimraf apps/server/dist apps/server/build/metadata
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    tsc --project apps/server/tsconfig.json --incremental
+    tsc --project apps/server/tsconfig.build.json --incremental
     WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/dist node apps/server/bin/copy_server_assets.js
     cp apps/server/build/metadata/version.json apps/server/dist/version.json
 
-# Build dependencies once, then run the server and its upstream library watchers.
+# Compile the server once, then watch its sources and restart the server.
 [group('development')]
 develop: prepare-development-server
     concurrently --raw --kill-others \
         "just watch-server-typescript" \
-        "just run-development-server" \
-        "just watch-library commons" \
-        "just watch-library config" \
-        "just watch-library core" \
-        "just watch-library api-client" \
-        "just watch-library react-ui-kit" \
-        "just watch-library store-engine" \
-        "just watch-library-telemetry"
-
-# Alternative to develop: build dependencies, select libraries, and start the server.
-[group('development')]
-develop-watch: prepare-development-server
-    ts-node --project ./tsconfig.tools.json tools/development/startDevelopment.ts
+        "just run-development-server"
 
 # Recompile server sources while Node watches the compiled output and restarts the server.
 [group('development')]
 watch-server-typescript:
-    tsc --project apps/server/tsconfig.json --incremental --watch --preserveWatchOutput
+    tsc --project apps/server/tsconfig.build.json --incremental --watch --preserveWatchOutput
 
 [group('development')]
 run-development-server:
@@ -163,21 +145,6 @@ run-development-server:
     else \
         node --watch apps/server/dist/index.js; \
     fi
-
-# Compile a selected workspace library continuously.
-[group('development')]
-watch-library library:
-    case {{ quote(library) }} in \
-        api-client|commons|config|core|react-ui-kit|store-engine) ;; \
-        *) echo "Unknown library: {{ quote(library) }}" >&2; exit 2 ;; \
-    esac
-    tsc --project {{ quote("libraries/" + library + "/tsconfig.json") }} --watch --preserveWatchOutput
-
-# Copy telemetry assets and watch both TypeScript module formats.
-[group('development')]
-watch-library-telemetry:
-    cd libraries/telemetry && node bin/copyAssets.mts
-    cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json --watch --preserveWatchOutput
 
 # Configure the webapp, generate its React icon components, and validate their types.
 [group('setup')]
@@ -193,30 +160,30 @@ docker *dockerArguments:
 
 # Run all unit tests with native Jest multi-project execution.
 [group('testing')]
-test: build-libraries
-    jest --config ./jest.config.js
+test *jestArguments:
+    jest --config ./jest.config.js "$@"
 
-# Build workspace dependencies and run Playwright with the webapp's shared configuration.
+# Run Playwright with the webapp's shared configuration.
 [group('testing')]
-e2e-test *playwrightArguments: build-libraries
+e2e-test *playwrightArguments:
     npx playwright test --config apps/webapp/playwright.config.ts "$@"
 
-# Run Playwright UI mode with the same webapp configuration and dependency build.
+# Run Playwright UI mode with the same webapp configuration.
 [group('testing')]
-e2e-ui *playwrightArguments: build-libraries
+e2e-ui *playwrightArguments:
     npx playwright test --config apps/webapp/playwright.config.ts --ui "$@"
 
 # Run each Jest project separately to preserve its coverage thresholds.
 [group('testing')]
-test-ci: build-libraries
-    for jest_config_path in apps/*/jest.config.* libraries/*/jest.config.js; do \
+test-ci:
+    for jest_config_path in apps/*/jest.config.* apps/webapp/test/core/jest.config.js apps/webapp/test/uiKit/jest.config.js apps/webapp/test/apiClient/jest.config.js apps/webapp/test/commons/jest.config.js; do \
         CI=true jest --config "${jest_config_path}" --ci --coverage --maxWorkers=2 || exit $?; \
     done
     CI=true jest --config tools/jest.config.js --ci --maxWorkers=2
 
 # Run all unit tests in watch mode through the repository Jest project configuration.
 [group('testing')]
-test-watch: build-libraries
+test-watch:
     jest --config ./jest.config.js --watch
 
 # Extract i18next strings from webapp JavaScript, HTML, and template files.
@@ -250,6 +217,11 @@ translate-download:
 [group('build')]
 validate-build-artifact:
     node tools/buildArtifact/validateBuildArtifact.mts
+
+# Start the extracted ZIP with only lockfile-pinned server production dependencies.
+[group('testing')]
+verify-server-package:
+    node tools/serverPackaging/verifyServerPackage.mts
 
 # Validate recovered artifact metadata using the expected values from the environment.
 [group('build')]

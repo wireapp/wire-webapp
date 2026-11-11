@@ -34,7 +34,7 @@ import {translateForTest} from '../../../../util/test/translateForTest';
 import {createUuid} from '../../../../util/uuid';
 
 import {ContentMessageComponent, ContentMessageProps} from './contentMessage';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

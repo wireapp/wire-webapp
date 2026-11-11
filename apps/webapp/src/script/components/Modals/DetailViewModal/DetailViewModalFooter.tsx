@@ -20,14 +20,13 @@
 import {FC, useCallback, useRef, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {ReactionType} from '@wireapp/core/lib/conversation';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {ReactionType} from '../../../core/conversation';
 import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {isTabKey} from '../../../util/keyboardUtil';
 import type {Translate} from '../../../util/localizerUtil';

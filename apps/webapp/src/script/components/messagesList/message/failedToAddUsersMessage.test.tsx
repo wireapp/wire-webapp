@@ -19,9 +19,10 @@
 
 import {act, render} from '@testing-library/react';
 import {isNull, isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {AddUsersFailure, AddUsersFailureReasons} from '../../../core/conversation';
+import {StyledApp} from '../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../uiKit/identity/theme/theme';
 
 import de from '../../../../i18n/de-DE.json';
 import en from '../../../../i18n/en-US.json';

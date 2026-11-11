@@ -19,8 +19,8 @@
 
 import {fireEvent, render} from '@testing-library/react';
 import type {ComponentProps} from 'react';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {ContentMessage as ContentMessageEntity} from '../../../repositories/entity/message/contentMessage';
@@ -286,8 +286,10 @@ describe('MessageWrapper', () => {
       message.user(generateUser());
       message.addAsset(new Text(createUuid(), 'hello'));
       const actionOrder: string[] = [];
-      const markUnreadFrom = jest.spyOn(conversation, 'markUnreadFrom').mockImplementation(() => {
+      const markUnreadFromOriginal = conversation.markUnreadFrom.bind(conversation);
+      const markUnreadFrom = jest.spyOn(conversation, 'markUnreadFrom').mockImplementation(selectedMessage => {
         actionOrder.push('mark unread');
+        markUnreadFromOriginal(selectedMessage);
       });
       const cancelPendingReadReceiptsForConversation = jest.fn((conversationToCancel: Conversation): void => {
         expect(conversationToCancel).toBe(conversation);
@@ -348,6 +350,10 @@ describe('MessageWrapper', () => {
       expect(cancelPendingReadReceiptsForConversation).toHaveBeenCalledWith(conversation);
       expect(markUnreadFrom).toHaveBeenCalledWith(message);
       expect(actionOrder).toEqual(['cancel pending receipts', 'mark unread']);
+      expect(conversation.manualUnreadTimestamp()).toBe(message.timestamp());
+      expect(conversation.effectiveReadTimestamp()).toBe(message.timestamp() - 1);
+      expect(conversation.last_read_timestamp()).toBe(0);
+      expect(conversation.isAutoReadSuppressed()).toBe(true);
     });
 
     it('does not offer the entry by default', () => {

@@ -17,7 +17,7 @@
  *
  */
 
-import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
+import {ComboboxSelectOption} from '../../../../../../../../../uiKit/inputs/comboboxSelect/comboboxSelect';
 
 export const transformTagToSelectOption = (tag: string): ComboboxSelectOption => {
   return {

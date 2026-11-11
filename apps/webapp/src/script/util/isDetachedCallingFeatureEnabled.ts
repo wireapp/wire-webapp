@@ -17,8 +17,7 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
-
+import {Runtime} from '../commons/util/Runtime';
 import {Config} from '../Config';
 
 export const isDetachedCallingFeatureEnabled = (): boolean => {

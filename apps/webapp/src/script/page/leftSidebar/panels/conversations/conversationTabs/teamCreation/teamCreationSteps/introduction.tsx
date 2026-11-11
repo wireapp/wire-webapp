@@ -19,8 +19,6 @@
 
 import type {ReactNode, FunctionComponent} from 'react';
 
-import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
-
 import {StepProps} from './stepProps';
 import {
   checkIconCss,
@@ -31,6 +29,9 @@ import {
 } from './teamCreationSteps.styles';
 
 import {Config} from '../../../../../../../Config';
+import {CheckRoundIcon} from '../../../../../../../uiKit/dataDisplay/icon/checkRoundIcon';
+import {Button} from '../../../../../../../uiKit/inputs/button/button';
+import {Link} from '../../../../../../../uiKit/typography/link/link';
 import {renderReactTranslation} from '../../../../../../../util/localizerUtil/reactLocalizerUtil';
 import {useApplicationContext} from '../../../../../../rootProvider';
 import {buttonCss} from '../teamCreation.styles';

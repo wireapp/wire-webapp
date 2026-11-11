@@ -20,8 +20,6 @@
 import type {FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
-import {ReactionType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -42,6 +40,8 @@ import {PingMessage} from './pingMessage';
 import {SystemMessage} from './systemMessage';
 import {VerificationMessage} from './verificationMessage';
 
+import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
+import {ReactionType} from '../../../core/conversation';
 import {markAsUnreadFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from '../../../message/quoteEntity';
 import {useApplicationContext} from '../../../page/rootProvider';

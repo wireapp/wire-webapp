@@ -21,9 +21,6 @@ import type {Clock} from '@enormora/clock/clock';
 import {AnyAction, bindActionCreators as bindActionCreatorsRedux} from 'redux';
 import type {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
 
-import type {APIClient} from '@wireapp/api-client';
-import type {Account} from '@wireapp/core';
-
 import {AuthState, authReducer, initialAuthState} from './authReducer';
 import {ClientState, clientReducer, initialClientState} from './clientReducer';
 import {ConversationState, conversationReducer, initialConversationState} from './conversationReducer';
@@ -31,7 +28,9 @@ import {InvitationState, initialInvitationState, invitationReducer} from './invi
 import {LanguageState, initialLanguageState, languageReducer} from './languageReducer';
 import {SelfState, initialSelfState, selfReducer} from './selfReducer';
 
+import type {APIClient} from '../../../apiClient/apiClient';
 import type {Configuration} from '../../../Config';
+import type {Account} from '../../../core';
 import type {ActionRoot} from '../action';
 
 export type Api = {

@@ -18,8 +18,6 @@
  */
 
 import {isEmptyArray, isNonEmptyArray, isNull, isUndefined} from '@sindresorhus/is';
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -27,6 +25,8 @@ import {isError} from 'underscore';
 
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
+import {ConnectionStatus} from '../apiClient/connection/connectionStatus';
+import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationError} from '../error/conversationError';

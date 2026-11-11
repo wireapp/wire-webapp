@@ -18,11 +18,11 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {E2eiConversationState, MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
-import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
+import {CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import {E2eiConversationState, MLSServiceEvents} from '../../../../core/messagingProtocols/mls';
+import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../../core/util/qualifiedIdUtil';
 import {
   E2EIHandler,
   getActiveWireIdentity,
@@ -56,7 +56,6 @@ export class MLSConversationVerificationStateHandler {
   private readonly logger: Logger;
 
   public constructor(
-    private readonly selfDomain: string,
     private readonly onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange,
     private readonly onSelfClientCertificateRevoked: () => Promise<void>,
     private readonly conversationState: ConversationState,
@@ -70,9 +69,8 @@ export class MLSConversationVerificationStateHandler {
 
     // We hook into the newEpoch event of the MLS service to check if the conversation needs to be verified or degraded
     this.core.service?.mls?.on(MLSServiceEvents.NEW_EPOCH, this.onEpochChanged);
-    this.core.service.e2eIdentity.on('crlChanged', ({domain}) => {
-      return this.handleNewRevocationList(domain);
-    });
+    // After CoreCrypto refreshed the CRLs, both the self certificate and every conversation have to be re-evaluated.
+    this.core.service.e2eIdentity.on('credentialsChecked', this.handleCredentialsChecked);
   }
 
   /**
@@ -124,16 +122,17 @@ export class MLSConversationVerificationStateHandler {
   }
 
   /**
-   * This function checks if self client certificate is revoked
+   * CoreCrypto finished a credentials check, so the CRLs it uses are up to date.
+   *
+   * The event has no payload: V11 no longer tells us which domain changed. Only an actually
+   * revoked self certificate is acted on. CoreCrypto V11 reports an invalid own credential as an
+   * error after completing the check, so that specific outcome also reaches this handler. A check
+   * that failed before refreshing state (for example an unreachable CRL) does not.
    */
-  private handleNewRevocationList = async (domain: string): Promise<void> => {
-    // CRL hosts can be tenant-prefixed, so a suffix match is enough to scope this event to the backend domain.
-    if (domain.endsWith(this.selfDomain)) {
-      // The crl of the self user has changed, we need to check if the self client certificate is revoked
-      const activeIdentity = await getActiveWireIdentity();
-      if (activeIdentity?.status === MLSStatuses.REVOKED) {
-        await this.onSelfClientCertificateRevoked();
-      }
+  private handleCredentialsChecked = async (): Promise<void> => {
+    const activeIdentity = await getActiveWireIdentity();
+    if (activeIdentity?.status === MLSStatuses.REVOKED) {
+      await this.onSelfClientCertificateRevoked();
     }
     await this.checkAllConversationsVerificationState();
   };
@@ -196,7 +195,7 @@ export class MLSConversationVerificationStateHandler {
       }),
     );
   };
-  private onEpochChanged = async ({groupId, epoch: newEpoch}: {groupId: string; epoch: number}): Promise<void> => {
+  private onEpochChanged = async ({groupId, epoch: newEpoch}: {groupId: string; epoch: bigint}): Promise<void> => {
     // There could be a race condition where we would receive an epoch update for a conversation that is not yet known by the webapp.
     // We just wait for it to be available and then check the verification state
     const conversation = await waitFor(() => {

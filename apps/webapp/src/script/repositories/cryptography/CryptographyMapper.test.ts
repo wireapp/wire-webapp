@@ -17,8 +17,8 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {GenericMessageType} from '@wireapp/core/lib/conversation';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
+import {GenericMessageType} from '../../core/conversation';
 import {isObject} from 'underscore';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import Long from 'long';
@@ -31,6 +31,7 @@ import {
   Cleared,
   ClientAction,
   External,
+  Ephemeral,
   GenericMessage,
   Knock,
   LastRead,
@@ -142,6 +143,45 @@ describe('CryptographyMapper', () => {
   });
 
   describe('"mapGenericMessage"', () => {
+    it.each(['not-json', JSON.stringify({type: 'CANCEL', version: '3.0'})])(
+      'skips invalid calling content inside an ephemeral wrapper: %s',
+      async content => {
+        // Calling is outside the current protobuf's ephemeral field set, but
+        // the mapper interprets the wrapper as a generic message at runtime.
+        const ephemeral = Object.assign(
+          new GenericMessage({messageId: createUuid(), calling: new Calling({content})}),
+          {
+            expireAfterMillis: Long.fromNumber(5_000),
+          },
+        );
+        const genericMessage = new GenericMessage({
+          messageId: createUuid(),
+          ephemeral,
+        });
+
+        expect(ephemeral.content).toBe(GenericMessageType.CALLING);
+        await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toBeUndefined();
+      },
+    );
+
+    it('preserves valid ephemeral content and its expiry', async () => {
+      const messageId = createUuid();
+      const genericMessage = new GenericMessage({
+        messageId,
+        ephemeral: new Ephemeral({
+          expireAfterMillis: Long.fromNumber(5_000),
+          text: new Text({content: 'temporary message'}),
+        }),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toMatchObject({
+        id: messageId,
+        ephemeral_expires: 5_000,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+        data: {content: 'temporary message'},
+      });
+    });
+
     it.each([
       [0, 0],
       [NaN, 0],
@@ -769,12 +809,12 @@ describe('CryptographyMapper', () => {
       });
     });
 
-    it('resolves with a mapped calling message', () => {
+    it.each(['3.0', '4.0', '4'.repeat(16)])('resolves with a mapped calling message at version %s', version => {
       const content_message = {
         resp: false,
         sessid: 'asd2',
         type: 'CANCEL',
-        version: '3.0',
+        version,
       };
 
       const calling = new Calling({content: JSON.stringify(content_message)});
@@ -793,6 +833,131 @@ describe('CryptographyMapper', () => {
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.content).toEqual(content_message);
       });
+    });
+
+    it.each([
+      ['REMOTE_MUTE', {data: {targets: {domain: {user: ['client']}}}, type: 'REMOTEMUTE'}],
+      ['REMOTE_KICK', {type: 'REMOTEKICK'}],
+    ])('maps the moderator %s payload emitted by CallingRepository', async (_name, content_message) => {
+      const calling = new Calling({content: JSON.stringify(content_message)});
+      const genericMessage = new GenericMessage({
+        [GenericMessageType.CALLING]: calling,
+        messageId: createUuid(),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toMatchObject({
+        type: ClientEvent.CALL.E_CALL,
+        content: content_message,
+      });
+    });
+
+    it.each(['CONFSTART', 'CONFCHECK'])('accepts %s when AVS omits an empty sfts list', async type => {
+      const content_message = {
+        resp: false,
+        secret: 'c2VjcmV0',
+        seqno: '0',
+        sessid: 'session',
+        sft_url: 'https://sft.example',
+        timestamp: '1',
+        type,
+        version: '3.0',
+      };
+      const calling = new Calling({content: JSON.stringify(content_message)});
+      const genericMessage = new GenericMessage({
+        [GenericMessageType.CALLING]: calling,
+        messageId: createUuid(),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toMatchObject({
+        type: ClientEvent.CALL.E_CALL,
+        content: content_message,
+      });
+    });
+
+    it.each([
+      ['CONFCONN', {}],
+      ['CONFPART', {should_start: false, timestamp: '1', seqno: '0', entropy: '', participants: []}],
+      ['CONFSTREAMS', {mode: 'list', streams: []}],
+      ['ALERT', {level: 1, descr: 'alert'}],
+      ['PING', {}],
+      ['DEVPAIR_PUBLISH', {ice_servers: [], sdp: '', username: 'user'}],
+      ['DEVPAIR_ACCEPT', {sdp: ''}],
+    ])('discards unsupported calling message type %s', async (type, fields) => {
+      const calling = new Calling({
+        content: JSON.stringify({resp: false, sessid: 'session', version: '3.0', type, ...fields}),
+      });
+      const genericMessage = new GenericMessage({
+        [GenericMessageType.CALLING]: calling,
+        messageId: createUuid(),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toBeUndefined();
+    });
+
+    it('maps an unfamiliar protocol version without requiring the 3.0 field set', async () => {
+      const content_message = {type: 'CONFSTART', version: '4.0', future: {codecs: ['example']}};
+      const calling = new Calling({content: JSON.stringify(content_message)});
+      const genericMessage = new GenericMessage({
+        [GenericMessageType.CALLING]: calling,
+        messageId: createUuid(),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toMatchObject({
+        type: ClientEvent.CALL.E_CALL,
+        content: content_message,
+      });
+    });
+
+    it('accepts CONFKEY at the 256-key limit', async () => {
+      const content_message = {
+        keys: new Array(256).fill({idx: 0, data: 'key'}),
+        resp: false,
+        sessid: 'session',
+        type: 'CONFKEY',
+        version: '3.0',
+      };
+      const calling = new Calling({content: JSON.stringify(content_message)});
+      const genericMessage = new GenericMessage({
+        [GenericMessageType.CALLING]: calling,
+        messageId: createUuid(),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toMatchObject({
+        type: ClientEvent.CALL.E_CALL,
+        content: content_message,
+      });
+    });
+
+    it.each([
+      ['not-json', 'malformed JSON'],
+      [
+        JSON.stringify({
+          keys: new Array(257).fill({idx: 0, data: 'key'}),
+          resp: false,
+          sessid: 'session',
+          type: 'CONFKEY',
+          version: '3.0',
+        }),
+        'oversized key arrays',
+      ],
+      ['[]', 'non-object JSON'],
+      [
+        JSON.stringify({resp: false, sessid: 'session', type: 'CANCEL', version: '3.0', unknown: true}),
+        'unknown fields',
+      ],
+      [JSON.stringify({resp: false, sessid: 'session', type: 'UNKNOWN', version: '3.0'}), 'unknown message types'],
+      [JSON.stringify({sessid: 'session', type: 'CANCEL', version: '3.0'}), 'missing fields'],
+      [JSON.stringify({resp: 'false', sessid: 'session', type: 'CANCEL', version: '3.0'}), 'incorrect field types'],
+      [JSON.stringify({resp: false, sessid: 'x'.repeat(128), type: 'CANCEL', version: '3.0'}), 'oversized strings'],
+      [JSON.stringify({resp: false, sessid: 'session', type: 'CANCEL', version: '4'.repeat(17)}), 'oversized versions'],
+    ])('discards calling messages with %s', async (serializedContent, _) => {
+      const calling = new Calling({content: serializedContent});
+      const genericMessage = new GenericMessage({
+        [GenericMessageType.CALLING]: calling,
+        messageId: createUuid(),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toBeUndefined();
     });
   });
 });

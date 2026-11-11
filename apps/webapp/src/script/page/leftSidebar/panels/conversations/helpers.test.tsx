@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation';
 
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {

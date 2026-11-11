@@ -17,9 +17,9 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe} from 'true-myth';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
 import type {MeetingSeries} from '../types/meetingSeries';
 

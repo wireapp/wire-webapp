@@ -60,6 +60,10 @@ jest.mock('../../../repositories/tracking/telemetry.helpers', () => {
 });
 
 describe('QualityFeedbackModal', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   function translateQualityFeedbackForTest(translationKey: Parameters<typeof translateForTest>[0]): string {
     switch (translationKey) {
       case 'qualityFeedback.skip':

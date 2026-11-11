@@ -40,7 +40,7 @@ import {SystemMessageType} from '../../message/systemMessageType';
 
 import {EventMapper} from './EventMapper';
 import {translateForTest} from '../../util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
 describe('Event Mapper', () => {
   let conversation: Conversation;

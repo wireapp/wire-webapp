@@ -241,14 +241,12 @@ jobs:
           distribution_context_directory="${RUNNER_TEMP}/${distribution_artifact_name}"
           mkdir -p \
             "${distribution_context_directory}/apps/server" \
-            "${distribution_context_directory}/libraries/config" \
             "${distribution_context_directory}/bin"
 
           cp -a package.json .npmrc run.sh .env.defaults "${distribution_context_directory}/"
           cp -a package-lock.json "${distribution_context_directory}/package-lock.json"
           cp -a apps/server/Dockerfile apps/server/package.json "${distribution_context_directory}/apps/server/"
           cp -a apps/server/dist "${distribution_context_directory}/apps/server/dist"
-          cp -a libraries/config/package.json libraries/config/lib "${distribution_context_directory}/libraries/config/"
 
           jq -n \
             --arg release_version "${RELEASE_VERSION}" \

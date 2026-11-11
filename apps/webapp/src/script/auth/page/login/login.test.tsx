@@ -18,9 +18,11 @@
  */
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
-import {ClientType} from '@wireapp/api-client/lib/client';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
-import {Runtime, TypeUtil} from '@wireapp/commons';
+import {ClientType} from '../../../apiClient/client/clientType';
+import {BackendError} from '../../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
+import {Runtime} from '../../../commons/util/Runtime';
+import {TypeUtil} from '../../../commons/util';
 import {StatusCodes} from 'http-status-codes';
 import {Provider} from 'react-redux';
 import {HashRouter as Router} from 'react-router';

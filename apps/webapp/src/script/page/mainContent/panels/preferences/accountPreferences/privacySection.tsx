@@ -19,16 +19,15 @@
 
 import React, {type FunctionComponent} from 'react';
 
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {container} from 'tsyringe';
 
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-
+import {RECEIPT_MODE} from '../../../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
 import {Config} from '../../../../../Config';
 import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 import {AppLockRepository} from '../../../../../repositories/user/appLockRepository';
 import {AppLockState} from '../../../../../repositories/user/appLockState';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../../../../repositories/user/typingIndicatorMode';
+import {Checkbox, CheckboxLabel} from '../../../../../uiKit/inputs/checkbox/checkbox';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {formatDurationCaption, TIME_IN_MILLIS} from '../../../../../util/timeUtil';
 import {useApplicationContext} from '../../../../rootProvider';

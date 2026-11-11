@@ -18,8 +18,8 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_TYPE} from '../../../../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../../../../apiClient/team/feature/featureList.types';
 import {container} from 'tsyringe';
 
 import {randomUUID} from 'crypto';
@@ -40,6 +40,7 @@ import {createUuid} from '../../../../../util/uuid';
 
 import {DevicesPreferences} from './devicesPreference';
 import {translateForTest} from '../../../../../util/test/translateForTest';
+import {createCoreTestFixture} from '../../../../../util/test/createCoreTestFixture';
 
 function createDevice(): ClientEntity {
   const device = new ClientEntity(true, '', createUuid());
@@ -70,8 +71,19 @@ describe('DevicesPreferences', () => {
   const selfMLSConversation = createConversation(CONVERSATION_PROTOCOL.MLS, CONVERSATION_TYPE.SELF);
   const regularConversation = createConversation();
 
-  const coreMock = container.resolve(Core);
-  coreMock.isMLSActiveForClient = jest.fn().mockReturnValue(true);
+  beforeEach(() => {
+    container.registerInstance(
+      Core,
+      createCoreTestFixture({
+        isMLSActiveForClient: jest.fn().mockReturnValue(true),
+        service: {e2eIdentity: {getUsersIdentities: jest.fn().mockResolvedValue(new Map())}},
+      }),
+    );
+  });
+
+  afterEach(() => {
+    container.clearInstances();
+  });
 
   const selfUser = new User(createUuid(), '', translateForTest);
   selfUser.devices([createDevice(), createDevice()]);

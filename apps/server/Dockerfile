@@ -1,4 +1,4 @@
-FROM node:26.13.0-alpine3.24@sha256:c6ad9e9c1d80f6eb607c26b4b0a132ff7a2344fad1c78ea3baa2a7d4c8de6d94
+FROM node:26.13.0-alpine3.24@sha256:8996bb5821d62a8fd9bb27c1cb07462f3fdce6e47d640c6a881ead0b064ce216
 
 # For some extra dependencies...
 RUN apk add --no-cache dumb-init git bash
@@ -8,13 +8,9 @@ WORKDIR /app
 # npm workspace metadata
 COPY package.json package-lock.json .npmrc ./
 COPY apps/server/package.json ./apps/server/package.json
-COPY libraries/config/package.json ./libraries/config/package.json
 
 # Install only server production deps
 RUN npm clean-install --omit=dev --workspace=@wireapp/server --include-workspace-root=false --ignore-scripts
-
-# Copy built config library artifacts
-COPY libraries/config/lib ./libraries/config/lib
 
 # Copy built server artifacts and runtime files
 COPY apps/server/dist /dist

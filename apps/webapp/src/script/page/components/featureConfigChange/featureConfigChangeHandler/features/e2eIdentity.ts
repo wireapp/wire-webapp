@@ -19,8 +19,8 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
-import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
+import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '../../../../../apiClient/team/feature/featureList.types';
 import {E2EIHandler} from '../../../../../e2eIdentity';
 import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../../../../guards/Protocol';
 import {supportsMLS} from '../../../../../util/util';
@@ -66,6 +66,9 @@ export const configureE2EI = (config: FeatureList, clock: Clock): undefined | Pr
   return E2EIHandler.getInstance().initialize({
     discoveryUrl,
     gracePeriodInSeconds: e2eiConfig.config.verificationExpiration,
+    // `useProxyOnMobile` only applies to mobile clients. In the browser the proxy is the only
+    // reachable CRL endpoint, so it is always preferred when the deployment provides one.
+    crlProxy: isNonEmptyString(e2eiConfig.config.crlProxy) ? e2eiConfig.config.crlProxy : undefined,
     clock,
   });
 };

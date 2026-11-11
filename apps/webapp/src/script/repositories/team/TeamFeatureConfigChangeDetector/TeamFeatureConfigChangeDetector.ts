@@ -18,7 +18,8 @@
  */
 
 import {isNullOrUndefined, isObject} from '@sindresorhus/is';
-import {FeatureList, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
+
+import {FeatureList, FEATURE_KEY, FEATURE_STATUS} from '../../../apiClient/team/feature/featureList.types';
 
 export enum FeatureUpdateType {
   ENABLED = 'ENABLED', // Feature was enabled or didn't exist before and now it was added and is enabled

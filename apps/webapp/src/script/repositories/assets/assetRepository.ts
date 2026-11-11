@@ -19,11 +19,6 @@
 
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import type {NonEmptyString} from '@sindresorhus/is/distribution/types';
-import {AssetAuditData, AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/lib/asset/';
-import type {AssetResponse} from '@wireapp/api-client/lib/asset/assetApi';
-import type {RequestCancelable} from '@wireapp/api-client/lib/http';
-import type {AssetService} from '@wireapp/core/lib/conversation';
-import type {EncryptedAssetUploaded} from '@wireapp/core/lib/cryptography';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
@@ -36,6 +31,12 @@ import {AssetRemoteData} from './assetRemoteData';
 import {AssetTransferState} from './assetTransferState';
 import {getAssetUrl, setAssetUrl} from './assetUrlCache';
 
+import {AssetAuditData, AssetOptions} from '../../apiClient/asset/assetApi';
+import type {AssetResponse} from '../../apiClient/asset/assetApi';
+import {AssetRetentionPolicy} from '../../apiClient/asset/assetRetentionPolicy';
+import type {RequestCancelable} from '../../apiClient/http/requestCancelable';
+import type {AssetService} from '../../core/conversation';
+import type {EncryptedAssetUploaded} from '../../core/cryptography';
 import {Core} from '../../service/coreSingleton';
 import {stripImageExifData} from '../../util/imageUtil';
 import {getLogger, Logger} from '../../util/logger';

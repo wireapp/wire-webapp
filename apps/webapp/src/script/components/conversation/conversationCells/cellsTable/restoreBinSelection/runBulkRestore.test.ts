@@ -60,6 +60,7 @@ const createDependencies = (overrides: Partial<BulkRestoreDependencies> = {}): B
     lookupRootParentId: jest.fn().mockResolvedValue('parent-id'),
     restoreNodes: jest.fn().mockResolvedValue(performed),
     observeJobs: jest.fn().mockResolvedValue('all-finished'),
+    reportError: jest.fn(),
     ...overrides,
   };
 };
@@ -107,6 +108,24 @@ describe('runBulkRestore', () => {
 
     expect(outcome).toBe('request-failed');
     expect(dependencies.restoreNodes).not.toHaveBeenCalled();
+  });
+
+  it('reports the underlying error when a root parent lookup fails', async () => {
+    const error = new Error('missing');
+    const dependencies = createDependencies({lookupRootParentId: jest.fn().mockRejectedValue(error)});
+
+    await runBulkRestore({targets: [parent('Folder')], ...dependencies});
+
+    expect(dependencies.reportError).toHaveBeenCalledWith(error);
+  });
+
+  it('reports the underlying error when the restore request rejects', async () => {
+    const error = new Error('network');
+    const dependencies = createDependencies({restoreNodes: jest.fn().mockRejectedValue(error)});
+
+    await runBulkRestore({targets: [selected('a')], ...dependencies});
+
+    expect(dependencies.reportError).toHaveBeenCalledWith(error);
   });
 
   it('reports request-failed when the restore request rejects', async () => {

@@ -18,21 +18,26 @@
  */
 
 import {isArray, isEmptyString, isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
+import {Task, task} from 'true-myth';
+import {container} from 'tsyringe';
+
+import {MLSCapableConversation} from './ConversationSelectors';
+
 import type {
   CONVERSATION_ACCESS_ROLE,
   Conversation as BackendConversation,
-  ConversationCode,
   MLS1to1Conversation,
   CONVERSATION_ACCESS,
-  RemoteConversations,
   ADD_PERMISSION,
-} from '@wireapp/api-client/lib/conversation';
+} from '../../apiClient/conversation/conversation';
+import type {ConversationCode} from '../../apiClient/conversation/conversationCode';
+import type {ConversationJoinData} from '../../apiClient/conversation/data/conversationJoinData';
 import type {
-  ConversationJoinData,
   ConversationMemberUpdateData,
   ConversationOtherMemberUpdateData,
-  ConversationReceiptModeUpdateData,
-} from '@wireapp/api-client/lib/conversation/data';
+} from '../../apiClient/conversation/data/conversationMemberUpdateData';
+import type {ConversationReceiptModeUpdateData} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import type {RemoteConversations} from '../../apiClient/conversation/remoteConversations';
 import {
   ConversationProtocolUpdateEvent,
   type ConversationAddPermissionUpdateEvent,
@@ -44,16 +49,11 @@ import {
   ConversationMessageTimerUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
-} from '@wireapp/api-client/lib/event';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {ConversationService as CoreConversationService} from '@wireapp/core/lib/conversation';
-import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
-import {Task, task} from 'true-myth';
-import {container} from 'tsyringe';
-
-import {MLSCapableConversation} from './ConversationSelectors';
-
+} from '../../apiClient/event/conversationEvent';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import type {ConversationService as CoreConversationService} from '../../core/conversation';
+import {MLSServiceEvents} from '../../core/messagingProtocols/mls';
 import {MessageCategory} from '../../message/messageCategory';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';

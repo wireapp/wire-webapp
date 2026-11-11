@@ -21,20 +21,20 @@ import {Fragment, useMemo, useState} from 'react';
 import type {ReactNode} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
-import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {container} from 'tsyringe';
-
-import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {backendErrorLink, warning} from './contentMessage/warnings/warnings.styles';
 import {MessageTime} from './messageTime';
 import {useMessageFocusedTabIndex} from './util';
 
 import {Config} from '../../../Config';
+import {AddUsersFailure, AddUsersFailureReasons} from '../../../core/conversation';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../repositories/entity/message/failedToAddUsersMessage';
 import {User} from '../../../repositories/entity/User';
 import {UserState} from '../../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {Link, LinkVariant} from '../../../uiKit/typography/link/link';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import type {Translate, TranslationKey} from '../../../util/localizerUtil';
 import type {ReactTranslationMarker} from '../../../util/localizerUtil/reactLocalizerUtil';

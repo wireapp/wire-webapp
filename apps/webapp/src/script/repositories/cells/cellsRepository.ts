@@ -18,8 +18,6 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
-import {NodeFlags, RestShareLink} from '@wireapp/api-client/lib/cells';
-import type {Node as CellsNode, NodeVersions} from '@wireapp/api-client/lib/cells/cellsApi.schema';
 import type {
   BackgroundActionInfoNameEnum,
   RestBackgroundAction,
@@ -33,6 +31,8 @@ import type {
 } from 'cells-sdk-ts';
 import {container, singleton} from 'tsyringe';
 
+import {NodeFlags, RestShareLink} from '../../apiClient/cells';
+import type {Node as CellsNode, NodeVersions} from '../../apiClient/cells/cellsApi.schema';
 import {APIClient} from '../../service/apiClientSingleton';
 import {createUuid} from '../../util/uuid';
 

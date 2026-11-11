@@ -21,15 +21,6 @@ import type {ReactNode, FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {
-  AlertIcon,
-  ChevronIcon,
-  CloseIcon,
-  FolderIcon,
-  ReloadIcon,
-  SharedDriveUploadStatusIcon,
-} from '@wireapp/react-ui-kit';
-
 import type {SharedDriveUploadStatus, SharedDriveUploadStatusKind} from './sharedDriveUploadStatus';
 import type {SharedDriveMoveStatus} from './sharedDriveUploadStatusContext';
 import {
@@ -61,6 +52,12 @@ import {
   sharedDriveUploadStatusPopupToggleStyles,
 } from './sharedDriveUploadStatusPopup.styles';
 
+import {AlertIcon} from '../../../uiKit/dataDisplay/icon/alertIcon';
+import {ChevronIcon} from '../../../uiKit/dataDisplay/icon/chevronIcon';
+import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
+import {FolderIcon} from '../../../uiKit/dataDisplay/icon/files/folderIcon';
+import {ReloadIcon} from '../../../uiKit/dataDisplay/icon/reloadIcon';
+import {SharedDriveUploadStatusIcon} from '../../../uiKit/dataDisplay/icon/sharedDriveUploadStatusIcon';
 import {getFileExtension} from '../../../util/util';
 import {FileTypeIcon} from '../common/fileTypeIcon/fileTypeIcon';
 
@@ -81,8 +78,11 @@ interface SharedDriveMoveActivityProps {
   readonly isExpanded: boolean;
   readonly toggleLabel: string;
   readonly dismissLabel: string;
+  readonly reviewLabel?: string;
+  readonly reviewingLabel?: string;
   readonly onToggle: () => void;
   readonly onDismiss: () => void;
+  readonly onReview?: () => void;
 }
 
 interface SharedDriveUploadStatusPopupProps {
@@ -448,12 +448,16 @@ export const SharedDriveUploadStatusPopup: FunctionComponent<
       isExpanded,
       toggleLabel,
       dismissLabel,
+      reviewLabel,
+      reviewingLabel,
       onToggle,
       onDismiss,
+      onReview,
     } = props;
     const rowStatusKind = getMoveRowStatusKind(move);
     const rowsId = 'shared-drive-move-status-rows';
     const isMoveWarning = move.kind !== 'processing' && move.kind !== 'completed';
+    const isReviewing = move.isReviewing === true;
 
     return (
       <div css={sharedDriveUploadStatusPopupStyles} data-uie-name="shared-drive-upload-status-popup">
@@ -472,6 +476,17 @@ export const SharedDriveUploadStatusPopup: FunctionComponent<
             </span>
           </div>
           <div css={sharedDriveUploadStatusPopupHeaderActionsStyles}>
+            {isMoveWarning && onReview !== undefined && reviewLabel !== undefined && (
+              <button
+                type="button"
+                css={sharedDriveUploadStatusPopupHeaderCancelStyles}
+                disabled={isReviewing}
+                aria-busy={isReviewing}
+                onClick={onReview}
+              >
+                {isReviewing ? (reviewingLabel ?? reviewLabel) : reviewLabel}
+              </button>
+            )}
             <button
               type="button"
               css={sharedDriveUploadStatusPopupHeaderCancelStyles}

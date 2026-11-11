@@ -17,8 +17,7 @@
  *
  */
 
-import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
-
+import {stringifyQualifiedId} from '../../../../../core/util/qualifiedIdUtil';
 import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 import type {Conversation} from '../../../../../repositories/entity/Conversation';
 import type {User} from '../../../../../repositories/entity/User';

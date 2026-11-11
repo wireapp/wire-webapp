@@ -42,7 +42,7 @@ import {CallingCell, CallingCellProps} from './CallingCell';
 
 import {buildMediaDevicesHandler} from '../../../auth/util/test/testUtil';
 import {translateForTest} from '../../../util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 const mockCallAlertState = {
   clearShowAlert: jest.fn(),

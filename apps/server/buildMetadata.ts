@@ -19,8 +19,8 @@
 
 import {Maybe, Result} from 'true-myth';
 
-import {isBuildMetadata, parseBuildMetadata as parseAuthoritativeBuildMetadata} from '@wireapp/config';
-import type {BuildMetadata} from '@wireapp/config';
+import {isBuildMetadata, parseBuildMetadata as parseAuthoritativeBuildMetadata} from './configuration/buildMetadata';
+import type {BuildMetadata} from './configuration/buildMetadata';
 
 export type BuildMetadataFileDependencies = {
   readonly readFile: (metadataFilePath: string) => string;

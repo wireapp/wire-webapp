@@ -17,11 +17,11 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 
 import type {MeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
 import {WebAppEvents} from '../../../webAppEvents';
 import type {MeetingCancellationOptions} from '../meetingNotificationEventHandlers';

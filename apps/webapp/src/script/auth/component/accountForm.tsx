@@ -20,19 +20,23 @@
 import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyArray, isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
-import {ValidationUtil} from '@wireapp/commons';
-import {Button, Checkbox, CheckboxLabel, Form, Input, Text} from '@wireapp/react-ui-kit';
-
 import {styles} from './accountForm.styles';
 import {Exception} from './exception';
 
+import {BackendError} from '../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {ValidationUtil} from '../../commons/util';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Checkbox, CheckboxLabel} from '../../uiKit/inputs/checkbox/checkbox';
+import {Form} from '../../uiKit/inputs/form/form';
+import {Input} from '../../uiKit/inputs/input/input';
+import {Text} from '../../uiKit/typography/text/text';
 import {handleEnterDown} from '../../util/keyboardUtil';
 import {getLogger} from '../../util/logger';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';

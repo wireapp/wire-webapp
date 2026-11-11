@@ -1,0 +1,65 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+const {TextDecoder, TextEncoder} = require('util');
+const rootJestConfiguration = require('../../../../jest.config.js');
+
+module.exports = {
+  rootDir: '../..',
+  roots: ['<rootDir>/src/script/core', '<rootDir>/test/core'],
+  displayName: 'core-lib',
+  testEnvironment: 'node',
+  clearMocks: true,
+  cacheDirectory: '../../target/jest/cache',
+  setupFilesAfterEnv: ['<rootDir>/test/core/jest.setup.ts'],
+  globals: {
+    TextDecoder,
+    TextEncoder,
+  },
+  transform: {
+    '^.+\\.(ts|tsx)$': '@swc/jest',
+    '^.+\\.(js|jsx)$': '@swc/jest',
+  },
+  moduleNameMapper: {
+    '^@enormora/clock$': '<rootDir>/../../node_modules/@enormora/clock/index.js',
+    '^@enormora/clock/clock$': '<rootDir>/../../node_modules/@enormora/clock/clock.entry-point.js',
+    '^@enormora/clock/deterministic-clock$': '<rootDir>/../../node_modules/@enormora/clock/deterministic-clock.js',
+    '^@enormora/fire-and-forget$': '<rootDir>/../../node_modules/@enormora/fire-and-forget/index.js',
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(true-myth|uuid|noop-esm|p-queue|p-timeout|eventemitter3|@sindresorhus/is|@faker-js/faker|@enormora/clock|@enormora/fire-and-forget)/)',
+  ],
+  coveragePathIgnorePatterns: ['<rootDir>/src/script/apiClient/'],
+  coverageDirectory: '../../target/coverage/apps/webapp/core',
+  coverageThreshold: {
+    global: {
+      branches: 49,
+      functions: 53,
+      lines: 62,
+      statements: 62,
+    },
+  },
+  coverageReporters: rootJestConfiguration.coverageReporters,
+  testMatch: [
+    '<rootDir>/src/script/core/**/__tests__/**/*.[jt]s?(x)',
+    '<rootDir>/src/script/core/**/?(*.)+(spec|test).[jt]s?(x)',
+  ],
+  moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
+  reporters: rootJestConfiguration.reporters,
+};

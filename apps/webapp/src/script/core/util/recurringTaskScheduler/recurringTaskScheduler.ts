@@ -1,0 +1,148 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+
+import {TimeUtil} from '../../../commons/util';
+import {LowPrecisionTaskScheduler} from '../lowPrecisionTaskScheduler';
+import {TaskScheduler} from '../taskScheduler';
+
+const windowFocusMinimumIntervalInMinutes = 15;
+const maximumRecurringIntervalInDays = 20;
+
+interface RecurringTaskSchedulerStorage {
+  set: (key: string, timestamp: number) => Promise<void>;
+  get: (key: string) => Promise<number | undefined>;
+  delete: (key: string) => Promise<void>;
+}
+
+export interface TaskParams {
+  every: number;
+  task: () => Promise<unknown> | unknown;
+  key: string;
+  addTaskOnWindowFocusEvent?: boolean;
+}
+
+const WINDOW_FOCUS_MIN_INTERVAL_MS = windowFocusMinimumIntervalInMinutes * TimeUtil.TimeInMillis.MINUTE;
+
+export class RecurringTaskScheduler {
+  private readonly focusListeners = new Map<string, () => void>();
+  private readonly lastExecutedAt = new Map<string, number>();
+  private readonly executingTaskKeys = new Set<string>();
+  private readonly windowFocusTaskKeys = new Set<string>();
+
+  constructor(
+    private readonly storage: RecurringTaskSchedulerStorage,
+    private readonly fireAndForgetInvoker: FireAndForgetInvoker,
+  ) {}
+
+  public readonly registerTask = async ({
+    every,
+    task,
+    key,
+    addTaskOnWindowFocusEvent = false,
+  }: TaskParams): Promise<void> => {
+    if (addTaskOnWindowFocusEvent) {
+      this.windowFocusTaskKeys.add(key);
+    }
+
+    const firingDate = (await this.storage.get(key)) ?? Date.now() + every;
+    await this.storage.set(key, firingDate);
+
+    const executeTask = async (): Promise<void> => {
+      if (this.executingTaskKeys.has(key)) {
+        return;
+      }
+
+      this.executingTaskKeys.add(key);
+
+      await this.storage.delete(key);
+      try {
+        await task();
+      } finally {
+        this.executingTaskKeys.delete(key);
+        this.lastExecutedAt.set(key, Date.now());
+        await this.registerTask({
+          every,
+          task,
+          key,
+          addTaskOnWindowFocusEvent: this.windowFocusTaskKeys.has(key),
+        });
+      }
+    };
+
+    const taskConfig = {
+      firingDate,
+      key,
+      task: executeTask,
+    };
+
+    if (every > TimeUtil.TimeInMillis.DAY * maximumRecurringIntervalInDays) {
+      // If the firing date is in more that 20 days, we could switch to a lowPrecision scheduler that will avoid hitting the limit of setTimeout
+      // (see https://developer.mozilla.org/en-US/docs/Web/API/setTimeout#maximum_delay_value)
+      LowPrecisionTaskScheduler.addTask({...taskConfig, intervalDelay: TimeUtil.TimeInMillis.MINUTE});
+    } else {
+      TaskScheduler.addTask(taskConfig);
+    }
+
+    if (this.windowFocusTaskKeys.has(key) && typeof window !== 'undefined') {
+      this.removeWindowFocusListener(key);
+
+      const focusHandler = (): void => {
+        if (this.executingTaskKeys.has(key)) {
+          return;
+        }
+
+        const lastRun = this.lastExecutedAt.get(key);
+        if (lastRun !== undefined && Date.now() - lastRun < WINDOW_FOCUS_MIN_INTERVAL_MS) {
+          return;
+        }
+
+        this.fireAndForgetInvoker.fireAndForget(executeTask);
+      };
+
+      this.focusListeners.set(key, focusHandler);
+      window.addEventListener('focus', focusHandler);
+    }
+  };
+
+  public readonly cancelTask = async (taskKey: string): Promise<void> => {
+    this.windowFocusTaskKeys.delete(taskKey);
+    this.removeWindowFocusListener(taskKey);
+    this.lastExecutedAt.delete(taskKey);
+    this.executingTaskKeys.delete(taskKey);
+    await this.storage.delete(taskKey);
+    TaskScheduler.cancelTask(taskKey);
+    LowPrecisionTaskScheduler.cancelTask({intervalDelay: TimeUtil.TimeInMillis.MINUTE, key: taskKey});
+  };
+
+  public readonly hasTask = async (taskKey: string): Promise<boolean> => {
+    return (await this.storage.get(taskKey)) !== undefined;
+  };
+
+  private readonly removeWindowFocusListener = (key: string): void => {
+    const handler = this.focusListeners.get(key);
+    if (handler === undefined || typeof window === 'undefined') {
+      return;
+    }
+
+    window.removeEventListener('focus', handler);
+    this.focusListeners.delete(key);
+  };
+}

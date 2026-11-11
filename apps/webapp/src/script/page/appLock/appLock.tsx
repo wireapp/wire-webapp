@@ -24,12 +24,10 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {ValidationUtil} from '@wireapp/commons';
-import {Button, ButtonVariant, Checkbox, CheckboxLabel, Input, Link, LinkVariant} from '@wireapp/react-ui-kit';
-
 import {applockStyles} from './appLock.styles';
 
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {ValidationUtil} from '../../commons/util';
 import * as Icon from '../../components/icon';
 import {ModalComponent} from '../../components/Modals/ModalComponent';
 import {Config} from '../../Config';
@@ -37,6 +35,10 @@ import {ClientRepository} from '../../repositories/client';
 import {ClientState} from '../../repositories/client/ClientState';
 import {AppLockRepository} from '../../repositories/user/appLockRepository';
 import {AppLockState} from '../../repositories/user/appLockState';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {Checkbox, CheckboxLabel} from '../../uiKit/inputs/checkbox/checkbox';
+import {Input} from '../../uiKit/inputs/input/input';
+import {Link, LinkVariant} from '../../uiKit/typography/link/link';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import type {ReactTranslationValueReplacement} from '../../util/localizerUtil/reactLocalizerUtil';
 import {createReactTranslationMarker, renderReactTranslation} from '../../util/localizerUtil/reactLocalizerUtil';
@@ -221,8 +223,6 @@ const AppLock: FunctionComponent<AppLockProps> = ({
   useEffect(() => {
     if (isAppLockEnabled) {
       showAppLock();
-    } else if (appLockState.hasPassphrase()) {
-      appLockRepository.removeCode();
     }
   }, [isAppLockEnabled]);
 

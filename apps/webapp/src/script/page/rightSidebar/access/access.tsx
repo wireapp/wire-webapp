@@ -20,12 +20,10 @@
 import {useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {conversationAccessContainerCss, conversationAccessContentCss} from './access.styles';
 
+import {ADD_PERMISSION, CONVERSATION_ACCESS} from '../../../apiClient/conversation/conversation';
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import {ConversationAccess} from '../../../components/Modals/CreateConversation/types';
 import {
@@ -36,6 +34,7 @@ import {RadioGroup} from '../../../components/Radio';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from '../../../repositories/conversation/ConversationRoleRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {useChannelsFeatureFlag} from '../../../util/useChannelsFeatureFlag';
 import {useApplicationContext} from '../../rootProvider';

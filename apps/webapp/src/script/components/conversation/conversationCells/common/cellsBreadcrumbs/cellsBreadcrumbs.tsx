@@ -19,7 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Breadcrumbs} from '@wireapp/react-ui-kit';
+import {Breadcrumbs} from '../../../../../uiKit/navigation/breadcrumbs/breadcrumbs';
 
 interface CellsBreadcrumbsProps {
   maxNotCombinedItems?: number;

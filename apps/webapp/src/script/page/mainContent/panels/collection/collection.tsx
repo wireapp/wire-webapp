@@ -21,16 +21,14 @@ import {useEffect, useState} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
-
-import {ChevronIcon, SecondaryButton} from '@wireapp/react-ui-kit';
 
 import {CollectionDetails} from './collectionDetails';
 import {CollectionSection} from './collectionSection';
 import {FullSearch} from './fullSearch';
 import {Category, isOfCategory} from './utils';
 
+import {CONVERSATION_CELLS_STATE} from '../../../../apiClient/conversation/conversation';
 import * as Icon from '../../../../components/icon';
 import {showDetailViewModal} from '../../../../components/Modals/DetailViewModal';
 import {Config} from '../../../../Config';
@@ -43,6 +41,8 @@ import {ContentMessage} from '../../../../repositories/entity/message/contentMes
 import {User} from '../../../../repositories/entity/User';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate} from '../../../../router/routerBindings';
+import {ChevronIcon} from '../../../../uiKit/dataDisplay/icon/chevronIcon';
+import {SecondaryButton} from '../../../../uiKit/inputs/secondaryButton/secondaryButton';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
 import {useApplicationContext} from '../../../rootProvider';

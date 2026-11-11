@@ -23,8 +23,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {Config} from '../../../../Config';
 import {WireIdentity} from '../../../../e2eIdentity';
 import {MotionDuration} from '../../../../motion/MotionDuration';
@@ -37,6 +35,7 @@ import {ConversationState} from '../../../../repositories/conversation/Conversat
 import type {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
 import type {CryptographyRepository} from '../../../../repositories/cryptography/CryptographyRepository';
 import type {User} from '../../../../repositories/entity/User';
+import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from '../../../../util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from '../../../../util/localizerUtil/translationTypes';

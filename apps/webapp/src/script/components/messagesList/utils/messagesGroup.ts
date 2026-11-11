@@ -49,17 +49,12 @@ function getMessageMarkerType(
   lastReadTimestamp: number,
   previousMessage?: Message,
 ): Marker['type'] | undefined {
-  if (message.isCall()) {
+  if (isNullOrUndefined(previousMessage) || message.isCall()) {
     return undefined;
   }
 
-  const currentMessageTimestamp = message.timestamp();
-
-  if (isNullOrUndefined(previousMessage)) {
-    return currentMessageTimestamp > lastReadTimestamp ? 'unread' : undefined;
-  }
-
   const previousMessageTimestamp = previousMessage.timestamp();
+  const currentMessageTimestamp = message.timestamp();
   const isFirstUnread = previousMessageTimestamp <= lastReadTimestamp && currentMessageTimestamp > lastReadTimestamp;
 
   if (isFirstUnread) {
@@ -118,14 +113,22 @@ function shouldGroupMessagesByTimestamp(
  * @param messages - the sorted list of messages
  * @param lastReadTimestamp - the timestamp of the last read message (used to mark unread messages)
  */
-export function groupMessagesBySenderAndTime(
-  messages: Message[],
-  lastReadTimestamp: number,
-): (MessagesGroup | Marker)[] {
+type GroupMessagesOptions = {
+  readonly messages: Message[];
+  readonly lastReadTimestamp: number;
+  readonly includeInitialUnreadSeparator?: boolean;
+};
+
+export function groupMessagesBySenderAndTime(options: GroupMessagesOptions): (MessagesGroup | Marker)[] {
+  const {messages, lastReadTimestamp, includeInitialUnreadSeparator = false} = options;
+
   return messages.reduce<(MessagesGroup | Marker)[]>((acc, message, index) => {
     const previousMessage = messages[index - 1];
 
-    const marker = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
+    const marker =
+      index === 0 && includeInitialUnreadSeparator && !message.isCall() && message.timestamp() > lastReadTimestamp
+        ? 'unread'
+        : getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
     if (!isUndefined(marker)) {
       // if there is a marker to insert, we insert it before the current message

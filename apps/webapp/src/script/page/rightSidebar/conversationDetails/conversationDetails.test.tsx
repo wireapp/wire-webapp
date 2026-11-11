@@ -19,10 +19,10 @@
 
 import {act, fireEvent, render} from '@testing-library/react';
 import {type ReactElement} from 'react';
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {CONVERSATION_CELLS_STATE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {UserType} from '@wireapp/api-client/lib/user';
+import {ConnectionStatus} from '../../../apiClient/connection/connectionStatus';
+import {CONVERSATION_CELLS_STATE, CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {UserType} from '../../../apiClient/user/user';
 
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {ConnectionEntity} from '../../../repositories/connection/connectionEntity';
@@ -191,6 +191,10 @@ const getDefaultParams = (): GetDefaultParamsResult => {
 };
 
 describe('ConversationDetails', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     conversationRepository = await testFactory.exposeConversationActors();
     searchRepository = await testFactory.exposeSearchActors();

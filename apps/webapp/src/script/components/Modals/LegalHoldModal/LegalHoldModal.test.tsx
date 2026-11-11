@@ -18,8 +18,8 @@
  */
 
 import {act, render, waitFor} from '@testing-library/react';
-import {ClientClassification} from '@wireapp/api-client/lib/client/';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {ClientClassification} from '../../../apiClient/client/clientClassification';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 
 import en from '../../../../i18n/en-US.json';
 import si from '../../../../i18n/si-LK.json';
@@ -45,7 +45,7 @@ import {
 import {LegalHoldModal, LegalHoldModalProps, LegalHoldModalType} from './LegalHoldModal';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 const userRepository = {} as UserRepository;
 const testFactory = new TestFactory();
@@ -129,6 +129,10 @@ const defaultProps = (): DefaultPropsResult => {
 };
 
 describe('LegalHoldModal', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     await testFactory.exposeCallingActors();
   });

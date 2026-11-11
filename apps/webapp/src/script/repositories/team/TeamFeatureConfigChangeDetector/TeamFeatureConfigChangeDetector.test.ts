@@ -20,11 +20,10 @@
 import {
   FEATURE_KEY,
   FEATURE_STATUS,
-  FeatureMLS,
-  FeatureMLSE2EId,
   FeatureList,
   CONVERSATION_PROTOCOL,
-} from '@wireapp/api-client/lib/team';
+} from '../../../apiClient/team/feature/featureList.types';
+import {FeatureMLS, FeatureMLSE2EId} from '../../../apiClient/team/feature/featureList.schema';
 
 import {FeatureUpdateType, detectTeamFeatureUpdate} from './TeamFeatureConfigChangeDetector';
 

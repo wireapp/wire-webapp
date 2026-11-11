@@ -32,16 +32,6 @@ export const wrapperWithRowsStyles: CSSObject = {
   marginBottom: 'auto',
 };
 
-export const permanentDeleteProgressStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  margin: '0 0 8px',
-  color: 'var(--main-color)',
-  fontSize: 'var(--font-size-small)',
-  lineHeight: 1.5,
-};
-
 export const selectionBarContainerStyles: CSSObject = {
   position: 'relative',
   width: '100%',
@@ -169,18 +159,6 @@ export const bulkActionButtonStyles: CSSObject = {
   },
 };
 
-export const bulkMoveToBinButtonStyles: CSSObject = {
-  ...bulkActionButtonStyles,
-  borderColor: 'transparent',
-  background: 'var(--danger-color)',
-  color: 'var(--main-color)',
-
-  '&:hover, &:focus-visible': {
-    background: 'var(--danger-color)',
-    opacity: 0.9,
-  },
-};
-
 export const tableStyles: CSSObject = {
   width: '100%',
   borderCollapse: 'collapse',
@@ -201,6 +179,11 @@ export const headerCellStyles: CSSObject = {
   [`@media (max-width: ${styleBreakpoint}px)`]: {
     display: 'none',
   },
+};
+
+export const selectionHeaderCellStyles: CSSObject = {
+  ...headerCellStyles,
+  paddingLeft: '12px',
 };
 
 export const tableCellStyles: CSSObject = {

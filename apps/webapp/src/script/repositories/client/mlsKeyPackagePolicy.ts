@@ -18,8 +18,9 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import {FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
 import {Maybe} from 'true-myth';
+
+import {FEATURE_STATUS, type FeatureList} from '../../apiClient/team/feature/featureList.types';
 
 const REGULAR_UPLOAD_AMOUNT = 100;
 const MIGRATION_UPLOAD_AMOUNT = 1000;

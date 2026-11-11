@@ -17,7 +17,7 @@
  *
  */
 
-import {MemoryEngine} from '@wireapp/store-engine';
+import {MemoryEngine} from '../../core/storage/engine/memoryEngine';
 
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/storageSchemata';
@@ -25,7 +25,7 @@ import {createMessageAddEvent, toSavedEvent} from '../../../../test/helper/Event
 
 import {EventService} from './EventService';
 
-describe('EventService persisted event truthiness', () => {
+describe('EventService', () => {
   it.each([
     {expires: undefined, expectedEventIds: []},
     {expires: null, expectedEventIds: []},
@@ -94,5 +94,36 @@ describe('EventService persisted event truthiness', () => {
 
     await expect(service.loadEvents('conversation-id', [])).resolves.toEqual([]);
     await expect(service.loadEvents('', [])).rejects.toThrow();
+  });
+
+  it('returns the records moved to a new conversation', async () => {
+    const engine = new MemoryEngine();
+    await engine.init('event-conversation-migration-test');
+    const storageService = new StorageService();
+    storageService.init(engine);
+    const service = new EventService(storageService);
+    const sourceConversation = {domain: 'example.com', id: 'source-conversation'};
+    const targetConversation = {domain: 'example.com', id: 'target-conversation'};
+    const record = toSavedEvent(
+      createMessageAddEvent({
+        overrides: {
+          conversation: sourceConversation.id,
+          qualified_conversation: sourceConversation,
+          time: '2026-09-30T10:00:00.000Z',
+        },
+      }),
+    );
+    await engine.create(StorageSchemata.OBJECT_STORE.EVENTS, record.primary_key, record);
+
+    const movedEvents = await service.moveEventsToConversation(sourceConversation, targetConversation);
+
+    expect(movedEvents).toEqual([
+      expect.objectContaining({
+        conversation: targetConversation.id,
+        qualified_conversation: targetConversation,
+      }),
+    ]);
+    await expect(service.loadAllConversationEvents(sourceConversation.id)).resolves.toEqual([]);
+    await expect(service.loadAllConversationEvents(targetConversation.id)).resolves.toEqual(movedEvents);
   });
 });

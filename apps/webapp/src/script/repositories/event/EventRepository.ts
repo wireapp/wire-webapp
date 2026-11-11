@@ -18,24 +18,11 @@
  */
 
 import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
-import {
-  CONVERSATION_EVENT,
-  MEETING_EVENT,
-  USER_EVENT,
-  type BackendEvent,
-  ConversationOtrMessageAddEvent,
-  ConversationMLSMessageAddEvent,
-} from '@wireapp/api-client/lib/event';
-import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
-import {sequentialQueueOptions} from '@wireapp/core/lib/queue/sequentialQueueOptions';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
 import PromiseQueue from 'p-queue';
 import {container} from 'tsyringe';
-
-import {Runtime, StringUtil} from '@wireapp/commons';
-import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '@wireapp/core';
 
 import {ClientEvent} from './Client';
 import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
@@ -48,6 +35,19 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventHandlers/EventValidationError';
 
+import {type BackendEvent} from '../../apiClient/event/backendEvent';
+import {
+  CONVERSATION_EVENT,
+  ConversationOtrMessageAddEvent,
+  ConversationMLSMessageAddEvent,
+} from '../../apiClient/event/conversationEvent';
+import {MEETING_EVENT} from '../../apiClient/event/meetingEvent';
+import {USER_EVENT} from '../../apiClient/event/userEvent';
+import {StringUtil} from '../../commons/util';
+import {Runtime} from '../../commons/util/Runtime';
+import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '../../core';
+import {NotificationSource, HandledEventPayload} from '../../core/notification';
+import {sequentialQueueOptions} from '../../core/queue/sequentialQueueOptions';
 import {CryptographyError} from '../../error/cryptographyError';
 import {EventError} from '../../error/eventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';

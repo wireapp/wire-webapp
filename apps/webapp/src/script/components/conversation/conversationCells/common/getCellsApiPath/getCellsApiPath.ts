@@ -17,8 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
 import {RECYCLE_BIN_PATH} from '../recycleBin/recycleBin';
 

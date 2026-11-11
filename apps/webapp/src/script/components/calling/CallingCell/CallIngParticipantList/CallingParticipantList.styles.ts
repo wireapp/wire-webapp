@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {media} from '@wireapp/react-ui-kit';
+import {media} from '../../../../uiKit/utils/mediaQueries';
 
 export const labelStyles: CSSObject = {
   padding: '12px 10px',

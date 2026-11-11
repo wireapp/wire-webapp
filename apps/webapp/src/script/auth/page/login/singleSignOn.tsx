@@ -20,36 +20,29 @@
 import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isNull, isObject, isString, isUndefined} from '@sindresorhus/is';
-import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import {connect} from 'react-redux';
 import {useParams} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
-import {
-  COLOR,
-  Column,
-  Columns,
-  Container,
-  ContainerXS,
-  H1,
-  IsMobile,
-  Link,
-  Logo,
-  Muted,
-  Overlay,
-  QUERY,
-  QueryKeys,
-  Text,
-  useMatchMedia,
-} from '@wireapp/react-ui-kit';
-
 import {SingleSignOnForm} from './singleSignOnForm';
 
+import {BackendError} from '../../../apiClient/http/backendError';
+import {SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {LogoFullIcon} from '../../../components/icon';
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
+import {COLOR} from '../../../uiKit/identity/colors/colors';
+import {Logo} from '../../../uiKit/identity/logo/logo';
+import {Column, Columns} from '../../../uiKit/layout/column/column';
+import {Container, ContainerXS} from '../../../uiKit/layout/container/container';
+import {IsMobile, useMatchMedia} from '../../../uiKit/layout/matchMedia/matchMedia';
+import {Overlay} from '../../../uiKit/surface/modal/overlay';
+import {H1} from '../../../uiKit/typography/heading/heading';
+import {Link} from '../../../uiKit/typography/link/link';
+import {Muted, Text} from '../../../uiKit/typography/text/text';
+import {QUERY, QueryKeys} from '../../../uiKit/utils/mediaQueries';
 import {calculateChildWindowPosition} from '../../../util/DOM/caculateChildWindowPosition';
 import {getLogger} from '../../../util/logger';
 import {WebAppEvents} from '../../../webAppEvents';

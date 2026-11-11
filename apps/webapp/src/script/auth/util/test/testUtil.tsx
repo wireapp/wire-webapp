@@ -20,10 +20,11 @@
 import React from 'react';
 
 import {render, type RenderResult} from '@testing-library/react';
-import {CONVERSATION_TYPE, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
+import {CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
+import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {RecursivePartial} from '../../../commons/util/TypeUtil';
 import ko from 'knockout';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
@@ -32,7 +33,8 @@ import {AnyAction} from 'redux';
 import {MockStoreEnhanced} from 'redux-mock-store';
 import {ThunkDispatch} from 'redux-thunk';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../uiKit/identity/theme/theme';
 import type {JSX} from '@emotion/react/jsx-runtime';
 
 import cs from '../../../../i18n/cs-CZ.json';

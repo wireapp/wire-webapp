@@ -29,30 +29,18 @@ import {
   type ReactElement,
 } from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
 import {Maybe, maybe} from 'true-myth';
 
-import {
-  ArrowIcon,
-  Button,
-  ButtonVariant,
-  CloseIcon,
-  SharedDriveUploadSpinnerIcon,
-  TrashIcon,
-  UploadIcon,
-} from '@wireapp/react-ui-kit';
-
 import {bulkMoveReducer} from './bulkMoveState';
 import {CellsBulkMovePreviewModal} from './cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
+import {normalizeCellsPath} from './cellsBulkMovePreviewModal/normalizeCellsPath';
 import {CellsBulkMoveToBinConfirmationModal} from './cellsBulkMoveToBinConfirmationModal';
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
   bulkActionButtonStyles,
-  bulkMoveToBinButtonStyles,
   clearSelectionButtonStyles,
   folderDropOverlayDescriptionStyles,
   folderDropOverlayFolderNameStyles,
@@ -60,8 +48,8 @@ import {
   folderDropOverlayTitleStyles,
   folderDropTargetRowStyles,
   headerCellStyles,
+  selectionHeaderCellStyles,
   moveOutcomeMessageStyles,
-  permanentDeleteProgressStyles,
   tableActionsCellStyles,
   tableCellRow,
   tableCellStyles,
@@ -78,17 +66,32 @@ import {
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 import {getBulkMoveOutcomeEvidence} from './getBulkMoveOutcomeEvidence';
+import {
+  getDriveDragNodes,
+  hasSameSelection,
+  INTERNAL_DRIVE_DRAG_TYPE,
+  type CapturedDriveDrag,
+} from './getDriveDragNodes';
+import {getPermanentDeleteStatusKind} from './getPermanentDeleteStatusKind';
 import {resolveRestoreTargets} from './restoreBinSelection/resolveRestoreTargets';
 import {showBulkRestoreModal} from './restoreBinSelection/showBulkRestoreModal';
 import {useBulkRestore} from './restoreBinSelection/useBulkRestore';
-import type {PermanentDeleteReviewReason} from './usePermanentDeleteReconciliation';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
-import {driveBulkActionsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import {
+  driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
+} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import type {Conversation} from '../../../../repositories/entity/Conversation';
 import {CellNode, CellNodeType} from '../../../../types/cellNode';
+import {ArrowIcon} from '../../../../uiKit/dataDisplay/icon/arrowIcon';
+import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';
+import {TrashIcon} from '../../../../uiKit/dataDisplay/icon/trashIcon';
+import {UploadIcon} from '../../../../uiKit/dataDisplay/icon/uploadIcon';
+import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
 import {formatBytes} from '../../../../util/util';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '../../../Modals/PrimaryModal';
 import {
@@ -102,6 +105,7 @@ import {
   useCellsActionPermissions,
 } from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsSortDirection} from '../common/cellsSortIcon/cellsSortIcon';
+import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {isInRecycleBin} from '../common/recycleBin/recycleBin';
 import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
@@ -112,6 +116,7 @@ import {
   type SharedDriveMoveStatusKind,
   type SharedDriveMoveSummary,
 } from '../sharedDriveUploadStatusContext';
+import {useBulkActionStatusReporter} from '../useBulkActionStatusReporter';
 
 interface CellsTableProps {
   nodes: CellNode[];
@@ -149,11 +154,14 @@ const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
   isSortingEnabled,
 }: CellsTableHeaderCellProps) => {
   const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
-  const ariaSort = isSortingEnabled && isNonEmptyString(sortField) ? toAriaSort(getDirectionFor(sortField)) : undefined;
+  const ariaSort =
+    isSortingEnabled && typeof sortField === 'string' && sortField.length > 0
+      ? toAriaSort(getDirectionFor(sortField))
+      : undefined;
 
   return (
     <th
-      css={headerCellStyles}
+      css={header.column.id === 'selection' ? selectionHeaderCellStyles : headerCellStyles}
       aria-sort={ariaSort}
       style={{
         width: header.id === 'name' ? undefined : header.getSize(),
@@ -198,54 +206,8 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.stopPropagation();
 };
 
-type PermanentDeleteCheckingMessageKey =
-  'cells.bulkDelete.checking' | 'cells.bulkDelete.checkingAfterJobFailure' | 'cells.bulkDelete.retryingRefresh';
-type PermanentDeleteReviewMessageKey =
-  | 'cells.bulkDelete.jobFailed'
-  | 'cells.bulkDelete.refreshFailed'
-  | 'cells.bulkDelete.stillVisible'
-  | 'cells.bulkDelete.timedOut';
-
 // Selecting rows only makes sense when at least one of these is available, e.g. never for viewers.
 const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE];
-
-const hasSameSelection = (selectedNodeIds: ReadonlySet<string>, nodeIds: readonly string[]): boolean => {
-  return (
-    selectedNodeIds.size === nodeIds.length &&
-    nodeIds.every(nodeId => {
-      return selectedNodeIds.has(nodeId);
-    })
-  );
-};
-
-const getPermanentDeleteCheckingMessageKey = (
-  reason: PermanentDeleteReviewReason | null,
-): PermanentDeleteCheckingMessageKey => {
-  if (reason === 'job-failed') {
-    return 'cells.bulkDelete.checkingAfterJobFailure';
-  }
-  if (reason === 'refresh-failed') {
-    return 'cells.bulkDelete.retryingRefresh';
-  }
-
-  return 'cells.bulkDelete.checking';
-};
-
-const getPermanentDeleteReviewMessageKey = (
-  reason: PermanentDeleteReviewReason | null,
-): PermanentDeleteReviewMessageKey => {
-  switch (reason) {
-    case 'job-failed':
-      return 'cells.bulkDelete.jobFailed';
-    case 'refresh-failed':
-      return 'cells.bulkDelete.refreshFailed';
-    case 'still-visible':
-      return 'cells.bulkDelete.stillVisible';
-    case 'timed-out':
-    default:
-      return 'cells.bulkDelete.timedOut';
-  }
-};
 
 interface CapturedBulkMoveToBinSelection {
   nodeIds: string[];
@@ -296,6 +258,9 @@ export const CellsTable = ({
   });
   const isSelectionEnabled =
     selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName) && canPerformAnyBulkAction;
+  const isBulkRestoreEnabled = isSelectionEnabled && isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName);
+  const activeDriveDrag = useRef<CapturedDriveDrag | null>(null);
+  const isDropMoveSubmitting = useRef(false);
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
   });
@@ -332,6 +297,9 @@ export const CellsTable = ({
   const canPerformCurrentDriveActionRef = useRef(canPerformCurrentDriveAction);
   canPerformCurrentDriveActionRef.current = canPerformCurrentDriveAction;
   const permanentDeleteModalId = useId();
+  const permanentDeleteStatusReporter = useBulkActionStatusReporter('permanentDelete', () => {
+    void handleRefreshAfterPermanentDeleteReview();
+  });
   const permanentDelete = usePermanentDeleteReconciliation({
     cellsRepository,
     clock,
@@ -345,11 +313,13 @@ export const CellsTable = ({
     onRefresh,
     onRefreshAndReportSuccess,
     onDeleteCompleted: nodeIds => {
+      permanentDeleteStatusReporter.report('completed');
       setSelectedNodeIds(currentSelection => {
         return hasSameSelection(currentSelection, nodeIds) ? new Set() : currentSelection;
       });
     },
     onReconciliationCompleted: () => {
+      permanentDeleteStatusReporter.report('completed');
       setSelectedNodeIds(new Set());
     },
     reportError: error => {
@@ -360,9 +330,8 @@ export const CellsTable = ({
     isPending: isPermanentDeletePending,
     isRejected: isPermanentDeleteRejected,
     isUnresolved: isPermanentDeleteUnresolved,
-    isRefreshingReview: isRefreshingPermanentDeleteReview,
     isReconciling: isPermanentDeleteReconciling,
-    isRequestInFlight: isPermanentDeleteReconciliationRequestInFlight,
+    isRefreshingReview: isPermanentDeleteRefreshingReview,
     reviewReason: permanentDeleteReviewReason,
     deletePermanently,
     refreshReview: handleRefreshAfterPermanentDeleteReview,
@@ -371,6 +340,9 @@ export const CellsTable = ({
     reset: resetPermanentDeleteReconciliation,
   } = permanentDelete;
   const bulkRestoreModalId = useId();
+  const restoreStatusReporter = useBulkActionStatusReporter('restore', () => {
+    void bulkRestore.refreshReview();
+  });
   const bulkRestore = useBulkRestore({
     cellsRepository,
     clock,
@@ -383,8 +355,49 @@ export const CellsTable = ({
     onRestoreSettled: () => {
       setSelectedNodeIds(new Set());
     },
+    onStatusChange: restoreStatusReporter.report,
+    onStatusCleared: restoreStatusReporter.clear,
+    reportError: error => {
+      console.error(error);
+    },
   });
   const {reset: resetBulkRestore} = bulkRestore;
+  const setPermanentDeleteReviewing = permanentDeleteStatusReporter.setReviewing;
+  useEffect(() => {
+    setPermanentDeleteReviewing(isPermanentDeleteRefreshingReview);
+  }, [isPermanentDeleteRefreshingReview, setPermanentDeleteReviewing]);
+  const setRestoreReviewing = restoreStatusReporter.setReviewing;
+  const {isRefreshingReview: isRestoreRefreshingReview} = bulkRestore;
+  useEffect(() => {
+    setRestoreReviewing(isRestoreRefreshingReview);
+  }, [isRestoreRefreshingReview, setRestoreReviewing]);
+  const reportPermanentDeleteStatus = permanentDeleteStatusReporter.report;
+  const isPermanentDeleteStatusProcessing = permanentDeleteStatusReporter.isProcessing;
+  useEffect(() => {
+    const permanentDeleteStatusKind = getPermanentDeleteStatusKind({
+      isPending: isPermanentDeletePending,
+      isRejected: isPermanentDeleteRejected,
+      isUnresolved: isPermanentDeleteUnresolved,
+      isReconciling: isPermanentDeleteReconciling,
+      reviewReason: permanentDeleteReviewReason,
+    });
+    if (maybe.isJust(permanentDeleteStatusKind)) {
+      reportPermanentDeleteStatus(permanentDeleteStatusKind.value);
+      return;
+    }
+    // The reconciliation state was reset (e.g. the user navigated away) before an outcome was known.
+    if (isPermanentDeleteStatusProcessing()) {
+      reportPermanentDeleteStatus('status-unknown');
+    }
+  }, [
+    isPermanentDeletePending,
+    isPermanentDeleteReconciling,
+    isPermanentDeleteRejected,
+    isPermanentDeleteStatusProcessing,
+    isPermanentDeleteUnresolved,
+    permanentDeleteReviewReason,
+    reportPermanentDeleteStatus,
+  ]);
   const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
   const [backgroundMoveStatusId, setBackgroundMoveStatusId] = useState('');
   const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);
@@ -392,6 +405,7 @@ export const CellsTable = ({
   useEffect(() => {
     const didSelectionScopeChange = previousSelectionScopeKey.current !== selectionScopeKey;
     previousSelectionScopeKey.current = selectionScopeKey;
+    activeDriveDrag.current = null;
 
     if (isMovePendingRef.current) {
       return cancelPermanentDeleteReconciliation;
@@ -659,6 +673,7 @@ export const CellsTable = ({
   };
 
   const handleToggleSelection = (nodeId: string, isSelected: boolean): void => {
+    activeDriveDrag.current = null;
     clearPermanentDeleteRejection();
     setSelectedNodeIds(currentSelection => {
       const nextSelection = new Set(currentSelection);
@@ -666,6 +681,22 @@ export const CellsTable = ({
         nextSelection.add(nodeId);
       } else {
         nextSelection.delete(nodeId);
+      }
+      return nextSelection;
+    });
+  };
+
+  const handleTogglePageSelection = (isSelected: boolean): void => {
+    activeDriveDrag.current = null;
+    clearPermanentDeleteRejection();
+    setSelectedNodeIds(currentSelection => {
+      const nextSelection = new Set(currentSelection);
+      for (const node of nodes) {
+        if (isSelected) {
+          nextSelection.add(node.id);
+        } else {
+          nextSelection.delete(node.id);
+        }
       }
       return nextSelection;
     });
@@ -693,6 +724,11 @@ export const CellsTable = ({
       return;
     }
 
+    restoreStatusReporter.start(
+      currentSelectedNodes.map(node => {
+        return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
+      }),
+    );
     void bulkRestore.restore(currentResolution.targets, scopeKey);
   };
 
@@ -722,6 +758,11 @@ export const CellsTable = ({
       return;
     }
 
+    permanentDeleteStatusReporter.start(
+      currentSelectedNodes.map(node => {
+        return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
+      }),
+    );
     await deletePermanently(nodeIds, scopeKey, path);
   };
   const [activeFolderDropTargetId, setActiveFolderDropTargetId] = useState<string | null>(null);
@@ -729,6 +770,7 @@ export const CellsTable = ({
   const labels = {
     actions: translate('cells.tableRow.actions'),
     created: translate('cells.tableRow.modified'),
+    selectAllOnPage: translate('cells.selection.allItemsOnPage'),
     name: translate('cells.tableRow.name'),
     owner: translate('cells.tableRow.owner'),
     publicLink: translate('cells.tableRow.publicLink'),
@@ -736,6 +778,14 @@ export const CellsTable = ({
     tags: translate('cells.tableRow.tags'),
   };
   const cellLabels = getCellsTableDataCellLabels(labels);
+  const isRowSelectionEnabled =
+    isSelectionEnabled &&
+    !isBulkMoveOutcomeUnresolved &&
+    !isPermanentDeleteUnresolved &&
+    !isBulkMoveToBinNeedsReview &&
+    !isBulkMoveToBinPending &&
+    !bulkRestore.isPending &&
+    bulkRestore.reviewReason === null;
 
   const table = useReactTable({
     data: nodes,
@@ -751,14 +801,13 @@ export const CellsTable = ({
       onToggleSort,
       selectedNodeIds,
       onToggleSelection: handleToggleSelection,
-      selectionEnabled:
-        isSelectionEnabled &&
-        !isBulkMoveOutcomeUnresolved &&
-        !isPermanentDeleteUnresolved &&
-        !isBulkMoveToBinNeedsReview &&
-        !isBulkMoveToBinPending &&
-        !bulkRestore.isPending &&
-        bulkRestore.reviewReason === null,
+      onTogglePageSelection: handleTogglePageSelection,
+      isPageSelected:
+        nodes.length > 0 &&
+        nodes.every(node => {
+          return selectedNodeIds.has(node.id);
+        }),
+      selectionEnabled: isRowSelectionEnabled,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -772,7 +821,7 @@ export const CellsTable = ({
   const restoreResolution = resolveRestoreTargets({selectedNodes});
   const isBulkRestoreBlocking = bulkRestore.isPending || bulkRestore.reviewReason !== null;
   const canRestoreSelection =
-    isSelectionEnabled &&
+    isBulkRestoreEnabled &&
     selectedNodes.length > 0 &&
     selectedNodes.length === selectedNodeIds.size &&
     isInRecycleBin() &&
@@ -792,7 +841,9 @@ export const CellsTable = ({
       return canPerformCellsAction({action: CELLS_ACTION.DELETE, selfUserDriveRole: node.selfUserDriveRole});
     });
   const canMoveSelection =
+    isSelectionEnabled &&
     selectedNodes.length > 0 &&
+    selectedNodes.length === selectedNodeIds.size &&
     !isBulkMoveOutcomeUnresolved &&
     !isBulkMoveRequestPending &&
     !isBackgroundMovePending &&
@@ -1059,10 +1110,57 @@ export const CellsTable = ({
     setActiveFolderDropTargetName(null);
   }, [folderDropResetKey]);
 
-  const setActiveFolderDropTarget = (node: CellNode | null): void => {
+  const getDriveDragNodesForEvent = (destination: CellNode, event: DragEvent<HTMLElement>): CellNode[] | null => {
+    return getDriveDragNodes({
+      activeDrag: activeDriveDrag.current,
+      dataTransferTypes: Array.from(event.dataTransfer.types),
+      selectedNodeIds: selectedNodeIdsRef.current,
+      selectionScopeKey: selectionScopeKeyRef.current,
+      canMoveSelection,
+      destination,
+      nodes,
+      conversationQualifiedId,
+    });
+  };
+
+  const setActiveFolderDropTarget = (node: CellNode | null, isFileUpload = true): void => {
     setActiveFolderDropTargetId(node?.id ?? null);
-    setActiveFolderDropTargetName(node?.name ?? null);
-    onFolderDropTargetChange?.(node?.name ?? null);
+    setActiveFolderDropTargetName(isFileUpload ? (node?.name ?? null) : null);
+    if (isFileUpload) {
+      onFolderDropTargetChange?.(node?.name ?? null);
+    }
+  };
+
+  const handleDriveDrop = async (destination: CellNode, event: DragEvent<HTMLTableRowElement>): Promise<void> => {
+    const selected = getDriveDragNodesForEvent(destination, event);
+    activeDriveDrag.current = null;
+    setActiveFolderDropTarget(null, false);
+    if (selected === null || isDropMoveSubmitting.current) {
+      return;
+    }
+
+    isDropMoveSubmitting.current = true;
+    const summary: SharedDriveMoveSummary = {
+      action: 'move',
+      items: selected.map(node => {
+        return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
+      }),
+      destinationPath: normalizeCellsPath(destination.path, conversationQualifiedId),
+    };
+    handleBulkMoveStart(summary);
+    try {
+      const response = await cellsRepository.moveNodes({
+        currentPaths: selected.map(node => {
+          return node.path;
+        }),
+        targetPath: getCellsApiPath({conversationQualifiedId, currentPath: summary.destinationPath}),
+      });
+      handleBulkMoveResult(response, summary);
+    } catch {
+      handleBulkMoveRequestError();
+    } finally {
+      isDropMoveSubmitting.current = false;
+    }
   };
 
   type GetFolderDropHandlersResult =
@@ -1074,13 +1172,20 @@ export const CellsTable = ({
         onDrop: (event: DragEvent<HTMLTableRowElement>) => void;
       };
   const getFolderDropHandlers = (node: CellNode): GetFolderDropHandlersResult => {
-    if (node.type !== CellNodeType.FOLDER || onDropFilesToFolder === undefined) {
+    if (node.type !== CellNodeType.FOLDER || (onDropFilesToFolder === undefined && !canMoveSelection)) {
       return {};
     }
 
     return {
       onDragEnter: (event: DragEvent<HTMLTableRowElement>): void => {
         if (!dragEventContainsFiles(event)) {
+          if (getDriveDragNodesForEvent(node, event) !== null) {
+            preventDefaultFileDrop(event);
+            setActiveFolderDropTarget(node, false);
+          }
+          return;
+        }
+        if (onDropFilesToFolder === undefined) {
           return;
         }
 
@@ -1089,6 +1194,17 @@ export const CellsTable = ({
       },
       onDragOver: (event: DragEvent<HTMLTableRowElement>): void => {
         if (!dragEventContainsFiles(event)) {
+          const isValidTarget = getDriveDragNodesForEvent(node, event) !== null;
+          event.dataTransfer.dropEffect = isValidTarget ? 'move' : 'none';
+          if (isValidTarget) {
+            preventDefaultFileDrop(event);
+            setActiveFolderDropTarget(node, false);
+          } else if (activeFolderDropTargetId === node.id) {
+            setActiveFolderDropTarget(null, false);
+          }
+          return;
+        }
+        if (onDropFilesToFolder === undefined) {
           return;
         }
 
@@ -1097,21 +1213,27 @@ export const CellsTable = ({
         setActiveFolderDropTarget(node);
       },
       onDragLeave: (event: DragEvent<HTMLTableRowElement>): void => {
-        if (!dragEventContainsFiles(event)) {
+        if (!dragEventContainsFiles(event) && activeDriveDrag.current === null) {
           return;
         }
 
         preventDefaultFileDrop(event);
-
         const nextTarget = event.relatedTarget;
         if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) {
           return;
         }
 
-        setActiveFolderDropTarget(null);
+        setActiveFolderDropTarget(null, dragEventContainsFiles(event));
       },
       onDrop: (event: DragEvent<HTMLTableRowElement>): void => {
         if (!dragEventContainsFiles(event)) {
+          if (activeDriveDrag.current !== null) {
+            preventDefaultFileDrop(event);
+            void handleDriveDrop(node, event);
+          }
+          return;
+        }
+        if (onDropFilesToFolder === undefined) {
           return;
         }
 
@@ -1194,6 +1316,7 @@ export const CellsTable = ({
                                 action: () => {
                                   void handlePermanentDelete(nodeIds, selectionScopeKey, path);
                                 },
+                                isDestructive: true,
                                 text: translate('cells.deletePermanentlyModal.button'),
                               },
                               text: {
@@ -1247,11 +1370,12 @@ export const CellsTable = ({
                     )}
                     {canMoveSelectionToBin && (
                       <button
-                        css={bulkMoveToBinButtonStyles}
+                        css={bulkActionButtonStyles}
                         type="button"
                         aria-haspopup="dialog"
                         onClick={() => {
-                          const summary = {
+                          const summary: SharedDriveMoveSummary = {
+                            action: 'move',
                             items: selectedNodes.map(node => {
                               return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
                             }),
@@ -1350,53 +1474,6 @@ export const CellsTable = ({
             </p>
           </div>
         )}
-        {isPermanentDeleteUnresolved && isPermanentDeleteReconciling && (
-          <div css={permanentDeleteProgressStyles} role="status" aria-live="polite">
-            <SharedDriveUploadSpinnerIcon color="var(--accent-color)" width={16} height={16} aria-hidden="true" />
-            <span>{translate(getPermanentDeleteCheckingMessageKey(permanentDeleteReviewReason))}</span>
-          </div>
-        )}
-        {isPermanentDeleteRejected && !isPermanentDeleteUnresolved && (
-          <div css={permanentDeleteProgressStyles} role="alert">
-            {translate('cells.bulkDelete.rejected')}
-          </div>
-        )}
-        {isPermanentDeleteUnresolved && !isPermanentDeleteReconciling && (
-          <div css={permanentDeleteProgressStyles} role="alert">
-            <span>{translate(getPermanentDeleteReviewMessageKey(permanentDeleteReviewReason))}</span>
-            <Button
-              variant={ButtonVariant.SECONDARY}
-              type="button"
-              onClick={() => {
-                void handleRefreshAfterPermanentDeleteReview();
-              }}
-              disabled={isRefreshingPermanentDeleteReview || isPermanentDeleteReconciliationRequestInFlight}
-            >
-              {translate('cells.bulkAction.refresh')}
-            </Button>
-          </div>
-        )}
-        {bulkRestore.isPending && (
-          <div css={permanentDeleteProgressStyles} role="status" aria-live="polite">
-            <SharedDriveUploadSpinnerIcon color="var(--accent-color)" width={16} height={16} aria-hidden="true" />
-            <span>{translate('cells.bulkRestore.restoring')}</span>
-          </div>
-        )}
-        {bulkRestore.reviewReason !== null && !bulkRestore.isPending && (
-          <div css={permanentDeleteProgressStyles} role="alert">
-            <span>{translate('cells.restore.error')}</span>
-            <Button
-              variant={ButtonVariant.SECONDARY}
-              type="button"
-              onClick={() => {
-                void bulkRestore.refreshReview();
-              }}
-              disabled={bulkRestore.isRefreshingReview}
-            >
-              {translate('cells.bulkAction.refresh')}
-            </Button>
-          </div>
-        )}
         {isBulkMoveOutcomeUnresolved && (
           <div css={moveOutcomeMessageStyles}>
             <span>
@@ -1463,6 +1540,43 @@ export const CellsTable = ({
                     data-folder-drop-active={activeFolderDropTargetId === node.id || undefined}
                     aria-selected={isSelectionEnabled && selectedNodeIds.has(node.id)}
                     data-uie-name="cells-table-row"
+                    onClickCapture={event => {
+                      if (!isRowSelectionEnabled || (!event.metaKey && !event.ctrlKey)) {
+                        return;
+                      }
+
+                      const target = event.target;
+                      if (!(target instanceof Element)) {
+                        return;
+                      }
+                      const control = target.closest('button, a, input, label, select, textarea');
+                      if (control !== null && control.closest('td')?.getAttribute('data-cell') !== labels.name) {
+                        return;
+                      }
+
+                      event.preventDefault();
+                      event.stopPropagation();
+                      handleToggleSelection(node.id, !selectedNodeIds.has(node.id));
+                    }}
+                    draggable={canMoveSelection && selectedNodeIds.has(node.id)}
+                    onDragStart={event => {
+                      if (!canMoveSelection || !selectedNodeIds.has(node.id)) {
+                        event.preventDefault();
+                        return;
+                      }
+                      activeDriveDrag.current = {
+                        nodeIds: selectedNodes.map(({id}) => {
+                          return id;
+                        }),
+                        scopeKey: selectionScopeKey,
+                      };
+                      event.dataTransfer.setData(INTERNAL_DRIVE_DRAG_TYPE, 'move');
+                      event.dataTransfer.effectAllowed = 'move';
+                    }}
+                    onDragEnd={() => {
+                      activeDriveDrag.current = null;
+                      setActiveFolderDropTarget(null, false);
+                    }}
                     {...getFolderDropHandlers(node)}
                   >
                     {row.getVisibleCells().map(cell => {

@@ -18,22 +18,6 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isObject, isUndefined} from '@sindresorhus/is';
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
-import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
-import {
-  BackendEvent,
-  ConversationEvent,
-  ConversationOtrMessageAddEvent,
-  CONVERSATION_EVENT,
-  USER_EVENT,
-} from '@wireapp/api-client/lib/event/';
-import type {Notification, NotificationList} from '@wireapp/api-client/lib/notification/';
-import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
-import type {FeatureList} from '@wireapp/api-client/lib/team/feature/featureList.types';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {BaseCreateConversationResponse} from '@wireapp/core/lib/conversation/conversationService/conversationService.types';
-import {NotificationSource} from '@wireapp/core/lib/notification';
-import {DatabaseKeys} from '@wireapp/core/lib/notification/notificationDatabaseRepository';
 import {Dexie} from 'dexie';
 import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
@@ -49,6 +33,23 @@ import {TIME_IN_MILLIS} from './timeUtil';
 import {downloadBlob} from './util';
 import {createUuid} from './uuid';
 
+import {ConnectionStatus} from '../apiClient/connection/connectionStatus';
+import {MemberLeaveReason} from '../apiClient/conversation/data/conversationMemberLeaveData';
+import {BackendEvent} from '../apiClient/event/backendEvent';
+import {
+  ConversationEvent,
+  ConversationOtrMessageAddEvent,
+  CONVERSATION_EVENT,
+} from '../apiClient/event/conversationEvent';
+import {USER_EVENT} from '../apiClient/event/userEvent';
+import type {Notification} from '../apiClient/notification/notification';
+import type {NotificationList} from '../apiClient/notification/notificationList';
+import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
+import type {FeatureList} from '../apiClient/team/feature/featureList.types';
+import type {QualifiedId} from '../apiClient/user/qualifiedId';
+import type {BaseCreateConversationResponse} from '../core/conversation/conversationService/conversationService.types';
+import {NotificationSource} from '../core/notification';
+import {DatabaseKeys} from '../core/notification/notificationDatabaseRepository';
 import {E2EIHandler} from '../e2eIdentity';
 import {checkForNewVersion, createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {CallingRepository} from '../repositories/calling/CallingRepository';

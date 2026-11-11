@@ -18,8 +18,8 @@
  */
 
 import {act, render} from '@testing-library/react';
-import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {QualifiedUserClients} from '../../../../../../apiClient/conversation/qualifiedUserClients';
+import {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 
 import {
   generateQualifiedIds,

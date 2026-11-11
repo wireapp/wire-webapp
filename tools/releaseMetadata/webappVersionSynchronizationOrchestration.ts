@@ -21,11 +21,7 @@ import {isUndefined} from '@sindresorhus/is';
 import {Maybe, Result, Task, Unit} from 'true-myth';
 import {match, P} from 'ts-pattern';
 
-import {
-  compareWebAppVersions,
-  updateWebAppPackageDocuments,
-  validateMatchingWebAppPackageVersions,
-} from './webappVersion.ts';
+import {compareWebAppVersions, updateWebAppPackageDocuments, validateWebAppPackageVersion} from './webappVersion.ts';
 import type {WebAppVersion} from './webappVersion.ts';
 import {
   createWebAppVersionSynchronizationRequest,
@@ -41,7 +37,10 @@ import type {
   WebAppVersionSynchronizationPullRequest,
   WebAppVersionSynchronizationRequest,
 } from './webappVersionSynchronization.ts';
-import {validateWebAppVersionSynchronizationBranch} from './webappVersionSynchronizationGit.ts';
+import {
+  validateWebAppVersionSynchronizationBranch,
+  webAppVersionSynchronizationPackageFilePaths,
+} from './webappVersionSynchronizationGit.ts';
 import type {
   CommitWebAppVersionSynchronizationOptions,
   WebAppVersionSynchronizationBranchInspection,
@@ -49,6 +48,10 @@ import type {
   WebAppVersionSynchronizationMainSnapshot,
 } from './webappVersionSynchronizationGit.ts';
 import type {WebAppVersionSynchronizationGitHubClient} from './webappVersionSynchronizationGitHubClient.ts';
+import {
+  updateWebAppVersionSynchronizationLockfile,
+  validateWebAppVersionSynchronizationLockfileChange,
+} from './webappVersionSynchronizationLockfile.ts';
 
 export type WebAppVersionSynchronizationDependencies = {
   readonly githubClient: WebAppVersionSynchronizationGitHubClient;
@@ -152,8 +155,6 @@ type RecoverSynchronizationBranchDependencies = WebAppVersionSynchronizationDepe
 type CreateSynchronizationBranchDependencies = WebAppVersionSynchronizationDependencies;
 
 type ReconcileAndSynchronizeWebAppVersionOptions = Omit<CreateSynchronizationBranchOptions, 'branchName'>;
-
-const synchronizationPackageFilePaths = ['apps/webapp/package.json', 'package.json'] as const;
 
 function createExistingSynchronizationResult(
   action: 'already-open' | 'already-merged',
@@ -272,7 +273,7 @@ function resolveCurrentSynchronizationOutcome(
 
 function validateExpectedPackageFileChanges(changedFilePaths: readonly string[]): Result<Unit, Error> {
   const actualChangedFilePaths = changedFilePaths.toSorted();
-  const expectedChangedFilePaths = [...synchronizationPackageFilePaths].toSorted();
+  const expectedChangedFilePaths = [...webAppVersionSynchronizationPackageFilePaths].toSorted();
   if (actualChangedFilePaths.join('\n') !== expectedChangedFilePaths.join('\n')) {
     return Result.err(
       new Error(
@@ -290,29 +291,49 @@ function prepareSynchronizationCommit(
 ): Task<Unit, Error> {
   const packageDocumentsResult = updateWebAppPackageDocuments({
     rootPackageDocument: options.mainSnapshot.rootPackageDocument,
-    webAppPackageDocument: options.mainSnapshot.webAppPackageDocument,
     targetVersion: options.webAppVersion,
   });
   if (packageDocumentsResult.isErr) {
     return Task.reject(packageDocumentsResult.error);
   }
 
+  const currentVersionResult = validateWebAppPackageVersion(options.mainSnapshot.rootPackageDocument);
+  if (currentVersionResult.isErr) {
+    return Task.reject(currentVersionResult.error);
+  }
+
+  const lockfileResult = updateWebAppVersionSynchronizationLockfile({
+    lockfileDocument: options.mainSnapshot.lockfileDocument,
+    currentVersion: currentVersionResult.value.rootVersion,
+    targetVersion: options.webAppVersion,
+  });
+  if (lockfileResult.isErr) {
+    return Task.reject(lockfileResult.error);
+  }
+
   return dependencies.gitClient
-    .writePackageDocuments(packageDocumentsResult.value)
+    .writePackageDocuments({...packageDocumentsResult.value, lockfileDocument: lockfileResult.value})
     .andThen(() => {
       return dependencies.gitClient.readWorkingTreePackageDocuments();
     })
     .andThen(packageDocuments => {
-      const packageVersionsResult = validateMatchingWebAppPackageVersions(
-        packageDocuments.rootPackageDocument,
-        packageDocuments.webAppPackageDocument,
-      );
+      const packageVersionsResult = validateWebAppPackageVersion(packageDocuments.rootPackageDocument);
       if (packageVersionsResult.isErr) {
         return Task.reject(packageVersionsResult.error);
       }
 
       if (packageVersionsResult.value.rootVersion !== options.webAppVersion) {
         return Task.reject(new Error('Working tree package documents contain an unexpected WebApp version'));
+      }
+
+      const lockfileChangeResult = validateWebAppVersionSynchronizationLockfileChange({
+        baseLockfileDocument: options.mainSnapshot.lockfileDocument,
+        updatedLockfileDocument: packageDocuments.lockfileDocument,
+        currentVersion: currentVersionResult.value.rootVersion,
+        targetVersion: options.webAppVersion,
+      });
+      if (lockfileChangeResult.isErr) {
+        return Task.reject(lockfileChangeResult.error);
       }
 
       return dependencies.gitClient.getWorkingTreeChangedFilePaths();
@@ -486,10 +507,7 @@ function reconcileAndSynchronizeWebAppVersion(
   options: ReconcileAndSynchronizeWebAppVersionOptions,
   dependencies: WebAppVersionSynchronizationDependencies,
 ): Task<WebAppVersionSynchronizationResult, Error> {
-  const packageVersionsResult = validateMatchingWebAppPackageVersions(
-    options.mainSnapshot.rootPackageDocument,
-    options.mainSnapshot.webAppPackageDocument,
-  );
+  const packageVersionsResult = validateWebAppPackageVersion(options.mainSnapshot.rootPackageDocument);
   if (packageVersionsResult.isErr) {
     return Task.reject(packageVersionsResult.error);
   }

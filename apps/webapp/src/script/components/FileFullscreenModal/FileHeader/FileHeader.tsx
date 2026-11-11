@@ -23,17 +23,6 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {
-  BadgesWithTooltip,
-  Button,
-  ButtonVariant,
-  CloseIcon,
-  DownloadIcon,
-  DropdownMenu,
-  MoreIcon,
-  ShowIcon,
-} from '@wireapp/react-ui-kit';
-
-import {
   headerStyles,
   leftColumnStyles,
   closeButtonStyles,
@@ -53,6 +42,13 @@ import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../h
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import type {Conversation} from '../../../repositories/entity/Conversation';
+import {BadgesWithTooltip} from '../../../uiKit/dataDisplay/badgesWithTooltip/badgesWithTooltip';
+import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
+import {DownloadIcon} from '../../../uiKit/dataDisplay/icon/downloadIcon';
+import {MoreIcon} from '../../../uiKit/dataDisplay/icon/moreIcon';
+import {ShowIcon} from '../../../uiKit/dataDisplay/icon/showIcon';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {DropdownMenu} from '../../../uiKit/surface/dropdownMenu/dropdownMenu';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {useChannelsFeatureFlag} from '../../../util/useChannelsFeatureFlag';
 import {forcedDownloadFile, getFileNameWithExtension} from '../../../util/util';

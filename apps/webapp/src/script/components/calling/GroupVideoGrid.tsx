@@ -21,20 +21,20 @@ import {CSSProperties, ReactNode, useEffect, useState, type FunctionComponent} f
 
 import {css} from '@emotion/react';
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {Loading, QUERY} from '@wireapp/react-ui-kit';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
 import {groupVideoBackgroundInitializingOverlay} from './GroupVideoGridTile.styles';
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {useActiveWindowMatchMedia} from '../../hooks/useActiveWindowMatchMedia';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Call} from '../../repositories/calling/Call';
 import type {Participant} from '../../repositories/calling/Participant';
 import type {Grid} from '../../repositories/calling/videoGridHandler';
+import {Loading} from '../../uiKit/dataDisplay/loading/loading';
+import {QUERY} from '../../uiKit/utils/mediaQueries';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import * as Icon from '../icon';

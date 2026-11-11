@@ -21,16 +21,19 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import type {RestoreTarget} from './resolveRestoreTargets';
 import {runBulkRestore, type BulkRestoreDependencies, type BulkRestoreOutcome} from './runBulkRestore';
 
+import type {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {observeCellsBackgroundActionJobs} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import {createBulkJobPollingPolicy} from '../../common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
 import {getCellsApiPath} from '../../common/getCellsApiPath/getCellsApiPath';
 import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';
+import type {SharedDriveMoveStatusKind} from '../../sharedDriveUploadStatusContext';
+
+const REVIEW_REFRESH_DEADLINE_MS = 20_000;
 
 export type BulkRestoreReviewReason = Exclude<BulkRestoreOutcome, 'completed'> | 'refresh-failed';
 
@@ -42,6 +45,9 @@ export interface UseBulkRestoreOptions {
   readonly isCurrentScope: (scopeKey: string) => boolean;
   readonly onRefreshAndReportSuccess: () => Promise<boolean>;
   readonly onRestoreSettled: () => void;
+  readonly onStatusChange: (kind: SharedDriveMoveStatusKind) => void;
+  readonly onStatusCleared: () => void;
+  readonly reportError: (error: unknown) => void;
 }
 
 export interface BulkRestoreState {
@@ -63,6 +69,7 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
 
   const isMountedRef = useRef(true);
   const isPendingRef = useRef(false);
+  const isRefreshingReviewRef = useRef(false);
   const reviewReasonRef = useRef<BulkRestoreReviewReason | null>(null);
   const generationRef = useRef(0);
   const cancelJobObservationRef = useRef<(() => void) | undefined>(undefined);
@@ -72,6 +79,9 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
     return () => {
       isMountedRef.current = false;
       generationRef.current += 1;
+      if (isPendingRef.current) {
+        optionsRef.current.onStatusChange('status-unknown');
+      }
       cancelJobObservationRef.current?.();
     };
   }, []);
@@ -85,7 +95,7 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
     try {
       return await optionsRef.current.onRefreshAndReportSuccess();
     } catch (error) {
-      console.error(error);
+      optionsRef.current.reportError(error);
       return false;
     }
   };
@@ -104,7 +114,7 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
   const observeJobs: BulkRestoreDependencies['observeJobs'] = jobUuids => {
     return new Promise(resolve => {
       const {cellsRepository, clock, random} = optionsRef.current;
-      cancelJobObservationRef.current = observeCellsBackgroundActionJobs({
+      const cancelObservation = observeCellsBackgroundActionJobs({
         actionName: 'restore',
         cellsRepository,
         jobUuids,
@@ -115,6 +125,11 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
         },
         onOutcome: resolve,
       });
+      cancelJobObservationRef.current = () => {
+        cancelObservation();
+        // Stopping the polling yields no outcome, so settle the wait or the restore would never finish.
+        resolve('status-unknown');
+      };
     });
   };
 
@@ -126,6 +141,7 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
     isPendingRef.current = true;
     const generation = ++generationRef.current;
     setIsPending(true);
+    optionsRef.current.onStatusChange('processing');
     try {
       const outcome = await runBulkRestore({
         targets,
@@ -134,27 +150,35 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
           return optionsRef.current.cellsRepository.restoreNodes(params);
         },
         observeJobs,
+        reportError: error => {
+          optionsRef.current.reportError(error);
+        },
       });
-      if (
-        !isMountedRef.current ||
-        generationRef.current !== generation ||
-        !optionsRef.current.isCurrentScope(scopeKey)
-      ) {
+      if (!isMountedRef.current || generationRef.current !== generation) {
+        return;
+      }
+      if (!optionsRef.current.isCurrentScope(scopeKey)) {
+        // The view moved on: skip refreshing it, but do not leave the status popup stuck on processing.
+        optionsRef.current.onStatusChange(outcome);
         return;
       }
 
       const didRefresh = await refreshAndReportSuccess();
-      if (
-        !isMountedRef.current ||
-        generationRef.current !== generation ||
-        !optionsRef.current.isCurrentScope(scopeKey)
-      ) {
+      const statusKind = outcome === 'completed' && !didRefresh ? 'finished-unknown' : outcome;
+      if (!isMountedRef.current || generationRef.current !== generation) {
+        return;
+      }
+      if (!optionsRef.current.isCurrentScope(scopeKey)) {
+        // Refreshing can itself move the view (e.g. to the Bin root); still report so the popup is not left processing.
+        optionsRef.current.onStatusChange(statusKind);
         return;
       }
 
-      if (outcome === 'completed' && didRefresh) {
+      if (statusKind === 'completed') {
+        optionsRef.current.onStatusChange('completed');
         optionsRef.current.onRestoreSettled();
       } else {
+        optionsRef.current.onStatusChange(statusKind);
         updateReviewReason(outcome === 'completed' ? 'refresh-failed' : outcome);
       }
     } finally {
@@ -166,24 +190,38 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
   };
 
   const refreshReview = async (): Promise<void> => {
-    if (reviewReasonRef.current === null || isPendingRef.current) {
+    if (reviewReasonRef.current === null || isPendingRef.current || isRefreshingReviewRef.current) {
       return;
     }
 
     const generation = ++generationRef.current;
+    isRefreshingReviewRef.current = true;
     setIsRefreshingReview(true);
+    const {clock} = optionsRef.current;
+    let deadline: ReturnType<typeof clock.setTimeout> | undefined;
+    const deadlineReached = new Promise<'timed-out'>(resolve => {
+      deadline = clock.setTimeout(() => {
+        resolve('timed-out');
+      }, REVIEW_REFRESH_DEADLINE_MS);
+    });
     try {
-      const didRefresh = await refreshAndReportSuccess();
-      if (!isMountedRef.current || generationRef.current !== generation) {
+      const didRefresh = await Promise.race([refreshAndReportSuccess(), deadlineReached]);
+      if (deadline !== undefined) {
+        clock.clearTimeout(deadline);
+      }
+      // A refresh that outlives its deadline is abandoned so the review action can be retried.
+      if (!isMountedRef.current || generationRef.current !== generation || didRefresh === 'timed-out') {
         return;
       }
 
       if (didRefresh) {
         updateReviewReason(null);
+        optionsRef.current.onStatusCleared();
         optionsRef.current.onRestoreSettled();
       }
     } finally {
       if (isMountedRef.current && generationRef.current === generation) {
+        isRefreshingReviewRef.current = false;
         setIsRefreshingReview(false);
       }
     }
@@ -191,9 +229,13 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
 
   const reset = useCallback((): void => {
     generationRef.current += 1;
+    if (isPendingRef.current) {
+      optionsRef.current.onStatusChange('status-unknown');
+    }
     cancelJobObservationRef.current?.();
     cancelJobObservationRef.current = undefined;
     isPendingRef.current = false;
+    isRefreshingReviewRef.current = false;
     reviewReasonRef.current = null;
     setIsPending(false);
     setIsRefreshingReview(false);

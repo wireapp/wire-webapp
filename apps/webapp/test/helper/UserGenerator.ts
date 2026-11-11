@@ -18,8 +18,10 @@
  */
 
 import {faker} from '@faker-js/faker';
-import {QualifiedId, UserAssetType, UserType} from '@wireapp/api-client/lib/user';
-import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
+import {QualifiedId} from '../../src/script/apiClient/user/qualifiedId';
+import {UserAssetType} from '../../src/script/apiClient/user/userAsset';
+import {UserType} from '../../src/script/apiClient/user/user';
+import type {User as APIClientUser} from '../../src/script/apiClient/user/user';
 import type {User} from '../../src/script/repositories/entity/User';
 import type {UserRecord} from '../../src/script/repositories/storage';
 import {UserMapper} from '../../src/script/repositories/user/userMapper';

@@ -19,10 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {useApplicationContext} from '../../../page/rootProvider';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {renderMessage} from '../../../util/messageRenderer';
 import {RestrictedVideo} from '../../asset/RestrictedVideo';

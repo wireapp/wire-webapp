@@ -17,9 +17,10 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe} from 'true-myth';
 import {create} from 'zustand';
+
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 
 export type MeetingPrepSession = {
   meetingTitle: string;

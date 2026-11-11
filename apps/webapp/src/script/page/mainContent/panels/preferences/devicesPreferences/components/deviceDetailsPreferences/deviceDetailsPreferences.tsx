@@ -21,12 +21,11 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {Config} from '../../../../../../../Config';
 import {WireIdentity} from '../../../../../../../e2eIdentity';
 import {MotionDuration} from '../../../../../../../motion/MotionDuration';
 import {ClientEntity} from '../../../../../../../repositories/client/ClientEntity';
+import {Button, ButtonVariant} from '../../../../../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../../../../../util/componentUtil';
 import {useApplicationContext} from '../../../../../../rootProvider';
 import {contentStyle} from '../../../components/preferencesPage.styles';

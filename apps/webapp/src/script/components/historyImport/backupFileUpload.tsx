@@ -19,9 +19,9 @@
 
 import {useRef, type FunctionComponent} from 'react';
 
-import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {useApplicationContext} from '../../page/rootProvider';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {TabIndex} from '../../uiKit/utils/enums';
 import {handleKeyDown, KEY} from '../../util/keyboardUtil';
 import {CONFIG as HistoryExportConfig} from '../historyExport';
 

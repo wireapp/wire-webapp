@@ -17,8 +17,7 @@
  *
  */
 
-import {ConversationEvent} from '@wireapp/api-client/lib/event';
-
+import {ConversationEvent} from '../../../../apiClient/event/conversationEvent';
 import {ClientConversationEvent} from '../../../conversation/EventBuilder';
 import {EventRecord} from '../../../storage';
 import {IdentifiedUpdatePayload} from '../../EventService';

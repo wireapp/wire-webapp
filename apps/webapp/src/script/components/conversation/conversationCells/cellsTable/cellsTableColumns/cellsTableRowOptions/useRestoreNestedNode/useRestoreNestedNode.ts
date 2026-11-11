@@ -17,8 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
+import {QualifiedId} from '../../../../../../../apiClient/user/qualifiedId';
 import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
 import {CellNode} from '../../../../../../../types/cellNode';
 import {useCellsStore} from '../../../../common/useCellsStore/useCellsStore';

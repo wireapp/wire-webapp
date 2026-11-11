@@ -17,11 +17,11 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Task, task} from 'true-myth';
 
 import {meetingConversationSyncErrors, type MeetingConversationSyncError} from './meetingConversationSync';
 
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 
 export type LeaveMeetingConversationError =

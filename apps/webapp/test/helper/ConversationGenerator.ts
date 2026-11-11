@@ -17,18 +17,18 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {ConnectionStatus} from '../../src/script/apiClient/connection/connectionStatus';
 import {
   CONVERSATION_TYPE,
   CONVERSATION_ACCESS_ROLE,
   Conversation as BackendConversation,
-  Member,
   CONVERSATION_CELLS_STATE,
-} from '@wireapp/api-client/lib/conversation/';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {LegalHoldStatus} from '@wireapp/core/lib/conversation/content';
+} from '../../src/script/apiClient/conversation/conversation';
+import {Member} from '../../src/script/apiClient/conversation/member';
+import {RECEIPT_MODE} from '../../src/script/apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {CONVERSATION_PROTOCOL} from '../../src/script/apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../src/script/apiClient/user/qualifiedId';
+import {LegalHoldStatus} from '../../src/script/core/conversation/content';
 import {ConnectionEntity} from '../../src/script/repositories/connection/connectionEntity';
 import {
   ConversationDatabaseData,

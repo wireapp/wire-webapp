@@ -22,11 +22,12 @@ import {FC, useState} from 'react';
 import {container} from 'tsyringe';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
-import {MultipleFilesIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {useGetMultipartAsset} from './multipartAssets/useGetMultipartAsset/useGetMultipartAsset';
 
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {MultipleFilesIcon} from '../../../../../uiKit/dataDisplay/icon/files/multipleFilesIcon';
+import {PlayIcon} from '../../../../../uiKit/dataDisplay/icon/playIcon';
 import {isPreviewableImage} from '../../../../../util/imageUtil';
 import {getFileExtension, getName} from '../../../../../util/util';
 import {FileTypeIcon} from '../../../../conversation/common/fileTypeIcon/fileTypeIcon';

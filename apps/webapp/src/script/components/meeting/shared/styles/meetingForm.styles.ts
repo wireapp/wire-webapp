@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {overlayPortalZIndex} from '@wireapp/react-ui-kit';
+import {overlayPortalZIndex} from '../../../../uiKit/utils/overlayPortal';
 
 /** Portaled react-select menus must sit above ModalComponent (z-index 10000000). */
 export const scheduleMeetingSelectMenuPortalStyles: CSSObject = {

@@ -20,10 +20,10 @@
 import React, {type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {TeamData} from '@wireapp/api-client/lib/team';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router';
 
+import {TeamData} from '../../apiClient/team/team/teamData';
 import {Layout} from '../component/layout';
 import {RootState} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';

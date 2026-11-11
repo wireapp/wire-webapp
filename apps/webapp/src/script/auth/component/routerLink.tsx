@@ -21,7 +21,8 @@ import type {FunctionComponent} from 'react';
 
 import {Link, LinkProps as ReactRouterLinkProps} from 'react-router';
 
-import {LinkProps, linkStyle, Theme} from '@wireapp/react-ui-kit';
+import {Theme} from '../../uiKit/identity/theme/theme';
+import {LinkProps, linkStyle} from '../../uiKit/typography/link/link';
 
 type RouterLinkProps = LinkProps & ReactRouterLinkProps;
 

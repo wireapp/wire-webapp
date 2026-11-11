@@ -18,14 +18,14 @@
  */
 
 import {isEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
-import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
-import type {MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {AddUsersFailure} from '@wireapp/core/lib/conversation';
 import {Task, task} from 'true-myth';
 
 import {syncMeetingConversationName} from './syncMeetingConversationName';
 
+import type {CreateMeeting} from '../../../../apiClient/meetings/createMeeting';
+import type {MeetingWithConversation} from '../../../../apiClient/meetings/meeting';
+import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import type {AddUsersFailure} from '../../../../core/conversation';
 import type {User} from '../../../../repositories/entity/User';
 import {computeParticipantDiff} from '../../computeMeetingParticipantDiff';
 import {mapMeetNowCommandToCreateMeeting} from '../../mapMeetNowCommandToCreateMeeting';

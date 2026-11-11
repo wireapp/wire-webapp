@@ -23,8 +23,6 @@ import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
-
 import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {AssetError} from '../../../../../../repositories/assets/assetError';
 import {AssetRepository} from '../../../../../../repositories/assets/assetRepository';
@@ -32,6 +30,9 @@ import {AssetTransferState} from '../../../../../../repositories/assets/assetTra
 import type {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import type {FileAsset as FileAssetType} from '../../../../../../repositories/entity/message/fileAsset';
 import {TeamState} from '../../../../../../repositories/team/TeamState';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
+import {TabIndex} from '../../../../../../uiKit/utils/enums';
+import {useTimeout} from '../../../../../../uiKit/utils/useTimeout';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 import {formatSeconds} from '../../../../../../util/timeUtil';
 import {useEffectRef} from '../../../../../../util/useEffectRef';

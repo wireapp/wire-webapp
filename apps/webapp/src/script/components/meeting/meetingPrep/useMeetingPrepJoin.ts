@@ -19,11 +19,11 @@
 
 import {useCallback, useMemo} from 'react';
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {joinPreparedMeeting} from './joinPreparedMeeting';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {useNoInternetCallGuard} from '../../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {useApplicationContext, useMainViewModel} from '../../../page/rootProvider';
 import type {CallMediaChoice} from '../../../repositories/calling/callMediaChoice';

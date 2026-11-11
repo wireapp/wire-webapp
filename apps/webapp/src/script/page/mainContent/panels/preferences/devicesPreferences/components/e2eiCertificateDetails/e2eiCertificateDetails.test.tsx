@@ -18,9 +18,8 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conversation';
-import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-import {noop} from 'noop-esm';
+import {CONVERSATION_TYPE, MLSConversation} from '../../../../../../../apiClient/conversation/conversation';
+import {CredentialType} from '../../../../../../../core/messagingProtocols/mls';
 import {container} from 'tsyringe';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
@@ -34,6 +33,7 @@ import {
   requireValueForTest,
 } from '../../../../../../testSupport/rootContextTestSupport';
 import {Core} from '../../../../../../../service/coreSingleton';
+import {createCoreTestFixture} from '../../../../../../../util/test/createCoreTestFixture';
 import {generateAPIConversation} from '../../../../../../../../../test/helper/ConversationGenerator';
 
 import {E2EICertificateDetails} from './e2eiCertificateDetails';
@@ -43,15 +43,13 @@ const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X
   return {
     status,
     x509Identity: {
-      free: jest.fn(),
       certificate: 'certificate',
       displayName: '',
       domain: '',
       handle: '',
-      notAfter: BigInt(0),
-      notBefore: BigInt(0),
+      notAfter: new Date(0),
+      notBefore: new Date(0),
       serialNumber: '',
-      [Symbol.dispose]: noop,
     },
     credentialType,
     deviceId: '',
@@ -64,13 +62,25 @@ const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X
   };
 };
 
-const core = container.resolve(Core);
-
 describe('E2EICertificateDetails', () => {
   const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    const core = createCoreTestFixture({
+      backendFeatures: {domain: 'domain'},
+      service: {
+        conversation: {getMLSSelfConversation: jest.fn()},
+        e2eIdentity: {
+          initialize: jest.fn(),
+          isEnrollmentInProgress: jest.fn(),
+          isFreshMLSSelfClient: jest.fn(),
+          getAllGroupUsersIdentities: jest.fn().mockResolvedValue(new Map()),
+        },
+      },
+    });
+    container.registerInstance(Core, core);
+    E2EIHandler.resetInstance();
     jest.spyOn(requireValueForTest(core.service?.conversation), 'getMLSSelfConversation').mockResolvedValue(
       generateAPIConversation({
         id: {id: 'id', domain: 'domain'},
@@ -88,6 +98,11 @@ describe('E2EICertificateDetails', () => {
       gracePeriodInSeconds: 100,
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
     });
+  });
+
+  afterEach(() => {
+    E2EIHandler.resetInstance();
+    container.clearInstances();
   });
 
   describe('idicates the state of the e2ei identity', () => {

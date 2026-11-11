@@ -19,7 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2, media} from '@wireapp/react-ui-kit';
+import {COLOR_V2} from '../../uiKit/identity/colorsV2/colorsV2';
+import {media} from '../../uiKit/utils/mediaQueries';
 
 export const leftSectionCss: CSSObject = {
   background: 'black',

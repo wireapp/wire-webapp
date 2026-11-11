@@ -21,8 +21,7 @@ import React, {type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
+import {TabIndex} from '../../uiKit/utils/enums';
 import {handleKeyDown, KEY} from '../../util/keyboardUtil';
 
 interface SelectTextProps {

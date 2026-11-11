@@ -19,8 +19,8 @@
 
 import assert from 'node:assert';
 
-import ky from 'ky';
-import type {KyInstance} from 'ky';
+import ky from 'ky-release';
+import type {KyInstance} from 'ky-release';
 import {Maybe} from 'true-myth';
 
 import {createKyHttpClient, formatHttpRequestFailure, isHttpRequestFailure} from './githubHttpClient.ts';

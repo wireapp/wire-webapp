@@ -19,10 +19,10 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
-import {randomInt} from '@wireapp/commons/lib/util/RandomUtil';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
-import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 
+import {randomInt} from '../../commons/util/RandomUtil';
+import {TimeInMillis} from '../../commons/util/TimeUtil';
+import {CredentialType} from '../../core/messagingProtocols/mls';
 import {MLSStatuses, WireIdentity} from '../e2eIdentityVerification';
 
 const shortEnrollmentReminderInMinutes = 5;
@@ -99,7 +99,10 @@ function getGracePeriod(
   // To be sure the device does not expire, we want to keep a safe delay
   const safeDelay = randomInt(TimeInMillis.DAY) + messageRetentionTime;
 
-  const end = Number(identity.x509Identity?.notAfter) * TimeInMillis.SECOND;
+  const notAfter = identity.x509Identity?.notAfter;
+  // An X509 identity without certificate details cannot be scheduled. Treat it as already
+  // expired so the user is asked to enroll again instead of waiting forever.
+  const end = isUndefined(notAfter) ? 0 : notAfter.getTime();
   const start = Math.max(end - safeDelay, end - teamGracePeriodDuration);
 
   return {end, start};

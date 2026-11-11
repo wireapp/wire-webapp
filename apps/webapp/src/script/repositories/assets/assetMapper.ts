@@ -18,11 +18,11 @@
  */
 
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
 
 import {AssetRemoteData} from './assetRemoteData';
 
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import type {UserAsset as APIClientUserAsset} from '../../apiClient/user/userAsset';
 import type {User} from '../entity/User';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 

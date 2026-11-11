@@ -17,13 +17,18 @@
  *
  */
 
+import type {ReactElement} from 'react';
+
 import {act, render, screen, waitFor, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {JobsTaskStatus, TreeNodeType} from 'cells-sdk-ts';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../../uiKit/identity/theme/theme';
+
+import en from '../../../../../i18n/en-US.json';
 
 import type {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
@@ -31,9 +36,13 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../../../util/localizerUtil';
 import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {CellsHeader} from './cellsHeader';
+import type {SharedDriveUploadController} from '../sharedDriveUploadController';
+import {SharedDriveUploadStatusProvider} from '../sharedDriveUploadStatusContext';
+import {SharedDriveUploadStatusPopupHost} from '../sharedDriveUploadStatusPopupHost';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 
 const cellsNewItemButtonLabel = 'cells.newItemMenu.button';
@@ -49,6 +58,7 @@ const defaultProperties = {
   onRefresh: jest.fn(),
   onRefreshAfterEmptyBinOutcome: jest.fn().mockResolvedValue(true),
   onEmptyBinSubmitted: jest.fn(),
+  onEmptyBinInProgressChange: jest.fn(),
   getCurrentCellsPath: getCellsFilesPath,
   conversationName: 'Project Alpha',
   conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
@@ -66,17 +76,46 @@ const defaultProperties = {
   showViewerPermission: false,
 };
 
+const uploadStatusController = {
+  snapshots: () => {
+    return [];
+  },
+  subscribe: () => {
+    return () => {
+      return undefined;
+    };
+  },
+} as unknown as SharedDriveUploadController;
+
+// The status popup host is rendered next to the header so bulk action progress is observable.
+const createHeaderTree = (properties: Partial<typeof defaultProperties>): ReactElement => {
+  return (
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <SharedDriveUploadStatusProvider>
+        <CellsHeader {...defaultProperties} {...properties} />
+        <SharedDriveUploadStatusPopupHost
+          controller={uploadStatusController}
+          conversationQualifiedId="conversation@example.com"
+          isEnabled
+          isFileTabActive
+        />
+      </SharedDriveUploadStatusProvider>
+    </StyledApp>
+  );
+};
+
 const renderCellsHeader = (
   properties: Partial<typeof defaultProperties> & {
     clock?: ReturnType<typeof createDeterministicClock>;
     onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   } = {},
   isBulkActionsEnabled = true,
+  translateFunction: typeof translate | typeof translateForTest = translateForTest,
 ): RenderResult => {
   const {clock, ...headerProperties} = properties;
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
-      translate: translateForTest,
+      translate: translateFunction,
       clock,
       isFeatureToggleEnabled: featureToggleName => {
         return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
@@ -84,15 +123,36 @@ const renderCellsHeader = (
     }),
   );
 
-  return render(
-    <StyledApp themeId={THEME_ID.DEFAULT}>
-      <CellsHeader {...defaultProperties} {...headerProperties} />
-    </StyledApp>,
-    {wrapper},
-  );
+  return render(createHeaderTree(headerProperties), {wrapper});
 };
 
 describe('CellsHeader', () => {
+  afterEach(() => {
+    setStrings({});
+  });
+
+  it.each([
+    ['MFA feature - Administration & Identity', 'MFA feature - Administration & Identity files'],
+    ['R&amp;D', 'R&amp;D files'],
+    ['<img src=x onerror=alert(1)>', '<img src=x onerror=alert(1)> files'],
+  ])('renders conversation name %s as plain breadcrumb text', (conversationName, expectedLabel) => {
+    setStrings({en});
+    const {container} = renderCellsHeader(
+      {
+        conversationName,
+        getCurrentCellsPath: () => {
+          return 'wire-cells-web/Mocks';
+        },
+        isSearchViewOpen: false,
+      },
+      true,
+      translate,
+    );
+
+    expect(screen.getByRole('button', {name: expectedLabel})).toBeInTheDocument();
+    expect(container.querySelector('img')).not.toBeInTheDocument();
+  });
+
   it('keeps the breadcrumb strip clickable while providing a selection overlay anchor', () => {
     const onSelectionBarAnchorChange = jest.fn();
     const {container} = renderCellsHeader({isSearchViewOpen: false, onSelectionBarAnchorChange});
@@ -210,11 +270,7 @@ describe('CellsHeader', () => {
     };
     const rendered = renderCellsHeader({...properties, clock}, true);
     const rerender = (): void => {
-      rendered.rerender(
-        <StyledApp themeId={THEME_ID.DEFAULT}>
-          <CellsHeader {...properties} />
-        </StyledApp>,
-      );
+      rendered.rerender(createHeaderTree(properties));
     };
 
     await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
@@ -222,7 +278,7 @@ describe('CellsHeader', () => {
     await waitFor(() => {
       expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
     });
-    expect(screen.getByRole('status')).toHaveTextContent('cells.emptyBin.status.processing');
+    expect(screen.getByText('cells.emptyBin.status.processing')).toBeInTheDocument();
 
     currentPath = 'recycle_bin/folder';
     rerender();
@@ -263,11 +319,31 @@ describe('CellsHeader', () => {
     expect(screen.getByRole('button', {name: 'Public links'})).toBeInTheDocument();
   });
 
-  it('renders the viewer permission banner when restricted', () => {
-    renderCellsHeader({showViewerPermission: true, isSearchViewOpen: false});
+  it('keeps a dismissed viewer permission banner hidden when reopening the conversation', async () => {
+    const dismissedKey = 'conversation-viewer-permission-banner-dismissed:conversation-id@wire.com';
+    sessionStorage.removeItem(dismissedKey);
+    const view = renderCellsHeader({showViewerPermission: true, isSearchViewOpen: false});
 
     expect(screen.getByRole('status')).toBeInTheDocument();
     expect(screen.getByText('conversationFileUploadRestrictedOverlayDescription')).toBeInTheDocument();
+    expect(screen.getByText('conversationViewerPermissionBannerMessagesAllowed')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', {name: 'accessibility.rightPanel.close'}));
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+
+    view.unmount();
+    renderCellsHeader({showViewerPermission: true, isSearchViewOpen: false});
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+
+    renderCellsHeader({
+      showViewerPermission: true,
+      isSearchViewOpen: false,
+      conversationQualifiedId: {id: 'another-conversation', domain: 'wire.com'},
+    });
+    expect(screen.getByRole('status')).toBeInTheDocument();
+
+    sessionStorage.removeItem(dismissedKey);
+    sessionStorage.removeItem('conversation-viewer-permission-banner-dismissed:another-conversation@wire.com');
   });
 
   it('renders the new-item menu outside the recycle bin', () => {

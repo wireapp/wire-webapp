@@ -28,15 +28,18 @@ import {readFile as readFileFromFileSystem, writeFile as writeFileToFileSystem} 
 import {resolve} from 'node:path';
 import {isDeepStrictEqual} from 'node:util';
 
-import {compareWebAppVersions, validateMatchingWebAppPackageVersions} from './webappVersion.ts';
+import {compareWebAppVersions, validateWebAppPackageVersion} from './webappVersion.ts';
 import type {WebAppPackageDocument, WebAppPackageDocuments, WebAppPackageVersions} from './webappVersion.ts';
 import {validateWebAppVersionSynchronizationBranchName} from './webappVersionSynchronization.ts';
 import type {WebAppVersionSynchronizationBranch} from './webappVersionSynchronization.ts';
+import {validateWebAppVersionSynchronizationLockfileChange} from './webappVersionSynchronizationLockfile.ts';
 
-export type WebAppVersionSynchronizationMainSnapshot = {
+export type WebAppVersionSynchronizationPackageDocuments = WebAppPackageDocuments & {
+  readonly lockfileDocument: WebAppPackageDocument;
+};
+
+export type WebAppVersionSynchronizationMainSnapshot = WebAppVersionSynchronizationPackageDocuments & {
   readonly commitSha: string;
-  readonly rootPackageDocument: WebAppPackageDocument;
-  readonly webAppPackageDocument: WebAppPackageDocument;
 };
 
 export type WebAppVersionSynchronizationBranchInspection = {
@@ -49,9 +52,9 @@ export type WebAppVersionSynchronizationBranchInspection = {
   readonly isBasedOnMainHistory: boolean;
   readonly changedFilePaths: readonly string[];
   readonly baseRootPackageDocument: unknown;
-  readonly baseWebAppPackageDocument: unknown;
   readonly branchRootPackageDocument: unknown;
-  readonly branchWebAppPackageDocument: unknown;
+  readonly baseLockfileDocument: unknown;
+  readonly branchLockfileDocument: unknown;
 };
 
 export type ValidateWebAppVersionSynchronizationBranchOptions = {
@@ -66,7 +69,7 @@ export type WebAppVersionSynchronizationGitClient = {
     options: InspectWebAppVersionSynchronizationBranchOptions,
   ) => Task<WebAppVersionSynchronizationBranchInspection | undefined, Error>;
   readonly createBranchFromMain: (options: CreateWebAppVersionSynchronizationBranchOptions) => Task<Unit, Error>;
-  readonly readWorkingTreePackageDocuments: () => Task<WebAppPackageDocuments, Error>;
+  readonly readWorkingTreePackageDocuments: () => Task<WebAppVersionSynchronizationPackageDocuments, Error>;
   readonly writePackageDocuments: (
     options: WriteWebAppVersionSynchronizationPackageDocumentsOptions,
   ) => Task<Unit, Error>;
@@ -86,7 +89,7 @@ export type CreateWebAppVersionSynchronizationBranchOptions = {
   readonly mainCommitSha: string;
 };
 
-export type WriteWebAppVersionSynchronizationPackageDocumentsOptions = WebAppPackageDocuments;
+export type WriteWebAppVersionSynchronizationPackageDocumentsOptions = WebAppVersionSynchronizationPackageDocuments;
 
 export type CommitWebAppVersionSynchronizationOptions = {
   readonly message: string;
@@ -113,7 +116,7 @@ export type WebAppVersionSynchronizationFileSystem = {
   readonly writeFile: (filePath: string, fileContents: string) => Promise<void>;
 };
 
-export const webAppVersionSynchronizationPackageFilePaths = ['apps/webapp/package.json', 'package.json'] as const;
+export const webAppVersionSynchronizationPackageFilePaths = ['package-lock.json', 'package.json'] as const;
 
 type RunGitOperationOptions<valueType> = {
   readonly description: string;
@@ -128,8 +131,8 @@ type CreateBranchInspectionOptions = {
   readonly parentCommitOutput: string;
   readonly isBasedOnMainHistory: boolean;
   readonly changedFilePaths: readonly string[];
-  readonly basePackageDocuments: WebAppPackageDocuments | undefined;
-  readonly branchPackageDocuments: WebAppPackageDocuments | undefined;
+  readonly basePackageDocuments: WebAppVersionSynchronizationPackageDocuments | undefined;
+  readonly branchPackageDocuments: WebAppVersionSynchronizationPackageDocuments | undefined;
 };
 
 type ValidatePackageDocumentVersionChangeOptions = {
@@ -328,19 +331,20 @@ function readPackageDocumentAtRevision(
   });
 }
 
-function readPackageDocumentsAtRevision(git: SimpleGit, revision: string): Task<WebAppPackageDocuments, Error> {
+function readPackageDocumentsAtRevision(
+  git: SimpleGit,
+  revision: string,
+): Task<WebAppVersionSynchronizationPackageDocuments, Error> {
   return readPackageDocumentAtRevision({
     git,
     revision,
     packageFilePath: 'package.json',
   }).andThen(rootPackageDocument => {
-    return readPackageDocumentAtRevision({
-      git,
-      revision,
-      packageFilePath: 'apps/webapp/package.json',
-    }).map(webAppPackageDocument => {
-      return {rootPackageDocument, webAppPackageDocument};
-    });
+    return readPackageDocumentAtRevision({git, revision, packageFilePath: 'package-lock.json'}).map(
+      lockfileDocument => {
+        return {rootPackageDocument, lockfileDocument};
+      },
+    );
   });
 }
 
@@ -364,9 +368,9 @@ function createBranchInspection(options: CreateBranchInspectionOptions): WebAppV
     isBasedOnMainHistory: options.isBasedOnMainHistory,
     changedFilePaths: options.changedFilePaths,
     baseRootPackageDocument: options.basePackageDocuments?.rootPackageDocument,
-    baseWebAppPackageDocument: options.basePackageDocuments?.webAppPackageDocument,
     branchRootPackageDocument: options.branchPackageDocuments?.rootPackageDocument,
-    branchWebAppPackageDocument: options.branchPackageDocuments?.webAppPackageDocument,
+    baseLockfileDocument: options.basePackageDocuments?.lockfileDocument,
+    branchLockfileDocument: options.branchPackageDocuments?.lockfileDocument,
   };
 }
 
@@ -408,10 +412,7 @@ function validateSynchronizationBranchStructure(
     );
   }
 
-  const basePackageVersionsResult = validateMatchingWebAppPackageVersions(
-    branchInspection.baseRootPackageDocument,
-    branchInspection.baseWebAppPackageDocument,
-  );
+  const basePackageVersionsResult = validateWebAppPackageVersion(branchInspection.baseRootPackageDocument);
 
   if (basePackageVersionsResult.isErr) {
     return Result.err(new Error(`Synchronization branch base is invalid: ${basePackageVersionsResult.error.message}`));
@@ -424,10 +425,7 @@ function validateSynchronizationBranchPackageDocuments(options: {
   readonly branchInspection: WebAppVersionSynchronizationBranchInspection;
   readonly expectedWebAppVersion: string;
 }): Result<Unit, Error> {
-  const branchPackageVersionsResult = validateMatchingWebAppPackageVersions(
-    options.branchInspection.branchRootPackageDocument,
-    options.branchInspection.branchWebAppPackageDocument,
-  );
+  const branchPackageVersionsResult = validateWebAppPackageVersion(options.branchInspection.branchRootPackageDocument);
 
   if (branchPackageVersionsResult.isErr) {
     return Result.err(
@@ -447,16 +445,6 @@ function validateSynchronizationBranchPackageDocuments(options: {
 
   if (rootPackageDocumentChangeResult.isErr) {
     return Result.err(rootPackageDocumentChangeResult.error);
-  }
-
-  const webAppPackageDocumentChangeResult = validatePackageDocumentVersionChange({
-    basePackageDocument: options.branchInspection.baseWebAppPackageDocument,
-    branchPackageDocument: options.branchInspection.branchWebAppPackageDocument,
-    packagePath: 'apps/webapp/package.json',
-  });
-
-  if (webAppPackageDocumentChangeResult.isErr) {
-    return Result.err(webAppPackageDocumentChangeResult.error);
   }
 
   return Result.ok(Unit);
@@ -510,6 +498,17 @@ export function validateWebAppVersionSynchronizationBranch(
     return Result.err(branchPackageDocumentsResult.error);
   }
 
+  const lockfileChangeResult = validateWebAppVersionSynchronizationLockfileChange({
+    baseLockfileDocument: branchInspection.baseLockfileDocument,
+    updatedLockfileDocument: branchInspection.branchLockfileDocument,
+    currentVersion: branchStructureResult.value.rootVersion,
+    targetVersion: options.expectedWebAppVersion,
+  });
+
+  if (lockfileChangeResult.isErr) {
+    return Result.err(lockfileChangeResult.error);
+  }
+
   return Result.ok(validatedBranchName);
 }
 
@@ -552,10 +551,10 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
     });
   }
 
-  function readPackageDocumentsFromWorkingTree(): Task<WebAppPackageDocuments, Error> {
+  function readPackageDocumentsFromWorkingTree(): Task<WebAppVersionSynchronizationPackageDocuments, Error> {
     return readPackageContentsFromWorkingTree('package.json').andThen(rootPackageDocument => {
-      return readPackageContentsFromWorkingTree('apps/webapp/package.json').map(webAppPackageDocument => {
-        return {rootPackageDocument, webAppPackageDocument};
+      return readPackageContentsFromWorkingTree('package-lock.json').map(lockfileDocument => {
+        return {rootPackageDocument, lockfileDocument};
       });
     });
   }
@@ -666,7 +665,7 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
             : Task.resolve<readonly string[], Error>([]);
           const basePackageDocumentsTask = isString(baseCommitSha)
             ? readPackageDocumentsAtRevision(options.git, baseCommitSha)
-            : Task.resolve<WebAppPackageDocuments | undefined, Error>(undefined);
+            : Task.resolve<WebAppVersionSynchronizationPackageDocuments | undefined, Error>(undefined);
 
           return basedOnMainHistoryTask.andThen(isBasedOnMainHistory => {
             return changedFilePathsTask.andThen(changedFilePaths => {
@@ -753,7 +752,7 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
             return {
               commitSha,
               rootPackageDocument: packageDocuments.rootPackageDocument,
-              webAppPackageDocument: packageDocuments.webAppPackageDocument,
+              lockfileDocument: packageDocuments.lockfileDocument,
             };
           });
         });
@@ -798,7 +797,7 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
 
     writePackageDocuments(writeOptions) {
       return writePackageDocument('package.json', writeOptions.rootPackageDocument).andThen(() => {
-        return writePackageDocument('apps/webapp/package.json', writeOptions.webAppPackageDocument);
+        return writePackageDocument('package-lock.json', writeOptions.lockfileDocument);
       });
     },
 

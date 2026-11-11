@@ -17,18 +17,20 @@
  *
  */
 
-import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/conversationRole';
-import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
-import {FEATURE_STATUS, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
-import type {TeamInvitation} from '@wireapp/api-client/lib/team/invitation/teamInvitation';
-import {TeamMigrationPayload} from '@wireapp/api-client/lib/team/invitation/teamMigrationPayload';
-import type {LegalHoldMemberData} from '@wireapp/api-client/lib/team/legalhold/';
-import type {MemberData, Members} from '@wireapp/api-client/lib/team/member/';
-import type {Services} from '@wireapp/api-client/lib/team/service/';
-import type {TeamCollaborator, TeamData} from '@wireapp/api-client/lib/team/team/';
-import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
+import type {ConversationRolesList} from '../../apiClient/conversation/conversationRole';
+import type {FeatureList} from '../../apiClient/team/feature/featureList.types';
+import {FEATURE_STATUS, FEATURE_KEY} from '../../apiClient/team/feature/featureList.types';
+import type {TeamInvitation} from '../../apiClient/team/invitation/teamInvitation';
+import {TeamMigrationPayload} from '../../apiClient/team/invitation/teamMigrationPayload';
+import type {LegalHoldMemberData} from '../../apiClient/team/legalhold/legalHoldMemberStatus';
+import type {MemberData} from '../../apiClient/team/member/memberData';
+import type {Members} from '../../apiClient/team/member/members';
+import type {Services} from '../../apiClient/team/service/services';
+import type {TeamCollaborator} from '../../apiClient/team/team/collaborator/teamCollaborator';
+import type {TeamData} from '../../apiClient/team/team/teamData';
+import type {User as APIClientUser} from '../../apiClient/user/user';
 import {APIClient} from '../../service/apiClientSingleton';
 
 export class TeamService {
@@ -84,50 +86,52 @@ export class TeamService {
   }
 
   getAllTeamFeatures(): Promise<FeatureList> {
-    return this.apiClient.api.teams.feature.getAllFeatures().catch(() => {
-      // The following code enables all default features to ensure that modern webapps work with legacy backends (backends that don't provide a "feature-configs" endpoint)
-      const defaultFeatures: FeatureList = {
-        [FEATURE_KEY.APPLOCK]: {
-          config: {
-            enforceAppLock: false,
-            inactivityTimeoutSecs: 60,
-          },
-          status: FEATURE_STATUS.ENABLED,
+    return this.apiClient.api.teams.feature.getAllFeatures();
+  }
+
+  getDefaultTeamFeatures(): FeatureList {
+    // The following code enables all default features to ensure that modern webapps work with legacy backends (backends that don't provide a "feature-configs" endpoint)
+    const defaultFeatures: FeatureList = {
+      [FEATURE_KEY.APPLOCK]: {
+        config: {
+          enforceAppLock: false,
+          inactivityTimeoutSecs: 60,
         },
-        [FEATURE_KEY.CLASSIFIED_DOMAINS]: {
-          config: {
-            domains: [],
-          },
-          status: FEATURE_STATUS.DISABLED,
+        status: FEATURE_STATUS.ENABLED,
+      },
+      [FEATURE_KEY.CLASSIFIED_DOMAINS]: {
+        config: {
+          domains: [],
         },
-        [FEATURE_KEY.CONFERENCE_CALLING]: {
-          config: {useSFTForOneToOneCalls: false},
-          status: FEATURE_STATUS.ENABLED,
-        },
-        [FEATURE_KEY.DIGITAL_SIGNATURES]: {
-          status: FEATURE_STATUS.ENABLED,
-        },
-        [FEATURE_KEY.FILE_SHARING]: {
-          status: FEATURE_STATUS.ENABLED,
-        },
-        [FEATURE_KEY.LEGALHOLD]: {
-          status: FEATURE_STATUS.ENABLED,
-        },
-        [FEATURE_KEY.SEARCH_VISIBILITY]: {
-          status: FEATURE_STATUS.ENABLED,
-        },
-        [FEATURE_KEY.SSO]: {
-          status: FEATURE_STATUS.ENABLED,
-        },
-        [FEATURE_KEY.MLS]: undefined,
-        [FEATURE_KEY.VALIDATE_SAML_EMAILS]: {
-          status: FEATURE_STATUS.ENABLED,
-        },
-        [FEATURE_KEY.VIDEO_CALLING]: {
-          status: FEATURE_STATUS.ENABLED,
-        },
-      };
-      return defaultFeatures;
-    });
+        status: FEATURE_STATUS.DISABLED,
+      },
+      [FEATURE_KEY.CONFERENCE_CALLING]: {
+        config: {useSFTForOneToOneCalls: false},
+        status: FEATURE_STATUS.ENABLED,
+      },
+      [FEATURE_KEY.DIGITAL_SIGNATURES]: {
+        status: FEATURE_STATUS.ENABLED,
+      },
+      [FEATURE_KEY.FILE_SHARING]: {
+        status: FEATURE_STATUS.ENABLED,
+      },
+      [FEATURE_KEY.LEGALHOLD]: {
+        status: FEATURE_STATUS.ENABLED,
+      },
+      [FEATURE_KEY.SEARCH_VISIBILITY]: {
+        status: FEATURE_STATUS.ENABLED,
+      },
+      [FEATURE_KEY.SSO]: {
+        status: FEATURE_STATUS.ENABLED,
+      },
+      [FEATURE_KEY.MLS]: undefined,
+      [FEATURE_KEY.VALIDATE_SAML_EMAILS]: {
+        status: FEATURE_STATUS.ENABLED,
+      },
+      [FEATURE_KEY.VIDEO_CALLING]: {
+        status: FEATURE_STATUS.ENABLED,
+      },
+    };
+    return defaultFeatures;
   }
 }

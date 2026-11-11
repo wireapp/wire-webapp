@@ -20,10 +20,11 @@
 import React, {useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isEmptyArray, isNonEmptyString} from '@sindresorhus/is';
-import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
 
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {UserType} from '../../apiClient/user/user';
 import {useApplicationContext} from '../../page/rootProvider';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
 import type {User} from '../../repositories/entity/User';

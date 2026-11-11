@@ -20,9 +20,6 @@
 import {useId, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-
-import {Ciphersuite} from '@wireapp/core';
 
 import {
   titleStyles,
@@ -33,6 +30,8 @@ import {
   protocolValueStyles,
 } from './conversationProtocolDetails.styles';
 
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {Ciphersuite} from '../../../core';
 import {useApplicationContext} from '../../../page/rootProvider';
 
 interface ConversationProtocolDetailsProps {
@@ -40,6 +39,32 @@ interface ConversationProtocolDetailsProps {
   cipherSuite?: number;
   onProtocolActivated?: () => void;
 }
+
+const cipherSuiteNames = {
+  [Ciphersuite.Mls128Dhkemx25519Aes128gcmSha256Ed25519]: 'MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519',
+  [Ciphersuite.Mls128Dhkemp256Aes128gcmSha256P256]: 'MLS_128_DHKEMP256_AES128GCM_SHA256_P256',
+  [Ciphersuite.Mls128Dhkemx25519Chacha20poly1305Sha256Ed25519]: 'MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519',
+  [Ciphersuite.Mls256Dhkemx448Aes256gcmSha512Ed448]: 'MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448',
+  [Ciphersuite.Mls256Dhkemp521Aes256gcmSha512P521]: 'MLS_256_DHKEMP521_AES256GCM_SHA512_P521',
+  [Ciphersuite.Mls256Dhkemx448Chacha20poly1305Sha512Ed448]: 'MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448',
+  [Ciphersuite.Mls256Dhkemp384Aes256gcmSha384P384]: 'MLS_256_DHKEMP384_AES256GCM_SHA384_P384',
+  [Ciphersuite.Mls128Mlkem768x25519Aes128gcmSha256Ed25519]: 'MLS_128_MLKEM768X25519_AES128GCM_SHA256_Ed25519',
+  [Ciphersuite.Mls128Mlkem768x25519Aes256gcmSha384Ed25519]: 'MLS_128_MLKEM768X25519_AES256GCM_SHA384_Ed25519',
+  [Ciphersuite.Mls128Mlkem768p256Aes128gcmSha256P256]: 'MLS_128_MLKEM768P256_AES128GCM_SHA256_P256',
+  [Ciphersuite.Mls128Mlkem768p256Aes256gcmSha384P256]: 'MLS_128_MLKEM768P256_AES256GCM_SHA384_P256',
+  [Ciphersuite.Mls192Mlkem1024p384Aes256gcmSha384P384]: 'MLS_192_MLKEM1024P384_AES256GCM_SHA384_P384',
+  [Ciphersuite.Mls128Mlkem768Aes256gcmSha384Ed25519]: 'MLS_128_MLKEM768_AES256GCM_SHA384_Ed25519',
+  [Ciphersuite.Mls128Mlkem768Aes256gcmSha384P256]: 'MLS_128_MLKEM768_AES256GCM_SHA384_P256',
+  [Ciphersuite.Mls192Mlkem1024Aes256gcmSha384P384]: 'MLS_192_MLKEM1024_AES256GCM_SHA384_P384',
+  [Ciphersuite.Mls128Mlkem768x25519Chacha20poly1305Sha384Mldsa44]:
+    'MLS_128_MLKEM768X25519_CHACHA20POLY1305_SHA384_MLDSA44',
+  [Ciphersuite.Mls192Mlkem768Aes256gcmSha384Mldsa65]: 'MLS_192_MLKEM768_AES256GCM_SHA384_MLDSA65',
+  [Ciphersuite.Mls256Mlkem1024Aes256gcmSha384Mldsa87]: 'MLS_256_MLKEM1024_AES256GCM_SHA384_MLDSA87',
+} satisfies Record<Ciphersuite, string>;
+
+const getCipherSuiteName = (cipherSuite: number): string => {
+  return cipherSuiteNames[cipherSuite as Ciphersuite] ?? cipherSuite.toString();
+};
 
 export const ConversationProtocolDetails: FunctionComponent<ConversationProtocolDetailsProps> = ({
   protocol,
@@ -84,7 +109,7 @@ export const ConversationProtocolDetails: FunctionComponent<ConversationProtocol
               {translate('conversationDetailsCipherSuite')}
             </div>
             <div aria-labelledby={cipherSuiteLabelId} css={subTitleStyles} data-uie-name="cipher-suite">
-              {Ciphersuite[cipherSuite]}
+              {getCipherSuiteName(cipherSuite)}
             </div>
           </>
         )}

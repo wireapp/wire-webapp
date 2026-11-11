@@ -18,9 +18,9 @@
  */
 
 import {act, fireEvent, render, screen} from '@testing-library/react';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
+import {CONVERSATION_PROTOCOL} from '../../../../../../apiClient/team/feature/featureList.types';
+import {ThemeProvider} from '../../../../../../uiKit/identity/theme/theme';
 import {container} from 'tsyringe';
 
 import {User} from '../../../../../../repositories/entity/User';

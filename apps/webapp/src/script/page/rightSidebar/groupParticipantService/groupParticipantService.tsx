@@ -21,8 +21,6 @@ import {FC, useEffect} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {ServiceDetails} from '../../../components/panel/serviceDetails';
@@ -33,6 +31,7 @@ import {IntegrationRepository} from '../../../repositories/integration/Integrati
 import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
 import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {generatePermissionHelpers} from '../../../repositories/user/userPermission';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';

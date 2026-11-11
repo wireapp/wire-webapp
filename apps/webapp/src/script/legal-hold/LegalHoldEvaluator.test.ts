@@ -17,7 +17,7 @@
  *
  */
 
-import {GenericMessageType} from '@wireapp/core/lib/conversation';
+import {GenericMessageType} from '../core/conversation';
 
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 

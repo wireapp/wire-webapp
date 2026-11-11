@@ -21,9 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
-
 import type {CompositeMessage} from '../../../../../../repositories/entity/message/compositeMessage';
+import {COLOR} from '../../../../../../uiKit/identity/colors/colors';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 import {noop} from '../../../../../../util/util';
 

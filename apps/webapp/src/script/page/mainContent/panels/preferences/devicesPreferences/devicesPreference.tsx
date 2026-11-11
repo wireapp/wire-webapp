@@ -20,13 +20,13 @@
 import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {DetailedDevice} from './components/detailedDevice';
 import {Device} from './components/device';
 import {DeviceDetailsPreferences} from './components/deviceDetailsPreferences';
 
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {useUserIdentity} from '../../../../../hooks/useDeviceIdentities';
 import {ClientEntity} from '../../../../../repositories/client/ClientEntity';
 import {ClientState} from '../../../../../repositories/client/ClientState';

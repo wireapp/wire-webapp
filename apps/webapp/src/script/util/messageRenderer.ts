@@ -18,13 +18,13 @@
  */
 
 import {isEmptyString, isNonEmptyArray, isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import MarkdownIt from 'markdown-it';
 import {escape} from 'underscore';
 
 import {highlightCode, languages} from './highlightCode';
 import {replaceInRange} from './stringUtil';
 
+import {QualifiedId} from '../apiClient/user/qualifiedId';
 import type {MentionEntity} from '../message/mentionEntity';
 
 const linkClosingTokenOffset = 2;

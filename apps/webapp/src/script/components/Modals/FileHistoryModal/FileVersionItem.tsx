@@ -19,8 +19,6 @@
 
 import {ReactElement} from 'react';
 
-import {Button, ButtonVariant, DownloadIcon, ReloadIcon} from '@wireapp/react-ui-kit';
-
 import {
   fileVersionItemWrapperCss,
   iconMarginRightCss,
@@ -38,6 +36,9 @@ import {
 } from './FileHistoryModal.styles';
 
 import {useApplicationContext} from '../../../page/rootProvider';
+import {DownloadIcon} from '../../../uiKit/dataDisplay/icon/downloadIcon';
+import {ReloadIcon} from '../../../uiKit/dataDisplay/icon/reloadIcon';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 
 interface FileVersionItemProps {
   version: {

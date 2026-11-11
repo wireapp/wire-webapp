@@ -18,11 +18,11 @@
  */
 
 import {waitFor} from '@testing-library/react';
-import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
-import {container} from 'tsyringe';
-import {noop} from 'noop-esm';
+import {CredentialType} from '../core/messagingProtocols/mls';
+import {LowPrecisionTaskScheduler} from '../core/util/lowPrecisionTaskScheduler';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {noop} from 'noop-esm';
+import {container} from 'tsyringe';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
@@ -39,7 +39,8 @@ import * as e2eIdentityVerification from './e2eIdentityVerification';
 import {getEnrollmentStore} from './enrollment.store';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 import {translateForTest} from '../util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {createCoreTestFixture} from '../util/test/createCoreTestFixture';
+import {CONVERSATION_PROTOCOL} from '../apiClient/team/feature/featureList.types';
 
 jest.mock('./oidcService', () => {
   return {
@@ -75,15 +76,13 @@ const generateWireIdentity = (
 ): e2eIdentityVerification.WireIdentity => {
   return {
     x509Identity: {
-      free: jest.fn(),
       certificate: '',
       displayName: 'John Doe',
       domain: 'domain',
       handle: 'johndoe',
-      notAfter: BigInt(0),
-      notBefore: BigInt(0),
+      notAfter: new Date(0),
+      notBefore: new Date(0),
       serialNumber: '',
-      [Symbol.dispose]: noop,
     },
     thumbprint: '',
     credentialType,
@@ -106,7 +105,8 @@ describe('E2EIHandler', () => {
 
   const selfClientId = 'clientId';
 
-  const coreMock = container.resolve(Core);
+  let coreMock: Core;
+  let scheduleTask: jest.SpiedFunction<typeof LowPrecisionTaskScheduler.addTask>;
   function getE2EIServiceForTest(): NonNullable<NonNullable<typeof coreMock.service>['e2eIdentity']> {
     return requireValueForTest(requireValueForTest(coreMock.service).e2eIdentity);
   }
@@ -116,6 +116,26 @@ describe('E2EIHandler', () => {
   };
 
   beforeEach(() => {
+    scheduleTask = jest.spyOn(LowPrecisionTaskScheduler, 'addTask').mockImplementation(noop);
+    coreMock = createCoreTestFixture({
+      key: new Uint8Array(),
+      clientId: selfClientId,
+      backendFeatures: {domain: 'domain'},
+      enrollE2EI: jest.fn(),
+      service: {
+        e2eIdentity: {
+          initialize: jest.fn(),
+          isEnrollmentInProgress: jest.fn(),
+          isFreshMLSSelfClient: jest.fn(),
+          clearAllProgress: jest.fn(),
+          getDevicesIdentities: jest.fn(),
+          getAllGroupUsersIdentities: jest.fn().mockResolvedValue(new Map()),
+          isE2EIEnabled: jest.fn(),
+        },
+        conversation: {getMLSSelfConversation: jest.fn()},
+      },
+    });
+    container.registerInstance(Core, coreMock);
     jest.spyOn(util, 'supportsMLS').mockReturnValue(true);
     // Reset the singleton instance before each test
     E2EIHandler.resetInstance();
@@ -134,8 +154,12 @@ describe('E2EIHandler', () => {
     jest.spyOn(PrimaryModal, 'show');
 
     OIDCServiceStore.store.targetURL('http://example.com');
-    coreMock.key = new Uint8Array();
-    (coreMock as any).clientId = selfClientId;
+  });
+
+  afterEach(() => {
+    scheduleTask.mockRestore();
+    E2EIHandler.resetInstance();
+    container.clearInstances();
   });
 
   it('should create instance with valid params', async () => {
@@ -153,6 +177,16 @@ describe('E2EIHandler', () => {
     await E2EIHandler.getInstance().initialize(params);
     await wait(1);
     expect(coreMock.service?.e2eIdentity?.initialize).toHaveBeenCalled();
+  });
+
+  it('forwards the CRL proxy to the core E2EI service', async () => {
+    const crlProxy = 'https://proxy.example.test/proxyCrl';
+
+    await E2EIHandler.getInstance().initialize({...params, crlProxy});
+
+    expect(getE2EIServiceForTest().initialize).toHaveBeenCalledWith('http://example.com', expect.any(Function), {
+      crlProxy,
+    });
   });
 
   it('does nothing if there is not enrollment in progress and device is alreaady enrolled', async () => {
@@ -232,6 +266,7 @@ describe('E2EIHandler', () => {
   });
 
   it('starts from scratch if returned to app without auth params', async () => {
+    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(true);
     jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(true);
 
     // mock window search params (code, session_state, state)

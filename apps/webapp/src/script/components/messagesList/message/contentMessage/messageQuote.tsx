@@ -19,7 +19,6 @@
 
 import {FC, Fragment, MouseEvent as ReactMouseEvent, useEffect, useState} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
@@ -31,6 +30,7 @@ import {TextMessageRenderer} from './asset/textMessageRenderer';
 import {VideoAsset} from './asset/videoAsset/videoAsset';
 
 import {MessageActions} from '..';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {ConversationError} from '../../../../error/conversationError';
 import {QuoteEntity} from '../../../../message/quoteEntity';
 import {useApplicationContext} from '../../../../page/rootProvider';

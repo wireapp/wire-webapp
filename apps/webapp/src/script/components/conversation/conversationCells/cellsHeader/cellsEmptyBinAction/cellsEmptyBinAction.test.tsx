@@ -17,12 +17,15 @@
  *
  */
 
+import type {ReactElement} from 'react';
+
 import {act, render, screen, waitFor, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../../../uiKit/identity/theme/theme';
 import {JobsTaskStatus, type RestNode} from 'cells-sdk-ts';
 
 import {
@@ -37,7 +40,22 @@ import {
 } from '../../../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 
+import {SharedDriveUploadStatusPopupHost} from '../../sharedDriveUploadStatusPopupHost';
+import {SharedDriveUploadStatusProvider} from '../../sharedDriveUploadStatusContext';
+import type {SharedDriveUploadController} from '../../sharedDriveUploadController';
+
 import {CellsEmptyBinAction} from './cellsEmptyBinAction';
+
+const uploadStatusController = {
+  snapshots: () => {
+    return [];
+  },
+  subscribe: () => {
+    return () => {
+      return undefined;
+    };
+  },
+} as unknown as SharedDriveUploadController;
 
 const conversationQualifiedId = {id: 'shared-drive', domain: 'wire.com'};
 
@@ -54,6 +72,47 @@ const createRepository = (overrides: Partial<CellsRepository> = {}): CellsReposi
   } as unknown as CellsRepository;
 };
 
+interface EmptyBinTreeProps {
+  readonly cellsRepository: CellsRepository;
+  readonly role: typeof CELLS_SELF_USER_DRIVE_ROLE.EDITOR | typeof CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
+  readonly getCurrentCellsPath: () => string;
+  readonly onRefreshAfterEmptyBinOutcome: () => Promise<boolean>;
+  readonly onEmptyBinSubmitted: () => void;
+  readonly onInProgressChange: (isInProgress: boolean) => void;
+}
+
+const createEmptyBinTree = ({
+  cellsRepository,
+  role,
+  getCurrentCellsPath,
+  onRefreshAfterEmptyBinOutcome,
+  onEmptyBinSubmitted,
+  onInProgressChange,
+}: EmptyBinTreeProps): ReactElement => {
+  return (
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <SharedDriveUploadStatusProvider>
+        <CellsSelfUserDriveRoleProvider selfUserDriveRole={role}>
+          <CellsEmptyBinAction
+            cellsRepository={cellsRepository}
+            conversationQualifiedId={conversationQualifiedId}
+            getCurrentCellsPath={getCurrentCellsPath}
+            onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
+            onEmptyBinSubmitted={onEmptyBinSubmitted}
+            onInProgressChange={onInProgressChange}
+          />
+        </CellsSelfUserDriveRoleProvider>
+        <SharedDriveUploadStatusPopupHost
+          controller={uploadStatusController}
+          conversationQualifiedId={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
+          isEnabled
+          isFileTabActive
+        />
+      </SharedDriveUploadStatusProvider>
+    </StyledApp>
+  );
+};
+
 const renderEmptyBinAction = (
   cellsRepository: CellsRepository,
   {
@@ -65,6 +124,7 @@ const renderEmptyBinAction = (
     },
     onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(true),
     onEmptyBinSubmitted = jest.fn(),
+    onInProgressChange = jest.fn(),
   }: {
     enabled?: boolean;
     role?: typeof CELLS_SELF_USER_DRIVE_ROLE.EDITOR | typeof CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
@@ -72,6 +132,7 @@ const renderEmptyBinAction = (
     getCurrentCellsPath?: () => string;
     onRefreshAfterEmptyBinOutcome?: () => Promise<boolean>;
     onEmptyBinSubmitted?: () => void;
+    onInProgressChange?: (isInProgress: boolean) => void;
   } = {},
 ): RenderResult => {
   const rootContext = createRootContextValueForTest({
@@ -84,17 +145,14 @@ const renderEmptyBinAction = (
   const wrapper = createRootProviderWrapperForTest(rootContext);
 
   return render(
-    <StyledApp themeId={THEME_ID.DEFAULT}>
-      <CellsSelfUserDriveRoleProvider selfUserDriveRole={role}>
-        <CellsEmptyBinAction
-          cellsRepository={cellsRepository}
-          conversationQualifiedId={conversationQualifiedId}
-          getCurrentCellsPath={getCurrentCellsPath}
-          onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
-          onEmptyBinSubmitted={onEmptyBinSubmitted}
-        />
-      </CellsSelfUserDriveRoleProvider>
-    </StyledApp>,
+    createEmptyBinTree({
+      cellsRepository,
+      role,
+      getCurrentCellsPath,
+      onRefreshAfterEmptyBinOutcome,
+      onEmptyBinSubmitted,
+      onInProgressChange,
+    }),
     {wrapper},
   );
 };
@@ -142,7 +200,88 @@ describe('CellsEmptyBinAction', () => {
     });
     expect(onEmptyBinSubmitted).toHaveBeenCalledTimes(1);
     expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);
-    expect(screen.getByRole('status')).toHaveTextContent('cells.emptyBin.status.completed');
+    expect(await screen.findByText('cells.emptyBin.status.completed')).toBeInTheDocument();
+  });
+
+  it('shows progress in the status popup while the Bin is being emptied', async () => {
+    const user = userEvent.setup();
+    let resolveDelete: (response: {Status: string}) => void = () => {
+      return undefined;
+    };
+    const cellsRepository = createRepository({
+      deleteNodes: jest.fn().mockReturnValue(
+        new Promise<{Status: string}>(resolve => {
+          resolveDelete = resolve;
+        }),
+      ) as unknown as CellsRepository['deleteNodes'],
+    });
+    renderEmptyBinAction(cellsRepository);
+
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+
+    expect(await screen.findByText('cells.emptyBin.status.processing')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', {name: 'cells.bulkMove.processing'})).toBeInTheDocument();
+
+    await act(async () => {
+      resolveDelete({Status: 'Performed'});
+    });
+    expect(await screen.findByText('cells.emptyBin.status.completed')).toBeInTheDocument();
+  });
+
+  it('signals that it is in progress from submission until the Bin is emptied', async () => {
+    const user = userEvent.setup();
+    const onInProgressChange = jest.fn();
+    renderEmptyBinAction(createRepository(), {onInProgressChange});
+    expect(onInProgressChange).toHaveBeenLastCalledWith(false);
+
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+
+    await waitFor(() => {
+      expect(onInProgressChange).toHaveBeenCalledWith(true);
+    });
+    await waitFor(() => {
+      expect(onInProgressChange).toHaveBeenLastCalledWith(false);
+    });
+  });
+
+  it('keeps signalling in progress while the outcome needs review, until the Bin is refreshed', async () => {
+    const user = userEvent.setup();
+    const onInProgressChange = jest.fn();
+    const cellsRepository = createRepository({
+      deleteNodes: jest.fn().mockResolvedValue({Status: 'Background'}) as unknown as CellsRepository['deleteNodes'],
+    });
+    renderEmptyBinAction(cellsRepository, {onInProgressChange});
+
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+    await screen.findByRole('button', {name: 'cells.emptyBin.refreshBin'});
+    expect(onInProgressChange).toHaveBeenLastCalledWith(true);
+
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.refreshBin'}));
+
+    await waitFor(() => {
+      expect(onInProgressChange).toHaveBeenLastCalledWith(false);
+    });
+  });
+
+  it('releases the in-progress signal when the Bin view is left while the outcome is unresolved', async () => {
+    const user = userEvent.setup();
+    const onInProgressChange = jest.fn();
+    const cellsRepository = createRepository({
+      deleteNodes: jest.fn().mockResolvedValue({Status: 'Background'}) as unknown as CellsRepository['deleteNodes'],
+    });
+    const rendered = renderEmptyBinAction(cellsRepository, {onInProgressChange});
+
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+    await screen.findByRole('button', {name: 'cells.emptyBin.refreshBin'});
+    expect(onInProgressChange).toHaveBeenLastCalledWith(true);
+
+    rendered.unmount();
+
+    expect(onInProgressChange).toHaveBeenLastCalledWith(false);
   });
 
   it('does not render outside the Bin root, for viewers, or when the feature is disabled', () => {
@@ -220,19 +359,16 @@ describe('CellsEmptyBinAction', () => {
     await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
 
     rendered.rerender(
-      <StyledApp themeId={THEME_ID.DEFAULT}>
-        <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>
-          <CellsEmptyBinAction
-            cellsRepository={cellsRepository}
-            conversationQualifiedId={conversationQualifiedId}
-            getCurrentCellsPath={() => {
-              return 'recycle_bin';
-            }}
-            onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
-            onEmptyBinSubmitted={onEmptyBinSubmitted}
-          />
-        </CellsSelfUserDriveRoleProvider>
-      </StyledApp>,
+      createEmptyBinTree({
+        cellsRepository,
+        role: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+        getCurrentCellsPath: () => {
+          return 'recycle_bin';
+        },
+        onRefreshAfterEmptyBinOutcome,
+        onEmptyBinSubmitted,
+        onInProgressChange: jest.fn(),
+      }),
     );
     await act(async () => {
       resolveLookup({
@@ -312,17 +448,14 @@ describe('CellsEmptyBinAction', () => {
     });
     const rerender = (): void => {
       rendered.rerender(
-        <StyledApp themeId={THEME_ID.DEFAULT}>
-          <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.EDITOR}>
-            <CellsEmptyBinAction
-              cellsRepository={cellsRepository}
-              conversationQualifiedId={conversationQualifiedId}
-              getCurrentCellsPath={getCurrentCellsPath}
-              onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
-              onEmptyBinSubmitted={onEmptyBinSubmitted}
-            />
-          </CellsSelfUserDriveRoleProvider>
-        </StyledApp>,
+        createEmptyBinTree({
+          cellsRepository,
+          role: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+          getCurrentCellsPath: getCurrentCellsPath,
+          onRefreshAfterEmptyBinOutcome,
+          onEmptyBinSubmitted,
+          onInProgressChange: jest.fn(),
+        }),
       );
     };
 
@@ -331,7 +464,7 @@ describe('CellsEmptyBinAction', () => {
     await waitFor(() => {
       expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
     });
-    expect(screen.getByRole('status')).toHaveTextContent('cells.emptyBin.status.processing');
+    expect(screen.getByText('cells.emptyBin.status.processing')).toBeInTheDocument();
 
     currentPath = 'recycle_bin/nested';
     rerender();
@@ -344,7 +477,7 @@ describe('CellsEmptyBinAction', () => {
     currentPath = 'recycle_bin';
     rerender();
     await waitFor(() => {
-      expect(screen.getByRole('status')).toHaveTextContent('cells.emptyBin.status.completed');
+      expect(screen.getByText('cells.emptyBin.status.completed')).toBeInTheDocument();
     });
     expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
     expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
@@ -375,7 +508,7 @@ describe('CellsEmptyBinAction', () => {
     await waitFor(() => {
       expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
     });
-    expect(screen.getByRole('status')).toHaveTextContent('cells.emptyBin.status.processing');
+    expect(screen.getByText('cells.emptyBin.status.processing')).toBeInTheDocument();
 
     await act(async () => {
       clock.advanceByMilliseconds(999);
@@ -388,7 +521,7 @@ describe('CellsEmptyBinAction', () => {
       await Promise.resolve();
     });
     await waitFor(() => {
-      expect(screen.getByRole('status')).toHaveTextContent('cells.emptyBin.status.completed');
+      expect(screen.getByText('cells.emptyBin.status.completed')).toBeInTheDocument();
     });
     expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
     expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);

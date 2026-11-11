@@ -22,8 +22,6 @@ import {KeyboardEvent, MutableRefObject, useEffect, type FunctionComponent} from
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-kit';
-
 import {
   button,
   collapsedHeader,
@@ -42,6 +40,10 @@ import {useCreateConversationModal} from '../../../../../components/Modals/Creat
 import {ConversationLabel} from '../../../../../repositories/conversation/ConversationLabelRepository';
 import {User} from '../../../../../repositories/entity/User';
 import {generatePermissionHelpers} from '../../../../../repositories/user/userPermission';
+import {CircleCloseIcon} from '../../../../../uiKit/dataDisplay/icon/circleCloseIcon';
+import {SearchIcon} from '../../../../../uiKit/dataDisplay/icon/searchIcon';
+import {IconButton} from '../../../../../uiKit/inputs/iconButton/iconButton';
+import {Input} from '../../../../../uiKit/inputs/input/input';
 import {handleEnterDown, handleEscDown, isTabKey} from '../../../../../util/keyboardUtil';
 import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 import {WebAppEvents} from '../../../../../webAppEvents';

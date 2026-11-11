@@ -21,18 +21,22 @@ import {forwardRef, ReactNode, MouseEvent} from 'react';
 
 import cx from 'classnames';
 
+import {destructiveButtonStyles} from '../../../../uiKit/inputs/button/destructiveButtonStyles';
+
 interface PrimaryButtonProps {
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled: boolean;
   fullWidth: boolean;
+  isDestructive?: boolean;
   children: ReactNode;
 }
 
 export const PrimaryButton = forwardRef<HTMLButtonElement, PrimaryButtonProps>(
-  ({onClick, disabled, fullWidth, children}, ref) => {
+  ({onClick, disabled, fullWidth, isDestructive = false, children}, ref) => {
     return (
       <button
         ref={ref}
+        css={isDestructive ? destructiveButtonStyles : undefined}
         type="button"
         onClick={onClick}
         disabled={disabled}

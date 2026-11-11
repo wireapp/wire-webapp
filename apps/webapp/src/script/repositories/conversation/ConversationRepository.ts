@@ -29,45 +29,6 @@ import {
   isTruthy,
   isUndefined,
 } from '@sindresorhus/is';
-import {
-  ADD_PERMISSION,
-  Conversation as BackendConversation,
-  CONVERSATION_CELLS_STATE,
-  CONVERSATION_TYPE,
-  DefaultConversationRoleName as DefaultRole,
-  MessageSendingStatus,
-  NewConversation,
-  RemoteConversations,
-} from '@wireapp/api-client/lib/conversation';
-import type {ValidatedMeetingConversation} from '@wireapp/api-client/lib/conversation/conversationSchema';
-import {
-  ConversationReceiptModeUpdateData,
-  MemberLeaveReason,
-  RECEIPT_MODE,
-} from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/conversationTypingData';
-import {
-  CONVERSATION_EVENT,
-  ConversationAddPermissionUpdateEvent,
-  ConversationCreateEvent,
-  ConversationCreateMeetingEvent,
-  ConversationEvent,
-  ConversationMemberJoinEvent,
-  ConversationMemberLeaveEvent,
-  ConversationMemberUpdateEvent,
-  ConversationMessageTimerUpdateEvent,
-  ConversationMLSResetEvent,
-  ConversationProtocolUpdateEvent,
-  ConversationReceiptModeUpdateEvent,
-  ConversationRenameEvent,
-  ConversationTypingEvent,
-} from '@wireapp/api-client/lib/event';
-import type {BackendError} from '@wireapp/api-client/lib/http/';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {AddUsersFailure, BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
-import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {asyncNoop, noop} from 'noop-esm';
@@ -75,7 +36,6 @@ import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
 
-import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {ACCESS_STATE} from './AccessState';
@@ -130,9 +90,49 @@ import {isSelfInitiatedConversationLeave} from './isSelfInitiatedConversationLea
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
+import {
+  ADD_PERMISSION,
+  Conversation as BackendConversation,
+  CONVERSATION_CELLS_STATE,
+  CONVERSATION_TYPE,
+} from '../../apiClient/conversation/conversation';
+import {DefaultConversationRoleName as DefaultRole} from '../../apiClient/conversation/conversationRole';
+import type {ValidatedMeetingConversation} from '../../apiClient/conversation/conversationSchema';
+import {MemberLeaveReason} from '../../apiClient/conversation/data/conversationMemberLeaveData';
+import {
+  ConversationReceiptModeUpdateData,
+  RECEIPT_MODE,
+} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {CONVERSATION_TYPING} from '../../apiClient/conversation/data/conversationTypingData';
+import {MessageSendingStatus} from '../../apiClient/conversation/messageSendingStatus';
+import {NewConversation} from '../../apiClient/conversation/newConversation';
+import {RemoteConversations} from '../../apiClient/conversation/remoteConversations';
+import {
+  CONVERSATION_EVENT,
+  ConversationAddPermissionUpdateEvent,
+  ConversationCreateEvent,
+  ConversationCreateMeetingEvent,
+  ConversationEvent,
+  ConversationMemberJoinEvent,
+  ConversationMemberLeaveEvent,
+  ConversationMemberUpdateEvent,
+  ConversationMessageTimerUpdateEvent,
+  ConversationMLSResetEvent,
+  ConversationProtocolUpdateEvent,
+  ConversationReceiptModeUpdateEvent,
+  ConversationRenameEvent,
+  ConversationTypingEvent,
+} from '../../apiClient/event/conversationEvent';
+import type {BackendError} from '../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {TYPING_TIMEOUT, useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
+import {Account} from '../../core';
+import {AddUsersFailure, BaseCreateConversationResponse} from '../../core/conversation';
+import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols/mls';
 import {BASE_ERROR_TYPE, BaseError} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 import {isMemberMessage} from '../../guards/Message';
@@ -450,12 +450,10 @@ export class ConversationRepository {
   }
 
   public registerMLSConversationVerificationStateHandler = (
-    domain: string,
     onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = noop,
     onSelfClientCertificateRevoked: () => Promise<void> = asyncNoop,
   ): void => {
     this.mlsConversationVerificationStateHandler = new MLSConversationVerificationStateHandler(
-      domain,
       onConversationVerificationStateChange,
       onSelfClientCertificateRevoked,
       this.conversationState,
@@ -2030,11 +2028,16 @@ export class ConversationRepository {
 
     this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
 
-    await Promise.allSettled(
-      proteusConversations.map(proteusConversation => {
-        return this.eventService.moveEventsToConversation(proteusConversation.qualifiedId, mlsConversation.qualifiedId);
-      }),
-    );
+    const movedEvents = (
+      await Promise.all(
+        proteusConversations.map(proteusConversation => {
+          return this.eventService.moveEventsToConversation(
+            proteusConversation.qualifiedId,
+            mlsConversation.qualifiedId,
+          );
+        }),
+      )
+    ).flat();
 
     // In the event that multiple 1:1 Proteus conversations exist, we migrate the one with the lowest id
     // See https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/1344602120/Use+case+multiple+1+1+conversation+in+teams+Proteus
@@ -2068,7 +2071,13 @@ export class ConversationRepository {
 
     // Migration can happen after startup has loaded unread events. Populate the new entity as well,
     // since unread counts are derived from messages in memory, not just the persisted read timestamp.
-    await this.getUnreadEvents(mlsConversation);
+    const readTimestamp = mlsConversation.last_read_timestamp();
+    const unreadEvents = movedEvents.filter(event => {
+      return new Date(event.time).getTime() > readTimestamp;
+    });
+    if (isNonEmptyArray(unreadEvents)) {
+      await this.addEventsToConversation(unreadEvents, mlsConversation, {offline: true});
+    }
 
     const wasProteus1to1ActiveConversation = proteusConversations.some(conversation => {
       return this.conversationState.isActiveConversation(conversation);
@@ -5078,11 +5087,11 @@ export class ConversationRepository {
 
       let epoch = 0;
       if (existingConversation) {
-        const newEpoch: number = await mlsService.getEpoch(newGroupId);
+        const newEpoch: bigint = await mlsService.getEpoch(newGroupId);
         this.logger.info('An MLS conversation with the new group ID already exists fetched epoch from core crypto', {
           newEpoch,
         });
-        epoch = newEpoch;
+        epoch = Number(newEpoch);
       }
 
       const updatedConversation = ConversationMapper.updateProperties(conversationEntity, {

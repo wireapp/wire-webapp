@@ -17,7 +17,7 @@
  *
  */
 
-import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
+import {MeetingRecurrenceFrequency} from '../../apiClient/meetings/meetingRecurrence';
 
 import {mapScheduleCommandToCreateMeeting} from './mapScheduleCommandToCreateMeeting';
 

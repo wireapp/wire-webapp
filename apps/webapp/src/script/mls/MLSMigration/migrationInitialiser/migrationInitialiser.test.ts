@@ -17,9 +17,9 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {container} from 'tsyringe';
 
 import {MixedConversation, ProteusConversation} from '../../../repositories/conversation/ConversationSelectors';
@@ -30,6 +30,7 @@ import {createUuid} from '../../../util/uuid';
 
 import {initialiseMigrationOfProteusConversations} from '.';
 import {translateForTest} from '../../../util/test/translateForTest';
+import {createCoreTestFixture} from '../../../util/test/createCoreTestFixture';
 
 const selfUserId = {id: 'self-user-id', domain: 'local.wire.link'};
 
@@ -55,10 +56,24 @@ const changeConversationProtocolToMixed = (conversation: Conversation, groupId: 
 };
 
 describe('initialiseMigrationOfProteusConversations', () => {
-  const testFactory = new TestFactory();
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
+  let testFactory: TestFactory;
+
+  beforeEach(() => {
+    testFactory = new TestFactory(
+      createCoreTestFixture({
+        backendFeatures: {isFederated: false},
+        service: {conversation: {tryEstablishingMLSGroup: jest.fn()}},
+      }),
+    );
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
+    container.clearInstances();
   });
 
   it('Should not try to establish MLS group if conversation was not updated to mixed', async () => {

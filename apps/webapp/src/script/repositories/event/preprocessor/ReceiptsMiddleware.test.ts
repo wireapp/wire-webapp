@@ -17,9 +17,9 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
+import {RECEIPT_MODE} from '../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 import {Conversation} from '../../entity/Conversation';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';

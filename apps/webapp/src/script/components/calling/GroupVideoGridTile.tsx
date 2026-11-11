@@ -19,10 +19,7 @@
 
 import {KeyboardEvent, type FunctionComponent} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {VIDEO_STATE} from '@wireapp/avs';
-import {Loading, TabIndex} from '@wireapp/react-ui-kit';
 
 import {
   groupVideoActiveSpeaker,
@@ -38,8 +35,11 @@ import {
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../page/rootProvider';
 import type {Participant} from '../../repositories/calling/Participant';
+import {Loading} from '../../uiKit/dataDisplay/loading/loading';
+import {TabIndex} from '../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isEnterKey} from '../../util/keyboardUtil';
 import {Avatar, AVATAR_SIZE} from '../avatar';

@@ -20,8 +20,8 @@
 import {Maybe, Result} from 'true-myth';
 import {match, P} from 'ts-pattern';
 
-import {isBuildMetadata} from '@wireapp/config';
-import type {BuildMetadata} from '@wireapp/config';
+import {isBuildMetadata} from '../../apps/server/configuration/buildMetadata.ts';
+import type {BuildMetadata} from '../../apps/server/configuration/buildMetadata.ts';
 
 export type BuildArtifactHtmlDocument = {
   readonly archiveFilePath: string;

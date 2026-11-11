@@ -18,9 +18,16 @@
 
 import {expect, test} from '@playwright/test';
 import type {Page, Response} from '@playwright/test';
+import {isEmptyArray} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 import {match} from 'ts-pattern';
 import {Maybe} from 'true-myth';
+
+import {readFileSync, readdirSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {z} from 'zod';
+
+import {previewDefaultEnabledStartupFeatureToggleNames} from '../../src/script/featureToggles/startupFeatureToggleNames';
 
 type RuntimeDiagnostics = {
   readonly uncaughtPageErrors: string[];
@@ -108,18 +115,20 @@ function expectNoRuntimeFailures(options: RuntimeAssertionOptions): void {
 async function expectSuccessfulScripts(options: SuccessfulScriptsOptions): Promise<void> {
   const {diagnostics, buildProjectName, requiredScriptPaths} = options;
 
-  for (const scriptPath of requiredScriptPaths) {
-    await expect
-      .poll(
-        () => {
-          return Maybe.of(diagnostics.localScriptResponses.get(scriptPath));
-        },
-        {
-          message: `${buildProjectName} should load ${scriptPath}`,
-        },
-      )
-      .toEqual(Maybe.just(200));
-  }
+  await Promise.all(
+    requiredScriptPaths.map(async scriptPath => {
+      await expect
+        .poll(
+          () => {
+            return Maybe.of(diagnostics.localScriptResponses.get(scriptPath));
+          },
+          {
+            message: `${buildProjectName} should load ${scriptPath}`,
+          },
+        )
+        .toEqual(Maybe.just(200));
+    }),
+  );
 }
 
 test('loads the application entry points and redirects an unauthenticated visitor to authentication', async ({
@@ -141,7 +150,12 @@ test('loads the application entry points and redirects an unauthenticated visito
   });
 
   expect(documentStatus, `${testInfo.project.name} application document status`).toEqual(Maybe.just(200));
-  await expect(page).toHaveURL(/\/auth\/?(?:#\/)?$/);
+  await expect(page).toHaveURL(/\/auth\/?(?:\?[^#]*)?(?:#\/)?$/);
+  const expectedDefaultNames =
+    testInfo.project.name === 'rspack-internal' ? previewDefaultEnabledStartupFeatureToggleNames : [];
+  expect(new URL(page.url()).searchParams.get('enabled-features')).toBe(
+    isEmptyArray(expectedDefaultNames) ? null : expectedDefaultNames.join(','),
+  );
   await expectSuccessfulScripts({
     diagnostics,
     buildProjectName: testInfo.project.name,
@@ -153,9 +167,160 @@ test('loads the application entry points and redirects an unauthenticated visito
       '/min/vendor.js',
       '/min/runtime.js',
       '/min/app.js',
+      '/libs/wire/telemetry/embed.js',
     ],
   });
   expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
+});
+
+test('starts when service-worker cleanup finishes after DOMContentLoaded', async ({page}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'serviceWorker', {
+      value: {
+        async getRegistrations() {
+          await new Promise<void>(resolve => {
+            document.addEventListener(
+              'DOMContentLoaded',
+              () => {
+                resolve();
+              },
+              {once: true},
+            );
+          });
+
+          return [];
+        },
+      },
+    });
+  });
+
+  await page.goto('/');
+
+  await expect(page).toHaveURL(/\/auth\//);
+  await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+});
+
+test('redirects to authentication with the explicit feature selection while service-worker cleanup never settles', async ({
+  page,
+}) => {
+  const uncaughtPageErrors: string[] = [];
+  page.on('pageerror', error => {
+    uncaughtPageErrors.push(error.message);
+  });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'serviceWorker', {
+      value: {
+        getRegistrations() {
+          return Promise.withResolvers<never>().promise;
+        },
+      },
+    });
+  });
+
+  await page.goto('/?enabled-features=for-tests-only&hl=en');
+
+  await expect(page).toHaveURL(/\/auth\//);
+  await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+  expect(new URL(page.url()).searchParams.get('enabled-features')).toBe('for-tests-only');
+  expect(new URL(page.url()).searchParams.get('hl')).toBe('en');
+  expect(uncaughtPageErrors).toEqual([]);
+});
+
+test('redirects to authentication with an empty selection while cache cleanup never settles', async ({page}) => {
+  const uncaughtPageErrors: string[] = [];
+  page.on('pageerror', error => {
+    uncaughtPageErrors.push(error.message);
+  });
+  await page.addInitScript(() => {
+    Object.defineProperty(window, 'caches', {
+      value: {
+        keys() {
+          return Promise.withResolvers<never>().promise;
+        },
+      },
+    });
+  });
+
+  await page.goto('/?enabled-features=');
+
+  await expect(page).toHaveURL(/\/auth\//);
+  await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+  expect(new URL(page.url()).searchParams.get('enabled-features')).toBe('');
+  expect(uncaughtPageErrors).toEqual([]);
+});
+
+test('reports rejected cleanup through the invoker without an unhandled rejection or blocked authentication', async ({
+  page,
+}) => {
+  const reportedErrors: string[] = [];
+  const uncaughtPageErrors: string[] = [];
+  page.on('pageerror', error => {
+    uncaughtPageErrors.push(error.message);
+  });
+  page.on('console', message => {
+    if (message.type() === 'error') {
+      reportedErrors.push(message.text());
+    }
+  });
+  await page.addInitScript(() => {
+    localStorage.setItem('debug', '*');
+    Object.defineProperty(navigator, 'serviceWorker', {
+      value: {
+        getRegistrations() {
+          return Promise.reject(new Error('simulated cleanup failure'));
+        },
+      },
+    });
+  });
+
+  await page.goto('/');
+
+  await expect(page).toHaveURL(/\/auth\//);
+  await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+  expect(reportedErrors.join('\n')).toContain('failed to execute fire-and-forget action');
+  expect(reportedErrors.join('\n')).toContain('simulated cleanup failure');
+  expect(uncaughtPageErrors).toEqual([]);
+});
+
+test('bundles the application entrypoint selected for the artifact', async ({request}, testInfo) => {
+  const sourceMapResponse = await request.get('/min/app.js.map');
+  const sourceMapText = await sourceMapResponse.text();
+  const expectedEntrypoint = testInfo.project.name === 'rspack-internal' ? 'preview' : 'release';
+  const excludedEntrypoint = testInfo.project.name === 'rspack-internal' ? 'release' : 'preview';
+
+  expect(sourceMapResponse.ok()).toBe(true);
+  expect(sourceMapText).toContain(`/main/${expectedEntrypoint}Entrypoint.tsx`);
+  expect(sourceMapText).not.toContain(`/main/${excludedEntrypoint}Entrypoint.tsx`);
+});
+
+async function expectStartupSelectionSurvivesAuthentication(page: Page, selection: string): Promise<void> {
+  await page.goto(`/?enabled-features=${selection}&hl=en`);
+  await expect(page).toHaveURL(/\/auth\//);
+  expect(new URL(page.url()).searchParams.get('enabled-features')).toBe(selection);
+  expect(new URL(page.url()).searchParams.get('hl')).toBe('en');
+
+  await page.getByRole('button', {name: 'Log in'}).click();
+  await expect(page).toHaveURL(/#\/login$/);
+  expect(new URL(page.url()).searchParams.get('enabled-features')).toBe(selection);
+  await page.reload();
+  await expect(page.getByPlaceholder('Email or username')).toBeVisible();
+  expect(new URL(page.url()).searchParams.get('enabled-features')).toBe(selection);
+}
+
+test('preserves an explicit enabled feature through authentication navigation', async ({page}) => {
+  await expectStartupSelectionSurvivesAuthentication(page, 'for-tests-only');
+});
+
+test('preserves explicit Mark as unread opt-in through authentication and reload', async ({page}) => {
+  await expectStartupSelectionSurvivesAuthentication(page, 'mark-as-unread');
+});
+
+test('preserves an explicit empty feature selection through authentication navigation', async ({page}) => {
+  await expectStartupSelectionSurvivesAuthentication(page, '');
+});
+
+test('preserves an unknown feature selection through authentication navigation', async ({page}) => {
+  await expectStartupSelectionSurvivesAuthentication(page, 'unknown-feature');
 });
 
 test('initializes authentication and navigates to an interactive login form', async ({page}, testInfo) => {
@@ -188,6 +353,7 @@ test('initializes authentication and navigates to an interactive login form', as
       '/min/vendor.js',
       '/min/runtime.js',
       '/min/auth.js',
+      '/libs/wire/telemetry/embed.js',
     ],
   });
 
@@ -201,4 +367,49 @@ test('initializes authentication and navigates to an interactive login form', as
   await passwordInput.fill('rspack-smoke-password');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeEnabled();
   expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
+});
+
+test('serves the unmodified standalone Countly SDK without initializing telemetry', async ({page, request}) => {
+  const sdkResponse = await request.get('/libs/wire/telemetry/embed.js');
+  const actualSdk = await sdkResponse.body();
+  const expectedSdk = readFileSync(require.resolve('countly-sdk-web/lib/countly.min.js'));
+
+  expect(sdkResponse.status()).toBe(200);
+  expect(actualSdk.equals(expectedSdk)).toBe(true);
+
+  await page.goto('/auth');
+  await expect(page.getByRole('button', {name: 'Create account'})).toBeVisible();
+  const providerState = await page.evaluate(() => {
+    return {initializationType: typeof window.Countly.init, apiKey: window.Countly.app_key};
+  });
+
+  expect(providerState).toEqual({initializationType: 'function', apiKey: undefined});
+});
+
+test('bundles browser API-client adapters without Node implementations', async ({}, testInfo) => {
+  const buildVariant = testInfo.project.name === 'rspack-internal' ? 'internal' : 'public';
+  const bundleDirectory = resolve(__dirname, '../../dist', buildVariant, 'min');
+  const sourceMapSchema = z.object({sources: z.array(z.string())});
+  const bundledSources = readdirSync(bundleDirectory)
+    .filter(filename => {
+      return filename.endsWith('.js.map');
+    })
+    .flatMap(filename => {
+      const sourceMap = sourceMapSchema.parse(JSON.parse(readFileSync(resolve(bundleDirectory, filename), 'utf8')));
+
+      return sourceMap.sources;
+    });
+  const browserAdapterSources = bundledSources.join('\n');
+
+  for (const adapterName of ['buffer', 'cookie', 'websocket', 'platform']) {
+    expect(browserAdapterSources).toContain('/apiClient/shims/browser/' + adapterName + '.ts');
+  }
+
+  const nodeImplementationSources = bundledSources.filter(sourcePath => {
+    return /\/apiClient\/shims\/node\/(?:buffer|cookie|websocket|platform|obfuscateCookie)\.ts|\/node_modules\/(?:ws|tough-cookie)\//.test(
+      sourcePath,
+    );
+  });
+
+  expect(nodeImplementationSources).toEqual([]);
 });

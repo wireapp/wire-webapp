@@ -20,10 +20,7 @@
 import {useMemo, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {UserType} from '@wireapp/api-client/lib/user';
 import {noop} from 'noop-esm';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {
   sharedDriveAvatarCss,
@@ -39,6 +36,7 @@ import {
   sharedDriveViewerRoleCss,
 } from './sharedDrive.styles';
 
+import {UserType} from '../../../apiClient/user/user';
 import {Avatar, AVATAR_SIZE} from '../../../components/avatar';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
@@ -50,6 +48,7 @@ import {ParticipantItemContent} from '../../../components/participantItemContent
 import {BaseToggle} from '../../../components/toggle/BaseToggle';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {User} from '../../../repositories/entity/User';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {capitalizeFirstChar, sortUsersByPriority} from '../../../util/stringUtil';
 import {useApplicationContext} from '../../rootProvider';

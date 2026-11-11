@@ -19,7 +19,7 @@
 
 import {render, screen, type RenderResult} from '@testing-library/react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../../../../uiKit/identity/theme/theme';
 
 import {MeetingStoreProvider} from '../../../../meetingStore/meetingStoreProvider';
 import {createMeetingStore, type MeetingStore} from '../../../../meetingStore/createMeetingStore';

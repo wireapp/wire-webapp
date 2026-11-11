@@ -25,6 +25,10 @@ import {resetStoreValue, storeValue} from '../../../src/script/util/storageUtil'
 import {TestFactory} from '../../helper/TestFactory';
 
 describe('EventTrackingRepository', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   const testFactory = new TestFactory();
 
   beforeEach(() => {

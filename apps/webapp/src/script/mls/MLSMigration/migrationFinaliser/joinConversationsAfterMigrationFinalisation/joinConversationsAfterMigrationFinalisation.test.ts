@@ -17,8 +17,12 @@
  *
  */
 
-import {CONVERSATION_TYPE, CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {
+  CONVERSATION_TYPE,
+  CONVERSATION_ACCESS,
+  CONVERSATION_ACCESS_ROLE,
+} from '../../../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {result, task} from 'true-myth';
 import {container} from 'tsyringe';
 
@@ -33,6 +37,7 @@ import {createUuid} from '../../../../util/uuid';
 
 import {joinConversationsAfterMigrationFinalisation} from '.';
 import {translateForTest} from '../../../../util/test/translateForTest';
+import {createCoreTestFixture} from '../../../../util/test/createCoreTestFixture';
 
 function getConversationServiceForTest(core: Core): NonNullable<NonNullable<Core['service']>['conversation']> {
   const service = requireValueForTest(core.service);
@@ -135,10 +140,27 @@ const mockSafeEpoch = (core: Core): void => {
 };
 
 describe('joinConversationsAfterMigrationFinalisation', () => {
-  const testFactory = new TestFactory();
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
+  let testFactory: TestFactory;
+
+  beforeEach(() => {
+    testFactory = new TestFactory(
+      createCoreTestFixture({
+        backendFeatures: {isFederated: false},
+        service: {
+          mls: {getSafeEpoch: jest.fn(), scheduleKeyMaterialRenewal: jest.fn()},
+          conversation: {mlsGroupExistsLocally: jest.fn(), joinByExternalCommit: jest.fn()},
+        },
+      }),
+    );
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
+    container.clearInstances();
   });
 
   it('Should join MLS groups of group conversations and call onSuccess callback after successful join', async () => {

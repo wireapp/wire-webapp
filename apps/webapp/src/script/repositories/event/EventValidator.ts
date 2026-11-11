@@ -18,11 +18,13 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
-import {isOutdatedNotificationStreamEvent} from '@wireapp/core/lib/notification';
 
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
+
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
+import {USER_EVENT} from '../../apiClient/event/userEvent';
+import {isOutdatedNotificationStreamEvent} from '../../core/notification';
 
 export function validateEvent(
   event: {time: string; type: CONVERSATION_EVENT | USER_EVENT},

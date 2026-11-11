@@ -20,13 +20,13 @@
 import {useCallback, useEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {TopPeople} from './components/topPeople';
 
+import {BackendErrorLabel} from '../../../../apiClient/http/backendErrorLabel';
 import * as Icon from '../../../../components/icon';
 import {UserList, UserlistMode} from '../../../../components/userList';
 import {getManageTeamUrl} from '../../../../externalRoute';

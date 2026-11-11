@@ -23,11 +23,11 @@ import {Maybe} from 'true-myth';
 
 import {appendFileSync} from 'node:fs';
 
-import type {BuildMetadata} from '@wireapp/config';
-
 import {readBuildArtifactHtmlDocuments, readBuildArtifactMetadata} from './buildArtifactArchive.ts';
 import {validateBuildArtifactMetadata} from './buildArtifactMetadata.ts';
 import {formatBuildArtifactMetadataOutputs} from './buildArtifactMetadataOutput.ts';
+
+import type {BuildMetadata} from '../../apps/server/configuration/buildMetadata.ts';
 
 function readRequiredEnvironmentValue(environmentVariableName: string): string {
   const environmentValue = Maybe.of<string>(process.env[environmentVariableName]).andThen(value => {

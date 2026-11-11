@@ -29,20 +29,19 @@ import React, {
 
 import {CSSObject} from '@emotion/react';
 import {isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {CellDescription} from './components/cellDescription';
 import {StatusIcon} from './components/statusIcon';
 
+import {CONVERSATION_ACCESS} from '../../apiClient/conversation/conversation';
 import {useConversationCall} from '../../hooks/useConversationCall';
 import type {RegisterConversationElement} from '../../hooks/useConversationFocus';
 import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {useApplicationContext} from '../../page/rootProvider';
 import type {Conversation} from '../../repositories/entity/Conversation';
 import {MediaType} from '../../repositories/media/MediaType';
+import {TabIndex} from '../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isKey, isOneOfKeys, KEY} from '../../util/keyboardUtil';
 import {useChannelsFeatureFlag} from '../../util/useChannelsFeatureFlag';

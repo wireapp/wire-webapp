@@ -24,14 +24,14 @@ import type {Conversation} from '../../../repositories/entity/Conversation';
  * while auto-read is suppressed for the conversation (e.g. after "Mark as unread from here").
  * The check happens when the wrapped callback runs, not when it is created.
  */
-export const withAutoReadGuard = <Args extends unknown[]>(
+export function withAutoReadGuard<CallbackArguments extends unknown[]>(
   conversation: Pick<Conversation, 'isAutoReadSuppressed'>,
-  callback: (...args: Args) => void,
-): ((...args: Args) => void) => {
-  return (...args: Args) => {
+  callback: (...callbackArguments: CallbackArguments) => void,
+): (...callbackArguments: CallbackArguments) => void {
+  return (...callbackArguments: CallbackArguments) => {
     if (conversation.isAutoReadSuppressed()) {
       return;
     }
-    callback(...args);
+    callback(...callbackArguments);
   };
-};
+}

@@ -22,8 +22,6 @@ import type {FunctionComponent} from 'react';
 import type {JSX} from '@emotion/react/jsx-runtime';
 import type {CSSObject} from '@emotion/serialize';
 
-import {BlockIcon, SaveIcon} from '@wireapp/react-ui-kit';
-
 import {
   iconStyles,
   uploadIconStyles,
@@ -34,6 +32,8 @@ import {
 } from './fileDropzoneOverlay.styles';
 
 import {useApplicationContext, type RootContextValue} from '../../../../../page/rootProvider';
+import {BlockIcon} from '../../../../../uiKit/dataDisplay/icon/blockIcon';
+import {SaveIcon} from '../../../../../uiKit/dataDisplay/icon/saveIcon';
 
 export type FileDropzoneOverlayMode = 'upload' | 'restricted';
 

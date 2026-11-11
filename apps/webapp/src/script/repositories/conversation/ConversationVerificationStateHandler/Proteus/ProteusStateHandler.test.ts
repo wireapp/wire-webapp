@@ -29,9 +29,13 @@ import {ConversationRepository} from '../../ConversationRepository';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
 import {EventBuilder} from '../../EventBuilder';
 import {translateForTest} from '../../../../util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 
 describe('ProteusConversationVerificationStateHandler', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   const testFactory = new TestFactory();
   let stateHandler: ProteusConversationVerificationStateHandler;
   let conversationRepository: ConversationRepository;

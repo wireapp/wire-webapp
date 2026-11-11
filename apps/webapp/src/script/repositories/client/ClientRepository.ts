@@ -18,16 +18,11 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
-import {ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client/';
-import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import murmurhash from 'murmurhash';
 import {container} from 'tsyringe';
-
-import {Runtime} from '@wireapp/commons';
 
 import {ClientEntity} from './ClientEntity';
 import {constructClientId, parseClientId} from './ClientIdUtil';
@@ -36,7 +31,13 @@ import type {ClientService} from './ClientService';
 import {ClientState} from './ClientState';
 import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils';
 
+import {ClientType} from '../../apiClient/client/clientType';
+import {PublicClient} from '../../apiClient/client/publicClient';
+import {RegisteredClient} from '../../apiClient/client/registeredClient';
+import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '../../apiClient/event/userEvent';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {Runtime} from '../../commons/util/Runtime';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';

@@ -17,13 +17,13 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Task} from 'true-myth';
 
 import {DELETE_MEETING_ERROR_TRANSLATION_KEYS} from './deleteMeetingSubmitErrorKeys';
 import {isMeetingDeletedDespiteSubmitError} from './shouldRefreshMeetingsListAfterSubmitError';
 import {showMeetingSubmitError} from './showMeetingSubmitError';
 
+import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import type {User} from '../../../../repositories/entity/User';
 import type {Translate, TranslationKey} from '../../../../util/localizerUtil';
 import {PrimaryModal} from '../../../Modals/PrimaryModal';

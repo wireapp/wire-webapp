@@ -22,12 +22,6 @@
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
-import {Context} from '@wireapp/api-client/lib/auth';
-import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
-import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {EVENTS as CoreEvents} from '@wireapp/core/lib/account';
-import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import 'core-js/full/reflect';
 import pWaitFor from 'p-wait-for';
@@ -36,16 +30,22 @@ import {pdfjs} from 'react-pdf';
 import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
-
 import {refreshApplication} from './applicationRefresh';
 import {reportStartupFailure} from './reportStartupFailure';
 
 import '../../style/default.less';
+import {Context} from '../apiClient/auth/context';
+import {ClientClassification} from '../apiClient/client/clientClassification';
+import {ClientType} from '../apiClient/client/clientType';
+import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {createBrowserSystemNotificationApi} from '../browser/notification/createSystemNotificationApiFromBrowserNotification';
+import {Runtime} from '../commons/util/Runtime';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config, Configuration} from '../Config';
+import {EVENTS as CoreEvents} from '../core/account';
+import {MLSServiceEvents} from '../core/messagingProtocols/mls';
 import {E2EIHandler} from '../e2eIdentity';
 import {getModalOptions, ModalType} from '../e2eIdentity/modals';
 import {AccessTokenError} from '../error/accessTokenError';
@@ -691,7 +691,6 @@ export class App {
         conversationRepository.initMLSConversationRecoveredListener();
         conversationRepository.initMLSEventDistributedListener();
         conversationRepository.registerMLSConversationVerificationStateHandler(
-          selfUser.qualifiedId.domain,
           this.updateConversationE2EIVerificationState,
           this.showClientCertificateRevokedWarning,
         );

@@ -24,18 +24,6 @@ import classNames from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {
-  BlurHighIcon,
-  BlurLowIcon,
-  CircleIcon,
-  EmojiIcon,
-  GridIcon,
-  ImageIcon,
-  MoreIcon,
-  QUERY,
-  RaiseHandIcon,
-  TabIndex,
-} from '@wireapp/react-ui-kit';
 
 import {EmojisBar} from './EmojisBar/EmojisBar';
 import {VideoCallCancelButton} from './VideoCallCancelButton/VideoCallCancelButton';
@@ -74,6 +62,16 @@ import {PropertiesRepository} from '../../../repositories/properties/propertiesR
 import {PROPERTIES_TYPE} from '../../../repositories/properties/propertiesType';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {ContextMenuEntry, showContextMenu} from '../../../ui/contextMenu';
+import {BlurHighIcon} from '../../../uiKit/dataDisplay/icon/blurHighIcon';
+import {BlurLowIcon} from '../../../uiKit/dataDisplay/icon/blurLowIcon';
+import {CircleIcon} from '../../../uiKit/dataDisplay/icon/circleIcon';
+import {EmojiIcon} from '../../../uiKit/dataDisplay/icon/emojiIcon';
+import {GridIcon} from '../../../uiKit/dataDisplay/icon/gridIcon';
+import {ImageIcon} from '../../../uiKit/dataDisplay/icon/imageIcon';
+import {MoreIcon} from '../../../uiKit/dataDisplay/icon/moreIcon';
+import {RaiseHandIcon} from '../../../uiKit/dataDisplay/icon/raiseHandIcon';
+import {TabIndex} from '../../../uiKit/utils/enums';
+import {QUERY} from '../../../uiKit/utils/mediaQueries';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {handleKeyDown, isEscapeKey, KEY} from '../../../util/keyboardUtil';
 import {CallViewTab} from '../../../view_model/CallingViewModel';

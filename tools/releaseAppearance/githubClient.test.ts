@@ -21,7 +21,7 @@ import assert from 'node:assert';
 
 import {createFactory} from '@enormora/objectory';
 import type {ShapeToGeneratorReturnValue} from '@enormora/objectory';
-import ky from 'ky';
+import ky from 'ky-release';
 import {Maybe} from 'true-myth';
 
 import {createGitHubClient} from './githubClient.ts';

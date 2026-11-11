@@ -21,17 +21,15 @@ import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
 import ky from 'ky';
 import {container} from 'tsyringe';
-
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {getOtherInstanceAction} from './getOtherInstanceAction';
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
+import {ClientType} from '../../apiClient/client/clientType';
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
@@ -50,6 +48,8 @@ import {RootProvider} from '../../page/rootProvider';
 import {PROPERTIES_TYPE} from '../../repositories/properties/propertiesType';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
+import {THEME_ID} from '../../uiKit/identity/theme/theme';
+import {StyledApp} from '../../uiKit/layout/styledApp/styledApp';
 import type {Translate} from '../../util/localizerUtil';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';

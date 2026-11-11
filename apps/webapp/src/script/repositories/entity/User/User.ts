@@ -18,14 +18,15 @@
  */
 
 import {isEmptyString, isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
+import {ConnectionStatus} from '../../../apiClient/connection/connectionStatus';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {UserType} from '../../../apiClient/user/user';
 import {ACCENT_ID} from '../../../Config';
 import type {Translate} from '../../../util/localizerUtil';
 import {clamp} from '../../../util/numberUtil';

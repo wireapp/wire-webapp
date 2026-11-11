@@ -22,8 +22,6 @@ import {type FunctionComponent, type KeyboardEvent, useEffect, useRef, useState}
 import {JSX} from '@emotion/react/jsx-runtime';
 import {Maybe, maybe} from 'true-myth';
 
-import {Button, ButtonVariant, CloseIcon, Loading} from '@wireapp/react-ui-kit';
-
 import {
   meetingPrepAvatarStyles,
   meetingPrepBodyStyles,
@@ -61,6 +59,9 @@ import {InputLevel} from '../../../page/mainContent/panels/preferences/avPrefere
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
 import {useMediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
+import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
+import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {formatLocale} from '../../../util/timeUtil';
 import {Avatar, AVATAR_SIZE} from '../../avatar';
 import {groupVideoBackgroundInitializingOverlay} from '../../calling/GroupVideoGridTile.styles';
@@ -174,11 +175,17 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
   const [cameraMenuOpen, setCameraMenuOpen] = useState(false);
   const microphoneMenuRef = useRef<HTMLDivElement | null>(null);
   const cameraMenuRef = useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const videoElementRef = useRef<HTMLVideoElement | null>(null);
   const isJoiningRef = useRef(false);
   const reportedCameraPermissionErrorRef = useRef(false);
   const reportedMicrophonePermissionErrorRef = useRef(false);
   const [isJoining, setIsJoining] = useState(false);
+
+  useEffect(() => {
+    closeButtonRef.current?.focus();
+  }, []);
+
   const {
     audioInputDevices,
     audioInputDeviceId,
@@ -424,6 +431,7 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
       <header css={meetingPrepHeaderStyles}>
         <button
           type="button"
+          ref={closeButtonRef}
           css={meetingPrepCloseButtonStyles}
           onClick={onCancel}
           disabled={isJoining}

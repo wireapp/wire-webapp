@@ -17,14 +17,10 @@
  *
  */
 
-import type {
-  GiphySearchOptions,
-  GiphyMultipleResult,
-  GiphyResult,
-  GiphyTrendingOptions,
-} from '@wireapp/api-client/lib/giphy';
 import {container} from 'tsyringe';
 
+import type {GiphySearchOptions, GiphyTrendingOptions} from '../../apiClient/giphy/giphyOptions';
+import type {GiphyMultipleResult, GiphyResult} from '../../apiClient/giphy/giphyResult';
 import {APIClient} from '../../service/apiClientSingleton';
 
 export class GiphyService {

@@ -18,8 +18,8 @@
  */
 
 import {isNonEmptyArray} from '@sindresorhus/is';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
+import {CONVERSATION_EVENT} from '../../../apiClient/event/conversationEvent';
 import {isMemberMessage} from '../../../guards/Message';
 import {Message as MessageEntity} from '../../../repositories/entity/message/message';
 import {ProtocolUpdateMessage} from '../../../repositories/entity/message/protocolUpdateMessage';

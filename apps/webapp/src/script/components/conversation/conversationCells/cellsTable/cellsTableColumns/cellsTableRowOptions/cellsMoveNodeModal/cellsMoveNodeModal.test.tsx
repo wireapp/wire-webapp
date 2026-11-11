@@ -36,7 +36,8 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {RestNode} from 'cells-sdk-ts';
 import {noop} from 'noop-esm';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../../../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../../../../../uiKit/identity/theme/theme';
 
 import {getCellsFilesPath} from '../../../../common/getCellsFilesPath/getCellsFilesPath';
 import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';

@@ -24,9 +24,11 @@ import {
 } from './startupFeatureToggles';
 import {
   applockRefactoredFeatureToggleName,
+  callSecurityLineFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
@@ -36,16 +38,35 @@ import {
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
+  callSecurityLineFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
+  it('keeps Mark as unread disabled by default for release builds and allows explicit opt-in', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch('?enabled-features=mark-as-unread');
+
+    expect(disabled.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(false);
+    expect(enabled.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(true);
+    expect(enabled.enabledFeatureToggleNames).toEqual([markAsUnreadFeatureToggleName]);
+  });
+  it.each(['?enabled-features', '?enabled-features=', '?enabled-features=%20%2C%20'])(
+    'resolves an explicit empty selection to no enabled features: %s',
+    locationSearch => {
+      const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
+
+      expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+    },
+  );
+
   it('returns disabled toggles when the query parameter is missing', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar');
 
@@ -57,6 +78,20 @@ describe('startupFeatureToggles', function () {
     const toggles = createStartupFeatureTogglesFromLocationSearch('');
 
     expect(toggles.isFeatureToggleEnabled(troubleshooterFeatureToggleName)).toBe(false);
+  });
+
+  it('keeps the call security line disabled by default', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch('');
+
+    expect(toggles.isFeatureToggleEnabled(callSecurityLineFeatureToggleName)).toBe(false);
+  });
+
+  it('enables the call security line when selected in developer settings', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${callSecurityLineFeatureToggleName}`,
+    );
+
+    expect(toggles.isFeatureToggleEnabled(callSecurityLineFeatureToggleName)).toBe(true);
   });
 
   it('enables the troubleshooter when selected in developer settings', () => {
@@ -83,18 +118,24 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(false);
   });
 
-  it('keeps Mark as unread disabled by default', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('');
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(false);
-  });
-
   it('enables Drive bulk actions when selected in developer settings', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName}`,
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(true);
+  });
+
+  it('keeps Drive bulk restore disabled until its separate toggle is enabled', () => {
+    const bulkActionsOnly = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName}`,
+    );
+    const bulkActionsWithRestore = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName},${driveBulkRestoreFeatureToggleName}`,
+    );
+
+    expect(bulkActionsOnly.isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName)).toBe(false);
+    expect(bulkActionsWithRestore.isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName)).toBe(true);
   });
 
   it('enables a whitelisted feature toggle when present in the query parameter', () => {
@@ -172,14 +213,6 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(disableMessagePreprocessingFeatureToggleName)).toBe(true);
   });
 
-  it('enables the mark as unread feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${markAsUnreadFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(true);
-  });
-
   it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${applockRefactoredFeatureToggleName} `,
@@ -219,10 +252,12 @@ describe('startupFeatureToggles', function () {
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       applockRefactoredFeatureToggleName,
+      callSecurityLineFeatureToggleName,
       conversationListCollapseFeatureToggleName,
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
       driveBulkActionsFeatureToggleName,
+      driveBulkRestoreFeatureToggleName,
       markAsUnreadFeatureToggleName,
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,

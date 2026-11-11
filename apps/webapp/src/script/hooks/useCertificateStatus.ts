@@ -20,9 +20,9 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {noop} from 'noop-esm';
 
+import {CredentialType} from '../core/messagingProtocols/mls';
 import {E2EIHandler, MLSStatuses, WireIdentity} from '../e2eIdentity';
 import {TIME_IN_MILLIS} from '../util/timeUtil';
 

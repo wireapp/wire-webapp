@@ -20,16 +20,15 @@
 import React, {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import {isTruthy, isUndefined} from '@sindresorhus/is';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/conversationReceiptModeUpdateData';
-import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
-import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
-
+import {RECEIPT_MODE} from '../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {mapToConversationProtocol} from '../../../apiClient/team/feature/featureList.helper';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {Config} from '../../../Config';
+import {isNonFederatingBackendsError} from '../../../core/errors';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {SidebarTabs, useSidebarStore} from '../../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from '../../../page/rootProvider';
@@ -45,6 +44,8 @@ import {TeamState} from '../../../repositories/team/TeamState';
 import {UserState} from '../../../repositories/user/userState';
 import {generateConversationUrl} from '../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../router/routerBindings';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {Option, Select} from '../../../uiKit/inputs/select/select';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {checkAppsFeatureAvailability} from '../../../util/featureUtil';
 import {handleEnterDown, handleEscDown, isKeyboardEvent} from '../../../util/keyboardUtil';

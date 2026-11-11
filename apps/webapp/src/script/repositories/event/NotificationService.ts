@@ -18,10 +18,10 @@
  */
 
 import {isTruthy} from '@sindresorhus/is';
-import type {NotificationList} from '@wireapp/api-client/lib/notification/';
-import {DatabaseKeys} from '@wireapp/core/lib/notification/notificationDatabaseRepository';
 import {container} from 'tsyringe';
 
+import type {NotificationList} from '../../apiClient/notification/notificationList';
+import {DatabaseKeys} from '../../core/notification/notificationDatabaseRepository';
 import {APIClient} from '../../service/apiClientSingleton';
 import {StorageSchemata, StorageService} from '../storage/';
 

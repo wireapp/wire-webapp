@@ -469,7 +469,10 @@ jobs:
 
           git archive --format=tar HEAD | tar -xf - -C "${context_directory}"
           cp -R apps/server/dist "${context_directory}/apps/server/dist"
-          cp -R libraries/config/lib "${context_directory}/libraries/config/lib"
+          # Pre-migration maintenance sources still require their compiled configuration package.
+          if [[ -f libraries/config/package.json ]]; then
+            cp -R libraries/config/lib "${context_directory}/libraries/config/lib"
+          fi
           cp .env.defaults "${context_directory}/.env.defaults"
           tar -czf "${archive_path}" -C "${context_directory}" .
 

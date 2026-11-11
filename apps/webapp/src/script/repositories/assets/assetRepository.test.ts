@@ -17,15 +17,15 @@
  *
  */
 
-import {AssetUploadData} from '@wireapp/api-client/lib/asset/';
+import {AssetUploadData} from '../../apiClient/asset/assetApi.schema';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
-import {container} from 'tsyringe';
 
 import {createUuid} from '../../util/uuid';
 
 import {AssetRepository, AssetUploadOptions} from './assetRepository';
 
 import {Core} from '../../service/coreSingleton';
+import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 
 describe('AssetRepository', () => {
   let assetRepository: AssetRepository;
@@ -36,16 +36,15 @@ describe('AssetRepository', () => {
   let core: Core;
 
   beforeEach(async () => {
-    core = container.resolve(Core);
-
-    // Mock the asset service
-    core.service = {
-      asset: {
-        uploadAsset: jest.fn(),
-        downloadAsset: jest.fn(),
-        downloadRawAsset: jest.fn(),
+    core = createCoreTestFixture({
+      service: {
+        asset: {
+          uploadAsset: jest.fn(),
+          downloadAsset: jest.fn(),
+          downloadRawAsset: jest.fn(),
+        },
       },
-    } as any;
+    });
 
     assetRepository = new AssetRepository(core);
   });

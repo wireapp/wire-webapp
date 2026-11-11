@@ -19,9 +19,9 @@
 
 import {useState} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task} from 'true-myth';
 
+import {QualifiedId} from '../../../../../../../../apiClient/user/qualifiedId';
 import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
 import {CellNode} from '../../../../../../../../types/cellNode';
 import {getCellsApiPath} from '../../../../../common/getCellsApiPath/getCellsApiPath';

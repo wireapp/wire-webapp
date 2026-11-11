@@ -38,6 +38,7 @@ export const showDeletePermanentlyModal = ({
         action: () => {
           return onDeletePermanently(node.id);
         },
+        isDestructive: true,
         text: translate('cells.deletePermanentlyModal.button'),
       },
       text: {

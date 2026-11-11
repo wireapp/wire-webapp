@@ -18,9 +18,9 @@
  */
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
-import {ClientType} from '@wireapp/api-client/lib/client';
+import {ClientType} from '../../../apiClient/client/clientType';
 
-import {TypeUtil} from '@wireapp/commons';
+import {TypeUtil} from '../../../commons/util';
 import {noop} from 'noop-esm';
 import {Provider} from 'react-redux';
 import {HashRouter as Router} from 'react-router';
@@ -42,17 +42,6 @@ import {initialRootState} from '../../module/reducer';
 import {ROUTE, QUERY_KEY} from '../../route';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {mountComponent, withIntl, withThemeAndRootContext} from '../../util/test/testUtil';
-
-jest.mock('@wireapp/react-ui-kit', () => {
-  const actualModule = jest.requireActual('@wireapp/react-ui-kit');
-
-  return {
-    ...actualModule,
-    Loading: () => {
-      return null;
-    },
-  };
-});
 
 const codeOrEmailInputId = 'enter-code';
 const submitButtonId = 'do-sso-sign-in';

@@ -18,9 +18,9 @@
  */
 
 import {waitFor} from '@testing-library/react';
-import {FeatureList} from '@wireapp/api-client/lib/team';
-import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature';
-import {UserType} from '@wireapp/api-client/lib/user';
+import {FeatureList} from '../../apiClient/team/feature/featureList.types';
+import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
+import {UserType} from '../../apiClient/user/user';
 import {container} from 'tsyringe';
 
 import {ClientEntity} from '../client';
@@ -32,8 +32,9 @@ import {SelfRepository} from './SelfRepository';
 import * as SelfSupportedProtocols from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {Core} from '../../service/coreSingleton';
+import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 
-const testFactory = new TestFactory();
+let testFactory: TestFactory;
 
 type MLSFeatureConfig = {
   allowedCipherSuites: number[];
@@ -54,6 +55,22 @@ const generateMLSFeatureConfig = (supportedProtocols: CONVERSATION_PROTOCOL[]): 
 };
 
 describe('SelfRepository', () => {
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
+  beforeEach(() => {
+    testFactory = new TestFactory(
+      createCoreTestFixture({
+        recurringTaskScheduler: {registerTask: jest.fn(), cancelTask: jest.fn()},
+        service: {client: {deleteClient: jest.fn()}, self: {putSupportedProtocols: jest.fn()}},
+      }),
+    );
+  });
+
+  afterEach(() => {
+    container.clearInstances();
+  });
   describe('initialisePeriodicSelfSupportedProtocolsCheck', () => {
     beforeAll(() => {
       jest.useFakeTimers();

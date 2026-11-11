@@ -20,18 +20,19 @@
 import {forwardRef, useEffect, useMemo, useState, type ReactElement} from 'react';
 
 import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_ACCESS, CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
-import type {ConversationRenameEvent, ConversationReceiptModeUpdateEvent} from '@wireapp/api-client/lib/event';
-import {UserType} from '@wireapp/api-client/lib/user';
 import {noop} from 'noop-esm';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {ConversationDetailsHeader} from './components/conversationDetailsHeader';
 import {ConversationDetailsOptions} from './components/conversationDetailsOptions';
 import {ConversationDetailsParticipants} from './components/conversationDetailsParticipants';
 
+import {CONVERSATION_ACCESS, CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
+import {RECEIPT_MODE} from '../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import type {
+  ConversationRenameEvent,
+  ConversationReceiptModeUpdateEvent,
+} from '../../../apiClient/event/conversationEvent';
+import {UserType} from '../../../apiClient/user/user';
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {ManualMigrationProtocolDetails} from '../../../components/panel/conversationProtocolDetails/manualMigrationProtocolDetails';
@@ -50,6 +51,7 @@ import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {Shortcut} from '../../../ui/shortcut';
 import {ShortcutType} from '../../../ui/shortcutType';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {sortUsersByPriority} from '../../../util/stringUtil';
 import {formatDuration} from '../../../util/timeUtil';

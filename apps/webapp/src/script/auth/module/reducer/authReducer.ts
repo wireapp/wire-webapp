@@ -17,13 +17,12 @@
  *
  */
 
-import type {SSOSettings} from '@wireapp/api-client/lib/account/ssoSettings';
-import {LoginData} from '@wireapp/api-client/lib/auth';
-import {ClientType} from '@wireapp/api-client/lib/client/';
-import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
-import type {TeamData} from '@wireapp/api-client/lib/team/';
-import type {UserAsset} from '@wireapp/api-client/lib/user/';
-
+import type {SSOSettings} from '../../../apiClient/account/ssoSettings';
+import {LoginData} from '../../../apiClient/auth/loginData';
+import {ClientType} from '../../../apiClient/client/clientType';
+import {OAuthClient} from '../../../apiClient/oauth/oAuthClient';
+import type {TeamData} from '../../../apiClient/team/team/teamData';
+import type {UserAsset} from '../../../apiClient/user/userAsset';
 import {Config} from '../../../Config';
 import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator/';
 

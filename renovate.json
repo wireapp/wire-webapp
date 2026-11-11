@@ -2,7 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", ":semanticCommitsDisabled"],
   "constraints": {
-    "npm": "11.21.1"
+    "npm": "11.21.2"
   },
   "labels": ["renovate", "semver:patch"],
   "timezone": "Europe/Berlin",
@@ -12,21 +12,13 @@
   "configMigration": true,
   "minimumReleaseAge": "3 days",
   "lockFileMaintenance": {
-    "enabled": false
+    "enabled": true
   },
   "packageRules": [
     {
       "matchManagers": ["npm"],
       "matchDepTypes": ["dependencies", "devDependencies", "optionalDependencies"],
       "rangeStrategy": "pin"
-    },
-    {
-      "description": "Keep library @types/node dependencies on Node 22 typings",
-      "matchManagers": ["npm"],
-      "matchFileNames": ["libraries/**/package.json"],
-      "matchPackageNames": ["@types/node"],
-      "matchCurrentVersion": ">=22 <23",
-      "allowedVersions": ">=22 <23"
     },
     {
       "matchUpdateTypes": ["major"],
@@ -52,6 +44,12 @@
       "groupName": "webapp app configuration"
     },
     {
+      "description": "Keep browser Ky on 1.x while release tooling retains its existing Ky 2 error API",
+      "matchPackageNames": ["ky"],
+      "matchDepNames": ["ky"],
+      "allowedVersions": "<2"
+    },
+    {
       "matchManagers": ["github-actions"],
       "groupName": "github actions"
     },
@@ -71,12 +69,7 @@
       "pinDigests": true
     },
     {
-      "matchPackageNames": ["quay.io/wire/mirror-images/playwright"],
-      "minimumReleaseAge": null,
-      "pinDigests": true
-    },
-    {
-      "matchDepNames": ["playwright", "@playwright/test", "quay.io/wire/mirror-images/playwright"],
+      "matchDepNames": ["playwright", "@playwright/test", "mcr.microsoft.com/playwright"],
       "groupName": "playwright",
       "addLabels": ["run-e2e"]
     },

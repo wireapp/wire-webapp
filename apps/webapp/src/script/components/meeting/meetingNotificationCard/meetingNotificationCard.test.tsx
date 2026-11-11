@@ -17,8 +17,8 @@
  *
  */
 import {fireEvent, render, screen, type RenderResult} from '@testing-library/react';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 import {container} from 'tsyringe';
 
 import en from '../../../../i18n/en-US.json';

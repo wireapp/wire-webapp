@@ -18,16 +18,15 @@
  */
 
 import {isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {Decoder} from '@wireapp/commons/lib/base64/decoder';
-import {Encoder} from '@wireapp/commons/lib/base64/encoder';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {noop} from 'noop-esm';
-
-import {Runtime} from '@wireapp/commons';
 
 import {isTabKey} from './keyboardUtil';
 import {getLogger} from './logger';
 
+import {Decoder} from '../commons/base64/decoder';
+import {Encoder} from '../commons/base64/encoder';
+import {Runtime} from '../commons/util/Runtime';
 import {AuthError} from '../error/authError';
 import type {Conversation} from '../repositories/entity/Conversation';
 

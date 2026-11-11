@@ -18,8 +18,6 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {Dexie} from 'dexie';
 import {container} from 'tsyringe';
 
@@ -27,6 +25,8 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 import {StorageError} from '../../error/storageError';
@@ -508,11 +508,12 @@ export class EventService {
    *
    * @param conversationId - conversation id from which events should be moved
    * @param newConversationId - conversation id to which events should be moved
+   * @returns the event records after assigning them to the new conversation
    */
   public async moveEventsToConversation(
     conversationId: QualifiedId,
     newConversationId: QualifiedId,
-  ): Promise<string[]> {
+  ): Promise<EventRecord[]> {
     const eventsToSkip = [CLIENT_CONVERSATION_EVENT.ONE2ONE_CREATION];
 
     const events = await this.loadAllConversationEvents(conversationId.id, eventsToSkip);
@@ -525,11 +526,13 @@ export class EventService {
       };
     });
 
-    return Promise.all(
+    await Promise.all(
       eventsToMove.map(event => {
         return this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event);
       }),
     );
+
+    return eventsToMove;
   }
 
   /**
@@ -554,7 +557,9 @@ export class EventService {
       }
 
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
-      return records;
+      return records.filter(record => {
+        return record.conversation === conversationId && !eventTypesToSkip.includes(record.type);
+      });
     } catch (error: unknown) {
       const logMessage = `Failed to get events for conversation '${conversationId}': ${toError(error).message}`;
       this.logger.error(logMessage, error);

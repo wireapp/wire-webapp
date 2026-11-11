@@ -17,12 +17,11 @@
  *
  */
 
-import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {InCallEmojiType} from '@wireapp/core/lib/conversation';
-
 import {CALL} from './Client';
 
+import type {QualifiedUserClients} from '../../apiClient/conversation/qualifiedUserClients';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {InCallEmojiType} from '../../core/conversation';
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 
 interface CallingRemoteMuteEventContentData {
@@ -35,19 +34,31 @@ interface CallingEventContentData {
   [CALL_MESSAGE_TYPE.HAND_RAISED]: {};
 }
 
-type CallingEventContent = {
-  [EventType in CALL_MESSAGE_TYPE]: EventType extends keyof CallingEventContentData
-    ? {
-        type: EventType;
-        version: string;
-        data: CallingEventContentData[EventType];
-        emojis: InCallEmojiType;
-        isHandUp: boolean;
-      }
-    : EventType extends CALL_MESSAGE_TYPE.SETUP
-      ? {type: EventType; version: string; resp?: boolean}
-      : {type: EventType; version: string};
-}[CALL_MESSAGE_TYPE];
+type CallingModeratorEventContent =
+  | {
+      type: CALL_MESSAGE_TYPE.REMOTE_MUTE;
+      version?: string;
+      data: CallingEventContentData[CALL_MESSAGE_TYPE.REMOTE_MUTE];
+      emojis?: InCallEmojiType;
+      isHandUp?: boolean;
+    }
+  | {type: CALL_MESSAGE_TYPE.REMOTE_KICK; version?: string};
+
+type CallingEventContent =
+  | {
+      [EventType in CALL_MESSAGE_TYPE]: EventType extends keyof CallingEventContentData
+        ? {
+            type: EventType;
+            version: string;
+            data: CallingEventContentData[EventType];
+            emojis: InCallEmojiType;
+            isHandUp: boolean;
+          }
+        : EventType extends CALL_MESSAGE_TYPE.SETUP
+          ? {type: EventType; version: string; resp?: boolean; sessid?: string; sdp?: string}
+          : {type: EventType; version: string};
+    }[Exclude<CALL_MESSAGE_TYPE, CallingModeratorEventContent['type']>]
+  | CallingModeratorEventContent;
 
 export interface CallingEvent {
   /**

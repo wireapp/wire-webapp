@@ -22,8 +22,6 @@ import {ReactNode, useEffect, useState, type FunctionComponent} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
-
 import {useUserModalState} from './UserModal.state';
 import {
   unverifiedUserWarningIconStyle,
@@ -42,6 +40,8 @@ import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {UserRepository} from '../../../repositories/user/userRepository';
 import {Core} from '../../../service/coreSingleton';
+import {Link, LinkVariant} from '../../../uiKit/typography/link/link';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
 import {createReactTranslationMarker, renderReactTranslation} from '../../../util/localizerUtil/reactLocalizerUtil';

@@ -19,10 +19,8 @@
 
 import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {JumpToLastMessageButton} from './jumpToLastMessageButton';
 import {Message, MessageActions} from './message';
@@ -46,6 +44,7 @@ import {Message as MessageEntity} from '../../repositories/entity/message/messag
 import {User} from '../../repositories/entity/User';
 import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import type {UserRepository} from '../../repositories/user/userRepository';
+import {TabIndex} from '../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isLastReceivedMessage} from '../../util/conversationMessages';
 import {onHitTopOrBottom} from '../../util/DOM/onHitTopOrBottom';
@@ -133,13 +132,20 @@ export const MessagesList: FC<MessagesListParams> = ({
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
-  const {timestamp: conversationLastReadTimestamp, setTimestamp: setConversationLastReadTimestamp} =
-    useConversationReadBoundary(conversation);
+  const {
+    timestamp: conversationLastReadTimestamp,
+    setTimestamp: setConversationLastReadTimestamp,
+    hasManualUnreadMarker,
+  } = useConversationReadBoundary(conversation);
 
   const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
 
-  const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp);
+  const groupedMessages = groupMessagesBySenderAndTime({
+    messages: filteredMessages,
+    lastReadTimestamp: conversationLastReadTimestamp,
+    includeInitialUnreadSeparator: hasManualUnreadMarker,
+  });
 
   const [messagesContainer, setMessagesContainer] = useState<HTMLDivElement | null>(null);
 
@@ -273,10 +279,12 @@ export const MessagesList: FC<MessagesListParams> = ({
   const jumpToLastMessage = (): void => {
     if (conversation !== undefined) {
       // jumping to the latest message is an explicit "read" action, resume auto-read
-      conversation.clearManualUnreadMarker();
-      const newestMessage = conversation.getNewestMessage();
-      if (!isUndefined(newestMessage)) {
-        setConversationLastReadTimestamp(newestMessage.timestamp());
+      if (isNumber(conversation.manualUnreadTimestamp())) {
+        conversation.clearManualUnreadMarker();
+        const newestMessage = conversation.getNewestMessage();
+        if (!isUndefined(newestMessage)) {
+          setConversationLastReadTimestamp(newestMessage.timestamp());
+        }
       }
       // clean up anything like search result
       setHighlightedMessage(undefined);

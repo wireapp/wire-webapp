@@ -18,11 +18,11 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, Task, task} from 'true-myth';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
 
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import type {CallingRepository} from '../../repositories/calling/CallingRepository';
 import type {CallMediaChoice} from '../../repositories/calling/callMediaChoice';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';

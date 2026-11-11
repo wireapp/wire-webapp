@@ -21,8 +21,6 @@ import {useState, useRef, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {FileInput} from './fileInput';
 
 import {Avatar, AVATAR_SIZE} from '../../../../../components/avatar';
@@ -31,6 +29,7 @@ import {Config} from '../../../../../Config';
 import {UserError} from '../../../../../error/userError';
 import {User} from '../../../../../repositories/entity/User';
 import {UserRepository} from '../../../../../repositories/user/userRepository';
+import {TabIndex} from '../../../../../uiKit/utils/enums';
 import {handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
 import {getLogger} from '../../../../../util/logger';
 import {isErrorWithType} from '../../../../../util/typePredicateUtil';

@@ -18,7 +18,6 @@
  */
 
 import {isNan, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {singleton} from 'tsyringe';
@@ -27,6 +26,7 @@ import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 
 import {Call} from './Call';
 
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {Config} from '../../Config';
 import {matchQualifiedIds} from '../../util/qualifiedId';
 import {CallViewTab} from '../../view_model/CallingViewModel';

@@ -22,8 +22,6 @@ import {type FormEvent, useMemo, useRef, type FunctionComponent} from 'react';
 import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, CallIcon, CloseIcon} from '@wireapp/react-ui-kit';
-
 import {MEET_NOW_FORM_ID, MeetNowForm} from './meetNowForm';
 import {meetNowModalWrapperStyles} from './meetNowModal.styles';
 import {wasMeetNowMeetingCreated} from './meetNowTypes';
@@ -32,6 +30,9 @@ import {useMeetNowSubmit} from './useMeetNowSubmit';
 
 import {useApplicationContext} from '../../../page/rootProvider';
 import {UserState} from '../../../repositories/user/userState';
+import {CallIcon} from '../../../uiKit/dataDisplay/icon/callIcon';
+import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {handleEscDown} from '../../../util/keyboardUtil';
 import {ModalComponent} from '../../Modals/ModalComponent';
 import {

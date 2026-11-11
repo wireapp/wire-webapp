@@ -24,20 +24,6 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {Maybe, maybe} from 'true-myth';
 
 import {
-  CircleCloseIcon,
-  combineDateAndTime,
-  DatePickerField,
-  dateValueFromDate,
-  ErrorMessage,
-  getOverlayPortalContainer,
-  Input,
-  nearestTimeOptionFromDate,
-  Select,
-  TIME_INTERVAL_MINUTES,
-  TimePickerField,
-} from '@wireapp/react-ui-kit';
-
-import {
   SCHEDULE_MEETING_RECURRENCE_OPTIONS,
   SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS,
 } from './scheduleMeetingRecurrence';
@@ -52,6 +38,15 @@ import {
 import {currentLanguage} from '../../../auth/localeConfig';
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
+import {CircleCloseIcon} from '../../../uiKit/dataDisplay/icon/circleCloseIcon';
+import {DatePickerField} from '../../../uiKit/inputs/datePickerField/datePickerField';
+import {combineDateAndTime, dateValueFromDate} from '../../../uiKit/inputs/dateTimePickerField/dateTimeUtils';
+import {ErrorMessage} from '../../../uiKit/inputs/errorMessage/errorMessage';
+import {Input} from '../../../uiKit/inputs/input/input';
+import {Select} from '../../../uiKit/inputs/select/select';
+import {TimePickerField} from '../../../uiKit/inputs/timePickerField/timePickerField';
+import {nearestTimeOptionFromDate, TIME_INTERVAL_MINUTES} from '../../../uiKit/inputs/timePickerField/timePickerUtils';
+import {getOverlayPortalContainer} from '../../../uiKit/utils/overlayPortal';
 import {getRegionalDateLocale} from '../../../util/timeUtil';
 import {MeetingParticipantsPicker} from '../meetingParticipantsPicker';
 import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';
