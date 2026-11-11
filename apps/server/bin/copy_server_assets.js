@@ -35,3 +35,8 @@ assetFolders.forEach(assetFolder => {
 });
 
 copyTelemetryAsset(serverOutputDirectory);
+
+if (process.argv.includes('--bundle')) {
+  const countryDatabasePath = path.resolve(path.dirname(require.resolve('geolite2')), 'dbs/GeoLite2-Country.mmdb');
+  fs.copySync(countryDatabasePath, path.resolve(serverOutputDirectory, 'dbs/GeoLite2-Country.mmdb'));
+}

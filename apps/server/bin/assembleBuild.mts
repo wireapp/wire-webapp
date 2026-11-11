@@ -26,19 +26,17 @@ import {fileURLToPath} from 'node:url';
 const FIRST_USER_ARGUMENT_INDEX = 2;
 
 type BuildVariant = 'development' | 'internal' | 'public';
-type AssemblyScope = 'artifact' | 'webapp';
+type AssemblyScope = 'artifact' | 'webapp' | 'bundle';
 
 const workspaceRootPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-const serverBuildOutputPath = path.resolve(workspaceRootPath, 'apps/server/build/server');
 const buildMetadataFilePath = path.resolve(workspaceRootPath, 'apps/server/build/metadata/version.json');
-const artifactOutputPath = path.resolve(workspaceRootPath, 'apps/server/dist');
 
 function isBuildVariant(value: unknown): value is BuildVariant {
   return value === 'development' || value === 'internal' || value === 'public';
 }
 
 function isAssemblyScope(value: unknown): value is AssemblyScope {
-  return value === 'artifact' || value === 'webapp';
+  return value === 'artifact' || value === 'webapp' || value === 'bundle';
 }
 
 function resolveWebappBuildOutputPath(buildVariant: BuildVariant): string {
@@ -68,29 +66,41 @@ function copyDirectoryContents(sourceDirectoryPath: string, destinationDirectory
 
 function assembleBuild(buildVariant: BuildVariant, assemblyScope: AssemblyScope): void {
   const webappBuildOutputPath = resolveWebappBuildOutputPath(buildVariant);
+  const serverBuildOutputPath = path.resolve(
+    workspaceRootPath,
+    assemblyScope === 'bundle' ? 'apps/server/build/bundle' : 'apps/server/build/server',
+  );
+  const artifactOutputPath = path.resolve(
+    workspaceRootPath,
+    assemblyScope === 'bundle' ? 'apps/server/build/bundled-artifact' : 'apps/server/dist',
+  );
 
   assertPathExists(buildMetadataFilePath);
   assertPathExists(webappBuildOutputPath);
-  if (assemblyScope === 'artifact') {
+  if (assemblyScope !== 'webapp') {
     assertPathExists(serverBuildOutputPath);
   }
 
   rmSync(artifactOutputPath, {force: true, recursive: true});
   mkdirSync(artifactOutputPath, {recursive: true});
 
-  if (assemblyScope === 'artifact') {
+  if (assemblyScope !== 'webapp') {
     copyDirectoryContents(serverBuildOutputPath, artifactOutputPath);
   }
 
   copyDirectoryContents(webappBuildOutputPath, path.resolve(artifactOutputPath, 'static'));
   cpSync(buildMetadataFilePath, path.resolve(artifactOutputPath, 'version.json'));
+
+  if (assemblyScope === 'bundle') {
+    cpSync(path.resolve(workspaceRootPath, '.env.defaults'), path.resolve(artifactOutputPath, '.env.defaults'));
+  }
 }
 
 function run(): void {
   const [buildVariant, assemblyScope] = process.argv.slice(FIRST_USER_ARGUMENT_INDEX);
 
   if (!isBuildVariant(buildVariant) || !isAssemblyScope(assemblyScope)) {
-    console.error('Usage: assembleBuild.mts <development|internal|public> <artifact|webapp>');
+    console.error('Usage: assembleBuild.mts <development|internal|public> <artifact|webapp|bundle>');
     process.exitCode = 1;
     return;
   }

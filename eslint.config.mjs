@@ -68,6 +68,7 @@ const ignores = [
   '!apps/webapp/rspack.config.mts',
   '!apps/webapp/rspack.config.dev.mts',
   '!apps/webapp/rspack.config.public.mts',
+  '!apps/server/rspack.config.mts',
   '!apps/server/configuration/client.config.ts',
   '!apps/server/configuration/server.config.ts',
   '!**/*.config.test.*',
@@ -410,6 +411,20 @@ const productionConfigs = [
         NodeJS: 'readonly',
       },
     },
+  },
+  {
+    files: ['apps/server/rspack.config.mts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/server/tsconfig.rspack.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        sourceType: 'module',
+      },
+      globals: runtimeGlobals,
+    },
+    rules: {'import/no-default-export': 'off'},
   },
   {
     files: [
