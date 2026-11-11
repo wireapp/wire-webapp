@@ -36,6 +36,7 @@ import {
   RestActionOptionsCopyMove,
   RestBackgroundAction,
   RestNamespaceValuesResponse,
+  RestSelection,
   GetByUuidFlagsEnum,
 } from 'cells-sdk-ts';
 import logdown from 'logdown';
@@ -851,6 +852,87 @@ export class CellsAPI {
     const result = await this.client.updatePublicLink(linkUuid, requestBody);
 
     return result.data;
+  }
+
+  async createSelection({
+    paths,
+    abortController,
+  }: {
+    paths: readonly string[];
+    abortController?: AbortController;
+  }): Promise<string> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+    if (
+      paths.length === 0 ||
+      paths.some(path => {
+        return path.trim().length === 0;
+      })
+    ) {
+      throw new Error('At least one non-empty node path is required');
+    }
+
+    const result = await this.client.createSelection(
+      {
+        Nodes: paths.map(Path => {
+          return {Path: Path.normalize('NFC')};
+        }) as RestSelection['Nodes'],
+      },
+      {
+        signal: abortController?.signal,
+        'axios-retry': {retries: 0},
+      },
+    );
+    const uuid = result.data.Uuid;
+
+    if (uuid === undefined || uuid.trim().length === 0) {
+      throw new Error('Cells did not return a selection UUID');
+    }
+
+    return uuid;
+  }
+
+  async downloadSelectionArchive({
+    paths,
+    archiveParentPath,
+    abortController,
+  }: {
+    paths: readonly string[];
+    archiveParentPath: string;
+    abortController?: AbortController;
+  }): Promise<ReadableStream<Uint8Array>> {
+    if (this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+    if (archiveParentPath.trim().length === 0) {
+      throw new Error('An archive parent path is required');
+    }
+
+    const selectionUuid = await this.createSelection({paths, abortController});
+    const archivePath = `${archiveParentPath.normalize('NFC').replace(/\/+$/, '')}/${selectionUuid}-selection.zip`;
+    const {body, contentType} = await this.storageService.getObject({path: archivePath, abortController});
+    const normalizedContentType = contentType?.split(';', 1)[0]?.trim().toLowerCase();
+    const supportedContentTypes = new Set([
+      'application/zip',
+      'application/x-zip-compressed',
+      'application/octet-stream',
+    ]);
+
+    const hasContentType = normalizedContentType !== undefined && normalizedContentType.length > 0;
+
+    if (!hasContentType || !supportedContentTypes.has(normalizedContentType)) {
+      await body.cancel().catch(() => {
+        return undefined;
+      });
+      throw new Error(
+        hasContentType
+          ? `Cells returned an unexpected archive content type: ${normalizedContentType}`
+          : 'Cells returned an archive without a ZIP content type',
+      );
+    }
+
+    return body;
   }
 
   async getAllTags(): Promise<RestNamespaceValuesResponse> {
