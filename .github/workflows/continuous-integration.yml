@@ -314,6 +314,12 @@ jobs:
       - name: Lint repository
         run: npx just eslint
 
+      - name: Check formatting
+        run: npx just format-check
+
+      - name: Stylelint
+        run: npx just stylesheet-lint
+
       - name: Check circular dependencies
         run: npx just lint-dependencies
 
@@ -329,12 +335,6 @@ jobs:
           path: target/reports/dependencies/
           if-no-files-found: error
           retention-days: 3
-
-      - name: Check formatting
-        run: npx just format-check
-
-      - name: Stylelint
-        run: npx just stylesheet-lint
 
   unit-tests:
     runs-on: ubuntu-26.04-arm
