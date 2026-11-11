@@ -255,7 +255,7 @@
     "type-fest": "5.10.0",
     "typescript": "6.0.3",
     "worker-timers": "8.0.34",
-    "ws": "8.22.1"
+    "ws": "8.22.2"
   },
   "allowScripts": {
     "@parcel/watcher@2.6.0": true,
