@@ -24,19 +24,23 @@ import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 import {NIL as NilUuid} from 'uuid';
 
-import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {Asset, GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {AssetError} from './assetError';
 import {AssetRemoteData} from './assetRemoteData';
 import {AssetTransferState} from './assetTransferState';
 import {getAssetUrl, setAssetUrl} from './assetUrlCache';
+import {createPdfPreview} from './pdfPreview';
 
 import {AssetAuditData, AssetOptions} from '../../apiClient/asset/assetApi';
 import type {AssetResponse} from '../../apiClient/asset/assetApi';
 import {AssetRetentionPolicy} from '../../apiClient/asset/assetRetentionPolicy';
 import type {RequestCancelable} from '../../apiClient/http/requestCancelable';
+import {RequestCancellationError} from '../../apiClient/user/userError';
 import type {AssetService} from '../../core/conversation';
 import type {EncryptedAssetUploaded} from '../../core/cryptography';
+import {e2ePdfPreviewFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {createStartupFeatureTogglesFromLocationSearch} from '../../featureToggles/startupFeatureToggles';
 import {Core} from '../../service/coreSingleton';
 import {stripImageExifData} from '../../util/imageUtil';
 import {getLogger, Logger} from '../../util/logger';
@@ -79,6 +83,8 @@ export class AssetRepository {
   constructor(
     private readonly core = container.resolve(Core),
     private readonly teamState = container.resolve(TeamState),
+    private readonly createPreview = createPdfPreview,
+    private readonly featureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search),
   ) {
     this.logger = getLogger('AssetRepository');
   }
@@ -277,7 +283,7 @@ export class AssetRepository {
     options: AssetUploadOptions,
     isAuditLogEnabled: boolean,
     onCancel?: () => void,
-  ): Promise<EncryptedAssetUploaded> {
+  ): Promise<EncryptedAssetUploaded & {preview?: Asset.IPreview}> {
     const bytes = await loadFileBuffer(file);
     const progressObservable = ko.observable(0);
     this.uploadProgressQueue.push({messageId, progress: progressObservable});
@@ -300,19 +306,84 @@ export class AssetRepository {
       }
     }
 
-    const request = await this.assetCoreService.uploadAsset(Buffer.from(bytes), {...assetOptions}, fraction => {
-      const percentage = fraction * percentageScale;
-      progressObservable(percentage);
-    });
-
+    const controller = new AbortController();
+    let cancelRequest: (() => void) | undefined;
     this.uploadCancelTokens[messageId] = () => {
-      request.cancel();
+      controller.abort();
+      cancelRequest?.();
       onCancel?.();
     };
+    const assertNotCanceled = (): void => {
+      if (controller.signal.aborted) {
+        throw new RequestCancellationError('File upload canceled');
+      }
+    };
+    const upload = async (
+      data: Uint8Array,
+      uploadOptions: AssetOptions,
+      onProgress?: (fraction: number) => void,
+    ): Promise<EncryptedAssetUploaded> => {
+      assertNotCanceled();
+      const request = await this.assetCoreService.uploadAsset(data, uploadOptions, onProgress);
+      cancelRequest = request.cancel;
+      if (controller.signal.aborted) {
+        request.cancel();
+      }
+      const result = await request.response;
+      assertNotCanceled();
+      cancelRequest = undefined;
+      return result;
+    };
 
-    const response = await request.response;
-    this.removeFromUploadQueue(messageId);
-    return response;
+    try {
+      const response = await upload(Buffer.from(bytes), assetOptions, fraction => {
+        progressObservable(fraction * percentageScale);
+      });
+      if (
+        file.type !== 'application/pdf' ||
+        !this.featureToggles.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)
+      ) {
+        return response;
+      }
+
+      let preview: Asset.IPreview | undefined;
+      try {
+        const thumbnail = await this.createPreview(file, controller.signal);
+        assertNotCanceled();
+        if (thumbnail !== undefined) {
+          const previewOptions: AssetOptions = {
+            ...assetOptions,
+            ...(isAuditLogEnabled &&
+              options.auditData !== undefined && {
+                auditData: {
+                  ...options.auditData,
+                  filename: `${options.auditData.filename}.preview.png`,
+                  filetype: thumbnail.blob.type,
+                },
+              }),
+          };
+          const uploaded = await upload(new Uint8Array(await loadFileBuffer(thumbnail.blob)), previewOptions);
+          preview = {
+            mimeType: thumbnail.blob.type,
+            size: thumbnail.blob.size,
+            image: {width: thumbnail.width, height: thumbnail.height},
+            remote: {
+              assetId: uploaded.key,
+              assetDomain: uploaded.domain,
+              assetToken: uploaded.token,
+              otrKey: uploaded.keyBytes,
+              sha256: uploaded.sha256,
+            },
+          };
+        }
+      } catch {
+        // Preview failure must not prevent sharing the original file.
+        assertNotCanceled();
+      }
+      return {...response, preview};
+    } finally {
+      this.removeFromUploadQueue(messageId);
+    }
   }
 
   cancelUpload(messageId: string): void {

@@ -22,12 +22,39 @@ import {
   forTestsOnlyFeatureToggleName,
   sendCallLogsFeatureToggleName,
   markAsUnreadFeatureToggleName,
+  e2ePdfPreviewFeatureToggleName,
   previewDefaultEnabledStartupFeatureToggleNames,
 } from './startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from './startupFeatureToggles';
 import {updateLocationSearchForStartupFeatureToggle} from './startupFeatureToggleQueryParameters';
 
 describe('initializeStartupFeatureToggleUrl', () => {
+  it.each([
+    {description: 'Edge defaults', selection: '', preview: true, expected: false},
+    {description: 'release defaults', selection: '', preview: false, expected: false},
+    {description: 'release opt-in', selection: '?enabled-features=e2e-pdf-preview', preview: false, expected: true},
+    {description: 'Edge explicit opt-out', selection: '?enabled-features=', preview: true, expected: false},
+    {
+      description: 'Edge explicit other features',
+      selection: '?enabled-features=mark-as-unread',
+      preview: true,
+      expected: false,
+    },
+  ])('resolves encrypted PDF previews with $description', ({selection, preview, expected}) => {
+    let url = new URL(`https://example.com/${selection}`);
+    initializeStartupFeatureToggleUrl({
+      url,
+      defaultEnabledFeatureToggleNames: preview ? previewDefaultEnabledStartupFeatureToggleNames : [],
+      replaceUrl(replacement) {
+        url = new URL(replacement);
+      },
+    });
+
+    const toggles = createStartupFeatureTogglesFromLocationSearch(url.search);
+
+    expect(toggles.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)).toBe(expected);
+  });
+
   it.each([
     {description: 'Edge defaults', selection: '', preview: true, expectedEnabled: true},
     {description: 'release defaults', selection: '', preview: false, expectedEnabled: false},

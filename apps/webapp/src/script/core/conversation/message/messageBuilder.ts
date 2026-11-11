@@ -125,7 +125,7 @@ export function buildFileDataMessage(
   payloadBundle: FileAssetMessage['content'],
   messageId: string = createId(),
 ): GenericMessage {
-  const {asset, expectsReadConfirmation, legalHoldStatus, metaData} = payloadBundle;
+  const {asset, expectsReadConfirmation, legalHoldStatus, metaData, preview} = payloadBundle;
 
   const remoteData = Asset.RemoteData.create({
     assetId: asset.key,
@@ -149,6 +149,7 @@ export function buildFileDataMessage(
     legalHoldStatus,
     uploaded: remoteData,
     original,
+    preview,
   });
 
   assetMessage.status = AssetTransferState.UPLOADED;

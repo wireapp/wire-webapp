@@ -59,6 +59,7 @@ export interface ImageAssetContent extends AssetBase {
 }
 
 export interface FileAssetContent extends AssetBase {
+  preview?: Preview;
   asset: EncryptedAssetUploaded;
   file: FileContent;
   metaData: FileMetaDataContent;
