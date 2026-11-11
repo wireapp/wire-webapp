@@ -162,54 +162,6 @@ jobs:
       - name: Verify isolated production server bundle
         run: npx just verify-server-bundle
 
-      - name: Install unzip for artifact verification
-        run: |
-          apt-get update
-          apt-get install --yes --no-install-recommends unzip
-          rm -rf /var/lib/apt/lists/*
-
-      - name: Verify public Rspack deployment package
-        env:
-          BUILD_ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
-          EXPECTED_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
-          EXPECTED_VERSION: ${{ steps.public_rspack_build.outputs.expected_version }}
-        run: |
-          set -euo pipefail
-
-          test -f "$BUILD_ARTIFACT_PATH"
-          unzip -tq "$BUILD_ARTIFACT_PATH"
-          npx just validate-build-artifact
-
-          archive_entries="$(unzip -Z1 "$BUILD_ARTIFACT_PATH")"
-          required_entry_scripts=(
-            static/min/app.js
-            static/min/auth.js
-            static/min/checkBrowser.js
-            static/min/runtime.js
-            static/min/vendor.js
-            static/min/dexie.js
-            static/min/pdf.worker.mjs
-            static/min/worker.js
-          )
-
-          for entry_script_path in "${required_entry_scripts[@]}"; do
-            if ! grep -Fqx -- "$entry_script_path" <<< "$archive_entries"; then
-              echo "Public Rspack deployment package is missing required entry script: $entry_script_path" >&2
-              exit 1
-            fi
-          done
-
-          public_rspack_runtime="$(unzip -p "$BUILD_ARTIFACT_PATH" static/min/runtime.js)"
-          if ! grep -Fq 'rspackChunk_wireapp_webapp' <<< "$public_rspack_runtime"; then
-            echo "Public deployment package does not contain the Rspack runtime fingerprint." >&2
-            exit 1
-          fi
-
-          if grep -Fq 'webpackChunk_wireapp_webapp' <<< "$public_rspack_runtime"; then
-            echo "Public deployment package contains the Webpack runtime fingerprint." >&2
-            exit 1
-          fi
-
       - name: Upload Rspack smoke diagnostics
         if: ${{ failure() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -381,7 +333,6 @@ jobs:
   public-production-package:
     runs-on: ubuntu-26.04
     name: Public production package verification
-    if: ${{ github.event_name == 'pull_request' }}
     needs:
       - generated-artifacts
       - type-check
@@ -422,7 +373,9 @@ jobs:
             npx just validate-build-artifact
 
       - name: Verify extracted ZIP without installed packages
-        run: npx just verify-server-package
+        run: |
+          bash tools/serverPackaging/verifyBrowserArchive.sh apps/server/dist/s3/ebs.zip
+          npx just verify-server-package
 
       - name: Build and smoke-test sparse production Docker context
         env:
