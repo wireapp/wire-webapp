@@ -17,6 +17,7 @@
  *
  */
 
+import {isNull, isNullOrUndefined} from '@sindresorhus/is';
 import {AxiosHeaders, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {Cookie as ToughCookie} from 'tough-cookie';
 
@@ -29,14 +30,18 @@ import {ObfuscationUtil} from '../../obfuscation';
 
 const logger = LogFactory.getLogger('@wireapp/api-client/shims/node/cookie');
 
+export function getCookieExpiration(expires: Date | 'Infinity' | null): string {
+  return isNull(expires) ? 'Infinity' : expires.toString();
+}
+
 export const retrieveCookie = async <T>(response: AxiosResponse<T>): Promise<T> => {
   if (response.headers?.['set-cookie'] !== undefined) {
     const cookies: ToughCookie[] = response.headers['set-cookie'].flatMap(cookieString => {
       const cookie = ToughCookie.parse(cookieString);
-      return cookie !== undefined ? [cookie] : [];
+      return isNullOrUndefined(cookie) ? [] : [cookie];
     });
     for (const cookie of cookies) {
-      const cookieString = cookie.expires?.toString() ?? 'Infinity';
+      const cookieString = getCookieExpiration(cookie.expires);
       CookieStore.setCookie(new Cookie(cookie.value, cookieString));
       logger.info(
         `Saved internal cookie. It will expire on "${cookieString}".`,

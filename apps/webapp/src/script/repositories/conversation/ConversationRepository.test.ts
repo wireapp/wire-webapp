@@ -183,7 +183,10 @@ function createConversationCoreForTest(): Core {
   });
 }
 
-function buildConversationRepository(translate: Translate): ConversationRepositoryTestFixture {
+function buildConversationRepository(
+  translate: Translate,
+  isMarkAsUnreadFeatureEnabled: boolean = false,
+): ConversationRepositoryTestFixture {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
   // @ts-ignore
@@ -230,6 +233,7 @@ function buildConversationRepository(translate: Translate): ConversationReposito
     callingRepository,
     {} as any,
     translate,
+    {isMarkAsUnreadFeatureEnabled},
     userState,
     teamState,
     conversationState,
@@ -3607,28 +3611,48 @@ describe('ConversationRepository', () => {
       expect(conversations).toHaveLength(remoteConversations.found.length);
     });
 
-    it('preserves persisted manual unread state when loading conversations', async () => {
+    it.each([true, false])('loads persisted manual markers only when enabled: %s', async isEnabled => {
       const existingConversation = _generateConversation();
       existingConversation.last_read_timestamp(500);
       existingConversation.manualUnreadTimestamp(100);
-      const persistedConversations = [existingConversation.serialize()];
+      let persistedConversations: ConversationRecord[] = [existingConversation.serialize()];
       const remoteConversations = {failed: [], found: []} as unknown as RemoteConversations;
-      const [conversationRepository, {conversationService}] = buildConversationRepository(translateForTest);
-      jest
-        .spyOn(conversationService, 'loadConversationStatesFromDb')
-        .mockResolvedValue(persistedConversations as unknown as ConversationDatabaseData[]);
-      const saveConversations = jest.spyOn(conversationService, 'saveConversationsInDb');
+      const [conversationRepository, {conversationService}] = buildConversationRepository(translateForTest, isEnabled);
+      jest.spyOn(conversationService, 'loadConversationStatesFromDb').mockImplementation(async () => {
+        return persistedConversations as unknown as ConversationDatabaseData[];
+      });
+      const saveConversations = jest
+        .spyOn(conversationService, 'saveConversationsInDb')
+        .mockImplementation(async conversations => {
+          persistedConversations = conversations;
+
+          return conversations;
+        });
 
       const conversations = await conversationRepository['loadRemoteConversations'](remoteConversations, []);
+      const conversation = requireValueForTest(conversations.at(0));
+      const expectedMarker = isEnabled ? 100 : undefined;
 
-      expect(saveConversations).not.toHaveBeenCalled();
-      expect(persistedConversations.at(0)?.manual_unread_timestamp).toBe(100);
-      expect(conversations.at(0)?.manualUnreadTimestamp()).toBe(100);
-      expect(conversations.at(0)?.last_read_timestamp()).toBe(500);
+      expect(conversation.manualUnreadTimestamp()).toBe(expectedMarker);
+      expect(conversation.last_read_timestamp()).toBe(500);
+      expect(conversation.effectiveReadTimestamp()).toBe(isEnabled ? 99 : 500);
+      expect(conversation.isAutoReadSuppressed()).toBe(false);
+      expect(conversation.hasUnread()).toBe(isEnabled);
+      expect(persistedConversations.at(0)?.manual_unread_timestamp).toBe(expectedMarker);
+      expect(saveConversations).toHaveBeenCalledTimes(isEnabled ? 0 : 1);
+
+      const [reloadedRepository, reloadedDependencies] = buildConversationRepository(translateForTest, true);
+      jest
+        .spyOn(reloadedDependencies.conversationService, 'loadConversationStatesFromDb')
+        .mockResolvedValue(persistedConversations as unknown as ConversationDatabaseData[]);
+      const reloadedConversations = await reloadedRepository['loadRemoteConversations'](remoteConversations, []);
+
+      expect(reloadedConversations.at(0)?.manualUnreadTimestamp()).toBe(expectedMarker);
+      expect(reloadedConversations.at(0)?.last_read_timestamp()).toBe(500);
     });
 
-    it('loads unread history from the local manual boundary without changing canonical read state', async () => {
-      const [conversationRepository] = buildConversationRepository(translateForTest);
+    it('loads unread history from the manual boundary without changing canonical read state', async () => {
+      const [conversationRepository] = buildConversationRepository(translateForTest, true);
       const conversation = _generateConversation();
       const firstUnreadMessage = new ContentMessage(createUuid(), translateForTest);
       firstUnreadMessage.timestamp(300);
@@ -3644,6 +3668,23 @@ describe('ConversationRepository', () => {
       expect(loadPrecedingEvents).toHaveBeenCalledWith(conversation.id, new Date(100), new Date(300));
       expect(conversation.last_read_timestamp()).toBe(200);
       expect(conversation.manualUnreadTimestamp()).toBe(100);
+    });
+
+    it('loads unread history immediately after the synchronized read timestamp', async () => {
+      const [conversationRepository] = buildConversationRepository(translateForTest);
+      const conversation = _generateConversation();
+      const firstUnreadMessage = new ContentMessage(createUuid(), translateForTest);
+      firstUnreadMessage.timestamp(300);
+      conversation.last_read_timestamp(200);
+      conversation.messages_unordered.push(firstUnreadMessage);
+      const loadPrecedingEvents = jest
+        .spyOn(conversationRepository['eventService'], 'loadPrecedingEvents')
+        .mockResolvedValue([]);
+
+      await conversationRepository['getUnreadEvents'](conversation);
+
+      expect(loadPrecedingEvents).toHaveBeenCalledWith(conversation.id, new Date(201), new Date(300));
+      expect(conversation.last_read_timestamp()).toBe(200);
     });
 
     it("does not load proteus 1:1 conversation if there's mls 1:1 conversation with the same user", async () => {
@@ -4534,7 +4575,7 @@ describe('onMLSResetMessage', () => {
     const coreConversationService = getConversationServiceFromCoreForTest(core);
     spyOn(coreConversationService, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
     spyOn(coreConversationService, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(true));
-    spyOn(getMlsServiceForTest(core), 'getEpoch').and.returnValue(Promise.resolve(5));
+    spyOn(getMlsServiceForTest(core), 'getEpoch').and.returnValue(Promise.resolve(5n));
 
     const addEventSpy = jest.spyOn(conversationRepository as any, 'addEventToConversation').mockResolvedValue({});
     const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');

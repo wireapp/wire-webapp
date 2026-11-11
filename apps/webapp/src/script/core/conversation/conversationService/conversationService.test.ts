@@ -41,13 +41,12 @@ import {noop} from 'noop-esm';
 import {Result, task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';
-import {ErrorType, MlsErrorType} from '@wireapp/core-crypto';
+import {CoreCryptoError, MlsError} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {AddUsersFailure, AddUsersFailureReasons, ConversationService, MessageSendingState} from '..';
 import {MLSService} from '../../messagingProtocols/mls';
 import {
-  CORE_CRYPTO_ERROR_NAMES,
   serializeAbortReason,
   UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
 } from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';
@@ -69,6 +68,10 @@ type ConversationServiceTestSetup = readonly [
 ];
 
 type KeyMaterialFailureCallback = (payload: {error: unknown; groupId: string}) => Promise<void>;
+
+const makeMlsMessageRejectedError = (reason: string): CoreCryptoError => {
+  return CoreCryptoError.Mls.new({mlsError: MlsError.MessageRejected.new({reason})});
+};
 
 type ImageMessageFixture = {
   image: {data: Buffer<ArrayBuffer>; height: number; type: string; width: number};
@@ -277,15 +280,9 @@ describe('ConversationService', () => {
         {id: 'test-id-2', domain: 'test-domain'},
       ];
 
-      const staleMessageError = {
-        type: ErrorType.Mls,
-        context: {
-          type: MlsErrorType.MessageRejected,
-          context: {
-            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
-          },
-        },
-      } as any;
+      const staleMessageError = makeMlsMessageRejectedError(
+        serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+      );
 
       // First removal attempt fails with stale, second succeeds
       jest
@@ -294,7 +291,7 @@ describe('ConversationService', () => {
         .mockResolvedValueOnce(undefined as any);
 
       const remoteEpoch = 6;
-      const localEpoch = 5;
+      const localEpoch = 5n;
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValue({
@@ -321,15 +318,9 @@ describe('ConversationService', () => {
       const [conversationService, {apiClient, mlsService}] = await buildConversationService();
       const conversationId = {id: 'conv-join-stale', domain: 'staging.zinfra.io'};
 
-      const staleMessageError = {
-        type: ErrorType.Mls,
-        context: {
-          type: MlsErrorType.MessageRejected,
-          context: {
-            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
-          },
-        },
-      } as any;
+      const staleMessageError = makeMlsMessageRejectedError(
+        serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+      );
 
       jest
         .spyOn(mlsService, 'joinByExternalCommit')
@@ -337,7 +328,7 @@ describe('ConversationService', () => {
         .mockResolvedValueOnce(undefined as any);
 
       const remoteEpoch = 10;
-      const localEpoch = 9;
+      const localEpoch = 9n;
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: conversationId,
@@ -394,7 +385,7 @@ describe('ConversationService', () => {
         .mockResolvedValueOnce(undefined as unknown as void);
 
       const remoteEpoch = 5;
-      const localEpoch = 4;
+      const localEpoch = 4n;
 
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
@@ -436,7 +427,7 @@ describe('ConversationService', () => {
       jest.spyOn(apiClient.api.conversation, 'postMlsMessage').mockRejectedValueOnce(staleMessageError);
 
       const remoteEpoch = 5;
-      const localEpoch = 4;
+      const localEpoch = 4n;
 
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
@@ -543,7 +534,7 @@ describe('ConversationService', () => {
       const mockedDBResponse: Conversation[] = [mlsConversation1, mlsConversation2];
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({found: mockedDBResponse});
 
-      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(2)));
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(2n)));
 
       await conversationService.handleConversationsEpochMismatch();
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mlsConversation1.qualified_id);
@@ -558,7 +549,7 @@ describe('ConversationService', () => {
       const mockedDBResponse: Conversation[] = [mlsConversation];
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({found: mockedDBResponse});
 
-      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(1)));
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(1n)));
 
       await conversationService.handleConversationsEpochMismatch();
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
@@ -835,13 +826,12 @@ describe('ConversationService', () => {
 
       const mockMLSMessageAddEvent = createMLSMessageAddEventMock(conversationId);
 
-      const wrongEpochError = new Error();
-      wrongEpochError.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch;
+      const wrongEpochError = CoreCryptoError.Mls.new({mlsError: MlsError.WrongEpoch.new()});
 
       jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(wrongEpochError);
 
       const remoteEpoch = 5;
-      const localEpoch = 4;
+      const localEpoch = 4n;
 
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
@@ -917,8 +907,7 @@ describe('ConversationService', () => {
       const conversationId = {id: 'conversationId', domain: 'staging.zinfra.io'};
       const mockMLSMessageAddEvent = createMLSMessageAddEventMock(conversationId);
 
-      const wrongEpochError = new Error();
-      wrongEpochError.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch;
+      const wrongEpochError = CoreCryptoError.Mls.new({mlsError: MlsError.WrongEpoch.new()});
 
       jest.spyOn(mockedMLSService, 'handleMLSMessageAddEvent').mockRejectedValue(wrongEpochError);
 
@@ -950,13 +939,12 @@ describe('ConversationService', () => {
 
       const mockMLSMessageAddEvent = createMLSMessageAddEventMock(conversationId, SUBCONVERSATION_ID.CONFERENCE);
 
-      const wrongEpochError = new Error();
-      wrongEpochError.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch;
+      const wrongEpochError = CoreCryptoError.Mls.new({mlsError: MlsError.WrongEpoch.new()});
 
       jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(wrongEpochError);
 
       const remoteEpoch = 5;
-      const localEpoch = 4;
+      const localEpoch = 4n;
 
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
@@ -985,11 +973,7 @@ describe('ConversationService', () => {
 
       const mockMLSWelcomeMessageEvent = createMLSWelcomeMessageEventMock(conversationId);
 
-      const orphanWelcomeMessageError = new Error();
-      // Simulate core-crypto orphan welcome classification for mapper
-      orphanWelcomeMessageError.name = MlsErrorType.OrphanWelcome as unknown as string;
-      (orphanWelcomeMessageError as any).context = {type: MlsErrorType.OrphanWelcome};
-      (orphanWelcomeMessageError as any).type = ErrorType.Mls;
+      const orphanWelcomeMessageError = CoreCryptoError.Mls.new({mlsError: MlsError.OrphanWelcome.new()});
 
       jest.spyOn(mlsService, 'handleMLSWelcomeMessageEvent').mockRejectedValueOnce(orphanWelcomeMessageError);
 
@@ -1013,15 +997,11 @@ describe('ConversationService', () => {
 
       // Create a base64 group id and its byte-array form to simulate core-crypto error context
       const expectedGroupId = 'AXNhbXBsZQ=='; // base64 for '\u0001sample'
-      const conversationIdArray = Array.from(Buffer.from(expectedGroupId, 'base64'));
+      const conversationIdBytes = new Uint8Array(Buffer.from(expectedGroupId, 'base64'));
 
-      const existsError: any = {};
-      // Simulate core-crypto "conversation already exists" classification for the mapper
-      existsError.type = ErrorType.Mls;
-      existsError.context = {
-        type: MlsErrorType.ConversationAlreadyExists,
-        context: {conversationId: conversationIdArray},
-      };
+      const existsError = CoreCryptoError.Mls.new({
+        mlsError: MlsError.ConversationAlreadyExists.new({conversationId: conversationIdBytes}),
+      });
 
       const welcomeSpy = jest
         .spyOn(mlsService, 'handleMLSWelcomeMessageEvent')
@@ -1220,15 +1200,9 @@ describe('ConversationService', () => {
         });
       const qualifiedUsers = [...otherUsersToAdd];
 
-      const staleMessageError = {
-        type: ErrorType.Mls,
-        context: {
-          type: MlsErrorType.MessageRejected,
-          context: {
-            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
-          },
-        },
-      } as any;
+      const staleMessageError = makeMlsMessageRejectedError(
+        serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+      );
 
       const getKPSpy = jest.spyOn(mlsService, 'getKeyPackagesPayload');
       getKPSpy.mockResolvedValue({
@@ -1243,7 +1217,7 @@ describe('ConversationService', () => {
         .mockResolvedValueOnce(undefined as any);
 
       const remoteEpoch = 5;
-      const localEpoch = 4;
+      const localEpoch = 4n;
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       const getConvSpy = jest.spyOn(apiClient.api.conversation, 'getConversation');
@@ -1289,7 +1263,7 @@ describe('ConversationService', () => {
         commitPendingFirst: true,
       });
 
-      expect(mlsService.commitPendingProposals).toHaveBeenCalledWith(mockGroupId, true);
+      expect(mlsService.commitPendingProposals).toHaveBeenCalledWith(mockGroupId);
       expect(mlsService.addUsersToExistingConversation).not.toHaveBeenCalled();
       expect(mlsService.updateKeyingMaterialForConversation).toHaveBeenCalledWith(mockGroupId);
       expect(mlsService.resetKeyMaterialRenewal).toHaveBeenCalledWith(mockGroupId);
@@ -1407,15 +1381,9 @@ describe('ConversationService', () => {
 
       const handler = getKeyMaterialFailureHandler(mlsService);
 
-      const brokenErr = {
-        type: ErrorType.Mls,
-        context: {
-          type: MlsErrorType.MessageRejected,
-          context: {
-            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION}),
-          },
-        },
-      };
+      const brokenErr = makeMlsMessageRejectedError(
+        serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION}),
+      );
 
       await handler({error: brokenErr, groupId});
 
@@ -1445,18 +1413,12 @@ describe('ConversationService', () => {
 
       const handler = getKeyMaterialFailureHandler(mlsService);
 
-      const outOfSyncErr = {
-        type: ErrorType.Mls,
-        context: {
-          type: MlsErrorType.MessageRejected,
-          context: {
-            reason: serializeAbortReason({
-              message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC,
-              missing_users: missingUsers,
-            }),
-          },
-        },
-      };
+      const outOfSyncErr = makeMlsMessageRejectedError(
+        serializeAbortReason({
+          message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC,
+          missing_users: missingUsers,
+        }),
+      );
 
       await handler({error: outOfSyncErr, groupId});
 
@@ -1488,15 +1450,9 @@ describe('ConversationService', () => {
 
       const handler = getKeyMaterialFailureHandler(mlsService);
 
-      const brokenErr = {
-        type: ErrorType.Mls,
-        context: {
-          type: MlsErrorType.MessageRejected,
-          context: {
-            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION}),
-          },
-        },
-      };
+      const brokenErr = makeMlsMessageRejectedError(
+        serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION}),
+      );
 
       const p1 = handler({error: brokenErr, groupId});
       const p2 = handler({error: brokenErr, groupId});
@@ -1521,18 +1477,12 @@ describe('ConversationService', () => {
 
       const handler = getKeyMaterialFailureHandler(mlsService);
 
-      const staleMessageError = {
-        type: ErrorType.Mls,
-        context: {
-          type: MlsErrorType.MessageRejected,
-          context: {
-            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
-          },
-        },
-      } as any;
+      const staleMessageError = makeMlsMessageRejectedError(
+        serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+      );
 
       const remoteEpoch = 3;
-      const localEpoch = 2;
+      const localEpoch = 2n;
 
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 

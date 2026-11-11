@@ -22,7 +22,6 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, use
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {CheckboxOption} from './CheckboxOption/CheckboxOption';
 import {MessageContent} from './Content/MessageContent';
@@ -41,6 +40,7 @@ import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
 import {SecondaryButton} from './SecondaryButton/SecondaryButton';
 
 import {Config} from '../../../Config';
+import {ErrorMessage} from '../../../uiKit/inputs/errorMessage/errorMessage';
 import {isEnterKey, isEscapeKey} from '../../../util/keyboardUtil';
 import type {Translate} from '../../../util/localizerUtil';
 import {isValidPassword} from '../../../util/stringUtil';
@@ -326,6 +326,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
       ref={primaryActionButtonRef}
       onClick={performAction(confirm, closeOnConfirm ?? false)}
       disabled={isPrimaryActionDisabled(primaryAction.disabled)}
+      isDestructive={primaryAction.isDestructive}
       fullWidth={hasMultipleSecondary || allButtonsFullWidth}
     >
       {primaryAction.text}

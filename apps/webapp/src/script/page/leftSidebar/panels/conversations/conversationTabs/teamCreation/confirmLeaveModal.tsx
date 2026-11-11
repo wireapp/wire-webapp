@@ -21,8 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {
   buttonCss,
   confirmLeaveModalBodyCss,
@@ -34,6 +32,7 @@ import * as Icon from '../../../../../../components/icon';
 import {ModalComponent} from '../../../../../../components/Modals/ModalComponent';
 import {EventName} from '../../../../../../repositories/tracking/eventName';
 import {Segmentation} from '../../../../../../repositories/tracking/segmentation';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
 import {WebAppEvents} from '../../../../../../webAppEvents';
 import {useApplicationContext} from '../../../../../rootProvider';
 

@@ -21,9 +21,8 @@ import React, {forwardRef} from 'react';
 
 import cx from 'classnames';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {User} from '../../../../../../repositories/entity/User';
+import {TabIndex} from '../../../../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';
 import {Avatar, AVATAR_SIZE} from '../../../../../avatar';

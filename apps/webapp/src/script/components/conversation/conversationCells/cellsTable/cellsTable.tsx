@@ -35,8 +35,6 @@ import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
 import {Maybe, maybe} from 'true-myth';
 
-import {ArrowIcon, Button, ButtonVariant, CloseIcon, TrashIcon, UploadIcon} from '@wireapp/react-ui-kit';
-
 import {bulkMoveReducer} from './bulkMoveState';
 import {CellsBulkMovePreviewModal} from './cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
 import {normalizeCellsPath} from './cellsBulkMovePreviewModal/normalizeCellsPath';
@@ -44,7 +42,6 @@ import {CellsBulkMoveToBinConfirmationModal} from './cellsBulkMoveToBinConfirmat
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
   bulkActionButtonStyles,
-  bulkMoveToBinButtonStyles,
   clearSelectionButtonStyles,
   folderDropOverlayDescriptionStyles,
   folderDropOverlayFolderNameStyles,
@@ -82,11 +79,19 @@ import {showBulkRestoreModal} from './restoreBinSelection/showBulkRestoreModal';
 import {useBulkRestore} from './restoreBinSelection/useBulkRestore';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
-import {driveBulkActionsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
+import {
+  driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
+} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import type {Conversation} from '../../../../repositories/entity/Conversation';
 import {CellNode, CellNodeType} from '../../../../types/cellNode';
+import {ArrowIcon} from '../../../../uiKit/dataDisplay/icon/arrowIcon';
+import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';
+import {TrashIcon} from '../../../../uiKit/dataDisplay/icon/trashIcon';
+import {UploadIcon} from '../../../../uiKit/dataDisplay/icon/uploadIcon';
+import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
 import {formatBytes} from '../../../../util/util';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '../../../Modals/PrimaryModal';
 import {
@@ -253,6 +258,7 @@ export const CellsTable = ({
   });
   const isSelectionEnabled =
     selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName) && canPerformAnyBulkAction;
+  const isBulkRestoreEnabled = isSelectionEnabled && isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName);
   const activeDriveDrag = useRef<CapturedDriveDrag | null>(null);
   const isDropMoveSubmitting = useRef(false);
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
@@ -815,7 +821,7 @@ export const CellsTable = ({
   const restoreResolution = resolveRestoreTargets({selectedNodes});
   const isBulkRestoreBlocking = bulkRestore.isPending || bulkRestore.reviewReason !== null;
   const canRestoreSelection =
-    isSelectionEnabled &&
+    isBulkRestoreEnabled &&
     selectedNodes.length > 0 &&
     selectedNodes.length === selectedNodeIds.size &&
     isInRecycleBin() &&
@@ -1310,6 +1316,7 @@ export const CellsTable = ({
                                 action: () => {
                                   void handlePermanentDelete(nodeIds, selectionScopeKey, path);
                                 },
+                                isDestructive: true,
                                 text: translate('cells.deletePermanentlyModal.button'),
                               },
                               text: {
@@ -1363,7 +1370,7 @@ export const CellsTable = ({
                     )}
                     {canMoveSelectionToBin && (
                       <button
-                        css={bulkMoveToBinButtonStyles}
+                        css={bulkActionButtonStyles}
                         type="button"
                         aria-haspopup="dialog"
                         onClick={() => {

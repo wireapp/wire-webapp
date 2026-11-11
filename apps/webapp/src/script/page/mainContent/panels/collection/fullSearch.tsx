@@ -23,14 +23,16 @@ import {CSSObject} from '@emotion/react';
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyArray, isNonEmptyString, isNull, isNumber} from '@sindresorhus/is';
 
-import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
-
 import {FullSearchItem} from './fullSearch/fullSearchItem';
 import type {FullSearchProvider} from './fullSearch/useFullSearch';
 import {useFullSearch} from './fullSearch/useFullSearch';
 
 import type {Message} from '../../../../repositories/entity/message/message';
 import {getSearchRegex} from '../../../../repositories/search/fullTextSearch';
+import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';
+import {SearchIcon} from '../../../../uiKit/dataDisplay/icon/searchIcon';
+import {Input} from '../../../../uiKit/inputs/input/input';
+import {InputSubmitCombo} from '../../../../uiKit/inputs/inputSubmitCombo/inputSubmitCombo';
 import {isScrolledBottom} from '../../../../util/scrollHelpers';
 import {useEffectRef} from '../../../../util/useEffectRef';
 import {noop} from '../../../../util/util';

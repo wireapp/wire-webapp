@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2} from '@wireapp/react-ui-kit';
+import {COLOR_V2} from '../../uiKit/identity/colorsV2/colorsV2';
 
 export const styles: {
   container: CSSObject;

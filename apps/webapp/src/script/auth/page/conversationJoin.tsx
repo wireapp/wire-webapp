@@ -29,7 +29,6 @@ import {connect} from 'react-redux';
 import {Navigate} from 'react-router';
 
 import {UrlUtil} from '@wireapp/commons';
-import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './conversationJoinComponents';
 import {ConversationJoinFull} from './conversationJoinInvalid';
@@ -39,6 +38,9 @@ import {Page} from './page';
 
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
+import {Column, Columns} from '../../uiKit/layout/column/column';
+import {H1} from '../../uiKit/typography/heading/heading';
+import {Muted} from '../../uiKit/typography/text/text';
 import {isBackendError} from '../../util/typePredicateUtil';
 import {noop} from '../../util/util';
 import {AppAlreadyOpen} from '../component/appAlreadyOpen';

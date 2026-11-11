@@ -23,21 +23,16 @@ import {CSSObject} from '@emotion/react';
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {
-  BASE_DARK_COLOR,
-  BASE_LIGHT_COLOR,
-  Button,
-  ButtonVariant,
-  COLOR_V2,
-  Input,
-  Label,
-  Switch,
-} from '@wireapp/react-ui-kit';
 
 import {CellsShareExpirationFields, type CellsShareExpirationSelection} from './cellsShareExpirationFields';
 
 import {Config} from '../../../Config';
 import {type RootContextValue} from '../../../page/rootProvider';
+import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR_V2} from '../../../uiKit/identity/colorsV2/colorsV2';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {Input} from '../../../uiKit/inputs/input/input';
+import {Switch} from '../../../uiKit/inputs/switch/switch';
+import {Label} from '../../../uiKit/typography/label/label';
 import {CellsTableLoader} from '../../conversation/conversationCells/common/cellsTableLoader/cellsTableLoader';
 import {CopyToClipboardButton} from '../../copyToClipboardButton/copyToClipboardButton';
 import * as Icon from '../../icon';

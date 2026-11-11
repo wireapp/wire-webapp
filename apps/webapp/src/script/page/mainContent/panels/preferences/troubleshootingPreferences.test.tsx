@@ -20,9 +20,9 @@
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {act, fireEvent, render, screen, type RenderResult} from '@testing-library/react';
 import {Maybe} from 'true-myth';
+import {ThemeProvider} from '../../../../uiKit/identity/theme/theme';
 
 import type {ConnectionTestResult} from '@wireapp/avs';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import {
   createTroubleshooterRepository,

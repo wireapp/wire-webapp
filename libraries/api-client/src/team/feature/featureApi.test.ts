@@ -20,8 +20,18 @@
 import {LogFactory} from '@wireapp/commons';
 
 import {HttpClient} from '../../http';
-import {FeatureAPI} from './featureApi';
+import {FeatureAPI, isBackendError} from './featureApi';
 import {FEATURE_STATUS} from './featureList.types';
+
+describe('isBackendError()', () => {
+  it('exposes the backend error predicate from the feature API module', () => {
+    const backendError = Object.assign(new Error('Feature is locked'), {label: 'feature-locked'});
+
+    expect(isBackendError(backendError)).toBe(true);
+    expect(isBackendError(new Error('Network unavailable'))).toBe(false);
+    expect(isBackendError({label: 'feature-locked'})).toBe(false);
+  });
+});
 
 describe('FeatureAPI.getAllFeatures()', () => {
   afterEach(() => {

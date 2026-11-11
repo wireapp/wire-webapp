@@ -21,8 +21,6 @@ import {useCallback, useEffect, useId, useRef, useState, type FunctionComponent}
 
 import {isNull, isNullOrUndefined} from '@sindresorhus/is';
 
-import {Checkbox, CheckboxLabel, TabIndex} from '@wireapp/react-ui-kit';
-
 import {
   checkboxLabel,
   dropdown,
@@ -36,6 +34,8 @@ import {
 
 import * as Icon from '../../../../../components/icon';
 import {Config} from '../../../../../Config';
+import {Checkbox, CheckboxLabel} from '../../../../../uiKit/inputs/checkbox/checkbox';
+import {TabIndex} from '../../../../../uiKit/utils/enums';
 import {handleEscDown, isEnterKey, isKey, isSpaceKey, KEY} from '../../../../../util/keyboardUtil';
 import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 import {useApplicationContext} from '../../../../rootProvider';

@@ -30,36 +30,27 @@ import {connect} from 'react-redux';
 import {useNavigate} from 'react-router';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
-import {
-  ActionLinkButton,
-  Button,
-  ButtonVariant,
-  Checkbox,
-  CheckboxLabel,
-  CodeInput,
-  Column,
-  Columns,
-  Container,
-  ContainerXS,
-  FlexBox,
-  Form,
-  Heading,
-  IsMobile,
-  Label,
-  Link,
-  LinkVariant,
-  Loading,
-  QUERY,
-  QueryKeys,
-  Text,
-  useMatchMedia,
-} from '@wireapp/react-ui-kit';
 
 import {separator} from './login.styles';
 
 import {LogoFullIcon} from '../../../components/icon';
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
+import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {Checkbox, CheckboxLabel} from '../../../uiKit/inputs/checkbox/checkbox';
+import {CodeInput} from '../../../uiKit/inputs/codeInput/codeInput';
+import {Form} from '../../../uiKit/inputs/form/form';
+import {Column, Columns} from '../../../uiKit/layout/column/column';
+import {Container, ContainerXS} from '../../../uiKit/layout/container/container';
+import {FlexBox} from '../../../uiKit/layout/flexBox/flexBox';
+import {IsMobile, useMatchMedia} from '../../../uiKit/layout/matchMedia/matchMedia';
+import {ActionLinkButton} from '../../../uiKit/typography/actionLink/actionLink';
+import {Heading} from '../../../uiKit/typography/heading/heading';
+import {Label} from '../../../uiKit/typography/label/label';
+import {Link, LinkVariant} from '../../../uiKit/typography/link/link';
+import {Text} from '../../../uiKit/typography/text/text';
+import {QUERY, QueryKeys} from '../../../uiKit/utils/mediaQueries';
 import {getLogger} from '../../../util/logger';
 import {isBackendError} from '../../../util/typePredicateUtil';
 import {AccountAlreadyExistsModal} from '../../component/accountAlreadyExistsModal';

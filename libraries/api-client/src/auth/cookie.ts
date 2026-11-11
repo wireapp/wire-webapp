@@ -27,6 +27,10 @@ export class Cookie {
   }
 
   public get isExpired(): boolean {
+    if (this.expiration === 'Infinity') {
+      return false;
+    }
+
     return new Date() > new Date(this.expiration);
   }
 }

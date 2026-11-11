@@ -309,6 +309,10 @@ test('preserves an explicit enabled feature through authentication navigation', 
   await expectStartupSelectionSurvivesAuthentication(page, 'for-tests-only');
 });
 
+test('preserves explicit Mark as unread opt-in through authentication and reload', async ({page}) => {
+  await expectStartupSelectionSurvivesAuthentication(page, 'mark-as-unread');
+});
+
 test('preserves an explicit empty feature selection through authentication navigation', async ({page}) => {
   await expectStartupSelectionSurvivesAuthentication(page, '');
 });

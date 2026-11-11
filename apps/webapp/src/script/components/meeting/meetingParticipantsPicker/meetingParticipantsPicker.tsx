@@ -22,8 +22,6 @@ import {useId, type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {Button, Popover} from 'react-aria-components';
 
-import {ChevronDownIcon, getOverlayPortalContainer, InputLabel, SearchIcon} from '@wireapp/react-ui-kit';
-
 import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';
 import {MeetingConversationsSearchableList} from './meetingConversationsSearchableList';
 import {
@@ -49,6 +47,10 @@ import type {User} from '../../../repositories/entity/User';
 import type {SearchRepository} from '../../../repositories/search/searchRepository';
 import type {TeamRepository} from '../../../repositories/team/TeamRepository';
 import type {TeamState} from '../../../repositories/team/TeamState';
+import {ChevronDownIcon} from '../../../uiKit/dataDisplay/icon/chevronDownIcon';
+import {SearchIcon} from '../../../uiKit/dataDisplay/icon/searchIcon';
+import {InputLabel} from '../../../uiKit/inputs/inputLabel/inputLabel';
+import {getOverlayPortalContainer} from '../../../uiKit/utils/overlayPortal';
 import {UserSearchableList} from '../../UserSearchableList';
 
 export interface MeetingParticipantsPickerProps {

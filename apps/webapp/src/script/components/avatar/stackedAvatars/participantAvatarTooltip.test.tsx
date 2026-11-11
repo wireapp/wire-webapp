@@ -18,7 +18,7 @@
  */
 
 import {act, fireEvent, render, screen, waitFor, type RenderResult} from '@testing-library/react';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 
 import {AVATAR_SIZE} from '..';
 import {User} from '../../../repositories/entity/User';

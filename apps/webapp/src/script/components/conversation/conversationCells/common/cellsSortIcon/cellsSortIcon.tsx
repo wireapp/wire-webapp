@@ -19,9 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
-import {SortAscendingIcon, SortDescendingIcon, SortNeutralIcon} from '@wireapp/react-ui-kit';
-
 import {sortIconStyles} from './cellsSortIcon.styles';
+
+import {SortAscendingIcon} from '../../../../../uiKit/dataDisplay/icon/sortAscendingIcon';
+import {SortDescendingIcon} from '../../../../../uiKit/dataDisplay/icon/sortDescendingIcon';
+import {SortNeutralIcon} from '../../../../../uiKit/dataDisplay/icon/sortNeutralIcon';
 
 export type CellsSortDirection = 'asc' | 'desc';
 type CellsSortState = CellsSortDirection | 'none';

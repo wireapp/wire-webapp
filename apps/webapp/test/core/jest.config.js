@@ -37,10 +37,13 @@ module.exports = {
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
   moduleNameMapper: {
+    '^@enormora/clock$': '<rootDir>/../../node_modules/@enormora/clock/index.js',
+    '^@enormora/clock/clock$': '<rootDir>/../../node_modules/@enormora/clock/clock.entry-point.js',
+    '^@enormora/clock/deterministic-clock$': '<rootDir>/../../node_modules/@enormora/clock/deterministic-clock.js',
     '^@enormora/fire-and-forget$': '<rootDir>/../../node_modules/@enormora/fire-and-forget/index.js',
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(true-myth|uuid|noop-esm|p-queue|p-timeout|eventemitter3|@sindresorhus/is|@faker-js/faker|@enormora/fire-and-forget)/)',
+    '/node_modules/(?!(true-myth|uuid|noop-esm|p-queue|p-timeout|eventemitter3|@sindresorhus/is|@faker-js/faker|@enormora/clock|@enormora/fire-and-forget)/)',
   ],
   coverageDirectory: '../../target/coverage/apps/webapp/core',
   coverageThreshold: {

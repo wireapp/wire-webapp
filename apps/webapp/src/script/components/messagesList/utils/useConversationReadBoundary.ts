@@ -20,11 +20,14 @@
 import {useEffect, useRef, useState} from 'react';
 import type {Dispatch, MutableRefObject, SetStateAction} from 'react';
 
+import {isNumber} from '@sindresorhus/is';
+
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 
 export type ConversationReadBoundary = {
   readonly timestamp: number;
+  readonly hasManualUnreadMarker: boolean;
   readonly timestampReference: MutableRefObject<number>;
   readonly setTimestamp: Dispatch<SetStateAction<number>>;
 };
@@ -42,5 +45,5 @@ export function useConversationReadBoundary(conversation: Conversation): Convers
     timestampReference.current = timestamp;
   }, [timestamp]);
 
-  return {timestamp, timestampReference, setTimestamp};
+  return {timestamp, timestampReference, setTimestamp, hasManualUnreadMarker: isNumber(manualUnreadTimestamp)};
 }

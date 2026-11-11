@@ -23,8 +23,6 @@ import {isEmptyArray, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {ChevronDownIcon} from '@wireapp/react-ui-kit';
-
 import {UserListItem} from './components/userListItem';
 import {collapseButton, collapseIcon} from './userList.styles';
 
@@ -34,6 +32,7 @@ import {ConversationState} from '../../repositories/conversation/ConversationSta
 import type {Conversation} from '../../repositories/entity/Conversation';
 import type {User} from '../../repositories/entity/User';
 import {TeamState} from '../../repositories/team/TeamState';
+import {ChevronDownIcon} from '../../uiKit/dataDisplay/icon/chevronDownIcon';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isEnterKey, isSpaceKey} from '../../util/keyboardUtil';
 import {InViewport} from '../inViewport';

@@ -19,9 +19,8 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Checkbox} from '@wireapp/react-ui-kit';
-
 import {useApplicationContext} from '../../../../page/rootProvider';
+import {Checkbox} from '../../../../uiKit/inputs/checkbox/checkbox';
 
 interface CellsSelectionCheckboxProps {
   id: string;

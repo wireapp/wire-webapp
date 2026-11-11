@@ -481,7 +481,10 @@ export class ConversationMapper {
     const selfState = members?.self ?? conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
 
-    if (isNumber(conversationData.manual_unread_timestamp)) {
+    if (
+      isNumber(conversationData.manual_unread_timestamp) &&
+      Number.isFinite(conversationData.manual_unread_timestamp)
+    ) {
       conversationEntity.manualUnreadTimestamp(conversationData.manual_unread_timestamp);
     }
 

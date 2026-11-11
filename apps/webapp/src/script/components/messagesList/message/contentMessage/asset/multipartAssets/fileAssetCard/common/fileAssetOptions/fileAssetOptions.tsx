@@ -19,11 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
-import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
-
 import {buttonStyles, iconStyles} from './fileAssetOptions.styles';
 
 import {useApplicationContext} from '../../../../../../../../../page/rootProvider';
+import {MoreIcon} from '../../../../../../../../../uiKit/dataDisplay/icon/moreIcon';
+import {DropdownMenu} from '../../../../../../../../../uiKit/surface/dropdownMenu/dropdownMenu';
 import {isFileEditable} from '../../../../../../../../../util/fileTypeUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from '../../../../../../../../../util/util';
 import {

@@ -25,12 +25,17 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil, StringUtil, Runtime} from '@wireapp/commons';
-import {Button, ButtonVariant, ContainerXS, Muted, QUERY, Text, useMatchMedia, useTimeout} from '@wireapp/react-ui-kit';
 
 import {Page} from './page';
 
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
+import {Muted, Text} from '../../uiKit/typography/text/text';
+import {QUERY} from '../../uiKit/utils/mediaQueries';
+import {useTimeout} from '../../uiKit/utils/useTimeout';
 import {ClientList} from '../component/clientList';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators, type ThunkAction} from '../module/reducer';

@@ -73,7 +73,10 @@ export class APIClient extends APIClientUnconfigured {
     };
 
     super(unconfiguredApiClientConfiguration);
+    this.clock = clock;
   }
+
+  public readonly clock: Clock;
 
   public resetIncrementalRetryBackoff(): void {
     const retryBackoffResettableHttpClient = this.transport.http as unknown as RetryBackoffResettableHttpClient;

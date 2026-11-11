@@ -21,9 +21,8 @@ import {useRef, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {useApplicationContext} from '../../../../page/rootProvider';
+import {TabIndex} from '../../../../uiKit/utils/enums';
 import * as Icon from '../../../icon';
 
 interface ImageUploadButtonProps {

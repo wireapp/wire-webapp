@@ -27,8 +27,6 @@ import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
-import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
-
 import {AppLock} from './appLock';
 import {useE2EIFeatureConfigUpdate} from './components/featureConfigChange/featureConfigChangeHandler/features/useE2eIFeatureConfigUpdate';
 import {FeatureConfigChangeNotifier} from './components/featureConfigChange/featureConfigChangeNotifier';
@@ -76,6 +74,10 @@ import {UserState} from '../repositories/user/userState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRouterClock, configureRoutes, navigate} from '../router/Router';
 import {Core} from '../service/coreSingleton';
+import {THEME_ID} from '../uiKit/identity/theme/theme';
+import {useMatchMedia} from '../uiKit/layout/matchMedia/matchMedia';
+import {StyledApp} from '../uiKit/layout/styledApp/styledApp';
+import {QUERY} from '../uiKit/utils/mediaQueries';
 import {canUseMeetings} from '../util/canUseMeetings';
 import {canUseTroubleshooter} from '../util/canUseTroubleshooter';
 import {useKoSubscribableChildren} from '../util/componentUtil';

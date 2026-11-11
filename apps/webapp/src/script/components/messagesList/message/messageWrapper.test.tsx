@@ -28,6 +28,8 @@ import {MemberMessage as MemberMessageEntity} from '../../../repositories/entity
 import {Text} from '../../../repositories/entity/message/text';
 import {User} from '../../../repositories/entity/User';
 import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
+import {markAsUnreadFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import type {StartupFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {
@@ -262,6 +264,9 @@ describe('MessageWrapper', () => {
 
   describe('Mark as unread context menu entry', () => {
     type RenderContentMessageResult = ReturnType<typeof render> & {
+      readonly isFeatureToggleEnabledForTest: jest.MockedFunction<
+        (featureToggleName: StartupFeatureToggleName) => boolean
+      >;
       readonly cancelPendingReadReceiptsForConversation: jest.MockedFunction<(conversation: Conversation) => void>;
       readonly conversation: Conversation;
       readonly markUnreadFrom: jest.SpiedFunction<Conversation['markUnreadFrom']>;
@@ -269,7 +274,7 @@ describe('MessageWrapper', () => {
       readonly actionOrder: string[];
     };
 
-    function renderContentMessage(): RenderContentMessageResult {
+    function renderContentMessage(isMarkAsUnreadEnabled?: boolean): RenderContentMessageResult {
       const conversation = new Conversation(
         createUuid(),
         'test.wire.link',
@@ -281,8 +286,10 @@ describe('MessageWrapper', () => {
       message.user(generateUser());
       message.addAsset(new Text(createUuid(), 'hello'));
       const actionOrder: string[] = [];
-      const markUnreadFrom = jest.spyOn(conversation, 'markUnreadFrom').mockImplementation(() => {
+      const markUnreadFromOriginal = conversation.markUnreadFrom.bind(conversation);
+      const markUnreadFrom = jest.spyOn(conversation, 'markUnreadFrom').mockImplementation(selectedMessage => {
         actionOrder.push('mark unread');
+        markUnreadFromOriginal(selectedMessage);
       });
       const cancelPendingReadReceiptsForConversation = jest.fn((conversationToCancel: Conversation): void => {
         expect(conversationToCancel).toBe(conversation);
@@ -294,13 +301,27 @@ describe('MessageWrapper', () => {
         isFocused: true,
       };
 
-      const view = render(withThemeAndRootContext(<MessageWrapper {...props} />, rootProviderWrapper));
+      const isFeatureToggleEnabledForTest = jest.fn((featureToggleName: StartupFeatureToggleName): boolean => {
+        return isMarkAsUnreadEnabled === true && featureToggleName === markAsUnreadFeatureToggleName;
+      });
+
+      const rootProviderWrapperForMessage =
+        isMarkAsUnreadEnabled === true
+          ? createRootProviderWrapperForTest(
+              createRootContextValueForTest({
+                translate: translateForTest,
+                isFeatureToggleEnabled: isFeatureToggleEnabledForTest,
+              }),
+            )
+          : rootProviderWrapper;
+      const view = render(withThemeAndRootContext(<MessageWrapper {...props} />, rootProviderWrapperForMessage));
       fireEvent.click(view.getByLabelText('accessibility.conversationContextMenuOpenLabel'));
 
       return {
         ...view,
         cancelPendingReadReceiptsForConversation,
         conversation,
+        isFeatureToggleEnabledForTest,
         markUnreadFrom,
         message,
         actionOrder,
@@ -312,20 +333,33 @@ describe('MessageWrapper', () => {
     });
 
     it('marks the conversation as unread from the message when the entry is clicked', () => {
-      const {getByText, actionOrder, cancelPendingReadReceiptsForConversation, conversation, markUnreadFrom, message} =
-        renderContentMessage();
+      const {
+        getByText,
+        actionOrder,
+        cancelPendingReadReceiptsForConversation,
+        conversation,
+        isFeatureToggleEnabledForTest,
+        markUnreadFrom,
+        message,
+      } = renderContentMessage(true);
+
+      expect(isFeatureToggleEnabledForTest).toHaveBeenCalledWith(markAsUnreadFeatureToggleName);
 
       fireEvent.click(getByText('conversationContextMenuMarkUnread'));
 
       expect(cancelPendingReadReceiptsForConversation).toHaveBeenCalledWith(conversation);
       expect(markUnreadFrom).toHaveBeenCalledWith(message);
       expect(actionOrder).toEqual(['cancel pending receipts', 'mark unread']);
+      expect(conversation.manualUnreadTimestamp()).toBe(message.timestamp());
+      expect(conversation.effectiveReadTimestamp()).toBe(message.timestamp() - 1);
+      expect(conversation.last_read_timestamp()).toBe(0);
+      expect(conversation.isAutoReadSuppressed()).toBe(true);
     });
 
-    it('offers the entry by default', () => {
+    it('does not offer the entry by default', () => {
       const {queryByText, cancelPendingReadReceiptsForConversation} = renderContentMessage();
 
-      expect(queryByText('conversationContextMenuMarkUnread')).toBeInTheDocument();
+      expect(queryByText('conversationContextMenuMarkUnread')).not.toBeInTheDocument();
       expect(cancelPendingReadReceiptsForConversation).not.toHaveBeenCalled();
     });
   });

@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {SearchIcon} from '@wireapp/react-ui-kit';
-
 import {
   headingStyles,
   paragraphStyles,
@@ -32,6 +30,8 @@ import {
   searchWrapperStyles,
   wrapperStyles,
 } from './cellsStateInfo.styles';
+
+import {SearchIcon} from '../../../../uiKit/dataDisplay/icon/searchIcon';
 
 type DefaultCellsStateInfoProps = {
   heading?: string;

@@ -22,18 +22,6 @@ import {useEffect, useState, type JSX} from 'react';
 import {Maybe, task} from 'true-myth';
 import {useStore} from 'zustand';
 
-import {
-  Button,
-  ButtonVariant,
-  ChevronDownIcon,
-  ComputerIcon,
-  ErrorStatusIcon,
-  Loading,
-  NetworkBuildingIcon,
-  SuccessStatusIcon,
-  WireLogoIcon,
-} from '@wireapp/react-ui-kit';
-
 import {PreferencesPage} from './components/preferencesPage';
 import {DiagnosticStatusIcon as StatusIcon} from './troubleshooting/diagnosticStatusIcon';
 import * as styles from './troubleshooting/troubleshooting.styles';
@@ -46,6 +34,12 @@ import type {
   DiagnosticResult,
 } from '../../../../repositories/troubleshooter/troubleshooterRepository';
 import type {CheckStatus} from '../../../../repositories/troubleshooter/troubleshooterService';
+import {ChevronDownIcon, ErrorStatusIcon, SuccessStatusIcon} from '../../../../uiKit';
+import {ComputerIcon} from '../../../../uiKit/dataDisplay/icon/computerIcon';
+import {NetworkBuildingIcon} from '../../../../uiKit/dataDisplay/icon/networkBuildingIcon';
+import {WireLogoIcon} from '../../../../uiKit/dataDisplay/icon/wireLogoIcon';
+import {Loading} from '../../../../uiKit/dataDisplay/loading/loading';
+import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
 import {copyText} from '../../../../util/clipboardUtil';
 import {createReactTranslationMarker, renderReactTranslation} from '../../../../util/localizerUtil/reactLocalizerUtil';
 import {downloadBlob} from '../../../../util/util';

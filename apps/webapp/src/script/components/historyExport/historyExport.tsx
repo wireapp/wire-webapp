@@ -23,8 +23,6 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
-
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {ContentState} from '../../page/useAppState';
@@ -33,6 +31,8 @@ import {ClientState} from '../../repositories/client/ClientState';
 import {User} from '../../repositories/entity/User';
 import {EventName} from '../../repositories/tracking/eventName';
 import {Segmentation} from '../../repositories/tracking/segmentation';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {FlexBox} from '../../uiKit/layout/flexBox/flexBox';
 import {getLogger} from '../../util/logger';
 import {getCurrentDate} from '../../util/timeUtil';
 import {downloadBlob} from '../../util/util';

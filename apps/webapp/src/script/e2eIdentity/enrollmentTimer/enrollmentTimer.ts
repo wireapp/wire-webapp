@@ -99,7 +99,10 @@ function getGracePeriod(
   // To be sure the device does not expire, we want to keep a safe delay
   const safeDelay = randomInt(TimeInMillis.DAY) + messageRetentionTime;
 
-  const end = Number(identity.x509Identity?.notAfter) * TimeInMillis.SECOND;
+  const notAfter = identity.x509Identity?.notAfter;
+  // An X509 identity without certificate details cannot be scheduled. Treat it as already
+  // expired so the user is asked to enroll again instead of waiting forever.
+  const end = isUndefined(notAfter) ? 0 : notAfter.getTime();
   const start = Math.max(end - safeDelay, end - teamGracePeriodDuration);
 
   return {end, start};

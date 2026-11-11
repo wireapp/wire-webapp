@@ -21,13 +21,13 @@ import type {FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Checkbox, CheckboxLabel, ChevronDownIcon} from '@wireapp/react-ui-kit';
-
 import {conversationIconStyles, conversationListStyles} from './meetingParticipantsPicker.styles';
 import {getConversationKey} from './participantPickerUtils';
 
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {Conversation} from '../../../repositories/entity/Conversation';
+import {ChevronDownIcon} from '../../../uiKit/dataDisplay/icon/chevronDownIcon';
+import {Checkbox, CheckboxLabel} from '../../../uiKit/inputs/checkbox/checkbox';
 import {ChannelAvatar} from '../../avatar/channelAvatar';
 import {GroupAvatar} from '../../avatar/groupAvatar';
 import {listItem, listWrapper} from '../../participantItemContent/participantItem.styles';

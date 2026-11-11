@@ -21,7 +21,6 @@ import {UserManager, UserManagerSettings, WebStorageStateStore, type User} from 
 
 import {EncryptedStorage} from './oauthEncryptedStore';
 
-import {KeyAuth} from '../../core/messagingProtocols/mls';
 import {clearKeysStartingWith} from '../../util/localStorage';
 
 export class OIDCService {
@@ -61,12 +60,12 @@ export class OIDCService {
     this.userManager = new UserManager(dexioConfig);
   }
 
-  public async authenticate(keyAuth: KeyAuth, challengeUrl: string, silent: boolean): Promise<void | User | null> {
+  public async authenticate(keyAuth: string, acmeAudience: string, silent: boolean): Promise<void | User | null> {
     // New claims value for keycloak
     const claims = {
       id_token: {
         keyauth: {essential: true, value: keyAuth},
-        acme_aud: {essential: true, value: challengeUrl},
+        acme_aud: {essential: true, value: acmeAudience},
       },
     };
 

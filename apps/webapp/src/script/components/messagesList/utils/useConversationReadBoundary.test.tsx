@@ -27,6 +27,35 @@ import {translateForTest} from '../../../util/test/translateForTest';
 import {useConversationReadBoundary} from './useConversationReadBoundary';
 
 describe('useConversationReadBoundary', () => {
+  it('uses the next conversation boundary when switching without remounting', () => {
+    const firstConversation = new Conversation(
+      'first-conversation',
+      '',
+      CONVERSATION_PROTOCOL.PROTEUS,
+      translateForTest,
+    );
+    const secondConversation = new Conversation(
+      'second-conversation',
+      '',
+      CONVERSATION_PROTOCOL.PROTEUS,
+      translateForTest,
+    );
+    firstConversation.last_read_timestamp(100);
+    secondConversation.last_read_timestamp(500);
+    secondConversation.manualUnreadTimestamp(200);
+    const {result, rerender} = renderHook(
+      conversation => {
+        return useConversationReadBoundary(conversation);
+      },
+      {initialProps: firstConversation},
+    );
+
+    rerender(secondConversation);
+
+    expect(result.current.timestamp).toBe(199);
+    expect(result.current.timestampReference.current).toBe(199);
+    expect(result.current.hasManualUnreadMarker).toBe(true);
+  });
   it('keeps automatic read progress from moving the separator and updates it for an explicit marker', () => {
     const conversation = new Conversation('conversation', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.last_read_timestamp(100);

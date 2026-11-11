@@ -19,13 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {
-  isProteusDuplicateMessageError,
-  isProteusRemoteIdentityChangedError,
-  isProteusSessionNotFoundError,
-  isProteusError,
-  ProteusErrorType,
-} from '@wireapp/core-crypto';
+import {CoreCryptoError, ProteusError} from '@wireapp/core-crypto';
 
 import {DecryptionError} from '../../../../errors/decryptionError';
 
@@ -40,44 +34,45 @@ export const ProteusErrors = {
   Unknown: 999,
 } as const;
 
-type CryptoboxError = Error & {code: number};
-
-const isCryptoboxError = (error: unknown): error is CryptoboxError => {
-  return typeof (error as any)?.code === 'number';
-};
-
-type LegacyProteusError = {proteusErrorCode: number};
-const hasProteusErrorCode = (error: unknown): error is LegacyProteusError => {
-  return typeof (error as any)?.proteusErrorCode === 'number';
-};
-
 type SenderInfo = {clientId: string; userId: QualifiedId};
 
+type LegacyProteusError = Error & {code: number};
+
+/**
+ * Legacy Cryptobox errors are Proteus `Error` instances carrying a numeric code.
+ * This boundary is intentionally structural: importing `@wireapp/proteus` only
+ * for `instanceof` would eagerly initialize its separate libsodium stack even
+ * when the application uses CoreCrypto.
+ */
+const isLegacyProteusError = (error: unknown): error is LegacyProteusError => {
+  return error instanceof Error && 'code' in error && typeof error.code === 'number';
+};
+
 function getErrorCode(error: unknown): number {
-  if (isProteusSessionNotFoundError(error)) {
+  if (!CoreCryptoError.Proteus.instanceOf(error)) {
+    if (isLegacyProteusError(error)) {
+      return error.code;
+    }
+
+    return ProteusErrors.Unknown;
+  }
+
+  const proteusError = error.inner.exception;
+
+  if (ProteusError.SessionNotFound.instanceOf(proteusError)) {
     return ProteusErrors.SessionNotFound;
   }
 
-  if (isProteusRemoteIdentityChangedError(error)) {
+  if (ProteusError.RemoteIdentityChanged.instanceOf(proteusError)) {
     return ProteusErrors.RemoteIdentityChanged;
   }
 
-  if (isProteusDuplicateMessageError(error)) {
+  if (ProteusError.DuplicateMessage.instanceOf(proteusError)) {
     return ProteusErrors.DuplicateMessage;
   }
 
-  if (isProteusError(error, ProteusErrorType.Other)) {
-    return typeof error.context.context.errorCode === 'number'
-      ? error.context.context.errorCode
-      : ProteusErrors.Unknown;
-  }
-
-  if (hasProteusErrorCode(error)) {
-    return error.proteusErrorCode;
-  }
-
-  if (isCryptoboxError(error)) {
-    return error.code;
+  if (ProteusError.Other.instanceOf(proteusError)) {
+    return proteusError.inner.errorCode;
   }
 
   return ProteusErrors.Unknown;
@@ -89,8 +84,8 @@ export const generateDecryptionError = (senderInfo: SenderInfo, error: unknown):
 
   const code = getErrorCode(error);
 
-  const name = (error as {name?: string})?.name;
-  const text = (error as {message?: string})?.message ?? String(error);
+  const name = error instanceof Error ? error.name : undefined;
+  const text = error instanceof Error ? error.message : String(error);
   const message = `Decryption error from ${sender} (name: ${name}) (message: ${text})`;
 
   return new DecryptionError(message, code);

@@ -23,7 +23,6 @@ import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {callingContainer} from './CallingCell.styles';
 import {CallingControls} from './CallingControls';
@@ -45,6 +44,7 @@ import {PropertiesRepository} from '../../../repositories/properties/propertiesR
 import {PROPERTIES_TYPE} from '../../../repositories/properties/propertiesType';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {generateConversationUrl} from '../../../router/routeGenerator';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from '../../../util/keyboardUtil';
 import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';

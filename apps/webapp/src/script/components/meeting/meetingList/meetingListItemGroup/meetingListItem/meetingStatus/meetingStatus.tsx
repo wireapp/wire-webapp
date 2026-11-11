@@ -19,8 +19,6 @@
 
 import {memo, type FunctionComponent} from 'react';
 
-import {Button, ButtonVariant, CallIcon} from '@wireapp/react-ui-kit';
-
 import {
   joinButtonContainerStyles,
   joinButtonIconStyles,
@@ -30,6 +28,8 @@ import {
 } from './meetingStatus.styles';
 
 import {useApplicationContext} from '../../../../../../page/rootProvider';
+import {CallIcon} from '../../../../../../uiKit/dataDisplay/icon/callIcon';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
 import {MeetingTemporalStatuses} from '../../../../utils/meetingStatusUtil';
 
 export interface MeetingStatusProps {

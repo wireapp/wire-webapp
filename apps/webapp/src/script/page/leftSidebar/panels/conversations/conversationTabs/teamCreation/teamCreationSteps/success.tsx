@@ -21,14 +21,13 @@ import type {FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {StepProps} from './stepProps';
 import {listCss, modalButtonsCss, successStepSubHeaderCss} from './teamCreationSteps.styles';
 
 import {Config} from '../../../../../../../Config';
 import {EventName} from '../../../../../../../repositories/tracking/eventName';
 import {Segmentation} from '../../../../../../../repositories/tracking/segmentation';
+import {Button, ButtonVariant} from '../../../../../../../uiKit/inputs/button/button';
 import {safeWindowOpen} from '../../../../../../../util/sanitizationUtil';
 import {WebAppEvents} from '../../../../../../../webAppEvents';
 import {useApplicationContext} from '../../../../../../rootProvider';

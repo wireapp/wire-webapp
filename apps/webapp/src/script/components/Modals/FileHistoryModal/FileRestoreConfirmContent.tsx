@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {
   fileHistoryRestoreCloseButtonCss,
   restoreModalButtonCss,
@@ -31,6 +29,7 @@ import {
 } from './FileHistoryModal.styles';
 
 import {useApplicationContext} from '../../../page/rootProvider';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import * as Icon from '../../icon';
 
 interface FileRestoreConfirmModalProps {

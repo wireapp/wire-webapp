@@ -26,12 +26,15 @@ import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
-import {Button, ContainerXS, Link, Paragraph, Text} from '@wireapp/react-ui-kit';
-
 import {Page} from './page';
 
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
+import {Button} from '../../uiKit/inputs/button/button';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {Link} from '../../uiKit/typography/link/link';
+import {Paragraph} from '../../uiKit/typography/paragraph/paragraph';
+import {Text} from '../../uiKit/typography/text/text';
 import {handleEnterDown} from '../../util/keyboardUtil';
 import {actionRoot} from '../module/action/';
 import {bindActionCreators, RootState, type ThunkAction} from '../module/reducer';

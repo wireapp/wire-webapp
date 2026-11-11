@@ -19,6 +19,9 @@
 
 import {
   applockRefactoredFeatureToggleName,
+  driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
+  markAsUnreadFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   previewDefaultEnabledStartupFeatureToggleNames,
   selectPreviewDefaultEnabledStartupFeatureToggleNames,
@@ -28,6 +31,13 @@ import {
 } from './startupFeatureToggleNames';
 
 describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
+  it('enables Mark as unread by default in preview builds', () => {
+    expect(startupFeatureToggleRegistry).toContainEqual({
+      name: markAsUnreadFeatureToggleName,
+      previewDefaultEnabled: true,
+    });
+    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(markAsUnreadFeatureToggleName);
+  });
   it('selects enabled definitions and excludes disabled definitions in registry order', () => {
     const featureDefinitions = [
       {name: applockRefactoredFeatureToggleName, previewDefaultEnabled: true},
@@ -63,6 +73,18 @@ describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
 
     expect(previewDefaultEnabledStartupFeatureToggleNames).toEqual(expectedDefaultNames);
     expect(startupFeatureToggleNames).toEqual(expect.arrayContaining(previewDefaultEnabledStartupFeatureToggleNames));
+  });
+
+  it('enables Drive bulk actions by default in preview builds', () => {
+    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(driveBulkActionsFeatureToggleName);
+  });
+
+  it('keeps Drive bulk restore disabled by default in preview builds', () => {
+    expect(startupFeatureToggleRegistry).toContainEqual({
+      name: driveBulkRestoreFeatureToggleName,
+      previewDefaultEnabled: false,
+    });
+    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(driveBulkRestoreFeatureToggleName);
   });
 
   it('keeps the test-only flag explicitly opted out of preview defaults', () => {

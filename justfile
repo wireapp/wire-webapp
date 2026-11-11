@@ -27,11 +27,11 @@ lint-duplication:
 stylesheet-lint:
     cd apps/webapp && prettier --ignore-path ../../.prettierignore --check "**/*.less" && stylelint --ignore-path .gitignore "**/*.less"
 
-# Lint the repository with ESLint's flat config and the temporary 287-warning budget.
+# Lint the repository with ESLint's flat config and the temporary 279-warning budget.
 [arg("fix", long, value="true")]
 [group('lint')]
 eslint fix="false":
-    eslint . --config eslint.config.mjs --max-warnings=287 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
+    eslint . --config eslint.config.mjs --max-warnings=279 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
 
 # Run all repository lint checks, including ESLint, Prettier, Stylelint, and duplication.
 [group('lint')]
@@ -66,14 +66,12 @@ type-check: build-libraries
     tsc --project ./libraries/api-client/tsconfig.type-check.json
     tsc --project ./libraries/commons/tsconfig.type-check.json
     tsc --project ./libraries/config/tsconfig.type-check.json
-    tsc --project ./libraries/react-ui-kit/tsconfig.type-check.json
 
 # Build workspace libraries required by dependent tasks such as type-checking and tests.
 [group('build')]
 build-libraries:
     cd libraries/commons && tsc
     cd libraries/config && tsc
-    cd libraries/react-ui-kit && tsc
     cd libraries/api-client && tsc
 
 # Compile the production server and copy its runtime assets.
@@ -130,8 +128,7 @@ develop: prepare-development-server
         "just run-development-server" \
         "just watch-library commons" \
         "just watch-library config" \
-        "just watch-library api-client" \
-        "just watch-library react-ui-kit"
+        "just watch-library api-client"
 
 # Alternative to develop: build dependencies, select libraries, and start the server.
 [group('development')]
@@ -156,7 +153,7 @@ run-development-server:
 [group('development')]
 watch-library library:
     case {{ quote(library) }} in \
-        api-client|commons|config|react-ui-kit) ;; \
+        api-client|commons|config) ;; \
         *) echo "Unknown library: {{ quote(library) }}" >&2; exit 2 ;; \
     esac
     tsc --project {{ quote("libraries/" + library + "/tsconfig.json") }} --watch --preserveWatchOutput
@@ -191,7 +188,7 @@ e2e-ui *playwrightArguments: build-libraries
 # Run each Jest project separately to preserve its coverage thresholds.
 [group('testing')]
 test-ci: build-libraries
-    for jest_config_path in apps/*/jest.config.* apps/webapp/test/core/jest.config.js libraries/*/jest.config.js; do \
+    for jest_config_path in apps/*/jest.config.* apps/webapp/test/core/jest.config.js apps/webapp/test/uiKit/jest.config.js libraries/*/jest.config.js; do \
         CI=true jest --config "${jest_config_path}" --ci --coverage --maxWorkers=2 || exit $?; \
     done
     CI=true jest --config tools/jest.config.js --ci --maxWorkers=2

@@ -122,7 +122,7 @@ describe('ConversationMapper', () => {
     });
 
     it('rehydrates a local manual unread timestamp without changing canonical read state', () => {
-      const lastReadTimestamp = Date.now();
+      const lastReadTimestamp = 5_000;
       const manualUnreadTimestamp = lastReadTimestamp - 1000;
       const conversationData = {
         ...entities.conversation,
@@ -131,24 +131,29 @@ describe('ConversationMapper', () => {
         manual_unread_timestamp: manualUnreadTimestamp,
       } as ConversationDatabaseData;
 
-      const [conversationEntity] = ConversationMapper.mapConversations([conversationData], 1, translate);
+      const conversationEntity = ConversationMapper.mapConversations([conversationData], 1, translate).at(0);
+      assertNotNullOrUndefined(conversationEntity);
 
       expect(conversationEntity.manualUnreadTimestamp()).toBe(manualUnreadTimestamp);
       expect(conversationEntity.last_read_timestamp()).toBe(lastReadTimestamp);
       expect(conversationEntity.effectiveReadTimestamp()).toBe(manualUnreadTimestamp - 1);
     });
 
-    it('ignores a malformed persisted manual unread timestamp', () => {
-      const conversationData = {
-        ...entities.conversation,
-        members: undefined,
-        manual_unread_timestamp: 'invalid',
-      } as unknown as ConversationDatabaseData;
+    it.each(['invalid', Number.NaN, Infinity, -Infinity])(
+      'ignores a malformed persisted manual unread timestamp: %s',
+      manualUnreadTimestamp => {
+        const conversationData = {
+          ...entities.conversation,
+          members: undefined,
+          manual_unread_timestamp: manualUnreadTimestamp,
+        } as unknown as ConversationDatabaseData;
 
-      const [conversationEntity] = ConversationMapper.mapConversations([conversationData], 1, translate);
+        const conversationEntity = ConversationMapper.mapConversations([conversationData], 1, translate).at(0);
+        assertNotNullOrUndefined(conversationEntity);
 
-      expect(conversationEntity.manualUnreadTimestamp()).toBeUndefined();
-    });
+        expect(conversationEntity.manualUnreadTimestamp()).toBeUndefined();
+      },
+    );
 
     it('maps a backend conversation roles', () => {
       const conversation = {

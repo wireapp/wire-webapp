@@ -183,6 +183,10 @@ import {UserFilter} from '../user/userFilter';
 import {UserRepository} from '../user/userRepository';
 import {UserState} from '../user/userState';
 
+export type ConversationRepositoryOptions = {
+  readonly isMarkAsUnreadFeatureEnabled: boolean;
+};
+
 function withoutManualUnreadTimestamp<ConversationData extends ConversationRecord>(
   conversationData: ConversationData,
 ): ConversationData {
@@ -294,6 +298,7 @@ export class ConversationRepository {
     private readonly callingRepository: CallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly translate: Translate,
+    private readonly options: ConversationRepositoryOptions,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -445,12 +450,10 @@ export class ConversationRepository {
   }
 
   public registerMLSConversationVerificationStateHandler = (
-    domain: string,
     onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = noop,
     onSelfClientCertificateRevoked: () => Promise<void> = asyncNoop,
   ): void => {
     this.mlsConversationVerificationStateHandler = new MLSConversationVerificationStateHandler(
-      domain,
       onConversationVerificationStateChange,
       onSelfClientCertificateRevoked,
       this.conversationState,
@@ -1007,7 +1010,18 @@ export class ConversationRepository {
     connections: ConnectionEntity[],
     deadConnections: ConnectionEntity[] = [],
   ): Promise<Conversation[]> {
-    const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
+    let localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
+
+    if (!this.options.isMarkAsUnreadFeatureEnabled) {
+      const hasManualUnreadMarkers = localConversations.some(conversationData => {
+        return !isUndefined(conversationData.manual_unread_timestamp);
+      });
+
+      if (hasManualUnreadMarkers) {
+        localConversations = localConversations.map(withoutManualUnreadTimestamp);
+        await this.conversationService.saveConversationsInDb(localConversations);
+      }
+    }
 
     let conversationsData: any[];
 
@@ -2014,11 +2028,16 @@ export class ConversationRepository {
 
     this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
 
-    await Promise.allSettled(
-      proteusConversations.map(proteusConversation => {
-        return this.eventService.moveEventsToConversation(proteusConversation.qualifiedId, mlsConversation.qualifiedId);
-      }),
-    );
+    const movedEvents = (
+      await Promise.all(
+        proteusConversations.map(proteusConversation => {
+          return this.eventService.moveEventsToConversation(
+            proteusConversation.qualifiedId,
+            mlsConversation.qualifiedId,
+          );
+        }),
+      )
+    ).flat();
 
     // In the event that multiple 1:1 Proteus conversations exist, we migrate the one with the lowest id
     // See https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/1344602120/Use+case+multiple+1+1+conversation+in+teams+Proteus
@@ -2052,7 +2071,13 @@ export class ConversationRepository {
 
     // Migration can happen after startup has loaded unread events. Populate the new entity as well,
     // since unread counts are derived from messages in memory, not just the persisted read timestamp.
-    await this.getUnreadEvents(mlsConversation);
+    const readTimestamp = mlsConversation.last_read_timestamp();
+    const unreadEvents = movedEvents.filter(event => {
+      return new Date(event.time).getTime() > readTimestamp;
+    });
+    if (isNonEmptyArray(unreadEvents)) {
+      await this.addEventsToConversation(unreadEvents, mlsConversation, {offline: true});
+    }
 
     const wasProteus1to1ActiveConversation = proteusConversations.some(conversation => {
       return this.conversationState.isActiveConversation(conversation);
@@ -2712,7 +2737,10 @@ export class ConversationRepository {
     initialTimestamp = this.getLatestEventTimestamp(true),
   ): Conversation[] {
     const conversationData = payload as ConversationDatabaseData[];
-    const entities = ConversationMapper.mapConversations(conversationData, initialTimestamp, this.translate);
+    const conversationsForMapping = this.options.isMarkAsUnreadFeatureEnabled
+      ? conversationData
+      : conversationData.map(withoutManualUnreadTimestamp);
+    const entities = ConversationMapper.mapConversations(conversationsForMapping, initialTimestamp, this.translate);
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.userState.self());
@@ -5059,11 +5087,11 @@ export class ConversationRepository {
 
       let epoch = 0;
       if (existingConversation) {
-        const newEpoch: number = await mlsService.getEpoch(newGroupId);
+        const newEpoch: bigint = await mlsService.getEpoch(newGroupId);
         this.logger.info('An MLS conversation with the new group ID already exists fetched epoch from core crypto', {
           newEpoch,
         });
-        epoch = newEpoch;
+        epoch = Number(newEpoch);
       }
 
       const updatedConversation = ConversationMapper.updateProperties(conversationEntity, {

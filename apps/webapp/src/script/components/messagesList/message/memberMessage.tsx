@@ -19,8 +19,6 @@
 
 import type {ReactElement, ReactNode, FunctionComponent} from 'react';
 
-import {Button, ButtonVariant, CollectionIcon, Link, LinkVariant} from '@wireapp/react-ui-kit';
-
 import {E2eEncryptionMessage} from './e2eEncryptionMessage/e2eEncryptionMessage';
 import {e2eMessageContentLinkCss} from './e2eEncryptionMessage/e2eEncryptionMessage.styles';
 import {ConnectedMessage} from './memberMessage/connectedMessage';
@@ -36,6 +34,9 @@ import {
   MemberMessage as MemberMessageEntity,
 } from '../../../repositories/entity/message/memberMessage';
 import {User} from '../../../repositories/entity/User';
+import {CollectionIcon} from '../../../uiKit/dataDisplay/icon/collectionIcon';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {Link, LinkVariant} from '../../../uiKit/typography/link/link';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {replaceReactComponents} from '../../../util/localizerUtil/reactLocalizerUtil';
 import * as Icon from '../../icon';

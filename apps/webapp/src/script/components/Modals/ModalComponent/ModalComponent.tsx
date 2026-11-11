@@ -25,8 +25,6 @@ import weakMemoize from '@emotion/weak-memoize';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {createPortal} from 'react-dom';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {
   ModalContentStyles,
   ModalContentVisibleStyles,
@@ -34,6 +32,7 @@ import {
   ModalOverlayVisibleStyles,
 } from './ModalComponent.styles';
 
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {noop, preventFocusOutside} from '../../../util/util';
 import {LoadingIcon} from '../../icon';
 

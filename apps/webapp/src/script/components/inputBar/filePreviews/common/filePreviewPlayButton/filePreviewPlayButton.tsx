@@ -19,9 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {PlayIcon} from '@wireapp/react-ui-kit';
-
 import {buttonStyles, playIconStyles} from './filePreviewPlayButton.styles';
+
+import {PlayIcon} from '../../../../../uiKit/dataDisplay/icon/playIcon';
 
 export const FilePreviewPlayButton: FunctionComponent = () => {
   return (

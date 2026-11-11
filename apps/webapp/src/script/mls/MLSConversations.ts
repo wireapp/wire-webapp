@@ -47,6 +47,10 @@ const logger = getLogger('Webapp/MLSConversations');
 // increase total recovery time.
 const DEFAULT_RECOVERY_BATCH_SIZE = 10;
 
+// The backend reports epoch 0 for a group that does not exist yet, which means
+// this client has to create the MLS group instead of joining it.
+const ZERO_EPOCH = 0n;
+
 export type MLSConversationRecoveryResult = {
   completed: boolean;
   failedConversationCount: number;
@@ -333,7 +337,7 @@ export async function initialiseSelfAndTeamConversations(
  * Lifts the read failure (whether `Result.Err` from CoreCrypto or a thrown error
  * from the backend) into a domain-shaped tagged union so it becomes part of the data model.
  */
-export type EpochReading = {kind: 'epoch'; value: number} | {kind: 'unreadable'; error: unknown};
+export type EpochReading = {kind: 'epoch'; value: bigint} | {kind: 'unreadable'; error: unknown};
 
 /**
  * Local CoreCrypto state for an MLS group: whether the group exists and its epoch reading.
@@ -359,7 +363,7 @@ export type LocalDecision =
  * the fetch failed, the response shape was wrong, or the value was not a non-negative finite number.
  */
 export type RemoteDecision =
-  {kind: 'establish'; epoch: 0} | {kind: 'joinExisting'; epoch: number} | {kind: 'unreadable'; error: unknown};
+  {kind: 'establish'; epoch: bigint} | {kind: 'joinExisting'; epoch: bigint} | {kind: 'unreadable'; error: unknown};
 
 export const classifyLocal = ({existsLocally, epoch}: LocalMLSState): LocalDecision => {
   if (!existsLocally) {
@@ -371,7 +375,7 @@ export const classifyLocal = ({existsLocally, epoch}: LocalMLSState): LocalDecis
     .with({kind: 'unreadable'}, ({error}) => {
       return {kind: 'epochUnreadable', error};
     })
-    .with({kind: 'epoch', value: P.number.gt(0)}, () => {
+    .with({kind: 'epoch', value: P.bigint.gt(ZERO_EPOCH)}, () => {
       return {kind: 'alreadyEstablished'};
     })
     .with({kind: 'epoch'}, () => {
@@ -386,8 +390,8 @@ export const classifyRemote = (reading: EpochReading): RemoteDecision => {
     .with({kind: 'unreadable'}, ({error}) => {
       return {kind: 'unreadable', error};
     })
-    .with({kind: 'epoch', value: 0}, () => {
-      return {kind: 'establish', epoch: 0};
+    .with({kind: 'epoch', value: ZERO_EPOCH}, () => {
+      return {kind: 'establish', epoch: ZERO_EPOCH};
     })
     .with({kind: 'epoch'}, ({value}) => {
       return {kind: 'joinExisting', epoch: value};
@@ -421,13 +425,13 @@ export async function fetchRemoteEpoch(
   const result = await conversationService.getSafeConversationById(conversationId);
   return result.match<EpochReading>({
     Ok: ({epoch}) => {
-      if (typeof epoch === 'number' && Number.isFinite(epoch) && epoch >= 0) {
-        return {kind: 'epoch', value: epoch};
+      if (typeof epoch === 'number' && Number.isInteger(epoch) && epoch >= 0) {
+        return {kind: 'epoch', value: BigInt(epoch)};
       }
 
       return {
         kind: 'unreadable',
-        error: new Error(`Remote epoch is not a non-negative finite number: ${String(epoch)}`),
+        error: new Error(`Remote epoch is not a non-negative integer: ${String(epoch)}`),
       };
     },
     Err: error => {
@@ -528,7 +532,7 @@ async function establishMlsGroupConversation({
 }: {
   conversationId: QualifiedId;
   groupId: string;
-  epoch: number;
+  epoch: bigint;
   dependencies: {
     core: Account;
     userState: UserState;

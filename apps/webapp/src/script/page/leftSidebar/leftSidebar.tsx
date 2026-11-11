@@ -22,8 +22,6 @@ import {useEffect, type FunctionComponent} from 'react';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
-
 import {Conversations} from './panels/conversations';
 import {getIsConversationListCollapsed, SidebarTabs, useSidebarStore} from './panels/conversations/useSidebarStore';
 import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
@@ -31,6 +29,7 @@ import {TemporaryGuestConversations} from './panels/temporatyGuestConversations'
 import {MeetingNotificationHost} from '../../components/meeting/meetingNotificationHost/meetingNotificationHost';
 import {conversationListCollapseFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {User} from '../../repositories/entity/User';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {ListViewModel} from '../../view_model/ListViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import {useApplicationContext} from '../rootProvider';

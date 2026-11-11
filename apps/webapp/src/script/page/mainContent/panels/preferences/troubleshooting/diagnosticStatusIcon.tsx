@@ -19,9 +19,12 @@
 
 import type {JSX} from 'react';
 
-import {ErrorStatusIcon, NeutralStatusIcon, SuccessStatusIcon, WarningStatusIcon} from '@wireapp/react-ui-kit';
-
 import {statusIconStyles, statusStyles} from './troubleshooting.styles';
+
+import {ErrorStatusIcon} from '../../../../../uiKit/dataDisplay/icon/errorStatusIcon';
+import {NeutralStatusIcon} from '../../../../../uiKit/dataDisplay/icon/neutralStatusIcon';
+import {SuccessStatusIcon} from '../../../../../uiKit/dataDisplay/icon/successStatusIcon';
+import {WarningStatusIcon} from '../../../../../uiKit/dataDisplay/icon/warningStatusIcon';
 
 type StatusTone = 'good' | 'warning' | 'bad' | 'muted';
 
