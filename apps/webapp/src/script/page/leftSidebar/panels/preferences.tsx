@@ -34,7 +34,7 @@ import {
 } from '../../../repositories/notification/PreferenceNotificationRepository';
 import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {TabIndex} from '../../../uiKit/utils/enums';
-import {canUseTroubleshooter} from "../../../util/canUseTroubleshooter";
+import {canUseTroubleshooter} from '../../../util/canUseTroubleshooter';
 import {WebAppEvents} from '../../../webAppEvents';
 import {useApplicationContext} from '../../rootProvider';
 import {ContentState, useAppState} from '../../useAppState';
