@@ -227,10 +227,25 @@ describe('encrypted PDF uploads', () => {
     expect(uploadAsset).toHaveBeenCalledTimes(1);
   });
 
-  it('does not generate thumbnails for non-PDF files', async () => {
-    await repository.uploadFile(new Blob(['text'], {type: 'text/plain'}), 'message', options, false);
+  it.each(['application/octet-stream', ''])('allows the preview generator to inspect MIME type %p', async type => {
+    const file = new Blob(['%PDF-1.7'], {type});
 
-    expect(createPreview).not.toHaveBeenCalled();
+    const result = await repository.uploadFile(file, 'message', options, false);
+
+    expect(createPreview).toHaveBeenCalledWith(file, expect.any(AbortSignal));
+    expect(uploadAsset).toHaveBeenCalledTimes(2);
+    expect(result.preview?.remote?.assetId).toBe('thumbnail');
+  });
+
+  it('sends only the original when the preview generator skips an unsupported file', async () => {
+    const file = new Blob(['text'], {type: 'text/plain'});
+    createPreview.mockResolvedValue(undefined);
+
+    const result = await repository.uploadFile(file, 'message', options, false);
+
+    expect(createPreview).toHaveBeenCalledWith(file, expect.any(AbortSignal));
+    expect(result.key).toBe('original');
+    expect(result.preview).toBeUndefined();
     expect(uploadAsset).toHaveBeenCalledTimes(1);
   });
 });

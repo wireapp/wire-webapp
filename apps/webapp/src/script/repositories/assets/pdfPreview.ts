@@ -33,6 +33,7 @@ const maxFileSize = 20_971_520;
 const maxPreviewDimension = 640;
 const maxPreviewSize = 1_048_576;
 const previewTimeout = 5000;
+const maxPdfHeaderSize = 1024;
 
 type PdfJs = Pick<typeof import('react-pdf').pdfjs, 'getDocument'>;
 
@@ -42,12 +43,25 @@ const loadPdfJs = async (): Promise<PdfJs> => {
   return pdfjs;
 };
 
+async function isLikelyPdfFile(file: Blob): Promise<boolean> {
+  if (file.type === 'application/pdf') {
+    return true;
+  }
+  if (file.type !== '' && file.type !== 'application/octet-stream') {
+    return false;
+  }
+
+  // MIME types can be missing. Inspect only a small prefix; PDF.js validates the document.
+  const header = await loadFileBuffer(file.slice(0, maxPdfHeaderSize));
+  return String.fromCharCode(...new Uint8Array(header)).includes('%PDF-');
+}
+
 export async function createPdfPreview(
   file: Blob,
   signal: AbortSignal,
   loadPdf: () => Promise<PdfJs> = loadPdfJs,
 ): Promise<PdfPreview | undefined> {
-  if (file.type !== 'application/pdf' || file.size > maxFileSize || signal.aborted) {
+  if (file.size > maxFileSize || signal.aborted) {
     return undefined;
   }
 
@@ -70,6 +84,10 @@ export async function createPdfPreview(
   signal.addEventListener('abort', cancel, {once: true});
 
   const render = async (): Promise<PdfPreview | undefined> => {
+    if (!(await isLikelyPdfFile(file)) || canceled) {
+      return undefined;
+    }
+
     const {getDocument} = await loadPdf();
     const buffer = await loadFileBuffer(file);
     if (canceled) {

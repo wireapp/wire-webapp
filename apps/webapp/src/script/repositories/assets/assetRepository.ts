@@ -339,10 +339,7 @@ export class AssetRepository {
       const response = await upload(Buffer.from(bytes), assetOptions, fraction => {
         progressObservable(fraction * percentageScale);
       });
-      if (
-        file.type !== 'application/pdf' ||
-        !this.featureToggles.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)
-      ) {
+      if (!this.featureToggles.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)) {
         return response;
       }
 

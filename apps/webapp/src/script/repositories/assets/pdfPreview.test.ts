@@ -25,9 +25,9 @@ import {createPdfPreview} from './pdfPreview';
 
 describe('createPdfPreview', () => {
   const getDocument = jest.fn<ReturnType<typeof pdfjs.getDocument>, Parameters<typeof pdfjs.getDocument>>();
-  const loadPdf = (): Promise<Pick<typeof pdfjs, 'getDocument'>> => {
+  const loadPdf = jest.fn<Promise<Pick<typeof pdfjs, 'getDocument'>>, []>(() => {
     return Promise.resolve({getDocument});
-  };
+  });
   const render = jest.fn();
   const destroy = jest.fn().mockResolvedValue(undefined);
   const getPage = jest.fn();
@@ -63,27 +63,87 @@ describe('createPdfPreview', () => {
     expect(destroy).toHaveBeenCalledTimes(1);
   });
 
+  it.each(['application/octet-stream', ''])('renders a PDF with MIME type %p using its signature', async type => {
+    const file = new Blob(['prefix\n%PDF-1.7\ncontents'], {type});
+
+    const preview = await createPdfPreview(file, new AbortController().signal, loadPdf);
+
+    expect(preview?.blob.type).toBe('image/png');
+    expect(getDocument).toHaveBeenCalledWith({
+      data: new Uint8Array(Buffer.from('prefix\n%PDF-1.7\ncontents')),
+      isEvalSupported: false,
+    });
+    expect(destroy).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    new Blob(['not a PDF'], {type: 'application/octet-stream'}),
+    new Blob(['not a PDF']),
+    new File(['not a PDF'], 'misleading.pdf'),
+    new Blob(['x'.repeat(1024), '%PDF-1.7'], {type: 'application/octet-stream'}),
+    new Blob(['%PDF-1.7'], {type: 'text/plain'}),
+  ])('skips unsupported content without loading PDF.js', async file => {
+    await expect(createPdfPreview(file, new AbortController().signal, loadPdf)).resolves.toBeUndefined();
+
+    expect(loadPdf).not.toHaveBeenCalled();
+  });
+
+  it('sends no preview when reading the candidate signature fails', async () => {
+    const read = jest.spyOn(FileReader.prototype, 'readAsArrayBuffer').mockImplementation(function (this: FileReader) {
+      this.dispatchEvent(new ProgressEvent('error'));
+    });
+
+    try {
+      await expect(
+        createPdfPreview(new Blob(['%PDF-1.7']), new AbortController().signal, loadPdf),
+      ).resolves.toBeUndefined();
+
+      expect(loadPdf).not.toHaveBeenCalled();
+    } finally {
+      read.mockRestore();
+    }
+  });
+
+  it('cancels while reading the signature without loading PDF.js', async () => {
+    const controller = new AbortController();
+    const read = jest.spyOn(FileReader.prototype, 'readAsArrayBuffer').mockImplementation(() => {
+      controller.abort();
+    });
+
+    try {
+      await expect(createPdfPreview(new Blob(['%PDF-1.7']), controller.signal, loadPdf)).resolves.toBeUndefined();
+
+      expect(loadPdf).not.toHaveBeenCalled();
+    } finally {
+      read.mockRestore();
+    }
+  });
+
   it.each([
     new Blob(['text'], {type: 'text/plain'}),
     new Blob([new Uint8Array(20 * 1024 * 1024 + 1)], {type: 'application/pdf'}),
+    new Blob([new Uint8Array(20 * 1024 * 1024 + 1)], {type: 'application/octet-stream'}),
   ])('skips unsupported or oversized files without starting PDF.js', async file => {
     await expect(createPdfPreview(file, new AbortController().signal, loadPdf)).resolves.toBeUndefined();
     expect(getDocument).not.toHaveBeenCalled();
   });
 
-  it('releases password-protected or malformed documents without a preview', async () => {
-    getDocument.mockImplementation(() => {
-      return {
-        promise: Promise.reject(new Error('Password required')),
-        destroy,
-      } as unknown as ReturnType<typeof pdfjs.getDocument>;
-    });
+  it.each(['application/pdf', 'application/octet-stream', ''])(
+    'releases password-protected or malformed documents with MIME type %p without a preview',
+    async type => {
+      getDocument.mockImplementation(() => {
+        return {
+          promise: Promise.reject(new Error('Password required')),
+          destroy,
+        } as unknown as ReturnType<typeof pdfjs.getDocument>;
+      });
 
-    await expect(
-      createPdfPreview(new Blob(['invalid'], {type: 'application/pdf'}), new AbortController().signal, loadPdf),
-    ).resolves.toBeUndefined();
-    expect(destroy).toHaveBeenCalledTimes(1);
-  });
+      await expect(
+        createPdfPreview(new Blob(['%PDF-invalid'], {type}), new AbortController().signal, loadPdf),
+      ).resolves.toBeUndefined();
+      expect(destroy).toHaveBeenCalledTimes(1);
+    },
+  );
 
   it('stops slow rendering after the preview time budget', async () => {
     const timer = jest.spyOn(window, 'setTimeout');
