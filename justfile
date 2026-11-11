@@ -206,6 +206,11 @@ translate-download:
 validate-build-artifact:
     node tools/buildArtifact/validateBuildArtifact.mts
 
+# Start the extracted ZIP with only lockfile-pinned server production dependencies.
+[group('testing')]
+verify-server-package:
+    node tools/serverPackaging/verifyServerPackage.mts
+
 # Validate recovered artifact metadata using the expected values from the environment.
 [group('build')]
 validate-recovery-build-artifact:

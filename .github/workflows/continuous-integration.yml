@@ -402,6 +402,9 @@ jobs:
           EXPECTED_VERSION="${expected_version}" \
             npx just validate-build-artifact
 
+      - name: Verify extracted ZIP with isolated production dependencies
+        run: npx just verify-server-package
+
       - name: Build and smoke-test sparse production Docker context
         env:
           DOCKER_IMAGE_TAG: wire-webapp-production-ci:${{ github.run_id }}-${{ github.run_attempt }}

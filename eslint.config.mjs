@@ -602,7 +602,12 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/buildArtifact/**/*.mts', 'tools/configuration/**/*.mts', 'tools/runtimeVerification/**/*.mts'],
+    files: [
+      'tools/buildArtifact/**/*.mts',
+      'tools/configuration/**/*.mts',
+      'tools/runtimeVerification/**/*.mts',
+      'tools/serverPackaging/**/*.mts',
+    ],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.tools.json',

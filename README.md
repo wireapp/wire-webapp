@@ -123,7 +123,7 @@ Telemetry's TypeScript implementation lives in `apps/webapp/src/script/telemetry
 
 ## Testing
 
-Configuration tests live alongside the generators and metadata functions in `apps/server/configuration/` and run with the server Jest project. Run `npx just test --selectProjects server` to check them.
+Configuration tests live alongside the generators and metadata functions in `apps/server/configuration/` and run with the server Jest project. Run `npx just test --selectProjects server` to check them. After packaging, `npx just verify-server-package` installs only server production dependencies in a temporary fixture, starts the extracted ZIP, and checks `/version` and `/config.js`.
 
 Run all unit tests:
 
