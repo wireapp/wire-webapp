@@ -17,11 +17,10 @@
  *
  */
 
-import {PreKey} from '@wireapp/api-client/lib/auth';
-import {Encoder} from '@wireapp/commons/lib/base64/encoder';
+import type {Clock} from '@enormora/clock/clock';
 import {deleteDB} from 'idb';
+import {result, task, type Result, type Task} from 'true-myth';
 
-import {LogFactory} from '@wireapp/commons';
 import {
   CoreCrypto,
   CoreCryptoLogLevel,
@@ -30,11 +29,20 @@ import {
   version as CCVersion,
   initWasmModule,
   migrateDatabaseKeyTypeToBytes,
+  Database,
   DatabaseKey,
+  PkiEnvironment,
+  proteusLastResortPrekeyId,
+  type PkiEnvironmentHooks,
 } from '@wireapp/core-crypto';
 
+import {releaseCoreCryptoHandles} from './coreCryptoHandleLifecycle';
+import {removeCoreCryptoOpfsDatabase} from './coreCryptoOpfsStorage';
 import {PrekeyTracker} from './prekeysTracker';
 
+import {PreKey} from '../../../../../../apiClient/auth/preKey';
+import {Encoder} from '../../../../../../commons/base64/encoder';
+import {LogFactory} from '../../../../../../commons/LogFactory';
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
 import type {CRUDEngine} from '../../../../../storage/engine/crudEngine';
 import {CoreCryptoConfig} from '../../../../common.types';
@@ -43,15 +51,38 @@ import {CryptoClient, InitialPrekeys} from '../cryptoClient.types';
 type SecretKeySizeInBytes = 16 | 32;
 const legacySecretKeySizeInBytes = 16;
 const secretKeySizeInBytes = 32;
+const reseedSeedSizeInBytes = 32;
+
+const validateReseedSeed = (seed: Uint8Array): Result<Uint8Array, Error> => {
+  if (seed.byteLength !== reseedSeedSizeInBytes) {
+    return result.err(
+      new Error(
+        `CoreCrypto reseed requires a seed of exactly ${reseedSeedSizeInBytes} bytes, received ${seed.byteLength}`,
+      ),
+    );
+  }
+  return result.ok(seed);
+};
 
 type Config = {
+  clock: Clock;
   generateSecretKey: (keyId: string, keySize: SecretKeySizeInBytes) => Promise<GeneratedKey>;
   nbPrekeys: number;
   onNewPrekeys: (prekeys: PreKey[]) => void;
 };
 
-type ClientConfig = Omit<Config, 'generateSecretKey'> & {
+type ClientConfig = Omit<Config, 'clock' | 'generateSecretKey'> & {
   onWipe: () => Promise<void>;
+};
+
+type CoreCryptoRuntime = {
+  configureLogging: () => void;
+  createCoreCrypto: (database: Database) => CoreCrypto;
+  createDatabaseKey: (key: Uint8Array) => DatabaseKey;
+  getVersion: () => string;
+  initializeWasm: (wasmFilePath?: string) => Promise<void>;
+  migrateDatabaseKey: (databaseName: string, oldKey: string, newKey: DatabaseKey) => Promise<void>;
+  openDatabase: (databaseName: string, key: DatabaseKey) => Promise<Database>;
 };
 
 const logger = LogFactory.getLogger('@wireapp/core/CoreCryptoWrapper');
@@ -66,8 +97,27 @@ const logFunctions: Record<CoreCryptoLogLevel, Function> = {
 };
 
 const coreCryptoLogger = {
-  log: (level: CoreCryptoLogLevel, message: string, context: string) => {
+  log: (level: CoreCryptoLogLevel, message: string, context: string | undefined) => {
     logFunctions[level].call(logger, {message, context});
+  },
+};
+
+const defaultCoreCryptoRuntime: CoreCryptoRuntime = {
+  configureLogging: () => {
+    setLogger(coreCryptoLogger);
+    setMaxLogLevel(CoreCryptoLogLevel.Info);
+  },
+  createCoreCrypto: database => {
+    return CoreCrypto.new(database);
+  },
+  createDatabaseKey: key => {
+    return new DatabaseKey(key);
+  },
+  getVersion: CCVersion,
+  initializeWasm: initWasmModule,
+  migrateDatabaseKey: migrateDatabaseKeyTypeToBytes,
+  openDatabase: (databaseName, key) => {
+    return Database.open(databaseName, key);
   },
 };
 
@@ -86,6 +136,7 @@ type MigrateOnceAndGetKeyReturnType = {
 const migrateOnceAndGetKey = async (
   generateSecretKey: Config['generateSecretKey'],
   coreCryptoDbName: string,
+  runtime: CoreCryptoRuntime,
 ): Promise<MigrateOnceAndGetKeyReturnType> => {
   const coreCryptoNewKeyId = 'corecrypto-key-v2';
   const coreCryptoKeyId = 'corecrypto-key';
@@ -108,15 +159,15 @@ const migrateOnceAndGetKey = async (
    *     - Migrate data from `keyOld` to `keyNew`
    */
   if (keyNew.freshlyGenerated && !keyOld.freshlyGenerated) {
-    const databaseKey = new DatabaseKey(keyNew.key);
-    await migrateDatabaseKeyTypeToBytes(coreCryptoDbName, Encoder.toBase64(keyOld.key).asString, databaseKey);
+    const databaseKey = runtime.createDatabaseKey(keyNew.key);
+    await runtime.migrateDatabaseKey(coreCryptoDbName, Encoder.toBase64(keyOld.key).asString, databaseKey);
   }
 
   // Always clean up the old key
   await keyOld.deleteKey();
 
   return {
-    key: new DatabaseKey(keyNew.key),
+    key: runtime.createDatabaseKey(keyNew.key),
     deleteKey: keyNew.deleteKey,
   };
 };
@@ -125,64 +176,191 @@ export const getCoreCryptoDbName = (storeEngine: CRUDEngine): string => {
   return `corecrypto-${storeEngine.storeName}`;
 };
 
-export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> => {
-  const coreCryptoDbName = getCoreCryptoDbName(storeEngine);
-  try {
-    await coreCryptoInstance?.close();
-    await deleteDB(coreCryptoDbName);
-    logger.log('info', 'CoreCrypto DB wiped successfully');
-  } catch {
-    logger.error('error', 'Failed to wipe CoreCrypto DB');
-  }
+let coreCryptoInstance: CoreCrypto | undefined;
+let coreCryptoDatabase: Database | undefined;
+let coreCryptoPkiEnvironment: PkiEnvironment | undefined;
+
+const destroyCoreCryptoHandles = (): Result<void, Error> => {
+  const instance = coreCryptoInstance;
+  const database = coreCryptoDatabase;
+  const pkiEnvironment = coreCryptoPkiEnvironment;
+
+  // Clear the references first so a failed destroy cannot leave handles that
+  // might be destroyed a second time on a later wipe attempt.
+  coreCryptoInstance = undefined;
+  coreCryptoDatabase = undefined;
+  coreCryptoPkiEnvironment = undefined;
+
+  return releaseCoreCryptoHandles({database, instance, pkiEnvironment});
 };
 
-let coreCryptoInstance: CoreCrypto | undefined;
+/**
+ * Creates the PKI environment used for X509 credential acquisition and registers it on the
+ * current CoreCrypto instance.
+ *
+ * The environment is owned by this module because it shares the lifetime of the CoreCrypto
+ * database handle. It is destroyed together with the other handles on wipe, so callers never
+ * receive a database handle that can outlive (and dangle after) a wipe.
+ */
+export const createPkiEnvironment = (hooks: PkiEnvironmentHooks): Task<PkiEnvironment, Error> => {
+  return task.tryOrElse(
+    cause => {
+      return new Error('Failed to create the CoreCrypto PKI environment', {cause});
+    },
+    async () => {
+      if (coreCryptoInstance === undefined || coreCryptoDatabase === undefined) {
+        throw new Error('CoreCrypto is not initialized');
+      }
+
+      const pkiEnvironment = await PkiEnvironment.create(hooks, coreCryptoDatabase);
+      await coreCryptoInstance.setPkiEnvironment(pkiEnvironment);
+      coreCryptoPkiEnvironment?.uniffiDestroy();
+      coreCryptoPkiEnvironment = pkiEnvironment;
+      return pkiEnvironment;
+    },
+  );
+};
+
+const removeCoreCryptoOpfsFiles = (databaseLocation: string, clock: Clock): Task<void, Error> => {
+  if (typeof navigator === 'undefined' || typeof navigator.storage?.getDirectory !== 'function') {
+    return task.resolve(undefined);
+  }
+
+  return task
+    .tryOrElse(
+      cause => {
+        return new Error('Failed to access OPFS while wiping the CoreCrypto database', {cause});
+      },
+      () => {
+        return navigator.storage.getDirectory();
+      },
+    )
+    .andThen(opfsRoot => {
+      return removeCoreCryptoOpfsDatabase(opfsRoot, databaseLocation, clock);
+    });
+};
+
+const wipeCoreCryptoDbTask = (storeEngine: CRUDEngine, clock: Clock): Task<void, Error> => {
+  const coreCryptoDbName = getCoreCryptoDbName(storeEngine);
+
+  const destroyResult = destroyCoreCryptoHandles();
+  if (result.isErr(destroyResult)) {
+    return task.reject(destroyResult.error);
+  }
+
+  const deleteLegacyIndexedDb = task.tryOrElse(
+    cause => {
+      return new Error(`Failed to remove legacy CoreCrypto IndexedDB database "${coreCryptoDbName}"`, {cause});
+    },
+    () => {
+      return deleteDB(coreCryptoDbName);
+    },
+  );
+
+  return task.all([deleteLegacyIndexedDb, removeCoreCryptoOpfsFiles(coreCryptoDbName, clock)]).map(() => {
+    return undefined;
+  });
+};
+
+export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine, clock: Clock): Promise<void> => {
+  const wipeResult = await wipeCoreCryptoDbTask(storeEngine, clock);
+  if (result.isErr(wipeResult)) {
+    logger.error('Failed to wipe CoreCrypto DB', {error: wipeResult.error});
+    return Promise.reject(wipeResult.error);
+  }
+
+  logger.info('CoreCrypto DB wiped successfully');
+};
+
 export async function buildClient(
   storeEngine: CRUDEngine,
-  {generateSecretKey, nbPrekeys, onNewPrekeys}: Config,
+  {clock, generateSecretKey, nbPrekeys, onNewPrekeys}: Config,
   {wasmFilePath}: CoreCryptoConfig,
+  runtime: CoreCryptoRuntime = defaultCoreCryptoRuntime,
 ): Promise<CoreCryptoWrapper> {
-  return (
-    // We need to initialize the coreCrypto package with the path to the wasm file
-    // before we can use it. This is a one time operation and should be done
-    // before we create the CoreCrypto instance.
-    initWasmModule(wasmFilePath)
-      .then(async output => {
-        logger.log('info', 'CoreCrypto initialized', {output});
-        const coreCryptoDbName = getCoreCryptoDbName(storeEngine);
-        // New key format used by coreCrypto
-        let key: MigrateOnceAndGetKeyReturnType;
+  // A client can be rebuilt during registration. Explicitly release every object
+  // which retains the database before opening the same OPFS location again.
+  const destroyResult = destroyCoreCryptoHandles();
+  if (result.isErr(destroyResult)) {
+    return Promise.reject(destroyResult.error);
+  }
 
-        try {
-          key = await migrateOnceAndGetKey(generateSecretKey, coreCryptoDbName);
-        } catch (error: unknown) {
-          if (error instanceof CorruptedKeyError) {
-            // If we are dealing with a corrupted key, we wipe the key and the coreCrypto DB to start fresh
-            await wipeCoreCryptoDb(storeEngine);
-            key = await migrateOnceAndGetKey(generateSecretKey, coreCryptoDbName);
-          } else {
-            throw error;
-          }
-        }
+  const initializationTask = task.tryOrElse(
+    cause => {
+      return cause;
+    },
+    async () => {
+      // We need to initialize the CoreCrypto package with the path to the WASM file
+      // before creating the CoreCrypto instance.
+      const output = await runtime.initializeWasm(wasmFilePath);
+      logger.info('CoreCrypto initialized', {output});
+      const coreCryptoDbName = getCoreCryptoDbName(storeEngine);
 
-        coreCryptoInstance = await CoreCrypto.deferredInit({
-          databaseName: coreCryptoDbName,
-          key: key.key,
-        });
+      let keyResult = await task
+        .tryOrElse(
+          cause => {
+            return cause;
+          },
+          () => {
+            return migrateOnceAndGetKey(generateSecretKey, coreCryptoDbName, runtime);
+          },
+        )
+        .toPromise();
 
-        setLogger(coreCryptoLogger);
-        setMaxLogLevel(CoreCryptoLogLevel.Info);
+      if (result.isErr(keyResult) && keyResult.error instanceof CorruptedKeyError) {
+        // Never generate a new key on top of a database which could not be wiped.
+        await wipeCoreCryptoDb(storeEngine, clock);
+        keyResult = await task
+          .tryOrElse(
+            cause => {
+              return cause;
+            },
+            () => {
+              return migrateOnceAndGetKey(generateSecretKey, coreCryptoDbName, runtime);
+            },
+          )
+          .toPromise();
+      }
 
-        return new CoreCryptoWrapper(coreCryptoInstance, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
-      })
-      // if the coreCrypto initialization fails, can not use the crypto client and throw an error
-      .catch(async (error: unknown) => {
-        logger.error('error', 'CoreCrypto initialization failed', {error});
-        // If the initialization fails, we wipe the coreCrypto DB to start fresh
-        await wipeCoreCryptoDb(storeEngine);
-        throw error;
-      })
+      if (result.isErr(keyResult)) {
+        return Promise.reject(keyResult.error);
+      }
+
+      runtime.configureLogging();
+
+      coreCryptoDatabase = await runtime.openDatabase(coreCryptoDbName, keyResult.value.key);
+      coreCryptoInstance = runtime.createCoreCrypto(coreCryptoDatabase);
+
+      return new CoreCryptoWrapper(
+        coreCryptoInstance,
+        {
+          nbPrekeys,
+          onNewPrekeys,
+          onWipe: keyResult.value.deleteKey,
+        },
+        runtime.getVersion(),
+      );
+    },
   );
+
+  const initializationResult = await initializationTask;
+  if (result.isOk(initializationResult)) {
+    return initializationResult.value;
+  }
+
+  logger.error('CoreCrypto initialization failed', {error: initializationResult.error});
+  // Database.open keeps an interrupted legacy import retryable. Release handles without deleting either database.
+  const releaseResult = destroyCoreCryptoHandles();
+  if (result.isErr(releaseResult)) {
+    return Promise.reject(
+      new AggregateError(
+        [initializationResult.error, releaseResult.error],
+        'CoreCrypto initialization failed and its database handles could not be released',
+      ),
+    );
+  }
+
+  return Promise.reject(initializationResult.error);
 }
 
 export class CoreCryptoWrapper implements CryptoClient {
@@ -192,8 +370,9 @@ export class CoreCryptoWrapper implements CryptoClient {
   constructor(
     private readonly coreCrypto: CoreCrypto,
     config: ClientConfig,
+    version = CCVersion(),
   ) {
-    this.version = CCVersion();
+    this.version = version;
     this.prekeyTracker = new PrekeyTracker(this, config);
   }
 
@@ -224,7 +403,11 @@ export class CoreCryptoWrapper implements CryptoClient {
 
   async create(nbPrekeys: number, entropy?: Uint8Array): Promise<InitialPrekeys> {
     if (entropy !== undefined) {
-      await this.coreCrypto.reseedRng(entropy);
+      const seed = validateReseedSeed(entropy);
+      if (result.isErr(seed)) {
+        return Promise.reject(seed.error);
+      }
+      await this.coreCrypto.reseed(seed.value);
     }
     await this.init();
     const prekeys: PreKey[] = [];
@@ -237,7 +420,7 @@ export class CoreCryptoWrapper implements CryptoClient {
     });
     const lastPrekey = Encoder.toBase64(lastPrekeyBytes).asString;
 
-    const lastPrekeyId = CoreCrypto.proteusLastResortPrekeyId();
+    const lastPrekeyId = proteusLastResortPrekeyId();
 
     return {
       prekeys,

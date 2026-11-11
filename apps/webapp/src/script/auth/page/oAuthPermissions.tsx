@@ -20,28 +20,9 @@
 import React, {useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNull, isNullOrUndefined} from '@sindresorhus/is';
-import type {OAuthBody} from '@wireapp/api-client/lib/oauth/oAuthBody';
-import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
-import type {Self} from '@wireapp/api-client/lib/self';
-import type {TeamData} from '@wireapp/api-client/lib/team';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {container} from 'tsyringe';
-
-import {
-  Button,
-  ButtonVariant,
-  ContainerXS,
-  Text,
-  Paragraph,
-  Box,
-  Link,
-  LinkVariant,
-  COLOR_V2,
-  H2,
-  QUERY,
-  useMatchMedia,
-} from '@wireapp/react-ui-kit';
 
 import {
   boxCSS,
@@ -58,11 +39,25 @@ import {
 } from './oauthPermissions.styles';
 import {Page} from './page';
 
+import type {OAuthBody} from '../../apiClient/oauth/oAuthBody';
+import {OAuthClient} from '../../apiClient/oauth/oAuthClient';
+import type {Self} from '../../apiClient/self/self';
+import type {TeamData} from '../../apiClient/team/team/teamData';
 import * as Icon from '../../components/icon';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {AssetRemoteData} from '../../repositories/assets/assetRemoteData';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
+import {COLOR_V2} from '../../uiKit/identity/colorsV2/colorsV2';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {Box} from '../../uiKit/layout/box/box';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
+import {H2} from '../../uiKit/typography/heading/heading';
+import {Link, LinkVariant} from '../../uiKit/typography/link/link';
+import {Paragraph} from '../../uiKit/typography/paragraph/paragraph';
+import {Text} from '../../uiKit/typography/text/text';
+import {QUERY} from '../../uiKit/utils/mediaQueries';
 import {handleEscDown, handleKeyDown, KEY} from '../../util/keyboardUtil';
 import {toError} from '../../util/toError';
 import {loadDataUrl} from '../../util/util';

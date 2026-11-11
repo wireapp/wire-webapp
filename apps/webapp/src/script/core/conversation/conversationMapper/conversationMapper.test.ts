@@ -17,20 +17,17 @@
  *
  */
 
-import {
-  CONVERSATION_TYPING,
-  ConversationMemberJoinData,
-  ConversationMessageTimerUpdateData,
-  ConversationRenameData,
-  ConversationTypingData,
-} from '@wireapp/api-client/lib/conversation/data';
+import {CONVERSATION_TYPING, ConversationTypingData} from '../../../apiClient/conversation/data/conversationTypingData';
+import {ConversationMemberJoinData} from '../../../apiClient/conversation/data/conversationMemberJoinData';
+import {ConversationMessageTimerUpdateData} from '../../../apiClient/conversation/data/conversationMessageTimerUpdateData';
+import {ConversationRenameData} from '../../../apiClient/conversation/data/conversationRenameData';
 import {
   CONVERSATION_EVENT,
   ConversationMemberJoinEvent,
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
   ConversationTypingEvent,
-} from '@wireapp/api-client/lib/event';
+} from '../../../apiClient/event/conversationEvent';
 
 import {ConversationMapper} from './conversationMapper';
 

@@ -17,10 +17,9 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {Message} from './message';
 
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {E2EIVerificationMessageType} from '../../../message/e2eiVerificationMessageType';
 import {SuperType} from '../../../message/superType';
 import type {Translate} from '../../../util/localizerUtil';

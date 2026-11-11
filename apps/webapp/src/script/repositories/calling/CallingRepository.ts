@@ -18,11 +18,6 @@
  */
 
 import {isFunction, isNan, isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
-import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
-import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
@@ -51,7 +46,6 @@ import {
   WcallMember,
 } from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
-import {Runtime} from '@wireapp/commons';
 
 import {Call, SerializedConversationId} from './Call';
 import {NetworkQualityInfo, NetworkQualityInfoSchema, UNKNOWN_NETWORK_QUALITY} from './calling.schema';
@@ -66,6 +60,12 @@ import {isIncomingSetupOffer, shouldRejectStaleIncomingRing} from './incomingCal
 import {ClientId, Participant, UserId} from './Participant';
 import {getAllowedSftOrigins, isAllowedSftUrl} from './sftUrl';
 
+import type {CallConfigData} from '../../apiClient/account/callConfigData';
+import {QualifiedUserClients} from '../../apiClient/conversation/qualifiedUserClients';
+import {FEATURE_KEY} from '../../apiClient/team/feature/featureList.types';
+import type {WebappProperties} from '../../apiClient/user/data/userPropertiesSetData';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {Runtime} from '../../commons/util/Runtime';
 import {showNoAudioInputModal, showNoCameraModal} from '../../components/calling/devicePermissionModals';
 import {useCallAlertState} from '../../components/calling/useCallAlertState';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';

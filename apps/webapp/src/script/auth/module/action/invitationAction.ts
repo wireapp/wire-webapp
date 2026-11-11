@@ -18,13 +18,14 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
-import type {NewTeamInvitation} from '@wireapp/api-client/lib/team/';
-import {Role} from '@wireapp/api-client/lib/team/member/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {InvitationActionCreator} from './creator/';
 
+import {BackendError} from '../../../apiClient/http/backendError';
+import {SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
+import type {NewTeamInvitation} from '../../../apiClient/team/invitation/newTeamInvitation';
+import {Role} from '../../../apiClient/team/member/role';
 import {toError} from '../../../util/toError';
 import type {ThunkAction} from '../reducer';
 import * as InviteSelector from '../selector/inviteSelector';

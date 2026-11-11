@@ -25,9 +25,9 @@ import {UserRepository} from '../../user/userRepository';
 import {createUuid} from '../../../util/uuid';
 
 import {ServiceMiddleware} from './ServiceMiddleware';
-import {UserType} from '@wireapp/api-client/lib/user';
+import {UserType} from '../../../apiClient/user/user';
 import {translateForTest} from '../../../util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 function buildServiceMiddleware(): readonly [
   ServiceMiddleware,

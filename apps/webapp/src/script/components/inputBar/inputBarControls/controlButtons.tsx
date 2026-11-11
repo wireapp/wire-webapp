@@ -19,8 +19,6 @@
 
 import {MouseEvent, type FunctionComponent} from 'react';
 
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation/';
-
 import {AssetUploadButton} from './assetUploadButton/assetUploadButton';
 import {CancelEditButton} from './cancelEditButton/cancelEditButton';
 import {CellAssetUploadButton} from './cellAssetUploadButton/cellAssetUploadButton';
@@ -32,6 +30,7 @@ import {ImageUploadButton} from './imageUploadButton/imageUploadButton';
 import {MessageTimerButton} from './messageTimerButton/messageTimerButton';
 import {PingButton} from './pingButton/pingButton';
 
+import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
 import {Config} from '../../../Config';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {FormatSeparator} from '../common/formatSeparator/formatSeparator';

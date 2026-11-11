@@ -20,10 +20,7 @@
 import {UIEvent, useCallback, useEffect, useMemo, useState, type ReactElement} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
-
-import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {
   searchResultsHeadingStyles,
@@ -59,6 +56,7 @@ import {withAutoReadGuard} from './utils/autoReadGuard';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 import {parseAccountDeepLink} from './utils/parseAccountDeepLink';
 
+import {CONVERSATION_CELLS_STATE} from '../../apiClient/conversation/conversation';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
@@ -79,6 +77,7 @@ import {Message} from '../../repositories/entity/message/message';
 import {User} from '../../repositories/entity/User';
 import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {TeamState} from '../../repositories/team/TeamState';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isLastReceivedMessage} from '../../util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from '../../util/fileTypeUtil';

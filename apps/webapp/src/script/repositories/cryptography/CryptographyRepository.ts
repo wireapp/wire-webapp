@@ -18,12 +18,12 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import type {PreKey as BackendPreKey} from '@wireapp/api-client/lib/auth/';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {CryptographyMapper} from './CryptographyMapper';
 
+import type {PreKey as BackendPreKey} from '../../apiClient/auth/preKey';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import type {ProteusService} from '../../core/index';
 import {Core} from '../../service/coreSingleton';
 import {getLogger, Logger} from '../../util/logger';

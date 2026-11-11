@@ -19,12 +19,11 @@
 
 import {isArray, isNullOrUndefined, isNonEmptyString} from '@sindresorhus/is';
 
-import {Runtime} from '@wireapp/commons';
-
 import {MediaDeviceType} from './MediaDeviceType';
 import {resolveActiveDeviceId} from './resolveActiveDeviceId';
 import {mediaDevicesStore} from './useMediaDevicesStore';
 
+import {Runtime} from '../../commons/util/Runtime';
 import {getLogger, Logger} from '../../util/logger';
 import {loadValue, storeValue} from '../../util/storageUtil';
 

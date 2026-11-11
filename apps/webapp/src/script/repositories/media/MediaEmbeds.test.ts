@@ -17,7 +17,7 @@
  *
  */
 
-import type {TypeUtil} from '@wireapp/commons';
+import type {TypeUtil} from '../../commons/util';
 
 import {Configuration, Config} from '../../Config';
 

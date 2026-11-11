@@ -24,7 +24,6 @@ import {Maybe, maybe} from 'true-myth';
 import {match} from 'ts-pattern';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
-import {CloseIcon, InfoIcon, LockClosedIcon, ShieldIcon, UpdateIcon} from '@wireapp/react-ui-kit';
 
 import {CallPerson, diffCallPeople, getCallPeople} from './callPeople';
 import {
@@ -51,6 +50,11 @@ import {createKeyUpdateQueue, KeyUpdateMessage, KeyUpdateQueue} from './keyUpdat
 
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {Participant} from '../../../repositories/calling/Participant';
+import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
+import {InfoIcon} from '../../../uiKit/dataDisplay/icon/infoIcon';
+import {LockClosedIcon} from '../../../uiKit/dataDisplay/icon/lockClosedIcon';
+import {ShieldIcon} from '../../../uiKit/dataDisplay/icon/shieldIcon';
+import {UpdateIcon} from '../../../uiKit/dataDisplay/icon/updateIcon';
 import {isEscapeKey} from '../../../util/keyboardUtil';
 import type {Translate} from '../../../util/localizerUtil';
 import {Duration} from '../Duration';

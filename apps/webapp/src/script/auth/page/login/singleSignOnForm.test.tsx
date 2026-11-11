@@ -18,9 +18,9 @@
  */
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
-import {ClientType} from '@wireapp/api-client/lib/client';
+import {ClientType} from '../../../apiClient/client/clientType';
 
-import {TypeUtil} from '@wireapp/commons';
+import {TypeUtil} from '../../../commons/util';
 import {noop} from 'noop-esm';
 import {Provider} from 'react-redux';
 import {HashRouter as Router} from 'react-router';

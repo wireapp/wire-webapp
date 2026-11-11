@@ -17,7 +17,7 @@
  *
  */
 
-import {MessageSendingStatus} from '@wireapp/api-client/lib/conversation';
+import {MessageSendingStatus} from '../../../../apiClient/conversation/messageSendingStatus';
 
 const isClearFromMismatch = (mismatch: MessageSendingStatus): boolean => {
   const hasMissing = Object.keys(mismatch.missing ?? {}).length > 0;

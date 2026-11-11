@@ -17,13 +17,11 @@
  *
  */
 
-import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/config';
-
-import {Runtime} from '@wireapp/commons';
-
+import {MINIMUM_API_VERSION} from './apiClient/config';
+import {Runtime} from './commons/util/Runtime';
 import {createUuid} from './util/uuid';
 
-import packageJson from '../../package.json';
+import packageJson from '../../../../package.json';
 
 const env = window.wire.env;
 

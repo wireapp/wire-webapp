@@ -21,14 +21,15 @@ import type {FunctionComponent} from 'react';
 
 import {Navigate, useNavigate} from 'react-router';
 
-import {Runtime} from '@wireapp/commons';
-import {Button, ButtonVariant, CheckRoundIcon, FlexBox} from '@wireapp/react-ui-kit';
-
 import {Page} from './page';
 import {styles} from './setAccountType.styles';
 
+import {Runtime} from '../../commons/util/Runtime';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
+import {CheckRoundIcon} from '../../uiKit/dataDisplay/icon/checkRoundIcon';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {FlexBox} from '../../uiKit/layout/flexBox/flexBox';
 import {BackButton} from '../component/backButton';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {ROUTE} from '../route';

@@ -20,11 +20,11 @@
 import {useEffect, useCallback, useRef, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformToCellPagination} from './transformToCellPagination';
 
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {UserRepository} from '../../../../repositories/user/userRepository';
 import {transformCellsNodes} from '../../../cells/common/transformCellsNodes/transformCellsNodes';

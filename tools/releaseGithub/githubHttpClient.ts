@@ -17,8 +17,8 @@
  *
  */
 
-import ky, {isHTTPError} from 'ky';
-import type {KyInstance, Options} from 'ky';
+import ky, {isHTTPError} from 'ky-release';
+import type {KyInstance, Options} from 'ky-release';
 import {Maybe} from 'true-myth';
 import {z} from 'zod';
 

@@ -18,8 +18,8 @@
  */
 
 import {isTruthy} from '@sindresorhus/is';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
+import {RECEIPT_MODE} from '../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
 import {StatusType} from '../../../message/statusType';
 import {getLogger, Logger} from '../../../util/logger';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';

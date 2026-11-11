@@ -17,8 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event';
-
+import {CONVERSATION_EVENT, ConversationEvent} from '../../../apiClient/event/conversationEvent';
 import {NotificationSource} from '../../notification';
 import {MessageSendingState} from '../message';
 import {createId} from '../message/messageBuilder';

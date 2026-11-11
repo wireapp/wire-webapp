@@ -18,6 +18,7 @@
  */
 
 import {expect, test} from '@playwright/test';
+import {Maybe} from 'true-myth';
 
 import {
   applockRefactoredFeatureToggleName,
@@ -32,9 +33,12 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
   test('enables a known feature without mutating the original URL', () => {
     const originalUrl = new URL('https://example.com/auth/#/login');
 
-    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [forTestsOnlyFeatureToggleName]: true,
-    });
+    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(
+      originalUrl,
+      Maybe.just({
+        [forTestsOnlyFeatureToggleName]: true,
+      }),
+    );
 
     expect(updatedUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe(forTestsOnlyFeatureToggleName);
     expect(updatedUrl).not.toBe(originalUrl);
@@ -43,14 +47,20 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
 
   test('enables multiple features in canonical order regardless of override insertion order', () => {
     const originalUrl = new URL('https://example.com/');
-    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [forTestsOnlyFeatureToggleName]: true,
-      [applockRefactoredFeatureToggleName]: true,
-    });
-    const reorderedOverridesUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [applockRefactoredFeatureToggleName]: true,
-      [forTestsOnlyFeatureToggleName]: true,
-    });
+    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(
+      originalUrl,
+      Maybe.just({
+        [forTestsOnlyFeatureToggleName]: true,
+        [applockRefactoredFeatureToggleName]: true,
+      }),
+    );
+    const reorderedOverridesUrl = applyStartupFeatureToggleOverridesToUrl(
+      originalUrl,
+      Maybe.just({
+        [applockRefactoredFeatureToggleName]: true,
+        [forTestsOnlyFeatureToggleName]: true,
+      }),
+    );
 
     expect(updatedUrl.search).toBe(
       `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}%2C${forTestsOnlyFeatureToggleName}`,
@@ -63,34 +73,43 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
       `https://example.com/?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName},${forTestsOnlyFeatureToggleName}`,
     );
 
-    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [forTestsOnlyFeatureToggleName]: false,
-    });
+    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(
+      originalUrl,
+      Maybe.just({
+        [forTestsOnlyFeatureToggleName]: false,
+      }),
+    );
 
     expect(updatedUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe(
       applockRefactoredFeatureToggleName,
     );
   });
 
-  test('removes the query parameter when disabling the last enabled feature', () => {
+  test('preserves an explicit empty selection when disabling the last enabled feature', () => {
     const originalUrl = new URL(
       `https://example.com/?${startupFeatureToggleQueryParameterName}=${forTestsOnlyFeatureToggleName}`,
     );
 
-    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [forTestsOnlyFeatureToggleName]: false,
-    });
+    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(
+      originalUrl,
+      Maybe.just({
+        [forTestsOnlyFeatureToggleName]: false,
+      }),
+    );
 
-    expect(updatedUrl.searchParams.has(startupFeatureToggleQueryParameterName)).toBe(false);
-    expect(updatedUrl.search).toBe('');
+    expect(updatedUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe('');
+    expect(updatedUrl.search).toBe(`?${startupFeatureToggleQueryParameterName}=`);
   });
 
   test('preserves unrelated query parameters including repeated values', () => {
     const originalUrl = new URL('https://example.com/auth/?return=conversation%2F123&filter=one&filter=two');
 
-    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [forTestsOnlyFeatureToggleName]: true,
-    });
+    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(
+      originalUrl,
+      Maybe.just({
+        [forTestsOnlyFeatureToggleName]: true,
+      }),
+    );
 
     expect(updatedUrl.searchParams.get('return')).toBe('conversation/123');
     expect(updatedUrl.searchParams.getAll('filter')).toEqual(['one', 'two']);
@@ -101,19 +120,22 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
   test('preserves the URL hash when applying overrides', () => {
     const originalUrl = new URL('https://example.com/auth/#/login');
 
-    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [forTestsOnlyFeatureToggleName]: true,
-    });
+    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(
+      originalUrl,
+      Maybe.just({
+        [forTestsOnlyFeatureToggleName]: true,
+      }),
+    );
 
     expect(updatedUrl.hash).toBe('#/login');
   });
 
-  test('leaves the URL unchanged when overrides are omitted', () => {
+  test('leaves the URL unchanged when artifact defaults are explicitly requested', () => {
     const originalUrl = new URL(
       `https://example.com/auth/?${startupFeatureToggleQueryParameterName}=${forTestsOnlyFeatureToggleName},${applockRefactoredFeatureToggleName}&return=a%20b#/login`,
     );
 
-    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {});
+    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, Maybe.nothing());
 
     expect(updatedUrl.href).toBe(originalUrl.href);
   });
@@ -123,12 +145,41 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
       `https://example.com/?${startupFeatureToggleQueryParameterName}=${forTestsOnlyFeatureToggleName}`,
     );
 
-    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [forTestsOnlyFeatureToggleName]: undefined,
-      [applockRefactoredFeatureToggleName]: undefined,
-    });
+    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(
+      originalUrl,
+      Maybe.just({
+        [forTestsOnlyFeatureToggleName]: undefined,
+        [applockRefactoredFeatureToggleName]: undefined,
+      }),
+    );
 
     expect(updatedUrl.href).toBe(originalUrl.href);
+  });
+
+  test('leaves artifact defaults available when explicitly requested', () => {
+    const originalUrl = new URL('https://example.com/');
+
+    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, Maybe.nothing());
+
+    expect(updatedUrl.href).toBe(originalUrl.href);
+    expect(updatedUrl.searchParams.has(startupFeatureToggleQueryParameterName)).toBe(false);
+  });
+
+  test('selects no features explicitly without assuming artifact defaults', () => {
+    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(new URL('https://example.com/'), Maybe.just({}));
+
+    expect(updatedUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe('');
+  });
+
+  test('disables a feature on a bare URL without allowing preview defaults to restore it', () => {
+    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(
+      new URL('https://example.com/'),
+      Maybe.just({
+        [forTestsOnlyFeatureToggleName]: false,
+      }),
+    );
+
+    expect(updatedUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe('');
   });
 
   test('composes enabling, disabling, and undefined overrides while keeping unspecified features', () => {
@@ -136,11 +187,14 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
       `https://example.com/?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName},${conversationListCollapseFeatureToggleName}&return=home#/login`,
     );
 
-    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [forTestsOnlyFeatureToggleName]: true,
-      [applockRefactoredFeatureToggleName]: false,
-      [conversationListCollapseFeatureToggleName]: undefined,
-    });
+    const updatedUrl = applyStartupFeatureToggleOverridesToUrl(
+      originalUrl,
+      Maybe.just({
+        [forTestsOnlyFeatureToggleName]: true,
+        [applockRefactoredFeatureToggleName]: false,
+        [conversationListCollapseFeatureToggleName]: undefined,
+      }),
+    );
 
     expect(updatedUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe(
       `${conversationListCollapseFeatureToggleName},${forTestsOnlyFeatureToggleName}`,

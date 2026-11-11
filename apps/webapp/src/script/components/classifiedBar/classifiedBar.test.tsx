@@ -29,7 +29,7 @@ import {
 import {createUuid} from '../../util/uuid';
 
 import {ConversationClassifiedBar} from './classifiedBar';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

@@ -17,7 +17,8 @@
  *
  */
 
-import {ClientClassification, QualifiedUserClientMap} from '@wireapp/api-client/lib/client';
+import {ClientClassification} from '../../apiClient/client/clientClassification';
+import {QualifiedUserClientMap} from '../../apiClient/client/qualifiedPublicClients';
 
 import {
   mapQualifiedUserClientIdsToFullyQualifiedClientIds,

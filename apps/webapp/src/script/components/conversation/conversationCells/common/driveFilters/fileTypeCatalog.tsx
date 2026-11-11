@@ -19,18 +19,15 @@
 
 import {ComponentType} from 'react';
 
-import {
-  ArchiveFileIcon,
-  AudioFileIcon,
-  DocumentFileIcon,
-  ImageFileIcon,
-  PdfFileIcon,
-  PresentationFileIcon,
-  SpreadsheetFileIcon,
-  TextFileIcon,
-  VideoFileIcon,
-} from '@wireapp/react-ui-kit';
-
+import {ArchiveFileIcon} from '../../../../../uiKit/dataDisplay/icon/files/archiveFileIcon';
+import {AudioFileIcon} from '../../../../../uiKit/dataDisplay/icon/files/audioFileIcon';
+import {DocumentFileIcon} from '../../../../../uiKit/dataDisplay/icon/files/documentFileIcon';
+import {ImageFileIcon} from '../../../../../uiKit/dataDisplay/icon/files/imageFileIcon';
+import {PdfFileIcon} from '../../../../../uiKit/dataDisplay/icon/files/pdfFileIcon';
+import {PresentationFileIcon} from '../../../../../uiKit/dataDisplay/icon/files/presentationFileIcon';
+import {SpreadsheetFileIcon} from '../../../../../uiKit/dataDisplay/icon/files/spreadsheetFileIcon';
+import {TextFileIcon} from '../../../../../uiKit/dataDisplay/icon/files/textFileIcon';
+import {VideoFileIcon} from '../../../../../uiKit/dataDisplay/icon/files/videoFileIcon';
 import type {TranslationKey} from '../../../../../util/localizerUtil';
 
 type FileTypeLabelKey = Extract<TranslationKey, `cells.fileType.${string}`>;

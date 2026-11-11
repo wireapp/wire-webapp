@@ -18,10 +18,11 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 
 import {TIME_IN_MILLIS} from './timeUtil';
+
+import {QualifiedId} from '../apiClient/user/qualifiedId';
 
 export function loadValue<T>(key: string): T | undefined {
   return amplify.store(key);

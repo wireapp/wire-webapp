@@ -17,15 +17,12 @@
  *
  */
 
-import {
-  CONVERSATION_TYPE,
-  DefaultConversationRoleName,
-  GROUP_CONVERSATION_TYPE,
-} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
+import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
-import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import type {CallConfigData} from '../../apiClient/account/callConfigData';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {amplify} from 'amplify';
 import type axios from 'axios';
 import 'jsdom-worker';
@@ -44,7 +41,7 @@ import {
   Wcall,
   type WcallAudioCbrChangeHandler,
 } from '@wireapp/avs';
-import {Runtime} from '@wireapp/commons';
+import {Runtime} from '../../commons/util/Runtime';
 import {WebAppEvents} from '../../webAppEvents';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
@@ -86,7 +83,7 @@ import {BackgroundEffectsHandler, ReleasableMediaStream} from '../media/backgrou
 import {APIClient} from '../../service/apiClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
 import {Translate} from '../../util/localizerUtil';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {BackgroundEffectSelection} from '../media/VideoBackgroundEffects';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {NoAudioInputError} from '../../error/noAudioInputError';

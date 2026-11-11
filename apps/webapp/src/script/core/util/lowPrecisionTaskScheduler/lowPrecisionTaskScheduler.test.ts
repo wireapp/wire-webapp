@@ -17,7 +17,7 @@
  *
  */
 
-import {advanceJestTimersWithPromise} from '@wireapp/commons/lib/util/testUtils';
+import {advanceJestTimersWithPromise} from '../../../commons/util/testUtils';
 
 import {LowPrecisionTaskScheduler} from './lowPrecisionTaskScheduler';
 

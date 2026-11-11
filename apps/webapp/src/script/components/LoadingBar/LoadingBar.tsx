@@ -21,7 +21,7 @@ import {FC} from 'react';
 
 import cx from 'classnames';
 
-import {Loading} from '@wireapp/react-ui-kit';
+import {Loading} from '../../uiKit/dataDisplay/loading/loading';
 
 interface LoadingBarProps {
   message?: string;

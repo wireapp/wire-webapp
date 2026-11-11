@@ -6,8 +6,6 @@ This is a monorepo managed with Just and npm workspaces, with the following stru
 apps/
 ├── webapp/           # React frontend application
 └── server/           # Node.js/Express backend API
-libraries/
-└── …                 # Shared workspace libraries
 ```
 
 ## Communication core
@@ -20,4 +18,3 @@ Located in `apps/webapp/src/script/core/`, the communication core provides:
 
 The webapp uses these modules for all backend communication. When making changes to core functionality:
 - Run unit tests: `npx just test`
-- Build workspace libraries: `npx just build-libraries`

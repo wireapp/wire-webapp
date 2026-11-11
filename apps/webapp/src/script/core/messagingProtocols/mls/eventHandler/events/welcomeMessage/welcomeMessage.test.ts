@@ -18,18 +18,18 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '../../../../../../apiClient/event/conversationEvent';
 
-import {Welcome} from '@wireapp/core-crypto';
+import {ConversationId} from '@wireapp/core-crypto';
 
 import {handleMLSWelcomeMessage} from './welcomeMessage';
 
 import {NotificationSource} from '../../../../../notification';
 import {MLSService, MLSServiceEvents} from '../../../mlsService';
 
-jest.mock('@wireapp/commons/lib/base64/decoder', () => {
+jest.mock('../../../../../../commons/base64/decoder', () => {
   return {
-    ...jest.requireActual('@wireapp/commons/lib/base64/decoder'),
+    ...jest.requireActual('../../../../../../commons/base64/decoder'),
     Decoder: {
       fromBase64: jest.fn().mockImplementation((value: string) => {
         return {
@@ -40,9 +40,9 @@ jest.mock('@wireapp/commons/lib/base64/decoder', () => {
   };
 });
 
-jest.mock('@wireapp/commons/lib/base64/encoder', () => {
+jest.mock('../../../../../../commons/base64/encoder', () => {
   return {
-    ...jest.requireActual('@wireapp/commons/lib/base64/encoder'),
+    ...jest.requireActual('../../../../../../commons/base64/encoder'),
     Encoder: {
       toBase64: jest.fn().mockImplementation((value: string) => {
         return {
@@ -59,7 +59,11 @@ const mockParams = {
   } as ConversationMLSWelcomeEvent,
   source: {} as NotificationSource,
   mlsService: {
-    processWelcomeMessage: jest.fn().mockResolvedValue(new Welcome(Uint8Array.from([1, 2, 3]))),
+    processWelcomeMessage: jest.fn().mockResolvedValue({
+      copyBytes: jest.fn(() => {
+        return Uint8Array.from([1, 2, 3]);
+      }),
+    } as unknown as ConversationId),
     scheduleKeyMaterialRenewal: jest.fn(),
     getEpoch: jest.fn(),
     emit: jest.fn(),
@@ -90,13 +94,13 @@ describe('MLS welcomeMessage eventHandler', () => {
     });
 
     it('emits new epoch event after processing a welcome message', async () => {
-      jest.spyOn(mockParams.mlsService, 'getEpoch').mockResolvedValue(1);
+      jest.spyOn(mockParams.mlsService, 'getEpoch').mockResolvedValue(1n);
 
       await handleMLSWelcomeMessage(mockParams);
 
       expect(mockParams.mlsService.emit).toHaveBeenCalledWith(MLSServiceEvents.NEW_EPOCH, {
         groupId: Uint8Array.from([1, 2, 3]),
-        epoch: 1,
+        epoch: 1n,
       });
     });
   });

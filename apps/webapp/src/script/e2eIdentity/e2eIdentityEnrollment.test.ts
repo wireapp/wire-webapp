@@ -20,9 +20,9 @@
 import {waitFor} from '@testing-library/react';
 import {CredentialType} from '../core/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '../core/util/lowPrecisionTaskScheduler';
-import {container} from 'tsyringe';
-import {noop} from 'noop-esm';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {noop} from 'noop-esm';
+import {container} from 'tsyringe';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
@@ -40,7 +40,7 @@ import {getEnrollmentStore} from './enrollment.store';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 import {translateForTest} from '../util/test/translateForTest';
 import {createCoreTestFixture} from '../util/test/createCoreTestFixture';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../apiClient/team/feature/featureList.types';
 
 jest.mock('./oidcService', () => {
   return {
@@ -76,15 +76,13 @@ const generateWireIdentity = (
 ): e2eIdentityVerification.WireIdentity => {
   return {
     x509Identity: {
-      free: jest.fn(),
       certificate: '',
       displayName: 'John Doe',
       domain: 'domain',
       handle: 'johndoe',
-      notAfter: BigInt(0),
-      notBefore: BigInt(0),
+      notAfter: new Date(0),
+      notBefore: new Date(0),
       serialNumber: '',
-      [Symbol.dispose]: noop,
     },
     thumbprint: '',
     credentialType,
@@ -179,6 +177,16 @@ describe('E2EIHandler', () => {
     await E2EIHandler.getInstance().initialize(params);
     await wait(1);
     expect(coreMock.service?.e2eIdentity?.initialize).toHaveBeenCalled();
+  });
+
+  it('forwards the CRL proxy to the core E2EI service', async () => {
+    const crlProxy = 'https://proxy.example.test/proxyCrl';
+
+    await E2EIHandler.getInstance().initialize({...params, crlProxy});
+
+    expect(getE2EIServiceForTest().initialize).toHaveBeenCalledWith('http://example.com', expect.any(Function), {
+      crlProxy,
+    });
   });
 
   it('does nothing if there is not enrollment in progress and device is alreaady enrolled', async () => {

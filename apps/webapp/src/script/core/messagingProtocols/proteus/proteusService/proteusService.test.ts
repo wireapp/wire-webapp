@@ -17,9 +17,9 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
-import type {PreKey} from '@wireapp/api-client/lib/auth';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {APIClient} from '../../../../apiClient/apiClient';
+import type {PreKey} from '../../../../apiClient/auth/preKey';
+import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import type {CryptoClient} from './cryptoClient';
 import * as Recipients from '../utility/recipients';
 
@@ -28,22 +28,24 @@ import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
   Conversation,
+} from '../../../../apiClient/conversation/conversation';
+import {
   FederatedBackendsError,
   FederatedBackendsErrorLabel,
-  QualifiedUserClients,
-} from '@wireapp/api-client/lib/conversation';
+} from '../../../../apiClient/conversation/federatedBackendsError';
+import {QualifiedUserClients} from '../../../../apiClient/conversation/qualifiedUserClients';
 
 import {AddUsersFailureReasons, MessageSendingState, MessageTargetMode} from '../../../conversation';
 import {buildTextMessage} from '../../../conversation/message/messageBuilder';
 import {SendProteusMessageParams} from './proteusService.types';
 import {buildProteusService, cleanupProteusServiceMocks} from './proteusService.mocks';
 import {constructSessionId} from '../utility/sessionHandler';
-import {CONVERSATION_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
+import {CONVERSATION_EVENT, ConversationOtrMessageAddEvent} from '../../../../apiClient/event/conversationEvent';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {ProteusService} from './proteusService';
 import {NonFederatingBackendsError} from '../../../errors';
 import {generateQualifiedId, generateQualifiedIds} from '../../../testUtils';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 
 type EncryptionTestSetup = {
   services: {proteusService: ProteusService; apiClient: APIClient; cryptoClient: CryptoClient};

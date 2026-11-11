@@ -18,7 +18,9 @@
  */
 
 import {expect} from '@playwright/test';
-import {type ConfigGeneratorParams, type Env, generateClientConfig} from '@wireapp/config';
+import {type ConfigGeneratorParams} from '../../../../../server/configuration/config.types';
+import {type Env} from '../../../../../server/configuration/env';
+import {generateConfig as generateClientConfig} from '../../../../../server/configuration/client.config';
 
 import {test} from '../../test.fixtures';
 

@@ -19,11 +19,10 @@
 
 import type {FunctionComponent} from 'react';
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-
 import {EmojiPill} from './emojiPill';
 import {messageReactionWrapper} from './messageReactions.styles';
 
+import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 import {User} from '../../../../../../repositories/entity/User';
 import {ReactionMap} from '../../../../../../repositories/storage';
 import {getEmojiUnicode} from '../../../../../../util/emojiUtil';

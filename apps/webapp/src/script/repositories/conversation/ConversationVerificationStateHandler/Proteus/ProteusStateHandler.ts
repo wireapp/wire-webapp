@@ -18,10 +18,10 @@
  */
 
 import {isTruthy, isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {VerificationMessageType} from '../../../../message/verificationMessageType';
 import {getLogger, Logger} from '../../../../util/logger';
 import {WebAppEvents} from '../../../../webAppEvents';

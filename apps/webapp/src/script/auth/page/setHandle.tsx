@@ -20,19 +20,24 @@
 import React, {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
-import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {connect} from 'react-redux';
 import {useLocation} from 'react-router';
 
-import {Runtime} from '@wireapp/commons';
-import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
-
 import {Page} from './page';
 
+import {BackendErrorLabel, SyntheticErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {ConsentType} from '../../apiClient/self/consentType';
+import {Runtime} from '../../commons/util/Runtime';
 import {useApplicationContext} from '../../page/rootProvider';
 import {StorageKey} from '../../repositories/storage';
 import {navigate} from '../../router/Router';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Form} from '../../uiKit/inputs/form/form';
+import {Input} from '../../uiKit/inputs/input/input';
+import {InputBlock} from '../../uiKit/inputs/inputBlock/inputBlock';
+import {InputSubmitCombo} from '../../uiKit/inputs/inputSubmitCombo/inputSubmitCombo';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {Text} from '../../uiKit/typography/text/text';
 import {storeValue} from '../../util/storageUtil';
 import {isBackendError} from '../../util/typePredicateUtil';
 import {AcceptNewsModal} from '../component/acceptNewsModal';

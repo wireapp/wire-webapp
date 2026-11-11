@@ -20,10 +20,10 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RestVersion} from 'cells-sdk-ts';
 import {container} from 'tsyringe';
 
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {parseQualifiedId} from '../../../../core';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';

@@ -28,7 +28,7 @@ if [[ ! -s apps/server/dist/version.json ]]; then
   exit 1
 fi
 
-if [[ ! -s apps/server/dist/index.js ]] || [[ ! -d libraries/config/lib ]]; then
-  echo 'Public production build did not produce the compiled server and config library required by Docker.' >&2
+if [[ ! -s apps/server/dist/index.js ]] || [[ ! -s apps/server/dist/configuration/server.config.js ]]; then
+  echo 'Public production build did not produce the compiled server and configuration required by Docker.' >&2
   exit 1
 fi

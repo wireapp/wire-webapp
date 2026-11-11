@@ -1,6 +1,8 @@
 import {Router, type Request, type Response} from 'express';
 
-import {createBuildMetadata, generateClientConfig, type BuildMetadata, type Env} from '@wireapp/config';
+import {createBuildMetadata, type BuildMetadata} from '../../configuration/buildMetadata';
+import {generateConfig as generateClientConfig} from '../../configuration/client.config';
+import {type Env} from '../../configuration/env';
 
 import {createClientVersionCheckRoute} from './clientVersionCheckRoute';
 

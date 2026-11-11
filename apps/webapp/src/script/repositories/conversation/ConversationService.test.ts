@@ -17,8 +17,8 @@
  *
  */
 
-import type {Conversation as BackendConversation} from '@wireapp/api-client/lib/conversation';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {Conversation as BackendConversation} from '../../apiClient/conversation/conversation';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 import {ClientEvent} from '../event/Client';
 import type {EventService} from '../event/EventService';

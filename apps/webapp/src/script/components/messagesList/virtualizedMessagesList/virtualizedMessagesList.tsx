@@ -140,11 +140,16 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
     timestamp: conversationLastReadTimestamp,
     timestampReference: conversationLastReadTimestampReference,
     setTimestamp: setConversationLastReadTimestamp,
+    hasManualUnreadMarker,
   } = useConversationReadBoundary(conversation);
 
   const groupedMessages = useMemo(() => {
-    return groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp);
-  }, [conversationLastReadTimestamp, filteredMessages]);
+    return groupMessagesBySenderAndTime({
+      messages: filteredMessages,
+      lastReadTimestamp: conversationLastReadTimestamp,
+      includeInitialUnreadSeparator: hasManualUnreadMarker,
+    });
+  }, [conversationLastReadTimestamp, filteredMessages, hasManualUnreadMarker]);
 
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
 

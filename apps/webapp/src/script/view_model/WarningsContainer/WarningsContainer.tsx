@@ -21,11 +21,10 @@ import {FunctionComponent, ReactNode, useEffect} from 'react';
 
 import cx from 'classnames';
 
-import {Runtime} from '@wireapp/commons';
-
 import {closeWarning, useWarningsState} from './WarningsState';
 import {CONFIG, TYPE} from './WarningsTypes';
 
+import {Runtime} from '../../commons/util/Runtime';
 import * as Icon from '../../components/icon';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';

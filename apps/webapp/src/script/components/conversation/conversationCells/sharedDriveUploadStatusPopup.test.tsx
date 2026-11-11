@@ -19,7 +19,7 @@
 
 import {render, screen, within, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 
 import type {SharedDriveUploadStatus} from './sharedDriveUploadStatus';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';

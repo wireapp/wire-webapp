@@ -21,14 +21,13 @@ import type {FunctionComponent, ReactNode} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
 
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
-
 import {MessageTime} from './messageTime';
 import {useMessageFocusedTabIndex} from './util';
 
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {FederationStopMessage as FederationStopMessageEntity} from '../../../repositories/entity/message/federationStopMessage';
+import {Link, LinkVariant} from '../../../uiKit/typography/link/link';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from '../../../util/localizerUtil/reactLocalizerUtil';
 import type {ReactTranslationValueReplacement} from '../../../util/localizerUtil/reactLocalizerUtil';

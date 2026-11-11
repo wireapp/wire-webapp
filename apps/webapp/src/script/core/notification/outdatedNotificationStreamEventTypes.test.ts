@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 
 import {NotificationSource} from './notificationSource.types';
 import {isOutdatedNotificationStreamEvent} from './outdatedNotificationStreamEventTypes';

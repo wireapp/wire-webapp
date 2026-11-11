@@ -21,7 +21,8 @@ import {ReactNode} from 'react';
 
 import {render, screen} from '@testing-library/react';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../../uiKit/identity/theme/theme';
 
 import {CellsStateInfo} from './cellsStateInfo';
 import type {JSX} from '@emotion/react/jsx-runtime';

@@ -17,7 +17,7 @@
  *
  */
 
-import {UserType} from '@wireapp/api-client/lib/user';
+import {UserType} from '../../apiClient/user/user';
 
 import {randomUUID} from 'crypto';
 

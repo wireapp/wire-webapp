@@ -21,8 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {isEmptyString, isUndefined} from '@sindresorhus/is';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {useVideoPlayback} from './useVideoPlayback/useVideoPlayback';
 import {VideoAssetCard} from './videoAssetCard/videoAssetCard';
 import {VideoAssetError} from './videoAssetError/videoAssetError';
@@ -32,6 +30,7 @@ import {VideoControls} from './videoControls/videoControls';
 import {VideoPlayOverlay} from './videoPlayOverlay/videoPlayOverlay';
 
 import {useInView} from '../../../../../../../../hooks/useInView/useInView';
+import {TabIndex} from '../../../../../../../../uiKit/utils/enums';
 import {useEffectRef} from '../../../../../../../../util/useEffectRef';
 
 interface VideoAssetPlayerProps {

@@ -70,7 +70,14 @@ await pageManager.openLoginPage({
 ```
 
 Keys derive from the production `StartupFeatureToggleName` type, so arbitrary feature strings are not accepted.
-`true` enables a feature; `false` removes it from the URL. Omitted or `undefined` overrides leave its state unchanged.
+`true` enables a feature; `false` removes it from the selection. Omitting `startupFeatureToggles` preserves the URL
+and allows the tested artifact's defaults to apply. Providing an override object creates an explicit URL selection,
+starting with the existing URL selection or no features. Use `startupFeatureToggles: {}` on a bare URL to select no
+features, independently of preview defaults. Individual omitted or `undefined` entries preserve the URL selection;
+the helper never assumes preview defaults. Disabling the last feature preserves `enabled-features=`.
+The underlying `applyStartupFeatureToggleOverridesToUrl` adapter requires a `Maybe<StartupFeatureToggleOverrides>`:
+pass `Maybe.nothing()` to use artifact defaults or `Maybe.just(overrides)` for an explicit selection. The navigation
+methods convert their existing optional `startupFeatureToggles` option into `Maybe` at the boundary.
 Existing `baseUrl` and `confirmNewHistory` options still work with `withLogin`; navigation methods accept `baseUrl`
 in the options object.
 

@@ -17,11 +17,10 @@
  *
  */
 
-import {PreKey} from '@wireapp/api-client/lib/auth';
-
 import {PrekeysTrackerStore} from './prekeysTracker.store';
 
 import {CryptoClient} from '../..';
+import {PreKey} from '../../../../../../../apiClient/auth/preKey';
 
 const prekeyReplenishmentDivisor = 2;
 

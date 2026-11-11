@@ -18,7 +18,8 @@
  */
 
 import {fireEvent, waitFor} from '@testing-library/react';
-import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client';
+import {ClientClassification} from '../../apiClient/client/clientClassification';
+import {ClientType} from '../../apiClient/client/clientType';
 
 import {ClientList} from './clientList';
 

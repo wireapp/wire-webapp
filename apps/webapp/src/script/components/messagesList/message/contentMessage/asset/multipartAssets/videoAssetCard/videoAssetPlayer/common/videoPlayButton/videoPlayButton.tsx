@@ -21,11 +21,11 @@ import {ReactNode, useEffect, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {PauseIcon, PlayIcon} from '@wireapp/react-ui-kit';
-
 import {wrapperStyles, playButtonStyles, wrapperStylesFullscreen} from './videoPlayButton.styles';
 
 import {useApplicationContext} from '../../../../../../../../../../page/rootProvider';
+import {PauseIcon} from '../../../../../../../../../../uiKit/dataDisplay/icon/pauseIcon';
+import {PlayIcon} from '../../../../../../../../../../uiKit/dataDisplay/icon/playIcon';
 import {useMessageFocusedTabIndex} from '../../../../../../../util';
 
 interface VideoPlayButtonProps {

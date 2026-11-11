@@ -17,10 +17,9 @@
  *
  */
 
-import {ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
-import {Decoder} from '@wireapp/commons/lib/base64/decoder';
-import {Encoder} from '@wireapp/commons/lib/base64/encoder';
-
+import {ConversationMLSWelcomeEvent} from '../../../../../../apiClient/event/conversationEvent';
+import {Decoder} from '../../../../../../commons/base64/decoder';
+import {Encoder} from '../../../../../../commons/base64/encoder';
 import {HandledEventPayload} from '../../../../../notification';
 import {MLSService, MLSServiceEvents} from '../../../mlsService';
 

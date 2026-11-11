@@ -17,8 +17,9 @@
  *
  */
 
-import {CONVERSATION_TYPE, DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
+import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
+import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 import {Maybe, task} from 'true-myth';
 import {asyncNoop, noop} from 'noop-esm';
 

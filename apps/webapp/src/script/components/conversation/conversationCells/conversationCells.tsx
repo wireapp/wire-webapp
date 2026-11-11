@@ -20,10 +20,7 @@
 import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {task} from 'true-myth';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CellsHeader} from './cellsHeader/cellsHeader';
 import {CellsLoader} from './cellsLoader/cellsLoader';
@@ -64,12 +61,14 @@ import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresigne
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 import {useSharedDriveFileDrop} from './useSharedDriveFileDrop';
 
+import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {UserRepository} from '../../../repositories/user/userRepository';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {allowsAllFiles, hasAllowedExtension} from '../../../util/fileTypeUtil';
 import {showFileDropzoneErrorModal} from '../useFilesUploadDropzone/showFileDropzoneErrorModal/showFileDropzoneErrorModal';

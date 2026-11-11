@@ -21,9 +21,12 @@ import type {FunctionComponent} from 'react';
 
 import {isNan} from '@sindresorhus/is';
 
-import {Button, ButtonVariant, FlexBox, Input, Select, Text} from '@wireapp/react-ui-kit';
-
 import {useApplicationContext} from '../../../../../page/rootProvider';
+import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
+import {Input} from '../../../../../uiKit/inputs/input/input';
+import {Select} from '../../../../../uiKit/inputs/select/select';
+import {FlexBox} from '../../../../../uiKit/layout/flexBox/flexBox';
+import {Text} from '../../../../../uiKit/typography/text/text';
 import {handleEscDown, handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
 import {ModalComponent} from '../../../ModalComponent';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';

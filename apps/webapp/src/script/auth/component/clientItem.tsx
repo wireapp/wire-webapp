@@ -32,24 +32,20 @@ import {
 } from 'react';
 
 import {isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
-import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
 
-import {
-  TabIndex,
-  COLOR,
-  ContainerXS,
-  DeviceIcon,
-  FlexBox,
-  Form,
-  IconButton,
-  Input,
-  Line,
-  Small,
-  Text,
-  TrashIcon,
-} from '@wireapp/react-ui-kit';
-
+import {RegisteredClient} from '../../apiClient/client/registeredClient';
 import {useApplicationContext} from '../../page/rootProvider';
+import {DeviceIcon} from '../../uiKit/dataDisplay/icon/deviceIcon';
+import {TrashIcon} from '../../uiKit/dataDisplay/icon/trashIcon';
+import {COLOR} from '../../uiKit/identity/colors/colors';
+import {Form} from '../../uiKit/inputs/form/form';
+import {IconButton} from '../../uiKit/inputs/iconButton/iconButton';
+import {Input} from '../../uiKit/inputs/input/input';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {FlexBox} from '../../uiKit/layout/flexBox/flexBox';
+import {Line} from '../../uiKit/typography/line/line';
+import {Small, Text} from '../../uiKit/typography/text/text';
+import {TabIndex} from '../../uiKit/utils/enums';
 import {isEnterKey} from '../../util/keyboardUtil';
 import {splitFingerprint} from '../../util/stringUtil';
 import {isBackendError} from '../../util/typePredicateUtil';

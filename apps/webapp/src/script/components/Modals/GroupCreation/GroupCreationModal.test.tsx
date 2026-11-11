@@ -1,4 +1,4 @@
-import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../../apiClient/team/feature/featureList.types';
 import {TeamState} from '../../../repositories/team/TeamState';
 import ko from 'knockout';
 import {GroupCreationModal} from './GroupCreationModal';
@@ -10,7 +10,7 @@ import {WebAppEvents} from '../../../webAppEvents';
 import {mountComponent} from '../../../auth/util/test/testUtil';
 import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
 import {initialRootState} from '../../../auth/module/reducer';
-import {TypeUtil} from '@wireapp/commons';
+import {TypeUtil} from '../../../commons/util';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {createRootContextValueForTest} from '../../../page/testSupport/rootContextTestSupport';

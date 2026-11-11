@@ -8,13 +8,9 @@ WORKDIR /app
 # npm workspace metadata
 COPY package.json package-lock.json .npmrc ./
 COPY apps/server/package.json ./apps/server/package.json
-COPY libraries/config/package.json ./libraries/config/package.json
 
 # Install only server production deps
 RUN npm clean-install --omit=dev --workspace=@wireapp/server --include-workspace-root=false --ignore-scripts
-
-# Copy built config library artifacts
-COPY libraries/config/lib ./libraries/config/lib
 
 # Copy built server artifacts and runtime files
 COPY apps/server/dist /dist

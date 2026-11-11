@@ -18,7 +18,6 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {ConversationMessageTimerUpdateEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
@@ -26,6 +25,7 @@ import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
 import {ConversationMapper} from './ConversationMapper';
 
+import {ConversationMessageTimerUpdateEvent, CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 import {EphemeralStatusType} from '../../message/ephemeralStatusType';
 import {StatusType} from '../../message/statusType';
 import {getLogger, Logger} from '../../util/logger';

@@ -20,13 +20,13 @@
 import {useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {PeopleTab, SearchResultsData} from './peopleTab';
 import {ServicesTab} from './servicesTab';
 
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {showInviteModal} from '../../../../components/Modals/InviteModal';
 import {showServiceModal} from '../../../../components/Modals/ServiceModal';
 import {showUserModal} from '../../../../components/Modals/UserModal';

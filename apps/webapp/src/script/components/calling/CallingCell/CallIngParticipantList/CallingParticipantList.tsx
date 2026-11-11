@@ -21,8 +21,6 @@ import React, {type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {Tooltip} from '@wireapp/react-ui-kit';
-
 import {
   headerStyles,
   labelStyles,
@@ -35,6 +33,7 @@ import {CallingRepository} from '../../../../repositories/calling/CallingReposit
 import {Participant} from '../../../../repositories/calling/Participant';
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {ContextMenuEntry, showContextMenu} from '../../../../ui/contextMenu';
+import {Tooltip} from '../../../../uiKit/dataDisplay/tooltip/tooltip';
 import {sortUsersByPriority} from '../../../../util/stringUtil';
 import {FadingScrollbar} from '../../../fadingScrollbar';
 import * as Icon from '../../../icon';

@@ -20,7 +20,7 @@
 import * as ContentType from './contentType.guards';
 
 export {LegalHoldStatus} from '@wireapp/protocol-messaging';
-export {Connection as ConnectionContent} from '@wireapp/api-client/lib/connection';
+export type {Connection as ConnectionContent} from '../../../apiClient/connection/connection';
 export {ContentType};
 
 export * from './assetContent';

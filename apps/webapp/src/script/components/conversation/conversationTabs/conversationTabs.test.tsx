@@ -18,7 +18,7 @@
  */
 
 import {act, render, type RenderResult} from '@testing-library/react';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 import {Maybe} from 'true-myth';
 
 import type {UploadState} from '../../../repositories/cells/upload';

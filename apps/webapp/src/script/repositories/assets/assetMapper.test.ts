@@ -17,7 +17,7 @@
  *
  */
 
-import {UserAsset as APIClientUserAsset, UserAssetType} from '@wireapp/api-client/lib/user/';
+import {UserAsset as APIClientUserAsset, UserAssetType} from '../../apiClient/user/userAsset';
 
 import * as AssetMapper from './assetMapper';
 

@@ -37,6 +37,7 @@ export type {
 
 export interface ButtonAction {
   action?: Function;
+  isDestructive?: boolean;
   runActionOnEnterClick?: Boolean;
   uieName?: string;
   text?: React.ReactNode;

@@ -20,11 +20,9 @@
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {isEmptyArray, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 
-import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
-
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {SearchInput} from '../../../components/SearchInput';
@@ -41,6 +39,8 @@ import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {generatePermissionHelpers} from '../../../repositories/user/userPermission';
 import {UserState} from '../../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {checkAppsFeatureAvailability} from '../../../util/featureUtil';
 import {handleKeyDown, KEY} from '../../../util/keyboardUtil';

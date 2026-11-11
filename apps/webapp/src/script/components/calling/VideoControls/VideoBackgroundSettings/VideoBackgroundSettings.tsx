@@ -21,8 +21,6 @@ import {CSSProperties, ReactNode, useEffect, useId, useRef, type FunctionCompone
 
 import {match} from 'ts-pattern';
 
-import {BlurHighIcon, BlurLowIcon, CircleIcon} from '@wireapp/react-ui-kit';
-
 import {
   backgroundEffectPanelHintStyles,
   backgroundSettingsHeaderStyles,
@@ -41,6 +39,9 @@ import {Config} from '../../../../Config';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {BackgroundEffectsQuality} from '../../../../repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection, BuiltinBackground} from '../../../../repositories/media/VideoBackgroundEffects';
+import {BlurHighIcon} from '../../../../uiKit/dataDisplay/icon/blurHighIcon';
+import {BlurLowIcon} from '../../../../uiKit/dataDisplay/icon/blurLowIcon';
+import {CircleIcon} from '../../../../uiKit/dataDisplay/icon/circleIcon';
 import {FadingScrollbar} from '../../../fadingScrollbar';
 import * as Icon from '../../../icon';
 import {RadioGroup} from '../../../Radio';

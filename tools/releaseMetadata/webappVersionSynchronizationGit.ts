@@ -28,7 +28,7 @@ import {readFile as readFileFromFileSystem, writeFile as writeFileToFileSystem} 
 import {resolve} from 'node:path';
 import {isDeepStrictEqual} from 'node:util';
 
-import {compareWebAppVersions, validateMatchingWebAppPackageVersions} from './webappVersion.ts';
+import {compareWebAppVersions, validateWebAppPackageVersion} from './webappVersion.ts';
 import type {WebAppPackageDocument, WebAppPackageDocuments, WebAppPackageVersions} from './webappVersion.ts';
 import {validateWebAppVersionSynchronizationBranchName} from './webappVersionSynchronization.ts';
 import type {WebAppVersionSynchronizationBranch} from './webappVersionSynchronization.ts';
@@ -52,9 +52,7 @@ export type WebAppVersionSynchronizationBranchInspection = {
   readonly isBasedOnMainHistory: boolean;
   readonly changedFilePaths: readonly string[];
   readonly baseRootPackageDocument: unknown;
-  readonly baseWebAppPackageDocument: unknown;
   readonly branchRootPackageDocument: unknown;
-  readonly branchWebAppPackageDocument: unknown;
   readonly baseLockfileDocument: unknown;
   readonly branchLockfileDocument: unknown;
 };
@@ -118,11 +116,7 @@ export type WebAppVersionSynchronizationFileSystem = {
   readonly writeFile: (filePath: string, fileContents: string) => Promise<void>;
 };
 
-export const webAppVersionSynchronizationPackageFilePaths = [
-  'apps/webapp/package.json',
-  'package-lock.json',
-  'package.json',
-] as const;
+export const webAppVersionSynchronizationPackageFilePaths = ['package-lock.json', 'package.json'] as const;
 
 type RunGitOperationOptions<valueType> = {
   readonly description: string;
@@ -346,17 +340,11 @@ function readPackageDocumentsAtRevision(
     revision,
     packageFilePath: 'package.json',
   }).andThen(rootPackageDocument => {
-    return readPackageDocumentAtRevision({
-      git,
-      revision,
-      packageFilePath: 'apps/webapp/package.json',
-    }).andThen(webAppPackageDocument => {
-      return readPackageDocumentAtRevision({git, revision, packageFilePath: 'package-lock.json'}).map(
-        lockfileDocument => {
-          return {rootPackageDocument, webAppPackageDocument, lockfileDocument};
-        },
-      );
-    });
+    return readPackageDocumentAtRevision({git, revision, packageFilePath: 'package-lock.json'}).map(
+      lockfileDocument => {
+        return {rootPackageDocument, lockfileDocument};
+      },
+    );
   });
 }
 
@@ -380,9 +368,7 @@ function createBranchInspection(options: CreateBranchInspectionOptions): WebAppV
     isBasedOnMainHistory: options.isBasedOnMainHistory,
     changedFilePaths: options.changedFilePaths,
     baseRootPackageDocument: options.basePackageDocuments?.rootPackageDocument,
-    baseWebAppPackageDocument: options.basePackageDocuments?.webAppPackageDocument,
     branchRootPackageDocument: options.branchPackageDocuments?.rootPackageDocument,
-    branchWebAppPackageDocument: options.branchPackageDocuments?.webAppPackageDocument,
     baseLockfileDocument: options.basePackageDocuments?.lockfileDocument,
     branchLockfileDocument: options.branchPackageDocuments?.lockfileDocument,
   };
@@ -426,10 +412,7 @@ function validateSynchronizationBranchStructure(
     );
   }
 
-  const basePackageVersionsResult = validateMatchingWebAppPackageVersions(
-    branchInspection.baseRootPackageDocument,
-    branchInspection.baseWebAppPackageDocument,
-  );
+  const basePackageVersionsResult = validateWebAppPackageVersion(branchInspection.baseRootPackageDocument);
 
   if (basePackageVersionsResult.isErr) {
     return Result.err(new Error(`Synchronization branch base is invalid: ${basePackageVersionsResult.error.message}`));
@@ -442,10 +425,7 @@ function validateSynchronizationBranchPackageDocuments(options: {
   readonly branchInspection: WebAppVersionSynchronizationBranchInspection;
   readonly expectedWebAppVersion: string;
 }): Result<Unit, Error> {
-  const branchPackageVersionsResult = validateMatchingWebAppPackageVersions(
-    options.branchInspection.branchRootPackageDocument,
-    options.branchInspection.branchWebAppPackageDocument,
-  );
+  const branchPackageVersionsResult = validateWebAppPackageVersion(options.branchInspection.branchRootPackageDocument);
 
   if (branchPackageVersionsResult.isErr) {
     return Result.err(
@@ -465,16 +445,6 @@ function validateSynchronizationBranchPackageDocuments(options: {
 
   if (rootPackageDocumentChangeResult.isErr) {
     return Result.err(rootPackageDocumentChangeResult.error);
-  }
-
-  const webAppPackageDocumentChangeResult = validatePackageDocumentVersionChange({
-    basePackageDocument: options.branchInspection.baseWebAppPackageDocument,
-    branchPackageDocument: options.branchInspection.branchWebAppPackageDocument,
-    packagePath: 'apps/webapp/package.json',
-  });
-
-  if (webAppPackageDocumentChangeResult.isErr) {
-    return Result.err(webAppPackageDocumentChangeResult.error);
   }
 
   return Result.ok(Unit);
@@ -583,10 +553,8 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
 
   function readPackageDocumentsFromWorkingTree(): Task<WebAppVersionSynchronizationPackageDocuments, Error> {
     return readPackageContentsFromWorkingTree('package.json').andThen(rootPackageDocument => {
-      return readPackageContentsFromWorkingTree('apps/webapp/package.json').andThen(webAppPackageDocument => {
-        return readPackageContentsFromWorkingTree('package-lock.json').map(lockfileDocument => {
-          return {rootPackageDocument, webAppPackageDocument, lockfileDocument};
-        });
+      return readPackageContentsFromWorkingTree('package-lock.json').map(lockfileDocument => {
+        return {rootPackageDocument, lockfileDocument};
       });
     });
   }
@@ -784,7 +752,6 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
             return {
               commitSha,
               rootPackageDocument: packageDocuments.rootPackageDocument,
-              webAppPackageDocument: packageDocuments.webAppPackageDocument,
               lockfileDocument: packageDocuments.lockfileDocument,
             };
           });
@@ -830,9 +797,7 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
 
     writePackageDocuments(writeOptions) {
       return writePackageDocument('package.json', writeOptions.rootPackageDocument).andThen(() => {
-        return writePackageDocument('apps/webapp/package.json', writeOptions.webAppPackageDocument).andThen(() => {
-          return writePackageDocument('package-lock.json', writeOptions.lockfileDocument);
-        });
+        return writePackageDocument('package-lock.json', writeOptions.lockfileDocument);
       });
     },
 

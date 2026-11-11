@@ -21,8 +21,7 @@ import type {Clock} from '@enormora/clock/clock';
 import {isError} from '@sindresorhus/is';
 import {task, type Task} from 'true-myth';
 
-import {isBuildMetadata, type BuildMetadata} from '@wireapp/config';
-
+import {isBuildMetadata, type BuildMetadata} from '../../../../server/configuration/buildMetadata';
 import {getLogger} from '../util/logger';
 import {TIME_IN_MILLIS} from '../util/timeUtil';
 

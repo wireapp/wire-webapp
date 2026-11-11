@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {container} from 'tsyringe';
 import {AddUsersFailureReasons} from '../../core/conversation';
 

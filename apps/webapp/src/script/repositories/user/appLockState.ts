@@ -17,10 +17,10 @@
  *
  */
 
-import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
+import {FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 import {Config} from '../../Config';
 import {TeamState} from '../team/TeamState';
 
@@ -41,7 +41,7 @@ export class AppLockState {
 
   constructor(teamState = container.resolve(TeamState)) {
     this.isAppLockDisabledOnTeam = ko.pureComputed(() => {
-      return teamState.isTeam() && teamState.teamFeatures()?.appLock?.status !== FEATURE_STATUS.ENABLED;
+      return teamState.isTeam() && teamState.teamFeatures()?.appLock?.status === FEATURE_STATUS.DISABLED;
     });
 
     this.isAppLockAvailable = ko.pureComputed(() => {
@@ -70,10 +70,16 @@ export class AppLockState {
       const isMdmAppLockDisabled =
         Config.getConfig().FEATURE.ENABLE_MDM_CONFIG &&
         Config.getDesktopConfig()?.managedConfig?.applockOverride === true;
-      if (isMdmAppLockDisabled) {
+      if (isMdmAppLockDisabled || this.isAppLockDisabledOnTeam()) {
         return false;
       }
-      return this.isAppLockEnforced() || this.isActivatedInPreferences();
+      const appLockStatus = teamState.teamFeatures()?.appLock?.status;
+      const hasPassphraseWhileConfigIsUnknown =
+        teamState.isTeam() &&
+        (teamState.isTeamFeatureConfigFallback() ||
+          (appLockStatus !== FEATURE_STATUS.ENABLED && appLockStatus !== FEATURE_STATUS.DISABLED)) &&
+        this.hasPassphrase();
+      return this.isAppLockEnforced() || this.isActivatedInPreferences() || hasPassphraseWhileConfigIsUnknown;
     });
   }
 }

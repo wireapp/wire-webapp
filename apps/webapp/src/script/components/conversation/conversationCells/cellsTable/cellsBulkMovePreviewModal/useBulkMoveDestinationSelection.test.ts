@@ -19,7 +19,7 @@
 
 import {renderHook, waitFor} from '@testing-library/react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {RestNode} from 'cells-sdk-ts';
 
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';

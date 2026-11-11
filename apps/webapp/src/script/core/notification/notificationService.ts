@@ -17,11 +17,6 @@
  *
  */
 
-import {BackendEvent} from '@wireapp/api-client/lib/event';
-import {Notification} from '@wireapp/api-client/lib/notification';
-
-import {APIClient} from '@wireapp/api-client';
-import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {NotificationBackendRepository} from './notificationBackendRepository';
@@ -29,6 +24,11 @@ import {NotificationDatabaseRepository} from './notificationDatabaseRepository';
 import {NotificationSource} from './notificationSource.types';
 import {isOutdatedNotificationStreamEvent} from './outdatedNotificationStreamEventTypes';
 
+import {APIClient} from '../../apiClient/apiClient';
+import {BackendEvent} from '../../apiClient/event/backendEvent';
+import {Notification} from '../../apiClient/notification/notification';
+import {LogFactory} from '../../commons/LogFactory';
+import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../coreError';
 import {DecryptionError} from '../errors/decryptionError';
@@ -44,6 +44,8 @@ export type HandledEventPayload = {
   decryptionError?: DecryptionError;
 };
 
+export type HandledEventPayloads = HandledEventPayload | readonly HandledEventPayload[];
+
 /**
  * The result of handling an event
  * - unhandled: The event was not handled by the particular service
@@ -51,7 +53,7 @@ export type HandledEventPayload = {
  * - handled: The event was handled and its payload will be emitted
  */
 export type HandledEventResult =
-  {status: 'unhandled'} | {status: 'ignored'} | {status: 'handled'; payload: HandledEventPayload | null};
+  {status: 'unhandled'} | {status: 'ignored'} | {status: 'handled'; payload: HandledEventPayloads | null};
 
 enum TOPIC {
   NOTIFICATION_ERROR = 'NotificationService.TOPIC.NOTIFICATION_ERROR',
@@ -222,7 +224,10 @@ export class NotificationService extends TypedEventEmitter<Events> {
       try {
         const handledEventResult = await this.handleEvent(event);
         if (handledEventResult.status === 'handled' && handledEventResult.payload !== null) {
-          yield handledEventResult.payload;
+          const payloads = Array.isArray(handledEventResult.payload)
+            ? handledEventResult.payload
+            : [handledEventResult.payload];
+          yield* payloads;
         }
       } catch (error: unknown) {
         this.logger.error(

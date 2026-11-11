@@ -20,16 +20,8 @@
 import {useEffect, useState, useRef, FormEvent, type FunctionComponent} from 'react';
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import type {RegisterData} from '@wireapp/api-client/lib/auth';
-import type {RegisteredClient} from '@wireapp/api-client/lib/client';
-import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data';
-import type {ConversationEvent} from '@wireapp/api-client/lib/event';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router';
-
-import {UrlUtil} from '@wireapp/commons';
-import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './conversationJoinComponents';
 import {ConversationJoinFull} from './conversationJoinInvalid';
@@ -37,8 +29,17 @@ import {EntropyContainer} from './entropyContainer';
 import {Login} from './login/login';
 import {Page} from './page';
 
+import type {RegisterData} from '../../apiClient/auth/registerData';
+import type {RegisteredClient} from '../../apiClient/client/registeredClient';
+import type {ConversationJoinData} from '../../apiClient/conversation/data/conversationJoinData';
+import type {ConversationEvent} from '../../apiClient/event/conversationEvent';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {UrlUtil} from '../../commons/util';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
+import {Column, Columns} from '../../uiKit/layout/column/column';
+import {H1} from '../../uiKit/typography/heading/heading';
+import {Muted} from '../../uiKit/typography/text/text';
 import {isBackendError} from '../../util/typePredicateUtil';
 import {noop} from '../../util/util';
 import {AppAlreadyOpen} from '../component/appAlreadyOpen';

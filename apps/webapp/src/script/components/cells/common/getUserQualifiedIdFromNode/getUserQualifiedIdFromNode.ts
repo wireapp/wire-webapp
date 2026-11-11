@@ -18,9 +18,9 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RestNode} from 'cells-sdk-ts';
 
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {parseQualifiedId} from '../../../../core/util/qualifiedIdUtil';
 
 export const getUserQualifiedIdFromNode = (node: RestNode): QualifiedId | null => {

@@ -17,9 +17,8 @@
  *
  */
 
-import {BackendEvent} from '@wireapp/api-client/lib/event';
-import {Notification} from '@wireapp/api-client/lib/notification';
-
+import {BackendEvent} from '../../apiClient/event/backendEvent';
+import {Notification} from '../../apiClient/notification/notification';
 import type {CRUDEngine} from '../storage/engine/crudEngine';
 
 enum DatabaseStores {

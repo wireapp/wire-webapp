@@ -17,9 +17,10 @@
  *
  */
 
-import type {QualifiedId, UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import type {UserAsset as APIClientUserAsset} from '../../apiClient/user/userAsset';
 import {AssetRemoteData} from '../assets/assetRemoteData';
 
 type ServiceType = 'Service' | 'App';

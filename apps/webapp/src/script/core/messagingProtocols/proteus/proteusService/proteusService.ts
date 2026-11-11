@@ -17,20 +17,6 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client/lib/apiClient';
-import type {PreKey, Context} from '@wireapp/api-client/lib/auth';
-import {
-  isFederatedBackendsError,
-  FederatedBackendsErrorLabel,
-  NewConversation,
-  QualifiedOTRRecipients,
-  QualifiedUserClients,
-} from '@wireapp/api-client/lib/conversation';
-import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
-import type {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
-
-import {LogFactory} from '@wireapp/commons';
-
 import {CryptoClient, InitialPrekeys} from './cryptoClient';
 import {cryptoMigrationStore} from './cryptoMigrationStateStore';
 import {generateDecryptionError} from './decryptionErrorGenerator';
@@ -43,6 +29,20 @@ import type {
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import {filterUsersFromDomains} from './userDomainFilters';
 
+import type {APIClient} from '../../../../apiClient/apiClient';
+import type {Context} from '../../../../apiClient/auth/context';
+import type {PreKey} from '../../../../apiClient/auth/preKey';
+import {
+  isFederatedBackendsError,
+  FederatedBackendsErrorLabel,
+} from '../../../../apiClient/conversation/federatedBackendsError';
+import {NewConversation} from '../../../../apiClient/conversation/newConversation';
+import {QualifiedOTRRecipients} from '../../../../apiClient/conversation/otrRecipients';
+import {QualifiedUserClients} from '../../../../apiClient/conversation/qualifiedUserClients';
+import type {ConversationOtrMessageAddEvent} from '../../../../apiClient/event/conversationEvent';
+import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import type {QualifiedUserPreKeyBundleMap} from '../../../../apiClient/user/userPreKeyBundleMap';
+import {LogFactory} from '../../../../commons/LogFactory';
 import {
   AddUsersFailureReasons,
   ProteusCreateConversationResponse,

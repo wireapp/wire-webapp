@@ -17,10 +17,9 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-
 import {SystemMessage} from './systemMessage';
 
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import type {Translate} from '../../../util/localizerUtil';
 

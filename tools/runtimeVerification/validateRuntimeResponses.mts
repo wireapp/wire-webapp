@@ -21,9 +21,9 @@
 
 import {readFileSync} from 'node:fs';
 
-import type {BuildMetadata} from '@wireapp/config';
-
 import {validateRuntimeResponses} from './validateRuntimeResponses.ts';
+
+import type {BuildMetadata} from '../../apps/server/configuration/buildMetadata.ts';
 
 function readRequiredEnvironmentValue(environmentVariableName: string): string {
   const environmentValue = process.env[environmentVariableName];

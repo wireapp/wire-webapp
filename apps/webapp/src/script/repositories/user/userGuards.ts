@@ -17,8 +17,7 @@
  *
  */
 
-import type {Self as SelfAPIUser} from '@wireapp/api-client/lib/self';
-
+import type {Self as SelfAPIUser} from '../../apiClient/self/self';
 import {UserRecord} from '../storage';
 
 export function isSelfAPIUser(payload: Partial<UserRecord>): payload is SelfAPIUser {

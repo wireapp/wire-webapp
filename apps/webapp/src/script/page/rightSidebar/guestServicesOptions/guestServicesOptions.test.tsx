@@ -34,8 +34,8 @@ import {GuestServicesOptions} from './guestServicesOptions';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {translateForTest} from '../../../util/test/translateForTest';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;

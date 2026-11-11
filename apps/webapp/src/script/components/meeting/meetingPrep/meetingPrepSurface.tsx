@@ -22,8 +22,6 @@ import {type FunctionComponent, type KeyboardEvent, useEffect, useRef, useState}
 import {JSX} from '@emotion/react/jsx-runtime';
 import {Maybe, maybe} from 'true-myth';
 
-import {Button, ButtonVariant, CloseIcon, Loading} from '@wireapp/react-ui-kit';
-
 import {
   meetingPrepAvatarStyles,
   meetingPrepBodyStyles,
@@ -61,6 +59,9 @@ import {InputLevel} from '../../../page/mainContent/panels/preferences/avPrefere
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
 import {useMediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
+import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
+import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {formatLocale} from '../../../util/timeUtil';
 import {Avatar, AVATAR_SIZE} from '../../avatar';
 import {groupVideoBackgroundInitializingOverlay} from '../../calling/GroupVideoGridTile.styles';

@@ -17,10 +17,10 @@
  *
  */
 
-import {Connection, ConnectionStatus} from '@wireapp/api-client/lib/connection';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../apiClient/apiClient';
+import {Connection} from '../../apiClient/connection/connection';
+import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 export class ConnectionService {
   constructor(private readonly apiClient: APIClient) {}

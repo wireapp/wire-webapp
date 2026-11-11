@@ -19,13 +19,13 @@
 
 import {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
-import {Node} from '@wireapp/api-client/lib/cells';
 import {Maybe, result} from 'true-myth';
 import {container} from 'tsyringe';
 
 import * as styles from './FileEditor.styles';
 import {validateCollaboraUrl} from './validateCollaboraUrl';
 
+import {Node} from '../../../apiClient/cells/cellsApi.schema';
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';

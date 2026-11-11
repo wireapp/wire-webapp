@@ -17,8 +17,7 @@
  *
  */
 
-import type {TeamInvitation} from '@wireapp/api-client/lib/team/';
-
+import type {TeamInvitation} from '../../../apiClient/team/invitation/teamInvitation';
 import {INVITATION_ACTION, InvitationActions} from '../action/creator/';
 
 export interface InvitationState {

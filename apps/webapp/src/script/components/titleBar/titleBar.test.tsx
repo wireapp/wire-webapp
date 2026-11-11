@@ -18,13 +18,13 @@
  */
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {isNull} from '@sindresorhus/is';
 
-import {Runtime} from '@wireapp/commons';
-import * as uiKit from '@wireapp/react-ui-kit';
+import {Runtime} from '../../commons/util/Runtime';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {WebAppEvents} from '../../webAppEvents';
 
 import en from '../../../i18n/en-US.json';
@@ -49,11 +49,13 @@ import {TestFactory} from '../../../../test/helper/TestFactory';
 import {PanelState} from '../../page/rightSidebar/rightSidebar';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {translateForTest} from '../../util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
-jest.mock('@wireapp/react-ui-kit', () => {
+jest.mock('../../uiKit/layout/matchMedia/matchMedia', () => {
   return {
-    ...(jest.requireActual('@wireapp/react-ui-kit') as any),
+    ...jest.requireActual<typeof import('../../uiKit/layout/matchMedia/matchMedia')>(
+      '../../uiKit/layout/matchMedia/matchMedia',
+    ),
     useMatchMedia: jest.fn(),
   };
 });
@@ -68,7 +70,7 @@ jest.mock('../calling/useCallAlertState', () => {
   };
 });
 
-const mockedUiKit = uiKit as jest.Mocked<typeof uiKit>;
+const mockedUseMatchMedia = jest.mocked(useMatchMedia);
 
 const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
@@ -228,7 +230,7 @@ describe('TitleBar', () => {
     const conversation = createConversationEntity();
     const props = getDefaultProps(callingRepository, conversation);
 
-    mockedUiKit.useMatchMedia.mockReturnValue(false);
+    mockedUseMatchMedia.mockReturnValue(false);
 
     const {getByLabelText} = render(withTheme(<TitleBar {...props} selfUser={selfUser} />));
 
@@ -240,7 +242,7 @@ describe('TitleBar', () => {
   });
 
   it('hide info button and search button on scaled down view', async () => {
-    mockedUiKit.useMatchMedia.mockReturnValue(true);
+    mockedUseMatchMedia.mockReturnValue(true);
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const {queryByLabelText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));

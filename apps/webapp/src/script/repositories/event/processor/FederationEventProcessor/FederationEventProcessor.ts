@@ -17,7 +17,6 @@
  *
  */
 
-import {FEDERATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 import {debounce} from 'underscore';
 
@@ -26,6 +25,7 @@ import {
   getFederationDeleteEventUpdates,
 } from './ConversationFederationUtils';
 
+import {FEDERATION_EVENT} from '../../../../apiClient/event/federationEvent';
 import {ServerTimeHandler} from '../../../../time/serverTimeHandler';
 import {ConversationState} from '../../../conversation/ConversationState';
 import {ConversationStatus} from '../../../conversation/ConversationStatus';

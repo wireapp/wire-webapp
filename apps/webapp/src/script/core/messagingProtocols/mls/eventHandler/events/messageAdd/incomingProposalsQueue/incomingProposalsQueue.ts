@@ -17,8 +17,7 @@
  *
  */
 
-import {LogFactory} from '@wireapp/commons';
-
+import {LogFactory} from '../../../../../../../commons/LogFactory';
 import {createFlushableQueue, type PromiseTask} from '../../../../../../queue/flushableQueue';
 import {sequentialQueueOptions} from '../../../../../../queue/sequentialQueueOptions';
 

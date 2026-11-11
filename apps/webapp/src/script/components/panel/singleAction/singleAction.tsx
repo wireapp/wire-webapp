@@ -19,11 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
-
 import {singleActionButtonStyle} from './singleAction.styles';
 
 import {useApplicationContext} from '../../../page/rootProvider';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {FlexBox} from '../../../uiKit/layout/flexBox/flexBox';
 
 interface MenuItem {
   click: () => void;

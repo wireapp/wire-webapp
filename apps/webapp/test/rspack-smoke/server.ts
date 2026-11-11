@@ -18,8 +18,9 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-import {generateClientConfig, parseBuildMetadata} from '@wireapp/config';
-import type {Env} from '@wireapp/config';
+import {generateConfig as generateClientConfig} from '../../../server/configuration/client.config.ts';
+import {parseBuildMetadata} from '../../../server/configuration/buildMetadata.ts';
+import type {Env} from '../../../server/configuration/env.ts';
 import {isError} from '@sindresorhus/is';
 import dotenv from 'dotenv-extended';
 import {match, P} from 'ts-pattern';

@@ -18,35 +18,7 @@
  */
 
 import {isEmptySet, isUndefined} from '@sindresorhus/is';
-import {
-  Conversation,
-  DefaultConversationRoleName,
-  MutedStatus,
-  NewConversation,
-  QualifiedUserClients,
-  RemoteConversations,
-  MLSConversation,
-  MLS1to1Conversation,
-  SUBCONVERSATION_ID,
-  Subconversation,
-  isMLS1to1Conversation,
-} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/lib/conversation/data';
-import {
-  BackendEvent,
-  CONVERSATION_EVENT,
-  ConversationMLSMessageAddEvent,
-  ConversationMLSWelcomeEvent,
-  ConversationMemberLeaveEvent,
-  ConversationOtrMessageAddEvent,
-} from '@wireapp/api-client/lib/event';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {Decoder} from '@wireapp/commons/lib/base64/decoder';
-import {XOR} from '@wireapp/commons/lib/util/TypeUtil';
 
-import {APIClient} from '@wireapp/api-client';
-import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {ConversationId} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
@@ -60,6 +32,35 @@ import {
   SendResult,
 } from './conversationService.types';
 
+import {APIClient} from '../../../apiClient/apiClient';
+import {
+  Conversation,
+  MLSConversation,
+  MLS1to1Conversation,
+  isMLS1to1Conversation,
+} from '../../../apiClient/conversation/conversation';
+import {DefaultConversationRoleName} from '../../../apiClient/conversation/conversationRole';
+import {ConversationMemberUpdateData} from '../../../apiClient/conversation/data/conversationMemberUpdateData';
+import {CONVERSATION_TYPING} from '../../../apiClient/conversation/data/conversationTypingData';
+import {MutedStatus} from '../../../apiClient/conversation/mutedStatus';
+import {NewConversation} from '../../../apiClient/conversation/newConversation';
+import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
+import {RemoteConversations} from '../../../apiClient/conversation/remoteConversations';
+import {SUBCONVERSATION_ID, Subconversation} from '../../../apiClient/conversation/subconversation';
+import {BackendEvent} from '../../../apiClient/event/backendEvent';
+import {
+  CONVERSATION_EVENT,
+  ConversationMLSMessageAddEvent,
+  ConversationMLSWelcomeEvent,
+  ConversationMemberLeaveEvent,
+  ConversationOtrMessageAddEvent,
+} from '../../../apiClient/event/conversationEvent';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {Decoder} from '../../../commons/base64/decoder';
+import {LogFactory} from '../../../commons/LogFactory';
+import {TypedEventEmitter} from '../../../commons/TypedEventEmitter/TypedEventEmitter';
+import {XOR} from '../../../commons/util/TypeUtil';
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {isMlsConversationNotFoundError} from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';
@@ -496,7 +497,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     // immediately execute pending commits before sending the message
-    await this.mlsService.commitPendingProposals(groupId, true);
+    await this.mlsService.commitPendingProposals(groupId);
 
     const encrypted = await this.mlsService.encryptMessage(
       new ConversationId(groupIdBytes),
@@ -569,7 +570,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     this.logger.info(`Adding users to MLS conversation`, {groupId, conversationId, qualifiedUsers});
 
     if (commitPendingFirst) {
-      await this.mlsService.commitPendingProposals(groupId, true);
+      await this.mlsService.commitPendingProposals(groupId);
     }
 
     const existingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);
@@ -1176,10 +1177,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * - WrongEpoch during notification replay → defer recovery until runDeferredEpochRecovery.
    * - GroupOutOfSync.handleMessageAdd → not handled here; the error bubbles.
    *
-   * Returns the decrypted payload when available. Unknown or unrecoverable errors are logged
-   * and result in null so event processing can continue safely.
+   * Returns decrypted payloads when available. Unknown or unrecoverable errors are logged
+   * and result in an empty list so event processing can continue safely.
    */
-  private async handleMLSMessageAddEvent(event: ConversationMLSMessageAddEvent): Promise<HandledEventPayload | null> {
+  private async handleMLSMessageAddEvent(event: ConversationMLSMessageAddEvent): Promise<HandledEventPayload[]> {
     try {
       const {qualified_conversation: qualifiedConversationId, subconv} = event;
       if (qualifiedConversationId === undefined) {
@@ -1189,7 +1190,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
         throw new Error('MLSService is required to handle MLS message-add event');
       }
 
-      return await requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute<HandledEventPayload | null>({
+      return await requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute<HandledEventPayload[]>({
         context: {
           operationName: OperationName.handleMessageAdd,
           qualifiedConversationId,
@@ -1201,24 +1202,24 @@ export class ConversationService extends TypedEventEmitter<Events> {
       });
     } catch (error: unknown) {
       if (error instanceof MlsEpochRecoveryDeferredError) {
-        this.logger.info('MLS message-add skipped until notification replay completes; returning null', {
+        this.logger.info('MLS message-add skipped until notification replay completes; returning no payloads', {
           conversationId: error.conversationId,
           subconvId: error.subconvId,
         });
-        return null;
+        return [];
       }
 
       // For unmapped or unrecoverable errors, avoid surfacing exceptions from event handling
-      // and instead log and return null so the event processing queue can continue safely.
+      // and instead log and return no payloads so the event processing queue can continue safely.
       const isSafeMissingSubconversationGroup = event.subconv !== undefined && isMlsConversationNotFoundError(error);
 
       this.logger.error(
         isSafeMissingSubconversationGroup
-          ? 'MLS message-add for subconversation skipped: local group missing (safe after leave); returning null'
-          : 'Failed to handle MLS message-add event after recovery; returning null',
+          ? 'MLS message-add for subconversation skipped: local group missing (safe after leave); returning no payloads'
+          : 'Failed to handle MLS message-add event after recovery; returning no payloads',
         {error, event},
       );
-      return null;
+      return [];
     }
   }
 

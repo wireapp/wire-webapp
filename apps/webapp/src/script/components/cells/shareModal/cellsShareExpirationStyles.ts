@@ -19,7 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR} from '@wireapp/react-ui-kit';
+import {COLOR} from '../../../uiKit/identity/colors/colors';
+import {BASE_DARK_COLOR, BASE_LIGHT_COLOR} from '../../../uiKit/identity/colorsV2/colorsV2';
 
 export const expirationContentStyles: CSSObject = {
   display: 'flex',

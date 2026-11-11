@@ -22,6 +22,17 @@ import ko from 'knockout';
 import {withAutoReadGuard} from './autoReadGuard';
 
 describe('withAutoReadGuard', () => {
+  it('allows a previously guarded callback to run after normal reading resumes', () => {
+    const callback = jest.fn();
+    const conversation = {isAutoReadSuppressed: ko.observable(true)};
+    const guardedCallback = withAutoReadGuard(conversation, callback);
+
+    guardedCallback();
+    conversation.isAutoReadSuppressed(false);
+    guardedCallback();
+
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
   it('runs the callback with its arguments while auto-read is not suppressed', () => {
     const callback = jest.fn();
     const conversation = {isAutoReadSuppressed: ko.observable(false)};

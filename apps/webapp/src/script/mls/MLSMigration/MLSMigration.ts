@@ -18,12 +18,12 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {MLSMigrationStatus} from './migrationStatus';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import type {Account} from '../../core';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import type {Conversation} from '../../repositories/entity/Conversation';

@@ -17,9 +17,10 @@
  *
  */
 
-import type {Provider, Service} from '@wireapp/api-client/lib/team/service/';
 import {container} from 'tsyringe';
 
+import type {Provider} from '../../apiClient/team/service/provider';
+import type {Service} from '../../apiClient/team/service/service';
 import {APIClient} from '../../service/apiClientSingleton';
 
 export class IntegrationService {

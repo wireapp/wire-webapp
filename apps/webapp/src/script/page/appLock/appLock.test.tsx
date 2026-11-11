@@ -18,7 +18,7 @@
  */
 
 import {act, render} from '@testing-library/react';
-import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
@@ -181,6 +181,29 @@ describe('AppLock', () => {
       const appLockModal = queryByTestId('applock-modal');
       expect(appLockModal).toBe(null);
     });
+  });
+
+  it('does not erase a stored passphrase when enabled state changes outside a user action', async () => {
+    const appLockState = createAppLockState(new TeamState());
+    const appLockRepository = createAppLockRepository(appLockState);
+    await appLockRepository.setCode('ValidPassword123!');
+    appLockState.isActivatedInPreferences(true);
+
+    render(
+      withTheme(
+        <AppLock
+          appLockRepository={appLockRepository}
+          appLockState={appLockState}
+          clientRepository={clientRepository}
+        />,
+      ),
+    );
+
+    act(() => {
+      appLockState.isActivatedInPreferences(false);
+    });
+
+    expect(appLockRepository.getStoredPassphrase()).toBe('ValidPassword123!');
   });
 
   describe('modal state', () => {

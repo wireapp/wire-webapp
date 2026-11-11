@@ -19,11 +19,11 @@
 
 import React, {ChangeEvent, useId, type FunctionComponent} from 'react';
 
-import {TabIndex, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-
 import {UserlistMode} from '../..';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {User} from '../../../../repositories/entity/User';
+import {Checkbox, CheckboxLabel} from '../../../../uiKit/inputs/checkbox/checkbox';
+import {TabIndex} from '../../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {capitalizeFirstChar} from '../../../../util/stringUtil';
 import {Avatar, AVATAR_SIZE} from '../../../avatar';

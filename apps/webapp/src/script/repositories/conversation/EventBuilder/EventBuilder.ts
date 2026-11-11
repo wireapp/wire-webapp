@@ -18,19 +18,19 @@
  */
 
 import {isNan, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
-import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data';
-import {
-  CONVERSATION_EVENT,
-  ConversationMLSMessageAddEvent,
-  ConversationOtrMessageAddEvent,
-} from '@wireapp/api-client/lib/event';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {BuildMessageAddParams} from './EventBuilder.types';
 
+import {MemberLeaveReason} from '../../../apiClient/conversation/data/conversationMemberLeaveData';
+import {
+  CONVERSATION_EVENT,
+  ConversationMLSMessageAddEvent,
+  ConversationOtrMessageAddEvent,
+} from '../../../apiClient/event/conversationEvent';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {AddUsersFailure} from '../../../core/conversation';
 import {MultiPartContent} from '../../../core/conversation/content';
 import {ReactionType} from '../../../core/conversation/reactionType';

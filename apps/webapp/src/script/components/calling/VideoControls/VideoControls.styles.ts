@@ -19,7 +19,7 @@
 
 import {css, CSSObject} from '@emotion/react';
 
-import {media} from '@wireapp/react-ui-kit';
+import {media} from '../../../uiKit/utils/mediaQueries';
 
 export const videoControlsWrapperStyles: CSSObject = {
   display: 'grid',

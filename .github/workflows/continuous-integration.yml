@@ -77,7 +77,6 @@ jobs:
 
       - name: Verify deployment CLI from clean install
         run: |
-          rm -rf libraries/config/lib
           published_charts_path="$(mktemp)"
           printf '%s\n' '[]' > "${published_charts_path}"
 
@@ -89,8 +88,6 @@ jobs:
           )"
 
           test "${helm_action}" = 'publish'
-          test -f libraries/config/lib/index.js
-          test -f libraries/config/lib/index.d.ts
 
       - name: Verify generated i18n artifacts are committed
         run: |
@@ -105,38 +102,13 @@ jobs:
       - name: Validate translation markers
         run: npx just translate-validate
 
-  build-libraries:
-    runs-on: ubuntu-26.04-arm
-    name: build libraries
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
-        with:
-          persist-credentials: false
-          fetch-depth: 1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm clean-install && npx just setup
-
-      - name: Build libraries
-        run: npx just build-libraries
-
   rspack-build:
     runs-on: ubuntu-26.04
     name: Rspack production build
     permissions:
       contents: read
     container:
-      image: quay.io/wire/mirror-images/playwright:v1.64.1-noble@sha256:7852dc5a7d72f5fe458a597d690f6c42fbc8e9e26ddfa95f8e6ef552558d9bbf
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d
       options: --ipc=host
     defaults:
       run:
@@ -339,9 +311,6 @@ jobs:
           if-no-files-found: error
           retention-days: 3
 
-      - name: Build libraries for lint import resolution
-        run: npx just build-libraries
-
       - name: Lint repository
         run: npx just eslint
 
@@ -350,6 +319,22 @@ jobs:
 
       - name: Stylelint
         run: npx just stylesheet-lint
+
+      - name: Check circular dependencies
+        run: npx just lint-dependencies
+
+      - name: Report all circular dependencies
+        if: ${{ !cancelled() }}
+        run: npx just report-dependencies
+
+      - name: Upload circular dependency report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: circular-dependencies
+          path: target/reports/dependencies/
+          if-no-files-found: error
+          retention-days: 3
 
   unit-tests:
     runs-on: ubuntu-26.04-arm
@@ -387,7 +372,8 @@ jobs:
             target/coverage/apps/webapp
             target/coverage/apps/server
             target/coverage/apps/webapp/core
-            target/coverage/libraries/api-client
+            target/coverage/apps/webapp/apiClient
+            target/coverage/apps/webapp/commons
 
   public-production-package:
     runs-on: ubuntu-26.04
@@ -395,7 +381,6 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     needs:
       - generated-artifacts
-      - build-libraries
       - type-check
       - lint-file-names
       - lint
@@ -433,6 +418,9 @@ jobs:
           EXPECTED_VERSION="${expected_version}" \
             npx just validate-build-artifact
 
+      - name: Verify extracted ZIP with isolated production dependencies
+        run: npx just verify-server-package
+
       - name: Build and smoke-test sparse production Docker context
         env:
           DOCKER_IMAGE_TAG: wire-webapp-production-ci:${{ github.run_id }}-${{ github.run_attempt }}
@@ -441,12 +429,10 @@ jobs:
           set -euo pipefail
 
           mkdir -p \
-            "${DISTRIBUTION_CONTEXT_PATH}/apps/server" \
-            "${DISTRIBUTION_CONTEXT_PATH}/libraries/config"
+            "${DISTRIBUTION_CONTEXT_PATH}/apps/server"
 
           cp -a package.json package-lock.json .npmrc run.sh .env.defaults "${DISTRIBUTION_CONTEXT_PATH}/"
           cp -a apps/server/Dockerfile apps/server/package.json apps/server/dist "${DISTRIBUTION_CONTEXT_PATH}/apps/server/"
-          cp -a libraries/config/package.json libraries/config/lib "${DISTRIBUTION_CONTEXT_PATH}/libraries/config/"
 
           docker build \
             "${DISTRIBUTION_CONTEXT_PATH}" \
@@ -465,7 +451,7 @@ jobs:
             grep -q "^URL_ACCOUNT_BASE=" /dist/.env.defaults
             grep -q "^BACKEND_REST=" /dist/.env.defaults
             grep -q "^BACKEND_WS=" /dist/.env.defaults
-            node -e "require(\"@wireapp/config\")"
+            node -e "const configuration = require(\"/dist/config.js\"); if (configuration.clientConfig.VERSION !== configuration.buildMetadata.version) process.exit(1)"
 
             ENFORCE_HTTPS=false NODE_PORT=8080 /bin/bash /app/run.sh &
             server_pid=$!

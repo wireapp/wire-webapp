@@ -17,22 +17,20 @@
  *
  */
 
+import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
-import {LoginData} from '@wireapp/api-client/lib/auth';
-import {
-  ClientCapability,
-  ClientCapabilityData,
-  ClientType,
-  CreateClientPayload,
-  RegisteredClient,
-} from '@wireapp/api-client/lib/client';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import axios from 'axios';
 import {StatusCodes} from 'http-status-codes';
 
-import {APIClient} from '@wireapp/api-client';
-import {LogFactory} from '@wireapp/commons';
-
+import {APIClient} from '../../apiClient/apiClient';
+import {LoginData} from '../../apiClient/auth/loginData';
+import {ClientCapability} from '../../apiClient/client/clientCapability';
+import {ClientCapabilityData} from '../../apiClient/client/clientCapabilityData';
+import {ClientType} from '../../apiClient/client/clientType';
+import {CreateClientPayload} from '../../apiClient/client/newClient';
+import {RegisteredClient} from '../../apiClient/client/registeredClient';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {LogFactory} from '../../commons/LogFactory';
 import type {ProteusService} from '../messagingProtocols/proteus';
 import {InitialPrekeys} from '../messagingProtocols/proteus/proteusService/cryptoClient';
 import {wipeCoreCryptoDb} from '../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
@@ -58,6 +56,7 @@ export class ClientService {
     private readonly apiClient: APIClient,
     private readonly proteusService: ProteusService,
     private readonly storeEngine: CRUDEngine,
+    private readonly clock: Clock,
   ) {
     this.database = new ClientDatabaseRepository(this.storeEngine);
     this.backend = new ClientBackendRepository(this.apiClient);
@@ -133,7 +132,7 @@ export class ClientService {
         await this.proteusService.wipe();
         // The MLS/CoreCrypto keystore is scoped to the user (not the client id), so it survives
         // a plain proteus wipe and would otherwise let a re-registered client inherit stale MLS key material.
-        await wipeCoreCryptoDb(this.storeEngine);
+        await wipeCoreCryptoDb(this.storeEngine, this.clock);
         if (shouldDeleteWholeDatabase) {
           await this.storeEngine.clearTables();
         }

@@ -23,7 +23,7 @@ import userEvent from '@testing-library/user-event';
 import React, {KeyboardEventHandler, MouseEventHandler, ReactNode} from 'react';
 import type {FunctionComponent} from 'react';
 
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../../../../uiKit/identity/theme/theme';
 
 import type {AssetUrl} from '../common/useAssetTransfer/useAssetTransfer';
 import type {GetAssetUrl, ImageLogger} from '../../../../../image';

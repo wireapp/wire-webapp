@@ -21,19 +21,9 @@ import {CSSProperties, useEffect, useMemo, useRef, useState, type FunctionCompon
 
 import {CSSObject} from '@emotion/react';
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
-import {
-  TabIndex,
-  CertificateExpiredIcon,
-  CertificateRevoked,
-  ExpiresSoon,
-  MLSVerified,
-  ProteusVerified,
-  Tooltip,
-} from '@wireapp/react-ui-kit';
-
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {stringifyQualifiedId} from '../../../../core/util/qualifiedIdUtil';
 import {MLSStatuses, WireIdentity} from '../../../../e2eIdentity/e2eIdentityVerification';
 import {useUserIdentity} from '../../../../hooks/useDeviceIdentities';
@@ -44,6 +34,13 @@ import {checkUserHandle} from '../../../../repositories/conversation/Conversatio
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {User} from '../../../../repositories/entity/User';
 import {UserState} from '../../../../repositories/user/userState';
+import {CertificateExpiredIcon} from '../../../../uiKit/dataDisplay/icon/certificateExpired';
+import {CertificateRevoked} from '../../../../uiKit/dataDisplay/icon/certificateRevoked';
+import {ExpiresSoon} from '../../../../uiKit/dataDisplay/icon/expiresSoon';
+import {MLSVerified} from '../../../../uiKit/dataDisplay/icon/mlsVerified';
+import {ProteusVerified} from '../../../../uiKit/dataDisplay/icon/proteusVerified';
+import {Tooltip} from '../../../../uiKit/dataDisplay/tooltip/tooltip';
+import {TabIndex} from '../../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {waitFor} from '../../../../util/waitFor';
 

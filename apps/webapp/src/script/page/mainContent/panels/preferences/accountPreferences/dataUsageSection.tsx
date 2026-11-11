@@ -21,13 +21,12 @@ import React, {useEffect, useState, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-
 import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../../repositories/properties/propertiesType';
 import {TeamState} from '../../../../../repositories/team/TeamState';
 import {getForcedErrorReportingStatus} from '../../../../../repositories/tracking/telemetry.helpers';
 import {ConsentValue} from '../../../../../repositories/user/consentValue';
+import {Checkbox, CheckboxLabel} from '../../../../../uiKit/inputs/checkbox/checkbox';
 import {WebAppEvents} from '../../../../../webAppEvents';
 import {useApplicationContext} from '../../../../rootProvider';
 import {PreferencesSection} from '../components/preferencesSection';

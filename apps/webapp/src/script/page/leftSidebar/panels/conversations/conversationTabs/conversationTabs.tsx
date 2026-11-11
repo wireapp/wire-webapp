@@ -22,18 +22,6 @@ import type {ReactNode, FunctionComponent} from 'react';
 import {container} from 'tsyringe';
 
 import {
-  ChannelIcon,
-  CollectionIcon,
-  ExternalLinkIcon,
-  GroupIcon,
-  MessageIcon,
-  StarIcon,
-  SupportIcon,
-  TeamIcon,
-  Tooltip,
-} from '@wireapp/react-ui-kit';
-
-import {
   conversationsTitleWrapper,
   footerDisclaimer,
   footerDisclaimerEllipsis,
@@ -55,6 +43,15 @@ import {User} from '../../../../../repositories/entity/User';
 import {TeamState} from '../../../../../repositories/team/TeamState';
 import {FEATURES, hasAccessToFeature} from '../../../../../repositories/user/userPermission';
 import {Core} from '../../../../../service/coreSingleton';
+import {ChannelIcon} from '../../../../../uiKit/dataDisplay/icon/channelIcon';
+import {CollectionIcon} from '../../../../../uiKit/dataDisplay/icon/collectionIcon';
+import {ExternalLinkIcon} from '../../../../../uiKit/dataDisplay/icon/externalLinkIcon';
+import {GroupIcon} from '../../../../../uiKit/dataDisplay/icon/groupIcon';
+import {MessageIcon} from '../../../../../uiKit/dataDisplay/icon/messageIcon';
+import {StarIcon} from '../../../../../uiKit/dataDisplay/icon/starIcon';
+import {SupportIcon} from '../../../../../uiKit/dataDisplay/icon/supportIcon';
+import {TeamIcon} from '../../../../../uiKit/dataDisplay/icon/teamIcon';
+import {Tooltip} from '../../../../../uiKit/dataDisplay/tooltip/tooltip';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {isDataDogEnabled} from '../../../../../util/dataDog';
 import {getWebEnvironment} from '../../../../../util/environment';

@@ -19,9 +19,9 @@
 
 import type {ChangeEvent, FunctionComponent} from 'react';
 
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-
 import {warningOptionStyles} from './CheckboxOption.styles';
+
+import {Checkbox, CheckboxLabel} from '../../../../uiKit/inputs/checkbox/checkbox';
 
 interface CheckboxOptionProps {
   isChecked: boolean;

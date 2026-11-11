@@ -23,9 +23,11 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 - `apps/webapp/`: React client (Rspack internal, public production, and development), plus E2E tests and i18n files
 - `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
-- `libraries/config/`: `@wireapp/config` package - centralized environment configuration management with type-safe configuration loading and validation
+- `apps/server/configuration/`: configuration generators, environment contracts, and browser-safe build metadata functions
 - `apps/webapp/src/script/core/`: communication core handling authentication, WebSocket connections, protocol messaging, and shared storage engines
-- Root-level tooling (`justfile`, npm workspaces, and `tools/`) provides commands shared by apps and libraries
+- Root-level tooling (`justfile` and `tools/`) provides commands for both applications. Webapp dependencies live in the root `package.json` and `package-lock.json`; only `apps/server` remains an npm workspace to preserve production dependency installation.
+
+The browser keeps Ky 1.x as `ky`; release tooling imports its existing Ky 2.x dependency as `ky-release` because its HTTP error handling uses `error.data`. Unifying those versions requires a separate compatibility migration. Commander remains on the root tooling's 15.x version; the former webapp 14.x declaration had no application or tooling imports.
 
 Use `npx just --list` to discover repository tasks, including builds, development, type checks, unit tests, linting, E2E, and translation management.
 
@@ -55,10 +57,8 @@ Prerequisites:
 1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
    - `127.0.0.1 local.zinfra.io` (to connect with the staging backend)
    - `127.0.0.1 local.imai.wire.link` (to connect with the imai backend)
-1. Run `npx just develop`; Just builds the workspace libraries and server output, then starts the Express server, its TypeScript watcher, and watchers for the WebApp's upstream libraries. Rspack compiles the WebApp in memory and serves it at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
+1. Run `npx just develop`; Just builds the server output, then starts the Express server and its TypeScript watcher. Rspack compiles the WebApp in memory and serves it at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
 1. Server TypeScript changes are recompiled with `tsc --watch`; `node --watch` restarts the compiled Express server when its output changes. `concurrently` stops sibling processes if any watcher exits.
-1. `npx just develop-watch` is an alternative to `npx just develop`: it starts the server with libraries you select interactively. Choose one development command; do not run `develop-watch` alongside `develop`.
-1. To watch one library without the server, run `npx just watch-library api-client`.
 1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
    `FEATURE_CHECK_CONSENT="false"` to the env file
 
@@ -74,7 +74,7 @@ If you would like your browser to trust the certificate from "local.wire.com"/"l
 
 The application can be configured to connect to different environments by modifying the following environment variables in your `.env` file:
 
-For the full environment variable reference, see [Environment Variables](https://github.com/wireapp/wire-webapp/blob/main/libraries/config/README.md#environment-variables).
+For the full environment variable reference, see [Environment Variables](https://github.com/wireapp/wire-webapp/blob/main/apps/server/configuration/README.md#environment-variables).
 
 **Staging:**
 
@@ -111,19 +111,21 @@ Build a one-shot development-mode WebApp bundle with `npx just build-webapp-deve
 Rspack is the sole application bundler for internal and public production builds and local development. Jest continues to use Babel.
 
 1. Build only the internal Rspack WebApp assets: `npx just build-webapp-internal`
-1. Compile the production server and copy its runtime assets: `npx just build-server` (writes to `apps/server/build/server` after building workspace libraries)
+1. Compile the production server and copy its runtime assets: `npx just build-server` (writes to `apps/server/build/server`)
 1. Build and package the default internal Rspack release: `npx just package-server-internal`
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
 1. Build and package the default public Rspack release: `npx just package-server-public`
 1. Start the server output from `apps/server/dist` (or build a Docker image with `npx just docker <tag>`)
 
-`npx just build-server` compiles with the server TypeScript project and copies the server runtime assets, including the telemetry embed and compiled local workspace dependencies. It does not remove an existing `apps/server/build/server` directory.
+`npx just build-server` clears `apps/server/build/server`, compiles the server and configuration together, and copies the server runtime assets, including the telemetry embed.
 
 Telemetry's TypeScript implementation lives in `apps/webapp/src/script/telemetry`. The server copies the unmodified `countly-sdk-web/lib/countly.min.js` build dependency directly to `libs/wire/telemetry/embed.js`. Both HTML templates load this standalone SDK before the application bundles; telemetry initializes only when explicitly requested by the application.
 
 **Note:** The `zip` command has been deprecated. Packaging is integrated into the build process via `npx just package-server-internal`.
 
 ## Testing
+
+Configuration tests live alongside the generators and metadata functions in `apps/server/configuration/` and run with the server Jest project. Run `npx just test --selectProjects server` to check them. After packaging, `npx just verify-server-package` installs only server production dependencies in a temporary fixture, starts the extracted ZIP, and checks `/version` and `/config.js`.
 
 Run all unit tests:
 
@@ -134,6 +136,10 @@ npx just test
 Run `npx just test-ci` to execute each Jest project with coverage and its existing project-specific thresholds. CI uses this command inside the network-isolation wrapper and uploads HTML and LCOV reports for the webapp, server, core, and API client. Use `npx just test-watch` for watch mode.
 
 Core tests retain a separate Node Jest project in `apps/webapp/test/core/jest.config.js`, with minimum coverage of 49% branches, 53% functions, and 62% lines/statements. Run it directly with `npx jest --config apps/webapp/test/core/jest.config.js --coverage`. Its original discovery patterns still exclude `encryptedStore.test.node.ts`. Webapp tests and coverage exclude the core tree; explicit service fixtures remain in `src/script/util/test/createCoreTestFixture.ts`.
+
+API-client source lives in `apps/webapp/src/script/apiClient/` and is compiled and watched directly by Rspack. Import individual source modules using relative paths. Browser adapters are passed at the webapp construction boundaries; Node tests pass the Node adapters explicitly. Its separate Node Jest project is `apps/webapp/test/apiClient/jest.config.js`: run `npx jest --config apps/webapp/test/apiClient/jest.config.js --coverage`. Webapp test discovery and coverage exclude this tree, and core coverage excludes it too. Coverage thresholds remain 50% branches, 40% functions, and 53% lines/statements. `tsconfig.api-client.json` preserves the source's stricter checks without emitting a separate library build. `APIClient.VERSION` retains the final standalone SDK version, `27.96.0`, independently of the webapp release version.
+
+UI-kit components live in `apps/webapp/src/script/uiKit/` and are compiled and watched directly by Rspack. Import individual source modules using relative paths. Their behavior tests retain a separate jsdom/SWC Jest project in `apps/webapp/test/uiKit/jest.config.js`. Run it with `npx jest --config apps/webapp/test/uiKit/jest.config.js --coverage`; `just test-ci` also runs it. Webapp test discovery and coverage exclude this tree to avoid counting it twice. The Emotion theme augmentation lives beside the components in `emotion.d.ts` and is included by the webapp TypeScript configurations.
 
 Asset encryption uses the browser crypto implementation explicitly. Node asset tests pass the Node implementation through the existing asset functions and `AssetService` constructor. Core source changes are compiled and watched directly by Rspack, without a separate library build or watcher.
 

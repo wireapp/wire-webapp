@@ -18,10 +18,10 @@
  */
 
 import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
+import {USER_EVENT} from '../../apiClient/event/userEvent';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {type Translate} from '../../util/localizerUtil';

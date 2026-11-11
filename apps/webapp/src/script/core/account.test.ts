@@ -17,31 +17,33 @@
  *
  */
 
-import {AuthAPI} from '@wireapp/api-client/lib/auth';
+import {nodePlatform} from '../apiClient/shims/node/platform';
+
+import {AuthAPI} from '../apiClient/auth/authApi';
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {
-  ClientAPI,
-  ClientCapability,
-  ClientClassification,
-  ClientType,
-  RegisteredClient,
-} from '@wireapp/api-client/lib/client';
-import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/config';
-import {ConversationAPI} from '@wireapp/api-client/lib/conversation';
-import {BackendEvent} from '@wireapp/api-client/lib/event';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {NotificationAPI} from '@wireapp/api-client/lib/notification';
-import {ConsumableEvent} from '@wireapp/api-client/lib/notification/consumableNotification';
-import {Self, SelfAPI} from '@wireapp/api-client/lib/self';
-import {UserType} from '@wireapp/api-client/lib/user';
-import {ReconnectingWebsocket} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
+import {ClientAPI} from '../apiClient/client/clientApi';
+import {ClientCapability} from '../apiClient/client/clientCapability';
+import {ClientClassification} from '../apiClient/client/clientClassification';
+import {ClientType} from '../apiClient/client/clientType';
+import {RegisteredClient} from '../apiClient/client/registeredClient';
+import {MINIMUM_API_VERSION} from '../apiClient/config';
+import {ConversationAPI} from '../apiClient/conversation/conversationApi/conversationApi';
+import {BackendEvent} from '../apiClient/event/backendEvent';
+import {BackendError} from '../apiClient/http/backendError';
+import {BackendErrorLabel} from '../apiClient/http/backendErrorLabel';
+import {NotificationAPI} from '../apiClient/notification/notificationApi/notificationApi';
+import {ConsumableEvent} from '../apiClient/notification/consumableNotification';
+import {Self} from '../apiClient/self/self';
+import {SelfAPI} from '../apiClient/self/selfApi';
+import {UserType} from '../apiClient/user/user';
+import {ReconnectingWebsocket} from '../apiClient/tcp/reconnectingWebsocket';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {WS} from 'jest-websocket-mock';
 import nock, {cleanAll} from 'nock';
 import {v4 as uuidv4} from 'uuid';
 
-import {APIClient} from '@wireapp/api-client';
-import {AccentColor, ValidationUtil} from '@wireapp/commons';
+import {APIClient} from '../apiClient/apiClient';
+import {AccentColor, ValidationUtil} from '../commons/util';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 // Mock ConversationService to avoid requiring MLSService in constructor during tests
@@ -85,7 +87,7 @@ const MOCK_BACKEND = {
 const apiClients: APIClient[] = [];
 
 async function createAccount(): Promise<{account: Account; apiClient: APIClient}> {
-  const apiClient = new APIClient({urls: MOCK_BACKEND});
+  const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
   apiClients.push(apiClient);
   const account = new Account(apiClient);
   await account['initServices']({
@@ -251,10 +253,9 @@ describe('Account', () => {
   };
   describe('"init"', () => {
     it('initializes the Protocol buffers', async () => {
-      const account = new Account();
-      if (account['apiClient']) {
-        apiClients.push(account['apiClient']);
-      }
+      const apiClient = new APIClient({platform: nodePlatform});
+      apiClients.push(apiClient);
+      const account = new Account(apiClient);
 
       await account['initServices']({clientType: ClientType.TEMPORARY, userId: ''});
 
@@ -271,7 +272,7 @@ describe('Account', () => {
 
   describe('"login"', () => {
     it('logs in with correct credentials', async () => {
-      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
       apiClients.push(apiClient);
       const account = new Account(apiClient);
 
@@ -287,7 +288,7 @@ describe('Account', () => {
     });
 
     it('does not log in with incorrect credentials', async () => {
-      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
       apiClients.push(apiClient);
       const account = new Account(apiClient);
       let backendError;

@@ -17,41 +17,15 @@
  *
  */
 
+import {createClock} from '@enormora/clock';
+import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {
-  RegisterData,
-  AUTH_COOKIE_KEY,
-  AUTH_TABLE_NAME,
-  Context,
-  Cookie,
-  CookieStore,
-  LoginData,
-  PreKey,
-} from '@wireapp/api-client/lib/auth';
-import {ClientCapability, ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
-import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
-import * as Events from '@wireapp/api-client/lib/event';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-import {Notification} from '@wireapp/api-client/lib/notification';
-import {
-  ConsumableEvent,
-  ConsumableNotification,
-  ConsumableNotificationEvent,
-  ConsumableNotificationSynchronization,
-} from '@wireapp/api-client/lib/notification/consumableNotification';
-import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
-import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
-import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {once} from 'lodash';
 import logdown from 'logdown';
 import {asyncNoop, noop} from 'noop-esm';
 import {TimeoutError} from 'p-queue';
 
-import {APIClient, BackendFeatures} from '@wireapp/api-client';
-import {LogFactory, StringUtil, TypedEventEmitter} from '@wireapp/commons';
 import type {CoreCryptoLogLevel} from '@wireapp/core-crypto';
 
 import {AccountService} from './account/';
@@ -74,10 +48,7 @@ import {
   resumeRejoiningMLSConversations,
 } from './messagingProtocols/mls/conversationRejoinQueue';
 import {E2EIServiceExternal, User} from './messagingProtocols/mls/e2eIdentityService';
-import {
-  getAllConversationsCallback,
-  getTokenCallback,
-} from './messagingProtocols/mls/e2eIdentityService/e2eiServiceInternal';
+import {getAllConversationsCallback} from './messagingProtocols/mls/e2eIdentityService/e2eiServiceInternal';
 import {
   flushProposalsQueue,
   getProposalQueueLength,
@@ -88,6 +59,7 @@ import {CoreCallbacks, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {CryptoClientType} from './messagingProtocols/proteus/proteusService/cryptoClient';
 import {
+  createPkiEnvironment,
   wipeCoreCryptoDb,
   CoreCryptoWrapper,
 } from './messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
@@ -106,6 +78,37 @@ import {TeamService} from './team/';
 import {UserService} from './user/';
 import {LocalStorageStore} from './util/localStorageStore';
 import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
+
+import {APIClient, BackendFeatures} from '../apiClient/apiClient';
+import {Context} from '../apiClient/auth/context';
+import {Cookie} from '../apiClient/auth/cookie';
+import {CookieStore} from '../apiClient/auth/cookieStore';
+import {AUTH_COOKIE_KEY, AUTH_TABLE_NAME} from '../apiClient/auth/index';
+import {LoginData} from '../apiClient/auth/loginData';
+import {PreKey} from '../apiClient/auth/preKey';
+import {RegisterData} from '../apiClient/auth/registerData';
+import {ClientCapability} from '../apiClient/client/clientCapability';
+import {ClientClassification} from '../apiClient/client/clientClassification';
+import {ClientType} from '../apiClient/client/clientType';
+import {RegisteredClient} from '../apiClient/client/registeredClient';
+import {SUBCONVERSATION_ID} from '../apiClient/conversation/subconversation';
+import * as Events from '../apiClient/event';
+import {CONVERSATION_EVENT} from '../apiClient/event/conversationEvent';
+import {
+  ConsumableEvent,
+  ConsumableNotification,
+  ConsumableNotificationEvent,
+  ConsumableNotificationSynchronization,
+} from '../apiClient/notification/consumableNotification';
+import {Notification} from '../apiClient/notification/notification';
+import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '../apiClient/tcp/reconnectingWebsocket';
+import {WebSocketClient} from '../apiClient/tcp/webSocketClient';
+import {FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../apiClient/user/qualifiedId';
+import {LogFactory} from '../commons/LogFactory';
+import {TypedEventEmitter} from '../commons/TypedEventEmitter/TypedEventEmitter';
+import {StringUtil} from '../commons/util';
+import {TimeInMillis} from '../commons/util/TimeUtil';
 
 type CryptoClientWithProtocol =
   readonly [CryptoClientType.CORE_CRYPTO, CoreCryptoWrapper] | readonly [CryptoClientType.CRYPTOBOX, CryptoboxWrapper];
@@ -128,6 +131,8 @@ interface AccountOptions {
   createStore?: CreateStoreFn;
   systemCrypto?: SecretCrypto;
   coreCryptoConfig?: CoreCryptoConfig;
+  /** Clock shared by services which need wall time or retry scheduling. */
+  clock?: Clock;
 
   /** Number of prekeys to generate when creating a new device (defaults to 2)
    * Prekeys are Diffie-Hellmann public keys which allow offline initiation of a secure Proteus session between two devices.
@@ -175,6 +180,7 @@ export class Account extends TypedEventEmitter<Events> {
   private db?: CoreDatabase;
   private encryptedDb?: EncryptedStore<any>;
   private coreCallbacks?: CoreCallbacks;
+  private readonly clock: Clock;
   private connectionState: ConnectionState = ConnectionState.CLOSED;
 
   private readonly isConnectionLive = (): boolean => {
@@ -219,17 +225,18 @@ export class Account extends TypedEventEmitter<Events> {
   public recurringTaskScheduler: RecurringTaskScheduler;
 
   /**
-   * @param apiClient The apiClient instance to use in the core (will create a new new one if undefined)
+   * @param apiClient The API client supplied by the caller.
    * @param accountOptions
    */
   constructor(
-    apiClient: APIClient = new APIClient(),
+    apiClient: APIClient,
     private readonly options: AccountOptions = {
       nbPrekeys: 100,
       coreCryptoConfig: {wasmFilePath: '', enabled: false},
     },
   ) {
     super();
+    this.clock = options.clock ?? createClock();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
     this.logger = LogFactory.getLogger('@wireapp/core/Account');
@@ -306,7 +313,6 @@ export class Account extends TypedEventEmitter<Events> {
     handle,
     teamId,
     discoveryUrl,
-    getOAuthToken,
     getAllConversations,
     certificateTtl = defaultCertificateLifetimeInDays * (TimeInMillis.DAY / TimeInMillis.SECOND),
   }: {
@@ -317,8 +323,6 @@ export class Account extends TypedEventEmitter<Events> {
     /** team of the user */
     teamId: string;
     discoveryUrl: string;
-    /** function called to get the oauth token */
-    getOAuthToken: getTokenCallback;
     /** function called to get all conversations */
     getAllConversations: getAllConversationsCallback;
     /** number of seconds the certificate should be valid (default 90 days) */
@@ -349,7 +353,6 @@ export class Account extends TypedEventEmitter<Events> {
       this.currentClient,
       this.options.nbPrekeys,
       certificateTtl,
-      getOAuthToken,
       getAllConversations,
     );
   };
@@ -479,6 +482,7 @@ export class Account extends TypedEventEmitter<Events> {
     encryptedStore: EncryptedStore,
   ): Promise<CryptoClientWithProtocol> => {
     const baseConfig = {
+      clock: this.clock,
       nbPrekeys: this.options.nbPrekeys,
       onNewPrekeys: async (prekeys: PreKey[]) => {
         this.logger.debug(`Received '${prekeys.length}' new PreKeys.`);
@@ -554,17 +558,19 @@ export class Account extends TypedEventEmitter<Events> {
       this.storeEngine,
     );
 
-    const clientService = new ClientService(this.apiClient, proteusService, this.storeEngine);
+    const clientService = new ClientService(this.apiClient, proteusService, this.storeEngine, this.clock);
 
     if (clientType === CryptoClientType.CORE_CRYPTO && (await this.apiClient.supportsMLS())) {
       mlsService = new MLSService(this.apiClient, cryptoClient.getNativeClient(), this.db, this.recurringTaskScheduler);
 
       e2eServiceExternal = new E2EIServiceExternal(
         cryptoClient.getNativeClient(),
+        this.apiClient,
         this.db,
         this.recurringTaskScheduler,
         clientService,
         mlsService,
+        createPkiEnvironment,
       );
     }
 
@@ -645,7 +651,7 @@ export class Account extends TypedEventEmitter<Events> {
 
     try {
       if (this.storeEngine !== undefined) {
-        await wipeCoreCryptoDb(this.storeEngine);
+        await wipeCoreCryptoDb(this.storeEngine, this.clock);
       }
     } catch (error: unknown) {
       this.logger.error('Failed to wipe crypto database during logout cleanup:', error);

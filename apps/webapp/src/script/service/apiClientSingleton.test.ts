@@ -26,6 +26,7 @@ describe('APIClientSingleton', () => {
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 1_234_000n});
     using apiClient = new APIClient({clock});
 
+    expect(apiClient.clock).toBe(clock);
     expect(apiClient.config.wallClock.currentTimestampInMilliseconds).toBe(1_234);
 
     clock.advanceByMilliseconds(10);

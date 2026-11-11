@@ -33,7 +33,7 @@ import {TestFactory} from '../../../../../../../test/helper/TestFactory';
 import {ConversationFolderTab} from './conversationFolderTab';
 
 import {SidebarTabs} from '../useSidebarStore';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../../../apiClient/team/feature/featureList.types';
 import type {JSX} from '@emotion/react/jsx-runtime';
 import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 

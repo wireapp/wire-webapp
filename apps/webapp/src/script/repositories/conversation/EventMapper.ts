@@ -18,12 +18,6 @@
  */
 
 import {isNonEmptyString, isTruthy, isUndefined, isValidDate} from '@sindresorhus/is';
-import {
-  CONVERSATION_EVENT,
-  ConversationAdminlessDeleteReminderEvent,
-  ConversationEvent,
-  ConversationProtocolUpdateEvent,
-} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
@@ -42,6 +36,12 @@ import {
   TeamMemberLeaveEvent,
 } from './EventBuilder';
 
+import {
+  CONVERSATION_EVENT,
+  ConversationAdminlessDeleteReminderEvent,
+  ConversationEvent,
+  ConversationProtocolUpdateEvent,
+} from '../../apiClient/event/conversationEvent';
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage} from '../../guards/Message';
 import {CALL_MESSAGE_TYPE} from '../../message/callMessageType';

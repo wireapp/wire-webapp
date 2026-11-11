@@ -21,12 +21,11 @@ import type {FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {Config} from '../../../../../Config';
 import type {CallingRepository} from '../../../../../repositories/calling/CallingRepository';
 import {UserState} from '../../../../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
 import {getCurrentDate} from '../../../../../util/timeUtil';
 import {downloadBlob} from '../../../../../util/util';
 import {useApplicationContext} from '../../../../rootProvider';

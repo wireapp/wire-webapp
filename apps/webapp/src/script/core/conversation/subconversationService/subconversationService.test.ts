@@ -17,11 +17,15 @@
  *
  */
 
-import {SUBCONVERSATION_ID, Subconversation} from '@wireapp/api-client/lib/conversation';
-import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/lib/http';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {nodePlatform} from '../../../apiClient/shims/node/platform';
 
-import {APIClient} from '@wireapp/api-client';
+import {SUBCONVERSATION_ID, Subconversation} from '../../../apiClient/conversation/subconversation';
+import {BackendError} from '../../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
+import {StatusCode} from '../../../apiClient/http';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+
+import {APIClient} from '../../../apiClient/apiClient';
 
 import {SubconversationService} from './subconversationService';
 
@@ -69,7 +73,7 @@ const getSubconversationResponse = ({
 const apiClients: APIClient[] = [];
 
 const buildSubconversationService = async (isFederated = false): Promise<SubconversationServiceTestSetup> => {
-  const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+  const apiClient = new APIClient({platform: nodePlatform, urls: APIClient.BACKEND.STAGING});
   apiClients.push(apiClient);
   apiClient.backendFeatures.isFederated = isFederated;
 
@@ -342,14 +346,14 @@ describe('SubconversationService', () => {
       jest.spyOn(apiClient.api.conversation, 'getSubconversation').mockResolvedValueOnce(subconversationResponse);
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(false);
 
-      const updatedEpoch = 1;
+      const updatedEpoch = 1n;
       jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(updatedEpoch);
 
       const response = await subconversationService.joinConferenceSubconversation(parentConversationId, parentGroupId);
 
       expect(mlsService.wipeConversation).not.toHaveBeenCalled();
       expect(mlsService.registerConversation).toHaveBeenCalledWith(subconversationGroupId, [], {parentGroupId});
-      expect(response).toEqual({epoch: updatedEpoch, groupId: subconversationGroupId});
+      expect(response).toEqual({epoch: Number(updatedEpoch), groupId: subconversationGroupId});
     });
   });
 
@@ -458,7 +462,7 @@ describe('SubconversationService', () => {
 
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
 
-      const mockedEpoch = 2;
+      const mockedEpoch = 2n;
       jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(mockedEpoch);
 
       const mockedSecretKey = 'mockedSecretKey';
@@ -500,7 +504,7 @@ describe('SubconversationService', () => {
       );
 
       const expected = {
-        epoch: mockedEpoch,
+        epoch: Number(mockedEpoch),
         keyLength: 32,
         members: [
           {clientid: 'clientId1', in_subconv: true, userid: isFederated ? 'userId1@domain' : 'userId1'},
@@ -522,7 +526,7 @@ describe('SubconversationService', () => {
       const parentConversationGroupId = 'parentConversationGroupId';
 
       const subconversationGroupId = 'subconversationGroupId';
-      const mockedInitialEpoch = 1;
+      const mockedInitialEpoch = 1n;
 
       await subconversationService.saveSubconversationGroupId(
         parentConversationId,
@@ -530,11 +534,11 @@ describe('SubconversationService', () => {
         subconversationGroupId,
       );
 
-      const mockedEpochInfo = {epoch: mockedInitialEpoch, keyLength: 32, members: [], secretKey: ''};
+      const mockedEpochInfo = {epoch: Number(mockedInitialEpoch), keyLength: 32, members: [], secretKey: ''};
       jest.spyOn(subconversationService, 'getSubconversationEpochInfo').mockResolvedValueOnce(mockedEpochInfo);
       jest
         .spyOn(subconversationService, 'joinConferenceSubconversation')
-        .mockResolvedValue({epoch: mockedInitialEpoch, groupId: subconversationGroupId});
+        .mockResolvedValue({epoch: Number(mockedInitialEpoch), groupId: subconversationGroupId});
       jest.spyOn(mlsService, 'getEpoch').mockResolvedValue(mockedInitialEpoch);
 
       const findConversationByGroupId = (groupId: string): QualifiedId | undefined => {

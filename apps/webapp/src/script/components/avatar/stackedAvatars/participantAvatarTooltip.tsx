@@ -21,12 +21,11 @@ import type {FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Tooltip} from '@wireapp/react-ui-kit';
-
 import {avatarItemStyles} from './stackedAvatars.styles';
 
 import {Avatar, AVATAR_SIZE} from '..';
 import type {User} from '../../../repositories/entity/User';
+import {Tooltip} from '../../../uiKit/dataDisplay/tooltip/tooltip';
 import {useUserName} from '../../UserName';
 
 interface ParticipantAvatarTooltipProps {

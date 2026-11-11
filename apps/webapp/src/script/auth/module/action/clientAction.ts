@@ -18,13 +18,14 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
-import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
-
-import {Runtime} from '@wireapp/commons';
 
 import {ClientActionCreator} from './creator/';
 
+import {ClientClassification} from '../../../apiClient/client/clientClassification';
+import {ClientType} from '../../../apiClient/client/clientType';
+import {RegisteredClient} from '../../../apiClient/client/registeredClient';
+import {FEATURE_KEY, FEATURE_STATUS} from '../../../apiClient/team/feature/featureList.types';
+import {Runtime} from '../../../commons/util/Runtime';
 import {ClientInfo} from '../../../core/client';
 import {getClientMLSConfig} from '../../../repositories/client/clientMLSConfig';
 import {toError} from '../../../util/toError';

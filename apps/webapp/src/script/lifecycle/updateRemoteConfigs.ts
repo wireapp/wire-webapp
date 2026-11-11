@@ -18,9 +18,9 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import type {BackendFeatures} from '@wireapp/api-client/lib/apiClient';
 import {container} from 'tsyringe';
 
+import type {BackendFeatures} from '../apiClient/apiClient';
 import {Config} from '../Config';
 import {TaskParams} from '../core/util/recurringTaskScheduler';
 import {Core} from '../service/coreSingleton';

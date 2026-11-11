@@ -19,13 +19,12 @@
 
 import {noop} from 'noop-esm';
 
-import {TrashIcon} from '@wireapp/react-ui-kit';
-
 import {
   deleteMeetingConfirmButtonContentStyles,
   deleteMeetingConfirmButtonIconStyles,
 } from './showDeleteMeetingModal.styles';
 
+import {TrashIcon} from '../../../../uiKit/dataDisplay/icon/trashIcon';
 import type {Translate, TranslationKey} from '../../../../util/localizerUtil';
 import {PrimaryModal} from '../../../Modals/PrimaryModal';
 

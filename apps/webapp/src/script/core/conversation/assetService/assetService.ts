@@ -17,18 +17,18 @@
  *
  */
 
-import {AssetOptions, AssetResponse, AssetUploadData} from '@wireapp/api-client/lib/asset';
-import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/lib/http';
-
-import {APIClient} from '@wireapp/api-client';
-
+import {APIClient} from '../../../apiClient/apiClient';
+import {AssetOptions, AssetResponse} from '../../../apiClient/asset/assetApi';
+import {AssetUploadData} from '../../../apiClient/asset/assetApi.schema';
+import {RequestCancelable} from '../../../apiClient/http/requestCancelable';
+import {ProgressCallback} from '../../../apiClient/http/requestProgressHandler';
 import {EncryptedAsset, EncryptedAssetUploaded} from '../../cryptography';
 import {decryptAsset, encryptAsset} from '../../cryptography/assetCryptography/assetCryptography';
 import {crypto as browserCrypto} from '../../cryptography/assetCryptography/crypto.browser';
 import type {Crypto} from '../../cryptography/assetCryptography/interfaces';
 import {toBufferSource} from '../../util/bufferUtils';
 
-export {ProgressCallback};
+export type {ProgressCallback};
 
 export type AssetUrlData = {
   assetKey: string;

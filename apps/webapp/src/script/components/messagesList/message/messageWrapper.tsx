@@ -20,7 +20,6 @@
 import type {FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -41,7 +40,9 @@ import {PingMessage} from './pingMessage';
 import {SystemMessage} from './systemMessage';
 import {VerificationMessage} from './verificationMessage';
 
+import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
 import {ReactionType} from '../../../core/conversation';
+import {markAsUnreadFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from '../../../message/quoteEntity';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {AssetRepository} from '../../../repositories/assets/assetRepository';
@@ -88,7 +89,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
 }: MessageParams) => {
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   type FindMessageResult = Promise<ContentMessage & {primary_key: string}>;
   const findMessage = async (conversation: Conversation, messageId: string): FindMessageResult => {
     const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
@@ -186,7 +187,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
       });
     }
 
-    if (!conversation.isSelfUserRemoved()) {
+    if (isFeatureToggleEnabled(markAsUnreadFeatureToggleName) && !conversation.isSelfUserRemoved()) {
       entries.push({
         click: () => {
           cancelPendingReadReceiptsForConversation(conversation);

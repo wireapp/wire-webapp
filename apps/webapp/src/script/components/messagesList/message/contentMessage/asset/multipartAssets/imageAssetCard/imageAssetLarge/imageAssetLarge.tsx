@@ -22,7 +22,6 @@ import {CSSProperties, useState, type FunctionComponent} from 'react';
 import {Maybe} from 'true-myth';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
-import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
 import {
   containerStyles,
@@ -36,6 +35,7 @@ import {
 } from './imageAssetLarge.styles';
 
 import {useApplicationContext} from '../../../../../../../../page/rootProvider';
+import {UnavailableFileIcon} from '../../../../../../../../uiKit/dataDisplay/icon/unavailableFileIcon';
 import {getBestPreviewSource} from '../../../../../../../../util/imageUtil';
 import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
 

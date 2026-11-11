@@ -18,15 +18,15 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {SUBCONVERSATION_ID, Subconversation} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
-
-import {APIClient} from '@wireapp/api-client';
-import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 
 import {generateSubconversationStoreKey} from './subconversationUtil';
 
+import {APIClient} from '../../../apiClient/apiClient';
+import {SUBCONVERSATION_ID, Subconversation} from '../../../apiClient/conversation/subconversation';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {LogFactory} from '../../../commons/LogFactory';
+import {TypedEventEmitter} from '../../../commons/TypedEventEmitter/TypedEventEmitter';
+import {TimeInMillis} from '../../../commons/util/TimeUtil';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {CoreDatabase} from '../../storage/coreDb';
 import {constructFullyQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
@@ -264,7 +264,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       parentConversationGroupId,
     );
 
-    const forwardNewEpoch = async ({groupId}: {groupId: string; epoch: number}): Promise<void> => {
+    const forwardNewEpoch = async ({groupId}: {groupId: string; epoch: bigint}): Promise<void> => {
       this.logger.debug('Received MLS NEW_EPOCH event', {eventGroupId: groupId, subconversationGroupId});
       if (groupId !== subconversationGroupId) {
         // if the epoch update did not happen in the subconversation directly, check if it happened in the parent conversation
@@ -317,7 +317,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
 
     this.mlsService.on(MLSServiceEvents.NEW_EPOCH, forwardNewEpoch);
 
-    await forwardNewEpoch({groupId: subconversationGroupId, epoch: initialEpoch});
+    await forwardNewEpoch({groupId: subconversationGroupId, epoch: BigInt(initialEpoch)});
 
     this.logger.info('Subscribed to MLS NEW_EPOCH events for subconversation', {subconversationGroupId});
     return () => {
