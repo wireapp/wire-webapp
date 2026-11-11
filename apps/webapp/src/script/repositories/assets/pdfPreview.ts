@@ -20,7 +20,7 @@
 import {noop} from 'noop-esm';
 import type {PDFDocumentLoadingTask, RenderTask} from 'pdfjs-dist';
 
-import {loadFileBuffer} from '../../util/util';
+import {readPreviewBlob} from './readPreviewBlob';
 
 export interface PdfPreview {
   blob: Blob;
@@ -52,7 +52,7 @@ async function isLikelyPdfFile(file: Blob): Promise<boolean> {
   }
 
   // MIME types can be missing. Inspect only a small prefix; PDF.js validates the document.
-  const header = await loadFileBuffer(file.slice(0, maxPdfHeaderSize));
+  const header = await readPreviewBlob(file.slice(0, maxPdfHeaderSize));
   return String.fromCharCode(...new Uint8Array(header)).includes('%PDF-');
 }
 
@@ -89,7 +89,7 @@ export async function createPdfPreview(
     }
 
     const {getDocument} = await loadPdf();
-    const buffer = await loadFileBuffer(file);
+    const buffer = await readPreviewBlob(file);
     if (canceled) {
       return undefined;
     }
