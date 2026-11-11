@@ -25,7 +25,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
 - `apps/server/configuration/`: configuration generators, environment contracts, and browser-safe build metadata functions
 - `apps/webapp/src/script/core/`: communication core handling authentication, WebSocket connections, protocol messaging, and shared storage engines
-- Root-level tooling (`justfile` and `tools/`) provides commands for both applications. Webapp dependencies live in the root `package.json` and `package-lock.json`; only `apps/server` remains an npm workspace to preserve production dependency installation.
+- Root-level tooling (`justfile` and `tools/`) provides commands for both applications. Webapp dependencies live in the root `package.json` and `package-lock.json`; `apps/server` remains an npm workspace for build and development dependencies. Production artifacts run without installed npm packages.
 
 The browser keeps Ky 1.x as `ky`; release tooling imports its existing Ky 2.x dependency as `ky-release` because its HTTP error handling uses `error.data`. Unifying those versions requires a separate compatibility migration. Commander remains on the root tooling's 15.x version; the former webapp 14.x declaration had no application or tooling imports.
 
@@ -111,13 +111,13 @@ Build a one-shot development-mode WebApp bundle with `npx just build-webapp-deve
 Rspack is the sole application bundler for internal and public production builds and local development. Jest continues to use Babel.
 
 1. Build only the internal Rspack WebApp assets: `npx just build-webapp-internal`
-1. Compile the production server and copy its runtime assets: `npx just build-server` (writes to `apps/server/build/server`)
+1. Type-check and bundle the production server with its runtime assets: `npx just build-server-bundle` (writes to `apps/server/build/bundle`)
 1. Build and package the default internal Rspack release: `npx just package-server-internal`
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
 1. Build and package the default public Rspack release: `npx just package-server-public`
 1. Start the server output from `apps/server/dist` (or build a Docker image with `npx just docker <tag>`)
 
-`npx just build-server` clears `apps/server/build/server`, compiles the server and configuration together, and copies the server runtime assets, including the telemetry embed.
+Both packaging tasks reuse the minified Rspack server bundle and assemble it with the selected browser build into `apps/server/dist`. The artifact includes the server source map, GeoIP database, templates, certificates, robots, telemetry embed, environment defaults, and shared version metadata. The server source map stays alongside `index.js`, outside the HTTP static directories. Docker and Elastic Beanstalk launch Node with `--enable-source-maps` and install no npm packages. Local development continues to use TypeScript compilation and installed workspace dependencies.
 
 Telemetry's TypeScript implementation lives in `apps/webapp/src/script/telemetry`. The server copies the unmodified `countly-sdk-web/lib/countly.min.js` build dependency directly to `libs/wire/telemetry/embed.js`. Both HTML templates load this standalone SDK before the application bundles; telemetry initializes only when explicitly requested by the application.
 
@@ -125,7 +125,7 @@ Telemetry's TypeScript implementation lives in `apps/webapp/src/script/telemetry
 
 ## Testing
 
-Configuration tests live alongside the generators and metadata functions in `apps/server/configuration/` and run with the server Jest project. Run `npx just test --selectProjects server` to check them. After packaging, `npx just verify-server-package` installs only server production dependencies in a temporary fixture, starts the extracted ZIP, and checks `/version` and `/config.js`.
+Configuration tests live alongside the generators and metadata functions in `apps/server/configuration/` and run with the server Jest project. Run `npx just test --selectProjects server` to check them. After packaging, `npx just verify-server-package` extracts the ZIP outside the repository with no installed packages and checks startup, `/version`, `/config.js`, template rendering with GeoIP, private source maps, and mapped exception stacks. `npx just verify-server-bundle` also checks Rspack statistics for minification and unexpected external dependencies.
 
 Run all unit tests:
 
