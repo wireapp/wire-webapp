@@ -1063,8 +1063,10 @@ test.describe('Calling', () => {
 
       await expect(userBPages.calling().getGridTile(userB.fullName).muteIcon).toBeHidden(); // Ensure active video state
 
-      await expect(userACall.getCallingParticipant(userA.fullName).activeSpeakerIcon).toBeVisible();
-      await expect(userACall.getCallingParticipant(userB.fullName).activeSpeakerIcon).toBeVisible({timeout: 30_000});
+      await Promise.all([
+        expect(userACall.getCallingParticipant(userA.fullName).activeSpeakerIcon).toBeVisible({timeout: 30_000}),
+        expect(userACall.getCallingParticipant(userB.fullName).activeSpeakerIcon).toBeVisible({timeout: 30_000}),
+      ]);
     });
   });
 
