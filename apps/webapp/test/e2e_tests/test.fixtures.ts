@@ -18,6 +18,7 @@
  */
 
 import {test as baseTest, type BrowserContext, type Page} from '@playwright/test';
+
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
 import {PageManager, WebAppNavigationOptions} from './pageManager';

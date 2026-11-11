@@ -9,9 +9,9 @@
     "noEmit": true,
     "resolveJsonModule": true,
     "types": ["node"],
-    // Prevent inherited path mappings from affecting Playwright resolution.
+    // Keep the root's legacy declaration path mapping from affecting Playwright runtime resolution.
     "paths": {}
- },
+  },
   "include": [
     "playwright.config.ts",
     "playwright.rspack.config.ts",
