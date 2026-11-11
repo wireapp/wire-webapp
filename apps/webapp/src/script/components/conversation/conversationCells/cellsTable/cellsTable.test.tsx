@@ -111,10 +111,10 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
     return 'Move to bin';
   }
   if (key === 'cells.bulkMoveToBin.confirmation.title') {
-    return 'Move selected items to Bin?';
+    return 'Move items to bin';
   }
   if (key === 'cells.bulkMoveToBin.confirmation.description') {
-    return `Move ${substitutions?.count} selected items to Bin. Selected folders and their contents will also move to Bin.`;
+    return `${substitutions?.count} selected items will move to the recycle bin.`;
   }
   if (key === 'cells.bulkMoveToBin.destination') {
     return 'Bin';
@@ -219,7 +219,7 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
     return 'Restore file';
   }
   if (key === 'cells.bulkRestore.confirmation.multiple') {
-    return `Restore ${substitutions?.count} selected items to their original location?`;
+    return `The ${substitutions?.count} items will be restored and available again to everyone in this conversation.`;
   }
   if (key === 'cells.restoreNestedNodeModal.button') {
     return 'Restore Parent Folder';
@@ -598,9 +598,8 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('button', {name: 'Move to bin'}));
 
     const confirmation = await screen.findByRole('dialog');
-    expect(within(confirmation).getByRole('heading', {name: 'Move selected items to Bin?'})).toBeInTheDocument();
-    expect(within(confirmation).getByText(/Move 2 selected items to Bin/)).toBeInTheDocument();
-    expect(within(confirmation).getByText(/Selected folders and their contents/)).toBeInTheDocument();
+    expect(within(confirmation).getByRole('heading', {name: 'Move items to bin'})).toBeInTheDocument();
+    expect(within(confirmation).getByText('2 selected items will move to the recycle bin.')).toBeInTheDocument();
 
     await user.click(within(confirmation).getByRole('button', {name: 'Cancel'}));
     await waitFor(() => {
@@ -3961,7 +3960,9 @@ describe('CellsTable restoring selected Bin items', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select b.txt'}));
     await user.click(screen.getByRole('button', {name: 'Restore'}));
     const confirmation = await screen.findByRole('dialog');
-    expect(within(confirmation).getByText('Restore 2 selected items to their original location?')).toBeInTheDocument();
+    expect(
+      within(confirmation).getByText('The 2 items will be restored and available again to everyone in this conversation.'),
+    ).toBeInTheDocument();
     await user.click(within(confirmation).getByRole('button', {name: 'Restore selected items'}));
 
     await waitFor(() => {
@@ -4096,7 +4097,7 @@ describe('CellsTable restoring selected Bin items', () => {
     expect(
       within(confirmation).getByText(/The folder Reports with all its files will be restored\./),
     ).toBeInTheDocument();
-    expect(within(confirmation).getByText(/Restore 2 selected items to their original location/)).toBeInTheDocument();
+    expect(within(confirmation).getByText(/The 2 items will be restored and available again/)).toBeInTheDocument();
     await user.click(within(confirmation).getByRole('button', {name: 'Restore selected items'}));
 
     await waitFor(() => {
@@ -4121,7 +4122,7 @@ describe('CellsTable restoring selected Bin items', () => {
       await user.click(screen.getByRole('checkbox', {name: 'Select nested.txt'}));
       await user.click(screen.getByRole('button', {name: 'Restore'}));
       const confirmation = await screen.findByRole('dialog');
-      expect(within(confirmation).getByText(/Restore 2 selected items to their original location/)).toBeInTheDocument();
+      expect(within(confirmation).getByText(/The 2 items will be restored and available again/)).toBeInTheDocument();
       expect(
         within(confirmation).getByText(/The folder Reports with all its files will be restored/),
       ).toBeInTheDocument();
