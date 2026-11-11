@@ -19,9 +19,9 @@
 import {rspack} from '@rspack/core';
 import type {Configuration} from '@rspack/core';
 import browserslist from 'browserslist';
+import cssnano from 'cssnano';
 import dotenv from 'dotenv-extended';
 import HtmlRspackPlugin from 'html-rspack-plugin';
-import postcss from 'postcss';
 
 import {readFileSync} from 'node:fs';
 import path from 'node:path';
@@ -200,7 +200,9 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
             {
               loader: 'postcss-loader',
               options: {
-                implementation: postcss,
+                postcssOptions: {
+                  plugins: isDevelopment ? [['autoprefixer']] : [['autoprefixer'], [cssnano()]],
+                },
               },
             },
             'less-loader',
