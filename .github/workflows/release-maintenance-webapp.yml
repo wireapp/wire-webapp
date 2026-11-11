@@ -467,7 +467,14 @@ jobs:
           manifest_path="${distribution_artifact_directory}/distribution-manifest.json"
           mkdir -p "${context_directory}" "${distribution_artifact_directory}"
 
-          git archive --format=tar HEAD | tar -xf - -C "${context_directory}"
+          if [[ -s apps/server/dist/dbs/GeoLite2-Country.mmdb ]]; then
+            mkdir -p "${context_directory}/apps/server"
+            cp apps/server/Dockerfile "${context_directory}/apps/server/Dockerfile"
+            cp run.sh "${context_directory}/run.sh"
+          else
+            # Preserve source-era Docker inputs for maintenance lines predating server bundling.
+            git archive --format=tar HEAD | tar -xf - -C "${context_directory}"
+          fi
           cp -R apps/server/dist "${context_directory}/apps/server/dist"
           # Pre-migration maintenance sources still require their compiled configuration package.
           if [[ -f libraries/config/package.json ]]; then

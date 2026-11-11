@@ -66,14 +66,8 @@ function copyDirectoryContents(sourceDirectoryPath: string, destinationDirectory
 
 function assembleBuild(buildVariant: BuildVariant, assemblyScope: AssemblyScope): void {
   const webappBuildOutputPath = resolveWebappBuildOutputPath(buildVariant);
-  const serverBuildOutputPath = path.resolve(
-    workspaceRootPath,
-    assemblyScope === 'bundle' ? 'apps/server/build/bundle' : 'apps/server/build/server',
-  );
-  const artifactOutputPath = path.resolve(
-    workspaceRootPath,
-    assemblyScope === 'bundle' ? 'apps/server/build/bundled-artifact' : 'apps/server/dist',
-  );
+  const serverBuildOutputPath = path.resolve(workspaceRootPath, 'apps/server/build/bundle');
+  const artifactOutputPath = path.resolve(workspaceRootPath, 'apps/server/dist');
 
   assertPathExists(buildMetadataFilePath);
   assertPathExists(webappBuildOutputPath);
@@ -91,7 +85,7 @@ function assembleBuild(buildVariant: BuildVariant, assemblyScope: AssemblyScope)
   copyDirectoryContents(webappBuildOutputPath, path.resolve(artifactOutputPath, 'static'));
   cpSync(buildMetadataFilePath, path.resolve(artifactOutputPath, 'version.json'));
 
-  if (assemblyScope === 'bundle') {
+  if (assemblyScope !== 'webapp') {
     cpSync(path.resolve(workspaceRootPath, '.env.defaults'), path.resolve(artifactOutputPath, '.env.defaults'));
   }
 }

@@ -144,15 +144,13 @@ jobs:
           development_context_artifact_name="main-development-context-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           development_context_directory="${RUNNER_TEMP}/${development_context_artifact_name}"
 
-          mkdir -p \
-            "${development_context_directory}/apps/server" \
-            "${development_context_directory}/bin"
+          mkdir -p "${development_context_directory}/apps/server"
 
-          cp -a package.json package-lock.json .npmrc run.sh .env.defaults "${development_context_directory}/"
-          cp -a apps/server/Dockerfile apps/server/package.json "${development_context_directory}/apps/server/"
+          cp -a run.sh .env.defaults "${development_context_directory}/"
+          cp -a apps/server/Dockerfile "${development_context_directory}/apps/server/"
           cp -a apps/server/dist "${development_context_directory}/apps/server/dist"
 
-          test -s "${development_context_directory}/package.json"
+          test -s "${development_context_directory}/apps/server/dist/index.js.map"
           test -s "${development_context_directory}/apps/server/Dockerfile"
           test -d "${development_context_directory}/apps/server/dist"
 

@@ -159,8 +159,8 @@ jobs:
         run: |
           npx just package-server-public
 
-      - name: Build and verify isolated production server bundle
-        run: npx just assemble-server-bundle public verify-server-bundle
+      - name: Verify isolated production server bundle
+        run: npx just verify-server-bundle
 
       - name: Install unzip for artifact verification
         run: |
@@ -421,7 +421,7 @@ jobs:
           EXPECTED_VERSION="${expected_version}" \
             npx just validate-build-artifact
 
-      - name: Verify extracted ZIP with isolated production dependencies
+      - name: Verify extracted ZIP without installed packages
         run: npx just verify-server-package
 
       - name: Build and smoke-test sparse production Docker context
@@ -434,8 +434,8 @@ jobs:
           mkdir -p \
             "${DISTRIBUTION_CONTEXT_PATH}/apps/server"
 
-          cp -a package.json package-lock.json .npmrc run.sh .env.defaults "${DISTRIBUTION_CONTEXT_PATH}/"
-          cp -a apps/server/Dockerfile apps/server/package.json apps/server/dist "${DISTRIBUTION_CONTEXT_PATH}/apps/server/"
+          cp -a run.sh .env.defaults "${DISTRIBUTION_CONTEXT_PATH}/"
+          cp -a apps/server/Dockerfile apps/server/dist "${DISTRIBUTION_CONTEXT_PATH}/apps/server/"
 
           docker build \
             "${DISTRIBUTION_CONTEXT_PATH}" \
@@ -445,6 +445,12 @@ jobs:
           docker run --rm --entrypoint sh "${DOCKER_IMAGE_TAG}" -c '
             set -eu
             test -s /dist/index.js
+            test -s /dist/index.js.map
+            test -s /dist/dbs/GeoLite2-Country.mmdb
+            test ! -e /app/node_modules
+            test ! -e /dist/node_modules
+            test ! -e /app/package.json
+            test ! -e /dist/package.json
             test -s /dist/version.json
             test -d /dist/static
             test -s /app/run.sh
@@ -454,7 +460,6 @@ jobs:
             grep -q "^URL_ACCOUNT_BASE=" /dist/.env.defaults
             grep -q "^BACKEND_REST=" /dist/.env.defaults
             grep -q "^BACKEND_WS=" /dist/.env.defaults
-            node -e "const configuration = require(\"/dist/config.js\"); if (configuration.clientConfig.VERSION !== configuration.buildMetadata.version) process.exit(1)"
 
             ENFORCE_HTTPS=false NODE_PORT=8080 /bin/bash /app/run.sh &
             server_pid=$!

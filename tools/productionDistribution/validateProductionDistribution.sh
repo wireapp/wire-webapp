@@ -45,10 +45,6 @@ fi
 for required_context_path in \
   "${DISTRIBUTION_CONTEXT_PATH}/apps/server/Dockerfile" \
   "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist" \
-  "${DISTRIBUTION_CONTEXT_PATH}/package.json" \
-  "${DISTRIBUTION_CONTEXT_PATH}/.npmrc" \
-  "${DISTRIBUTION_CONTEXT_PATH}/apps/server/package.json" \
-  "${DISTRIBUTION_CONTEXT_PATH}/package-lock.json" \
   "${DISTRIBUTION_CONTEXT_PATH}/run.sh" \
   "${DISTRIBUTION_CONTEXT_PATH}/.env.defaults"; do
   if [[ ! -e "${required_context_path}" ]]; then
