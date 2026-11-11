@@ -17,8 +17,8 @@
  *
  */
 
-import {Cookie} from '@wireapp/api-client/lib/auth/cookie';
-import {CookieStore} from '@wireapp/api-client/lib/auth/cookieStore';
+import {Cookie} from '../../src/script/apiClient/auth/cookie';
+import {CookieStore} from '../../src/script/apiClient/auth/cookieStore';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../../src/script/service/apiClientSingleton';

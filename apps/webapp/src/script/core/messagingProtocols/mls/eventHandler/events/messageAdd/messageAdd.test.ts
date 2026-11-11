@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT, ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
+import {CONVERSATION_EVENT, ConversationMLSMessageAddEvent} from '../../../../../../apiClient/event/conversationEvent';
 import {task} from 'true-myth';
 
 import {

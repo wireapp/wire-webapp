@@ -17,11 +17,10 @@
  *
  */
 
-import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {CALL} from './Client';
 
+import type {QualifiedUserClients} from '../../apiClient/conversation/qualifiedUserClients';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {InCallEmojiType} from '../../core/conversation';
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 

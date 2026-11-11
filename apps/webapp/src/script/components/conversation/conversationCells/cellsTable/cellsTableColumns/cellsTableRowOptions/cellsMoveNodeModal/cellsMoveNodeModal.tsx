@@ -19,13 +19,12 @@
 
 import {useEffect, useState, type FunctionComponent} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {CellsFoldersListModalContent} from './cellsFoldersListModalContent/cellsFoldersListModalContent';
 import {LegacyCellsMoveNodeModal} from './legacy/legacyCellsMoveNodeModal';
 import {useGetCellsFolders} from './useGetCellsFolders/useGetCellsFolders';
 import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
 
+import {QualifiedId} from '../../../../../../../apiClient/user/qualifiedId';
 import {driveBulkActionsFeatureToggleName} from '../../../../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';

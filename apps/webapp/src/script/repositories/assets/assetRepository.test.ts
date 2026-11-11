@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetUploadData} from '@wireapp/api-client/lib/asset/';
+import {AssetUploadData} from '../../apiClient/asset/assetApi.schema';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 
 import {createUuid} from '../../util/uuid';

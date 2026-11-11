@@ -20,7 +20,6 @@
 import {useId, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {
   titleStyles,
@@ -31,6 +30,7 @@ import {
   protocolValueStyles,
 } from './conversationProtocolDetails.styles';
 
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {Ciphersuite} from '../../../core';
 import {useApplicationContext} from '../../../page/rootProvider';
 

@@ -18,7 +18,8 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
+
+import type {FeatureList} from '../../../../apiClient/team/feature/featureList.types';
 
 const LOCAL_STORAGE_FEATURE_CONFIG_KEY = 'FEATURE_CONFIG_KEY';
 

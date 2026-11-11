@@ -19,8 +19,7 @@
 
 import {MouseEvent as ReactMouseEvent} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
-
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {generateConversationUrl} from '../../../../../router/routeGenerator';
 import {createNavigate} from '../../../../../router/routerBindings';
 

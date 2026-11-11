@@ -18,11 +18,11 @@
  */
 
 import {isNan} from '@sindresorhus/is';
-import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
 import {ChatHistory, ConversationAccess, ConversationType, HistorySharingUnit} from './types';
 
+import {ADD_PERMISSION} from '../../../apiClient/conversation/conversation';
 import {Config} from '../../../Config';
 import type {RootContextValue} from '../../../page/rootProvider';
 import {TeamState} from '../../../repositories/team/TeamState';

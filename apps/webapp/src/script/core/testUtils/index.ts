@@ -17,9 +17,9 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {randomUUID, UUID} from 'crypto';
+
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 export function generateQualifiedId(domain: string): {id: UUID; domain: string} {
   return {id: randomUUID(), domain};

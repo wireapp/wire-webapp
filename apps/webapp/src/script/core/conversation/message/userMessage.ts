@@ -17,20 +17,18 @@
  *
  */
 
-import {
-  UserActivateData,
-  UserClientAddData,
-  UserClientRemoveData,
-  UserConnectionData,
-  UserDeleteData,
-  UserLegalHoldDisableData,
-  UserLegalHoldEnableData,
-  UserLegalHoldRequestData,
-  UserPropertiesSetData,
-  UserUpdateData,
-} from '@wireapp/api-client/lib/user/data';
-
 import {BasePayloadBundle, PayloadBundleType} from './payloadBundle';
+
+import {UserActivateData} from '../../../apiClient/user/data/userActivateData';
+import {UserClientAddData} from '../../../apiClient/user/data/userClientAddData';
+import {UserClientRemoveData} from '../../../apiClient/user/data/userClientRemoveData';
+import {UserConnectionData} from '../../../apiClient/user/data/userConnectionData';
+import {UserDeleteData} from '../../../apiClient/user/data/userDeleteData';
+import {UserLegalHoldDisableData} from '../../../apiClient/user/data/userLegalHoldDisableData';
+import {UserLegalHoldEnableData} from '../../../apiClient/user/data/userLegalHoldEnableData';
+import {UserLegalHoldRequestData} from '../../../apiClient/user/data/userLegalHoldRequestData';
+import {UserPropertiesSetData} from '../../../apiClient/user/data/userPropertiesSetData';
+import {UserUpdateData} from '../../../apiClient/user/data/userUpdateData';
 
 export interface UserActivateMessage extends BasePayloadBundle {
   content: UserActivateData;

@@ -18,10 +18,12 @@
  */
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import type {QualifiedHandle} from '../../apiClient/user/qualifiedHandle';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import type {User as APIClientUser} from '../../apiClient/user/user';
 import type {UserService as CoreUserService} from '../../core/user';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';

@@ -18,10 +18,10 @@
  */
 
 import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {UserType} from '@wireapp/api-client/lib/user';
 
 import {isSelfAPIUser} from './userGuards';
 
+import {UserType} from '../../apiClient/user/user';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {type Translate} from '../../util/localizerUtil';
 import {getLogger, Logger} from '../../util/logger';

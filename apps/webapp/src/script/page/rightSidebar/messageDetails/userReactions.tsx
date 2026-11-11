@@ -20,10 +20,10 @@
 import {Fragment} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {panelContentTitleStyles} from './messageDetails.styles';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {EmojiChar} from '../../../components/messagesList/message/contentMessage/messageActions/messageReactions/emojiChar';
 import {
   messageReactionDetailsMargin,

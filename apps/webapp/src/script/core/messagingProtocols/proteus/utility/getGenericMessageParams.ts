@@ -17,15 +17,15 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client/lib/apiClient';
-import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
-
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {getRecipientsForConversation} from './recipients';
 import {extractQualifiedUserIds} from './userIds';
 
+import {APIClient} from '../../../../apiClient/apiClient';
+import {QualifiedUserClients} from '../../../../apiClient/conversation/qualifiedUserClients';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import {QualifiedUserPreKeyBundleMap} from '../../../../apiClient/user/userPreKeyBundleMap';
 import {MessageTargetMode, MessageSendingOptions} from '../../../conversation';
 import {isQualifiedUserClients} from '../../../util';
 

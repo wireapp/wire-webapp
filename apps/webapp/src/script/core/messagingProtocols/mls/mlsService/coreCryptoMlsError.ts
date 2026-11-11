@@ -17,10 +17,11 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Result, result} from 'true-myth';
 
 import {CoreCryptoError, MlsError} from '@wireapp/core-crypto';
+
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 
 type CoreCryptoMlsError = InstanceType<typeof CoreCryptoError.Mls>;
 type CoreCryptoMlsErrorWith<TMlsError extends MlsError> = CoreCryptoMlsError & {

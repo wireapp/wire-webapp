@@ -10,6 +10,7 @@ module.exports = {
   maxWorkers: 2,
   projects: [
     '<rootDir>/apps/webapp/test/core/jest.config.js',
+    '<rootDir>/apps/webapp/test/apiClient/jest.config.js',
     '<rootDir>/apps/webapp/test/uiKit/jest.config.js',
     '<rootDir>/apps/*/jest.config.*',
     '<rootDir>/libraries/*/jest.config.js',

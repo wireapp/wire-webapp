@@ -17,7 +17,7 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/lib/auth';
+import {LoginData} from '../../apiClient/auth/loginData';
 
 export class LoginSanitizer {
   constructor() {}

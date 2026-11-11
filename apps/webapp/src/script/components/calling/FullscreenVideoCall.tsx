@@ -21,7 +21,6 @@ import {ChangeEvent, type FunctionComponent, useEffect, useRef, useState} from '
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -44,6 +43,7 @@ import {VideoBackgroundPerformancePanel} from './VideoControls/videoBackgroundPe
 import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
 import {VideoControls} from './VideoControls/VideoControls';
 
+import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
 import {Config} from '../../Config';
 import {callSecurityLineFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useActiveWindowMatchMedia} from '../../hooks/useActiveWindowMatchMedia';

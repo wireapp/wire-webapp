@@ -48,7 +48,7 @@ import {callSecurityLineFeatureToggleName} from '../../featureToggles/startupFea
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
 import {KEY} from '../../util/keyboardUtil';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;
 

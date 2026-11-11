@@ -17,7 +17,8 @@
  *
  */
 
-import {MLSPublicKeyAlgorithmKeys, RegisteredClient} from '@wireapp/api-client/lib/client';
+import {MLSPublicKeyAlgorithmKeys} from '../../../../apiClient/client/clientApi';
+import {RegisteredClient} from '../../../../apiClient/client/registeredClient';
 
 export const isMLSDevice = (
   {mls_public_keys}: RegisteredClient,

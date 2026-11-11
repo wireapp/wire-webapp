@@ -18,27 +18,11 @@
  */
 
 import {isNonEmptyArray} from '@sindresorhus/is';
-import type {
-  ClaimedKeyPackages,
-  MLSPublicKeyAlgorithmKeys,
-  MLSPublicKeyRecord,
-  RegisteredClient,
-} from '@wireapp/api-client/lib/client';
-import {
-  MLSGroupOutOfSyncError,
-  MLSInvalidLeafNodeIndexError,
-  MLSInvalidLeafNodeSignatureError,
-  MLSStaleMessageError,
-  SUBCONVERSATION_ID,
-} from '@wireapp/api-client/lib/conversation';
-import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Converter} from '@wireapp/commons/lib/base64/converter';
 import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {Encoder} from '@wireapp/commons/lib/base64/encoder';
 import {Task, result, task} from 'true-myth';
 
-import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TimeUtil, TypedEventEmitter} from '@wireapp/commons';
 import {
   CipherSuite as Ciphersuite,
@@ -70,6 +54,25 @@ import {
 } from './coreCryptoMlsError';
 import {getMLSDeviceStatus, isMLSDevice, MLSDeviceStatus} from './mlsDeviceStatus';
 
+import {APIClient} from '../../../../apiClient/apiClient';
+import type {
+  ClaimedKeyPackages,
+  MLSPublicKeyAlgorithmKeys,
+  MLSPublicKeyRecord,
+} from '../../../../apiClient/client/clientApi';
+import type {RegisteredClient} from '../../../../apiClient/client/registeredClient';
+import {
+  MLSGroupOutOfSyncError,
+  MLSInvalidLeafNodeIndexError,
+  MLSInvalidLeafNodeSignatureError,
+  MLSStaleMessageError,
+} from '../../../../apiClient/conversation/conversationError';
+import {SUBCONVERSATION_ID} from '../../../../apiClient/conversation/subconversation';
+import {
+  ConversationMLSMessageAddEvent,
+  ConversationMLSWelcomeEvent,
+} from '../../../../apiClient/event/conversationEvent';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';
 import type {HandledEventPayload} from '../../../notification';
 import {CoreDatabase} from '../../../storage/coreDb';

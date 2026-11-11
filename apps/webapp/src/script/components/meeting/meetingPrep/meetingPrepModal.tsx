@@ -19,13 +19,13 @@
 
 import {type FunctionComponent, useCallback, useRef} from 'react';
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {maybe} from 'true-myth';
 
 import {MeetingPrepSurface} from './meetingPrepSurface';
 import {type MeetingPrepDeviceKind, meetingPrepDeviceKinds, type RequestMeetingPrepPreview} from './meetingPrepTypes';
 import {useMeetingPrepModal} from './useMeetingPrepModal';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {CallMediaChoice} from '../../../repositories/calling/callMediaChoice';
 import type {User} from '../../../repositories/entity/User';

@@ -18,11 +18,6 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
-import {
-  ConversationOtrMessageAddEvent,
-  ConversationMLSMessageAddEvent,
-  CONVERSATION_EVENT,
-} from '@wireapp/api-client/lib/event';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
@@ -56,6 +51,11 @@ import {
 
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
+import {
+  ConversationOtrMessageAddEvent,
+  ConversationMLSMessageAddEvent,
+  CONVERSATION_EVENT,
+} from '../../apiClient/event/conversationEvent';
 import {GenericMessageType} from '../../core/conversation';
 import {MultiPartContent} from '../../core/conversation/content';
 import {CryptographyError} from '../../error/cryptographyError';

@@ -20,11 +20,6 @@
 import React, {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import type {DomainData} from '@wireapp/api-client/lib/account/domainData';
-import {ClientType} from '@wireapp/api-client/lib/client/index';
-import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data';
-import type {ConversationEvent} from '@wireapp/api-client/lib/event';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect, useDispatch} from 'react-redux';
@@ -35,6 +30,12 @@ import {Runtime, UrlUtil} from '@wireapp/commons';
 
 import {buildDomainRedirectUrl, handleEnterpriseLogin, handleSSOBackendError, requiresPasswordModal} from './util';
 
+import type {DomainData} from '../../../apiClient/account/domainData';
+import {ClientType} from '../../../apiClient/client/clientType';
+import type {ConversationJoinData} from '../../../apiClient/conversation/data/conversationJoinData';
+import type {ConversationEvent} from '../../../apiClient/event/conversationEvent';
+import {BackendError} from '../../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {APIClient} from '../../../service/apiClientSingleton';

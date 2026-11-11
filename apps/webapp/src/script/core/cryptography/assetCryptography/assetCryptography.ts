@@ -17,11 +17,11 @@
  *
  */
 
-import {CipherOptions} from '@wireapp/api-client/lib/asset';
-
 import {crypto as browserCrypto} from './crypto.browser';
 import {EncryptedAsset} from './encryptedAsset';
 import type {Crypto} from './interfaces';
+
+import {CipherOptions} from '../../../apiClient/asset/assetApi';
 
 const initializationVectorLengthInBytes = 16;
 const encryptionKeyLengthInBytes = 32;

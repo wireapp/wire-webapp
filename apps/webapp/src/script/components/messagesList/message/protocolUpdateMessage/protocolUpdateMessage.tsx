@@ -19,8 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from '../../../../repositories/entity/message/protocolUpdateMessage';
 import {SystemMessage} from '../../../../repositories/entity/message/systemMessage';

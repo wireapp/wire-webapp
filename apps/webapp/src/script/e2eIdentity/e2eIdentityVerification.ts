@@ -18,13 +18,13 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import type {E2eiConversationState} from '@wireapp/core-crypto';
 
 import {mapMLSStatus, MLSStatuses} from './mlsStatus';
 
+import type {QualifiedId} from '../apiClient/user/qualifiedId';
 import type {ConversationService} from '../core/conversation';
 import {DeviceIdentity, type E2EIServiceExternal} from '../core/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../core/util/qualifiedIdUtil';

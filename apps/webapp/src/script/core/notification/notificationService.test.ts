@@ -17,9 +17,11 @@
  *
  */
 
-import {Notification} from '@wireapp/api-client/lib/notification';
+import {nodePlatform} from '../../apiClient/shims/node/platform';
 
-import {APIClient} from '@wireapp/api-client';
+import {Notification} from '../../apiClient/notification/notification';
+
+import {APIClient} from '../../apiClient/apiClient';
 import {MemoryEngine} from '../storage/engine/memoryEngine';
 
 import {ConversationService} from '../conversation';
@@ -50,7 +52,7 @@ describe('NotificationService', () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
 
-      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
       apiClients.push(apiClient);
 
       const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
@@ -85,7 +87,7 @@ describe('NotificationService', () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
 
-      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
       apiClients.push(apiClient);
       const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
       const payload = {event: {type: 'single'}} as unknown as HandledEventPayload;
@@ -109,7 +111,7 @@ describe('NotificationService', () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
 
-      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
       apiClients.push(apiClient);
       const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
       const firstPayload = {event: {type: 'first'}} as unknown as HandledEventPayload;
@@ -138,7 +140,7 @@ describe('NotificationService', () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
 
-      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
       apiClients.push(apiClient);
       const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
 
@@ -167,7 +169,7 @@ describe('NotificationService', () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
 
-      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
       apiClients.push(apiClient);
       const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
 
@@ -195,7 +197,7 @@ describe('NotificationService', () => {
         const storeEngine = new MemoryEngine();
         await storeEngine.init('NotificationService.test');
 
-        const apiClient = new APIClient({urls: MOCK_BACKEND});
+        const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
         apiClients.push(apiClient);
         const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
         notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {

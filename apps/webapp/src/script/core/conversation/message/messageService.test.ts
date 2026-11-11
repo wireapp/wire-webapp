@@ -17,16 +17,15 @@
  *
  */
 
-import {
-  MessageSendingStatus,
-  OTRRecipients,
-  QualifiedOTRRecipients,
-  QualifiedUserClients,
-} from '@wireapp/api-client/lib/conversation';
+import {nodePlatform} from '../../../apiClient/shims/node/platform';
+
+import {MessageSendingStatus} from '../../../apiClient/conversation/messageSendingStatus';
+import {OTRRecipients, QualifiedOTRRecipients} from '../../../apiClient/conversation/otrRecipients';
+import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
 import {StatusCodes} from 'http-status-codes';
 import {v4 as uuidv4} from 'uuid';
 
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../../apiClient/apiClient';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 import {MessageService} from './messageService';
@@ -95,7 +94,7 @@ const apiClients: APIClient[] = [];
 const buildMessageService = async (): Promise<
   readonly [MessageService, {readonly apiClient: APIClient; readonly proteusService: ProteusService}]
 > => {
-  const apiClient = new APIClient();
+  const apiClient = new APIClient({platform: nodePlatform});
   apiClients.push(apiClient);
   const [proteusService] = await buildProteusService();
   const messageService = new MessageService(apiClient, proteusService);

@@ -17,10 +17,10 @@
  *
  */
 
-import type {Meeting, MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
-import type {MeetingsAPI} from '@wireapp/api-client/lib/meetings/meetingsApi';
-
 import type {MeetingsDataSource} from './meetingsDataSource';
+
+import type {Meeting, MeetingWithConversation} from '../../apiClient/meetings/meeting';
+import type {MeetingsAPI} from '../../apiClient/meetings/meetingsApi';
 
 export class MeetingsApiDataSource implements MeetingsDataSource {
   constructor(private readonly meetingsApi: MeetingsAPI) {}

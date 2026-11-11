@@ -19,8 +19,6 @@
 
 import {useCallback, useState, type FunctionComponent} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {CellsMoveNodeModal} from './cellsMoveNodeModal/cellsMoveNodeModal';
 import {CellsRenameNodeModal} from './cellsRenameNodeModal/cellsRenameNodeModal';
 import {buttonStyles, iconStyles, textStyles} from './cellsTableRowOptions.styles';
@@ -33,6 +31,7 @@ import {useDeleteNode} from './useDeleteNode/useDeleteNode';
 import {useRestoreNestedNode} from './useRestoreNestedNode/useRestoreNestedNode';
 import {useRestoreParentNode} from './useRestoreParentNode/useRestoreParentNode';
 
+import {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {CellNode, CellNodeType} from '../../../../../../types/cellNode';

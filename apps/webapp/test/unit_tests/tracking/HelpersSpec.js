@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_TYPE} from '../../../src/script/apiClient/conversation/conversation';
 
 import {Conversation} from '../../../src/script/repositories/entity/Conversation';
 import {ConversationType as ConversationTypeAttribute} from '../../../src/script/repositories/tracking/attribute';

@@ -17,7 +17,7 @@
  *
  */
 
-import {MeetingsAPI} from '@wireapp/api-client/lib/meetings/meetingsApi';
+import {MeetingsAPI} from '../../apiClient/meetings/meetingsApi';
 import {MeetingsApiDataSource} from './meetingsApiDataSource';
 
 describe('MeetingsApiDataSource', () => {

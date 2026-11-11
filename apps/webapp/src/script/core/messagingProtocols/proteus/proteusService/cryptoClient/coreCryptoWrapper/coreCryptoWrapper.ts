@@ -18,7 +18,6 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import {PreKey} from '@wireapp/api-client/lib/auth';
 import {Encoder} from '@wireapp/commons/lib/base64/encoder';
 import {deleteDB} from 'idb';
 import {result, task, type Result, type Task} from 'true-myth';
@@ -43,6 +42,7 @@ import {releaseCoreCryptoHandles} from './coreCryptoHandleLifecycle';
 import {removeCoreCryptoOpfsDatabase} from './coreCryptoOpfsStorage';
 import {PrekeyTracker} from './prekeysTracker';
 
+import {PreKey} from '../../../../../../apiClient/auth/preKey';
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
 import type {CRUDEngine} from '../../../../../storage/engine/crudEngine';
 import {CoreCryptoConfig} from '../../../../common.types';

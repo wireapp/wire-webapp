@@ -20,8 +20,8 @@
 import {FC, useCallback, useRef, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {ReactionType} from '../../../core/conversation';
 import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';

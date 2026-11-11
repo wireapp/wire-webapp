@@ -18,10 +18,10 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import {CONVERSATION_EVENT} from '../apiClient/event/conversationEvent';
 import type {Conversation} from '../repositories/entity/Conversation';
 import type {User} from '../repositories/entity/User';
 import {CONVERSATION} from '../repositories/event/Client';

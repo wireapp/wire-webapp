@@ -18,11 +18,12 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 
 import type {DeviceTimeZone} from './deviceTimeZone';
 import {getMeetNowMeetingTimes} from './shared/defaults/meetingDateTimeDefaults';
 import type {MeetNowMeetingCommand} from './shared/types/meetingCommandTypes';
+
+import type {CreateMeeting} from '../../apiClient/meetings/createMeeting';
 
 export const mapMeetNowCommandToCreateMeeting = (
   command: MeetNowMeetingCommand,

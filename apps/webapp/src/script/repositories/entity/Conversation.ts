@@ -26,19 +26,6 @@ import {
   isNumber,
   isUndefined,
 } from '@sindresorhus/is';
-import {
-  CONVERSATION_ACCESS_ROLE,
-  CONVERSATION_ACCESS,
-  CONVERSATION_LEGACY_ACCESS_ROLE,
-  CONVERSATION_TYPE,
-  DefaultConversationRoleName,
-  GROUP_CONVERSATION_TYPE,
-  ADD_PERMISSION,
-  CONVERSATION_CELLS_STATE,
-} from '@wireapp/api-client/lib/conversation/';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -52,6 +39,20 @@ import type {Message} from './message/message';
 import {PingMessage} from './message/pingMessage';
 import type {User} from './User';
 
+import {
+  CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_ACCESS,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
+  CONVERSATION_TYPE,
+  GROUP_CONVERSATION_TYPE,
+  ADD_PERMISSION,
+  CONVERSATION_CELLS_STATE,
+} from '../../apiClient/conversation/conversation';
+import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
+import {RECEIPT_MODE} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {UserType} from '../../apiClient/user/user';
 import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';

@@ -20,7 +20,6 @@
 import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {task} from 'true-myth';
 
 import {CellsHeader} from './cellsHeader/cellsHeader';
@@ -62,6 +61,7 @@ import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresigne
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 import {useSharedDriveFileDrop} from './useSharedDriveFileDrop';
 
+import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';

@@ -21,9 +21,9 @@ import {CSSProperties, useEffect, useMemo, useRef, useState, type FunctionCompon
 
 import {CSSObject} from '@emotion/react';
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {stringifyQualifiedId} from '../../../../core/util/qualifiedIdUtil';
 import {MLSStatuses, WireIdentity} from '../../../../e2eIdentity/e2eIdentityVerification';
 import {useUserIdentity} from '../../../../hooks/useDeviceIdentities';

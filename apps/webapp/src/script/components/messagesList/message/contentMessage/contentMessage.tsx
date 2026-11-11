@@ -20,7 +20,6 @@
 import {useMemo, useState, useEffect, useRef, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 import ko from 'knockout';
 
@@ -34,6 +33,7 @@ import {Quote} from './messageQuote';
 import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './warnings';
 
 import {MessageActions} from '..';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {useClickOutside} from '../../../../hooks/useClickOutside';
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../../hooks/useRelativeTimestamp';
 import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';

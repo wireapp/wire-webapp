@@ -21,7 +21,6 @@ import {useEffect, useState} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
 
 import {CollectionDetails} from './collectionDetails';
@@ -29,6 +28,7 @@ import {CollectionSection} from './collectionSection';
 import {FullSearch} from './fullSearch';
 import {Category, isOfCategory} from './utils';
 
+import {CONVERSATION_CELLS_STATE} from '../../../../apiClient/conversation/conversation';
 import * as Icon from '../../../../components/icon';
 import {showDetailViewModal} from '../../../../components/Modals/DetailViewModal';
 import {Config} from '../../../../Config';

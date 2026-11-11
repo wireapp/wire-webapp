@@ -26,15 +26,15 @@ import {
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   GROUP_CONVERSATION_TYPE,
-  Member as MemberBackendData,
-  OtherMember as OtherMemberBackendData,
-  DefaultConversationRoleName,
-  RemoteConversations,
-} from '@wireapp/api-client/lib/conversation/';
+} from '../../apiClient/conversation/conversation';
+import {Member as MemberBackendData} from '../../apiClient/conversation/member';
+import {OtherMember as OtherMemberBackendData} from '../../apiClient/conversation/otherMember';
+import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
+import {RemoteConversations} from '../../apiClient/conversation/remoteConversations';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {RECEIPT_MODE} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import ko from 'knockout';
 
 import {Conversation} from '../entity/Conversation';

@@ -18,9 +18,9 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {E2eiConversationState, MLSServiceEvents} from '../../../../core/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../../core/util/qualifiedIdUtil';
 import {

@@ -18,9 +18,9 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {TreeNodeType, type RestPerformActionResponse} from 'cells-sdk-ts';
 
+import type {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {getCellsApiPath} from '../../common/getCellsApiPath/getCellsApiPath';
 import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';

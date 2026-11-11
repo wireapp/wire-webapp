@@ -18,8 +18,8 @@
  */
 
 import {isEmptyArray, isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../../core/conversation';
 import type {User} from '../../../../repositories/entity/User';
 import type {Translate, TranslationKey} from '../../../../util/localizerUtil';

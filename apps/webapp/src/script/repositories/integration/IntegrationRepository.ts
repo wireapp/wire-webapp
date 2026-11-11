@@ -18,7 +18,6 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
@@ -27,6 +26,7 @@ import type {IntegrationService} from './IntegrationService';
 import {ProviderEntity} from './ProviderEntity';
 import {ServiceEntity} from './ServiceEntity';
 
+import type {ConversationMemberJoinEvent} from '../../apiClient/event/conversationEvent';
 import {getLogger, Logger} from '../../util/logger';
 import {compareTransliteration, sortByPriority} from '../../util/stringUtil';
 import {toError} from '../../util/toError';

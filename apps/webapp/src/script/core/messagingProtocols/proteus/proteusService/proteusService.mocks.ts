@@ -17,14 +17,13 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/lib/client';
-
-import {APIClient} from '@wireapp/api-client';
-
 import {CryptoClient} from './cryptoClient';
 import {CoreCryptoWrapper} from './cryptoClient/coreCryptoWrapper/coreCryptoWrapper';
 import {ProteusService} from './proteusService';
 
+import {APIClient} from '../../../../apiClient/apiClient';
+import {ClientType} from '../../../../apiClient/client/clientType';
+import {nodePlatform} from '../../../../apiClient/shims/node/platform';
 import {getUUID} from '../../../test/payloadHelper';
 import {createMemoryEngine} from '../../../test/storeHelper';
 
@@ -33,7 +32,7 @@ const createdApiClients: APIClient[] = [];
 export const buildProteusService = async (): Promise<
   [ProteusService, {apiClient: APIClient; cryptoClient: CryptoClient}]
 > => {
-  const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+  const apiClient = new APIClient({platform: nodePlatform, urls: APIClient.BACKEND.STAGING});
   createdApiClients.push(apiClient);
 
   apiClient.context = {

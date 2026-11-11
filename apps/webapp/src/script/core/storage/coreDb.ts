@@ -17,10 +17,10 @@
  *
  */
 
-import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DBSchema, deleteDB as idbDeleteDB, IDBPDatabase, openDB as idbOpenDb} from 'idb';
 
+import {SUBCONVERSATION_ID} from '../../apiClient/conversation/subconversation';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {PendingEnrollmentData} from '../messagingProtocols/mls/e2eIdentityService/storage/e2eiStorage.schema';
 
 const recurringTasksMigrationVersion = 2;

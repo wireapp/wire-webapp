@@ -17,9 +17,8 @@
  *
  */
 
-import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data';
-import type {BackendError} from '@wireapp/api-client/lib/http';
-
+import type {ConversationJoinData} from '../../../apiClient/conversation/data/conversationJoinData';
+import type {BackendError} from '../../../apiClient/http/backendError';
 import type {RootState} from '../reducer';
 
 type ConversationInfoError = Error & {label?: string; code?: number; message?: string};

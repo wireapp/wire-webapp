@@ -21,7 +21,6 @@ import {useEffect, type FunctionComponent} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {match, P} from 'ts-pattern';
 import {container} from 'tsyringe';
 
@@ -36,6 +35,7 @@ import {
   meetingNotificationViewBtnStyles,
 } from './meetingNotificationCard.styles';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {UserState} from '../../../repositories/user/userState';
 import {navigate} from '../../../router/Router';

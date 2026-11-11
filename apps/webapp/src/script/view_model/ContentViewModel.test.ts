@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../apiClient/team/feature/featureList.types';
 
 import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';
 import type {MessageRepository} from '../repositories/conversation/MessageRepository';

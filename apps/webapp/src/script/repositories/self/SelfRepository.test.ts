@@ -18,9 +18,9 @@
  */
 
 import {waitFor} from '@testing-library/react';
-import {FeatureList} from '@wireapp/api-client/lib/team';
-import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature';
-import {UserType} from '@wireapp/api-client/lib/user';
+import {FeatureList} from '../../apiClient/team/feature/featureList.types';
+import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
+import {UserType} from '../../apiClient/user/user';
 import {container} from 'tsyringe';
 
 import {ClientEntity} from '../client';

@@ -24,8 +24,7 @@ import {
   UserConnectionEvent,
   UserEvent,
   UserUpdateEvent,
-} from '@wireapp/api-client/lib/event';
-
+} from '../../apiClient/event/userEvent';
 import {MessageSendingState, PayloadBundle, PayloadBundleType} from '../conversation';
 import {createId} from '../conversation/message/messageBuilder';
 import {NotificationSource} from '../notification';

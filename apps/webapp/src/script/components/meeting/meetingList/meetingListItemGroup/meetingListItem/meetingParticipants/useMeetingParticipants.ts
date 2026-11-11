@@ -19,11 +19,11 @@
 
 import {useMemo} from 'react';
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {getMeetingParticipantsForDisplay} from './getMeetingParticipantsForDisplay';
 
+import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 import type {Conversation} from '../../../../../../repositories/entity/Conversation';
 import type {User} from '../../../../../../repositories/entity/User';
 import {UserState} from '../../../../../../repositories/user/userState';

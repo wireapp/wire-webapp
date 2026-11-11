@@ -22,7 +22,7 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios from 'axios';
 import {task} from 'true-myth';
 
-import {APIClient} from '@wireapp/api-client';
+import {APIClient} from '../../../../apiClient/apiClient';
 import {
   CoreCrypto,
   CoreCryptoError,

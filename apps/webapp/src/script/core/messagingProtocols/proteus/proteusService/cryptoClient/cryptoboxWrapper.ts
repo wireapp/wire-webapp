@@ -18,13 +18,13 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {PreKey} from '@wireapp/api-client/lib/auth';
 
 import {Cryptobox} from '@wireapp/cryptobox';
 import {keys as ProteusKeys} from '@wireapp/proteus';
 
 import {CryptoClient, InitialPrekeys} from './cryptoClient.types';
 
+import {PreKey} from '../../../../../apiClient/auth/preKey';
 import type {CRUDEngine} from '../../../../storage/engine/crudEngine';
 import {toArrayBuffer} from '../../../../util/bufferUtils';
 

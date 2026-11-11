@@ -20,7 +20,6 @@
 import {useCallback, useState} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {type Maybe, task, type Task} from 'true-myth';
 
 import {
@@ -32,6 +31,7 @@ import {
 } from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {useApplicationContext, useMainViewModel} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
 import {mapScheduleFormToMeetingCommand} from '../mapScheduleFormToMeetingCommand';

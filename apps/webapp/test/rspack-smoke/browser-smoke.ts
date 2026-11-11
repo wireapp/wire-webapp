@@ -23,7 +23,9 @@ import {noop} from 'noop-esm';
 import {match} from 'ts-pattern';
 import {Maybe} from 'true-myth';
 
-import {readFileSync} from 'node:fs';
+import {readFileSync, readdirSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {z} from 'zod';
 
 import {previewDefaultEnabledStartupFeatureToggleNames} from '../../src/script/featureToggles/startupFeatureToggleNames';
 
@@ -382,4 +384,32 @@ test('serves the unmodified standalone Countly SDK without initializing telemetr
   });
 
   expect(providerState).toEqual({initializationType: 'function', apiKey: undefined});
+});
+
+test('bundles browser API-client adapters without Node implementations', async ({}, testInfo) => {
+  const buildVariant = testInfo.project.name === 'rspack-internal' ? 'internal' : 'public';
+  const bundleDirectory = resolve(__dirname, '../../dist', buildVariant, 'min');
+  const sourceMapSchema = z.object({sources: z.array(z.string())});
+  const bundledSources = readdirSync(bundleDirectory)
+    .filter(filename => {
+      return filename.endsWith('.js.map');
+    })
+    .flatMap(filename => {
+      const sourceMap = sourceMapSchema.parse(JSON.parse(readFileSync(resolve(bundleDirectory, filename), 'utf8')));
+
+      return sourceMap.sources;
+    });
+  const browserAdapterSources = bundledSources.join('\n');
+
+  for (const adapterName of ['buffer', 'cookie', 'websocket', 'platform']) {
+    expect(browserAdapterSources).toContain('/apiClient/shims/browser/' + adapterName + '.ts');
+  }
+
+  const nodeImplementationSources = bundledSources.filter(sourcePath => {
+    return /\/apiClient\/shims\/node\/(?:buffer|cookie|websocket|platform|obfuscateCookie)\.ts|\/node_modules\/(?:ws|tough-cookie)\//.test(
+      sourcePath,
+    );
+  });
+
+  expect(nodeImplementationSources).toEqual([]);
 });

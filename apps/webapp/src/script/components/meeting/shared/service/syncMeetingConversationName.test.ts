@@ -17,8 +17,8 @@
  *
  */
 
-import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {GROUP_CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {task} from 'true-myth';
 
 import {meetingSubmitErrors} from '../../meetingSubmitErrors';

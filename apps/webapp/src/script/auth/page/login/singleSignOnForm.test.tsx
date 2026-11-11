@@ -18,7 +18,7 @@
  */
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
-import {ClientType} from '@wireapp/api-client/lib/client';
+import {ClientType} from '../../../apiClient/client/clientType';
 
 import {TypeUtil} from '@wireapp/commons';
 import {noop} from 'noop-esm';

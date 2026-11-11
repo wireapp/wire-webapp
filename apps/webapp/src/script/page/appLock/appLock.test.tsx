@@ -18,7 +18,7 @@
  */
 
 import {act, render} from '@testing-library/react';
-import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 

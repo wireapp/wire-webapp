@@ -18,11 +18,11 @@
  */
 
 import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {UserType} from '@wireapp/api-client/lib/user';
 
 import {ProviderData, ProviderEntity} from './ProviderEntity';
 import {ServiceData, ServiceEntity} from './ServiceEntity';
 
+import {UserType} from '../../apiClient/user/user';
 import {mapProfileAssets, updateUserEntityAssets} from '../assets/assetMapper';
 import {User} from '../entity/User';
 

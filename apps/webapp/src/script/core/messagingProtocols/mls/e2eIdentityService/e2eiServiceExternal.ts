@@ -17,13 +17,11 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios from 'axios';
 import {result, task, type Result, type Task} from 'true-myth';
 
-import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {
   ConversationId,
@@ -44,6 +42,8 @@ import {AcmeService} from './connection';
 import {E2EIAuthenticateCallback} from './e2eiService.types';
 import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 
+import {APIClient} from '../../../../apiClient/apiClient';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {ClientService} from '../../../client';
 import {CoreDatabase} from '../../../storage/coreDb';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';

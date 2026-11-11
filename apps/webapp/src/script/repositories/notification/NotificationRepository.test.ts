@@ -17,14 +17,14 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
+import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import type {DeterministicClock} from '@enormora/clock/deterministic-clock';
-import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-import {NotificationPreference} from '@wireapp/api-client/lib/user/data';
+import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
+import {NotificationPreference} from '../../apiClient/user/data/userPropertiesSetData';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {result} from 'true-myth';

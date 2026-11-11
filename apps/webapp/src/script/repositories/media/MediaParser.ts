@@ -17,11 +17,11 @@
  *
  */
 
-import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 
 import {MediaEmbeds} from './MediaEmbeds';
 
+import type {WebappProperties} from '../../apiClient/user/data/userPropertiesSetData';
 import {Config} from '../../Config';
 import {getLinksFromHtml} from '../../util/urlUtil';
 import {WebAppEvents} from '../../webAppEvents';

@@ -17,11 +17,15 @@
  *
  */
 
-import {SUBCONVERSATION_ID, Subconversation} from '@wireapp/api-client/lib/conversation';
-import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/lib/http';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {nodePlatform} from '../../../apiClient/shims/node/platform';
 
-import {APIClient} from '@wireapp/api-client';
+import {SUBCONVERSATION_ID, Subconversation} from '../../../apiClient/conversation/subconversation';
+import {BackendError} from '../../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
+import {StatusCode} from '../../../apiClient/http';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+
+import {APIClient} from '../../../apiClient/apiClient';
 
 import {SubconversationService} from './subconversationService';
 
@@ -69,7 +73,7 @@ const getSubconversationResponse = ({
 const apiClients: APIClient[] = [];
 
 const buildSubconversationService = async (isFederated = false): Promise<SubconversationServiceTestSetup> => {
-  const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+  const apiClient = new APIClient({platform: nodePlatform, urls: APIClient.BACKEND.STAGING});
   apiClients.push(apiClient);
   apiClient.backendFeatures.isFederated = isFederated;
 

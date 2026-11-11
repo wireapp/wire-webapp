@@ -18,7 +18,6 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {v4 as uuidv4} from 'uuid';
 
 import {
@@ -66,6 +65,7 @@ import {
   TextMessage,
 } from './otrMessage';
 
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {AssetTransferState} from '../assetTransferState';
 import {MultiPartContent, TextContent} from '../content';
 import {GenericMessageType} from '../genericMessageType';

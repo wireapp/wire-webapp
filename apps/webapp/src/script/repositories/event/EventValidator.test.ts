@@ -17,13 +17,13 @@
  *
  */
 
-import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_TYPING} from '../../apiClient/conversation/data/conversationTypingData';
 import {
   ConversationMemberJoinEvent,
   ConversationOtrMessageAddEvent,
   ConversationTypingEvent,
   CONVERSATION_EVENT,
-} from '@wireapp/api-client/lib/event/';
+} from '../../apiClient/event/conversationEvent';
 
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';

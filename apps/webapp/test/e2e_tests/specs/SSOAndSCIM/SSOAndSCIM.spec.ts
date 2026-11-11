@@ -22,7 +22,7 @@ import {test, expect} from '../../test.fixtures';
 import {Page} from '@playwright/test';
 import {getImageFilePath} from '../../utils/sendImage.util';
 
-import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
+import {FEATURE_KEY} from '../../../../src/script/apiClient/team/feature/featureList.types';
 import {PageManager} from '../../pageManager';
 
 test.describe('SSO and SCIM', () => {

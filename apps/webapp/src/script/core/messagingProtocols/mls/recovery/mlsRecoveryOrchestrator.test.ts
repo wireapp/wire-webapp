@@ -17,8 +17,8 @@
  *
  */
 
-import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {SUBCONVERSATION_ID} from '../../../../apiClient/conversation/subconversation';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {noop} from 'noop-esm';
 
 import {LogFactory} from '@wireapp/commons';

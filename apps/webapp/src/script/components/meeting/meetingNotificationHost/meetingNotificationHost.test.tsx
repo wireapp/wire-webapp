@@ -18,7 +18,7 @@
  */
 
 import {fireEvent, render, screen, type RenderResult} from '@testing-library/react';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 
 import {MeetingNotificationHost} from './meetingNotificationHost';

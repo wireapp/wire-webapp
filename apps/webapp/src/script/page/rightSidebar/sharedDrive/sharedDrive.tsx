@@ -20,7 +20,6 @@
 import {useMemo, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {UserType} from '@wireapp/api-client/lib/user';
 import {noop} from 'noop-esm';
 
 import {
@@ -37,6 +36,7 @@ import {
   sharedDriveViewerRoleCss,
 } from './sharedDrive.styles';
 
+import {UserType} from '../../../apiClient/user/user';
 import {Avatar, AVATAR_SIZE} from '../../../components/avatar';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,

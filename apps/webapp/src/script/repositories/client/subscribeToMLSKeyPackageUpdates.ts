@@ -19,9 +19,10 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import type {FeatureList} from '@wireapp/api-client/lib/team';
 
 import {getMLSKeyPackageUploadAmount} from './mlsKeyPackagePolicy';
+
+import type {FeatureList} from '../../apiClient/team/feature/featureList.types';
 
 type Dependencies = {
   readonly clock: Clock;

@@ -32,8 +32,8 @@ import {
 } from 'react';
 
 import {isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
-import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
 
+import {RegisteredClient} from '../../apiClient/client/registeredClient';
 import {useApplicationContext} from '../../page/rootProvider';
 import {DeviceIcon} from '../../uiKit/dataDisplay/icon/deviceIcon';
 import {TrashIcon} from '../../uiKit/dataDisplay/icon/trashIcon';

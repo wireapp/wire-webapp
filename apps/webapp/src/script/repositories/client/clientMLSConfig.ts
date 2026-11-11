@@ -19,10 +19,10 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
-import {FeatureList} from '@wireapp/api-client/lib/team';
 
 import {getMLSKeyPackageUploadAmount} from './mlsKeyPackagePolicy';
 
+import {FeatureList} from '../../apiClient/team/feature/featureList.types';
 import {Config} from '../../Config';
 import {getE2EIConfig} from '../../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
 import {getMLSConfig} from '../../page/components/featureConfigChange/featureConfigChangeHandler/features/mls';

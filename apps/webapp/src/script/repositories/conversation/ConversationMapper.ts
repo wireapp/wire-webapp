@@ -18,21 +18,6 @@
  */
 
 import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isNumber, isUndefined} from '@sindresorhus/is';
-import {
-  CONVERSATION_ACCESS_ROLE,
-  Conversation as ConversationBackendData,
-  ConversationCode,
-  CONVERSATION_ACCESS,
-  CONVERSATION_LEGACY_ACCESS_ROLE,
-  CONVERSATION_TYPE,
-  DefaultConversationRoleName,
-  RemoteConversations,
-  GROUP_CONVERSATION_TYPE,
-  ADD_PERMISSION,
-  CONVERSATION_CELLS_STATE,
-} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {isObject} from 'underscore';
 
@@ -43,6 +28,21 @@ import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
+import {
+  CONVERSATION_ACCESS_ROLE,
+  Conversation as ConversationBackendData,
+  CONVERSATION_ACCESS,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
+  CONVERSATION_TYPE,
+  GROUP_CONVERSATION_TYPE,
+  ADD_PERMISSION,
+  CONVERSATION_CELLS_STATE,
+} from '../../apiClient/conversation/conversation';
+import {ConversationCode} from '../../apiClient/conversation/conversationCode';
+import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
+import {RemoteConversations} from '../../apiClient/conversation/remoteConversations';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 import {type Translate} from '../../util/localizerUtil';

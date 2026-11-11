@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team/feature/';
+import {CONVERSATION_PROTOCOL} from '../apiClient/team/feature/featureList.types';
 
 export interface AppsFeatureOptions {
   protocol: CONVERSATION_PROTOCOL;

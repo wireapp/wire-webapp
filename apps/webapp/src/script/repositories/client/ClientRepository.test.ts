@@ -17,8 +17,9 @@
  *
  */
 
-import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ClientClassification} from '../../apiClient/client/clientClassification';
+import {ClientType} from '../../apiClient/client/clientType';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Runtime} from '@wireapp/commons';

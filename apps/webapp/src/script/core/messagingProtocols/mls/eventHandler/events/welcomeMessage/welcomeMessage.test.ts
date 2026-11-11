@@ -18,7 +18,7 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '../../../../../../apiClient/event/conversationEvent';
 
 import {ConversationId} from '@wireapp/core-crypto';
 

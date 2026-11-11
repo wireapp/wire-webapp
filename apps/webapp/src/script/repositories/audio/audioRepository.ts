@@ -18,13 +18,13 @@
  */
 
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import {noop} from 'noop-esm';
 
 import {AudioPlayingType} from './audioPlayingType';
 import {AudioType} from './audioType';
 
+import {AudioPreference, WebappProperties} from '../../apiClient/user/data/userPropertiesSetData';
 import {getLogger, Logger} from '../../util/logger';
 import {WebAppEvents} from '../../webAppEvents';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';

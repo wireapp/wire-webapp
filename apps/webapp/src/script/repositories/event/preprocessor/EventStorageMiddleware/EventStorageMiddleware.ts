@@ -18,13 +18,13 @@
  */
 
 import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 
 import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactionEvent} from './eventHandlers';
 import {EventValidationError} from './eventHandlers/EventValidationError';
 import {HandledEvents, DBOperation} from './types';
 
+import {CONVERSATION_EVENT} from '../../../../apiClient/event/conversationEvent';
 import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../../message/statusType';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';
 import {fixWebsocketString} from '../../../../util/stringUtil';

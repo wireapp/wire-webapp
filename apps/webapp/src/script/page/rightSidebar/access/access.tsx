@@ -20,10 +20,10 @@
 import {useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 
 import {conversationAccessContainerCss, conversationAccessContentCss} from './access.styles';
 
+import {ADD_PERMISSION, CONVERSATION_ACCESS} from '../../../apiClient/conversation/conversation';
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import {ConversationAccess} from '../../../components/Modals/CreateConversation/types';
 import {
