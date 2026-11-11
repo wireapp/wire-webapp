@@ -159,6 +159,9 @@ jobs:
         run: |
           npx just package-server-public
 
+      - name: Build and verify isolated production server bundle
+        run: npx just assemble-server-bundle public verify-server-bundle
+
       - name: Install unzip for artifact verification
         run: |
           apt-get update

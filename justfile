@@ -73,6 +73,7 @@ type-check:
     tsc --project ./apps/webapp/tsconfig.rspack.json
     tsc --project ./apps/server/tsconfig.build.json --noEmit
     tsc --project ./apps/server/tsconfig.type-check.json
+    tsc --project ./apps/server/tsconfig.rspack.json
     tsc --project ./apps/server/bin/tsconfig.json
     tsc --project ./apps/webapp/tsconfig.api-client.json
     tsc --project ./apps/webapp/tsconfig.commons.json
@@ -84,6 +85,23 @@ build-server:
     rimraf apps/server/build/server
     tsc --project apps/server/tsconfig.build.json --outDir apps/server/build/server
     WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/server node apps/server/bin/copy_server_assets.js
+
+# Build the opt-in production server bundle without changing deployment output.
+[group('build')]
+build-server-bundle:
+    tsc --project apps/server/tsconfig.build.json --noEmit
+    rspack build --config apps/server/rspack.config.mts --json=apps/server/build/server-bundle-stats.json
+    WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/bundle node apps/server/bin/copy_server_assets.js --bundle
+
+# Assemble the bundle with an existing webapp build and its shared metadata.
+[group('build')]
+assemble-server-bundle variant="public": build-server-bundle
+    node apps/server/bin/assembleBuild.mts {{variant}} bundle
+
+# Start the assembled bundle outside the repository with no installed packages.
+[group('testing')]
+verify-server-bundle:
+    node tools/serverPackaging/verifyServerBundle.mts
 
 # Build the internal production webapp with Rspack.
 [group('build')]
