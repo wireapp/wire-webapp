@@ -59,7 +59,9 @@ export const CellsBulkMoveToBinConfirmationModal: FunctionComponent<CellsBulkMov
       <CellsModal.Header>{translate('cells.bulkMoveToBin.confirmation.title')}</CellsModal.Header>
       <div css={confirmationContentStyles}>
         <p css={confirmationTextStyles}>
-          {translate('cells.bulkMoveToBin.confirmation.description', {count: selectedRootCount})}
+          {selectedRootCount === 1
+            ? translate('cells.bulkMoveToBin.confirmation.description.single')
+            : translate('cells.bulkMoveToBin.confirmation.description.multiple', {count: selectedRootCount})}
         </p>
       </div>
       <CellsModal.Actions>

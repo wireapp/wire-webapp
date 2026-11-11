@@ -113,8 +113,11 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkMoveToBin.confirmation.title') {
     return 'Move items to bin';
   }
-  if (key === 'cells.bulkMoveToBin.confirmation.description') {
+  if (key === 'cells.bulkMoveToBin.confirmation.description.multiple') {
     return `${substitutions?.count} selected items will move to the recycle bin.`;
+  }
+  if (key === 'cells.bulkMoveToBin.confirmation.description.single') {
+    return '1 selected item will move to the recycle bin.';
   }
   if (key === 'cells.bulkMoveToBin.destination') {
     return 'Bin';
@@ -667,6 +670,7 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     await user.click(screen.getByRole('button', {name: 'Move to bin'}));
     const confirmation = await screen.findByRole('dialog');
+    expect(within(confirmation).getByText('1 selected item will move to the recycle bin.')).toBeInTheDocument();
     const confirmButton = within(confirmation).getByRole('button', {name: 'Move to Bin'});
     await user.click(confirmButton);
 
