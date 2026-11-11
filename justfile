@@ -60,6 +60,7 @@ type-check:
     tsc --project ./tsconfig.release-cli.json
     tsc --project ./apps/webapp/tsconfig.type-check.json
     tsc --project ./apps/webapp/tsconfig.rspack.json
+    tsc --project ./apps/server/tsconfig.build.json --noEmit
     tsc --project ./apps/server/tsconfig.type-check.json
     tsc --project ./apps/server/bin/tsconfig.json
     tsc --project ./apps/webapp/tsconfig.api-client.json
@@ -70,7 +71,7 @@ type-check:
 [group('build')]
 build-server:
     rimraf apps/server/build/server
-    tsc --project apps/server/tsconfig.json --outDir apps/server/build/server
+    tsc --project apps/server/tsconfig.build.json --outDir apps/server/build/server
     WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/server node apps/server/bin/copy_server_assets.js
 
 # Build the internal production webapp with Rspack.
@@ -109,7 +110,7 @@ build-webapp-public:
 prepare-development-server:
     rimraf apps/server/dist apps/server/build/metadata
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    tsc --project apps/server/tsconfig.json --incremental
+    tsc --project apps/server/tsconfig.build.json --incremental
     WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/dist node apps/server/bin/copy_server_assets.js
     cp apps/server/build/metadata/version.json apps/server/dist/version.json
 
@@ -123,7 +124,7 @@ develop: prepare-development-server
 # Recompile server sources while Node watches the compiled output and restarts the server.
 [group('development')]
 watch-server-typescript:
-    tsc --project apps/server/tsconfig.json --incremental --watch --preserveWatchOutput
+    tsc --project apps/server/tsconfig.build.json --incremental --watch --preserveWatchOutput
 
 [group('development')]
 run-development-server:

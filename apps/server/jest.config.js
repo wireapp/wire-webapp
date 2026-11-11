@@ -52,6 +52,6 @@ module.exports = {
   },
   reporters: rootJestConfiguration.reporters,
   testEnvironment: 'node',
-  testPathIgnorePatterns: ['<rootDir>/dist', '<rootDir>/build'],
+  testPathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/build/'],
   transformIgnorePatterns: ['/node_modules/(?!(true-myth|@sindresorhus/is|@enormora/objectory)/)'],
 };

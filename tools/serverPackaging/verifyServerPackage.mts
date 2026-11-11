@@ -19,7 +19,7 @@
 
 import assert from 'node:assert/strict';
 import {execFileSync, spawn} from 'node:child_process';
-import {copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync} from 'node:fs';
+import {copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
@@ -60,6 +60,17 @@ async function verifyServerPackage(): Promise<void> {
     );
     execFileSync('unzip', ['-q', artifactPath, '-d', deploymentDirectory]);
 
+    const testArtifactPaths = readdirSync(deploymentDirectory, {recursive: true, encoding: 'utf8'}).filter(
+      artifactFilePath => {
+        const isTestDirectory = artifactFilePath.split(/[\\/]/).some(pathSegment => {
+          return pathSegment === '__tests__' || pathSegment === '__mocks__';
+        });
+
+        return isTestDirectory || /\.(test|spec)\.(d\.)?[cm]?[jt]sx?(\.map)?$/.test(artifactFilePath);
+      },
+    );
+    assert.deepEqual(testArtifactPaths, [], 'Production server package must not contain test files or their maps');
+
     for (const runtimeFile of [
       'index.js',
       'config.js',
@@ -73,6 +84,9 @@ async function verifyServerPackage(): Promise<void> {
     }
     assert.equal(existsSync(join(deploymentDirectory, 'node_modules')), false);
     assert.equal(existsSync(join(fixtureDirectory, 'node_modules/@rspack/core')), false);
+    for (const testDependency of ['jest', '@types/jest', 'ts-node', '@enormora/objectory']) {
+      assert.equal(existsSync(join(fixtureDirectory, 'node_modules', testDependency)), false, testDependency);
+    }
 
     const expectedBuildMetadata: unknown = JSON.parse(readFileSync(join(deploymentDirectory, 'version.json'), 'utf8'));
     assert(isBuildMetadata(expectedBuildMetadata));
