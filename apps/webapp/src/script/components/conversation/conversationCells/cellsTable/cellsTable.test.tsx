@@ -3965,7 +3965,9 @@ describe('CellsTable restoring selected Bin items', () => {
     await user.click(screen.getByRole('button', {name: 'Restore'}));
     const confirmation = await screen.findByRole('dialog');
     expect(
-      within(confirmation).getByText('The 2 items will be restored and available again to everyone in this conversation.'),
+      within(confirmation).getByText(
+        'The 2 items will be restored and available again to everyone in this conversation.',
+      ),
     ).toBeInTheDocument();
     await user.click(within(confirmation).getByRole('button', {name: 'Restore selected items'}));
 
