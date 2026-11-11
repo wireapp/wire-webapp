@@ -37,6 +37,7 @@ import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemote
 import {AssetRepository} from '../../../../../../repositories/assets/assetRepository';
 import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
 import {requireValueForTest} from '../../../../../../page/testSupport/rootContextTestSupport';
+import type {MainViewModel} from '../../../../../../view_model/MainViewModel';
 
 describe('FileAssetComponent', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -126,7 +127,16 @@ describe('FileAssetComponent', () => {
 
   it('removes the PDF preview and revokes its URL when the message expires', async () => {
     const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])]);
-    const load = jest.spyOn(container.resolve(AssetRepository), 'load').mockResolvedValue(png);
+    const repository = container.resolve(AssetRepository);
+    const load = jest.spyOn(repository, 'load').mockResolvedValue(png);
+    const previewWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview')
+          .isFeatureToggleEnabled,
+        mainViewModel: {content: {repositories: {asset: repository}}} as MainViewModel,
+      }),
+    );
     URL.revokeObjectURL = jest.fn();
     jest.spyOn(URL, 'createObjectURL').mockReturnValue('blob:expiry-preview');
     const message = mockContentMessage('report.pdf');
@@ -142,7 +152,7 @@ describe('FileAssetComponent', () => {
         sha256: new Uint8Array(32),
       }),
     );
-    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: previewWrapper});
     const [callback] = requireValueForTest((IntersectionObserver as jest.Mock).mock.calls.at(-1));
     act(() => {
       return callback([{isIntersecting: true} as IntersectionObserverEntry], {} as IntersectionObserver);

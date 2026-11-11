@@ -17,7 +17,7 @@
  *
  */
 
-import type {FunctionComponent} from 'react';
+import {useCallback, type FunctionComponent} from 'react';
 
 import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -28,6 +28,7 @@ import {RestrictedFile} from './restrictedFile/restrictedFile';
 
 import {e2ePdfPreviewFeatureToggleName} from '../../../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../../../page/rootProvider';
+import type {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
 import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
 import type {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import type {FileAsset as FileAssetType} from '../../../../../../repositories/entity/message/fileAsset';
@@ -56,7 +57,13 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   isFocusable = true,
 }: FileAssetProps) => {
   const asset = message.getFirstAsset() as FileAssetType;
-  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled, mainViewModel} = useApplicationContext();
+  const loadPdfPreview = useCallback(
+    (resource: AssetRemoteData) => {
+      return mainViewModel.content.repositories.asset.load(resource);
+    },
+    [mainViewModel],
+  );
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
@@ -197,6 +204,7 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
         <PdfAssetPreview
           key={previewResource.identifier}
           resource={previewResource}
+          loadAsset={loadPdfPreview}
           label={`${translate('conversationContextMenuDownload')} ${assetFileName}`}
           tabIndex={messageFocusedTabIndex}
           onDownload={onDownloadAsset}

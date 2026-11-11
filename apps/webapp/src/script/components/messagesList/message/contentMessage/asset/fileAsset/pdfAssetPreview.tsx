@@ -19,20 +19,17 @@
 
 import {useEffect, useState, type ReactElement} from 'react';
 
-import {container} from 'tsyringe';
-
 import {useInView} from '../../../../../../hooks/useInView/useInView';
-import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
-import {AssetRepository} from '../../../../../../repositories/assets/assetRepository';
-import {loadFileBuffer} from '../../../../../../util/util';
-import {FileCard} from '../../../../../fileCard/fileCard';
+import type {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
+import {readPreviewBlob} from '../../../../../../repositories/assets/readPreviewBlob';
+import {FileCardPreview} from '../../../../../fileCard/fileCardPreview/fileCardPreview';
 
 interface PdfAssetPreviewProps {
   resource: AssetRemoteData;
   label: string;
   tabIndex: number;
   onDownload: () => Promise<void> | void;
-  loadAsset?: (resource: AssetRemoteData) => Promise<Blob | undefined>;
+  loadAsset: (resource: AssetRemoteData) => Promise<Blob | undefined>;
 }
 
 const keyLength = 32;
@@ -40,16 +37,12 @@ const maxPreviewSize = 1_048_576;
 const pngSignature = '\x89PNG\r\n\x1a\n';
 const jpegSignature = '\xff\xd8\xff';
 
-const loadPreview = (resource: AssetRemoteData): Promise<Blob | undefined> => {
-  return container.resolve(AssetRepository).load(resource);
-};
-
 export const PdfAssetPreview = ({
   resource,
   label,
   tabIndex,
   onDownload,
-  loadAsset = loadPreview,
+  loadAsset,
 }: PdfAssetPreviewProps): ReactElement => {
   const {elementRef, hasBeenInView} = useInView<HTMLDivElement>();
   const [preview, setPreview] = useState<{resource: AssetRemoteData; url: string}>();
@@ -69,7 +62,7 @@ export const PdfAssetPreview = ({
           return;
         }
         // Asset transport MIME describes ciphertext. Accept raster bytes only, never SVG/HTML.
-        const bytes = new Uint8Array(await loadFileBuffer(blob.slice(0, pngSignature.length)));
+        const bytes = new Uint8Array(await readPreviewBlob(blob.slice(0, pngSignature.length)));
         const matchesSignature = (signature: string): boolean => {
           return Array.from(signature).every((character, index) => {
             return bytes[index] === character.charCodeAt(0);
@@ -102,7 +95,7 @@ export const PdfAssetPreview = ({
     <div ref={elementRef} css={{width: '100%'}}>
       {url !== undefined && url !== failedUrl && (
         <div css={{marginTop: '12px'}}>
-          <FileCard.Preview
+          <FileCardPreview
             src={url}
             aria-label={label}
             tabIndex={tabIndex}
