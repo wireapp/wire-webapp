@@ -96,7 +96,7 @@ build-server-bundle:
 # Assemble the bundle with an existing webapp build and its shared metadata.
 [group('build')]
 assemble-server-bundle variant="public": build-server-bundle
-    node apps/server/bin/assembleBuild.mts {{variant}} bundle
+    node apps/server/bin/assembleBuild.mts {{variant}} artifact
 
 # Start the assembled bundle outside the repository with no installed packages.
 [group('testing')]

@@ -26,7 +26,7 @@ import {fileURLToPath} from 'node:url';
 const FIRST_USER_ARGUMENT_INDEX = 2;
 
 type BuildVariant = 'development' | 'internal' | 'public';
-type AssemblyScope = 'artifact' | 'webapp' | 'bundle';
+type AssemblyScope = 'artifact' | 'webapp';
 
 const workspaceRootPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const buildMetadataFilePath = path.resolve(workspaceRootPath, 'apps/server/build/metadata/version.json');
@@ -36,7 +36,7 @@ function isBuildVariant(value: unknown): value is BuildVariant {
 }
 
 function isAssemblyScope(value: unknown): value is AssemblyScope {
-  return value === 'artifact' || value === 'webapp' || value === 'bundle';
+  return value === 'artifact' || value === 'webapp';
 }
 
 function resolveWebappBuildOutputPath(buildVariant: BuildVariant): string {
@@ -94,7 +94,7 @@ function run(): void {
   const [buildVariant, assemblyScope] = process.argv.slice(FIRST_USER_ARGUMENT_INDEX);
 
   if (!isBuildVariant(buildVariant) || !isAssemblyScope(assemblyScope)) {
-    console.error('Usage: assembleBuild.mts <development|internal|public> <artifact|webapp|bundle>');
+    console.error('Usage: assembleBuild.mts <development|internal|public> <artifact|webapp>');
     process.exitCode = 1;
     return;
   }

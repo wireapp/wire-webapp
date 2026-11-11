@@ -23,6 +23,30 @@ import {tmpdir} from 'node:os';
 import {dirname, join} from 'node:path';
 
 describe('production server artifact', () => {
+  it('assembles browser-only output without requiring a server build', () => {
+    const fixtureDirectory = mkdtempSync(join(tmpdir(), 'browser-only-assembly-'));
+
+    try {
+      const serverDirectory = join(fixtureDirectory, 'apps/server');
+      mkdirSync(join(serverDirectory, 'bin'), {recursive: true});
+      mkdirSync(join(serverDirectory, 'build/metadata'), {recursive: true});
+      mkdirSync(join(fixtureDirectory, 'apps/webapp/dist/development'), {recursive: true});
+      cpSync('apps/server/bin/assembleBuild.mts', join(serverDirectory, 'bin/assembleBuild.mts'));
+      writeFileSync(join(serverDirectory, 'build/metadata/version.json'), '{"version":"browser-build"}');
+      writeFileSync(join(fixtureDirectory, 'apps/webapp/dist/development/index.html'), 'development browser');
+
+      execFileSync(process.execPath, ['apps/server/bin/assembleBuild.mts', 'development', 'webapp'], {
+        cwd: fixtureDirectory,
+      });
+
+      expect(readFileSync(join(serverDirectory, 'dist/static/index.html'), 'utf8')).toBe('development browser');
+      expect(readFileSync(join(serverDirectory, 'dist/version.json'), 'utf8')).toBe('{"version":"browser-build"}');
+      expect(existsSync(join(serverDirectory, 'dist/index.js'))).toBe(false);
+    } finally {
+      rmSync(fixtureDirectory, {recursive: true, force: true});
+    }
+  });
+
   it.each(['internal', 'public'])('packages the %s browser build with its server bundle', buildVariant => {
     const fixtureDirectory = mkdtempSync(join(tmpdir(), 'production-artifact-'));
 
