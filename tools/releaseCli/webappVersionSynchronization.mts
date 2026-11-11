@@ -84,7 +84,7 @@ function createRuntimeGitHubClient(options: RuntimeGitHubClientOptions): WebAppV
 function createCommand(createCommandOptions: CreateWebAppVersionSynchronizationCommandOptions): Command {
   const command = new Command()
     .name('webappVersionSynchronization')
-    .description('Synchronize WebApp package versions to a stable Production tag.')
+    .description('Synchronize the root WebApp package and lockfile versions to a stable Production tag.')
     .configureOutput({
       writeOut: createCommandOptions.writeOutput,
       writeErr: createCommandOptions.writeError,

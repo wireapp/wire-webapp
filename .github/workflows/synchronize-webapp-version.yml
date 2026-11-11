@@ -35,7 +35,7 @@ jobs:
           set -euo pipefail
 
           if [[ "${CONFIRM_SYNCHRONIZATION}" != 'true' ]]; then
-            echo 'confirm must be true to synchronize WebApp package versions.' >&2
+            echo 'confirm must be true to synchronize the root WebApp package and lockfile versions.' >&2
             exit 1
           fi
 
@@ -79,7 +79,7 @@ jobs:
 
           echo "production_tag_name=${PRODUCTION_TAG_NAME}" >> "$GITHUB_OUTPUT"
 
-      - name: Synchronize package versions
+      - name: Synchronize root package and lockfile versions
         env:
           OTTO_THE_BOT_GH_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
           PRODUCTION_TAG_NAME: ${{ steps.production_tag.outputs.production_tag_name }}

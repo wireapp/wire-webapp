@@ -35,6 +35,6 @@ module.exports = {
     '^.+\\.mts$': ['@swc/jest', {jsc: {parser: {syntax: 'typescript'}}}],
     '^.+\\.(js|jsx|ts|tsx|cts)$': '@swc/jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|ky|p-map|@enormora/objectory|@sindresorhus/is)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth|ky-release|p-map|@enormora/objectory|@sindresorhus/is)/)'],
   reporters: rootJestConfiguration.reporters,
 };

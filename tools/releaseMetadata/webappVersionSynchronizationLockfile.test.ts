@@ -24,8 +24,7 @@ function createLockfileDocument(version: string): Readonly<Record<string, unknow
     lockfileVersion: 3,
     requires: true,
     packages: {
-      '': {name: 'example-webapp', version, workspaces: ['apps/*']},
-      'apps/webapp': {name: '@example/webapp', version, dependencies: {example: '2.0.0'}},
+      '': {name: 'example-webapp', version, workspaces: ['apps/server'], dependencies: {example: '2.0.0'}},
       'apps/server': {version: '4.0.0'},
       'node_modules/example': {
         version: '2.0.0',
@@ -37,7 +36,7 @@ function createLockfileDocument(version: string): Readonly<Record<string, unknow
 }
 
 describe('WebApp version synchronization lockfile', () => {
-  it('updates all three version fields while preserving dependency metadata and the original document', () => {
+  it('updates both root version fields while preserving dependency metadata and the original document', () => {
     const lockfileDocument = createLockfileDocument('1.0.0');
     const originalLockfileDocument = structuredClone(lockfileDocument);
     const actualResult = updateWebAppVersionSynchronizationLockfile({
@@ -58,10 +57,8 @@ describe('WebApp version synchronization lockfile', () => {
     {version: '1.0.0', lockfileVersion: 3},
     {...createLockfileDocument('1.0.0'), lockfileVersion: 2},
     {...createLockfileDocument('1.0.0'), version: '0.9.0'},
-    {...createLockfileDocument('1.0.0'), packages: {'': {version: '1.0.0'}}},
-    {...createLockfileDocument('1.0.0'), packages: {'': {version: '0.9.0'}, 'apps/webapp': {version: '1.0.0'}}},
-    {...createLockfileDocument('1.0.0'), packages: {'': {version: '1.0.0'}, 'apps/webapp': {version: '0.9.0'}}},
-    {...createLockfileDocument('1.0.0'), packages: {'': {version: '1.0.0'}, 'apps/webapp': {}}},
+    {...createLockfileDocument('1.0.0'), packages: {}},
+    {...createLockfileDocument('1.0.0'), packages: {'': {version: '0.9.0'}}},
   ])('rejects a malformed or inconsistent lockfile: %j', lockfileDocument => {
     const actualResult = updateWebAppVersionSynchronizationLockfile({
       lockfileDocument,
@@ -92,6 +89,23 @@ describe('WebApp version synchronization lockfile', () => {
     });
 
     assert(actualResult.isOk);
+  });
+
+  it('rejects a server workspace version change', () => {
+    const updatedLockfileDocument = createLockfileDocument('1.2.0');
+    const lockedPackages = updatedLockfileDocument.packages;
+    assert(isPlainObject(lockedPackages));
+    const actualResult = validateWebAppVersionSynchronizationLockfileChange({
+      baseLockfileDocument: createLockfileDocument('1.0.0'),
+      updatedLockfileDocument: {
+        ...updatedLockfileDocument,
+        packages: {...lockedPackages, 'apps/server': {version: '5.0.0'}},
+      },
+      currentVersion: '1.0.0',
+      targetVersion: '1.2.0',
+    });
+
+    assert(actualResult.isErr);
   });
 
   it('rejects a dependency integrity change even when every WebApp version is correct', () => {

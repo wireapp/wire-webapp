@@ -124,7 +124,7 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       type: 'persistent',
       buildDependencies: [
         configFilePath,
-        path.resolve(configDirectoryPath, 'package.json'),
+        path.resolve(rootPath, 'package.json'),
         path.resolve(rootPath, '.browserslistrc'),
         buildMetadataPath,
       ],

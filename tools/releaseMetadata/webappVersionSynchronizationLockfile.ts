@@ -54,16 +54,11 @@ export function updateWebAppVersionSynchronizationLockfile(
   }
 
   const lockedRootPackage = lockedPackages[''];
-  const lockedWebAppPackage = lockedPackages['apps/webapp'];
-  if (isPlainObject(lockedRootPackage) === false || isPlainObject(lockedWebAppPackage) === false) {
-    return Result.err(new Error('Invalid package-lock.json: missing root or WebApp workspace object'));
+  if (isPlainObject(lockedRootPackage) === false) {
+    return Result.err(new Error('Invalid package-lock.json: missing root package object'));
   }
 
-  if (
-    lockfileDocument.version !== currentVersion ||
-    lockedRootPackage.version !== currentVersion ||
-    lockedWebAppPackage.version !== currentVersion
-  ) {
+  if (lockfileDocument.version !== currentVersion || lockedRootPackage.version !== currentVersion) {
     return Result.err(new Error(`package-lock.json versions do not match package version ${currentVersion}`));
   }
 
@@ -78,7 +73,6 @@ export function updateWebAppVersionSynchronizationLockfile(
     packages: {
       ...lockedPackages,
       '': {...lockedRootPackage, version: targetVersionResult.value},
-      'apps/webapp': {...lockedWebAppPackage, version: targetVersionResult.value},
     },
   });
 }
