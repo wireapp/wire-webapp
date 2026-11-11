@@ -41,6 +41,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators, type ThunkAction} from '../module/reducer';
 import {QUERY_KEY} from '../route';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
+import {getOAuthQueryString} from '../util/oauthUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -50,7 +51,7 @@ const ClientManagerComponent: FunctionComponent<Props & ConnectedProps & Dispatc
 }: Props & ConnectedProps & DispatchProps) => {
   const {translate} = useApplicationContext();
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, getOAuthQueryString(window.location));
   const isMobile = useMatchMedia(QUERY.mobile);
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 

@@ -38,6 +38,7 @@ import {getEntropy} from '../module/selector/authSelector';
 import * as ClientSelector from '../module/selector/clientSelector';
 import * as SelfSelector from '../module/selector/selfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
+import {getOAuthQueryString, withOAuthQuery} from '../util/oauthUtil';
 
 const logger = getLogger('ClientList');
 
@@ -57,7 +58,7 @@ const ClientListComponent: FunctionComponent<Props & ConnectedProps & DispatchPr
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
   const [showLoading, setShowLoading] = useState(false);
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, getOAuthQueryString(window.location));
   const [currentlySelectedClient, setCurrentlySelectedClient] = useState<string | null>(null);
   const [sortedClients, setSortedClients] = useState(permanentClients);
 
@@ -90,7 +91,7 @@ const ClientListComponent: FunctionComponent<Props & ConnectedProps & DispatchPr
       removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
 
       if (isOauth) {
-        return navigate(ROUTE.AUTHORIZE);
+        return navigate(withOAuthQuery(ROUTE.AUTHORIZE));
       }
 
       return navigate(ROUTE.HISTORY_INFO);

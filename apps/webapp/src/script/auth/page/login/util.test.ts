@@ -75,7 +75,10 @@ describe('Login util', () => {
   });
 
   describe('handleSSOBackendError', () => {
-    it('resets auth error and navigates to clients route for too many clients', () => {
+    it.each([false, true])('preserves the request at the device limit (OAuth: %s)', isOAuth => {
+      const originalUrl = window.location.href;
+      const query = '?client_id=test-client&scope=read%3Aself&state=encoded%2Bstate&code_challenge=challenge';
+      window.history.replaceState({}, '', `#/sso${isOAuth ? query : ''}`);
       const navigate = jest.fn();
       const resetAuthError = jest.fn();
       const setSsoError = jest.fn();
@@ -85,7 +88,8 @@ describe('Login util', () => {
       handleSSOBackendError(error, {navigate, resetAuthError, setSsoError});
 
       expect(resetAuthError).toHaveBeenCalledTimes(1);
-      expect(navigate).toHaveBeenCalledWith(ROUTE.CLIENTS);
+      window.history.replaceState({}, '', originalUrl);
+      expect(navigate).toHaveBeenCalledWith(`${ROUTE.CLIENTS}${isOAuth ? query : ''}`);
       expect(setSsoError).not.toHaveBeenCalled();
     });
 
@@ -139,6 +143,10 @@ describe('Login util', () => {
   });
 
   describe('handleEnterpriseLogin', () => {
+    const originalUrl = window.location.href;
+    afterEach(() => {
+      window.history.replaceState({}, '', originalUrl);
+    });
     const email = 'someone@example.com';
     const password = 'secret-password';
 
@@ -180,6 +188,21 @@ describe('Login util', () => {
       });
       expect(dispatchSpy).toHaveBeenCalledTimes(1);
       expect(navigate).toHaveBeenCalledWith(ROUTE.LOGIN);
+      expect(loginWithSSO).not.toHaveBeenCalled();
+    });
+
+    it('preserves OAuth when email discovery selects password login', async () => {
+      const query =
+        '?client_id=client&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&scope=read%3Aself&state=a%2Bb%26c&response_type=code&code_challenge=challenge&code_challenge_method=S256';
+      window.history.replaceState({}, '', `#/sso${query}`);
+      jest.spyOn(apiClient.api.account, 'getSSOCodeByEmail').mockResolvedValue({sso_code: null});
+      jest
+        .spyOn(apiClient.api.account, 'getDomainRegistration')
+        .mockResolvedValue({domain_redirect: DomainRedirect.NONE});
+
+      await handleEnterpriseLogin({email, password, loginWithSSO, dispatch, navigate, apiClient});
+
+      expect(navigate).toHaveBeenCalledWith(`${ROUTE.PASSWORD_LOGIN}${query}`);
       expect(loginWithSSO).not.toHaveBeenCalled();
     });
 
