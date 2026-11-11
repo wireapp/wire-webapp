@@ -43,7 +43,7 @@ fi
   validate-manifest "${validation_options[@]}"
 
 bash "${script_directory}/../serverPackaging/validateDistributionRuntime.sh" \
-  "${DISTRIBUTION_CONTEXT_PATH}" "${production_tag_commit_sha}"
+  "${DISTRIBUTION_CONTEXT_PATH}" "${production_tag_commit_sha}" package-lock.json .npmrc
 
 cloud_artifact_checksum="$(jq --raw-output '.cloudArtifactChecksum' "${manifest_path}")"
 actual_cloud_artifact_checksum="$(sha256sum "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist/s3/ebs.zip" | awk '{print $1}')"

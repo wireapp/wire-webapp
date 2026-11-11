@@ -28,13 +28,15 @@ const historicalBuildRecipes =
 const commonRuntimePaths = ['apps/server/Dockerfile', 'run.sh', '.env.defaults', 'apps/server/dist/index.js'];
 const bundleRuntimePaths = ['apps/server/dist/index.js.map', 'apps/server/dist/dbs/GeoLite2-Country.mmdb'];
 const historicalManifestPaths = ['package.json', 'apps/server/package.json'];
+const historicalProductionOnlyPaths = ['package-lock.json', '.npmrc'];
 
 type DistributionFixtureOptions = {
   readonly validatorPath: string;
   readonly sourceBuildRecipes: string | undefined;
-  readonly missingPath?: string;
+  readonly missingPaths?: readonly string[];
   readonly emptyPath?: string;
   readonly sourceIsUnavailable?: boolean;
+  readonly sourceRecipesAreUnreadable?: boolean;
 };
 
 function validateDistributionFixture(options: DistributionFixtureOptions): ReturnType<typeof spawnSync> {
@@ -43,8 +45,13 @@ function validateDistributionFixture(options: DistributionFixtureOptions): Retur
   try {
     const contextDirectory = join(fixtureDirectory, 'context');
     // Include legacy manifests even in bundled fixtures: they must not permit a downgrade.
-    for (const runtimePath of [...commonRuntimePaths, ...bundleRuntimePaths, ...historicalManifestPaths]) {
-      if (runtimePath !== options.missingPath) {
+    for (const runtimePath of [
+      ...commonRuntimePaths,
+      ...bundleRuntimePaths,
+      ...historicalManifestPaths,
+      ...historicalProductionOnlyPaths,
+    ]) {
+      if (options.missingPaths?.includes(runtimePath) !== true) {
         const destinationPath = join(contextDirectory, runtimePath);
         mkdirSync(dirname(destinationPath), {recursive: true});
         writeFileSync(destinationPath, runtimePath === options.emptyPath ? '' : 'runtime fixture');
@@ -61,7 +68,12 @@ if [[ "\${FIXTURE_SOURCE_IS_UNAVAILABLE}" == true ]]; then exit 1; fi
 case "$*" in
   'cat-file -e immutable-source^{commit}') exit 0 ;;
   'cat-file -e immutable-source:justfile') [[ "\${FIXTURE_HAS_JUSTFILE}" == true ]] ;;
-  'show immutable-source:justfile') printf '%s' "\${FIXTURE_BUILD_RECIPES}" ;;
+  'show immutable-source:justfile')
+    if [[ "\${FIXTURE_SOURCE_RECIPES_ARE_UNREADABLE}" == true ]]; then
+      echo 'Cannot read immutable source build recipes' >&2
+      exit 1
+    fi
+    printf '%s' "\${FIXTURE_BUILD_RECIPES}" ;;
   *) echo "Unexpected Git request: $*" >&2; exit 1 ;;
 esac
 `,
@@ -90,6 +102,7 @@ esac
         FIXTURE_HAS_JUSTFILE: String(options.sourceBuildRecipes !== undefined),
         FIXTURE_BUILD_RECIPES: options.sourceBuildRecipes ?? '',
         FIXTURE_SOURCE_IS_UNAVAILABLE: String(options.sourceIsUnavailable === true),
+        FIXTURE_SOURCE_RECIPES_ARE_UNREADABLE: String(options.sourceRecipesAreUnreadable === true),
       },
     });
   } finally {
@@ -101,22 +114,20 @@ describe.each([
   'tools/productionDistribution/validateProductionDistribution.sh',
   'tools/maintenanceRelease/validateMaintenanceDistribution.sh',
 ])('distribution runtime validation through %s', validatorPath => {
-  it('accepts a complete bundled runtime without npm manifests', () => {
-    for (const missingPath of historicalManifestPaths) {
-      const verification = validateDistributionFixture({
-        validatorPath,
-        sourceBuildRecipes: bundledBuildRecipes,
-        missingPath,
-      });
-      expect(verification.status).toBe(0);
-    }
+  it('accepts a complete bundled runtime without npm manifests, lockfiles, or configuration', () => {
+    const verification = validateDistributionFixture({
+      validatorPath,
+      sourceBuildRecipes: bundledBuildRecipes,
+      missingPaths: [...historicalManifestPaths, ...historicalProductionOnlyPaths],
+    });
+    expect(verification.status).toBe(0);
   });
 
   it.each([...commonRuntimePaths, ...bundleRuntimePaths])('rejects a bundled runtime missing %s', missingPath => {
     const verification = validateDistributionFixture({
       validatorPath,
       sourceBuildRecipes: bundledBuildRecipes,
-      missingPath,
+      missingPaths: [missingPath],
     });
     expect(verification.status).toBe(1);
     expect(verification.stderr).toContain(missingPath);
@@ -136,10 +147,15 @@ describe.each([
   it.each([historicalBuildRecipes, undefined])(
     'accepts historical compiled runtimes without bundled assets: %s',
     sourceBuildRecipes => {
-      for (const missingPath of bundleRuntimePaths) {
-        const verification = validateDistributionFixture({validatorPath, sourceBuildRecipes, missingPath});
-        expect(verification.status).toBe(0);
-      }
+      const verification = validateDistributionFixture({
+        validatorPath,
+        sourceBuildRecipes,
+        missingPaths:
+          validatorPath === 'tools/productionDistribution/validateProductionDistribution.sh'
+            ? bundleRuntimePaths
+            : [...bundleRuntimePaths, ...historicalProductionOnlyPaths],
+      });
+      expect(verification.status).toBe(0);
     },
   );
 
@@ -149,12 +165,48 @@ describe.each([
       const verification = validateDistributionFixture({
         validatorPath,
         sourceBuildRecipes: historicalBuildRecipes,
-        missingPath,
+        missingPaths: [missingPath],
       });
       expect(verification.status).toBe(1);
       expect(verification.stderr).toContain(missingPath);
     },
   );
+
+  it.each(historicalProductionOnlyPaths)(
+    'preserves the deployment-specific historical requirement for %s',
+    missingPath => {
+      const verification = validateDistributionFixture({
+        validatorPath,
+        sourceBuildRecipes: historicalBuildRecipes,
+        missingPaths: [missingPath],
+      });
+      const isProductionDistribution =
+        validatorPath === 'tools/productionDistribution/validateProductionDistribution.sh';
+      expect(verification.status).toBe(isProductionDistribution === true ? 1 : 0);
+      if (isProductionDistribution === true) {
+        expect(verification.stderr).toContain(missingPath);
+      }
+    },
+  );
+
+  it('fails closed when the source build recipes cannot be read', () => {
+    const verification = validateDistributionFixture({
+      validatorPath,
+      sourceBuildRecipes: bundledBuildRecipes,
+      sourceRecipesAreUnreadable: true,
+    });
+    expect(verification.status).toBe(1);
+    expect(verification.stderr).toContain('Cannot read immutable source build recipes');
+  });
+
+  it('preserves historical acceptance of an empty npm configuration file', () => {
+    const verification = validateDistributionFixture({
+      validatorPath,
+      sourceBuildRecipes: historicalBuildRecipes,
+      emptyPath: '.npmrc',
+    });
+    expect(verification.status).toBe(0);
+  });
 
   it('fails closed when the validated source revision cannot be inspected', () => {
     const verification = validateDistributionFixture({

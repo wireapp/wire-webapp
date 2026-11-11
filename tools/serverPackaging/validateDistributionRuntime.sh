@@ -29,6 +29,13 @@ if grep -Eq '^package-server-public:.*[[:space:]]build-server-bundle([[:space:]]
 else
   # Historical Dockerfiles install dependencies from their source-era manifests.
   required_runtime_paths+=(package.json apps/server/package.json)
+  # Additional source-era context files need to exist; an empty .npmrc is valid.
+  for historical_context_path in "${@:3}"; do
+    if [[ ! -f "${context_directory}/${historical_context_path}" ]]; then
+      echo "Required historical distribution context file is missing: ${context_directory}/${historical_context_path} (source ${source_commit_sha})" >&2
+      exit 1
+    fi
+  done
 fi
 
 for runtime_path in "${required_runtime_paths[@]}"; do
