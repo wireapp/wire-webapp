@@ -4,6 +4,8 @@ apps/webapp/src/i18n/
 /docs/auth-coverage
 /docs/coverage
 /package-lock.json
+# Keep Dependency Cruiser's generated baseline in its native format.
+/.dependency-cruiser-known-violations.json
 /resource
 /assets
 apps/webapp/assets/
