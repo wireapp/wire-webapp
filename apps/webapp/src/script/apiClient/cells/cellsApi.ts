@@ -876,7 +876,7 @@ export class CellsAPI {
     const result = await this.client.createSelection(
       {
         Nodes: paths.map(Path => {
-          return {Path};
+          return {Path: Path.normalize('NFC')};
         }) as RestSelection['Nodes'],
       },
       {
@@ -910,7 +910,7 @@ export class CellsAPI {
     }
 
     const selectionUuid = await this.createSelection({paths, abortController});
-    const archivePath = `${archiveParentPath.replace(/\/+$/, '')}/${selectionUuid}-selection.zip`;
+    const archivePath = `${archiveParentPath.normalize('NFC').replace(/\/+$/, '')}/${selectionUuid}-selection.zip`;
     const {body, contentType} = await this.storageService.getObject({path: archivePath, abortController});
     const normalizedContentType = contentType?.split(';', 1)[0]?.trim().toLowerCase();
     const supportedContentTypes = new Set([
@@ -919,15 +919,17 @@ export class CellsAPI {
       'application/octet-stream',
     ]);
 
-    if (
-      normalizedContentType !== undefined &&
-      normalizedContentType.length > 0 &&
-      !supportedContentTypes.has(normalizedContentType)
-    ) {
+    const hasContentType = normalizedContentType !== undefined && normalizedContentType.length > 0;
+
+    if (!hasContentType || !supportedContentTypes.has(normalizedContentType)) {
       await body.cancel().catch(() => {
         return undefined;
       });
-      throw new Error(`Cells returned an unexpected archive content type: ${normalizedContentType}`);
+      throw new Error(
+        hasContentType
+          ? `Cells returned an unexpected archive content type: ${normalizedContentType}`
+          : 'Cells returned an archive without a ZIP content type',
+      );
     }
 
     return body;

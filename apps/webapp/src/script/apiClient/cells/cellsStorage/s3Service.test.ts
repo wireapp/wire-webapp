@@ -18,14 +18,18 @@
  */
 
 import {GetObjectCommand, S3Client, S3ServiceException} from '@aws-sdk/client-s3';
-import {FetchHttpHandler} from '@smithy/fetch-http-handler';
 import {Upload} from '@aws-sdk/lib-storage';
 import {XhrHttpHandler} from '@aws-sdk/xhr-http-handler';
+import {FetchHttpHandler} from '@smithy/fetch-http-handler';
+import {NodeServiceApi} from 'cells-sdk-ts';
 
 import {CellsStorageError} from './cellsStorage';
 import {createAbortableXhrHttpHandler, MAX_QUEUE_SIZE, PART_SIZE, S3Service} from './s3Service';
 
 import {AccessTokenStore} from '../../auth/accessTokenStore';
+import {HttpClient} from '../../http';
+import {cellsConfigMock} from '../../mocks/cells';
+import {CellsAPI} from '../cellsApi';
 
 jest.mock('@aws-sdk/client-s3', () => {
   const actualS3Module = jest.requireActual('@aws-sdk/client-s3');
@@ -201,6 +205,47 @@ describe('S3Service', () => {
         accessKeyId: 'normal-user-token',
         secretAccessKey: 'gatewaysecret',
       });
+    });
+
+    it('signs the archive GET with the token refreshed during selection creation', async () => {
+      const accessTokenStore = {getAccessToken: jest.fn().mockReturnValue('initial-token')};
+      const storageService = new S3Service({
+        config: {...testConfig, apiKey: undefined},
+        accessTokenStore: accessTokenStore as unknown as AccessTokenStore,
+      });
+      const api = new CellsAPI({
+        accessTokenStore: accessTokenStore as unknown as AccessTokenStore,
+        httpClientConfig: {
+          urls: {rest: 'https://cells.example.test', name: 'cells', ws: 'wss://cells.example.test'},
+        },
+      });
+      const createSelection = jest.spyOn(NodeServiceApi.prototype, 'createSelection').mockImplementation(async () => {
+        accessTokenStore.getAccessToken.mockReturnValue('refreshed-token');
+        return {data: {Uuid: 'selection-id'}} as never;
+      });
+      api.initialize({cellsConfig: cellsConfigMock, httpClient: {client: {}} as HttpClient, storageService});
+      mockSend.mockResolvedValueOnce({
+        Body: {
+          transformToWebStream: () => {
+            return new ReadableStream<Uint8Array>();
+          },
+        },
+        ContentType: 'application/zip',
+      });
+
+      try {
+        await api.downloadSelectionArchive({paths: ['workspace/file.txt'], archiveParentPath: 'workspace'});
+
+        expect(createSelection).toHaveBeenCalledTimes(1);
+        expect(mockSend).toHaveBeenCalledTimes(1);
+        const [clientConfig] = (S3Client as jest.Mock).mock.calls.at(-1) as [Record<string, unknown>];
+        await expect((clientConfig.credentials as () => Promise<unknown>)()).resolves.toEqual({
+          accessKeyId: 'refreshed-token',
+          secretAccessKey: 'gatewaysecret',
+        });
+      } finally {
+        createSelection.mockRestore();
+      }
     });
 
     it('fails if Cells returned no response body', async () => {

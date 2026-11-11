@@ -1051,6 +1051,49 @@ describe('CellsAPI', () => {
       expect(mockStorage.getObject).toHaveBeenCalledWith({path: `${archiveParentPath}/selection-id-selection.zip`});
     });
 
+    it('normalizes selected paths and the archive parent to NFC without changing the input', async () => {
+      const selectedPaths = ['workspace/cafe\u0301/document.txt'];
+      mockNodeServiceApi.createSelection.mockResolvedValueOnce(createMockResponse({Uuid: 'selection-id', Nodes: []}));
+
+      await cellsAPI.downloadSelectionArchive({paths: selectedPaths, archiveParentPath: 'workspace/cafe\u0301///'});
+
+      expect(mockNodeServiceApi.createSelection).toHaveBeenCalledWith(
+        {Nodes: [{Path: 'workspace/caf\u00e9/document.txt'}]},
+        {'axios-retry': {retries: 0}},
+      );
+      expect(mockStorage.getObject).toHaveBeenCalledWith({path: 'workspace/caf\u00e9/selection-id-selection.zip'});
+      expect(selectedPaths).toEqual(['workspace/cafe\u0301/document.txt']);
+    });
+
+    it.each([undefined, '', '   '])(
+      'rejects and cancels an archive with missing content type %p',
+      async contentType => {
+        const cancel = jest.fn();
+        mockNodeServiceApi.createSelection.mockResolvedValueOnce(createMockResponse({Uuid: 'selection-id', Nodes: []}));
+        mockStorage.getObject.mockResolvedValueOnce({body: new ReadableStream<Uint8Array>({cancel}), contentType});
+
+        await expect(cellsAPI.downloadSelectionArchive({paths, archiveParentPath})).rejects.toThrow(
+          'Cells returned an archive without a ZIP content type',
+        );
+
+        expect(cancel).toHaveBeenCalledTimes(1);
+      },
+    );
+
+    it.each([
+      'application/zip',
+      'application/x-zip-compressed',
+      'application/octet-stream',
+      ' Application/ZIP; charset=binary ',
+    ])('preserves the stream for supported content type %s', async contentType => {
+      const body = new ReadableStream<Uint8Array>();
+      mockNodeServiceApi.createSelection.mockResolvedValueOnce(createMockResponse({Uuid: 'selection-id', Nodes: []}));
+      mockStorage.getObject.mockResolvedValueOnce({body, contentType});
+
+      await expect(cellsAPI.downloadSelectionArchive({paths, archiveParentPath})).resolves.toBe(body);
+      expect(body.locked).toBe(false);
+    });
+
     it('does not create or download an archive for an empty selection', async () => {
       await expect(cellsAPI.downloadSelectionArchive({paths: [], archiveParentPath})).rejects.toThrow(
         'At least one non-empty node path is required',

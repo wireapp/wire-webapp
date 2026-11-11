@@ -78,6 +78,8 @@ export class S3Service implements CellsStorage {
     path: string;
     abortController?: AbortController;
   }): Promise<{body: ReadableStream<Uint8Array>; contentType?: string}> {
+    // Downloads need Fetch streaming and no retries: Cells consumes the selection on GET.
+    // Keep the upload XHR client separate and read the latest token after selection creation.
     const client = this.createS3Client({
       accessToken: this.accessTokenStore.getAccessToken(),
       requestHandler: new FetchHttpHandler(),
