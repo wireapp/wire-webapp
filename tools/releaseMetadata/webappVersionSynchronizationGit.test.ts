@@ -88,7 +88,6 @@ function createLockfileDocument(version: string): Readonly<Record<string, unknow
     lockfileVersion: 3,
     packages: {
       '': {version},
-      'apps/webapp': {version},
       'node_modules/example': {version: '2.0.0', integrity: 'sha512-example'},
     },
   };
@@ -105,9 +104,7 @@ function createValidBranchInspection(): WebAppVersionSynchronizationBranchInspec
     isBasedOnMainHistory: true,
     changedFilePaths: webAppVersionSynchronizationPackageFilePaths,
     baseRootPackageDocument: createPackageDocument('0.27.0'),
-    baseWebAppPackageDocument: createPackageDocument('0.27.0'),
     branchRootPackageDocument: createPackageDocument('1.0.0'),
-    branchWebAppPackageDocument: createPackageDocument('1.0.0'),
     baseLockfileDocument: createLockfileDocument('0.27.0'),
     branchLockfileDocument: createLockfileDocument('1.0.0'),
   };
@@ -121,9 +118,7 @@ function createVersionJumpBranchInspection(
     ...createValidBranchInspection(),
     branchName: `webapp-version-${targetVersion}`,
     baseRootPackageDocument: createPackageDocument(baseVersion),
-    baseWebAppPackageDocument: createPackageDocument(baseVersion),
     branchRootPackageDocument: createPackageDocument(targetVersion),
-    branchWebAppPackageDocument: createPackageDocument(targetVersion),
     baseLockfileDocument: createLockfileDocument(baseVersion),
     branchLockfileDocument: createLockfileDocument(targetVersion),
   };
@@ -174,7 +169,7 @@ describe('WebApp synchronization Git authentication', () => {
     expect(actualFailureMessage).not.toContain(basicCredential);
   });
 
-  it('commits, pushes, and validates all three synchronization files through the Git adapter', async () => {
+  it('commits, pushes, and validates both root synchronization files through the Git adapter', async () => {
     const temporaryDirectoryPath = await mkdtemp(join(tmpdir(), 'wire-webapp-version-synchronization-'));
     const repositoryPath = join(temporaryDirectoryPath, 'repository');
     const bareRemotePath = join(temporaryDirectoryPath, 'origin.git');
@@ -192,7 +187,6 @@ describe('WebApp synchronization Git authentication', () => {
       await repositoryGit.raw(['config', 'user.email', 'webapp-synchronization-test@example.com']);
       await repositoryGit.raw(['config', 'commit.gpgSign', 'false']);
       await repositoryGit.addRemote('origin', bareRemotePath);
-      await mkdir(join(repositoryPath, 'apps/webapp'), {recursive: true});
       const gitClient = createSimpleGitWebAppVersionSynchronizationClient({
         repositoryPath,
         fileSystem: createRuntimeWebAppVersionSynchronizationFileSystem(),
@@ -200,11 +194,10 @@ describe('WebApp synchronization Git authentication', () => {
       });
       const initialWriteResult = await gitClient.writePackageDocuments({
         rootPackageDocument: createPackageDocument('0.27.0'),
-        webAppPackageDocument: createPackageDocument('0.27.0'),
         lockfileDocument: createLockfileDocument('0.27.0'),
       });
       assert(initialWriteResult.isOk);
-      await repositoryGit.add(['package.json', 'apps/webapp/package.json', 'package-lock.json']);
+      await repositoryGit.add(['package.json', 'package-lock.json']);
       await repositoryGit.commit('Initial commit');
       await repositoryGit.push('origin', 'main');
 
@@ -224,7 +217,6 @@ describe('WebApp synchronization Git authentication', () => {
       assert(lockfileResult.isOk);
       const writeResult = await gitClient.writePackageDocuments({
         rootPackageDocument: createPackageDocument('1.0.0'),
-        webAppPackageDocument: createPackageDocument('1.0.0'),
         lockfileDocument: lockfileResult.value,
       });
       assert(writeResult.isOk);
@@ -233,7 +225,7 @@ describe('WebApp synchronization Git authentication', () => {
       expect(workingTreeResult.value.lockfileDocument).toEqual(createLockfileDocument('1.0.0'));
       const changedFilesResult = await gitClient.getWorkingTreeChangedFilePaths();
       assert(changedFilesResult.isOk);
-      expect(changedFilesResult.value).toEqual(['apps/webapp/package.json', 'package-lock.json', 'package.json']);
+      expect(changedFilesResult.value).toEqual(['package-lock.json', 'package.json']);
       const commitResult = await gitClient.commit({
         message: 'Update WebApp version to 1.0.0',
         authorName: 'Synchronization test',
@@ -259,11 +251,7 @@ describe('WebApp synchronization Git authentication', () => {
       });
       assert(branchInspectionResult.isOk);
       assert(branchInspectionResult.value !== undefined);
-      expect(branchInspectionResult.value.changedFilePaths).toEqual([
-        'apps/webapp/package.json',
-        'package-lock.json',
-        'package.json',
-      ]);
+      expect(branchInspectionResult.value.changedFilePaths).toEqual(['package-lock.json', 'package.json']);
       const validationResult = validateBranch({branchInspection: branchInspectionResult.value});
       assert(validationResult.isOk);
     } finally {
@@ -273,12 +261,24 @@ describe('WebApp synchronization Git authentication', () => {
 });
 
 describe('WebApp version synchronization branch validation', () => {
+  it('rejects a synchronization branch that recreates the webapp manifest', () => {
+    const actualResult = validateBranch({
+      branchInspection: {
+        ...createValidBranchInspection(),
+        changedFilePaths: [...webAppVersionSynchronizationPackageFilePaths, 'apps/webapp/package.json'],
+      },
+    });
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('unexpected files');
+  });
+
   it.each([
     {
       description: 'a missing lockfile change',
       branchInspection: {
         ...createValidBranchInspection(),
-        changedFilePaths: ['apps/webapp/package.json', 'package.json'],
+        changedFilePaths: ['package.json'],
       },
     },
     {
@@ -386,10 +386,10 @@ describe('WebApp version synchronization branch validation', () => {
       expectedWebAppVersion: '1.0.0',
     },
     {
-      description: 'disagreeing base package versions',
+      description: 'a missing base package version',
       branchInspection: {
         ...createValidBranchInspection(),
-        baseWebAppPackageDocument: createPackageDocument('0.27.1'),
+        baseRootPackageDocument: {name: 'example'},
       },
       expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
@@ -407,10 +407,10 @@ describe('WebApp version synchronization branch validation', () => {
       expectedWebAppVersion: '1.0.0',
     },
     {
-      description: 'disagreeing branch package versions',
+      description: 'an unexpected branch package version',
       branchInspection: {
         ...createValidBranchInspection(),
-        branchWebAppPackageDocument: createPackageDocument('1.0.1'),
+        branchRootPackageDocument: createPackageDocument('1.0.1'),
       },
       expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',

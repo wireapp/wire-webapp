@@ -25,7 +25,7 @@ import {
   compareWebAppVersions,
   incrementWebAppVersion,
   updateWebAppPackageDocuments,
-  validateMatchingWebAppPackageVersions,
+  validateWebAppPackageVersion,
   validateWebAppVersion,
 } from './webappVersion.ts';
 import type {WebAppVersionBump} from './webappVersion.ts';
@@ -163,70 +163,48 @@ describe('WebApp version domain logic', () => {
     },
   );
 
-  it('accepts matching root and WebApp package versions', () => {
-    const actualVersionsResult = validateMatchingWebAppPackageVersions(
-      createTestPackageDocument('0.27.0'),
-      createTestPackageDocument('0.27.0'),
-    );
+  it('accepts the root WebApp package version', () => {
+    const actualVersionsResult = validateWebAppPackageVersion(createTestPackageDocument('0.27.0'));
 
     assert(actualVersionsResult.isOk);
-    expect(actualVersionsResult.value).toEqual({rootVersion: '0.27.0', webAppVersion: '0.27.0'});
-  });
-
-  it('rejects mismatching root and WebApp package versions', () => {
-    const actualVersionsResult = validateMatchingWebAppPackageVersions(
-      createTestPackageDocument('0.27.0'),
-      createTestPackageDocument('1.0.0'),
-    );
-
-    assert(actualVersionsResult.isErr);
-    expect(actualVersionsResult.error.message).toContain('WebApp package versions disagree');
+    expect(actualVersionsResult.value).toEqual({rootVersion: '0.27.0'});
   });
 
   it('rejects a missing package version', () => {
-    const actualVersionsResult = validateMatchingWebAppPackageVersions(
-      createTestPackageDocument(),
-      createTestPackageDocument('0.27.0'),
-    );
+    const actualVersionsResult = validateWebAppPackageVersion(createTestPackageDocument());
 
     assert(actualVersionsResult.isErr);
     expect(actualVersionsResult.error.message).toBe('Missing WebApp package version: package.json');
   });
 
   it('rejects a malformed package version', () => {
-    const actualVersionsResult = validateMatchingWebAppPackageVersions(
-      createTestPackageDocument('1.0.0-beta.1'),
-      createTestPackageDocument('1.0.0-beta.1'),
-    );
+    const actualVersionsResult = validateWebAppPackageVersion(createTestPackageDocument('1.0.0-beta.1'));
 
     assert(actualVersionsResult.isErr);
     expect(actualVersionsResult.error.message).toContain('Invalid WebApp version: 1.0.0-beta.1');
   });
 
-  it('updates only the version field in both package documents', () => {
+  it('updates only the root version field without mutating the original document', () => {
     const rootPackageDocument = createTestPackageDocument('0.27.0');
-    const webAppPackageDocument = createTestPackageDocument('0.27.0');
     const actualUpdateResult = updateWebAppPackageDocuments({
       rootPackageDocument,
-      webAppPackageDocument,
       targetVersion: '1.0.0',
     });
 
     assert(actualUpdateResult.isOk);
     expect(actualUpdateResult.value).toEqual({
       rootPackageDocument: {...rootPackageDocument, version: '1.0.0'},
-      webAppPackageDocument: {...webAppPackageDocument, version: '1.0.0'},
     });
+    expect(rootPackageDocument).toEqual(createTestPackageDocument('0.27.0'));
   });
 
-  it('rejects package updates before changing anything when versions disagree', () => {
+  it('rejects package updates when the root version is missing', () => {
     const actualUpdateResult = updateWebAppPackageDocuments({
-      rootPackageDocument: createTestPackageDocument('0.27.0'),
-      webAppPackageDocument: createTestPackageDocument('1.0.0'),
+      rootPackageDocument: createTestPackageDocument(),
       targetVersion: '1.0.1',
     });
 
     assert(actualUpdateResult.isErr);
-    expect(actualUpdateResult.error.message).toContain('WebApp package versions disagree');
+    expect(actualUpdateResult.error.message).toBe('Missing WebApp package version: package.json');
   });
 });

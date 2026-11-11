@@ -50,7 +50,6 @@ function createLockfileDocument(version: string): Readonly<Record<string, unknow
     lockfileVersion: 3,
     packages: {
       '': {version},
-      'apps/webapp': {version},
       'node_modules/example': {version: '2.0.0', integrity: 'sha512-example'},
     },
   };
@@ -90,7 +89,6 @@ function createSynchronizationHarness(options: {
   const mainSnapshot: WebAppVersionSynchronizationMainSnapshot = {
     commitSha: 'a'.repeat(40),
     rootPackageDocument: createPackageDocument(options.packageVersion),
-    webAppPackageDocument: createPackageDocument(options.packageVersion),
     lockfileDocument: options.lockfileDocument ?? createLockfileDocument(options.packageVersion),
   };
   const calls = {
@@ -103,7 +101,6 @@ function createSynchronizationHarness(options: {
   };
   let workingTreePackageDocuments = {
     rootPackageDocument: mainSnapshot.rootPackageDocument,
-    webAppPackageDocument: mainSnapshot.webAppPackageDocument,
     lockfileDocument: mainSnapshot.lockfileDocument,
   };
 
@@ -212,7 +209,6 @@ describe('WebApp version synchronization orchestration', () => {
     expect(harness.calls.writtenPackageDocuments).toEqual([
       {
         rootPackageDocument: createPackageDocument('1.1.0'),
-        webAppPackageDocument: createPackageDocument('1.1.0'),
         lockfileDocument: createLockfileDocument('1.1.0'),
       },
     ]);
@@ -263,7 +259,7 @@ describe('WebApp version synchronization orchestration', () => {
   it('rejects a synchronization that omits the lockfile from changed files', async () => {
     const harness = createSynchronizationHarness({
       packageVersion: '1.0.0',
-      changedFilePaths: ['apps/webapp/package.json', 'package.json'],
+      changedFilePaths: ['package.json'],
     });
 
     const actualResult = await synchronize(createSynchronizationOptions('v1.1.0'), harness.dependencies).toPromise();

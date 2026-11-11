@@ -44,6 +44,12 @@
       "groupName": "webapp app configuration"
     },
     {
+      "description": "Keep browser Ky on 1.x while release tooling retains its existing Ky 2 error API",
+      "matchPackageNames": ["ky"],
+      "matchDepNames": ["ky"],
+      "allowedVersions": "<2"
+    },
+    {
       "matchManagers": ["github-actions"],
       "groupName": "github actions"
     },
