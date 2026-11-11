@@ -19,7 +19,7 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {LinkIcon} from '../../../../../icon';
+import {LinkIcon} from '../../../../../../uiKit/dataDisplay/icon/linkIcon';
 import {linkIconStyles} from './getMeetingActionEntries.styles';
 
 import {
