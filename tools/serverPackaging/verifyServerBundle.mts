@@ -18,6 +18,7 @@
  */
 
 import {isArray, isNonEmptyArray, isPlainObject} from '@sindresorhus/is';
+import getPort from 'get-port';
 import {StatusCodes} from 'http-status-codes';
 
 import assert from 'node:assert/strict';
@@ -31,8 +32,6 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {validateServerBundleStatistics} from './validateServerBundleStatistics.ts';
 
 const repositoryDirectory = realpathSync(process.cwd());
-const runtimePort = 18081;
-const runtimeBaseUrl = `http://127.0.0.1:${runtimePort}`;
 const startupAttemptLimit = 80;
 const startupRetryMilliseconds = 250;
 const requestTimeoutMilliseconds = 1000;
@@ -53,6 +52,8 @@ function verifyBuildStatistics(): void {
 
 async function verifyServerBundle(): Promise<void> {
   verifyBuildStatistics();
+  const port = await getPort();
+  const runtimeBaseUrl = `http://127.0.0.1:${port}`;
   const runtimeDirectory = realpathSync(mkdtempSync(join(tmpdir(), 'bundled-server-')));
 
   try {
@@ -73,7 +74,7 @@ async function verifyServerBundle(): Promise<void> {
       NODE_ENV: 'production',
       NODE_PATH: '',
       NODE_OPTIONS: '',
-      PORT: String(runtimePort),
+      PORT: String(port),
       ENFORCE_HTTPS: 'false',
       APP_BASE: 'https://runtime.example.test',
       BACKEND_REST: 'https://runtime.example.test',
