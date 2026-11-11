@@ -21,7 +21,7 @@ import type {ReactNode} from 'react';
 
 import {act, renderHook, waitFor} from '@testing-library/react';
 import {task} from 'true-myth';
-import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {AddUsersFailureReasons} from '../../../core/conversation';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import {removeCurrentModal, usePrimaryModalState} from '../../Modals/PrimaryModal';
