@@ -120,7 +120,7 @@ const is1to1ConversationWithUser = <Protocol extends CONVERSATION_PROTOCOL.PROTE
     const doesProtocolMatch =
       protocol === CONVERSATION_PROTOCOL.PROTEUS
         ? isProteusConversation(conversation)
-        : isMLSConversation(conversation);
+        : isMLSConversation(conversation) && conversation.type() === CONVERSATION_TYPE.ONE_TO_ONE;
 
     if (!doesProtocolMatch) {
       return false;
