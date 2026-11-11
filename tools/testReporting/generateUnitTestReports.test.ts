@@ -17,12 +17,15 @@
  *
  */
 
+import {resolve} from 'node:path';
+
 import {
   createCombinedReport,
   createJestTestCommand,
   createManifest,
   createProjectReport,
   createReportFileName,
+  findTestableProjects,
   runProjectTestReports,
   sanitizeProjectNameForFileName,
 } from './generateUnitTestReports';
@@ -49,6 +52,52 @@ function createProjectTestResult(project: TestableProject, exitCode: number, out
 }
 
 describe('generate-unit-test-reports', (): void => {
+  it.each(['commons', 'core', 'apiClient', 'uiKit'])(
+    'discovers the dedicated Jest configuration for relocated %s sources',
+    (sourceDirectoryName): void => {
+      const workspaceRoot = resolve(__dirname, '../..');
+      const projectName = `${sourceDirectoryName}-tests`;
+      const jestConfigOutput = JSON.stringify({
+        configs: [
+          {
+            displayName: {name: projectName},
+            rootDir: resolve(workspaceRoot, 'apps/webapp'),
+            roots: [resolve(workspaceRoot, 'apps/webapp/src/script', sourceDirectoryName)],
+          },
+        ],
+      });
+
+      const actualProjects = findTestableProjects(jestConfigOutput, workspaceRoot);
+
+      expect(actualProjects).toEqual([
+        {
+          jestConfigFile: `apps/webapp/test/${sourceDirectoryName}/jest.config.js`,
+          name: projectName,
+          root: 'apps/webapp',
+          type: 'app',
+        },
+      ]);
+    },
+  );
+
+  it.each([
+    ['apps/webapp', 'apps/webapp/jest.config.ts'],
+    ['apps/server', 'apps/server/jest.config.js'],
+    ['libraries/config', 'libraries/config/jest.config.js'],
+  ])('preserves Jest configuration discovery for %s', (projectRoot, expectedConfigFile): void => {
+    const workspaceRoot = resolve(__dirname, '../..');
+    const rootDirectory = resolve(workspaceRoot, projectRoot);
+    const jestConfigOutput = JSON.stringify({configs: [{rootDir: rootDirectory, roots: [rootDirectory]}]});
+
+    const actualProjects = findTestableProjects(jestConfigOutput, workspaceRoot);
+
+    expect(
+      actualProjects.map(project => {
+        return project.jestConfigFile;
+      }),
+    ).toEqual([expectedConfigFile]);
+  });
+
   it('creates a native Jest CI test command for each project', (): void => {
     const actualCommand = createJestTestCommand({
       jestConfigFile: 'apps/webapp/jest.config.ts',
