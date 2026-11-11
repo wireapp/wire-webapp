@@ -253,6 +253,7 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       filename: 'min/[name].js',
       path: outputPath,
       publicPath: '/',
+      uniqueName: '@wireapp/webapp',
     },
     plugins: [
       new rspack.ProvidePlugin({
