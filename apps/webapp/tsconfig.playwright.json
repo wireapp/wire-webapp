@@ -11,7 +11,7 @@
     "types": ["node"],
     // Prevent inherited path mappings from affecting Playwright resolution.
     "paths": {}
-},
+ },
   "include": [
     "playwright.config.ts",
     "playwright.rspack.config.ts",

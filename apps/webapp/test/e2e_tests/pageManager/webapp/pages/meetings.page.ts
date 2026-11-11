@@ -410,13 +410,6 @@ export class MeetingsPage {
     });
   }
 
-  meetingPrepHeading(title: string): Locator {
-    return this.meetingPrepModal.getByRole('heading', {
-      name: title,
-      exact: true,
-    });
-  }
-
   async isParticipantImageLoaded(avatar: Locator): Promise<boolean> {
     return this.participantImage(avatar).evaluateAll(images => {
       return (

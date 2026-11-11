@@ -271,6 +271,7 @@ test.describe('Meetings', () => {
         await meetings.openMeetingsTab();
         const details = createMeetingDetailsData(new Date(), await meetings.getLocalTimeZone(), 0);
 
+        let testFailed = false;
         try {
           // Create Meet Now and join through the preparation dialog.
           await meetings.startMeetNow(MEETING_TITLE, []);
@@ -295,14 +296,30 @@ test.describe('Meetings', () => {
 
           await expect(meetings.editMeetingMenuAction(menu)).toBeVisible();
           await expect(meetings.deleteMeetingForEveryoneMenuAction(menu)).toBeVisible();
+        } catch (error) {
+          testFailed = true;
+          throw error;
         } finally {
-          // Attempt to leave the call even if an assertion fails.
-          await meetings.closeMeetingContextMenu();
-          await calling.minimizeCall();
+          try {
+            try {
+              await meetings.closeMeetingContextMenu();
+            } finally {
+              try {
+                await calling.minimizeCall({timeout: 2000});
+              } finally {
+                if (await calling.leaveCallButton.isVisible()) {
+                  await calling.clickLeaveCallButton({timeout: 2000});
+                }
 
-          if (await calling.leaveCallButton.isVisible()) {
-            await calling.clickLeaveCallButton();
-            await expect(calling.callCell).toBeHidden();
+                await expect(calling.callCell).toBeHidden({timeout: 2000});
+              }
+            }
+          } catch (cleanupError) {
+            if (!testFailed) {
+              throw cleanupError;
+            }
+
+            console.warn('Meet Now cleanup also failed:', cleanupError);
           }
         }
       },

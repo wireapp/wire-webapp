@@ -18,7 +18,6 @@
  */
 
 import {test as baseTest, type BrowserContext, type Page} from '@playwright/test';
-
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
 import {PageManager, WebAppNavigationOptions} from './pageManager';
@@ -26,7 +25,6 @@ import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
 import {Role} from '@wireapp/api-client/lib/team';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 import {BrigRepositoryE2E} from './backend/brigRepository.e2e';
-import {MeetingsPage} from './pageManager/webapp/pages/meetings.page';
 
 export type PagePlugin = (page: Page) => void | Promise<void>;
 
@@ -53,9 +51,6 @@ type Fixtures = {
    * @returns an object containing the teams owner and an array of users.
    */
   createTeam: (...args: Parameters<typeof createTeam> extends [any, ...infer Args] ? Args : never) => Promise<Team>;
-
-  meetingsTimeZone: string;
-  meetingsPage: MeetingsPage;
 };
 
 export type Team = {
@@ -151,29 +146,6 @@ export const test = baseTest.extend<Fixtures>({
         return api.team.deleteTeam(owner, owner.teamId);
       }),
     );
-  },
-  meetingsTimeZone: ['Europe/Berlin', {option: true}],
-
-  meetingsPage: async ({browser, createTeam, createPage, meetingsTimeZone}, use) => {
-    const {owner} = await createTeam('Meetings', {
-      features: {
-        meetings: true,
-        mls: true,
-      },
-    });
-
-    const context = await browser.newContext({
-      locale: 'en-US',
-      timezoneId: meetingsTimeZone,
-    });
-
-    try {
-      const page = await createPage(context, withLogin(owner));
-
-      await use(PageManager.from(page).webapp.pages.meetings());
-    } finally {
-      await context.close();
-    }
   },
 });
 

@@ -107,13 +107,13 @@ export class CallingPage {
     await this.toggleScreenShareButton.click();
   }
 
-  async clickLeaveCallButton(): Promise<void> {
-    await this.leaveCallButton.click();
+  async clickLeaveCallButton(options: {timeout?: number} = {}): Promise<void> {
+    await this.leaveCallButton.click(options);
   }
 
-  async minimizeCall(): Promise<void> {
+  async minimizeCall(options: {timeout?: number} = {}): Promise<void> {
     if (await this.minimizeButton.isVisible()) {
-      await this.minimizeButton.click();
+      await this.minimizeButton.click(options);
     }
   }
 
