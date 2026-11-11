@@ -104,16 +104,8 @@ node "${workflow_source_directory}/tools/releaseCli/maintenanceReleaseCli.mts" \
     npx just validate-build-artifact
 )
 
-for required_context_path in \
-  "${DISTRIBUTION_CONTEXT_PATH}/apps/server/Dockerfile" \
-  "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist" \
-  "${DISTRIBUTION_CONTEXT_PATH}/run.sh" \
-  "${DISTRIBUTION_CONTEXT_PATH}/.env.defaults"; do
-  if [[ ! -e "${required_context_path}" ]]; then
-    echo "Required maintenance Docker context path is missing: ${required_context_path}" >&2
-    exit 1
-  fi
-done
+bash "${script_directory}/../serverPackaging/validateDistributionRuntime.sh" \
+  "${DISTRIBUTION_CONTEXT_PATH}" "${maintenance_tag_commit_sha}"
 
 echo "maintenance_tag_commit_sha=${maintenance_tag_commit_sha}" >> "${GITHUB_OUTPUT}"
 echo "maintenance_artifact_name=${tag_distribution_artifact_name}" >> "${GITHUB_OUTPUT}"

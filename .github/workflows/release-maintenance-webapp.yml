@@ -467,7 +467,7 @@ jobs:
           manifest_path="${distribution_artifact_directory}/distribution-manifest.json"
           mkdir -p "${context_directory}" "${distribution_artifact_directory}"
 
-          if [[ -s apps/server/dist/dbs/GeoLite2-Country.mmdb ]]; then
+          if [[ -f justfile ]] && grep -Eq '^package-server-public:.*[[:space:]]build-server-bundle([[:space:]]|$)' justfile; then
             mkdir -p "${context_directory}/apps/server"
             cp apps/server/Dockerfile "${context_directory}/apps/server/Dockerfile"
             cp run.sh "${context_directory}/run.sh"

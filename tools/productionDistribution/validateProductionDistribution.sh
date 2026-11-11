@@ -42,16 +42,8 @@ fi
 "${script_directory}/runProductionDistributionCli.sh" \
   validate-manifest "${validation_options[@]}"
 
-for required_context_path in \
-  "${DISTRIBUTION_CONTEXT_PATH}/apps/server/Dockerfile" \
-  "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist" \
-  "${DISTRIBUTION_CONTEXT_PATH}/run.sh" \
-  "${DISTRIBUTION_CONTEXT_PATH}/.env.defaults"; do
-  if [[ ! -e "${required_context_path}" ]]; then
-    echo "Required Docker context path is missing: ${required_context_path}" >&2
-    exit 1
-  fi
-done
+bash "${script_directory}/../serverPackaging/validateDistributionRuntime.sh" \
+  "${DISTRIBUTION_CONTEXT_PATH}" "${production_tag_commit_sha}"
 
 cloud_artifact_checksum="$(jq --raw-output '.cloudArtifactChecksum' "${manifest_path}")"
 actual_cloud_artifact_checksum="$(sha256sum "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist/s3/ebs.zip" | awk '{print $1}')"

@@ -203,6 +203,10 @@ describe('maintenance distribution workflow boundaries', () => {
       writeFileSync(path.join(sourceDirectory, 'run.sh'), 'node --enable-source-maps /dist/index.js');
       writeFileSync(path.join(sourceDirectory, '.env.defaults'), 'BACKEND_NAME=example');
       writeFileSync(path.join(sourceDirectory, 'package.json'), 'must stay out of the context');
+      writeFileSync(
+        path.join(sourceDirectory, 'justfile'),
+        'package-server-public: build-server-bundle build-webapp-public',
+      );
 
       execFileSync('bash', ['-c', contextAssemblyStep.run.slice(0, checksumStepOffset)], {
         cwd: sourceDirectory,
