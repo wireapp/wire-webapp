@@ -39,6 +39,7 @@ export const CellsSelectionCheckbox: FunctionComponent<CellsSelectionCheckboxPro
 
   return (
     <Checkbox
+      checkboxSize="small"
       id={`cells-selection-${id}`}
       checked={isChecked}
       aria-label={translate('cells.selection.selectItem', {name})}
