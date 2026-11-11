@@ -103,7 +103,6 @@ import {
   ConsumableNotificationSynchronization,
 } from '../apiClient/notification/consumableNotification';
 import {Notification} from '../apiClient/notification/notification';
-import {browserPlatform} from '../apiClient/shims/browser/platform';
 import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '../apiClient/tcp/reconnectingWebsocket';
 import {WebSocketClient} from '../apiClient/tcp/webSocketClient';
 import {FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
@@ -224,11 +223,11 @@ export class Account extends TypedEventEmitter<Events> {
   public recurringTaskScheduler: RecurringTaskScheduler;
 
   /**
-   * @param apiClient The apiClient instance to use in the core (will create a new new one if undefined)
+   * @param apiClient The API client supplied by the caller.
    * @param accountOptions
    */
   constructor(
-    apiClient: APIClient = new APIClient({platform: browserPlatform}),
+    apiClient: APIClient,
     private readonly options: AccountOptions = {
       nbPrekeys: 100,
       coreCryptoConfig: {wasmFilePath: '', enabled: false},

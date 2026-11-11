@@ -253,10 +253,9 @@ describe('Account', () => {
   };
   describe('"init"', () => {
     it('initializes the Protocol buffers', async () => {
-      const account = new Account();
-      if (account['apiClient']) {
-        apiClients.push(account['apiClient']);
-      }
+      const apiClient = new APIClient({platform: nodePlatform});
+      apiClients.push(apiClient);
+      const account = new Account(apiClient);
 
       await account['initServices']({clientType: ClientType.TEMPORARY, userId: ''});
 
