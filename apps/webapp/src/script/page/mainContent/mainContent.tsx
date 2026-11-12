@@ -53,8 +53,8 @@ import {UserState} from '../../repositories/user/userState';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {useMeetingsFeatureFlag} from '../../util/useMeetingsFeatureFlag';
 import {incomingCssClass, removeAnimationsClass} from '../../util/util';
-import {PanelState} from '../rightSidebar';
 import {RightSidebarParams} from '../appMain';
+import {PanelState} from '../rightSidebar';
 import {useApplicationContext} from '../rootProvider';
 import {ContentState, useAppState} from '../useAppState';
 

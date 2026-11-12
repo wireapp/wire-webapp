@@ -27,8 +27,8 @@ import {container} from 'tsyringe';
 
 import {useConversationCall} from '../../hooks/useConversationCall';
 import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import {PanelState} from '../../page/rightSidebar';
 import {RightSidebarParams} from '../../page/appMain';
+import {PanelState} from '../../page/rightSidebar';
 import {useApplicationContext} from '../../page/rootProvider';
 import {useAppMainState, ViewType} from '../../page/state';
 import {ContentState} from '../../page/useAppState';
