@@ -21,6 +21,7 @@ import {ClientClassification} from '../../apiClient/client/clientClassification'
 import {ClientType} from '../../apiClient/client/clientType';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {Maybe} from 'true-myth';
 
 import {Runtime} from '../../commons/util/Runtime';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
@@ -66,6 +67,22 @@ describe('ClientRepository', () => {
   afterEach(() => {
     PrimaryModal.show = originalPrimaryModalShow;
     jest.clearAllMocks();
+  });
+
+  describe('constructCookieLabelKey', () => {
+    it.each([Maybe.nothing<string>(), Maybe.just('')])('uses the user ID when the login is %s', login => {
+      const repository = testFactory.client_repository;
+      const expectedKey = repository.constructCookieLabelKey(Maybe.just(userId), ClientType.PERMANENT);
+
+      expect(repository.constructCookieLabelKey(login, ClientType.PERMANENT)).toBe(expectedKey);
+    });
+
+    it('keeps email-based cookie labels distinct from the user ID fallback', () => {
+      const repository = testFactory.client_repository;
+      const emailKey = repository.constructCookieLabelKey(Maybe.just('test@example.com'), ClientType.PERMANENT);
+
+      expect(emailKey).not.toBe(repository.constructCookieLabelKey(Maybe.nothing(), ClientType.PERMANENT));
+    });
   });
 
   describe('getClientsByUserIds', () => {

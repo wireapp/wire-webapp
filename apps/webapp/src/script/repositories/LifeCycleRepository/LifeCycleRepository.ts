@@ -19,6 +19,7 @@
 
 import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
+import {Maybe} from 'true-myth';
 
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {URLParameter} from '../../auth/urlParameter';
@@ -245,7 +246,10 @@ export class LifeCycleRepository {
     // Handle cookie label preservation
     const currentUser = this.dependencies.userRepository['userState'].self();
     if (isTruthy(currentUser)) {
-      const cookieLabelsToPreserve = this.determineCookieLabelsToPreserve(currentUser, shouldClearAllData);
+      const cookieLabelsToPreserve = this.determineCookieLabelsToPreserve(
+        Maybe.of(currentUser.email()),
+        shouldClearAllData,
+      );
       storageKeysToPreserve.push(...cookieLabelsToPreserve);
 
       // Clear localStorage selectively, keeping conversation input for session expiry
@@ -287,9 +291,9 @@ export class LifeCycleRepository {
    * Determines which cookie labels should be preserved during logout.
    * User's own cookie label is deleted only when explicitly clearing all data.
    */
-  private readonly determineCookieLabelsToPreserve = (currentUser: any, shouldClearAllData: boolean): string[] => {
+  private readonly determineCookieLabelsToPreserve = (email: Maybe<string>, shouldClearAllData: boolean): string[] => {
     this.logger.debug('Determining which cookie labels to preserve during logout.');
-    const userCookieLabelKey = this.dependencies.clientRepository.constructCookieLabelKey(currentUser.email());
+    const userCookieLabelKey = this.dependencies.clientRepository.constructCookieLabelKey(email);
     const allStorageKeys = Object.keys(amplify.store());
 
     return allStorageKeys.filter(storageKey => {
