@@ -211,7 +211,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
         if (!isMounted.current) {
           return;
         }
-        logger.error('Failed to load image asset', error);
+        logger.error('Failed to load image asset', {error});
         setImageLoadState('failed');
       }
     }

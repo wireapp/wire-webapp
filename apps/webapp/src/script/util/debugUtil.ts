@@ -244,7 +244,7 @@ export class DebugUtil {
         {},
       );
 
-      this.logger.info({
+      this.logger.info('MLS conversation state', {
         id,
         groupId,
         epochCC: Number(epochCC),
@@ -708,7 +708,7 @@ export class DebugUtil {
       notifications: notificationsInRange,
     };
 
-    this.logger.info('Notification backend dump ready', dump.counts);
+    this.logger.info('Notification backend dump ready', {counts: dump.counts});
     return dump;
   }
 
@@ -790,12 +790,13 @@ export class DebugUtil {
     };
 
     const logMessage = `Hey ${this.userState.self().name()}, this is for you:`;
-    this.logger.warn(logMessage, debugInformation);
-    this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, debugInformation.conversation);
-    this.logger.warn(
-      `From: ${!isUndefined(debugInformation.user) ? debugInformation.user.name() : 'system'}`,
-      debugInformation.user,
-    );
+    this.logger.warn(logMessage, {debugInformation});
+    this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, {
+      conversation: debugInformation.conversation,
+    });
+    this.logger.warn(`From: ${!isUndefined(debugInformation.user) ? debugInformation.user.name() : 'system'}`, {
+      user: debugInformation.user,
+    });
 
     return debugInformation;
   }

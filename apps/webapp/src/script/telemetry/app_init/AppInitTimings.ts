@@ -66,7 +66,7 @@ export class AppInitTimings {
   }
 
   log(): void {
-    this.logger.debug('App initialization step durations', this.timings);
+    this.logger.debug('App initialization step durations', {timings: this.timings});
   }
 
   timeStep(step: AppInitTimingsStep): void {

@@ -232,7 +232,7 @@ describe('image-asset', () => {
     });
 
     expect(imageContainer).not.toHaveClass('loading-dots');
-    expect(imageLoggerMock.error).toHaveBeenCalledWith('Failed to load image asset', expect.any(Error));
+    expect(imageLoggerMock.error).toHaveBeenCalledWith('Failed to load image asset', {error: expect.any(Error)});
     expect(screen.getByRole('button', {name: retryLabel})).toBeDefined();
     expect(imageContainer).not.toHaveAttribute('role', 'button');
 

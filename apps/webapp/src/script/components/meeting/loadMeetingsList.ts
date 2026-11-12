@@ -31,7 +31,7 @@ export const loadMeetingsList = async (meetingsRepository: MeetingsRepository): 
   const listResult = await meetingsRepository.getMeetingsList();
 
   if (listResult.isErr) {
-    logger.warn('Failed to load meetings list', listResult.error);
+    logger.warn('Failed to load meetings list', {error: listResult.error});
     return {meetingSeries: [], hasLoadError: true};
   }
 

@@ -204,7 +204,7 @@ export class MediaStreamHandler {
 
         this.logger.warn(
           `MediaStream request for (audio: ${audio}, video: ${video}, screen: ${screen}) failed: ${name} ${message}`,
-          error,
+          {error},
         );
         this.clearPermissionRequestHint(audio, video, screen);
         /**

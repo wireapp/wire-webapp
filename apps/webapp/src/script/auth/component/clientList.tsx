@@ -96,7 +96,7 @@ const ClientListComponent: FunctionComponent<Props & ConnectedProps & DispatchPr
 
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error: unknown) {
-      logger.error(error);
+      logger.error('Failed to replace client', {error, clientId});
     } finally {
       setShowLoading(false);
     }

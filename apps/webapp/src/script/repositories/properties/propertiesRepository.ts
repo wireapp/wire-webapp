@@ -338,7 +338,7 @@ export class PropertiesRepository {
   }
 
   setProperty(key: string, value: any): void {
-    this.logger.log(`Setting key "${key}"...`, value);
+    this.logger.info(`Setting key "${key}"...`, {value});
 
     switch (key) {
       case PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS:

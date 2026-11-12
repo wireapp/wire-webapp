@@ -106,7 +106,7 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
       const shouldIgnoreStaleRequest = (): boolean => {
         const isStaleRequest = requestVersionGate.current.isStale(requestVersion);
         if (isStaleRequest) {
-          logger.debug('Ignoring stale request version:', requestVersion);
+          logger.debug('Ignoring stale request version:', {requestVersion});
         }
         return isStaleRequest;
       };

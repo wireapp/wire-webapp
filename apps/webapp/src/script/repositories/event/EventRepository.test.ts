@@ -241,11 +241,11 @@ describe('EventRepository', () => {
     });
 
     it('should log the connection state change', () => {
-      const logSpy = jest.spyOn(eventRepository.logger, 'log').mockReturnValue(undefined);
+      const logSpy = jest.spyOn(eventRepository.logger, 'info').mockReturnValue(undefined);
 
       eventRepository['updateConnectivityStatus'](ConnectionState.LIVE);
 
-      expect(logSpy).toHaveBeenCalledWith('Websocket connection state changed to', ConnectionState.LIVE);
+      expect(logSpy).toHaveBeenCalledWith('Websocket connection state changed to', {state: ConnectionState.LIVE});
     });
   });
 

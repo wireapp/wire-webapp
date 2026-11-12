@@ -385,7 +385,7 @@ describe('NotificationRepository', () => {
       expect(close).toHaveBeenCalledTimes(1);
       expect(errorSpy).toHaveBeenCalledWith(
         "Failed to close notification for 'content' message in 'undefined' by timeout.",
-        {kind: systemNotificationErrorKinds.closeFailed, cause: closeError},
+        {error: {kind: systemNotificationErrorKinds.closeFailed, cause: closeError}},
       );
       expect(infoSpy).not.toHaveBeenCalledWith("Notification for 'content' message in 'undefined' closed by timeout.");
     });
@@ -424,7 +424,7 @@ describe('NotificationRepository', () => {
 
       expect(errorSpy).toHaveBeenCalledWith(
         "Failed to close notification for 'content' message in 'undefined' by click.",
-        {kind: systemNotificationErrorKinds.closeFailed, cause: closeError},
+        {error: {kind: systemNotificationErrorKinds.closeFailed, cause: closeError}},
       );
       expect(infoSpy).not.toHaveBeenCalledWith("Notification for 'content' message in 'undefined' closed by click.");
     });
@@ -470,8 +470,7 @@ describe('NotificationRepository', () => {
       repository.clearNotifications();
 
       expect(errorSpy).toHaveBeenCalledWith("Failed to close notification for 'undefined' in 'undefined' on unload.", {
-        kind: systemNotificationErrorKinds.closeFailed,
-        cause: closeError,
+        error: {kind: systemNotificationErrorKinds.closeFailed, cause: closeError},
       });
     });
 
@@ -519,7 +518,7 @@ describe('NotificationRepository', () => {
 
       expect(errorSpy).toHaveBeenCalledWith(
         "Failed to close read notification for message 'message' of type 'content' in 'conversation'.",
-        {kind: systemNotificationErrorKinds.closeFailed, cause: closeError},
+        {error: {kind: systemNotificationErrorKinds.closeFailed, cause: closeError}},
       );
     });
   });

@@ -88,7 +88,7 @@ export class ConversationRoleRepository {
         const response = await this.teamRepository.getTeamConversationRoles();
         this.teamRoles = response.conversation_roles;
       } catch (error: unknown) {
-        this.logger.warn('Could not load team conversation roles', error);
+        this.logger.warn('Could not load team conversation roles', {error});
       }
     }
   };

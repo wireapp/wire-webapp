@@ -21,7 +21,7 @@ import {ClientAction, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {ConversationOtrMessageAddEvent} from '../../../../../../apiClient/event/conversationEvent';
 import {Decoder} from '../../../../../../commons/base64/decoder';
-import {LogFactory} from '../../../../../../commons/LogFactory';
+import {getLogger} from '../../../../../../commons/getLogger';
 import {GenericMessageType} from '../../../../../conversation';
 import {DecryptionError} from '../../../../../errors/decryptionError';
 import {HandledEventPayload} from '../../../../../notification';
@@ -32,7 +32,7 @@ interface HandleOtrMessageAddParams {
   proteusService: ProteusService;
 }
 
-const logger = LogFactory.getLogger('@wireapp/core/otrMessageAdd');
+const logger = getLogger('@wireapp/core/otrMessageAdd');
 
 export const handleOtrMessageAdd = async ({
   event,

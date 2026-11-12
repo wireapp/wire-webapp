@@ -99,7 +99,7 @@ export const AvatarInput: FunctionComponent<AvatarInputProps> = ({
       const titleString = translate('modalPictureTooSmallHeadline');
       return await showUploadWarning(titleString, messageString);
     } catch (error: unknown) {
-      logger.error('Failed to validate profile image', error);
+      logger.error('Failed to validate profile image', {error});
       return false;
     } finally {
       setIsUploading(false);

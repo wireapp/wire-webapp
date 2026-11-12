@@ -23,25 +23,25 @@ import * as fs from 'fs-extra';
 import logdown from 'logdown';
 
 import os from 'os';
-import * as path from 'path';
 
+import {createLogdownAdapter} from './logdownAdapter';
+import type {Logger} from './logger';
 import {Runtime} from './util/Runtime';
-import {serializeArgs} from './util/StringUtil';
 
 const colorChannelValueCount = 256;
 const hexadecimalRadix = 16;
 const hexadecimalCharactersPerColorChannel = 2;
 
-export type Logger = logdown.Logger;
+export type {LogAttributes, Logger} from './logger';
 
-export interface LoggerOptions {
+export type LoggerOptions = {
   color?: string;
   forceEnable?: boolean;
   logFilePath?: string;
   namespace?: string;
   separator?: string;
   plaintext?: boolean;
-}
+};
 
 export class LogFactory {
   private static readonly logFilePath?: string = undefined;
@@ -95,14 +95,11 @@ export class LogFactory {
     await fs.outputFile(logFilePath, `${withoutColor}${os.EOL}`, {flag: 'a'});
   }
 
-  static createLoggerName(fileName: string, namespace?: string, separator?: string): string {
-    if (typeof window === 'undefined') {
-      fileName = path.basename(fileName, path.extname(fileName));
-    }
-    return [namespace, fileName].filter(Boolean).join(separator);
+  static createLoggerName(name: string, namespace?: string, separator?: string): string {
+    return [namespace, name].filter(Boolean).join(separator);
   }
 
-  static getLogger(name: string, options?: LoggerOptions): logdown.Logger {
+  static getLogger(name: string, options?: LoggerOptions): Logger {
     const defaults: LoggerOptions = {
       color: LogFactory.getColor(),
       forceEnable: false,
@@ -130,27 +127,6 @@ export class LogFactory {
       logger.state.isEnabled = true;
     }
 
-    if (Runtime.isDesktopApp()) {
-      return {
-        ...logger,
-        debug: (...args: any[]): void => {
-          logger.debug(...serializeArgs(args));
-        },
-        error: (...args: any[]): void => {
-          logger.error(...serializeArgs(args));
-        },
-        info: (...args: any[]): void => {
-          logger.info(...serializeArgs(args));
-        },
-        log: (...args: any[]): void => {
-          logger.log(...serializeArgs(args));
-        },
-        warn: (...args: any[]): void => {
-          logger.warn(...serializeArgs(args));
-        },
-      };
-    }
-
-    return logger;
+    return createLogdownAdapter({output: logger, serializeForDesktop: Runtime.isDesktopApp()});
   }
 }

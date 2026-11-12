@@ -71,7 +71,7 @@ export const QualityFeedbackModal: FunctionComponent<Props> = ({callingRepositor
   }
 
   if (isNullOrUndefined(call)) {
-    logger.warn('Call not found for conversationId', conversationId);
+    logger.warn('Call not found for conversationId', {conversationId});
     setQualityFeedbackModalShown(false);
     return null;
   }

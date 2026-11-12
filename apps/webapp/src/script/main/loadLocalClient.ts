@@ -49,7 +49,7 @@ export function loadLocalClient(
 ): Task<MetaClient, ClientError> {
   return getLocalClient()
     .mapRejected(error => {
-      logger.error('Failed to load the local client', error);
+      logger.error('Failed to load the local client', {error});
       let errorType: CLIENT_ERROR_TYPE | BASE_ERROR_TYPE = BASE_ERROR_TYPE.UNKNOWN;
       if (isClientRequestFailure(error)) {
         errorType = CLIENT_ERROR_TYPE.REQUEST_FAILURE;

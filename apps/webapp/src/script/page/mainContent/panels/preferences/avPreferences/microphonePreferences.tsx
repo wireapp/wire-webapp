@@ -70,7 +70,7 @@ const MicrophonePreferences: FunctionComponent<MicrophonePreferencesProps> = ({
       setStream(await refreshStream());
     } catch (error: unknown) {
       if (error instanceof Error) {
-        logger.warn(`Requesting MediaStream for type "${MediaType.AUDIO}" failed: ${error.message}`, error);
+        logger.warn(`Requesting MediaStream for type "${MediaType.AUDIO}" failed: ${error.message}`, {error});
       }
       setStream(null);
     } finally {

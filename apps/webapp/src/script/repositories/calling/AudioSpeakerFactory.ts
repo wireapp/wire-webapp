@@ -33,11 +33,11 @@ export class AudioSpeakerFactory {
       throw new Error('Audio element could not be crated!');
     }
 
-    AudioSpeakerFactory.logger.log('Add new audio speaker');
+    AudioSpeakerFactory.logger.info('Add new audio speaker');
     const audioElement = new Audio();
     audioElement.srcObject = stream;
     audioElement.play().catch((error: unknown) => {
-      AudioSpeakerFactory.logger.error('Audio play failed', error);
+      AudioSpeakerFactory.logger.error('Audio play failed', {error});
     });
     AudioSpeakerFactory.baseElement.appendChild(audioElement);
 

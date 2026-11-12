@@ -27,7 +27,7 @@ import {isOutdatedNotificationStreamEvent} from './outdatedNotificationStreamEve
 import {APIClient} from '../../apiClient/apiClient';
 import {BackendEvent} from '../../apiClient/event/backendEvent';
 import {Notification} from '../../apiClient/notification/notification';
-import {LogFactory} from '../../commons/LogFactory';
+import {getLogger} from '../../commons/getLogger';
 import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../coreError';
@@ -73,7 +73,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
   private readonly apiClient: APIClient;
   private readonly backend: NotificationBackendRepository;
   private readonly database: NotificationDatabaseRepository;
-  private readonly logger = LogFactory.getLogger('@wireapp/core/NotificationService');
+  private readonly logger = getLogger('@wireapp/core/NotificationService');
   public static readonly TOPIC = TOPIC;
 
   constructor(
@@ -165,7 +165,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
       notifications.length > 0
         ? `Start processing ${notifications.length} notifications since notification id ${lastNotificationId}`
         : `No notification to process from the stream`;
-    this.logger.log(logMessage);
+    this.logger.info(logMessage);
     for (const [index, notification] of notifications.entries()) {
       if (abortHandler?.signal.aborted === true) {
         /* Stop handling notifications if the websocket has been disconnected.
@@ -182,7 +182,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
         results.success++;
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : error;
-        this.logger.error(`Error while processing notification ${notification.id}: ${message}`, error);
+        this.logger.error(`Error while processing notification ${notification.id}: ${message}`, {error});
         results.error++;
       }
     }
@@ -210,7 +210,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
     source: NotificationSource,
   ): AsyncGenerator<HandledEventPayload> {
     for (const event of notification.payload) {
-      this.logger.debug(`Handling event of type "${event.type}"`, event);
+      this.logger.debug(`Handling event of type "${event.type}"`, {event});
       let lastEventDate: Date | undefined = undefined;
       try {
         lastEventDate = await this.database.getLastEventDate();
@@ -230,10 +230,9 @@ export class NotificationService extends TypedEventEmitter<Events> {
           yield* payloads;
         }
       } catch (error: unknown) {
-        this.logger.error(
-          `There was an error with notification ID "${notification.id}": ${(error as Error).message}`,
+        this.logger.error(`There was an error with notification ID "${notification.id}": ${(error as Error).message}`, {
           error,
-        );
+        });
         const notificationError: NotificationError = {
           error: error as Error,
           notification,

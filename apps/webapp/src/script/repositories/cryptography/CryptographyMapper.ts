@@ -579,7 +579,7 @@ export class CryptographyMapper {
   private _mapCalling(calling: Calling, event: EncryptedEvent): MappedCallingContent | undefined {
     const content = parseSerializedCallingMessage(calling.content);
     if (content.isErr) {
-      this.logger.warn('Discarding invalid calling message', content.error);
+      this.logger.warn('Discarding invalid calling message', {error: content.error});
       return undefined;
     }
 
@@ -701,7 +701,7 @@ export class CryptographyMapper {
       });
       return GenericMessage.decode(new Uint8Array(externalMessageBuffer));
     } catch (error: unknown) {
-      this.logger.error(`Failed to unwrap external message: ${toError(error).message}`, error);
+      this.logger.error(`Failed to unwrap external message: ${toError(error).message}`, {error});
       throw new CryptographyError(CryptographyError.TYPE.BROKEN_EXTERNAL, CryptographyError.MESSAGE.BROKEN_EXTERNAL);
     }
   }

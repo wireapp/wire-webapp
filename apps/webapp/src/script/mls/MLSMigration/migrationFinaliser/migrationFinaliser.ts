@@ -83,6 +83,6 @@ const finaliseMigrationOfMixedConversation = async (
       throw new Error(`Conversation ${updatedMLSConversation.qualifiedId.id} has not updated its protocol to MLS.`);
     }
   } catch (error: unknown) {
-    mlsMigrationLogger.error(`Failed to finalise migration of mixed conversation ${mixedConversation.id}.`, error);
+    mlsMigrationLogger.error(`Failed to finalise migration of mixed conversation ${mixedConversation.id}.`, {error});
   }
 };

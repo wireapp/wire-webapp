@@ -20,7 +20,7 @@
 import {StatusCodes as StatusCode} from 'http-status-codes';
 import {z} from 'zod';
 
-import {LogFactory} from '../../commons/LogFactory';
+import {getLogger} from '../../commons/getLogger';
 import {
   IdentifierExistsError,
   InvalidCredentialsError,
@@ -56,7 +56,7 @@ type StatusCodeToMessageVariantMap = Partial<
   Record<StatusCode, Partial<Record<BackendErrorLabel, MessageToBuilderMap>>>
 >;
 
-const logger = LogFactory.getLogger('@wireapp/api-client/http/BackendErrorMapper');
+const logger = getLogger('@wireapp/api-client/http/BackendErrorMapper');
 
 // BAD_REQUEST / CLIENT_ERROR
 const MESSAGE_BAD_REQUEST_SATISFY = 'Error in $: Failed reading: satisfy';

@@ -274,7 +274,9 @@ export class ConnectionRepository {
           }
 
           default: {
-            this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
+            this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, {
+              error,
+            });
             PrimaryModal.show(
               PrimaryModal.type.ACKNOWLEDGE,
               {
@@ -406,7 +408,7 @@ export class ConnectionRepository {
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error: unknown) {
       const logMessage = `Connection change from '${currentStatus}' to '${newStatus}' failed`;
-      this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${toError(error).message}`, error);
+      this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${toError(error).message}`, {error});
       switch (newStatus) {
         case ConnectionStatus.ACCEPTED: {
           PrimaryModal.show(

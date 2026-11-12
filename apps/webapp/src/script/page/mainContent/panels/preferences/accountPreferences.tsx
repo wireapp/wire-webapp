@@ -132,7 +132,7 @@ export const AccountPreferences: FunctionComponent<AccountPreferencesProps> = ({
               await conversationRepository.leaveGuestRoom();
               void clientRepository.logoutClient();
             } catch (error: unknown) {
-              logger.warn('Error while leaving room', error);
+              logger.warn('Error while leaving room', {error});
             }
           },
           text: translate('modalAccountLeaveGuestRoomAction'),

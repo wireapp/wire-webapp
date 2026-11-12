@@ -153,7 +153,7 @@ export class EventMapper {
         return this._mapJsonEvent(event, conversationEntity);
       } catch (error: unknown) {
         const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${toError(error).message}`;
-        this.logger.error(errorMessage, error);
+        this.logger.error(errorMessage, {error});
       }
 
       return undefined;
@@ -179,7 +179,7 @@ export class EventMapper {
         throw error;
       }
       const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${toError(error).message}`;
-      this.logger.error(errorMessage, error);
+      this.logger.error(errorMessage, {error});
 
       throw new ConversationError(
         ConversationError.TYPE.MESSAGE_NOT_FOUND,

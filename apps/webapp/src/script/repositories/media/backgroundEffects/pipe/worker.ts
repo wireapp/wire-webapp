@@ -27,7 +27,7 @@ import {PerformanceSample} from '../helper/samples';
 
 const workerLogger = getSafeLogger('virtual-background-worker');
 globalThis.onmessage = ({data}) => {
-  workerLogger.log(`[virtual-background] worker onmessage`, data);
+  workerLogger.info(`[virtual-background] worker onmessage`, {data});
   const {name} = data as {name: string};
   if (name === 'options') {
     const {options: opts} = data as {options: WorkerProcessVideoTrackOptions};
@@ -53,11 +53,12 @@ globalThis.onmessage = ({data}) => {
         globalThis.postMessage({name: 'performanceSample', sample, mode});
       },
     ).catch((err: unknown) => {
-      workerLogger.error(`[virtual-background] video error: ${(err as Error).message}`);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      workerLogger.error(`[virtual-background] video error: ${errorMessage}`, {error: err});
       globalThis.postMessage({
         name: 'error',
         reason: 'segmenter-init-failed',
-        message: err instanceof Error ? err.message : String(err),
+        message: errorMessage,
       });
     });
   }

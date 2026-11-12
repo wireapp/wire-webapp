@@ -243,7 +243,7 @@ export class ContentViewModel {
         await this.conversationRepository.fetchBackendConversationEntityById(conversationId);
         return true;
       } catch (error: unknown) {
-        this.logger.warn(`Retry attempt ${attempt + 1}/${maxRetries} failed for conversation fetch`, error);
+        this.logger.warn(`Retry attempt ${attempt + 1}/${maxRetries} failed for conversation fetch`, {error});
       }
     }
     return false;

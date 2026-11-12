@@ -39,13 +39,12 @@ import {
   RestSelection,
   GetByUuidFlagsEnum,
 } from 'cells-sdk-ts';
-import logdown from 'logdown';
 
 import {Node, NodeVersions, RestNodeSchema, RestNodeVersionsSchema} from './cellsApi.schema';
 import {CellsStorage} from './cellsStorage/cellsStorage';
 import {S3Service} from './cellsStorage/s3Service';
 
-import {LogFactory} from '../../commons/LogFactory';
+import {getLogger, type Logger} from '../../commons/getLogger';
 import {AccessTokenStore} from '../auth';
 import {HttpClient} from '../http';
 import type {CookiePlatform} from '../platform';
@@ -121,7 +120,7 @@ interface CellsConfig {
 }
 
 export class CellsAPI {
-  private readonly logger: logdown.Logger;
+  private readonly logger: Logger;
   private accessTokenStore: AccessTokenStore;
   private httpClientConfig: HttpClient['config'];
   private readonly cookie: CookiePlatform;
@@ -137,7 +136,7 @@ export class CellsAPI {
     httpClientConfig: HttpClient['config'];
     readonly cookie: CookiePlatform;
   }) {
-    this.logger = LogFactory.getLogger('@wireapp/api-client/CellsAPI');
+    this.logger = getLogger('@wireapp/api-client/CellsAPI');
     this.accessTokenStore = accessTokenStore;
     this.httpClientConfig = httpClientConfig;
     this.cookie = cookie;
@@ -527,7 +526,7 @@ export class CellsAPI {
     const validation = RestNodeVersionsSchema.safeParse(result.data.Versions);
 
     if (!validation.success) {
-      this.logger.warn('Get node versions response validation failed:', validation.error);
+      this.logger.warn('Get node versions response validation failed:', {error: validation.error});
     }
 
     return result.data.Versions !== undefined ? result.data.Versions : [];
@@ -543,7 +542,7 @@ export class CellsAPI {
     const validation = RestNodeSchema.safeParse(result.data);
 
     if (!validation.success) {
-      this.logger.warn('Get node response validation failed:', validation.error);
+      this.logger.warn('Get node response validation failed:', {error: validation.error});
     }
 
     return result.data;

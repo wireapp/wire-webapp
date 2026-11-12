@@ -18,13 +18,12 @@
  */
 
 import axios, {AxiosHeaderValue, AxiosRequestConfig} from 'axios';
-import logdown from 'logdown';
 
 import {AssetUploadData, PostAssetsResponseSchema} from './assetApi.schema';
 import {AssetRetentionPolicy} from './assetRetentionPolicy';
 import {isValidToken, isValidUUID} from './assetUtil';
 
-import {LogFactory} from '../../commons/LogFactory';
+import {getLogger, type Logger} from '../../commons/getLogger';
 import {
   BackendError,
   handleProgressEvent,
@@ -81,13 +80,13 @@ const assetDownloadRetryConfig = {
 } as const;
 
 export class AssetAPI {
-  private readonly logger: logdown.Logger;
+  private readonly logger: Logger;
 
   constructor(
     private readonly client: HttpClient,
     private readonly buffer: Pick<BufferPlatform, 'base64MD5FromBuffer' | 'concatToBuffer'>,
   ) {
-    this.logger = LogFactory.getLogger('@wireapp/api-client/AssetAPI');
+    this.logger = getLogger('@wireapp/api-client/AssetAPI');
   }
 
   private getAssetShared(
@@ -204,7 +203,7 @@ export class AssetAPI {
         const validation = PostAssetsResponseSchema.safeParse(response.data);
 
         if (!validation.success) {
-          this.logger.warn('Asset upload response validation failed:', validation.error);
+          this.logger.warn('Asset upload response validation failed:', {error: validation.error});
         }
 
         return response.data;

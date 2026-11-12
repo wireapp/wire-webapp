@@ -124,7 +124,7 @@ export class GiphyRepository {
 
     if (!isNonEmptyString(query)) {
       const error = new Error('No query specified');
-      this.logger.error(error.message, error);
+      this.logger.error(error.message, {error});
       throw error;
     }
 
@@ -163,7 +163,7 @@ export class GiphyRepository {
 
       return result;
     } catch (error: unknown) {
-      this.logger.warn(`Unable to fetch GIF for query: ${query}`, error);
+      this.logger.warn(`Unable to fetch GIF for query: ${query}`, {error});
       throw error;
     }
   }

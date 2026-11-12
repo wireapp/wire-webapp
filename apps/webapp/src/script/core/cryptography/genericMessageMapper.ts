@@ -20,7 +20,7 @@
 import {isUndefined} from '@sindresorhus/is';
 
 import {ConversationOtrMessageAddEvent} from '../../apiClient/event/conversationEvent';
-import {LogFactory} from '../../commons/LogFactory';
+import {getLogger} from '../../commons/getLogger';
 import {GenericMessageType, MessageSendingState, PayloadBundle, PayloadBundleType} from '../conversation';
 import {
   AssetContent,
@@ -38,7 +38,7 @@ import {
 import {NotificationSource} from '../notification';
 
 export class GenericMessageMapper {
-  private static readonly logger = LogFactory.getLogger('@wireapp/core/GenericMessageMapper');
+  private static readonly logger = getLogger('@wireapp/core/GenericMessageMapper');
 
   // TODO: Turn "any" into a specific type (or collection of types) and make the return type more specific based on the
   // "genericMessage" input parameter.

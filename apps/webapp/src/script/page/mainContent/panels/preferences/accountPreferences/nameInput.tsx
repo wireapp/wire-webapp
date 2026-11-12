@@ -47,7 +47,7 @@ const NameInput: FunctionComponent<NameInputProps> = ({name, userRepository, can
         await userRepository.changeName(newName);
         nameInputDone.done();
       } catch (error: unknown) {
-        logger.warn('Failed to update name', error);
+        logger.warn('Failed to update name', {error});
       }
     }
   };

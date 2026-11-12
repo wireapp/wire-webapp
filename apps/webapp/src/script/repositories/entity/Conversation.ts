@@ -234,7 +234,7 @@ export class Conversation {
     this.domain = domain;
     this.protocol = protocol;
 
-    this.logger = getLogger(`Conversation (${this.id})`);
+    this.logger = getLogger('Conversation');
     this.initialProtocol = this.protocol;
     this.accessState = ko.observable(ACCESS_STATE.OTHER.UNKNOWN);
     this.accessCode = ko.observable('');
@@ -1121,7 +1121,10 @@ export class Conversation {
     if (!isNullOrUndefined(messageEntity)) {
       const existingMessageEntity = this._findDuplicate(messageEntity.id, messageEntity.from);
       if (!isNullOrUndefined(existingMessageEntity)) {
-        this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`);
+        this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`, {
+          conversationId: this.id,
+          messageId: messageEntity.id,
+        });
         return undefined;
       }
       return messageEntity;
