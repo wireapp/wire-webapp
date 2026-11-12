@@ -24,7 +24,6 @@ import {
 } from './startupFeatureToggles';
 import {
   applockRefactoredFeatureToggleName,
-  callSecurityLineFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
@@ -38,7 +37,6 @@ import {
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
-  callSecurityLineFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
@@ -78,20 +76,6 @@ describe('startupFeatureToggles', function () {
     const toggles = createStartupFeatureTogglesFromLocationSearch('');
 
     expect(toggles.isFeatureToggleEnabled(troubleshooterFeatureToggleName)).toBe(false);
-  });
-
-  it('keeps the call security line disabled by default', () => {
-    const toggles = createStartupFeatureTogglesFromLocationSearch('');
-
-    expect(toggles.isFeatureToggleEnabled(callSecurityLineFeatureToggleName)).toBe(false);
-  });
-
-  it('enables the call security line when selected in developer settings', () => {
-    const toggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${callSecurityLineFeatureToggleName}`,
-    );
-
-    expect(toggles.isFeatureToggleEnabled(callSecurityLineFeatureToggleName)).toBe(true);
   });
 
   it('enables the troubleshooter when selected in developer settings', () => {
@@ -252,7 +236,6 @@ describe('startupFeatureToggles', function () {
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       applockRefactoredFeatureToggleName,
-      callSecurityLineFeatureToggleName,
       conversationListCollapseFeatureToggleName,
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
