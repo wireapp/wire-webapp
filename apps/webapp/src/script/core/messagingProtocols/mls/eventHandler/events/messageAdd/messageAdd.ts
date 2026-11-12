@@ -183,6 +183,7 @@ export const handleMLSMessageAdd = async ({
     new ConversationId(groupIdBytes),
     encryptedData,
     qualifiedConversationId,
+    event.time,
   );
 
   if (decryptedMessage === undefined) {

@@ -42,6 +42,8 @@ import {
 
 import {ClientMLSError, ClientMLSErrorLabel} from './clientMlsError';
 import {
+  BufferedMessageError,
+  isCoreCryptoMLSBufferedMessageError,
   isCoreCryptoMLSConversationAlreadyExistsError,
   isMlsMessageRejectedError,
   serializeAbortReason,
@@ -86,6 +88,8 @@ import {User} from '../e2eIdentityService';
 import {E2EIServiceInternal, getAllConversationsCallback} from '../e2eIdentityService/e2eiServiceInternal';
 import {getSignatureAlgorithmForCiphersuite} from '../e2eIdentityService/helper';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../eventHandler/events';
+import {BufferedMlsMessageRecoveryTracker} from '../recovery/bufferedMlsMessageRecoveryTracker';
+import {MlsBufferedMessageRecoveryRequiredError} from '../recovery/mlsBufferedMessageRecoveryRequiredError';
 import {ClientId, HandlePendingProposalsParams} from '../types';
 import {createMLSClientId} from '../utils/mlsId';
 
@@ -149,6 +153,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   private initialKeyPackageUploadDeferred = false;
   private readonly mlsTransport: MlsTransport;
   private readonly pendingProposalRetries = new Set<string>();
+  private readonly bufferedMessageRecoveryTracker = new BufferedMlsMessageRecoveryTracker();
 
   constructor(
     private readonly apiClient: APIClient,
@@ -638,6 +643,8 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       //after we've successfully joined via external commit, we schedule periodic key material renewal
       const groupIdStr = Encoder.toBase64(conversationId.copyBytes()).asString;
+      // Buffered messages from before the rejoin are no longer relevant for recovery.
+      this.bufferedMessageRecoveryTracker.clear(groupIdStr);
       const newEpoch = await this.getEpoch(groupIdStr);
 
       // Schedule the next key material renewal
@@ -664,17 +671,28 @@ export class MLSService extends TypedEventEmitter<Events> {
     });
   }
 
+  /**
+   * Decrypts an incoming MLS message.
+   *
+   * Returns `undefined` when CoreCrypto reports an error that can safely be ignored, including messages it buffered
+   * for later consumption. If messages of the group keep being buffered for longer than the recovery threshold
+   * (based on `eventTime`), a {@link MlsBufferedMessageRecoveryRequiredError} is thrown so the caller can verify
+   * the group epoch and recover from a missed commit.
+   */
   public async decryptMessage(
     conversationId: ConversationId,
     payload: Uint8Array,
     qualifiedConversationId: QualifiedId,
+    eventTime?: string,
   ): Promise<DecryptedMessage | undefined> {
+    const groupId = Encoder.toBase64(conversationId.copyBytes()).asString;
     try {
       const start = Date.now();
       this.logger.info('Decrypting message', {qualifiedConversationId});
       const decryptedMessage = await this.coreCryptoClient.transaction(cx => {
         return cx.decryptMessage(conversationId, payload);
       });
+      this.bufferedMessageRecoveryTracker.clear(groupId);
       await this.resumePendingProposalsAfterIncomingMessage(conversationId);
       this.logger.info('Message decrypted successfully', {qualifiedConversationId, duration: Date.now() - start});
       return decryptedMessage;
@@ -700,12 +718,49 @@ export class MLSService extends TypedEventEmitter<Events> {
         }),
         error,
       });
+      if (isCoreCryptoMLSBufferedMessageError(error)) {
+        return this.handleBufferedMessage(groupId, error, qualifiedConversationId, eventTime);
+      }
       // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
       if (shouldMLSDecryptionErrorBeIgnored(error)) {
         return undefined;
       }
       throw error;
     }
+  }
+
+  /**
+   * CoreCrypto buffered the message and will consume it once the missing messages arrive.
+   * If the group keeps buffering for too long, a commit was most likely missed and recovery is required.
+   */
+  private handleBufferedMessage(
+    groupId: string,
+    error: BufferedMessageError,
+    qualifiedConversationId: QualifiedId,
+    eventTime?: string,
+  ): undefined {
+    const timestamp = eventTime !== undefined ? new Date(eventTime).getTime() : Number.NaN;
+    if (Number.isNaN(timestamp)) {
+      this.logger.warn('Buffered MLS message has no valid event time, skipping recovery tracking', {
+        qualifiedConversationId,
+        groupId,
+        eventTime,
+      });
+      return undefined;
+    }
+
+    if (this.bufferedMessageRecoveryTracker.observeBufferedMessage(groupId, timestamp)) {
+      throw new MlsBufferedMessageRecoveryRequiredError(groupId, error.inner.mlsError.tag, error);
+    }
+    return undefined;
+  }
+
+  /**
+   * Stops tracking buffered messages for the given group, so a new tracking window starts with the next
+   * buffered message. Should be called once stale epoch recovery has been performed (or scheduled).
+   */
+  public clearBufferedMessageRecoveryTracking(groupId: string): void {
+    this.bufferedMessageRecoveryTracker.clear(groupId);
   }
 
   public async encryptMessage(conversationId: ConversationId, message: Uint8Array): Promise<Uint8Array> {
@@ -1229,6 +1284,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async wipeConversation(groupId: string): Promise<void> {
+    this.bufferedMessageRecoveryTracker.clear(groupId);
     await this.cancelKeyMaterialRenewal(groupId);
     await this.cancelPendingProposalsTask(groupId);
 

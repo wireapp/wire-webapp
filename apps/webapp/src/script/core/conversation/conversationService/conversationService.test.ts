@@ -38,7 +38,7 @@ import {noop} from 'noop-esm';
 import {Result, task} from 'true-myth';
 
 import {APIClient} from '../../../apiClient/apiClient';
-import {CoreCryptoError, MlsError} from '@wireapp/core-crypto';
+import {CoreCryptoError, MlsError, MlsError_Tags} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {AddUsersFailure, AddUsersFailureReasons, ConversationService, MessageSendingState} from '..';
@@ -48,6 +48,7 @@ import {
   UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
 } from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';
 import {MLSServiceEvents} from '../../messagingProtocols/mls/mlsService/mlsService';
+import {MlsBufferedMessageRecoveryRequiredError} from '../../messagingProtocols/mls/recovery';
 import {ProteusService} from '../../messagingProtocols/proteus';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
 import {CoreDatabase, openDB} from '../../storage/coreDb';
@@ -196,6 +197,7 @@ describe('ConversationService', () => {
       register1to1Conversation: jest.fn(),
       wipeConversation: jest.fn(),
       handleMLSMessageAddEvent: jest.fn(),
+      clearBufferedMessageRecoveryTracking: jest.fn(),
       conversationExists: jest.fn(),
       isConversationEstablished: jest.fn(),
       tryEstablishingMLSGroup: jest.fn(),
@@ -927,6 +929,86 @@ describe('ConversationService', () => {
 
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(conversationId);
       expect(conversationService.emit).toHaveBeenCalledWith('MLSConversationRecovered', {conversationId});
+    });
+
+    describe('when MLS messages have been buffered for too long', () => {
+      const conversationId = {id: 'conversationId', domain: 'staging.zinfra.io'};
+      const mockGroupId = 'mock-group-id';
+      const createBufferedRecoveryError = (): MlsBufferedMessageRecoveryRequiredError => {
+        return new MlsBufferedMessageRecoveryRequiredError(
+          mockGroupId,
+          MlsError_Tags.BufferedFutureMessage,
+          CoreCryptoError.Mls.new({mlsError: MlsError.BufferedFutureMessage.new()}),
+        );
+      };
+
+      it('rejoins the conversation on epoch mismatch and restarts buffered message tracking', async () => {
+        const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+        jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(createBufferedRecoveryError());
+        jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(4n)));
+        jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+          qualified_id: conversationId,
+          protocol: CONVERSATION_PROTOCOL.MLS,
+          epoch: 5,
+          group_id: mockGroupId,
+        } as unknown as Conversation);
+
+        const result = await conversationService.handleEvent(createMLSMessageAddEventMock(conversationId));
+
+        expect(result).toEqual({status: 'handled', payload: []});
+        expect(mlsService.handleMLSMessageAddEvent).toHaveBeenCalledTimes(1);
+        expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(conversationId);
+        expect(conversationService.emit).toHaveBeenCalledWith('MLSConversationRecovered', {conversationId});
+        expect(mlsService.clearBufferedMessageRecoveryTracking).toHaveBeenCalledWith(mockGroupId);
+      });
+
+      it('does not rejoin when the epoch matches the backend and restarts buffered message tracking', async () => {
+        const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+        jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(createBufferedRecoveryError());
+        jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(5n)));
+        jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+          qualified_id: conversationId,
+          protocol: CONVERSATION_PROTOCOL.MLS,
+          epoch: 5,
+          group_id: mockGroupId,
+        } as unknown as Conversation);
+
+        await conversationService.handleEvent(createMLSMessageAddEventMock(conversationId));
+
+        expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
+        expect(mlsService.clearBufferedMessageRecoveryTracking).toHaveBeenCalledWith(mockGroupId);
+      });
+
+      it('keeps buffered message tracking when the recovery fails so it is retried', async () => {
+        const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+        jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(createBufferedRecoveryError());
+        jest.spyOn(apiClient.api.conversation, 'getConversation').mockRejectedValueOnce(new Error('network error'));
+
+        const result = await conversationService.handleEvent(createMLSMessageAddEventMock(conversationId));
+
+        expect(result).toEqual({status: 'handled', payload: []});
+        expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
+        expect(mlsService.clearBufferedMessageRecoveryTracking).not.toHaveBeenCalled();
+      });
+
+      it('verifies the subconversation epoch for buffered subconversation messages', async () => {
+        const [conversationService, {apiClient, mlsService, subconversationService}] = await buildConversationService();
+        jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(createBufferedRecoveryError());
+        jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(4n)));
+        jest.spyOn(apiClient.api.conversation, 'getSubconversation').mockResolvedValueOnce({
+          epoch: 5,
+          group_id: mockGroupId,
+          parent_qualified_id: conversationId,
+          subconv_id: SUBCONVERSATION_ID.CONFERENCE,
+        } as unknown as Subconversation);
+
+        await conversationService.handleEvent(
+          createMLSMessageAddEventMock(conversationId, SUBCONVERSATION_ID.CONFERENCE),
+        );
+
+        expect(subconversationService.joinConferenceSubconversation).toHaveBeenCalledWith(conversationId, 'groupId');
+        expect(mlsService.clearBufferedMessageRecoveryTracking).toHaveBeenCalledWith(mockGroupId);
+      });
     });
 
     it('rejoins a conference subconversation if epoch mismatch detected when decrypting mls message', async () => {

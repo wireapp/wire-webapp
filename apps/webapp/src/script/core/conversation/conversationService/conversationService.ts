@@ -68,6 +68,7 @@ import {
   MlsRecoveryOrchestrator,
   MlsEpochRecoveryTrigger,
   MlsEpochRecoveryDeferredError,
+  MlsBufferedMessageRecoveryRequiredError,
   MlsRecoveryOrchestratorImpl,
   OperationName,
   createDefaultMlsErrorMapper,
@@ -1177,6 +1178,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * - WrongEpoch during notification replay → defer recovery until runDeferredEpochRecovery.
    * - GroupOutOfSync.handleMessageAdd → not handled here; the error bubbles.
    *
+   * If CoreCrypto keeps buffering messages of the group for too long (most likely a missed commit),
+   * the epoch is verified against the backend and the group is rejoined if needed.
+   *
    * Returns decrypted payloads when available. Unknown or unrecoverable errors are logged
    * and result in an empty list so event processing can continue safely.
    */
@@ -1209,6 +1213,11 @@ export class ConversationService extends TypedEventEmitter<Events> {
         return [];
       }
 
+      if (error instanceof MlsBufferedMessageRecoveryRequiredError && event.qualified_conversation !== undefined) {
+        await this.recoverFromProlongedMessageBuffering(event.qualified_conversation, event.subconv, error);
+        return [];
+      }
+
       // For unmapped or unrecoverable errors, avoid surfacing exceptions from event handling
       // and instead log and return no payloads so the event processing queue can continue safely.
       const isSafeMissingSubconversationGroup = event.subconv !== undefined && isMlsConversationNotFoundError(error);
@@ -1220,6 +1229,48 @@ export class ConversationService extends TypedEventEmitter<Events> {
         {error, event},
       );
       return [];
+    }
+  }
+
+  /**
+   * CoreCrypto only reports a wrong epoch once the epoch gap gets large enough, and keeps buffering messages until
+   * then. In conversations where the epoch rarely changes (e.g. 1:1 conversations) a missed commit would leave the
+   * conversation stuck, so once messages have been buffered for too long we verify the epoch and rejoin if needed.
+   *
+   * If the recovery fails, the buffering window is kept so the next buffered message retries it.
+   */
+  private async recoverFromProlongedMessageBuffering(
+    conversationId: QualifiedId,
+    subconvId: SUBCONVERSATION_ID | undefined,
+    {groupId, bufferedErrorType}: MlsBufferedMessageRecoveryRequiredError,
+  ): Promise<void> {
+    this.logger.warn('MLS messages have been buffered for too long, verifying epoch', {
+      conversationId,
+      subconvId,
+      groupId,
+      bufferedErrorType,
+    });
+
+    try {
+      await this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId, {
+        operationName: OperationName.handleMessageAdd,
+        errorType: bufferedErrorType,
+        groupId,
+      });
+      this.mlsService.clearBufferedMessageRecoveryTracking(groupId);
+    } catch (error: unknown) {
+      if (error instanceof MlsEpochRecoveryDeferredError) {
+        // Recovery has been scheduled and will run once the notification replay completes.
+        this.mlsService.clearBufferedMessageRecoveryTracking(groupId);
+        return;
+      }
+
+      this.logger.warn('Buffered MLS message recovery failed, will retry on next buffered message', {
+        error,
+        conversationId,
+        subconvId,
+        groupId,
+      });
     }
   }
 
