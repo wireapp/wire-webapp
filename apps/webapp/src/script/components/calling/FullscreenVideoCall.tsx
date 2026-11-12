@@ -26,7 +26,6 @@ import {container} from 'tsyringe';
 
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {CallSecurityLine} from './callSecurityLine/callSecurityLine';
-import {Duration} from './Duration';
 import {
   classifiedBarStyles,
   headerActionsWrapperStyles,
@@ -45,7 +44,6 @@ import {VideoControls} from './VideoControls/VideoControls';
 
 import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
 import {Config} from '../../Config';
-import {callSecurityLineFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useActiveWindowMatchMedia} from '../../hooks/useActiveWindowMatchMedia';
 import {useToggleState} from '../../hooks/useToggleState';
 import {useApplicationContext} from '../../page/rootProvider';
@@ -143,7 +141,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: FullscreenVideoCallProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const selfParticipant = call.getSelfParticipant();
   const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesCamera']);
@@ -177,7 +175,6 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
   const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {BRAND_NAME: brandName, URL: configUrls} = Config.getConfig();
-  const isCallSecurityLineEnabled = isFeatureToggleEnabled(callSecurityLineFeatureToggleName);
   const callEncryptionSupportUrl = configUrls.SUPPORT.CALL_ENCRYPTION;
 
   const {selfUser, roles} = useKoSubscribableChildren(conversation, ['selfUser', 'roles']);
@@ -362,17 +359,13 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
               <h2 className="video-remote-title">{conversationName}</h2>
 
               <div data-uie-name="video-timer" className="video-timer label-xs">
-                {isCallSecurityLineEnabled ? (
-                  <CallSecurityLine
-                    callConnectionState={callConnectionState}
-                    participants={participants}
-                    startedAt={startedAt}
-                    brandName={brandName}
-                    supportUrl={callEncryptionSupportUrl}
-                  />
-                ) : (
-                  <Duration startedAt={startedAt} />
-                )}
+                <CallSecurityLine
+                  callConnectionState={callConnectionState}
+                  participants={participants}
+                  startedAt={startedAt}
+                  brandName={brandName}
+                  supportUrl={callEncryptionSupportUrl}
+                />
               </div>
             </div>
           </div>

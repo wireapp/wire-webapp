@@ -18,7 +18,6 @@
  */
 
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
-export const callSecurityLineFeatureToggleName = 'call-security-line';
 export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
 export const forTestsOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
@@ -32,7 +31,6 @@ export const e2ePdfPreviewFeatureToggleName = 'e2e-pdf-preview';
 
 export const startupFeatureToggleRegistry = [
   {name: applockRefactoredFeatureToggleName, previewDefaultEnabled: false},
-  {name: callSecurityLineFeatureToggleName, previewDefaultEnabled: false},
   {name: conversationListCollapseFeatureToggleName, previewDefaultEnabled: false},
   {name: forTestsOnlyFeatureToggleName, previewDefaultEnabled: false},
   {name: disableMessagePreprocessingFeatureToggleName, previewDefaultEnabled: false},
