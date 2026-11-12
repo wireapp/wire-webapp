@@ -938,6 +938,7 @@ export class MessageRepository {
       : MessageBuilder.buildFileDataMessage(
           {
             metaData: meta,
+            preview: asset.preview,
             ...commonMessageData,
             file: {data: Buffer.from(await file.arrayBuffer())},
           },

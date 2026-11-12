@@ -32,6 +32,7 @@ import {
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
+  e2ePdfPreviewFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
 } from './startupFeatureToggleNames';
@@ -47,9 +48,19 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
+  e2ePdfPreviewFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
+  it('keeps encrypted PDF previews disabled for release builds and allows explicit opt-in', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview');
+
+    expect(disabled.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)).toBe(false);
+    expect(enabled.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)).toBe(true);
+    expect(enabled.enabledFeatureToggleNames).toEqual([e2ePdfPreviewFeatureToggleName]);
+  });
+
   it('keeps Mark as unread disabled by default for release builds and allows explicit opt-in', () => {
     const disabled = createStartupFeatureTogglesFromLocationSearch('');
     const enabled = createStartupFeatureTogglesFromLocationSearch('?enabled-features=mark-as-unread');
@@ -261,6 +272,7 @@ describe('startupFeatureToggles', function () {
       markAsUnreadFeatureToggleName,
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,
+      e2ePdfPreviewFeatureToggleName,
     ]);
   });
 
