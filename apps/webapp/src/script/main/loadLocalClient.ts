@@ -28,6 +28,14 @@ import {BASE_ERROR_TYPE} from '../error/baseError';
 import {CLIENT_ERROR_TYPE, ClientError} from '../error/clientError';
 import type {Logger} from '../util/logger';
 
+function isClientRequestFailure(error: Error): boolean {
+  return error instanceof BackendError || axios.isAxiosError(error);
+}
+
+function isClientStorageFailure(error: Error): boolean {
+  return error instanceof Dexie.DexieError || error instanceof DOMException || error instanceof LowDiskSpaceError;
+}
+
 /**
  * Loads the local client during app initialization.
  *
@@ -43,13 +51,9 @@ export function loadLocalClient(
     .mapRejected(error => {
       logger.error('Failed to load the local client', error);
       let errorType: CLIENT_ERROR_TYPE | BASE_ERROR_TYPE = BASE_ERROR_TYPE.UNKNOWN;
-      if (error instanceof BackendError || axios.isAxiosError(error)) {
+      if (isClientRequestFailure(error)) {
         errorType = CLIENT_ERROR_TYPE.REQUEST_FAILURE;
-      } else if (
-        error instanceof Dexie.DexieError ||
-        error instanceof DOMException ||
-        error instanceof LowDiskSpaceError
-      ) {
+      } else if (isClientStorageFailure(error)) {
         errorType = CLIENT_ERROR_TYPE.DATABASE_FAILURE;
       }
       const clientError = new ClientError(errorType, 'Failed to load the local client');
