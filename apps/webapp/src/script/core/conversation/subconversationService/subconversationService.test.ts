@@ -328,6 +328,66 @@ describe('SubconversationService', () => {
       expect(mlsService.joinByExternalCommit).toHaveBeenCalled();
     });
 
+    it('retries stale external commits with bounded jittered backoff', async () => {
+      const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
+      const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
+      const parentGroupId = 'parentGroupId';
+      const subconversationResponse = getSubconversationResponse({
+        epoch: 1,
+        epochTimestamp: new Date().toISOString(),
+        parentConversationId,
+        groupId: 'subconversationGroupId',
+      });
+      const staleMessage = new BackendError('', BackendErrorLabel.MLS_STALE_MESSAGE, StatusCode.CONFLICT);
+
+      jest.useFakeTimers();
+      jest.spyOn(Math, 'random').mockReturnValueOnce(0).mockReturnValueOnce(1);
+      const timeoutSpy = jest.spyOn(global, 'setTimeout');
+      jest.spyOn(apiClient.api.conversation, 'getSubconversation').mockResolvedValue(subconversationResponse);
+      jest
+        .spyOn(mlsService, 'joinByExternalCommit')
+        .mockRejectedValueOnce(staleMessage)
+        .mockRejectedValueOnce(staleMessage)
+        .mockRejectedValueOnce(staleMessage);
+
+      const join = subconversationService.joinConferenceSubconversation(parentConversationId, parentGroupId);
+      await jest.runAllTimersAsync();
+      await join;
+
+      expect(mlsService.joinByExternalCommit).toHaveBeenCalledTimes(4);
+      expect(apiClient.api.conversation.getSubconversation).toHaveBeenCalledTimes(4);
+      expect(
+        timeoutSpy.mock.calls.map(([, delay]) => {
+          return delay;
+        }),
+      ).toEqual(expect.arrayContaining([800, 2400]));
+    });
+
+    it('stops after the fourth stale external commit failure', async () => {
+      const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
+      const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
+      const staleMessage = new BackendError('', BackendErrorLabel.MLS_STALE_MESSAGE, StatusCode.CONFLICT);
+
+      jest.useFakeTimers();
+      jest.spyOn(Math, 'random').mockReturnValue(0.5);
+      jest.spyOn(apiClient.api.conversation, 'getSubconversation').mockResolvedValue(
+        getSubconversationResponse({
+          epoch: 1,
+          epochTimestamp: new Date().toISOString(),
+          parentConversationId,
+          groupId: 'subconversationGroupId',
+        }),
+      );
+      jest.spyOn(mlsService, 'joinByExternalCommit').mockRejectedValue(staleMessage);
+
+      const join = subconversationService.joinConferenceSubconversation(parentConversationId, 'parentGroupId');
+      const rejection = expect(join).rejects.toBe(staleMessage);
+      await jest.runAllTimersAsync();
+      await rejection;
+
+      expect(mlsService.joinByExternalCommit).toHaveBeenCalledTimes(4);
+    });
+
     it('returns fresh epoch number after joining the group', async () => {
       const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
 

@@ -22,12 +22,15 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {generateSubconversationStoreKey} from './subconversationUtil';
 
 import {APIClient} from '../../../apiClient/apiClient';
-import {SUBCONVERSATION_ID, Subconversation} from '../../../apiClient/conversation/subconversation';
+import {Subconversation, SUBCONVERSATION_ID} from '../../../apiClient/conversation/subconversation';
+import {BackendError} from '../../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {getLogger} from '../../../commons/getLogger';
 import {TypedEventEmitter} from '../../../commons/TypedEventEmitter/TypedEventEmitter';
 import {TimeInMillis} from '../../../commons/util/TimeUtil';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
+import {isMLSStaleMessageError} from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';
 import {CoreDatabase} from '../../storage/coreDb';
 import {constructFullyQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 
@@ -42,6 +45,11 @@ export interface SubconversationEpochInfoMember {
 }
 
 const MLS_CONVERSATION_KEY_LENGTH = 32;
+const MAX_CONFERENCE_JOIN_RETRIES = 3;
+const SECOND_RETRY_DELAY = TimeInMillis.SECOND;
+const CONFERENCE_JOIN_RETRY_DELAYS = [0, SECOND_RETRY_DELAY, SECOND_RETRY_DELAY + SECOND_RETRY_DELAY];
+const CONFERENCE_JOIN_MIN_JITTER = 0.8;
+const CONFERENCE_JOIN_JITTER_RANGE = 0.4;
 
 export class SubconversationService extends TypedEventEmitter<Events> {
   private readonly logger = getLogger('@wireapp/core/SubconversationService');
@@ -67,11 +75,12 @@ export class SubconversationService extends TypedEventEmitter<Events> {
    *
    * @param conversationId Id of the parent conversation in which the call should happen
    * @param groupId groupId of the parent conversation in which the call should happen
+   * @param retryCount
    */
   public async joinConferenceSubconversation(
     conversationId: QualifiedId,
     groupId: string,
-    shouldRetry = true,
+    retryCount = 0,
   ): Promise<{groupId: string; epoch: number}> {
     try {
       this.logger.info('Joining conference subconversation', {conversationId, groupId});
@@ -115,12 +124,33 @@ export class SubconversationService extends TypedEventEmitter<Events> {
 
       return {groupId: subconversationGroupId, epoch};
     } catch (error: unknown) {
-      this.logger.error('Failed to join conference subconversation', {conversationId, groupId, error, shouldRetry});
-      if (shouldRetry) {
-        return this.joinConferenceSubconversation(conversationId, groupId, false);
-      }
+      this.logger.error('Failed to join conference subconversation', {conversationId, groupId, error, retryCount});
+      return this.retryConferenceSubconversationJoin(conversationId, groupId, retryCount, error);
+    }
+  }
+
+  private async retryConferenceSubconversationJoin(
+    conversationId: QualifiedId,
+    groupId: string,
+    retryCount: number,
+    error: unknown,
+  ): Promise<{groupId: string; epoch: number}> {
+    const isStaleMessage =
+      (error instanceof BackendError && error.label === BackendErrorLabel.MLS_STALE_MESSAGE) ||
+      isMLSStaleMessageError(error);
+    if (retryCount >= MAX_CONFERENCE_JOIN_RETRIES || (retryCount > 0 && !isStaleMessage)) {
       throw error;
     }
+
+    if (retryCount > 0) {
+      const baseDelay = CONFERENCE_JOIN_RETRY_DELAYS[retryCount];
+      const delay = Math.round(baseDelay * (CONFERENCE_JOIN_MIN_JITTER + Math.random() * CONFERENCE_JOIN_JITTER_RANGE));
+      await new Promise(resolve => {
+        setTimeout(resolve, delay);
+      });
+    }
+
+    return this.joinConferenceSubconversation(conversationId, groupId, retryCount + 1);
   }
 
   /**
