@@ -19,7 +19,7 @@
 
 import {act, waitFor} from '@testing-library/react';
 import {Navigate} from 'react-router';
-import {Maybe} from 'true-myth';
+import {Maybe, task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import type {MetaClient} from '../../core/client/clientService';
@@ -71,7 +71,9 @@ describe('when visiting the index page', () => {
         ...configuration,
         FEATURE: {...configuration.FEATURE, ENABLE_AUTO_LOGIN: true},
       });
-      const getLocalClient = jest.spyOn(container.resolve(Core), 'getLocalClient').mockResolvedValue(localClient);
+      const getLocalClient = jest
+        .spyOn(container.resolve(Core), 'getLocalClient')
+        .mockReturnValue(task.resolve(localClient));
       const historyPush = jest.spyOn(history, 'pushState');
       const doInit = jest.fn().mockResolvedValue(undefined);
       const IndexComponent = Index.WrappedComponent;

@@ -18,7 +18,7 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {Maybe} from 'true-myth';
+import {Maybe, task, type Task} from 'true-myth';
 import {ClientType} from '../../../apiClient/client/clientType';
 import type {RegisteredClient} from '../../../apiClient/client/registeredClient';
 import {
@@ -44,8 +44,8 @@ describe('ClientAction', () => {
     const store = mockStoreFactory({
       actions: actionRoot,
       core: {
-        async getLocalClient(): Promise<Maybe<MetaClient>> {
-          return Maybe.nothing();
+        getLocalClient(): Task<Maybe<MetaClient>, Error> {
+          return task.resolve(Maybe.nothing());
         },
         registerClient,
         initClient,
@@ -65,8 +65,8 @@ describe('ClientAction', () => {
     const store = mockStoreFactory({
       actions: actionRoot,
       core: {
-        async getLocalClient(): Promise<Maybe<MetaClient>> {
-          throw lookupError;
+        getLocalClient(): Task<Maybe<MetaClient>, Error> {
+          return task.reject(lookupError);
         },
         registerClient,
         initClient,
@@ -118,8 +118,8 @@ describe('ClientAction', () => {
       ...clockParameters,
       actions: actionRoot,
       core: {
-        async getLocalClient(): Promise<Maybe<MetaClient>> {
-          return Maybe.just(client as MetaClient);
+        getLocalClient(): Task<Maybe<MetaClient>, Error> {
+          return task.resolve(Maybe.just(client as MetaClient));
         },
         service: {
           team: {

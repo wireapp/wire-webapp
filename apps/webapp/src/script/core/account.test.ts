@@ -65,7 +65,7 @@ jest.mock('./conversation', () => {
 });
 
 import {Account} from './account';
-import {Maybe} from 'true-myth';
+import {Maybe, result, task} from 'true-myth';
 import type {MetaClient} from './client/clientService';
 import {ConnectionState} from './connectionState/connectionState';
 import type {MLSService} from './messagingProtocols/mls';
@@ -121,30 +121,32 @@ const waitFor = (assertion: () => void): Promise<void> => {
 
 describe('Account', () => {
   describe('getLocalClient', () => {
-    it('rejects when the client service has not been initialized', async () => {
+    it('returns Err when the client service has not been initialized', async () => {
       const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
       apiClients.push(apiClient);
       const account = new Account(apiClient);
 
-      await expect(account.getLocalClient()).rejects.toThrow('Client service is not initialized.');
+      await expect(account.getLocalClient()).resolves.toEqual(
+        result.err(new Error('Client service is not initialized.')),
+      );
     });
 
     it.each([Maybe.just({id: 'local-client'} as MetaClient), Maybe.nothing<MetaClient>()])(
       'preserves the client lookup outcome %s',
       async localClient => {
         const {account} = await createAccount();
-        jest.spyOn(getAccountServiceForTest(account).client, 'loadClient').mockResolvedValue(localClient);
+        jest.spyOn(getAccountServiceForTest(account).client, 'loadClient').mockReturnValue(task.resolve(localClient));
 
-        await expect(account.getLocalClient()).resolves.toBe(localClient);
+        await expect(account.getLocalClient()).resolves.toEqual(result.ok(localClient));
       },
     );
 
     it('preserves a failed client lookup', async () => {
       const {account} = await createAccount();
       const lookupError = new Error('Database unavailable');
-      jest.spyOn(getAccountServiceForTest(account).client, 'loadClient').mockRejectedValue(lookupError);
+      jest.spyOn(getAccountServiceForTest(account).client, 'loadClient').mockReturnValue(task.reject(lookupError));
 
-      await expect(account.getLocalClient()).rejects.toBe(lookupError);
+      await expect(account.getLocalClient()).resolves.toEqual(result.err(lookupError));
     });
   });
 

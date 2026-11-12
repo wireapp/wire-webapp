@@ -74,8 +74,11 @@ const IndexComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
     await doInit({isImmediateLogin: true, shouldValidateLocalClient: true});
     // Check if the user is already logged in
     if (!hasOtherInstance) {
-      const localClient = await core.getLocalClient();
-      if (localClient.isJust) {
+      const localClientResult = await core.getLocalClient();
+      if (localClientResult.isErr) {
+        throw localClientResult.error;
+      }
+      if (localClientResult.value.isJust) {
         navigate(ROUTE.HISTORY_INFO);
       }
     }

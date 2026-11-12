@@ -18,7 +18,7 @@
  */
 
 import {VerificationActionType} from '../../../apiClient/auth/verificationActionType';
-import {Maybe} from 'true-myth';
+import {Maybe, task, type Task} from 'true-myth';
 import {asyncNoop} from 'noop-esm';
 import type {MetaClient} from '../../../core/client/clientService';
 import {ClientType} from '../../../apiClient/client/clientType';
@@ -61,8 +61,8 @@ describe('AuthAction', () => {
         },
         core: {
           login: jest.fn().mockResolvedValue(undefined),
-          async getLocalClient(): Promise<Maybe<MetaClient>> {
-            return localClient;
+          getLocalClient(): Task<Maybe<MetaClient>, Error> {
+            return task.resolve(localClient);
           },
         },
       })({});
@@ -86,6 +86,47 @@ describe('AuthAction', () => {
       expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
     },
   );
+
+  it('stops authentication before entropy collection or initialization when the client Task fails', async () => {
+    const lookupError = new Error('Database unavailable');
+    const getEntropy = jest.fn();
+    const doInitializeClient = jest.fn();
+    const store = mockStoreFactory({
+      actions: {
+        clientAction: {doInitializeClient},
+        selfAction: {
+          fetchSelf(): typeof asyncNoop {
+            return asyncNoop;
+          },
+        },
+        localStorageAction: {
+          setLocalStorage(): typeof asyncNoop {
+            return asyncNoop;
+          },
+        },
+      },
+      core: {
+        login: jest.fn().mockResolvedValue(undefined),
+        getLocalClient(): Task<Maybe<MetaClient>, Error> {
+          return task.reject(lookupError);
+        },
+      },
+    })({});
+
+    await expect(
+      store.dispatch(
+        actionRoot.authAction.doLoginPlain(
+          {clientType: ClientType.PERMANENT, email: 'test@example.com', password: 'password'},
+          undefined,
+          undefined,
+          getEntropy,
+        ),
+      ),
+    ).rejects.toBe(lookupError);
+    expect(getEntropy).not.toHaveBeenCalled();
+    expect(doInitializeClient).not.toHaveBeenCalled();
+    expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.failedLogin(lookupError)]);
+  });
 
   it('authenticates a user successfully', async () => {
     const email = 'test@example.com';

@@ -22,6 +22,7 @@ import {CredentialType} from '../core/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '../core/util/lowPrecisionTaskScheduler';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {noop} from 'noop-esm';
+import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
@@ -126,7 +127,7 @@ describe('E2EIHandler', () => {
         e2eIdentity: {
           initialize: jest.fn(),
           isEnrollmentInProgress: jest.fn(),
-          isFreshMLSSelfClient: jest.fn(),
+          isFreshMLSSelfClient: jest.fn().mockReturnValue(task.resolve(false)),
           clearAllProgress: jest.fn(),
           getDevicesIdentities: jest.fn(),
           getAllGroupUsersIdentities: jest.fn().mockResolvedValue(new Map()),
@@ -191,7 +192,7 @@ describe('E2EIHandler', () => {
 
   it('does nothing if there is not enrollment in progress and device is alreaady enrolled', async () => {
     jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
-    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockReturnValue(task.resolve(false));
     const enrollPromise = E2EIHandler.getInstance().initialize(params);
 
     expect(modalMock).not.toHaveBeenCalled();
@@ -202,7 +203,7 @@ describe('E2EIHandler', () => {
   it('stops initialization without enrollment or progress cleanup when freshness is unknown', async () => {
     const lookupError = new Error('Client lookup unavailable');
     const service = getE2EIServiceForTest();
-    jest.spyOn(service, 'isFreshMLSSelfClient').mockRejectedValue(lookupError);
+    jest.spyOn(service, 'isFreshMLSSelfClient').mockReturnValue(task.reject(lookupError));
     jest.spyOn(service, 'isEnrollmentInProgress').mockResolvedValue(true);
 
     await expect(E2EIHandler.getInstance().initialize(params)).rejects.toBe(lookupError);
@@ -212,7 +213,7 @@ describe('E2EIHandler', () => {
   });
 
   it('trigger an enrollment when instantiated with a fresh new MLS device', async () => {
-    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(true);
+    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockReturnValue(task.resolve(true));
     const enrollPromise = E2EIHandler.getInstance().initialize(params);
     await waitFor(() => {
       expect(modalMock).toHaveBeenCalledWith(
@@ -278,7 +279,7 @@ describe('E2EIHandler', () => {
   });
 
   it('starts from scratch if returned to app without auth params', async () => {
-    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(true);
+    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockReturnValue(task.resolve(true));
     jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(true);
 
     // mock window search params (code, session_state, state)
@@ -314,7 +315,7 @@ describe('E2EIHandler', () => {
   });
 
   it('shows the error modal without the snooze option after enrollment failed and the client is fresh', async () => {
-    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(true);
+    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockReturnValue(task.resolve(true));
     jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(true);
     jest.spyOn(coreMock, 'enrollE2EI').mockRejectedValue(new Error('OIDC Error'));
 
@@ -355,7 +356,7 @@ describe('E2EIHandler', () => {
   });
 
   it('shows the error modal with the snooze option after enrollment failed and the client is an e2ei client already', async () => {
-    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockReturnValue(task.resolve(false));
     jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(true);
     jest.spyOn(coreMock, 'enrollE2EI').mockRejectedValue(new Error('OIDC Error'));
 
@@ -402,7 +403,7 @@ describe('E2EIHandler', () => {
     enrollmentStore.store.e2eiActivatedAt(clock.currentUnixEpochMilliseconds);
 
     jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
-    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+    jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockReturnValue(task.resolve(false));
     jest
       .spyOn(requireValueForTest(requireValueForTest(coreMock.service).conversation), 'getMLSSelfConversation')
       .mockResolvedValue({group_id: 'groupId'} as any);
@@ -421,7 +422,7 @@ describe('E2EIHandler', () => {
       'preserves persisted activation timestamp truthiness for %p',
       async storedActivationMilliseconds => {
         jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
-        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockReturnValue(task.resolve(false));
         jest.spyOn(e2eIdentityVerification, 'getActiveWireIdentity').mockResolvedValue(undefined);
         const instance = await E2EIHandler.getInstance().initialize(params);
         const enrollmentStore = getEnrollmentStore(user.qualifiedId, selfClientId);
@@ -440,7 +441,7 @@ describe('E2EIHandler', () => {
       'preserves persisted firing timestamp truthiness for %p',
       async storedFiringMilliseconds => {
         jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
-        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockReturnValue(task.resolve(false));
         jest.spyOn(e2eIdentityVerification, 'getActiveWireIdentity').mockResolvedValue(undefined);
         const instance = await E2EIHandler.getInstance().initialize(params);
         const enrollmentStore = getEnrollmentStore(user.qualifiedId, selfClientId);
@@ -458,7 +459,7 @@ describe('E2EIHandler', () => {
 
     it('should reset the timer after user interaction with modal', async () => {
       jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
-      jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+      jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockReturnValue(task.resolve(false));
       jest
         .spyOn(e2eIdentityVerification, 'getActiveWireIdentity')
         .mockResolvedValue(
@@ -491,7 +492,7 @@ describe('E2EIHandler', () => {
     describe('should start enrollment for existing devices', () => {
       it('with a basic credential type', async () => {
         jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
-        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockReturnValue(task.resolve(false));
         jest
           .spyOn(e2eIdentityVerification, 'getActiveWireIdentity')
           .mockResolvedValue(
@@ -511,7 +512,7 @@ describe('E2EIHandler', () => {
 
       it('without existing WireIdentity', async () => {
         jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
-        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockReturnValue(task.resolve(false));
         jest.spyOn(e2eIdentityVerification, 'getActiveWireIdentity').mockResolvedValue(undefined);
 
         const instance = await E2EIHandler.getInstance().initialize(params);
@@ -527,7 +528,7 @@ describe('E2EIHandler', () => {
 
       it('with pristine WireIdentity', async () => {
         jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
-        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockReturnValue(task.resolve(false));
         jest
           .spyOn(e2eIdentityVerification, 'getActiveWireIdentity')
           .mockResolvedValue(generateWireIdentity(selfClientId, CredentialType.X509));

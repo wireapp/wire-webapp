@@ -20,7 +20,7 @@
 import type {Clock} from '@enormora/clock/clock';
 import {AxiosError, AxiosResponse} from 'axios';
 import {openDB} from 'idb';
-import {Maybe} from 'true-myth';
+import {Maybe, result} from 'true-myth';
 
 import type {APIClient} from '../../apiClient/apiClient';
 import {ClientType} from '../../apiClient/client/clientType';
@@ -83,7 +83,7 @@ describe('ClientService.loadClient', () => {
   it('returns Nothing without asking the backend when there is no local client', async () => {
     const {clientService, getClient} = await setup({storeLocalClient: false});
 
-    await expect(clientService.loadClient()).resolves.toEqual(Maybe.nothing());
+    await expect(clientService.loadClient()).resolves.toEqual(result.ok(Maybe.nothing()));
     expect(getClient).not.toHaveBeenCalled();
   });
 
@@ -92,21 +92,53 @@ describe('ClientService.loadClient', () => {
     getClient.mockResolvedValue({...localClient, label: 'updated'});
 
     await expect(clientService.loadClient()).resolves.toEqual(
-      Maybe.just(expect.objectContaining({id: localClient.id, label: 'updated'})),
+      result.ok(Maybe.just(expect.objectContaining({id: localClient.id, label: 'updated'}))),
     );
   });
 
-  it('throws when the local client cannot be read', async () => {
+  it('returns Err when the local client cannot be read', async () => {
     const {clientService, getClient, proteusService, storeEngine} = await setup();
     const databaseError = new Error('Internal error opening backing store for indexedDB.open.');
     jest.spyOn(storeEngine, 'read').mockRejectedValue(databaseError);
 
-    await expect(clientService.loadClient()).rejects.toBe(databaseError);
+    await expect(clientService.loadClient()).resolves.toEqual(result.err(databaseError));
     expect(getClient).not.toHaveBeenCalled();
     expect(proteusService.wipe).not.toHaveBeenCalled();
     await expect(indexedDB.databases()).resolves.toEqual(
       expect.arrayContaining([expect.objectContaining({name: getCoreCryptoDbName(storeEngine)})]),
     );
+  });
+
+  it('captures a synchronous storage failure in the Task', async () => {
+    const {clientService, getClient, proteusService, storeEngine} = await setup();
+    const databaseError = new Error('IndexedDB is unavailable');
+    jest.spyOn(storeEngine, 'read').mockImplementation(() => {
+      throw databaseError;
+    });
+
+    const loadResult = await clientService.loadClient();
+
+    expect(loadResult.isErr).toBe(true);
+    if (loadResult.isErr) {
+      expect(loadResult.error).toBe(databaseError);
+    }
+    expect(getClient).not.toHaveBeenCalled();
+    expect(proteusService.wipe).not.toHaveBeenCalled();
+  });
+
+  it('normalizes an unknown request rejection without losing its cause', async () => {
+    const {clientService, getClient, proteusService} = await setup();
+    const requestFailure = {message: 'Connection interrupted'};
+    getClient.mockRejectedValue(requestFailure);
+
+    const loadResult = await clientService.loadClient();
+
+    expect(loadResult.isErr).toBe(true);
+    if (loadResult.isErr) {
+      expect(loadResult.error).toBeInstanceOf(Error);
+      expect(loadResult.error.cause).toBe(requestFailure);
+    }
+    expect(proteusService.wipe).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -118,7 +150,7 @@ describe('ClientService.loadClient', () => {
     getClient.mockResolvedValue(localClient);
     jest.spyOn(storeEngine, 'update').mockRejectedValue(updateError);
 
-    await expect(clientService.loadClient()).rejects.toBe(updateError);
+    await expect(clientService.loadClient()).resolves.toEqual(result.err(updateError));
     expect(proteusService.wipe).not.toHaveBeenCalled();
     await expect(indexedDB.databases()).resolves.toEqual(
       expect.arrayContaining([expect.objectContaining({name: getCoreCryptoDbName(storeEngine)})]),
@@ -129,12 +161,12 @@ describe('ClientService.loadClient', () => {
     ['a backend error', new BackendError('Server error', BackendErrorLabel.SERVER_ERROR, 500)],
     ['a network error', createAxiosError()],
     ['an HTTP error without body', createAxiosError(503)],
-  ])('throws and keeps local data when the backend request fails with %s', async (_, backendError) => {
+  ])('returns Err and keeps local data when the backend request fails with %s', async (_, backendError) => {
     const {clientService, getClient, proteusService, storeEngine} = await setup();
     getClient.mockRejectedValue(backendError);
     const clearTables = jest.spyOn(storeEngine, 'clearTables');
 
-    await expect(clientService.loadClient()).rejects.toBe(backendError);
+    await expect(clientService.loadClient()).resolves.toEqual(result.err(backendError));
     expect(proteusService.wipe).not.toHaveBeenCalled();
     expect(clearTables).not.toHaveBeenCalled();
     await expect(indexedDB.databases()).resolves.toEqual(
@@ -150,7 +182,7 @@ describe('ClientService.loadClient', () => {
     getClient.mockRejectedValue(notFoundError);
     const clearTables = jest.spyOn(storeEngine, 'clearTables');
 
-    await expect(clientService.loadClient()).resolves.toEqual(Maybe.nothing());
+    await expect(clientService.loadClient()).resolves.toEqual(result.ok(Maybe.nothing()));
     expect(proteusService.wipe).toHaveBeenCalled();
     expect(clearTables).not.toHaveBeenCalled();
     await expect(indexedDB.databases()).resolves.not.toEqual(
@@ -163,7 +195,18 @@ describe('ClientService.loadClient', () => {
     getClient.mockRejectedValue(new BackendError('Client not found', BackendErrorLabel.NOT_FOUND, 404));
     const clearTables = jest.spyOn(storeEngine, 'clearTables');
 
-    await expect(clientService.loadClient()).resolves.toEqual(Maybe.nothing());
+    await expect(clientService.loadClient()).resolves.toEqual(result.ok(Maybe.nothing()));
     expect(clearTables).toHaveBeenCalled();
+  });
+
+  it('returns Err if identity cleanup fails after a confirmed removal', async () => {
+    const {clientService, getClient, proteusService, storeEngine} = await setup({clientType: ClientType.TEMPORARY});
+    getClient.mockRejectedValue(new BackendError('Client not found', BackendErrorLabel.NOT_FOUND, 404));
+    const cleanupError = new Error('Identity storage unavailable');
+    proteusService.wipe.mockRejectedValue(cleanupError);
+    const clearTables = jest.spyOn(storeEngine, 'clearTables');
+
+    await expect(clientService.loadClient()).resolves.toEqual(result.err(cleanupError));
+    expect(clearTables).not.toHaveBeenCalled();
   });
 });

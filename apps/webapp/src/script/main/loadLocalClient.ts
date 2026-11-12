@@ -19,7 +19,7 @@
 
 import axios from 'axios';
 import {Dexie} from 'dexie';
-import {Maybe} from 'true-myth';
+import {result, type Maybe, type Task} from 'true-myth';
 
 import {BackendError} from '../apiClient/http/backendError';
 import type {MetaClient} from '../core/client/clientService';
@@ -35,35 +35,33 @@ import type {Logger} from '../util/logger';
  * removed on the backend. If the client could not be loaded at all (e.g. the database cannot be read because the disk
  * is full), the failure keeps its cause and cannot be reported as a missing client.
  */
-export async function loadLocalClient(
-  getLocalClient: () => Promise<Maybe<MetaClient>>,
+export function loadLocalClient(
+  getLocalClient: () => Task<Maybe<MetaClient>, Error>,
   logger: Logger,
-): Promise<MetaClient> {
-  let localClient: Maybe<MetaClient>;
+): Task<MetaClient, ClientError> {
+  return getLocalClient()
+    .mapRejected(error => {
+      logger.error('Failed to load the local client', error);
+      let errorType: CLIENT_ERROR_TYPE | BASE_ERROR_TYPE = BASE_ERROR_TYPE.UNKNOWN;
+      if (error instanceof BackendError || axios.isAxiosError(error)) {
+        errorType = CLIENT_ERROR_TYPE.REQUEST_FAILURE;
+      } else if (
+        error instanceof Dexie.DexieError ||
+        error instanceof DOMException ||
+        error instanceof LowDiskSpaceError
+      ) {
+        errorType = CLIENT_ERROR_TYPE.DATABASE_FAILURE;
+      }
+      const clientError = new ClientError(errorType, 'Failed to load the local client');
+      Object.defineProperty(clientError, 'cause', {value: error, configurable: true});
 
-  try {
-    localClient = await getLocalClient();
-  } catch (error: unknown) {
-    logger.error('Failed to load the local client', error);
-    let errorType: CLIENT_ERROR_TYPE | BASE_ERROR_TYPE = BASE_ERROR_TYPE.UNKNOWN;
-    if (error instanceof BackendError || axios.isAxiosError(error)) {
-      errorType = CLIENT_ERROR_TYPE.REQUEST_FAILURE;
-    } else if (
-      error instanceof Dexie.DexieError ||
-      error instanceof DOMException ||
-      error instanceof LowDiskSpaceError
-    ) {
-      errorType = CLIENT_ERROR_TYPE.DATABASE_FAILURE;
-    }
-    const clientError = new ClientError(errorType, 'Failed to load the local client');
-    Object.defineProperty(clientError, 'cause', {value: error, configurable: true});
+      return clientError;
+    })
+    .andThen(localClient => {
+      if (localClient.isNothing) {
+        return result.err(new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend'));
+      }
 
-    throw clientError;
-  }
-
-  if (localClient.isNothing) {
-    throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
-  }
-
-  return localClient.value;
+      return result.ok(localClient.value);
+    });
 }

@@ -107,8 +107,11 @@ export class AuthAction {
         await dispatch(selfAction.fetchSelf());
         let entropyData: Uint8Array | undefined = undefined;
         if (getEntropy !== undefined) {
-          const existingClient = await core.getLocalClient();
-          entropyData = existingClient.isNothing ? await getEntropy() : undefined;
+          const existingClientResult = await core.getLocalClient();
+          if (existingClientResult.isErr) {
+            throw existingClientResult.error;
+          }
+          entropyData = existingClientResult.value.isNothing ? await getEntropy() : undefined;
         }
         await onAfterLogin(dispatch, getState, global);
         await dispatch(

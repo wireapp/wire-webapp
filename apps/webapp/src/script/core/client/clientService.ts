@@ -18,10 +18,10 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import {isUndefined} from '@sindresorhus/is';
+import {isError, isUndefined} from '@sindresorhus/is';
 import axios from 'axios';
 import {StatusCodes} from 'http-status-codes';
-import {Maybe} from 'true-myth';
+import {Maybe, task, type Task} from 'true-myth';
 
 import {APIClient} from '../../apiClient/apiClient';
 import {LoginData} from '../../apiClient/auth/loginData';
@@ -111,17 +111,26 @@ export class ClientService {
     return this.database.deleteLocalClient();
   }
 
-  private async getLocalClient(): Promise<Maybe<MetaClient>> {
-    try {
-      return Maybe.just(await this.database.getLocalClient());
-    } catch (error: unknown) {
-      // Only a missing record means there is no local client. Any other failure (e.g. the database cannot be
-      // opened because the disk is full) must not be mistaken for a removed client.
-      if (error instanceof RecordNotFoundError) {
-        return Maybe.nothing();
-      }
-      throw error;
-    }
+  private getLocalClient(): Task<Maybe<MetaClient>, Error> {
+    return task
+      .tryOrElse(
+        error => {
+          return isError(error) ? error : new Error('Failed to read the local client', {cause: error});
+        },
+        () => {
+          return this.database.getLocalClient();
+        },
+      )
+      .map<Maybe<MetaClient>>(client => {
+        return Maybe.just(client);
+      })
+      .orElse(error => {
+        if (error instanceof RecordNotFoundError) {
+          return task.resolve(Maybe.nothing<MetaClient>());
+        }
+
+        return task.reject(error);
+      });
   }
 
   /**
@@ -129,41 +138,47 @@ export class ClientService {
    * Returns Nothing if the local record is missing or the backend confirms the client was removed.
    * If the client doesn't exist on the backend it will clean up the identity before returning Nothing.
    * If the client is found on the backend it will update the local client in the database and return it.
-   * Any other failure (database error, network error, ...) is thrown.
+   * Any other failure (database error, network error, ...) is a rejected Task.
    *
    * @return Just the loaded client, or Nothing for confirmed absence
    */
-  public async loadClient(): Promise<Maybe<MetaClient>> {
-    const loadedClient = await this.getLocalClient();
-
-    if (loadedClient.isNothing) {
-      return Maybe.nothing();
-    }
-
-    let remoteClient: RegisteredClient;
-    try {
-      remoteClient = await this.apiClient.api.client.getClient(loadedClient.value.id);
-    } catch (error: unknown) {
-      if (!isNotFoundError(error)) {
-        throw error;
-      }
-      if (this.storeEngine !== undefined) {
-        const shouldDeleteWholeDatabase = loadedClient.value.type === ClientType.TEMPORARY;
-        await this.proteusService.wipe();
-        // The MLS/CoreCrypto keystore is scoped to the user (not the client id), so it survives
-        // a plain proteus wipe and would otherwise let a re-registered client inherit stale MLS key material.
-        await wipeCoreCryptoDb(this.storeEngine, this.clock);
-        if (shouldDeleteWholeDatabase) {
-          await this.storeEngine.clearTables();
-        }
-        const log = `No valid client on backend, deleting identity (deleting content: ${shouldDeleteWholeDatabase ? 'yes' : 'no'})`;
-        this.logger.warn(log);
+  public loadClient(): Task<Maybe<MetaClient>, Error> {
+    return this.getLocalClient().andThen(loadedClient => {
+      if (loadedClient.isNothing) {
+        return task.resolve(loadedClient);
       }
 
-      return Maybe.nothing();
-    }
+      return task.tryOrElse(
+        error => {
+          return isError(error) ? error : new Error('Failed to load the local client', {cause: error});
+        },
+        async () => {
+          let remoteClient: RegisteredClient;
+          try {
+            remoteClient = await this.apiClient.api.client.getClient(loadedClient.value.id);
+          } catch (error: unknown) {
+            if (!isNotFoundError(error)) {
+              throw error;
+            }
+            if (this.storeEngine !== undefined) {
+              const shouldDeleteWholeDatabase = loadedClient.value.type === ClientType.TEMPORARY;
+              await this.proteusService.wipe();
+              // The keystore is scoped to the user, so a new client must not inherit stale MLS key material.
+              await wipeCoreCryptoDb(this.storeEngine, this.clock);
+              if (shouldDeleteWholeDatabase) {
+                await this.storeEngine.clearTables();
+              }
+              const log = `No valid client on backend, deleting identity (deleting content: ${shouldDeleteWholeDatabase ? 'yes' : 'no'})`;
+              this.logger.warn(log);
+            }
 
-    return Maybe.just(await this.database.updateLocalClient(remoteClient));
+            return Maybe.nothing<MetaClient>();
+          }
+
+          return Maybe.just(await this.database.updateLocalClient(remoteClient));
+        },
+      );
+    });
   }
 
   private createLocalClient(client: RegisteredClient, domain?: string): Promise<MetaClient> {

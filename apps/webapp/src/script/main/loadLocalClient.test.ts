@@ -19,7 +19,7 @@
 
 import {AxiosError} from 'axios';
 import {Dexie} from 'dexie';
-import {Maybe} from 'true-myth';
+import {Maybe, result, task} from 'true-myth';
 
 import {BackendError} from '../apiClient/http/backendError';
 import {BackendErrorLabel} from '../apiClient/http/backendErrorLabel';
@@ -44,17 +44,17 @@ describe('loadLocalClient', () => {
 
     await expect(
       loadLocalClient(() => {
-        return Promise.resolve(Maybe.just(localClient));
+        return task.resolve(Maybe.just(localClient));
       }, createLogger()),
-    ).resolves.toBe(localClient);
+    ).resolves.toEqual(result.ok(localClient));
   });
 
   it('reports NO_VALID_CLIENT when there is no local client', async () => {
     await expect(
       loadLocalClient(() => {
-        return Promise.resolve(Maybe.nothing());
+        return task.resolve(Maybe.nothing());
       }, createLogger()),
-    ).rejects.toEqual(expect.objectContaining({type: CLIENT_ERROR_TYPE.NO_VALID_CLIENT}));
+    ).resolves.toEqual(result.err(expect.objectContaining({type: CLIENT_ERROR_TYPE.NO_VALID_CLIENT})));
   });
 
   it.each([
@@ -67,12 +67,16 @@ describe('loadLocalClient', () => {
   ])('preserves the cause and safely classifies %s as %s', async (originalError, errorType) => {
     const logger = createLogger();
 
-    const result = loadLocalClient(() => {
-      return Promise.reject(originalError);
+    const loadResult = await loadLocalClient(() => {
+      return task.reject(originalError);
     }, logger);
 
-    await expect(result).rejects.toBeInstanceOf(ClientError);
-    await expect(result).rejects.toEqual(expect.objectContaining({type: errorType, cause: originalError}));
+    expect(loadResult.isErr).toBe(true);
+    if (loadResult.isErr) {
+      expect(loadResult.error).toBeInstanceOf(ClientError);
+      expect(loadResult.error.type).toBe(errorType);
+      expect(loadResult.error.cause).toBe(originalError);
+    }
     expect(logger.error).toHaveBeenCalledWith(expect.any(String), originalError);
   });
 });

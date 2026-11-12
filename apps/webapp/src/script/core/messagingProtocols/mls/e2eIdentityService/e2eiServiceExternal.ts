@@ -289,10 +289,10 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     });
   }
 
-  public async isFreshMLSSelfClient(): Promise<boolean> {
-    const client = await this.clientService.loadClient();
-
-    return client.isNothing || !this.mlsService.isInitializedMLSClient(client.value);
+  public isFreshMLSSelfClient(): Task<boolean, Error> {
+    return this.clientService.loadClient().map(client => {
+      return client.isNothing || !this.mlsService.isInitializedMLSClient(client.value);
+    });
   }
 
   private get acmeService(): AcmeService {

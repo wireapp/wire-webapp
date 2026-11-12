@@ -138,5 +138,10 @@ export async function getActiveWireIdentity(): Promise<WireIdentity | undefined>
 }
 
 export async function isFreshMLSSelfClient(): Promise<boolean> {
-  return getE2EIdentityService().isFreshMLSSelfClient();
+  const freshnessResult = await getE2EIdentityService().isFreshMLSSelfClient();
+  if (freshnessResult.isErr) {
+    throw freshnessResult.error;
+  }
+
+  return freshnessResult.value;
 }

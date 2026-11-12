@@ -67,7 +67,11 @@ export class ClientAction {
     entropyData?: Uint8Array,
   ): ThunkAction => {
     return async (dispatch, getState, {core, clock, actions: {clientAction}}) => {
-      const localClient = await core.getLocalClient();
+      const localClientResult = await core.getLocalClient();
+      if (localClientResult.isErr) {
+        throw localClientResult.error;
+      }
+      const localClient = localClientResult.value;
       const commonConfig = (await core.service?.team.getCommonFeatureConfig()) ?? {};
 
       const useAsyncNotificationStream =

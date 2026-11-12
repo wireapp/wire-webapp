@@ -580,9 +580,13 @@ export class App {
 
       await this.initiateSelfUser(selfUser);
       eventLogger.log(AppInitializationStep.UserInitialize);
-      const localClient = await loadLocalClient(() => {
+      const localClientResult = await loadLocalClient(() => {
         return this.core.getLocalClient();
       }, this.logger);
+      if (localClientResult.isErr) {
+        throw localClientResult.error;
+      }
+      const localClient = localClientResult.value;
 
       let teamFeatures: FeatureList = {};
       let teamMembers: QualifiedId[] = [];

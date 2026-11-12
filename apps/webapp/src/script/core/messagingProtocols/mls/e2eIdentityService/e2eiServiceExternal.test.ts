@@ -20,7 +20,7 @@
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {TimeInMillis} from '../../../../commons/util/TimeUtil';
 import axios from 'axios';
-import {Maybe, task} from 'true-myth';
+import {Maybe, result, task} from 'true-myth';
 
 import {APIClient} from '../../../../apiClient/apiClient';
 import {
@@ -184,25 +184,25 @@ describe('E2EIServiceExternal', () => {
   describe('isFreshMLSSelfClient', () => {
     it('considers a genuinely missing client fresh', async () => {
       const [service, {clientService}] = await buildE2EIService('freshMissingClient');
-      clientService.loadClient.mockResolvedValue(Maybe.nothing());
+      clientService.loadClient.mockReturnValue(task.resolve(Maybe.nothing()));
 
-      await expect(service.isFreshMLSSelfClient()).resolves.toBe(true);
+      await expect(service.isFreshMLSSelfClient()).resolves.toEqual(result.ok(true));
     });
 
     it.each([true, false])('reports freshness for MLS initialization state %s', async initialized => {
       const [service, {clientService, mlsService}] = await buildE2EIService('freshExistingClient');
-      clientService.loadClient.mockResolvedValue(Maybe.just({id: 'local-client'} as MetaClient));
+      clientService.loadClient.mockReturnValue(task.resolve(Maybe.just({id: 'local-client'} as MetaClient)));
       jest.spyOn(mlsService, 'isInitializedMLSClient').mockReturnValue(initialized);
 
-      await expect(service.isFreshMLSSelfClient()).resolves.toBe(initialized === false);
+      await expect(service.isFreshMLSSelfClient()).resolves.toEqual(result.ok(initialized === false));
     });
 
     it('propagates lookup failures without assuming freshness', async () => {
       const [service, {clientService, mlsService}] = await buildE2EIService('freshLookupFailure');
       const lookupError = new Error('Database unavailable');
-      clientService.loadClient.mockRejectedValue(lookupError);
+      clientService.loadClient.mockReturnValue(task.reject(lookupError));
 
-      await expect(service.isFreshMLSSelfClient()).rejects.toBe(lookupError);
+      await expect(service.isFreshMLSSelfClient()).resolves.toEqual(result.err(lookupError));
       expect(mlsService.isInitializedMLSClient).not.toHaveBeenCalled();
     });
   });
