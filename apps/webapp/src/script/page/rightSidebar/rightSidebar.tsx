@@ -35,7 +35,7 @@ import {GuestServicesOptions} from './guestServicesOptions';
 import {MessageDetails} from './messageDetails';
 import {Notifications} from './notifications';
 import {ParticipantDevices} from './participantDevices';
-import type {PanelEntity, RightSidebarParams} from './rightSidebarTypes';
+import {RightSidebarParams} from '../appMain';
 import {SharedDrive} from './sharedDrive';
 import {TimedMessages} from './timedMessages';
 
@@ -44,6 +44,7 @@ import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/Panel';
 import {isAppOrServiceEntity} from '../../guards/Service';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
 import {Message} from '../../repositories/entity/message/message';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {User} from '../../repositories/entity/User';
 import {TeamState} from '../../repositories/team/TeamState';
 import {UserState} from '../../repositories/user/userState';
@@ -93,7 +94,7 @@ export enum PanelState {
   CONVERSATION_HISTORY = 'CONVERSATION_HISTORY',
 }
 
-export type {PanelEntity} from './rightSidebarTypes';
+export type PanelEntity = Conversation | User | Message | ServiceEntity;
 
 interface RightSidebarProps {
   currentEntity?: RightSidebarParams['entity'];

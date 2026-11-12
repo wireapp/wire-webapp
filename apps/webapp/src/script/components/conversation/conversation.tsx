@@ -63,7 +63,7 @@ import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {PanelState} from '../../page/rightSidebar';
-import type {RightSidebarParams} from '../../page/rightSidebar/rightSidebarTypes';
+import {RightSidebarParams} from '../../page/appMain';
 import {useApplicationContext, useMainViewModel} from '../../page/rootProvider';
 import {CallState} from '../../repositories/calling/CallState';
 import {createCellsRepositoryGateway} from '../../repositories/cells/cellsRepositoryGateway';

@@ -36,9 +36,7 @@ import {LeftSidebar} from './leftSidebar';
 import {TeamCreationModalContainer} from './leftSidebar/panels/conversations/conversationTabs/teamCreation/teamCreationModalContainer';
 import {SidebarTabs, useSidebarStore} from './leftSidebar/panels/conversations/useSidebarStore';
 import {MainContent} from './mainContent';
-import {PanelState, RightSidebar} from './rightSidebar';
-import type {RightSidebarParams} from './rightSidebar/rightSidebarTypes';
-import {useApplicationContext} from './rootProvider';
+import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
@@ -55,6 +53,7 @@ import {LegalHoldModal} from '../components/Modals/LegalHoldModal/LegalHoldModal
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from '../components/Modals/UserModal';
 import {Config} from '../Config';
+import type {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
@@ -88,6 +87,12 @@ import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 import {WebAppEvents} from '../webAppEvents';
 
+export type RightSidebarParams = {
+  entity: PanelEntity | null;
+  showReactions?: boolean;
+  highlighted?: User[];
+};
+
 type AppMainProps = {
   readonly app: App;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
@@ -96,6 +101,7 @@ type AppMainProps = {
   readonly conversationState?: ConversationState;
   readonly callState?: CallState;
   readonly clock: Clock;
+  readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
   readonly locked: boolean;
 };
@@ -109,10 +115,10 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
     conversationState = container.resolve(ConversationState),
     callState = container.resolve(CallState),
     clock,
+    isFeatureToggleEnabled,
     locked,
   } = properties;
   const translate = mainView.translate;
-  const {isFeatureToggleEnabled} = useApplicationContext();
   const apiContext = app.getAPIContext();
 
   useActiveWindow(window);
