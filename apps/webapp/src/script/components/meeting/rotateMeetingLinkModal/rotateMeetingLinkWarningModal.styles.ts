@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {footerStyles, modalWrapperStyles} from 'Components/meeting/shared/styles/meetingModalShell.styles';
+import {footerStyles, modalWrapperStyles} from '../shared/styles/meetingModalShell.styles';
 
 export const warningModalWrapperStyles: CSSObject = {
   ...modalWrapperStyles,
