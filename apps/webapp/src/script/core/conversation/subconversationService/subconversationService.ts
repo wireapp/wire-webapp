@@ -17,7 +17,8 @@
  *
  */
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import type {Clock} from '@enormora/clock/clock';
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
 import {generateSubconversationStoreKey} from './subconversationUtil';
 
@@ -44,6 +45,9 @@ export interface SubconversationEpochInfoMember {
   in_subconv: boolean;
 }
 
+type ConferenceJoinResult = {groupId: string; epoch: number};
+type PendingConferenceJoin = {controller: AbortController; promise: Promise<ConferenceJoinResult>};
+
 const MLS_CONVERSATION_KEY_LENGTH = 32;
 const MAX_CONFERENCE_JOIN_RETRIES = 3;
 const SECOND_RETRY_DELAY = TimeInMillis.SECOND;
@@ -53,17 +57,21 @@ const CONFERENCE_JOIN_JITTER_RANGE = 0.4;
 
 export class SubconversationService extends TypedEventEmitter<Events> {
   private readonly logger = getLogger('@wireapp/core/SubconversationService');
+  private readonly pendingConferenceJoins = new Map<string, PendingConferenceJoin>();
+  private readonly pendingConferenceLeaves = new Map<string, Promise<void>>();
 
   constructor(
     private readonly apiClient: APIClient,
     private readonly coreDatabase: CoreDatabase,
+    private readonly clock: Clock,
     private readonly _mlsService?: MLSService,
+    private readonly random: () => number = Math.random,
   ) {
     super();
   }
 
   get mlsService(): MLSService {
-    if (this._mlsService === undefined) {
+    if (isUndefined(this._mlsService)) {
       throw new Error('MLSService was not initialised!');
     }
     return this._mlsService;
@@ -75,14 +83,38 @@ export class SubconversationService extends TypedEventEmitter<Events> {
    *
    * @param conversationId Id of the parent conversation in which the call should happen
    * @param groupId groupId of the parent conversation in which the call should happen
-   * @param retryCount
    */
-  public async joinConferenceSubconversation(
+  public joinConferenceSubconversation(conversationId: QualifiedId, groupId: string): Promise<ConferenceJoinResult> {
+    const key = generateSubconversationStoreKey(conversationId, SUBCONVERSATION_ID.CONFERENCE);
+    const pending = this.pendingConferenceJoins.get(key);
+    if (!isUndefined(pending) && !pending.controller.signal.aborted) {
+      return pending.promise;
+    }
+
+    const controller = new AbortController();
+    const leave = this.pendingConferenceLeaves.get(key);
+    const promise = Promise.resolve(leave).then(() => {
+      controller.signal.throwIfAborted();
+      return this.joinConferenceSubconversationAttempt(conversationId, groupId, controller.signal);
+    });
+    this.pendingConferenceJoins.set(key, {controller, promise});
+    const clearPending = (): void => {
+      if (this.pendingConferenceJoins.get(key)?.controller === controller) {
+        this.pendingConferenceJoins.delete(key);
+      }
+    };
+    void promise.then(clearPending, clearPending);
+    return promise;
+  }
+
+  private async joinConferenceSubconversationAttempt(
     conversationId: QualifiedId,
     groupId: string,
+    signal: AbortSignal,
     retryCount = 0,
   ): Promise<{groupId: string; epoch: number}> {
     try {
+      signal.throwIfAborted();
       this.logger.info('Joining conference subconversation', {conversationId, groupId});
       const {
         group_id: subconversationGroupId,
@@ -90,14 +122,18 @@ export class SubconversationService extends TypedEventEmitter<Events> {
         epoch_timestamp: subconversationEpochTimestamp,
         subconv_id: subconversationId,
       } = await this.getConferenceSubconversation(conversationId);
+      signal.throwIfAborted();
 
       // We store the mapping between the subconversation and the parent conversation
       await this.saveSubconversationGroupId(conversationId, subconversationId, subconversationGroupId);
+      signal.throwIfAborted();
 
       if (subconversationEpoch === 0) {
         const doesConversationExistsLocally = await this.mlsService.conversationExists(subconversationGroupId);
+        signal.throwIfAborted();
         if (doesConversationExistsLocally) {
           await this.mlsService.wipeConversation(subconversationGroupId);
+          signal.throwIfAborted();
         }
 
         // If subconversation is not yet established, create it and upload the commit bundle.
@@ -113,44 +149,69 @@ export class SubconversationService extends TypedEventEmitter<Events> {
             epoch: subconversationEpoch,
           });
           await this.mlsService.wipeConversation(subconversationGroupId);
+          signal.throwIfAborted();
 
-          return this.joinConferenceSubconversation(conversationId, groupId);
+          return this.joinConferenceSubconversationAttempt(conversationId, groupId, signal);
         }
 
+        signal.throwIfAborted();
         await this.joinSubconversationByExternalCommit(conversationId, SUBCONVERSATION_ID.CONFERENCE);
       }
 
       const epoch = Number(await this.mlsService.getEpoch(subconversationGroupId));
+      signal.throwIfAborted();
 
       return {groupId: subconversationGroupId, epoch};
     } catch (error: unknown) {
-      this.logger.error('Failed to join conference subconversation', {conversationId, groupId, error, retryCount});
-      return this.retryConferenceSubconversationJoin(conversationId, groupId, retryCount, error);
+      if (signal.aborted) {
+        this.logger.info('Conference subconversation join cancelled', {conversationId, groupId, retryCount});
+      } else {
+        this.logger.error('Failed to join conference subconversation', {conversationId, groupId, error, retryCount});
+      }
+      return this.retryConferenceSubconversationJoin(conversationId, groupId, signal, retryCount, error);
     }
   }
 
   private async retryConferenceSubconversationJoin(
     conversationId: QualifiedId,
     groupId: string,
+    signal: AbortSignal,
     retryCount: number,
     error: unknown,
   ): Promise<{groupId: string; epoch: number}> {
+    if (signal.aborted || retryCount >= MAX_CONFERENCE_JOIN_RETRIES) {
+      throw error;
+    }
     const isStaleMessage =
       (error instanceof BackendError && error.label === BackendErrorLabel.MLS_STALE_MESSAGE) ||
       isMLSStaleMessageError(error);
-    if (retryCount >= MAX_CONFERENCE_JOIN_RETRIES || (retryCount > 0 && !isStaleMessage)) {
+    if (retryCount > 0 && !isStaleMessage) {
       throw error;
     }
 
     if (retryCount > 0) {
       const baseDelay = CONFERENCE_JOIN_RETRY_DELAYS[retryCount];
-      const delay = Math.round(baseDelay * (CONFERENCE_JOIN_MIN_JITTER + Math.random() * CONFERENCE_JOIN_JITTER_RANGE));
-      await new Promise(resolve => {
-        setTimeout(resolve, delay);
-      });
+      const delay = Math.round(baseDelay * (CONFERENCE_JOIN_MIN_JITTER + this.random() * CONFERENCE_JOIN_JITTER_RANGE));
+      await this.waitForConferenceJoinRetry(delay, signal);
     }
 
-    return this.joinConferenceSubconversation(conversationId, groupId, retryCount + 1);
+    signal.throwIfAborted();
+    return this.joinConferenceSubconversationAttempt(conversationId, groupId, signal, retryCount + 1);
+  }
+
+  private async waitForConferenceJoinRetry(delay: number, signal: AbortSignal): Promise<void> {
+    signal.throwIfAborted();
+    return new Promise<void>((resolve, reject) => {
+      const timeout = this.clock.setTimeout(() => {
+        signal.removeEventListener('abort', onAbort);
+        resolve();
+      }, delay);
+      const onAbort = (): void => {
+        this.clock.clearTimeout(timeout);
+        reject(signal.reason);
+      };
+      signal.addEventListener('abort', onAbort, {once: true});
+    });
   }
 
   /**
@@ -158,7 +219,34 @@ export class SubconversationService extends TypedEventEmitter<Events> {
    *
    * @param conversationId Id of the parent conversation which subconversation we want to leave
    */
-  public async leaveConferenceSubconversation(conversationId: QualifiedId): Promise<void> {
+  public leaveConferenceSubconversation(conversationId: QualifiedId): Promise<void> {
+    const key = generateSubconversationStoreKey(conversationId, SUBCONVERSATION_ID.CONFERENCE);
+    const pending = this.pendingConferenceJoins.get(key);
+    pending?.controller.abort();
+    const existing = this.pendingConferenceLeaves.get(key);
+    if (!isUndefined(existing)) {
+      return existing;
+    }
+    const leave = this.leaveConferenceSubconversationAfterJoin(conversationId, pending);
+    this.pendingConferenceLeaves.set(key, leave);
+    const clear = (): void => {
+      if (this.pendingConferenceLeaves.get(key) === leave) {
+        this.pendingConferenceLeaves.delete(key);
+      }
+    };
+    void leave.then(clear, clear);
+    return leave;
+  }
+
+  private async leaveConferenceSubconversationAfterJoin(
+    conversationId: QualifiedId,
+    pending?: PendingConferenceJoin,
+  ): Promise<void> {
+    if (!isUndefined(pending)) {
+      await pending.promise.catch(() => {
+        return undefined;
+      });
+    }
     this.logger.info('Leaving conference subconversation', {conversationId});
     const subconversationGroupId = await this.getSubconversationGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
 

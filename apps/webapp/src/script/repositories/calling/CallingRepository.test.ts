@@ -948,6 +948,38 @@ describe('CallingRepository', () => {
       );
     });
 
+    it('does not start AVS when the call ends while its MLS join is pending', async () => {
+      jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.MLS);
+      const subconversationService = getSubconversationServiceForTest();
+      const unsubscribe = jest.fn();
+      const {promise: subscribed, resolve: notifySubscribed} = Promise.withResolvers<void>();
+      const {promise: subscription, resolve: resolveSubscription} = Promise.withResolvers<() => void>();
+      jest.spyOn(subconversationService, 'subscribeToEpochUpdates').mockImplementationOnce(() => {
+        notifySubscribed();
+        return subscription;
+      });
+      const startAvs = jest.spyOn(wCall, 'start');
+
+      const start = callingRepository.startCall(conversation);
+      await subscribed;
+      const pendingCall = callingRepository.findCall(conversation.qualifiedId);
+      expect(pendingCall).toBeDefined();
+      if (pendingCall === undefined) {
+        throw new Error('Expected pending call');
+      }
+      const releaseMedia = jest.spyOn(pendingCall.getSelfParticipant(), 'releaseMediaStream');
+      callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+      resolveSubscription(unsubscribe);
+      await start;
+
+      expect(subconversationService.leaveConferenceSubconversation).toHaveBeenCalledWith(conversation.qualifiedId);
+      expect(callingRepository.findCall(conversation.qualifiedId)).toBeUndefined();
+      expect(releaseMedia).toHaveBeenCalledWith(true);
+      expect(unsubscribe).toHaveBeenCalledTimes(1);
+      expect(startAvs).not.toHaveBeenCalled();
+    });
+
     it('does not subscribe to epoch updates after initiating a call in 1:1 mls conversation', async () => {
       const conversationId = {domain: 'example.com', id: 'conversation1'};
 
@@ -1060,6 +1092,7 @@ describe('CallingRepository', () => {
 
       jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
       callingRepository['conversationState'].conversations.push(mlsConversation);
+      callingRepository['callState'].calls([incomingCall]);
 
       await callingRepository.answerCall(incomingCall);
 
@@ -1095,6 +1128,7 @@ describe('CallingRepository', () => {
 
       jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
       callingRepository['conversationState'].conversations.push(mlsConversation);
+      callingRepository['callState'].calls([incomingCall]);
 
       await callingRepository.answerCall(incomingCall);
 
@@ -1224,6 +1258,7 @@ describe('CallingRepository', () => {
         const setMute = jest.spyOn(wCall, 'setMute');
         const answer = jest.spyOn(wCall, 'answer');
         callingRepository['conversationState'].conversations.push(conversation);
+        callingRepository['callState'].calls([incomingCall]);
 
         await callingRepository.answerCall(incomingCall, undefined, {cameraEnabled, microphoneEnabled});
 
