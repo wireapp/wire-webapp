@@ -24,8 +24,7 @@ function createLockfileDocument(version: string): Readonly<Record<string, unknow
     lockfileVersion: 3,
     requires: true,
     packages: {
-      '': {name: 'example-webapp', version, workspaces: ['apps/server'], dependencies: {example: '2.0.0'}},
-      'apps/server': {version: '4.0.0'},
+      '': {name: 'example-webapp', version, dependencies: {example: '2.0.0'}},
       'node_modules/example': {
         version: '2.0.0',
         resolved: 'https://example.com/package.tgz',
@@ -91,15 +90,20 @@ describe('WebApp version synchronization lockfile', () => {
     assert(actualResult.isOk);
   });
 
-  it('rejects a server workspace version change', () => {
+  it('rejects a dependency version change', () => {
     const updatedLockfileDocument = createLockfileDocument('1.2.0');
     const lockedPackages = updatedLockfileDocument.packages;
     assert(isPlainObject(lockedPackages));
+    const lockedExampleDependency = lockedPackages['node_modules/example'];
+    assert(isPlainObject(lockedExampleDependency));
     const actualResult = validateWebAppVersionSynchronizationLockfileChange({
       baseLockfileDocument: createLockfileDocument('1.0.0'),
       updatedLockfileDocument: {
         ...updatedLockfileDocument,
-        packages: {...lockedPackages, 'apps/server': {version: '5.0.0'}},
+        packages: {
+          ...lockedPackages,
+          'node_modules/example': {...lockedExampleDependency, version: '3.0.0'},
+        },
       },
       currentVersion: '1.0.0',
       targetVersion: '1.2.0',

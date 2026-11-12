@@ -25,7 +25,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
 - `apps/server/configuration/`: configuration generators, environment contracts, and browser-safe build metadata functions
 - `apps/webapp/src/script/core/`: communication core handling authentication, WebSocket connections, protocol messaging, and shared storage engines
-- Root-level tooling (`justfile` and `tools/`) provides commands for both applications. Webapp dependencies live in the root `package.json` and `package-lock.json`; `apps/server` remains an npm workspace for build and development dependencies. Production artifacts run without installed npm packages.
+- This remains a monorepo with two applications. Root-level tooling (`justfile` and `tools/`) provides commands for both applications, and dependency management is centralized in the root npm project using a single `package.json` and `package-lock.json`. Runtime application dependencies live in `dependencies`; development-only types and tooling live in `devDependencies`. Production artifacts run without installed npm packages.
 
 The browser keeps Ky 1.x as `ky`; release tooling imports its existing Ky 2.x dependency as `ky-release` because its HTTP error handling uses `error.data`. Unifying those versions requires a separate compatibility migration. Commander remains on the root tooling's 15.x version; the former webapp 14.x declaration had no application or tooling imports.
 
@@ -117,7 +117,7 @@ Rspack is the sole application bundler for internal and public production builds
 1. Build and package the default public Rspack release: `npx just package-server-public`
 1. Start the server output from `apps/server/dist` (or build a Docker image with `npx just docker <tag>`)
 
-Both packaging tasks reuse the minified Rspack server bundle and assemble it with the selected browser build into `apps/server/dist`. The artifact includes the server source map, GeoIP database, templates, certificates, robots, telemetry embed, environment defaults, and shared version metadata. The server source map stays alongside `index.js`, outside the HTTP static directories. Docker and Elastic Beanstalk launch Node with `--enable-source-maps` and install no npm packages. Local development continues to use TypeScript compilation and installed workspace dependencies.
+Both packaging tasks reuse the minified Rspack server bundle and assemble it with the selected browser build into `apps/server/dist`. The artifact includes the server source map, GeoIP database, templates, certificates, robots, telemetry embed, environment defaults, and shared version metadata. The server source map stays alongside `index.js`, outside the HTTP static directories. Docker and Elastic Beanstalk launch Node with `--enable-source-maps` and install no npm packages. Local development continues to use TypeScript compilation and dependencies installed in the root npm project.
 
 Telemetry's TypeScript implementation lives in `apps/webapp/src/script/telemetry`. The server copies the unmodified `countly-sdk-web/lib/countly.min.js` build dependency directly to `libs/wire/telemetry/embed.js`. Both HTML templates load this standalone SDK before the application bundles; telemetry initializes only when explicitly requested by the application.
 
