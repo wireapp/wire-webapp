@@ -182,7 +182,7 @@ export class Call {
       try {
         audio.audioElement = AudioSpeakerFactory.createNewCallingAudioSpeaker(audio.stream);
       } catch (error: unknown) {
-        this.logger.warn('Fail to playAudioStreams:', error);
+        this.logger.warn('Fail to playAudioStreams:', {error});
       }
     });
     this.updateAudioStreamsSink();

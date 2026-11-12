@@ -111,7 +111,7 @@ export const PeopleTab: FunctionComponent<PeopleTabProps> = ({
 
     void teamRepository.loadTeamAppsAndCollaborators(teamId, abortController).catch((error: unknown) => {
       if (!abortController.signal.aborted) {
-        logger.error('Failed to load team apps and collaborators', error);
+        logger.error('Failed to load team apps and collaborators', {error});
       }
     });
 
@@ -266,7 +266,7 @@ export const PeopleTab: FunctionComponent<PeopleTabProps> = ({
             return logger.warn(`Error searching for contacts: ${error.message}`);
           }
         }
-        logger.error(`Error searching for contacts: ${(error as any).message}`, error);
+        logger.error(`Error searching for contacts: ${(error as any).message}`, {error});
       }
     }
   }, SEARCH_DEBOUNCE_MILLISECONDS);

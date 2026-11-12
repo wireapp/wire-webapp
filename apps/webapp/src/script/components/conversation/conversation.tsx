@@ -567,7 +567,7 @@ function ConversationContent({
         resetProgress();
       }
     } catch (error: unknown) {
-      messageListLogger.warn('Error while trying to reset session', error);
+      messageListLogger.warn('Error while trying to reset session', {error});
       resetProgress();
     }
   };

@@ -48,7 +48,7 @@ export const importCPBHistoryToDatabase = async ({
 
   // Check if the backup was created by the same user
   if (!peekedData.isUserBackup) {
-    CPBLogger.log('Backup is not created by the same user');
+    CPBLogger.info('Backup is not created by the same user');
     throw new DifferentAccountError('Backup is not created by the same user');
   }
 
@@ -70,7 +70,7 @@ export const importCPBHistoryToDatabase = async ({
       });
     }
     FileDescriptor.push({entities: eventRecords, filename: Filename.EVENTS});
-    CPBLogger.log(`IMPORTED ${eventRecords.length} EVENTS`);
+    CPBLogger.info(`IMPORTED ${eventRecords.length} EVENTS`);
 
     // import conversations
     const conversationRecords: ConversationRecord[] = [];
@@ -84,7 +84,7 @@ export const importCPBHistoryToDatabase = async ({
       });
     }
     FileDescriptor.push({entities: conversationRecords, filename: Filename.CONVERSATIONS});
-    CPBLogger.log(`IMPORTED ${conversationRecords.length} CONVERSATIONS`);
+    CPBLogger.info(`IMPORTED ${conversationRecords.length} CONVERSATIONS`);
 
     // import users
     const userRecords: UserRecord[] = [];
@@ -98,19 +98,19 @@ export const importCPBHistoryToDatabase = async ({
       });
     }
     FileDescriptor.push({entities: userRecords, filename: Filename.USERS});
-    CPBLogger.log(`IMPORTED ${userRecords.length} USERS`);
+    CPBLogger.info(`IMPORTED ${userRecords.length} USERS`);
   }
 
   if (result instanceof BackupImportResult.Failure) {
     if (result === BackupImportResult.Failure.MissingOrWrongPassphrase) {
-      CPBLogger.log(`Backup import failed: ${result}`);
+      CPBLogger.info(`Backup import failed: ${result}`);
       throw new InvalidPassword('Invalid password');
     }
     if (result === BackupImportResult.Failure.ParsingFailure) {
-      CPBLogger.log(`Backup import failed: ${result}`);
+      CPBLogger.info(`Backup import failed: ${result}`);
       throw new IncompatibleBackupError('Incompatible cross-platform backup');
     }
-    CPBLogger.log(`Backup import failed: ${result}`);
+    CPBLogger.info(`Backup import failed: ${result}`);
     throw new IncompatibleBackupFormatError('Incompatible format');
   }
 

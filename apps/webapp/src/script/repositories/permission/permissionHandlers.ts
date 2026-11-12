@@ -65,7 +65,7 @@ export const queryBrowserPermission = async (
     logger.debug(`Permission state for '${permissionType}' is '${permissionStatus.state}'`);
     return permissionStatus.state as BrowserPermissionStatus;
   } catch (error: unknown) {
-    logger.debug(`Failed to query permission for '${permissionType}'`, error);
+    logger.debug(`Failed to query permission for '${permissionType}'`, {error});
     return null;
   }
 };
@@ -92,7 +92,7 @@ export const setupPermissionListener = async (
 
     return permissionStatus;
   } catch (error: unknown) {
-    logger.debug(`Failed to setup permission listener for '${permissionType}'`, error);
+    logger.debug(`Failed to setup permission listener for '${permissionType}'`, {error});
     return null;
   }
 };
@@ -121,7 +121,7 @@ export const initializePermissions = async (
         setPermissionState(permissionType, newState);
       });
     } catch (error: unknown) {
-      logger.debug(`Failed to initialize permission '${permissionType}'`, error);
+      logger.debug(`Failed to initialize permission '${permissionType}'`, {error});
     }
   });
 

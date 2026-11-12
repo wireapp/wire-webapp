@@ -1546,10 +1546,9 @@ describe('CallingRepository', () => {
 
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidJsonString);
 
-      expect(callingRepository['logger'].warn).toHaveBeenCalledWith(
-        'Invalid network quality info JSON',
-        expect.any(Error),
-      );
+      expect(callingRepository['logger'].warn).toHaveBeenCalledWith('Invalid network quality info JSON', {
+        error: expect.any(Error),
+      });
     });
 
     it('logs warning when network quality info schema validation fails', () => {
@@ -1561,10 +1560,9 @@ describe('CallingRepository', () => {
 
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidQualityInfo);
 
-      expect(callingRepository['logger'].warn).toHaveBeenCalledWith(
-        'Invalid network quality info schema',
-        expect.any(z.ZodError),
-      );
+      expect(callingRepository['logger'].warn).toHaveBeenCalledWith('Invalid network quality info schema', {
+        error: expect.any(z.ZodError),
+      });
 
       expect(Warnings.showWarning).not.toHaveBeenCalled();
       expect(Warnings.hideWarning).not.toHaveBeenCalled();

@@ -88,10 +88,10 @@ const InputLevel: FunctionComponent<InputLevelProps> = ({
       audioContext
         ?.close()
         .then(() => {
-          return logger.info('Closed existing AudioContext', audioContext);
+          return logger.info('Closed existing AudioContext', {audioContext});
         })
         .catch((error: unknown) => {
-          return logger.error(error);
+          return logger.error('Failed to close existing AudioContext', {error});
         });
 
       audioSource?.disconnect();

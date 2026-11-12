@@ -159,7 +159,7 @@ export function ConfigToolbar(): JSX.Element | null {
         });
         messageCountRef.current++;
       } catch (error: unknown) {
-        logger.error('Error sending message:', error);
+        logger.error('Error sending message:', {error});
       }
 
       if (isActive) {
@@ -444,7 +444,7 @@ export function ConfigToolbar(): JSX.Element | null {
     try {
       await window.wire?.app?.debug?.resetMLSConversation();
     } catch (error: unknown) {
-      logger.error('Error resetting MLS conversation:', error);
+      logger.error('Error resetting MLS conversation:', {error});
     } finally {
       setIsResettingMLSConversation(false);
     }
@@ -455,7 +455,7 @@ export function ConfigToolbar(): JSX.Element | null {
     try {
       await window.wire?.app?.debug?.updateActiveConversationKeyPackages();
     } catch (error: unknown) {
-      logger.error('Error advancing epoch:', error);
+      logger.error('Error advancing epoch:', {error});
     } finally {
       setIsAdvancingEpoch(false);
     }
@@ -481,7 +481,7 @@ export function ConfigToolbar(): JSX.Element | null {
 
       await window.wire?.app?.debug?.downloadNotificationsDump(from, to);
     } catch (error: unknown) {
-      logger.error('Error downloading notifications dump:', error);
+      logger.error('Error downloading notifications dump:', {error});
     } finally {
       setIsDownloadingNotifications(false);
     }

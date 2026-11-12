@@ -97,7 +97,7 @@ const CallOptions: FunctionComponent<CallOptionsProps> = ({
           await refreshAudioInput();
         } catch (error: unknown) {
           if (error instanceof Error) {
-            logger.warn(`Refreshing audio input after AGC preference change failed: ${error.message}`, error);
+            logger.warn(`Refreshing audio input after AGC preference change failed: ${error.message}`, {error});
           }
         }
       }

@@ -209,7 +209,7 @@ export class LifeCycleRepository {
         await this.dependencies.conversationRepository.sendTypingStop(activeConversation);
         this.logger.debug('Sent typing stop notification for active conversation during logout.');
       } catch (error: unknown) {
-        this.logger.warn('Failed to send typing stop before logout.', error);
+        this.logger.warn('Failed to send typing stop before logout.', {error});
       }
     }
 
@@ -251,7 +251,7 @@ export class LifeCycleRepository {
       // Clear localStorage selectively, keeping conversation input for session expiry
       const shouldPreserveConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
       const deletedKeys = CacheRepository.clearLocalStorage(shouldPreserveConversationInput, storageKeysToPreserve);
-      this.logger.debug(`Selective localStorage cleanup complete. Deleted ${deletedKeys.length} keys.`, deletedKeys);
+      this.logger.debug(`Selective localStorage cleanup complete. Deleted ${deletedKeys.length} keys.`, {deletedKeys});
     }
 
     // Perform complete localStorage wipe for specific scenarios
@@ -355,7 +355,7 @@ export class LifeCycleRepository {
       await this.dependencies.storageRepository.deleteDatabase();
       this.logger.info('Database deleted successfully as part of persistent storage cleanup.');
     } catch (error: unknown) {
-      this.logger.error('Failed to delete database before logout', error);
+      this.logger.error('Failed to delete database before logout', {error});
     }
   };
 

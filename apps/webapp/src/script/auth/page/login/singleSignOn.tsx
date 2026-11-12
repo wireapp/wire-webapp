@@ -92,7 +92,7 @@ const SingleSignOnComponent: FunctionComponent<Props & ConnectedProps & Dispatch
       onReceiveChildWindowMessage = (event: MessageEvent) => {
         // We need to copy properties to `JSON.stringify` because `event` is not serializable
         const serializedEvent = JSON.stringify({data: event.data, origin: event.origin});
-        logger.log(`Received SSO login event from wrapper: ${serializedEvent}`);
+        logger.info(`Received SSO login event from wrapper: ${serializedEvent}`);
         const isExpectedOrigin = event.origin === Config.getConfig().BACKEND_REST;
         if (!isExpectedOrigin) {
           onChildWindowClose();

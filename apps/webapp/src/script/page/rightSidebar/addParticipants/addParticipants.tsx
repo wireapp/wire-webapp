@@ -135,7 +135,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
     void teamRepository.loadTeamAppsAndCollaborators(teamId, abortController).catch((error: unknown) => {
       if (!abortController.signal.aborted) {
-        logger.error('Failed to load team apps and collaborators', error);
+        logger.error('Failed to load team apps and collaborators', {error});
       }
     });
 

@@ -121,14 +121,14 @@ const HistoryExport: FunctionComponent<HistoryExportProps> = ({
   const onError = useCallback(
     (error: Error) => {
       if (error instanceof CancelError) {
-        logger.log('History export was cancelled');
+        logger.info('History export was cancelled');
         dismissExport();
 
         return;
       }
 
       setHasError(true);
-      logger.error(`Failed to export history: ${error.message}`, error);
+      logger.error(`Failed to export history: ${error.message}`, {error});
     },
     [dismissExport],
   );
@@ -173,7 +173,7 @@ const HistoryExport: FunctionComponent<HistoryExportProps> = ({
       try {
         const startTime = Date.now();
         const numberOfRecords = await backupRepository.getBackupInitData();
-        logger.log(`Exporting '${numberOfRecords}' records from history`);
+        logger.info(`Exporting '${numberOfRecords}' records from history`);
 
         setNumberOfRecords(numberOfRecords);
         setNumberOfProcessedRecords(0);
@@ -198,7 +198,7 @@ const HistoryExport: FunctionComponent<HistoryExportProps> = ({
               : Segmentation.GENERAL.NO,
           });
           onSuccess(archiveBlob);
-          logger.log(`Completed export of '${numberOfRecords}' records from history`);
+          logger.info(`Completed export of '${numberOfRecords}' records from history`);
         } else {
           throw new Error('No local client found');
         }

@@ -36,7 +36,7 @@ export const editorConfig: InitialConfigType = {
   namespace: 'WireLexicalEditor',
   theme,
   onError(error: unknown) {
-    logger.error(error);
+    logger.error('Rich text editor failed', {error});
   },
   nodes: [
     MentionNode,

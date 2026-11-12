@@ -96,7 +96,7 @@ export class EventService {
       const logMessage = `Failed to get events '${eventIds.join(',')}' for conversation '${conversationId}': ${
         toError(error).message
       }`;
-      this.logger.error(logMessage, error);
+      this.logger.error(logMessage, {error});
       throw error;
     }
   }
@@ -128,7 +128,7 @@ export class EventService {
         .toSorted(compareEventsById);
     } catch (error: unknown) {
       const logMessage = `Failed to get ephemeral events for conversation '${conversationId}': ${toError(error).message}`;
-      this.logger.error(logMessage, error);
+      this.logger.error(logMessage, {error});
       throw error;
     }
   }
@@ -171,7 +171,7 @@ export class EventService {
         .shift();
     } catch (error: unknown) {
       const logMessage = `Failed to get event '${eventId}' for conversation '${conversationId}': ${toError(error).message}`;
-      this.logger.error(logMessage, error);
+      this.logger.error(logMessage, {error});
       throw error;
     }
   }
@@ -415,7 +415,7 @@ export class EventService {
     record.data.reason = reason;
     record.data.status = AssetTransferState.UPLOAD_FAILED;
     await this.replaceEvent(record);
-    this.logger.info('Updated asset message_et (failed)', primaryKey);
+    this.logger.info('Updated asset message_et (failed)', {primaryKey});
     return record;
   }
 
@@ -474,7 +474,7 @@ export class EventService {
           databaseVersion: databaseVersion,
           updateVersion: changes.version,
         };
-        this.logger.error(logMessage, logObject);
+        this.logger.error(logMessage, {logObject});
         throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
       });
     }
@@ -562,7 +562,7 @@ export class EventService {
       });
     } catch (error: unknown) {
       const logMessage = `Failed to get events for conversation '${conversationId}': ${toError(error).message}`;
-      this.logger.error(logMessage, error);
+      this.logger.error(logMessage, {error});
       throw error;
     }
   }

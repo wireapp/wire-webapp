@@ -41,7 +41,7 @@ export const isCPBackup = async (data: ArrayBuffer | Blob): Promise<boolean> => 
     return false;
   }
   if (result instanceof BackupPeekResult.Success) {
-    CPBLogger.log(`Backup version: ${result.version}`);
+    CPBLogger.info(`Backup version: ${result.version}`);
     return true;
   }
   return false;
@@ -55,13 +55,13 @@ export const peekCrossPlatformData = async (
   const backupData = new Uint8Array(fileBytes);
   const result = await backupImporter.peekFileData(backupData);
   if (result instanceof BackupPeekResult.Failure) {
-    CPBLogger.log(`Could not peek into backup: ${result}`);
+    CPBLogger.info(`Could not peek into backup: ${result}`);
     throw new IncompatibleBackupError('Incompatible cross-platform backup');
   }
   if (result instanceof BackupPeekResult.Success) {
     const isUserBackup = !isNullOrUndefined(userId) ? await isCreatedBySameUser(result, userId) : false;
 
-    CPBLogger.log(`Backup version: ${result.version}`);
+    CPBLogger.info(`Backup version: ${result.version}`);
     return {
       archiveVersion: result.version,
       isEncrypted: result.isEncrypted,

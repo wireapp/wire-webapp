@@ -195,10 +195,10 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
       doCheckConversationCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
-        logger.warn('Invalid conversation code', error);
+        logger.warn('Invalid conversation code', {error});
       });
       doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
-        logger.warn('Failed to fetch conversation info', error);
+        logger.warn('Failed to fetch conversation info', {error});
       });
     }
   }, [doCheckConversationCode, doGetConversationInfoByCode]);
@@ -215,7 +215,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error: unknown) {
-      logger.error('Unable to login immediately', error);
+      logger.error('Unable to login immediately', {error});
       setShowEntropyForm(false);
       if (isBackendError(error) && error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
         return navigate(withOAuthQuery(ROUTE.CLIENTS));

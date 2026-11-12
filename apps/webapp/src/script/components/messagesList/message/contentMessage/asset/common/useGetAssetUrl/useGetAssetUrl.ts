@@ -72,7 +72,7 @@ export const useGetAssetUrl = ({
         setIsError(true);
         onError?.(error);
       }
-      logger.error(`Failed to load asset ${asset.id}`, error);
+      logger.error(`Failed to load asset ${asset.id}`, {error});
     } finally {
       setIsLoading(false);
       asset.status(AssetTransferState.UPLOADED);

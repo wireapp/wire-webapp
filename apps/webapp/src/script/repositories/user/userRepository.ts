@@ -776,7 +776,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       await this.initMarketingConsent();
       return userEntity;
     } catch (error: unknown) {
-      this.logger.error(`Unable to load self user: ${toError(error).message}`, [error]);
+      this.logger.error(`Unable to load self user: ${toError(error).message}`, {error});
       throw error;
     }
   }
@@ -807,7 +807,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       if (!isNotFound) {
         this.logger.warn(
           `Failed to find user with ID '${userId.id}' and domain '${userId.domain}': ${toError(error).message}`,
-          error,
+          {error},
         );
       }
       throw error;
@@ -839,7 +839,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       await this.updateUserSupportedProtocols(user.qualifiedId, supportedProtocols);
       this.emit('supportedProtocolsUpdated', {user, supportedProtocols});
     } catch (error: unknown) {
-      this.logger.warn(`Failed to refresh supported protocols for user ${user.qualifiedId.id}`, error);
+      this.logger.warn(`Failed to refresh supported protocols for user ${user.qualifiedId.id}`, {error});
     }
   }
 
@@ -874,12 +874,12 @@ export class UserRepository extends TypedEventEmitter<Events> {
       if (!isNullOrUndefined(localSupportedProtocols)) {
         this.logger.warn(
           `Failed when fetching supported protocols of user ${userId.id}, using local supported protocols as fallback: `,
-          localSupportedProtocols,
+          {localSupportedProtocols},
         );
         return localSupportedProtocols;
       }
 
-      this.logger.error(`Couldn't specify supported protocols of user ${userId.id}.`, error);
+      this.logger.error(`Couldn't specify supported protocols of user ${userId.id}.`, {error});
       throw error;
     }
   }
@@ -1158,7 +1158,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
         }
       }
     } catch (error: unknown) {
-      this.logger.warn(`Failed to retrieve marketing consent: ${toError(error).message}`, error);
+      this.logger.warn(`Failed to retrieve marketing consent: ${toError(error).message}`, {error});
     }
   }
 }

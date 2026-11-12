@@ -48,7 +48,7 @@ export class DexieDatabase extends Dexie {
 
   constructor(dbName: string) {
     super(dbName);
-    this.logger = getLogger(`Dexie (${dbName})`);
+    this.logger = getLogger('Dexie');
 
     void this.initDbSchema();
 
@@ -69,7 +69,7 @@ export class DexieDatabase extends Dexie {
       const versionInstance = this.version(version).stores(schema);
       if (!isUndefined(upgrade)) {
         versionInstance.upgrade((transaction: Transaction) => {
-          this.logger.warn(`Database upgrade to version '${version}'`);
+          this.logger.warn(`Database upgrade to version '${version}'`, {databaseName: this.name, version});
           upgrade(transaction, this);
         });
       }
@@ -81,7 +81,7 @@ export class DexieDatabase extends Dexie {
       // If the archive version is greater than the current version, run the upgrade
       if (!isUndefined(upgrade) && version > archiveVersion) {
         await this.transaction('rw', this.tables, transaction => {
-          this.logger.info(`Running DB schema update for version '${version}'`);
+          this.logger.info(`Running DB schema update for version '${version}'`, {databaseName: this.name, version});
           upgrade(transaction, this);
         });
       }

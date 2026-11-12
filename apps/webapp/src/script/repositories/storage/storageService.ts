@@ -253,7 +253,7 @@ export class StorageService {
       const records = await this.engine.readAll<T>(storeName);
       return records.filter(Boolean);
     } catch (error: unknown) {
-      this.logger.error(`Failed to load objects from store '${storeName}'`, error);
+      this.logger.error('Failed to load objects from store', {error, storeName});
       throw error;
     }
   }
@@ -287,7 +287,7 @@ export class StorageService {
       if (error instanceof RecordNotFoundError) {
         return undefined;
       }
-      this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
+      this.logger.error('Failed to load record from store', {error, primaryKey, storeName});
       throw error;
     }
   }
@@ -324,7 +324,7 @@ export class StorageService {
       const newKey = await this.engine.updateOrCreate(storeName, primaryKey, entity);
       return newKey;
     } catch (error: unknown) {
-      this.logger.error(`Failed to update or create '${primaryKey}' in store '${storeName}'`, error);
+      this.logger.error('Failed to update or create record in store', {error, primaryKey, storeName});
       throw error;
     }
   }
@@ -371,7 +371,7 @@ export class StorageService {
         }
         const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);
         const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
-        this.logger.log(logMessage);
+        this.logger.info(logMessage);
         return numberOfUpdates;
       }
       const oldRecord = await this.load<unknown>(storeName, primaryKey);
@@ -382,7 +382,7 @@ export class StorageService {
 
       return 1;
     } catch (error: unknown) {
-      this.logger.error(`Failed to update '${primaryKey}' in store '${storeName}'`, error);
+      this.logger.error('Failed to update record in store', {error, primaryKey, storeName});
       throw error;
     }
   }

@@ -818,7 +818,7 @@ export class WebGLRenderer {
     this.gl.linkProgram(program);
 
     if (this.gl.getProgramParameter(program, this.gl.LINK_STATUS) !== true) {
-      this.logger.error('Program link error:', this.gl.getProgramInfoLog(program));
+      this.logger.error('Program link error:', {programLog: this.gl.getProgramInfoLog(program)});
 
       this.gl.deleteProgram(program);
 
@@ -847,7 +847,7 @@ export class WebGLRenderer {
     this.gl.compileShader(shader);
 
     if (this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS) !== true) {
-      this.logger.error('Shader compile error:', this.gl.getShaderInfoLog(shader));
+      this.logger.error('Shader compile error:', {shaderLog: this.gl.getShaderInfoLog(shader)});
 
       this.gl.deleteShader(shader);
 

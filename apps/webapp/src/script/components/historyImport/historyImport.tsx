@@ -126,14 +126,14 @@ const HistoryImport: FunctionComponent<HistoryImportProps> = ({
   const onError = useCallback(
     (error: Error) => {
       if (error instanceof CancelError) {
-        logger.log('History import was cancelled');
+        logger.info('History import was cancelled');
         dismissImport();
 
         return;
       }
 
       setError(error);
-      logger.error(`Failed to import history: ${error.message}`, error);
+      logger.error(`Failed to import history: ${error.message}`, {error});
 
       if (error instanceof DifferentAccountError) {
         setErrorHeadline(translate('backupImportAccountErrorHeadline'));

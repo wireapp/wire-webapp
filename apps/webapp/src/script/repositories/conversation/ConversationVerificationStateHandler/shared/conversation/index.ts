@@ -112,7 +112,7 @@ export const attemptChangeToDegraded = ({
       ? ConversationVerificationState.DEGRADED
       : ConversationVerificationState.UNVERIFIED;
     conversationEntity.verification_state(conversationVerificationState);
-    logger.log(`Verification of conversation '${conversationEntity.id}' changed to degraded`);
+    logger.info(`Verification of conversation '${conversationEntity.id}' changed to degraded`);
     return conversationVerificationState;
   }
 
@@ -144,7 +144,7 @@ export const attemptChangeToVerified = ({
   const isConversationVerified = conversationEntity.is_verified() === true;
   if (isConversationVerified) {
     conversationEntity.verification_state(ConversationVerificationState.VERIFIED);
-    logger.log(`Verification state of conversation '${conversationEntity.id}' changed to verified`);
+    logger.info(`Verification state of conversation '${conversationEntity.id}' changed to verified`);
     return ConversationVerificationState.VERIFIED;
   }
 
