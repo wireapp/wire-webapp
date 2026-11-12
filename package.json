@@ -122,7 +122,7 @@
     "@emotion/jest": "11.14.2",
     "@enormora/objectory": "0.0.25",
     "@faker-js/faker": "10.6.0",
-    "@formatjs/cli": "6.18.0",
+    "@formatjs/cli": "6.18.2",
     "@ls-lint/ls-lint": "2.3.2",
     "@playwright/test": "1.65.0",
     "@roamhq/wrtc": "0.10.0",
