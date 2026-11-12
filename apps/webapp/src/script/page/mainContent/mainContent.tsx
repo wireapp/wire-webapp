@@ -47,7 +47,7 @@ import {MediaDeviceType} from '../../repositories/media/MediaDeviceType';
 import {useMediaDevicesStore} from '../../repositories/media/useMediaDevicesStore';
 import {TeamState} from '../../repositories/team/TeamState';
 import {createTroubleshooterRepository} from '../../repositories/troubleshooter/troubleshooterRepository';
-import {createMockTroubleshooterService} from '../../repositories/troubleshooter/troubleshooterService';
+import {createAvsTroubleshooterService} from '../../repositories/troubleshooter/troubleshooterService';
 import {AppLockRepository} from '../../repositories/user/appLockRepository';
 import {UserState} from '../../repositories/user/userState';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
@@ -96,9 +96,6 @@ const MainContent: FunctionComponent<MainContentProps> = ({
 }: MainContentProps) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const {mainViewModel, translate, clock} = useApplicationContext();
-  const troubleshooterRepository = useMemo(() => {
-    return createTroubleshooterRepository(createMockTroubleshooterService(clock), clock);
-  }, [clock]);
 
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
@@ -130,6 +127,14 @@ const MainContent: FunctionComponent<MainContentProps> = ({
 
   const contentViewModel = mainViewModel.content;
   const {isFederated, repositories, switchContent} = contentViewModel;
+  const callingRepository = repositories.calling;
+  const troubleshooterRepository = useMemo(() => {
+    const service = createAvsTroubleshooterService(
+      callingRepository.startConnectionTest,
+      callingRepository.startScanTest,
+    );
+    return createTroubleshooterRepository(service, clock);
+  }, [callingRepository, clock]);
 
   const {audioInputSupported, audioOutputSupported, videoInputSupported} = useMediaDevicesStore(state => {
     return {

@@ -20,6 +20,8 @@
 import type {Clock} from '@enormora/clock/clock';
 import {Task, task} from 'true-myth';
 
+import type {ConnectionTestProgress, ConnectionTestResult, ScanReport} from '@wireapp/avs';
+
 export type CheckStatus = 'allowed' | 'blocked' | 'available' | 'unavailable' | 'relay' | 'reached' | 'good';
 export type CheckId =
   'udp' | 'tcp' | 'tls' | 'ipv4' | 'ipv6' | 'sft' | 'turn' | 'incoming' | 'roundTrip' | 'jitter' | 'packetLoss';
@@ -30,15 +32,51 @@ export type DiagnosticCheck = {
   address: string;
   port: number;
 };
-export type ConnectionResult = {route: 'relay'; devices: 'ok'};
-export type ScanResult = {checks: readonly DiagnosticCheck[]};
+export type ConnectionResult = (
+  {route: 'relay'; devices: 'ok'} | {status: 'connected'; report: ConnectionTestResult}
+) & {
+  qualityChecks?: readonly DiagnosticCheck[];
+};
+export type ScanResult = {checks: readonly DiagnosticCheck[]; report?: ScanReport};
 export type TroubleshooterService = {
-  testConnection: () => Task<ConnectionResult, Error>;
+  testConnection: (onProgress: (progress: ConnectionTestProgress) => void) => Task<ConnectionResult, Error>;
   runFullScan: () => Task<ScanResult, Error>;
 };
 
 export const MOCK_CONNECTION_DELAY_MILLISECONDS = 1_500;
 export const MOCK_SCAN_DELAY_MILLISECONDS = 3_000;
+const SCAN_REPORT_INDENTATION = 2;
+
+export const createAvsTroubleshooterService = (
+  startConnectionTest: (onProgress: (progress: ConnectionTestProgress) => void) => Promise<ConnectionTestResult>,
+  startScanTest: () => Promise<ScanReport>,
+): TroubleshooterService => {
+  return {
+    testConnection: onProgress => {
+      return task.tryOrElse(
+        error => {
+          return error instanceof Error ? error : new Error('AVS connection test failed');
+        },
+        async (): Promise<ConnectionResult> => {
+          return {status: 'connected', report: await startConnectionTest(onProgress)};
+        },
+      );
+    },
+    runFullScan: () => {
+      return task.tryOrElse(
+        error => {
+          console.error('AVS scan test failed', error);
+          return error instanceof Error ? error : new Error('AVS scan test failed');
+        },
+        async (): Promise<ScanResult> => {
+          const report = await startScanTest();
+          console.info(JSON.stringify(report, null, SCAN_REPORT_INDENTATION));
+          return {checks: [], report};
+        },
+      );
+    },
+  };
+};
 
 // Fixtures only: no microphone, camera or network access is performed.
 export const createMockTroubleshooterService = (clock: Clock): TroubleshooterService => {
@@ -63,13 +101,18 @@ export const createMockTroubleshooterService = (clock: Clock): TroubleshooterSer
     {id: 'sft', status: 'relay', value: '', address: 'mock-conference.example.invalid', port: 443},
     {id: 'turn', status: 'reached', value: '', address: 'mock-relay.example.invalid', port: 443},
     {id: 'incoming', status: 'blocked', value: '', address: '192.0.2.1', port: 49152},
+  ];
+  const qualityChecks: readonly DiagnosticCheck[] = [
     {id: 'roundTrip', status: 'good', value: '42 ms', address: 'mock-relay.example.invalid', port: 443},
     {id: 'jitter', status: 'good', value: '3 ms', address: 'mock-relay.example.invalid', port: 443},
     {id: 'packetLoss', status: 'good', value: '0 %', address: 'mock-relay.example.invalid', port: 443},
   ];
   return {
     testConnection: () => {
-      return afterDelay<ConnectionResult>({route: 'relay', devices: 'ok'}, MOCK_CONNECTION_DELAY_MILLISECONDS);
+      return afterDelay<ConnectionResult>(
+        {route: 'relay', devices: 'ok', qualityChecks},
+        MOCK_CONNECTION_DELAY_MILLISECONDS,
+      );
     },
     runFullScan: () => {
       return afterDelay<ScanResult>({checks}, MOCK_SCAN_DELAY_MILLISECONDS);

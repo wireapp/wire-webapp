@@ -257,6 +257,53 @@ export class CallingRepository {
   private selfUser: User | null = null;
   private wCall?: Wcall;
   private wUser: number = 0;
+  private connectionTest?: {id: string; closed?: boolean; stream?: MediaStream};
+
+  readonly startConnectionTest = async (
+    onProgress?: Parameters<Wcall['runConnectionTest']>[1],
+  ): ReturnType<Wcall['runConnectionTest']> => {
+    const avs = this.wCall;
+    if (
+      isUndefined(avs) ||
+      !isFunction(avs.runConnectionTest) ||
+      this.wUser === 0 ||
+      isNullOrUndefined(this.selfUser) ||
+      !isNonEmptyString(this.selfClientId)
+    ) {
+      throw new Error('AVS connection testing is unavailable');
+    }
+    if (!isUndefined(this.connectionTest)) {
+      throw new Error('An AVS connection test is already running');
+    }
+
+    const id = `avs-connection-test:${this.serializeQualifiedId(this.selfUser.qualifiedId)}:${this.selfClientId}`;
+    const connectionTest = {id};
+    this.connectionTest = connectionTest;
+    try {
+      return await avs.runConnectionTest(this.wUser, onProgress);
+    } finally {
+      if (this.connectionTest === connectionTest) {
+        this.stopConnectionTestMedia(this.connectionTest);
+        this.connectionTest = undefined;
+      }
+    }
+  };
+
+  private stopConnectionTestMedia(connectionTest: NonNullable<CallingRepository['connectionTest']>): void {
+    connectionTest.closed = true;
+    connectionTest.stream?.getTracks().forEach(track => {
+      track.stop();
+    });
+    connectionTest.stream = undefined;
+  }
+
+  readonly startScanTest = async (): ReturnType<Wcall['scanTest']> => {
+    const avs = this.wCall;
+    if (isUndefined(avs) || !isFunction(avs.scanTest) || this.wUser === 0) {
+      throw new Error('AVS scan testing is unavailable');
+    }
+    return avs.scanTest(this.wUser);
+  };
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
   private isOnAvsStagingSft = false;
@@ -2698,6 +2745,11 @@ export class CallingRepository {
   };
 
   private readonly callClosed = async (reason: REASON, convId: SerializedConversationId): Promise<void> => {
+    const connectionTest = this.connectionTest;
+    if (connectionTest?.id === convId) {
+      this.stopConnectionTestMedia(connectionTest);
+      return;
+    }
     Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
@@ -3111,6 +3163,21 @@ export class CallingRepository {
     camera: boolean,
     screen: boolean,
   ): Promise<MediaStream> => {
+    const connectionTest = this.connectionTest;
+    if (connectionTest?.id === convId) {
+      const stream = await this.getMediaStream({audio, camera, screen}, true);
+      if (this.connectionTest !== connectionTest || connectionTest.closed === true) {
+        stream.getTracks().forEach(track => {
+          track.stop();
+        });
+        throw new Error('AVS connection test already ended');
+      }
+      connectionTest.stream?.getTracks().forEach(track => {
+        track.stop();
+      });
+      connectionTest.stream = stream;
+      return stream;
+    }
     const call = this.findCall(this.parseQualifiedId(convId));
     if (isUndefined(call)) {
       return Promise.reject();
@@ -3335,6 +3402,11 @@ export class CallingRepository {
    * @note Should only used by "window.onbeforeunload".
    */
   destroy(): void {
+    const connectionTest = this.connectionTest;
+    if (!isUndefined(connectionTest)) {
+      this.wCall?.end(this.wUser, connectionTest.id);
+      void this.callClosed(REASON.CANCELED, connectionTest.id);
+    }
     this.callState.calls().forEach((call: Call) => {
       this.wCall?.end(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId));
     });

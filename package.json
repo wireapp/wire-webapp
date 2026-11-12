@@ -26,7 +26,7 @@
     "@smithy/fetch-http-handler": "5.8.1",
     "@tanstack/react-table": "8.21.3",
     "@tanstack/react-virtual": "3.14.26",
-    "@wireapp/avs": "10.5.19",
+    "@wireapp/avs": "10.5.44",
     "@wireapp/avs-debugger": "0.0.7",
     "@wireapp/core-crypto": "11.0.0",
     "@wireapp/cryptobox": "12.8.0",

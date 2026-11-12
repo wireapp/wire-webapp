@@ -34,6 +34,7 @@ import {
   CALL_TYPE,
   CONV_TYPE,
   ERROR,
+  getAvsInstance,
   LOG_LEVEL,
   QUALITY,
   REASON,
@@ -88,6 +89,22 @@ import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {BackgroundEffectSelection} from '../media/VideoBackgroundEffects';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {NoAudioInputError} from '../../error/noAudioInputError';
+
+const initializeBrowserAvs = (): Promise<Wcall> => {
+  const nodeVersion = Object.getOwnPropertyDescriptor(process.versions, 'node');
+  if (!nodeVersion) {
+    return getAvsInstance();
+  }
+
+  // jsdom exposes Node's version, which the browser AVS build checks during startup.
+  // AVS is only working in browser and worker environment.
+  Object.defineProperty(process.versions, 'node', {...nodeVersion, value: undefined});
+  try {
+    return getAvsInstance();
+  } finally {
+    Object.defineProperty(process.versions, 'node', nodeVersion);
+  }
+};
 
 type AudioFlowStat = {
   bytesReceived?: number;
@@ -251,6 +268,24 @@ function createSftCallingFixture(): SftCallingFixture {
   };
 }
 
+describe('AVS connection test', () => {
+  it('forwards the progress callback and propagates AVS connection test failures', async () => {
+    const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+    const error = new Error('Connection setup timed out');
+    const runConnectionTest: jest.MockedFunction<Wcall['runConnectionTest']> = jest.fn();
+    runConnectionTest.mockRejectedValue(error);
+    repository['wCall'] = {runConnectionTest} as unknown as Wcall;
+    repository['wUser'] = 1;
+    repository['selfUser'] = new User(createUuid(), '', translateForTest);
+    repository['selfClientId'] = createUuid();
+    const onProgress = jest.fn();
+
+    await expect(repository.startConnectionTest(onProgress)).rejects.toBe(error);
+    expect(runConnectionTest).toHaveBeenCalledWith(1, onProgress);
+    await expect(repository.startConnectionTest(onProgress)).rejects.toBe(error);
+  });
+});
+
 describe('CallingRepository AVS logging', () => {
   afterEach(() => {
     jest.restoreAllMocks();
@@ -327,6 +362,8 @@ describe('CallingRepository AVS logging', () => {
 });
 
 describe('CallingRepository', () => {
+  beforeAll(initializeBrowserAvs);
+
   afterEach(() => {
     testFactory.dispose();
   });
@@ -1873,6 +1910,8 @@ describe('CallingRepository', () => {
 });
 
 describe('CallingRepository ISO', () => {
+  beforeAll(initializeBrowserAvs);
+
   describe('incoming call', () => {
     let avsUser: number;
     let avsCall: Wcall;
@@ -2147,6 +2186,8 @@ describe('CallingRepository ISO', () => {
 });
 
 describe.skip('E2E audio call', () => {
+  beforeAll(initializeBrowserAvs);
+
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: noop} as unknown as EventRepository,
   });
@@ -2287,6 +2328,8 @@ describe.skip('E2E audio call', () => {
 });
 
 describe('NotificationHandlingState', () => {
+  beforeAll(initializeBrowserAvs);
+
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: noop} as unknown as EventRepository,
     mediaDevicesHandler: {
@@ -2334,6 +2377,8 @@ describe('NotificationHandlingState', () => {
 });
 
 describe('init AVS state', () => {
+  beforeAll(initializeBrowserAvs);
+
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: noop} as unknown as EventRepository,
     mediaDevicesHandler: {
