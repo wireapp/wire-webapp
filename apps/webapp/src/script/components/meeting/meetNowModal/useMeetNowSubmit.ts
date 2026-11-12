@@ -23,7 +23,10 @@ import type {MeetNowFormState, MeetNowSubmitResult} from './meetNowTypes';
 import {submitMeetNow} from './submitMeetNow';
 
 import {useApplicationContext} from '../../../page/rootProvider';
-import {showMeetingLinkConfirmation, type MeetingLinkConfirmationSession} from '../meetingLinkConfirmation/meetingLinkConfirmation';
+import {
+  type MeetingLinkConfirmationSession,
+  showMeetingLinkConfirmation,
+} from '../meetingLinkConfirmation/meetingLinkConfirmation';
 import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
 import {useMeetingStore} from '../meetingStore/meetingStoreProvider';
 
@@ -43,7 +46,7 @@ export const useMeetNowSubmit = (): UseMeetNowSubmitResult => {
   const openMeetingPrep = useMeetingPrepModal(state => {
     return state.open;
   });
-  const onMeetingCreated = (session: MeetingLinkConfirmationSession) => {
+  const onMeetingCreated = (session: MeetingLinkConfirmationSession): void => {
     showMeetingLinkConfirmation({...session, translate});
   };
 

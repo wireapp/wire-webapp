@@ -101,6 +101,9 @@ function renderCameraPreferences(
         hasActiveCameraStream={false}
         refreshStream={jest.fn().mockResolvedValue(undefined)}
         streamHandler={createStreamHandlerForTest()}
+        videoInputDevices={[]}
+        videoInputDeviceId=""
+        setVideoInputDeviceId={jest.fn()}
       />,
       rootProviderWrapper,
     ),
