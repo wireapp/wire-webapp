@@ -34,6 +34,7 @@ import {
   CALL_TYPE,
   CONV_TYPE,
   ERROR,
+  getAvsInstance,
   QUALITY,
   REASON,
   STATE as CALL_STATE,
@@ -87,6 +88,22 @@ import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {BackgroundEffectSelection} from '../media/VideoBackgroundEffects';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {NoAudioInputError} from '../../error/noAudioInputError';
+
+const initializeBrowserAvs = (): Promise<Wcall> => {
+  const nodeVersion = Object.getOwnPropertyDescriptor(process.versions, 'node');
+  if (!nodeVersion) {
+    return getAvsInstance();
+  }
+
+  // jsdom exposes Node's version, which the browser AVS build checks during startup.
+  // AVS is only working in browser and worker environment.
+  Object.defineProperty(process.versions, 'node', {...nodeVersion, value: undefined});
+  try {
+    return getAvsInstance();
+  } finally {
+    Object.defineProperty(process.versions, 'node', nodeVersion);
+  }
+};
 
 type AudioFlowStat = {
   bytesReceived?: number;
@@ -269,6 +286,8 @@ describe('AVS connection test', () => {
 });
 
 describe('CallingRepository', () => {
+  beforeAll(initializeBrowserAvs);
+
   afterEach(() => {
     testFactory.dispose();
   });
@@ -1817,6 +1836,8 @@ describe('CallingRepository', () => {
 });
 
 describe('CallingRepository ISO', () => {
+  beforeAll(initializeBrowserAvs);
+
   describe('incoming call', () => {
     let avsUser: number;
     let avsCall: Wcall;
@@ -2091,6 +2112,8 @@ describe('CallingRepository ISO', () => {
 });
 
 describe.skip('E2E audio call', () => {
+  beforeAll(initializeBrowserAvs);
+
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: noop} as unknown as EventRepository,
   });
@@ -2231,6 +2254,8 @@ describe.skip('E2E audio call', () => {
 });
 
 describe('NotificationHandlingState', () => {
+  beforeAll(initializeBrowserAvs);
+
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: noop} as unknown as EventRepository,
     mediaDevicesHandler: {
@@ -2278,6 +2303,8 @@ describe('NotificationHandlingState', () => {
 });
 
 describe('init AVS state', () => {
+  beforeAll(initializeBrowserAvs);
+
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: noop} as unknown as EventRepository,
     mediaDevicesHandler: {
