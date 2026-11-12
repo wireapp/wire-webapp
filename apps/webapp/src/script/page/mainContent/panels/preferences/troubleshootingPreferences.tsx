@@ -237,7 +237,7 @@ export const TroubleshootingPreferences = ({repository}: {repository: Troublesho
         return value.value !== '' ? value.value : translate(`troubleshooter.status.${value.status}`);
       })
       .unwrapOr(
-        measurement === undefined || measurement === null
+       isNullOrUndefined(measurement)
           ? translate('troubleshooter.noResult')
           : `${measurement.toLocaleString()} ${qualityThresholds[id].unit}`,
       );
