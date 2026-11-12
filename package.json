@@ -71,6 +71,7 @@
     "ky": "1.14.3",
     "ky-release": "npm:ky@2.2.0",
     "lexical": "0.27.2",
+    "libsodium-sumo": "0.7.15",
     "libsodium-wrappers-sumo": "0.8.4",
     "linkify-it": "5.0.2",
     "lodash": "4.18.1",
@@ -312,6 +313,9 @@
     },
     "stylelint-order": {
       "stylelint": "^14.0.0 || ^15.0.0 || ^16.0.1 || ^17.0.0"
+    },
+    "libsodium-wrappers-sumo@0.7.9": {
+      "libsodium-sumo": "0.7.15"
     },
     "typescript": "6.0.3",
     "xml2js": "0.6.2",

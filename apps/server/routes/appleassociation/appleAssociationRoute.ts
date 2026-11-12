@@ -29,6 +29,10 @@ export const AppleAssociationRoute = (): Router => {
           'EDF3JCE8BC.com.wearezeta.zclient.development',
           'EDF3JCE8BC.com.wearezeta.zclient.ios.beta',
           'EDF3JCE8BC.com.wearezeta.zclient.ios.edge',
+          'EDF3JCE8BC.com.wire.prism.ios.dev',
+          'EDF3JCE8BC.com.wire.prism.ios.alpha',
+          'EDF3JCE8BC.com.wire.prism.ios.beta',
+          'EDF3JCE8BC.com.wire.prism.ios',
         ],
       },
     };

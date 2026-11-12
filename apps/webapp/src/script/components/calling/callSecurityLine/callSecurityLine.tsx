@@ -111,7 +111,7 @@ interface CallSecurityLineProps {
 
 /**
  * The line under the call title that tells participants the call is end-to-end encrypted.
- * It replaces the plain call timer when the call-security-line startup feature toggle is on.
+ * It includes the call duration once media is established.
  *
  * - connecting: until the call media is established
  * - intro: for 3 s after the call is established (startedAt), so reopening the call view does not replay it

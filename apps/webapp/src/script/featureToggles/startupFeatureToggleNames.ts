@@ -18,7 +18,6 @@
  */
 
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
-export const callSecurityLineFeatureToggleName = 'call-security-line';
 export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
 export const forTestsOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
@@ -28,10 +27,10 @@ export const markAsUnreadFeatureToggleName = 'mark-as-unread';
 export const troubleshooterFeatureToggleName = 'troubleshooter';
 
 export const sendCallLogsFeatureToggleName = 'send-call-logs';
+export const e2ePdfPreviewFeatureToggleName = 'e2e-pdf-preview';
 
 export const startupFeatureToggleRegistry = [
   {name: applockRefactoredFeatureToggleName, previewDefaultEnabled: false},
-  {name: callSecurityLineFeatureToggleName, previewDefaultEnabled: false},
   {name: conversationListCollapseFeatureToggleName, previewDefaultEnabled: false},
   {name: forTestsOnlyFeatureToggleName, previewDefaultEnabled: false},
   {name: disableMessagePreprocessingFeatureToggleName, previewDefaultEnabled: false},
@@ -40,6 +39,7 @@ export const startupFeatureToggleRegistry = [
   {name: markAsUnreadFeatureToggleName, previewDefaultEnabled: true},
   {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},
   {name: sendCallLogsFeatureToggleName, previewDefaultEnabled: false},
+  {name: e2ePdfPreviewFeatureToggleName, previewDefaultEnabled: true},
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleRegistry)[number]['name'];
