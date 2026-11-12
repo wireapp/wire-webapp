@@ -19,21 +19,21 @@
 
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {task} from 'true-myth';
-import {createStore} from 'zustand/vanilla';
+import {createStore, StoreApi} from 'zustand/vanilla';
 
-import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
-import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
-import {removeCurrentModal} from 'Components/Modals/PrimaryModal/PrimaryModalState';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
+import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
+import type {MeetingSeries} from '../types/meetingSeries';
+import {PrimaryModalComponent} from '../../Modals/PrimaryModal/PrimaryModal';
+import {removeCurrentModal} from '../../Modals/PrimaryModal';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import {KEY} from 'Util/keyboardUtil';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {KEY} from '../../../util/keyboardUtil';
 
 import {RotateMeetingLinkModal} from './rotateMeetingLinkModal';
 import {useRotateMeetingLinkModal} from './useRotateMeetingLinkModal';
@@ -60,7 +60,7 @@ const meeting: MeetingSeries = {
 const createMeetingStore = (
   rotateMeetingLink: MeetingStoreState['rotateMeetingLink'],
   meetingSeries: MeetingSeries[] = [],
-) => {
+): StoreApi<MeetingStoreState> => {
   return createStore<MeetingStoreState>(() => {
     return {
       meetingSeries,
@@ -83,7 +83,10 @@ const createMeetingStore = (
 const renderModal = (
   rotateMeetingLink: MeetingStoreState['rotateMeetingLink'],
   meetingSeries: MeetingSeries[] = [meeting],
-) => {
+): {
+  fireAndForgetInvoker: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
+  unmount: ReturnType<typeof render>['unmount'];
+} => {
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
   const store = createMeetingStore(rotateMeetingLink, meetingSeries);
 

@@ -22,7 +22,6 @@ import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import {asyncNoop} from 'noop-esm';
 
 import {AuthActionCreator} from './creator/';
-import {joinLinkAction} from './joinLinkAction';
 import {LabeledError} from './labeledError';
 import {LocalStorageAction, LocalStorageKey} from './localStorageAction';
 
@@ -37,6 +36,7 @@ import {OAuthBody} from '../../../apiClient/oauth/oAuthBody';
 import {OAuthClient} from '../../../apiClient/oauth/oAuthClient';
 import type {TeamData} from '../../../apiClient/team/team/teamData';
 import {LowDiskSpaceError} from '../../../core/storage/engine/error';
+import type {JoinLinkResult} from '../../../navigation/meetingJoinDestination';
 import {toError} from '../../../util/toError';
 import {isAxiosError, isBackendError} from '../../../util/typePredicateUtil';
 import {currentLanguage} from '../../localeConfig';
@@ -45,6 +45,17 @@ import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer';
 
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<void>;
+
+export type JoinLinkActionOperations = {
+  doJoinByLink: (
+    key: string,
+    code: string,
+    uri?: string,
+    password?: string,
+  ) => ThunkAction<Promise<JoinLinkResult | undefined>>;
+  doStoreJoinDestination: (result: JoinLinkResult) => ThunkAction;
+  doJoinMeetingLink: (link: MeetingLink, password?: string) => ThunkAction<Promise<JoinLinkResult>>;
+};
 
 const isSystemKeychainAccessError = (errorCandidate: unknown): errorCandidate is Error => {
   return errorCandidate instanceof Error && errorCandidate.message.includes('cryption is not available');
@@ -65,16 +76,20 @@ export class AuthAction {
     uri?: string,
     getEntropy?: () => Promise<Uint8Array>,
     password?: string,
+    joinLinkOperations?: JoinLinkActionOperations,
   ): ThunkAction => {
+    if (joinLinkOperations === undefined) {
+      throw new Error('Join link actions are required for login and join');
+    }
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) => {
       return dispatch(authAction.doSilentLogout());
     };
     const onAfterLogin: LoginLifecycleFunction = async dispatch => {
-      const result = await dispatch(joinLinkAction.doJoinByLink(key, code, uri, password));
+      const result = await dispatch(joinLinkOperations.doJoinByLink(key, code, uri, password));
       if (isNullOrUndefined(result)) {
         return;
       }
-      await dispatch(joinLinkAction.doStoreJoinDestination(result));
+      await dispatch(joinLinkOperations.doStoreJoinDestination(result));
     };
 
     return async dispatch => {
@@ -184,15 +199,18 @@ export class AuthAction {
     };
   };
 
-  doFinalizeSSOLogin = ({
-    clientType,
-    meetingLink,
-    password,
-  }: {
-    clientType: ClientType;
-    meetingLink?: MeetingLink;
-    password?: string;
-  }): ThunkAction => {
+  doFinalizeSSOLogin = (
+    {
+      clientType,
+      meetingLink,
+      password,
+    }: {
+      clientType: ClientType;
+      meetingLink?: MeetingLink;
+      password?: string;
+    },
+    joinLinkOperations?: JoinLinkActionOperations,
+  ): ThunkAction => {
     return async (dispatch, getState, {core, actions: {clientAction, selfAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startLogin());
       try {
@@ -200,8 +218,11 @@ export class AuthAction {
         await this.persistClientData(clientType, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
         if (!isNullOrUndefined(meetingLink)) {
-          const result = await dispatch(joinLinkAction.doJoinMeetingLink(meetingLink, password));
-          await dispatch(joinLinkAction.doStoreJoinDestination(result));
+          if (joinLinkOperations === undefined) {
+            throw new Error('Join link actions are required for SSO meeting join');
+          }
+          const result = await dispatch(joinLinkOperations.doJoinMeetingLink(meetingLink, password));
+          await dispatch(joinLinkOperations.doStoreJoinDestination(result));
         }
         await dispatch(clientAction.doInitializeClient(clientType));
         if (!isNullOrUndefined(meetingLink)) {

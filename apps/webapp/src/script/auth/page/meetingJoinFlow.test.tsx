@@ -17,8 +17,8 @@
  *
  */
 
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {act, fireEvent, render, waitFor, type RenderResult} from '@testing-library/react';
+import {BackendError, BackendErrorLabel} from '../../apiClient/http';
+import {act, fireEvent, render, type RenderResult, waitFor} from '@testing-library/react';
 import {Provider} from 'react-redux';
 import {HashRouter} from 'react-router';
 import {applyMiddleware, combineReducers, legacy_createStore, type Reducer, type Store} from 'redux';
@@ -31,7 +31,7 @@ import {SingleSignOnForm} from './login/singleSignOnForm';
 
 import {Config} from '../../Config';
 import {actionRoot} from '../module/action';
-import {SelfActionCreator, type AppActions} from '../module/action/creator';
+import {type AppActions, SelfActionCreator} from '../module/action/creator';
 import {initialRootState, reducers, type RootState, type ThunkDispatch} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent, withIntl, withTheme} from '../util/test/testUtil';
@@ -393,6 +393,10 @@ describe('meeting links in the existing auth flow', () => {
         undefined,
         undefined,
         undefined,
+        expect.objectContaining({
+          doJoinByLink: expect.any(Function),
+          doJoinMeetingLink: expect.any(Function),
+        }),
       );
     });
     expect(page.queryByText('Private meeting title')).toBeNull();

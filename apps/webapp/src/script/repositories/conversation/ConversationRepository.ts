@@ -37,8 +37,6 @@ import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
 
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {replaceBrowserLocation} from '../../navigation/browserLocation';
-import {meetingJoinPath} from '../../navigation/meetingJoin';
 
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
@@ -143,6 +141,8 @@ import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../../message/messageCategory';
 import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
+import {replaceBrowserLocation} from '../../navigation/browserLocation';
+import {meetingJoinPath} from '../../navigation/meetingJoin';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {getNextItem} from '../../util/arrayUtil';
@@ -177,8 +177,8 @@ import {EventSource} from '../event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {PropertiesRepository} from '../properties/propertiesRepository';
 import {SelfRepository} from '../self/SelfRepository';
-import {ConversationRecord} from '../storage';
 import type {EventRecord, WithSender} from '../storage';
+import {ConversationRecord} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 import {UserFilter} from '../user/userFilter';

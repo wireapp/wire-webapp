@@ -131,11 +131,21 @@ const MainContent: FunctionComponent<MainContentProps> = ({
   const contentViewModel = mainViewModel.content;
   const {isFederated, repositories, switchContent} = contentViewModel;
 
-  const {audioInputSupported, audioOutputSupported, videoInputSupported} = useMediaDevicesStore(state => {
+  const {
+    audioInputSupported,
+    audioOutputSupported,
+    videoInputSupported,
+    videoInputDevices,
+    videoInputDeviceId,
+    setVideoInputDeviceId,
+  } = useMediaDevicesStore(state => {
     return {
       audioInputSupported: state.audio.input.supported,
       audioOutputSupported: state.audio.output.supported,
       videoInputSupported: state.video.input.supported,
+      videoInputDevices: state.video.input.devices,
+      videoInputDeviceId: state.video.input.activeId,
+      setVideoInputDeviceId: state.setVideoInputDeviceId,
     };
   });
   const deviceSupport = {
@@ -228,6 +238,9 @@ const MainContent: FunctionComponent<MainContentProps> = ({
                   callingRepository={repositories.calling}
                   propertiesRepository={repositories.properties}
                   deviceSupport={deviceSupport}
+                  videoInputDevices={videoInputDevices}
+                  videoInputDeviceId={videoInputDeviceId}
+                  setVideoInputDeviceId={setVideoInputDeviceId}
                 />
               </div>
             )}

@@ -18,27 +18,27 @@
  */
 
 import {act, fireEvent, render, screen} from '@testing-library/react';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../uiKit';
 import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {MeetingStoreRoot} from 'Components/meeting/meetingStore/meetingStoreRoot';
-import {MeetingPrepModal} from 'Components/meeting/meetingPrep/meetingPrepModal';
+import {MeetingStoreRoot} from '../components/meeting/meetingStore/meetingStoreRoot';
+import {MeetingPrepModal} from '../components/meeting/meetingPrep/meetingPrepModal';
 import {
   meetingPrepPreviewErrors,
   type RequestMeetingPrepPreview,
-} from 'Components/meeting/meetingPrep/meetingPrepTypes';
-import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
-import {User} from 'Repositories/entity/User';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {UserState} from 'Repositories/user/userState';
+} from '../components/meeting/meetingPrep/meetingPrepTypes';
+import {useMeetingPrepModal} from '../components/meeting/meetingPrep/useMeetingPrepModal';
+import {User} from '../repositories/entity/User';
+import {MediaStreamHandler} from '../repositories/media/MediaStreamHandler';
+import {UserState} from '../repositories/user/userState';
 import {
+  createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import type {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../page/testSupport/rootContextTestSupport';
+import type {MainViewModel} from '../view_model/MainViewModel';
+import {translateForTest} from '../util/test/translateForTest';
 
 import {joinedMeetingDestinationSchema, loginJoinDestination, openLoginMeetingPrep} from './meetingJoinDestination';
 

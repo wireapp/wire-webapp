@@ -680,8 +680,10 @@ const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult =
     doLogin: (...args: Parameters<typeof actionRoot.authAction.doLogin>) => {
       return dispatch(actionRoot.authAction.doLogin(...args));
     },
-    doLoginAndJoin: (...args: Parameters<typeof actionRoot.authAction.doLoginAndJoin>) => {
-      return dispatch(actionRoot.authAction.doLoginAndJoin(...args));
+    doLoginAndJoin: (loginData, key, code, uri, getEntropy, password) => {
+      return dispatch(
+        actionRoot.authAction.doLoginAndJoin(loginData, key, code, uri, getEntropy, password, joinLinkAction),
+      );
     },
     doSendTwoFactorCode: (...args: Parameters<typeof actionRoot.authAction.doSendTwoFactorLoginCode>) => {
       return dispatch(actionRoot.authAction.doSendTwoFactorLoginCode(...args));

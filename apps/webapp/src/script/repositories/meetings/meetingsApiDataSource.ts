@@ -19,8 +19,12 @@
 
 import type {MeetingsDataSource} from './meetingsDataSource';
 
-import type {CreatedMeetingWithConversation, Meeting, MeetingWithConversation} from '../../apiClient/meetings/meeting';
-import type {MeetingsAPI} from '../../apiClient/meetings/meetingsApi';
+import type {
+  CreatedMeetingWithConversation,
+  Meeting,
+  MeetingsAPI,
+  MeetingWithConversation,
+} from '../../apiClient/meetings';
 
 export class MeetingsApiDataSource implements MeetingsDataSource {
   constructor(private readonly meetingsApi: MeetingsAPI) {}
@@ -41,11 +45,11 @@ export class MeetingsApiDataSource implements MeetingsDataSource {
     return this.meetingsApi.getMeetingsList(...args);
   }
 
-  updateMeeting(...args: Parameters<MeetingsDataSource['updateMeeting']>) {
+  updateMeeting(...args: Parameters<MeetingsDataSource['updateMeeting']>): Promise<MeetingWithConversation> {
     return this.meetingsApi.updateMeeting(...args);
   }
 
-  rotateMeetingLink(...args: Parameters<MeetingsDataSource['rotateMeetingLink']>) {
+  rotateMeetingLink(...args: Parameters<MeetingsDataSource['rotateMeetingLink']>): Promise<MeetingWithConversation> {
     return this.meetingsApi.rotateMeetingLink(...args);
   }
 }

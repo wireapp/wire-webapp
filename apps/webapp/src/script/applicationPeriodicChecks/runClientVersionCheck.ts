@@ -17,8 +17,9 @@
  *
  */
 
-import {KyInstance} from 'ky';
 import {result} from 'true-myth';
+
+import {KyInstance} from 'ky';
 
 import {upgradeRequiredHttpStatusCode, validateClientVersionCheckResponse} from './clientVersionCheckResponseSchema';
 

@@ -17,10 +17,9 @@
  *
  */
 
-import {type ReactNode, useEffect, useMemo, type FunctionComponent} from 'react';
+import {type FunctionComponent, type ReactNode, useEffect, useMemo} from 'react';
 
 import {container} from 'tsyringe';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
 import {createMeetingStore} from './createMeetingStore';
@@ -31,6 +30,7 @@ import {subscribeToMeetingLifecycleEvents} from './subscribeToMeetingLifecycleEv
 import {createBrowserSystemNotificationApi} from '../../../browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {UserState} from '../../../repositories/user/userState';
+import {ThemeProvider} from '../../../uiKit';
 import {getLogger} from '../../../util/logger';
 import {formatTimeShort} from '../../../util/timeUtil';
 import {useMeetingsFeatureFlag} from '../../../util/useMeetingsFeatureFlag';
@@ -42,9 +42,10 @@ import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
 } from '../meetingNotificationStore/meetingNotificationStore';
-import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
 import {MeetingPrepModalHost} from '../meetingPrep/meetingPrepModalHost';
+import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
 import {resolveCurrentMeetingReminderPayload} from '../resolveCurrentMeetingReminderPayload';
+import {RotateMeetingLinkModal} from '../rotateMeetingLinkModal/rotateMeetingLinkModal';
 import {deleteMeetingForAll, deleteMeetingForMe} from '../shared/service/deleteMeeting';
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from '../shared/service/meetingService';
 
@@ -207,6 +208,9 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
   return (
     <MeetingStoreProvider store={store}>
       {children}
+      <ThemeProvider>
+        <RotateMeetingLinkModal />
+      </ThemeProvider>
       {meetingPrepSession.isJust && (
         <ThemeProvider>
           <MeetingPrepModalHost />

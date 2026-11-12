@@ -18,10 +18,10 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {z} from 'zod';
 
-import type {MeetingPrepSession} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
+import type {QualifiedId} from '../apiClient/user';
+import type {MeetingPrepSession} from '../components/meeting/meetingPrep/useMeetingPrepModal';
 
 export type JoinLinkResult = {conversation: QualifiedId; eventTime?: string; meetingPrep?: MeetingPrepSession};
 

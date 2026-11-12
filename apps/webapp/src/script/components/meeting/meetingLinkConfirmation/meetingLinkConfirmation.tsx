@@ -17,20 +17,19 @@
  *
  */
 
-import {type ReactNode} from 'react';
+import {JSX} from 'react';
 
-import {Button, ButtonVariant, Input, ShieldIcon} from '@wireapp/react-ui-kit';
-
-import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
 import {
   meetingLinkConfirmationInputStyles,
-  meetingLinkConfirmationStyles,
   meetingLinkConfirmationStatusStyles,
-} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation.styles';
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import type {Translate} from 'Util/localizerUtil';
+  meetingLinkConfirmationStyles,
+} from './meetingLinkConfirmation.styles';
 
-type ShowMeetingLinkConfirmationParams = {
+import {Button, ButtonVariant, Input, ShieldIcon} from '../../../uiKit';
+import type {Translate} from '../../../util/localizerUtil/translationTypes';
+import {CopyToClipboardButton} from '../../copyToClipboardButton';
+
+export type ShowMeetingLinkConfirmationParams = {
   link: string;
   hasPassword: boolean;
   translate: Translate;
@@ -47,9 +46,15 @@ type MeetingLinkConfirmationMessageProps = {
   link: string;
   hasPassword: boolean;
   translate: Translate;
+  onClose?: () => void;
 };
 
-export const MeetingLinkConfirmationMessage = ({link, hasPassword, translate}: MeetingLinkConfirmationMessageProps) => {
+export const MeetingLinkConfirmationMessage = ({
+  link,
+  hasPassword,
+  translate,
+  onClose,
+}: MeetingLinkConfirmationMessageProps): JSX.Element => {
   return (
     <>
       <p id="meeting-link-description">{translate('meetings.meetingLink.description')}</p>
@@ -79,7 +84,7 @@ export const MeetingLinkConfirmationMessage = ({link, hasPassword, translate}: M
           type="button"
           variant={ButtonVariant.SECONDARY}
           onClick={() => {
-            removeCurrentModal();
+            onClose?.();
           }}
         >
           {translate('meetings.meetingLink.close')}
@@ -89,29 +94,17 @@ export const MeetingLinkConfirmationMessage = ({link, hasPassword, translate}: M
   );
 };
 
-export const showMeetingLinkConfirmation = ({
-  link,
-  hasPassword,
-  translate,
-  onClosed,
-}: ShowMeetingLinkConfirmationParams): void => {
-  const message: ReactNode = (
-    <MeetingLinkConfirmationMessage link={link} hasPassword={hasPassword} translate={translate} />
-  );
+let showMeetingLinkConfirmationHandler: ((params: ShowMeetingLinkConfirmationParams) => void) | undefined;
 
-  PrimaryModal.show(
-    PrimaryModal.type.CONFIRM,
-    {
-      close: onClosed,
-      confirmCancelBtnLabel: '',
-      hideSecondary: true,
-      text: {
-        closeBtnLabel: translate('meetings.meetingLink.close'),
-        message,
-        title: translate('meetings.meetingLink.title'),
-      },
-    },
-    undefined,
-    translate,
-  );
+export const registerMeetingLinkConfirmationHandler = (
+  handler: (params: ShowMeetingLinkConfirmationParams) => void,
+): void => {
+  showMeetingLinkConfirmationHandler = handler;
+};
+
+export const showMeetingLinkConfirmation = (params: ShowMeetingLinkConfirmationParams): void => {
+  if (showMeetingLinkConfirmationHandler === undefined) {
+    throw new Error('Meeting link confirmation has not been initialized');
+  }
+  showMeetingLinkConfirmationHandler(params);
 };

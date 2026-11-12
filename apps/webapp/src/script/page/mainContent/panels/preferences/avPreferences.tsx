@@ -44,6 +44,9 @@ import {useApplicationContext} from '../../../rootProvider';
 interface AVPreferencesProps {
   callingRepository: CallingRepository;
   propertiesRepository: PropertiesRepository;
+  videoInputDevices: MediaDeviceInfo[];
+  videoInputDeviceId: string;
+  setVideoInputDeviceId: (id: string) => void;
   deviceSupport: Pick<
     Record<MediaDeviceType, boolean>,
     MediaDeviceType.AUDIO_INPUT | MediaDeviceType.AUDIO_OUTPUT | MediaDeviceType.VIDEO_INPUT
@@ -54,6 +57,9 @@ const AVPreferencesComponent: FunctionComponent<AVPreferencesProps> = ({
   propertiesRepository,
   callingRepository,
   deviceSupport,
+  videoInputDevices,
+  videoInputDeviceId,
+  setVideoInputDeviceId,
 }: AVPreferencesProps) => {
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const devicesHandler = container.resolve(MediaDevicesHandler);
@@ -61,7 +67,6 @@ const AVPreferencesComponent: FunctionComponent<AVPreferencesProps> = ({
   const streamHandler = container.resolve(MediaStreamHandler);
   const {shouldReloadCamera} = useCameraReloadOnCallEnd(callingRepository);
   const {areMediaDevicesInitialized} = useInitializeMediaDevices(devicesHandler, streamHandler);
-
   return (
     <PreferencesPage title={translate('preferencesAV')}>
       {!areMediaDevicesInitialized && (
@@ -88,6 +93,9 @@ const AVPreferencesComponent: FunctionComponent<AVPreferencesProps> = ({
       )}
       {areMediaDevicesInitialized && deviceSupport.videoinput && (
         <CameraPreferences
+          videoInputDevices={videoInputDevices}
+          videoInputDeviceId={videoInputDeviceId}
+          setVideoInputDeviceId={setVideoInputDeviceId}
           key={`camera-${shouldReloadCamera}`} // Force remount when call ends
           {...{streamHandler}}
           refreshStream={() => {

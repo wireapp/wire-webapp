@@ -270,17 +270,6 @@ describe('scheduleMeeting', () => {
 });
 
 describe('meetNowMeeting', () => {
-  type CreateDepsResult = {
-    deps: {
-      meetingsRepository: MeetingsRepository;
-      conversationRepository: ConversationRepository;
-      callingRepository: CallingRepository;
-      clock: DeterministicClock;
-      deviceTimeZone: {ianaTimeZoneId: string};
-    };
-    createMeetingMock: jest.Mock<any, any, any>;
-    establishMeetingConversation: jest.Mock<any, any, any>;
-  };
   const createDeps = ({
     createMeetingMock = jest.fn().mockReturnValue(
       task.resolve({
@@ -301,7 +290,11 @@ describe('meetNowMeeting', () => {
     safeGetConversationById?: jest.Mock;
     establishMeetingConversation?: jest.Mock;
     safeAddUsers?: jest.Mock;
-  } = {}) => {
+  } = {}): {
+    deps: MeetingServiceDeps;
+    createMeetingMock: jest.Mock;
+    establishMeetingConversation: jest.Mock;
+  } => {
     const meetingsRepository = {
       createMeeting: createMeetingMock,
       getMeetingsList: jest.fn(),

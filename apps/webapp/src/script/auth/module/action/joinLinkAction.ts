@@ -20,17 +20,16 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {StatusCodes} from 'http-status-codes';
 
+import {ConversationActionCreator} from './creator';
+import {LocalStorageKey} from './localStorageKeys';
+
+import {Config} from '../../../Config';
 import {
   joinedMeetingDestinationSchema,
   type JoinLinkResult,
   loginJoinDestination,
-} from 'src/script/navigation/meetingJoinDestination';
-import {toError} from 'Util/toError';
-
-import {ConversationActionCreator} from './creator';
-import {LocalStorageKey} from './localStorageAction';
-
-import {Config} from '../../../Config';
+} from '../../../navigation/meetingJoinDestination';
+import {toError} from '../../../util/toError';
 import {getJoinLink, isJoinLinkPasswordError, JOIN_LINK_KIND, type MeetingLink} from '../../util/joinLink';
 import type {ThunkAction} from '../reducer';
 

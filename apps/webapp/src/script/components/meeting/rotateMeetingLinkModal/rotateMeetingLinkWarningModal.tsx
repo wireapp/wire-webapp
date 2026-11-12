@@ -17,24 +17,26 @@
  *
  */
 
-import {Button, ButtonVariant, CloseIcon} from '@wireapp/react-ui-kit';
+import {JSX} from 'react';
 
 import {
   warningModalCancelButtonStyles,
   warningModalConfirmButtonStyles,
   warningModalFooterStyles,
   warningModalWrapperStyles,
-} from 'Components/meeting/rotateMeetingLinkModal/rotateMeetingLinkWarningModal.styles';
+} from './rotateMeetingLinkWarningModal.styles';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {Button, ButtonVariant, CloseIcon} from '../../../uiKit';
+import {handleEscDown} from '../../../util/keyboardUtil';
+import {ModalComponent} from '../../Modals/ModalComponent';
 import {
   bodyStyles,
   closeButtonStyles,
   headerStyles,
   headerTitleStyles,
   wrapperStyles,
-} from 'Components/meeting/shared/styles/meetingModalShell.styles';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown} from 'Util/keyboardUtil';
+} from '../shared/styles/meetingModalShell.styles';
 
 type RotateMeetingLinkWarningModalProps = {
   isShown: boolean;
@@ -42,7 +44,11 @@ type RotateMeetingLinkWarningModalProps = {
   onConfirm: () => void;
 };
 
-export const RotateMeetingLinkWarningModal = ({isShown, onCancel, onConfirm}: RotateMeetingLinkWarningModalProps) => {
+export const RotateMeetingLinkWarningModal = ({
+  isShown,
+  onCancel,
+  onConfirm,
+}: RotateMeetingLinkWarningModalProps): JSX.Element => {
   const {translate} = useApplicationContext();
 
   return (

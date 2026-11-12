@@ -18,9 +18,9 @@
  */
 
 import {render, screen} from '@testing-library/react';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../uiKit';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {MeetingLinkConfirmationMessage} from './meetingLinkConfirmation';
 

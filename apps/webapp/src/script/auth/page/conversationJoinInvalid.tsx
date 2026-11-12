@@ -25,10 +25,10 @@ import {useSelector} from 'react-redux';
 
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
+import {Button} from '../../uiKit/inputs/button/button';
 import {ContainerXS} from '../../uiKit/layout/container/container';
 import {H2} from '../../uiKit/typography/heading/heading';
 import {Text} from '../../uiKit/typography/text/text';
-import {Button} from '../../uiKit/inputs/button/button';
 import {WirelessContainer} from '../component/wirelessContainer';
 import {getError} from '../module/selector/conversationSelector';
 import {ROUTE} from '../route';

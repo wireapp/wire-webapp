@@ -17,25 +17,13 @@
  *
  */
 
+import type {Meeting} from '../../apiClient/meetings/meeting';
 import {MeetingRecurrenceFrequency} from '../../apiClient/meetings/meetingRecurrence';
 
 import {unwrap, unwrapErr} from '../../util/test/resultTestSupport';
 
 import {mapApiMeetingToSeries} from './mapApiMeetingToSeries';
 
-type CreateApiMeetingResult = {
-  start_time: string;
-  end_time: string;
-  title: string;
-  recurrence?: {frequency: MeetingRecurrenceFrequency; until?: string};
-  tzid: string;
-  created_at: string;
-  updated_at: string;
-  qualified_conversation: {id: string; domain: string};
-  qualified_creator: {id: string; domain: string};
-  qualified_id: {id: string; domain: string};
-  link: string;
-};
 const createApiMeeting = (
   overrides: {
     start_time?: string;
@@ -44,7 +32,7 @@ const createApiMeeting = (
     recurrence?: {frequency: MeetingRecurrenceFrequency; until?: string};
     tzid?: string;
   } = {},
-) => {
+): Meeting => {
   return {
     created_at: '2026-06-15T09:00:00.000Z',
     updated_at: '2026-06-15T09:00:00.000Z',

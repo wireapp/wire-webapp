@@ -21,7 +21,7 @@ import {clearMeetingJoinParameters, getJoinLink} from './joinLink';
 import {getSearchParams} from './urlUtil';
 
 import {buildDomainRedirectUrl} from '../page/login/util';
-import {ClientType} from '@wireapp/api-client/lib/client';
+import {ClientType} from '../../apiClient/client';
 
 describe('meeting join context', () => {
   afterEach(() => {

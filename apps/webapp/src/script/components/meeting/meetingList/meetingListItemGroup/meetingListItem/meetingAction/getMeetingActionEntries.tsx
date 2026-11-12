@@ -19,9 +19,7 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {LinkIcon} from '../../../../../../uiKit/dataDisplay/icon/linkIcon';
 import {linkIconStyles} from './getMeetingActionEntries.styles';
-
 import {
   contextMenuDangerItemIconStyles,
   contextMenuDangerItemStyles,
@@ -33,6 +31,7 @@ import type {User} from '../../../../../../repositories/entity/User';
 import type {ContextMenuEntry} from '../../../../../../ui/contextMenu';
 import {CallIcon} from '../../../../../../uiKit/dataDisplay/icon/callIcon';
 import {EditIcon} from '../../../../../../uiKit/dataDisplay/icon/editIcon';
+import {LinkIcon} from '../../../../../../uiKit/dataDisplay/icon/linkIcon';
 import {TrashIcon} from '../../../../../../uiKit/dataDisplay/icon/trashIcon';
 import type {Translate} from '../../../../../../util/localizerUtil';
 import type {MeetingInstance} from '../../../../types/meetingInstance';

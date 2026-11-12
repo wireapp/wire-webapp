@@ -20,7 +20,6 @@
 import type {ConversationJoinData} from '../../../../apiClient/conversation/data/conversationJoinData';
 import type {ConversationEvent} from '../../../../apiClient/event/conversationEvent';
 import type {BackendError} from '../../../../apiClient/http/backendError';
-
 import {JOIN_LINK_KIND} from '../../../util/joinLink';
 
 import type {AppAction} from '.';

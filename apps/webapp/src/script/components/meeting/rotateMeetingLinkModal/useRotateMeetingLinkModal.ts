@@ -18,13 +18,12 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {create} from 'zustand';
 
-import {
-  getMeetingPasswordErrors,
-  type MeetingPasswordErrors,
-} from 'Components/meeting/shared/validation/meetingPasswordValidation';
+import {registerRotateMeetingLinkHandler} from './rotateMeetingLinkController';
+
+import type {QualifiedId} from '../../../apiClient/user';
+import {getMeetingPasswordErrors, type MeetingPasswordErrors} from '../shared/validation/meetingPasswordValidation';
 
 type RotateMeetingLinkModalState = {
   isOpen: boolean;
@@ -105,3 +104,7 @@ export const useRotateMeetingLinkModal = create<RotateMeetingLinkModalState>((se
 export const hasRotateMeetingLinkFormErrors = (errors: MeetingPasswordErrors): boolean => {
   return !isUndefined(errors.password) || !isUndefined(errors.passwordConfirmation);
 };
+
+registerRotateMeetingLinkHandler(meetingId => {
+  useRotateMeetingLinkModal.getState().open(meetingId);
+});
