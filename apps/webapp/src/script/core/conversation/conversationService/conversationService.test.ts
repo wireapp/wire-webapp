@@ -991,6 +991,48 @@ describe('ConversationService', () => {
         expect(mlsService.clearBufferedMessageRecoveryTracking).not.toHaveBeenCalled();
       });
 
+      it('keeps buffered message tracking when rejoining the conversation fails so it is retried', async () => {
+        const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+        jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(createBufferedRecoveryError());
+        jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(4n)));
+        jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+          qualified_id: conversationId,
+          protocol: CONVERSATION_PROTOCOL.MLS,
+          epoch: 5,
+          group_id: mockGroupId,
+        } as unknown as Conversation);
+        jest.mocked(conversationService.joinByExternalCommit).mockRejectedValueOnce(new Error('join failed'));
+
+        const result = await conversationService.handleEvent(createMLSMessageAddEventMock(conversationId));
+
+        expect(result).toEqual({status: 'handled', payload: []});
+        expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(conversationId);
+        expect(conversationService.emit).not.toHaveBeenCalledWith('MLSConversationRecovered', {conversationId});
+        expect(mlsService.clearBufferedMessageRecoveryTracking).not.toHaveBeenCalled();
+      });
+
+      it('keeps buffered message tracking when rejoining the subconversation fails so it is retried', async () => {
+        const [conversationService, {apiClient, mlsService, subconversationService}] = await buildConversationService();
+        jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(createBufferedRecoveryError());
+        jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(4n)));
+        jest.spyOn(apiClient.api.conversation, 'getSubconversation').mockResolvedValueOnce({
+          epoch: 5,
+          group_id: mockGroupId,
+          parent_qualified_id: conversationId,
+          subconv_id: SUBCONVERSATION_ID.CONFERENCE,
+        } as unknown as Subconversation);
+        jest
+          .spyOn(subconversationService, 'joinConferenceSubconversation')
+          .mockRejectedValueOnce(new Error('join failed'));
+
+        await conversationService.handleEvent(
+          createMLSMessageAddEventMock(conversationId, SUBCONVERSATION_ID.CONFERENCE),
+        );
+
+        expect(subconversationService.joinConferenceSubconversation).toHaveBeenCalled();
+        expect(mlsService.clearBufferedMessageRecoveryTracking).not.toHaveBeenCalled();
+      });
+
       it('verifies the subconversation epoch for buffered subconversation messages', async () => {
         const [conversationService, {apiClient, mlsService, subconversationService}] = await buildConversationService();
         jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(createBufferedRecoveryError());
