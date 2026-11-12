@@ -17,8 +17,7 @@
  *
  */
 
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-
+import {BackendErrorLabel} from '../../apiClient/http';
 import {QUERY_KEY} from '../route';
 
 export const JOIN_LINK_KIND = {CONVERSATION: 'conversation', MEETING: 'meeting'} as const;

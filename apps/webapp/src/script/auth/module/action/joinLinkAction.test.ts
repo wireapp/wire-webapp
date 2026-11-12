@@ -17,8 +17,8 @@
  *
  */
 
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {ClientType} from '@wireapp/api-client/lib/client';
+import {BackendError, BackendErrorLabel} from '../../../apiClient/http';
+import {ClientType} from '../../../apiClient/client';
 
 import {joinLinkAction} from './joinLinkAction';
 import {conversationAction} from './conversationAction';
@@ -119,9 +119,7 @@ describe('Join link actions', () => {
     expect(sendJSON).toHaveBeenLastCalledWith(expect.objectContaining({method: 'get'}));
     expect(sendJSON.mock.lastCall?.[0]).not.toHaveProperty('params');
     await store.dispatch(joinLinkAction.doJoinMeetingLink(link, 'secret'));
-    expect(sendJSON).toHaveBeenLastCalledWith(
-      expect.objectContaining({method: 'post', params: {password: 'secret'}}),
-    );
+    expect(sendJSON).toHaveBeenLastCalledWith(expect.objectContaining({method: 'post', params: {password: 'secret'}}));
   });
 
   it('joins the meeting and returns a qualified conversation without fabricating an event', async () => {
@@ -258,11 +256,14 @@ describe('Join link actions', () => {
     })(initialRootState);
     await expect(
       store.dispatch(
-        authAction.doFinalizeSSOLogin({
-          clientType: ClientType.PERMANENT,
-          meetingLink: link,
-          password: 'wrong-password',
-        }),
+        authAction.doFinalizeSSOLogin(
+          {
+            clientType: ClientType.PERMANENT,
+            meetingLink: link,
+            password: 'wrong-password',
+          },
+          joinLinkAction,
+        ),
       ),
     ).rejects.toBe(error);
     expect(sendJSON).toHaveBeenCalledWith(

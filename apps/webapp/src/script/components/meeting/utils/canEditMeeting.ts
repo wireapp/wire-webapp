@@ -17,11 +17,11 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
+import {TZDate} from '@date-fns/tz';
+import {addDays} from 'date-fns';
 
 import type {User} from '../../../repositories/entity/User';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
-import {getNextMeetingInstance} from '../selectors/getMeetingInstancesInRange';
 import type {MeetingInstance} from '../types/meetingInstance';
 import type {MeetingSeries} from '../types/meetingSeries';
 
@@ -34,12 +34,28 @@ export const canRotateMeetingLink = (
   selfUser: User,
   nowMilliseconds: number,
 ): boolean => {
-  const nextInstance = getNextMeetingInstance(meetingInstance);
+  const {meetingSeries} = meetingInstance;
+  const recurrenceDays = {
+    daily: 1,
+    weekly: 7,
+    everyTwoWeeks: 14,
+    everyFourWeeks: 28,
+  } as const;
+  const nextStart =
+    meetingSeries.recurrence === 'doesNotRepeat'
+      ? undefined
+      : addDays(
+          new TZDate(meetingInstance.start.getTime(), meetingSeries.tzid),
+          recurrenceDays[meetingSeries.recurrence],
+        );
   const hasUpcomingInstance =
     meetingInstance.start.getTime() > nowMilliseconds ||
-    (!isUndefined(nextInstance) && nextInstance.start.getTime() > nowMilliseconds);
+    (nextStart !== undefined &&
+      nextStart.getTime() > nowMilliseconds &&
+      (meetingSeries.recurrence_until === undefined ||
+        nextStart.getTime() <= Date.parse(meetingSeries.recurrence_until)));
 
-  return isMeetingHost(meetingInstance.meetingSeries, selfUser) && hasUpcomingInstance;
+  return isMeetingHost(meetingSeries, selfUser) && hasUpcomingInstance;
 };
 
 /**

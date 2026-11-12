@@ -21,12 +21,12 @@ import {type FunctionComponent, useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {UserState} from 'Repositories/user/userState';
-
 import {createMeetingPrepPreview} from './createMeetingPrepPreview';
 import {MeetingPrepModal} from './meetingPrepModal';
 import {useMeetingPrepJoin} from './useMeetingPrepJoin';
+
+import {MediaStreamHandler} from '../../../repositories/media/MediaStreamHandler';
+import {UserState} from '../../../repositories/user/userState';
 
 export const MeetingPrepModalHost: FunctionComponent = () => {
   const participant = container.resolve(UserState).self();

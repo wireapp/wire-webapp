@@ -32,6 +32,7 @@ import type {TypeUtil} from '../../../commons/util';
 
 import {AuthActionCreator} from './creator/';
 import {conversationAction} from './conversationAction';
+import {joinLinkAction} from './joinLinkAction';
 
 import {getJoinLink} from '../../util/joinLink';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
@@ -99,10 +100,13 @@ describe.each(['password', 'SSO'] as const)('Meeting link login with %s', mode =
       const link = getJoinLink();
       if (mode === 'SSO') {
         return store.dispatch(
-          actionRoot.authAction.doFinalizeSSOLogin({
-            clientType: ClientType.PERMANENT,
-            ...(link.kind === 'meeting' ? {meetingLink: link, password: 'secret'} : {}),
-          }),
+          actionRoot.authAction.doFinalizeSSOLogin(
+            {
+              clientType: ClientType.PERMANENT,
+              ...(link.kind === 'meeting' ? {meetingLink: link, password: 'secret'} : {}),
+            },
+            joinLinkAction,
+          ),
         );
       }
       return store.dispatch(
@@ -113,6 +117,7 @@ describe.each(['password', 'SSO'] as const)('Meeting link login with %s', mode =
           undefined,
           undefined,
           'secret',
+          joinLinkAction,
         ),
       );
     };
