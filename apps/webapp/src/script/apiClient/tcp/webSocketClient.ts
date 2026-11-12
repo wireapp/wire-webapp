@@ -18,7 +18,6 @@
  */
 
 import {isPromise} from '@sindresorhus/is';
-import logdown from 'logdown';
 import type {ErrorEvent} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
 
@@ -33,7 +32,7 @@ import {
   WEBSOCKET_STATE,
 } from './reconnectingWebsocket';
 
-import {LogFactory} from '../../commons/LogFactory';
+import {getLogger, type Logger} from '../../commons/getLogger';
 import {StringUtil} from '../../commons/util';
 import {AuthAPI, InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
 import {MINIMUM_API_VERSION} from '../config';
@@ -79,7 +78,7 @@ export class WebSocketClient extends EventEmitter {
   private clientId?: string;
   private accessTokenRefreshPromise?: Promise<void>;
   private readonly baseUrl: string;
-  private readonly logger: logdown.Logger;
+  private readonly logger: Logger;
   private readonly socket: ReconnectingWebsocket;
   private readonly wallClock: ReconnectingWebsocketWallClock;
   private websocketState: WEBSOCKET_STATE;
@@ -110,7 +109,7 @@ export class WebSocketClient extends EventEmitter {
     });
     this.websocketState = this.socket.getState();
 
-    this.logger = LogFactory.getLogger('@wireapp/api-client/tcp/WebSocketClient');
+    this.logger = getLogger('@wireapp/api-client/tcp/WebSocketClient');
   }
 
   public useVersion(version: number): void {

@@ -24,7 +24,7 @@ import {generateSubconversationStoreKey} from './subconversationUtil';
 import {APIClient} from '../../../apiClient/apiClient';
 import {SUBCONVERSATION_ID, Subconversation} from '../../../apiClient/conversation/subconversation';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import {LogFactory} from '../../../commons/LogFactory';
+import {getLogger} from '../../../commons/getLogger';
 import {TypedEventEmitter} from '../../../commons/TypedEventEmitter/TypedEventEmitter';
 import {TimeInMillis} from '../../../commons/util/TimeUtil';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
@@ -44,7 +44,7 @@ export interface SubconversationEpochInfoMember {
 const MLS_CONVERSATION_KEY_LENGTH = 32;
 
 export class SubconversationService extends TypedEventEmitter<Events> {
-  private readonly logger = LogFactory.getLogger('@wireapp/core/SubconversationService');
+  private readonly logger = getLogger('@wireapp/core/SubconversationService');
 
   constructor(
     private readonly apiClient: APIClient,

@@ -25,7 +25,6 @@ import {
   isObject,
   isUndefined,
 } from '@sindresorhus/is';
-import {Logger} from 'logdown';
 
 import {SessionId} from './sessionHandler.types';
 
@@ -35,6 +34,7 @@ import {QualifiedUserClients} from '../../../../../apiClient/conversation/qualif
 import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {QualifiedUserPreKeyBundleMap} from '../../../../../apiClient/user/userPreKeyBundleMap';
 import {Decoder} from '../../../../../commons/base64/decoder';
+import type {Logger} from '../../../../../commons/logger';
 import {flattenUserMap} from '../../../../conversation/message/userClientsUtil';
 import {CryptoClient} from '../../proteusService/cryptoClient';
 

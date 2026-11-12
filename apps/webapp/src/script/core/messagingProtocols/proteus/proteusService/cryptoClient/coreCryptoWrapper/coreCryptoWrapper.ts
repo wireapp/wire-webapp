@@ -42,7 +42,7 @@ import {PrekeyTracker} from './prekeysTracker';
 
 import {PreKey} from '../../../../../../apiClient/auth/preKey';
 import {Encoder} from '../../../../../../commons/base64/encoder';
-import {LogFactory} from '../../../../../../commons/LogFactory';
+import {getLogger} from '../../../../../../commons/getLogger';
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
 import type {CRUDEngine} from '../../../../../storage/engine/crudEngine';
 import {CoreCryptoConfig} from '../../../../common.types';
@@ -85,7 +85,7 @@ type CoreCryptoRuntime = {
   openDatabase: (databaseName: string, key: DatabaseKey) => Promise<Database>;
 };
 
-const logger = LogFactory.getLogger('@wireapp/core/CoreCryptoWrapper');
+const logger = getLogger('@wireapp/core/CoreCryptoWrapper');
 
 const logFunctions: Record<CoreCryptoLogLevel, Function> = {
   1: logger.debug,

@@ -33,7 +33,7 @@ import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 import {InitialData} from './storage/e2eiStorage.schema';
 
 import {Decoder} from '../../../../commons/base64/decoder';
-import {LogFactory} from '../../../../commons/LogFactory';
+import {getLogger} from '../../../../commons/getLogger';
 import {CoreDatabase} from '../../../storage/coreDb';
 import {createMLSClientId} from '../utils/mlsId';
 
@@ -46,7 +46,7 @@ export type getAllConversationsCallback = () => Promise<
 >;
 
 export class E2EIServiceInternal {
-  private readonly logger = LogFactory.getLogger('@wireapp/core/E2EIdentityServiceInternal');
+  private readonly logger = getLogger('@wireapp/core/E2EIdentityServiceInternal');
   private readonly enrollmentStorage: ReturnType<typeof createE2EIEnrollmentStorage>;
 
   public constructor(

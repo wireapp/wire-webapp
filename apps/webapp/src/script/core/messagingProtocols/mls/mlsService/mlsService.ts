@@ -72,7 +72,7 @@ import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {Converter} from '../../../../commons/base64/converter';
 import {Decoder} from '../../../../commons/base64/decoder';
 import {Encoder} from '../../../../commons/base64/encoder';
-import {LogFactory} from '../../../../commons/LogFactory';
+import {getLogger} from '../../../../commons/getLogger';
 import {TypedEventEmitter} from '../../../../commons/TypedEventEmitter/TypedEventEmitter';
 import {TimeUtil} from '../../../../commons/util';
 import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';
@@ -141,7 +141,7 @@ type Events = {
 
 const MLS_CONVERSATION_RECOVERY_KEY = 'required';
 export class MLSService extends TypedEventEmitter<Events> {
-  logger = LogFactory.getLogger('@wireapp/core/MLSService');
+  logger = getLogger('@wireapp/core/MLSService');
   private _config?: ConfiguredMLSConfig;
   private clientInitialized = false;
   private epochObserverRegistered = false;
@@ -362,7 +362,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           break;
       }
     } catch (error: unknown) {
-      this.logger.error(`Error while initializing client ${client.id}`, error);
+      this.logger.error('Error while initializing client', {error, clientId: client.id});
       throw error;
     }
     this.clientInitialized = true;
@@ -415,7 +415,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   };
 
   private toMlsTransportError(error: unknown): MlsTransportError {
-    this.logger.warn('Failed to upload commit bundle', error);
+    this.logger.warn('Failed to upload commit bundle', {error});
 
     if (error instanceof MLSInvalidLeafNodeSignatureError || error instanceof MLSInvalidLeafNodeIndexError) {
       this.logger.info('Rejecting commit bundle upload due to broken MLS conversation');
@@ -647,7 +647,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       this.emit(MLSServiceEvents.NEW_EPOCH, {groupId: groupIdStr, epoch: newEpoch});
       this.logger.info(`Joined MLS group with id ${groupIdStr} via external commit, new epoch: ${newEpoch}`);
     } catch (error: unknown) {
-      this.logger.warn('Failed to join MLS group via external commit', error);
+      this.logger.warn('Failed to join MLS group via external commit', {error});
       throw error;
     }
   }
@@ -929,7 +929,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       await this.registerConversation(groupId, []);
       return true;
     } catch (error: unknown) {
-      this.logger.warn("Couldn't establish the MLS group", error);
+      this.logger.warn("Couldn't establish the MLS group", {error});
       // If conversation already existed, locally, nothing more to do, we've received a welcome message.
       if (isCoreCryptoMLSConversationAlreadyExistsError(error)) {
         this.logger.debug(`MLS Group with id ${groupId} already exists, skipping the initialisation.`);
@@ -1028,7 +1028,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         await this.updateKeyingMaterial(groupId, coreCryptoContext);
       });
     } catch (error: unknown) {
-      this.logger.error(`Error while renewing key material for groupId ${groupId}`, error);
+      this.logger.error('Error while renewing key material', {error, groupId});
       // Renewal runs from the recurring task scheduler, so there is no call site that could handle
       // this. Hand the failure to the consumer, which owns the MLS recovery orchestrator.
       this.emit(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, {error, groupId});
@@ -1079,7 +1079,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   public schedulePeriodicKeyPackagesBackendSync(clientId: string): Promise<void> {
     const task = async (): Promise<void> => {
-      this.logger.log('Executed Periodic check for key packages');
+      this.logger.info('Executed Periodic check for key packages');
       await this.verifyRemoteMLSKeyPackagesAmount(clientId);
     };
 
@@ -1135,7 +1135,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         await this.coreDatabase.put('mlsConversationRecovery', {required: true}, MLS_CONVERSATION_RECOVERY_KEY);
         isConversationRecoveryRequired = true;
       } catch (error: unknown) {
-        this.logger.error('Failed to persist MLS conversation recovery marker', error);
+        this.logger.error('Failed to persist MLS conversation recovery marker', {error});
       }
     }
 
@@ -1204,7 +1204,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         },
       });
     } catch (error: unknown) {
-      this.logger.error(`Failed to upload public keys for client ${client.id}`, error);
+      this.logger.error('Failed to upload public keys for client', {error, clientId: client.id});
       throw error;
     }
   }
@@ -1395,7 +1395,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         );
       }
     } catch (error: unknown) {
-      this.logger.error('Could not get pending proposals', error);
+      this.logger.error('Could not get pending proposals', {error});
     }
   }
 

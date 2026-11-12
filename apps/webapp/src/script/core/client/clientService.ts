@@ -32,7 +32,7 @@ import {CreateClientPayload} from '../../apiClient/client/newClient';
 import {RegisteredClient} from '../../apiClient/client/registeredClient';
 import {BackendError} from '../../apiClient/http/backendError';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
-import {LogFactory} from '../../commons/LogFactory';
+import {getLogger} from '../../commons/getLogger';
 import type {ProteusService} from '../messagingProtocols/proteus';
 import {InitialPrekeys} from '../messagingProtocols/proteus/proteusService/cryptoClient';
 import {wipeCoreCryptoDb} from '../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
@@ -62,7 +62,7 @@ export interface MetaClient extends RegisteredClient {
 export class ClientService {
   private readonly database: ClientDatabaseRepository;
   private readonly backend: ClientBackendRepository;
-  private readonly logger = LogFactory.getLogger('@wireapp/core/Client');
+  private readonly logger = getLogger('@wireapp/core/Client');
 
   constructor(
     private readonly apiClient: APIClient,
@@ -106,7 +106,7 @@ export class ClientService {
     try {
       await this.backend.deleteClient(localClientId, password);
     } catch (error: unknown) {
-      this.logger.warn('Failed to delete client on backend', error);
+      this.logger.warn('Failed to delete client on backend', {error});
     }
     return this.database.deleteLocalClient();
   }

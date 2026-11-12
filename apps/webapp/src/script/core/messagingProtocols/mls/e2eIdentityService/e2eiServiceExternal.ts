@@ -43,7 +43,7 @@ import {APIClient} from '../../../../apiClient/apiClient';
 import type {RegisteredClient} from '../../../../apiClient/client/registeredClient';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {Decoder} from '../../../../commons/base64/decoder';
-import {LogFactory} from '../../../../commons/LogFactory';
+import {getLogger} from '../../../../commons/getLogger';
 import {TypedEventEmitter} from '../../../../commons/TypedEventEmitter/TypedEventEmitter';
 import {TimeInMillis} from '../../../../commons/util/TimeUtil';
 import {CoreDatabase} from '../../../storage/coreDb';
@@ -108,7 +108,7 @@ const decodeClientId = (clientId: WireIdentity['clientId']): string => {
 
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
 export class E2EIServiceExternal extends TypedEventEmitter<Events> {
-  private readonly logger = LogFactory.getLogger('@wireapp/core/E2EIdentityServiceExternal');
+  private readonly logger = getLogger('@wireapp/core/E2EIdentityServiceExternal');
   private _acmeService?: AcmeService;
   private crlProxy?: string;
   private readonly enrollmentStorage: ReturnType<typeof createE2EIEnrollmentStorage>;
