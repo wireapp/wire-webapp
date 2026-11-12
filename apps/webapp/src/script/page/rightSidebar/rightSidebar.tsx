@@ -35,6 +35,7 @@ import {GuestServicesOptions} from './guestServicesOptions';
 import {MessageDetails} from './messageDetails';
 import {Notifications} from './notifications';
 import {ParticipantDevices} from './participantDevices';
+import type {PanelEntity, RightSidebarParams} from './rightSidebarTypes';
 import {SharedDrive} from './sharedDrive';
 import {TimedMessages} from './timedMessages';
 
@@ -42,10 +43,8 @@ import {isReadableMessage} from '../../guards/Message';
 import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/Panel';
 import {isAppOrServiceEntity} from '../../guards/Service';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
-import {Conversation} from '../../repositories/entity/Conversation';
 import {Message} from '../../repositories/entity/message/message';
 import {User} from '../../repositories/entity/User';
-import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {TeamState} from '../../repositories/team/TeamState';
 import {UserState} from '../../repositories/user/userState';
 import {Core} from '../../service/coreSingleton';
@@ -53,7 +52,6 @@ import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {WebAppEvents} from '../../webAppEvents';
-import {RightSidebarParams} from '../appMain';
 import {useAppMainState} from '../state';
 import {ContentState} from '../useAppState';
 
@@ -95,7 +93,7 @@ export enum PanelState {
   CONVERSATION_HISTORY = 'CONVERSATION_HISTORY',
 }
 
-export type PanelEntity = Conversation | User | Message | ServiceEntity;
+export type {PanelEntity} from './rightSidebarTypes';
 
 interface RightSidebarProps {
   currentEntity?: RightSidebarParams['entity'];

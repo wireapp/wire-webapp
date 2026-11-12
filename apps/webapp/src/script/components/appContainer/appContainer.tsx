@@ -229,7 +229,6 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
                 locked={softLockEnabled}
                 fireAndForgetInvoker={fireAndForgetInvoker}
                 clock={clock}
-                isFeatureToggleEnabled={isFeatureToggleEnabled}
               />
             </MeetingStoreRoot>
           );
