@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {narrowModalWrapperStyles} from 'Components/meeting/shared/styles/meetingModalShell.styles';
+import {narrowModalWrapperStyles} from '../shared/styles/meetingModalShell.styles';
 
 export const meetNowModalWrapperStyles: CSSObject = {
   ...narrowModalWrapperStyles,

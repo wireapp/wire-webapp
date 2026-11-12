@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
+import React, {type FunctionComponent, useCallback, useEffect, useRef, useState} from 'react';
 
 import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
@@ -30,9 +30,7 @@ import {buildDomainRedirectUrl, handleEnterpriseLogin, handleSSOBackendError, re
 import type {DomainData} from '../../../apiClient/account/domainData';
 import {ClientType} from '../../../apiClient/client/clientType';
 import type {ConversationJoinData} from '../../../apiClient/conversation/data/conversationJoinData';
-import type {ConversationEvent} from '../../../apiClient/event/conversationEvent';
 import {BackendError} from '../../../apiClient/http/backendError';
-import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {UrlUtil} from '../../../commons/util';
 import {Runtime} from '../../../commons/util/Runtime';
 import {isValidEmail, PATTERN} from '../../../commons/util/ValidationUtil';
@@ -497,7 +495,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult =
       return dispatch(joinLinkAction.doCheckJoinLink(...args));
     },
     doFinalizeSSOLogin: args => {
-      return dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(args));
+      return dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(args, joinLinkAction));
     },
     doGetDomainInfo: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doGetDomainInfo>) => {
       return dispatch(ROOT_ACTIONS.authAction.doGetDomainInfo(...args));

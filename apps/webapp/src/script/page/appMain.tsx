@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useLayoutEffect, useMemo, type FunctionComponent} from 'react';
+import {type FunctionComponent, useEffect, useLayoutEffect, useMemo} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
@@ -29,8 +29,6 @@ import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {AppLock} from './appLock';
-import {openLoginMeetingPrep} from '../navigation/meetingJoinDestination';
-import {useMeetingPrepModal} from '../components/meeting/meetingPrep/useMeetingPrepModal';
 import {useE2EIFeatureConfigUpdate} from './components/featureConfigChange/featureConfigChangeHandler/features/useE2eIFeatureConfigUpdate';
 import {FeatureConfigChangeNotifier} from './components/featureConfigChange/featureConfigChangeNotifier';
 import {ForceReloadModal} from './components/forceReloadModal/forceReloadModal';
@@ -50,6 +48,7 @@ import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
 import {ConfigToolbar} from '../components/configToolbar/configToolbar';
 import {SharedDriveUploadStatusScope} from '../components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {ErrorFallback} from '../components/errorFallback';
+import {useMeetingPrepModal} from '../components/meeting/meetingPrep/useMeetingPrepModal';
 import {CreateConversationModal} from '../components/Modals/CreateConversation/CreateConversaionModal';
 import {FileHistoryModal} from '../components/Modals/FileHistoryModal/FileHistoryModal';
 import {GroupCreationModal} from '../components/Modals/GroupCreation/GroupCreationModal';
@@ -71,6 +70,7 @@ import {
   initialiseMigrationOfProteusConversations,
   joinUnestablishedMixedConversations,
 } from '../mls/MLSMigration/migrationInitialiser';
+import {openLoginMeetingPrep} from '../navigation/meetingJoinDestination';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
 import {ConversationState} from '../repositories/conversation/ConversationState';
 import {User} from '../repositories/entity/User';

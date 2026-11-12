@@ -17,16 +17,24 @@
  *
  */
 
-import {type FormEvent, useCallback, useRef} from 'react';
+import {type FormEvent, JSX, useCallback, useRef} from 'react';
 
 import {isEmptyString, isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Button, ButtonVariant, CloseIcon, ErrorMessage} from '@wireapp/react-ui-kit';
+import {RotateMeetingLinkWarningModal} from './rotateMeetingLinkWarningModal';
+import {hasRotateMeetingLinkFormErrors, useRotateMeetingLinkModal} from './useRotateMeetingLinkModal';
 
-import {showMeetingLinkConfirmation} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
-import {RotateMeetingLinkWarningModal} from 'Components/meeting/rotateMeetingLinkModal/rotateMeetingLinkWarningModal';
-import {MeetingLinkForm} from 'Components/meeting/shared/meetingLinkForm/meetingLinkForm';
+import type {QualifiedId} from '../../../apiClient/user';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {Button, ButtonVariant, CloseIcon, ErrorMessage} from '../../../uiKit';
+import {handleEscDown} from '../../../util/keyboardUtil';
+import {getLogger} from '../../../util/logger';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
+import {ModalComponent} from '../../Modals/ModalComponent';
+import {showMeetingLinkConfirmation} from '../meetingLinkConfirmation/meetingLinkConfirmation';
+import {useMeetingStore} from '../meetingStore/meetingStoreProvider';
+import {rotateMeetingLinkErrors} from '../meetingStore/rotateMeetingLinkErrors';
+import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -37,21 +45,11 @@ import {
   narrowModalWrapperStyles,
   submitButtonStyles,
   wrapperStyles,
-} from 'Components/meeting/shared/styles/meetingModalShell.styles';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown} from 'Util/keyboardUtil';
-import {getLogger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
-import {hasRotateMeetingLinkFormErrors, useRotateMeetingLinkModal} from './useRotateMeetingLinkModal';
-
-import {useMeetingStore} from '../meetingStore/meetingStoreProvider';
-import {rotateMeetingLinkErrors} from '../meetingStore/rotateMeetingLinkErrors';
+} from '../shared/styles/meetingModalShell.styles';
 
 const logger = getLogger('RotateMeetingLinkModal');
 
-export const RotateMeetingLinkModal = () => {
+export const RotateMeetingLinkModal = (): JSX.Element => {
   const {translate, fireAndForgetInvoker} = useApplicationContext();
   const rotateMeetingLink = useMeetingStore(state => {
     return state.rotateMeetingLink;
@@ -65,7 +63,7 @@ export const RotateMeetingLinkModal = () => {
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const submissionInProgressRef = useRef(false);
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     if (state.isSubmitting || submissionInProgressRef.current) {
       return;
     }
@@ -104,14 +102,14 @@ export const RotateMeetingLinkModal = () => {
     [fireAndForgetInvoker, rotateMeetingLink, state, translate],
   );
 
-  const handleWarningConfirm = () => {
+  const handleWarningConfirm = (): void => {
     const meetingId = state.confirmWarning();
     if (!isUndefined(meetingId)) {
       rotate(meetingId);
     }
   };
 
-  const handleRotate = () => {
+  const handleRotate = (): void => {
     const errors = state.errors;
     const meetingId = state.meetingId;
     // State controls the rendered UI; the ref closes the same-tick/stale-closure double-submit race before React re-renders.
@@ -135,7 +133,7 @@ export const RotateMeetingLinkModal = () => {
     rotate(meetingId, password);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     handleRotate();
   };

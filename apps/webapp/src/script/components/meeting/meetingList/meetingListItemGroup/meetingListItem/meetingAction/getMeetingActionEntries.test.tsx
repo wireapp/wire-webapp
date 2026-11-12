@@ -76,7 +76,7 @@ const getMeetingActionEntries = (
   params: Omit<Parameters<typeof getMeetingActionEntriesImpl>[0], 'onRotateMeetingLink'> & {
     onRotateMeetingLink?: () => void;
   },
-) => {
+): ContextMenuEntry[] => {
   return getMeetingActionEntriesImpl({onRotateMeetingLink: noop, ...params});
 };
 

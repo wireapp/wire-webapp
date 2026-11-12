@@ -32,7 +32,6 @@ import {Page} from './page';
 import type {RegisterData} from '../../apiClient/auth/registerData';
 import type {RegisteredClient} from '../../apiClient/client/registeredClient';
 import type {ConversationJoinData} from '../../apiClient/conversation/data/conversationJoinData';
-import type {ConversationEvent} from '../../apiClient/event/conversationEvent';
 import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import {UrlUtil} from '../../commons/util';
 import {Config} from '../../Config';
