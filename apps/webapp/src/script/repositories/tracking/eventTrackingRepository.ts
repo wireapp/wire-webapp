@@ -133,7 +133,7 @@ export class EventTrackingRepository {
   public readonly onUserEvent = (eventJson: any): void => {
     const type = eventJson.type;
     if (type === ClientEvent.USER.DATA_TRANSFER && this.teamState.isTeam()) {
-      this.telemetryLogger.info('Received data transfer event with new telemetry tracking id', eventJson.data);
+      this.telemetryLogger.info('Received data transfer event with new telemetry tracking id', {data: eventJson.data});
       if (isTruthy(eventJson.data.trackingIdentifier) && eventJson.data.trackingIdentifier !== this.telemetryDeviceId) {
         void this.migrateDeviceId(eventJson.data.trackingIdentifier);
       }
@@ -291,14 +291,11 @@ export class EventTrackingRepository {
         },
       });
 
-      this.telemetryLogger.info(
-        'Telemetry has been initialized with version',
-        VERSION,
-        ', logging',
-        COUNTLY_ENABLE_LOGGING,
-        'and app_key',
-        COUNTLY_API_KEY,
-      );
+      this.telemetryLogger.info('Telemetry has been initialized with version', {
+        version: VERSION,
+        loggingEnabled: COUNTLY_ENABLE_LOGGING,
+        appKey: COUNTLY_API_KEY,
+      });
 
       this.telemetryInitialized = true;
     }
@@ -452,8 +449,8 @@ export class EventTrackingRepository {
       this.telemetryLogger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
 
       // NOTE: This log is required by QA
-      this.logger.log(`Reporting custom data for product event ${eventName}@${JSON.stringify(userData)}`);
-      this.logger.log(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
+      this.logger.info(`Reporting custom data for product event ${eventName}@${JSON.stringify(userData)}`);
+      this.logger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
     }
   }
 

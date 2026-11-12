@@ -227,7 +227,7 @@ export class IntegrationRepository {
         return serviceEntities;
       }
     } catch (error: unknown) {
-      this.logger.error(`Error searching for services: ${toError(error).message}`, error);
+      this.logger.error(`Error searching for services: ${toError(error).message}`, {error});
     }
     return undefined;
   }

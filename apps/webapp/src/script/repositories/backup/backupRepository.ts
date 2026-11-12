@@ -129,7 +129,7 @@ export class BackupRepository {
       return await this.compressHistoryFiles(user, clientId, exportedData, password);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : error;
-      this.logger.error(`Could not export history: ${errorMessage}`, error);
+      this.logger.error(`Could not export history: ${errorMessage}`, {error});
       const isCancelError = isErrorOfType(error, ErrorType.CancelError);
       throw isCancelError ? error : new ExportError();
     }
@@ -447,7 +447,7 @@ export class BackupRepository {
       const nbImported = await importFunction(chunk);
       stats.imported += nbImported;
       stats.ignored += chunk.length - nbImported;
-      this.logger.info(`Imported entities from '${type}'`, JSON.stringify(stats));
+      this.logger.info(`Imported entities from '${type}'`, {statistics: stats});
       if (this.canceled) {
         throw new CancelError();
       }

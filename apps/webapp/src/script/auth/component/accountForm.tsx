@@ -187,7 +187,7 @@ const AccountFormComponent: FunctionComponent<Props & ConnectedProps & DispatchP
           }
         }
       } else {
-        logger.error('Account registration error', error);
+        logger.error('Account registration error', {error});
       }
     }
   };

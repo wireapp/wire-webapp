@@ -75,7 +75,7 @@ export async function startApplication(
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const fireAndForgetInvoker = createFireAndForgetInvoker({
     reportError(error) {
-      fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
+      fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', {error});
     },
   });
   const documentContentLoaded = waitForDocumentContentLoaded({

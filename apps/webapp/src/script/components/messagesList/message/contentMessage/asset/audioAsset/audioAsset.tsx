@@ -84,7 +84,7 @@ export const AudioAsset: FunctionComponent<AudioAssetProps> = ({
         const url = await getAssetUrl(asset.original_resource());
         setAudioSrc(url);
       } catch (error: unknown) {
-        logger.error('Failed to load audio asset ', error);
+        logger.error('Failed to load audio asset ', {error});
       }
       asset.status(AssetTransferState.UPLOADED);
     }
@@ -95,7 +95,7 @@ export const AudioAsset: FunctionComponent<AudioAssetProps> = ({
       const playPromise = audioElement.play();
 
       playPromise?.catch((error: unknown) => {
-        logger.error('Failed to load audio asset ', error);
+        logger.error('Failed to load audio asset ', {error});
       });
     }
   }, [audioElement, audioSrc]);

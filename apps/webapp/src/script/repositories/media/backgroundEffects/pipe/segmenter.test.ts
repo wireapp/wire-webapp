@@ -22,6 +22,7 @@ import type {WorkerProcessVideoTrackOptions} from './options';
 import {defaultWorkerOpts} from './options';
 import {getSegmenterModelUpdatedOptions, runSegmenter, updateSegmenterOptions} from './segmenter';
 import {ImageSegmenter} from '@mediapipe/tasks-vision';
+import {getSafeLogger} from '../helper/logger';
 
 jest.mock('@enormora/clock/clock', () => {
   return {
@@ -222,6 +223,40 @@ describe('segmenter tests', () => {
         },
       });
     });
+  });
+
+  it('keeps stream failure details in console text and structured attributes', async () => {
+    const error = new Error('Video stream interrupted');
+    const readable = {
+      pipeTo: jest.fn().mockRejectedValue(error),
+    } as unknown as ReadableStream;
+    const canvas = {
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    } as unknown as OffscreenCanvas;
+
+    await runSegmenter(
+      canvas,
+      readable,
+      {
+        ...defaultWorkerOpts,
+        modelPath: 'model-a.tflite',
+        wasmLoaderPath: '/mock/vision_wasm_internal.js',
+        wasmBinaryPath: '/mock/vision_wasm_internal.wasm',
+      },
+      jest.fn(),
+      jest.fn(),
+    );
+
+    const loggerCreation = (getSafeLogger as jest.MockedFunction<typeof getSafeLogger>).mock.results[0];
+    if (loggerCreation?.type !== 'return') {
+      throw new Error('The segmenter logger was not created');
+    }
+
+    expect(loggerCreation.value.error).toHaveBeenCalledWith(
+      '[virtual-background] video error: Video stream interrupted',
+      {error},
+    );
   });
 
   describe('runSegmenter webgl context handling', () => {

@@ -32,7 +32,11 @@ export const ErrorFallback: FunctionComponent<FallbackProps> = ({error, resetErr
 
   useEffect(() => {
     const customError = new Error();
-    logger.error({originalError: error, originalStack: error?.stack, fallbackInvocationStack: customError.stack});
+    logger.error('Rendering failed; showing error fallback', {
+      originalError: error,
+      originalStack: error?.stack,
+      fallbackInvocationStack: customError.stack,
+    });
 
     PrimaryModal.show(
       PrimaryModal.type.CONFIRM,

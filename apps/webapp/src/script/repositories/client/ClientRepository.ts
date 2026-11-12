@@ -149,7 +149,7 @@ export class ClientRepository {
       const status = isAxiosError(error) ? error.response?.status : undefined;
       const clientNotFoundBackend = status === HTTP_STATUS.NOT_FOUND;
       if (clientNotFoundBackend) {
-        this.logger.warn(`Local client no longer exists on the backend`, error);
+        this.logger.warn(`Local client no longer exists on the backend`, {error});
         throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
       }
 
@@ -279,7 +279,7 @@ export class ClientRepository {
       const clientNotValidated = isErrorWithType(error) && error.type === ClientError.TYPE.NO_VALID_CLIENT;
       if (!clientNotValidated) {
         const errorMessage = isErrorWithCode(error) ? String(error.code) : toError(error).message;
-        this.logger.error(`Getting valid local client failed: ${errorMessage}`, error);
+        this.logger.error(`Getting valid local client failed: ${errorMessage}`, {error});
       }
 
       throw error;
@@ -539,7 +539,7 @@ export class ClientRepository {
         return clientEntities;
       })
       .catch((error: unknown) => {
-        this.logger.error(`Unable to retrieve clients for user '${userId}': ${toError(error).message}`, error);
+        this.logger.error(`Unable to retrieve clients for user '${userId}': ${toError(error).message}`, {error});
         throw error;
       });
   }

@@ -77,15 +77,21 @@ export function serializeArgs(args: any[]): any[] {
 }
 
 // Helper function to prevent circular references
-function getCircularReplacer() {
-  const seen = new WeakSet();
-  return (_key: string, value: any) => {
+function getCircularReplacer(): (key: string, value: unknown) => unknown {
+  const seen = new WeakSet<object>();
+
+  return (_key: string, value: unknown) => {
     if (typeof value === 'object' && value !== null) {
       if (seen.has(value)) {
         return '[Circular]';
       }
       seen.add(value);
+
+      if (isError(value)) {
+        return {...value, name: value.name, message: value.message, stack: value.stack, cause: value.cause};
+      }
     }
+
     return value;
   };
 }

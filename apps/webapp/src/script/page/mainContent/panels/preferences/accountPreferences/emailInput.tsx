@@ -60,7 +60,7 @@ const EmailInput: FunctionComponent<EmailInputProps> = ({email, canEditProfile, 
       emailInputDone.done();
       showWarning(translate('modalPreferencesAccountEmailHeadline'), translate('authPostedResendDetail'));
     } catch (error: unknown) {
-      logger.warn('Failed to send reset email request', error);
+      logger.warn('Failed to send reset email request', {error});
       if (isErrorWithCode(error) && error.code === HTTP_STATUS.BAD_REQUEST) {
         showWarning(
           translate('modalPreferencesAccountEmailErrorHeadline'),

@@ -251,7 +251,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       },
     );
     if (featureResult.isErr) {
-      this.logger.error(featureResult.error);
+      this.logger.error('Failed to load team features', {error: featureResult.error});
       if (!useDefaultsOnError) {
         return undefined;
       }
@@ -298,7 +298,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         await this.getTeam();
         await this.updateFeatureConfig();
       } catch (error: unknown) {
-        this.logger.error(error);
+        this.logger.error('Failed to update team settings', {error});
       }
     };
 
@@ -473,7 +473,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     // IF the backend supports MLS, AND we use the proteus protocol, THEN filter out federated users
     return users.filter(user => {
       if (user.domain !== domain) {
-        this.logger.log(`Filtering out user ${user.id} because of domain mismatch, current protocol is not MLS`);
+        this.logger.info(`Filtering out user ${user.id} because of domain mismatch, current protocol is not MLS`);
         return false;
       }
       return true;
@@ -604,7 +604,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
             imageDataUrl = await loadDataUrl(imageBlob);
           }
         } catch (error: unknown) {
-          this.logger.warn(`Account image could not be loaded`, error);
+          this.logger.warn(`Account image could not be loaded`, {error});
         }
       }
 
@@ -627,7 +627,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         accountInfo.availability = this.userState.self().availability();
       }
 
-      this.logger.log('Publishing account info', {...accountInfo, picture: null});
+      this.logger.info('Publishing account info', {...accountInfo, picture: null});
       amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
       return accountInfo;
     }
@@ -746,7 +746,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   }
 
   private onUnhandled(eventJson: TeamEvent): void {
-    this.logger.log(`Received '${eventJson.type}' event from backend which is not yet handled`, eventJson);
+    this.logger.info(`Received '${eventJson.type}' event from backend which is not yet handled`, {eventJson});
   }
 
   public getTeamSupportedProtocols(): CONVERSATION_PROTOCOL[] {

@@ -143,7 +143,7 @@ const CameraPreferencesComponent: FunctionComponent<CameraPreferencesProps> = ({
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
-        logger.warn(`Requesting MediaStream for type "${MediaType.VIDEO}" failed: ${error.message}`, error);
+        logger.warn(`Requesting MediaStream for type "${MediaType.VIDEO}" failed: ${error.message}`, {error});
       }
       setStream(null);
     } finally {

@@ -34,6 +34,7 @@ import {
   CALL_TYPE,
   CONV_TYPE,
   ERROR,
+  LOG_LEVEL,
   QUALITY,
   REASON,
   STATE as CALL_STATE,
@@ -249,6 +250,81 @@ function createSftCallingFixture(): SftCallingFixture {
     sendRequest,
   };
 }
+
+describe('CallingRepository AVS logging', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it.each([
+    {level: LOG_LEVEL.DEBUG, loggerMethod: 'debug', callLogLevel: 'DEBUG'},
+    {level: LOG_LEVEL.INFO, loggerMethod: 'info', callLogLevel: 'INFO '},
+    {level: LOG_LEVEL.WARN, loggerMethod: 'warn', callLogLevel: 'WARN '},
+    {level: LOG_LEVEL.ERROR, loggerMethod: 'error', callLogLevel: 'ERROR'},
+  ] as const)('forwards $loggerMethod messages without attributes and preserves callLog formatting', options => {
+    const {level, loggerMethod, callLogLevel} = options;
+    const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+    const loggerSpies = {
+      debug: jest.spyOn(repository['avsLogger'], 'debug').mockImplementation(noop),
+      info: jest.spyOn(repository['avsLogger'], 'info').mockImplementation(noop),
+      warn: jest.spyOn(repository['avsLogger'], 'warn').mockImplementation(noop),
+      error: jest.spyOn(repository['avsLogger'], 'error').mockImplementation(noop),
+    };
+
+    expect(repository.getCallLog()).toBeUndefined();
+
+    repository['avsLogHandler'](level, ' \nAVS diagnostic\t ', undefined);
+
+    const actualLoggerCalls = {
+      debug: loggerSpies.debug.mock.calls,
+      info: loggerSpies.info.mock.calls,
+      warn: loggerSpies.warn.mock.calls,
+      error: loggerSpies.error.mock.calls,
+    };
+    const expectedLoggerCalls = {debug: [], info: [], warn: [], error: [], [loggerMethod]: [['AVS diagnostic']]};
+    const expectedCallLogPattern = new RegExp(
+      `^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z \\[${callLogLevel}\\] AVS diagnostic$`,
+      'u',
+    );
+
+    expect(actualLoggerCalls).toEqual(expectedLoggerCalls);
+    expect(repository.getCallLog()).toEqual([expect.stringMatching(expectedCallLogPattern)]);
+  });
+
+  it.each([new Error('Socket closed'), {reason: 'Socket closed'}, 'Socket closed', 0, false, null])(
+    'preserves the error attribute and message-only callLog entry for %p',
+    error => {
+      const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+      const errorLogSpy = jest.spyOn(repository['avsLogger'], 'error').mockImplementation(noop);
+
+      repository['avsLogHandler'](LOG_LEVEL.ERROR, ' \nFailed AVS operation\t ', error);
+
+      expect(errorLogSpy).toHaveBeenCalledWith('Failed AVS operation', {error});
+      expect(errorLogSpy.mock.calls[0]?.[1]?.error).toBe(error);
+      expect(repository.getCallLog()).toEqual([
+        expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z \[ERROR\] Failed AVS operation$/u),
+      ]);
+    },
+  );
+
+  it('appends repeated AVS messages to the existing callLog in order', () => {
+    const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+    jest.spyOn(repository['avsLogger'], 'info').mockImplementation(noop);
+    jest.spyOn(repository['avsLogger'], 'warn').mockImplementation(noop);
+
+    repository['avsLogHandler'](LOG_LEVEL.INFO, 'First message', undefined);
+    const initialCallLog = repository.getCallLog();
+    repository['avsLogHandler'](LOG_LEVEL.WARN, 'Second message', new Error('Socket closed'));
+
+    const actualCallLog = repository.getCallLog();
+
+    expect(actualCallLog).toBe(initialCallLog);
+    expect(actualCallLog).toEqual([
+      expect.stringMatching(/ \[INFO \] First message$/u),
+      expect.stringMatching(/ \[WARN \] Second message$/u),
+    ]);
+  });
+});
 
 describe('CallingRepository', () => {
   afterEach(() => {
@@ -1546,10 +1622,9 @@ describe('CallingRepository', () => {
 
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidJsonString);
 
-      expect(callingRepository['logger'].warn).toHaveBeenCalledWith(
-        'Invalid network quality info JSON',
-        expect.any(Error),
-      );
+      expect(callingRepository['logger'].warn).toHaveBeenCalledWith('Invalid network quality info JSON', {
+        error: expect.any(Error),
+      });
     });
 
     it('logs warning when network quality info schema validation fails', () => {
@@ -1561,10 +1636,9 @@ describe('CallingRepository', () => {
 
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidQualityInfo);
 
-      expect(callingRepository['logger'].warn).toHaveBeenCalledWith(
-        'Invalid network quality info schema',
-        expect.any(z.ZodError),
-      );
+      expect(callingRepository['logger'].warn).toHaveBeenCalledWith('Invalid network quality info schema', {
+        error: expect.any(z.ZodError),
+      });
 
       expect(Warnings.showWarning).not.toHaveBeenCalled();
       expect(Warnings.hideWarning).not.toHaveBeenCalled();

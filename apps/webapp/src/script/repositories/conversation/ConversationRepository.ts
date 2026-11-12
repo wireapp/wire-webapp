@@ -660,7 +660,7 @@ export class ConversationRepository {
             this.showLegalHoldConsentError();
             break;
           default:
-            this.logger.error(error);
+            this.logger.error('Failed to create conversation', {error});
         }
       }
       throw error;
@@ -708,7 +708,7 @@ export class ConversationRepository {
         await this.loadMissingConversations();
         await this.refreshAllConversationsUnavailableParticipants();
       } catch (error: unknown) {
-        this.logger.warn(`failed to refresh missing users & conversations metat data`, error);
+        this.logger.warn(`failed to refresh missing users & conversations metat data`, {error});
       }
     }, TIME_IN_MILLIS.HOUR * conversationRetentionCheckIntervalInHours);
   };
@@ -1284,7 +1284,7 @@ export class ConversationRepository {
           await this.addEventsToConversation(events, conversationEntity, {offline: true});
         }
       } catch (error: unknown) {
-        this.logger.warn(`Could not load unread events for conversation: ${conversationEntity.id}`, error);
+        this.logger.warn(`Could not load unread events for conversation: ${conversationEntity.id}`, {error});
       }
       conversationEntity.isLoadingMessages(false);
     }
@@ -1468,7 +1468,7 @@ export class ConversationRepository {
       const isConversationNotFound =
         isErrorWithType(error) && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {
-        this.logger.warn(`Failed to get conversation '${conversation_id.id}': ${toError(error).message}`, error);
+        this.logger.warn(`Failed to get conversation '${conversation_id.id}': ${toError(error).message}`, {error});
       }
 
       throw error;
@@ -2265,7 +2265,7 @@ export class ConversationRepository {
       initialisedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
       initialisedMLSConversation.readOnlyState(null);
     } catch (error: unknown) {
-      this.logger.warn(`Failed to establish MLS 1:1 conversation with user ${otherUserId.id}`, error);
+      this.logger.warn(`Failed to establish MLS 1:1 conversation with user ${otherUserId.id}`, {error});
       if (!allowUnestablished) {
         throw error;
       }
@@ -2673,7 +2673,7 @@ export class ConversationRepository {
       } catch (error: unknown) {
         this.logger.error(
           `Failed when mapping a connection with user ${connection.userId} to a conversation, error: `,
-          error,
+          {error},
         );
       }
     }
@@ -2720,7 +2720,7 @@ export class ConversationRepository {
       try {
         await this.init1to1Conversation(conversation);
       } catch (error: unknown) {
-        this.logger.error(`Failed when initialising 1:1 conversation with id ${conversation.id}, error: `, error);
+        this.logger.error(`Failed when initialising 1:1 conversation with id ${conversation.id}, error: `, {error});
       }
     }
   };
@@ -3096,7 +3096,7 @@ export class ConversationRepository {
       const event = response?.event;
       if (isTruthy(event)) {
         const logMessage = `Successfully added service to conversation '${conversationEntity.display_name()}'`;
-        this.logger.debug(logMessage, response);
+        this.logger.debug(logMessage, {response});
         return this.eventRepository.injectEvent(response.event, EventRepository.SOURCE.BACKEND_RESPONSE);
       }
 
@@ -3589,7 +3589,7 @@ export class ConversationRepository {
     } catch (error: unknown) {
       const log = `Failed to change notification state of conversation '${conversationEntity.id}': ${toError(error).message}`;
       const rejectError = new Error(log);
-      this.logger.warn(rejectError.message, error);
+      this.logger.warn(rejectError.message, {error});
       throw rejectError;
     }
   }
@@ -4890,7 +4890,7 @@ export class ConversationRepository {
       .catch((error: unknown) => {
         const isNotFound = isErrorWithType(error) && error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (!isNotFound) {
-          this.logger.warn(`Failed to delete message for conversation '${conversationEntity.id}'`, error);
+          this.logger.warn(`Failed to delete message for conversation '${conversationEntity.id}'`, {error});
           throw error;
         }
       });
@@ -4925,7 +4925,7 @@ export class ConversationRepository {
     } catch (error: unknown) {
       this.logger.warn(
         `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
-        error,
+        {error},
       );
       throw error;
     }
@@ -4962,7 +4962,7 @@ export class ConversationRepository {
       const isNotFound = isErrorWithType(error) && error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
         const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationEntity.id}'`;
-        this.logger.error(log, error);
+        this.logger.error(log, {error});
         throw error;
       }
     }
@@ -5105,7 +5105,7 @@ export class ConversationRepository {
         `Updated conversation group ID from ${oldGroupId} to ${newGroupId} for conversation ${conversationEntity.id} and set epoch to 0`,
       );
     } catch (error: unknown) {
-      this.logger.error(`Failed to reset MLS conversation ${conversationEntity.id}`, error);
+      this.logger.error(`Failed to reset MLS conversation ${conversationEntity.id}`, {error});
     }
   }
 

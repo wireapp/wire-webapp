@@ -36,28 +36,62 @@ describe('LogFactory', () => {
       const loggerName = LogFactory.createLoggerName('LogFactory', '', '::');
       expect(loggerName).toBe('LogFactory');
     });
+
+    it.each(['@wireapp/webapp/Connection', '@wireapp/api-client/Connection', '@wireapp/core/Connection'])(
+      'preserves the complete component identifier %s',
+      name => {
+        expect(LogFactory.createLoggerName(name)).toBe(name);
+      },
+    );
   });
 
   describe('getLogger', () => {
-    it('sets a different color for every new logger', () => {
-      const firstLogger = LogFactory.getLogger('FirstLogger');
-      const secondLogger = LogFactory.getLogger('SecondLogger');
-      expect((firstLogger as any).opts.prefixColor).not.toBe((secondLogger as any).opts.prefixColor);
+    afterEach(() => {
+      jest.restoreAllMocks();
     });
 
-    it('supports namespaces', () => {
+    it('exposes only the Wire logging contract', () => {
+      const logger = LogFactory.getLogger('ContractLogger');
+
+      expect(Object.keys(logger).sort()).toEqual(['debug', 'error', 'info', 'warn']);
+    });
+
+    it.each(['debug', 'info', 'warn', 'error'] as const)('preserves console severity and timestamps for %s', level => {
+      const consoleOutput = jest.spyOn(console, level).mockImplementation(jest.fn());
+      const logger = LogFactory.getLogger(`SeverityLogger/${level}`, {forceEnable: true});
+      const attributes = {connectionId: 'connection-1'};
+
+      logger[level]('Connection established', attributes);
+
+      const actualConsoleArguments: unknown[] = consoleOutput.mock.calls.flat();
+
+      expect(consoleOutput).toHaveBeenCalledTimes(1);
+      expect(actualConsoleArguments).toContain('Connection established');
+      expect(actualConsoleArguments).toContain(attributes);
+      expect(actualConsoleArguments.join(' ')).toMatch(/\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]/u);
+    });
+
+    it('supports namespaces in console output', () => {
+      const consoleOutput = jest.spyOn(console, 'info').mockImplementation(jest.fn());
       const name = 'LogFactory';
       const namespace = 'OurCompany';
-      const logger = LogFactory.getLogger(name, {namespace});
-      expect((logger as any).opts.prefix.startsWith(namespace)).toBe(true);
+      const logger = LogFactory.getLogger(name, {namespace, forceEnable: true});
+
+      logger.info('Namespaced message');
+
+      expect(consoleOutput.mock.calls.flat().join(' ')).toContain(`${namespace}::${name}`);
     });
 
     it('supports namespaces and separators', () => {
+      const consoleOutput = jest.spyOn(console, 'info').mockImplementation(jest.fn());
       const name = 'LogFactory';
       const namespace = 'OurCompany';
       const separator = '-';
-      const logger = LogFactory.getLogger('LogFactory', {namespace, separator});
-      expect((logger as any).opts.prefix).toBe(`${namespace}${separator}${name}`);
+      const logger = LogFactory.getLogger(name, {namespace, separator, forceEnable: true});
+
+      logger.info('Namespaced message');
+
+      expect(consoleOutput.mock.calls.flat().join(' ')).toContain(`${namespace}${separator}${name}`);
     });
   });
 

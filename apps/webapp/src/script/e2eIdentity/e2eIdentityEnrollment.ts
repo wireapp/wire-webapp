@@ -397,7 +397,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       await this.showSuccessMessage(isCertificateRenewal);
     } catch (error: unknown) {
-      this.logger.error('E2EI enrollment failed', error);
+      this.logger.error('E2EI enrollment failed', {error});
 
       setTimeout(removeCurrentModal, 0);
       await this.showErrorMessage(snoozable);

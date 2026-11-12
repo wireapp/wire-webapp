@@ -54,7 +54,7 @@ export const E2EICertificateDetails: FunctionComponent<E2EICertificateDetailsPro
     try {
       await E2EIHandler.getInstance().enroll({resetTimers: true});
     } catch (error: unknown) {
-      logger.error('Cannot get E2EI instance: ', error);
+      logger.error('Cannot get E2EI instance: ', {error});
     }
   };
 

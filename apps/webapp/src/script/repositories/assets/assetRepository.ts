@@ -165,7 +165,7 @@ export class AssetRepository {
       }
       return downloadBlob(blob, fileName);
     } catch (error: unknown) {
-      return this.logger.error('Failed to download blob', error);
+      return this.logger.error('Failed to download blob', {error});
     }
   }
 
@@ -188,7 +188,7 @@ export class AssetRepository {
           asset.status(AssetTransferState.DOWNLOAD_FAILED_DECRPYT);
         }
       }
-      return this.logger.error('Failed to download FileAsset blob', error);
+      return this.logger.error('Failed to download FileAsset blob', {error});
     }
   }
 

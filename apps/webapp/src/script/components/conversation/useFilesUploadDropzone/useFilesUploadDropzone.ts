@@ -105,13 +105,13 @@ export const useFilesUploadDropzone = ({
       onFileDrop: checkFileSharingPermission((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
         void processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id).catch(
           (error: unknown) => {
-            logger.error('Processing incoming files failed', error);
+            logger.error('Processing incoming files failed', {error});
           },
         );
       }, translate),
     }),
     onError: (error: Error) => {
-      logger.error('Dropping files failed', error);
+      logger.error('Dropping files failed', {error});
       showFileDropzoneErrorModal({
         title: translate('conversationFileUploadFailedHeading'),
         message: translate('conversationFileUploadFailedMessage'),
@@ -177,7 +177,7 @@ export const useFilesUploadDropzone = ({
     try {
       await attatchMetadataToFiles(transformedAcceptedFiles);
     } catch (error: unknown) {
-      logger.warn('Attaching file metadata failed', error);
+      logger.warn('Attaching file metadata failed', {error});
     }
 
     await uploadFiles(transformedAcceptedFiles);
@@ -223,7 +223,7 @@ export const useFilesUploadDropzone = ({
         return;
       }
 
-      logger.error('Uploading file failed', error);
+      logger.error('Uploading file failed', {error});
       updateFile({conversationId: conversation.id, fileId: file.id, data: {uploadStatus: 'error'}});
       throw error;
     }
@@ -253,7 +253,7 @@ export const useFilesUploadDropzone = ({
             data: {...metadata},
           });
         } catch (error: unknown) {
-          logger.warn('Building file metadata failed', error);
+          logger.warn('Building file metadata failed', {error});
         }
       }),
     );

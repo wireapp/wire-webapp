@@ -58,7 +58,7 @@ export const joinUnestablishedMixedConversation = async (
       onError: ({id}, error) => {
         return mlsMigrationLogger.error(
           `Failed when joining a mls group of mixed conversation with id ${id}, error: `,
-          error,
+          {error},
         );
       },
     });
@@ -80,7 +80,7 @@ export const joinUnestablishedMixedConversation = async (
   } catch (error: unknown) {
     mlsMigrationLogger.error(
       `Failed to establish MLS group for mixed conversation with id ${mixedConversation.id}, error: `,
-      error,
+      {error},
     );
     if (!shouldRetry) {
       return;

@@ -187,7 +187,7 @@ export class BackgroundEffectsHandler {
 
       return {applied: true, media: this.currentReleasableStream};
     } catch (error) {
-      this.logger.warn('BackgroundEffectsController failed with error:', error);
+      this.logger.warn('BackgroundEffectsController failed with error:', {error});
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
   }
@@ -223,7 +223,7 @@ export class BackgroundEffectsHandler {
     try {
       return this.storage.getItem(VIDEO_BACKGROUND_EFFECTS_PERFORMANCE_PANEL_STORAGE_KEY) === 'true';
     } catch (error) {
-      this.logger.error('Failed to read video background effects performance panel state', error);
+      this.logger.error('Failed to read video background effects performance panel state', {error});
       return false;
     }
   }
@@ -239,7 +239,7 @@ export class BackgroundEffectsHandler {
       this.storage.setItem(VIDEO_BACKGROUND_EFFECTS_PERFORMANCE_PANEL_STORAGE_KEY, `${flag}`);
       return flag;
     } catch (error) {
-      this.logger.error('Failed to persist video background effects performance panel state', error);
+      this.logger.error('Failed to persist video background effects performance panel state', {error});
       return false;
     }
   }
@@ -278,7 +278,7 @@ export class BackgroundEffectsHandler {
 
       return null;
     } catch (error) {
-      this.logger.warn('Failed to load background source', error);
+      this.logger.warn('Failed to load background source', {error});
       return null;
     }
   }
@@ -291,7 +291,7 @@ export class BackgroundEffectsHandler {
     try {
       return parseStoredPreferredEffect(this.storage.getItem(VIDEO_BACKGROUND_EFFECT_STORAGE_KEY));
     } catch (error) {
-      this.logger.error('Failed to read persisted preferred video background effect', error);
+      this.logger.error('Failed to read persisted preferred video background effect', {error});
       return DEFAULT_BACKGROUND_EFFECT;
     }
   }
@@ -305,7 +305,7 @@ export class BackgroundEffectsHandler {
       const serialized = JSON.stringify(effect);
       this.storage.setItem(VIDEO_BACKGROUND_EFFECT_STORAGE_KEY, serialized);
     } catch (error) {
-      this.logger.error('Failed to persist preferred video background effect', error);
+      this.logger.error('Failed to persist preferred video background effect', {error});
     }
   }
 
@@ -317,7 +317,7 @@ export class BackgroundEffectsHandler {
     try {
       return this.storage.getItem(VIDEO_BACKGROUND_LAST_VIRTUAL_ID_STORAGE_KEY) ?? DEFAULT_BUILTIN_BACKGROUND_ID;
     } catch (error) {
-      this.logger.error('Failed to read last virtual background ID', error);
+      this.logger.error('Failed to read last virtual background ID', {error});
       return DEFAULT_BUILTIN_BACKGROUND_ID;
     }
   }
@@ -330,7 +330,7 @@ export class BackgroundEffectsHandler {
     try {
       this.storage.setItem(VIDEO_BACKGROUND_LAST_VIRTUAL_ID_STORAGE_KEY, backgroundId);
     } catch (error) {
-      this.logger.error('Failed to persist last virtual background ID', error);
+      this.logger.error('Failed to persist last virtual background ID', {error});
     }
   }
 

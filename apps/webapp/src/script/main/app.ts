@@ -548,7 +548,7 @@ export class App {
       try {
         selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
       } catch (error: unknown) {
-        this.logger.error('Could not get self user', error);
+        this.logger.error('Could not get self user', {error});
         await reportStartup('failure');
         await this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
         return undefined;
@@ -566,7 +566,7 @@ export class App {
         await this.core.init(clientType);
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : error;
-        this.logger.error(`Error when initializing core: "${errorMessage}"`, error);
+        this.logger.error(`Error when initializing core: "${errorMessage}"`, {error});
         throw new AccessTokenError(AccessTokenError.TYPE.REQUEST_FORBIDDEN, 'Session has expired');
       }
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
@@ -686,7 +686,7 @@ export class App {
 
       fireAndForgetInvoker.fireAndForget(() => {
         return bgEffectsHandler.preloadResources().catch((error: unknown) => {
-          this.logger.warn('[virtual-background] preload failed, starting without resources', error);
+          this.logger.warn('[virtual-background] preload failed, starting without resources', {error});
         });
       });
 
@@ -771,7 +771,7 @@ export class App {
           core: this.core,
           onSuccess: conversationRepository.injectJoinedAfterMigrationFinalisationMessage,
           onError: ({id}, error) => {
-            return this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error);
+            return this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, {error});
           },
         });
 
@@ -781,7 +781,7 @@ export class App {
         await initMLSGroupConversations(conversations, conversationRepository, {
           core: this.core,
           onError: ({id}, error) => {
-            return this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error);
+            return this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, {error});
           },
         });
 
@@ -815,7 +815,7 @@ export class App {
       try {
         await conversationRepository.conversationLabelRepository.loadLabels();
       } catch (error: unknown) {
-        this.logger.error('Failed to load conversation labels', error);
+        this.logger.error('Failed to load conversation labels', {error});
         // Continue with empty labels rather than breaking the app
       }
 
@@ -951,7 +951,7 @@ export class App {
       recoveryInProgress = false;
 
       if (recoveryTask.isErr) {
-        this.logger.error('Failed to run MLS conversation recovery', recoveryTask.error);
+        this.logger.error('Failed to run MLS conversation recovery', {error: recoveryTask.error});
       }
     };
 
@@ -1000,7 +1000,7 @@ export class App {
       const isReload = this._isReload();
       switch (type) {
         case CLIENT_ERROR_TYPE.NO_VALID_CLIENT: {
-          this.logger.warn(`Redirecting to login: ${message}`, error);
+          this.logger.warn(`Redirecting to login: ${message}`, {error});
           return isReload
             ? this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
             : this.repository.lifeCycle.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
@@ -1008,22 +1008,22 @@ export class App {
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
-          this.logger.warn(`Redirecting to login: ${message}`, error);
+          this.logger.warn(`Redirecting to login: ${message}`, {error});
           return isReload
             ? this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
             : this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
         case TeamError.TYPE.NO_APP_CONFIG: {
-          this.logger.warn(`Logging out user: ${message}`, error);
+          this.logger.warn(`Logging out user: ${message}`, {error});
           return this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
         }
 
         default: {
-          this.logger.error(`Caused by: ${isNonEmptyString(message) ? message : error}`, error);
+          this.logger.error(`Caused by: ${isNonEmptyString(message) ? message : error}`, {error});
 
           const isAccessTokenError = error instanceof AccessTokenError;
           if (isAccessTokenError) {
-            this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
+            this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, {error});
           }
 
           return this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false);
@@ -1031,7 +1031,7 @@ export class App {
       }
     }
 
-    this.logger.warn("No internet connectivity. Refreshing the page to show the browser's offline page...", error);
+    this.logger.warn("No internet connectivity. Refreshing the page to show the browser's offline page...", {error});
     window.location.reload();
   }
 

@@ -58,7 +58,7 @@ import {
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {Decoder} from '../../../commons/base64/decoder';
-import {LogFactory} from '../../../commons/LogFactory';
+import {getLogger} from '../../../commons/getLogger';
 import {TypedEventEmitter} from '../../../commons/TypedEventEmitter/TypedEventEmitter';
 import {XOR} from '../../../commons/util/TypeUtil';
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
@@ -106,7 +106,7 @@ type Events = {
 
 export class ConversationService extends TypedEventEmitter<Events> {
   public readonly messageTimer: MessageTimer;
-  private readonly logger = LogFactory.getLogger('@wireapp/core/ConversationService');
+  private readonly logger = getLogger('@wireapp/core/ConversationService');
   // Track groups currently undergoing recovery due to key material update failure to prevent duplicate work
   private groupIdConversationMap: Map<string, Conversation> = new Map();
   private MLSRecoveryOrchestrator?: MlsRecoveryOrchestrator;
@@ -912,7 +912,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
         await this.subconversationService.joinConferenceSubconversation(parentConversationId, parentGroupId);
       } catch (error: unknown) {
         const message = `There was an error while handling epoch mismatch in MLS subconversation (id: ${parentConversationId.id}, subconv: ${subconversationId}):`;
-        this.logger.error(message, error);
+        this.logger.error(message, {error});
       }
     }
   }
@@ -1102,7 +1102,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       return updatedMLSConversation;
     } catch (error: unknown) {
       if (!shouldRetry) {
-        this.logger.error(`Could not register MLS group with id ${groupId}: `, error);
+        this.logger.error(`Could not register MLS group with id ${groupId}: `, {error});
 
         throw error;
       }
@@ -1164,7 +1164,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
         this.logger.debug('No other users were added to the group.');
       }
     } catch (error: unknown) {
-      this.logger.error('Failed to establish MLS group', error);
+      this.logger.error('Failed to establish MLS group', {error});
       throw error;
     }
   }

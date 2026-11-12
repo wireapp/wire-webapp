@@ -77,6 +77,6 @@ describe('loadLocalClient', () => {
       expect(loadResult.error.type).toBe(errorType);
       expect(loadResult.error.cause).toBe(originalError);
     }
-    expect(logger.error).toHaveBeenCalledWith(expect.any(String), originalError);
+    expect(logger.error).toHaveBeenCalledWith('Failed to load the local client', {error: originalError});
   });
 });

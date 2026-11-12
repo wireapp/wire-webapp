@@ -19,9 +19,9 @@
 
 import {TaskSchedulerStore} from './taskScheduler.store';
 
-import {LogFactory} from '../../../commons/LogFactory';
+import {getLogger} from '../../../commons/getLogger';
 
-const logger = LogFactory.getLogger('@wireapp/core/TaskScheduler');
+const logger = getLogger('@wireapp/core/TaskScheduler');
 
 type ScheduleTaskParams = {
   task: () => Promise<void> | void;

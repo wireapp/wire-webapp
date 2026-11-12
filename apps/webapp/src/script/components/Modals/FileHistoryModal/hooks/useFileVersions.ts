@@ -195,7 +195,7 @@ const parseOwnerQualifiedId = (ownerUuid?: string): QualifiedId | undefined => {
   try {
     return parseQualifiedId(ownerUuid.trim());
   } catch (error) {
-    logger.warn('Failed to parse qualifiedId', ownerUuid, error);
+    logger.warn('Failed to parse qualifiedId', {ownerUuid, error});
     return undefined;
   }
 };
