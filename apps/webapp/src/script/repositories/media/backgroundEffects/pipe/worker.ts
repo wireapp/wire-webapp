@@ -53,11 +53,12 @@ globalThis.onmessage = ({data}) => {
         globalThis.postMessage({name: 'performanceSample', sample, mode});
       },
     ).catch((err: unknown) => {
-      workerLogger.error('[virtual-background] video error', {error: err});
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      workerLogger.error(`[virtual-background] video error: ${errorMessage}`, {error: err});
       globalThis.postMessage({
         name: 'error',
         reason: 'segmenter-init-failed',
-        message: err instanceof Error ? err.message : String(err),
+        message: errorMessage,
       });
     });
   }

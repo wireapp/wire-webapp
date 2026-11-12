@@ -551,6 +551,7 @@ export async function runSegmenter(
   );
 
   readable.pipeTo(writer).catch((error: unknown) => {
-    logger.error('[virtual-background] video error', {error});
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error(`[virtual-background] video error: ${errorMessage}`, {error});
   });
 }
