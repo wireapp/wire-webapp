@@ -17,13 +17,14 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
+import {type FunctionComponent, useCallback, useEffect, useMemo, useState} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {amplify} from 'amplify';
-import ky from 'ky';
 import {container} from 'tsyringe';
+
+import ky from 'ky';
 
 import {getOtherInstanceAction} from './getOtherInstanceAction';
 import {useAccentColor} from './hooks/useAccentColor';

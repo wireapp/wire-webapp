@@ -18,7 +18,7 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {MeetingType} from '@wireapp/api-client/lib/meetings/createMeeting';
+import {MeetingType} from '../../apiClient/meetings';
 
 import {mapMeetNowCommandToCreateMeeting} from './mapMeetNowCommandToCreateMeeting';
 

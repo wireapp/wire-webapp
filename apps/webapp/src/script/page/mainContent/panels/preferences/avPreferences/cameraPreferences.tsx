@@ -27,7 +27,6 @@ import * as Icon from '../../../../../components/icon';
 import {Config} from '../../../../../Config';
 import {MediaStreamHandler} from '../../../../../repositories/media/MediaStreamHandler';
 import {MediaType} from '../../../../../repositories/media/MediaType';
-import {useMediaDevicesStore} from '../../../../../repositories/media/useMediaDevicesStore';
 import {
   createReactTranslationMarker,
   renderReactTranslation,
@@ -43,6 +42,9 @@ interface CameraPreferencesProps {
   hasActiveCameraStream: boolean;
   refreshStream: () => Promise<MediaStream | void>;
   streamHandler: MediaStreamHandler;
+  videoInputDevices: MediaDeviceInfo[];
+  videoInputDeviceId: string;
+  setVideoInputDeviceId: (id: string) => void;
 }
 
 const DEBOUNCE_TIMEOUT = 100;
@@ -108,19 +110,14 @@ const CameraPreferencesComponent: FunctionComponent<CameraPreferencesProps> = ({
   streamHandler,
   refreshStream,
   hasActiveCameraStream,
+  videoInputDevices,
+  videoInputDeviceId,
+  setVideoInputDeviceId,
 }: CameraPreferencesProps) => {
   const {translate} = useApplicationContext();
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
-
-  const {videoInputDevices, videoInputDeviceId, setVideoInputDeviceId} = useMediaDevicesStore(state => {
-    return {
-      videoInputDevices: state.video.input.devices,
-      videoInputDeviceId: state.video.input.activeId,
-      setVideoInputDeviceId: state.setVideoInputDeviceId,
-    };
-  });
 
   const {URL: urls, BRAND_NAME: brandName} = Config.getConfig();
 

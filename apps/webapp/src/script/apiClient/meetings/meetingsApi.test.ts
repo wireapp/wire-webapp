@@ -196,7 +196,7 @@ describe('MeetingsAPI', () => {
     ['secret-password', {password: 'secret-password'}],
     [undefined, {}],
   ])('refreshes a meeting link with the requested password payload', async (password, expectedData) => {
-    const client = new APIClient(testConfig);
+    using client = new APIClient({...testConfig, platform: nodePlatform});
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
       data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
     } as never);
@@ -219,7 +219,7 @@ describe('MeetingsAPI', () => {
   });
 
   it('rejects a refresh response without a meeting link', async () => {
-    const client = new APIClient(testConfig);
+    using client = new APIClient({...testConfig, platform: nodePlatform});
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
       data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
     } as never);

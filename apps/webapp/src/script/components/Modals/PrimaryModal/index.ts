@@ -17,8 +17,15 @@
  *
  */
 
-import {addNewModalToQueue, replaceCurrentModal, showNextModalInQueue} from './PrimaryModalState';
+import {createElement} from 'react';
+
+import {addNewModalToQueue, removeCurrentModal, replaceCurrentModal, showNextModalInQueue} from './PrimaryModalState';
 import {PrimaryModalType} from './PrimaryModalTypes';
+
+import {
+  MeetingLinkConfirmationMessage,
+  registerMeetingLinkConfirmationHandler,
+} from '../../meeting/meetingLinkConfirmation/meetingLinkConfirmation';
 
 export {removeCurrentModal, usePrimaryModalState} from './PrimaryModalState';
 export {PrimaryModal};
@@ -31,3 +38,26 @@ const PrimaryModal = {
   replace: replaceCurrentModal,
   type: PrimaryModalType,
 };
+
+registerMeetingLinkConfirmationHandler(({link, hasPassword, translate, onClosed}) => {
+  PrimaryModal.show(
+    PrimaryModal.type.CONFIRM,
+    {
+      close: onClosed,
+      confirmCancelBtnLabel: '',
+      hideSecondary: true,
+      text: {
+        closeBtnLabel: translate('meetings.meetingLink.close'),
+        message: createElement(MeetingLinkConfirmationMessage, {
+          link,
+          hasPassword,
+          translate,
+          onClose: removeCurrentModal,
+        }),
+        title: translate('meetings.meetingLink.title'),
+      },
+    },
+    undefined,
+    translate,
+  );
+});

@@ -22,13 +22,7 @@ import {LocalStorageActionCreator} from './creator/';
 import {toError} from '../../../util/toError';
 import type {ThunkAction} from '../reducer';
 
-export const LocalStorageKey = {
-  AUTH: {
-    COOKIE_LABEL: '__amplify__z.storage.StorageKey.AUTH.COOKIE_LABEL',
-    LOGIN_CONVERSATION_KEY: 'LOGIN_CONVERSATION_KEY',
-    PERSIST: '__amplify__z.storage.StorageKey.AUTH.PERSIST',
-  },
-};
+export {LocalStorageKey} from './localStorageKeys';
 
 export class LocalStorageAction {
   setLocalStorage = (key: string, value: any): ThunkAction => {
