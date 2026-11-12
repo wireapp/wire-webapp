@@ -19,6 +19,7 @@
 
 import {useEffect, useState, type JSX} from 'react';
 
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {Maybe, task} from 'true-myth';
 import {useStore} from 'zustand';
 
@@ -237,7 +238,7 @@ export const TroubleshootingPreferences = ({repository}: {repository: Troublesho
         return value.value !== '' ? value.value : translate(`troubleshooter.status.${value.status}`);
       })
       .unwrapOr(
-       isNullOrUndefined(measurement)
+        isNullOrUndefined(measurement)
           ? translate('troubleshooter.noResult')
           : `${measurement.toLocaleString()} ${qualityThresholds[id].unit}`,
       );
