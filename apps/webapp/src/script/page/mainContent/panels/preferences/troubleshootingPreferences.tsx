@@ -269,7 +269,7 @@ export const TroubleshootingPreferences = ({repository}: {repository: Troublesho
               .unwrapOr(<></>)}
           </div>
           <p>{translate('troubleshooter.connectionDescription', {brandName})}</p>
-          {(state.running === 'connection' || failedStep !== undefined) && (
+          {(state.running === 'connection' || !isUndefined(failedStep)) && (
             <div css={styles.connectionProgressStyles} aria-live="polite">
               {state.running === 'connection' && <strong>{translate('troubleshooter.testing')}</strong>}
               <progress
