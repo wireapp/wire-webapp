@@ -17,25 +17,31 @@
  *
  */
 
-import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ClientClassification} from '../../apiClient/client/clientClassification';
+import {ClientType} from '../../apiClient/client/clientType';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {Maybe} from 'true-myth';
 
-import {Runtime} from '@wireapp/commons';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Runtime} from '../../commons/util/Runtime';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 
-import {User} from 'Repositories/entity/User';
-import {ClientRecord} from 'Repositories/storage/record/clientRecord';
-import {ClientError} from 'src/script/error/clientError';
-import {type Translate} from 'Util/localizerUtil';
+import {User} from '../entity/User';
+import {ClientRecord} from '../storage/record/clientRecord';
+import {ClientError} from '../../error/clientError';
+import {type Translate} from '../../util/localizerUtil';
 
 import {ClientRepository, ClientMapper, ClientEntity} from './.';
 
 import {entities} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ClientRepository', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   const originalPrimaryModalShow = PrimaryModal.show;
   const testFactory = new TestFactory();
   const clientId = '5021d77752286cac';
@@ -61,6 +67,22 @@ describe('ClientRepository', () => {
   afterEach(() => {
     PrimaryModal.show = originalPrimaryModalShow;
     jest.clearAllMocks();
+  });
+
+  describe('constructCookieLabelKey', () => {
+    it.each([Maybe.nothing<string>(), Maybe.just('')])('uses the user ID when the login is %s', login => {
+      const repository = testFactory.client_repository;
+      const expectedKey = repository.constructCookieLabelKey(Maybe.just(userId), ClientType.PERMANENT);
+
+      expect(repository.constructCookieLabelKey(login, ClientType.PERMANENT)).toBe(expectedKey);
+    });
+
+    it('keeps email-based cookie labels distinct from the user ID fallback', () => {
+      const repository = testFactory.client_repository;
+      const emailKey = repository.constructCookieLabelKey(Maybe.just('test@example.com'), ClientType.PERMANENT);
+
+      expect(emailKey).not.toBe(repository.constructCookieLabelKey(Maybe.nothing(), ClientType.PERMANENT));
+    });
   });
 
   describe('getClientsByUserIds', () => {

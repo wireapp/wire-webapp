@@ -17,7 +17,7 @@
  *
  */
 
-import {MentionEntity} from 'src/script/message/mentionEntity';
+import {MentionEntity} from '../../../../message/mentionEntity';
 
 export interface MessageContent {
   text: string;

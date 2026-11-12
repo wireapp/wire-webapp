@@ -17,18 +17,22 @@
  *
  */
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {QuoteEntity} from 'src/script/message/quoteEntity';
-import {createMessageAddEvent, createMultipartMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
-import {createUuid} from 'Util/uuid';
+import {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
+import {QuoteEntity} from '../../../message/quoteEntity';
+import {
+  createMessageAddEvent,
+  createMultipartMessageAddEvent,
+  toSavedEvent,
+} from '../../../../../test/helper/EventGenerator';
+import {createUuid} from '../../../util/uuid';
 
 import {RepliesUpdaterMiddleware} from './RepliesUpdaterMiddleware';
 
 import {ClientEvent} from '../Client';
 import {EventService} from '../EventService';
-import {translateForTest} from 'Util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 function buildRepliesUpdaterMiddleware(): readonly [
   RepliesUpdaterMiddleware,

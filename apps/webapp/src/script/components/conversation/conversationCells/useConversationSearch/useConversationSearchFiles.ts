@@ -21,15 +21,14 @@ import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyStringAndNotWhitespace} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {useDebouncedCallback} from 'use-debounce';
-
-import {transformCellsNodes} from 'Components/cells/common/transformCellsNodes/transformCellsNodes';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
 
 import {createRequestVersionGate} from './requestVersionGate';
 
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {UserRepository} from '../../../../repositories/user/userRepository';
+import {transformCellsNodes} from '../../../cells/common/transformCellsNodes/transformCellsNodes';
 import {
   ConversationDriveFiltersState,
   hasActiveSearchParams,

@@ -1,4 +1,4 @@
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {getSharedDrivePermissionHint} from './utils';
 

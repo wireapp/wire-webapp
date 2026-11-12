@@ -20,58 +20,57 @@
 import type {Clock, TimeoutIdentifier} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {result} from 'true-myth';
 import {match} from 'ts-pattern';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AudioRepository} from 'Repositories/audio/audioRepository';
-import {AudioType} from 'Repositories/audio/audioType';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
-import type {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isMeetingConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {CallMessage} from 'Repositories/entity/message/callMessage';
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {DeleteConversationMessage} from 'Repositories/entity/message/deleteConversationMessage';
-import type {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import type {Message} from 'Repositories/entity/message/message';
-import type {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
-import type {RenameMessage} from 'Repositories/entity/message/renameMessage';
-import type {SystemMessage} from 'Repositories/entity/message/systemMessage';
-import type {User} from 'Repositories/entity/User';
-import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
-import {getPermissionState, setPermissionState} from 'Repositories/permission/permissionHandlers';
-import {normalizePermissionState} from 'Repositories/permission/Permissions.types';
-import {PermissionType} from 'Repositories/permission/PermissionType';
-import {UserState} from 'Repositories/user/userState';
-import {Declension, getUserName, type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {getRenderedTextContent} from 'Util/messageRenderer';
-import {truncate} from 'Util/stringUtil';
-import {formatDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
-import {ValidationUtilError} from 'Util/validationUtil';
 
 import {AppPermissionState} from './AppPermissionState';
 
+import {NotificationPreference, WebappProperties} from '../../apiClient/user/data/userPropertiesSetData';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {Runtime} from '../../commons/util/Runtime';
 import {SuperType} from '../../message/superType';
 import {SystemMessageType} from '../../message/systemMessageType';
 import type {SystemNotificationApi, SystemNotificationHandle} from '../../notification/systemNotificationTypes';
 import {ContentState, useAppState} from '../../page/useAppState';
+import {Declension, getUserName, type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {getRenderedTextContent} from '../../util/messageRenderer';
+import {truncate} from '../../util/stringUtil';
+import {formatDuration, TIME_IN_MILLIS} from '../../util/timeUtil';
+import {ValidationUtilError} from '../../util/validationUtil';
 import {Warnings} from '../../view_model/WarningsContainer';
+import {WebAppEvents} from '../../webAppEvents';
+import {AssetRepository} from '../assets/assetRepository';
+import {AudioRepository} from '../audio/audioRepository';
+import {AudioType} from '../audio/audioType';
+import {CallingRepository} from '../calling/CallingRepository';
+import {CallingViewMode, CallState} from '../calling/CallState';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
+import type {ConnectionEntity} from '../connection/connectionEntity';
+import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {isMeetingConversation} from '../conversation/ConversationSelectors';
+import {ConversationState} from '../conversation/ConversationState';
+import type {Conversation} from '../entity/Conversation';
+import type {CallMessage} from '../entity/message/callMessage';
+import type {ContentMessage} from '../entity/message/contentMessage';
+import type {DeleteConversationMessage} from '../entity/message/deleteConversationMessage';
+import type {MemberMessage} from '../entity/message/memberMessage';
+import type {Message} from '../entity/message/message';
+import type {MessageTimerUpdateMessage} from '../entity/message/messageTimerUpdateMessage';
+import type {RenameMessage} from '../entity/message/renameMessage';
+import type {SystemMessage} from '../entity/message/systemMessage';
+import type {User} from '../entity/User';
+import {BrowserPermissionStatus} from '../permission/BrowserPermissionStatus';
+import {getPermissionState, setPermissionState} from '../permission/permissionHandlers';
+import {normalizePermissionState} from '../permission/Permissions.types';
+import {PermissionType} from '../permission/PermissionType';
+import {UserState} from '../user/userState';
 
 const notificationTimeoutInSeconds = 5;
 
@@ -862,7 +861,7 @@ export class NotificationRepository {
     const closeAttempt = handle.close();
 
     if (result.isErr(closeAttempt)) {
-      this.logger.error(failureMessage, closeAttempt.error);
+      this.logger.error(failureMessage, {error: closeAttempt.error});
       return;
     }
 
@@ -1016,7 +1015,7 @@ export class NotificationRepository {
     });
 
     if (result.isErr(notificationResult)) {
-      this.logger.error(`Failed to present notification for ${messageInfo}.`, notificationResult.error);
+      this.logger.error(`Failed to present notification for ${messageInfo}.`, {error: notificationResult.error});
       return;
     }
 

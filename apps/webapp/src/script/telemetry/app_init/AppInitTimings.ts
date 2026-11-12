@@ -20,10 +20,10 @@
 import type {Clock} from '@enormora/clock/clock';
 import {Maybe} from 'true-myth';
 
-import {Logger, getLogger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
 import {AppInitTimingsStep} from './AppInitTimingsStep';
+
+import {Logger, getLogger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 type AppTimings = Partial<Record<AppInitTimingsStep, number>>;
 type AppInitTimingsConfig = {BUCKET_SIZE: number; LOG_LENGTH_KEY: number; LOG_LENGTH_VALUE: number};
@@ -66,7 +66,7 @@ export class AppInitTimings {
   }
 
   log(): void {
-    this.logger.debug('App initialization step durations', this.timings);
+    this.logger.debug('App initialization step durations', {timings: this.timings});
   }
 
   timeStep(step: AppInitTimingsStep): void {

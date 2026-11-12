@@ -19,11 +19,10 @@
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {ClientEvent} from 'Repositories/event/Client';
-import {EventRecord} from 'Repositories/storage';
-import {MessageCategory} from 'src/script/message/messageCategory';
-
 import {CPBLogger} from '..';
+import {MessageCategory} from '../../../../message/messageCategory';
+import {ClientEvent} from '../../../event/Client';
+import {EventRecord} from '../../../storage';
 import {BackupMessageContent, BackupMessage} from '../CPB.library';
 
 // Type definition for common message fields
@@ -215,6 +214,6 @@ export const mapEventRecord = (message: BackupMessage): EventRecord | undefined 
     return mapTextMessageToEventRecord(message as TextBackupMessage);
   }
 
-  CPBLogger.error('Unknown message type', message);
+  CPBLogger.error('Unknown message type', {message});
   return undefined;
 };

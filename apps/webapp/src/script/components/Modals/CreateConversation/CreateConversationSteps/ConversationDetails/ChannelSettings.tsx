@@ -19,19 +19,18 @@
 
 import type {FunctionComponent} from 'react';
 
-import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
-
-import {Muted, Option, Select} from '@wireapp/react-ui-kit';
-
-import {RadioGroup} from 'Components/Radio';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {channelSettingsTextCss} from './ConversationDetails.styles';
 import {CustomHistorySharingOption} from './CustomHistorySharingOption';
 
+import {ADD_PERMISSION} from '../../../../../apiClient/conversation/conversation';
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {TeamState} from '../../../../../repositories/team/TeamState';
+import {Option, Select} from '../../../../../uiKit/inputs/select/select';
+import {Muted} from '../../../../../uiKit/typography/text/text';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
+import {RadioGroup} from '../../../../Radio';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory, ConversationAccess} from '../../types';
 import {getConversationAccessOptions, getChatHistoryOptions, getConversationManagerOptions} from '../../utils';

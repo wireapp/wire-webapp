@@ -17,7 +17,7 @@
  *
  */
 
-import type {BuildMetadata} from '@wireapp/config';
+import type {BuildMetadata} from '../../apps/server/configuration/buildMetadata.ts';
 
 const buildMetadataPropertyNames = ['version', 'assetVersion', 'commit', 'builtAt'] as const;
 const runtimeConfigurationPropertyNames = ['BACKEND_REST', 'BACKEND_WS'] as const;

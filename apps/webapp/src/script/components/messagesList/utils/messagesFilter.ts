@@ -18,14 +18,13 @@
  */
 
 import {isNonEmptyArray} from '@sindresorhus/is';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {Message as MessageEntity} from 'Repositories/entity/message/message';
-import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateMessage';
-import {SystemMessage} from 'Repositories/entity/message/systemMessage';
-import {ClientEvent} from 'Repositories/event/Client';
-
+import {CONVERSATION_EVENT} from '../../../apiClient/event/conversationEvent';
 import {isMemberMessage} from '../../../guards/Message';
+import {Message as MessageEntity} from '../../../repositories/entity/message/message';
+import {ProtocolUpdateMessage} from '../../../repositories/entity/message/protocolUpdateMessage';
+import {SystemMessage} from '../../../repositories/entity/message/systemMessage';
+import {ClientEvent} from '../../../repositories/event/Client';
 
 /**
  * Filters out duplicated system messages.

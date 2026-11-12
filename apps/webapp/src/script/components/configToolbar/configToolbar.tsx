@@ -25,19 +25,21 @@ import keyboardjs from 'keyboardjs';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
-import {Button, Input, Switch} from '@wireapp/react-ui-kit';
-
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Config, Configuration} from 'src/script/Config';
-import {StartupFeatureToggleName, startupFeatureToggleNames} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {updateLocationSearchForStartupFeatureToggle} from 'src/script/featureToggles/startupFeatureToggleQueryParameters';
-import {useClickOutside} from 'src/script/hooks/useClickOutside';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CoreCryptoLogLevel} from 'Util/debugUtil';
-import {getLogger} from 'Util/logger';
-
+import {CallLogsUploadSettings} from './callLogsUploadSettings';
 import {wrapperStyles} from './configToolbar.styles';
 import {openDebugToolbarEventName} from './debugToolbarEvents';
+
+import {Config, Configuration} from '../../Config';
+import {StartupFeatureToggleName, startupFeatureToggleNames} from '../../featureToggles/startupFeatureToggleNames';
+import {updateLocationSearchForStartupFeatureToggle} from '../../featureToggles/startupFeatureToggleQueryParameters';
+import {useClickOutside} from '../../hooks/useClickOutside';
+import {useApplicationContext} from '../../page/rootProvider';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Input} from '../../uiKit/inputs/input/input';
+import {Switch} from '../../uiKit/inputs/switch/switch';
+import {CoreCryptoLogLevel} from '../../util/debugUtil';
+import {getLogger} from '../../util/logger';
 
 const timeComponentDigitCount = 2;
 
@@ -157,7 +159,7 @@ export function ConfigToolbar(): JSX.Element | null {
         });
         messageCountRef.current++;
       } catch (error: unknown) {
-        logger.error('Error sending message:', error);
+        logger.error('Error sending message:', {error});
       }
 
       if (isActive) {
@@ -442,7 +444,7 @@ export function ConfigToolbar(): JSX.Element | null {
     try {
       await window.wire?.app?.debug?.resetMLSConversation();
     } catch (error: unknown) {
-      logger.error('Error resetting MLS conversation:', error);
+      logger.error('Error resetting MLS conversation:', {error});
     } finally {
       setIsResettingMLSConversation(false);
     }
@@ -453,7 +455,7 @@ export function ConfigToolbar(): JSX.Element | null {
     try {
       await window.wire?.app?.debug?.updateActiveConversationKeyPackages();
     } catch (error: unknown) {
-      logger.error('Error advancing epoch:', error);
+      logger.error('Error advancing epoch:', {error});
     } finally {
       setIsAdvancingEpoch(false);
     }
@@ -479,7 +481,7 @@ export function ConfigToolbar(): JSX.Element | null {
 
       await window.wire?.app?.debug?.downloadNotificationsDump(from, to);
     } catch (error: unknown) {
-      logger.error('Error downloading notifications dump:', error);
+      logger.error('Error downloading notifications dump:', {error});
     } finally {
       setIsDownloadingNotifications(false);
     }
@@ -630,6 +632,10 @@ export function ConfigToolbar(): JSX.Element | null {
       <hr />
 
       <div>{renderStartupFeatureToggleCheckboxList()}</div>
+
+      <hr />
+
+      <CallLogsUploadSettings />
 
       <hr />
 

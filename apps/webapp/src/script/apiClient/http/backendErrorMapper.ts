@@ -1,0 +1,301 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {StatusCodes as StatusCode} from 'http-status-codes';
+import {z} from 'zod';
+
+import {getLogger} from '../../commons/getLogger';
+import {
+  IdentifierExistsError,
+  InvalidCredentialsError,
+  LoginTooFrequentError,
+  SuspendedAccountError,
+  InvalidTokenError,
+  MissingCookieAndTokenError,
+  MissingCookieError,
+  TokenExpiredError,
+} from '../auth/';
+import {
+  ConversationIsUnknownError,
+  ConversationOperationError,
+  MLSGroupOutOfSyncError,
+  MLSInvalidLeafNodeIndexError,
+  MLSInvalidLeafNodeSignatureError,
+  MLSStaleMessageError,
+} from '../conversation/';
+import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/teamError';
+import {QualifiedId, QualifiedIdSchema, UnconnectedUserError, UserIsUnknownError} from '../user/';
+
+import {BackendError, BackendErrorLabel} from './';
+
+type BackendErrorWithLabel = BackendError & {label: BackendErrorLabel};
+type ErrorBuilder = (e: BackendErrorWithLabel) => BackendError;
+
+// A mapper builds the appropriate error instance from the backend error payload.
+type ErrorLabelToBuilderMap = Partial<Record<BackendErrorLabel, ErrorBuilder>>;
+
+type StatusCodeToLabelMap = Partial<Record<StatusCode, ErrorLabelToBuilderMap>>;
+type MessageToBuilderMap = Record<string, ErrorBuilder>;
+type StatusCodeToMessageVariantMap = Partial<
+  Record<StatusCode, Partial<Record<BackendErrorLabel, MessageToBuilderMap>>>
+>;
+
+const logger = getLogger('@wireapp/api-client/http/BackendErrorMapper');
+
+// BAD_REQUEST / CLIENT_ERROR
+const MESSAGE_BAD_REQUEST_SATISFY = 'Error in $: Failed reading: satisfy';
+const MESSAGE_INVALID_CONVERSATION_UUID = "[path] 'cnv' invalid: Failed reading: Invalid UUID";
+const MESSAGE_INVALID_USER_UUID = "[path] 'usr' invalid: Failed reading: Invalid UUID";
+// FORBIDDEN / INVALID_CREDENTIALS and related variants
+const MESSAGE_INVALID_ZAUTH_TOKEN = 'Invalid zauth token';
+const MESSAGE_INVALID_TOKEN = 'Invalid token';
+const MESSAGE_AUTHENTICATION_FAILED = 'Authentication failed.';
+const MESSAGE_MISSING_COOKIE = 'Missing cookie';
+const MESSAGE_TOKEN_EXPIRED = 'Token expired';
+const MESSAGE_MISSING_COOKIE_AND_TOKEN = 'Missing cookie and token';
+// FORBIDDEN / INVALID_OPERATION
+const MESSAGE_INVALID_OPERATION_FOR_ONE_TO_ONE = 'invalid operation for 1:1 conversations';
+// FORBIDDEN / CLIENT_ERROR variant
+const MESSAGE_FAILED_READING_INVALID_ZAUTH_TOKEN = 'Failed reading: Invalid zauth token';
+
+// Consolidated token-invalid messages to reduce duplication across variants.
+const INVALID_TOKEN_MESSAGES = new Set<string>([
+  MESSAGE_INVALID_ZAUTH_TOKEN,
+  MESSAGE_INVALID_TOKEN,
+  MESSAGE_FAILED_READING_INVALID_ZAUTH_TOKEN,
+]);
+
+/**
+ * Baseline/default handler for each (code, label). Used when no message variant matches.
+ */
+const defaultHandlers: StatusCodeToLabelMap = {
+  [StatusCode.BAD_REQUEST]: {
+    [BackendErrorLabel.CLIENT_ERROR]: backendError => {
+      return new BackendError('Wrong set of parameters.', backendError.label, backendError.code);
+    },
+
+    [BackendErrorLabel.INVALID_INVITATION_CODE]: backendError => {
+      return new InvalidInvitationCodeError('Invalid invitation code.', backendError.label, backendError.code);
+    },
+    [BackendErrorLabel.MLS_INVALID_LEAF_NODE_SIGNATURE]: backendError => {
+      return new MLSInvalidLeafNodeSignatureError('Invalid leaf node signature', backendError.label, backendError.code);
+    },
+
+    [BackendErrorLabel.MLS_INVALID_LEAF_NODE_INDEX]: backendError => {
+      return new MLSInvalidLeafNodeIndexError('Invalid leaf node index', backendError.label, backendError.code);
+    },
+  },
+
+  [StatusCode.FORBIDDEN]: {
+    [BackendErrorLabel.INVALID_CREDENTIALS]: backendError =>
+      // default to logout-safe type for unknown messages
+      {
+        return new InvalidTokenError(
+          'Authentication failed because the token is invalid.',
+          backendError.label,
+          backendError.code,
+        );
+      },
+
+    [BackendErrorLabel.CLIENT_ERROR]: backendError => {
+      return new BackendError('Operation not permitted.', backendError.label, backendError.code);
+    },
+
+    [BackendErrorLabel.NOT_CONNECTED]: backendError => {
+      return new UnconnectedUserError('Users are not connected.', backendError.label, backendError.code);
+    },
+
+    [BackendErrorLabel.INVALID_OPERATION]: backendError => {
+      return new ConversationOperationError('Cannot perform this operation.', backendError.label, backendError.code);
+    },
+
+    [BackendErrorLabel.SUSPENDED_ACCOUNT]: backendError => {
+      return new SuspendedAccountError('Account suspended.', backendError.label, backendError.code);
+    },
+  },
+
+  [StatusCode.TOO_MANY_REQUESTS]: {
+    [BackendErrorLabel.CLIENT_ERROR]: backendError => {
+      return new LoginTooFrequentError(
+        'Logins too frequent. User login temporarily disabled.',
+        backendError.label,
+        backendError.code,
+      );
+    },
+  },
+
+  [StatusCode.CONFLICT]: {
+    [BackendErrorLabel.INVITE_EMAIL_EXISTS]: backendError => {
+      return new InviteEmailInUseError('The given e-mail address is in use.', backendError.label, backendError.code);
+    },
+
+    [BackendErrorLabel.KEY_EXISTS]: backendError => {
+      return new IdentifierExistsError('The given e-mail address is in use.', backendError.label, backendError.code);
+    },
+    [BackendErrorLabel.MLS_STALE_MESSAGE]: backendError => {
+      return new MLSStaleMessageError(
+        'The conversation epoch in a message is too old',
+        backendError.label,
+        backendError.code,
+      );
+    },
+    [BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC]: error => {
+      const missingUsers = getMlsGroupOutOfSyncMissingUsers(error);
+      if (missingUsers !== undefined) {
+        return new MLSGroupOutOfSyncError(error.code, missingUsers, error.message, error.label, error.data);
+      }
+
+      logger.warn(
+        'Failed to detect missing_users field in MLSGroupOutOfSyncError, using empty array for missing_users',
+        {error},
+      );
+      return new MLSGroupOutOfSyncError(error.code, [], error.message, error.label, error.data);
+    },
+  },
+  [StatusCode.NOT_FOUND]: {
+    [BackendErrorLabel.NOT_FOUND]: backendError => {
+      return new ServiceNotFoundError('Service not found', backendError.label, backendError.code);
+    },
+  },
+};
+
+/**
+ * Message-specific variants for known texts under a given (code,label).
+ * Provides finer granularity when wording matches; otherwise we fall back to defaultHandlers.
+ */
+const messageVariantHandlers: StatusCodeToMessageVariantMap = {
+  [StatusCode.BAD_REQUEST]: {
+    [BackendErrorLabel.CLIENT_ERROR]: {
+      [MESSAGE_BAD_REQUEST_SATISFY]: backendError => {
+        return new BackendError('Wrong set of parameters.', backendError.label, backendError.code);
+      },
+      [MESSAGE_INVALID_CONVERSATION_UUID]: backendError => {
+        return new ConversationIsUnknownError('Conversation ID is unknown.', backendError.label, backendError.code);
+      },
+      [MESSAGE_INVALID_USER_UUID]: backendError => {
+        return new UserIsUnknownError('User ID is unknown.', backendError.label, backendError.code);
+      },
+    },
+  },
+  [StatusCode.FORBIDDEN]: {
+    [BackendErrorLabel.INVALID_CREDENTIALS]: {
+      [MESSAGE_INVALID_ZAUTH_TOKEN]: backendError => {
+        return new InvalidTokenError(
+          'Authentication failed because the token is invalid.',
+          backendError.label,
+          backendError.code,
+        );
+      },
+      [MESSAGE_INVALID_TOKEN]: backendError => {
+        return new InvalidTokenError(
+          'Authentication failed because the token is invalid.',
+          backendError.label,
+          backendError.code,
+        );
+      },
+      [MESSAGE_AUTHENTICATION_FAILED]: backendError => {
+        return new InvalidCredentialsError(
+          'Authentication failed because of invalid credentials.',
+          backendError.label,
+          backendError.code,
+        );
+      },
+      [MESSAGE_MISSING_COOKIE]: backendError => {
+        return new MissingCookieError(
+          'Authentication failed because the cookie is missing.',
+          backendError.label,
+          backendError.code,
+        );
+      },
+      [MESSAGE_TOKEN_EXPIRED]: backendError => {
+        return new TokenExpiredError(
+          'Authentication failed because the token is expired.',
+          backendError.label,
+          backendError.code,
+        );
+      },
+      [MESSAGE_MISSING_COOKIE_AND_TOKEN]: backendError => {
+        return new MissingCookieAndTokenError(
+          'Authentication failed because both cookie and token are missing.',
+          backendError.label,
+          backendError.code,
+        );
+      },
+    },
+    [BackendErrorLabel.INVALID_OPERATION]: {
+      [MESSAGE_INVALID_OPERATION_FOR_ONE_TO_ONE]: backendError => {
+        return new ConversationOperationError('Cannot leave 1:1 conversation.', backendError.label, backendError.code);
+      },
+    },
+    [BackendErrorLabel.CLIENT_ERROR]: {
+      [MESSAGE_FAILED_READING_INVALID_ZAUTH_TOKEN]: backendError => {
+        return new InvalidTokenError(
+          'Authentication failed because the token is invalid.',
+          backendError.label,
+          backendError.code,
+        );
+      },
+    },
+  },
+};
+
+function getMlsGroupOutOfSyncMissingUsers(error: BackendError): QualifiedId[] | undefined {
+  const missingUsers = z.array(QualifiedIdSchema).safeParse(error.data?.missing_users);
+  return missingUsers.success ? missingUsers.data : undefined;
+}
+
+/**
+ * Map a BackendError to a more specific error instance based on its code, label, and message.
+ */
+export function mapBackendError(error: BackendError): BackendError {
+  const code = Number(error.code) as StatusCode;
+  const label = error.label as BackendErrorLabel;
+  const message = (error.message ?? '').trim();
+  const backendErrorWithLabel = {...error, label, message};
+
+  // Consolidated handling for common "invalid token" variants
+  if (code === StatusCode.FORBIDDEN) {
+    if (
+      (label === BackendErrorLabel.INVALID_CREDENTIALS || label === BackendErrorLabel.CLIENT_ERROR) &&
+      INVALID_TOKEN_MESSAGES.has(message)
+    ) {
+      return new InvalidTokenError('Authentication failed because the token is invalid.', label, code);
+    }
+  }
+
+  // 1) Message-specific variant
+  const messageVariantHandler = messageVariantHandlers[code]?.[label]?.[message];
+  if (messageVariantHandler !== undefined) {
+    const mapped = messageVariantHandler(backendErrorWithLabel);
+    logger.info('Mapped backend error with message variant', {error, mapped});
+    return mapped;
+  }
+
+  // 2) Default fallback for this (code,label)
+  const fallbackHandler = defaultHandlers[code]?.[label];
+  if (fallbackHandler !== undefined) {
+    const mapped = fallbackHandler(backendErrorWithLabel);
+    logger.info('Mapped backend error with default handler', {error, mapped});
+    return mapped;
+  }
+
+  // 3) Unknown (code,label) — keep original but log in dev
+  logger.warn('Failed to map backend error; returning original', {error});
+  return error;
+}

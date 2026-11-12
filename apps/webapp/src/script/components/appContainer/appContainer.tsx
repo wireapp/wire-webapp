@@ -21,44 +21,44 @@ import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
 import ky from 'ky';
 import {container} from 'tsyringe';
-
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {MeetingStoreRoot} from 'Components/meeting/meetingStore/meetingStoreRoot';
-import {LeaveGroupAdminModal} from 'Components/Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
-import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
-import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
-import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
-import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
-import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import type {Translate} from 'Util/localizerUtil';
 
 import {getOtherInstanceAction} from './getOtherInstanceAction';
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
+import {ClientType} from '../../apiClient/client/clientType';
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {Config, Configuration} from '../../Config';
+import {markAsUnreadFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
+import {useAppSoftLock} from '../../hooks/useAppSoftLock';
+import {useSingleInstance} from '../../hooks/useSingleInstance';
+import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import type {FetchLatestBuildMetadata} from '../../lifecycle/newVersionHandler';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
 import type {ApplicationObservability} from '../../observability/applicationObservability';
 import {AppMain} from '../../page/appMain';
 import {RootProvider} from '../../page/rootProvider';
+import {PROPERTIES_TYPE} from '../../repositories/properties/propertiesType';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
+import {THEME_ID} from '../../uiKit/identity/theme/theme';
+import {StyledApp} from '../../uiKit/layout/styledApp/styledApp';
+import type {Translate} from '../../util/localizerUtil';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
+import {WebAppEvents} from '../../webAppEvents';
 import {AppLoader} from '../appLoader/index';
+import {MeetingStoreRoot} from '../meeting/meetingStore/meetingStoreRoot';
+import {LeaveGroupAdminModal} from '../Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
+import {PrimaryModalComponent} from '../Modals/PrimaryModal/PrimaryModal';
+import {QualityFeedbackModal} from '../Modals/QualityFeedbackModal';
 
 type AppProps = {
   readonly config: Configuration;
@@ -89,6 +89,7 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
     translate,
   } = properties;
   setAppLocale();
+  const isMarkAsUnreadFeatureEnabled = isFeatureToggleEnabled(markAsUnreadFeatureToggleName);
   const app = useMemo(() => {
     return new App(
       container.resolve(Core),
@@ -97,8 +98,9 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
       translate,
       clock,
       fireAndForgetInvoker,
+      {isMarkAsUnreadFeatureEnabled},
     );
-  }, [config, fireAndForgetInvoker, translate, clock]);
+  }, [config, fireAndForgetInvoker, translate, clock, isMarkAsUnreadFeatureEnabled]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
@@ -227,6 +229,7 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
                 locked={softLockEnabled}
                 fireAndForgetInvoker={fireAndForgetInvoker}
                 clock={clock}
+                isFeatureToggleEnabled={isFeatureToggleEnabled}
               />
             </MeetingStoreRoot>
           );

@@ -22,7 +22,7 @@ import assert from 'node:assert';
 import {validateRecoveryBuildArtifactMetadata} from './recoveryBuildArtifactMetadata';
 import {formatRecoverableBuildArtifactMetadataOutputs} from './recoveryBuildArtifactMetadataOutput';
 import type {BuildArtifactHtmlDocument} from './buildArtifactMetadata';
-import type {BuildMetadata} from '@wireapp/config';
+import type {BuildMetadata} from '../../apps/server/configuration/buildMetadata.ts';
 
 const releaseBuildMetadata: BuildMetadata = {
   version: '2026-07-20.1',

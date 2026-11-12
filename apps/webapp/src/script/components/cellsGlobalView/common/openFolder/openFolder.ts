@@ -19,11 +19,10 @@
 
 import {MouseEvent as ReactMouseEvent} from 'react';
 
-import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
-
-import {useSidebarStore, SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate} from 'src/script/router/routerBindings';
+import {parseQualifiedId} from '../../../../core/util/qualifiedIdUtil';
+import {useSidebarStore, SidebarTabs} from '../../../../page/leftSidebar/panels/conversations/useSidebarStore';
+import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {createNavigate} from '../../../../router/routerBindings';
 
 export const openFolder = ({path, event}: {path: string; event?: ReactMouseEvent<HTMLButtonElement>}): void => {
   const [idWithDomain, ...filePathParts] = path.split('/');

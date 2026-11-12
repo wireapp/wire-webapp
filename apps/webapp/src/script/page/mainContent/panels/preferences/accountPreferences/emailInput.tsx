@@ -21,13 +21,13 @@ import type {FunctionComponent} from 'react';
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-import {isErrorWithCode} from 'Util/typePredicateUtil';
-
 import {AccountInput, useInputDone} from './accountInput';
+
+import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
+import {UserRepository} from '../../../../../repositories/user/userRepository';
+import {getLogger} from '../../../../../util/logger';
+import {isErrorWithCode} from '../../../../../util/typePredicateUtil';
+import {useApplicationContext} from '../../../../rootProvider';
 
 interface EmailInputProps {
   canEditProfile: boolean;
@@ -60,7 +60,7 @@ const EmailInput: FunctionComponent<EmailInputProps> = ({email, canEditProfile, 
       emailInputDone.done();
       showWarning(translate('modalPreferencesAccountEmailHeadline'), translate('authPostedResendDetail'));
     } catch (error: unknown) {
-      logger.warn('Failed to send reset email request', error);
+      logger.warn('Failed to send reset email request', {error});
       if (isErrorWithCode(error) && error.code === HTTP_STATUS.BAD_REQUEST) {
         showWarning(
           translate('modalPreferencesAccountEmailErrorHeadline'),

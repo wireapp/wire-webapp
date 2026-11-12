@@ -18,18 +18,17 @@
  */
 
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import {noop} from 'noop-esm';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {getLogger, Logger} from 'Util/logger';
-
 import {AudioPlayingType} from './audioPlayingType';
 import {AudioType} from './audioType';
+
+import {AudioPreference, WebappProperties} from '../../apiClient/user/data/userPropertiesSetData';
+import {getLogger, Logger} from '../../util/logger';
+import {WebAppEvents} from '../../webAppEvents';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {mediaDevicesStore} from '../media/useMediaDevicesStore';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Playback outcomes define their existing numeric values inline. */
 enum AUDIO_PLAY_PERMISSION {
@@ -86,7 +85,7 @@ export class AudioRepository {
     }
     Object.values(this.audioElements).forEach(element => {
       element.setSinkId?.(currentOutputDevice).catch((error: unknown) => {
-        this.logger.warn(error);
+        this.logger.warn('Failed to set audio output device', {error, currentOutputDevice});
       });
     });
   }
@@ -156,7 +155,7 @@ export class AudioRepository {
       case AUDIO_PLAY_PERMISSION.ALLOWED:
         try {
           await this.playAudio(audioElement, playInLoop);
-          this.logger.log(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
+          this.logger.info(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
         } catch (error: unknown) {
           if (error instanceof Error) {
             this.logger.error(`Failed to play sound '${audioId}': ${error.message}`);
@@ -196,7 +195,7 @@ export class AudioRepository {
     const audioElement = this.getSoundById(audioId);
     if (!audioElement?.paused) {
       // This log is used by QA
-      this.logger.log(`Stopping sound '${audioId}'`);
+      this.logger.info(`Stopping sound '${audioId}'`);
       audioElement.pause();
       audioElement.load();
     }

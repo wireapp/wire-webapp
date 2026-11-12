@@ -21,11 +21,11 @@ import React, {type FunctionComponent} from 'react';
 
 import {FormattedMessage} from 'react-intl';
 
-import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {H2} from '../../uiKit/typography/heading/heading';
+import {Text} from '../../uiKit/typography/text/text';
 import {WirelessContainer} from '../component/wirelessContainer';
 
 type Props = React.HTMLProps<HTMLDivElement>;

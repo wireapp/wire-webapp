@@ -21,22 +21,20 @@ import {useState, useRef, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {User} from 'Repositories/entity/User';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {getLogger} from 'Util/logger';
-import {isErrorWithType} from 'Util/typePredicateUtil';
-import {formatBytes, validateProfileImageResolution} from 'Util/util';
-
 import {FileInput} from './fileInput';
 
+import {Avatar, AVATAR_SIZE} from '../../../../../components/avatar';
+import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {Config} from '../../../../../Config';
 import {UserError} from '../../../../../error/userError';
+import {User} from '../../../../../repositories/entity/User';
+import {UserRepository} from '../../../../../repositories/user/userRepository';
+import {TabIndex} from '../../../../../uiKit/utils/enums';
+import {handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
+import {getLogger} from '../../../../../util/logger';
+import {isErrorWithType} from '../../../../../util/typePredicateUtil';
+import {formatBytes, validateProfileImageResolution} from '../../../../../util/util';
+import {useApplicationContext} from '../../../../rootProvider';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;
@@ -101,7 +99,7 @@ export const AvatarInput: FunctionComponent<AvatarInputProps> = ({
       const titleString = translate('modalPictureTooSmallHeadline');
       return await showUploadWarning(titleString, messageString);
     } catch (error: unknown) {
-      logger.error('Failed to validate profile image', error);
+      logger.error('Failed to validate profile image', {error});
       return false;
     } finally {
       setIsUploading(false);

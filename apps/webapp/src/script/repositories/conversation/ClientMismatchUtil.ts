@@ -18,14 +18,16 @@
  */
 
 import {isNonEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
-import type {MessageSendingStatus, QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClientsUtil';
-import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {difference, intersection} from 'underscore';
 
-import {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import type {MessageSendingStatus} from '../../apiClient/conversation/messageSendingStatus';
+import type {QualifiedUserClients} from '../../apiClient/conversation/qualifiedUserClients';
+import type {UserClients} from '../../apiClient/conversation/userClients';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {flattenUserMap} from '../../core/conversation/message/userClientsUtil';
+import {isQualifiedUserClients} from '../../core/util';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {User} from '../entity/User';
 
 type UserClient = {clients: string[]; userId: QualifiedId};
 

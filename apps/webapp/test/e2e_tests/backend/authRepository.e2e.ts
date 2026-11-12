@@ -17,7 +17,7 @@
  *
  */
 
-import {User as AuthUser} from '@wireapp/api-client/lib/user';
+import {User as AuthUser} from '../../../src/script/apiClient/user/user';
 import {AxiosResponse} from 'axios';
 
 import {BackendClientE2E} from './backendClient.e2e';

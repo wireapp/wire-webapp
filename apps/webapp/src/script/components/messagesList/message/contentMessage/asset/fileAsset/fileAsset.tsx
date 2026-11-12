@@ -17,22 +17,25 @@
  *
  */
 
-import type {FunctionComponent} from 'react';
+import {useCallback, type FunctionComponent} from 'react';
 
 import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {RestrictedFile} from 'Components/messagesList/message/contentMessage/asset/fileAsset/restrictedFile/restrictedFile';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
+import {PdfAssetPreview} from './pdfAssetPreview';
+import {RestrictedFile} from './restrictedFile/restrictedFile';
 
+import {e2ePdfPreviewFeatureToggleName} from '../../../../../../featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from '../../../../../../page/rootProvider';
+import type {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
+import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
+import type {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
+import type {FileAsset as FileAssetType} from '../../../../../../repositories/entity/message/fileAsset';
+import {TeamState} from '../../../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';
+import {formatBytes, getFileExtension, trimFileExtension} from '../../../../../../util/util';
 import {useMessageFocusedTabIndex} from '../../../util';
 import {AssetHeader} from '../common/assetHeader/assetHeader';
 import {AssetLoader} from '../common/assetLoader/assetLoader';
@@ -54,11 +57,20 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   isFocusable = true,
 }: FileAssetProps) => {
   const asset = message.getFirstAsset() as FileAssetType;
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled, mainViewModel} = useApplicationContext();
+  const loadPdfPreview = useCallback(
+    (resource: AssetRemoteData) => {
+      return mainViewModel.content.repositories.asset.load(resource);
+    },
+    [mainViewModel],
+  );
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
-  const {downloadProgress} = useKoSubscribableChildren(asset, ['downloadProgress']);
+  const {downloadProgress, preview_resource: previewResource} = useKoSubscribableChildren(asset, [
+    'downloadProgress',
+    'preview_resource',
+  ]);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
@@ -66,6 +78,10 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   const fileName = trimFileExtension(assetFileName);
   const fileExtension = getFileExtension(assetFileName);
   const formattedFileSize = formatBytes(asset.file_size);
+  const hasPdfPreview =
+    isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName) &&
+    asset.file_type === 'application/pdf' &&
+    previewResource !== undefined;
 
   // This is a hack since we don't have a FileAsset available before it's
   // uploaded completely we have to check if there is upload progress to
@@ -97,7 +113,12 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   }
 
   return (
-    <div className="file-asset" data-uie-name="file-asset" data-uie-value={asset.file_name}>
+    <div
+      className="file-asset"
+      data-uie-name="file-asset"
+      data-uie-value={asset.file_name}
+      css={hasPdfPreview ? {maxWidth: '500px', alignSelf: 'flex-start'} : undefined}
+    >
       {hasHeader && <AssetHeader message={message} />}
 
       {isFileSharingReceivingEnabled ? (
@@ -178,6 +199,16 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
         </div>
       ) : (
         <RestrictedFile asset={asset} />
+      )}
+      {isFileSharingReceivingEnabled && isUploadedOrCancelled && hasPdfPreview && (
+        <PdfAssetPreview
+          key={previewResource.identifier}
+          resource={previewResource}
+          loadAsset={loadPdfPreview}
+          label={`${translate('conversationContextMenuDownload')} ${assetFileName}`}
+          tabIndex={messageFocusedTabIndex}
+          onDownload={onDownloadAsset}
+        />
       )}
     </div>
   );

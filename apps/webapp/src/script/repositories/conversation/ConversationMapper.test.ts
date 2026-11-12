@@ -26,22 +26,22 @@ import {
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   GROUP_CONVERSATION_TYPE,
-  Member as MemberBackendData,
-  OtherMember as OtherMemberBackendData,
-  DefaultConversationRoleName,
-  RemoteConversations,
-} from '@wireapp/api-client/lib/conversation/';
+} from '../../apiClient/conversation/conversation';
+import {Member as MemberBackendData} from '../../apiClient/conversation/member';
+import {OtherMember as OtherMemberBackendData} from '../../apiClient/conversation/otherMember';
+import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
+import {RemoteConversations} from '../../apiClient/conversation/remoteConversations';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {RECEIPT_MODE} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import ko from 'knockout';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {BaseError} from 'src/script/error/baseError';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {Conversation} from '../entity/Conversation';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {BaseError} from '../../error/baseError';
+import {translate} from '../../util/localizerUtil';
+import {createUuid} from '../../util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationDatabaseData, ConversationMapper, SelfStatusUpdateDatabaseData} from './ConversationMapper';
@@ -51,7 +51,7 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {entities, payload} from '../../../../test/api/payloads';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ConversationMapper', () => {
   describe('mapConversations', () => {
@@ -120,6 +120,40 @@ describe('ConversationMapper', () => {
       expect(conversationEntity.last_event_timestamp()).toBe(initialTimestamp);
       expect(conversationEntity.last_server_timestamp()).toBe(initialTimestamp);
     });
+
+    it('rehydrates a local manual unread timestamp without changing canonical read state', () => {
+      const lastReadTimestamp = 5_000;
+      const manualUnreadTimestamp = lastReadTimestamp - 1000;
+      const conversationData = {
+        ...entities.conversation,
+        members: undefined,
+        last_read_timestamp: lastReadTimestamp,
+        manual_unread_timestamp: manualUnreadTimestamp,
+      } as ConversationDatabaseData;
+
+      const conversationEntity = ConversationMapper.mapConversations([conversationData], 1, translate).at(0);
+      assertNotNullOrUndefined(conversationEntity);
+
+      expect(conversationEntity.manualUnreadTimestamp()).toBe(manualUnreadTimestamp);
+      expect(conversationEntity.last_read_timestamp()).toBe(lastReadTimestamp);
+      expect(conversationEntity.effectiveReadTimestamp()).toBe(manualUnreadTimestamp - 1);
+    });
+
+    it.each(['invalid', Number.NaN, Infinity, -Infinity])(
+      'ignores a malformed persisted manual unread timestamp: %s',
+      manualUnreadTimestamp => {
+        const conversationData = {
+          ...entities.conversation,
+          members: undefined,
+          manual_unread_timestamp: manualUnreadTimestamp,
+        } as unknown as ConversationDatabaseData;
+
+        const conversationEntity = ConversationMapper.mapConversations([conversationData], 1, translate).at(0);
+        assertNotNullOrUndefined(conversationEntity);
+
+        expect(conversationEntity.manualUnreadTimestamp()).toBeUndefined();
+      },
+    );
 
     it('maps a backend conversation roles', () => {
       const conversation = {
@@ -361,6 +395,34 @@ describe('ConversationMapper', () => {
       const updatedConversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfStatus);
 
       expect(updatedConversationEntity.last_event_timestamp()).toBe(timestamp);
+    });
+
+    it('does not change the local manual unread marker for unrelated self status updates', () => {
+      conversationEntity.manualUnreadTimestamp(123);
+      const selfStatus: Partial<SelfStatusUpdateDatabaseData> = {last_event_timestamp: Date.now()};
+      const updatedConversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfStatus);
+
+      expect(updatedConversationEntity.manualUnreadTimestamp()).toBe(123);
+    });
+
+    it('preserves a local manual unread marker when a stale synchronized read state arrives', () => {
+      conversationEntity.last_read_timestamp(500);
+      conversationEntity.manualUnreadTimestamp(100);
+
+      ConversationMapper.updateSelfStatus(conversationEntity, {last_read_timestamp: 200});
+
+      expect(conversationEntity.last_read_timestamp()).toBe(500);
+      expect(conversationEntity.manualUnreadTimestamp()).toBe(100);
+    });
+
+    it('clears a local manual unread marker when a newer synchronized read state arrives', () => {
+      conversationEntity.last_read_timestamp(500);
+      conversationEntity.manualUnreadTimestamp(100);
+
+      ConversationMapper.updateSelfStatus(conversationEntity, {last_read_timestamp: 600});
+
+      expect(conversationEntity.last_read_timestamp()).toBe(600);
+      expect(conversationEntity.manualUnreadTimestamp()).toBeUndefined();
     });
 
     it('can update the self status using otr_archived', () => {

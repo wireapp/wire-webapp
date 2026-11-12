@@ -17,11 +17,11 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {generateConversation} from 'test/helper/ConversationGenerator';
-import {generateUser} from 'test/helper/UserGenerator';
+import {Conversation} from '../../../entity/Conversation';
+import {generateConversation} from '../../../../../../test/helper/ConversationGenerator';
+import {generateUser} from '../../../../../../test/helper/UserGenerator';
 
 import {
   getFederationDeleteEventUpdates,

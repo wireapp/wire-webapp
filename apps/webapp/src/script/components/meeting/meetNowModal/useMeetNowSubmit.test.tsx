@@ -23,18 +23,18 @@ import {act, renderHook} from '@testing-library/react';
 import {task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
-import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
-import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
-import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {ConversationState} from 'Repositories/conversation/ConversationState';
+import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
+import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
+import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
+import {meetingSubmitErrors} from '../meetingSubmitErrors';
+import type {ConversationState} from '../../../repositories/conversation/ConversationState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {MainViewModel} from '../../../view_model/MainViewModel';
+import {useWarningsState} from '../../../view_model/WarningsContainer/WarningsState';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {type MeetNowSubmitResult, meetNowSubmitResults, wasMeetNowMeetingCreated} from './meetNowTypes';
 import {useMeetNowSubmit} from './useMeetNowSubmit';

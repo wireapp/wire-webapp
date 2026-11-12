@@ -21,31 +21,28 @@ import {CSSProperties, useEffect, useMemo, useRef, useState, type FunctionCompon
 
 import {CSSObject} from '@emotion/react';
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
 
-import {
-  TabIndex,
-  CertificateExpiredIcon,
-  CertificateRevoked,
-  ExpiresSoon,
-  MLSVerified,
-  ProteusVerified,
-  Tooltip,
-} from '@wireapp/react-ui-kit';
-
-import {useUserIdentity} from 'Hooks/useDeviceIdentities';
-import {ClientEntity} from 'Repositories/client';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {checkUserHandle} from 'Repositories/conversation/ConversationVerificationStateHandler';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
-import {MLSStatuses, WireIdentity} from 'src/script/e2eIdentity/e2eIdentityVerification';
-import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {waitFor} from 'Util/waitFor';
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
+import {stringifyQualifiedId} from '../../../../core/util/qualifiedIdUtil';
+import {MLSStatuses, WireIdentity} from '../../../../e2eIdentity/e2eIdentityVerification';
+import {useUserIdentity} from '../../../../hooks/useDeviceIdentities';
+import {RootContextValue, useApplicationContext} from '../../../../page/rootProvider';
+import {ClientEntity} from '../../../../repositories/client';
+import {ConversationVerificationState} from '../../../../repositories/conversation/ConversationVerificationState';
+import {checkUserHandle} from '../../../../repositories/conversation/ConversationVerificationStateHandler';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
+import {UserState} from '../../../../repositories/user/userState';
+import {CertificateExpiredIcon} from '../../../../uiKit/dataDisplay/icon/certificateExpired';
+import {CertificateRevoked} from '../../../../uiKit/dataDisplay/icon/certificateRevoked';
+import {ExpiresSoon} from '../../../../uiKit/dataDisplay/icon/expiresSoon';
+import {MLSVerified} from '../../../../uiKit/dataDisplay/icon/mlsVerified';
+import {ProteusVerified} from '../../../../uiKit/dataDisplay/icon/proteusVerified';
+import {Tooltip} from '../../../../uiKit/dataDisplay/tooltip/tooltip';
+import {TabIndex} from '../../../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {waitFor} from '../../../../util/waitFor';
 
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
 

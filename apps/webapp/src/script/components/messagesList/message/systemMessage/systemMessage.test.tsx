@@ -19,21 +19,21 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
-import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
-import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
-import {RenameMessage} from 'Repositories/entity/message/renameMessage';
-import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/systemMessage';
-import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {MemberRoleUpdateMessage} from '../../../../repositories/entity/message/memberRoleUpdateMessage';
+import {MessageTimerUpdateMessage} from '../../../../repositories/entity/message/messageTimerUpdateMessage';
+import {ReceiptModeUpdateMessage} from '../../../../repositories/entity/message/receiptModeUpdateMessage';
+import {RenameMessage} from '../../../../repositories/entity/message/renameMessage';
+import {SystemMessage as SystemMessageEntity} from '../../../../repositories/entity/message/systemMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from '../../../../repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
+import type {Translate} from '../../../../util/localizerUtil';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {SystemMessage} from './systemMessage';
 import {SystemMessageBase} from './systemMessageBase';
-import {Config} from 'src/script/Config';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {Config} from '../../../../Config';
+import {withTheme} from '../../../../auth/util/test/testUtil';
 
-jest.mock('Components/icon', () => {
+jest.mock('../../../icon', () => {
   return {
     EditIcon: () => {
       return <span data-uie-name="editicon" className="editicon"></span>;

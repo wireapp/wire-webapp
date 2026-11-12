@@ -17,7 +17,7 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 import assert from 'node:assert';
 
@@ -26,14 +26,14 @@ import {isUndefined} from '@sindresorhus/is';
 import {createFactory} from '@enormora/objectory';
 import {Maybe, result} from 'true-myth';
 
-import type {MeetingReminderFirePayload} from 'Components/meeting/createMeetingReminderScheduler';
-import type {Translate} from 'Util/localizerUtil';
+import type {MeetingReminderFirePayload} from './createMeetingReminderScheduler';
+import type {Translate} from '../../util/localizerUtil';
 
 import {
   systemNotificationErrorKinds,
   type SystemNotificationApi,
   type SystemNotificationRequest,
-} from 'src/script/notification/systemNotificationTypes';
+} from '../../notification/systemNotificationTypes';
 
 import {
   createMeetingReminderOsNotifier,

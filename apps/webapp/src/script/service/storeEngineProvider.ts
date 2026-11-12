@@ -20,12 +20,11 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {applyEncryptionMiddleware, NON_INDEXED_FIELDS} from 'dexie-encrypted';
 
-import type {CRUDEngine} from '@wireapp/store-engine';
-import {MemoryEngine} from '@wireapp/store-engine';
-import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
-
-import {DexieDatabase} from 'Repositories/storage/dexieDatabase';
-import {getLogger} from 'Util/logger';
+import type {CRUDEngine} from '../core/storage/engine/crudEngine';
+import {MemoryEngine} from '../core/storage/engine/memoryEngine';
+import {DexieDatabase} from '../repositories/storage/dexieDatabase';
+import {IndexedDBEngine} from '../repositories/storage/indexedDatabaseEngine';
+import {getLogger} from '../util/logger';
 
 const storageEncryptionKeyLengthInBytes = 32;
 

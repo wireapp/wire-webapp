@@ -17,18 +17,18 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {act, render, screen} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {User} from '../../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+} from '../../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../util/test/translateForTest';
+import {createUuid} from '../../../../util/uuid';
 
 import {StatusIcon} from './statusIcon';
 
@@ -37,6 +37,23 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 describe('StatusIcon', () => {
+  it('renders a manual unread indicator without creating an unread message count', () => {
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+
+    render(<StatusIcon conversation={conversation} />, {wrapper: rootProviderWrapper});
+
+    act(() => {
+      conversation.manualUnreadTimestamp(1);
+    });
+
+    expect(screen.getByTitle('accessibility.conversationStatusUnread')).toBeDefined();
+    expect(screen.getByTitle('accessibility.conversationStatusUnread')).toHaveAttribute(
+      'data-uie-name',
+      'status-manual-unread',
+    );
+    expect(screen.queryByText('1')).toBeNull();
+  });
+
   it('renders an unread mention icon after the conversation unread state changes', () => {
     const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const selfUser = new User(createUuid(), '', translateForTest);

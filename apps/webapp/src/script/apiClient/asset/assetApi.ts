@@ -1,0 +1,283 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import axios, {AxiosHeaderValue, AxiosRequestConfig} from 'axios';
+
+import {AssetUploadData, PostAssetsResponseSchema} from './assetApi.schema';
+import {AssetRetentionPolicy} from './assetRetentionPolicy';
+import {isValidToken, isValidUUID} from './assetUtil';
+
+import {getLogger, type Logger} from '../../commons/getLogger';
+import {
+  BackendError,
+  handleProgressEvent,
+  HttpClient,
+  ProgressCallback,
+  RequestCancelable,
+  SyntheticErrorLabel,
+} from '../http/';
+import type {BufferPlatform} from '../platform';
+import {unsafeAlphanumeric} from '../shims/node/random';
+import {QualifiedId, RequestCancellationError} from '../user';
+
+const redactedTokenPrefixLength = 5;
+
+export interface CipherOptions {
+  /** Set a custom algorithm for encryption */
+  algorithm?: string;
+  /** Set a custom hash for encryption */
+  hash?: Buffer;
+}
+
+export interface AssetAuditData {
+  conversationId: QualifiedId;
+  filename: string;
+  filetype: string;
+}
+export interface AssetOptions extends CipherOptions {
+  public?: boolean;
+  retention?: AssetRetentionPolicy;
+  /** If given, will upload an asset that can be shared in a federated env */
+  domain?: string;
+  /** Used for identifying the conversation the asset belongs to */
+  auditData?: AssetAuditData;
+}
+
+export interface AssetResponse {
+  buffer: ArrayBuffer;
+  mimeType?: string;
+}
+
+function getHeaderStringOrUndefined(headerValue: AxiosHeaderValue | undefined): string | undefined {
+  if (typeof headerValue === 'string') {
+    return headerValue;
+  }
+
+  return undefined;
+}
+
+const assetDownloadRetryConfig = {
+  // Asset previews must eventually settle so the UI can handle download failures.
+  'axios-retry': {
+    retries: 3,
+  },
+} as const;
+
+export class AssetAPI {
+  private readonly logger: Logger;
+
+  constructor(
+    private readonly client: HttpClient,
+    private readonly buffer: Pick<BufferPlatform, 'base64MD5FromBuffer' | 'concatToBuffer'>,
+  ) {
+    this.logger = getLogger('@wireapp/api-client/AssetAPI');
+  }
+
+  private getAssetShared(
+    assetUrl: string,
+    token?: string | null,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetResponse> {
+    if (token !== null && token !== undefined && token.length > 0 && !isValidToken(token)) {
+      throw new TypeError(
+        `Expected token "${token.substr(0, redactedTokenPrefixLength)}..." (redacted) to be base64 encoded string.`,
+      );
+    }
+
+    const cancelSource = axios.CancelToken.source();
+    const config: AxiosRequestConfig = {
+      cancelToken: cancelSource.token,
+      method: 'get',
+      onDownloadProgress: handleProgressEvent(progressCallback),
+      onUploadProgress: handleProgressEvent(progressCallback),
+      params: {},
+      responseType: 'arraybuffer',
+      url: assetUrl,
+      ...assetDownloadRetryConfig,
+    };
+
+    if (token !== null && token !== undefined && token.length > 0) {
+      config.params.asset_token = token;
+    }
+
+    const handleRequest = async (): Promise<AssetResponse> => {
+      try {
+        const response = await this.client.sendRequest<ArrayBuffer>(config);
+        return {
+          buffer: response.data,
+          mimeType: getHeaderStringOrUndefined(response.headers['content-type']),
+        };
+      } catch (error: unknown) {
+        if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+          throw new RequestCancellationError('Asset download got cancelled.');
+        }
+        throw error;
+      }
+    };
+
+    return {
+      cancel: () => {
+        return cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED);
+      },
+      response: handleRequest(),
+    };
+  }
+
+  private postAssetShared(
+    assetBaseUrl: string,
+    asset: Uint8Array,
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetUploadData> {
+    const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
+
+    const metadataObject: {
+      public: boolean;
+      retention: AssetRetentionPolicy;
+      domain?: string;
+      convId?: QualifiedId;
+      filename?: string;
+      filetype?: string;
+    } = {
+      public: options?.public ?? true,
+      retention: options?.retention ?? AssetRetentionPolicy.PERSISTENT,
+      domain: options?.domain,
+    };
+
+    if (options?.auditData !== undefined) {
+      metadataObject.convId = options.auditData.conversationId;
+      metadataObject.filename = options.auditData.filename;
+      metadataObject.filetype = options.auditData.filetype;
+    }
+
+    const metadata = JSON.stringify(metadataObject);
+    const metadataByteLength = new TextEncoder().encode(metadata).length;
+
+    const body =
+      `--${BOUNDARY}\r\n` +
+      'Content-Type: application/json;charset=utf-8\r\n' +
+      `Content-length: ${metadataByteLength}\r\n` +
+      '\r\n' +
+      `${metadata}\r\n` +
+      `--${BOUNDARY}\r\n` +
+      'Content-Type: application/octet-stream\r\n' +
+      `Content-length: ${asset.length}\r\n` +
+      `Content-MD5: ${this.buffer.base64MD5FromBuffer(asset.buffer as ArrayBuffer)}\r\n` +
+      '\r\n';
+
+    const footer = `\r\n--${BOUNDARY}--\r\n`;
+
+    const cancelSource = axios.CancelToken.source();
+
+    const config: AxiosRequestConfig = {
+      cancelToken: cancelSource.token,
+      data: this.buffer.concatToBuffer(body, asset, footer),
+      headers: {
+        'Content-Type': `multipart/mixed; boundary=${BOUNDARY}`,
+      },
+      method: 'post',
+      onDownloadProgress: handleProgressEvent(progressCallback),
+      onUploadProgress: handleProgressEvent(progressCallback),
+      url: assetBaseUrl,
+    };
+
+    const handleRequest = async (): Promise<AssetUploadData> => {
+      try {
+        const response = await this.client.sendRequest<AssetUploadData>(config);
+        const validation = PostAssetsResponseSchema.safeParse(response.data);
+
+        if (!validation.success) {
+          this.logger.warn('Asset upload response validation failed:', {error: validation.error});
+        }
+
+        return response.data;
+      } catch (error: unknown) {
+        if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+          throw new RequestCancellationError('Asset upload got cancelled.');
+        }
+        throw error;
+      }
+    };
+
+    return {
+      cancel: () => {
+        return cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED);
+      },
+      response: handleRequest(),
+    };
+  }
+
+  getAsset(
+    assetId: string,
+    assetDomain: string,
+    token?: string | null,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetResponse> {
+    if (!isValidUUID(assetId)) {
+      throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
+    }
+
+    const isValidDomain = (domain: string): boolean => {
+      return !!Boolean(domain) && /^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-zA-Z]{2,}$/.test(domain);
+    };
+
+    if (!isValidDomain(assetDomain)) {
+      throw new TypeError(`Invalid asset domain ${assetDomain}`);
+    }
+
+    return this.getAssetShared(`/assets/${assetDomain}/${assetId}`, token, progressCallback);
+  }
+
+  getServiceAsset(
+    assetId: string,
+    token?: string | null,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetResponse> {
+    if (!isValidUUID(assetId)) {
+      throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
+    }
+
+    const assetBaseUrl = `/bot/assets/${assetId}`;
+
+    return this.getAssetShared(assetBaseUrl, token, progressCallback);
+  }
+
+  /**
+   * Uploads an asset to the backend
+   *
+   * @param asset Raw content of the asset to upload
+   * @param options?
+   * @param progressCallback? Will be called at every progress of the upload
+   */
+  postAsset(
+    asset: Uint8Array,
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetUploadData> {
+    return this.postAssetShared('/assets', asset, options, progressCallback);
+  }
+
+  postServiceAsset(
+    asset: Uint8Array,
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetUploadData> {
+    return this.postAssetShared('/bot/assets', asset, options, progressCallback);
+  }
+}

@@ -21,19 +21,15 @@ import {createClock} from '@enormora/clock/clock';
 import {ImageSegmenter} from '@mediapipe/tasks-vision';
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import type {Metrics, Mode} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
-import {
-  buildMetrics,
-  createMetricsWindow,
-  pushMetricsSample,
-} from 'Repositories/media/backgroundEffects/helper/metrics';
-import {createRestartQueue} from 'Repositories/media/backgroundEffects/helper/restartQueue';
-import {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
-
 import {VideoFilter} from './filter';
 import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
+
+import type {Metrics, Mode} from '../backgroundEffectsWorkerTypes';
+import {getSafeLogger} from '../helper/logger';
+import {buildMetrics, createMetricsWindow, pushMetricsSample} from '../helper/metrics';
+import {createRestartQueue} from '../helper/restartQueue';
+import {PerformanceSample} from '../helper/samples';
 
 const segmentationInitializationRetryDelayInMilliseconds = 1000;
 const metricsWindowFrameCount = 60;
@@ -91,7 +87,7 @@ async function createSegmenter(canvas: OffscreenCanvas): Promise<ImageSegmenter>
     wasmBinaryPath,
   };
 
-  logger.log('[virtual-background] createSegmenter');
+  logger.info('[virtual-background] createSegmenter');
 
   return ImageSegmenter.createFromOptions(fileset, {
     baseOptions: {
@@ -132,14 +128,14 @@ export async function runSegmenter(
 ): Promise<void> {
   const logger = getSafeLogger('segmenter:runSegmenter');
 
-  logger.log('[virtual-background] runSegmenter');
+  logger.info('[virtual-background] runSegmenter');
 
   segmenterOptions = opts;
 
   let webGLRenderer: WebGLRenderer | null = new WebGLRenderer(canvas);
 
   function onContextLost(event: Event): void {
-    logger.log(`[virtual-background] webglcontextlost (${!isNullOrUndefined(webGLRenderer)})`);
+    logger.info(`[virtual-background] webglcontextlost (${!isNullOrUndefined(webGLRenderer)})`);
 
     event.preventDefault();
 
@@ -148,13 +144,13 @@ export async function runSegmenter(
   }
 
   function onContextRestored(): void {
-    logger.log(`[virtual-background] webglcontextrestored (${!isNullOrUndefined(webGLRenderer)})`);
+    logger.info(`[virtual-background] webglcontextrestored (${!isNullOrUndefined(webGLRenderer)})`);
 
     if (isNullOrUndefined(webGLRenderer)) {
       const timer = createClock();
 
       timer.setTimeout(() => {
-        logger.log('[virtual-background] restart segmenter onContextRestored');
+        logger.info('[virtual-background] restart segmenter onContextRestored');
 
         webGLRenderer = new WebGLRenderer(canvas);
 
@@ -210,7 +206,7 @@ export async function runSegmenter(
       hasSegmentationMask = false;
       segmentationFrameCounter = 0;
     } catch (error: unknown) {
-      logger.error('Error restarting segmenter:', error);
+      logger.error('Error restarting segmenter:', {error});
     }
   }
 
@@ -224,7 +220,7 @@ export async function runSegmenter(
     }
 
     try {
-      logger.log(`[virtual-background] model is changed to ${nextOptions.baseOptions.modelAssetPath}`);
+      logger.info(`[virtual-background] model is changed to ${nextOptions.baseOptions.modelAssetPath}`);
 
       await segmenter.setOptions(nextOptions);
 
@@ -237,7 +233,7 @@ export async function runSegmenter(
       hasSegmentationMask = false;
       segmentationFrameCounter = 0;
     } catch (error: unknown) {
-      logger.error('[virtual-background] Error updating segmenter model:', error);
+      logger.error('[virtual-background] Error updating segmenter model:', {error});
     }
   }
 
@@ -514,7 +510,7 @@ export async function runSegmenter(
                       // Registering REAL GPU measurement in the background
                       triggerGpuTracking(gpuStart, frameDeltaMs, segmentationMs, filterMs);
                     } catch (error) {
-                      frameLogger.error('Error processing segmentation result:', error);
+                      frameLogger.error('Error processing segmentation result:', {error});
 
                       /*
                        * If rendering the new mask failed,
@@ -538,13 +534,13 @@ export async function runSegmenter(
       },
 
       close() {
-        logger.log('[virtual-background] runSegmenter close');
+        logger.info('[virtual-background] runSegmenter close');
 
         close();
       },
 
       abort(reason) {
-        logger.log('[virtual-background] runSegmenter abort', reason);
+        logger.info('[virtual-background] runSegmenter abort', {reason});
 
         close();
       },
@@ -555,6 +551,7 @@ export async function runSegmenter(
   );
 
   readable.pipeTo(writer).catch((error: unknown) => {
-    logger.error(`[virtual-background] video error: ${(error as Error).message}`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error(`[virtual-background] video error: ${errorMessage}`, {error});
   });
 }

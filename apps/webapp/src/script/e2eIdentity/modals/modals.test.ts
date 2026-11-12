@@ -19,8 +19,8 @@
 
 import assert from 'node:assert';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {translate} from 'Util/localizerUtil';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {translate} from '../../util/localizerUtil';
 
 import {getModalOptions, ModalType} from './modals';
 

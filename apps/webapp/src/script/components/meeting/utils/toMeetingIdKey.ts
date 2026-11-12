@@ -17,7 +17,7 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 
 export const toMeetingIdKey = (meetingId: QualifiedId): string => {
   return `${meetingId.domain}:${meetingId.id}`;

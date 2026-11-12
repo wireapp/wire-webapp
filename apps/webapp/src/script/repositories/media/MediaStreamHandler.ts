@@ -20,25 +20,23 @@
 import {isObject, isString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
-
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
-import {getPermissionStates} from 'Repositories/permission/permissionHandlers';
-import {PermissionType} from 'Repositories/permission/PermissionType';
-import {getLogger, Logger} from 'Util/logger';
-import {toError} from 'Util/toError';
-import {isErrorWithType} from 'Util/typePredicateUtil';
-
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {isMediaStreamReadDeviceError, MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
 
+import {Runtime} from '../../commons/util/Runtime';
 import {MediaError} from '../../error/mediaError';
 import {NoAudioInputError} from '../../error/noAudioInputError';
 import {PermissionError} from '../../error/permissionError';
+import {getLogger, Logger} from '../../util/logger';
+import {toError} from '../../util/toError';
+import {isErrorWithType} from '../../util/typePredicateUtil';
 import {Warnings} from '../../view_model/WarningsContainer';
+import {CallingViewMode, CallState} from '../calling/CallState';
+import {BrowserPermissionStatus} from '../permission/BrowserPermissionStatus';
+import {getPermissionStates} from '../permission/permissionHandlers';
+import {PermissionType} from '../permission/PermissionType';
 
 type DeniedPermissionWarningType =
   typeof Warnings.TYPE.DENIED_CAMERA | typeof Warnings.TYPE.DENIED_MICROPHONE | typeof Warnings.TYPE.DENIED_SCREEN;
@@ -206,7 +204,7 @@ export class MediaStreamHandler {
 
         this.logger.warn(
           `MediaStream request for (audio: ${audio}, video: ${video}, screen: ${screen}) failed: ${name} ${message}`,
-          error,
+          {error},
         );
         this.clearPermissionRequestHint(audio, video, screen);
         /**

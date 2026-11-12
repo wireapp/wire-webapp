@@ -29,45 +29,6 @@ import {
   isTruthy,
   isUndefined,
 } from '@sindresorhus/is';
-import {
-  ADD_PERMISSION,
-  Conversation as BackendConversation,
-  CONVERSATION_CELLS_STATE,
-  CONVERSATION_TYPE,
-  DefaultConversationRoleName as DefaultRole,
-  MessageSendingStatus,
-  NewConversation,
-  RemoteConversations,
-} from '@wireapp/api-client/lib/conversation';
-import type {ValidatedMeetingConversation} from '@wireapp/api-client/lib/conversation/conversationSchema';
-import {
-  ConversationReceiptModeUpdateData,
-  MemberLeaveReason,
-  RECEIPT_MODE,
-} from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/conversationTypingData';
-import {
-  CONVERSATION_EVENT,
-  ConversationAddPermissionUpdateEvent,
-  ConversationCreateEvent,
-  ConversationCreateMeetingEvent,
-  ConversationEvent,
-  ConversationMemberJoinEvent,
-  ConversationMemberLeaveEvent,
-  ConversationMemberUpdateEvent,
-  ConversationMessageTimerUpdateEvent,
-  ConversationMLSResetEvent,
-  ConversationProtocolUpdateEvent,
-  ConversationReceiptModeUpdateEvent,
-  ConversationRenameEvent,
-  ConversationTypingEvent,
-} from '@wireapp/api-client/lib/event';
-import type {BackendError} from '@wireapp/api-client/lib/http/';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {AddUsersFailure, BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
-import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {asyncNoop, noop} from 'noop-esm';
@@ -75,50 +36,7 @@ import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
 
-import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {ConnectionState} from 'Repositories/connection/connectionState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {DeleteConversationMessage} from 'Repositories/entity/message/deleteConversationMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from 'Repositories/event/Client';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
-import {EventSource} from 'Repositories/event/EventSource';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import type {EventRecord, WithSender} from 'Repositories/storage';
-import {ConversationRecord} from 'Repositories/storage';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserFilter} from 'Repositories/user/userFilter';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {getNextItem} from 'Util/arrayUtil';
-import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
-import {compareTransliteration, sortByPriority, sortUsersByPriority, startsWith} from 'Util/stringUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {toError} from 'Util/toError';
-import {isBackendError, isErrorWithType} from 'Util/typePredicateUtil';
-import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
@@ -172,7 +90,49 @@ import {isSelfInitiatedConversationLeave} from './isSelfInitiatedConversationLea
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
+import {
+  ADD_PERMISSION,
+  Conversation as BackendConversation,
+  CONVERSATION_CELLS_STATE,
+  CONVERSATION_TYPE,
+} from '../../apiClient/conversation/conversation';
+import {DefaultConversationRoleName as DefaultRole} from '../../apiClient/conversation/conversationRole';
+import type {ValidatedMeetingConversation} from '../../apiClient/conversation/conversationSchema';
+import {MemberLeaveReason} from '../../apiClient/conversation/data/conversationMemberLeaveData';
+import {
+  ConversationReceiptModeUpdateData,
+  RECEIPT_MODE,
+} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {CONVERSATION_TYPING} from '../../apiClient/conversation/data/conversationTypingData';
+import {MessageSendingStatus} from '../../apiClient/conversation/messageSendingStatus';
+import {NewConversation} from '../../apiClient/conversation/newConversation';
+import {RemoteConversations} from '../../apiClient/conversation/remoteConversations';
+import {
+  CONVERSATION_EVENT,
+  ConversationAddPermissionUpdateEvent,
+  ConversationCreateEvent,
+  ConversationCreateMeetingEvent,
+  ConversationEvent,
+  ConversationMemberJoinEvent,
+  ConversationMemberLeaveEvent,
+  ConversationMemberUpdateEvent,
+  ConversationMessageTimerUpdateEvent,
+  ConversationMLSResetEvent,
+  ConversationProtocolUpdateEvent,
+  ConversationReceiptModeUpdateEvent,
+  ConversationRenameEvent,
+  ConversationTypingEvent,
+} from '../../apiClient/event/conversationEvent';
+import type {BackendError} from '../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {TYPING_TIMEOUT, useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
+import {Account} from '../../core';
+import {AddUsersFailure, BaseCreateConversationResponse} from '../../core/conversation';
+import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols/mls';
 import {BASE_ERROR_TYPE, BaseError} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 import {isMemberMessage} from '../../guards/Message';
@@ -183,6 +143,58 @@ import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {getNextItem} from '../../util/arrayUtil';
+import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from '../../util/fileTypeUtil';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {removeClientFromUserClientMap} from '../../util/removeClientFromUserClientMap';
+import {compareTransliteration, sortByPriority, sortUsersByPriority, startsWith} from '../../util/stringUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {toError} from '../../util/toError';
+import {isBackendError, isErrorWithType} from '../../util/typePredicateUtil';
+import {createUuid} from '../../util/uuid';
+import {WebAppEvents} from '../../webAppEvents';
+import {AssetTransferState} from '../assets/assetTransferState';
+import {CallingRepository} from '../calling/CallingRepository';
+import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {ConnectionEntity} from '../connection/connectionEntity';
+import {ConnectionRepository} from '../connection/connectionRepository';
+import {ConnectionState} from '../connection/connectionState';
+import {Conversation} from '../entity/Conversation';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {DeleteConversationMessage} from '../entity/message/deleteConversationMessage';
+import {FileAsset} from '../entity/message/fileAsset';
+import {MemberMessage} from '../entity/message/memberMessage';
+import {Message} from '../entity/message/message';
+import {User} from '../entity/User';
+import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from '../event/Client';
+import {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
+import {EventSource} from '../event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {PropertiesRepository} from '../properties/propertiesRepository';
+import {SelfRepository} from '../self/SelfRepository';
+import {ConversationRecord} from '../storage';
+import type {EventRecord, WithSender} from '../storage';
+import {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
+import {UserFilter} from '../user/userFilter';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
+
+export type ConversationRepositoryOptions = {
+  readonly isMarkAsUnreadFeatureEnabled: boolean;
+};
+
+function withoutManualUnreadTimestamp<ConversationData extends ConversationRecord>(
+  conversationData: ConversationData,
+): ConversationData {
+  const conversationWithoutManualUnreadTimestamp = {...conversationData};
+  delete conversationWithoutManualUnreadTimestamp.manual_unread_timestamp;
+
+  return conversationWithoutManualUnreadTimestamp;
+}
 
 const bytesPerKibibyte = 1024;
 const externalMessageThresholdInKibibytes = 200;
@@ -286,6 +298,7 @@ export class ConversationRepository {
     private readonly callingRepository: CallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly translate: Translate,
+    private readonly options: ConversationRepositoryOptions,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -437,12 +450,10 @@ export class ConversationRepository {
   }
 
   public registerMLSConversationVerificationStateHandler = (
-    domain: string,
     onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = noop,
     onSelfClientCertificateRevoked: () => Promise<void> = asyncNoop,
   ): void => {
     this.mlsConversationVerificationStateHandler = new MLSConversationVerificationStateHandler(
-      domain,
       onConversationVerificationStateChange,
       onSelfClientCertificateRevoked,
       this.conversationState,
@@ -649,7 +660,7 @@ export class ConversationRepository {
             this.showLegalHoldConsentError();
             break;
           default:
-            this.logger.error(error);
+            this.logger.error('Failed to create conversation', {error});
         }
       }
       throw error;
@@ -697,7 +708,7 @@ export class ConversationRepository {
         await this.loadMissingConversations();
         await this.refreshAllConversationsUnavailableParticipants();
       } catch (error: unknown) {
-        this.logger.warn(`failed to refresh missing users & conversations metat data`, error);
+        this.logger.warn(`failed to refresh missing users & conversations metat data`, {error});
       }
     }, TIME_IN_MILLIS.HOUR * conversationRetentionCheckIntervalInHours);
   };
@@ -999,7 +1010,18 @@ export class ConversationRepository {
     connections: ConnectionEntity[],
     deadConnections: ConnectionEntity[] = [],
   ): Promise<Conversation[]> {
-    const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
+    let localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
+
+    if (!this.options.isMarkAsUnreadFeatureEnabled) {
+      const hasManualUnreadMarkers = localConversations.some(conversationData => {
+        return !isUndefined(conversationData.manual_unread_timestamp);
+      });
+
+      if (hasManualUnreadMarkers) {
+        localConversations = localConversations.map(withoutManualUnreadTimestamp);
+        await this.conversationService.saveConversationsInDb(localConversations);
+      }
+    }
 
     let conversationsData: any[];
 
@@ -1043,7 +1065,7 @@ export class ConversationRepository {
         return;
       }
 
-      unknownConversations.push(conversationData);
+      unknownConversations.push(withoutManualUnreadTimestamp(conversationData));
     });
 
     let conversationEntities: Conversation[] = [];
@@ -1242,7 +1264,7 @@ export class ConversationRepository {
   private async getUnreadEvents(conversationEntity: Conversation): Promise<void> {
     const first_message = conversationEntity.getOldestMessage();
     // The lower bound should be right after the last read timestamp in order not to load the last read message again (thus the +1)
-    const lower_bound = new Date(conversationEntity.last_read_timestamp() + 1);
+    const lower_bound = new Date(conversationEntity.effectiveReadTimestamp() + 1);
     const upper_bound = !isUndefined(first_message)
       ? new Date(first_message.timestamp())
       : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
@@ -1262,7 +1284,7 @@ export class ConversationRepository {
           await this.addEventsToConversation(events, conversationEntity, {offline: true});
         }
       } catch (error: unknown) {
-        this.logger.warn(`Could not load unread events for conversation: ${conversationEntity.id}`, error);
+        this.logger.warn(`Could not load unread events for conversation: ${conversationEntity.id}`, {error});
       }
       conversationEntity.isLoadingMessages(false);
     }
@@ -1446,7 +1468,7 @@ export class ConversationRepository {
       const isConversationNotFound =
         isErrorWithType(error) && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {
-        this.logger.warn(`Failed to get conversation '${conversation_id.id}': ${toError(error).message}`, error);
+        this.logger.warn(`Failed to get conversation '${conversation_id.id}': ${toError(error).message}`, {error});
       }
 
       throw error;
@@ -1502,7 +1524,8 @@ export class ConversationRepository {
   }
 
   /**
-   * Get all the group conversations owned by self user's team from the local state.
+   * Get all group conversations from the self user's team in the local state.
+   * Conversations are excluded when the self user has no non-empty team ID.
    */
   public readonly getAllTeamGroupConversations = (): Conversation[] => {
     const selfUser = this.userState.self();
@@ -1519,7 +1542,7 @@ export class ConversationRepository {
   };
 
   /**
-   * Get all the group conversations owned by self user's team from the local state.
+   * Get all group conversations from the local state, regardless of team ownership.
    */
   public readonly getAllGroupConversations = (): Conversation[] => {
     return this.conversationState.conversations().filter(conversation => {
@@ -2005,11 +2028,16 @@ export class ConversationRepository {
 
     this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
 
-    await Promise.allSettled(
-      proteusConversations.map(proteusConversation => {
-        return this.eventService.moveEventsToConversation(proteusConversation.qualifiedId, mlsConversation.qualifiedId);
-      }),
-    );
+    const movedEvents = (
+      await Promise.all(
+        proteusConversations.map(proteusConversation => {
+          return this.eventService.moveEventsToConversation(
+            proteusConversation.qualifiedId,
+            mlsConversation.qualifiedId,
+          );
+        }),
+      )
+    ).flat();
 
     // In the event that multiple 1:1 Proteus conversations exist, we migrate the one with the lowest id
     // See https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/1344602120/Use+case+multiple+1+1+conversation+in+teams+Proteus
@@ -2021,6 +2049,8 @@ export class ConversationRepository {
     try {
       mlsConversation.last_event_timestamp(proteusConversationToBeKept.last_event_timestamp());
       mlsConversation.last_read_timestamp(proteusConversationToBeKept.last_read_timestamp());
+      mlsConversation.manualUnreadTimestamp(proteusConversationToBeKept.manualUnreadTimestamp());
+      mlsConversation.isAutoReadSuppressed(proteusConversationToBeKept.isAutoReadSuppressed());
       mlsConversation.last_server_timestamp(proteusConversationToBeKept.last_server_timestamp());
       mlsConversation.archivedState(proteusConversationToBeKept.archivedState());
       mlsConversation.archivedTimestamp(proteusConversationToBeKept.archivedTimestamp());
@@ -2041,7 +2071,13 @@ export class ConversationRepository {
 
     // Migration can happen after startup has loaded unread events. Populate the new entity as well,
     // since unread counts are derived from messages in memory, not just the persisted read timestamp.
-    await this.getUnreadEvents(mlsConversation);
+    const readTimestamp = mlsConversation.last_read_timestamp();
+    const unreadEvents = movedEvents.filter(event => {
+      return new Date(event.time).getTime() > readTimestamp;
+    });
+    if (isNonEmptyArray(unreadEvents)) {
+      await this.addEventsToConversation(unreadEvents, mlsConversation, {offline: true});
+    }
 
     const wasProteus1to1ActiveConversation = proteusConversations.some(conversation => {
       return this.conversationState.isActiveConversation(conversation);
@@ -2229,7 +2265,7 @@ export class ConversationRepository {
       initialisedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
       initialisedMLSConversation.readOnlyState(null);
     } catch (error: unknown) {
-      this.logger.warn(`Failed to establish MLS 1:1 conversation with user ${otherUserId.id}`, error);
+      this.logger.warn(`Failed to establish MLS 1:1 conversation with user ${otherUserId.id}`, {error});
       if (!allowUnestablished) {
         throw error;
       }
@@ -2637,7 +2673,7 @@ export class ConversationRepository {
       } catch (error: unknown) {
         this.logger.error(
           `Failed when mapping a connection with user ${connection.userId} to a conversation, error: `,
-          error,
+          {error},
         );
       }
     }
@@ -2684,7 +2720,7 @@ export class ConversationRepository {
       try {
         await this.init1to1Conversation(conversation);
       } catch (error: unknown) {
-        this.logger.error(`Failed when initialising 1:1 conversation with id ${conversation.id}, error: `, error);
+        this.logger.error(`Failed when initialising 1:1 conversation with id ${conversation.id}, error: `, {error});
       }
     }
   };
@@ -2700,11 +2736,11 @@ export class ConversationRepository {
     payload: (BackendConversation | ValidatedMeetingConversation | ConversationDatabaseData)[],
     initialTimestamp = this.getLatestEventTimestamp(true),
   ): Conversation[] {
-    const entities = ConversationMapper.mapConversations(
-      payload as ConversationDatabaseData[],
-      initialTimestamp,
-      this.translate,
-    );
+    const conversationData = payload as ConversationDatabaseData[];
+    const conversationsForMapping = this.options.isMarkAsUnreadFeatureEnabled
+      ? conversationData
+      : conversationData.map(withoutManualUnreadTimestamp);
+    const entities = ConversationMapper.mapConversations(conversationsForMapping, initialTimestamp, this.translate);
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.userState.self());
@@ -3060,7 +3096,7 @@ export class ConversationRepository {
       const event = response?.event;
       if (isTruthy(event)) {
         const logMessage = `Successfully added service to conversation '${conversationEntity.display_name()}'`;
-        this.logger.debug(logMessage, response);
+        this.logger.debug(logMessage, {response});
         return this.eventRepository.injectEvent(response.event, EventRepository.SOURCE.BACKEND_RESPONSE);
       }
 
@@ -3553,7 +3589,7 @@ export class ConversationRepository {
     } catch (error: unknown) {
       const log = `Failed to change notification state of conversation '${conversationEntity.id}': ${toError(error).message}`;
       const rejectError = new Error(log);
-      this.logger.warn(rejectError.message, error);
+      this.logger.warn(rejectError.message, {error});
       throw rejectError;
     }
   }
@@ -4854,7 +4890,7 @@ export class ConversationRepository {
       .catch((error: unknown) => {
         const isNotFound = isErrorWithType(error) && error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (!isNotFound) {
-          this.logger.warn(`Failed to delete message for conversation '${conversationEntity.id}'`, error);
+          this.logger.warn(`Failed to delete message for conversation '${conversationEntity.id}'`, {error});
           throw error;
         }
       });
@@ -4889,7 +4925,7 @@ export class ConversationRepository {
     } catch (error: unknown) {
       this.logger.warn(
         `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
-        error,
+        {error},
       );
       throw error;
     }
@@ -4926,7 +4962,7 @@ export class ConversationRepository {
       const isNotFound = isErrorWithType(error) && error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
         const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationEntity.id}'`;
-        this.logger.error(log, error);
+        this.logger.error(log, {error});
         throw error;
       }
     }
@@ -5051,11 +5087,11 @@ export class ConversationRepository {
 
       let epoch = 0;
       if (existingConversation) {
-        const newEpoch: number = await mlsService.getEpoch(newGroupId);
+        const newEpoch: bigint = await mlsService.getEpoch(newGroupId);
         this.logger.info('An MLS conversation with the new group ID already exists fetched epoch from core crypto', {
           newEpoch,
         });
-        epoch = newEpoch;
+        epoch = Number(newEpoch);
       }
 
       const updatedConversation = ConversationMapper.updateProperties(conversationEntity, {
@@ -5069,7 +5105,7 @@ export class ConversationRepository {
         `Updated conversation group ID from ${oldGroupId} to ${newGroupId} for conversation ${conversationEntity.id} and set epoch to 0`,
       );
     } catch (error: unknown) {
-      this.logger.error(`Failed to reset MLS conversation ${conversationEntity.id}`, error);
+      this.logger.error(`Failed to reset MLS conversation ${conversationEntity.id}`, {error});
     }
   }
 

@@ -20,9 +20,9 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import {Result} from 'true-myth';
 
-import type {MeetNowFormErrors, MeetNowFormState} from 'Components/meeting/meetNowModal/meetNowTypes';
-import {validateMeetNowForm} from 'Components/meeting/meetNowModal/useMeetNowModal';
-import type {MeetNowMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
+import type {MeetNowFormErrors, MeetNowFormState} from './meetNowModal/meetNowTypes';
+import {validateMeetNowForm} from './meetNowModal/useMeetNowModal';
+import type {MeetNowMeetingCommand} from './shared/types/meetingCommandTypes';
 
 export const mapMeetNowFormToMeetingCommand = (
   formState: MeetNowFormState,

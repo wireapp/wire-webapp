@@ -1,0 +1,56 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {isNullOrUndefined} from '@sindresorhus/is';
+import {mls} from '@wireapp/protocol-messaging/web/mls';
+import {Encoder} from '../../../../commons/base64/encoder';
+
+import {CommitBundle, RatchetTreeType, GroupInfoEncryptionType, Welcome} from '@wireapp/core-crypto';
+
+import {toProtobufCommitBundle} from './commitBundleUtil';
+
+describe('toProtobufCommitBundle', () => {
+  it('encode commit bundles', () => {
+    const welcomeMessage = {
+      serialize: jest.fn(() => {
+        return Uint8Array.from([1]);
+      }),
+    } as unknown as Welcome;
+    const payload: CommitBundle = {
+      commit: Uint8Array.from([0]),
+      welcome: welcomeMessage,
+      groupInfo: {
+        ratchetTreeType: RatchetTreeType.Full,
+        payload: Uint8Array.from([2]),
+        encryptionType: GroupInfoEncryptionType.Plaintext,
+      },
+    };
+    const result = toProtobufCommitBundle(payload);
+    const {commit, welcome, groupInfoBundle} = mls.CommitBundle.decode(result);
+    if (isNullOrUndefined(payload.welcome)) {
+      throw new Error('Expected test welcome to be available');
+    }
+
+    expect(Encoder.toBase64(commit)).toEqual(Encoder.toBase64(payload.commit));
+    expect(Encoder.toBase64(welcome)).toEqual(Encoder.toBase64(payload.welcome.serialize()));
+    expect(Encoder.toBase64(groupInfoBundle.groupInfo)).toEqual(Encoder.toBase64(payload.groupInfo.payload));
+    expect(groupInfoBundle.ratchetTreeType).toEqual(mls.RatchetTreeType.FULL);
+    expect(groupInfoBundle.groupInfoType).toEqual(mls.GroupInfoType.PUBLIC_GROUP_STATE);
+  });
+});

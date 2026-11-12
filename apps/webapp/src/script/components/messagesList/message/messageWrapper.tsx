@@ -20,31 +20,16 @@
 import type {FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
-import {ReactionType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {E2EIVerificationMessage} from 'Components/messagesList/message/e2eiVerificationMessage';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {Text} from 'Repositories/entity/message/text';
-import {TeamState} from 'Repositories/team/TeamState';
-import {QuoteEntity} from 'src/script/message/quoteEntity';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {CallMessage} from './callMessage';
 import {CallTimeoutMessage} from './callTimeoutMessage';
 import {ContentMessageComponent} from './contentMessage';
 import {DecryptErrorMessage} from './decryptErrorMessage';
 import {DeleteMessage} from './deleteMessage';
+import {E2EIVerificationMessage} from './e2eiVerificationMessage';
 import {FailedToAddUsersMessage} from './failedToAddUsersMessage';
 import {FederationStopMessage} from './federationStopMessage';
 import {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';
@@ -55,7 +40,21 @@ import {PingMessage} from './pingMessage';
 import {SystemMessage} from './systemMessage';
 import {VerificationMessage} from './verificationMessage';
 
+import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
+import {ReactionType} from '../../../core/conversation';
+import {markAsUnreadFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import {QuoteEntity} from '../../../message/quoteEntity';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {AssetRepository} from '../../../repositories/assets/assetRepository';
+import {OutgoingQuote} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {CompositeMessage} from '../../../repositories/entity/message/compositeMessage';
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {Text} from '../../../repositories/entity/message/text';
+import {TeamState} from '../../../repositories/team/TeamState';
 import {ContextMenuEntry} from '../../../ui/contextMenu';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {WebAppEvents} from '../../../webAppEvents';
 
 import {MessageParams} from './index';
 
@@ -66,6 +65,7 @@ const isOutgoingQuote = (QuoteEntity: QuoteEntity): QuoteEntity is OutgoingQuote
 export const MessageWrapper: FunctionComponent<MessageParams> = ({
   message,
   conversation,
+  cancelPendingReadReceiptsForConversation,
   selfId,
   isFocused,
   isSelfTemporaryGuest,
@@ -89,7 +89,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
 }: MessageParams) => {
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   type FindMessageResult = Promise<ContentMessage & {primary_key: string}>;
   const findMessage = async (conversation: Conversation, messageId: string): FindMessageResult => {
     const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
@@ -184,6 +184,17 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
           return onClickDetails(message);
         },
         label: translate('conversationContextMenuDetails'),
+      });
+    }
+
+    if (isFeatureToggleEnabled(markAsUnreadFeatureToggleName) && !conversation.isSelfUserRemoved()) {
+      entries.push({
+        click: () => {
+          cancelPendingReadReceiptsForConversation(conversation);
+
+          return conversation.markUnreadFrom(message);
+        },
+        label: translate('conversationContextMenuMarkUnread'),
       });
     }
 

@@ -17,9 +17,9 @@
  *
  */
 
-import {OAuthBody} from '@wireapp/api-client/lib/oauth/oAuthBody';
-
+import {OAuthBody} from '../../apiClient/oauth/oAuthBody';
 import {Scope} from '../page/oAuthPermissions';
+import {QUERY_KEY} from '../route';
 
 /**
  *  Takes the oauth parameters and returns the oauth object expected by the API.
@@ -32,10 +32,16 @@ export const oAuthParams = (location: Location): OAuthBody => {
   return Object.fromEntries(params) as unknown as OAuthBody;
 };
 
-export const getOAuthQueryString = (location: Location): string => {
+export const getOAuthQueryString = (location: Pick<Location, 'hash'>): string => {
   const hash = location.hash;
   const queryParamIndex = hash.indexOf('?');
-  return hash.substring(queryParamIndex);
+  return queryParamIndex < 0 ? '' : hash.substring(queryParamIndex);
+};
+
+/** Preserve the original encoding of OAuth state and PKCE parameters across auth routes. */
+export const withOAuthQuery = (route: string, location: Pick<Location, 'hash'> = window.location): string => {
+  const query = getOAuthQueryString(location);
+  return new URLSearchParams(query).has(QUERY_KEY.SCOPE) ? `${route}${query}` : route;
 };
 
 /**

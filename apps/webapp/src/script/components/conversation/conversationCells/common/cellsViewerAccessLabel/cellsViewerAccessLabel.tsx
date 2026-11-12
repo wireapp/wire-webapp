@@ -19,9 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {ViewerAccessIcon} from '@wireapp/react-ui-kit';
-
 import {viewerAccessLabelStyles} from './cellsViewerAccessLabel.styles';
+
+import {ViewerAccessIcon} from '../../../../../uiKit/dataDisplay/icon/viewerAccessIcon';
 
 interface CellsViewerAccessLabelProps {
   label: string;

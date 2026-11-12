@@ -19,9 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {upgradeBadgeCss} from './ConversationDetails.styles';
+
+import {useApplicationContext} from '../../../../../page/rootProvider';
 
 export const UpgradeBadge: FunctionComponent = () => {
   const {translate} = useApplicationContext();

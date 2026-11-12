@@ -17,16 +17,15 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import type {MeetingCancellationOptions} from 'Components/meeting/meetingNotificationEventHandlers';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import type {MeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
+
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
+import {WebAppEvents} from '../../../webAppEvents';
+import type {MeetingCancellationOptions} from '../meetingNotificationEventHandlers';
+import type {MeetingSeries} from '../types/meetingSeries';
 
 export type SubscribeToMeetingLifecycleEventsDependencies = {
   dispatcher: MeetingLifecycleDispatcher;

@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {videoOptionsMenuStyles} from 'Components/calling/VideoControls/VideoControls.styles';
+import {videoOptionsMenuStyles} from '../../calling/VideoControls/VideoControls.styles';
 
 export const meetingPrepSurfaceStyles: CSSObject = {
   display: 'flex',
@@ -107,6 +107,12 @@ export const meetingPrepDeviceMenuStyles: CSSObject = {
   transform: 'none',
   width: 'min(320px, calc(100vw - 32px))',
   maxWidth: 'calc(100vw - 32px)',
+  '@media (max-height: 500px)': {
+    '& [role="listbox"]': {
+      maxHeight: 170,
+      overflowY: 'auto',
+    },
+  },
 };
 
 export const meetingPrepAvatarStyles: CSSObject = {

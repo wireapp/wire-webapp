@@ -17,7 +17,7 @@
  *
  */
 
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
+import type {MeetingSeries} from '../types/meetingSeries';
 
 import {getMeetingInstancePage, getNextMeetingInstancePage} from './getMeetingInstancePage';
 

@@ -17,13 +17,12 @@
  *
  */
 
-import {
-  CONVERSATION_TYPE,
-  DefaultConversationRoleName,
-  GROUP_CONVERSATION_TYPE,
-} from '@wireapp/api-client/lib/conversation';
-import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
+import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
+import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
+import type {CallConfigData} from '../../apiClient/account/callConfigData';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {amplify} from 'amplify';
 import type axios from 'axios';
 import 'jsdom-worker';
@@ -34,6 +33,9 @@ import {container} from 'tsyringe';
 import {
   CALL_TYPE,
   CONV_TYPE,
+  ERROR,
+  getAvsInstance,
+  LOG_LEVEL,
   QUALITY,
   REASON,
   STATE as CALL_STATE,
@@ -41,47 +43,68 @@ import {
   Wcall,
   type WcallAudioCbrChangeHandler,
 } from '@wireapp/avs';
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {Runtime} from '../../commons/util/Runtime';
+import {WebAppEvents} from '../../webAppEvents';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {CallingEvent} from 'Repositories/event/CallingEvent';
-import {CALL} from 'Repositories/event/Client';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {MediaType} from 'Repositories/media/MediaType';
-import {UserRepository} from 'Repositories/user/userRepository';
-import type {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
-import {TestFactory} from 'test/helper/TestFactory';
-import {createUuid} from 'Util/uuid';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {Conversation} from '../entity/Conversation';
+import {CryptographyMapper} from '../cryptography/CryptographyMapper';
+import {User} from '../entity/User';
+import {CallingEvent} from '../event/CallingEvent';
+import {CALL} from '../event/Client';
+import {EventRepository} from '../event/EventRepository';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {MediaType} from '../media/MediaType';
+import {UserRepository} from '../user/userRepository';
+import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {TestFactory} from '../../../../test/helper/TestFactory';
+import {createUuid} from '../../util/uuid';
 
 import {Call} from './Call';
 import {CallingRepository, MediaStreamQuery, setupDetachedWindowExternalLinksClick} from './CallingRepository';
 import {CallingViewMode, CallState, MuteState} from './CallState';
 import {type NetworkQuality, UNKNOWN_NETWORK_QUALITY} from './calling.schema';
+import assert from 'node:assert';
+
+import {parseSerializedCallingMessage} from './callingMessage.schema';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
-import {useActiveWindowState} from 'Hooks/useActiveWindow';
+import {useActiveWindowState} from '../../hooks/useActiveWindow';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {Core} from '../../service/coreSingleton';
+import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
-import {translateForTest} from 'Util/test/translateForTest';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {BackgroundEffectsHandler, ReleasableMediaStream} from 'Repositories/media/backgroundEffectsHandler';
+import {translateForTest} from '../../util/test/translateForTest';
+import {MessageRepository} from '../conversation/MessageRepository';
+import {MediaStreamHandler} from '../media/MediaStreamHandler';
+import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {BackgroundEffectsHandler, ReleasableMediaStream} from '../media/backgroundEffectsHandler';
 import {APIClient} from '../../service/apiClientSingleton';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Translate} from 'Util/localizerUtil';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {ConversationState} from '../conversation/ConversationState';
+import {Translate} from '../../util/localizerUtil';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {BackgroundEffectSelection} from '../media/VideoBackgroundEffects';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {NoAudioInputError} from '../../error/noAudioInputError';
+
+const initializeBrowserAvs = (): Promise<Wcall> => {
+  const nodeVersion = Object.getOwnPropertyDescriptor(process.versions, 'node');
+  if (!nodeVersion) {
+    return getAvsInstance();
+  }
+
+  // jsdom exposes Node's version, which the browser AVS build checks during startup.
+  // AVS is only working in browser and worker environment.
+  Object.defineProperty(process.versions, 'node', {...nodeVersion, value: undefined});
+  try {
+    return getAvsInstance();
+  } finally {
+    Object.defineProperty(process.versions, 'node', nodeVersion);
+  }
+};
 
 type AudioFlowStat = {
   bytesReceived?: number;
@@ -245,8 +268,107 @@ function createSftCallingFixture(): SftCallingFixture {
   };
 }
 
+describe('AVS connection test', () => {
+  it('forwards the progress callback and propagates AVS connection test failures', async () => {
+    const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+    const error = new Error('Connection setup timed out');
+    const runConnectionTest: jest.MockedFunction<Wcall['runConnectionTest']> = jest.fn();
+    runConnectionTest.mockRejectedValue(error);
+    repository['wCall'] = {runConnectionTest} as unknown as Wcall;
+    repository['wUser'] = 1;
+    repository['selfUser'] = new User(createUuid(), '', translateForTest);
+    repository['selfClientId'] = createUuid();
+    const onProgress = jest.fn();
+
+    await expect(repository.startConnectionTest(onProgress)).rejects.toBe(error);
+    expect(runConnectionTest).toHaveBeenCalledWith(1, onProgress);
+    await expect(repository.startConnectionTest(onProgress)).rejects.toBe(error);
+  });
+});
+
+describe('CallingRepository AVS logging', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it.each([
+    {level: LOG_LEVEL.DEBUG, loggerMethod: 'debug', callLogLevel: 'DEBUG'},
+    {level: LOG_LEVEL.INFO, loggerMethod: 'info', callLogLevel: 'INFO '},
+    {level: LOG_LEVEL.WARN, loggerMethod: 'warn', callLogLevel: 'WARN '},
+    {level: LOG_LEVEL.ERROR, loggerMethod: 'error', callLogLevel: 'ERROR'},
+  ] as const)('forwards $loggerMethod messages without attributes and preserves callLog formatting', options => {
+    const {level, loggerMethod, callLogLevel} = options;
+    const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+    const loggerSpies = {
+      debug: jest.spyOn(repository['avsLogger'], 'debug').mockImplementation(noop),
+      info: jest.spyOn(repository['avsLogger'], 'info').mockImplementation(noop),
+      warn: jest.spyOn(repository['avsLogger'], 'warn').mockImplementation(noop),
+      error: jest.spyOn(repository['avsLogger'], 'error').mockImplementation(noop),
+    };
+
+    expect(repository.getCallLog()).toBeUndefined();
+
+    repository['avsLogHandler'](level, ' \nAVS diagnostic\t ', undefined);
+
+    const actualLoggerCalls = {
+      debug: loggerSpies.debug.mock.calls,
+      info: loggerSpies.info.mock.calls,
+      warn: loggerSpies.warn.mock.calls,
+      error: loggerSpies.error.mock.calls,
+    };
+    const expectedLoggerCalls = {debug: [], info: [], warn: [], error: [], [loggerMethod]: [['AVS diagnostic']]};
+    const expectedCallLogPattern = new RegExp(
+      `^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z \\[${callLogLevel}\\] AVS diagnostic$`,
+      'u',
+    );
+
+    expect(actualLoggerCalls).toEqual(expectedLoggerCalls);
+    expect(repository.getCallLog()).toEqual([expect.stringMatching(expectedCallLogPattern)]);
+  });
+
+  it.each([new Error('Socket closed'), {reason: 'Socket closed'}, 'Socket closed', 0, false, null])(
+    'preserves the error attribute and message-only callLog entry for %p',
+    error => {
+      const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+      const errorLogSpy = jest.spyOn(repository['avsLogger'], 'error').mockImplementation(noop);
+
+      repository['avsLogHandler'](LOG_LEVEL.ERROR, ' \nFailed AVS operation\t ', error);
+
+      expect(errorLogSpy).toHaveBeenCalledWith('Failed AVS operation', {error});
+      expect(errorLogSpy.mock.calls[0]?.[1]?.error).toBe(error);
+      expect(repository.getCallLog()).toEqual([
+        expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z \[ERROR\] Failed AVS operation$/u),
+      ]);
+    },
+  );
+
+  it('appends repeated AVS messages to the existing callLog in order', () => {
+    const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+    jest.spyOn(repository['avsLogger'], 'info').mockImplementation(noop);
+    jest.spyOn(repository['avsLogger'], 'warn').mockImplementation(noop);
+
+    repository['avsLogHandler'](LOG_LEVEL.INFO, 'First message', undefined);
+    const initialCallLog = repository.getCallLog();
+    repository['avsLogHandler'](LOG_LEVEL.WARN, 'Second message', new Error('Socket closed'));
+
+    const actualCallLog = repository.getCallLog();
+
+    expect(actualCallLog).toBe(initialCallLog);
+    expect(actualCallLog).toEqual([
+      expect.stringMatching(/ \[INFO \] First message$/u),
+      expect.stringMatching(/ \[WARN \] Second message$/u),
+    ]);
+  });
+});
+
 describe('CallingRepository', () => {
-  const testFactory = new TestFactory();
+  beforeAll(initializeBrowserAvs);
+
+  afterEach(() => {
+    testFactory.dispose();
+  });
+
+  let testFactory: TestFactory;
   let callingRepository: CallingRepository;
   let wCall: Wcall;
   let wUser: number;
@@ -254,7 +376,19 @@ describe('CallingRepository', () => {
   selfUser.isMe = true;
   const clientId = createUuid();
 
-  beforeAll(() => {
+  beforeEach(() => {
+    testFactory = new TestFactory(
+      createCoreTestFixture({
+        backendFeatures: {isFederated: false},
+        service: {
+          subconversation: {
+            joinConferenceSubconversation: jest.fn(),
+            leaveConferenceSubconversation: jest.fn(),
+            subscribeToEpochUpdates: jest.fn(),
+          },
+        },
+      }),
+    );
     return testFactory.exposeCallingActors().then(injectedCallingRepository => {
       callingRepository = injectedCallingRepository;
       return callingRepository.initAvs(selfUser, clientId).then(avsApi => {
@@ -269,6 +403,7 @@ describe('CallingRepository', () => {
     callingRepository['conversationState'].conversations([]);
     callingRepository.destroy();
     jest.restoreAllMocks();
+    container.clearInstances();
   });
 
   afterAll(() => {
@@ -375,10 +510,10 @@ describe('CallingRepository', () => {
       const stagingSftServers = [{urls: ['https://sft.calling-staging-v01.zinfra.io']}];
       const stagingSftServerAll = [
         {
-          urls: [
-            'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0',
-            'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1',
-          ],
+          urls: ['https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0'],
+        },
+        {
+          urls: ['https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1'],
         },
       ];
 
@@ -425,6 +560,121 @@ describe('CallingRepository', () => {
   });
 
   describe('onCallEvent', () => {
+    it.each([
+      {avsResult: 0, expectedWarnings: 0},
+      {avsResult: ERROR.UNKNOWN_PROTOCOL, expectedWarnings: 1},
+    ])('forwards version 4.0 to AVS returning $avsResult', async ({avsResult, expectedWarnings}) => {
+      const conversation = createConversation();
+      callingRepository['conversationState'].conversations.push(conversation);
+      const recvMsg = jest.spyOn(wCall, 'recvMsg').mockReturnValue(avsResult);
+      const warnOutdatedClient = jest
+        .spyOn(
+          callingRepository as unknown as {warnOutdatedClient: (conversationId: QualifiedId) => void},
+          'warnOutdatedClient',
+        )
+        .mockImplementation(noop);
+      const content = {
+        type: CALL_MESSAGE_TYPE.CONF_START as const,
+        version: '4.0',
+        resp: false,
+        sessid: 'session',
+        secret: 'c2VjcmV0',
+        seqno: '0',
+        sft_url: 'https://sft.example',
+        timestamp: '1',
+        future: {codecs: ['example']},
+      };
+      const parsed = parseSerializedCallingMessage(JSON.stringify(content));
+      assert(parsed.isOk);
+      const event: CallingEvent = {
+        content: parsed.value,
+        conversation: conversation.id,
+        qualified_conversation: conversation.qualifiedId,
+        from: 'sender',
+        sender: 'client',
+        time: '2026-01-01T00:00:00.000Z',
+        type: CALL.E_CALL,
+      };
+
+      await callingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+
+      expect(recvMsg).toHaveBeenCalledTimes(1);
+      expect(JSON.parse(recvMsg.mock.calls[0][1])).toEqual(content);
+      expect(warnOutdatedClient).toHaveBeenCalledTimes(expectedWarnings);
+    });
+
+    it.each([
+      ['oversized string', JSON.stringify({type: 'SETUP', version: '4.0', sdp: 'a'.repeat(65_537)})],
+      ['deep nesting', '{"type":"CONFSTART","version":"4.0","future":' + '['.repeat(17) + '0' + ']'.repeat(17) + '}'],
+    ])('discards an unfamiliar-version %s before AVS', async (_name, content) => {
+      const conversation = createConversation();
+      callingRepository['conversationState'].conversations.push(conversation);
+      const recvMsg = jest.spyOn(wCall, 'recvMsg').mockReturnValue(0);
+      const mapper = new CryptographyMapper(container.resolve(Core));
+      const mapped = await mapper.mapGenericMessage(
+        new GenericMessage({messageId: createUuid(), calling: new Calling({content})}),
+        {
+          conversation: conversation.id,
+          qualified_conversation: conversation.qualifiedId,
+          from: 'sender',
+          time: '2026-01-01T00:00:00.000Z',
+          type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+          data: {sender: 'client', recipient: 'self-client', text: ''},
+        },
+      );
+      if (mapped && mapped.type === CALL.E_CALL) {
+        await callingRepository.onCallEvent(
+          {
+            content: mapped.content,
+            conversation: mapped.conversation,
+            qualified_conversation: conversation.qualifiedId,
+            from: mapped.from,
+            sender: 'client',
+            time: mapped.time,
+            type: CALL.E_CALL,
+          },
+          EventRepository.SOURCE.WEB_SOCKET,
+        );
+      }
+
+      expect(mapped).toBeUndefined();
+      expect(recvMsg).not.toHaveBeenCalled();
+    });
+
+    it('forwards validated CONFCHECK messages to AVS', async () => {
+      const conversation = createConversation();
+      callingRepository['conversationState'].conversations.push(conversation);
+      const recvMsg = jest.spyOn(wCall, 'recvMsg').mockReturnValue(0);
+      const content = {
+        type: CALL_MESSAGE_TYPE.CONF_CHECK,
+        version: '3.0',
+        resp: true,
+        sessid: 'session',
+        secret: 'c2VjcmV0',
+        seqno: '0',
+        sft_url: 'https://sft.example',
+        timestamp: '1',
+      };
+      const parsed = parseSerializedCallingMessage(JSON.stringify(content));
+      assert(parsed.isOk);
+
+      await callingRepository.onCallEvent(
+        {
+          content: parsed.value,
+          conversation: conversation.id,
+          qualified_conversation: conversation.qualifiedId,
+          from: 'sender',
+          sender: 'client',
+          time: '2026-01-01T00:00:00.000Z',
+          type: CALL.E_CALL,
+        },
+        EventRepository.SOURCE.WEB_SOCKET,
+      );
+
+      expect(recvMsg).toHaveBeenCalledTimes(1);
+      expect(JSON.parse(recvMsg.mock.calls[0][1])).toEqual(content);
+    });
+
     it('does mute itself when remote muted message arrives', async () => {
       const conversation = createConversation();
       const selfParticipant = createSelfParticipant();
@@ -564,6 +814,56 @@ describe('CallingRepository', () => {
       expect(callingRepository.muteCall).not.toHaveBeenCalled();
       expect(wCall.recvMsg).not.toHaveBeenCalled();
     });
+  });
+
+  it.each([1, 256, 257, 500])('sends valid moderator-mute batches for %s same-domain users', count => {
+    const conversation = createConversation();
+    callingRepository['conversationState'].conversations.push(conversation);
+    const sendCallingMessage = jest
+      .spyOn(callingRepository['messageRepository'], 'sendCallingMessage')
+      .mockResolvedValue({} as Awaited<ReturnType<MessageRepository['sendCallingMessage']>>);
+    const participants = Array.from({length: count}, (_, index) => {
+      return new Participant(new User(`user-${index}`, 'example.com', translateForTest), `client-${index}`);
+    });
+
+    callingRepository.sendModeratorMute(conversation.qualifiedId, participants);
+
+    expect(sendCallingMessage).toHaveBeenCalledTimes(Math.ceil(count / 256));
+    const receivedUsers: string[] = [];
+    for (const [targetConversation, serialized, options] of sendCallingMessage.mock.calls) {
+      assert(typeof serialized === 'string');
+      const parsed = parseSerializedCallingMessage(serialized);
+      assert(parsed.isOk);
+      assert(parsed.value.type === CALL_MESSAGE_TYPE.REMOTE_MUTE);
+      const targets = parsed.value.data.targets;
+      expect(targetConversation).toBe(conversation);
+      expect(options).toEqual({nativePush: true, recipients: targets});
+      const users = Object.keys(targets['example.com']);
+      expect(users.length).toBeLessThanOrEqual(256);
+      for (const user of users) {
+        expect(targets['example.com'][user]).toEqual([`client-${user.slice('user-'.length)}`]);
+      }
+      receivedUsers.push(...users);
+    }
+    expect(receivedUsers).toEqual(
+      participants.map(participant => {
+        return participant.user.id;
+      }),
+    );
+  });
+
+  it('preserves version 3.0 in outgoing AVS messages', async () => {
+    const conversation = createConversation();
+    callingRepository['conversationState'].conversations.push(conversation);
+    const sendCallingMessage = jest
+      .spyOn(callingRepository['messageRepository'], 'sendCallingMessage')
+      .mockResolvedValue({} as Awaited<ReturnType<MessageRepository['sendCallingMessage']>>);
+    const payload = JSON.stringify({resp: false, sessid: 'session', type: CALL_MESSAGE_TYPE.CANCEL, version: '3.0'});
+
+    await callingRepository['sendCallingMessage'](conversation.qualifiedId, payload);
+
+    expect(sendCallingMessage).toHaveBeenCalledWith(conversation, payload, undefined);
+    expect(JSON.parse(sendCallingMessage.mock.calls[0][1] as string).version).toBe('3.0');
   });
 
   describe('startCall', () => {
@@ -1359,10 +1659,9 @@ describe('CallingRepository', () => {
 
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidJsonString);
 
-      expect(callingRepository['logger'].warn).toHaveBeenCalledWith(
-        'Invalid network quality info JSON',
-        expect.any(Error),
-      );
+      expect(callingRepository['logger'].warn).toHaveBeenCalledWith('Invalid network quality info JSON', {
+        error: expect.any(Error),
+      });
     });
 
     it('logs warning when network quality info schema validation fails', () => {
@@ -1374,10 +1673,9 @@ describe('CallingRepository', () => {
 
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidQualityInfo);
 
-      expect(callingRepository['logger'].warn).toHaveBeenCalledWith(
-        'Invalid network quality info schema',
-        expect.any(z.ZodError),
-      );
+      expect(callingRepository['logger'].warn).toHaveBeenCalledWith('Invalid network quality info schema', {
+        error: expect.any(z.ZodError),
+      });
 
       expect(Warnings.showWarning).not.toHaveBeenCalled();
       expect(Warnings.hideWarning).not.toHaveBeenCalled();
@@ -1612,6 +1910,8 @@ describe('CallingRepository', () => {
 });
 
 describe('CallingRepository ISO', () => {
+  beforeAll(initializeBrowserAvs);
+
   describe('incoming call', () => {
     let avsUser: number;
     let avsCall: Wcall;
@@ -1780,7 +2080,7 @@ describe('CallingRepository ISO', () => {
         sendIncomingSetup: async (setupReceivedAt: number) => {
           await callingRepo.onCallEvent(
             {
-              content: {resp: false, type: CALL_MESSAGE_TYPE.SETUP, version: '3.0'},
+              content: {resp: false, sessid: 'test-session', sdp: '', type: CALL_MESSAGE_TYPE.SETUP, version: '3.0'},
               conversation: conversation.id,
               from: createUuid(),
               sender: createUuid(),
@@ -1886,6 +2186,8 @@ describe('CallingRepository ISO', () => {
 });
 
 describe.skip('E2E audio call', () => {
+  beforeAll(initializeBrowserAvs);
+
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: noop} as unknown as EventRepository,
   });
@@ -2026,6 +2328,8 @@ describe.skip('E2E audio call', () => {
 });
 
 describe('NotificationHandlingState', () => {
+  beforeAll(initializeBrowserAvs);
+
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: noop} as unknown as EventRepository,
     mediaDevicesHandler: {
@@ -2073,6 +2377,8 @@ describe('NotificationHandlingState', () => {
 });
 
 describe('init AVS state', () => {
+  beforeAll(initializeBrowserAvs);
+
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: noop} as unknown as EventRepository,
     mediaDevicesHandler: {

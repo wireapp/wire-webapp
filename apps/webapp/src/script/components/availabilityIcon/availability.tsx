@@ -21,10 +21,9 @@ import {ReactNode, type FunctionComponent} from 'react';
 
 import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 
-import {AVATAR_SIZE} from 'Components/avatar';
-
 import * as styles from './availability.styles';
 
+import {AVATAR_SIZE} from '../avatar';
 import * as Icon from '../icon';
 
 const availabilityIconBaseProps = {

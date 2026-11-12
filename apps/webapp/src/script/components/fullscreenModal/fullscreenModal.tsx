@@ -21,10 +21,10 @@ import {useEffect, useCallback, ReactNode, useState, type FunctionComponent} fro
 
 import {createPortal} from 'react-dom';
 
-import {handleEscDown} from 'Util/keyboardUtil';
-import {preventFocusOutside} from 'Util/util';
-
 import {modalStyles, contentStyles} from './fullscreenModal.styles';
+
+import {handleEscDown} from '../../util/keyboardUtil';
+import {preventFocusOutside} from '../../util/util';
 
 const ANIMATION_OPEN_TIMEOUT = 50;
 const ANIMATION_CLOSE_TIMEOUT = 350;

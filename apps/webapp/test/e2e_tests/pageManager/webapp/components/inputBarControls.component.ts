@@ -19,7 +19,7 @@
 
 import {Page, Locator} from '@playwright/test';
 
-import {shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
+import {shareAssetHelper} from '../../../utils/asset.util';
 
 export const EPHEMERAL_TIMER_CHOICES = ['10 seconds', '5 minutes', '1 hour', 'Off'] as const;
 

@@ -20,20 +20,21 @@
 import React, {useEffect, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {RegisterData} from '@wireapp/api-client/lib/auth/';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
-import {ActionLinkButton, CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-
 import {Page} from './page';
 import {styles} from './verifyEmailCode.styles';
 
+import type {RegisterData} from '../../apiClient/auth/registerData';
+import {useApplicationContext} from '../../page/rootProvider';
+import {CodeInput} from '../../uiKit/inputs/codeInput/codeInput';
+import {FlexBox} from '../../uiKit/layout/flexBox/flexBox';
+import {ActionLinkButton} from '../../uiKit/typography/actionLink/actionLink';
+import {Text} from '../../uiKit/typography/text/text';
+import {getLogger} from '../../util/logger';
 import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
 import {BackButton} from '../component/backButton';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
@@ -67,7 +68,7 @@ const VerifyEmailCodeComponent: FunctionComponent<Props & ConnectedProps & Dispa
       navigate(ROUTE.SET_HANDLE, {state: {isNewAccount: true}});
     } catch (error: unknown) {
       trackTelemetryPageView(PageView.ACCOUNT_VERIFICATION_FAILED_SCREEN_2_5);
-      logger.error('Failed to create personal account', error);
+      logger.error('Failed to create personal account', {error});
     }
   };
 
@@ -80,7 +81,7 @@ const VerifyEmailCodeComponent: FunctionComponent<Props & ConnectedProps & Dispa
     try {
       await doSendActivationCode(account.email);
     } catch (error: unknown) {
-      logger.error('Failed to send email code', error);
+      logger.error('Failed to send email code', {error});
     }
   };
 

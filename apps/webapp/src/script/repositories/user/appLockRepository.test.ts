@@ -17,23 +17,25 @@
  *
  */
 
-import {removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {usePrimaryModalState} from 'Components/Modals/PrimaryModal/PrimaryModalState';
-import {User} from 'Repositories/entity/User/User';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {removeCurrentModal} from '../../components/Modals/PrimaryModal';
+import {usePrimaryModalState} from '../../components/Modals/PrimaryModal/PrimaryModalState';
+import {User} from '../entity/User/User';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {createUuid} from '../../util/uuid';
 
 import {AppLockCrypto, AppLockRepository} from './appLockRepository';
 import {AppLockState} from './appLockState';
 import {UserState} from './userState';
+import {TeamEntity} from '../team/TeamEntity';
+import {TeamState} from '../team/TeamState';
+import {FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 
 const mockCryptoPwhashStr = jest.fn();
 const mockCryptoPwhashStrVerify = jest.fn();
 
-const createAppLockRepository = (translate: Translate): AppLockRepository => {
+const createAppLockRepository = (translate: Translate, appLockState = new AppLockState()): AppLockRepository => {
   const userState = new UserState();
-  const appLockState = new AppLockState();
   const appLockCrypto: AppLockCrypto = {
     cryptoPwhashMemLimitInteractive: 1,
     cryptoPwhashOpsLimitInteractive: 1,
@@ -98,5 +100,43 @@ describe('AppLockRepository', () => {
     expect(cancelActionButton?.text).toBe('translated:AppLockDisableCancel');
     expect(currentModalContent.titleText).toBe('translated:ApplockDisableHeadline');
     expect(currentModalContent.message).toBe('translated:AppLockDisableInfo');
+  });
+
+  it('keeps the stored passphrase when team features disappear and removes it on explicit disable', async () => {
+    const teamState = new TeamState();
+    teamState.team(new TeamEntity('team-id'));
+    teamState.teamFeatures({
+      appLock: {
+        status: FEATURE_STATUS.ENABLED,
+        config: {enforceAppLock: true, inactivityTimeoutSecs: 60},
+      },
+    });
+    const repository = createAppLockRepository(translateForTest, new AppLockState(teamState));
+    mockCryptoPwhashStr.mockReturnValue('$argon2id$mocked');
+    await repository.setCode('ValidPassword123!');
+
+    teamState.teamFeatures(undefined);
+    expect(repository.getStoredPassphrase()).toBe('$argon2id$mocked');
+
+    teamState.teamFeatures({});
+    expect(repository.getStoredPassphrase()).toBe('$argon2id$mocked');
+
+    teamState.teamFeatures({
+      appLock: {
+        status: FEATURE_STATUS.DISABLED,
+        config: {enforceAppLock: false, inactivityTimeoutSecs: 60},
+      },
+    });
+    expect(repository.getStoredPassphrase()).toBeNull();
+  });
+
+  it('removes the stored passphrase when the user disables app lock', async () => {
+    const repository = createAppLockRepository(translateForTest);
+    mockCryptoPwhashStr.mockReturnValue('$argon2id$mocked');
+    await repository.setCode('ValidPassword123!');
+
+    repository.disableFeature();
+
+    expect(repository.getStoredPassphrase()).toBeNull();
   });
 });

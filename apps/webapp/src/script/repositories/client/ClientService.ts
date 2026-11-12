@@ -18,14 +18,14 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import type {RegisteredClient, QualifiedUserClientMap} from '@wireapp/api-client/lib/client';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {type ClientRecord, StorageService} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-
+import type {QualifiedUserClientMap} from '../../apiClient/client/qualifiedPublicClients';
+import type {RegisteredClient} from '../../apiClient/client/registeredClient';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {APIClient} from '../../service/apiClientSingleton';
+import {type ClientRecord, StorageService} from '../storage';
+import {StorageSchemata} from '../storage/storageSchemata';
 
 export class ClientService {
   private readonly CLIENT_STORE_NAME: string;

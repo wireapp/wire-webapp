@@ -18,17 +18,22 @@
  */
 
 import {act, render} from '@testing-library/react';
-import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {QualifiedUserClients} from '../../../../../../apiClient/conversation/qualifiedUserClients';
+import {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 
-import {generateQualifiedIds, generateUserClients, generateUsers, withTheme} from 'src/script/auth/util/test/testUtil';
+import {
+  generateQualifiedIds,
+  generateUserClients,
+  generateUsers,
+  withTheme,
+} from '../../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../../page/testSupport/rootContextTestSupport';
 
 import {PartialFailureToSendWarning} from './partialFailureToSend';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

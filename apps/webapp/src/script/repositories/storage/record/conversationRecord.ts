@@ -17,24 +17,23 @@
  *
  */
 
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+
 import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
-  DefaultConversationRoleName,
   GROUP_CONVERSATION_TYPE,
   ADD_PERMISSION,
-} from '@wireapp/api-client/lib/conversation';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-
-import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+} from '../../../apiClient/conversation/conversation';
+import {DefaultConversationRoleName} from '../../../apiClient/conversation/conversationRole';
+import {RECEIPT_MODE} from '../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {CONVERSATION_READONLY_STATE} from '../../conversation/ConversationRepository';
+import {ConversationStatus} from '../../conversation/ConversationStatus';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 
 export interface ConversationRecord {
   access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
@@ -57,6 +56,8 @@ export interface ConversationRecord {
   id: string;
   initial_protocol?: CONVERSATION_PROTOCOL;
   is_guest: boolean;
+  /** Local-only message timestamp from which this conversation is manually unread. */
+  manual_unread_timestamp?: number;
   last_event_timestamp: number;
   last_read_timestamp: number;
   last_server_timestamp: number;

@@ -18,29 +18,12 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
-import {ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client/';
-import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import murmurhash from 'murmurhash';
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
-
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
-import {ClientRecord} from 'Repositories/storage';
-import {StorageKey} from 'Repositories/storage/storageKey';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {loadValue} from 'Util/storageUtil';
-import {toError} from 'Util/toError';
-import {isAxiosError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 
 import {ClientEntity} from './ClientEntity';
 import {constructClientId, parseClientId} from './ClientIdUtil';
@@ -49,9 +32,27 @@ import type {ClientService} from './ClientService';
 import {ClientState} from './ClientState';
 import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils';
 
+import {ClientType} from '../../apiClient/client/clientType';
+import {PublicClient} from '../../apiClient/client/publicClient';
+import {RegisteredClient} from '../../apiClient/client/registeredClient';
+import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '../../apiClient/event/userEvent';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {Runtime} from '../../commons/util/Runtime';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {loadValue} from '../../util/storageUtil';
+import {toError} from '../../util/toError';
+import {isAxiosError, isErrorWithCode, isErrorWithType} from '../../util/typePredicateUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {User} from '../entity/User';
+import {ClientRecord} from '../storage';
+import {StorageKey} from '../storage/storageKey';
 
 const loginHashSeed = 42;
 
@@ -148,7 +149,7 @@ export class ClientRepository {
       const status = isAxiosError(error) ? error.response?.status : undefined;
       const clientNotFoundBackend = status === HTTP_STATUS.NOT_FOUND;
       if (clientNotFoundBackend) {
-        this.logger.warn(`Local client no longer exists on the backend`, error);
+        this.logger.warn(`Local client no longer exists on the backend`, {error});
         throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
       }
 
@@ -251,10 +252,11 @@ export class ClientRepository {
    * @returns Cookie label key
    */
   constructCookieLabelKey(
-    login: string,
+    login: Maybe<string>,
     clientType: ClientType = this.loadCurrentClientType() ?? ClientType.PERMANENT,
   ): string {
-    const loginHash = murmurhash.v3(login !== '' ? login : this.selfUser().id, loginHashSeed);
+    const loginValue = login.unwrapOr('');
+    const loginHash = murmurhash.v3(isNonEmptyString(loginValue) ? loginValue : this.selfUser().id, loginHashSeed);
     return `${StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 
@@ -277,7 +279,7 @@ export class ClientRepository {
       const clientNotValidated = isErrorWithType(error) && error.type === ClientError.TYPE.NO_VALID_CLIENT;
       if (!clientNotValidated) {
         const errorMessage = isErrorWithCode(error) ? String(error.code) : toError(error).message;
-        this.logger.error(`Getting valid local client failed: ${errorMessage}`, error);
+        this.logger.error(`Getting valid local client failed: ${errorMessage}`, {error});
       }
 
       throw error;
@@ -537,7 +539,7 @@ export class ClientRepository {
         return clientEntities;
       })
       .catch((error: unknown) => {
-        this.logger.error(`Unable to retrieve clients for user '${userId}': ${toError(error).message}`, error);
+        this.logger.error(`Unable to retrieve clients for user '${userId}': ${toError(error).message}`, {error});
         throw error;
       });
   }

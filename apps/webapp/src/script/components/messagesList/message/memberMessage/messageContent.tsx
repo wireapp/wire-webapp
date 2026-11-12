@@ -21,18 +21,18 @@ import {ReactNode} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
-import {User} from 'Repositories/entity/User';
-import {ClientEvent} from 'Repositories/event/Client';
-import {Config} from 'src/script/Config';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {useApplicationContext, type RootContextValue} from 'src/script/page/rootProvider';
-import {Declension, joinNames} from 'Util/localizerUtil';
-import {createReactTranslationMarker, replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import {MemberLeaveReason} from '../../../../apiClient/conversation/data/conversationMemberLeaveData';
+import {CONVERSATION_EVENT} from '../../../../apiClient/event/conversationEvent';
+import {Config} from '../../../../Config';
+import {SystemMessageType} from '../../../../message/systemMessageType';
+import {useApplicationContext, type RootContextValue} from '../../../../page/rootProvider';
+import {MemberMessage as MemberMessageEntity} from '../../../../repositories/entity/message/memberMessage';
+import {User} from '../../../../repositories/entity/User';
+import {ClientEvent} from '../../../../repositories/event/Client';
+import {Declension, joinNames} from '../../../../util/localizerUtil';
+import {createReactTranslationMarker, replaceReactComponents} from '../../../../util/localizerUtil/reactLocalizerUtil';
+import {matchQualifiedIds} from '../../../../util/qualifiedId';
 
 export const CONFIG = {
   MAX_USERS_VISIBLE: 17,

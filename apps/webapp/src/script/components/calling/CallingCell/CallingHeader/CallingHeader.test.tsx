@@ -20,12 +20,12 @@
 import {fireEvent, render, type RenderResult} from '@testing-library/react';
 import type {ComponentProps} from 'react';
 
-import * as Router from 'src/script/router/Router';
+import * as Router from '../../../../router/Router';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {CallingHeader} from './CallingHeader';
 

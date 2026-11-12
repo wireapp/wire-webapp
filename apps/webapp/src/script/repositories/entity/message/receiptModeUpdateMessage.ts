@@ -17,13 +17,11 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-
-import {type Translate} from 'Util/localizerUtil';
-
 import {SystemMessage} from './systemMessage';
 
+import {CONVERSATION_EVENT} from '../../../apiClient/event/conversationEvent';
 import {SystemMessageType} from '../../../message/systemMessageType';
+import {type Translate} from '../../../util/localizerUtil';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
   constructor(isReceiptEnabled: boolean, translate: Translate) {

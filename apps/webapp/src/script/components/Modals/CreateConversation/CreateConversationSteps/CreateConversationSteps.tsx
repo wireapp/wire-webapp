@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {FlexBox} from '@wireapp/react-ui-kit';
-
 import {ConversationDetails} from './ConversationDetails/ConversationDetails';
 import {
   createConversationStepRightContainerCss,
@@ -29,6 +27,7 @@ import {
 import {ParticipantsSelection} from './ParticipantsSelection';
 import {Preference} from './Preference';
 
+import {FlexBox} from '../../../../uiKit/layout/flexBox/flexBox';
 import {ConversationTypeContainer} from '../ConversationType/ConversationTypeContainer';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationCreationStep} from '../types';

@@ -20,36 +20,36 @@
 import {FC, ReactNode, useCallback, useEffect, useRef, useState} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {LegalHoldMemberStatus} from '@wireapp/api-client/lib/team/legalhold/';
 import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import * as Icon from 'Components/icon';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {UserDevicesState, UserDevices} from 'Components/userDevices';
-import {UserSearchableList} from 'Components/UserSearchableList';
-import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
-import {ClientRepository} from 'Repositories/client';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEnterDown} from 'Util/keyboardUtil';
+import {useLegalHoldModalState} from './LegalHoldModal.state';
+
+import {LegalHoldMemberStatus} from '../../../apiClient/team/legalhold/legalHoldMemberStatus';
+import {useUserDevicesHistory} from '../../../hooks/useUserDevicesHistory';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {ClientRepository} from '../../../repositories/client';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {CryptographyRepository} from '../../../repositories/cryptography/CryptographyRepository';
+import {User} from '../../../repositories/entity/User';
+import {SearchRepository} from '../../../repositories/search/searchRepository';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {handleEnterDown} from '../../../util/keyboardUtil';
 import {
   createReactTranslationMarker,
   renderReactTranslation,
   replaceReactComponents,
-} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {splitFingerprint} from 'Util/stringUtil';
-import {toError} from 'Util/toError';
-import {isErrorWithCode} from 'Util/typePredicateUtil';
-
-import {useLegalHoldModalState} from './LegalHoldModal.state';
+} from '../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../util/localizerUtil/translationTypes';
+import {splitFingerprint} from '../../../util/stringUtil';
+import {toError} from '../../../util/toError';
+import {isErrorWithCode} from '../../../util/typePredicateUtil';
+import * as Icon from '../../icon';
+import {LegalHoldDot} from '../../LegalHoldDot';
+import {UserDevicesState, UserDevices} from '../../userDevices';
+import {UserSearchableList} from '../../UserSearchableList';
+import {ModalComponent} from '../ModalComponent';
 
 const DISABLE_SUBMIT_TEXT_LENGTH = 1;
 const legalHoldModalLineBreakMarker = createReactTranslationMarker('legal-hold-modal-line-break');

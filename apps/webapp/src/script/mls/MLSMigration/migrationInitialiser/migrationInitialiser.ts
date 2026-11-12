@@ -17,16 +17,14 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {
   ProteusConversation,
   isMixedConversation,
   isProteusConversation,
-} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-
+} from '../../../repositories/conversation/ConversationSelectors';
+import {Conversation} from '../../../repositories/entity/Conversation';
 import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
 interface MigrationInitConversationHandler {
@@ -102,7 +100,7 @@ const initialiseMigrationOfProteusConversation = async (
   } catch (error: unknown) {
     mlsMigrationLogger.error(
       `Error while initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,
-      error,
+      {error},
     );
   }
 };

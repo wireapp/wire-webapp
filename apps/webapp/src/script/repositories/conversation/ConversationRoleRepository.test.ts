@@ -17,20 +17,24 @@
  *
  */
 
-import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {DefaultConversationRoleName as DefaultRole} from '../../apiClient/conversation/conversationRole';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {TeamEntity} from 'Repositories/team/TeamEntity';
-import {createUuid} from 'Util/uuid';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {TeamEntity} from '../team/TeamEntity';
+import {createUuid} from '../../util/uuid';
 
 import {ConversationRoleRepository, Permissions} from './ConversationRoleRepository';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ConversationRoleRepository', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   const testFactory = new TestFactory();
   let roleRepository: ConversationRoleRepository;
 

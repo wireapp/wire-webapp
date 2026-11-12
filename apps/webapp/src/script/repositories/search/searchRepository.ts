@@ -18,23 +18,23 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {QualifiedId, SearchResult} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
-import type {User} from 'Repositories/entity/User';
-import {validateHandle} from 'Repositories/user/userHandleGenerator';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {EMOJI_RANGES} from 'Util/emojiUtil';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import type {SearchResult} from '../../apiClient/user/searchResult';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Core} from '../../service/coreSingleton';
+import {EMOJI_RANGES} from '../../util/emojiUtil';
 import {
   computeTransliteration,
   replaceAccents,
   sortByPriority,
   startsWith,
   transliterationIndex,
-} from 'Util/stringUtil';
-
-import {APIClient} from '../../service/apiClientSingleton';
-import {Core} from '../../service/coreSingleton';
+} from '../../util/stringUtil';
+import type {User} from '../entity/User';
+import {validateHandle} from '../user/userHandleGenerator';
+import type {UserRepository} from '../user/userRepository';
 
 const propertyOrderWeightMultiplier = 10;
 const exactPrefixMatchWeight = 100;

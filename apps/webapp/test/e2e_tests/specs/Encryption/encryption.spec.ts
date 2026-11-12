@@ -1,6 +1,6 @@
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
-import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
+import {PageManager} from '../../pageManager';
+import {test, expect, withLogin, LOGIN_TIMEOUT} from '../../test.fixtures';
+import {connectWithUser, createGroup} from '../../utils/userActions';
 
 test.describe('Encryption', () => {
   test(

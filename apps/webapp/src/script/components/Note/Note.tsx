@@ -19,9 +19,9 @@
 
 import {ReactNode, type FunctionComponent} from 'react';
 
-import {InfoIcon} from 'Components/icon';
-
 import {ContainerStyle, ContentStyle, HeaderStyle} from './Note.styles';
+
+import {InfoIcon} from '../icon';
 
 interface NoteProps {
   title: string;

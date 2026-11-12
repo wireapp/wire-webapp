@@ -17,9 +17,8 @@
  *
  */
 
-import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data/conversationJoinData';
-import type {BackendError} from '@wireapp/api-client/lib/http/';
-
+import type {ConversationJoinData} from '../../../apiClient/conversation/data/conversationJoinData';
+import type {BackendError} from '../../../apiClient/http/backendError';
 import {AppActions, CONVERSATION_ACTION} from '../action/creator/';
 
 export interface ConversationState {

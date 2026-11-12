@@ -25,14 +25,6 @@ import {
   type AccessorKeyColumnDefBase,
 } from '@tanstack/react-table';
 
-import {CellsSelectionCheckbox} from 'Components/cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
-import {CellsSortDirection} from 'Components/conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
-import {CellsTableSortableHeader} from 'Components/conversation/conversationCells/common/cellsTableSortableHeader/cellsTableSortableHeader';
-import {CellsSortField} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {RootContextValue} from 'src/script/page/rootProvider';
-import {CellNode} from 'src/script/types/cellNode';
-
 import {CellsConversationColumn} from './cellsConversationColumn/cellsConversationColumn';
 import {CellsTableOwnerColumn} from './cellsOwnerColumn/cellsOwnerColumn';
 import {CellsTableDateColumn} from './cellsTableDateColumn/cellsTableDateColumn';
@@ -40,6 +32,14 @@ import {CellsTableNameColumn} from './cellsTableNameColumn/cellsTableNameColumn'
 import {CellsTableRowOptions} from './cellsTableRowOptions/cellsTableRowOptions';
 import {CellsTableSharedColumn} from './cellsTableSharedColumn/cellsTableSharedColumn';
 import {CellsTableTagsColumn} from './cellsTableTagsColumn/cellsTableTagsColumn';
+
+import type {RootContextValue} from '../../../../page/rootProvider';
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../types/cellNode';
+import {CellsSelectionCheckbox} from '../../../cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
+import {CellsSortDirection} from '../../../conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
+import {CellsTableSortableHeader} from '../../../conversation/conversationCells/common/cellsTableSortableHeader/cellsTableSortableHeader';
+import {CellsSortField} from '../../../conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 
 const columnHelper = createColumnHelper<CellNode>();
 

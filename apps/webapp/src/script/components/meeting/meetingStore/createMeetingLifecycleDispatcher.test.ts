@@ -17,10 +17,10 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {task} from 'true-myth';
 
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
+import type {MeetingSeries} from '../types/meetingSeries';
 
 import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
 import type {MeetingLifecycleDispatcherDependencies} from './createMeetingLifecycleDispatcher';

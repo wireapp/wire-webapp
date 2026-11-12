@@ -18,30 +18,27 @@
  */
 
 import {isEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
-import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
-import type {MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {AddUsersFailure} from '@wireapp/core/lib/conversation';
 import {Task, task} from 'true-myth';
 
-import {computeParticipantDiff} from 'Components/meeting/computeMeetingParticipantDiff';
-import {mapMeetNowCommandToCreateMeeting} from 'Components/meeting/mapMeetNowCommandToCreateMeeting';
-import {mapScheduleCommandToCreateMeeting} from 'Components/meeting/mapScheduleCommandToCreateMeeting';
-import {mapUpdateCommandToUpdateMeeting} from 'Components/meeting/mapUpdateCommandToUpdateMeeting';
+import {syncMeetingConversationName} from './syncMeetingConversationName';
+
+import type {CreateMeeting} from '../../../../apiClient/meetings/createMeeting';
+import type {MeetingWithConversation} from '../../../../apiClient/meetings/meeting';
+import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import type {AddUsersFailure} from '../../../../core/conversation';
+import type {User} from '../../../../repositories/entity/User';
+import {computeParticipantDiff} from '../../computeMeetingParticipantDiff';
+import {mapMeetNowCommandToCreateMeeting} from '../../mapMeetNowCommandToCreateMeeting';
+import {mapScheduleCommandToCreateMeeting} from '../../mapScheduleCommandToCreateMeeting';
+import {mapUpdateCommandToUpdateMeeting} from '../../mapUpdateCommandToUpdateMeeting';
 import {
   type MeetingConversationSyncError,
   meetingConversationSyncErrors,
   syncMeetingConversationParticipants,
-} from 'Components/meeting/meetingConversationSync';
-import type {MeetingServiceDeps} from 'Components/meeting/meetingStore/meetingStoreDeps';
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {syncMeetingConversationName} from 'Components/meeting/shared/service/syncMeetingConversationName';
-import type {
-  MeetNowMeetingCommand,
-  ScheduleMeetingCommand,
-  UpdateMeetingCommand,
-} from 'Components/meeting/shared/types/meetingCommandTypes';
-import type {User} from 'Repositories/entity/User';
+} from '../../meetingConversationSync';
+import type {MeetingServiceDeps} from '../../meetingStore/meetingStoreDeps';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from '../../meetingSubmitErrors';
+import type {MeetNowMeetingCommand, ScheduleMeetingCommand, UpdateMeetingCommand} from '../types/meetingCommandTypes';
 
 export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
 

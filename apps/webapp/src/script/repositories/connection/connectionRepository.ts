@@ -18,39 +18,39 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {Connection, ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {UserConnectionEvent, USER_EVENT, UserEvent} from '@wireapp/api-client/lib/event/';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {UserConnectionData, UserUpdateData} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import type {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import type {EventSource} from 'Repositories/event/EventSource';
-import {SelfService} from 'Repositories/self/SelfService';
-import {TeamService} from 'Repositories/team/TeamService';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {toError} from 'Util/toError';
-import {isBackendError} from 'Util/typePredicateUtil';
 
 import type {ConnectionEntity} from './connectionEntity';
 import {ConnectionMapper} from './connectionMapper';
 import type {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
 
+import {Connection} from '../../apiClient/connection/connection';
+import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
+import {UserConnectionEvent, USER_EVENT, UserEvent} from '../../apiClient/event/userEvent';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import type {UserConnectionData} from '../../apiClient/user/data/userConnectionData';
+import type {UserUpdateData} from '../../apiClient/user/data/userUpdateData';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {SystemMessageType} from '../../message/systemMessageType';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {toError} from '../../util/toError';
+import {isBackendError} from '../../util/typePredicateUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import type {Conversation} from '../entity/Conversation';
+import {MemberMessage} from '../entity/message/memberMessage';
+import type {User} from '../entity/User';
+import {EventRepository} from '../event/EventRepository';
+import type {EventSource} from '../event/EventSource';
+import {SelfService} from '../self/SelfService';
+import {TeamService} from '../team/TeamService';
+import type {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 
 type ConnectionRequestResult = {connectionStatus: ConnectionStatus; conversationId: QualifiedId};
 type ConnectionsResult = {connections: ConnectionEntity[]; deadConnections: ConnectionEntity[]};
@@ -274,7 +274,9 @@ export class ConnectionRepository {
           }
 
           default: {
-            this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
+            this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, {
+              error,
+            });
             PrimaryModal.show(
               PrimaryModal.type.ACKNOWLEDGE,
               {
@@ -406,7 +408,7 @@ export class ConnectionRepository {
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error: unknown) {
       const logMessage = `Connection change from '${currentStatus}' to '${newStatus}' failed`;
-      this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${toError(error).message}`, error);
+      this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${toError(error).message}`, {error});
       switch (newStatus) {
         case ConnectionStatus.ACCEPTED: {
           PrimaryModal.show(

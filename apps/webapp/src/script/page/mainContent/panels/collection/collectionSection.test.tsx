@@ -19,13 +19,13 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+} from '../../../testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../util/test/translateForTest';
+import {createUuid} from '../../../../util/uuid';
 
 import {CollectionSection} from './collectionSection';
 

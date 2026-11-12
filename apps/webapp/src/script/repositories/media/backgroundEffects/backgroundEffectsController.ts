@@ -19,22 +19,9 @@
 
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
-import {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
-import {
-  getBestMatchingQualityTier,
-  QualityMode,
-  QualityTier,
-  Resolution,
-  resolutionIsGreaterThanOrEqualTo,
-  TIER_DEFINITIONS,
-} from 'Repositories/media/backgroundEffects/quality/definitions';
-import {QUALITY_TIERS, QualityController} from 'Repositories/media/backgroundEffects/quality/qualityController';
-import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
-import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
-import {getLogger, Logger} from 'Util/logger';
-
 import {type CapabilityInfo, type EffectMode, type Metrics, Mode} from './backgroundEffectsWorkerTypes';
 import {detectCapabilities} from './helper/capability';
+import {PerformanceSample} from './helper/samples';
 import {
   defaultOpts,
   ProcessVideoTrackOptions,
@@ -45,7 +32,20 @@ import {
 } from './pipe/options';
 import {TrackProcessor} from './pipe/processor';
 import {runSegmenter, updateSegmenterOptions} from './pipe/segmenter';
+import {
+  getBestMatchingQualityTier,
+  QualityMode,
+  QualityTier,
+  Resolution,
+  resolutionIsGreaterThanOrEqualTo,
+  TIER_DEFINITIONS,
+} from './quality/definitions';
+import {QUALITY_TIERS, QualityController} from './quality/qualityController';
 import {qualityTierFromModel} from './qualityTierMapping';
+
+import {getLogger, Logger} from '../../../util/logger';
+import {backgroundEffectsStore} from '../useBackgroundEffectsStore';
+import {BackgroundSource} from '../VideoBackgroundEffects';
 
 // Blur strength (0–1) maps to Gaussian sigma in pixel units for the shader.
 // The shader's blur radius is 30 px, so a sigma in the ~10–20 px range gives
@@ -220,7 +220,7 @@ export class BackgroundEffectsController {
   }
 
   public setMode(mode: EffectMode): void {
-    this.logger.info('Background effects mode', mode);
+    this.logger.info('Background effects mode', {mode});
     const renderFlags = modeToRenderFlags(mode, this.options.blurStrength, this.options.bgBlurRadius);
     this.options = {...this.options, mode, ...renderFlags};
     this.pushOptionsUpdate();
@@ -245,7 +245,7 @@ export class BackgroundEffectsController {
           return this.applyImageBitmap(bitmap, url);
         })
         .catch((error: unknown) => {
-          return this.logger.warn('Failed to set background image', error);
+          return this.logger.warn('Failed to set background image', {error});
         });
       return;
     }
@@ -256,7 +256,7 @@ export class BackgroundEffectsController {
   }
 
   public async setQuality(quality: QualityMode): Promise<void> {
-    this.logger.info('setQuality', quality);
+    this.logger.info('setQuality', {quality});
 
     this.qualityMode = quality;
 
@@ -386,7 +386,7 @@ export class BackgroundEffectsController {
       await this.inputTrack.applyConstraints(mediaConstraints);
       return newQualityTier;
     } catch (error: unknown) {
-      this.logger.warn('Failed to change resolution', error);
+      this.logger.warn('Failed to change resolution', {error});
       return this.maxQualityTier;
     }
   }
@@ -418,7 +418,7 @@ export class BackgroundEffectsController {
       return;
     }
 
-    this.logger.log(`onPerformanceSample: qualityController.update from: ${currentQualityTier} to ${tier.tier}`);
+    this.logger.info(`onPerformanceSample: qualityController.update from: ${currentQualityTier} to ${tier.tier}`);
     await this.applyQualityTier(tier.tier);
   }
 }

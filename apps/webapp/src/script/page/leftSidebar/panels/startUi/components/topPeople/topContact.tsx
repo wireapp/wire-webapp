@@ -19,14 +19,12 @@
 
 import React, {useEffect, useState, type FunctionComponent} from 'react';
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {User} from 'Repositories/entity/User';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {ConnectionStatus} from '../../../../../../apiClient/connection/connectionStatus';
+import {Avatar, AVATAR_SIZE} from '../../../../../../components/avatar';
+import {User} from '../../../../../../repositories/entity/User';
+import {TabIndex} from '../../../../../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';
 
 interface TopContactProps {
   clickOnUser?: (userEntity: User, event: React.UIEvent) => void;

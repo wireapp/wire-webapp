@@ -21,11 +21,11 @@ import {isUndefined} from '@sindresorhus/is';
 import {act, renderHook} from '@testing-library/react';
 import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import type {Logger} from 'Util/logger';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {UserRepository} from '../../../repositories/user/userRepository';
+import {createExecutingFireAndForgetInvokerForTest} from '../../../page/testSupport/rootContextTestSupport';
+import type {Logger} from '../../../util/logger';
 
 import {useSearchCellsNodes} from './useSearchCellsNodes';
 
@@ -377,7 +377,7 @@ describe('useSearchCellsNodes', () => {
       return fireAndForgetInvoker.waitUntilAllSettled();
     });
 
-    expect(logger.debug).toHaveBeenCalledWith('Ignoring stale request version:', 1);
+    expect(logger.debug).toHaveBeenCalledWith('Ignoring stale request version:', {requestVersion: 1});
     expect(
       useCellsStore.getState().nodes.map(node => {
         return node.name;

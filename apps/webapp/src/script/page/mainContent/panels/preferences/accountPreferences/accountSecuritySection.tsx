@@ -23,20 +23,19 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
-import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockState} from 'Repositories/user/appLockState';
-import {FEATURES, hasAccessToFeature} from 'Repositories/user/userPermission';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
+import {Runtime} from '../../../../../commons/util/Runtime';
+import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
+import {User} from '../../../../../repositories/entity/User';
+import {TeamState} from '../../../../../repositories/team/TeamState';
+import {AppLockState} from '../../../../../repositories/user/appLockState';
+import {FEATURES, hasAccessToFeature} from '../../../../../repositories/user/userPermission';
+import {UserRepository} from '../../../../../repositories/user/userRepository';
+import {Link, LinkVariant} from '../../../../../uiKit/typography/link/link';
+import {TabIndex} from '../../../../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {WebAppEvents} from '../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../rootProvider';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface AccountSecuritySectionProps {

@@ -75,6 +75,14 @@ export const selectionBarStyles: CSSObject = {
   },
 };
 
+export const selectionActionsStyles: CSSObject = {
+  display: 'flex',
+  flexShrink: 0,
+  alignItems: 'center',
+  gap: '8px',
+  marginLeft: 'auto',
+};
+
 export const clearSelectionButtonStyles: CSSObject = {
   flexShrink: 0,
   display: 'inline-flex',
@@ -90,7 +98,7 @@ export const clearSelectionButtonStyles: CSSObject = {
   cursor: 'pointer',
 
   '&:hover, &:focus-visible': {
-    backgroundColor: 'var(--foreground-fade-8)',
+    backgroundColor: 'var(--accent-color-fade-24)',
   },
 
   '&:focus-visible': {
@@ -121,14 +129,13 @@ export const selectionSizeStyles: CSSObject = {
   },
 };
 
-export const bulkMoveButtonStyles: CSSObject = {
+export const bulkActionButtonStyles: CSSObject = {
   flexShrink: 0,
   display: 'inline-flex',
   minHeight: '30px',
   alignItems: 'center',
   justifyContent: 'center',
   gap: '4px',
-  marginLeft: 'auto',
   padding: '0 12px',
   border: '1px solid var(--border-color)',
   borderRadius: '16px',
@@ -137,7 +144,7 @@ export const bulkMoveButtonStyles: CSSObject = {
   cursor: 'pointer',
 
   '&:hover, &:focus-visible': {
-    backgroundColor: 'var(--foreground-fade-8)',
+    backgroundColor: 'var(--accent-color-fade-24)',
   },
 
   '&:focus-visible': {
@@ -172,6 +179,11 @@ export const headerCellStyles: CSSObject = {
   [`@media (max-width: ${styleBreakpoint}px)`]: {
     display: 'none',
   },
+};
+
+export const selectionHeaderCellStyles: CSSObject = {
+  ...headerCellStyles,
+  paddingLeft: '12px',
 };
 
 export const tableCellStyles: CSSObject = {

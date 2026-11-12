@@ -20,11 +20,10 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {Dexie} from 'dexie';
 
-import {ClientEvent} from 'Repositories/event/Client';
-import {getLogger} from 'Util/logger';
-
 import {CPBackupImporter, BackupPeekResult, isCreatedBySameUser, BackupQualifiedId} from './CPB.library';
 
+import {getLogger} from '../../../util/logger';
+import {ClientEvent} from '../../event/Client';
 import {BackupService} from '../backupService';
 import {IncompatibleBackupError} from '../error';
 
@@ -42,7 +41,7 @@ export const isCPBackup = async (data: ArrayBuffer | Blob): Promise<boolean> => 
     return false;
   }
   if (result instanceof BackupPeekResult.Success) {
-    CPBLogger.log(`Backup version: ${result.version}`);
+    CPBLogger.info(`Backup version: ${result.version}`);
     return true;
   }
   return false;
@@ -56,13 +55,13 @@ export const peekCrossPlatformData = async (
   const backupData = new Uint8Array(fileBytes);
   const result = await backupImporter.peekFileData(backupData);
   if (result instanceof BackupPeekResult.Failure) {
-    CPBLogger.log(`Could not peek into backup: ${result}`);
+    CPBLogger.info(`Could not peek into backup: ${result}`);
     throw new IncompatibleBackupError('Incompatible cross-platform backup');
   }
   if (result instanceof BackupPeekResult.Success) {
     const isUserBackup = !isNullOrUndefined(userId) ? await isCreatedBySameUser(result, userId) : false;
 
-    CPBLogger.log(`Backup version: ${result.version}`);
+    CPBLogger.info(`Backup version: ${result.version}`);
     return {
       archiveVersion: result.version,
       isEncrypted: result.isEncrypted,

@@ -19,12 +19,11 @@
 
 import {amplify} from 'amplify';
 
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {ROLE} from 'Repositories/user/userPermission';
-
 import {Environment} from './environment';
+
+import {Runtime} from '../commons/util/Runtime';
+import {ROLE} from '../repositories/user/userPermission';
+import {WebAppEvents} from '../webAppEvents';
 
 export function exposeWrapperGlobals(): void {
   if (Runtime.isDesktopApp()) {

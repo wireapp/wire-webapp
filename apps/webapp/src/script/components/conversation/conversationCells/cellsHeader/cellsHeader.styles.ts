@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {selectionBarBreadcrumbAnchorStyles as sharedSelectionBarBreadcrumbAnchorStyles} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar.styles';
+import {selectionBarBreadcrumbAnchorStyles as sharedSelectionBarBreadcrumbAnchorStyles} from '../../../cells/common/cellsSelectionBar/cellsSelectionBar.styles';
 
 export const wrapperStyles: CSSObject = {
   display: 'flex',

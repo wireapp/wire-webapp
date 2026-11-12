@@ -18,13 +18,16 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {BackendEvent, CONVERSATION_EVENT, MEETING_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
-import {ConnectionState} from '@wireapp/core';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {BackendEvent} from '../../apiClient/event/backendEvent';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
+import {MEETING_EVENT} from '../../apiClient/event/meetingEvent';
+import {USER_EVENT} from '../../apiClient/event/userEvent';
+import {ConnectionState} from '../../core';
+import {WebAppEvents} from '../../webAppEvents';
 import {amplify} from 'amplify';
-import {Runtime} from '@wireapp/commons';
+import {Runtime} from '../../commons/util/Runtime';
 
-import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
+import {ClientConversationEvent} from '../conversation/EventBuilder';
 import {Warnings} from '../../view_model/WarningsContainer';
 
 import {ClientEvent} from './Client';
@@ -33,7 +36,7 @@ import {EventSource} from './EventSource';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 
 const testFactory = new TestFactory();
 
@@ -42,6 +45,10 @@ function getEventRepositoryForTest(): EventRepository {
 }
 
 describe('EventRepository', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(() => {
     return testFactory.exposeClientActors();
   });
@@ -234,11 +241,11 @@ describe('EventRepository', () => {
     });
 
     it('should log the connection state change', () => {
-      const logSpy = jest.spyOn(eventRepository.logger, 'log').mockReturnValue(undefined);
+      const logSpy = jest.spyOn(eventRepository.logger, 'info').mockReturnValue(undefined);
 
       eventRepository['updateConnectivityStatus'](ConnectionState.LIVE);
 
-      expect(logSpy).toHaveBeenCalledWith('Websocket connection state changed to', ConnectionState.LIVE);
+      expect(logSpy).toHaveBeenCalledWith('Websocket connection state changed to', {state: ConnectionState.LIVE});
     });
   });
 

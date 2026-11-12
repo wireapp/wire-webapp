@@ -19,17 +19,19 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Button, ButtonVariant, CalendarIcon, CallIcon} from '@wireapp/react-ui-kit';
-
 import {
   emptyListActionButtonContainerStyles,
   emptyListActionButtonsStyles,
   emptyListBodyStyles,
   emptyListHeadingStyles,
   emptyListStyles,
-} from 'Components/meeting/emptyMeetingList/emptyListStyles';
-import {useMeetingActions} from 'Components/meeting/useMeetingActions';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+} from './emptyListStyles';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {CalendarIcon} from '../../../uiKit/dataDisplay/icon/calendarIcon';
+import {CallIcon} from '../../../uiKit/dataDisplay/icon/callIcon';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {useMeetingActions} from '../useMeetingActions';
 
 export interface EmptyMeetingListProps {
   useMeetingActionsHook?: typeof useMeetingActions;

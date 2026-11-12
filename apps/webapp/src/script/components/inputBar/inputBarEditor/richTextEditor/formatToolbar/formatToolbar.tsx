@@ -23,22 +23,6 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {FORMAT_TEXT_COMMAND, TextFormatType} from 'lexical';
 
-import {
-  CodeBlockIcon,
-  BlockquoteIcon,
-  BoldIcon,
-  CodeInlineIcon,
-  ItalicIcon,
-  StrikethroughIcon,
-  BulletListIcon,
-  NumberedListIcon,
-  HeadingIcon,
-  LinkIcon,
-} from '@wireapp/react-ui-kit';
-
-import {FormatSeparator} from 'Components/inputBar/common/formatSeparator/formatSeparator';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {FormatButton} from './formatButton/formatButton';
 import {wrapperStyles} from './formatToolbar.styles';
 import {LinkDialog} from './linkDialog/linkDialog';
@@ -48,6 +32,19 @@ import {useHeadingState} from './useHeadingState/useHeadingState';
 import {useLinkState} from './useLinkState/useLinkState';
 import {useListState} from './useListState/useListState';
 import {useToolbarState} from './useToolbarState/useToolbarState';
+
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {BlockquoteIcon} from '../../../../../uiKit/dataDisplay/icon/blockquoteIcon';
+import {BoldIcon} from '../../../../../uiKit/dataDisplay/icon/boldIcon';
+import {BulletListIcon} from '../../../../../uiKit/dataDisplay/icon/bulletListIcon';
+import {CodeBlockIcon} from '../../../../../uiKit/dataDisplay/icon/codeBlockIcon';
+import {CodeInlineIcon} from '../../../../../uiKit/dataDisplay/icon/codeInlineIcon';
+import {HeadingIcon} from '../../../../../uiKit/dataDisplay/icon/headingIcon';
+import {ItalicIcon} from '../../../../../uiKit/dataDisplay/icon/italicIcon';
+import {LinkIcon} from '../../../../../uiKit/dataDisplay/icon/linkIcon';
+import {NumberedListIcon} from '../../../../../uiKit/dataDisplay/icon/numberedListIcon';
+import {StrikethroughIcon} from '../../../../../uiKit/dataDisplay/icon/strikethroughIcon';
+import {FormatSeparator} from '../../../common/formatSeparator/formatSeparator';
 
 interface FormatToolbarProps {
   isEditing: boolean;

@@ -31,15 +31,15 @@ export type ApplicationServices = {
 type CreateApplicationServicesDependencies = {
   readonly createApplicationObservability: () => ApplicationObservability;
   readonly clock: Clock;
-  readonly createFireAndForgetInvoker: () => FireAndForgetInvoker;
+  readonly fireAndForgetInvoker: FireAndForgetInvoker;
 };
 
 export function createApplicationServices(dependencies: CreateApplicationServicesDependencies): ApplicationServices {
-  const {createApplicationObservability, clock, createFireAndForgetInvoker} = dependencies;
+  const {createApplicationObservability, clock, fireAndForgetInvoker} = dependencies;
 
   return {
     applicationObservability: createApplicationObservability(),
     clock,
-    fireAndForgetInvoker: createFireAndForgetInvoker(),
+    fireAndForgetInvoker,
   };
 }

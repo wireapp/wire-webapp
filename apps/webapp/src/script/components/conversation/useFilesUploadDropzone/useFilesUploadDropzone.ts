@@ -22,18 +22,17 @@ import {useState} from 'react';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {Accept, DropzoneInputProps, FileRejection, useDropzone, type DropzoneRootProps} from 'react-dropzone';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Config} from 'src/script/Config';
-import type {RootContextValue} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-
 import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
 import {createFileDropHandler} from './createFileDropHandler/createFileDropHandler';
 import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 import {transformAcceptedFiles} from './transformAcceptedFiles/transformAcceptedFiles';
 
+import {Config} from '../../../Config';
+import type {RootContextValue} from '../../../page/rootProvider';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {getLogger} from '../../../util/logger';
 import {FileWithPreview, useFileUploadState} from '../useFilesUploadState/useFilesUploadState';
 import {buildCellsUploadPath} from '../utils/buildCellsUploadPath';
 import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';
@@ -106,13 +105,13 @@ export const useFilesUploadDropzone = ({
       onFileDrop: checkFileSharingPermission((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
         void processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id).catch(
           (error: unknown) => {
-            logger.error('Processing incoming files failed', error);
+            logger.error('Processing incoming files failed', {error});
           },
         );
       }, translate),
     }),
     onError: (error: Error) => {
-      logger.error('Dropping files failed', error);
+      logger.error('Dropping files failed', {error});
       showFileDropzoneErrorModal({
         title: translate('conversationFileUploadFailedHeading'),
         message: translate('conversationFileUploadFailedMessage'),
@@ -178,7 +177,7 @@ export const useFilesUploadDropzone = ({
     try {
       await attatchMetadataToFiles(transformedAcceptedFiles);
     } catch (error: unknown) {
-      logger.warn('Attaching file metadata failed', error);
+      logger.warn('Attaching file metadata failed', {error});
     }
 
     await uploadFiles(transformedAcceptedFiles);
@@ -224,7 +223,7 @@ export const useFilesUploadDropzone = ({
         return;
       }
 
-      logger.error('Uploading file failed', error);
+      logger.error('Uploading file failed', {error});
       updateFile({conversationId: conversation.id, fileId: file.id, data: {uploadStatus: 'error'}});
       throw error;
     }
@@ -254,7 +253,7 @@ export const useFilesUploadDropzone = ({
             data: {...metadata},
           });
         } catch (error: unknown) {
-          logger.warn('Building file metadata failed', error);
+          logger.warn('Building file metadata failed', {error});
         }
       }),
     );

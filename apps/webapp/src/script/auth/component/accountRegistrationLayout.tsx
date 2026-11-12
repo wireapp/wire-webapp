@@ -19,12 +19,6 @@
 
 import {ReactNode, type FunctionComponent} from 'react';
 
-import {WavesPattern} from '@wireapp/react-ui-kit/lib/images/wavesPattern';
-
-import {CheckRoundIcon, COLOR_V2, FlexBox, Logo, Text} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   bodyCss,
   contentContainerCss,
@@ -36,6 +30,14 @@ import {
   registrationLayoutListItemContainerCss,
   registrationLayoutListItemIconCss,
 } from './layout.styles';
+
+import {useApplicationContext} from '../../page/rootProvider';
+import {CheckRoundIcon} from '../../uiKit/dataDisplay/icon/checkRoundIcon';
+import {COLOR_V2} from '../../uiKit/identity/colorsV2/colorsV2';
+import {Logo} from '../../uiKit/identity/logo/logo';
+import {WavesPattern} from '../../uiKit/images/wavesPattern';
+import {FlexBox} from '../../uiKit/layout/flexBox/flexBox';
+import {Text} from '../../uiKit/typography/text/text';
 
 export const AccountRegistrationLayout: FunctionComponent<{children: ReactNode}> = ({
   children,

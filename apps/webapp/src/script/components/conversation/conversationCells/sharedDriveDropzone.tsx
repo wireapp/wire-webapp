@@ -19,10 +19,6 @@
 
 import {DragEvent, ReactNode, useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
-import {BlockIcon} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {getSharedDriveDroppedFiles} from './getSharedDriveDroppedFiles';
 import {
   contentStyles,
@@ -34,6 +30,9 @@ import {
   textWrapperStyles,
   titleStyles,
 } from './sharedDriveDropzone.styles';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {BlockIcon} from '../../../uiKit/dataDisplay/icon/blockIcon';
 
 interface SharedDriveDropzoneProps {
   readonly children: ReactNode;

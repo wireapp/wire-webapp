@@ -17,11 +17,11 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
-import {getTextFilePath, getVideoFilePath, TextFileName, VideoFileName} from 'test/e2e_tests/utils/asset.util';
-import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from '../../utils/sendImage.util';
+import {getTextFilePath, getVideoFilePath, TextFileName, VideoFileName} from '../../utils/asset.util';
+import {driveBulkActionsFeatureToggleName} from '../../../../src/script/featureToggles/startupFeatureToggleNames';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup} from '../../utils/userActions';
@@ -125,12 +125,20 @@ test.describe('Conversations', () => {
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 
-      await test.step('Preconditions: Create group with drive enabled', async () => {
+      await test.step('Preconditions: Create group and wait for its Shared Drive to be ready', async () => {
         await createGroup(userAPages, conversationName, [userB], {cells: true});
+        await userAPages.conversationList().getConversation(conversationName).open();
+        const driveBrowseResponsePromise = userAPageManager.page.waitForResponse(response => {
+          const url = new URL(response.url());
+          return url.pathname === '/v2/n/nodes' && response.request().method() === 'POST';
+        });
+        await userAPages.conversation().clickFilesTab();
+        const driveBrowseResponse = await driveBrowseResponsePromise;
+        expect(driveBrowseResponse.status()).toBe(200);
+        await userAPages.conversation().clickMessagesTab();
       });
 
       await test.step('User A sends a multipart message in a group conversation', async () => {
-        await userAPages.conversationList().getConversation(conversationName).open();
         await userAComponents.inputBarControls().clickShareFile(imageFilePath);
         await userAComponents.inputBarControls().setMessageInput(initialMessageText);
         await userAComponents.inputBarControls().clickSendMessage();
@@ -144,9 +152,11 @@ test.describe('Conversations', () => {
       await test.step('User A edits text part of the multipart message', async () => {
         const message = userAPages.conversation().getMessage({sender: userA});
         await userAPages.conversation().editMessage(message);
+        await expect(userAComponents.inputBarControls().messageInput).toContainText(initialMessageText);
         await userAComponents.inputBarControls().setMessageInput(editedMessageText);
         await userAComponents.inputBarControls().clickSendMessage();
 
+        await expect(message).toContainText(editedMessageText);
         const multipartMessage = userBPages.conversation().getMessage({sender: userA});
         await expect(multipartMessage).toContainText(editedMessageText);
         await expect(multipartMessage.getByRole('button', {name: `Image from ${userA.fullName}`})).toBeVisible();
@@ -250,17 +260,25 @@ test.describe('Conversations', () => {
       await expect(preview.getByRole('button', {name: 'Move', exact: true})).toBeEnabled();
       await preview.getByRole('button', {name: 'Move', exact: true}).click();
 
-      await expect(preview.getByRole('alert')).toBeVisible();
-      await expect(preview.getByRole('button', {name: 'Refresh Drive'})).toBeVisible();
-      await expect(preview.getByRole('button', {name: 'Move', exact: true})).toBeDisabled();
+      await expect(preview).not.toBeVisible();
       await expect
         .poll(() => {
           return moveRequestCount;
         })
         .toBe(1);
 
-      await preview.getByRole('button', {name: 'Refresh Drive'}).click();
-      await expect(preview).not.toBeVisible();
+      const refreshDriveButton = page.getByRole('button', {name: 'Refresh Drive', exact: true});
+      const drivePanel = page.getByRole('tabpanel').filter({has: refreshDriveButton});
+      await expect(page.getByRole('alert')).toContainText('The move request failed.');
+      await expect(drivePanel.getByRole('row', {name: new RegExp(TextFileName)})).toHaveAttribute(
+        'aria-selected',
+        'true',
+      );
+      await expect(selection).toHaveCount(0);
+      await expect(drivePanel.getByRole('button', {name: 'Move', exact: true})).toHaveCount(0);
+
+      await expect(refreshDriveButton).toBeVisible();
+      await refreshDriveButton.click();
       await expect(selection).toBeEnabled();
       await expect(selection).not.toBeChecked();
       expect(moveRequestCount).toBe(1);

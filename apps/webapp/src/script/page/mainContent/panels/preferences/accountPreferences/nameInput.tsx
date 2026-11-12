@@ -19,11 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
-import {UserRepository} from 'Repositories/user/userRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-
 import {AccountInput, useInputDone} from './accountInput';
+
+import {UserRepository} from '../../../../../repositories/user/userRepository';
+import {getLogger} from '../../../../../util/logger';
+import {useApplicationContext} from '../../../../rootProvider';
 
 interface NameInputProps {
   canEditProfile: boolean;
@@ -47,7 +47,7 @@ const NameInput: FunctionComponent<NameInputProps> = ({name, userRepository, can
         await userRepository.changeName(newName);
         nameInputDone.done();
       } catch (error: unknown) {
-        logger.warn('Failed to update name', error);
+        logger.warn('Failed to update name', {error});
       }
     }
   };

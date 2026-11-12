@@ -17,20 +17,21 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Task} from 'true-myth';
 
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {DeleteMeetingModalMode} from 'Components/meeting/shared/delete/showDeleteMeetingModal';
-import {DELETE_MEETING_ERROR_TRANSLATION_KEYS} from 'Components/meeting/shared/submit/deleteMeetingSubmitErrorKeys';
-import {isMeetingDeletedDespiteSubmitError} from 'Components/meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
-import {showMeetingSubmitError} from 'Components/meeting/shared/submit/showMeetingSubmitError';
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
-import {toMeetingIdKey} from 'Components/meeting/utils/toMeetingIdKey';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {User} from 'Repositories/entity/User';
-import type {Translate, TranslationKey} from 'Util/localizerUtil';
+import {DELETE_MEETING_ERROR_TRANSLATION_KEYS} from './deleteMeetingSubmitErrorKeys';
+import {isMeetingDeletedDespiteSubmitError} from './shouldRefreshMeetingsListAfterSubmitError';
+import {showMeetingSubmitError} from './showMeetingSubmitError';
+
+import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import type {User} from '../../../../repositories/entity/User';
+import type {Translate, TranslationKey} from '../../../../util/localizerUtil';
+import {PrimaryModal} from '../../../Modals/PrimaryModal';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from '../../meetingSubmitErrors';
+import type {MeetingInstance} from '../../types/meetingInstance';
+import {canDeleteMeetingForAll, canDeleteMeetingForMe} from '../../utils/canDeleteMeeting';
+import {toMeetingIdKey} from '../../utils/toMeetingIdKey';
+import type {DeleteMeetingModalMode} from '../delete/showDeleteMeetingModal';
 
 const inFlightDeleteMeetingIds = new Set<string>();
 

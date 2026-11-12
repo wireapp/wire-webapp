@@ -17,13 +17,13 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Task} from 'true-myth';
 
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {toMeetingIdKey} from 'Components/meeting/utils/toMeetingIdKey';
-
 import type {SyncMeetingError, SyncMeetingResult} from './createMeetingStore';
+
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import type {MeetingSeries} from '../types/meetingSeries';
+import {toMeetingIdKey} from '../utils/toMeetingIdKey';
 
 const dispatcherOperationFailed = 'dispatcherOperationFailed';
 

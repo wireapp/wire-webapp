@@ -17,7 +17,7 @@
  *
  */
 
-import {test, expect} from 'test/e2e_tests/test.fixtures';
+import {test, expect} from '../../test.fixtures';
 
 test('I want to upgrade team to paid', {tag: ['@TC-11757', '@regression']}, async ({createUser, createTeam, api}) => {
   const userB = await createUser();

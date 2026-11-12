@@ -23,17 +23,16 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {UserBlockedBadge, UserVerificationBadges} from 'Components/badge';
-import {UserClassifiedBar} from 'Components/classifiedBar/classifiedBar';
-import {ErrorFallback} from 'Components/errorFallback';
-import * as Icon from 'Components/icon';
-import {UserInfo} from 'Components/UserInfo';
-import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {useApplicationContext} from '../../page/rootProvider';
+import {User} from '../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import {Avatar, AVATAR_SIZE} from '../avatar';
+import {UserBlockedBadge, UserVerificationBadges} from '../badge';
+import {UserClassifiedBar} from '../classifiedBar/classifiedBar';
+import {ErrorFallback} from '../errorFallback';
+import * as Icon from '../icon';
+import {UserInfo} from '../UserInfo';
 
 interface UserDetailsProps {
   badge?: string;

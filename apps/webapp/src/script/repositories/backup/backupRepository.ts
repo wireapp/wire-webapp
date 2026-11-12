@@ -20,18 +20,6 @@
 import {isNonEmptyString, isNull, isTruthy} from '@sindresorhus/is';
 import {omit} from 'underscore';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isReadableConversation} from 'Repositories/conversation/ConversationSelectors';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {EventRecord, UserRecord} from 'Repositories/storage';
-import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-import {chunk} from 'Util/arrayUtil';
-import {Logger, getLogger} from 'Util/logger';
-import {constructUserPrimaryKey} from 'Util/storageUtil';
-import {WebWorker} from 'Util/worker';
-
 import {ProgressCallback, Filename, FileDescriptor} from './backup.types';
 import {BackUpHeader, ERROR_TYPES} from './backUpHeader';
 import {BackupService} from './backupService';
@@ -51,6 +39,17 @@ import {
 import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './legacyBackup.helper';
 
 import {Config} from '../../Config';
+import {chunk} from '../../util/arrayUtil';
+import {Logger, getLogger} from '../../util/logger';
+import {constructUserPrimaryKey} from '../../util/storageUtil';
+import {WebWorker} from '../../util/worker';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {isReadableConversation} from '../conversation/ConversationSelectors';
+import type {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {EventRecord, UserRecord} from '../storage';
+import {ConversationRecord} from '../storage/record/conversationRecord';
+import {StorageSchemata} from '../storage/storageSchemata';
 
 const backupMetadataIndentationSpaces = 2;
 
@@ -130,7 +129,7 @@ export class BackupRepository {
       return await this.compressHistoryFiles(user, clientId, exportedData, password);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : error;
-      this.logger.error(`Could not export history: ${errorMessage}`, error);
+      this.logger.error(`Could not export history: ${errorMessage}`, {error});
       const isCancelError = isErrorOfType(error, ErrorType.CancelError);
       throw isCancelError ? error : new ExportError();
     }
@@ -448,7 +447,7 @@ export class BackupRepository {
       const nbImported = await importFunction(chunk);
       stats.imported += nbImported;
       stats.ignored += chunk.length - nbImported;
-      this.logger.info(`Imported entities from '${type}'`, JSON.stringify(stats));
+      this.logger.info(`Imported entities from '${type}'`, {statistics: stats});
       if (this.canceled) {
         throw new CancelError();
       }

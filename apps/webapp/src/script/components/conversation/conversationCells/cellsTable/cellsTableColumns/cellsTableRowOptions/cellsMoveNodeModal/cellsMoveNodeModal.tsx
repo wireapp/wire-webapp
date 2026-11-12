@@ -19,22 +19,21 @@
 
 import {useEffect, useState, type FunctionComponent} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
-import {CellsNewNodeForm} from 'Components/conversation/conversationCells/common/cellsNewNodeForm/cellsNewNodeForm';
-import {getCellsFilesPath} from 'Components/conversation/conversationCells/common/getCellsFilesPath/getCellsFilesPath';
-import {openBreadcrumb} from 'Components/conversation/conversationCells/common/openBreadcrumb/openBreadcrumb';
-import {useCellsNewFolderForm} from 'Components/conversation/conversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode} from 'src/script/types/cellNode';
-
 import {CellsFoldersListModalContent} from './cellsFoldersListModalContent/cellsFoldersListModalContent';
 import {LegacyCellsMoveNodeModal} from './legacy/legacyCellsMoveNodeModal';
 import {useGetCellsFolders} from './useGetCellsFolders/useGetCellsFolders';
 import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
+
+import {QualifiedId} from '../../../../../../../apiClient/user/qualifiedId';
+import {driveBulkActionsFeatureToggleName} from '../../../../../../../featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from '../../../../../../../page/rootProvider';
+import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../../../../types/cellNode';
+import {CellsModal} from '../../../../common/cellsModal/cellsModal';
+import {CellsNewNodeForm} from '../../../../common/cellsNewNodeForm/cellsNewNodeForm';
+import {getCellsFilesPath} from '../../../../common/getCellsFilesPath/getCellsFilesPath';
+import {openBreadcrumb} from '../../../../common/openBreadcrumb/openBreadcrumb';
+import {useCellsNewFolderForm} from '../../../../common/useCellsNewNodeForm/useCellsNewFolderForm';
 
 interface CellsMoveNodeModalProps {
   isOpen: boolean;

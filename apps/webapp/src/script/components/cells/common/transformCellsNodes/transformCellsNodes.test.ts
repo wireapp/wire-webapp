@@ -19,10 +19,10 @@
 
 import {RestNode} from 'cells-sdk-ts';
 
-import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {transformCellsNodes} from './transformCellsNodes';
 

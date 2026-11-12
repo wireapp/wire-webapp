@@ -17,4 +17,4 @@
  *
  */
 
-export {CellsStateInfo} from 'Components/cells/common/cellsStateInfo/cellsStateInfo';
+export {CellsStateInfo} from '../../cells/common/cellsStateInfo/cellsStateInfo';

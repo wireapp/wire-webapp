@@ -68,29 +68,25 @@ const ignores = [
   '!apps/webapp/rspack.config.mts',
   '!apps/webapp/rspack.config.dev.mts',
   '!apps/webapp/rspack.config.public.mts',
-  '!libraries/config/src/client.config.ts',
-  '!libraries/config/src/server.config.ts',
+  '!apps/server/rspack.config.mts',
+  '!apps/server/configuration/client.config.ts',
+  '!apps/server/configuration/server.config.ts',
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
   'apps/server/bin/copy_server_assets.js',
   'apps/server/dist/',
+  'apps/server/build/',
+  '**/lib/',
   'apps/server/node_modules/',
   'apps/webapp/src/ext/',
   'apps/webapp/src/script/localization/**/webapp*.js',
   'apps/webapp/src/worker/',
   'apps/webapp/src/script/components/icon.tsx',
-  'libraries/core/lib/',
-  'libraries/api-client/lib/',
-  'libraries/core/.tmp/',
-  'libraries/config/lib/',
-  'libraries/react-ui-kit/lib/',
-  'libraries/*/lib/',
-  'libraries/react-ui-kit/emotion.d.ts',
+  'apps/webapp/src/script/uiKit/emotion.d.ts',
 ];
 
 const productionFileIgnorePatterns = [
   'apps/webapp/test/**',
-  'libraries/core/src/test/**',
   '**/test/**',
   '**/__mocks__/**',
   '*.js',
@@ -103,9 +99,9 @@ const productionFileIgnorePatterns = [
   'apps/webapp/playwright.config.ts',
   'apps/webapp/playwright.rspack.config.ts',
   'apps/webapp/rspack.config*.mts',
-  'libraries/config/src/client.config.ts',
-  'libraries/config/src/server.config.ts',
-  'libraries/react-ui-kit/emotion.d.ts',
+  'apps/server/configuration/client.config.ts',
+  'apps/server/configuration/server.config.ts',
+  'apps/webapp/src/script/uiKit/emotion.d.ts',
 ];
 
 function addProductionFileIgnores(configuration) {
@@ -263,30 +259,6 @@ const productionPlugins = {
   'unused-imports': unusedImportsPlugin,
   'header-tony': headerPlugin,
 };
-const webappImportOrderRule = [
-  'error',
-  {
-    groups: ['external', 'builtin', 'internal', 'sibling', 'parent', 'index'],
-    pathGroups: [
-      {pattern: 'react', group: 'external', position: 'before'},
-      {pattern: '@wireapp/*', group: 'internal', position: 'before'},
-      // One group for all webapp TS path aliases — alphabetize sorts Components/…/Util/…/src/…
-      {
-        pattern: '{apps,Components,Hooks,I18n,Repositories,Resource,src,Util}/**',
-        group: 'internal',
-        position: 'after',
-      },
-    ],
-    pathGroupsExcludedImportTypes: ['react', '@wireapp/*'],
-    'newlines-between': 'always',
-    alphabetize: {
-      order: 'asc',
-      caseInsensitive: true,
-    },
-    warnOnUnassignedImports: true,
-  },
-];
-
 const strictBooleanExpressionsRule = [
   'error',
   {
@@ -367,7 +339,7 @@ const productionConfigs = [
   reactPlugin.configs.flat.recommended,
   reactPlugin.configs.flat['jsx-runtime'],
   {
-    files: ['apps/webapp/src/**/*.{jsx,tsx}', 'libraries/react-ui-kit/src/**/*.{jsx,tsx}'],
+    files: ['apps/webapp/src/**/*.{jsx,tsx}'],
     rules: {
       'react/forbid-dom-props': ['warn', {forbid: ['data-testid']}],
       'react/forbid-component-props': ['warn', {forbid: ['data-testid']}],
@@ -381,6 +353,13 @@ const productionConfigs = [
       ...legacyRules,
       'no-unsanitized/property': 'error',
       'no-unsanitized/method': 'error',
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/main/startApplication.tsx'],
+    rules: {
+      // Bootstrap imports must load reflection support before decorated modules.
+      'import/order': 'off',
     },
   },
   {
@@ -432,6 +411,20 @@ const productionConfigs = [
         NodeJS: 'readonly',
       },
     },
+  },
+  {
+    files: ['apps/server/rspack.config.mts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/server/tsconfig.rspack.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        sourceType: 'module',
+      },
+      globals: runtimeGlobals,
+    },
+    rules: {'import/no-default-export': 'off'},
   },
   {
     files: [
@@ -582,7 +575,7 @@ const productionConfigs = [
   {
     files: [
       'tools/buildArtifact/**/*.ts',
-      'tools/development/**/*.ts',
+      'tools/maintenanceRelease/**/*.ts',
       'tools/productionDistribution/**/*.ts',
       'tools/releaseSummary/**/*.ts',
       'tools/runtimeVerification/**/*.ts',
@@ -624,7 +617,12 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/buildArtifact/**/*.mts', 'tools/runtimeVerification/**/*.mts'],
+    files: [
+      'tools/buildArtifact/**/*.mts',
+      'tools/configuration/**/*.mts',
+      'tools/runtimeVerification/**/*.mts',
+      'tools/serverPackaging/**/*.mts',
+    ],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.tools.json',
@@ -646,15 +644,9 @@ const productionConfigs = [
   {
     files: [
       'apps/server/**/*.{ts,tsx}',
-      'libraries/api-client/**/*.{ts,tsx}',
-      'libraries/commons/**/*.{ts,tsx}',
-      'libraries/certificate-check/**/*.{ts,tsx}',
-      'libraries/core/**/*.{ts,tsx}',
-      'libraries/copy-config/**/*.{ts,tsx}',
-      'libraries/license-collector/**/*.{ts,tsx}',
-      'libraries/store-engine/**/*.{ts,tsx}',
-      'libraries/store-engine-dexie/**/*.{ts,tsx}',
-      'libraries/react-ui-kit/**/*.{ts,tsx}',
+      'tools/configuration/**/*.{ts,mts}',
+      'apps/webapp/src/script/apiClient/**/*.{ts,tsx}',
+      'apps/webapp/src/script/commons/**/*.{ts,tsx}',
     ],
     rules: {
       '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
@@ -695,10 +687,8 @@ const productionConfigs = [
   {
     files: ['apps/webapp/**/*.{ts,tsx}'],
     rules: {
-      // Webapp path aliases (Util/*, Components/*, …) resolve to lowercase dirs on disk.
+      // Webapp path aliases resolve to lowercase dirs on disk.
       'import/no-unresolved': ['error', {caseSensitive: false}],
-      // Pin alias import order so Linux CI and macOS agree on webapp path aliases.
-      'import/order': webappImportOrderRule,
     },
   },
   {
@@ -715,7 +705,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['libraries/react-ui-kit/**/*.{ts,tsx}'],
+    files: ['apps/webapp/src/script/uiKit/**/*.{ts,tsx}'],
     rules: {
       'import/no-default-export': 'off',
     },
@@ -731,9 +721,9 @@ const productionConfigs = [
       'no-restricted-imports': [
         'error',
         {
-          paths: [
+          patterns: [
             {
-              name: 'src/script/page/RootProvider',
+              group: ['../**/page/rootProvider'],
               importNames: ['useApplicationContext'],
               message: 'This modal is rendered outside RootProvider. Pass required dependencies explicitly instead.',
             },
@@ -743,20 +733,14 @@ const productionConfigs = [
     },
   },
   {
-    files: ['apps/webapp/src/script/page/components/WindowTitleUpdater.ts'],
+    files: ['apps/webapp/src/script/page/components/windowTitleUpdater.ts'],
     rules: {
       'no-restricted-imports': [
         'error',
         {
           paths: [
             {
-              name: 'src/script/page/RootProvider',
-              importNames: ['useApplicationContext'],
-              message:
-                'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
-            },
-            {
-              name: '../RootProvider',
+              name: '../rootProvider',
               importNames: ['useApplicationContext'],
               message:
                 'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
@@ -818,75 +802,44 @@ const productionConfigs = [
 
 const testTypeScriptFilePatterns = [
   'apps/**/test/**/*.ts',
-  'libraries/**/test/**/*.ts',
   'apps/**/__mocks__/**/*.ts',
-  'libraries/**/__mocks__/**/*.ts',
   'apps/**/*.test.ts',
-  'libraries/**/*.test.ts',
   'apps/**/*.test.*.ts',
-  'libraries/**/*.test.*.ts',
   'apps/**/*.spec.ts',
-  'libraries/**/*.spec.ts',
   'apps/**/*.spec.*.ts',
-  'libraries/**/*.spec.*.ts',
   'apps/**/setupTests.ts',
-  'libraries/**/setupTests.ts',
   'apps/**/jest.setup.ts',
-  'libraries/**/jest.setup.ts',
   'tools/**/*.test.ts',
+  'tools/**/*.test.mts',
 ];
 
 const testTsxFilePatterns = testTypeScriptFilePatterns.map(filePattern => filePattern.replaceAll('.ts', '.tsx'));
 
 const testJavaScriptFilePatterns = [
   'apps/**/test/**/*.js',
-  'libraries/**/test/**/*.js',
   'apps/**/__mocks__/**/*.js',
-  'libraries/**/__mocks__/**/*.js',
   'apps/**/*.test.js',
-  'libraries/**/*.test.js',
   'apps/**/*.test.*.js',
-  'libraries/**/*.test.*.js',
   'apps/**/*.spec.js',
-  'libraries/**/*.spec.js',
   'apps/**/*.spec.*.js',
-  'libraries/**/*.spec.*.js',
   'apps/**/setupTests.js',
-  'libraries/**/setupTests.js',
   'apps/**/jest.setup.js',
-  'libraries/**/jest.setup.js',
   'apps/**/test/**/*.cjs',
-  'libraries/**/test/**/*.cjs',
   'apps/**/__mocks__/**/*.cjs',
-  'libraries/**/__mocks__/**/*.cjs',
   'apps/**/*.test.cjs',
-  'libraries/**/*.test.cjs',
   'apps/**/*.test.*.cjs',
-  'libraries/**/*.test.*.cjs',
   'apps/**/*.spec.cjs',
-  'libraries/**/*.spec.cjs',
   'apps/**/*.spec.*.cjs',
-  'libraries/**/*.spec.*.cjs',
   'apps/**/setupTests.cjs',
-  'libraries/**/setupTests.cjs',
   'apps/**/jest.setup.cjs',
-  'libraries/**/jest.setup.cjs',
   'apps/**/test/**/*.mjs',
-  'libraries/**/test/**/*.mjs',
   'apps/**/__mocks__/**/*.mjs',
-  'libraries/**/__mocks__/**/*.mjs',
   'apps/**/*.test.mjs',
-  'libraries/**/*.test.mjs',
   'apps/**/*.test.*.mjs',
-  'libraries/**/*.test.*.mjs',
   'apps/**/*.spec.mjs',
-  'libraries/**/*.spec.mjs',
   'apps/**/*.spec.*.mjs',
-  'libraries/**/*.spec.*.mjs',
   'apps/**/setupTests.mjs',
-  'libraries/**/setupTests.mjs',
   'apps/**/jest.setup.mjs',
-  'libraries/**/jest.setup.mjs',
 ];
 
 const testJsxFilePatterns = testJavaScriptFilePatterns.map(filePattern => filePattern.replaceAll('.js', '.jsx'));
@@ -983,7 +936,7 @@ const config = [
     },
   },
   {
-    files: ['libraries/config/src/client.config.ts', 'libraries/config/src/server.config.ts'],
+    files: ['apps/server/configuration/client.config.ts', 'apps/server/configuration/server.config.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -1049,6 +1002,7 @@ const config = [
           vars: 'all',
           args: 'after-used',
           ignoreRestSiblings: true,
+          ignoreUsingDeclarations: true,
           argsIgnorePattern: '^_$',
           caughtErrors: 'all',
           caughtErrorsIgnorePattern: '^_$',
@@ -1164,7 +1118,7 @@ const config = [
     },
   },
   {
-    files: ['apps/**/*.{js,jsx,ts,tsx,cjs,mjs}', 'libraries/**/*.{js,jsx,ts,tsx,cjs,mjs}'],
+    files: ['apps/**/*.{js,jsx,ts,tsx,cjs,mjs}'],
     plugins: {
       jest: jestPlugin,
     },

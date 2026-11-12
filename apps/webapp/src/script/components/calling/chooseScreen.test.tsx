@@ -29,20 +29,18 @@ import {
 } from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {CallState} from 'Repositories/calling/CallState';
+import {CallState} from '../../repositories/calling/CallState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {captureModalFocusContext} from 'Util/modalFocusUtil';
+} from '../../page/testSupport/rootContextTestSupport';
+import {captureModalFocusContext} from '../../util/modalFocusUtil';
 
 import {ChooseScreen} from './ChooseScreen';
-import {translateForTest} from 'Util/test/translateForTest';
-import type {Container} from 'react-dom/client';
-import type {OptionsReceived} from '@testing-library/dom/node_modules/pretty-format';
+import {translateForTest} from '../../util/test/translateForTest';
 
-jest.mock('Util/modalFocusUtil', () => {
+jest.mock('../../util/modalFocusUtil', () => {
   return {
     captureModalFocusContext: jest.fn(),
   };
@@ -118,11 +116,7 @@ describe('ChooseScreen', () => {
   type SetupResult = {
     container: HTMLElement;
     baseElement: HTMLElement;
-    debug: (
-      baseElement?: Container | (Element | Document) | Array<Container | (Element | Document)> | undefined,
-      maxLength?: number | undefined,
-      options?: OptionsReceived | undefined,
-    ) => void;
+    debug: ReturnType<typeof render>['debug'];
     rerender: (ui: React.ReactNode) => void;
     unmount: () => void;
     asFragment: () => DocumentFragment;

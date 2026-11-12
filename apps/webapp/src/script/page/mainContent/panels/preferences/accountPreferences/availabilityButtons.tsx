@@ -24,12 +24,11 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {availabilityStatus} from 'Util/availabilityStatus';
 
 import {ContextMenuEntry} from '../../../../../ui/contextMenu';
+import {availabilityStatus} from '../../../../../util/availabilityStatus';
+import {WebAppEvents} from '../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../rootProvider';
 
 interface AvailabilityInputProps {
   availability: Availability.Type;

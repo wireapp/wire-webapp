@@ -17,13 +17,12 @@
  *
  */
 
-import {type Translate} from 'Util/localizerUtil';
-
 import {Message} from './message';
 import {RenameMessage} from './renameMessage';
 
 import {SuperType} from '../../../message/superType';
 import {SystemMessageType} from '../../../message/systemMessageType';
+import {type Translate} from '../../../util/localizerUtil';
 
 export class SystemMessage extends Message {
   public caption?: string;

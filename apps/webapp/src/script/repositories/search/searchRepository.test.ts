@@ -17,10 +17,10 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {generateUser} from 'test/helper/UserGenerator';
-import {createUuid} from 'Util/uuid';
+import {User} from '../entity/User';
+import {UserRepository} from '../user/userRepository';
+import {generateUser} from '../../../../test/helper/UserGenerator';
+import {createUuid} from '../../util/uuid';
 
 import {SearchRepository} from './searchRepository';
 
@@ -28,7 +28,7 @@ import {randomInt} from '../../auth/util/randomUtil';
 import {generateUsers} from '../../auth/util/test/testUtil';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 type SerializedSearchUser = {name: string; username: string};
 

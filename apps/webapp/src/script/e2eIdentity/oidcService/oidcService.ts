@@ -17,12 +17,11 @@
  *
  */
 
-import {KeyAuth} from '@wireapp/core/lib/messagingProtocols/mls';
 import {UserManager, UserManagerSettings, WebStorageStateStore, type User} from 'oidc-client-ts';
 
-import {clearKeysStartingWith} from 'Util/localStorage';
-
 import {EncryptedStorage} from './oauthEncryptedStore';
+
+import {clearKeysStartingWith} from '../../util/localStorage';
 
 export class OIDCService {
   private readonly userManager: UserManager;
@@ -61,12 +60,12 @@ export class OIDCService {
     this.userManager = new UserManager(dexioConfig);
   }
 
-  public async authenticate(keyAuth: KeyAuth, challengeUrl: string, silent: boolean): Promise<void | User | null> {
+  public async authenticate(keyAuth: string, acmeAudience: string, silent: boolean): Promise<void | User | null> {
     // New claims value for keycloak
     const claims = {
       id_token: {
         keyauth: {essential: true, value: keyAuth},
-        acme_aud: {essential: true, value: challengeUrl},
+        acme_aud: {essential: true, value: acmeAudience},
       },
     };
 

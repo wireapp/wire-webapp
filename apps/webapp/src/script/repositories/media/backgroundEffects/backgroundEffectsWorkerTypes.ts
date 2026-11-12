@@ -24,7 +24,7 @@
  * including effect modes, quality settings, worker messages, and configuration options.
  */
 
-import {QualityMode, QualityTier} from 'Repositories/media/backgroundEffects/quality/definitions';
+import {QualityMode, QualityTier} from './quality/definitions';
 
 /**
  * Effect mode for background processing.

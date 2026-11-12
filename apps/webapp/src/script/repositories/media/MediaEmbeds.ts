@@ -19,9 +19,8 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Runtime} from '@wireapp/commons';
-
-import {formatString} from 'Util/stringUtil';
+import {Runtime} from '../../commons/util/Runtime';
+import {formatString} from '../../util/stringUtil';
 
 const secondsPerMinute = 60;
 const secondsPerHour = 3600;

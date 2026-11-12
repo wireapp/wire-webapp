@@ -21,9 +21,8 @@ import type {MouseEvent, FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {EmojiIcon} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {EmojiIcon} from '../../../../uiKit/dataDisplay/icon/emojiIcon';
 
 interface EmojiButtonProps {
   isActive: boolean;

@@ -19,12 +19,13 @@
 
 import {FC} from 'react';
 
-import {IconButton, IconButtonVariant, QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
-
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {useAppMainState, ViewType} from 'src/script/page/state';
-
 import {buttonsStyle, contentStyle, titleStyle, wrapperStyle} from './preferencesPage.styles';
+
+import {FadingScrollbar} from '../../../../../components/fadingScrollbar';
+import {IconButton, IconButtonVariant} from '../../../../../uiKit/inputs/iconButton/iconButton';
+import {useMatchMedia} from '../../../../../uiKit/layout/matchMedia/matchMedia';
+import {QUERY} from '../../../../../uiKit/utils/mediaQueries';
+import {useAppMainState, ViewType} from '../../../../state';
 
 interface PreferencesPageProps {
   children: React.ReactNode;

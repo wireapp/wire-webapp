@@ -27,6 +27,11 @@ import {
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
+  markAsUnreadFeatureToggleName,
+  troubleshooterFeatureToggleName,
+  sendCallLogsFeatureToggleName,
+  e2ePdfPreviewFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
 } from './startupFeatureToggleNames';
@@ -37,14 +42,69 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  driveBulkRestoreFeatureToggleName,
+  markAsUnreadFeatureToggleName,
+  troubleshooterFeatureToggleName,
+  sendCallLogsFeatureToggleName,
+  e2ePdfPreviewFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
+  it('keeps encrypted PDF previews disabled for release builds and allows explicit opt-in', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview');
+
+    expect(disabled.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)).toBe(false);
+    expect(enabled.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)).toBe(true);
+    expect(enabled.enabledFeatureToggleNames).toEqual([e2ePdfPreviewFeatureToggleName]);
+  });
+
+  it('keeps Mark as unread disabled by default for release builds and allows explicit opt-in', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch('?enabled-features=mark-as-unread');
+
+    expect(disabled.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(false);
+    expect(enabled.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(true);
+    expect(enabled.enabledFeatureToggleNames).toEqual([markAsUnreadFeatureToggleName]);
+  });
+  it.each(['?enabled-features', '?enabled-features=', '?enabled-features=%20%2C%20'])(
+    'resolves an explicit empty selection to no enabled features: %s',
+    locationSearch => {
+      const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
+
+      expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+    },
+  );
+
   it('returns disabled toggles when the query parameter is missing', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar');
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(false);
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+  });
+
+  it('keeps the troubleshooter disabled by default', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch('');
+
+    expect(toggles.isFeatureToggleEnabled(troubleshooterFeatureToggleName)).toBe(false);
+  });
+
+  it('enables the troubleshooter when selected in developer settings', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${troubleshooterFeatureToggleName}`,
+    );
+
+    expect(toggles.isFeatureToggleEnabled(troubleshooterFeatureToggleName)).toBe(true);
+  });
+
+  it('keeps sending call logs disabled by default and enables it through developer settings', () => {
+    expect(
+      createStartupFeatureTogglesFromLocationSearch('').isFeatureToggleEnabled(sendCallLogsFeatureToggleName),
+    ).toBe(false);
+    const enabled = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${sendCallLogsFeatureToggleName}`,
+    );
+    expect(enabled.isFeatureToggleEnabled(sendCallLogsFeatureToggleName)).toBe(true);
   });
 
   it('keeps Drive bulk actions disabled by default', () => {
@@ -59,6 +119,18 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(true);
+  });
+
+  it('keeps Drive bulk restore disabled until its separate toggle is enabled', () => {
+    const bulkActionsOnly = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName}`,
+    );
+    const bulkActionsWithRestore = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName},${driveBulkRestoreFeatureToggleName}`,
+    );
+
+    expect(bulkActionsOnly.isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName)).toBe(false);
+    expect(bulkActionsWithRestore.isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName)).toBe(true);
   });
 
   it('enables a whitelisted feature toggle when present in the query parameter', () => {
@@ -179,6 +251,11 @@ describe('startupFeatureToggles', function () {
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
       driveBulkActionsFeatureToggleName,
+      driveBulkRestoreFeatureToggleName,
+      markAsUnreadFeatureToggleName,
+      troubleshooterFeatureToggleName,
+      sendCallLogsFeatureToggleName,
+      e2ePdfPreviewFeatureToggleName,
     ]);
   });
 

@@ -22,13 +22,50 @@ export const conversationListCollapseFeatureToggleName = 'conversation-list-coll
 export const forTestsOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
 export const driveBulkActionsFeatureToggleName = 'drive-bulk-actions';
+export const driveBulkRestoreFeatureToggleName = 'drive-bulk-restore';
+export const markAsUnreadFeatureToggleName = 'mark-as-unread';
+export const troubleshooterFeatureToggleName = 'troubleshooter';
 
-export const startupFeatureToggleNames = [
-  applockRefactoredFeatureToggleName,
-  conversationListCollapseFeatureToggleName,
-  forTestsOnlyFeatureToggleName,
-  disableMessagePreprocessingFeatureToggleName,
-  driveBulkActionsFeatureToggleName,
+export const sendCallLogsFeatureToggleName = 'send-call-logs';
+export const e2ePdfPreviewFeatureToggleName = 'e2e-pdf-preview';
+
+export const startupFeatureToggleRegistry = [
+  {name: applockRefactoredFeatureToggleName, previewDefaultEnabled: false},
+  {name: conversationListCollapseFeatureToggleName, previewDefaultEnabled: false},
+  {name: forTestsOnlyFeatureToggleName, previewDefaultEnabled: false},
+  {name: disableMessagePreprocessingFeatureToggleName, previewDefaultEnabled: false},
+  {name: driveBulkActionsFeatureToggleName, previewDefaultEnabled: true},
+  {name: driveBulkRestoreFeatureToggleName, previewDefaultEnabled: false},
+  {name: markAsUnreadFeatureToggleName, previewDefaultEnabled: true},
+  {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},
+  {name: sendCallLogsFeatureToggleName, previewDefaultEnabled: false},
+  {name: e2ePdfPreviewFeatureToggleName, previewDefaultEnabled: true},
 ] as const;
 
-export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];
+export type StartupFeatureToggleName = (typeof startupFeatureToggleRegistry)[number]['name'];
+
+type StartupFeatureToggleDefinition = {
+  readonly name: StartupFeatureToggleName;
+  readonly previewDefaultEnabled: boolean;
+};
+
+export const startupFeatureToggleNames: readonly StartupFeatureToggleName[] = startupFeatureToggleRegistry.map(
+  featureToggle => {
+    return featureToggle.name;
+  },
+);
+
+export function selectPreviewDefaultEnabledStartupFeatureToggleNames(
+  featureDefinitions: readonly StartupFeatureToggleDefinition[],
+): readonly StartupFeatureToggleName[] {
+  return featureDefinitions
+    .filter(featureToggle => {
+      return featureToggle.previewDefaultEnabled;
+    })
+    .map(featureToggle => {
+      return featureToggle.name;
+    });
+}
+
+export const previewDefaultEnabledStartupFeatureToggleNames: readonly StartupFeatureToggleName[] =
+  selectPreviewDefaultEnabledStartupFeatureToggleNames(startupFeatureToggleRegistry);

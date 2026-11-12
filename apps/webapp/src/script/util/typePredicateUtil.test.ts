@@ -17,10 +17,11 @@
  *
  */
 
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import {BackendError} from '../apiClient/http/backendError';
+import {BackendErrorLabel} from '../apiClient/http/backendErrorLabel';
 import type {AxiosError} from 'axios';
 
-import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
+import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from './typePredicateUtil';
 
 describe('typePredicateUtil', () => {
   describe('isAxiosError', () => {

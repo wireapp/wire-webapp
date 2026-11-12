@@ -19,14 +19,14 @@
 
 import type {FunctionComponent} from 'react';
 
-import {ComboboxSelect, ErrorMessage} from '@wireapp/react-ui-kit';
-
-import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {contentStyles, descriptionStyles, menuListCSS, selectWrapperStyles} from './cellsTagsModal.styles';
 import {useTagsManagement} from './useTagsManagement/useTagsManagement';
+
+import {useApplicationContext} from '../../../../../../../page/rootProvider';
+import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
+import {ComboboxSelect} from '../../../../../../../uiKit/inputs/comboboxSelect/comboboxSelect';
+import {ErrorMessage} from '../../../../../../../uiKit/inputs/errorMessage/errorMessage';
+import {CellsModal} from '../../../../common/cellsModal/cellsModal';
 
 interface CellsTagsModalProps {
   uuid: string;

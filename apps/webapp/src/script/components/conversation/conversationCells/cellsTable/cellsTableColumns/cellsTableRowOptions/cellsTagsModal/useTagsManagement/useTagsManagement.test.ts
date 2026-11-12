@@ -19,12 +19,12 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../../../../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../../../../../util/test/translateForTest';
 
 import {useTagsManagement} from './useTagsManagement';
 

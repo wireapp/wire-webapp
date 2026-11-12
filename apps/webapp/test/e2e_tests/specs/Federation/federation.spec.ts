@@ -1,12 +1,12 @@
 import {Page} from 'playwright/test';
 import {isNonEmptyString} from '@sindresorhus/is';
-import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withLogin, expect, createTeam} from 'test/e2e_tests/test.fixtures';
-import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
-import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
-import {createAndSaveBackup, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {ApiManagerE2E} from '../../backend/apiManager.e2e';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, withLogin, expect, createTeam} from '../../test.fixtures';
+import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from '../../utils/asset.util';
+import {getImageFilePath} from '../../utils/sendImage.util';
+import {createAndSaveBackup, createGroup, sendConnectionRequest} from '../../utils/userActions';
 
 function getRequiredEnvironmentVariable(variableName: string): string {
   const variableValue = process.env[variableName];

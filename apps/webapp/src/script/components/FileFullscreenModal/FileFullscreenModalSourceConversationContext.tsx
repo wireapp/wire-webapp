@@ -19,7 +19,7 @@
 
 import {createContext, ReactNode, useContext, type FunctionComponent} from 'react';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Conversation} from '../../repositories/entity/Conversation';
 
 const FileFullscreenModalSourceConversationContext = createContext<Conversation | undefined>(undefined);
 

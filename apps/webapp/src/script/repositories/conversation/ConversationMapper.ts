@@ -17,38 +17,37 @@
  *
  */
 
-import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {
-  CONVERSATION_ACCESS_ROLE,
-  Conversation as ConversationBackendData,
-  ConversationCode,
-  CONVERSATION_ACCESS,
-  CONVERSATION_LEGACY_ACCESS_ROLE,
-  CONVERSATION_TYPE,
-  DefaultConversationRoleName,
-  RemoteConversations,
-  GROUP_CONVERSATION_TYPE,
-  ADD_PERMISSION,
-  CONVERSATION_CELLS_STATE,
-} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isNumber, isUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
 import {isObject} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
-import {type Translate} from 'Util/localizerUtil';
 
 import {ACCESS_STATE, type TEAM} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
+import {
+  CONVERSATION_ACCESS_ROLE,
+  Conversation as ConversationBackendData,
+  CONVERSATION_ACCESS,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
+  CONVERSATION_TYPE,
+  GROUP_CONVERSATION_TYPE,
+  ADD_PERMISSION,
+  CONVERSATION_CELLS_STATE,
+} from '../../apiClient/conversation/conversation';
+import {ConversationCode} from '../../apiClient/conversation/conversationCode';
+import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
+import {RemoteConversations} from '../../apiClient/conversation/remoteConversations';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
+import {type Translate} from '../../util/localizerUtil';
+import {Conversation} from '../entity/Conversation';
+import {ConversationRecord} from '../storage/record/conversationRecord';
 
 const guestLinkAccessModeCount = 2;
 type TeamAccessState =
@@ -481,6 +480,13 @@ export class ConversationMapper {
     conversationEntity.cellsState(cells_state ?? CONVERSATION_CELLS_STATE.DISABLED);
     const selfState = members?.self ?? conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
+
+    if (
+      isNumber(conversationData.manual_unread_timestamp) &&
+      Number.isFinite(conversationData.manual_unread_timestamp)
+    ) {
+      conversationEntity.manualUnreadTimestamp(conversationData.manual_unread_timestamp);
+    }
 
     if ((conversationEntity.last_event_timestamp() ?? 0) === 0 && initialTimestamp !== undefined) {
       conversationEntity.last_event_timestamp(initialTimestamp);

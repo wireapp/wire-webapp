@@ -17,10 +17,10 @@
  *
  */
 
-import {isObject} from 'src/script/guards/common';
-
 import {AssetMetaData, BackupMessageContent} from './CPB.library';
 import {AudioAsset, ImageAsset} from './CPB.types';
+
+import {isObject} from '../../../guards/common';
 
 const AssetContentType = {
   Image: ['image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/'],

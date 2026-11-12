@@ -21,16 +21,16 @@ import {FC} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {AssetImage} from 'Components/image';
-import {AudioAsset} from 'Components/messagesList/message/contentMessage/asset/audioAsset/audioAsset';
-import {FileAsset} from 'Components/messagesList/message/contentMessage/asset/fileAsset/fileAsset';
-import {LinkPreviewAsset} from 'Components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {MessageCategory} from 'src/script/message/messageCategory';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {isOfCategory} from './utils';
+
+import {AssetImage} from '../../../../components/image';
+import {AudioAsset} from '../../../../components/messagesList/message/contentMessage/asset/audioAsset/audioAsset';
+import {FileAsset} from '../../../../components/messagesList/message/contentMessage/asset/fileAsset/fileAsset';
+import {LinkPreviewAsset} from '../../../../components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent';
+import {MessageCategory} from '../../../../message/messageCategory';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {MediumImage} from '../../../../repositories/entity/message/mediumImage';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 
 interface CollectionItemProps {
   allMessages: ContentMessage[];

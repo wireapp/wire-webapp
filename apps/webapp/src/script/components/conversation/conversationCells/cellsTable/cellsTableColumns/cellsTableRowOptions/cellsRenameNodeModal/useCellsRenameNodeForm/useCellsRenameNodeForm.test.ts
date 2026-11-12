@@ -21,9 +21,9 @@ import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
 import {Maybe} from 'true-myth';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
+import {CellNode, CellNodeType} from '../../../../../../../../types/cellNode';
+import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
 import {useCellsRenameForm} from './useCellsRenameNodeForm';
 

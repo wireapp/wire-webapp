@@ -20,21 +20,21 @@
 import {render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {ClientRepository} from 'Repositories/client';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {Config} from 'src/script/Config';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {ClientRepository} from '../../../../repositories/client';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {User} from '../../../../repositories/entity/User';
+import {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
+import {TeamState} from '../../../../repositories/team/TeamState';
+import {AppLockRepository} from '../../../../repositories/user/appLockRepository';
+import type {UserRepository} from '../../../../repositories/user/userRepository';
+import {Config} from '../../../../Config';
+import {withTheme} from '../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {Core} from 'src/script/service/coreSingleton';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../testSupport/rootContextTestSupport';
+import {Core} from '../../../../service/coreSingleton';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {AccountPreferences} from './accountPreferences';
 

@@ -17,12 +17,10 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {Conversation} from 'Repositories/entity/Conversation';
-import {VerificationMessageType} from 'src/script/message/verificationMessageType';
-
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {E2EIVerificationMessageType} from '../../../../../message/e2eiVerificationMessageType';
+import {VerificationMessageType} from '../../../../../message/verificationMessageType';
+import {Conversation} from '../../../../entity/Conversation';
 import {ConversationVerificationState} from '../../../ConversationVerificationState';
 
 interface CommonOnConversationVerificationStateChangeParams {

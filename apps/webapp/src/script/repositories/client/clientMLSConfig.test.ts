@@ -18,7 +18,12 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {FEATURE_KEY, FEATURE_STATUS, CONVERSATION_PROTOCOL, FeatureList} from '@wireapp/api-client/lib/team';
+import {
+  FEATURE_KEY,
+  FEATURE_STATUS,
+  CONVERSATION_PROTOCOL,
+  FeatureList,
+} from '../../apiClient/team/feature/featureList.types';
 
 import {getClientMLSConfig} from './clientMLSConfig';
 

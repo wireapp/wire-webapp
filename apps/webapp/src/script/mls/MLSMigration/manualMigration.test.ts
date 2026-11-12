@@ -17,14 +17,15 @@
  *
  */
 
-import {CONVERSATION_TYPE, DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
+import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
+import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 import {Maybe, task} from 'true-myth';
 import {asyncNoop, noop} from 'noop-esm';
 
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {translateForTest} from 'Util/test/translateForTest';
+import {ConversationMapper} from '../../repositories/conversation/ConversationMapper';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {canManuallyMigrateConversation, manuallyMigrateConversation} from './manualMigration';
 

@@ -18,25 +18,25 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 import {container} from 'tsyringe';
-
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {MemberLeaveEvent} from 'Repositories/conversation/EventBuilder';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {getLogger, Logger} from 'Util/logger';
-import {compareTransliteration, sortByPriority} from 'Util/stringUtil';
-import {toError} from 'Util/toError';
 
 import {IntegrationMapper} from './IntegrationMapper';
 import type {IntegrationService} from './IntegrationService';
 import {ProviderEntity} from './ProviderEntity';
 import {ServiceEntity} from './ServiceEntity';
+
+import type {ConversationMemberJoinEvent} from '../../apiClient/event/conversationEvent';
+import {getLogger, Logger} from '../../util/logger';
+import {compareTransliteration, sortByPriority} from '../../util/stringUtil';
+import {toError} from '../../util/toError';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationState} from '../conversation/ConversationState';
+import {MemberLeaveEvent} from '../conversation/EventBuilder';
+import type {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
+import type {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
 
 export class IntegrationRepository {
   private readonly logger: Logger;
@@ -227,7 +227,7 @@ export class IntegrationRepository {
         return serviceEntities;
       }
     } catch (error: unknown) {
-      this.logger.error(`Error searching for services: ${toError(error).message}`, error);
+      this.logger.error(`Error searching for services: ${toError(error).message}`, {error});
     }
     return undefined;
   }

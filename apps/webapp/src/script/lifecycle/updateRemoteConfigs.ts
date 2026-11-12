@@ -18,15 +18,14 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import type {BackendFeatures} from '@wireapp/api-client/lib/apiClient';
-import {TaskParams} from '@wireapp/core/lib/util/recurringTaskScheduler';
 import {container} from 'tsyringe';
 
-import {getLogger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
+import type {BackendFeatures} from '../apiClient/apiClient';
 import {Config} from '../Config';
+import {TaskParams} from '../core/util/recurringTaskScheduler';
 import {Core} from '../service/coreSingleton';
+import {getLogger} from '../util/logger';
+import {TIME_IN_MILLIS} from '../util/timeUtil';
 
 let core: Core | undefined = undefined;
 export const updateRemoteConfigLogger = getLogger('updateRemoteConfigs');

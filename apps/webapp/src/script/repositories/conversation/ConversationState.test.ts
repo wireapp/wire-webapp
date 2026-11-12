@@ -17,17 +17,17 @@
  *
  */
 
-import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
 import {randomUUID} from 'crypto';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {Conversation} from '../entity/Conversation';
+import {TeamState} from '../team/TeamState';
+import {UserState} from '../user/userState';
 
 import {ConversationState} from './ConversationState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 function createConversationState(): ConversationState {
   return new ConversationState(new UserState(), new TeamState());
@@ -111,6 +111,19 @@ describe('ConversationState', () => {
       expect(conversationState.conversations()).toHaveLength(2);
       expect(conversationState.visibleConversations()).toEqual([regularConversation]);
       expect(conversationState.findConversation(meetingConversation.qualifiedId)).toBe(meetingConversation);
+    });
+
+    it('includes a manually unread conversation without incoming unread messages', () => {
+      const conversationState = createConversationState();
+      const conversation = createConversation();
+      conversationState.conversations([conversation]);
+
+      expect(conversationState.unreadConversations()).toEqual([]);
+
+      conversation.manualUnreadTimestamp(123);
+
+      expect(conversation.unreadState().allMessages).toEqual([]);
+      expect(conversationState.unreadConversations()).toEqual([conversation]);
     });
   });
 

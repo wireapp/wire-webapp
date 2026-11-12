@@ -19,14 +19,13 @@
 
 import {KeyboardEvent, MouseEvent as ReactMouseEvent, type FunctionComponent} from 'react';
 
-import {MoreIcon} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {showContextMenu} from 'src/script/ui/contextMenu';
-import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
-import {setContextMenuPosition} from 'Util/util';
-
 import {buttonStyles, iconStyles} from './filePreviewErrorMoreButton.styles';
+
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {showContextMenu} from '../../../../../ui/contextMenu';
+import {MoreIcon} from '../../../../../uiKit/dataDisplay/icon/moreIcon';
+import {isSpaceOrEnterKey} from '../../../../../util/keyboardUtil';
+import {setContextMenuPosition} from '../../../../../util/util';
 
 interface FilePreviewErrorMoreButtonProps {
   onDelete: () => void;

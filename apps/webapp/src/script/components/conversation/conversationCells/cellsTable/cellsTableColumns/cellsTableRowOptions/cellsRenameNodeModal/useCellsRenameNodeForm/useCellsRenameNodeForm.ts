@@ -21,10 +21,9 @@ import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {getFileExtension, trimFileExtension} from 'Util/util';
-
+import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
+import {CellNode, CellNodeType} from '../../../../../../../../types/cellNode';
+import {getFileExtension, trimFileExtension} from '../../../../../../../../util/util';
 import {isValidCellsNodeName} from '../../../../../common/cellsNodeNameValidator';
 
 interface UseCellsRenameFormProps {

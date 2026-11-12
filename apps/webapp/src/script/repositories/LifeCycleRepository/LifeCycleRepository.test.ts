@@ -19,17 +19,18 @@
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
-import {useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
-import {CacheRepository} from 'Repositories/cache/cacheRepository';
-import type {ClientRepository} from 'Repositories/client/ClientRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {EventRepository} from 'Repositories/event/EventRepository';
-import {StorageKey} from 'Repositories/storage/storageKey';
-import type {StorageRepository} from 'Repositories/storage/storageRepository';
-import type {UserRepository} from 'Repositories/user/userRepository';
+import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
+import {CacheRepository} from '../cache/cacheRepository';
+import {ClientRepository} from '../client/ClientRepository';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import type {EventRepository} from '../event/EventRepository';
+import {StorageKey} from '../storage/storageKey';
+import type {StorageRepository} from '../storage/storageRepository';
+import type {UserRepository} from '../user/userRepository';
 
 import {LifeCycleRepository, doSimpleRedirect, type LifeCycleDependencies} from './LifeCycleRepository';
 
@@ -39,6 +40,7 @@ import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';
 import * as browserLocationModule from '../../navigation/browserLocation';
+import {translateForTest} from '../../util/test/translateForTest';
 
 const createMockDependencies = (): LifeCycleDependencies => {
   return {
@@ -236,6 +238,29 @@ describe('LifeCycleRepository', () => {
 
       (mockDependencies.userRepository as any).userState.self.mockReturnValue(mockUser);
       (mockDependencies.clientRepository.constructCookieLabelKey as jest.Mock).mockReturnValue('cookie-key');
+    });
+
+    it.each([true, false])('completes logout without an email (clear data: %s)', async shouldClearAllData => {
+      const user = new User('user-without-email', '', translateForTest);
+      jest.mocked(mockDependencies.userRepository['userState'].self).mockReturnValue(user);
+      Object.assign(mockDependencies.clientRepository, {
+        loadCurrentClientType: jest.fn(),
+        selfUser: () => {
+          return user;
+        },
+      });
+      (mockDependencies.clientRepository.constructCookieLabelKey as jest.Mock).mockImplementation(login => {
+        return ClientRepository.prototype.constructCookieLabelKey.call(mockDependencies.clientRepository, login);
+      });
+
+      await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, shouldClearAllData);
+
+      expect(mockDependencies.core.logout).toHaveBeenCalledWith({
+        clearAllData: shouldClearAllData,
+        clearCryptoData: false,
+      });
+      expect(mockDependencies.storageRepository.deleteDatabase).toHaveBeenCalledTimes(shouldClearAllData ? 1 : 0);
+      expect(lifeCycleRepository.redirectToLogin).toHaveBeenCalledWith(SIGN_OUT_REASON.USER_REQUESTED);
     });
 
     it('should prevent multiple simultaneous logout calls', async () => {

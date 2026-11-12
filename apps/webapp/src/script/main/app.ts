@@ -21,13 +21,7 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
-import {Context} from '@wireapp/api-client/lib/auth';
-import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
-import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {EVENTS as CoreEvents} from '@wireapp/core/lib/account';
-import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
+import {isNonEmptyArray, isNonEmptyString, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import 'core-js/full/reflect';
 import pWaitFor from 'p-wait-for';
@@ -36,88 +30,29 @@ import {pdfjs} from 'react-pdf';
 import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AudioRepository} from 'Repositories/audio/audioRepository';
-import {BackupRepository} from 'Repositories/backup/backupRepository';
-import {BackupService} from 'Repositories/backup/backupService';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ClientRepository, ClientService, type ClientEntity} from 'Repositories/client';
-import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
-import {subscribeToMLSKeyPackageUpdates} from 'Repositories/client/subscribeToMLSKeyPackageUpdates';
-import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {ConnectionService} from 'Repositories/connection/connectionService';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationService} from 'Repositories/conversation/ConversationService';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {OnConversationE2EIVerificationStateChange} from 'Repositories/conversation/ConversationVerificationStateHandler/shared';
-import {EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {NotificationService} from 'Repositories/event/NotificationService';
-import {EventStorageMiddleware} from 'Repositories/event/preprocessor/EventStorageMiddleware';
-import {QuotedMessageMiddleware} from 'Repositories/event/preprocessor/QuoteDecoderMiddleware';
-import {ReceiptsMiddleware} from 'Repositories/event/preprocessor/ReceiptsMiddleware';
-import {RepliesUpdaterMiddleware} from 'Repositories/event/preprocessor/RepliesUpdaterMiddleware';
-import {ServiceMiddleware} from 'Repositories/event/preprocessor/ServiceMiddleware';
-import {FederationEventProcessor} from 'Repositories/event/processor/FederationEventProcessor';
-import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
-import {GiphyService} from 'Repositories/extension/GiphyService';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {IntegrationService} from 'Repositories/integration/IntegrationService';
-import {LifeCycleRepository} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
-import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
-import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MeetingsApiDataSource} from 'Repositories/meetings/meetingsApiDataSource';
-import {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
-import {NotificationRepository} from 'Repositories/notification/NotificationRepository';
-import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
-import {initializePermissions} from 'Repositories/permission/permissionHandlers';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {SelfService} from 'Repositories/self/SelfService';
-import {StorageRepository, StorageService} from 'Repositories/storage';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamService} from 'Repositories/team/TeamService';
-import {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserService} from 'Repositories/user/userService';
-import {UserState} from 'Repositories/user/userState';
-import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
-import {initializeDataDog} from 'Util/dataDog';
-import {DebugUtil} from 'Util/debugUtil';
-import {Environment} from 'Util/environment';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
-import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
-
 import {refreshApplication} from './applicationRefresh';
+import {loadLocalClient} from './loadLocalClient';
 import {reportStartupFailure} from './reportStartupFailure';
 
 import '../../style/default.less';
+import {Context} from '../apiClient/auth/context';
+import {ClientClassification} from '../apiClient/client/clientClassification';
+import {ClientType} from '../apiClient/client/clientType';
+import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
+import {createBrowserSystemNotificationApi} from '../browser/notification/createSystemNotificationApiFromBrowserNotification';
+import {Runtime} from '../commons/util/Runtime';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config, Configuration} from '../Config';
+import {EVENTS as CoreEvents} from '../core/account';
+import {MLSServiceEvents} from '../core/messagingProtocols/mls';
 import {E2EIHandler} from '../e2eIdentity';
 import {getModalOptions, ModalType} from '../e2eIdentity/modals';
 import {AccessTokenError} from '../error/accessTokenError';
 import {AuthError} from '../error/authError';
 import {BaseError} from '../error/baseError';
-import {CLIENT_ERROR_TYPE, ClientError} from '../error/clientError';
+import {CLIENT_ERROR_TYPE} from '../error/clientError';
 import {TeamError} from '../error/teamError';
 import {
   createNewVersionPollingCallback,
@@ -133,6 +68,65 @@ import type {ApplicationStartupReport} from '../observability/applicationStartup
 import {reportApplicationStartup} from '../observability/reportApplicationStartup';
 import {configureDownloadPath} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/downloadPath';
 import {configureE2EI} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
+import {AssetRepository} from '../repositories/assets/assetRepository';
+import {AudioRepository} from '../repositories/audio/audioRepository';
+import {BackupRepository} from '../repositories/backup/backupRepository';
+import {BackupService} from '../repositories/backup/backupService';
+import {CallingRepository} from '../repositories/calling/CallingRepository';
+import {CellsRepository} from '../repositories/cells/cellsRepository';
+import {ClientRepository, ClientService, type ClientEntity} from '../repositories/client';
+import {getClientMLSConfig} from '../repositories/client/clientMLSConfig';
+import {subscribeToMLSKeyPackageUpdates} from '../repositories/client/subscribeToMLSKeyPackageUpdates';
+import {ConnectionRepository} from '../repositories/connection/connectionRepository';
+import {ConnectionService} from '../repositories/connection/connectionService';
+import {
+  ConversationRepository,
+  type ConversationRepositoryOptions,
+} from '../repositories/conversation/ConversationRepository';
+import {ConversationService} from '../repositories/conversation/ConversationService';
+import {ConversationVerificationState} from '../repositories/conversation/ConversationVerificationState';
+import {OnConversationE2EIVerificationStateChange} from '../repositories/conversation/ConversationVerificationStateHandler/shared';
+import {EventBuilder} from '../repositories/conversation/EventBuilder';
+import {MessageRepository} from '../repositories/conversation/MessageRepository';
+import {CryptographyRepository} from '../repositories/cryptography/CryptographyRepository';
+import {User} from '../repositories/entity/User';
+import {EventRepository} from '../repositories/event/EventRepository';
+import {EventService} from '../repositories/event/EventService';
+import {NOTIFICATION_HANDLING_STATE} from '../repositories/event/NotificationHandlingState';
+import {NotificationService} from '../repositories/event/NotificationService';
+import {EventStorageMiddleware} from '../repositories/event/preprocessor/EventStorageMiddleware';
+import {QuotedMessageMiddleware} from '../repositories/event/preprocessor/QuoteDecoderMiddleware';
+import {ReceiptsMiddleware} from '../repositories/event/preprocessor/ReceiptsMiddleware';
+import {RepliesUpdaterMiddleware} from '../repositories/event/preprocessor/RepliesUpdaterMiddleware';
+import {ServiceMiddleware} from '../repositories/event/preprocessor/ServiceMiddleware';
+import {FederationEventProcessor} from '../repositories/event/processor/FederationEventProcessor';
+import {GiphyRepository} from '../repositories/extension/GiphyRepository';
+import {GiphyService} from '../repositories/extension/GiphyService';
+import {IntegrationRepository} from '../repositories/integration/IntegrationRepository';
+import {IntegrationService} from '../repositories/integration/IntegrationService';
+import {LifeCycleRepository} from '../repositories/LifeCycleRepository/LifeCycleRepository';
+import {BackgroundEffectsController} from '../repositories/media/backgroundEffects/backgroundEffectsController';
+import {BackgroundEffectsHandler} from '../repositories/media/backgroundEffectsHandler';
+import {MediaConstraintsHandler} from '../repositories/media/MediaConstraintsHandler';
+import {MediaDevicesHandler} from '../repositories/media/MediaDevicesHandler';
+import {MediaStreamHandler} from '../repositories/media/MediaStreamHandler';
+import {MeetingsApiDataSource} from '../repositories/meetings/meetingsApiDataSource';
+import {MeetingsRepository} from '../repositories/meetings/meetingsRepository';
+import {NotificationRepository} from '../repositories/notification/NotificationRepository';
+import {PreferenceNotificationRepository} from '../repositories/notification/PreferenceNotificationRepository';
+import {initializePermissions} from '../repositories/permission/permissionHandlers';
+import {PropertiesRepository} from '../repositories/properties/propertiesRepository';
+import {PropertiesService} from '../repositories/properties/propertiesService';
+import {SearchRepository} from '../repositories/search/searchRepository';
+import {SelfRepository} from '../repositories/self/SelfRepository';
+import {SelfService} from '../repositories/self/SelfService';
+import {StorageRepository, StorageService} from '../repositories/storage';
+import {TeamRepository} from '../repositories/team/TeamRepository';
+import {TeamService} from '../repositories/team/TeamService';
+import {EventTrackingRepository} from '../repositories/tracking/eventTrackingRepository';
+import {UserRepository} from '../repositories/user/userRepository';
+import {UserService} from '../repositories/user/userService';
+import {UserState} from '../repositories/user/userState';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
@@ -140,8 +134,17 @@ import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/windowHandler';
+import {initializeDataDog} from '../util/dataDog';
+import {DebugUtil} from '../util/debugUtil';
+import {Environment} from '../util/environment';
+import {type Translate} from '../util/localizerUtil';
+import {getLogger, Logger} from '../util/logger';
+import {matchQualifiedIds} from '../util/qualifiedId';
+import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from '../util/timeUtil';
+import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from '../util/util';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
+import {WebAppEvents} from '../webAppEvents';
 
 type AppConfig = {
   COOKIES_CHECK: {COOKIE_NAME: string};
@@ -239,6 +242,7 @@ export class App {
     private readonly translate: Translate,
     private readonly clock: Clock,
     private readonly fireAndForgetInvoker: FireAndForgetInvoker,
+    private readonly conversationRepositoryOptions: ConversationRepositoryOptions,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => {
@@ -252,7 +256,7 @@ export class App {
     this.repository = this._setupRepositories();
 
     if (config.FEATURE.ENABLE_DEBUG) {
-      import('Util/debugUtil').then(({DebugUtil}) => {
+      import('../util/debugUtil').then(({DebugUtil}) => {
         this.debug = new DebugUtil(this.repository);
         this.util = {debug: this.debug}; // Alias for QA
       });
@@ -370,6 +374,7 @@ export class App {
       repositories.calling,
       serverTimeHandler,
       this.translate,
+      this.conversationRepositoryOptions,
     );
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message, this.apiClient);
@@ -543,7 +548,7 @@ export class App {
       try {
         selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
       } catch (error: unknown) {
-        this.logger.error('Could not get self user', error);
+        this.logger.error('Could not get self user', {error});
         await reportStartup('failure');
         await this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
         return undefined;
@@ -561,7 +566,7 @@ export class App {
         await this.core.init(clientType);
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : error;
-        this.logger.error(`Error when initializing core: "${errorMessage}"`, error);
+        this.logger.error(`Error when initializing core: "${errorMessage}"`, {error});
         throw new AccessTokenError(AccessTokenError.TYPE.REQUEST_FORBIDDEN, 'Session has expired');
       }
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
@@ -575,10 +580,13 @@ export class App {
 
       await this.initiateSelfUser(selfUser);
       eventLogger.log(AppInitializationStep.UserInitialize);
-      const localClient = await this.core.getLocalClient();
-      if (isNullOrUndefined(localClient)) {
-        throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
+      const localClientResult = await loadLocalClient(() => {
+        return this.core.getLocalClient();
+      }, this.logger);
+      if (localClientResult.isErr) {
+        throw localClientResult.error;
       }
+      const localClient = localClientResult.value;
 
       let teamFeatures: FeatureList = {};
       let teamMembers: QualifiedId[] = [];
@@ -678,7 +686,7 @@ export class App {
 
       fireAndForgetInvoker.fireAndForget(() => {
         return bgEffectsHandler.preloadResources().catch((error: unknown) => {
-          this.logger.warn('[virtual-background] preload failed, starting without resources', error);
+          this.logger.warn('[virtual-background] preload failed, starting without resources', {error});
         });
       });
 
@@ -687,7 +695,6 @@ export class App {
         conversationRepository.initMLSConversationRecoveredListener();
         conversationRepository.initMLSEventDistributedListener();
         conversationRepository.registerMLSConversationVerificationStateHandler(
-          selfUser.qualifiedId.domain,
           this.updateConversationE2EIVerificationState,
           this.showClientCertificateRevokedWarning,
         );
@@ -764,7 +771,7 @@ export class App {
           core: this.core,
           onSuccess: conversationRepository.injectJoinedAfterMigrationFinalisationMessage,
           onError: ({id}, error) => {
-            return this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error);
+            return this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, {error});
           },
         });
 
@@ -774,7 +781,7 @@ export class App {
         await initMLSGroupConversations(conversations, conversationRepository, {
           core: this.core,
           onError: ({id}, error) => {
-            return this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error);
+            return this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, {error});
           },
         });
 
@@ -808,7 +815,7 @@ export class App {
       try {
         await conversationRepository.conversationLabelRepository.loadLabels();
       } catch (error: unknown) {
-        this.logger.error('Failed to load conversation labels', error);
+        this.logger.error('Failed to load conversation labels', {error});
         // Continue with empty labels rather than breaking the app
       }
 
@@ -944,7 +951,7 @@ export class App {
       recoveryInProgress = false;
 
       if (recoveryTask.isErr) {
-        this.logger.error('Failed to run MLS conversation recovery', recoveryTask.error);
+        this.logger.error('Failed to run MLS conversation recovery', {error: recoveryTask.error});
       }
     };
 
@@ -993,7 +1000,7 @@ export class App {
       const isReload = this._isReload();
       switch (type) {
         case CLIENT_ERROR_TYPE.NO_VALID_CLIENT: {
-          this.logger.warn(`Redirecting to login: ${message}`, error);
+          this.logger.warn(`Redirecting to login: ${message}`, {error});
           return isReload
             ? this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
             : this.repository.lifeCycle.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
@@ -1001,22 +1008,22 @@ export class App {
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
-          this.logger.warn(`Redirecting to login: ${message}`, error);
+          this.logger.warn(`Redirecting to login: ${message}`, {error});
           return isReload
             ? this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
             : this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
         case TeamError.TYPE.NO_APP_CONFIG: {
-          this.logger.warn(`Logging out user: ${message}`, error);
+          this.logger.warn(`Logging out user: ${message}`, {error});
           return this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
         }
 
         default: {
-          this.logger.error(`Caused by: ${isNonEmptyString(message) ? message : error}`, error);
+          this.logger.error(`Caused by: ${isNonEmptyString(message) ? message : error}`, {error});
 
           const isAccessTokenError = error instanceof AccessTokenError;
           if (isAccessTokenError) {
-            this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
+            this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, {error});
           }
 
           return this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false);
@@ -1024,7 +1031,7 @@ export class App {
       }
     }
 
-    this.logger.warn("No internet connectivity. Refreshing the page to show the browser's offline page...", error);
+    this.logger.warn("No internet connectivity. Refreshing the page to show the browser's offline page...", {error});
     window.location.reload();
   }
 

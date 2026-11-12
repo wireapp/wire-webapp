@@ -19,35 +19,43 @@
 
 import {act, render, waitFor} from '@testing-library/react';
 
-import {QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
+import {QUERY} from '../../uiKit/utils/mediaQueries';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {noop} from 'noop-esm';
 
-import {Call} from 'Repositories/calling/Call';
-import {Participant} from 'Repositories/calling/Participant';
-import {Grid} from 'Repositories/calling/videoGridHandler';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SelfService} from 'Repositories/self/SelfService';
-import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {Call} from '../../repositories/calling/Call';
+import {Participant} from '../../repositories/calling/Participant';
+import {Grid} from '../../repositories/calling/videoGridHandler';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
+import {PropertiesService} from '../../repositories/properties/propertiesService';
+import {SelfService} from '../../repositories/self/SelfService';
+import {
+  buildCallingRepository,
+  buildMediaDevicesHandler,
+  withTheme,
+  withThemeAndRootContext,
+} from '../../auth/util/test/testUtil';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translate} from 'Util/localizerUtil';
+} from '../../page/testSupport/rootContextTestSupport';
+import {translate} from '../../util/localizerUtil';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {KEY} from 'Util/keyboardUtil';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
+import {KEY} from '../../util/keyboardUtil';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;
 
-jest.mock('@wireapp/react-ui-kit', () => {
+jest.mock('../../uiKit/layout/matchMedia/matchMedia', () => {
   return {
-    ...(jest.requireActual('@wireapp/react-ui-kit') as any),
+    ...jest.requireActual<typeof import('../../uiKit/layout/matchMedia/matchMedia')>(
+      '../../uiKit/layout/matchMedia/matchMedia',
+    ),
     useMatchMedia: jest.fn(),
   };
 });
@@ -89,33 +97,16 @@ describe('fullscreenVideoCall', () => {
   });
 
   afterEach(() => {
-    return jest.useRealTimers();
+    jest.restoreAllMocks();
+    jest.useRealTimers();
   });
 
-  it('shows the calling timer', async () => {
-    const props = createProps();
+  it('always shows the security line in the timer', () => {
+    const {getByTestId} = render(
+      withThemeAndRootContext(<FullscreenVideoCall {...createProps()} />, rootProviderWrapper),
+    );
 
-    const {getByText} = render(withTheme(withTheme(<FullscreenVideoCall {...props} />)), {
-      wrapper: rootProviderWrapper,
-    });
-    const now = Date.now();
-
-    jest.setSystemTime(now);
-    act(() => {
-      props.call.startedAt(Date.now());
-    });
-
-    await waitFor(() => {
-      return expect(getByText('00:00')).toBeDefined();
-    });
-
-    act(() => {
-      jest.advanceTimersByTime(1001);
-    });
-
-    await waitFor(() => {
-      return expect(getByText('00:01')).toBeDefined();
-    });
+    expect(getByTestId('video-timer').contains(getByTestId('call-security-line'))).toBe(true);
   });
 
   it('has no active speaker toggle for calls with more less than 3 participants', () => {

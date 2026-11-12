@@ -19,13 +19,11 @@
 
 import type {FormEvent, MouseEvent, ChangeEvent} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-
 import {CellsNewNodeFormValidationCopy, ITEM_ALREADY_EXISTS_ERROR} from './cellsNodeFormUtils';
 import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
 
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 
 export type CellsFileType = 'document' | 'spreadsheet' | 'presentation';

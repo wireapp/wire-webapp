@@ -22,12 +22,12 @@ import React, {useEffect, type FunctionComponent} from 'react';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router';
 
-import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Page} from './page';
 
+import {useApplicationContext} from '../../page/rootProvider';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {H1, H3} from '../../uiKit/typography/heading/heading';
+import {Muted} from '../../uiKit/typography/text/text';
 import {RouterLink} from '../component/routerLink';
 import {RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/selfSelector';

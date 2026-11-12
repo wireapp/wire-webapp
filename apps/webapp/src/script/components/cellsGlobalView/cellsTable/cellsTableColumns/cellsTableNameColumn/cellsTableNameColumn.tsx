@@ -21,15 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {FolderIcon, PlayIcon, Tooltip, ViewerAccessIcon} from '@wireapp/react-ui-kit';
-
-import {openFolder} from 'Components/cellsGlobalView/common/openFolder/openFolder';
-import {useShouldRestrictGlobalDriveNodeActions} from 'Components/cellsGlobalView/common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellFile, CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {getFileExtension} from 'Util/util';
-
 import {
   desktopNameStyles,
   fileNameWrapperStyles,
@@ -41,6 +32,16 @@ import {
   wrapperStyles,
 } from './cellsTableNameColumn.styles';
 
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {CellFile, CellNode, CellNodeType} from '../../../../../types/cellNode';
+import {FolderIcon} from '../../../../../uiKit/dataDisplay/icon/files/folderIcon';
+import {PlayIcon} from '../../../../../uiKit/dataDisplay/icon/playIcon';
+import {ViewerAccessIcon} from '../../../../../uiKit/dataDisplay/icon/viewerAccessIcon';
+import {Tooltip} from '../../../../../uiKit/dataDisplay/tooltip/tooltip';
+import {getFileExtension} from '../../../../../util/util';
+import {FileTypeIcon} from '../../../../conversation/common/fileTypeIcon/fileTypeIcon';
+import {openFolder} from '../../../common/openFolder/openFolder';
+import {useShouldRestrictGlobalDriveNodeActions} from '../../../common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';
 import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
 interface CellsTableNameColumnProps {

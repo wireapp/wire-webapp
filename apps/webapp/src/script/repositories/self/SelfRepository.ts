@@ -18,31 +18,34 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team/feature/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
-
-import {TypedEventEmitter} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {ClientEntity, ClientRepository} from 'Repositories/client';
-import type {User as UserEntity} from 'Repositories/entity/User';
-import {EventSource} from 'Repositories/event/EventSource';
-import {
-  FeatureUpdateType,
-  detectTeamFeatureUpdate,
-} from 'Repositories/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {Logger, getLogger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
+import {
+  CONVERSATION_PROTOCOL,
+  FEATURE_KEY,
+  FEATURE_STATUS,
+  FeatureList,
+} from '../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
 import {Core} from '../../service/coreSingleton';
+import {Logger, getLogger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import {ClientEntity, ClientRepository} from '../client';
+import type {User as UserEntity} from '../entity/User';
+import {EventSource} from '../event/EventSource';
+import {
+  FeatureUpdateType,
+  detectTeamFeatureUpdate,
+} from '../team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
+import {TeamRepository} from '../team/TeamRepository';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 
 type Events = {selfSupportedProtocolsUpdated: CONVERSATION_PROTOCOL[]};
 
@@ -170,13 +173,13 @@ export class SelfRepository extends TypedEventEmitter<Events> {
    * @param supportedProtocols - an array of new supported protocols
    */
   private async updateSelfSupportedProtocols(supportedProtocols: CONVERSATION_PROTOCOL[]): Promise<void> {
-    this.logger.info('Supported protocols will get updated to:', supportedProtocols);
+    this.logger.info('Supported protocols will get updated to:', {supportedProtocols});
     try {
       await this.selfService.putSupportedProtocols(supportedProtocols);
       await this.userRepository.updateUserSupportedProtocols(this.selfUser.qualifiedId, supportedProtocols);
       this.emit('selfSupportedProtocolsUpdated', supportedProtocols);
     } catch (error: unknown) {
-      this.logger.error('Failed to update self supported protocols: ', error);
+      this.logger.error('Failed to update self supported protocols: ', {error});
     }
   }
 
@@ -187,7 +190,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
   public readonly refreshSelfSupportedProtocols = async (): Promise<CONVERSATION_PROTOCOL[]> => {
     const localSupportedProtocols = this.selfUser.supportedProtocols();
 
-    this.logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
+    this.logger.info('Evaluating self supported protocols, currently supported protocols:', {localSupportedProtocols});
 
     const currentSelf = await this.selfService.getSelf([]);
 

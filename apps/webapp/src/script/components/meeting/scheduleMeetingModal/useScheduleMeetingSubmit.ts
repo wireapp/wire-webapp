@@ -20,26 +20,7 @@
 import {useCallback, useState} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {type Maybe, task, type Task} from 'true-myth';
-
-import {mapScheduleFormToMeetingCommand} from 'Components/meeting/mapScheduleFormToMeetingCommand';
-import {mapScheduleFormToUpdateMeetingCommand} from 'Components/meeting/mapScheduleFormToUpdateMeetingCommand';
-import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {MeetingSubmitSuccess} from 'Components/meeting/shared/service/meetingService';
-import {syncMeetingConversationName} from 'Components/meeting/shared/service/syncMeetingConversationName';
-import {getScheduleMeetingSubmitErrorTranslationKeys} from 'Components/meeting/shared/submit/meetingSubmitErrorKeys';
-import {
-  isMeetingPersistedDespiteSubmitError,
-  shouldRefreshMeetingsListAfterSubmitError,
-} from 'Components/meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
-import {showMeetingConversationRenameFailedModal} from 'Components/meeting/shared/submit/showMeetingConversationRenameFailedModal';
-import {showMeetingPartialAddFailureModal} from 'Components/meeting/shared/submit/showMeetingPartialAddFailureModal';
-import {showMeetingSubmitError} from 'Components/meeting/shared/submit/showMeetingSubmitError';
-import type {ScheduleMeetingCommand, UpdateMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
-import type {User} from 'Repositories/entity/User';
-import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 
 import {
   type ScheduleMeetingFormState,
@@ -49,6 +30,25 @@ import {
   scheduleMeetingSubmitResults,
 } from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
+
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {useApplicationContext, useMainViewModel} from '../../../page/rootProvider';
+import type {User} from '../../../repositories/entity/User';
+import {mapScheduleFormToMeetingCommand} from '../mapScheduleFormToMeetingCommand';
+import {mapScheduleFormToUpdateMeetingCommand} from '../mapScheduleFormToUpdateMeetingCommand';
+import {useMeetingStore} from '../meetingStore/meetingStoreProvider';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from '../meetingSubmitErrors';
+import type {MeetingSubmitSuccess} from '../shared/service/meetingService';
+import {syncMeetingConversationName} from '../shared/service/syncMeetingConversationName';
+import {getScheduleMeetingSubmitErrorTranslationKeys} from '../shared/submit/meetingSubmitErrorKeys';
+import {
+  isMeetingPersistedDespiteSubmitError,
+  shouldRefreshMeetingsListAfterSubmitError,
+} from '../shared/submit/shouldRefreshMeetingsListAfterSubmitError';
+import {showMeetingConversationRenameFailedModal} from '../shared/submit/showMeetingConversationRenameFailedModal';
+import {showMeetingPartialAddFailureModal} from '../shared/submit/showMeetingPartialAddFailureModal';
+import {showMeetingSubmitError} from '../shared/submit/showMeetingSubmitError';
+import type {ScheduleMeetingCommand, UpdateMeetingCommand} from '../shared/types/meetingCommandTypes';
 
 type SubmitMeetingParams = {
   formState: ScheduleMeetingFormState;

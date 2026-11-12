@@ -21,9 +21,9 @@ import {useEffect, type FunctionComponent} from 'react';
 
 import {FallbackProps} from 'react-error-boundary';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
+import {useApplicationContext} from '../../page/rootProvider';
+import {getLogger} from '../../util/logger';
+import {PrimaryModal} from '../Modals/PrimaryModal';
 
 const logger = getLogger('ErrorFallback');
 
@@ -32,7 +32,11 @@ export const ErrorFallback: FunctionComponent<FallbackProps> = ({error, resetErr
 
   useEffect(() => {
     const customError = new Error();
-    logger.error({originalError: error, originalStack: error?.stack, fallbackInvocationStack: customError.stack});
+    logger.error('Rendering failed; showing error fallback', {
+      originalError: error,
+      originalStack: error?.stack,
+      fallbackInvocationStack: customError.stack,
+    });
 
     PrimaryModal.show(
       PrimaryModal.type.CONFIRM,

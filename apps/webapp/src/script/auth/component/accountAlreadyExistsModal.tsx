@@ -19,12 +19,16 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Button, Container, H2, Link, Modal, Text} from '@wireapp/react-ui-kit';
-
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {buttonCss, containerCss, headerCss, linkCss} from './accountAlreadyExistsModal.styles';
+
+import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Container} from '../../uiKit/layout/container/container';
+import {Modal} from '../../uiKit/surface/modal/modal';
+import {H2} from '../../uiKit/typography/heading/heading';
+import {Link} from '../../uiKit/typography/link/link';
+import {Text} from '../../uiKit/typography/text/text';
 
 interface AccountAlreadyExistsModalProps {
   onClose: () => void;

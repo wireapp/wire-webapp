@@ -19,11 +19,10 @@
 
 import type {FunctionComponent} from 'react';
 
-import {CloseIcon} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {clearButtonStyles, selectionBarStyles, selectionCountStyles} from './cellsSelectionBar.styles';
+
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';
 
 interface CellsSelectionBarProps {
   selectedCount: number;

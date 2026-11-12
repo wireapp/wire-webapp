@@ -24,13 +24,15 @@ import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
-import {Button, ContainerXS, Form, H1, Input} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {toError} from 'Util/toError';
-
 import {Page} from './page';
 
+import {useApplicationContext} from '../../page/rootProvider';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Form} from '../../uiKit/inputs/form/form';
+import {Input} from '../../uiKit/inputs/input/input';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {H1} from '../../uiKit/typography/heading/heading';
+import {toError} from '../../util/toError';
 import {Exception} from '../component/exception';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/validationError';

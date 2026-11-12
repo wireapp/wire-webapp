@@ -19,10 +19,10 @@
 
 import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {Call} from './Call';
 import type {Participant} from './Participant';
+
+import {useKoSubscribableChildren} from '../../util/componentUtil';
 
 const participantPairSize = 2;
 

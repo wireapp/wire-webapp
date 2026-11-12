@@ -17,7 +17,7 @@
  *
  */
 
-import {getRegionalDateLocale} from 'Util/timeUtil';
+import {getRegionalDateLocale} from '../../../../../util/timeUtil';
 
 const timeFormatterOptions: Intl.DateTimeFormatOptions = {
   hour: '2-digit',

@@ -28,17 +28,15 @@ import {
   type ByRoleOptions,
 } from '@testing-library/react';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {BackupRepository} from 'Repositories/backup/backupRepository';
-import {User} from 'Repositories/entity/User';
-import * as RootProvider from 'src/script/page/rootProvider';
-import {RootContextValue} from 'src/script/page/rootProvider';
-import * as BackupUtil from 'Util/backupUtil';
-import * as Util from 'Util/util';
+import {PrimaryModal, removeCurrentModal} from '../Modals/PrimaryModal';
+import {BackupRepository} from '../../repositories/backup/backupRepository';
+import {User} from '../../repositories/entity/User';
+import * as RootProvider from '../../page/rootProvider';
+import {RootContextValue} from '../../page/rootProvider';
+import * as BackupUtil from '../../util/backupUtil';
+import * as Util from '../../util/util';
 
 import {HistoryImport} from './historyImport';
-import type {Container} from 'react-dom/client';
-import type {OptionsReceived} from '@testing-library/dom/node_modules/pretty-format';
 
 describe('HistoryImport', () => {
   const createFile = (content = 'backup', name = 'backup.wbu'): File => {
@@ -52,11 +50,7 @@ describe('HistoryImport', () => {
     user: User;
     container: HTMLElement;
     baseElement: HTMLElement;
-    debug: (
-      baseElement?: Container | (Element | Document) | Array<Container | (Element | Document)> | undefined,
-      maxLength?: number | undefined,
-      options?: OptionsReceived | undefined,
-    ) => void;
+    debug: ReturnType<typeof render>['debug'];
     rerender: (ui: React.ReactNode) => void;
     unmount: () => void;
     asFragment: () => DocumentFragment;

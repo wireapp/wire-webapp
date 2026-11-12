@@ -17,8 +17,7 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
-
+import {User} from '../../entity/User';
 import {ProgressCallback} from '../backup.types';
 import {BackupService} from '../backupService';
 

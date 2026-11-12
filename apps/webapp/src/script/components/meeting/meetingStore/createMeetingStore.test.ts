@@ -20,21 +20,21 @@
 import assert from 'node:assert';
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {MEETING_EVENT} from '@wireapp/api-client/lib/event';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {MEETING_EVENT} from '../../../apiClient/event/meetingEvent';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {WebAppEvents} from '../../../webAppEvents';
 import {amplify} from 'amplify';
 import {noop} from 'noop-esm';
 import {maybe, task} from 'true-myth';
 
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventSource} from 'Repositories/event/EventSource';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {CallingRepository} from '../../../repositories/calling/CallingRepository';
+import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {EventRepository} from '../../../repositories/event/EventRepository';
+import {EventSource} from '../../../repositories/event/EventSource';
+import type {MeetingsRepository} from '../../../repositories/meetings/meetingsRepository';
+import {unwrap, unwrapErr} from '../../../util/test/resultTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {createMeetingStore} from './createMeetingStore';
 import type {MeetingStoreDeps, MeetingStoreServiceTasks} from './meetingStoreDeps';

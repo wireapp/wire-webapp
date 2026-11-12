@@ -21,16 +21,14 @@ import {useMemo, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
-
-import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 
 import {Config} from '../../../../Config';
 import {externalUrl} from '../../../../externalRoute';
+import {User} from '../../../../repositories/entity/User';
+import {Link, LinkVariant} from '../../../../uiKit/typography/link/link';
+import {useApplicationContext} from '../../../rootProvider';
 
 interface AboutPreferencesProps {
   selfUser: User;

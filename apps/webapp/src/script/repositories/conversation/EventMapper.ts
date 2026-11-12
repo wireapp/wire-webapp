@@ -18,65 +18,9 @@
  */
 
 import {isNonEmptyString, isTruthy, isUndefined, isValidDate} from '@sindresorhus/is';
-import {
-  CONVERSATION_EVENT,
-  ConversationAdminlessDeleteReminderEvent,
-  ConversationEvent,
-  ConversationProtocolUpdateEvent,
-} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
-
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
-import {AssetData} from 'Repositories/cryptography/CryptographyMapper';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {AdminlessDeleteReminderMessage} from 'Repositories/entity/message/adminlessDeleteReminderMessage';
-import {Button} from 'Repositories/entity/message/button';
-import {CallingTimeoutMessage} from 'Repositories/entity/message/callingTimeoutMessage';
-import {CallMessage} from 'Repositories/entity/message/callMessage';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {DecryptErrorMessage} from 'Repositories/entity/message/decryptErrorMessage';
-import {DeleteMessage} from 'Repositories/entity/message/deleteMessage';
-import {E2EIVerificationMessage} from 'Repositories/entity/message/e2eiVerificationMessage';
-import {FailedToAddUsersMessage} from 'Repositories/entity/message/failedToAddUsersMessage';
-import {FederationStopMessage} from 'Repositories/entity/message/federationStopMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {FileTypeRestrictedMessage} from 'Repositories/entity/message/fileTypeRestrictedMessage';
-import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
-import {LegalHoldMessage} from 'Repositories/entity/message/legalHoldMessage';
-import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from 'Repositories/entity/message/linkPreview';
-import {Location} from 'Repositories/entity/message/location';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
-import type {Message} from 'Repositories/entity/message/message';
-import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
-import {MissedMessage} from 'Repositories/entity/message/missedMessage';
-import {MLSConversationRecoveredMessage} from 'Repositories/entity/message/mlsConversationRecoveredMessage';
-import {MLSMigrationFinalisationOngoingCallMessage} from 'Repositories/entity/message/mlsMigrationFinalisationOngoingCallMessage';
-import {Multipart} from 'Repositories/entity/message/multipart';
-import {OneToOneMigratedToMlsMessage} from 'Repositories/entity/message/oneToOneMigratedToMlsMessage';
-import {PingMessage} from 'Repositories/entity/message/pingMessage';
-import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateMessage';
-import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
-import {RenameMessage} from 'Repositories/entity/message/renameMessage';
-import {createSessionResetMessage} from 'Repositories/entity/message/sessionResetMessage';
-import type {SystemMessage} from 'Repositories/entity/message/systemMessage';
-import type {Text as TextAsset} from 'Repositories/entity/message/text';
-import {Text} from 'Repositories/entity/message/text';
-import {VerificationMessage} from 'Repositories/entity/message/verificationMessage';
-import {ClientEvent} from 'Repositories/event/Client';
-import type {EventRecord, LegacyEventRecord, WithSender} from 'Repositories/storage';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {userReactionMapToReactionMap} from 'Util/reactionUtil';
-import {toError} from 'Util/toError';
-import {isErrorWithType} from 'Util/typePredicateUtil';
-import {base64ToArray} from 'Util/util';
 
 import {
   ClientConversationEvent,
@@ -92,6 +36,12 @@ import {
   TeamMemberLeaveEvent,
 } from './EventBuilder';
 
+import {
+  CONVERSATION_EVENT,
+  ConversationAdminlessDeleteReminderEvent,
+  ConversationEvent,
+  ConversationProtocolUpdateEvent,
+} from '../../apiClient/event/conversationEvent';
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage} from '../../guards/Message';
 import {CALL_MESSAGE_TYPE} from '../../message/callMessageType';
@@ -101,6 +51,55 @@ import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
 import {SystemMessageType} from '../../message/systemMessageType';
 import {APIClient} from '../../service/apiClientSingleton';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {userReactionMapToReactionMap} from '../../util/reactionUtil';
+import {toError} from '../../util/toError';
+import {isErrorWithType} from '../../util/typePredicateUtil';
+import {base64ToArray} from '../../util/util';
+import {AssetRemoteData} from '../assets/assetRemoteData';
+import {AssetTransferState} from '../assets/assetTransferState';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
+import {AssetData} from '../cryptography/CryptographyMapper';
+import type {Conversation} from '../entity/Conversation';
+import {AdminlessDeleteReminderMessage} from '../entity/message/adminlessDeleteReminderMessage';
+import {Button} from '../entity/message/button';
+import {CallingTimeoutMessage} from '../entity/message/callingTimeoutMessage';
+import {CallMessage} from '../entity/message/callMessage';
+import {CompositeMessage} from '../entity/message/compositeMessage';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {DecryptErrorMessage} from '../entity/message/decryptErrorMessage';
+import {DeleteMessage} from '../entity/message/deleteMessage';
+import {E2EIVerificationMessage} from '../entity/message/e2eiVerificationMessage';
+import {FailedToAddUsersMessage} from '../entity/message/failedToAddUsersMessage';
+import {FederationStopMessage} from '../entity/message/federationStopMessage';
+import {FileAsset} from '../entity/message/fileAsset';
+import {FileTypeRestrictedMessage} from '../entity/message/fileTypeRestrictedMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from '../entity/message/joinedAfterMlsMigrationFinalisationMessage';
+import {LegalHoldMessage} from '../entity/message/legalHoldMessage';
+import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from '../entity/message/linkPreview';
+import {Location} from '../entity/message/location';
+import {MediumImage} from '../entity/message/mediumImage';
+import {MemberMessage} from '../entity/message/memberMessage';
+import {MemberRoleUpdateMessage} from '../entity/message/memberRoleUpdateMessage';
+import type {Message} from '../entity/message/message';
+import {MessageTimerUpdateMessage} from '../entity/message/messageTimerUpdateMessage';
+import {MissedMessage} from '../entity/message/missedMessage';
+import {MLSConversationRecoveredMessage} from '../entity/message/mlsConversationRecoveredMessage';
+import {MLSMigrationFinalisationOngoingCallMessage} from '../entity/message/mlsMigrationFinalisationOngoingCallMessage';
+import {Multipart} from '../entity/message/multipart';
+import {OneToOneMigratedToMlsMessage} from '../entity/message/oneToOneMigratedToMlsMessage';
+import {PingMessage} from '../entity/message/pingMessage';
+import {ProtocolUpdateMessage} from '../entity/message/protocolUpdateMessage';
+import {ReceiptModeUpdateMessage} from '../entity/message/receiptModeUpdateMessage';
+import {RenameMessage} from '../entity/message/renameMessage';
+import {createSessionResetMessage} from '../entity/message/sessionResetMessage';
+import type {SystemMessage} from '../entity/message/systemMessage';
+import type {Text as TextAsset} from '../entity/message/text';
+import {Text} from '../entity/message/text';
+import {VerificationMessage} from '../entity/message/verificationMessage';
+import {ClientEvent} from '../event/Client';
+import type {EventRecord, LegacyEventRecord, WithSender} from '../storage';
 
 type MappedMessage =
   | ContentMessage
@@ -154,7 +153,7 @@ export class EventMapper {
         return this._mapJsonEvent(event, conversationEntity);
       } catch (error: unknown) {
         const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${toError(error).message}`;
-        this.logger.error(errorMessage, error);
+        this.logger.error(errorMessage, {error});
       }
 
       return undefined;
@@ -180,7 +179,7 @@ export class EventMapper {
         throw error;
       }
       const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${toError(error).message}`;
-      this.logger.error(errorMessage, error);
+      this.logger.error(errorMessage, {error});
 
       throw new ConversationError(
         ConversationError.TYPE.MESSAGE_NOT_FOUND,

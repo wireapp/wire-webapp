@@ -19,37 +19,37 @@
 
 import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {JumpToLastMessageButton} from 'Components/messagesList/jumpToLastMessageButton';
-import {filterMessages} from 'Components/messagesList/utils/messagesFilter';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {DecryptErrorMessage} from 'Repositories/entity/message/decryptErrorMessage';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import {Message as MessageEntity} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isLastReceivedMessage} from 'Util/conversationMessages';
-import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
-import {useResizeObserver} from 'Util/DOM/resizeObserver';
-
+import {JumpToLastMessageButton} from './jumpToLastMessageButton';
 import {Message, MessageActions} from './message';
 import {MarkerComponent} from './message/marker';
 import {ScrollToElement} from './message/types';
 import {UploadAssets} from './uploadAssets';
+import {filterMessages} from './utils/messagesFilter';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
+import {useConversationReadBoundary} from './utils/useConversationReadBoundary';
+
+import {useRoveFocus} from '../../hooks/useRoveFocus';
+import {AssetRepository} from '../../repositories/assets/assetRepository';
+import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {ContentMessage} from '../../repositories/entity/message/contentMessage';
+import {DecryptErrorMessage} from '../../repositories/entity/message/decryptErrorMessage';
+import {MemberMessage} from '../../repositories/entity/message/memberMessage';
+import {Message as MessageEntity} from '../../repositories/entity/message/message';
+import {User} from '../../repositories/entity/User';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import type {UserRepository} from '../../repositories/user/userRepository';
+import {TabIndex} from '../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {isLastReceivedMessage} from '../../util/conversationMessages';
+import {onHitTopOrBottom} from '../../util/DOM/onHitTopOrBottom';
+import {useResizeObserver} from '../../util/DOM/resizeObserver';
+import {FadingScrollbar} from '../fadingScrollbar';
 
 const messageScrollDelayInMilliseconds = 10;
 const messageFocusDelayInMilliseconds = 1000;
@@ -60,6 +60,7 @@ interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
+  cancelPendingReadReceiptsForConversation: (conversation: Conversation) => void;
   getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | undefined;
   invitePeople: (convesation: Conversation) => void;
   messageActions: {
@@ -86,6 +87,7 @@ interface MessagesListParams {
 export const MessagesList: FC<MessagesListParams> = ({
   assetRepository,
   conversation,
+  cancelPendingReadReceiptsForConversation,
   selfUser,
   conversationRepository,
   messageRepository,
@@ -130,12 +132,20 @@ export const MessagesList: FC<MessagesListParams> = ({
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
-  const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
+  const {
+    timestamp: conversationLastReadTimestamp,
+    setTimestamp: setConversationLastReadTimestamp,
+    hasManualUnreadMarker,
+  } = useConversationReadBoundary(conversation);
 
   const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
 
-  const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
+  const groupedMessages = groupMessagesBySenderAndTime({
+    messages: filteredMessages,
+    lastReadTimestamp: conversationLastReadTimestamp,
+    includeInitialUnreadSeparator: hasManualUnreadMarker,
+  });
 
   const [messagesContainer, setMessagesContainer] = useState<HTMLDivElement | null>(null);
 
@@ -208,7 +218,6 @@ export const MessagesList: FC<MessagesListParams> = ({
   useEffect(() => {
     onLoading(true);
     setLoaded(false);
-    conversationLastReadTimestamp.current = conversation.last_read_timestamp();
     loadConversation(conversation, conversation.initialMessage()).then(() => {
       setTimeout(() => {
         setLoaded(true);
@@ -269,6 +278,14 @@ export const MessagesList: FC<MessagesListParams> = ({
 
   const jumpToLastMessage = (): void => {
     if (conversation !== undefined) {
+      // jumping to the latest message is an explicit "read" action, resume auto-read
+      if (isNumber(conversation.manualUnreadTimestamp())) {
+        conversation.clearManualUnreadMarker();
+        const newestMessage = conversation.getNewestMessage();
+        if (!isUndefined(newestMessage)) {
+          setConversationLastReadTimestamp(newestMessage.timestamp());
+        }
+      }
       // clean up anything like search result
       setHighlightedMessage(undefined);
       conversation.initialMessage(undefined);
@@ -338,6 +355,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                   hideHeader={message.timestamp() !== firstMessageTimestamp}
                   messageActions={messageActions}
                   conversation={conversation}
+                  cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
                   hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                   isLastDeliveredMessage={isLastDeliveredMessage}
                   isHighlighted={isHighlighted}

@@ -19,12 +19,13 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {maybe} from 'true-myth';
 
-import {getNextSchedulableMeetingReminder} from 'Components/meeting/selectors/getNextSchedulableMeetingReminder';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {toMeetingIdKey} from 'Components/meeting/utils/toMeetingIdKey';
+import {getNextSchedulableMeetingReminder} from './selectors/getNextSchedulableMeetingReminder';
+import type {MeetingSeries} from './types/meetingSeries';
+import {toMeetingIdKey} from './utils/toMeetingIdKey';
+
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 export const MEETING_REMINDER_MAX_TIMEOUT_DELAY_MS = 2_147_483_647;
 

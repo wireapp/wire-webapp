@@ -19,15 +19,13 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Button} from '@wireapp/react-ui-kit';
-
+import {useApplicationContext} from '../../../page/rootProvider';
+import {Button} from '../../../uiKit/inputs/button/button';
+import {forcedDownloadFile, getFileNameWithExtension} from '../../../util/util';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
-
+} from '../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {FilePlaceholder} from '../common/FilePlaceholder/FilePlaceholder';
 
 interface NoPreviewAvailableProps {

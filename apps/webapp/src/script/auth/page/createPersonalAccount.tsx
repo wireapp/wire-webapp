@@ -21,14 +21,12 @@ import type {FunctionComponent} from 'react';
 
 import {useNavigate} from 'react-router';
 
-import {FlexBox} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {styles} from './createPersonalAccount.styles';
 import {Page} from './page';
 
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {FlexBox} from '../../uiKit/layout/flexBox/flexBox';
 import {AccountForm} from '../component/accountForm';
 import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
 import {BackButton} from '../component/backButton';

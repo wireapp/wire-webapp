@@ -19,12 +19,11 @@
 
 import {FunctionComponent} from 'react';
 
-import * as Icon from 'Components/icon';
-import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {DeviceSelect} from './deviceSelect';
 
+import * as Icon from '../../../../../components/icon';
+import {useMediaDevicesStore} from '../../../../../repositories/media/useMediaDevicesStore';
+import {useApplicationContext} from '../../../../rootProvider';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface AudioOutPreferencesProps {

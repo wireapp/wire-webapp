@@ -19,8 +19,8 @@
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import type {MeetingSeries} from './types/meetingSeries';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 import {createMeetingReminderScheduler, MEETING_REMINDER_MAX_TIMEOUT_DELAY_MS} from './createMeetingReminderScheduler';
 

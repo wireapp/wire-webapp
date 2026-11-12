@@ -1,0 +1,151 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {APIClient} from '../../../apiClient/apiClient';
+import {AssetOptions, AssetResponse} from '../../../apiClient/asset/assetApi';
+import {AssetUploadData} from '../../../apiClient/asset/assetApi.schema';
+import {RequestCancelable} from '../../../apiClient/http/requestCancelable';
+import {ProgressCallback} from '../../../apiClient/http/requestProgressHandler';
+import {EncryptedAsset, EncryptedAssetUploaded} from '../../cryptography';
+import {decryptAsset, encryptAsset} from '../../cryptography/assetCryptography/assetCryptography';
+import {crypto as browserCrypto} from '../../cryptography/assetCryptography/crypto.browser';
+import type {Crypto} from '../../cryptography/assetCryptography/interfaces';
+import {toBufferSource} from '../../util/bufferUtils';
+
+export type {ProgressCallback};
+
+export type AssetUrlData = {
+  assetKey: string;
+  assetDomain: string;
+  assetToken?: string;
+};
+
+export class AssetService {
+  constructor(
+    private readonly apiClient: APIClient,
+    private readonly crypto: Crypto = browserCrypto,
+  ) {}
+
+  /**
+   * Will download an asset on the server.
+   * Will route the request to the right endpoint depending on the asset version
+   *
+   * @param assetData The versioned asset data
+   * @param progressCallback?
+   * @return Resolves when the asset has been uploaded
+   */
+  public downloadRawAsset(
+    assetData: AssetUrlData,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetResponse> {
+    return this.apiClient.api.asset.getAsset(
+      assetData.assetKey,
+      assetData.assetDomain,
+      assetData.assetToken,
+      progressCallback,
+    );
+  }
+
+  /**
+   * Uploads a raw asset to the backend without encrypting it
+   *
+   * @param plainText The raw content of the asset to upload
+   * @param options?
+   * @param progressCallback?
+   * @return cancellable request that resolves with the uploaded image
+   */
+  public uploadRawAsset(
+    asset: Buffer | Uint8Array,
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetUploadData> {
+    return this.apiClient.api.asset.postAsset(new Uint8Array(asset), options, progressCallback);
+  }
+
+  /**
+   * Will encrypt and upload an asset to the backend
+   *
+   * @param plainText The raw content of the asset to upload
+   * @param options?
+   * @param progressCallback?
+   * @return cancellable request that resolves with the uploaded image and decryption keys
+   */
+  public async uploadAsset(
+    plainText: Buffer | Uint8Array,
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
+  ): Promise<RequestCancelable<EncryptedAssetUploaded>> {
+    const {cipherText, keyBytes, sha256} = await encryptAsset(
+      {plainText, algorithm: options?.algorithm, hash: options?.hash},
+      this.crypto,
+    );
+
+    const request = this.uploadRawAsset(cipherText, options, progressCallback);
+
+    return {
+      ...request,
+      response: request.response.then(response => {
+        const {key, token, domain} = response;
+        return {
+          cipherText,
+          domain,
+          key,
+          keyBytes,
+          sha256,
+          token,
+        };
+      }),
+    };
+  }
+
+  public decryptAsset(asset: EncryptedAsset): Promise<Uint8Array> {
+    return decryptAsset(asset, this.crypto);
+  }
+
+  /**
+   * Will download and decrypt an asset stored on the server
+   * @param assetData - the data of the asset to download
+   * @param otrKey the encryption key used to encrypt the asset
+   * @param sha256 the sha256 hash of the asset
+   * @param progressCallback a progress callback to inform about the download progress
+   */
+  public downloadAsset(
+    assetData: AssetUrlData,
+    otrKey: Uint8Array,
+    sha256: Uint8Array,
+    progressCallback?: ProgressCallback,
+  ): {response: Promise<AssetResponse>; cancel: () => void} {
+    const request = this.downloadRawAsset(assetData, progressCallback);
+    const {response} = request;
+
+    return {
+      response: response.then(async response => {
+        const decrypted = await decryptAsset(
+          {cipherText: new Uint8Array(response.buffer), keyBytes: otrKey, sha256},
+          this.crypto,
+        );
+        return {
+          ...response,
+          buffer: toBufferSource(decrypted).buffer,
+        };
+      }),
+      cancel: request.cancel,
+    };
+  }
+}

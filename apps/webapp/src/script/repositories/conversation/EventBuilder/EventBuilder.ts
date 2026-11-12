@@ -18,34 +18,33 @@
  */
 
 import {isNan, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
-import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data';
-import {
-  CONVERSATION_EVENT,
-  ConversationMLSMessageAddEvent,
-  ConversationOtrMessageAddEvent,
-} from '@wireapp/api-client/lib/event';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {AddUsersFailure} from '@wireapp/core/lib/conversation';
-import {MultiPartContent} from '@wireapp/core/lib/conversation/content';
-import {ReactionType} from '@wireapp/core/lib/conversation/reactionType';
-import {DecryptionError} from '@wireapp/core/lib/errors/decryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/message';
-import type {User} from 'Repositories/entity/User';
-import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
-import {ReactionMap, ReadReceipt, UserReactionMap} from 'Repositories/storage';
-import {createUuid} from 'Util/uuid';
-
 import {BuildMessageAddParams} from './EventBuilder.types';
 
+import {MemberLeaveReason} from '../../../apiClient/conversation/data/conversationMemberLeaveData';
+import {
+  CONVERSATION_EVENT,
+  ConversationMLSMessageAddEvent,
+  ConversationOtrMessageAddEvent,
+} from '../../../apiClient/event/conversationEvent';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {AddUsersFailure} from '../../../core/conversation';
+import {MultiPartContent} from '../../../core/conversation/content';
+import {ReactionType} from '../../../core/conversation/reactionType';
+import {DecryptionError} from '../../../core/errors/decryptionError';
 import {E2EIVerificationMessageType} from '../../../message/e2eiVerificationMessageType';
 import {StatusType} from '../../../message/statusType';
 import {VerificationMessageType} from '../../../message/verificationMessageType';
+import {createUuid} from '../../../util/uuid';
+import {AssetTransferState} from '../../assets/assetTransferState';
+import type {Conversation} from '../../entity/Conversation';
+import type {Message} from '../../entity/message/message';
+import type {User} from '../../entity/User';
+import {ClientEvent, CONVERSATION} from '../../event/Client';
+import {ReactionMap, ReadReceipt, UserReactionMap} from '../../storage';
 
 export interface BaseEvent {
   conversation: string;

@@ -18,13 +18,7 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
-import {
-  ConversationOtrMessageAddEvent,
-  ConversationMLSMessageAddEvent,
-  CONVERSATION_EVENT,
-} from '@wireapp/api-client/lib/event';
-import {GenericMessageType} from '@wireapp/core/lib/conversation';
-import {MultiPartContent} from '@wireapp/core/lib/conversation/content';
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {
@@ -55,22 +49,29 @@ import {
   ButtonAction,
 } from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {CALL_MESSAGE_TYPE} from 'Repositories/calling/enum/CallMessageType';
-import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
-import type {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
-import type {CallingEvent} from 'Repositories/event/CallingEvent';
-import {ClientEvent} from 'Repositories/event/Client';
-import {getLogger, Logger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {toError} from 'Util/toError';
-import {base64ToArray, arrayToBase64} from 'Util/util';
-
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
+import {
+  ConversationOtrMessageAddEvent,
+  ConversationMLSMessageAddEvent,
+  CONVERSATION_EVENT,
+} from '../../apiClient/event/conversationEvent';
+import {GenericMessageType} from '../../core/conversation';
+import {MultiPartContent} from '../../core/conversation/content';
 import {CryptographyError} from '../../error/cryptographyError';
 import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
+import {getLogger, Logger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {toError} from '../../util/toError';
+import {base64ToArray, arrayToBase64} from '../../util/util';
+import {AssetTransferState} from '../assets/assetTransferState';
+import {parseSerializedCallingMessage} from '../calling/callingMessage.schema';
+import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
+import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
+import type {MessageAddEvent} from '../conversation/EventBuilder';
+import type {CallingEvent} from '../event/CallingEvent';
+import {ClientEvent} from '../event/Client';
 
 export type MappedText = {
   data: {content: string; mentions: string[]; previews: string[]; quote?: string; replacing_message_id?: string};
@@ -210,7 +211,7 @@ type MappedGenericMessageNonEphemeralContent =
   | MappedInCallEmoji
   | MappedInCallHandRaise;
 type MappedEphemeralMessageEvent = MappedGenericMessageMetadata &
-  MappedGenericMessageNonEphemeralContent & {ephemeral_expires: number | null};
+  (MappedGenericMessageNonEphemeralContent | MappedSessionReset) & {ephemeral_expires: number | null};
 type MappedGenericMessageSpecificContent =
   MappedGenericMessageNonEphemeralContent | MappedEphemeralMessageEvent | MappedSessionReset;
 type MappedGenericMessageEvent = MappedGenericMessageMetadata & MappedGenericMessageSpecificContent;
@@ -275,7 +276,11 @@ export class CryptographyMapper {
       }
 
       case GenericMessageType.CALLING: {
-        specificContent = this._mapCalling(genericMessage.calling as Calling, event);
+        const mappedCalling = this._mapCalling(genericMessage.calling as Calling, event);
+        if (isUndefined(mappedCalling)) {
+          return;
+        }
+        specificContent = mappedCalling;
         break;
       }
 
@@ -308,7 +313,11 @@ export class CryptographyMapper {
       }
 
       case GenericMessageType.EPHEMERAL: {
-        specificContent = this._mapEphemeral(genericMessage, event);
+        const mappedEphemeral = this._mapEphemeral(genericMessage, event);
+        if (mappedEphemeral.isNothing) {
+          return;
+        }
+        specificContent = mappedEphemeral.value;
         break;
       }
 
@@ -567,9 +576,15 @@ export class CryptographyMapper {
     };
   }
 
-  private _mapCalling(calling: Calling, event: EncryptedEvent): MappedCallingContent {
+  private _mapCalling(calling: Calling, event: EncryptedEvent): MappedCallingContent | undefined {
+    const content = parseSerializedCallingMessage(calling.content);
+    if (content.isErr) {
+      this.logger.warn('Discarding invalid calling message', {error: content.error});
+      return undefined;
+    }
+
     return {
-      content: JSON.parse(calling.content),
+      content: content.value,
       targetConversation: calling.qualifiedConversationId,
       sender: event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD ? event.data.sender : undefined,
       senderClientId: event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD ? event.senderClientId : undefined,
@@ -637,7 +652,7 @@ export class CryptographyMapper {
     return mappedMessage;
   }
 
-  private _mapEphemeral(genericMessage: GenericMessage, event: EncryptedEvent): MappedEphemeralMessageEvent {
+  private _mapEphemeral(genericMessage: GenericMessage, event: EncryptedEvent): Maybe<MappedEphemeralMessageEvent> {
     if (isNullOrUndefined(genericMessage.ephemeral)) {
       throw new CryptographyError(
         CryptographyError.TYPE.NO_GENERIC_MESSAGE,
@@ -647,13 +662,14 @@ export class CryptographyMapper {
     const messageTimer = genericMessage.ephemeral[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
     (genericMessage.ephemeral as unknown as GenericMessage).messageId = genericMessage.messageId;
 
-    const embeddedMessage = this._mapGenericMessage(
-      genericMessage.ephemeral as unknown as GenericMessage,
-      event,
-    ) as MappedEphemeralMessageEvent;
-    embeddedMessage.ephemeral_expires = ConversationEphemeralHandler.validateTimer(messageTimer as number);
-
-    return embeddedMessage;
+    return Maybe.of(this._mapGenericMessage(genericMessage.ephemeral as unknown as GenericMessage, event)).map(
+      embeddedMessage => {
+        return {
+          ...embeddedMessage,
+          ephemeral_expires: ConversationEphemeralHandler.validateTimer(messageTimer as number),
+        };
+      },
+    );
   }
 
   /**
@@ -685,7 +701,7 @@ export class CryptographyMapper {
       });
       return GenericMessage.decode(new Uint8Array(externalMessageBuffer));
     } catch (error: unknown) {
-      this.logger.error(`Failed to unwrap external message: ${toError(error).message}`, error);
+      this.logger.error(`Failed to unwrap external message: ${toError(error).message}`, {error});
       throw new CryptographyError(CryptographyError.TYPE.BROKEN_EXTERNAL, CryptographyError.MESSAGE.BROKEN_EXTERNAL);
     }
   }

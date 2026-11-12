@@ -21,14 +21,14 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {task} from 'true-myth';
 
-import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode} from 'src/script/types/cellNode';
-
 import {transformNodesToCellsFolders} from './transformNodesToCellsFolders';
+
+import {QualifiedId} from '../../../../../../../../apiClient/user/qualifiedId';
+import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../../../../../types/cellNode';
+import {getCellsApiPath} from '../../../../../common/getCellsApiPath/getCellsApiPath';
 
 interface UseGetCellsFoldersProps {
   currentPath: string;

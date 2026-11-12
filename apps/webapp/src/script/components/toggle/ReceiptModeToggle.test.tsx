@@ -18,14 +18,14 @@
  */
 
 import {render} from '@testing-library/react';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {RECEIPT_MODE} from '../../apiClient/conversation/data/conversationReceiptModeUpdateData';
 import {noop} from 'noop-esm';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 
 import {ReceiptModeToggle} from './ReceiptModeToggle';
 

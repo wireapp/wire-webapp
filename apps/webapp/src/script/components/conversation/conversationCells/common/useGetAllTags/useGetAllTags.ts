@@ -19,9 +19,8 @@
 
 import {useEffect} from 'react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {useAllCellsTagsStore} from '../useAllCellsTagsStore/useAllCellsTagsStore';
 
 type UseGetAllTagsResult = {tags: string[]; isLoading: boolean; error: Error | null};

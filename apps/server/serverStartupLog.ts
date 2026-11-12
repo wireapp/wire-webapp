@@ -17,7 +17,7 @@
  *
  */
 
-import type {ServerConfig} from '@wireapp/config';
+import type {ServerConfig} from './configuration/server.config';
 
 type LogServerStartupDependencies = {
   readonly logInformation: (message: string) => void;

@@ -18,9 +18,9 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
-import {getLogger} from 'Util/logger';
+import {TimeInMillis} from '../../commons/util/TimeUtil';
+import {getLogger} from '../logger';
 
 const logger = getLogger('ConnectionQualityListener');
 

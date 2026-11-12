@@ -22,9 +22,7 @@ import {ReactNode, useCallback, useEffect, useMemo, useState, type FunctionCompo
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
-import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
-
-import {areCapabilityInfosEqual} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/capabilityInformationValidator';
+import {areCapabilityInfosEqual} from './capabilityInformationValidator';
 import {
   buttonBaseStyles,
   buttonNeutralStyles,
@@ -39,12 +37,16 @@ import {
   performancePanelResetButtonStyles,
   performancePanelStyles,
   performancePanelTitleStyles,
-} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel.styles';
-import {QualityMode} from 'Repositories/media/backgroundEffects';
-import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import type {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import {RenderMetrics, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+} from './videoBackgroundPerformancePanel.styles';
+
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {QualityMode} from '../../../../repositories/media/backgroundEffects';
+import {CapabilityInfo} from '../../../../repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import type {BackgroundEffectsHandler} from '../../../../repositories/media/backgroundEffectsHandler';
+import {RenderMetrics, useBackgroundEffectsStore} from '../../../../repositories/media/useBackgroundEffectsStore';
+import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';
+import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
+import {Option, Select} from '../../../../uiKit/inputs/select/select';
 
 type PerformancePanelProps = {
   backgroundEffectsHandler: BackgroundEffectsHandler;

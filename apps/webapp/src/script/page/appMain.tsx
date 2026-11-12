@@ -27,35 +27,6 @@ import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
-import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
-import {ChooseScreen} from 'Components/calling/ChooseScreen';
-import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
-import {ConfigToolbar} from 'Components/configToolbar/configToolbar';
-import {ErrorFallback} from 'Components/errorFallback';
-import {CreateConversationModal} from 'Components/Modals/CreateConversation/CreateConversaionModal';
-import {FileHistoryModal} from 'Components/Modals/FileHistoryModal/FileHistoryModal';
-import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
-import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {showUserModal, UserModal} from 'Components/Modals/UserModal';
-import {useActiveWindow} from 'Hooks/useActiveWindow';
-import {useInitializeRootFontSize} from 'Hooks/useRootFontSize';
-import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
-import {showInitialModal} from 'Repositories/user/availabilityModal';
-import {UserState} from 'Repositories/user/userState';
-import {isUUID} from 'src/script/auth/util/stringUtil';
-import {Config} from 'src/script/Config';
-import {canUseMeetings} from 'Util/canUseMeetings';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-
 import {AppLock} from './appLock';
 import {useE2EIFeatureConfigUpdate} from './components/featureConfigChange/featureConfigChangeHandler/features/useE2eIFeatureConfigUpdate';
 import {FeatureConfigChangeNotifier} from './components/featureConfigChange/featureConfigChangeNotifier';
@@ -69,14 +40,52 @@ import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
+import {isUUID} from '../auth/util/stringUtil';
+import {CallingContainer} from '../components/calling/CallingOverlayContainer';
+import {ChooseScreen} from '../components/calling/ChooseScreen';
+import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
+import {ConfigToolbar} from '../components/configToolbar/configToolbar';
+import {ErrorFallback} from '../components/errorFallback';
+import {CreateConversationModal} from '../components/Modals/CreateConversation/CreateConversaionModal';
+import {FileHistoryModal} from '../components/Modals/FileHistoryModal/FileHistoryModal';
+import {GroupCreationModal} from '../components/Modals/GroupCreation/GroupCreationModal';
+import {LegalHoldModal} from '../components/Modals/LegalHoldModal/LegalHoldModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {showUserModal, UserModal} from '../components/Modals/UserModal';
+import {Config} from '../Config';
+import type {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
+import {useActiveWindow} from '../hooks/useActiveWindow';
+import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
+import {isMLSSupportedByEnvironment} from '../mls/isMLSSupportedByEnvironment';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
+import {finaliseMigrationOfMixedConversations} from '../mls/MLSMigration/migrationFinaliser';
+import {
+  initialiseMigrationOfProteusConversations,
+  joinUnestablishedMixedConversations,
+} from '../mls/MLSMigration/migrationInitialiser';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import {User} from '../repositories/entity/User';
+import {TeamState} from '../repositories/team/TeamState';
+import {AppLockRepository} from '../repositories/user/appLockRepository';
+import {showInitialModal} from '../repositories/user/availabilityModal';
+import {UserState} from '../repositories/user/userState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRouterClock, configureRoutes, navigate} from '../router/Router';
 import {Core} from '../service/coreSingleton';
+import {THEME_ID} from '../uiKit/identity/theme/theme';
+import {useMatchMedia} from '../uiKit/layout/matchMedia/matchMedia';
+import {StyledApp} from '../uiKit/layout/styledApp/styledApp';
+import {QUERY} from '../uiKit/utils/mediaQueries';
+import {canUseMeetings} from '../util/canUseMeetings';
+import {canUseTroubleshooter} from '../util/canUseTroubleshooter';
+import {useKoSubscribableChildren} from '../util/componentUtil';
+import {isDetachedCallingFeatureEnabled} from '../util/isDetachedCallingFeatureEnabled';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
+import {WebAppEvents} from '../webAppEvents';
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;
@@ -92,6 +101,7 @@ type AppMainProps = {
   readonly conversationState?: ConversationState;
   readonly callState?: CallState;
   readonly clock: Clock;
+  readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
   readonly locked: boolean;
 };
@@ -105,6 +115,7 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
     conversationState = container.resolve(ConversationState),
     callState = container.resolve(CallState),
     clock,
+    isFeatureToggleEnabled,
     locked,
   } = properties;
   const translate = mainView.translate;
@@ -283,6 +294,11 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
       '/preferences/av': () => {
         return mainView.list.openPreferencesAudioVideo();
       },
+      '/preferences/troubleshooting': () => {
+        return canUseTroubleshooter(isFeatureToggleEnabled)
+          ? mainView.list.openPreferences(ContentState.PREFERENCES_TROUBLESHOOTING)
+          : navigate('/');
+      },
       '/preferences/devices': () => {
         return mainView.list.openPreferencesDevices();
       },
@@ -328,6 +344,23 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
       conversationRepository: repositories.conversation,
       getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
       refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
+      dependencies: {
+        isMLSSupportedByEnvironment,
+        registerTask: core.recurringTaskScheduler.registerTask,
+        initialiseMigrationOfProteusConversations: (conversations, selfUserId) => {
+          return initialiseMigrationOfProteusConversations(conversations, selfUserId, repositories.conversation);
+        },
+        joinUnestablishedMixedConversations: (conversations, selfUserId) => {
+          return joinUnestablishedMixedConversations(conversations, repositories.conversation, selfUserId, {core});
+        },
+        finaliseMigrationOfMixedConversations: conversations => {
+          return finaliseMigrationOfMixedConversations(
+            conversations,
+            repositories.conversation.updateConversationProtocol,
+            repositories.team.getTeamMLSMigrationStatus,
+          );
+        },
+      },
     });
   };
 

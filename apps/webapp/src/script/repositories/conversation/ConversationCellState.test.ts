@@ -17,18 +17,18 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CallMessage} from 'Repositories/entity/message/callMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {PingMessage} from 'Repositories/entity/message/pingMessage';
-import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
-import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {Conversation} from '../entity/Conversation';
+import {CallMessage} from '../entity/message/callMessage';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {PingMessage} from '../entity/message/pingMessage';
+import {Text} from '../entity/message/text';
+import {User} from '../entity/User';
+import {translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {createUuid} from '../../util/uuid';
 
 import {generateCellState} from './ConversationCellState';
 import {ConversationStatusIcon} from './ConversationStatusIcon';
@@ -61,6 +61,16 @@ describe('ConversationCellState', () => {
       conversationEntity.mutedState(NOTIFICATION_STATE.NOTHING);
 
       expect(generateCellState(conversationEntity, translate)).toEqual({description: '', icon: 'muted'});
+    });
+
+    it('shows a manual unread status even when notifications are muted and no incoming messages are unread', () => {
+      conversationEntity.mutedState(NOTIFICATION_STATE.NOTHING);
+      conversationEntity.manualUnreadTimestamp(123);
+
+      expect(generateCellState(conversationEntity, translate)).toEqual({description: '', icon: 'manual-unread'});
+
+      conversationEntity.manualUnreadTimestamp(undefined);
+      conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
     });
   });
 

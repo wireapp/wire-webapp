@@ -17,9 +17,8 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import type {ScheduleMeetingRecurrenceOption} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import type {ScheduleMeetingRecurrenceOption} from '../scheduleMeetingModal/scheduleMeetingTypes';
 
 export type MeetingSeries = {
   series_start_date: string;

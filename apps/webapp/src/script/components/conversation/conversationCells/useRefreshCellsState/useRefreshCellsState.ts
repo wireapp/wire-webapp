@@ -21,10 +21,10 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {CONVERSATION_CELLS_STATE} from '../../../../apiClient/conversation/conversation';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
 
 const REFRESH_INTERVAL_MS = 10000;
 const MAX_REFRESH_COUNT = 5;

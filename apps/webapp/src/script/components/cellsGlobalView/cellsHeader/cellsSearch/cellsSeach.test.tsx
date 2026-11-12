@@ -21,13 +21,14 @@ import type {ReactNode} from 'react';
 
 import {render, screen} from '@testing-library/react';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../../uiKit/identity/theme/theme';
 
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import type {Translate} from 'Util/localizerUtil';
+} from '../../../../page/testSupport/rootContextTestSupport';
+import type {Translate} from '../../../../util/localizerUtil';
 
 import {CellsSearch} from './cellsSeach';
 import type {JSX} from '@emotion/react/jsx-runtime';

@@ -145,10 +145,6 @@ jobs:
         working-directory: workflow-source
         run: npm clean-install --ignore-scripts && npx just apply-patches
 
-      - name: Build workflow tool dependencies
-        working-directory: workflow-source
-        run: npx just build-libraries
-
       - name: Setup Node.js for selected release
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:

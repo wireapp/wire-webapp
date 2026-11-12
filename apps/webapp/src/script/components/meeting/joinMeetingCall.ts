@@ -18,18 +18,18 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, Task, task} from 'true-myth';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
 
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
-import type {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import type {CallingRepository} from '../../repositories/calling/CallingRepository';
+import type {CallMediaChoice} from '../../repositories/calling/callMediaChoice';
+import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {isMLSCapableConversation} from '../../repositories/conversation/ConversationSelectors';
+import type {ConversationState} from '../../repositories/conversation/ConversationState';
+import type {Conversation} from '../../repositories/entity/Conversation';
+import type {CallingViewModel} from '../../view_model/CallingViewModel';
 
 export const joinMeetingCallErrors = {
   conversationNotFound: 'conversationNotFound',

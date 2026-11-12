@@ -28,86 +28,12 @@ import {
   isTruthy,
   isUndefined,
 } from '@sindresorhus/is';
-import {AssetAuditData} from '@wireapp/api-client/lib/asset';
-import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
-import {
-  GenericMessageType,
-  InCallEmojiType,
-  MessageSendingState,
-  MessageTargetMode,
-  ReactionType,
-  SendResult,
-  type ConversationService,
-} from '@wireapp/core/lib/conversation';
-import {
-  EditedTextContent,
-  FileMetaDataContent,
-  LinkPreviewContent,
-  LinkPreviewUploadedContent,
-  MultiPartContent,
-  TextContent,
-} from '@wireapp/core/lib/conversation/content';
-import * as MessageBuilder from '@wireapp/core/lib/conversation/message/messageBuilder';
-import {OtrMessage} from '@wireapp/core/lib/conversation/message/otrMessage';
-import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/textContentBuilder';
-import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/assetMetaDataBuilder';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {AudioRepository} from 'Repositories/audio/audioRepository';
-import {AudioType} from 'Repositories/audio/audioType';
-import {ClientState} from 'Repositories/client/ClientState';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService, type IdentifiedUpdatePayload} from 'Repositories/event/EventService';
-import {EventTypeHandling} from 'Repositories/event/EventTypeHandling';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import type {EventRecord, ReactionMap} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserType} from 'Repositories/tracking/attribute';
-import {EventName} from 'Repositories/tracking/eventName';
-import * as trackingHelpers from 'Repositories/tracking/helpers';
-import {Segmentation} from 'Repositories/tracking/segmentation';
-import {protoFromType} from 'Repositories/user/availabilityMapper';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {
-  cancelSendingLinkPreview,
-  clearLinkPreviewSendingState,
-  shouldSendLinkPreviewForMessage,
-} from 'Util/linkPreviewSender';
-import {type Translate, Declension, joinNames} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {isMarkdownText} from 'Util/markdownUtil';
-import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {roundLogarithmic} from 'Util/numberUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {capitalizeFirstChar} from 'Util/stringUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {isBackendError, isErrorWithCode} from 'Util/typePredicateUtil';
-import {loadUrlBlob, supportsMLS} from 'Util/util';
-import {createUuid} from 'Util/uuid';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
@@ -118,7 +44,36 @@ import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
+import {AssetAuditData} from '../../apiClient/asset/assetApi';
+import {MessageSendingStatus} from '../../apiClient/conversation/messageSendingStatus';
+import {QualifiedUserClients} from '../../apiClient/conversation/qualifiedUserClients';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {RequestCancellationError} from '../../apiClient/user/userError';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
+import {
+  GenericMessageType,
+  InCallEmojiType,
+  MessageSendingState,
+  MessageTargetMode,
+  ReactionType,
+  SendResult,
+  type ConversationService,
+} from '../../core/conversation';
+import {
+  EditedTextContent,
+  FileMetaDataContent,
+  LinkPreviewContent,
+  LinkPreviewUploadedContent,
+  MultiPartContent,
+  TextContent,
+} from '../../core/conversation/content';
+import * as MessageBuilder from '../../core/conversation/message/messageBuilder';
+import {OtrMessage} from '../../core/conversation/message/otrMessage';
+import {TextContentBuilder} from '../../core/conversation/message/textContentBuilder';
+import {isQualifiedUserClients} from '../../core/util';
 import {ConversationError} from '../../error/conversationError';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
 import {MentionEntity} from '../../message/mentionEntity';
@@ -126,6 +81,52 @@ import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {
+  cancelSendingLinkPreview,
+  clearLinkPreviewSendingState,
+  shouldSendLinkPreviewForMessage,
+} from '../../util/linkPreviewSender';
+import {type Translate, Declension, joinNames} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {isMarkdownText} from '../../util/markdownUtil';
+import {areMentionsDifferent, isTextDifferent} from '../../util/messageComparator';
+import {roundLogarithmic} from '../../util/numberUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {capitalizeFirstChar} from '../../util/stringUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {isBackendError, isErrorWithCode} from '../../util/typePredicateUtil';
+import {loadUrlBlob, supportsMLS} from '../../util/util';
+import {createUuid} from '../../util/uuid';
+import {WebAppEvents} from '../../webAppEvents';
+import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from '../assets/assetMetaDataBuilder';
+import {AssetRepository} from '../assets/assetRepository';
+import {AssetTransferState} from '../assets/assetTransferState';
+import {AudioRepository} from '../audio/audioRepository';
+import {AudioType} from '../audio/audioType';
+import {ClientState} from '../client/ClientState';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {Conversation} from '../entity/Conversation';
+import {CompositeMessage} from '../entity/message/compositeMessage';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {FileAsset} from '../entity/message/fileAsset';
+import {Message} from '../entity/message/message';
+import {User} from '../entity/User';
+import {EventRepository} from '../event/EventRepository';
+import {EventService, type IdentifiedUpdatePayload} from '../event/EventService';
+import {EventTypeHandling} from '../event/EventTypeHandling';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {PropertiesRepository} from '../properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../properties/propertiesType';
+import type {EventRecord, ReactionMap} from '../storage';
+import {TeamState} from '../team/TeamState';
+import {UserType} from '../tracking/attribute';
+import {EventName} from '../tracking/eventName';
+import * as trackingHelpers from '../tracking/helpers';
+import {Segmentation} from '../tracking/segmentation';
+import {protoFromType} from '../user/availabilityMapper';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 
 type OptimisticMessageEvent = Parameters<EventRepository['injectEvent']>[0];
 
@@ -748,10 +749,9 @@ export class MessageRepository {
       if (error instanceof RequestCancellationError) {
         return;
       }
-      this.logger.error(
-        `Failed to upload asset for conversation '${conversation.id}': ${(error as Error).message}`,
+      this.logger.error(`Failed to upload asset for conversation '${conversation.id}': ${(error as Error).message}`, {
         error,
-      );
+      });
       const messageEntity = await this.getMessageInConversationById(conversation, messageId);
       await this.sendAssetUploadFailed(conversation, messageEntity.id);
       return this.updateMessageAsUploadFailed(messageEntity);
@@ -880,11 +880,11 @@ export class MessageRepository {
       this.assetRepository.addToProcessQueue(message, conversation.id);
       return {message, metaData: meta as FileMetaDataContent};
     } catch (error: unknown) {
-      this.logger.error('Error while building metadata for asset', JSON.stringify(error));
+      this.logger.error('Error while building metadata for asset', {error});
       const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${
         (error as Error).message
       }`;
-      this.logger.warn(logMessage, error);
+      this.logger.warn(logMessage, {error});
       return null;
     }
   }
@@ -938,6 +938,7 @@ export class MessageRepository {
       : MessageBuilder.buildFileDataMessage(
           {
             metaData: meta,
+            preview: asset.preview,
             ...commonMessageData,
             file: {data: Buffer.from(await file.arrayBuffer())},
           },
@@ -1155,7 +1156,7 @@ export class MessageRepository {
 
     const shouldProceedSending = await injectOptimisticEvent();
     if (!shouldProceedSending) {
-      this.logger.log('User has canceled sending a message to a degraded conversation.');
+      this.logger.info('User has canceled sending a message to a degraded conversation.');
       return {id: payload.messageId, sentAt: new Date().toISOString(), state: MessageSendingState.CANCELED};
     }
 
@@ -1237,7 +1238,7 @@ export class MessageRepository {
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : error;
       const logMessage = `Failed to reset session for client '${clientId}' of user '${userId.id}': ${message}`;
-      this.logger.warn(logMessage, error);
+      this.logger.warn(logMessage, {error});
       throw error;
     }
   }
@@ -1443,7 +1444,7 @@ export class MessageRepository {
         return;
       }
       const logMessage = `Failed to delete message '${messageId}' in conversation '${conversationId}' for everyone`;
-      this.logger.warn(logMessage, error);
+      this.logger.warn(logMessage, {error});
       throw error;
     }
   }
@@ -1466,10 +1467,9 @@ export class MessageRepository {
       await this.sendToSelfConversations(payload);
       await this.deleteMessageById(conversation, message.id);
     } catch (error: unknown) {
-      this.logger.warn(
-        `Failed to send delete message with id '${message.id}' for conversation '${conversation.id}'`,
+      this.logger.warn(`Failed to send delete message with id '${message.id}' for conversation '${conversation.id}'`, {
         error,
-      );
+      });
       throw error;
     }
   }

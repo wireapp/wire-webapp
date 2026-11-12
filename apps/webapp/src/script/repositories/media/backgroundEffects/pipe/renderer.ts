@@ -19,8 +19,8 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
-import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
+import {BackgroundSource} from '../../VideoBackgroundEffects';
+import {getSafeLogger} from '../helper/logger';
 
 const opaqueAlphaChannel = 255;
 const defaultBackgroundBlueChannel = 243;
@@ -818,7 +818,8 @@ export class WebGLRenderer {
     this.gl.linkProgram(program);
 
     if (this.gl.getProgramParameter(program, this.gl.LINK_STATUS) !== true) {
-      this.logger.error('Program link error:', this.gl.getProgramInfoLog(program));
+      const programLog = this.gl.getProgramInfoLog(program);
+      this.logger.error(`Program link error: ${programLog}`, {programLog});
 
       this.gl.deleteProgram(program);
 
@@ -847,7 +848,8 @@ export class WebGLRenderer {
     this.gl.compileShader(shader);
 
     if (this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS) !== true) {
-      this.logger.error('Shader compile error:', this.gl.getShaderInfoLog(shader));
+      const shaderLog = this.gl.getShaderInfoLog(shader);
+      this.logger.error(`Shader compile error: ${shaderLog}`, {shaderLog});
 
       this.gl.deleteShader(shader);
 

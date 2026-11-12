@@ -27,13 +27,14 @@ module.exports = {
   coverageDirectory: '<rootDir>/target/coverage/tools',
   coverageReporters: rootJestConfiguration.coverageReporters,
   testEnvironment: 'node',
-  testMatch: ['<rootDir>/tools/**/*.test.ts'],
+  testMatch: ['<rootDir>/tools/**/*.test.ts', '<rootDir>/tools/**/*.test.mts'],
   moduleNameMapper: {
     '^@enormora/objectory$': '<rootDir>/node_modules/@enormora/objectory/main.js',
   },
   transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': '@swc/jest',
+    '^.+\\.mts$': ['@swc/jest', {jsc: {parser: {syntax: 'typescript'}}}],
+    '^.+\\.(js|jsx|ts|tsx|cts)$': '@swc/jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|ky|p-map|@enormora/objectory|@sindresorhus/is)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth|ky-release|p-map|@enormora/objectory|@sindresorhus/is)/)'],
   reporters: rootJestConfiguration.reporters,
 };

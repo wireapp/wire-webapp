@@ -19,10 +19,10 @@
 
 import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 
-import {UrlUtil} from '@wireapp/commons';
-
 import {QUERY_KEY} from './route';
 import {Locales, SupportedLocale} from './supportedLocales';
+
+import {UrlUtil} from '../commons/util';
 
 const DEFAULT_LANGUAGE: SupportedLocale = 'en-US';
 

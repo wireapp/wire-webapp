@@ -20,22 +20,22 @@
 import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
+import {ACCESS_STATE} from '../../../repositories/conversation/AccessState';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../repositories/team/TeamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../testSupport/rootContextTestSupport';
 
 import {GuestServicesOptions} from './guestServicesOptions';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
@@ -74,6 +74,10 @@ const getDefaultParams = (isGuest: boolean = true): GetDefaultParamsResult => {
 };
 
 describe('GuestServicesOptions', () => {
+  afterAll(() => {
+    testFactory.dispose();
+  });
+
   beforeAll(async () => {
     conversationRepository = await testFactory.exposeConversationActors();
   });

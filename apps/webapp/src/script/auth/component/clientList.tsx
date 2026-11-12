@@ -20,18 +20,17 @@
 import {HTMLProps, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isBoolean, isString} from '@sindresorhus/is';
-import {ClientType} from '@wireapp/api-client/lib/client/index';
-import type {RegisteredClient} from '@wireapp/api-client/lib/client/registeredClient';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router';
 
-import {UrlUtil} from '@wireapp/commons';
-import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
-
-import {getLogger} from 'Util/logger';
-
 import {ClientItem} from './clientItem';
 
+import {ClientType} from '../../apiClient/client/clientType';
+import type {RegisteredClient} from '../../apiClient/client/registeredClient';
+import {UrlUtil} from '../../commons/util';
+import {Loading} from '../../uiKit/dataDisplay/loading/loading';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {getLogger} from '../../util/logger';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import * as LocalStorageAction from '../module/action/localStorageAction';
 import {RootState, ThunkDispatch} from '../module/reducer';
@@ -39,6 +38,7 @@ import {getEntropy} from '../module/selector/authSelector';
 import * as ClientSelector from '../module/selector/clientSelector';
 import * as SelfSelector from '../module/selector/selfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
+import {getOAuthQueryString, withOAuthQuery} from '../util/oauthUtil';
 
 const logger = getLogger('ClientList');
 
@@ -58,7 +58,7 @@ const ClientListComponent: FunctionComponent<Props & ConnectedProps & DispatchPr
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
   const [showLoading, setShowLoading] = useState(false);
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, getOAuthQueryString(window.location));
   const [currentlySelectedClient, setCurrentlySelectedClient] = useState<string | null>(null);
   const [sortedClients, setSortedClients] = useState(permanentClients);
 
@@ -91,12 +91,12 @@ const ClientListComponent: FunctionComponent<Props & ConnectedProps & DispatchPr
       removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
 
       if (isOauth) {
-        return navigate(ROUTE.AUTHORIZE);
+        return navigate(withOAuthQuery(ROUTE.AUTHORIZE));
       }
 
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error: unknown) {
-      logger.error(error);
+      logger.error('Failed to replace client', {error, clientId});
     } finally {
       setShowLoading(false);
     }

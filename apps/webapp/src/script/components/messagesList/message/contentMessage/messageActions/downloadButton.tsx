@@ -19,7 +19,7 @@
 
 import {ReactNode, type FunctionComponent} from 'react';
 
-import type {Translate} from 'Util/localizerUtil';
+import type {Translate} from '../../../../../util/localizerUtil';
 
 interface DownloadButtonProps {
   translate: Translate;

@@ -17,11 +17,11 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
 
 import {test, expect, withLogin} from '../../test.fixtures';
-import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {createGroup, sendConnectionRequest} from '../../utils/userActions';
 
 test.describe('Connections', () => {
   let memberA: User;

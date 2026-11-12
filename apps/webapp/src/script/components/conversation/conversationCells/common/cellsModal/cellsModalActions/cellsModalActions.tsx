@@ -19,9 +19,9 @@
 
 import {MouseEvent, ReactNode, type FunctionComponent} from 'react';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {actionsWrapperStyles, buttonStyles, destructiveActionButtonStyles} from './cellsModalActions.styles';
 
-import {buttonStyles, actionsWrapperStyles} from './cellsModalActions.styles';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
 
 export const CellsModalActions: FunctionComponent<{children: ReactNode}> = ({children}: {children: ReactNode}) => {
   return <div css={actionsWrapperStyles}>{children}</div>;
@@ -43,21 +43,24 @@ export const CellsModalPrimaryButton: FunctionComponent<{
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   isDisabled?: boolean;
   isLoading?: boolean;
+  isDestructive?: boolean;
 }> = ({
   children,
   onClick,
   isDisabled,
   isLoading,
+  isDestructive = false,
 }: {
   children: ReactNode;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   isDisabled?: boolean;
   isLoading?: boolean;
+  isDestructive?: boolean;
 }) => {
   return (
     <Button
       variant={ButtonVariant.PRIMARY}
-      css={buttonStyles}
+      css={isDestructive ? destructiveActionButtonStyles : buttonStyles}
       disabled={isDisabled}
       onClick={onClick}
       showLoading={isLoading}

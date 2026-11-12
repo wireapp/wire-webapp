@@ -19,12 +19,10 @@
 
 import {ReactNode, useEffect, type FunctionComponent} from 'react';
 
-import {Runtime} from '@wireapp/commons';
-
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-
 import {largeModalStyles} from './PrimaryModalShell.styles';
 
+import {Runtime} from '../../../../commons/util/Runtime';
+import {ModalComponent} from '../../ModalComponent';
 import {ModalSize} from '../PrimaryModalTypes';
 
 interface PrimaryModalShellProps {

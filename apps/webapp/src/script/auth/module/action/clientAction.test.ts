@@ -18,10 +18,16 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {ClientType} from '@wireapp/api-client/lib/client';
-import type {RegisteredClient} from '@wireapp/api-client/lib/client';
-import {CONVERSATION_PROTOCOL, FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
-import type {Account} from '@wireapp/core';
+import {Maybe, task, type Task} from 'true-myth';
+import {ClientType} from '../../../apiClient/client/clientType';
+import type {RegisteredClient} from '../../../apiClient/client/registeredClient';
+import {
+  CONVERSATION_PROTOCOL,
+  FEATURE_STATUS,
+  type FeatureList,
+} from '../../../apiClient/team/feature/featureList.types';
+import type {Account} from '../../../core';
+import type {MetaClient} from '../../../core/client/clientService';
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -31,6 +37,50 @@ import {ClientActionCreator} from '../action/creator/';
 import {actionRoot} from '.';
 
 describe('ClientAction', () => {
+  it('registers a new client only for confirmed absence', async () => {
+    const client = {id: 'new-client'} as MetaClient;
+    const registerClient = jest.fn().mockResolvedValue(client);
+    const initClient = jest.fn().mockResolvedValue(client);
+    const store = mockStoreFactory({
+      actions: actionRoot,
+      core: {
+        getLocalClient(): Task<Maybe<MetaClient>, Error> {
+          return task.resolve(Maybe.nothing());
+        },
+        registerClient,
+        initClient,
+      },
+    })({});
+
+    await store.dispatch(actionRoot.clientAction.doInitializeClient(ClientType.PERMANENT));
+
+    expect(registerClient).toHaveBeenCalledTimes(1);
+    expect(store.getActions()).toEqual([ClientActionCreator.successfulInitializeClient({isNew: true, client})]);
+  });
+
+  it('does not register or initialize a client after a failed lookup', async () => {
+    const lookupError = new Error('Client service unavailable');
+    const registerClient = jest.fn();
+    const initClient = jest.fn();
+    const store = mockStoreFactory({
+      actions: actionRoot,
+      core: {
+        getLocalClient(): Task<Maybe<MetaClient>, Error> {
+          return task.reject(lookupError);
+        },
+        registerClient,
+        initClient,
+      },
+    })({});
+
+    await expect(store.dispatch(actionRoot.clientAction.doInitializeClient(ClientType.PERMANENT))).rejects.toBe(
+      lookupError,
+    );
+    expect(registerClient).not.toHaveBeenCalled();
+    expect(initClient).not.toHaveBeenCalled();
+    expect(store.getActions()).toEqual([]);
+  });
+
   it.each([
     ['default clock', {}, 1000],
     [
@@ -68,8 +118,8 @@ describe('ClientAction', () => {
       ...clockParameters,
       actions: actionRoot,
       core: {
-        getLocalClient: async () => {
-          return client;
+        getLocalClient(): Task<Maybe<MetaClient>, Error> {
+          return task.resolve(Maybe.just(client as MetaClient));
         },
         service: {
           team: {

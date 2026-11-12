@@ -22,11 +22,12 @@ import {ReactNode} from 'react';
 import {render} from '@testing-library/react';
 import {Maybe} from 'true-myth';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../../../../uiKit/identity/theme/theme';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {createFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
+import {createFireAndForgetInvokerForTest} from '../../../../../../page/testSupport/rootContextTestSupport';
+import {CellNode, CellNodeType} from '../../../../../../types/cellNode';
 import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
 import {CellShareModalContent} from './cellsNodeShareModal';

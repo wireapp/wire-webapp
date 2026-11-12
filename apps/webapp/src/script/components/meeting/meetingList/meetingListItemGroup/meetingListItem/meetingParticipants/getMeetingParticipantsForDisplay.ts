@@ -18,10 +18,10 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import type {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
+import type {User} from '../../../../../../repositories/entity/User';
+import {matchQualifiedIds} from '../../../../../../util/qualifiedId';
 
 export const getMeetingParticipantsForDisplay = (
   participants: User[],

@@ -17,10 +17,11 @@
  *
  */
 
-import {mapApiMeetingToSeries} from 'Components/meeting/mapApiMeetingToSeries';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
-import {getLogger} from 'Util/logger';
+import {mapApiMeetingToSeries} from './mapApiMeetingToSeries';
+import type {MeetingSeries} from './types/meetingSeries';
+
+import type {MeetingsRepository} from '../../repositories/meetings/meetingsRepository';
+import {getLogger} from '../../util/logger';
 
 export type LoadMeetingsListResult = {meetingSeries: MeetingSeries[]; hasLoadError: boolean};
 
@@ -30,7 +31,7 @@ export const loadMeetingsList = async (meetingsRepository: MeetingsRepository): 
   const listResult = await meetingsRepository.getMeetingsList();
 
   if (listResult.isErr) {
-    logger.warn('Failed to load meetings list', listResult.error);
+    logger.warn('Failed to load meetings list', {error: listResult.error});
     return {meetingSeries: [], hasLoadError: true};
   }
 

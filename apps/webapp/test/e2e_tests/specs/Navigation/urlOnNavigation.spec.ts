@@ -18,10 +18,10 @@
 
 import type {Page} from '@playwright/test';
 
-import {PageManager} from 'test/e2e_tests/pageManager';
-import type {ConversationSidebar} from 'test/e2e_tests/pageManager/webapp/components/conversationSidebar.component';
-import {expect, LOGIN_TIMEOUT, test} from 'test/e2e_tests/test.fixtures';
-import {loginWithMeetingsEnabled} from 'test/e2e_tests/utils/meetings.util';
+import {PageManager} from '../../pageManager';
+import type {ConversationSidebar} from '../../pageManager/webapp/components/conversationSidebar.component';
+import {expect, LOGIN_TIMEOUT, test} from '../../test.fixtures';
+import {loginWithMeetingsEnabled} from '../../utils/meetings.util';
 
 const CONVERSATION_LIST_TAB_IDS = [
   'go-recent-view',

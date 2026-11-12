@@ -17,7 +17,7 @@
  *
  */
 
-import type {TranslationKey} from 'Util/localizerUtil';
+import type {TranslationKey} from '../../../util/localizerUtil';
 
 type QualityFeedbackTranslationKey = Extract<TranslationKey, `qualityFeedback.${string}`>;
 

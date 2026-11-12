@@ -22,13 +22,6 @@ import {useState, type FunctionComponent} from 'react';
 import {StatusCodes} from 'http-status-codes';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, Checkbox, Link} from '@wireapp/react-ui-kit';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {TeamService} from 'Repositories/team/TeamService';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {StepProps} from './stepProps';
 import {
   listCss,
@@ -38,6 +31,13 @@ import {
   termsCheckboxWrapperCss,
 } from './teamCreationSteps.styles';
 
+import {PrimaryModal} from '../../../../../../../components/Modals/PrimaryModal';
+import {Config} from '../../../../../../../Config';
+import {TeamService} from '../../../../../../../repositories/team/TeamService';
+import {Button, ButtonVariant} from '../../../../../../../uiKit/inputs/button/button';
+import {Checkbox} from '../../../../../../../uiKit/inputs/checkbox/checkbox';
+import {Link} from '../../../../../../../uiKit/typography/link/link';
+import {useApplicationContext} from '../../../../../../rootProvider';
 import {buttonCss} from '../teamCreation.styles';
 
 export const Confirmation: FunctionComponent<StepProps> = ({

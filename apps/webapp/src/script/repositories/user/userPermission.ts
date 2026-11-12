@@ -18,12 +18,11 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {Role} from '@wireapp/api-client/lib/team';
-import type {PermissionsData} from '@wireapp/api-client/lib/team/member/permissionsData';
 
-import {capitalizeFirstChar} from 'Util/stringUtil';
-
+import type {PermissionsData} from '../../apiClient/team/member/permissionsData';
+import {Role} from '../../apiClient/team/member/role';
 import {TeamError} from '../../error/teamError';
+import {capitalizeFirstChar} from '../../util/stringUtil';
 
 /**
  * Enum for various team permissions.

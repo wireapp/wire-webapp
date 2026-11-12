@@ -20,49 +20,40 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {LoginData} from '@wireapp/api-client/lib/auth';
-import {ClientType} from '@wireapp/api-client/lib/client/index';
-import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data';
-import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
-import {useNavigate} from 'react-router';
-
-import {Runtime, UrlUtil} from '@wireapp/commons';
-import {
-  ActionLinkButton,
-  Button,
-  ButtonVariant,
-  Checkbox,
-  CheckboxLabel,
-  CodeInput,
-  Column,
-  Columns,
-  Container,
-  ContainerXS,
-  FlexBox,
-  Form,
-  Heading,
-  IsMobile,
-  Label,
-  Link,
-  LinkVariant,
-  Loading,
-  QUERY,
-  QueryKeys,
-  Text,
-  useMatchMedia,
-} from '@wireapp/react-ui-kit';
-
-import {LogoFullIcon} from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-import {isBackendError} from 'Util/typePredicateUtil';
+import {useLocation, useNavigate} from 'react-router';
 
 import {separator} from './login.styles';
 
+import {LoginData} from '../../../apiClient/auth/loginData';
+import {ClientType} from '../../../apiClient/client/clientType';
+import type {ConversationJoinData} from '../../../apiClient/conversation/data/conversationJoinData';
+import {BackendError} from '../../../apiClient/http/backendError';
+import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
+import {UrlUtil} from '../../../commons/util';
+import {Runtime} from '../../../commons/util/Runtime';
+import {LogoFullIcon} from '../../../components/icon';
 import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {Checkbox, CheckboxLabel} from '../../../uiKit/inputs/checkbox/checkbox';
+import {CodeInput} from '../../../uiKit/inputs/codeInput/codeInput';
+import {Form} from '../../../uiKit/inputs/form/form';
+import {Column, Columns} from '../../../uiKit/layout/column/column';
+import {Container, ContainerXS} from '../../../uiKit/layout/container/container';
+import {FlexBox} from '../../../uiKit/layout/flexBox/flexBox';
+import {IsMobile, useMatchMedia} from '../../../uiKit/layout/matchMedia/matchMedia';
+import {ActionLinkButton} from '../../../uiKit/typography/actionLink/actionLink';
+import {Heading} from '../../../uiKit/typography/heading/heading';
+import {Label} from '../../../uiKit/typography/label/label';
+import {Link, LinkVariant} from '../../../uiKit/typography/link/link';
+import {Text} from '../../../uiKit/typography/text/text';
+import {QUERY, QueryKeys} from '../../../uiKit/utils/mediaQueries';
+import {getLogger} from '../../../util/logger';
+import {isBackendError} from '../../../util/typePredicateUtil';
 import {AccountAlreadyExistsModal} from '../../component/accountAlreadyExistsModal';
 import {AppAlreadyOpen} from '../../component/appAlreadyOpen';
 import {BackButton} from '../../component/backButton';
@@ -81,7 +72,7 @@ import * as ConversationSelector from '../../module/selector/conversationSelecto
 import {QUERY_KEY, ROUTE} from '../../route';
 import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
-import {getOAuthQueryString} from '../../util/oauthUtil';
+import {getOAuthQueryString, withOAuthQuery} from '../../util/oauthUtil';
 import {getPrefixedSSOCode} from '../../util/urlUtil';
 import {EntropyContainer} from '../entropyContainer';
 import {Page} from '../page';
@@ -122,6 +113,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   const twoFactorExpiryMinutes = 10;
   const twoFactorExpiryMilliseconds = millisecondsPerSecond * secondsPerMinute * twoFactorExpiryMinutes;
   const navigate = useNavigate();
+  const location = useLocation();
   const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
 
   const {accountCreationEnabled, shouldDisplayWarning} = account;
@@ -139,7 +131,8 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, getOAuthQueryString(window.location));
+  const shouldEnterSSO = isOauth && isEnterpriseLoginV2Enabled && location.pathname !== ROUTE.PASSWORD_LOGIN;
 
   const [routeAction, setRouteAction] = useState<'login' | 'verify'>('login');
 
@@ -189,7 +182,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend unless we're following the guest link flow
     if (isNonEmptyString(defaultSSOCode) && embedded !== true) {
-      navigate(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`);
+      navigate(withOAuthQuery(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`), {replace: true});
     }
   }, [defaultSSOCode, embedded, navigate]);
 
@@ -202,10 +195,10 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
       doCheckConversationCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
-        logger.warn('Invalid conversation code', error);
+        logger.warn('Invalid conversation code', {error});
       });
       doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
-        logger.warn('Failed to fetch conversation info', error);
+        logger.warn('Failed to fetch conversation info', {error});
       });
     }
   }, [doCheckConversationCode, doGetConversationInfoByCode]);
@@ -222,10 +215,17 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error: unknown) {
-      logger.error('Unable to login immediately', error);
+      logger.error('Unable to login immediately', {error});
       setShowEntropyForm(false);
+      if (isBackendError(error) && error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
+        return navigate(withOAuthQuery(ROUTE.CLIENTS));
+      }
+      // Reuse an existing session before asking the user to authenticate with email or SSO.
+      if (shouldEnterSSO) {
+        navigate(withOAuthQuery(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`), {replace: true});
+      }
     }
-  }, [doInit, doInitializeClient, getEntropy, isOauth, navigate]);
+  }, [defaultSSOCode, doInit, doInitializeClient, getEntropy, isOauth, navigate, shouldEnterSSO]);
 
   useEffect(() => {
     void resetAuthError();
@@ -313,7 +313,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
             if (entropy.current !== undefined) {
               await pushEntropyData(entropy.current);
             }
-            navigate(ROUTE.CLIENTS);
+            navigate(withOAuthQuery(ROUTE.CLIENTS));
             break;
           }
 
@@ -577,7 +577,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
                         type="button"
                         variant={ButtonVariant.SECONDARY}
                         onClick={() => {
-                          return navigate(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`);
+                          return navigate(withOAuthQuery(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`));
                         }}
                         style={{marginTop: '16px'}}
                         data-uie-name="go-sso-login"

@@ -22,17 +22,10 @@ import {FunctionComponent, ReactNode, useEffect, useMemo} from 'react';
 import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString} from '@sindresorhus/is';
-import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Navigate, Route, Routes} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
-
-import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-
-import {RootProvider} from 'src/script/page/rootProvider';
-import type {Translate} from 'Util/localizerUtil';
-import {getLogger} from 'Util/logger';
 
 import {ClientManager} from './clientManager';
 import {ConversationJoin} from './conversationJoin';
@@ -54,7 +47,15 @@ import {VerifyEmailCode} from './verifyEmailCode';
 import {VerifyEmailLink} from './verifyEmailLink';
 
 import type englishMessages from '../../../i18n/en-US.json';
+import {pathWithParams} from '../../commons/util/UrlUtil';
 import {Config} from '../../Config';
+import {RootProvider} from '../../page/rootProvider';
+import {Loading} from '../../uiKit/dataDisplay/loading/loading';
+import {THEME_ID} from '../../uiKit/identity/theme/theme';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {StyledApp} from '../../uiKit/layout/styledApp/styledApp';
+import type {Translate} from '../../util/localizerUtil';
+import {getLogger} from '../../util/logger';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {RouteA11y} from '../component/routeA11Y';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
@@ -78,7 +79,7 @@ type LanguageMessages = typeof englishMessages;
 const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
 const authFireAndForgetInvoker = createFireAndForgetInvoker({
   reportError(error) {
-    fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
+    fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', {error});
   },
 });
 
@@ -160,7 +161,7 @@ const RootComponent: FunctionComponent<RootProps & ConnectedProps & DispatchProp
   }, [doGetSSOSettings]);
 
   const loadLanguage = (language: string): LanguageMessages => {
-    return require(`I18n/${mapLanguage(language)}.json`);
+    return require(`../../../i18n/${mapLanguage(language)}.json`);
   };
 
   const navigate = (route: string): null => {

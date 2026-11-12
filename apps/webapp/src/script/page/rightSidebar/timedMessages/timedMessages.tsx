@@ -21,18 +21,16 @@ import {FC, useEffect, useState} from 'react';
 
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {RadioGroup} from 'Components/Radio';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {formatDuration} from 'Util/timeUtil';
-
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import {RadioGroup} from '../../../components/Radio';
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {TabIndex} from '../../../uiKit/utils/enums';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {formatDuration} from '../../../util/timeUtil';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 
 interface TimedMessagesPanelProps {

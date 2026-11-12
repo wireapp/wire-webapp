@@ -17,14 +17,14 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, withLogin, expect} from '../../test.fixtures';
 
 import {getTextFilePath, shareAssetHelper} from '../../utils/asset.util';
 import {getImageFilePath} from '../../utils/sendImage.util';
 import {connectWithUser, createGroup} from '../../utils/userActions';
-import {ConversationListPage} from 'test/e2e_tests/pageManager/webapp/pages/conversationList.page';
+import {ConversationListPage} from '../../pageManager/webapp/pages/conversationList.page';
 
 test.describe('Clear Conversation Content', () => {
   let userA: User;

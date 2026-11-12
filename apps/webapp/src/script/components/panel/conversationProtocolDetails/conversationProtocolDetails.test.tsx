@@ -18,15 +18,15 @@
  */
 
 import {render} from '@testing-library/react';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
-import {Ciphersuite} from '@wireapp/core';
+import {Ciphersuite} from '../../../core';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {ConversationProtocolDetails} from './conversationProtocolDetails';
 
@@ -35,16 +35,20 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 describe('ConversationProtocolDetails', () => {
-  it('renders the correct infos for the conversation with mls protocol', () => {
+  it.each([
+    [Ciphersuite.Mls128Dhkemp256Aes128gcmSha256P256, 'MLS_128_DHKEMP256_AES128GCM_SHA256_P256'],
+    [Ciphersuite.Mls256Mlkem1024Aes256gcmSha384Mldsa87, 'MLS_256_MLKEM1024_AES256GCM_SHA384_MLDSA87'],
+    [65535, '65535'],
+  ])('renders cipher suite %s as %s', (cipherSuite, cipherSuiteName) => {
     const props = {
-      cipherSuite: Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256,
+      cipherSuite,
       protocol: CONVERSATION_PROTOCOL.MLS,
     };
 
     const {queryByText} = render(<ConversationProtocolDetails {...props} />, {wrapper: rootProviderWrapper});
 
     expect(queryByText('MLS')).not.toBeNull();
-    expect(queryByText('MLS_128_DHKEMP256_AES128GCM_SHA256_P256')).not.toBeNull();
+    expect(queryByText(cipherSuiteName)).not.toBeNull();
   });
 
   it('renders the correct infos for the conversation with proteus protocol', () => {

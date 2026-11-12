@@ -18,13 +18,12 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import {TEAM_EVENT} from '@wireapp/api-client/lib/event/teamEvent';
-
-import {type Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './systemMessage';
 
+import {TEAM_EVENT} from '../../../apiClient/event/teamEvent';
 import {SystemMessageType} from '../../../message/systemMessageType';
+import {type Translate} from '../../../util/localizerUtil';
 import type {Conversation} from '../Conversation';
 
 export class DeleteConversationMessage extends SystemMessage {

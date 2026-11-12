@@ -17,7 +17,7 @@
  *
  */
 
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from '../../meetingSubmitErrors';
 
 /**
  * Returns whether meeting metadata was already persisted before the submit failed.

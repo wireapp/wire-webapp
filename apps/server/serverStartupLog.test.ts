@@ -1,4 +1,4 @@
-import type {ServerConfig} from '@wireapp/config';
+import type {ServerConfig} from './configuration/server.config';
 import {formatServerStartupMessage, logServerStartup} from './serverStartupLog';
 
 function createServerConfiguration(): ServerConfig {

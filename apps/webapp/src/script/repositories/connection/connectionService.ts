@@ -17,10 +17,11 @@
  *
  */
 
-import type {Connection, ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
+import type {Connection} from '../../apiClient/connection/connection';
+import type {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {APIClient} from '../../service/apiClientSingleton';
 
 export class ConnectionService {

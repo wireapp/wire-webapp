@@ -18,18 +18,17 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import type {CRUDEngine} from '@wireapp/store-engine/lib/engine';
 import {container, singleton} from 'tsyringe';
-
-import {Account} from '@wireapp/core';
-
-import {supportsMLS} from 'Util/util';
 
 import {APIClient} from './apiClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './storeEngineProvider';
 import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
 
+import {isCoreCryptoEnabled} from '../browser/coreCryptoSupport';
 import {Config} from '../Config';
+import {Account} from '../core';
+import type {CRUDEngine} from '../core/storage/engine/crudEngine';
+import {supportsMLS} from '../util/util';
 
 declare global {
   interface Window {
@@ -46,8 +45,12 @@ export class Core extends Account {
       FEATURE: {USE_CORE_CRYPTO, ENABLE_ENCRYPTION_AT_REST},
     } = Config.getConfig();
 
-    const enableCoreCrypto = supportsMLS() || USE_CORE_CRYPTO;
+    const enableCoreCrypto = isCoreCryptoEnabled({
+      supportsMls: supportsMLS(),
+      useCoreCryptoOverride: USE_CORE_CRYPTO,
+    });
     super(apiClient, {
+      clock: apiClient.clock,
       createStore: async (storeName, key) => {
         this.key = key;
         return createStorageEngine(storeName, DatabaseTypes.PERMANENT, {
@@ -63,7 +66,8 @@ export class Core extends Account {
       systemCrypto: !isUndefined(window.systemCrypto) ? wrapSystemCrypto(window.systemCrypto) : undefined,
       coreCryptoConfig: {
         enabled: enableCoreCrypto,
-        wasmFilePath: `/min/`,
+        // `initWasmModule` fetches this URL directly, so it must point at the wasm file copied into `min/`.
+        wasmFilePath: `/min/core-crypto-ffi_bg.wasm`,
       },
       nbPrekeys: 100,
     });

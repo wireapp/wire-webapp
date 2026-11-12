@@ -18,15 +18,15 @@
  */
 
 import {act, render, type RenderResult} from '@testing-library/react';
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 import {Maybe} from 'true-myth';
 
-import type {UploadState} from 'Repositories/cells/upload';
+import type {UploadState} from '../../../repositories/cells/upload';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
 import type {DismissedUpload} from '../conversationCells/sharedDriveUploadStatus';

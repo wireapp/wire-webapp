@@ -1,6 +1,44 @@
 ls:
   tools:
     .dir: camelCase
+  apps/webapp/src/script/commons:
+    # Keep exact legacy names without allowing new PascalCase modules.
+    .*: camelCase
+    .ts: camelCase | regex:LogFactory
+    .*.ts: camelCase | regex:LogFactory
+    .*.*.ts: camelCase
+  apps/webapp/src/script/commons/TypedEventEmitter:
+    .*: camelCase
+    .ts: camelCase | regex:TypedEventEmitter
+    .*.ts: camelCase
+    .*.*.ts: camelCase
+  apps/webapp/src/script/commons/config:
+    .*: camelCase
+    .ts: camelCase | regex:CommonConfig
+    .*.ts: camelCase
+    .*.*.ts: camelCase
+  apps/webapp/src/script/commons/util:
+    .*: camelCase
+    .ts: camelCase | regex:(AccentColor|ArrayUtil|DateUtil|RandomUtil|Runtime|StringUtil|TimeUtil|TypeUtil|UrlUtil|ValidationUtil)
+    .*.ts: camelCase | regex:(ArrayUtil|DateUtil|RandomUtil|Runtime|StringUtil|TypeUtil|UrlUtil|ValidationUtil)
+    .*.*.ts: camelCase
+  apps/webapp/src/script/commons/test/helpers:
+    .*: camelCase
+    .js: camelCase | regex:ExceptionHandler
+  apps/webapp/src/script/commons/base64:
+    .*: camelCase
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .*.ts: camelCase
+    .*.*.ts: camelCase
+  apps/webapp/src/script/commons/base64/test:
+    .*: camelCase
+    .dir: camelCase
+    .ts: camelCase
+    .*.ts: camelCase
+    .*.*.ts: camelCase
+    .json: camelCase
   tools/{buildArtifact,releaseCli,releaseGithub,releaseMetadata}:
     .ts: camelCase
     .test.ts: camelCase
@@ -9,7 +47,7 @@ ls:
     .js: camelCase
     .test.ts: camelCase
     .sh: camelCase
-  libraries/config/src:
+  apps/server/configuration:
     .dir: camelCase
     .ts: camelCase
     .spec.ts: camelCase
@@ -738,342 +776,342 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/api-client/src/broadcast:
+  apps/webapp/src/script/apiClient/broadcast:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/env:
+  apps/webapp/src/script/apiClient/env:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/generic:
+  apps/webapp/src/script/apiClient/generic:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/services:
+  apps/webapp/src/script/apiClient/services:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/federation/data:
+  apps/webapp/src/script/apiClient/federation/data:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/giphy:
+  apps/webapp/src/script/apiClient/giphy:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/utils/backFromSleepHandler:
-    .dir: camelCase
-    .ts: camelCase
-    .test.ts: camelCase
-  libraries/api-client/src/validation:
-    .dir: camelCase
-    .ts: camelCase
-  libraries/api-client/src/obfuscation:
+  apps/webapp/src/script/apiClient/utils/backFromSleepHandler:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/api-client/src/oauth:
+  apps/webapp/src/script/apiClient/validation:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/types:
+  apps/webapp/src/script/apiClient/obfuscation:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/apiClient/oauth:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/apiClient/types:
     .dir: camelCase
     .d.ts: camelCase
-  libraries/api-client/src/serviceProvider:
+  apps/webapp/src/script/apiClient/serviceProvider:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/tcp:
+  apps/webapp/src/script/apiClient/tcp:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
-  libraries/api-client/src/asset:
+  apps/webapp/src/script/apiClient/asset:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
     .schema.ts: camelCase
-  libraries/api-client/src/cells:
+  apps/webapp/src/script/apiClient/cells:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
     .schema.ts: camelCase
-  libraries/api-client/src/notification:
+  apps/webapp/src/script/apiClient/notification:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
     .mocks.ts: camelCase
-  libraries/api-client/src/connection:
+  apps/webapp/src/script/apiClient/connection:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/account:
+  apps/webapp/src/script/apiClient/account:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/event:
+  apps/webapp/src/script/apiClient/event:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/userGroups:
+  apps/webapp/src/script/apiClient/userGroups:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/self:
+  apps/webapp/src/script/apiClient/self:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/client:
+  apps/webapp/src/script/apiClient/client:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/auth:
-    .dir: camelCase
-    .ts: camelCase
-    .test.ts: camelCase
-  libraries/api-client/src/http:
+  apps/webapp/src/script/apiClient/auth:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/api-client/src/user:
-    .dir: camelCase
-    .ts: camelCase
-  libraries/api-client/src/conversation/data:
-    .dir: camelCase
-    .ts: camelCase
-  libraries/api-client/src/conversation:
+  apps/webapp/src/script/apiClient/http:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/api-client/src/team/conversation:
+  apps/webapp/src/script/apiClient/user:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/team/data:
+  apps/webapp/src/script/apiClient/conversation/data:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/team/scim:
+  apps/webapp/src/script/apiClient/conversation:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/team/identityprovider:
+    .test.ts: camelCase
+  apps/webapp/src/script/apiClient/team/conversation:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/team/sso:
+  apps/webapp/src/script/apiClient/team/data:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/apiClient/team/scim:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/apiClient/team/identityprovider:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/apiClient/team/sso:
     .dir: camelCase
     .ts: camelCase
     .types.ts: camelCase
-  libraries/api-client/src/team/search:
+  apps/webapp/src/script/apiClient/team/search:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/team/invitation:
+  apps/webapp/src/script/apiClient/team/invitation:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/team/feature:
+  apps/webapp/src/script/apiClient/team/feature:
     .dir: camelCase
     .ts: camelCase
     .schema.ts: camelCase
     .types.ts: camelCase
     .helper.ts: camelCase
-  libraries/api-client/src/team/legalhold:
+  apps/webapp/src/script/apiClient/team/legalhold:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/team/service:
+  apps/webapp/src/script/apiClient/team/service:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/team/team:
+  apps/webapp/src/script/apiClient/team/team:
     .dir: camelCase
     .ts: camelCase
-  libraries/api-client/src/team/member:
-    .dir: camelCase
-    .ts: camelCase
-    .test.ts: camelCase
-  libraries/api-client/src/team/payment:
-    .dir: camelCase
-    .ts: camelCase
-  libraries/api-client/src/team/billing:
-    .dir: camelCase
-    .ts: camelCase
-  libraries/api-client/src/team:
-    .dir: camelCase
-    .ts: camelCase
-  libraries/api-client/src:
+  apps/webapp/src/script/apiClient/team/member:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/account:
+  apps/webapp/src/script/apiClient/team/payment:
     .dir: camelCase
     .ts: camelCase
-  libraries/core/src/connection:
+  apps/webapp/src/script/apiClient/team/billing:
     .dir: camelCase
     .ts: camelCase
-  libraries/core/src/self:
+  apps/webapp/src/script/apiClient/team:
     .dir: camelCase
     .ts: camelCase
-    .test.ts: camelCase
-  libraries/core/src/giphy:
-    .dir: camelCase
-    .ts: camelCase
-  libraries/core/src/team:
-    .dir: camelCase
-    .ts: camelCase
-  libraries/core/src/user:
+  apps/webapp/src/script/apiClient:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/notification:
+  apps/webapp/src/script/core/account:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/core/connection:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/core/self:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/core/giphy:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/core/team:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/core/user:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/core/notification:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
-  libraries/core/src/auth:
+  apps/webapp/src/script/core/auth:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/linkPreview:
+  apps/webapp/src/script/core/linkPreview:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/broadcast:
+  apps/webapp/src/script/core/broadcast:
     .dir: camelCase
     .ts: camelCase
-  libraries/core/src/client:
+  apps/webapp/src/script/core/client:
     .dir: camelCase
     .ts: camelCase
-  libraries/core/src/errors:
+  apps/webapp/src/script/core/errors:
     .dir: camelCase
     .ts: camelCase
-  libraries/core/src/storage:
+  apps/webapp/src/script/core/storage:
     .dir: camelCase
     .ts: camelCase
-  libraries/core/src:
+  apps/webapp/src/script/core:
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/util:
+  apps/webapp/src/script/core/util:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
     .store.ts: camelCase
-  libraries/core/src/cryptography:
+  apps/webapp/src/script/core/cryptography:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/secretStore:
+  apps/webapp/src/script/core/secretStore:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
     .test.node.ts: camelCase
-  libraries/core/src/test:
+  apps/webapp/src/script/core/test:
     .dir: camelCase
     .ts: camelCase
-  libraries/core/src/conversation/assetService:
-    .dir: camelCase
-    .ts: camelCase
-    .test.ts: camelCase
-  libraries/core/src/conversation/conversationMapper:
+  apps/webapp/src/script/core/conversation/assetService:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/conversation/messageTimer:
+  apps/webapp/src/script/core/conversation/conversationMapper:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/conversation/subconversationService:
+  apps/webapp/src/script/core/conversation/messageTimer:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/conversation/content:
-    .dir: camelCase
-    .ts: camelCase
-  libraries/core/src/conversation/message:
+  apps/webapp/src/script/core/conversation/subconversationService:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-    .types.ts: camelCase
-  libraries/core/src/conversation/conversationService:
+  apps/webapp/src/script/core/conversation/content:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/core/conversation/message:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
-  libraries/core/src/messagingProtocols/proteus/utility:
+  apps/webapp/src/script/core/conversation/conversationService:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
-  libraries/core/src/messagingProtocols/proteus:
+  apps/webapp/src/script/core/messagingProtocols/proteus/utility:
     .dir: camelCase
-  libraries/core/src/messagingProtocols/proteus/proteusService/cryptoClient:
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  apps/webapp/src/script/core/messagingProtocols/proteus:
+    .dir: camelCase
+  apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/cryptoClient:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
     .store.ts: camelCase
-  libraries/core/src/messagingProtocols/proteus/proteusService/decryptionErrorGenerator:
+  apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/decryptionErrorGenerator:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/messagingProtocols/proteus/proteusService:
+  apps/webapp/src/script/core/messagingProtocols/proteus/proteusService:
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
     .mocks.ts: camelCase
-  libraries/core/src/messagingProtocols/mls/recovery:
+  apps/webapp/src/script/core/messagingProtocols/mls/recovery:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/messagingProtocols/mls:
+  apps/webapp/src/script/core/messagingProtocols/mls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/messagingProtocols/mls/mlsService:
+  apps/webapp/src/script/core/messagingProtocols/mls/mlsService:
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
-  libraries/core/src/messagingProtocols/mls/utils:
+  apps/webapp/src/script/core/messagingProtocols/mls/utils:
     .ts: camelCase
-  libraries/core/src/messagingProtocols/mls/eventHandler:
+  apps/webapp/src/script/core/messagingProtocols/mls/eventHandler:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/messagingProtocols/mls/e2eIdentityService:
+  apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
-  libraries/core/src/messagingProtocols/mls/e2eIdentityService/connection/acmeServer:
+  apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/connection/acmeServer:
     .ts: camelCase
     .types.ts: camelCase
     .schema.ts: camelCase
-  libraries/core/src/messagingProtocols/mls/e2eIdentityService/storage:
+  apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/storage:
     .ts: camelCase
     .schema.ts: camelCase
-  libraries/core/src/messagingProtocols/mls/e2eIdentityService/steps/dpopChallenge:
+  apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/steps/dpopChallenge:
     .ts: camelCase
     .types.ts: camelCase
-  libraries/react-ui-kit/src/images:
+  apps/webapp/src/script/uiKit/images:
     .dir: camelCase
     .tsx: camelCase
-  libraries/react-ui-kit/src/dataDisplay:
+  apps/webapp/src/script/uiKit/dataDisplay:
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
     .test.tsx: camelCase
-  libraries/react-ui-kit/src/identity:
+  apps/webapp/src/script/uiKit/identity:
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
     .test.tsx: camelCase
-  libraries/react-ui-kit/src/navigation:
-    .dir: camelCase
-    .ts: camelCase
-    .tsx: camelCase
-    .styles.ts: camelCase
-    .test.tsx: camelCase
-  libraries/react-ui-kit/src/surface:
+  apps/webapp/src/script/uiKit/navigation:
     .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
     .test.tsx: camelCase
-  libraries/react-ui-kit/src/layout:
+  apps/webapp/src/script/uiKit/surface:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/uiKit/layout:
     .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
     .test.tsx: camelCase
-  libraries/react-ui-kit/src/typography:
+  apps/webapp/src/script/uiKit/typography:
     .ts: camelCase
     .tsx: camelCase
     .style.ts: camelCase
     .test.tsx: camelCase
-  libraries/react-ui-kit/src/utils:
+  apps/webapp/src/script/uiKit/utils:
     .ts: camelCase
     .tsx: camelCase
-  libraries/react-ui-kit/src/inputs/{button,buttonGroup,buttonLink,buttonsGroup,checkbox,codeInput,comboboxSelect,datePickerField,dateTimePickerField,dropFileInput,errorMessage,form,iconButton,indicatorRangeInput,input,inputBlock,inputLabel,inputSubmitCombo,rangeInput,roundIconButton,secondaryButton,select,shakeBox,switch,textArea,timePickerField}:
+  apps/webapp/src/script/uiKit/inputs/{button,buttonGroup,buttonLink,buttonsGroup,checkbox,codeInput,comboboxSelect,datePickerField,dateTimePickerField,dropFileInput,errorMessage,form,iconButton,indicatorRangeInput,input,inputBlock,inputLabel,inputSubmitCombo,rangeInput,roundIconButton,secondaryButton,select,shakeBox,switch,textArea,timePickerField}:
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase

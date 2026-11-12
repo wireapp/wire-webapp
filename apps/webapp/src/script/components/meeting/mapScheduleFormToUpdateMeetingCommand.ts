@@ -17,17 +17,18 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {type Maybe, Result, result} from 'true-myth';
 
-import {ScheduleFormErrors} from 'Components/meeting/scheduleFormErrors';
-import {requireScheduleMeetingTimesForUpdate} from 'Components/meeting/scheduleMeetingModal/requireScheduleMeetingTimes';
+import {ScheduleFormErrors} from './scheduleFormErrors';
+import {requireScheduleMeetingTimesForUpdate} from './scheduleMeetingModal/requireScheduleMeetingTimes';
 import type {
   ScheduleMeetingFormState,
   ScheduleMeetingRecurrenceOption,
-} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
-import type {UpdateMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
-import type {User} from 'Repositories/entity/User';
+} from './scheduleMeetingModal/scheduleMeetingTypes';
+import type {UpdateMeetingCommand} from './shared/types/meetingCommandTypes';
+
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import type {User} from '../../repositories/entity/User';
 
 export type MapScheduleFormToUpdateMeetingCommandParams = {
   formState: ScheduleMeetingFormState;

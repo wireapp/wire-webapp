@@ -19,28 +19,27 @@
 
 import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
-import {CacheRepository} from 'Repositories/cache/cacheRepository';
-import type {ClientRepository} from 'Repositories/client/ClientRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {EventRepository} from 'Repositories/event/EventRepository';
-import {StorageKey} from 'Repositories/storage/storageKey';
-import type {StorageRepository} from 'Repositories/storage/storageRepository';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
-import {getLogger, Logger} from 'Util/logger';
-import {includesString} from 'Util/stringUtil';
-import {appendParameter} from 'Util/urlUtil';
+import {Maybe} from 'true-myth';
 
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {URLParameter} from '../../auth/urlParameter';
+import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
 import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';
+import {replaceBrowserLocation} from '../../navigation/browserLocation';
 import type {Core} from '../../service/coreSingleton';
+import {getLogger, Logger} from '../../util/logger';
+import {includesString} from '../../util/stringUtil';
+import {appendParameter} from '../../util/urlUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import {CacheRepository} from '../cache/cacheRepository';
+import type {ClientRepository} from '../client/ClientRepository';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {EventRepository} from '../event/EventRepository';
+import {StorageKey} from '../storage/storageKey';
+import type {StorageRepository} from '../storage/storageRepository';
+import type {UserRepository} from '../user/userRepository';
 
 const LogoutConfig = {
   LOGIN_REDIRECT_STORAGE_KEY: 'LOGIN_REDIRECT_KEY',
@@ -211,7 +210,7 @@ export class LifeCycleRepository {
         await this.dependencies.conversationRepository.sendTypingStop(activeConversation);
         this.logger.debug('Sent typing stop notification for active conversation during logout.');
       } catch (error: unknown) {
-        this.logger.warn('Failed to send typing stop before logout.', error);
+        this.logger.warn('Failed to send typing stop before logout.', {error});
       }
     }
 
@@ -247,13 +246,16 @@ export class LifeCycleRepository {
     // Handle cookie label preservation
     const currentUser = this.dependencies.userRepository['userState'].self();
     if (isTruthy(currentUser)) {
-      const cookieLabelsToPreserve = this.determineCookieLabelsToPreserve(currentUser, shouldClearAllData);
+      const cookieLabelsToPreserve = this.determineCookieLabelsToPreserve(
+        Maybe.of(currentUser.email()),
+        shouldClearAllData,
+      );
       storageKeysToPreserve.push(...cookieLabelsToPreserve);
 
       // Clear localStorage selectively, keeping conversation input for session expiry
       const shouldPreserveConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
       const deletedKeys = CacheRepository.clearLocalStorage(shouldPreserveConversationInput, storageKeysToPreserve);
-      this.logger.debug(`Selective localStorage cleanup complete. Deleted ${deletedKeys.length} keys.`, deletedKeys);
+      this.logger.debug(`Selective localStorage cleanup complete. Deleted ${deletedKeys.length} keys.`, {deletedKeys});
     }
 
     // Perform complete localStorage wipe for specific scenarios
@@ -289,9 +291,9 @@ export class LifeCycleRepository {
    * Determines which cookie labels should be preserved during logout.
    * User's own cookie label is deleted only when explicitly clearing all data.
    */
-  private readonly determineCookieLabelsToPreserve = (currentUser: any, shouldClearAllData: boolean): string[] => {
+  private readonly determineCookieLabelsToPreserve = (email: Maybe<string>, shouldClearAllData: boolean): string[] => {
     this.logger.debug('Determining which cookie labels to preserve during logout.');
-    const userCookieLabelKey = this.dependencies.clientRepository.constructCookieLabelKey(currentUser.email());
+    const userCookieLabelKey = this.dependencies.clientRepository.constructCookieLabelKey(email);
     const allStorageKeys = Object.keys(amplify.store());
 
     return allStorageKeys.filter(storageKey => {
@@ -357,7 +359,7 @@ export class LifeCycleRepository {
       await this.dependencies.storageRepository.deleteDatabase();
       this.logger.info('Database deleted successfully as part of persistent storage cleanup.');
     } catch (error: unknown) {
-      this.logger.error('Failed to delete database before logout', error);
+      this.logger.error('Failed to delete database before logout', {error});
     }
   };
 

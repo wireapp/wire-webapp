@@ -52,7 +52,22 @@ describe('releaseMetadata', () => {
     },
   );
 
+  it('accepts a SemVer maintenance line key and preserves its branch and tag format', () => {
+    const maintenanceLineKey = 'v1.1.0-airgap-a';
+
+    const actualBranchName = createMaintenanceBranchName(maintenanceLineKey);
+    const actualTagName = createNextMaintenanceTagName(maintenanceLineKey, []);
+
+    assert(actualBranchName.isOk);
+    assert(actualTagName.isOk);
+    expect(actualBranchName.value).toBe('maintenance/v1.1.0-airgap-a');
+    expect(actualTagName.value).toBe('v1.1.0-airgap-a-maintenance.1');
+  });
+
   it.each([
+    'v1.1-airgap-a',
+    'v01.1.0-airgap-a',
+    'v1.1.0',
     '2026-07-27.0-airgap-a',
     '2026-07-27-airgap-a',
     '2026-7-27.1-airgap-a',
@@ -186,6 +201,24 @@ describe('releaseMetadata', () => {
     assert(actualSourceProductionTag.isOk);
 
     expect(actualSourceProductionTag.value).toBe('2026-07-27.1-production');
+  });
+
+  it('validateMaintenanceSource() accepts a matching stable SemVer Production tag', () => {
+    const actualSourceProductionTag = validateMaintenanceSource('v1.1.0-airgap-a', 'v1.1.0');
+
+    assert(actualSourceProductionTag.isOk);
+
+    expect(actualSourceProductionTag.value).toBe('v1.1.0');
+  });
+
+  it('validateMaintenanceSource() rejects a stable tag from a different SemVer release', () => {
+    const actualSourceProductionTag = validateMaintenanceSource('v1.1.0-airgap-a', 'v1.2.0');
+
+    assert(actualSourceProductionTag.isErr);
+
+    expect(actualSourceProductionTag.error.message).toBe(
+      'Source production tag v1.2.0 does not belong to maintenance line v1.1.0-airgap-a',
+    );
   });
 
   it('validateMaintenanceSource() rejects a Production tag from a different release identifier', () => {

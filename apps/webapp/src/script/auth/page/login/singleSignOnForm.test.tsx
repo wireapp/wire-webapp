@@ -18,9 +18,9 @@
  */
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
-import {ClientType} from '@wireapp/api-client/lib/client';
+import {ClientType} from '../../../apiClient/client/clientType';
 
-import {TypeUtil} from '@wireapp/commons';
+import {TypeUtil} from '../../../commons/util';
 import {noop} from 'noop-esm';
 import {Provider} from 'react-redux';
 import {HashRouter as Router} from 'react-router';
@@ -30,8 +30,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {SingleSignOnForm} from './singleSignOnForm';
 
@@ -42,17 +42,6 @@ import {initialRootState} from '../../module/reducer';
 import {ROUTE, QUERY_KEY} from '../../route';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {mountComponent, withIntl, withThemeAndRootContext} from '../../util/test/testUtil';
-
-jest.mock('@wireapp/react-ui-kit', () => {
-  const actualModule = jest.requireActual('@wireapp/react-ui-kit');
-
-  return {
-    ...actualModule,
-    Loading: () => {
-      return null;
-    },
-  };
-});
 
 const codeOrEmailInputId = 'enter-code';
 const submitButtonId = 'do-sso-sign-in';
@@ -337,5 +326,42 @@ describe('SingleSignOnForm', () => {
     await waitFor(() => {
       expect(actionRoot.authAction.pushLoginData).toHaveBeenCalledWith({clientType: ClientType.TEMPORARY});
     });
+  });
+});
+
+describe('SSO OAuth continuation', () => {
+  const originalUrl = window.location.href;
+
+  afterEach(() => {
+    window.history.replaceState({}, '', originalUrl);
+  });
+
+  it('returns to consent with the original request after successful SSO', async () => {
+    const query =
+      '?client_id=client&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&scope=read%3Aself&state=a%2Bb%26c&response_type=code&code_challenge=challenge&code_challenge_method=S256';
+    window.history.replaceState({}, '', `#/sso${query}`);
+    const historyPushSpy = spyOn(history, 'pushState');
+    const doLogin = jest.fn().mockResolvedValue(undefined);
+    spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => {
+      return Promise.resolve();
+    });
+    spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => {
+      return Promise.resolve();
+    });
+
+    const {getByTestId} = mountComponent(<SingleSignOnForm doLogin={doLogin} />, mockStoreFactory()(initialRootState));
+    fireEvent.change(getByTestId(codeOrEmailInputId), {
+      target: {value: 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab'},
+    });
+    fireEvent.click(getByTestId(submitButtonId));
+
+    await waitFor(() => {
+      expect(historyPushSpy).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(String),
+        `#${ROUTE.AUTHORIZE}${query}`,
+      );
+    });
+    expect(doLogin).toHaveBeenCalledWith('cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab');
   });
 });

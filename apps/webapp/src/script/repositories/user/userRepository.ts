@@ -18,57 +18,12 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import type {AddedClient, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client';
-import {
-  UserEvent,
-  UserLegalHoldDisableEvent,
-  UserLegalHoldRequestEvent,
-  USER_EVENT,
-  UserUpdateEvent,
-} from '@wireapp/api-client/lib/event';
-import type {BackendError, TraceState} from '@wireapp/api-client/lib/http';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {ConsentType} from '@wireapp/api-client/lib/self/';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import type {QualifiedHandle, User as APIClientUser} from '@wireapp/api-client/lib/user';
-import {
-  QualifiedId,
-  UserAsset as APIClientUserAsset,
-  UserAssetType as APIClientUserAssetType,
-} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {flatten, uniq} from 'underscore';
 
-import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import type {ClientRepository, QualifiedUserClientEntityMap} from 'Repositories/client';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ClientMapper} from 'Repositories/client/ClientMapper';
-import type {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {flattenUserClientsQualifiedIds} from 'Repositories/conversation/userClientsUtils';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {USER} from 'Repositories/event/Client';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import type {EventSource} from 'Repositories/event/EventSource';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import type {SelfService} from 'Repositories/self/SelfService';
-import {UserRecord} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
-import {chunk, partition} from 'Util/arrayUtil';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {fixWebsocketString} from 'Util/stringUtil';
-import {toError} from 'Util/toError';
-import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 
 import {showAvailabilityModal} from './availabilityModal';
 import {ConsentValue} from './consentValue';
@@ -76,10 +31,55 @@ import {UserMapper} from './userMapper';
 import type {UserService} from './userService';
 import {UserState} from './userState';
 
+import type {PublicClient} from '../../apiClient/client/publicClient';
+import type {AddedClient, RegisteredClient} from '../../apiClient/client/registeredClient';
+import {
+  UserEvent,
+  UserLegalHoldDisableEvent,
+  UserLegalHoldRequestEvent,
+  USER_EVENT,
+  UserUpdateEvent,
+} from '../../apiClient/event/userEvent';
+import type {BackendError} from '../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import type {TraceState} from '../../apiClient/http/traceState';
+import {ConsentType} from '../../apiClient/self/consentType';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import type {QualifiedHandle} from '../../apiClient/user/qualifiedHandle';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import type {User as APIClientUser} from '../../apiClient/user/user';
+import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '../../apiClient/user/userAsset';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
+import {type AccentColor} from '../../commons/util';
+import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {chunk, partition} from '../../util/arrayUtil';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {fixWebsocketString} from '../../util/stringUtil';
+import {toError} from '../../util/toError';
+import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from '../../util/typePredicateUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import {AssetRepository} from '../assets/assetRepository';
+import type {ClientRepository, QualifiedUserClientEntityMap} from '../client';
+import {ClientEntity} from '../client/ClientEntity';
+import {ClientMapper} from '../client/ClientMapper';
+import type {ConnectionEntity} from '../connection/connectionEntity';
+import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {USER} from '../event/Client';
+import {EventRepository} from '../event/EventRepository';
+import type {EventSource} from '../event/EventSource';
+import type {PropertiesRepository} from '../properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../properties/propertiesType';
+import type {SelfService} from '../self/SelfService';
+import {UserRecord} from '../storage';
+import {TeamState} from '../team/TeamState';
 
 const connectionUpdateDebounceInMilliseconds = 100;
 const maximumUserClients = 8;
@@ -776,7 +776,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       await this.initMarketingConsent();
       return userEntity;
     } catch (error: unknown) {
-      this.logger.error(`Unable to load self user: ${toError(error).message}`, [error]);
+      this.logger.error(`Unable to load self user: ${toError(error).message}`, {error});
       throw error;
     }
   }
@@ -807,7 +807,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       if (!isNotFound) {
         this.logger.warn(
           `Failed to find user with ID '${userId.id}' and domain '${userId.domain}': ${toError(error).message}`,
-          error,
+          {error},
         );
       }
       throw error;
@@ -839,7 +839,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       await this.updateUserSupportedProtocols(user.qualifiedId, supportedProtocols);
       this.emit('supportedProtocolsUpdated', {user, supportedProtocols});
     } catch (error: unknown) {
-      this.logger.warn(`Failed to refresh supported protocols for user ${user.qualifiedId.id}`, error);
+      this.logger.warn(`Failed to refresh supported protocols for user ${user.qualifiedId.id}`, {error});
     }
   }
 
@@ -874,12 +874,12 @@ export class UserRepository extends TypedEventEmitter<Events> {
       if (!isNullOrUndefined(localSupportedProtocols)) {
         this.logger.warn(
           `Failed when fetching supported protocols of user ${userId.id}, using local supported protocols as fallback: `,
-          localSupportedProtocols,
+          {localSupportedProtocols},
         );
         return localSupportedProtocols;
       }
 
-      this.logger.error(`Couldn't specify supported protocols of user ${userId.id}.`, error);
+      this.logger.error(`Couldn't specify supported protocols of user ${userId.id}.`, {error});
       throw error;
     }
   }
@@ -1158,7 +1158,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
         }
       }
     } catch (error: unknown) {
-      this.logger.warn(`Failed to retrieve marketing consent: ${toError(error).message}`, error);
+      this.logger.warn(`Failed to retrieve marketing consent: ${toError(error).message}`, {error});
     }
   }
 }

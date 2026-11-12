@@ -23,37 +23,6 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {
-  BadgesWithTooltip,
-  Button,
-  ButtonVariant,
-  CloseIcon,
-  DownloadIcon,
-  DropdownMenu,
-  MoreIcon,
-  ShowIcon,
-} from '@wireapp/react-ui-kit';
-
-import {ChannelAvatar, GroupAvatar} from 'Components/avatar';
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {
-  CELLS_ACTION,
-  useCellsActionPermissions,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {CellsViewerAccessLabel} from 'Components/conversation/conversationCells/common/cellsViewerAccessLabel';
-import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
-import {EditIcon} from 'Components/icon';
-import {iconStyles} from 'Components/messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/common/fileAssetOptions/fileAssetOptions.styles';
-import {MessageTime} from 'Components/messagesList/message/messageTime';
-import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
-import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
-
-import {
   headerStyles,
   leftColumnStyles,
   closeButtonStyles,
@@ -68,6 +37,33 @@ import {
   actionButtonsStyles,
   editModeButtonStyles,
 } from './FileHeader.styles';
+
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import type {Conversation} from '../../../repositories/entity/Conversation';
+import {BadgesWithTooltip} from '../../../uiKit/dataDisplay/badgesWithTooltip/badgesWithTooltip';
+import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
+import {DownloadIcon} from '../../../uiKit/dataDisplay/icon/downloadIcon';
+import {MoreIcon} from '../../../uiKit/dataDisplay/icon/moreIcon';
+import {ShowIcon} from '../../../uiKit/dataDisplay/icon/showIcon';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {DropdownMenu} from '../../../uiKit/surface/dropdownMenu/dropdownMenu';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {useChannelsFeatureFlag} from '../../../util/useChannelsFeatureFlag';
+import {forcedDownloadFile, getFileNameWithExtension} from '../../../util/util';
+import {ChannelAvatar, GroupAvatar} from '../../avatar';
+import {FileTypeIcon} from '../../conversation/common/fileTypeIcon/fileTypeIcon';
+import {
+  CELLS_ACTION,
+  useCellsActionPermissions,
+} from '../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {CellsViewerAccessLabel} from '../../conversation/conversationCells/common/cellsViewerAccessLabel';
+import {isInRecycleBin} from '../../conversation/conversationCells/common/recycleBin/recycleBin';
+import {EditIcon} from '../../icon';
+import {iconStyles} from '../../messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/common/fileAssetOptions/fileAssetOptions.styles';
+import {MessageTime} from '../../messagesList/message/messageTime';
+import {useFileHistoryModal} from '../../Modals/FileHistoryModal/hooks/useFileHistoryModal';
 
 interface FileHeaderProps {
   id: string;

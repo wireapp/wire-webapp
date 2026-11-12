@@ -18,17 +18,17 @@
  */
 
 import ko from 'knockout';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../src/script/apiClient/team/feature/featureList.types';
 import {
   ConversationLabelRepository,
   LabelType,
   createLabel,
-} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+} from '../../../src/script/repositories/conversation/ConversationLabelRepository';
+import {Conversation} from '../../../src/script/repositories/entity/Conversation';
+import {PropertiesService} from '../../../src/script/repositories/properties/propertiesService';
+import {SidebarTabs, useSidebarStore} from '../../../src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {translate} from '../../../src/script/util/localizerUtil';
+import {createUuid} from '../../../src/script/util/uuid';
 
 describe('ConversationLabelRepository Synchronization', () => {
   let conversationLabelRepository: ConversationLabelRepository;

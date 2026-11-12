@@ -19,9 +19,8 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import {getLogger, Logger} from 'Util/logger';
-
 import {ConversationError} from '../error/conversationError';
+import {getLogger, Logger} from '../util/logger';
 
 export class WindowHandler {
   logger: Logger;
@@ -39,7 +38,7 @@ export class WindowHandler {
 
       const isLegalHoldReject = error.type === ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
       if (isLegalHoldReject) {
-        this.logger.log('User has canceled sending a message to a conversation under legal hold.');
+        this.logger.info('User has canceled sending a message to a conversation under legal hold.');
         promiseRejectionEvent.preventDefault();
         promiseRejectionEvent.stopPropagation();
         return false;

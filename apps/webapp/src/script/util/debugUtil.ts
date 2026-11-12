@@ -18,22 +18,6 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isObject, isUndefined} from '@sindresorhus/is';
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
-import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
-import {
-  BackendEvent,
-  ConversationEvent,
-  ConversationOtrMessageAddEvent,
-  CONVERSATION_EVENT,
-  USER_EVENT,
-} from '@wireapp/api-client/lib/event/';
-import type {Notification, NotificationList} from '@wireapp/api-client/lib/notification/';
-import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
-import type {FeatureList} from '@wireapp/api-client/lib/team/feature/featureList.types';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {BaseCreateConversationResponse} from '@wireapp/core/lib/conversation/conversationService/conversationService.types';
-import {NotificationSource} from '@wireapp/core/lib/notification';
-import {DatabaseKeys} from '@wireapp/core/lib/notification/notificationDatabaseRepository';
 import {Dexie} from 'dexie';
 import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
@@ -42,36 +26,52 @@ import {container} from 'tsyringe';
 
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallState} from 'Repositories/calling/CallState';
-import {Participant} from 'Repositories/calling/Participant';
-import {ClientRepository} from 'Repositories/client';
-import {ClientState} from 'Repositories/client/ClientState';
-import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {EventRecord, StorageRepository, StorageSchemata} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
-import {disableForcedErrorReporting} from 'Repositories/tracking/telemetry.helpers';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {translate} from 'Util/localizerUtil';
-import {getStorage} from 'Util/localStorage';
-import {getLogger, Logger} from 'Util/logger';
-
+import {translate} from './localizerUtil';
+import {getStorage} from './localStorage';
+import {getLogger, Logger} from './logger';
 import {TIME_IN_MILLIS} from './timeUtil';
 import {downloadBlob} from './util';
 import {createUuid} from './uuid';
 
+import {ConnectionStatus} from '../apiClient/connection/connectionStatus';
+import {MemberLeaveReason} from '../apiClient/conversation/data/conversationMemberLeaveData';
+import {BackendEvent} from '../apiClient/event/backendEvent';
+import {
+  ConversationEvent,
+  ConversationOtrMessageAddEvent,
+  CONVERSATION_EVENT,
+} from '../apiClient/event/conversationEvent';
+import {USER_EVENT} from '../apiClient/event/userEvent';
+import type {Notification} from '../apiClient/notification/notification';
+import type {NotificationList} from '../apiClient/notification/notificationList';
+import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
+import type {FeatureList} from '../apiClient/team/feature/featureList.types';
+import type {QualifiedId} from '../apiClient/user/qualifiedId';
+import type {BaseCreateConversationResponse} from '../core/conversation/conversationService/conversationService.types';
+import {NotificationSource} from '../core/notification';
+import {DatabaseKeys} from '../core/notification/notificationDatabaseRepository';
 import {E2EIHandler} from '../e2eIdentity';
 import {checkForNewVersion, createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
+import {CallingRepository} from '../repositories/calling/CallingRepository';
+import {CallState} from '../repositories/calling/CallState';
+import {Participant} from '../repositories/calling/Participant';
+import {ClientRepository} from '../repositories/client';
+import {ClientState} from '../repositories/client/ClientState';
+import {ConnectionRepository} from '../repositories/connection/connectionRepository';
+import {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import {isMLSCapableConversation} from '../repositories/conversation/ConversationSelectors';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import type {MessageRepository} from '../repositories/conversation/MessageRepository';
+import {Conversation} from '../repositories/entity/Conversation';
+import {User} from '../repositories/entity/User';
+import {EventRepository} from '../repositories/event/EventRepository';
+import {PropertiesRepository} from '../repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../repositories/properties/propertiesType';
+import {EventRecord, StorageRepository, StorageSchemata} from '../repositories/storage';
+import {TeamState} from '../repositories/team/TeamState';
+import {disableForcedErrorReporting} from '../repositories/tracking/telemetry.helpers';
+import {UserRepository} from '../repositories/user/userRepository';
+import {UserState} from '../repositories/user/userState';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -244,7 +244,7 @@ export class DebugUtil {
         {},
       );
 
-      this.logger.info({
+      this.logger.info('MLS conversation state', {
         id,
         groupId,
         epochCC: Number(epochCC),
@@ -708,7 +708,7 @@ export class DebugUtil {
       notifications: notificationsInRange,
     };
 
-    this.logger.info('Notification backend dump ready', dump.counts);
+    this.logger.info('Notification backend dump ready', {counts: dump.counts});
     return dump;
   }
 
@@ -790,12 +790,13 @@ export class DebugUtil {
     };
 
     const logMessage = `Hey ${this.userState.self().name()}, this is for you:`;
-    this.logger.warn(logMessage, debugInformation);
-    this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, debugInformation.conversation);
-    this.logger.warn(
-      `From: ${!isUndefined(debugInformation.user) ? debugInformation.user.name() : 'system'}`,
-      debugInformation.user,
-    );
+    this.logger.warn(logMessage, {debugInformation});
+    this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, {
+      conversation: debugInformation.conversation,
+    });
+    this.logger.warn(`From: ${!isUndefined(debugInformation.user) ? debugInformation.user.name() : 'system'}`, {
+      user: debugInformation.user,
+    });
 
     return debugInformation;
   }

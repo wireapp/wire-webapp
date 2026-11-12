@@ -24,11 +24,11 @@ import {InitialConfigType} from '@lexical/react/LexicalComposer';
 import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {HeadingNode, QuoteNode} from '@lexical/rich-text';
 
-import {getLogger} from 'Util/logger';
-
 import {EmojiNode} from './nodes/emojiNode';
 import {MentionNode} from './nodes/mentionNode';
 import {theme} from './theme';
+
+import {getLogger} from '../../../../util/logger';
 
 const logger = getLogger('LexicalInput');
 
@@ -36,7 +36,7 @@ export const editorConfig: InitialConfigType = {
   namespace: 'WireLexicalEditor',
   theme,
   onError(error: unknown) {
-    logger.error(error);
+    logger.error('Rich text editor failed', {error});
   },
   nodes: [
     MentionNode,

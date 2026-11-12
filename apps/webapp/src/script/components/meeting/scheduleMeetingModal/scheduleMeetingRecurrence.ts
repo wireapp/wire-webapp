@@ -17,12 +17,11 @@
  *
  */
 
-import {MeetingRecurrence, MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
-import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
-
-import type {TranslationKey} from 'Util/localizerUtil';
-
 import type {ScheduleMeetingRecurrenceOption} from './scheduleMeetingTypes';
+
+import {MeetingRecurrence, MeetingRecurrenceFrequency} from '../../../apiClient/meetings/meetingRecurrence';
+import type {UpdateMeeting} from '../../../apiClient/meetings/updateMeeting';
+import type {TranslationKey} from '../../../util/localizerUtil';
 
 export const SCHEDULE_MEETING_RECURRENCE_OPTIONS = [
   'doesNotRepeat',

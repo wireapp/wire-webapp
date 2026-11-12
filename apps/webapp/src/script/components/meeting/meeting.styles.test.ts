@@ -18,7 +18,7 @@
  */
 
 import {contentStyles} from './meeting.styles';
-import {meetingsContentWrapperStyles} from 'Components/meeting/meetingCallingView/meetingCallingView.styles';
+import {meetingsContentWrapperStyles} from './meetingCallingView/meetingCallingView.styles';
 
 describe('meeting layout styles', () => {
   it('sizes the meeting list from the available parent height', () => {

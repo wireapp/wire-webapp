@@ -39,8 +39,6 @@ import {
   Popover,
 } from 'react-aria-components';
 
-import {Label, Select, type Option} from '@wireapp/react-ui-kit';
-
 import {
   calendarButtonStyles,
   calendarCellStyles,
@@ -68,6 +66,9 @@ import {
   expirationErrorTextStyles,
   timeSelectMenuPortalStyles,
 } from './cellsShareExpirationStyles';
+
+import {Select, type Option} from '../../../uiKit/inputs/select/select';
+import {Label} from '../../../uiKit/typography/label/label';
 
 const hoursPerHalfDay = 12;
 const twelveHourClockOffset = 11;

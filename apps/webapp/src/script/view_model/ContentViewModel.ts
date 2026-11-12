@@ -18,29 +18,16 @@
  */
 
 import {isEmptyArray, isNonEmptyArray, isNull, isUndefined} from '@sindresorhus/is';
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 import {isError} from 'underscore';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/message';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {isConversationEntity} from 'Util/typePredicateUtil';
-
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
+import {ConnectionStatus} from '../apiClient/connection/connectionStatus';
+import {QualifiedId} from '../apiClient/user/qualifiedId';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationError} from '../error/conversationError';
 import '../page/leftSidebar';
@@ -53,8 +40,19 @@ import '../page/mainContent';
 import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
+import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import {MessageRepository} from '../repositories/conversation/MessageRepository';
+import {Conversation} from '../repositories/entity/Conversation';
+import type {Message} from '../repositories/entity/message/message';
+import type {UserRepository} from '../repositories/user/userRepository';
+import {UserState} from '../repositories/user/userState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {navigate, setHistoryParam} from '../router/Router';
+import {type Translate} from '../util/localizerUtil';
+import {getLogger, Logger} from '../util/logger';
+import {isConversationEntity} from '../util/typePredicateUtil';
+import {WebAppEvents} from '../webAppEvents';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -245,7 +243,7 @@ export class ContentViewModel {
         await this.conversationRepository.fetchBackendConversationEntityById(conversationId);
         return true;
       } catch (error: unknown) {
-        this.logger.warn(`Retry attempt ${attempt + 1}/${maxRetries} failed for conversation fetch`, error);
+        this.logger.warn(`Retry attempt ${attempt + 1}/${maxRetries} failed for conversation fetch`, {error});
       }
     }
     return false;

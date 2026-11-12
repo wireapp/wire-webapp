@@ -18,9 +18,9 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team/feature/';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {FEATURE_STATUS, type FeatureList} from '../../../apiClient/team/feature/featureList.types';
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {WebAppEvents} from '../../../webAppEvents';
 import {
   act,
   render,
@@ -37,28 +37,26 @@ import {amplify} from 'amplify';
 import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
+import {useMeetingStore} from './meetingStoreProvider';
 import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
-} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {Config} from 'src/script/Config';
+} from '../meetingNotificationStore/meetingNotificationStore';
+import {User} from '../../../repositories/entity/User';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {UserState} from '../../../repositories/user/userState';
+import {Config} from '../../../Config';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {Core} from 'src/script/service/coreSingleton';
-import type {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {Core} from '../../../service/coreSingleton';
+import type {MainViewModel} from '../../../view_model/MainViewModel';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 import {MeetingStoreRoot} from './meetingStoreRoot';
 import type {FunctionComponent} from 'react';
-import type {Container} from 'react-dom/client';
-import type {OptionsReceived} from '@testing-library/dom/node_modules/pretty-format';
 
 const meetingId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const selfUserId: QualifiedId = {id: 'self-user-id', domain: 'example.com'};
@@ -131,11 +129,7 @@ type RenderMeetingStoreRootResult = {
   getMeeting: jest.Mock<any, any, any>;
   container: HTMLElement;
   baseElement: HTMLElement;
-  debug: (
-    baseElement?: Container | (Element | Document) | Array<Container | (Element | Document)> | undefined,
-    maxLength?: number | undefined,
-    options?: OptionsReceived | undefined,
-  ) => void;
+  debug: ReturnType<typeof render>['debug'];
   rerender: (ui: React.ReactNode) => void;
   unmount: () => void;
   asFragment: () => DocumentFragment;

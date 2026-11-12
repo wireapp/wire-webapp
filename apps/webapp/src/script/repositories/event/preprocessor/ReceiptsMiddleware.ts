@@ -18,16 +18,15 @@
  */
 
 import {isTruthy} from '@sindresorhus/is';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {supportsReadReceipts} from 'Repositories/conversation/ConversationSelectors';
-import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
-import {User} from 'Repositories/entity/User';
-import type {EventRecord} from 'Repositories/storage/record/eventRecord';
-import {getLogger, Logger} from 'Util/logger';
-
+import {RECEIPT_MODE} from '../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
 import {StatusType} from '../../../message/statusType';
+import {getLogger, Logger} from '../../../util/logger';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import {supportsReadReceipts} from '../../conversation/ConversationSelectors';
+import {ConfirmationEvent} from '../../conversation/EventBuilder';
+import {User} from '../../entity/User';
+import type {EventRecord} from '../../storage/record/eventRecord';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';

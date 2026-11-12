@@ -20,7 +20,7 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {create} from 'zustand';
 
-import {User} from 'Repositories/entity/User';
+import {User} from '../../../../repositories/entity/User';
 
 type TypingUser = {
   conversationId: string;

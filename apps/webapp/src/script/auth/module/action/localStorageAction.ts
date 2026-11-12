@@ -17,10 +17,9 @@
  *
  */
 
-import {toError} from 'Util/toError';
-
 import {LocalStorageActionCreator} from './creator/';
 
+import {toError} from '../../../util/toError';
 import type {ThunkAction} from '../reducer';
 
 export const LocalStorageKey = {

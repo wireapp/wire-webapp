@@ -21,17 +21,16 @@ import {isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {result} from 'true-myth';
 
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
+import {Runtime} from '../../commons/util/Runtime';
 import {
   type SystemNotificationApi,
   type SystemNotificationError,
   systemNotificationErrorKinds,
   type SystemNotificationPermission,
   toSystemNotificationError,
-} from 'src/script/notification/systemNotificationTypes';
-import {getLogger} from 'Util/logger';
+} from '../../notification/systemNotificationTypes';
+import {getLogger} from '../../util/logger';
+import {WebAppEvents} from '../../webAppEvents';
 
 type SystemNotificationLogger = {
   warn: (message: string, context?: unknown) => void;

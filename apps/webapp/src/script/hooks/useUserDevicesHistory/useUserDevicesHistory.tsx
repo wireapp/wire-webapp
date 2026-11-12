@@ -19,7 +19,7 @@
 
 import {useMemo, useState} from 'react';
 
-import {UserDevicesHistoryEntry, UserDevicesState} from 'Components/userDevices';
+import {UserDevicesHistoryEntry, UserDevicesState} from '../../components/userDevices';
 
 type UserDevicesHistoryState = {
   current: UserDevicesHistoryEntry;

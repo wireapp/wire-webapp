@@ -17,15 +17,12 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {Account} from '@wireapp/core';
-
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isMixedConversation, MixedConversation} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {initMLSGroupConversation} from 'src/script/mls/MLSConversations';
-
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import {Account} from '../../../../core';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {isMixedConversation, MixedConversation} from '../../../../repositories/conversation/ConversationSelectors';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {initMLSGroupConversation} from '../../../MLSConversations';
 import {mlsMigrationLogger} from '../../MLSMigrationLogger';
 
 interface JoinUnestablishedMixedConversationsParams {
@@ -61,7 +58,7 @@ export const joinUnestablishedMixedConversation = async (
       onError: ({id}, error) => {
         return mlsMigrationLogger.error(
           `Failed when joining a mls group of mixed conversation with id ${id}, error: `,
-          error,
+          {error},
         );
       },
     });
@@ -83,7 +80,7 @@ export const joinUnestablishedMixedConversation = async (
   } catch (error: unknown) {
     mlsMigrationLogger.error(
       `Failed to establish MLS group for mixed conversation with id ${mixedConversation.id}, error: `,
-      error,
+      {error},
     );
     if (!shouldRetry) {
       return;

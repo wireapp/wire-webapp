@@ -21,10 +21,10 @@ import {MutableRefObject, useEffect} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Message as MessageEntity} from 'Repositories/entity/message/message';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {Message as MessageEntity} from '../../../repositories/entity/message/message';
 
 interface Props {
   conversation: Conversation;
@@ -44,7 +44,7 @@ export const useLoadConversation = ({
   const loadConversation = async (conversationToLoad: Conversation): Promise<MessageEntity[]> => {
     onLoading(true);
     try {
-      conversationLastReadTimestamp.current = conversationToLoad.last_read_timestamp();
+      conversationLastReadTimestamp.current = conversationToLoad.effectiveReadTimestamp();
       await conversationRepository.updateParticipatingUserEntities(conversationToLoad, false, true);
 
       const initialMessage = conversationToLoad.initialMessage();

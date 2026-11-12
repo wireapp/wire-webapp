@@ -18,13 +18,13 @@
  */
 
 import {STATE} from '@wireapp/avs';
-import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {GROUP_CONVERSATION_TYPE} from '../apiClient/conversation/conversation';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {type Translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {LEAVE_CALL_REASON} from '../repositories/calling/enum/LeaveCallReason';
+import {Conversation} from '../repositories/entity/Conversation';
+import {type Translate} from '../util/localizerUtil';
+import {createUuid} from '../util/uuid';
 
 import {
   buildCall,
@@ -33,9 +33,9 @@ import {
   mockAudioRepository,
   mockCallingRepository,
 } from './CallingViewModel.mocks';
-import {AudioType} from 'Repositories/audio/audioType';
-import {translateForTest} from 'Util/test/translateForTest';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {AudioType} from '../repositories/audio/audioType';
+import {translateForTest} from '../util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '../apiClient/team/feature/featureList.types';
 
 describe('CallingViewModel', () => {
   const originalPrimaryModalShow = PrimaryModal.show;

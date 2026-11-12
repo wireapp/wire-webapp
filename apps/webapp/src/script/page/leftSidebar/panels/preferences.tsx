@@ -21,22 +21,21 @@ import React, {useEffect, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {Runtime} from '@wireapp/commons';
-import {TabIndex} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {ListWrapper} from './listWrapper';
 
-import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Runtime} from '../../../commons/util/Runtime';
+import * as Icon from '../../../components/icon';
+import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
 import {
   ClientNotificationData,
   Notification,
   PreferenceNotificationRepository,
-} from 'Repositories/notification/PreferenceNotificationRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
-import {ListWrapper} from './listWrapper';
-
+} from '../../../repositories/notification/PreferenceNotificationRepository';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TabIndex} from '../../../uiKit/utils/enums';
+import {canUseTroubleshooter} from '../../../util/canUseTroubleshooter';
+import {WebAppEvents} from '../../../webAppEvents';
+import {useApplicationContext} from '../../rootProvider';
 import {ContentState, useAppState} from '../../useAppState';
 
 type PreferencesProps = {
@@ -133,7 +132,7 @@ const Preferences: FunctionComponent<PreferencesProps> = ({
   onPreferenceItemClick,
   onClose,
 }: PreferencesProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const contentState = useAppState(state => {
     return state.contentState;
   });
@@ -178,6 +177,13 @@ const Preferences: FunctionComponent<PreferencesProps> = ({
       id: ContentState.PREFERENCES_AV,
       label: translate('preferencesAV'),
       uieName: 'go-audio-video',
+    },
+    {
+      IconComponent: Icon.NetworkIcon,
+      hidden: !canUseTroubleshooter(isFeatureToggleEnabled),
+      id: ContentState.PREFERENCES_TROUBLESHOOTING,
+      label: translate('preferencesTroubleshooting'),
+      uieName: 'go-troubleshooting',
     },
     {
       IconComponent: Icon.AboutIcon,

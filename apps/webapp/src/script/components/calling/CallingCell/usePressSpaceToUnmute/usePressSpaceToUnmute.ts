@@ -20,15 +20,14 @@
 import {isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {useAppNotification} from 'Components/appNotification/index';
-import {MicOnIcon} from 'Components/icon';
-import {useActiveWindowState} from 'Hooks/useActiveWindow';
-import {useKeyPressAndHold} from 'Hooks/useKeyPressAndHold/useKeyPressAndHold';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {EventName} from 'Repositories/tracking/eventName';
-import {KEY} from 'Util/keyboardUtil';
+import {useActiveWindowState} from '../../../../hooks/useActiveWindow';
+import {useKeyPressAndHold} from '../../../../hooks/useKeyPressAndHold/useKeyPressAndHold';
+import {CallingViewMode, CallState} from '../../../../repositories/calling/CallState';
+import {EventName} from '../../../../repositories/tracking/eventName';
+import {KEY} from '../../../../util/keyboardUtil';
+import {WebAppEvents} from '../../../../webAppEvents';
+import {useAppNotification} from '../../../appNotification';
+import {MicOnIcon} from '../../../icon';
 
 interface UsePressSpaceToUnmuteParams {
   callState: CallState;

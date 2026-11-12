@@ -20,14 +20,14 @@
 import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNull} from '@sindresorhus/is';
-import {LoginData} from '@wireapp/api-client/lib/auth';
 import {useSelector} from 'react-redux';
 
-import {Button, Input, Loading} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isValidEmail, isValidUsername} from 'Util/validationUtil';
-
+import {LoginData} from '../../apiClient/auth/loginData';
+import {useApplicationContext} from '../../page/rootProvider';
+import {Loading} from '../../uiKit/dataDisplay/loading/loading';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Input} from '../../uiKit/inputs/input/input';
+import {isValidEmail, isValidUsername} from '../../util/validationUtil';
 import {useAutoFocus} from '../hooks/useAutoFocus';
 import {ValidationError} from '../module/action/validationError';
 import {RootState} from '../module/reducer';

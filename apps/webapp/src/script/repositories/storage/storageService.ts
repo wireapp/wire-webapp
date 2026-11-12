@@ -21,17 +21,16 @@ import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {Dexie, Transaction} from 'dexie';
 import {singleton} from 'tsyringe';
 
-import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
-import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
-
-import {Logger, getLogger} from 'Util/logger';
-import {loadValue, storeValue} from 'Util/storageUtil';
-import {toError} from 'Util/toError';
-
 import {DexieDatabase} from './dexieDatabase';
+import {IndexedDBEngine} from './indexedDatabaseEngine';
 import {StorageSchemata} from './storageSchemata';
 
+import type {CRUDEngine} from '../../core/storage/engine/crudEngine';
+import {RecordNotFoundError} from '../../core/storage/engine/error';
 import {StorageError} from '../../error/storageError';
+import {Logger, getLogger} from '../../util/logger';
+import {loadValue, storeValue} from '../../util/storageUtil';
+import {toError} from '../../util/toError';
 
 const emptyStorageInteger = 0n;
 
@@ -254,7 +253,7 @@ export class StorageService {
       const records = await this.engine.readAll<T>(storeName);
       return records.filter(Boolean);
     } catch (error: unknown) {
-      this.logger.error(`Failed to load objects from store '${storeName}'`, error);
+      this.logger.error('Failed to load objects from store', {error, storeName});
       throw error;
     }
   }
@@ -285,10 +284,10 @@ export class StorageService {
     try {
       return await this.engine.read<T>(storeName, primaryKey);
     } catch (error: unknown) {
-      if (error instanceof StoreEngineError.RecordNotFoundError) {
+      if (error instanceof RecordNotFoundError) {
         return undefined;
       }
-      this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
+      this.logger.error('Failed to load record from store', {error, primaryKey, storeName});
       throw error;
     }
   }
@@ -325,7 +324,7 @@ export class StorageService {
       const newKey = await this.engine.updateOrCreate(storeName, primaryKey, entity);
       return newKey;
     } catch (error: unknown) {
-      this.logger.error(`Failed to update or create '${primaryKey}' in store '${storeName}'`, error);
+      this.logger.error('Failed to update or create record in store', {error, primaryKey, storeName});
       throw error;
     }
   }
@@ -372,7 +371,7 @@ export class StorageService {
         }
         const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);
         const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
-        this.logger.log(logMessage);
+        this.logger.info(logMessage);
         return numberOfUpdates;
       }
       const oldRecord = await this.load<unknown>(storeName, primaryKey);
@@ -383,7 +382,7 @@ export class StorageService {
 
       return 1;
     } catch (error: unknown) {
-      this.logger.error(`Failed to update '${primaryKey}' in store '${storeName}'`, error);
+      this.logger.error('Failed to update record in store', {error, primaryKey, storeName});
       throw error;
     }
   }

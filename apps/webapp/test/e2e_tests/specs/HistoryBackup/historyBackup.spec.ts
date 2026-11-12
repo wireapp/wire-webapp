@@ -17,16 +17,10 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
-import {
-  connectWithUser,
-  createAndSaveBackup,
-  createGroup,
-  loginUser,
-  logOutUser,
-} from 'test/e2e_tests/utils/userActions';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, expect, withLogin, LOGIN_TIMEOUT} from '../../test.fixtures';
+import {connectWithUser, createAndSaveBackup, createGroup, loginUser, logOutUser} from '../../utils/userActions';
 import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
 import {RequestResetPasswordPage} from '../../pageManager/webapp/pages/requestResetPassword.page';
 

@@ -18,21 +18,21 @@
  */
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {Backend} from '@wireapp/api-client/lib/env';
-import {Role} from '@wireapp/api-client/lib/team';
-import {FEATURE_STATUS, FeatureList, SELF_DELETING_TIMEOUT} from '@wireapp/api-client/lib/team/feature/';
-import {UserType} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {ROLE, roleMap} from 'Repositories/user/userPermission';
-import {UserState} from 'Repositories/user/userState';
-import {Config} from 'src/script/Config';
-import {sortUsersByPriority} from 'Util/stringUtil';
-
 import {TeamEntity} from './TeamEntity';
+
+import {Backend} from '../../apiClient/env/backend';
+import {FEATURE_STATUS, FeatureList, SELF_DELETING_TIMEOUT} from '../../apiClient/team/feature/featureList.types';
+import {Role} from '../../apiClient/team/member/role';
+import {UserType} from '../../apiClient/user/user';
+import {Config} from '../../Config';
+import {sortUsersByPriority} from '../../util/stringUtil';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {ROLE, roleMap} from '../user/userPermission';
+import {UserState} from '../user/userState';
 
 const millisecondsPerSecond = 1000;
 
@@ -45,6 +45,7 @@ export class TeamState {
   public readonly hasWhitelistedServices: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList | undefined>;
+  public readonly isTeamFeatureConfigFallback: ko.Observable<boolean>;
   public readonly classifiedDomains: ko.PureComputed<string[] | undefined>;
   public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
   public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
@@ -90,6 +91,7 @@ export class TeamState {
     this.memberRoles = ko.observable({});
     this.memberInviters = ko.observable({});
     this.teamFeatures = ko.observable();
+    this.isTeamFeatureConfigFallback = ko.observable(false);
     this.teamApps = ko.observable([]);
     this.teamCollaborators = ko.observable([]);
 

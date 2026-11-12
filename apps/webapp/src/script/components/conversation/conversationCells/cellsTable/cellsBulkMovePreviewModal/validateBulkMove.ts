@@ -17,9 +17,8 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
-
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
+import {CellNode, CellNodeType} from '../../../../../types/cellNode';
 
 interface ValidateBulkMoveParams {
   conversationQualifiedId: QualifiedId;

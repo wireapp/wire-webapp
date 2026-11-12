@@ -18,27 +18,34 @@
  */
 
 import {act, renderHook} from '@testing-library/react';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/message';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {Message} from '../../../repositories/entity/message/message';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {useLoadConversation} from './useLoadConversation';
 
 describe('useLoadConversation', () => {
-  it.each([false, true])(
-    'loads the conversation after its members when an initial message exists: %s',
-    async hasInitialMessage => {
+  it.each([
+    {hasInitialMessage: false, manualUnreadTimestamp: undefined},
+    {hasInitialMessage: true, manualUnreadTimestamp: undefined},
+    {hasInitialMessage: false, manualUnreadTimestamp: 100},
+    {hasInitialMessage: true, manualUnreadTimestamp: 100},
+  ])(
+    'loads members before history with initial message $hasInitialMessage and manual marker $manualUnreadTimestamp',
+    async options => {
+      const {hasInitialMessage, manualUnreadTimestamp} = options;
       const conversation = new Conversation('conversation', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       const initialMessage = new Message('anchor', undefined, translateForTest);
       conversation.initialMessage(hasInitialMessage ? initialMessage : undefined);
       conversation.last_read_timestamp(0);
+      conversation.manualUnreadTimestamp(manualUnreadTimestamp);
       const memberUpdate = Promise.withResolvers<Conversation>();
       const updateParticipatingUserEntities = jest.fn().mockReturnValue(memberUpdate.promise);
       const getMessagesWithOffset = jest.fn().mockResolvedValue([initialMessage]);
@@ -61,7 +68,8 @@ describe('useLoadConversation', () => {
 
       const loading = result.current.loadConversation(conversation);
 
-      expect(conversationLastReadTimestamp.current).toBe(0);
+      expect(conversationLastReadTimestamp.current).toBe(manualUnreadTimestamp === undefined ? 0 : 99);
+      expect(conversation.last_read_timestamp()).toBe(0);
       expect(onLoading).toHaveBeenLastCalledWith(true);
       expect(getMessagesWithOffset).not.toHaveBeenCalled();
       expect(getPrecedingMessages).not.toHaveBeenCalled();

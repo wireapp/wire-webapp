@@ -22,19 +22,6 @@ import React, {useState, type FunctionComponent} from 'react';
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-
-import {useAppNotification} from 'Components/appNotification/index';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {trackCallQualityFeedback} from 'Repositories/tracking/helpers';
-import {UserState} from 'Repositories/user/userState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import type {Translate} from 'Util/localizerUtil';
-import {getLogger} from 'Util/logger';
-
 import {CALL_QUALITY_FEEDBACK_KEY, CALL_SURVEY_MUTE_INTERVAL, ratingListItems} from './constants';
 import {
   buttonStyle,
@@ -46,6 +33,19 @@ import {
   title,
   wrapper,
 } from './QualityFeedbackModal.styles';
+import {RatingListLabel} from './typings';
+
+import {CallingRepository} from '../../../repositories/calling/CallingRepository';
+import {trackCallQualityFeedback} from '../../../repositories/tracking/helpers';
+import {UserState} from '../../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import {Checkbox, CheckboxLabel} from '../../../uiKit/inputs/checkbox/checkbox';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import type {Translate} from '../../../util/localizerUtil';
+import {getLogger} from '../../../util/logger';
+import {useAppNotification} from '../../appNotification';
+import {useCallAlertState} from '../../calling/useCallAlertState';
+import {ModalComponent} from '../ModalComponent';
 
 const logger = getLogger('CallQualityFeedback');
 
@@ -71,7 +71,7 @@ export const QualityFeedbackModal: FunctionComponent<Props> = ({callingRepositor
   }
 
   if (isNullOrUndefined(call)) {
-    logger.warn('Call not found for conversationId', conversationId);
+    logger.warn('Call not found for conversationId', {conversationId});
     setQualityFeedbackModalShown(false);
     return null;
   }

@@ -27,7 +27,7 @@ import {applockRefactoredFeatureToggleName} from '../featureToggles/startupFeatu
 import {MainViewModel} from '../view_model/MainViewModel';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from './testSupport/rootContextTestSupport';
 import {RootContext, RootContextValue, useApplicationContext, useMainViewModel} from './rootProvider';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../util/test/translateForTest';
 
 interface WrapperProperties {
   children: ReactNode;

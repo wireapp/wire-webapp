@@ -17,13 +17,11 @@
  *
  */
 
-import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
-
-import {Runtime} from '@wireapp/commons';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ModalType, getModalOptions} from 'src/script/e2eIdentity/modals';
-import type {Translate} from 'Util/localizerUtil';
+import {FEATURE_KEY, FeatureList} from '../../../../../apiClient/team/feature/featureList.types';
+import {Runtime} from '../../../../../commons/util/Runtime';
+import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
+import {ModalType, getModalOptions} from '../../../../../e2eIdentity/modals';
+import type {Translate} from '../../../../../util/localizerUtil';
 
 export const configureDownloadPath = (teamFeatures: FeatureList, translate: Translate): void => {
   const downloadPathNotifier =

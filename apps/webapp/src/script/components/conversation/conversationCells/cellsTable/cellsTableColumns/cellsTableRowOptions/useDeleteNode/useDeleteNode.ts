@@ -17,11 +17,10 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {useAppNotification} from 'Components/appNotification/index';
-import {useCellsStore} from 'Components/conversation/conversationCells/common/useCellsStore/useCellsStore';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {QualifiedId} from '../../../../../../../apiClient/user/qualifiedId';
+import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
+import {useAppNotification} from '../../../../../../appNotification';
+import {useCellsStore} from '../../../../common/useCellsStore/useCellsStore';
 
 interface UseDeleteNodeProps {
   conversationQualifiedId: QualifiedId;

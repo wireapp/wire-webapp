@@ -19,14 +19,13 @@
 
 import {isArray, isNullOrUndefined, isNonEmptyString} from '@sindresorhus/is';
 
-import {Runtime} from '@wireapp/commons';
-
-import {getLogger, Logger} from 'Util/logger';
-import {loadValue, storeValue} from 'Util/storageUtil';
-
 import {MediaDeviceType} from './MediaDeviceType';
 import {resolveActiveDeviceId} from './resolveActiveDeviceId';
 import {mediaDevicesStore} from './useMediaDevicesStore';
+
+import {Runtime} from '../../commons/util/Runtime';
+import {getLogger, Logger} from '../../util/logger';
+import {loadValue, storeValue} from '../../util/storageUtil';
 
 export type ElectronDesktopCapturerSource = {
   readonly display_id: string;
@@ -351,7 +350,7 @@ export class MediaDevicesHandler {
 
       return mediaDevices;
     } catch (error: unknown) {
-      this.logger.error(`Failed to update MediaDevice list: ${error instanceof Error ? error.message : ''}`, error);
+      this.logger.error(`Failed to update MediaDevice list: ${error instanceof Error ? error.message : ''}`, {error});
       throw error;
     }
   }

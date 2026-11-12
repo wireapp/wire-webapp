@@ -19,6 +19,8 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
+import {translate} from '../../util/localizerUtil';
+
 import {JoinGuestLinkPasswordModal, JoinGuestLinkPasswordModalProps} from './joinGuestLinkPasswordModal';
 
 import {withIntl, withTheme} from '../util/test/testUtil';
@@ -34,6 +36,37 @@ describe('JoinGuestLinkPasswordModal', () => {
 
   beforeEach(() => {
     onSubmitPasswordMock.mockClear();
+  });
+
+  it('renders a dialog and closes when its background is clicked', () => {
+    const onClose = jest.fn();
+    const {getByRole, getByTestId} = render(
+      withTheme(withIntl(<JoinGuestLinkPasswordModal {...props} onClose={onClose} />)),
+    );
+
+    expect(getByRole('dialog')).toBeVisible();
+
+    fireEvent.click(getByTestId('modal-background'));
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows and hides the password using the labelled toggle', () => {
+    const {getByRole, getByTestId} = render(withTheme(withIntl(<JoinGuestLinkPasswordModal {...props} />)));
+    const passwordInput = getByTestId('guest-link-join-password-input');
+
+    fireEvent.change(passwordInput, {target: {value: 'example-password'}});
+    expect(passwordInput).toHaveAttribute('type', 'password');
+
+    fireEvent.click(getByRole('button', {name: translate('showTogglePasswordLabel')}));
+
+    expect(passwordInput).toHaveAttribute('type', 'text');
+    expect(passwordInput).toHaveValue('example-password');
+
+    fireEvent.click(getByRole('button', {name: translate('hideTogglePasswordLabel')}));
+
+    expect(passwordInput).toHaveAttribute('type', 'password');
+    expect(passwordInput).toHaveValue('example-password');
   });
 
   it('should call onSubmitPassword with the password value when the form is submitted', () => {

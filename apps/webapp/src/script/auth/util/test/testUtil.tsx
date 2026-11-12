@@ -20,10 +20,11 @@
 import React from 'react';
 
 import {render, type RenderResult} from '@testing-library/react';
-import {CONVERSATION_TYPE, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
+import {CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
+import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {RecursivePartial} from '../../../commons/util/TypeUtil';
 import ko from 'knockout';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
@@ -32,46 +33,47 @@ import {AnyAction} from 'redux';
 import {MockStoreEnhanced} from 'redux-mock-store';
 import {ThunkDispatch} from 'redux-thunk';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp} from '../../../uiKit/layout/styledApp/styledApp';
+import {THEME_ID} from '../../../uiKit/identity/theme/theme';
 import type {JSX} from '@emotion/react/jsx-runtime';
 
-import cs from 'I18n/cs-CZ.json';
-import da from 'I18n/da-DK.json';
-import de from 'I18n/de-DE.json';
-import el from 'I18n/el-GR.json';
-import en from 'I18n/en-US.json';
-import es from 'I18n/es-ES.json';
-import et from 'I18n/et-EE.json';
-import fi from 'I18n/fi-FI.json';
-import fr from 'I18n/fr-FR.json';
-import hr from 'I18n/hr-HR.json';
-import hu from 'I18n/hu-HU.json';
-import it from 'I18n/it-IT.json';
-import lt from 'I18n/lt-LT.json';
-import nl from 'I18n/nl-NL.json';
-import pl from 'I18n/pl-PL.json';
-import pt from 'I18n/pt-BR.json';
-import ro from 'I18n/ro-RO.json';
-import ru from 'I18n/ru-RU.json';
-import si from 'I18n/si-LK.json';
-import sk from 'I18n/sk-SK.json';
-import sl from 'I18n/sl-SI.json';
-import tr from 'I18n/tr-TR.json';
-import uk from 'I18n/uk-UA.json';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
-import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import cs from '../../../../i18n/cs-CZ.json';
+import da from '../../../../i18n/da-DK.json';
+import de from '../../../../i18n/de-DE.json';
+import el from '../../../../i18n/el-GR.json';
+import en from '../../../../i18n/en-US.json';
+import es from '../../../../i18n/es-ES.json';
+import et from '../../../../i18n/et-EE.json';
+import fi from '../../../../i18n/fi-FI.json';
+import fr from '../../../../i18n/fr-FR.json';
+import hr from '../../../../i18n/hr-HR.json';
+import hu from '../../../../i18n/hu-HU.json';
+import it from '../../../../i18n/it-IT.json';
+import lt from '../../../../i18n/lt-LT.json';
+import nl from '../../../../i18n/nl-NL.json';
+import pl from '../../../../i18n/pl-PL.json';
+import pt from '../../../../i18n/pt-BR.json';
+import ro from '../../../../i18n/ro-RO.json';
+import ru from '../../../../i18n/ru-RU.json';
+import si from '../../../../i18n/si-LK.json';
+import sk from '../../../../i18n/sk-SK.json';
+import sl from '../../../../i18n/sl-SI.json';
+import tr from '../../../../i18n/tr-TR.json';
+import uk from '../../../../i18n/uk-UA.json';
+import {CallingRepository} from '../../../repositories/calling/CallingRepository';
+import {Participant} from '../../../repositories/calling/Participant';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {BackgroundEffectsController} from '../../../repositories/media/backgroundEffects/backgroundEffectsController';
+import {BackgroundEffectsHandler} from '../../../repositories/media/backgroundEffectsHandler';
+import {MediaDevicesHandler} from '../../../repositories/media/MediaDevicesHandler';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../../util/localizerUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {createUuid} from '../../../util/uuid';
 
 import {mapLanguage} from '../../localeConfig';
 import {Api, RootState} from '../../module/reducer';
@@ -117,7 +119,7 @@ const rootContextValue = createRootContextValueForTest({translate});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 const loadLanguage = (language: string): typeof en => {
-  return require(`I18n/${mapLanguage(language)}.json`);
+  return require(`../../../../i18n/${mapLanguage(language)}.json`);
 };
 
 export const withIntl = (component: React.ReactNode): JSX.Element => {

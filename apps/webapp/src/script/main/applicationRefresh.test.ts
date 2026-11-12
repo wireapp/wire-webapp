@@ -17,7 +17,7 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../webAppEvents';
 
 import {refreshApplication} from './applicationRefresh';
 

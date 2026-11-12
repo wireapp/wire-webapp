@@ -24,8 +24,8 @@ import {render, act, fireEvent, waitFor} from '@testing-library/react';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../../../../page/testSupport/rootContextTestSupport';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 import {MessageReactions, MessageReactionsProps} from './messageReactions';
 

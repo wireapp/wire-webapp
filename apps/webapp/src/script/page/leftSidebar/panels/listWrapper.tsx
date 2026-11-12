@@ -23,11 +23,11 @@ import {css} from '@emotion/react';
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {throttle} from 'underscore';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {useConnectionQuality} from 'src/script/hooks/useConnectionQuality';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scrollHelpers';
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import * as Icon from '../../../components/icon';
+import {useConnectionQuality} from '../../../hooks/useConnectionQuality';
+import {isScrollable, isScrolledBottom, isScrolledTop} from '../../../util/scrollHelpers';
+import {useApplicationContext} from '../../rootProvider';
 
 export const getListWrapperHeadingId = (panelId: string): string => {
   return `${panelId}-heading`;

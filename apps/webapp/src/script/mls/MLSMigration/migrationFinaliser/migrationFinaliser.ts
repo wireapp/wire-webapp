@@ -17,15 +17,13 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {
   MixedConversation,
   isMLSConversation,
   isMixedConversation,
-} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-
+} from '../../../repositories/conversation/ConversationSelectors';
+import {Conversation} from '../../../repositories/entity/Conversation';
 import {MLSMigrationStatus} from '../migrationStatus';
 import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
@@ -85,6 +83,6 @@ const finaliseMigrationOfMixedConversation = async (
       throw new Error(`Conversation ${updatedMLSConversation.qualifiedId.id} has not updated its protocol to MLS.`);
     }
   } catch (error: unknown) {
-    mlsMigrationLogger.error(`Failed to finalise migration of mixed conversation ${mixedConversation.id}.`, error);
+    mlsMigrationLogger.error(`Failed to finalise migration of mixed conversation ${mixedConversation.id}.`, {error});
   }
 };

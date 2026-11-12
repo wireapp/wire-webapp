@@ -21,20 +21,19 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {EventName} from 'Repositories/tracking/eventName';
-import {Segmentation} from 'Repositories/tracking/segmentation';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {teamCreationModalBodyCss, teamCreationModalWrapperCss} from './teamCreation.styles';
 import {Confirmation} from './teamCreationSteps/confirmation';
 import {Form} from './teamCreationSteps/form';
 import {Introduction} from './teamCreationSteps/introduction';
 import {Success} from './teamCreationSteps/success';
 import {useTeamCreationModal} from './useTeamCreationModal';
+
+import * as Icon from '../../../../../../components/icon';
+import {ModalComponent} from '../../../../../../components/Modals/ModalComponent';
+import {EventName} from '../../../../../../repositories/tracking/eventName';
+import {Segmentation} from '../../../../../../repositories/tracking/segmentation';
+import {WebAppEvents} from '../../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../../rootProvider';
 
 enum Step {
   Introduction = 'Introduction',

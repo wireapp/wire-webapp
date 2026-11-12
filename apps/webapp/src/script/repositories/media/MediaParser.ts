@@ -17,16 +17,14 @@
  *
  */
 
-import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {getLinksFromHtml} from 'Util/urlUtil';
 
 import {MediaEmbeds} from './MediaEmbeds';
 
+import type {WebappProperties} from '../../apiClient/user/data/userPropertiesSetData';
 import {Config} from '../../Config';
+import {getLinksFromHtml} from '../../util/urlUtil';
+import {WebAppEvents} from '../../webAppEvents';
 
 export class MediaParser {
   showEmbed: boolean;

@@ -21,27 +21,20 @@ import React, {useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {
-  useMatchMedia,
-  QUERY,
-  Button,
-  Column,
-  Columns,
-  Container,
-  ContainerXS,
-  H2,
-  Link,
-  LinkVariant,
-  Muted,
-  Form,
-  Input,
-  Loading,
-  Checkbox,
-} from '@wireapp/react-ui-kit';
-
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {Loading} from '../../uiKit/dataDisplay/loading/loading';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Checkbox} from '../../uiKit/inputs/checkbox/checkbox';
+import {Form} from '../../uiKit/inputs/form/form';
+import {Input} from '../../uiKit/inputs/input/input';
+import {Column, Columns} from '../../uiKit/layout/column/column';
+import {Container, ContainerXS} from '../../uiKit/layout/container/container';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
+import {H2} from '../../uiKit/typography/heading/heading';
+import {Link, LinkVariant} from '../../uiKit/typography/link/link';
+import {Muted} from '../../uiKit/typography/text/text';
+import {QUERY} from '../../uiKit/utils/mediaQueries';
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 
 interface IsLoggedInColumnProps {

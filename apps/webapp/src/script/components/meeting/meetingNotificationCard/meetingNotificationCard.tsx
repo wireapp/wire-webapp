@@ -21,19 +21,8 @@ import {useEffect, type FunctionComponent} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {match, P} from 'ts-pattern';
 import {container} from 'tsyringe';
-
-import {Button, ButtonVariant, CallIcon, CalendarIcon} from '@wireapp/react-ui-kit';
-
-import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
-import {useJoinMeetingCall} from 'Components/meeting/useJoinMeetingCall';
-import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import type {Translate, TranslationKey} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {formatLocale, formatTimeShort} from 'Util/timeUtil';
 
 import {
   meetingNotificationCardActionsStyles,
@@ -46,8 +35,19 @@ import {
   meetingNotificationViewBtnStyles,
 } from './meetingNotificationCard.styles';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {UserState} from '../../../repositories/user/userState';
 import {navigate} from '../../../router/Router';
+import {CalendarIcon} from '../../../uiKit/dataDisplay/icon/calendarIcon';
+import {CallIcon} from '../../../uiKit/dataDisplay/icon/callIcon';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import type {Translate, TranslationKey} from '../../../util/localizerUtil';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
+import {formatLocale, formatTimeShort} from '../../../util/timeUtil';
 import {type MeetingNotification, MeetingNotificationKind} from '../meetingNotificationStore/meetingNotificationStore';
+import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
+import {useJoinMeetingCall} from '../useJoinMeetingCall';
 
 type MeetingNotificationCardProps = MeetingNotification & {
   onDismiss: () => void;

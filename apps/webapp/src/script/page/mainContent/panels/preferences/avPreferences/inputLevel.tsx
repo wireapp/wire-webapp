@@ -21,8 +21,8 @@ import {HTMLProps, useEffect, useRef, useState, type FunctionComponent} from 're
 
 import cx from 'classnames';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
+import {getLogger} from '../../../../../util/logger';
+import {useApplicationContext} from '../../../../rootProvider';
 
 export interface InputLevelProps extends HTMLProps<HTMLDivElement> {
   disabled: boolean;
@@ -88,10 +88,10 @@ const InputLevel: FunctionComponent<InputLevelProps> = ({
       audioContext
         ?.close()
         .then(() => {
-          return logger.info('Closed existing AudioContext', audioContext);
+          return logger.info('Closed existing AudioContext', {audioContext});
         })
         .catch((error: unknown) => {
-          return logger.error(error);
+          return logger.error('Failed to close existing AudioContext', {error});
         });
 
       audioSource?.disconnect();

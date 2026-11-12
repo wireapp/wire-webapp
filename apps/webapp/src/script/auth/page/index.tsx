@@ -19,27 +19,28 @@
 
 import React, {useCallback, useEffect, useState, type FunctionComponent} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import {container} from 'tsyringe';
 
-import {UrlUtil} from '@wireapp/commons';
-import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
-
-import {LogoFullIcon} from 'Components/icon';
-import {useSingleInstance} from 'Hooks/useSingleInstance';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {Core} from 'src/script/service/coreSingleton';
-import {isDataDogEnabled} from 'Util/dataDog';
-import {getWebEnvironment} from 'Util/environment';
-
 import {Page} from './page';
 
+import {UrlUtil} from '../../commons/util';
+import {LogoFullIcon} from '../../components/icon';
 import {Config} from '../../Config';
+import {useSingleInstance} from '../../hooks/useSingleInstance';
 import '../../localization/Localizer';
+import {useApplicationContext} from '../../page/rootProvider';
+import {Core} from '../../service/coreSingleton';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
+import {ContainerXS} from '../../uiKit/layout/container/container';
+import {Text} from '../../uiKit/typography/text/text';
+import {isDataDogEnabled} from '../../util/dataDog';
+import {getWebEnvironment} from '../../util/environment';
 import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState, type ThunkAction} from '../module/reducer';
 import * as AuthSelector from '../module/selector/authSelector';
@@ -73,8 +74,11 @@ const IndexComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
     await doInit({isImmediateLogin: true, shouldValidateLocalClient: true});
     // Check if the user is already logged in
     if (!hasOtherInstance) {
-      const localClient = core.getLocalClient();
-      if (!isNullOrUndefined(localClient)) {
+      const localClientResult = await core.getLocalClient();
+      if (localClientResult.isErr) {
+        throw localClientResult.error;
+      }
+      if (localClientResult.value.isJust) {
         navigate(ROUTE.HISTORY_INFO);
       }
     }

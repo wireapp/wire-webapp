@@ -17,7 +17,7 @@
  *
  */
 
-import {formatLocale, isToday, isYesterday} from 'Util/timeUtil';
+import {formatLocale, isToday, isYesterday} from '../../../../util/timeUtil';
 
 interface MessageGroupLabels {
   today: string;

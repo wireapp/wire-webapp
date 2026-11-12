@@ -18,7 +18,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
+import {downloadAssetAndGetFilePath} from '../../../utils/asset.util';
 
 export class HistoryExportPage {
   private readonly page: Page;

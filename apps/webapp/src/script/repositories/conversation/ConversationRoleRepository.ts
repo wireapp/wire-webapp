@@ -17,22 +17,22 @@
  *
  */
 
+import {container} from 'tsyringe';
+
+import type {ConversationService} from './ConversationService';
+
+import {ADD_PERMISSION} from '../../apiClient/conversation/conversation';
 import {
   DefaultConversationRoleName as DefaultRole,
   ConversationRole,
-  ADD_PERMISSION,
-} from '@wireapp/api-client/lib/conversation/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {container} from 'tsyringe';
-
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {Logger, getLogger} from 'Util/logger';
-
-import type {ConversationService} from './ConversationService';
+} from '../../apiClient/conversation/conversationRole';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {Logger, getLogger} from '../../util/logger';
+import type {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
+import type {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
+import {UserState} from '../user/userState';
 
 export enum Permissions {
   addParticipants = 'add_conversation_member',
@@ -88,7 +88,7 @@ export class ConversationRoleRepository {
         const response = await this.teamRepository.getTeamConversationRoles();
         this.teamRoles = response.conversation_roles;
       } catch (error: unknown) {
-        this.logger.warn('Could not load team conversation roles', error);
+        this.logger.warn('Could not load team conversation roles', {error});
       }
     }
   };

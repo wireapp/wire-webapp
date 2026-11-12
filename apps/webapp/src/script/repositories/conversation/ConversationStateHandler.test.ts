@@ -17,11 +17,11 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStateHandler} from './ConversationStateHandler';

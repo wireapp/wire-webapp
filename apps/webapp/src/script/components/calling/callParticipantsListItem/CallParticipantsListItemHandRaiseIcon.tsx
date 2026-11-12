@@ -20,14 +20,14 @@
 import {useEffect, useState} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
-
-import {InviteIcon, Tooltip} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {formatDuration} from 'Util/timeUtil';
 
 import {toolTipStyles} from './CallParticipantsListItemHandRaiseIcon.styles';
+
+import {TimeInMillis} from '../../../commons/util/TimeUtil';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {InviteIcon} from '../../../uiKit/dataDisplay/icon/inviteIcon';
+import {Tooltip} from '../../../uiKit/dataDisplay/tooltip/tooltip';
+import {formatDuration} from '../../../util/timeUtil';
 
 interface CallParticipantsListItemHandRaiseIconProps {
   handRaisedAt: number;

@@ -22,15 +22,6 @@ import {ReactElement, useState} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import {hasActiveGlobalDriveFilters} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
-import {useCellsSorting} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-
 import {loadMoreWrapperStyles, wrapperStyles} from './cellsGlobalView.styles';
 import {CellsHeader} from './cellsHeader/cellsHeader';
 import {CellsLoader} from './cellsLoader/cellsLoader';
@@ -43,6 +34,13 @@ import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresigne
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
 import {useApplicationContext} from '../../page/rootProvider';
+import {CellsRepository} from '../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {UserRepository} from '../../repositories/user/userRepository';
+import {UserState} from '../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {hasActiveGlobalDriveFilters} from '../conversation/conversationCells/common/driveFilters/driveFilters';
+import {useCellsSorting} from '../conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 
 interface CellsGlobalViewProps {
   cellsRepository?: CellsRepository;
@@ -126,6 +124,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
           isSortingEnabled
           onToggleSort={toggleSort}
           {...getGlobalDriveSelectionProps(searchValue, filterState)}
+          selectionEnabled={false}
           selectionBarAnchor={selectionBarAnchor}
         />
       )}

@@ -18,36 +18,36 @@
  */
 
 import {isEmptyArray, isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
-import {UserType, QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {useLeaveGroupAdminModalStore} from 'Components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
-import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {ClientEntity} from 'Repositories/client';
-import type {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/message';
-import type {User} from 'Repositories/entity/User';
-import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {type Translate} from 'Util/localizerUtil';
-import {isBackendError} from 'Util/typePredicateUtil';
-
 import type {MainViewModel} from './MainViewModel';
+
+import {ConnectionStatus} from '../apiClient/connection/connectionStatus';
+import {DefaultConversationRoleName} from '../apiClient/conversation/conversationRole';
+import {BackendErrorLabel} from '../apiClient/http/backendErrorLabel';
+import {FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
+import {QualifiedId} from '../apiClient/user/qualifiedId';
+import {UserType} from '../apiClient/user/user';
+import {useLeaveGroupAdminModalStore} from '../components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
+import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '../components/Modals/PrimaryModal';
+import {CellsRepository} from '../repositories/cells/cellsRepository';
+import type {ClientEntity} from '../repositories/client';
+import type {ConnectionRepository} from '../repositories/connection/connectionRepository';
+import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import type {MessageRepository} from '../repositories/conversation/MessageRepository';
+import {NOTIFICATION_STATE} from '../repositories/conversation/NotificationSetting';
+import type {Conversation} from '../repositories/entity/Conversation';
+import type {Message} from '../repositories/entity/message/message';
+import type {User} from '../repositories/entity/User';
+import type {IntegrationRepository} from '../repositories/integration/IntegrationRepository';
+import type {ServiceEntity} from '../repositories/integration/ServiceEntity';
+import {SelfRepository} from '../repositories/self/SelfRepository';
+import {TeamState} from '../repositories/team/TeamState';
+import {UserState} from '../repositories/user/userState';
+import {type Translate} from '../util/localizerUtil';
+import {isBackendError} from '../util/typePredicateUtil';
+import {WebAppEvents} from '../webAppEvents';
 
 type ConnectionRequestResult = {connectionStatus: ConnectionStatus; conversationId: QualifiedId};
 

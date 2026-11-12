@@ -17,8 +17,8 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
+import {QualifiedId} from '../apiClient/user/qualifiedId';
+import {constructFullyQualifiedClientId} from '../core/util/fullyQualifiedClientIdUtils';
 
 const e2eActivatedAtKey = 'e2eActivatedAt';
 const e2eTimer = 'e2eTimer';

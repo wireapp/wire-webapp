@@ -17,10 +17,9 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {User} from '../../repositories/entity/User';
+import {matchQualifiedIds} from '../../util/qualifiedId';
 
 export const computeParticipantDiff = (
   originalUsers: User[],

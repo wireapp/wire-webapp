@@ -20,17 +20,17 @@
 import {useEffect, useId, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {RichInfoField} from '@wireapp/api-client/lib/user/richInfo';
 import {container} from 'tsyringe';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import type {User} from 'Repositories/entity/User';
-import {RichProfileRepository} from 'Repositories/user/richProfileRepository';
-import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
-import {availabilityStatus, availabilityTranslationKeys} from 'Util/availabilityStatus';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {noop} from 'Util/util';
+import type {RichInfoField} from '../../apiClient/user/richInfo';
+import {RootContextValue, useApplicationContext} from '../../page/rootProvider';
+import type {User} from '../../repositories/entity/User';
+import {RichProfileRepository} from '../../repositories/user/richProfileRepository';
+import {availabilityStatus, availabilityTranslationKeys} from '../../util/availabilityStatus';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {noop} from '../../util/util';
 
 interface EnrichedFieldsProps {
   onFieldsLoaded?: (richFields: RichInfoField[]) => void;

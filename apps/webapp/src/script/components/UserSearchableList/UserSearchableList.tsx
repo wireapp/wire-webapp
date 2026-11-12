@@ -20,20 +20,21 @@
 import React, {useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isEmptyArray, isNonEmptyString} from '@sindresorhus/is';
-import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {UserList} from 'Components/userList';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {User} from 'Repositories/entity/User';
-import type {SearchRepository} from 'Repositories/search/searchRepository';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {partition} from 'Util/arrayUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {sortByPriority} from 'Util/stringUtil';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {UserType} from '../../apiClient/user/user';
+import {useApplicationContext} from '../../page/rootProvider';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import type {User} from '../../repositories/entity/User';
+import type {SearchRepository} from '../../repositories/search/searchRepository';
+import type {TeamRepository} from '../../repositories/team/TeamRepository';
+import {TeamState} from '../../repositories/team/TeamState';
+import {partition} from '../../util/arrayUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {sortByPriority} from '../../util/stringUtil';
+import {UserList} from '../userList';
 
 export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'conversationState' | 'teamState'> & {
   conversationState?: Pick<ConversationState, 'hasConversationWith'>;

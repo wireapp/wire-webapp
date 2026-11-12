@@ -19,12 +19,11 @@
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {Config} from 'src/script/Config';
-import type {Translate} from 'Util/localizerUtil';
+import {Config} from '../../Config';
+import type {Translate} from '../../util/localizerUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import {PrimaryModal} from '../Modals/PrimaryModal';
+import type {PrimaryModalTranslatedMessage} from '../Modals/PrimaryModal/PrimaryModalTypes';
 
 type ModalFocusContext = {
   container?: HTMLElement;

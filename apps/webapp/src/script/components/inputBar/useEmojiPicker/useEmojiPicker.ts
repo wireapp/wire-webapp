@@ -19,7 +19,7 @@
 
 import {MouseEvent, useRef, useState, type RefObject} from 'react';
 
-import {useClickOutside} from 'Hooks/useClickOutside';
+import {useClickOutside} from '../../../hooks/useClickOutside';
 
 interface EmojiPickerParams {
   wrapperRef: React.RefObject<HTMLDivElement | null>;

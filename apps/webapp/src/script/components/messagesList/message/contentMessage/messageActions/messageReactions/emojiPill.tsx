@@ -21,18 +21,7 @@ import {useRef, useState} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNan, isNonEmptyString} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task} from 'true-myth';
-
-import {Tooltip} from '@wireapp/react-ui-kit';
-
-import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
-import type {User} from 'Repositories/entity/User';
-import {getEmojiTitleFromEmojiUnicode} from 'Util/emojiUtil';
-import {isTabKey} from 'Util/keyboardUtil';
-import type {Translate} from 'Util/localizerUtil';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {EmojiChar} from './emojiChar';
 import {
@@ -45,6 +34,16 @@ import {
   messageReactionCount,
   userBoldStyle,
 } from './messageReactions.styles';
+
+import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
+import type {User} from '../../../../../../repositories/entity/User';
+import {Tooltip} from '../../../../../../uiKit/dataDisplay/tooltip/tooltip';
+import {getEmojiTitleFromEmojiUnicode} from '../../../../../../util/emojiUtil';
+import {isTabKey} from '../../../../../../util/keyboardUtil';
+import type {Translate} from '../../../../../../util/localizerUtil';
+import {replaceReactComponents} from '../../../../../../util/localizerUtil/reactLocalizerUtil';
+import {matchQualifiedIds} from '../../../../../../util/qualifiedId';
+import {useMessageFocusedTabIndex} from '../../../util';
 
 interface EmojiPillProps {
   translate: Translate;

@@ -20,25 +20,8 @@
 import {useMemo, useState, useEffect, useRef, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 import ko from 'knockout';
-
-import {OutlineCheck} from '@wireapp/react-ui-kit';
-
-import {FileFullscreenModalSourceConversationProvider} from 'Components/FileFullscreenModal/FileFullscreenModalSourceConversationContext';
-import {ReadIndicator} from 'Components/messagesList/message/readIndicator';
-import {useClickOutside} from 'Hooks/useClickOutside';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
-import type {User} from 'Repositories/entity/User';
-import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
-import {StatusType} from 'src/script/message/statusType';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {getMessageAriaLabel} from 'Util/conversationMessages';
 
 import {ContentAsset} from './asset';
 import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './contentMessage.styles';
@@ -50,10 +33,25 @@ import {Quote} from './messageQuote';
 import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './warnings';
 
 import {MessageActions} from '..';
+import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import {useClickOutside} from '../../../../hooks/useClickOutside';
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../../hooks/useRelativeTimestamp';
 import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';
+import {StatusType} from '../../../../message/statusType';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {CompositeMessage} from '../../../../repositories/entity/message/compositeMessage';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import type {FileAsset as FileAssetType} from '../../../../repositories/entity/message/fileAsset';
+import type {User} from '../../../../repositories/entity/User';
 import {ContextMenuEntry} from '../../../../ui/contextMenu';
+import {OutlineCheck} from '../../../../uiKit/dataDisplay/icon/outlineCheck';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {getMessageAriaLabel} from '../../../../util/conversationMessages';
+import {FileFullscreenModalSourceConversationProvider} from '../../../FileFullscreenModal/FileFullscreenModalSourceConversationContext';
 import {EphemeralTimer} from '../ephemeralTimer';
 import {MessageTime} from '../messageTime';
+import {ReadIndicator} from '../readIndicator';
 import {useMessageFocusedTabIndex} from '../util';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {

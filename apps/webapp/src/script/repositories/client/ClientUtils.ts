@@ -18,9 +18,9 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {RegisteredClient} from '@wireapp/api-client/lib/client';
 
-import {weeksPassedSinceDate} from 'Util/timeUtil';
+import {RegisteredClient} from '../../apiClient/client/registeredClient';
+import {weeksPassedSinceDate} from '../../util/timeUtil';
 
 const activeClientThresholdInWeeks = 4;
 

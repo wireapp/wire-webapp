@@ -17,9 +17,10 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL, FeatureMLS, FeatureMLSE2EId} from '@wireapp/api-client/lib/team';
-
 import {isObject} from './common';
+
+import {FeatureMLS, FeatureMLSE2EId} from '../apiClient/team/feature/featureList.schema';
+import {CONVERSATION_PROTOCOL} from '../apiClient/team/feature/featureList.types';
 
 export interface ProtocolOption {
   label: string;

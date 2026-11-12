@@ -19,8 +19,8 @@
 
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
-import {Message} from 'Repositories/entity/message/message';
-import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
+import {Message} from '../../../repositories/entity/message/message';
+import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 const groupedMessageIntervalInSeconds = 30;
 
@@ -61,7 +61,6 @@ function getMessageMarkerType(
 
   const previousMessageTimestamp = previousMessage.timestamp();
   const currentMessageTimestamp = message.timestamp();
-
   const isFirstUnread = previousMessageTimestamp <= lastReadTimestamp && currentMessageTimestamp > lastReadTimestamp;
 
   if (isFirstUnread) {
@@ -123,14 +122,22 @@ function shouldGroupMessagesByTimestamp(
  * @param messages - the sorted list of messages
  * @param lastReadTimestamp - the timestamp of the last read message (used to mark unread messages)
  */
-export function groupMessagesBySenderAndTime(
-  messages: Message[],
-  lastReadTimestamp: number,
-): (Marker | GroupedMessage)[] {
+type GroupMessagesOptions = {
+  readonly messages: Message[];
+  readonly lastReadTimestamp: number;
+  readonly includeInitialUnreadSeparator?: boolean;
+};
+
+export function groupMessagesBySenderAndTime(options: GroupMessagesOptions): (Marker | GroupedMessage)[] {
+  const {messages, lastReadTimestamp, includeInitialUnreadSeparator = false} = options;
+
   return messages.reduce<(Marker | GroupedMessage)[]>((acc, message, index) => {
     const previousMessage = messages[index - 1];
 
-    const markerMessage = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
+    const markerMessage =
+      index === 0 && includeInitialUnreadSeparator && !message.isCall() && message.timestamp() > lastReadTimestamp
+        ? 'unread'
+        : getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
     if (!isUndefined(markerMessage)) {
       acc.push({

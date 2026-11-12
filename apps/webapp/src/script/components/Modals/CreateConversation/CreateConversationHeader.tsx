@@ -22,16 +22,15 @@ import type {FunctionComponent} from 'react';
 import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {createConversationHeaderContainerCss} from './CreateConversation.styles';
 import {CreateConversationSubmit} from './CreateConversationSubmit';
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
 import {ConversationType, ConversationCreationStep} from './types';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {UserState} from '../../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import * as Icon from '../../icon';
 
 export const CreateConversationHeader: FunctionComponent = () => {
   const {translate} = useApplicationContext();

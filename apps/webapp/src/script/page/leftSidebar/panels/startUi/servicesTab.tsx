@@ -22,16 +22,14 @@ import {useState, useEffect, type FunctionComponent} from 'react';
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {ServiceList} from 'Components/ServiceList/ServiceList';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
-
+import * as Icon from '../../../../components/icon';
+import {ServiceList} from '../../../../components/ServiceList/ServiceList';
 import {getManageServicesUrl} from '../../../../externalRoute';
+import {IntegrationRepository} from '../../../../repositories/integration/IntegrationRepository';
+import {ServiceEntity} from '../../../../repositories/integration/ServiceEntity';
+import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
+import {safeWindowOpen} from '../../../../util/sanitizationUtil';
+import {useApplicationContext} from '../../../rootProvider';
 
 const SEARCH_DEBOUNCE_MILLISECONDS = 300;
 

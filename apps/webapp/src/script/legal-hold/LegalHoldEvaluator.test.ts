@@ -17,14 +17,14 @@
  *
  */
 
-import {GenericMessageType} from '@wireapp/core/lib/conversation';
+import {GenericMessageType} from '../core/conversation';
 
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 
-import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
-import {ClientEvent} from 'Repositories/event/Client';
-import {createMessageAddEvent} from 'test/helper/EventGenerator';
-import {createUuid} from 'Util/uuid';
+import {CryptographyMapper} from '../repositories/cryptography/CryptographyMapper';
+import {ClientEvent} from '../repositories/event/Client';
+import {createMessageAddEvent} from '../../../test/helper/EventGenerator';
+import {createUuid} from '../util/uuid';
 
 import * as LegalHoldEvaluator from './LegalHoldEvaluator';
 

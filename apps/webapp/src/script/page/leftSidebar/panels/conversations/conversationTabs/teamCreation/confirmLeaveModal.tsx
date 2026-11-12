@@ -21,21 +21,20 @@ import type {FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {EventName} from 'Repositories/tracking/eventName';
-import {Segmentation} from 'Repositories/tracking/segmentation';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   buttonCss,
   confirmLeaveModalBodyCss,
   confirmLeaveModalButtonsCss,
   confirmLeaveModalWrapperCss,
 } from './teamCreation.styles';
+
+import * as Icon from '../../../../../../components/icon';
+import {ModalComponent} from '../../../../../../components/Modals/ModalComponent';
+import {EventName} from '../../../../../../repositories/tracking/eventName';
+import {Segmentation} from '../../../../../../repositories/tracking/segmentation';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
+import {WebAppEvents} from '../../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../../rootProvider';
 
 interface Props {
   isShown: boolean;

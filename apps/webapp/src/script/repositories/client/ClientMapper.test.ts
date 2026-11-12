@@ -17,10 +17,11 @@
  *
  */
 
-import {ClientType, ClientClassification} from '@wireapp/api-client/lib/client/';
+import {ClientType} from '../../apiClient/client/clientType';
+import {ClientClassification} from '../../apiClient/client/clientClassification';
 
-import {ClientRecord} from 'Repositories/storage';
-import {entities, payload} from 'test/api/payloads';
+import {ClientRecord} from '../storage';
+import {entities, payload} from '../../../../test/api/payloads';
 
 import {ClientMapper} from './ClientMapper';
 

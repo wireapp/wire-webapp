@@ -17,13 +17,11 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {Conversation} from 'Repositories/entity/Conversation';
-import {UserState} from 'Repositories/user/userState';
-import {Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
+import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
+import {Logger} from '../../../../../util/logger';
+import {matchQualifiedIds} from '../../../../../util/qualifiedId';
+import {Conversation} from '../../../../entity/Conversation';
+import {UserState} from '../../../../user/userState';
 import {isMLSCapableConversation, MLSCapableConversation} from '../../../ConversationSelectors';
 import {ConversationState} from '../../../ConversationState';
 import {ConversationVerificationState} from '../../../ConversationVerificationState';
@@ -114,7 +112,7 @@ export const attemptChangeToDegraded = ({
       ? ConversationVerificationState.DEGRADED
       : ConversationVerificationState.UNVERIFIED;
     conversationEntity.verification_state(conversationVerificationState);
-    logger.log(`Verification of conversation '${conversationEntity.id}' changed to degraded`);
+    logger.info(`Verification of conversation '${conversationEntity.id}' changed to degraded`);
     return conversationVerificationState;
   }
 
@@ -146,7 +144,7 @@ export const attemptChangeToVerified = ({
   const isConversationVerified = conversationEntity.is_verified() === true;
   if (isConversationVerified) {
     conversationEntity.verification_state(ConversationVerificationState.VERIFIED);
-    logger.log(`Verification state of conversation '${conversationEntity.id}' changed to verified`);
+    logger.info(`Verification state of conversation '${conversationEntity.id}' changed to verified`);
     return ConversationVerificationState.VERIFIED;
   }
 

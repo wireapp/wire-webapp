@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.commons.json",
+  "compilerOptions": {
+    "types": ["node", "jest"],
+    "noUncheckedIndexedAccess": false,
+    "tsBuildInfoFile": "../../target/buildcache/webapp-commons-tests-type-check.tsbuildinfo"
+  },
+  "include": ["src/script/commons/**/*"],
+  "exclude": ["node_modules"]
+}

@@ -18,27 +18,24 @@
  */
 
 import {act, render} from '@testing-library/react';
-import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
-import en from 'I18n/en-US.json';
-import type {ClientRepository} from 'Repositories/client';
-import {User} from 'Repositories/entity/User/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockCrypto, AppLockRepository} from 'Repositories/user/appLockRepository';
-import {AppLockState} from 'Repositories/user/appLockState';
-import {UserState} from 'Repositories/user/userState';
-import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {
-  createRootContextValueForTest,
-  createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import en from '../../../i18n/en-US.json';
+import type {ClientRepository} from '../../repositories/client';
+import {User} from '../../repositories/entity/User/User';
+import {TeamState} from '../../repositories/team/TeamState';
+import {AppLockCrypto, AppLockRepository} from '../../repositories/user/appLockRepository';
+import {AppLockState} from '../../repositories/user/appLockState';
+import {UserState} from '../../repositories/user/userState';
+import {withTheme, withThemeAndRootContext} from '../../auth/util/test/testUtil';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from '../testSupport/rootContextTestSupport';
+import {setStrings, translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {createUuid} from '../../util/uuid';
 
 import {AppLock, APPLOCK_STATE} from './appLock';
 
@@ -184,6 +181,29 @@ describe('AppLock', () => {
       const appLockModal = queryByTestId('applock-modal');
       expect(appLockModal).toBe(null);
     });
+  });
+
+  it('does not erase a stored passphrase when enabled state changes outside a user action', async () => {
+    const appLockState = createAppLockState(new TeamState());
+    const appLockRepository = createAppLockRepository(appLockState);
+    await appLockRepository.setCode('ValidPassword123!');
+    appLockState.isActivatedInPreferences(true);
+
+    render(
+      withTheme(
+        <AppLock
+          appLockRepository={appLockRepository}
+          appLockState={appLockState}
+          clientRepository={clientRepository}
+        />,
+      ),
+    );
+
+    act(() => {
+      appLockState.isActivatedInPreferences(false);
+    });
+
+    expect(appLockRepository.getStoredPassphrase()).toBe('ValidPassword123!');
   });
 
   describe('modal state', () => {

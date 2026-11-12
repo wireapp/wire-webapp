@@ -17,11 +17,10 @@
  *
  */
 
-import {BackendEvent} from '@wireapp/api-client/lib/event';
-
-import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
-
 import {EventSource} from './EventSource';
+
+import {BackendEvent} from '../../apiClient/event/backendEvent';
+import {ClientConversationEvent} from '../conversation/EventBuilder';
 
 export type IncomingEvent = BackendEvent | ClientConversationEvent;
 

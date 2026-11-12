@@ -17,7 +17,8 @@
  *
  */
 
-import {Encoder, Decoder} from 'bazinga64';
+import {Decoder} from '../../commons/base64/decoder';
+import {Encoder} from '../../commons/base64/encoder';
 
 const initializationVectorLengthInBytes = 12;
 

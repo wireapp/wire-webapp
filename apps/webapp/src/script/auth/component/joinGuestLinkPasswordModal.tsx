@@ -22,11 +22,18 @@ import {FormEvent, useState, type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {Button, COLOR, Container, ErrorMessage, Form, H2, Input, Link, Modal, Text} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {COLOR} from '../../uiKit/identity/colors/colors';
+import {Button} from '../../uiKit/inputs/button/button';
+import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
+import {Form} from '../../uiKit/inputs/form/form';
+import {Input} from '../../uiKit/inputs/input/input';
+import {Container} from '../../uiKit/layout/container/container';
+import {Modal} from '../../uiKit/surface/modal/modal';
+import {H2} from '../../uiKit/typography/heading/heading';
+import {Link} from '../../uiKit/typography/link/link';
+import {Text} from '../../uiKit/typography/text/text';
 
 export interface JoinGuestLinkPasswordModalProps {
   onSubmitPassword: (password: string) => void;

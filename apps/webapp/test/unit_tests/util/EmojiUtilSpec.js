@@ -17,7 +17,7 @@
  *
  */
 
-import {includesOnlyEmojis} from 'Util/emojiUtil';
+import {includesOnlyEmojis} from '../../../src/script/util/emojiUtil';
 
 describe('EmojiUtil', () => {
   describe('includesOnlyEmojis', () => {

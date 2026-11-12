@@ -19,11 +19,10 @@
 
 import {useMemo, type FunctionComponent} from 'react';
 
-import {Select} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {wrapperStyles, labelStyles, selectWrapperStyles, selectStyles} from './cellsPageSizeSelect.styles';
+
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {Select} from '../../../../../uiKit/inputs/select/select';
 
 const options = [
   {value: '10', label: '10'},

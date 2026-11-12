@@ -17,7 +17,7 @@
  *
  */
 
-import type {TeamInvitation} from '@wireapp/api-client/lib/team/';
+import type {TeamInvitation} from '../../../../apiClient/team/invitation/teamInvitation';
 
 export enum INVITATION_ACTION {
   INVITE_ADD_FAILED = 'INVITE_ADD_FAILED',

@@ -21,30 +21,28 @@ import {useCallback, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {BackupFileUpload} from './backupFileUpload';
 
-import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
-import {BackupRepository} from 'Repositories/backup/backupRepository';
+import {Config} from '../../Config';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {useApplicationContext} from '../../page/rootProvider';
+import {ContentState} from '../../page/useAppState';
+import {BackupRepository} from '../../repositories/backup/backupRepository';
 import {
   CancelError,
   DifferentAccountError,
   IncompatibleBackupError,
   IncompatibleBackupFormatError,
   InvalidPassword,
-} from 'Repositories/backup/error';
-import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {ContentState} from 'src/script/page/useAppState';
-import {checkBackupEncryption} from 'Util/backupUtil';
-import {getLogger} from 'Util/logger';
-import {loadFileBuffer} from 'Util/util';
-
-import {BackupFileUpload} from './backupFileUpload';
-
-import {Config} from '../../Config';
-import {MotionDuration} from '../../motion/MotionDuration';
+} from '../../repositories/backup/error';
+import {User} from '../../repositories/entity/User';
+import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
+import {checkBackupEncryption} from '../../util/backupUtil';
+import {getLogger} from '../../util/logger';
+import {loadFileBuffer} from '../../util/util';
+import * as Icon from '../icon';
+import {PrimaryModal} from '../Modals/PrimaryModal';
+import {ProgressBar} from '../ProgressBar/ProgressBar';
 
 export enum HistoryImportState {
   DONE = 'HistoryImportState.STATE.DONE',
@@ -128,14 +126,14 @@ const HistoryImport: FunctionComponent<HistoryImportProps> = ({
   const onError = useCallback(
     (error: Error) => {
       if (error instanceof CancelError) {
-        logger.log('History import was cancelled');
+        logger.info('History import was cancelled');
         dismissImport();
 
         return;
       }
 
       setError(error);
-      logger.error(`Failed to import history: ${error.message}`, error);
+      logger.error(`Failed to import history: ${error.message}`, {error});
 
       if (error instanceof DifferentAccountError) {
         setErrorHeadline(translate('backupImportAccountErrorHeadline'));

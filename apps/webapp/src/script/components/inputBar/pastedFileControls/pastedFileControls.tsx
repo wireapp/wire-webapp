@@ -21,12 +21,10 @@ import {FC} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {TabIndex} from '../../../uiKit/utils/enums';
+import * as Icon from '../../icon';
 
 interface PastedFileControlsProps {
   pastedFile: File;

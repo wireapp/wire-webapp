@@ -21,17 +21,17 @@ import {fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {Maybe} from 'true-myth';
 
-import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {driveBulkActionsFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {translateForTest} from 'Util/test/translateForTest';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {CellNode, CellNodeType} from '../../../types/cellNode';
+import type {Translate} from '../../../util/localizerUtil/translationTypes';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {CellsTable} from './cellsTable';
 

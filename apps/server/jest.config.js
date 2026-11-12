@@ -24,10 +24,12 @@ module.exports = {
   preset: '../../jest.preset.js',
   collectCoverageFrom: [
     '*.{js,ts}',
+    'configuration/**/*.ts',
     'routes/**/*.{js,ts}',
     'util/**/*.{js,ts}',
     '!**/*.d.ts',
     '!**/*.test.{js,ts}',
+    '!**/*.spec.ts',
     '!jest.config.js',
     '!dist/**',
     '!bin/**',
@@ -50,6 +52,6 @@ module.exports = {
   },
   reporters: rootJestConfiguration.reporters,
   testEnvironment: 'node',
-  testPathIgnorePatterns: ['<rootDir>/dist'],
+  testPathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/build/'],
   transformIgnorePatterns: ['/node_modules/(?!(true-myth|@sindresorhus/is|@enormora/objectory)/)'],
 };

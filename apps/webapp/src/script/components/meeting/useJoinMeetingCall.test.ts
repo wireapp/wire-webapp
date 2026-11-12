@@ -19,7 +19,7 @@
 
 import {Result} from 'true-myth';
 
-import {joinMeetingCallErrors} from 'Components/meeting/joinMeetingCall';
+import {joinMeetingCallErrors} from './joinMeetingCall';
 
 import {handleJoinMeetingCallResult} from './useJoinMeetingCall';
 

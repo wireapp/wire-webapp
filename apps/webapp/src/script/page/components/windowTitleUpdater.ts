@@ -24,16 +24,14 @@ import {amplify} from 'amplify';
 import {match} from 'ts-pattern';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {UserState} from 'Repositories/user/userState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import type {Translate} from 'Util/localizerUtil';
-import {getLogger} from 'Util/logger';
-
 import {Config} from '../../Config';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {NOTIFICATION_HANDLING_STATE} from '../../repositories/event/NotificationHandlingState';
+import {UserState} from '../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import type {Translate} from '../../util/localizerUtil';
+import {getLogger} from '../../util/logger';
+import {WebAppEvents} from '../../webAppEvents';
 import {ContentState, useAppState} from '../useAppState';
 
 const windowTitleLogger = getLogger('WindowTitlesViewModel');
@@ -138,6 +136,10 @@ const useWindowTitle = (translate: Translate): void => {
 
       .with(ContentState.PREFERENCES_AV, () => {
         return translate('preferencesAV');
+      })
+
+      .with(ContentState.PREFERENCES_TROUBLESHOOTING, () => {
+        return translate('preferencesTroubleshooting');
       })
 
       .with(ContentState.PREFERENCES_DEVICE_DETAILS, () => {

@@ -17,9 +17,9 @@
  *
  */
 
-import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
+import {MeetingRecurrenceFrequency} from '../../apiClient/meetings/meetingRecurrence';
 
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {unwrap, unwrapErr} from '../../util/test/resultTestSupport';
 
 import {mapApiMeetingToSeries} from './mapApiMeetingToSeries';
 

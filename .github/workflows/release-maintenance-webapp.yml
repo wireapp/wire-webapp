@@ -5,12 +5,17 @@ on:
   workflow_dispatch:
     inputs:
       maintenance_line_key:
-        description: 'Maintenance line key, for example 2026-07-27.1-airgap-a. This becomes public Git metadata and must not contain customer-identifying or sensitive information.'
+        description: 'Maintenance line key, for example 2026-07-27.1-airgap-a or v1.1.0-airgap-a. This becomes public Git metadata and must not contain customer-identifying or sensitive information.'
         required: true
         type: string
       source_production_tag:
-        description: 'Annotated Production tag from which the maintenance line starts, for example 2026-07-27.1-production'
+        description: 'Annotated Production tag from which the maintenance line starts, for example 2026-07-27.1-production or v1.1.0'
         required: true
+        type: string
+      wire_builds_branch:
+        description: 'Optional existing wire-builds branch with a legacy S3 WebApp chart entry'
+        required: false
+        default: ''
         type: string
       confirm_maintenance_release:
         description: 'I understand that this creates or reuses a maintenance branch and, when a maintenance fix exists, builds, validates, and tags its artifact without touching hosted Beta or Production.'
@@ -43,6 +48,7 @@ jobs:
       maintenance_line_key: ${{ steps.validate_request.outputs.maintenance_line_key }}
       maintenance_branch: ${{ steps.validate_request.outputs.maintenance_branch }}
       source_production_tag: ${{ steps.validate_request.outputs.source_production_tag }}
+      wire_builds_branch: ${{ steps.validate_request.outputs.wire_builds_branch }}
 
     steps:
       - name: Checkout main workflow tools
@@ -78,6 +84,8 @@ jobs:
           MAINTENANCE_LINE_KEY: ${{ inputs.maintenance_line_key }}
           REASON: ${{ inputs.reason }}
           SOURCE_PRODUCTION_TAG: ${{ inputs.source_production_tag }}
+          WIRE_BUILDS_BRANCH: ${{ inputs.wire_builds_branch }}
+          WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
         run: |
           set -euo pipefail
 
@@ -93,16 +101,46 @@ jobs:
 
           maintenance_branch="$(node ./tools/releaseCli/releaseMetadataCli.mts maintenance-branch "${MAINTENANCE_LINE_KEY}")"
           source_production_tag="$(node ./tools/releaseCli/releaseMetadataCli.mts validate-maintenance-source "${MAINTENANCE_LINE_KEY}" "${SOURCE_PRODUCTION_TAG}")"
+          wire_builds_branch=''
+
+          if [[ -n "${WIRE_BUILDS_BRANCH}" ]]; then
+            if [[ -z "${WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}" ]]; then
+              echo 'WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN is required when a wire-builds branch is selected.' >&2
+              exit 1
+            fi
+
+            wire_builds_branch="$(node ./tools/releaseCli/maintenanceReleaseCli.mts validate-wire-builds-branch "${WIRE_BUILDS_BRANCH}")"
+          fi
 
           {
             echo "maintenance_line_key=${MAINTENANCE_LINE_KEY}"
             echo "maintenance_branch=${maintenance_branch}"
             echo "source_production_tag=${source_production_tag}"
+            echo "wire_builds_branch=${wire_builds_branch}"
           } >> "$GITHUB_OUTPUT"
 
           echo "Maintenance line key: ${MAINTENANCE_LINE_KEY}"
           echo "Maintenance branch: ${maintenance_branch}"
           echo "Source Production tag: ${source_production_tag}"
+
+      - name: Check out selected wire-builds branch for compatibility validation
+        id: checkout_wire_builds_for_validation
+        if: ${{ inputs.wire_builds_branch != '' }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: wireapp/wire-builds
+          token: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ steps.validate_request.outputs.wire_builds_branch }}
+          path: wire-builds
+
+      - name: Validate selected wire-builds distribution metadata
+        id: validate_wire_builds_metadata
+        if: ${{ inputs.wire_builds_branch != '' }}
+        env:
+          BUILD_JSON_PATH: ${{ github.workspace }}/wire-builds/build.json
+        run: node ./tools/releaseCli/maintenanceReleaseCli.mts validate-wire-builds-build-json --build-json-path "${BUILD_JSON_PATH}"
 
   prepare_maintenance_branch:
     name: Prepare maintenance branch
@@ -141,7 +179,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          validated_source_production_tag="$(node ./tools/releaseCli/releaseMetadataCli.mts validate-production-tag "${SOURCE_PRODUCTION_TAG}")"
+          validated_source_production_tag="$(node ./tools/releaseCli/releaseMetadataCli.mts validate-webapp-production-tag "${SOURCE_PRODUCTION_TAG}")"
 
           if [[ "${validated_source_production_tag}" != "${SOURCE_PRODUCTION_TAG}" ]]; then
             echo "Validated source Production tag does not match the requested tag: ${SOURCE_PRODUCTION_TAG}" >&2
@@ -325,14 +363,25 @@ jobs:
       artifact_name: ${{ steps.artifact_metadata.outputs.artifact_name }}
       artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
       artifact_commit: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
+      distribution_artifact_name: ${{ steps.artifact_metadata.outputs.distribution_artifact_name }}
+      distribution_archive_checksum: ${{ steps.artifact_metadata.outputs.distribution_archive_checksum }}
 
     steps:
+      - name: Checkout current maintenance workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.sha }}
+          path: workflow-source
+
       - name: Checkout exact maintenance application commit
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
           fetch-depth: 1
           ref: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+          path: maintenance-source
 
       - name: Verify exact maintenance application commit
         env:
@@ -340,7 +389,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          maintenance_commit_sha="$(git rev-parse HEAD)"
+          maintenance_commit_sha="$(git -C maintenance-source rev-parse HEAD)"
 
           if [[ "${maintenance_commit_sha}" != "${EXPECTED_MAINTENANCE_COMMIT_SHA}" ]]; then
             echo "Checked out ${maintenance_commit_sha}, expected maintenance commit ${EXPECTED_MAINTENANCE_COMMIT_SHA}." >&2
@@ -349,59 +398,134 @@ jobs:
 
           echo "Building application source from maintenance commit ${maintenance_commit_sha}."
 
-      - name: Setup Node.js
+      - name: Setup workflow tooling Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: 'workflow-source/.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: 'workflow-source/package-lock.json'
 
-      - name: Install maintenance source dependencies
-        run: npm clean-install
+      - name: Install current workflow tooling dependencies
+        working-directory: workflow-source
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
-      - name: Update WebApp configuration
-        run: npx patch-package --error-on-fail && npx just configure-webapp
+      - name: Require maintenance source build script
+        id: check_source_build_script
+        working-directory: maintenance-source
+        run: |
+          set -euo pipefail
 
-      - name: Build and package public production artifact
+          if [[ ! -f tools/maintenance/build.sh ]]; then
+            echo '::error::Maintenance source must provide tools/maintenance/build.sh. Backport the source-era build script with the reviewed maintenance fix.'
+            exit 1
+          fi
+
+          if [[ ! -x tools/maintenance/build.sh ]]; then
+            echo '::error::Maintenance source tools/maintenance/build.sh must be executable.'
+            exit 1
+          fi
+
+      - name: Setup maintenance source Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: 'maintenance-source/.nvmrc'
+
+      - name: Build maintenance application
+        id: build_application
+        working-directory: maintenance-source
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ needs.select_maintenance_tag.outputs.candidate_tag }}
-        run: npx just package-server-public
+        run: ./tools/maintenance/build.sh
 
       - name: Validate maintenance artifact metadata
         id: validate_artifact_metadata
+        working-directory: workflow-source
         env:
-          BUILD_ARTIFACT_PATH: ${{ env.ARTIFACT_PATH }}
+          BUILD_ARTIFACT_PATH: ${{ github.workspace }}/maintenance-source/${{ env.ARTIFACT_PATH }}
           EXPECTED_COMMIT: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
           EXPECTED_VERSION: ${{ needs.select_maintenance_tag.outputs.candidate_tag }}
         run: npx just validate-build-artifact
 
-      - name: Compute maintenance artifact metadata
+      - name: Create immutable maintenance Docker context
         id: artifact_metadata
+        working-directory: maintenance-source
         env:
           ARTIFACT_COMMIT: ${{ steps.validate_artifact_metadata.outputs.artifact_commit }}
           ARTIFACT_VERSION: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
+          CANDIDATE_TAG: ${{ needs.select_maintenance_tag.outputs.candidate_tag }}
           MAINTENANCE_LINE_KEY: ${{ needs.validate_request.outputs.maintenance_line_key }}
+          SOURCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+          SOURCE_RUN_ATTEMPT: ${{ github.run_attempt }}
+          SOURCE_RUN_ID: ${{ github.run_id }}
         run: |
           set -euo pipefail
 
-          artifact_name="maintenance-ebs-${MAINTENANCE_LINE_KEY}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          context_directory="${RUNNER_TEMP}/maintenance-docker-context"
+          distribution_artifact_directory="${RUNNER_TEMP}/maintenance-distribution"
+          archive_path="${distribution_artifact_directory}/maintenance-docker-context.tar.gz"
+          manifest_path="${distribution_artifact_directory}/distribution-manifest.json"
+          mkdir -p "${context_directory}" "${distribution_artifact_directory}"
+
+          if [[ -f justfile ]] && grep -Eq '^package-server-public:.*[[:space:]]build-server-bundle([[:space:]]|$)' justfile; then
+            mkdir -p "${context_directory}/apps/server"
+            cp apps/server/Dockerfile "${context_directory}/apps/server/Dockerfile"
+            cp run.sh "${context_directory}/run.sh"
+          else
+            # Preserve source-era Docker inputs for maintenance lines predating server bundling.
+            git archive --format=tar HEAD | tar -xf - -C "${context_directory}"
+          fi
+          cp -R apps/server/dist "${context_directory}/apps/server/dist"
+          # Pre-migration maintenance sources still require their compiled configuration package.
+          if [[ -f libraries/config/package.json ]]; then
+            cp -R libraries/config/lib "${context_directory}/libraries/config/lib"
+          fi
+          cp .env.defaults "${context_directory}/.env.defaults"
+          tar -czf "${archive_path}" -C "${context_directory}" .
+
           artifact_checksum="$(sha256sum "${ARTIFACT_PATH}" | awk '{print $1}')"
+          distribution_archive_checksum="$(sha256sum "${archive_path}" | awk '{print $1}')"
+          distribution_artifact_name="maintenance-distribution-${CANDIDATE_TAG}-${SOURCE_RUN_ATTEMPT}"
+          artifact_name="maintenance-ebs-${MAINTENANCE_LINE_KEY}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+          jq --null-input \
+            --arg maintenanceTag "${CANDIDATE_TAG}" \
+            --arg maintenanceLineKey "${MAINTENANCE_LINE_KEY}" \
+            --arg distributionArtifactName "${distribution_artifact_name}" \
+            --arg maintenanceCommitSha "${SOURCE_COMMIT_SHA}" \
+            --arg artifactVersion "${ARTIFACT_VERSION}" \
+            --arg artifactCommitSha "${ARTIFACT_COMMIT}" \
+            --arg ebsArtifactChecksum "${artifact_checksum}" \
+            --arg dockerContextArchiveChecksum "${distribution_archive_checksum}" \
+            --arg sourceWorkflowRunId "${SOURCE_RUN_ID}" \
+            '{maintenanceTag: $maintenanceTag, maintenanceLineKey: $maintenanceLineKey, distributionArtifactName: $distributionArtifactName, maintenanceCommitSha: $maintenanceCommitSha, artifactVersion: $artifactVersion, artifactCommitSha: $artifactCommitSha, ebsArtifactChecksum: $ebsArtifactChecksum, dockerContextArchiveChecksum: $dockerContextArchiveChecksum, sourceWorkflowRunId: $sourceWorkflowRunId}' \
+            > "${manifest_path}"
 
           {
             echo "artifact_name=${artifact_name}"
             echo "artifact_checksum=${artifact_checksum}"
+            echo "distribution_artifact_name=${distribution_artifact_name}"
+            echo "distribution_archive_checksum=${distribution_archive_checksum}"
           } >> "$GITHUB_OUTPUT"
 
-          echo "Artifact name: ${artifact_name}"
-          echo "Artifact version: ${ARTIFACT_VERSION}"
-          echo "Artifact commit: ${ARTIFACT_COMMIT}"
-          echo "Artifact checksum: ${artifact_checksum}"
+          echo "EBS artifact SHA-256: ${artifact_checksum}"
+          echo "Docker context SHA-256: ${distribution_archive_checksum}"
 
       - name: Upload maintenance artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: ${{ steps.artifact_metadata.outputs.artifact_name }}
-          path: ${{ env.ARTIFACT_PATH }}
+          path: maintenance-source/${{ env.ARTIFACT_PATH }}
           if-no-files-found: error
+          retention-days: 90
+
+      - name: Upload maintenance distribution context
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ${{ steps.artifact_metadata.outputs.distribution_artifact_name }}
+          path: ${{ runner.temp }}/maintenance-distribution/
+          if-no-files-found: error
+          retention-days: 90
 
   validate_maintenance:
     name: Validate through maintenance precommit path
@@ -469,6 +593,9 @@ jobs:
           MAINTENANCE_BRANCH: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch }}
           MAINTENANCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
           MAINTENANCE_LINE_KEY: ${{ needs.validate_request.outputs.maintenance_line_key }}
+          DISTRIBUTION_ARTIFACT_NAME: ${{ needs.build_maintenance_artifact.outputs.distribution_artifact_name }}
+          DISTRIBUTION_ARCHIVE_CHECKSUM: ${{ needs.build_maintenance_artifact.outputs.distribution_archive_checksum }}
+          EBS_ARTIFACT_CHECKSUM: ${{ needs.build_maintenance_artifact.outputs.artifact_checksum }}
           SOURCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.source_commit_sha }}
           SOURCE_PRODUCTION_TAG: ${{ needs.prepare_maintenance_branch.outputs.source_production_tag }}
         run: |
@@ -553,6 +680,11 @@ jobs:
                 "Source Production tag: ${SOURCE_PRODUCTION_TAG}" \
                 "Source Production commit: ${SOURCE_COMMIT_SHA}" \
                 "Maintenance commit: ${MAINTENANCE_COMMIT_SHA}" \
+                "Maintenance validation: passed" \
+                "Source workflow run ID: ${GITHUB_RUN_ID}" \
+                "Distribution artifact: ${DISTRIBUTION_ARTIFACT_NAME}" \
+                "Distribution archive SHA-256: ${DISTRIBUTION_ARCHIVE_CHECKSUM}" \
+                "EBS artifact SHA-256: ${EBS_ARTIFACT_CHECKSUM}" \
                 "Workflow run URL: ${workflow_run_url}" \
                 "Dispatch reason: ${DISPATCH_REASON}"
             )"
@@ -596,6 +728,36 @@ jobs:
           echo "Maintenance tag: ${EXPECTED_CANDIDATE_TAG}"
           echo "Tag action: ${maintenance_tag_action}"
 
+  publish_distribution:
+    name: Publish validated maintenance distribution
+    needs:
+      [
+        validate_request,
+        prepare_maintenance_branch,
+        select_maintenance_tag,
+        build_maintenance_artifact,
+        validate_maintenance,
+        create_maintenance_tag,
+      ]
+    if: ${{ success() && needs.create_maintenance_tag.outputs.maintenance_tag != '' }}
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/publish-maintenance-distribution.yml
+    with:
+      maintenance_line_key: ${{ needs.validate_request.outputs.maintenance_line_key }}
+      maintenance_tag: ${{ needs.create_maintenance_tag.outputs.maintenance_tag }}
+      maintenance_commit_sha: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
+      source_workflow_run_id: ${{ github.run_id }}
+      distribution_artifact_name: ${{ needs.build_maintenance_artifact.outputs.distribution_artifact_name }}
+      wire_builds_branch: ${{ needs.validate_request.outputs.wire_builds_branch }}
+    secrets:
+      WEBTEAM_QUAY_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+      WEBTEAM_QUAY_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+      CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+      CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+      WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
+
   maintenance_summary:
     name: Write maintenance release summary
     runs-on: ubuntu-26.04
@@ -607,17 +769,21 @@ jobs:
       - build_maintenance_artifact
       - validate_maintenance
       - create_maintenance_tag
+      - publish_distribution
     permissions:
       contents: read
     env:
       ARTIFACT_CHECKSUM: ${{ needs.build_maintenance_artifact.outputs.artifact_checksum || 'unavailable' }}
       ARTIFACT_NAME: ${{ needs.build_maintenance_artifact.outputs.artifact_name || 'not built' }}
       ARTIFACT_VERSION: ${{ needs.build_maintenance_artifact.outputs.artifact_version || 'not built' }}
+      DISTRIBUTION_ARTIFACT_NAME: ${{ needs.build_maintenance_artifact.outputs.distribution_artifact_name || 'not built' }}
+      DISTRIBUTION_ARCHIVE_CHECKSUM: ${{ needs.build_maintenance_artifact.outputs.distribution_archive_checksum || 'unavailable' }}
       BRANCH_ACTION: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch_action || 'unavailable' }}
       MAINTENANCE_BRANCH: ${{ needs.validate_request.outputs.maintenance_branch || 'unavailable' }}
       MAINTENANCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha || 'unavailable' }}
       MAINTENANCE_LINE_KEY: ${{ needs.validate_request.outputs.maintenance_line_key || inputs.maintenance_line_key }}
       MAINTENANCE_TAG: ${{ needs.create_maintenance_tag.outputs.maintenance_tag || 'not created' }}
+      MAINTENANCE_TAG_ACTION: ${{ needs.create_maintenance_tag.outputs.maintenance_tag_action || 'not created' }}
       PLAYWRIGHT_REPORT_URL: ${{ needs.validate_maintenance.outputs.reportUrl || 'unavailable' }}
       REASON: ${{ inputs.reason }}
       SOURCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.source_commit_sha || 'unavailable' }}
@@ -625,6 +791,12 @@ jobs:
       TESTINY_RUN_NAME: WebApp maintenance ${{ needs.select_maintenance_tag.outputs.candidate_tag || 'unavailable' }}
       VALIDATION_RESULT: ${{ needs.validate_maintenance.result }}
       VALIDATION_URL: ${{ needs.validate_maintenance.outputs.precommit_url || 'unavailable' }}
+      WIRE_BUILDS_BRANCH: ${{ needs.validate_request.outputs.wire_builds_branch || inputs.wire_builds_branch }}
+      DOCKER_IMAGE_TAG: ${{ needs.publish_distribution.outputs.docker_image_tag || 'not published' }}
+      HELM_CHART_VERSION: ${{ needs.publish_distribution.outputs.helm_chart_version || 'not published' }}
+      WIRE_BUILDS_COMMIT_SHA: ${{ needs.publish_distribution.outputs.wire_builds_commit_sha || 'not updated' }}
+      DISTRIBUTION_RESULT: ${{ needs.publish_distribution.outputs.distribution_result || 'not run' }}
+      DISTRIBUTION_JOB_RESULT: ${{ needs.publish_distribution.result }}
       WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - name: Write GitHub Actions summary
@@ -644,10 +816,12 @@ jobs:
             echo "- Source Production tag: ${SOURCE_PRODUCTION_TAG}"
             echo "- Source Production commit: ${SOURCE_COMMIT_SHA}"
             echo "- Maintenance commit: ${MAINTENANCE_COMMIT_SHA}"
-            echo "- Maintenance tag: ${MAINTENANCE_TAG}"
+            echo "- Maintenance tag: ${MAINTENANCE_TAG} (${MAINTENANCE_TAG_ACTION})"
             echo "- Artifact: ${ARTIFACT_NAME}"
             echo "- Artifact version: ${ARTIFACT_VERSION}"
-            echo "- Artifact checksum: ${ARTIFACT_CHECKSUM}"
+            echo "- EBS artifact SHA-256: ${ARTIFACT_CHECKSUM}"
+            echo "- Distribution artifact: ${DISTRIBUTION_ARTIFACT_NAME}"
+            echo "- Docker context SHA-256: ${DISTRIBUTION_ARCHIVE_CHECKSUM}"
             echo '- Validation environment: wire-webapp-precommit'
             echo "- Validation URL: ${VALIDATION_URL}"
             echo "- Validation result: ${validation_result}"
@@ -657,8 +831,15 @@ jobs:
             echo "- Workflow run URL: ${WORKFLOW_RUN_URL}"
             echo
             echo 'Hosted Beta and Production were not touched.'
-            echo 'wire-builds/main and wire-builds/dev were not touched.'
-            echo 'Docker and Helm were not published.'
+            echo "- Docker image: quay.io/wire/webapp:${DOCKER_IMAGE_TAG}"
+            echo "- Helm chart: charts-webapp/webapp:${HELM_CHART_VERSION} (appVersion ${DOCKER_IMAGE_TAG})"
+            if [[ -n "${WIRE_BUILDS_BRANCH}" ]]; then
+              echo "- wire-builds/${WIRE_BUILDS_BRANCH} commit: ${WIRE_BUILDS_COMMIT_SHA}"
+            else
+              echo '- wire-builds update: skipped (no branch selected)'
+            fi
+            echo "- Distribution result: ${DISTRIBUTION_RESULT} (workflow job: ${DISTRIBUTION_JOB_RESULT})"
+            echo 'Customer deployment remains outside this workflow.'
 
             if [[ "${BRANCH_ACTION}" == 'created' ]]; then
               echo '- Maintenance branch was created from the source Production commit.'
@@ -667,5 +848,13 @@ jobs:
               echo '- Maintenance branch already exists and still points to the source Production commit.'
               echo '- No maintenance change is present yet.'
               echo "- Next action: merge a reviewed maintenance fix targeting ${MAINTENANCE_BRANCH} before rerunning this workflow."
+            fi
+
+            if [[ "${MAINTENANCE_TAG}" != 'not created' ]] && [[ "${DISTRIBUTION_JOB_RESULT}" != 'success' ]]; then
+              if [[ -n "${WIRE_BUILDS_BRANCH}" ]]; then
+                echo "- Recovery: run Repair WebApp maintenance distribution for ${MAINTENANCE_TAG} and select ${WIRE_BUILDS_BRANCH}; it retrieves the validated artifact recorded by the tag."
+              else
+                echo "- Recovery: run Repair WebApp maintenance distribution for ${MAINTENANCE_TAG}; it retrieves the validated artifact recorded by the tag."
+              fi
             fi
           } >> "$GITHUB_STEP_SUMMARY"

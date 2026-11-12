@@ -21,12 +21,6 @@ import {useCallback, useEffect, useRef, useState, FormEvent, type FunctionCompon
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   buttonGroupStyles,
   buttonStyles,
@@ -36,6 +30,12 @@ import {
   titleStyles,
 } from './linkDialog.styles';
 
+import {RootContextValue, useApplicationContext} from '../../../../../../page/rootProvider';
+import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
+import {ErrorMessage} from '../../../../../../uiKit/inputs/errorMessage/errorMessage';
+import {Input} from '../../../../../../uiKit/inputs/input/input';
+import * as Icon from '../../../../../icon';
+import {ModalComponent} from '../../../../../Modals/ModalComponent';
 import {validateUrl} from '../../utils/url';
 
 interface LinkDialogProps {

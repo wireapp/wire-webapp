@@ -18,32 +18,25 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {Dexie} from 'dexie';
 import {container} from 'tsyringe';
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {
-  StorageService,
-  DatabaseListenerCallback,
-  LegacyEventRecord,
-  EventRecord,
-  hasQuoteForMessage,
-} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-import {getLogger, Logger} from 'Util/logger';
-import {toError} from 'Util/toError';
-
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
+import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 import {StorageError} from '../../error/storageError';
 import {categoryFromEvent} from '../../message/messageCategorization';
 import {MessageCategory} from '../../message/messageCategory';
+import {getLogger, Logger} from '../../util/logger';
+import {toError} from '../../util/toError';
+import {AssetTransferState} from '../assets/assetTransferState';
+import {StorageService, DatabaseListenerCallback, LegacyEventRecord, EventRecord, hasQuoteForMessage} from '../storage';
+import {StorageSchemata} from '../storage/storageSchemata';
 
 type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;
@@ -103,7 +96,7 @@ export class EventService {
       const logMessage = `Failed to get events '${eventIds.join(',')}' for conversation '${conversationId}': ${
         toError(error).message
       }`;
-      this.logger.error(logMessage, error);
+      this.logger.error(logMessage, {error});
       throw error;
     }
   }
@@ -135,7 +128,7 @@ export class EventService {
         .toSorted(compareEventsById);
     } catch (error: unknown) {
       const logMessage = `Failed to get ephemeral events for conversation '${conversationId}': ${toError(error).message}`;
-      this.logger.error(logMessage, error);
+      this.logger.error(logMessage, {error});
       throw error;
     }
   }
@@ -178,7 +171,7 @@ export class EventService {
         .shift();
     } catch (error: unknown) {
       const logMessage = `Failed to get event '${eventId}' for conversation '${conversationId}': ${toError(error).message}`;
-      this.logger.error(logMessage, error);
+      this.logger.error(logMessage, {error});
       throw error;
     }
   }
@@ -422,7 +415,7 @@ export class EventService {
     record.data.reason = reason;
     record.data.status = AssetTransferState.UPLOAD_FAILED;
     await this.replaceEvent(record);
-    this.logger.info('Updated asset message_et (failed)', primaryKey);
+    this.logger.info('Updated asset message_et (failed)', {primaryKey});
     return record;
   }
 
@@ -481,7 +474,7 @@ export class EventService {
           databaseVersion: databaseVersion,
           updateVersion: changes.version,
         };
-        this.logger.error(logMessage, logObject);
+        this.logger.error(logMessage, {logObject});
         throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
       });
     }
@@ -515,11 +508,12 @@ export class EventService {
    *
    * @param conversationId - conversation id from which events should be moved
    * @param newConversationId - conversation id to which events should be moved
+   * @returns the event records after assigning them to the new conversation
    */
   public async moveEventsToConversation(
     conversationId: QualifiedId,
     newConversationId: QualifiedId,
-  ): Promise<string[]> {
+  ): Promise<EventRecord[]> {
     const eventsToSkip = [CLIENT_CONVERSATION_EVENT.ONE2ONE_CREATION];
 
     const events = await this.loadAllConversationEvents(conversationId.id, eventsToSkip);
@@ -532,11 +526,13 @@ export class EventService {
       };
     });
 
-    return Promise.all(
+    await Promise.all(
       eventsToMove.map(event => {
         return this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event);
       }),
     );
+
+    return eventsToMove;
   }
 
   /**
@@ -561,10 +557,12 @@ export class EventService {
       }
 
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
-      return records;
+      return records.filter(record => {
+        return record.conversation === conversationId && !eventTypesToSkip.includes(record.type);
+      });
     } catch (error: unknown) {
       const logMessage = `Failed to get events for conversation '${conversationId}': ${toError(error).message}`;
-      this.logger.error(logMessage, error);
+      this.logger.error(logMessage, {error});
       throw error;
     }
   }

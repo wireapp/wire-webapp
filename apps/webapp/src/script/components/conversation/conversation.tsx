@@ -19,43 +19,8 @@
 
 import {UIEvent, useCallback, useEffect, useMemo, useState, type ReactElement} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
+import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
-
-import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {CallingCell} from 'Components/calling/CallingCell';
-import {parseAccountDeepLink} from 'Components/conversation/utils/parseAccountDeepLink';
-import {Giphy} from 'Components/giphy';
-import {InputBar} from 'Components/inputBar';
-import {MessageListWrapper} from 'Components/messagesList/messageListWrapper';
-import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {showUserModal} from 'Components/Modals/UserModal';
-import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {TitleBar} from 'Components/titleBar';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {DecryptErrorMessage} from 'Repositories/entity/message/decryptErrorMessage';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {TeamState} from 'Repositories/team/TeamState';
-import {Config} from 'src/script/Config';
-import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isLastReceivedMessage} from 'Util/conversationMessages';
-import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/fileTypeUtil';
-import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
-import {getLogger} from 'Util/logger';
-import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
-import {formatBytes} from 'Util/util';
-import {createUuid} from 'Util/uuid';
 
 import {
   searchResultsHeadingStyles,
@@ -87,17 +52,51 @@ import {ConversationViewerPermissionBanner} from './conversationViewerPermission
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './readOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
+import {withAutoReadGuard} from './utils/autoReadGuard';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
+import {parseAccountDeepLink} from './utils/parseAccountDeepLink';
 
+import {CONVERSATION_CELLS_STATE} from '../../apiClient/conversation/conversation';
+import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
+import {useApplicationContext, useMainViewModel} from '../../page/rootProvider';
+import {CallState} from '../../repositories/calling/CallState';
 import {createCellsRepositoryGateway} from '../../repositories/cells/cellsRepositoryGateway';
 import {createCellsUploadManager} from '../../repositories/cells/upload/manager';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {Conversation as ConversationEntity} from '../../repositories/entity/Conversation';
+import {ContentMessage} from '../../repositories/entity/message/contentMessage';
+import {DecryptErrorMessage} from '../../repositories/entity/message/decryptErrorMessage';
+import {MemberMessage} from '../../repositories/entity/message/memberMessage';
+import {Message} from '../../repositories/entity/message/message';
+import {User} from '../../repositories/entity/User';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {TeamState} from '../../repositories/team/TeamState';
+import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {isLastReceivedMessage} from '../../util/conversationMessages';
+import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from '../../util/fileTypeUtil';
+import {isHittingUploadLimit} from '../../util/isHittingUploadLimit';
+import {getLogger} from '../../util/logger';
+import {safeMailOpen, safeWindowOpen} from '../../util/sanitizationUtil';
+import {formatBytes} from '../../util/util';
+import {createUuid} from '../../util/uuid';
+import {WebAppEvents} from '../../webAppEvents';
+import {CallingCell} from '../calling/CallingCell';
+import {Giphy} from '../giphy';
+import {InputBar} from '../inputBar';
 import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
+import {MessageListWrapper} from '../messagesList/messageListWrapper';
+import {showDetailViewModal} from '../Modals/DetailViewModal';
+import {PrimaryModal} from '../Modals/PrimaryModal';
+import {showUserModal} from '../Modals/UserModal';
+import {showWarningModal} from '../Modals/utils/showWarningModal';
+import {TitleBar} from '../titleBar';
 
 interface ConversationProps {
   readonly teamState: TeamState;
@@ -137,7 +136,7 @@ function ConversationContent({
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate, clock} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
@@ -195,7 +194,10 @@ function ConversationContent({
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
+  const {addReadReceiptToBatch, cancelPendingReadReceiptsForConversation} = useReadReceiptSender({
+    messageSender: repositories.message,
+    clock,
+  });
 
   useEffect(() => {
     if (!isVirtualizedMessagesListEnabled) {
@@ -565,7 +567,7 @@ function ConversationContent({
         resetProgress();
       }
     } catch (error: unknown) {
-      messageListLogger.warn('Error while trying to reset session', error);
+      messageListLogger.warn('Error while trying to reset session', {error});
       resetProgress();
     }
   };
@@ -615,6 +617,15 @@ function ConversationContent({
 
       const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
       const isNotOwnMessage = !messageEntity.user().isMe;
+      const manualUnreadTimestamp = conversationEntity.manualUnreadTimestamp();
+
+      if (isNumber(manualUnreadTimestamp) && messageTimestamp >= manualUnreadTimestamp) {
+        callbacks.push(
+          withAutoReadGuard(conversationEntity, () => {
+            conversationEntity.clearManualUnreadMarker();
+          }),
+        );
+      }
 
       let shouldSendReadReceipt = false;
 
@@ -632,17 +643,21 @@ function ConversationContent({
       }
 
       if (isLastReceivedMessage(messageEntity, conversationEntity)) {
-        callbacks.push(() => {
-          return updateConversationLastRead(conversationEntity, messageEntity);
-        });
+        callbacks.push(
+          withAutoReadGuard(conversationEntity, () => {
+            return updateConversationLastRead(conversationEntity, messageEntity);
+          }),
+        );
       }
 
       if (isUnreadMessage && isNotOwnMessage) {
-        callbacks.push(updateLastRead);
+        callbacks.push(withAutoReadGuard(conversationEntity, updateLastRead));
         if (shouldSendReadReceipt) {
-          callbacks.push(() => {
-            return addReadReceiptToBatch(conversationEntity, messageEntity);
-          });
+          callbacks.push(
+            withAutoReadGuard(conversationEntity, () => {
+              return addReadReceiptToBatch(conversationEntity, messageEntity);
+            }),
+          );
         }
       }
 
@@ -840,9 +855,15 @@ function ConversationContent({
                 setMsgElementsFocusable={setMsgElementsFocusable}
                 isRightSidebarOpen={isRightSidebarOpen}
                 updateConversationLastRead={updateConversationLastRead}
+                cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
               />
 
-              {showViewerPermission && !isFileTabActive && <ConversationViewerPermissionBanner />}
+              {showViewerPermission && !isFileTabActive && (
+                <ConversationViewerPermissionBanner
+                  key={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
+                  conversationId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
+                />
+              )}
 
               {isConversationLoaded &&
                 !isSelfUserRemoved &&

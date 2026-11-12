@@ -17,13 +17,13 @@
  *
  */
 
-import {getUser, User} from 'test/e2e_tests/data/user';
-import {test, expect} from 'test/e2e_tests/test.fixtures';
+import {getUser, User} from '../../data/user';
+import {test, expect} from '../../test.fixtures';
 import {Page} from '@playwright/test';
-import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
+import {getImageFilePath} from '../../utils/sendImage.util';
 
-import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {FEATURE_KEY} from '../../../../src/script/apiClient/team/feature/featureList.types';
+import {PageManager} from '../../pageManager';
 
 test.describe('SSO and SCIM', () => {
   test.describe.configure({timeout: 180_000});

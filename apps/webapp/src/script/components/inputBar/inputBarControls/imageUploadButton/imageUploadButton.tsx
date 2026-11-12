@@ -21,10 +21,9 @@ import {useRef, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/icon';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {TabIndex} from '../../../../uiKit/utils/enums';
+import * as Icon from '../../../icon';
 
 interface ImageUploadButtonProps {
   onSelectImages: (files: File[]) => void;

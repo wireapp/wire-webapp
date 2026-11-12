@@ -20,27 +20,33 @@
 import React, {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import type {DomainData} from '@wireapp/api-client/lib/account/domainData';
-import {ClientType} from '@wireapp/api-client/lib/client/index';
-import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data';
-import type {ConversationEvent} from '@wireapp/api-client/lib/event';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect, useDispatch} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
 import {container} from 'tsyringe';
 
-import {Runtime, UrlUtil} from '@wireapp/commons';
-import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
-
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {APIClient} from 'src/script/service/apiClientSingleton';
-import {isBackendError} from 'Util/typePredicateUtil';
-
 import {buildDomainRedirectUrl, handleEnterpriseLogin, handleSSOBackendError, requiresPasswordModal} from './util';
 
+import type {DomainData} from '../../../apiClient/account/domainData';
+import {ClientType} from '../../../apiClient/client/clientType';
+import type {ConversationJoinData} from '../../../apiClient/conversation/data/conversationJoinData';
+import type {ConversationEvent} from '../../../apiClient/event/conversationEvent';
+import {BackendError} from '../../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
+import {UrlUtil} from '../../../commons/util';
+import {Runtime} from '../../../commons/util/Runtime';
+import {isValidEmail, PATTERN} from '../../../commons/util/ValidationUtil';
 import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {APIClient} from '../../../service/apiClientSingleton';
+import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
+import {Button} from '../../../uiKit/inputs/button/button';
+import {Checkbox, CheckboxLabel} from '../../../uiKit/inputs/checkbox/checkbox';
+import {ErrorMessage} from '../../../uiKit/inputs/errorMessage/errorMessage';
+import {Form} from '../../../uiKit/inputs/form/form';
+import {Input} from '../../../uiKit/inputs/input/input';
+import {InputBlock} from '../../../uiKit/inputs/inputBlock/inputBlock';
+import {isBackendError} from '../../../util/typePredicateUtil';
 import {JoinGuestLinkPasswordModal} from '../../component/joinGuestLinkPasswordModal';
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ValidationError} from '../../module/action/validationError';
@@ -52,6 +58,7 @@ import {QUERY_KEY, ROUTE} from '../../route';
 import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
 import {logoutReasonStrings} from '../../util/logoutUtil';
+import {withOAuthQuery} from '../../util/oauthUtil';
 import {getSearchParams, SSO_CODE_PREFIX} from '../../util/urlUtil';
 
 interface SingleSignOnFormProps {
@@ -123,7 +130,8 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
         await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
       }
 
-      navigate(ROUTE.HISTORY_INFO);
+      const authorizationRoute = withOAuthQuery(ROUTE.AUTHORIZE);
+      navigate(authorizationRoute === ROUTE.AUTHORIZE ? ROUTE.HISTORY_INFO : authorizationRoute);
     },
     [
       clientType,

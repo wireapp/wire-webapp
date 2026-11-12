@@ -19,12 +19,15 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
-
-import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Config} from '../../Config';
+import {useSingleInstance} from '../../hooks/useSingleInstance';
+import {useApplicationContext} from '../../page/rootProvider';
+import {Button} from '../../uiKit/inputs/button/button';
+import {Column, Columns} from '../../uiKit/layout/column/column';
+import {Container} from '../../uiKit/layout/container/container';
+import {Modal} from '../../uiKit/surface/modal/modal';
+import {H3} from '../../uiKit/typography/heading/heading';
+import {Text} from '../../uiKit/typography/text/text';
 
 interface AppAlreadyOpenProps {
   fullscreen?: boolean;

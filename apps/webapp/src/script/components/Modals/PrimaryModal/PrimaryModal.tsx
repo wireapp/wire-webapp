@@ -21,16 +21,6 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, use
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {ValidationUtil} from '@wireapp/commons';
-import {ErrorMessage} from '@wireapp/react-ui-kit';
-
-import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {Config} from 'src/script/Config';
-import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
-import type {Translate} from 'Util/localizerUtil';
-import {isValidPassword} from 'Util/stringUtil';
-
 import {CheckboxOption} from './CheckboxOption/CheckboxOption';
 import {MessageContent} from './Content/MessageContent';
 import {GuestLinkPasswordForm} from './GuestLinkPasswordForm/GuestLinkPasswordForm';
@@ -46,6 +36,15 @@ import {PrimaryModalShell} from './PrimaryModalShell/PrimaryModalShell';
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
 import {SecondaryButton} from './SecondaryButton/SecondaryButton';
+
+import {ValidationUtil} from '../../../commons/util';
+import {Config} from '../../../Config';
+import {ErrorMessage} from '../../../uiKit/inputs/errorMessage/errorMessage';
+import {isEnterKey, isEscapeKey} from '../../../util/keyboardUtil';
+import type {Translate} from '../../../util/localizerUtil';
+import {isValidPassword} from '../../../util/stringUtil';
+import {CopyToClipboardButton} from '../../copyToClipboardButton';
+import {FadingScrollbar} from '../../fadingScrollbar';
 
 interface PrimaryModalComponentProps {
   readonly translate: Translate;
@@ -102,6 +101,9 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     allButtonsFullWidth = false,
     primaryBtnFirst = false,
     size = 'small',
+    bodyCSS = {},
+    optionPosition = 'before-actions',
+    optionVariant = 'default',
     container,
   } = content;
 
@@ -323,6 +325,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
       ref={primaryActionButtonRef}
       onClick={performAction(confirm, closeOnConfirm ?? false)}
       disabled={isPrimaryActionDisabled(primaryAction.disabled)}
+      isDestructive={primaryAction.isDestructive}
       fullWidth={hasMultipleSecondary || allButtonsFullWidth}
     >
       {primaryAction.text}
@@ -353,7 +356,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
         hideCloseBtn={hideCloseBtn}
         closeAction={closeAction}
       />
-      <FadingScrollbar className="modal__body">
+      <FadingScrollbar className="modal__body" css={bodyCSS}>
         <MessageContent message={message} translatedMessage={translatedMessage} translate={translate} />
 
         {isGuestLinkPassword && (
@@ -432,12 +435,27 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
 
         {errorMessage !== undefined && errorMessage !== '' && <div className="modal__input__error">{errorMessage}</div>}
 
-        {isOption && <CheckboxOption isChecked={optionChecked} onChange={onOptionChange} label={checkboxLabel} />}
+        {isOption && optionPosition === 'before-actions' && (
+          <CheckboxOption
+            isChecked={optionChecked}
+            onChange={onOptionChange}
+            label={checkboxLabel}
+            variant={optionVariant}
+          />
+        )}
 
         {showLoadingIndicator ? (
           <PrimaryModalLoading />
         ) : (
           <PrimaryModalButtons isColumn={hasMultipleSecondary || allButtonsFullWidth}>{buttons}</PrimaryModalButtons>
+        )}
+        {isOption && optionPosition === 'after-actions' && (
+          <CheckboxOption
+            isChecked={optionChecked}
+            onChange={onOptionChange}
+            label={checkboxLabel}
+            variant={optionVariant}
+          />
         )}
       </FadingScrollbar>
     </PrimaryModalShell>

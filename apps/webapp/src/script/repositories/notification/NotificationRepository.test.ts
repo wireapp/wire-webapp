@@ -17,61 +17,61 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
+import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import type {DeterministicClock} from '@enormora/clock/deterministic-clock';
-import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-import {NotificationPreference} from '@wireapp/api-client/lib/user/data';
+import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
+import {NotificationPreference} from '../../apiClient/user/data/userPropertiesSetData';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {result} from 'true-myth';
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime} from '../../commons/util/Runtime';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
-import {AudioRepository} from 'Repositories/audio/audioRepository';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ConnectionMapper} from 'Repositories/connection/connectionMapper';
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CallMessage} from 'Repositories/entity/message/callMessage';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {Location} from 'Repositories/entity/message/location';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import {Message} from 'Repositories/entity/message/message';
-import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
-import {PingMessage} from 'Repositories/entity/message/pingMessage';
-import {RenameMessage} from 'Repositories/entity/message/renameMessage';
-import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
-import {UserMapper} from 'Repositories/user/userMapper';
-import {UserState} from 'Repositories/user/userState';
-import 'src/script/localization/Localizer';
-import {CALL_MESSAGE_TYPE} from 'src/script/message/callMessageType';
-import {MentionEntity} from 'src/script/message/mentionEntity';
-import {QuoteEntity} from 'src/script/message/quoteEntity';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {ContentState, useAppState} from 'src/script/page/useAppState';
-import {entities, payload} from 'test/api/payloads';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {truncate} from 'Util/stringUtil';
-import {createUuid} from 'Util/uuid';
-import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {AudioRepository} from '../audio/audioRepository';
+import {CallingRepository} from '../calling/CallingRepository';
+import {CallingViewMode, CallState} from '../calling/CallState';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
+import {ConnectionEntity} from '../connection/connectionEntity';
+import {ConnectionMapper} from '../connection/connectionMapper';
+import {ConversationMapper} from '../conversation/ConversationMapper';
+import {ConversationState} from '../conversation/ConversationState';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
+import {Conversation} from '../entity/Conversation';
+import {CallMessage} from '../entity/message/callMessage';
+import {CompositeMessage} from '../entity/message/compositeMessage';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {Location} from '../entity/message/location';
+import {MediumImage} from '../entity/message/mediumImage';
+import {MemberMessage} from '../entity/message/memberMessage';
+import {Message} from '../entity/message/message';
+import {MessageTimerUpdateMessage} from '../entity/message/messageTimerUpdateMessage';
+import {PingMessage} from '../entity/message/pingMessage';
+import {RenameMessage} from '../entity/message/renameMessage';
+import {Text} from '../entity/message/text';
+import {User} from '../entity/User';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {BrowserPermissionStatus} from '../permission/BrowserPermissionStatus';
+import {UserMapper} from '../user/userMapper';
+import {UserState} from '../user/userState';
+import '../../localization/Localizer';
+import {CALL_MESSAGE_TYPE} from '../../message/callMessageType';
+import {MentionEntity} from '../../message/mentionEntity';
+import {QuoteEntity} from '../../message/quoteEntity';
+import {SystemMessageType} from '../../message/systemMessageType';
+import {ContentState, useAppState} from '../../page/useAppState';
+import {entities, payload} from '../../../../test/api/payloads';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {truncate} from '../../util/stringUtil';
+import {createUuid} from '../../util/uuid';
+import {createExecutingFireAndForgetInvokerForTest} from '../../page/testSupport/rootContextTestSupport';
 
 import {NotificationRepository} from './NotificationRepository';
 import {systemNotificationErrorKinds, type SystemNotificationApi} from '../../notification/systemNotificationTypes';
@@ -385,7 +385,7 @@ describe('NotificationRepository', () => {
       expect(close).toHaveBeenCalledTimes(1);
       expect(errorSpy).toHaveBeenCalledWith(
         "Failed to close notification for 'content' message in 'undefined' by timeout.",
-        {kind: systemNotificationErrorKinds.closeFailed, cause: closeError},
+        {error: {kind: systemNotificationErrorKinds.closeFailed, cause: closeError}},
       );
       expect(infoSpy).not.toHaveBeenCalledWith("Notification for 'content' message in 'undefined' closed by timeout.");
     });
@@ -424,7 +424,7 @@ describe('NotificationRepository', () => {
 
       expect(errorSpy).toHaveBeenCalledWith(
         "Failed to close notification for 'content' message in 'undefined' by click.",
-        {kind: systemNotificationErrorKinds.closeFailed, cause: closeError},
+        {error: {kind: systemNotificationErrorKinds.closeFailed, cause: closeError}},
       );
       expect(infoSpy).not.toHaveBeenCalledWith("Notification for 'content' message in 'undefined' closed by click.");
     });
@@ -470,8 +470,7 @@ describe('NotificationRepository', () => {
       repository.clearNotifications();
 
       expect(errorSpy).toHaveBeenCalledWith("Failed to close notification for 'undefined' in 'undefined' on unload.", {
-        kind: systemNotificationErrorKinds.closeFailed,
-        cause: closeError,
+        error: {kind: systemNotificationErrorKinds.closeFailed, cause: closeError},
       });
     });
 
@@ -519,7 +518,7 @@ describe('NotificationRepository', () => {
 
       expect(errorSpy).toHaveBeenCalledWith(
         "Failed to close read notification for message 'message' of type 'content' in 'conversation'.",
-        {kind: systemNotificationErrorKinds.closeFailed, cause: closeError},
+        {error: {kind: systemNotificationErrorKinds.closeFailed, cause: closeError}},
       );
     });
   });

@@ -1,0 +1,967 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {AxiosHeaders} from 'axios';
+import {
+  BackgroundActionInfoNameEnum,
+  NodeServiceApi,
+  LookupFilterMetaFilter,
+  RestLookupRequest,
+  RestCreateCheckResponse,
+  RestDeleteVersionResponse,
+  RestNode,
+  RestNodeCollection,
+  RestPerformActionResponse,
+  RestPromoteVersionResponse,
+  RestPublicLinkDeleteSuccess,
+  RestShareLink,
+  RestIncomingNode,
+  RestNodeLocator,
+  RestActionOptionsCopyMove,
+  RestBackgroundAction,
+  RestNamespaceValuesResponse,
+  RestSelection,
+  GetByUuidFlagsEnum,
+} from 'cells-sdk-ts';
+
+import {Node, NodeVersions, RestNodeSchema, RestNodeVersionsSchema} from './cellsApi.schema';
+import {CellsStorage} from './cellsStorage/cellsStorage';
+import {S3Service} from './cellsStorage/s3Service';
+
+import {getLogger, type Logger} from '../../commons/getLogger';
+import {AccessTokenStore} from '../auth';
+import {HttpClient} from '../http';
+import type {CookiePlatform} from '../platform';
+
+export type SortDirection = 'asc' | 'desc';
+
+const CONFIGURATION_ERROR = 'CellsAPI is not initialized. Call initialize() before using any methods.';
+const DEFAULT_LIMIT = 10;
+const DEFAULT_OFFSET = 0;
+const USER_META_TAGS_NAMESPACE = 'usermeta-tags';
+const USER_META_OWNER_UUID_NAMESPACE = 'usermeta-owner-uuid';
+const MIME_NAMESPACE = 'mime';
+
+const uploadNetworkRetryConfig = {
+  // Uploads have their own retry action, so keep automatic retries bounded while allowing transient recovery.
+  'axios-retry': {
+    retries: 3,
+  },
+} as const;
+
+// A lost response does not mean the mutation failed. Never replay a bulk mutation automatically.
+const bulkMutationNetworkRetryConfig = {
+  'axios-retry': {
+    retries: 0,
+  },
+} as const;
+
+const getNodeUuidLocators = (uuids: readonly string[]): RestNodeLocator[] => {
+  const uniqueUuids = [
+    ...new Set(
+      uuids.filter(uuid => {
+        return uuid.trim().length > 0;
+      }),
+    ),
+  ];
+
+  if (uniqueUuids.length === 0) {
+    throw new Error('At least one non-empty node UUID is required');
+  }
+
+  return uniqueUuids.map(Uuid => {
+    return {Uuid};
+  });
+};
+
+// Each selected tag is sent as its own metadata filter with the `Should` operation so the
+// backend applies OR semantics across tags (a node matching any selected tag is returned).
+// Matches the iOS client shape in WireMessaging RestAPI.swift.
+function createTagMetadataFilters(tags: string[]): LookupFilterMetaFilter[] {
+  return tags.map(tag => {
+    return {
+      Namespace: USER_META_TAGS_NAMESPACE,
+      Term: tag,
+      Operation: 'Should',
+    };
+  });
+}
+
+// TODO: remove the apiKey (from pydio and s3) once the Pydio backend has fully support for the auth with the Wire's access token
+// If it's passed we use it to authenticate, instead of the access token
+interface CellsConfig {
+  pydio: {
+    apiKey?: string;
+    segment: string;
+    url: string;
+  };
+  s3: {
+    apiKey?: string;
+    bucket: string;
+    endpoint: string;
+    region: string;
+  };
+}
+
+export class CellsAPI {
+  private readonly logger: Logger;
+  private accessTokenStore: AccessTokenStore;
+  private httpClientConfig: HttpClient['config'];
+  private readonly cookie: CookiePlatform;
+  private storageService: CellsStorage | null;
+  private client: NodeServiceApi | null;
+
+  constructor({
+    accessTokenStore,
+    httpClientConfig,
+    cookie,
+  }: {
+    accessTokenStore: AccessTokenStore;
+    httpClientConfig: HttpClient['config'];
+    readonly cookie: CookiePlatform;
+  }) {
+    this.logger = getLogger('@wireapp/api-client/CellsAPI');
+    this.accessTokenStore = accessTokenStore;
+    this.httpClientConfig = httpClientConfig;
+    this.cookie = cookie;
+    this.storageService = null;
+    this.client = null;
+  }
+
+  initialize({
+    cellsConfig,
+    httpClient,
+    storageService,
+  }: {
+    cellsConfig: CellsConfig;
+    httpClient?: HttpClient;
+    storageService?: CellsStorage;
+  }): void {
+    const http = httpClient !== undefined ? httpClient : this.getHttpClient({cellsConfig});
+
+    this.storageService =
+      storageService !== undefined
+        ? storageService
+        : new S3Service({
+            config: cellsConfig.s3,
+            accessTokenStore: this.accessTokenStore,
+          });
+    this.client = new NodeServiceApi(undefined, undefined, http.client);
+  }
+
+  private getHttpClient({cellsConfig}: {cellsConfig: CellsConfig}): HttpClient {
+    const baseHttpClientConfig = {
+      ...this.httpClientConfig,
+      urls: {...this.httpClientConfig.urls, rest: cellsConfig.pydio.url + cellsConfig.pydio.segment},
+      headers: {...this.httpClientConfig.headers},
+    };
+
+    if (cellsConfig.pydio.apiKey !== undefined && cellsConfig.pydio.apiKey.length > 0) {
+      return new HttpClient(
+        {
+          ...baseHttpClientConfig,
+          headers: {...baseHttpClientConfig.headers, Authorization: `Bearer ${cellsConfig.pydio.apiKey}`},
+        },
+        this.accessTokenStore,
+        {cookie: this.cookie},
+      );
+    }
+
+    const http = new HttpClient(baseHttpClientConfig, this.accessTokenStore, {cookie: this.cookie});
+
+    // Add axios interceptor to automatically add Authorization header to every request
+    // Althouht the HttpClient handles the authorization already (see _sendRequest), as we pass a custom axios instance to the NodeServiceApi, we need to add it manually
+    http.client.interceptors.request.use(config => {
+      const accessToken = this.accessTokenStore.getAccessToken();
+      if (accessToken !== undefined && accessToken.length > 0) {
+        const requestHeaders = AxiosHeaders.from(config.headers);
+        requestHeaders.set('Authorization', `Bearer ${accessToken}`);
+        config.headers = requestHeaders;
+      }
+      return config;
+    });
+
+    return http;
+  }
+
+  async uploadNodeDraft({
+    uuid,
+    versionId,
+    path,
+    file,
+    autoRename = true,
+    progressCallback,
+    abortController,
+  }: {
+    uuid: string;
+    versionId: string;
+    path: string;
+    file: File;
+    autoRename?: boolean;
+    progressCallback?: (progress: number) => void;
+    abortController?: AbortController;
+  }): Promise<RestCreateCheckResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    let filePath = `${path}`.normalize('NFC');
+
+    const result = await this.client.createCheck(
+      {
+        Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
+        FindAvailablePath: true,
+      },
+      {signal: abortController?.signal, ...uploadNetworkRetryConfig},
+    );
+
+    const firstCreateCheckResult = result.data.Results?.[0];
+
+    if (autoRename && firstCreateCheckResult?.Exists === true) {
+      filePath = firstCreateCheckResult.NextPath ?? filePath;
+    }
+
+    const metadata = {
+      'Draft-Mode': 'true',
+      'Create-Resource-Uuid': uuid,
+      'Create-Version-Id': versionId,
+    };
+
+    await this.storageService.putObject({path: filePath, file, metadata, progressCallback, abortController});
+
+    return result.data;
+  }
+
+  async uploadNode({
+    uuid,
+    versionId,
+    path,
+    file,
+    autoRename = true,
+    progressCallback,
+    abortController,
+  }: {
+    uuid: string;
+    versionId: string;
+    path: string;
+    file: File;
+    autoRename?: boolean;
+    progressCallback?: (progress: number) => void;
+    abortController?: AbortController;
+  }): Promise<RestCreateCheckResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    let filePath = `${path}`.normalize('NFC');
+
+    const result = await this.client.createCheck(
+      {
+        Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
+        FindAvailablePath: true,
+      },
+      {signal: abortController?.signal, ...uploadNetworkRetryConfig},
+    );
+
+    const firstCreateCheckResult = result.data.Results?.[0];
+
+    if (autoRename && firstCreateCheckResult?.Exists === true) {
+      filePath = firstCreateCheckResult.NextPath ?? filePath;
+    }
+
+    await this.storageService.putObject({path: filePath, file, progressCallback, abortController});
+
+    return result.data;
+  }
+
+  async checkNodeCreation({
+    path,
+    uuid,
+    versionId,
+    type,
+  }: {
+    path: NonNullable<RestNodeLocator['Path']>;
+    uuid: string;
+    versionId: string;
+    type: RestIncomingNode['Type'];
+  }): Promise<RestCreateCheckResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.createCheck(
+      {
+        Inputs: [{Type: type, Locator: {Path: path.normalize('NFC'), Uuid: uuid}, VersionId: versionId}],
+        FindAvailablePath: false,
+      },
+      uploadNetworkRetryConfig,
+    );
+
+    return result.data;
+  }
+
+  async promoteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}): Promise<RestPromoteVersionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.promoteVersion(uuid, versionId, {Publish: true}, uploadNetworkRetryConfig);
+
+    return result.data;
+  }
+
+  async deleteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}): Promise<RestDeleteVersionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.deleteVersion(uuid, versionId, uploadNetworkRetryConfig);
+
+    return result.data;
+  }
+
+  async deleteNode({
+    uuid,
+    permanently = false,
+  }: {
+    uuid: string;
+    permanently?: boolean;
+  }): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction('delete', {
+      Nodes: [{Uuid: uuid}],
+      DeleteOptions: {PermanentDelete: permanently},
+    });
+
+    return result.data;
+  }
+
+  async deleteNodes({
+    uuids,
+    permanently = false,
+  }: {
+    uuids: readonly string[];
+    permanently?: boolean;
+  }): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction(
+      'delete',
+      {Nodes: getNodeUuidLocators(uuids), DeleteOptions: {PermanentDelete: permanently}},
+      undefined,
+      bulkMutationNetworkRetryConfig,
+    );
+
+    return result.data;
+  }
+
+  async moveNode({
+    currentPath,
+    targetPath,
+  }: {
+    currentPath: RestNodeLocator['Path'];
+    targetPath: RestActionOptionsCopyMove['TargetPath'];
+  }): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction('move', {
+      Nodes: [{Path: currentPath}],
+      CopyMoveOptions: {TargetIsParent: true, TargetPath: targetPath},
+      AwaitStatus: 'Finished',
+      AwaitTimeout: '5000ms',
+    });
+
+    return result.data;
+  }
+
+  async getBackgroundActionInfo({
+    name,
+    jobUuid,
+  }: {
+    name: BackgroundActionInfoNameEnum;
+    jobUuid: string;
+  }): Promise<RestBackgroundAction> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.backgroundActionInfo(name, jobUuid);
+    return result.data;
+  }
+
+  async moveNodes({
+    currentPaths,
+    targetPath,
+  }: {
+    currentPaths: RestNodeLocator['Path'][];
+    targetPath: RestActionOptionsCopyMove['TargetPath'];
+  }): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction('move', {
+      Nodes: currentPaths.map(Path => {
+        return {Path};
+      }),
+      CopyMoveOptions: {TargetIsParent: true, TargetPath: targetPath},
+      AwaitStatus: 'Finished',
+      AwaitTimeout: '5000ms',
+    });
+
+    return result.data;
+  }
+
+  async restoreNode({uuid}: {uuid: string}): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction('restore', {Nodes: [{Uuid: uuid}]});
+
+    return result.data;
+  }
+
+  async restoreNodes({uuids}: {uuids: readonly string[]}): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction(
+      'restore',
+      {Nodes: getNodeUuidLocators(uuids)},
+      undefined,
+      bulkMutationNetworkRetryConfig,
+    );
+
+    return result.data;
+  }
+
+  async renameNode({currentPath, newName}: {currentPath: string; newName: string}): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const basePath = currentPath.split('/').slice(0, -1).join('/');
+    const newPath = `${basePath}/${newName}`;
+
+    const result = await this.client.performAction('move', {
+      Nodes: [{Path: currentPath}],
+      CopyMoveOptions: {TargetIsParent: false, TargetPath: newPath},
+      AwaitStatus: 'Finished',
+      AwaitTimeout: '5000ms',
+    });
+
+    return result.data;
+  }
+
+  async lookupNodeByPath({path}: {path: string}): Promise<RestNode | undefined> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.lookup({
+      Scope: {Nodes: [{Path: path}]},
+      Flags: ['WithPreSignedURLs'],
+    });
+
+    const node = result.data.Nodes?.[0];
+
+    if (!Boolean(node)) {
+      throw new Error(`File not found: ${path}`);
+    }
+
+    return node;
+  }
+
+  async lookupNodeByUuid({uuid}: {uuid: string}): Promise<RestNode | undefined> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.lookup({
+      Scope: {Nodes: [{Uuid: uuid}]},
+      Flags: ['WithPreSignedURLs'],
+    });
+
+    const node = result.data.Nodes?.[0];
+
+    if (!Boolean(node)) {
+      throw new Error(`File not found: ${uuid}`);
+    }
+
+    return node;
+  }
+
+  async getNodeVersions({uuid, flags}: {uuid: string; flags?: GetByUuidFlagsEnum[]}): Promise<NodeVersions> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.nodeVersions(uuid, {FilterBy: 'VersionsAll', Flags: flags});
+
+    const validation = RestNodeVersionsSchema.safeParse(result.data.Versions);
+
+    if (!validation.success) {
+      this.logger.warn('Get node versions response validation failed:', {error: validation.error});
+    }
+
+    return result.data.Versions !== undefined ? result.data.Versions : [];
+  }
+
+  async getNode({id, flags}: {id: string; flags?: GetByUuidFlagsEnum[]}): Promise<Node> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.getByUuid(id, flags);
+
+    const validation = RestNodeSchema.safeParse(result.data);
+
+    if (!validation.success) {
+      this.logger.warn('Get node response validation failed:', {error: validation.error});
+    }
+
+    return result.data;
+  }
+
+  async getAllNodes({
+    path,
+    limit = DEFAULT_LIMIT,
+    offset = DEFAULT_OFFSET,
+    sortBy,
+    sortDirection,
+    type,
+    deleted = false,
+  }: {
+    path: string;
+    limit?: number;
+    offset?: number;
+    sortBy?: string;
+    sortDirection?: SortDirection;
+    type?: RestIncomingNode['Type'];
+    deleted?: boolean;
+  }): Promise<RestNodeCollection> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const request: RestLookupRequest = {
+      Scope: {Root: {Path: path}},
+      Flags: ['WithPreSignedURLs'],
+      Limit: `${limit}`,
+      Offset: `${offset}`,
+      Filters: {
+        Type: type ?? 'UNKNOWN',
+        Status: {
+          Deleted: deleted ? 'Only' : 'Not',
+        },
+      },
+      SortField: sortBy,
+      SortDirDesc: Boolean(sortDirection) ? sortDirection === 'desc' : undefined,
+    };
+
+    const result = await this.client.lookup(request);
+
+    return result.data;
+  }
+
+  async searchNodes({
+    phrase,
+    path = '',
+    recursive,
+    limit = DEFAULT_LIMIT,
+    offset = DEFAULT_OFFSET,
+    sortBy,
+    sortDirection,
+    type,
+    tags,
+    mimeTypes,
+    hasPublicLink,
+    creatorIds,
+    deleted = false,
+  }: {
+    phrase: string;
+    path?: string;
+    recursive?: boolean;
+    limit?: number;
+    offset?: number;
+    sortBy?: string;
+    sortDirection?: SortDirection;
+    type?: RestIncomingNode['Type'];
+    tags?: string[];
+    mimeTypes?: string[];
+    hasPublicLink?: boolean;
+    creatorIds?: string[];
+    deleted?: boolean;
+  }): Promise<RestNodeCollection> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const tagMetadataFilters = createTagMetadataFilters(tags ?? []);
+    const mimeOp: 'Should' | 'Must' = mimeTypes !== undefined && mimeTypes.length > 1 ? 'Should' : 'Must';
+    const creatorOp: 'Should' | 'Must' = creatorIds !== undefined && creatorIds.length > 1 ? 'Should' : 'Must';
+
+    // `searchTerm == nil` drops the Text filter and sets `recursive = false`,
+    // making the empty search view behave exactly like the browse listing (folders-first natural order).
+    const hasPhrase = phrase.length > 0;
+    const isRecursive = recursive ?? hasPhrase;
+
+    const request: RestLookupRequest = {
+      Scope: {Root: {Path: path}, Recursive: isRecursive},
+      Filters: {
+        ...(hasPhrase ? {Text: {SearchIn: 'BaseName', Term: phrase}} : {}),
+        Type: Boolean(type) ? type : 'UNKNOWN',
+        Status: {
+          Deleted: deleted ? 'Only' : 'Not',
+          ...(hasPublicLink !== undefined ? {HasPublicLink: hasPublicLink} : {}),
+        },
+        Metadata: [
+          ...tagMetadataFilters,
+          ...(mimeTypes?.map(term => {
+            return {Namespace: MIME_NAMESPACE, Term: term, Operation: mimeOp};
+          }) ?? []),
+          ...(creatorIds?.map(term => {
+            return {
+              Namespace: USER_META_OWNER_UUID_NAMESPACE,
+              Term: JSON.stringify(term),
+              Operation: creatorOp,
+            };
+          }) ?? []),
+        ],
+      },
+      Flags: ['WithPreSignedURLs'],
+      Limit: `${limit}`,
+      Offset: `${offset}`,
+      SortField: sortBy,
+      SortDirDesc: sortDirection !== undefined ? sortDirection === 'desc' : undefined,
+    };
+
+    const result = await this.client.lookup(request);
+
+    return result.data;
+  }
+
+  private async createNode({
+    path,
+    uuid,
+    type,
+    versionId = '',
+    templateUuid,
+  }: {
+    path: NonNullable<RestNodeLocator['Path']>;
+    uuid: NonNullable<RestIncomingNode['ResourceUuid']>;
+    type: RestIncomingNode['Type'];
+    versionId?: RestIncomingNode['VersionId'];
+    templateUuid?: NonNullable<RestIncomingNode['TemplateUuid']>;
+  }): Promise<RestNodeCollection> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const response = await this.client.create({
+      Inputs: [
+        {
+          Type: type,
+          Locator: {Path: path.normalize('NFC')},
+          ResourceUuid: uuid,
+          VersionId: versionId,
+          ...(templateUuid !== undefined ? {TemplateUuid: templateUuid} : {}),
+        },
+      ],
+    });
+
+    return response.data;
+  }
+
+  async createFile({
+    path,
+    uuid,
+    versionId,
+    templateUuid,
+  }: {
+    path: NonNullable<RestNodeLocator['Path']>;
+    uuid: NonNullable<RestIncomingNode['ResourceUuid']>;
+    versionId: NonNullable<RestIncomingNode['VersionId']>;
+    templateUuid?: NonNullable<RestIncomingNode['TemplateUuid']>;
+  }): Promise<RestNodeCollection> {
+    return this.createNode({
+      path,
+      uuid,
+      type: 'LEAF',
+      versionId,
+      templateUuid,
+    });
+  }
+
+  async createFolder({
+    path,
+    uuid,
+  }: {
+    path: NonNullable<RestNodeLocator['Path']>;
+    uuid: NonNullable<RestIncomingNode['ResourceUuid']>;
+  }): Promise<RestNodeCollection> {
+    return this.createNode({
+      path,
+      uuid,
+      type: 'COLLECTION',
+    });
+  }
+
+  async deleteNodePublicLink({uuid}: {uuid: string}): Promise<RestPublicLinkDeleteSuccess> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.deletePublicLink(uuid);
+
+    return result.data;
+  }
+
+  /**
+   * Creates a public link for sharing a node (file or folder).
+   *
+   * @param uuid - The UUID of the node to share
+   * @param label - Optional label for the link
+   * @param createPassword - Initial password to protect the link
+   * @param passwordEnabled - Whether password protection is enabled (required if createPassword is provided)
+   * @param accessEnd - Unix timestamp as string (e.g., '1765839600') for link expiration
+   * @returns The created share link with its URL and metadata
+   */
+  async createNodePublicLink({
+    uuid,
+    link,
+    createPassword,
+    passwordEnabled,
+  }: {
+    uuid: string;
+    link: RestShareLink;
+    createPassword?: string;
+    passwordEnabled?: boolean;
+  }): Promise<RestShareLink> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const requestBody: {
+      Link: RestShareLink;
+      CreatePassword?: string;
+      PasswordEnabled?: boolean;
+    } = {
+      Link: {
+        ...link,
+        Permissions: link.Permissions ?? ['Preview', 'Download'],
+      },
+    };
+
+    if (createPassword !== undefined && createPassword.length > 0 && passwordEnabled === true) {
+      requestBody.Link.PasswordRequired = true;
+      requestBody.CreatePassword = createPassword;
+      requestBody.PasswordEnabled = passwordEnabled;
+    }
+
+    const result = await this.client.createPublicLink(uuid, requestBody);
+
+    return result.data;
+  }
+
+  async getNodePublicLink({uuid}: {uuid: string}): Promise<RestShareLink> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.getPublicLink(uuid);
+
+    return result.data;
+  }
+
+  /**
+   * Updates an existing public link's settings.
+   *
+   * @param linkUuid - The UUID of the link to update
+   * @param link - The RestShareLink object with updated properties
+   * @param createPassword - Set initial password (use when setting password for first time)
+   * @param updatePassword - Update existing password (use when changing an existing password)
+   * @param passwordEnabled - Enable or disable password protection
+   * @returns The updated share link with new settings
+   */
+  async updateNodePublicLink({
+    linkUuid,
+    link,
+    createPassword,
+    updatePassword,
+    passwordEnabled,
+  }: {
+    linkUuid: string;
+    link: RestShareLink;
+    createPassword?: string;
+    updatePassword?: string;
+    passwordEnabled?: boolean;
+  }): Promise<RestShareLink> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const requestBody: {
+      Link: RestShareLink;
+      CreatePassword?: string;
+      UpdatePassword?: string;
+      PasswordEnabled?: boolean;
+    } = {
+      Link: link,
+    };
+
+    if (passwordEnabled !== undefined) {
+      requestBody.PasswordEnabled = passwordEnabled;
+      requestBody.Link.PasswordRequired = passwordEnabled;
+    }
+
+    if (createPassword !== undefined && createPassword.length > 0) {
+      requestBody.CreatePassword = createPassword;
+    }
+
+    if (updatePassword !== undefined && updatePassword.length > 0) {
+      requestBody.UpdatePassword = updatePassword;
+    }
+
+    const result = await this.client.updatePublicLink(linkUuid, requestBody);
+
+    return result.data;
+  }
+
+  async createSelection({
+    paths,
+    abortController,
+  }: {
+    paths: readonly string[];
+    abortController?: AbortController;
+  }): Promise<string> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+    if (
+      paths.length === 0 ||
+      paths.some(path => {
+        return path.trim().length === 0;
+      })
+    ) {
+      throw new Error('At least one non-empty node path is required');
+    }
+
+    const result = await this.client.createSelection(
+      {
+        Nodes: paths.map(Path => {
+          return {Path: Path.normalize('NFC')};
+        }) as RestSelection['Nodes'],
+      },
+      {
+        signal: abortController?.signal,
+        'axios-retry': {retries: 0},
+      },
+    );
+    const uuid = result.data.Uuid;
+
+    if (uuid === undefined || uuid.trim().length === 0) {
+      throw new Error('Cells did not return a selection UUID');
+    }
+
+    return uuid;
+  }
+
+  async downloadSelectionArchive({
+    paths,
+    archiveParentPath,
+    abortController,
+  }: {
+    paths: readonly string[];
+    archiveParentPath: string;
+    abortController?: AbortController;
+  }): Promise<ReadableStream<Uint8Array>> {
+    if (this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+    if (archiveParentPath.trim().length === 0) {
+      throw new Error('An archive parent path is required');
+    }
+
+    const selectionUuid = await this.createSelection({paths, abortController});
+    const archivePath = `${archiveParentPath.normalize('NFC').replace(/\/+$/, '')}/${selectionUuid}-selection.zip`;
+    const {body, contentType} = await this.storageService.getObject({path: archivePath, abortController});
+    const normalizedContentType = contentType?.split(';', 1)[0]?.trim().toLowerCase();
+    const supportedContentTypes = new Set([
+      'application/zip',
+      'application/x-zip-compressed',
+      'application/octet-stream',
+    ]);
+
+    const hasContentType = normalizedContentType !== undefined && normalizedContentType.length > 0;
+
+    if (!hasContentType || !supportedContentTypes.has(normalizedContentType)) {
+      await body.cancel().catch(() => {
+        return undefined;
+      });
+      throw new Error(
+        hasContentType
+          ? `Cells returned an unexpected archive content type: ${normalizedContentType}`
+          : 'Cells returned an archive without a ZIP content type',
+      );
+    }
+
+    return body;
+  }
+
+  async getAllTags(): Promise<RestNamespaceValuesResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.listNamespaceValues(USER_META_TAGS_NAMESPACE);
+
+    return result.data;
+  }
+
+  async setNodeTags({uuid, tags}: {uuid: string; tags: string[]}): Promise<RestNode> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.patchNode(uuid, {
+      MetaUpdates: [
+        {
+          Operation: tags.length > 0 ? 'PUT' : 'DELETE',
+          UserMeta: {Namespace: USER_META_TAGS_NAMESPACE, JsonValue: this.transformTagsToJson(tags)},
+        },
+      ],
+    });
+
+    return result.data;
+  }
+
+  private transformTagsToJson(tags: string[]): string {
+    return JSON.stringify(tags.join(','));
+  }
+}

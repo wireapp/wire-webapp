@@ -18,11 +18,11 @@
  */
 
 import {createClock, type Clock, type IntervalIdentifier, type TimeoutIdentifier} from '@enormora/clock/clock';
-import type {ReconnectingWebsocketWallClock} from '@wireapp/api-client/lib/tcp';
 import {singleton} from 'tsyringe';
 
-import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
-
+import {APIClient as APIClientUnconfigured} from '../apiClient/apiClient';
+import {browserPlatform} from '../apiClient/shims/browser/platform';
+import type {ReconnectingWebsocketWallClock} from '../apiClient/tcp/reconnectingWebsocket';
 import {Config} from '../Config';
 
 const wireClientHeaderName = 'Wire-Client';
@@ -60,6 +60,7 @@ export class APIClient extends APIClientUnconfigured {
     };
 
     const unconfiguredApiClientConfiguration = {
+      platform: browserPlatform,
       headers: {
         [wireClientHeaderName]: wireClientIdentifier,
         [wireClientVersionHeaderName]: webAppConfiguration.VERSION,
@@ -73,7 +74,10 @@ export class APIClient extends APIClientUnconfigured {
     };
 
     super(unconfiguredApiClientConfiguration);
+    this.clock = clock;
   }
+
+  public readonly clock: Clock;
 
   public resetIncrementalRetryBackoff(): void {
     const retryBackoffResettableHttpClient = this.transport.http as unknown as RetryBackoffResettableHttpClient;
