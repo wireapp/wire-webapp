@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {ClientActionCreator} from './creator/';
 
@@ -67,7 +67,11 @@ export class ClientAction {
     entropyData?: Uint8Array,
   ): ThunkAction => {
     return async (dispatch, getState, {core, clock, actions: {clientAction}}) => {
-      const localClient = await core.getLocalClient();
+      const localClientResult = await core.getLocalClient();
+      if (localClientResult.isErr) {
+        throw localClientResult.error;
+      }
+      const localClient = localClientResult.value;
       const commonConfig = (await core.service?.team.getCommonFeatureConfig()) ?? {};
 
       const useAsyncNotificationStream =
@@ -75,8 +79,8 @@ export class ClientAction {
 
       const useLegacyNotificationStream = !useAsyncNotificationStream;
 
-      const creationStatus = !isNullOrUndefined(localClient)
-        ? {isNew: false, client: localClient}
+      const creationStatus = localClient.isJust
+        ? {isNew: false, client: localClient.value}
         : {
             isNew: true,
             client: await core.registerClient(
