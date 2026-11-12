@@ -1,6 +1,8 @@
 # Repository Structure
 
-This is a monorepo managed with Just and npm workspaces, with the following structure:
+This is a monorepo with two applications managed with Just. Dependency management is centralized in the root npm project, using a single `package.json` and `package-lock.json` for application and build dependencies. Runtime application dependencies belong in root `dependencies`; development-only types and tooling belong in root `devDependencies`.
+
+The application structure is:
 
 ```
 apps/
