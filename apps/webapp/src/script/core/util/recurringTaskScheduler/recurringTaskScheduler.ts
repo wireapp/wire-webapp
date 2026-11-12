@@ -19,8 +19,7 @@
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
-import {TimeUtil} from '@wireapp/commons';
-
+import {TimeUtil} from '../../../commons/util';
 import {LowPrecisionTaskScheduler} from '../lowPrecisionTaskScheduler';
 import {TaskScheduler} from '../taskScheduler';
 

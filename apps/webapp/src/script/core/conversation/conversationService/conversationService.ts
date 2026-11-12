@@ -18,10 +18,7 @@
  */
 
 import {isEmptySet, isUndefined} from '@sindresorhus/is';
-import {Decoder} from '@wireapp/commons/lib/base64/decoder';
-import {XOR} from '@wireapp/commons/lib/util/TypeUtil';
 
-import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {ConversationId} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
@@ -60,6 +57,10 @@ import {
 } from '../../../apiClient/event/conversationEvent';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {Decoder} from '../../../commons/base64/decoder';
+import {LogFactory} from '../../../commons/LogFactory';
+import {TypedEventEmitter} from '../../../commons/TypedEventEmitter/TypedEventEmitter';
+import {XOR} from '../../../commons/util/TypeUtil';
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {isMlsConversationNotFoundError} from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';

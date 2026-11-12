@@ -28,7 +28,7 @@ if [[ ! -s apps/server/dist/version.json ]]; then
   exit 1
 fi
 
-if [[ ! -s apps/server/dist/index.js ]] || [[ ! -d libraries/config/lib ]]; then
-  echo 'Public production build did not produce the compiled server and config library required by Docker.' >&2
+if [[ ! -s apps/server/dist/index.js ]] || [[ ! -s apps/server/dist/index.js.map ]] || [[ ! -s apps/server/dist/dbs/GeoLite2-Country.mmdb ]]; then
+  echo 'Public production build did not produce the standalone server bundle, source map, and GeoIP database required by Docker.' >&2
   exit 1
 fi

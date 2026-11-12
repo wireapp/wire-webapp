@@ -20,8 +20,6 @@
 import {AxiosRequestConfig} from 'axios';
 import logdown from 'logdown';
 
-import {LogFactory} from '@wireapp/commons';
-
 import {InvalidAppLockTimeoutError} from './featureError';
 import {
   allFeaturesResponseSchema,
@@ -48,6 +46,7 @@ import {
 } from './featureList.schema';
 import {FeatureList} from './featureList.types';
 
+import {LogFactory} from '../../../commons/LogFactory';
 import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
 
 import {FeatureConversationGuestLink, FeatureLockedError} from '.';

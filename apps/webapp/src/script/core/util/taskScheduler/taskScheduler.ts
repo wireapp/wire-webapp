@@ -17,9 +17,9 @@
  *
  */
 
-import {LogFactory} from '@wireapp/commons';
-
 import {TaskSchedulerStore} from './taskScheduler.store';
+
+import {LogFactory} from '../../../commons/LogFactory';
 
 const logger = LogFactory.getLogger('@wireapp/core/TaskScheduler');
 

@@ -23,8 +23,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
-
+import {Runtime} from '../../../../../commons/util/Runtime';
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
 import {User} from '../../../../../repositories/entity/User';

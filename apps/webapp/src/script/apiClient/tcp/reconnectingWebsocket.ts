@@ -22,8 +22,8 @@ import logdown from 'logdown';
 import PartySocketWebSocket, {type CloseEvent, type ErrorEvent, type Options} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
 
-import {LogFactory, StringUtil, TimeUtil} from '@wireapp/commons';
-
+import {LogFactory} from '../../commons/LogFactory';
+import {StringUtil, TimeUtil} from '../../commons/util';
 import type {WebSocketConstructor, WebSocketPlatform} from '../platform';
 import {BackFromSleepDetails, onBackFromSleep} from '../utils/backFromSleepHandler/backFromSleepHandler';
 

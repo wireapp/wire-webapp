@@ -1,6 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "references": [{"path": "../../libraries/config"}],
   "compilerOptions": {
     "noEmit": true,
     "incremental": true,

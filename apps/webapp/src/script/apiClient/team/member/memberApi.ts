@@ -19,11 +19,10 @@
 
 import axios, {AxiosHeaderValue, AxiosRequestConfig} from 'axios';
 
-import {ArrayUtil} from '@wireapp/commons';
-
 import {MemberCSVResponse} from './memberCsvResponse';
 import {UpdatedMemberData} from './updatedMemberData';
 
+import {ArrayUtil} from '../../../commons/util';
 import {
   BackendError,
   handleProgressEvent,

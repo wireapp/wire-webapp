@@ -17,10 +17,10 @@
  *
  */
 
-import {advanceJestTimersWithPromise} from '@wireapp/commons/lib/util/testUtils';
+import {advanceJestTimersWithPromise} from '../../../commons/util/testUtils';
 import {createFireAndForgetInvoker, type FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
-import {TimeUtil} from '@wireapp/commons';
+import {TimeUtil} from '../../../commons/util';
 
 import {RecurringTaskScheduler} from './recurringTaskScheduler';
 

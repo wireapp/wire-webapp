@@ -31,7 +31,6 @@ import React, {
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {ConnectionRequests} from './connectionRequests';
@@ -45,6 +44,7 @@ import {
 import {getConversationsToDisplay} from './helpers';
 import {useSidebarStore} from './useSidebarStore';
 
+import {TimeInMillis} from '../../../../commons/util/TimeUtil';
 import {ConversationListCell} from '../../../../components/conversationListCell';
 import type {RegisterConversationElement} from '../../../../hooks/useConversationFocus';
 import {Call} from '../../../../repositories/calling/Call';

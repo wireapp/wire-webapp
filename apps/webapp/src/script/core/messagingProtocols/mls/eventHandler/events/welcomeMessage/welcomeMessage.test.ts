@@ -27,9 +27,9 @@ import {handleMLSWelcomeMessage} from './welcomeMessage';
 import {NotificationSource} from '../../../../../notification';
 import {MLSService, MLSServiceEvents} from '../../../mlsService';
 
-jest.mock('@wireapp/commons/lib/base64/decoder', () => {
+jest.mock('../../../../../../commons/base64/decoder', () => {
   return {
-    ...jest.requireActual('@wireapp/commons/lib/base64/decoder'),
+    ...jest.requireActual('../../../../../../commons/base64/decoder'),
     Decoder: {
       fromBase64: jest.fn().mockImplementation((value: string) => {
         return {
@@ -40,9 +40,9 @@ jest.mock('@wireapp/commons/lib/base64/decoder', () => {
   };
 });
 
-jest.mock('@wireapp/commons/lib/base64/encoder', () => {
+jest.mock('../../../../../../commons/base64/encoder', () => {
   return {
-    ...jest.requireActual('@wireapp/commons/lib/base64/encoder'),
+    ...jest.requireActual('../../../../../../commons/base64/encoder'),
     Encoder: {
       toBase64: jest.fn().mockImplementation((value: string) => {
         return {

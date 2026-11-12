@@ -27,8 +27,10 @@ import {readFileSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import {generateClientConfig, generateServerConfig, parseBuildMetadata} from '@wireapp/config';
-import type {BuildMetadata, Env} from '@wireapp/config';
+import {generateConfig as generateClientConfig} from '../server/configuration/client.config.ts';
+import {parseBuildMetadata} from '../server/configuration/buildMetadata.ts';
+import type {BuildMetadata} from '../server/configuration/buildMetadata.ts';
+import type {Env} from '../server/configuration/env.ts';
 
 type EnvironmentUrls = {
   readonly base: string;
@@ -73,16 +75,15 @@ function createTemplateParameters(): Record<string, string> {
     urls: environmentUrls,
   };
   const clientConfig = generateClientConfig(commonConfig, environment);
-  const serverConfig = generateServerConfig(commonConfig, environment);
 
   return {
     VERSION: clientConfig.VERSION,
     ASSET_VERSION: clientConfig.ASSET_VERSION,
     BRAND_NAME: clientConfig.BRAND_NAME,
     APP_BASE: clientConfig.APP_BASE,
-    OPEN_GRAPH_TITLE: serverConfig.OPEN_GRAPH.TITLE,
-    OPEN_GRAPH_DESCRIPTION: serverConfig.OPEN_GRAPH.DESCRIPTION,
-    OPEN_GRAPH_IMAGE_URL: serverConfig.OPEN_GRAPH.IMAGE_URL,
+    OPEN_GRAPH_TITLE: environment.OPEN_GRAPH_TITLE,
+    OPEN_GRAPH_DESCRIPTION: environment.OPEN_GRAPH_DESCRIPTION,
+    OPEN_GRAPH_IMAGE_URL: environment.OPEN_GRAPH_IMAGE_URL,
   };
 }
 
@@ -121,7 +122,7 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       type: 'persistent',
       buildDependencies: [
         configFilePath,
-        path.resolve(configDirectoryPath, 'package.json'),
+        path.resolve(rootPath, 'package.json'),
         path.resolve(rootPath, '.browserslistrc'),
         buildMetadataPath,
       ],
@@ -145,7 +146,7 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       rules: [
         {
           test: /\.[jt]sx?$/,
-          include: scriptPath,
+          include: [scriptPath, path.resolve(rootPath, 'apps/server/configuration/buildMetadata.ts')],
           exclude: /node_modules/,
           use: {
             loader: 'builtin:swc-loader',
@@ -250,6 +251,7 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       filename: 'min/[name].js',
       path: outputPath,
       publicPath: '/',
+      uniqueName: '@wireapp/webapp',
     },
     plugins: [
       new rspack.ProvidePlugin({
@@ -328,7 +330,7 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       fallback: {
         crypto: false,
         fs: false,
-        os: fileURLToPath(import.meta.resolve('os-browserify')),
+        os: fileURLToPath(import.meta.resolve('os-browserify/browser.js')),
         path: fileURLToPath(import.meta.resolve('path-browserify')),
       },
       modules: [authPath, 'node_modules'],

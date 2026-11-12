@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime} from '../../../commons/util/Runtime';
 
 import {troubleshooterFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {translateForTest} from '../../../util/test/translateForTest';

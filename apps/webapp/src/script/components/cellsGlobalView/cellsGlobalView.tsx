@@ -124,6 +124,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
           isSortingEnabled
           onToggleSort={toggleSort}
           {...getGlobalDriveSelectionProps(searchValue, filterState)}
+          selectionEnabled={false}
           selectionBarAnchor={selectionBarAnchor}
         />
       )}

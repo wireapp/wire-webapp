@@ -81,6 +81,7 @@ export const ROUTE = {
   HISTORY_INFO: '/historyinfo',
   INDEX: '/',
   LOGIN: '/login',
+  PASSWORD_LOGIN: '/login/password',
   CUSTOM_BACKEND: '/custom-backend',
   SET_ACCOUNT_TYPE: '/setaccounttype',
   SET_EMAIL: '/setemail',

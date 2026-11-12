@@ -19,7 +19,7 @@
 
 import {nodePlatform} from './shims/node/platform';
 
-import {AccentColor} from '@wireapp/commons/lib';
+import {AccentColor} from '../commons/util';
 import nock from 'nock';
 
 import {APIClient} from './apiClient';

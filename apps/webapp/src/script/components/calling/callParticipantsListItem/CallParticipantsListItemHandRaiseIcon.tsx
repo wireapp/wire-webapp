@@ -20,10 +20,10 @@
 import {useEffect, useState} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
 import {toolTipStyles} from './CallParticipantsListItemHandRaiseIcon.styles';
 
+import {TimeInMillis} from '../../../commons/util/TimeUtil';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {InviteIcon} from '../../../uiKit/dataDisplay/icon/inviteIcon';
 import {Tooltip} from '../../../uiKit/dataDisplay/tooltip/tooltip';

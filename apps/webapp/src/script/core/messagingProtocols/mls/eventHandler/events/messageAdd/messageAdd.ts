@@ -17,10 +17,8 @@
  *
  */
 
-import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {result} from 'true-myth';
 
-import {LogFactory, TimeUtil} from '@wireapp/commons';
 import {BufferedDecryptedMessage, ClientId, ConversationId, DecryptedMessage} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
@@ -28,6 +26,9 @@ import {queueProposal} from './incomingProposalsQueue';
 
 import {ConversationMLSMessageAddEvent} from '../../../../../../apiClient/event/conversationEvent';
 import {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
+import {Decoder} from '../../../../../../commons/base64/decoder';
+import {LogFactory} from '../../../../../../commons/LogFactory';
+import {TimeUtil} from '../../../../../../commons/util';
 import {HandledEventPayload} from '../../../../../notification';
 import {parseFullQualifiedClientId} from '../../../../../util/fullyQualifiedClientIdUtils';
 import {MLSService} from '../../../mlsService/mlsService';

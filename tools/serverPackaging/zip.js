@@ -22,8 +22,6 @@ const archiver = require('archiver');
 const fs = require('fs');
 const path = require('path');
 
-const {createPackagedServerManifest, findLocalWorkspaceDependencyPackages} = require('./workspaceDependencies.ts');
-
 const archive = archiver('zip');
 
 const ROOT_PATH = path.resolve(__dirname, '../..');
@@ -37,50 +35,6 @@ if (!fs.existsSync(S3_PATH)) {
 }
 const output = fs.createWriteStream(path.join(S3_PATH, 'ebs.zip'));
 
-// Read local workspace package metadata and mark bundled dependencies with their package versions.
-const serverPackageManifest = JSON.parse(fs.readFileSync(path.join(SERVER_PATH, 'package.json'), 'utf8'));
-const librariesDirectory = path.join(ROOT_PATH, 'libraries');
-const workspacePackages = fs
-  .readdirSync(librariesDirectory, {withFileTypes: true})
-  .filter(libraryDirectory => {
-    return libraryDirectory.isDirectory();
-  })
-  .map(libraryDirectory => {
-    return path.join(librariesDirectory, libraryDirectory.name);
-  })
-  .flatMap(workspacePackageDirectory => {
-    const packageManifestPath = path.join(workspacePackageDirectory, 'package.json');
-
-    if (!fs.existsSync(packageManifestPath)) {
-      return [];
-    }
-
-    return [
-      {
-        directoryPath: workspacePackageDirectory,
-        manifest: JSON.parse(fs.readFileSync(packageManifestPath, 'utf8')),
-      },
-    ];
-  });
-const workspaceDependencyPackages = findLocalWorkspaceDependencyPackages({
-  dependencies: serverPackageManifest.dependencies || {},
-  workspacePackages,
-});
-
-workspaceDependencyPackages.forEach(workspacePackage => {
-  console.info(`Marking workspace dependency as pre-bundled: ${workspacePackage.manifest.name}`);
-});
-
-const packageJson = createPackagedServerManifest({
-  serverPackageManifest,
-  workspacePackages,
-});
-
-// Write modified package.json to a temp file
-const tempPackageJsonPath = path.join(DIST_PATH, 'package.json.tmp');
-const packageJsonIndentationSpaces = 2;
-fs.writeFileSync(tempPackageJsonPath, JSON.stringify(packageJson, null, packageJsonIndentationSpaces));
-archive.file(tempPackageJsonPath, {name: 'package.json'});
 archive.file(path.join(ROOT_PATH, '.env.defaults'), {name: '.env.defaults'});
 archive.file(path.join(SERVER_PATH, 'Procfile'), {name: 'Procfile'});
 // Archive dist directory but exclude s3 subdirectory

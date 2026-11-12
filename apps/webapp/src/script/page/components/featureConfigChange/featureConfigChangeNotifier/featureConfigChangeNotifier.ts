@@ -21,8 +21,6 @@ import {useEffect, useRef} from 'react';
 
 import {amplify} from 'amplify';
 
-import {Runtime} from '@wireapp/commons';
-
 import {loadFeatureConfig, saveFeatureConfig} from './featureConfigChangeNotifier.store';
 
 import {FeatureWithoutConfig} from '../../../../apiClient/team/feature/featureList.schema';
@@ -32,6 +30,7 @@ import {
   FEATURE_STATUS,
   SELF_DELETING_TIMEOUT,
 } from '../../../../apiClient/team/feature/featureList.types';
+import {Runtime} from '../../../../commons/util/Runtime';
 import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';
 import type {
   PrimaryModalTranslatedComponent,

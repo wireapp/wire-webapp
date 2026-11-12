@@ -23,11 +23,11 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
-import {UrlUtil, StringUtil, Runtime} from '@wireapp/commons';
-
 import {Page} from './page';
 
 import type {RegisteredClient} from '../../apiClient/client/registeredClient';
+import {UrlUtil, StringUtil} from '../../commons/util';
+import {Runtime} from '../../commons/util/Runtime';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
@@ -41,6 +41,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators, type ThunkAction} from '../module/reducer';
 import {QUERY_KEY} from '../route';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
+import {getOAuthQueryString} from '../util/oauthUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -50,7 +51,7 @@ const ClientManagerComponent: FunctionComponent<Props & ConnectedProps & Dispatc
 }: Props & ConnectedProps & DispatchProps) => {
   const {translate} = useApplicationContext();
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, getOAuthQueryString(window.location));
   const isMobile = useMatchMedia(QUERY.mobile);
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 

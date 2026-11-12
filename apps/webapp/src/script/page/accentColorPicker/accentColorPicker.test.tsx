@@ -21,7 +21,7 @@ import {act, render} from '@testing-library/react';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
 
-import {AccentColor} from '@wireapp/commons';
+import {AccentColor} from '../../commons/util';
 
 import {User} from '../../repositories/entity/User';
 import {translateForTest} from '../../util/test/translateForTest';

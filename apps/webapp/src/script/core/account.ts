@@ -21,13 +21,11 @@ import {createClock} from '@enormora/clock';
 import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {once} from 'lodash';
 import logdown from 'logdown';
 import {asyncNoop, noop} from 'noop-esm';
 import {TimeoutError} from 'p-queue';
 
-import {LogFactory, StringUtil, TypedEventEmitter} from '@wireapp/commons';
 import type {CoreCryptoLogLevel} from '@wireapp/core-crypto';
 
 import {AccountService} from './account/';
@@ -107,6 +105,10 @@ import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '../apiClient/tcp/
 import {WebSocketClient} from '../apiClient/tcp/webSocketClient';
 import {FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../apiClient/user/qualifiedId';
+import {LogFactory} from '../commons/LogFactory';
+import {TypedEventEmitter} from '../commons/TypedEventEmitter/TypedEventEmitter';
+import {StringUtil} from '../commons/util';
+import {TimeInMillis} from '../commons/util/TimeUtil';
 
 type CryptoClientWithProtocol =
   readonly [CryptoClientType.CORE_CRYPTO, CoreCryptoWrapper] | readonly [CryptoClientType.CRYPTOBOX, CryptoboxWrapper];

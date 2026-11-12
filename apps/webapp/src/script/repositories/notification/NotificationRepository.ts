@@ -26,13 +26,13 @@ import {result} from 'true-myth';
 import {match} from 'ts-pattern';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {AppPermissionState} from './AppPermissionState';
 
 import {NotificationPreference, WebappProperties} from '../../apiClient/user/data/userPropertiesSetData';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {Runtime} from '../../commons/util/Runtime';
 import {SuperType} from '../../message/superType';
 import {SystemMessageType} from '../../message/systemMessageType';
 import type {SystemNotificationApi, SystemNotificationHandle} from '../../notification/systemNotificationTypes';

@@ -23,8 +23,6 @@ import logdown from 'logdown';
 
 import {EventEmitter} from 'events';
 
-import {LogFactory} from '@wireapp/commons';
-
 import {AccountAPI} from './account/accountApi';
 import {AssetAPI} from './asset/';
 import {
@@ -76,6 +74,8 @@ import {TeamSearchAPI} from './team/search';
 import {SSOAPI} from './team/sso';
 import {UserAPI} from './user/';
 import {UserGroupAPI} from './userGroups/';
+
+import {LogFactory} from '../commons/LogFactory';
 
 const minimumMlsBackendVersion = 5;
 const minimumGuestLinkPasswordBackendVersion = 4;

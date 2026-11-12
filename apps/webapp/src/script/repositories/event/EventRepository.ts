@@ -24,8 +24,6 @@ import {noop} from 'noop-esm';
 import PromiseQueue from 'p-queue';
 import {container} from 'tsyringe';
 
-import {Runtime, StringUtil} from '@wireapp/commons';
-
 import {ClientEvent} from './Client';
 import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
 import type {EventService} from './EventService';
@@ -45,6 +43,8 @@ import {
 } from '../../apiClient/event/conversationEvent';
 import {MEETING_EVENT} from '../../apiClient/event/meetingEvent';
 import {USER_EVENT} from '../../apiClient/event/userEvent';
+import {StringUtil} from '../../commons/util';
+import {Runtime} from '../../commons/util/Runtime';
 import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '../../core';
 import {NotificationSource, HandledEventPayload} from '../../core/notification';
 import {sequentialQueueOptions} from '../../core/queue/sequentialQueueOptions';

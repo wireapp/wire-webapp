@@ -33,8 +33,9 @@ import https from 'https';
 import {createRequire} from 'node:module';
 import path from 'path';
 
-import type {BuildMetadata, ClientConfig, ServerConfig} from '@wireapp/config';
-
+import type {BuildMetadata} from './configuration/buildMetadata';
+import type {ClientConfig} from './configuration/client.config';
+import type {ServerConfig} from './configuration/server.config';
 import {AppleAssociationRoute} from './routes/appleassociation/appleAssociationRoute';
 import {createClientVersionCheckRoute} from './routes/clientVersionCheck/clientVersionCheckRoute';
 import {ConfigRoute} from './routes/config/configRoute';

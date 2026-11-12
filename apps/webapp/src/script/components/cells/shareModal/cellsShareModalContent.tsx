@@ -22,10 +22,9 @@ import {ComponentProps, type FunctionComponent} from 'react';
 import {CSSObject} from '@emotion/react';
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {ValidationUtil} from '@wireapp/commons';
-
 import {CellsShareExpirationFields, type CellsShareExpirationSelection} from './cellsShareExpirationFields';
 
+import {ValidationUtil} from '../../../commons/util';
 import {Config} from '../../../Config';
 import {type RootContextValue} from '../../../page/rootProvider';
 import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR_V2} from '../../../uiKit/identity/colorsV2/colorsV2';

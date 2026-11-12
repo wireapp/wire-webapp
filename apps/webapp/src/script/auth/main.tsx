@@ -30,8 +30,6 @@ import {Provider} from 'react-redux';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
-
 import './configureEnvironment';
 import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
@@ -42,6 +40,7 @@ import {
   isCoreCryptoEnabled,
   redirectIfCoreCryptoUnsupported,
 } from '../browser/coreCryptoSupport';
+import {Runtime} from '../commons/util/Runtime';
 import {Config} from '../Config';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';

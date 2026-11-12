@@ -26,10 +26,9 @@ import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import {container} from 'tsyringe';
 
-import {UrlUtil} from '@wireapp/commons';
-
 import {Page} from './page';
 
+import {UrlUtil} from '../../commons/util';
 import {LogoFullIcon} from '../../components/icon';
 import {Config} from '../../Config';
 import {useSingleInstance} from '../../hooks/useSingleInstance';

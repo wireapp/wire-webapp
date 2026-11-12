@@ -18,7 +18,7 @@
  */
 
 import '@testing-library/jest-dom/jest-globals';
-import {fireEvent, render} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 
 import {Checkbox} from './checkbox';
 
@@ -37,5 +37,26 @@ describe('account creation terms and conditions checkbox', () => {
     expect(checkbox).not.toBeChecked();
     fireEvent.click(checkbox);
     expect(checkbox).toBeChecked();
+  });
+});
+
+describe('checkbox sizing', () => {
+  it.each([THEME_ID.LIGHT, THEME_ID.DARK])('scales the selection box and checkmark in the %s theme', themeId => {
+    render(
+      <StyledApp themeId={themeId}>
+        <Checkbox checkboxSize="small" aria-label="Select item" />
+        <Checkbox aria-label="Regular checkbox" />
+      </StyledApp>,
+    );
+
+    const checkbox = screen.getByRole('checkbox', {name: 'Select item'});
+    const checkmark = checkbox.nextElementSibling?.querySelector('svg');
+    const regularCheckbox = screen.getByRole('checkbox', {name: 'Regular checkbox'});
+    const regularCheckmark = regularCheckbox.nextElementSibling?.querySelector('svg');
+
+    expect(checkbox).toHaveStyle({width: '1.125rem', height: '1.125rem'});
+    expect(checkmark).toHaveStyle({width: '0.6875rem', height: '0.5625rem'});
+    expect(regularCheckbox).toHaveStyle({width: '1.375rem', height: '1.375rem'});
+    expect(regularCheckmark).toHaveStyle({width: '0.9375rem', height: '0.8125rem'});
   });
 });

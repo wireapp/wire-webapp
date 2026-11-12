@@ -17,7 +17,7 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime} from '../../../src/script/commons/util/Runtime';
 
 import {Shortcut} from '../../../src/script/ui/shortcut';
 import {ShortcutType} from '../../../src/script/ui/shortcutType';

@@ -25,6 +25,7 @@ import {FileCardHeader} from './fileCardHeader/fileCardHeader';
 import {FileCardIcon} from './fileCardIcon/fileCardIcon';
 import {FileCardLoading} from './fileCardLoading/fileCardLoading';
 import {FileCardName} from './fileCardName/fileCardName';
+import {FileCardPreview} from './fileCardPreview/fileCardPreview';
 import {FileCardRoot} from './fileCardRoot/fileCardRoot';
 import {FileCardType} from './fileCardType/fileCardType';
 
@@ -85,6 +86,7 @@ export const FileCard = {
   CloseButton: FileCardCloseButton,
   Name: FileCardName,
   Content: FileCardContent,
+  Preview: FileCardPreview,
   Loading: FileCardLoading,
   Error: FileCardError,
 };

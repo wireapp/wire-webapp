@@ -19,35 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const contentWrapperStyles: CSSObject = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '100%',
-  backgroundColor: 'var(--foreground-fade-8)',
-  border: '1px solid var(--border-color)',
-  borderRadius: '10px',
-  color: 'var(--gray-70)',
-  aspectRatio: '16/9',
-  overflow: 'hidden',
-  padding: 0,
-  margin: 0,
-  cursor: 'pointer',
-
-  // Fallback for the above aspect-ratio
-  '@supports not (aspect-ratio: 16/9)': {
-    paddingBottom: '56.25%',
-  },
-};
-
-export const imageStyles: CSSObject = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-  objectPosition: 'top',
-  opacity: 'var(--opacity)',
-};
-
 export const infoOverlayStyles: CSSObject = {
   position: 'absolute',
   top: 0,

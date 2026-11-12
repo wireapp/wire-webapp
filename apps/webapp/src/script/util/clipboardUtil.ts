@@ -17,7 +17,7 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime} from '../commons/util/Runtime';
 
 export function copyText(text: string): Promise<void> {
   if (Runtime.isSupportingClipboard()) {

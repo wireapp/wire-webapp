@@ -17,10 +17,9 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
-
 import {CallConfigData} from '../../apiClient/account/callConfigData';
 import {APIClient} from '../../apiClient/apiClient';
+import {Runtime} from '../../commons/util/Runtime';
 
 const firefoxIceCandidateLimit = 3;
 

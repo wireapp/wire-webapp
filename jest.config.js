@@ -11,9 +11,9 @@ module.exports = {
   projects: [
     '<rootDir>/apps/webapp/test/core/jest.config.js',
     '<rootDir>/apps/webapp/test/apiClient/jest.config.js',
+    '<rootDir>/apps/webapp/test/commons/jest.config.js',
     '<rootDir>/apps/webapp/test/uiKit/jest.config.js',
     '<rootDir>/apps/*/jest.config.*',
-    '<rootDir>/libraries/*/jest.config.js',
     '<rootDir>/tools/jest.config.js',
   ],
   reporters,

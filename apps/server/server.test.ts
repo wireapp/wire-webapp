@@ -3,7 +3,9 @@ import type {Express} from 'express';
 
 import {createFactory} from '@enormora/objectory';
 import {isError, isNonEmptyString, isNullOrUndefined, isNumber, isString} from '@sindresorhus/is';
-import type {BuildMetadata, ClientConfig, ServerConfig} from '@wireapp/config';
+import type {BuildMetadata} from './configuration/buildMetadata';
+import type {ClientConfig} from './configuration/client.config';
+import type {ServerConfig} from './configuration/server.config';
 
 import {Server} from './Server';
 

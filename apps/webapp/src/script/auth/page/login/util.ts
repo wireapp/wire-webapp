@@ -18,7 +18,6 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isString} from '@sindresorhus/is';
-import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {noop} from 'noop-esm';
 import {Dispatch, UnknownAction} from 'redux';
 import {match, P} from 'ts-pattern';
@@ -27,12 +26,14 @@ import {DomainRedirect} from '../../../apiClient/account/domainRedirect';
 import {ClientType} from '../../../apiClient/client/clientType';
 import {BackendError} from '../../../apiClient/http/backendError';
 import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
+import {pathWithParams} from '../../../commons/util/UrlUtil';
 import {Config} from '../../../Config';
 import {APIClient} from '../../../service/apiClientSingleton';
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ValidationError} from '../../module/action/validationError';
 import {ConversationState} from '../../module/reducer/conversationReducer';
 import {QUERY_KEY, ROUTE} from '../../route';
+import {withOAuthQuery} from '../../util/oauthUtil';
 
 export const requiresPasswordModal = (
   isOpen: boolean,
@@ -72,7 +73,7 @@ export const handleSSOBackendError = (
   match(error.label)
     .with(BackendErrorLabel.TOO_MANY_CLIENTS, () => {
       resetAuthError();
-      navigate(ROUTE.CLIENTS);
+      navigate(withOAuthQuery(ROUTE.CLIENTS));
     })
     .with(BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND, () => {
       return setSsoError(error);
@@ -135,7 +136,8 @@ export const handleEnterpriseLogin = async ({
             shouldDisplayWarning: res.domain_redirect === DomainRedirect.NO_REGISTRATION && res.due_to_existing_account,
           }) as unknown as UnknownAction,
         );
-        navigate(ROUTE.LOGIN);
+        const passwordRoute = withOAuthQuery(ROUTE.PASSWORD_LOGIN);
+        navigate(passwordRoute === ROUTE.PASSWORD_LOGIN ? ROUTE.LOGIN : passwordRoute);
       },
     )
     .with({domain_redirect: DomainRedirect.SSO}, async res => {

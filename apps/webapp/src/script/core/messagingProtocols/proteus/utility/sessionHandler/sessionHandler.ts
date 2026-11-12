@@ -25,7 +25,6 @@ import {
   isObject,
   isUndefined,
 } from '@sindresorhus/is';
-import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {Logger} from 'logdown';
 
 import {SessionId} from './sessionHandler.types';
@@ -35,6 +34,7 @@ import {PreKey} from '../../../../../apiClient/auth/preKey';
 import {QualifiedUserClients} from '../../../../../apiClient/conversation/qualifiedUserClients';
 import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {QualifiedUserPreKeyBundleMap} from '../../../../../apiClient/user/userPreKeyBundleMap';
+import {Decoder} from '../../../../../commons/base64/decoder';
 import {flattenUserMap} from '../../../../conversation/message/userClientsUtil';
 import {CryptoClient} from '../../proteusService/cryptoClient';
 

@@ -21,8 +21,6 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, use
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {ValidationUtil} from '@wireapp/commons';
-
 import {CheckboxOption} from './CheckboxOption/CheckboxOption';
 import {MessageContent} from './Content/MessageContent';
 import {GuestLinkPasswordForm} from './GuestLinkPasswordForm/GuestLinkPasswordForm';
@@ -39,6 +37,7 @@ import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurren
 import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
 import {SecondaryButton} from './SecondaryButton/SecondaryButton';
 
+import {ValidationUtil} from '../../../commons/util';
 import {Config} from '../../../Config';
 import {ErrorMessage} from '../../../uiKit/inputs/errorMessage/errorMessage';
 import {isEnterKey, isEscapeKey} from '../../../util/keyboardUtil';

@@ -29,9 +29,7 @@ type BuildVariant = 'development' | 'internal' | 'public';
 type AssemblyScope = 'artifact' | 'webapp';
 
 const workspaceRootPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-const serverBuildOutputPath = path.resolve(workspaceRootPath, 'apps/server/build/server');
 const buildMetadataFilePath = path.resolve(workspaceRootPath, 'apps/server/build/metadata/version.json');
-const artifactOutputPath = path.resolve(workspaceRootPath, 'apps/server/dist');
 
 function isBuildVariant(value: unknown): value is BuildVariant {
   return value === 'development' || value === 'internal' || value === 'public';
@@ -68,22 +66,28 @@ function copyDirectoryContents(sourceDirectoryPath: string, destinationDirectory
 
 function assembleBuild(buildVariant: BuildVariant, assemblyScope: AssemblyScope): void {
   const webappBuildOutputPath = resolveWebappBuildOutputPath(buildVariant);
+  const serverBuildOutputPath = path.resolve(workspaceRootPath, 'apps/server/build/bundle');
+  const artifactOutputPath = path.resolve(workspaceRootPath, 'apps/server/dist');
 
   assertPathExists(buildMetadataFilePath);
   assertPathExists(webappBuildOutputPath);
-  if (assemblyScope === 'artifact') {
+  if (assemblyScope !== 'webapp') {
     assertPathExists(serverBuildOutputPath);
   }
 
   rmSync(artifactOutputPath, {force: true, recursive: true});
   mkdirSync(artifactOutputPath, {recursive: true});
 
-  if (assemblyScope === 'artifact') {
+  if (assemblyScope !== 'webapp') {
     copyDirectoryContents(serverBuildOutputPath, artifactOutputPath);
   }
 
   copyDirectoryContents(webappBuildOutputPath, path.resolve(artifactOutputPath, 'static'));
   cpSync(buildMetadataFilePath, path.resolve(artifactOutputPath, 'version.json'));
+
+  if (assemblyScope !== 'webapp') {
+    cpSync(path.resolve(workspaceRootPath, '.env.defaults'), path.resolve(artifactOutputPath, '.env.defaults'));
+  }
 }
 
 function run(): void {

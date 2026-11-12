@@ -23,13 +23,12 @@
  * classifies errors; recovery actions are implemented by a separate orchestrator.
  */
 
-import {Encoder} from '@wireapp/commons/lib/base64/encoder';
-
 import {MlsError_Tags} from '@wireapp/core-crypto';
 
 import {MLSStaleMessageError, MLSGroupOutOfSyncError} from '../../../../apiClient/conversation/conversationError';
 import {SUBCONVERSATION_ID} from '../../../../apiClient/conversation/subconversation';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import {Encoder} from '../../../../commons/base64/encoder';
 // Reuse existing type-guards from the MLS layer
 import {
   isCoreCryptoMLSWrongEpochError,

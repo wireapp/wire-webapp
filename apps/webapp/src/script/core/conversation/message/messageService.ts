@@ -18,7 +18,6 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {uuidToBytes} from '@wireapp/commons/lib/util/StringUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosError} from 'axios';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -33,6 +32,7 @@ import {QualifiedOTRRecipients} from '../../../apiClient/conversation/otrRecipie
 import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {QualifiedUserPreKeyBundleMap} from '../../../apiClient/user/userPreKeyBundleMap';
+import {uuidToBytes} from '../../../commons/util/StringUtil';
 import type {EncryptionResult, ProteusService} from '../../messagingProtocols/proteus';
 import {isQualifiedIdArray} from '../../util';
 

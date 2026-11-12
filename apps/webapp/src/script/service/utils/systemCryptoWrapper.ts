@@ -17,8 +17,8 @@
  *
  */
 
-import {Decoder} from '@wireapp/commons/lib/base64/decoder';
-import {Encoder} from '@wireapp/commons/lib/base64/encoder';
+import {Decoder} from '../../commons/base64/decoder';
+import {Encoder} from '../../commons/base64/encoder';
 
 type SystemCryptoV0 = {
   encrypt: (value: Uint8Array) => Promise<Uint8Array>;

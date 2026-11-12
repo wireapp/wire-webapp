@@ -17,12 +17,9 @@
  *
  */
 
-import {Decoder} from '@wireapp/commons/lib/base64/decoder';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios from 'axios';
 import {result, task, type Result, type Task} from 'true-myth';
 
-import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {
   ConversationId,
   CoreCrypto,
@@ -44,6 +41,10 @@ import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 
 import {APIClient} from '../../../../apiClient/apiClient';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import {Decoder} from '../../../../commons/base64/decoder';
+import {LogFactory} from '../../../../commons/LogFactory';
+import {TypedEventEmitter} from '../../../../commons/TypedEventEmitter/TypedEventEmitter';
+import {TimeInMillis} from '../../../../commons/util/TimeUtil';
 import {ClientService} from '../../../client';
 import {CoreDatabase} from '../../../storage/coreDb';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';

@@ -21,8 +21,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {TypedEventEmitter} from '@wireapp/commons';
-
 import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
@@ -33,6 +31,7 @@ import {
   FeatureList,
 } from '../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
 import {Core} from '../../service/coreSingleton';
 import {Logger, getLogger} from '../../util/logger';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';

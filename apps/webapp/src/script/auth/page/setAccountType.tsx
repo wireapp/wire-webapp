@@ -21,11 +21,10 @@ import type {FunctionComponent} from 'react';
 
 import {Navigate, useNavigate} from 'react-router';
 
-import {Runtime} from '@wireapp/commons';
-
 import {Page} from './page';
 import {styles} from './setAccountType.styles';
 
+import {Runtime} from '../../commons/util/Runtime';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {CheckRoundIcon} from '../../uiKit/dataDisplay/icon/checkRoundIcon';

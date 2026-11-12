@@ -20,12 +20,11 @@
 import axios, {AxiosHeaderValue, AxiosRequestConfig} from 'axios';
 import logdown from 'logdown';
 
-import {LogFactory} from '@wireapp/commons';
-
 import {AssetUploadData, PostAssetsResponseSchema} from './assetApi.schema';
 import {AssetRetentionPolicy} from './assetRetentionPolicy';
 import {isValidToken, isValidUUID} from './assetUtil';
 
+import {LogFactory} from '../../commons/LogFactory';
 import {
   BackendError,
   handleProgressEvent,

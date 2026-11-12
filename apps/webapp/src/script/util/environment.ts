@@ -19,8 +19,7 @@
 
 import {isNonEmptyString, isNull} from '@sindresorhus/is';
 
-import {Runtime} from '@wireapp/commons';
-
+import {Runtime} from '../commons/util/Runtime';
 import {Config} from '../Config';
 import {BackendEnvironment} from '../service/backendEnvironment';
 

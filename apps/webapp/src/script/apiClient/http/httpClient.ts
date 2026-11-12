@@ -25,13 +25,13 @@ import {Maybe} from 'true-myth';
 
 import {EventEmitter} from 'events';
 
-import {LogFactory, TimeUtil} from '@wireapp/commons';
-
 import {createAbortableWait} from './abortableWait';
 import {createIncrementalRetryBackoffPolicy, IncrementalRetryBackoffState} from './incrementalRetryBackoff';
 import {createIncrementalRetryBackoffRunner} from './incrementalRetryBackoffRunner';
 import {PriorityQueue} from './priorityQueue/priorityQueue';
 
+import {LogFactory} from '../../commons/LogFactory';
+import {TimeUtil} from '../../commons/util';
 import {
   AccessTokenData,
   AccessTokenStore,

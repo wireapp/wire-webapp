@@ -24,11 +24,10 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {ValidationUtil} from '@wireapp/commons';
-
 import {applockStyles} from './appLock.styles';
 
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {ValidationUtil} from '../../commons/util';
 import * as Icon from '../../components/icon';
 import {ModalComponent} from '../../components/Modals/ModalComponent';
 import {Config} from '../../Config';

@@ -1,11 +1,11 @@
 ls:
   tools:
     .dir: camelCase
-  libraries/commons/src/base64:
+  apps/webapp/src/script/commons/base64:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/commons/src/base64/test:
+  apps/webapp/src/script/commons/base64/test:
     .dir: camelCase
     .ts: camelCase
     .json: camelCase
@@ -17,7 +17,7 @@ ls:
     .js: camelCase
     .test.ts: camelCase
     .sh: camelCase
-  libraries/config/src:
+  apps/server/configuration:
     .dir: camelCase
     .ts: camelCase
     .spec.ts: camelCase

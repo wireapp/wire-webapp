@@ -22,8 +22,6 @@ import {isUndefined} from '@sindresorhus/is';
 import axios from 'axios';
 import {StatusCodes} from 'http-status-codes';
 
-import {LogFactory} from '@wireapp/commons';
-
 import {APIClient} from '../../apiClient/apiClient';
 import {LoginData} from '../../apiClient/auth/loginData';
 import {ClientCapability} from '../../apiClient/client/clientCapability';
@@ -32,6 +30,7 @@ import {ClientType} from '../../apiClient/client/clientType';
 import {CreateClientPayload} from '../../apiClient/client/newClient';
 import {RegisteredClient} from '../../apiClient/client/registeredClient';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
+import {LogFactory} from '../../commons/LogFactory';
 import type {ProteusService} from '../messagingProtocols/proteus';
 import {InitialPrekeys} from '../messagingProtocols/proteus/proteusService/cryptoClient';
 import {wipeCoreCryptoDb} from '../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
