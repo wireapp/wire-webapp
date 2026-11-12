@@ -304,7 +304,7 @@ export const TroubleshootingPreferences = ({repository}: {repository: Troublesho
                   );
                 })}
               </ol>
-              {failedStep !== undefined && (
+              {!isUndefined(failedStep) && (
                 <small>
                   <span css={failedStep === 'connected' ? styles.statusStyles('bad') : undefined}>
                     {translate(
