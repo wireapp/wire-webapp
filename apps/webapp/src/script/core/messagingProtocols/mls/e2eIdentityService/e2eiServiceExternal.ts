@@ -18,7 +18,7 @@
  */
 
 import axios from 'axios';
-import {result, task, type Result, type Task} from 'true-myth';
+import {result, task, type Maybe, type Result, type Task} from 'true-myth';
 
 import {
   ConversationId,
@@ -40,12 +40,12 @@ import {E2EIAuthenticateCallback} from './e2eiService.types';
 import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 
 import {APIClient} from '../../../../apiClient/apiClient';
+import type {RegisteredClient} from '../../../../apiClient/client/registeredClient';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {Decoder} from '../../../../commons/base64/decoder';
 import {LogFactory} from '../../../../commons/LogFactory';
 import {TypedEventEmitter} from '../../../../commons/TypedEventEmitter/TypedEventEmitter';
 import {TimeInMillis} from '../../../../commons/util/TimeUtil';
-import {ClientService} from '../../../client/clientService';
 import {CoreDatabase} from '../../../storage/coreDb';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
@@ -89,6 +89,10 @@ type InitializeOptions = {
 
 export type PkiEnvironmentFactory = (hooks: PkiEnvironmentHooks) => Task<PkiEnvironment, Error>;
 
+type LocalClientLoader = {
+  readonly loadClient: () => Task<Maybe<RegisteredClient>, Error>;
+};
+
 const axiosMethods: Record<HttpMethod, 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head'> = {
   [HttpMethod.Get]: 'get',
   [HttpMethod.Post]: 'post',
@@ -114,7 +118,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     private readonly apiClient: APIClient,
     coreDatabase: CoreDatabase,
     private readonly recurringTaskScheduler: RecurringTaskScheduler,
-    private readonly clientService: ClientService,
+    private readonly localClientLoader: LocalClientLoader,
     private readonly mlsService: MLSService,
     private readonly pkiEnvironmentFactory: PkiEnvironmentFactory,
   ) {
@@ -290,7 +294,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   public isFreshMLSSelfClient(): Task<boolean, Error> {
-    return this.clientService.loadClient().map(client => {
+    return this.localClientLoader.loadClient().map(client => {
       return client.isNothing || !this.mlsService.isInitializedMLSClient(client.value);
     });
   }
