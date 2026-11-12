@@ -78,7 +78,7 @@ const qualityStatusLabels = {
 } as const;
 
 const getQualityTone = (id: QualityCheckId, value: number | null | undefined): (typeof qualityTones)[number] => {
-  if (value === undefined || value === null) {
+  if (isNullOrUndefined(value)) {
     return 'muted';
   }
   const {fair, poorAbove} = qualityThresholds[id];
