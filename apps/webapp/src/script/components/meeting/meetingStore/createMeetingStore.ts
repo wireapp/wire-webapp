@@ -23,20 +23,23 @@ import {task, type Task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import type {MeetingStoreDeps} from './meetingStoreDeps';
+import {type RotateMeetingLinkError, rotateMeetingLinkErrors} from './rotateMeetingLinkErrors';
 
-import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import type {MeetingWithConversation} from '../../../apiClient/meetings/meeting';
+import type {QualifiedId} from '../../../apiClient/user';
 import type {User} from '../../../repositories/entity/User';
 import {getLogger} from '../../../util/logger';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
-import {isAxiosError} from '../../../util/typePredicateUtil';
 import {loadMeetingsList} from '../loadMeetingsList';
 import {mapApiMeetingToSeries} from '../mapApiMeetingToSeries';
 import {mapMeetingInstanceToScheduleFormState} from '../mapMeetingInstanceToScheduleFormState';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../meetingSubmitErrors';
-import type {ScheduleMeetingFormState} from '../scheduleMeetingModal/scheduleMeetingTypes';
+import type {ScheduleMeetingFormState} from '../scheduleMeetingModal';
 import type {DeleteMeetingCommand} from '../shared/service/deleteMeeting';
-import {type CreateMeetingSuccess, type MeetingSubmitSuccess, type ScheduleMeetingSuccess} from '../shared/service/meetingService';
+import {
+  type CreateMeetingSuccess,
+  type MeetingSubmitSuccess,
+  type ScheduleMeetingSuccess,
+} from '../shared/service/meetingService';
 import type {
   MeetNowMeetingCommand,
   ScheduleMeetingCommand,
@@ -45,7 +48,6 @@ import type {
 import type {MeetingInstance} from '../types/meetingInstance';
 import type {MeetingSeries} from '../types/meetingSeries';
 import {toMeetingIdKey} from '../utils/toMeetingIdKey';
-import {rotateMeetingLinkErrors, type RotateMeetingLinkError} from './rotateMeetingLinkErrors';
 
 const logger = getLogger('createMeetingStore');
 
@@ -185,9 +187,15 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
         return deps.meetingsRepository
           .rotateMeetingLink(meetingId, password)
           .mapRejected(error => {
-            return isAxiosError(error) && error.response?.status === HTTP_STATUS.NOT_FOUND
-              ? rotateMeetingLinkErrors.notFound
-              : rotateMeetingLinkErrors.requestFailed;
+            const isNotFoundResponse =
+              typeof error === 'object' &&
+              error !== null &&
+              'response' in error &&
+              typeof error.response === 'object' &&
+              error.response !== null &&
+              'status' in error.response &&
+              error.response.status === HTTP_STATUS.NOT_FOUND;
+            return isNotFoundResponse ? rotateMeetingLinkErrors.notFound : rotateMeetingLinkErrors.requestFailed;
           })
           .andThen(apiMeeting => {
             const mapResult = mapApiMeetingToSeries(apiMeeting);

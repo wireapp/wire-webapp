@@ -17,7 +17,8 @@
  *
  */
 
-import {MouseEvent, type FunctionComponent} from 'react';
+import {type FunctionComponent, MouseEvent} from 'react';
+
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {getMeetingActionEntries} from './getMeetingActionEntries';
@@ -28,13 +29,13 @@ import type {User} from '../../../../../../repositories/entity/User';
 import {showContextMenu} from '../../../../../../ui/contextMenu';
 import {MoreIcon} from '../../../../../../uiKit/dataDisplay/icon/moreIcon';
 import {IconButton} from '../../../../../../uiKit/inputs/iconButton/iconButton';
+import {showMeetingLinkConfirmation} from '../../../../meetingLinkConfirmation/meetingLinkConfirmation';
+import {openRotateMeetingLink} from '../../../../rotateMeetingLinkModal/rotateMeetingLinkController';
 import type {MeetingInstance} from '../../../../types/meetingInstance';
 import {useDeleteMeeting} from '../../../../useDeleteMeeting';
 import {useEditMeeting} from '../../../../useEditMeeting';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from '../../../../utils/canDeleteMeeting';
 import {canEditMeeting, canRotateMeetingLink} from '../../../../utils/canEditMeeting';
-import {showMeetingLinkConfirmation} from '../../../../meetingLinkConfirmation/meetingLinkConfirmation';
-import {useRotateMeetingLinkModal} from '../../../../rotateMeetingLinkModal/useRotateMeetingLinkModal';
 
 interface MeetingActionProps {
   meetingInstance: MeetingInstance;
@@ -52,9 +53,6 @@ export const MeetingAction: FunctionComponent<MeetingActionProps> = ({
   const {translate, clock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
   const {openDeleteMeetingModal} = useDeleteMeeting();
-  const openRotateMeetingLink = useRotateMeetingLinkModal(state => {
-    return state.open;
-  });
 
   const handleActionButton = (event: MouseEvent<HTMLElement>): void => {
     if (selfUser === undefined) {
