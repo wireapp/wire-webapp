@@ -429544,107 +429544,6 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/core/client/clientDatabaseRepository.ts",
-    "to": "apps/webapp/src/script/core/client/clientService.ts",
-    "unresolvedTo": "./clientService",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "apps/webapp/src/script/core/client/clientService.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/index.ts",
-        "dependencyTypes": [
-          "local",
-          "type-only",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/proteusService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/conversationService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/conversationService/conversationService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientDatabaseRepository.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
     "from": "apps/webapp/src/script/core/client/clientService.ts",
     "to": "apps/webapp/src/script/core/client/index.ts",
     "unresolvedTo": "./",
@@ -429657,208 +429556,6 @@
       "name": "no-circular"
     },
     "cycle": [
-      {
-        "name": "apps/webapp/src/script/core/client/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
-    "from": "apps/webapp/src/script/core/client/clientService.ts",
-    "to": "apps/webapp/src/script/core/messagingProtocols/proteus/index.ts",
-    "unresolvedTo": "../messagingProtocols/proteus",
-    "dependencyTypes": [
-      "local",
-      "type-only",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/index.ts",
-        "dependencyTypes": [
-          "local",
-          "type-only",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/proteusService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/conversationService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/conversationService/conversationService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
-    "from": "apps/webapp/src/script/core/client/clientService.ts",
-    "to": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper/index.ts",
-    "unresolvedTo": "../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper/coreCryptoWrapper.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/common.types.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/notification/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/notification/notificationService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/conversationService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/conversationService/conversationService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
       {
         "name": "apps/webapp/src/script/core/client/index.ts",
         "dependencyTypes": [
@@ -430647,43 +430344,14 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/core/client/index.ts",
+        "name": "apps/webapp/src/script/core/messagingProtocols/mls/mlsService/index.ts",
         "dependencyTypes": [
           "local",
           "import"
         ]
       },
       {
-        "name": "apps/webapp/src/script/core/client/clientDatabaseRepository.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientService.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/index.ts",
-        "dependencyTypes": [
-          "local",
-          "type-only",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/proteusService.ts",
+        "name": "apps/webapp/src/script/core/messagingProtocols/mls/mlsService/mlsService.ts",
         "dependencyTypes": [
           "local",
           "export"
@@ -431214,120 +430882,6 @@
   },
   {
     "type": "cycle",
-    "from": "apps/webapp/src/script/core/messagingProtocols/common.types.ts",
-    "to": "apps/webapp/src/script/core/notification/index.ts",
-    "unresolvedTo": "../notification",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "apps/webapp/src/script/core/notification/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/notification/notificationService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/conversationService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/conversationService/conversationService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientDatabaseRepository.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientService.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper/coreCryptoWrapper.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/common.types.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
     "from": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
     "to": "apps/webapp/src/script/core/messagingProtocols/mls/mlsService/index.ts",
     "unresolvedTo": "../mlsService",
@@ -431394,6 +430948,50 @@
         "dependencyTypes": [
           "local",
           "export"
+        ]
+      }
+    ]
+  },
+  {
+    "type": "cycle",
+    "from": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
+    "to": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
+    "unresolvedTo": "./e2eiServiceExternal",
+    "dependencyTypes": [
+      "local",
+      "export"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-circular"
+    },
+    "cycle": [
+      {
+        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
+        "dependencyTypes": [
+          "local",
+          "export"
+        ]
+      },
+      {
+        "name": "apps/webapp/src/script/core/messagingProtocols/mls/mlsService/index.ts",
+        "dependencyTypes": [
+          "local",
+          "import"
+        ]
+      },
+      {
+        "name": "apps/webapp/src/script/core/messagingProtocols/mls/mlsService/mlsService.ts",
+        "dependencyTypes": [
+          "local",
+          "export"
+        ]
+      },
+      {
+        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
+        "dependencyTypes": [
+          "local",
+          "import"
         ]
       }
     ]
@@ -431724,121 +431322,6 @@
   {
     "type": "cycle",
     "from": "apps/webapp/src/script/core/messagingProtocols/mls/mlsService/mlsService.ts",
-    "to": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
-    "unresolvedTo": "../e2eIdentityService",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientDatabaseRepository.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientService.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/index.ts",
-        "dependencyTypes": [
-          "local",
-          "type-only",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/proteus/proteusService/proteusService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/conversationService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/conversation/conversationService/conversationService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/mlsService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/mlsService/mlsService.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
-    "from": "apps/webapp/src/script/core/messagingProtocols/mls/mlsService/mlsService.ts",
     "to": "apps/webapp/src/script/core/messagingProtocols/mls/eventHandler/events/index.ts",
     "unresolvedTo": "../eventHandler/events",
     "dependencyTypes": [
@@ -432018,52 +431501,9 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientDatabaseRepository.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientService.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
         "name": "apps/webapp/src/script/core/messagingProtocols/proteus/index.ts",
         "dependencyTypes": [
           "local",
-          "type-only",
           "import"
         ]
       },
@@ -432191,52 +431631,9 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientDatabaseRepository.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientService.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
         "name": "apps/webapp/src/script/core/messagingProtocols/proteus/index.ts",
         "dependencyTypes": [
           "local",
-          "type-only",
           "import"
         ]
       },
@@ -432320,52 +431717,9 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientDatabaseRepository.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientService.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
         "name": "apps/webapp/src/script/core/messagingProtocols/proteus/index.ts",
         "dependencyTypes": [
           "local",
-          "type-only",
           "import"
         ]
       },
@@ -432423,52 +431777,9 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientDatabaseRepository.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientService.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
         "name": "apps/webapp/src/script/core/messagingProtocols/proteus/index.ts",
         "dependencyTypes": [
           "local",
-          "type-only",
           "import"
         ]
       },
@@ -432531,52 +431842,9 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientDatabaseRepository.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientService.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
         "name": "apps/webapp/src/script/core/messagingProtocols/proteus/index.ts",
         "dependencyTypes": [
           "local",
-          "type-only",
           "import"
         ]
       },
@@ -432646,52 +431914,9 @@
         ]
       },
       {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/index.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/messagingProtocols/mls/e2eIdentityService/e2eiServiceExternal.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/index.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientDatabaseRepository.ts",
-        "dependencyTypes": [
-          "local",
-          "export"
-        ]
-      },
-      {
-        "name": "apps/webapp/src/script/core/client/clientService.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
         "name": "apps/webapp/src/script/core/messagingProtocols/proteus/index.ts",
         "dependencyTypes": [
           "local",
-          "type-only",
           "import"
         ]
       },

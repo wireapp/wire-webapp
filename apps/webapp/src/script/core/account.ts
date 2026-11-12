@@ -25,6 +25,7 @@ import {once} from 'lodash';
 import logdown from 'logdown';
 import {asyncNoop, noop} from 'noop-esm';
 import {TimeoutError} from 'p-queue';
+import {task, type Maybe, type Task} from 'true-myth';
 
 import type {CoreCryptoLogLevel} from '@wireapp/core-crypto';
 
@@ -441,8 +442,12 @@ export class Account extends TypedEventEmitter<Events> {
     return client;
   };
 
-  public getLocalClient(): Promise<MetaClient | undefined> | undefined {
-    return this.service?.client.loadClient();
+  public getLocalClient(): Task<Maybe<MetaClient>, Error> {
+    if (isUndefined(this.service)) {
+      return task.reject(new Error('Client service is not initialized.'));
+    }
+
+    return this.service.client.loadClient();
   }
 
   /**

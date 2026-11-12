@@ -21,7 +21,7 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import 'core-js/full/reflect';
 import pWaitFor from 'p-wait-for';
@@ -31,6 +31,7 @@ import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {refreshApplication} from './applicationRefresh';
+import {loadLocalClient} from './loadLocalClient';
 import {reportStartupFailure} from './reportStartupFailure';
 
 import '../../style/default.less';
@@ -51,7 +52,7 @@ import {getModalOptions, ModalType} from '../e2eIdentity/modals';
 import {AccessTokenError} from '../error/accessTokenError';
 import {AuthError} from '../error/authError';
 import {BaseError} from '../error/baseError';
-import {CLIENT_ERROR_TYPE, ClientError} from '../error/clientError';
+import {CLIENT_ERROR_TYPE} from '../error/clientError';
 import {TeamError} from '../error/teamError';
 import {
   createNewVersionPollingCallback,
@@ -579,10 +580,13 @@ export class App {
 
       await this.initiateSelfUser(selfUser);
       eventLogger.log(AppInitializationStep.UserInitialize);
-      const localClient = await this.core.getLocalClient();
-      if (isNullOrUndefined(localClient)) {
-        throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
+      const localClientResult = await loadLocalClient(() => {
+        return this.core.getLocalClient();
+      }, this.logger);
+      if (localClientResult.isErr) {
+        throw localClientResult.error;
       }
+      const localClient = localClientResult.value;
 
       let teamFeatures: FeatureList = {};
       let teamMembers: QualifiedId[] = [];

@@ -17,7 +17,7 @@
  *
  */
 
-import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
+import {isString} from '@sindresorhus/is';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import {asyncNoop} from 'noop-esm';
 
@@ -107,12 +107,11 @@ export class AuthAction {
         await dispatch(selfAction.fetchSelf());
         let entropyData: Uint8Array | undefined = undefined;
         if (getEntropy !== undefined) {
-          const coreServices = core.service;
-          if (isUndefined(coreServices)) {
-            throw new Error('Core services are not initialized.');
+          const existingClientResult = await core.getLocalClient();
+          if (existingClientResult.isErr) {
+            throw existingClientResult.error;
           }
-          const existingClient = await coreServices.client.loadClient();
-          entropyData = !isNullOrUndefined(existingClient) ? undefined : await getEntropy();
+          entropyData = existingClientResult.value.isNothing ? await getEntropy() : undefined;
         }
         await onAfterLogin(dispatch, getState, global);
         await dispatch(

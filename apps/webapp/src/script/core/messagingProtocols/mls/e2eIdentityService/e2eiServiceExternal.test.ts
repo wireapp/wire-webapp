@@ -20,9 +20,12 @@
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {TimeInMillis} from '../../../../commons/util/TimeUtil';
 import axios from 'axios';
-import {task} from 'true-myth';
+import {Maybe, result, task, type Task} from 'true-myth';
 
 import {APIClient} from '../../../../apiClient/apiClient';
+import {ClientClassification} from '../../../../apiClient/client/clientClassification';
+import {ClientType} from '../../../../apiClient/client/clientType';
+import type {RegisteredClient} from '../../../../apiClient/client/registeredClient';
 import {
   CoreCrypto,
   CoreCryptoError,
@@ -39,12 +42,12 @@ import {
 
 import {E2EIServiceExternal, type PkiEnvironmentFactory} from './e2eiServiceExternal';
 
-import {ClientService} from '../../../client';
 import {openDB} from '../../../storage/coreDb';
 import {getUUID} from '../../../test/payloadHelper';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
+import {TaskScheduler} from '../../../util/taskScheduler';
 import {MLSService} from '../mlsService';
 import {createMLSClientId} from '../utils/mlsId';
 
@@ -58,6 +61,7 @@ type E2EIServiceTestSetup = readonly [
   E2EIServiceExternal,
   {
     readonly apiClient: jest.Mocked<APIClient>;
+    readonly loadLocalClient: jest.Mock<Task<Maybe<RegisteredClient>, Error>, []>;
     readonly coreCrypto: jest.Mocked<CoreCrypto>;
     readonly mlsService: MLSService;
     readonly pkiEnvironment: jest.Mocked<PkiEnvironment>;
@@ -91,7 +95,7 @@ async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTes
     },
   } as unknown as jest.Mocked<APIClient>;
 
-  const clientService = {} as jest.Mocked<ClientService>;
+  const loadLocalClient = jest.fn<Task<Maybe<RegisteredClient>, Error>, []>();
 
   const mockedDb = await openDB(dbName);
 
@@ -99,6 +103,7 @@ async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTes
     on: jest.fn(),
     getClientIds: jest.fn(),
     conversationExists: jest.fn(),
+    isInitializedMLSClient: jest.fn(),
   } as unknown as MLSService;
 
   const recurringTaskScheduler = new RecurringTaskScheduler(
@@ -136,12 +141,13 @@ async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTes
       apiClient,
       mockedDb,
       recurringTaskScheduler,
-      clientService,
+      {loadClient: loadLocalClient},
       mockedMLSService,
       pkiEnvironmentFactory,
     ),
     {
       apiClient,
+      loadLocalClient,
       coreCrypto,
       mlsService: mockedMLSService,
       pkiEnvironment,
@@ -177,6 +183,42 @@ const federatedCerts = ['federatedCert1', 'federatedCert2'];
 const axiosMock = axios as jest.Mocked<typeof axios>;
 
 describe('E2EIServiceExternal', () => {
+  describe('isFreshMLSSelfClient', () => {
+    it('considers a genuinely missing client fresh', async () => {
+      const [service, {loadLocalClient}] = await buildE2EIService('freshMissingClient');
+      loadLocalClient.mockReturnValue(task.resolve(Maybe.nothing()));
+
+      await expect(service.isFreshMLSSelfClient()).resolves.toEqual(result.ok(true));
+    });
+
+    it.each([true, false])('reports freshness for MLS initialization state %s', async initialized => {
+      const [service, {loadLocalClient, mlsService}] = await buildE2EIService('freshExistingClient');
+      const localClient: RegisteredClient = {
+        id: 'local-client',
+        class: ClientClassification.DESKTOP,
+        capabilities: [],
+        cookie: 'local-cookie',
+        mls_public_keys: {},
+        time: '2026-01-01T00:00:00Z',
+        type: ClientType.PERMANENT,
+      };
+      loadLocalClient.mockReturnValue(task.resolve(Maybe.just(localClient)));
+      jest.spyOn(mlsService, 'isInitializedMLSClient').mockReturnValue(initialized);
+
+      await expect(service.isFreshMLSSelfClient()).resolves.toEqual(result.ok(initialized === false));
+      expect(mlsService.isInitializedMLSClient).toHaveBeenCalledWith(localClient);
+    });
+
+    it('propagates lookup failures without assuming freshness', async () => {
+      const [service, {loadLocalClient, mlsService}] = await buildE2EIService('freshLookupFailure');
+      const lookupError = new Error('Database unavailable');
+      loadLocalClient.mockReturnValue(task.reject(lookupError));
+
+      await expect(service.isFreshMLSSelfClient()).resolves.toEqual(result.err(lookupError));
+      expect(mlsService.isInitializedMLSClient).not.toHaveBeenCalled();
+    });
+  });
+
   beforeEach(() => {
     axiosMock.get = jest.fn(async url => {
       if (url === `${discoveryUrl}/roots.pem`) {
@@ -198,6 +240,8 @@ describe('E2EIServiceExternal', () => {
   });
 
   afterEach(() => {
+    TaskScheduler.cancelTask('check-credentials');
+    TaskScheduler.cancelTask('update-intermediate-certificates');
     jest.clearAllMocks();
   });
 

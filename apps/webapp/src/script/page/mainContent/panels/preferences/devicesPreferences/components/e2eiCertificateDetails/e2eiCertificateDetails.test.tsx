@@ -22,6 +22,7 @@ import {CONVERSATION_TYPE, MLSConversation} from '../../../../../../../apiClient
 import {CredentialType} from '../../../../../../../core/messagingProtocols/mls';
 import {container} from 'tsyringe';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {task} from 'true-myth';
 
 import {User} from '../../../../../../../repositories/entity/User';
 import {UserState} from '../../../../../../../repositories/user/userState';
@@ -74,7 +75,7 @@ describe('E2EICertificateDetails', () => {
         e2eIdentity: {
           initialize: jest.fn(),
           isEnrollmentInProgress: jest.fn(),
-          isFreshMLSSelfClient: jest.fn(),
+          isFreshMLSSelfClient: jest.fn().mockReturnValue(task.resolve(false)),
           getAllGroupUsersIdentities: jest.fn().mockResolvedValue(new Map()),
         },
       },

@@ -22,6 +22,7 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import murmurhash from 'murmurhash';
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {ClientEntity} from './ClientEntity';
@@ -251,10 +252,11 @@ export class ClientRepository {
    * @returns Cookie label key
    */
   constructCookieLabelKey(
-    login: string,
+    login: Maybe<string>,
     clientType: ClientType = this.loadCurrentClientType() ?? ClientType.PERMANENT,
   ): string {
-    const loginHash = murmurhash.v3(login !== '' ? login : this.selfUser().id, loginHashSeed);
+    const loginValue = login.unwrapOr('');
+    const loginHash = murmurhash.v3(isNonEmptyString(loginValue) ? loginValue : this.selfUser().id, loginHashSeed);
     return `${StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 
