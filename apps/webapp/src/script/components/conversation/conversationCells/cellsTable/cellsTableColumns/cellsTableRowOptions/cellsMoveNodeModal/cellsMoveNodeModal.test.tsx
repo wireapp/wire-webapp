@@ -52,8 +52,6 @@ import {translateForTest} from '../../../../../../../util/test/translateForTest'
 
 import {CellsMoveNodeModal} from './cellsMoveNodeModal';
 import type {JSX} from '@emotion/react/jsx-runtime';
-import type {Container} from 'react-dom/client';
-import type {OptionsReceived} from '@testing-library/dom/node_modules/pretty-format';
 
 const withTheme = (component: ReactNode): JSX.Element => {
   return <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
@@ -86,11 +84,7 @@ describe('CellsMoveNodeModal', () => {
     setIsOpen: (nextIsOpen: boolean) => void;
     container: HTMLElement;
     baseElement: HTMLElement;
-    debug: (
-      baseElement?: Container | (Element | Document) | Array<Container | (Element | Document)> | undefined,
-      maxLength?: number | undefined,
-      options?: OptionsReceived | undefined,
-    ) => void;
+    debug: ReturnType<typeof render>['debug'];
     rerender: (ui: React.ReactNode) => void;
     unmount: () => void;
     asFragment: () => DocumentFragment;

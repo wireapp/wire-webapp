@@ -39,8 +39,6 @@ import {captureModalFocusContext} from '../../util/modalFocusUtil';
 
 import {ChooseScreen} from './ChooseScreen';
 import {translateForTest} from '../../util/test/translateForTest';
-import type {Container} from 'react-dom/client';
-import type {OptionsReceived} from '@testing-library/dom/node_modules/pretty-format';
 
 jest.mock('../../util/modalFocusUtil', () => {
   return {
@@ -118,11 +116,7 @@ describe('ChooseScreen', () => {
   type SetupResult = {
     container: HTMLElement;
     baseElement: HTMLElement;
-    debug: (
-      baseElement?: Container | (Element | Document) | Array<Container | (Element | Document)> | undefined,
-      maxLength?: number | undefined,
-      options?: OptionsReceived | undefined,
-    ) => void;
+    debug: ReturnType<typeof render>['debug'];
     rerender: (ui: React.ReactNode) => void;
     unmount: () => void;
     asFragment: () => DocumentFragment;

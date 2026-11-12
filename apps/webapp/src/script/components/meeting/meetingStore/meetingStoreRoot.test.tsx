@@ -57,8 +57,6 @@ import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 import {MeetingStoreRoot} from './meetingStoreRoot';
 import type {FunctionComponent} from 'react';
-import type {Container} from 'react-dom/client';
-import type {OptionsReceived} from '@testing-library/dom/node_modules/pretty-format';
 
 const meetingId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const selfUserId: QualifiedId = {id: 'self-user-id', domain: 'example.com'};
@@ -131,11 +129,7 @@ type RenderMeetingStoreRootResult = {
   getMeeting: jest.Mock<any, any, any>;
   container: HTMLElement;
   baseElement: HTMLElement;
-  debug: (
-    baseElement?: Container | (Element | Document) | Array<Container | (Element | Document)> | undefined,
-    maxLength?: number | undefined,
-    options?: OptionsReceived | undefined,
-  ) => void;
+  debug: ReturnType<typeof render>['debug'];
   rerender: (ui: React.ReactNode) => void;
   unmount: () => void;
   asFragment: () => DocumentFragment;
