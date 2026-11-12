@@ -20,7 +20,7 @@
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {TimeInMillis} from '../../../../commons/util/TimeUtil';
 import axios from 'axios';
-import {task} from 'true-myth';
+import {Maybe, task} from 'true-myth';
 
 import {APIClient} from '../../../../apiClient/apiClient';
 import {
@@ -39,12 +39,13 @@ import {
 
 import {E2EIServiceExternal, type PkiEnvironmentFactory} from './e2eiServiceExternal';
 
-import {ClientService} from '../../../client';
+import {ClientService, type MetaClient} from '../../../client/clientService';
 import {openDB} from '../../../storage/coreDb';
 import {getUUID} from '../../../test/payloadHelper';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
+import {TaskScheduler} from '../../../util/taskScheduler';
 import {MLSService} from '../mlsService';
 import {createMLSClientId} from '../utils/mlsId';
 
@@ -58,6 +59,7 @@ type E2EIServiceTestSetup = readonly [
   E2EIServiceExternal,
   {
     readonly apiClient: jest.Mocked<APIClient>;
+    readonly clientService: jest.Mocked<ClientService>;
     readonly coreCrypto: jest.Mocked<CoreCrypto>;
     readonly mlsService: MLSService;
     readonly pkiEnvironment: jest.Mocked<PkiEnvironment>;
@@ -91,7 +93,7 @@ async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTes
     },
   } as unknown as jest.Mocked<APIClient>;
 
-  const clientService = {} as jest.Mocked<ClientService>;
+  const clientService = {loadClient: jest.fn()} as unknown as jest.Mocked<ClientService>;
 
   const mockedDb = await openDB(dbName);
 
@@ -99,6 +101,7 @@ async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTes
     on: jest.fn(),
     getClientIds: jest.fn(),
     conversationExists: jest.fn(),
+    isInitializedMLSClient: jest.fn(),
   } as unknown as MLSService;
 
   const recurringTaskScheduler = new RecurringTaskScheduler(
@@ -142,6 +145,7 @@ async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTes
     ),
     {
       apiClient,
+      clientService,
       coreCrypto,
       mlsService: mockedMLSService,
       pkiEnvironment,
@@ -177,6 +181,32 @@ const federatedCerts = ['federatedCert1', 'federatedCert2'];
 const axiosMock = axios as jest.Mocked<typeof axios>;
 
 describe('E2EIServiceExternal', () => {
+  describe('isFreshMLSSelfClient', () => {
+    it('considers a genuinely missing client fresh', async () => {
+      const [service, {clientService}] = await buildE2EIService('freshMissingClient');
+      clientService.loadClient.mockResolvedValue(Maybe.nothing());
+
+      await expect(service.isFreshMLSSelfClient()).resolves.toBe(true);
+    });
+
+    it.each([true, false])('reports freshness for MLS initialization state %s', async initialized => {
+      const [service, {clientService, mlsService}] = await buildE2EIService('freshExistingClient');
+      clientService.loadClient.mockResolvedValue(Maybe.just({id: 'local-client'} as MetaClient));
+      jest.spyOn(mlsService, 'isInitializedMLSClient').mockReturnValue(initialized);
+
+      await expect(service.isFreshMLSSelfClient()).resolves.toBe(initialized === false);
+    });
+
+    it('propagates lookup failures without assuming freshness', async () => {
+      const [service, {clientService, mlsService}] = await buildE2EIService('freshLookupFailure');
+      const lookupError = new Error('Database unavailable');
+      clientService.loadClient.mockRejectedValue(lookupError);
+
+      await expect(service.isFreshMLSSelfClient()).rejects.toBe(lookupError);
+      expect(mlsService.isInitializedMLSClient).not.toHaveBeenCalled();
+    });
+  });
+
   beforeEach(() => {
     axiosMock.get = jest.fn(async url => {
       if (url === `${discoveryUrl}/roots.pem`) {
@@ -198,6 +228,8 @@ describe('E2EIServiceExternal', () => {
   });
 
   afterEach(() => {
+    TaskScheduler.cancelTask('check-credentials');
+    TaskScheduler.cancelTask('update-intermediate-certificates');
     jest.clearAllMocks();
   });
 

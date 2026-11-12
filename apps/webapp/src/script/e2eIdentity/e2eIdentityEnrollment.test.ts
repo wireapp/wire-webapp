@@ -199,6 +199,18 @@ describe('E2EIHandler', () => {
     return enrollPromise;
   });
 
+  it('stops initialization without enrollment or progress cleanup when freshness is unknown', async () => {
+    const lookupError = new Error('Client lookup unavailable');
+    const service = getE2EIServiceForTest();
+    jest.spyOn(service, 'isFreshMLSSelfClient').mockRejectedValue(lookupError);
+    jest.spyOn(service, 'isEnrollmentInProgress').mockResolvedValue(true);
+
+    await expect(E2EIHandler.getInstance().initialize(params)).rejects.toBe(lookupError);
+    expect(modalMock).not.toHaveBeenCalled();
+    expect(coreMock.enrollE2EI).not.toHaveBeenCalled();
+    expect(service.clearAllProgress).not.toHaveBeenCalled();
+  });
+
   it('trigger an enrollment when instantiated with a fresh new MLS device', async () => {
     jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(true);
     const enrollPromise = E2EIHandler.getInstance().initialize(params);

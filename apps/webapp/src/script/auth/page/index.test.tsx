@@ -19,6 +19,11 @@
 
 import {act, waitFor} from '@testing-library/react';
 import {Navigate} from 'react-router';
+import {Maybe} from 'true-myth';
+import {container} from 'tsyringe';
+
+import type {MetaClient} from '../../core/client/clientService';
+import {Core} from '../../service/coreSingleton';
 
 import {Index} from './index';
 
@@ -57,6 +62,40 @@ describe('when visiting the index page', () => {
     const logo = getByTestId('ui-wire-logo');
     expect(logo).not.toBeNull();
   });
+
+  it.each([Maybe.just({id: 'existing-client'} as MetaClient), Maybe.nothing<MetaClient>()])(
+    'navigates after automatic login only for an existing local client: %s',
+    async localClient => {
+      const configuration = Config.getConfig();
+      configSpy.mockReturnValue({
+        ...configuration,
+        FEATURE: {...configuration.FEATURE, ENABLE_AUTO_LOGIN: true},
+      });
+      const getLocalClient = jest.spyOn(container.resolve(Core), 'getLocalClient').mockResolvedValue(localClient);
+      const historyPush = jest.spyOn(history, 'pushState');
+      const doInit = jest.fn().mockResolvedValue(undefined);
+      const IndexComponent = Index.WrappedComponent;
+
+      try {
+        await act(async () => {
+          mountComponent(
+            <IndexComponent doInit={doInit} defaultSSOCode={undefined} />,
+            mockStoreFactory()(initialRootState),
+          );
+        });
+
+        expect(getLocalClient).toHaveBeenCalled();
+        if (localClient.isJust) {
+          expect(historyPush).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.HISTORY_INFO}`);
+        } else {
+          expect(historyPush).not.toHaveBeenCalled();
+        }
+      } finally {
+        getLocalClient.mockRestore();
+        historyPush.mockRestore();
+      }
+    },
+  );
 
   it('redirects to SSO login if default SSO code is set', async () => {
     const defaultSSOCode = 'default-a4b0-4c59-a31d-303a7f5eb5ab';

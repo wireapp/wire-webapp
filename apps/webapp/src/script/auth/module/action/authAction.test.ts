@@ -18,6 +18,9 @@
  */
 
 import {VerificationActionType} from '../../../apiClient/auth/verificationActionType';
+import {Maybe} from 'true-myth';
+import {asyncNoop} from 'noop-esm';
+import type {MetaClient} from '../../../core/client/clientService';
 import {ClientType} from '../../../apiClient/client/clientType';
 import {BackendError} from '../../../apiClient/http/backendError';
 import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
@@ -34,6 +37,56 @@ import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {ActionRoot, actionRoot} from './';
 
 describe('AuthAction', () => {
+  it.each([Maybe.just({id: 'existing-client'} as MetaClient), Maybe.nothing<MetaClient>()])(
+    'requests entropy only when the client is confirmed missing: %s',
+    async localClient => {
+      const entropy = new Uint8Array([1, 2, 3]);
+      const getEntropy = jest.fn().mockResolvedValue(entropy);
+      const doInitializeClient = jest.fn(() => {
+        return asyncNoop;
+      });
+      const store = mockStoreFactory({
+        actions: {
+          clientAction: {doInitializeClient},
+          selfAction: {
+            fetchSelf(): typeof asyncNoop {
+              return asyncNoop;
+            },
+          },
+          localStorageAction: {
+            setLocalStorage(): typeof asyncNoop {
+              return asyncNoop;
+            },
+          },
+        },
+        core: {
+          login: jest.fn().mockResolvedValue(undefined),
+          async getLocalClient(): Promise<Maybe<MetaClient>> {
+            return localClient;
+          },
+        },
+      })({});
+
+      await store.dispatch(
+        actionRoot.authAction.doLoginPlain(
+          {clientType: ClientType.PERMANENT, email: 'test@example.com', password: 'password'},
+          undefined,
+          undefined,
+          getEntropy,
+        ),
+      );
+
+      expect(getEntropy).toHaveBeenCalledTimes(localClient.isNothing ? 1 : 0);
+      expect(doInitializeClient).toHaveBeenCalledWith(
+        ClientType.PERMANENT,
+        'password',
+        undefined,
+        localClient.isNothing ? entropy : undefined,
+      );
+      expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
+    },
+  );
+
   it('authenticates a user successfully', async () => {
     const email = 'test@example.com';
     const password = 'password';

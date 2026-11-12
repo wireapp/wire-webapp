@@ -17,15 +17,26 @@
  *
  */
 
+import {AxiosError} from 'axios';
+import {Dexie} from 'dexie';
+import {Maybe} from 'true-myth';
+
+import {BackendError} from '../apiClient/http/backendError';
+import {BackendErrorLabel} from '../apiClient/http/backendErrorLabel';
 import type {MetaClient} from '../core/client/clientService';
+import {LowDiskSpaceError} from '../core/storage/engine/error/lowDiskSpaceError';
+import {BASE_ERROR_TYPE} from '../error/baseError';
 import {CLIENT_ERROR_TYPE, ClientError} from '../error/clientError';
 import type {Logger} from '../util/logger';
 
 import {loadLocalClient} from './loadLocalClient';
 
-const createLogger = (): Logger => {
+// The webapp's global Axios mock omits error constructors and classification.
+jest.unmock('axios');
+
+function createLogger(): Logger {
   return {error: jest.fn()} as unknown as Logger;
-};
+}
 
 describe('loadLocalClient', () => {
   it('returns the local client', async () => {
@@ -33,7 +44,7 @@ describe('loadLocalClient', () => {
 
     await expect(
       loadLocalClient(() => {
-        return Promise.resolve(localClient);
+        return Promise.resolve(Maybe.just(localClient));
       }, createLogger()),
     ).resolves.toBe(localClient);
   });
@@ -41,21 +52,27 @@ describe('loadLocalClient', () => {
   it('reports NO_VALID_CLIENT when there is no local client', async () => {
     await expect(
       loadLocalClient(() => {
-        return Promise.resolve(undefined);
+        return Promise.resolve(Maybe.nothing());
       }, createLogger()),
     ).rejects.toEqual(expect.objectContaining({type: CLIENT_ERROR_TYPE.NO_VALID_CLIENT}));
   });
 
-  it('reports DATABASE_FAILURE instead of NO_VALID_CLIENT when the local client cannot be loaded', async () => {
+  it.each([
+    [new Dexie.OpenFailedError('Cannot open IndexedDB'), CLIENT_ERROR_TYPE.DATABASE_FAILURE],
+    [new DOMException('IndexedDB read failed', 'UnknownError'), CLIENT_ERROR_TYPE.DATABASE_FAILURE],
+    [new LowDiskSpaceError(), CLIENT_ERROR_TYPE.DATABASE_FAILURE],
+    [new BackendError('Server error', BackendErrorLabel.SERVER_ERROR, 500), CLIENT_ERROR_TYPE.REQUEST_FAILURE],
+    [new AxiosError('Network unavailable'), CLIENT_ERROR_TYPE.REQUEST_FAILURE],
+    [new Error('Client service is not initialized.'), BASE_ERROR_TYPE.UNKNOWN],
+  ])('preserves the cause and safely classifies %s as %s', async (originalError, errorType) => {
     const logger = createLogger();
-    const databaseError = new Error('Internal error opening backing store for indexedDB.open.');
 
     const result = loadLocalClient(() => {
-      return Promise.reject(databaseError);
+      return Promise.reject(originalError);
     }, logger);
 
     await expect(result).rejects.toBeInstanceOf(ClientError);
-    await expect(result).rejects.toEqual(expect.objectContaining({type: CLIENT_ERROR_TYPE.DATABASE_FAILURE}));
-    expect(logger.error).toHaveBeenCalledWith(expect.any(String), databaseError);
+    await expect(result).rejects.toEqual(expect.objectContaining({type: errorType, cause: originalError}));
+    expect(logger.error).toHaveBeenCalledWith(expect.any(String), originalError);
   });
 });

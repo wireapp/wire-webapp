@@ -21,6 +21,7 @@ import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 import axios from 'axios';
 import {StatusCodes} from 'http-status-codes';
+import {Maybe} from 'true-myth';
 
 import {APIClient} from '../../apiClient/apiClient';
 import {LoginData} from '../../apiClient/auth/loginData';
@@ -41,12 +42,13 @@ import {RecordNotFoundError} from '../storage/engine/error';
 import {ClientInfo, ClientBackendRepository, ClientDatabaseRepository} from './';
 
 /** `HttpClient` turns error responses with a body into a `BackendError`, other failures stay an `AxiosError`. */
-const isNotFoundError = (error: unknown): boolean => {
+function isNotFoundError(error: unknown): boolean {
   if (error instanceof BackendError) {
     return Number(error.code) === StatusCodes.NOT_FOUND;
   }
+
   return axios.isAxiosError(error) && error.response?.status === StatusCodes.NOT_FOUND;
-};
+}
 
 export interface MetaClient extends RegisteredClient {
   domain?: string;
@@ -109,14 +111,14 @@ export class ClientService {
     return this.database.deleteLocalClient();
   }
 
-  private async getLocalClient(): Promise<MetaClient | undefined> {
+  private async getLocalClient(): Promise<Maybe<MetaClient>> {
     try {
-      return await this.database.getLocalClient();
+      return Maybe.just(await this.database.getLocalClient());
     } catch (error: unknown) {
       // Only a missing record means there is no local client. Any other failure (e.g. the database cannot be
       // opened because the disk is full) must not be mistaken for a removed client.
       if (error instanceof RecordNotFoundError) {
-        return undefined;
+        return Maybe.nothing();
       }
       throw error;
     }
@@ -124,29 +126,29 @@ export class ClientService {
 
   /**
    * Will try to load the local client from the database into memory.
-   * Will return undefined if the client is not found in the database or if the client does not exist on the backend.
-   * If the client doesn't exist on backend it will purge the database and return undefined.
+   * Returns Nothing if the local record is missing or the backend confirms the client was removed.
+   * If the client doesn't exist on the backend it will clean up the identity before returning Nothing.
    * If the client is found on the backend it will update the local client in the database and return it.
    * Any other failure (database error, network error, ...) is thrown.
    *
-   * @return the loaded client or undefined
+   * @return Just the loaded client, or Nothing for confirmed absence
    */
-  public async loadClient(): Promise<MetaClient | undefined> {
+  public async loadClient(): Promise<Maybe<MetaClient>> {
     const loadedClient = await this.getLocalClient();
 
-    if (loadedClient === undefined) {
-      return undefined;
+    if (loadedClient.isNothing) {
+      return Maybe.nothing();
     }
 
+    let remoteClient: RegisteredClient;
     try {
-      const remoteClient = await this.apiClient.api.client.getClient(loadedClient.id);
-      return this.database.updateLocalClient(remoteClient);
+      remoteClient = await this.apiClient.api.client.getClient(loadedClient.value.id);
     } catch (error: unknown) {
       if (!isNotFoundError(error)) {
         throw error;
       }
       if (this.storeEngine !== undefined) {
-        const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
+        const shouldDeleteWholeDatabase = loadedClient.value.type === ClientType.TEMPORARY;
         await this.proteusService.wipe();
         // The MLS/CoreCrypto keystore is scoped to the user (not the client id), so it survives
         // a plain proteus wipe and would otherwise let a re-registered client inherit stale MLS key material.
@@ -157,8 +159,11 @@ export class ClientService {
         const log = `No valid client on backend, deleting identity (deleting content: ${shouldDeleteWholeDatabase ? 'yes' : 'no'})`;
         this.logger.warn(log);
       }
+
+      return Maybe.nothing();
     }
-    return undefined;
+
+    return Maybe.just(await this.database.updateLocalClient(remoteClient));
   }
 
   private createLocalClient(client: RegisteredClient, domain?: string): Promise<MetaClient> {

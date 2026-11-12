@@ -65,6 +65,8 @@ jest.mock('./conversation', () => {
 });
 
 import {Account} from './account';
+import {Maybe} from 'true-myth';
+import type {MetaClient} from './client/clientService';
 import {ConnectionState} from './connectionState/connectionState';
 import type {MLSService} from './messagingProtocols/mls';
 import {NotificationSource} from './notification';
@@ -118,6 +120,34 @@ const waitFor = (assertion: () => void): Promise<void> => {
 };
 
 describe('Account', () => {
+  describe('getLocalClient', () => {
+    it('rejects when the client service has not been initialized', async () => {
+      const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
+      apiClients.push(apiClient);
+      const account = new Account(apiClient);
+
+      await expect(account.getLocalClient()).rejects.toThrow('Client service is not initialized.');
+    });
+
+    it.each([Maybe.just({id: 'local-client'} as MetaClient), Maybe.nothing<MetaClient>()])(
+      'preserves the client lookup outcome %s',
+      async localClient => {
+        const {account} = await createAccount();
+        jest.spyOn(getAccountServiceForTest(account).client, 'loadClient').mockResolvedValue(localClient);
+
+        await expect(account.getLocalClient()).resolves.toBe(localClient);
+      },
+    );
+
+    it('preserves a failed client lookup', async () => {
+      const {account} = await createAccount();
+      const lookupError = new Error('Database unavailable');
+      jest.spyOn(getAccountServiceForTest(account).client, 'loadClient').mockRejectedValue(lookupError);
+
+      await expect(account.getLocalClient()).rejects.toBe(lookupError);
+    });
+  });
+
   const CLIENT_ID = '4e37b32f57f6da55';
 
   afterEach(() => {

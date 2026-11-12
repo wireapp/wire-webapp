@@ -19,7 +19,7 @@
 
 import React, {useCallback, useEffect, useState, type FunctionComponent} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
@@ -74,8 +74,8 @@ const IndexComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
     await doInit({isImmediateLogin: true, shouldValidateLocalClient: true});
     // Check if the user is already logged in
     if (!hasOtherInstance) {
-      const localClient = core.getLocalClient();
-      if (!isNullOrUndefined(localClient)) {
+      const localClient = await core.getLocalClient();
+      if (localClient.isJust) {
         navigate(ROUTE.HISTORY_INFO);
       }
     }

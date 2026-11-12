@@ -45,7 +45,7 @@ import {Decoder} from '../../../../commons/base64/decoder';
 import {LogFactory} from '../../../../commons/LogFactory';
 import {TypedEventEmitter} from '../../../../commons/TypedEventEmitter/TypedEventEmitter';
 import {TimeInMillis} from '../../../../commons/util/TimeUtil';
-import {ClientService, MetaClient} from '../../../client';
+import {ClientService} from '../../../client/clientService';
 import {CoreDatabase} from '../../../storage/coreDb';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
@@ -290,15 +290,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   public async isFreshMLSSelfClient(): Promise<boolean> {
-    let client: MetaClient | undefined;
-    try {
-      client = await this.clientService.loadClient();
-    } catch (error: unknown) {
-      // Same outcome as before `loadClient` started to throw on failures
-      this.logger.warn('Failed to load the local client, considering it fresh', error);
-      return true;
-    }
-    return client === undefined || !this.mlsService.isInitializedMLSClient(client);
+    const client = await this.clientService.loadClient();
+
+    return client.isNothing || !this.mlsService.isInitializedMLSClient(client.value);
   }
 
   private get acmeService(): AcmeService {

@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {ClientActionCreator} from './creator/';
 
@@ -75,8 +75,8 @@ export class ClientAction {
 
       const useLegacyNotificationStream = !useAsyncNotificationStream;
 
-      const creationStatus = !isNullOrUndefined(localClient)
-        ? {isNew: false, client: localClient}
+      const creationStatus = localClient.isJust
+        ? {isNew: false, client: localClient.value}
         : {
             isNew: true,
             client: await core.registerClient(

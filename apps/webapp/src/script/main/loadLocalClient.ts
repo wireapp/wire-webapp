@@ -17,9 +17,14 @@
  *
  */
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import axios from 'axios';
+import {Dexie} from 'dexie';
+import {Maybe} from 'true-myth';
 
+import {BackendError} from '../apiClient/http/backendError';
 import type {MetaClient} from '../core/client/clientService';
+import {LowDiskSpaceError} from '../core/storage/engine/error/lowDiskSpaceError';
+import {BASE_ERROR_TYPE} from '../error/baseError';
 import {CLIENT_ERROR_TYPE, ClientError} from '../error/clientError';
 import type {Logger} from '../util/logger';
 
@@ -28,24 +33,37 @@ import type {Logger} from '../util/logger';
  *
  * `NO_VALID_CLIENT` makes the app wipe all local data, so it is only used when the client is missing locally or was
  * removed on the backend. If the client could not be loaded at all (e.g. the database cannot be read because the disk
- * is full), `DATABASE_FAILURE` is used instead, which keeps local data.
+ * is full), the failure keeps its cause and cannot be reported as a missing client.
  */
 export async function loadLocalClient(
-  getLocalClient: () => Promise<MetaClient | undefined> | undefined,
+  getLocalClient: () => Promise<Maybe<MetaClient>>,
   logger: Logger,
 ): Promise<MetaClient> {
-  let localClient: MetaClient | undefined;
+  let localClient: Maybe<MetaClient>;
 
   try {
     localClient = await getLocalClient();
   } catch (error: unknown) {
     logger.error('Failed to load the local client', error);
-    throw new ClientError(CLIENT_ERROR_TYPE.DATABASE_FAILURE, 'Failed to load the local client');
+    let errorType: CLIENT_ERROR_TYPE | BASE_ERROR_TYPE = BASE_ERROR_TYPE.UNKNOWN;
+    if (error instanceof BackendError || axios.isAxiosError(error)) {
+      errorType = CLIENT_ERROR_TYPE.REQUEST_FAILURE;
+    } else if (
+      error instanceof Dexie.DexieError ||
+      error instanceof DOMException ||
+      error instanceof LowDiskSpaceError
+    ) {
+      errorType = CLIENT_ERROR_TYPE.DATABASE_FAILURE;
+    }
+    const clientError = new ClientError(errorType, 'Failed to load the local client');
+    Object.defineProperty(clientError, 'cause', {value: error, configurable: true});
+
+    throw clientError;
   }
 
-  if (isNullOrUndefined(localClient)) {
+  if (localClient.isNothing) {
     throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
   }
 
-  return localClient;
+  return localClient.value;
 }
