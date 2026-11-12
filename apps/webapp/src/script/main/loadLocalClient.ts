@@ -57,7 +57,7 @@ export function loadLocalClient(
         errorType = CLIENT_ERROR_TYPE.DATABASE_FAILURE;
       }
       const clientError = new ClientError(errorType, 'Failed to load the local client');
-      Object.defineProperty(clientError, 'cause', {value: error, configurable: true});
+      clientError.cause = error;
 
       return clientError;
     })
