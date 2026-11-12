@@ -247,6 +247,7 @@ export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
   private readonly logger: Logger;
+  private readonly avsLogger = avsLogger;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private isReady: boolean = false;
@@ -660,14 +661,18 @@ export class CallingRepository {
       [LOG_LEVEL.WARN]: 'WARN ',
       [LOG_LEVEL.ERROR]: 'ERROR',
     };
-    const logFunctions: Record<LOG_LEVEL, Function> = {
-      [LOG_LEVEL.DEBUG]: avsLogger.debug,
-      [LOG_LEVEL.INFO]: avsLogger.info,
-      [LOG_LEVEL.WARN]: avsLogger.warn,
-      [LOG_LEVEL.ERROR]: avsLogger.error,
+    const logFunctions: Readonly<Record<LOG_LEVEL, Logger['info']>> = {
+      [LOG_LEVEL.DEBUG]: this.avsLogger.debug,
+      [LOG_LEVEL.INFO]: this.avsLogger.info,
+      [LOG_LEVEL.WARN]: this.avsLogger.warn,
+      [LOG_LEVEL.ERROR]: this.avsLogger.error,
     };
     const trimmedMessage = message.trim();
-    logFunctions[level](trimmedMessage, {error});
+    if (isUndefined(error)) {
+      logFunctions[level](trimmedMessage);
+    } else {
+      logFunctions[level](trimmedMessage, {error});
+    }
     this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
   };
 
