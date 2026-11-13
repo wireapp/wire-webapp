@@ -36,10 +36,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../../page/testSupport/rootContextTestSupport';
-import {
-  driveBulkActionsFeatureToggleName,
-  driveBulkRestoreFeatureToggleName,
-} from '../../../../featureToggles/startupFeatureToggleNames';
+import {driveBulkRestoreFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {CellNode, CellNodeType} from '../../../../types/cellNode';
 import type {Translate} from '../../../../util/localizerUtil/translationTypes';
 import {translateForTest} from '../../../../util/test/translateForTest';
@@ -285,7 +282,6 @@ const renderCellsTable = ({
   folderDropResetKey,
   selectionEnabled = true,
   selectionScopeKey = 'conversation:/files',
-  isBulkActionsEnabled = true,
   isBulkRestoreEnabled = true,
   cellsRepository = {} as CellsRepository,
   initialNodes,
@@ -307,7 +303,6 @@ const renderCellsTable = ({
   readonly folderDropResetKey?: number;
   readonly selectionEnabled?: boolean;
   readonly selectionScopeKey?: string;
-  readonly isBulkActionsEnabled?: boolean;
   readonly isBulkRestoreEnabled?: boolean;
   readonly cellsRepository?: CellsRepository;
   readonly initialNodes?: CellNode[];
@@ -336,10 +331,7 @@ const renderCellsTable = ({
       fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
       clock,
       isFeatureToggleEnabled: featureToggleName => {
-        return (
-          (isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName) ||
-          (isBulkRestoreEnabled && featureToggleName === driveBulkRestoreFeatureToggleName)
-        );
+        return isBulkRestoreEnabled && featureToggleName === driveBulkRestoreFeatureToggleName;
       },
     }),
   );
@@ -421,20 +413,8 @@ const renderCellsTable = ({
 };
 
 describe('CellsTable selection', () => {
-  it.each([
-    {label: 'a viewer', selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER, isBulkActionsEnabled: true},
-    {
-      label: 'an editor with the feature flag off',
-      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
-      isBulkActionsEnabled: false,
-    },
-    {
-      label: 'a viewer with the feature flag off',
-      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
-      isBulkActionsEnabled: false,
-    },
-  ])('hides page and row selection for $label', ({selfUserDriveRole, isBulkActionsEnabled}) => {
-    renderCellsTable({selfUserDriveRole, isBulkActionsEnabled});
+  it('hides page and row selection for a viewer', () => {
+    renderCellsTable({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER});
 
     expect(screen.getByRole('row', {name: /Marketing images/})).toBeInTheDocument();
     expect(screen.getByRole('row', {name: /Wire logs.pdf/})).toBeInTheDocument();
@@ -2038,15 +2018,6 @@ describe('CellsTable selection', () => {
     } finally {
       window.location.hash = originalHash;
     }
-  });
-
-  it('hides selection controls when the Drive bulk actions feature flag is off', () => {
-    renderCellsTable({isBulkActionsEnabled: false});
-
-    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
   });
 
   it('browses destinations without listing selected items, moving, or clearing selection', async () => {
@@ -3664,8 +3635,8 @@ describe('CellsTable row modifier selection', () => {
     }
   });
 
-  it('does not select a row when bulk selection is disabled', () => {
-    renderCellsTable({isBulkActionsEnabled: false});
+  it('does not select a row when selection is out of scope', () => {
+    renderCellsTable({selectionEnabled: false});
     fireEvent.click(screen.getByRole('button', {name: 'Wire logs.pdf', hidden: true}), {metaKey: true});
     expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
   });
@@ -4200,8 +4171,8 @@ describe('CellsTable restoring selected Bin items', () => {
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
 
-  it('does not offer Restore when bulk actions are disabled', () => {
-    renderCellsTable({isBulkActionsEnabled: false, initialNodes: [createBinNode('a.txt')]});
+  it('does not offer Restore when selection is out of scope', () => {
+    renderCellsTable({selectionEnabled: false, initialNodes: [createBinNode('a.txt')]});
 
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();

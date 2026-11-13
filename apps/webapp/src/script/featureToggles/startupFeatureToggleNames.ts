@@ -21,7 +21,6 @@ export const applockRefactoredFeatureToggleName = 'applock-refactored';
 export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
 export const forTestsOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
-export const driveBulkActionsFeatureToggleName = 'drive-bulk-actions';
 export const driveBulkRestoreFeatureToggleName = 'drive-bulk-restore';
 export const markAsUnreadFeatureToggleName = 'mark-as-unread';
 export const troubleshooterFeatureToggleName = 'troubleshooter';
@@ -35,7 +34,6 @@ export const startupFeatureToggleRegistry = [
   {name: conversationListCollapseFeatureToggleName, previewDefaultEnabled: false},
   {name: forTestsOnlyFeatureToggleName, previewDefaultEnabled: false},
   {name: disableMessagePreprocessingFeatureToggleName, previewDefaultEnabled: false},
-  {name: driveBulkActionsFeatureToggleName, previewDefaultEnabled: true},
   {name: driveBulkRestoreFeatureToggleName, previewDefaultEnabled: false},
   {name: markAsUnreadFeatureToggleName, previewDefaultEnabled: true},
   {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},

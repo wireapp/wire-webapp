@@ -32,7 +32,6 @@ import {emptyBin, isEmptyBinRootPath} from './emptyBinAction';
 import {getEmptyBinStatusKind, type EmptyBinStatus} from './getEmptyBinStatusKind';
 
 import type {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
-import {driveBulkActionsFeatureToggleName} from '../../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../../page/rootProvider';
 import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {TrashIcon} from '../../../../../uiKit/dataDisplay/icon/trashIcon';
@@ -69,7 +68,7 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   onEmptyBinSubmitted,
   onInProgressChange,
 }: CellsEmptyBinActionProps) => {
-  const {clock, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {clock, translate} = useApplicationContext();
   const canPerformCellsAction = useCellsActionPermissions();
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,10 +80,9 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   const isMounted = useRef(false);
   const statusReporter = useBulkActionStatusReporter('emptyBin');
 
-  const isFeatureEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const currentCellsPath = getCurrentCellsPath();
   const isAtBinRoot = isEmptyBinRootPath(currentCellsPath);
-  const canEmptyBin = isFeatureEnabled && isAtBinRoot && canPerformCellsAction(CELLS_ACTION.DELETE);
+  const canEmptyBin = isAtBinRoot && canPerformCellsAction(CELLS_ACTION.DELETE);
   const scopeKey = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
   const initialScopeKey = useRef(scopeKey).current;
   const currentScopeKey = useRef(scopeKey);

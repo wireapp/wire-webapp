@@ -64,7 +64,7 @@ jest.mock('./conversation', () => {
   };
 });
 
-import {Account} from './account';
+import {Account, EVENTS} from './account';
 import {Maybe, result, task} from 'true-myth';
 import type {MetaClient} from './client/clientService';
 import {ConnectionState} from './connectionState/connectionState';
@@ -284,6 +284,23 @@ describe('Account', () => {
     mls_public_keys: {},
   };
   describe('"init"', () => {
+    it('notifies consumers when services are replaced or cleared', async () => {
+      const {account} = await createAccount();
+      const previousNotificationService = getAccountServiceForTest(account).notification;
+      const servicesAtNotification: Account['service'][] = [];
+      account.on(EVENTS.SERVICES_CHANGED, () => {
+        servicesAtNotification.push(account.service);
+      });
+
+      await account['initServices']({clientType: ClientType.TEMPORARY, userId: ''});
+
+      expect(getAccountServiceForTest(account).notification).not.toBe(previousNotificationService);
+      expect(servicesAtNotification).toEqual([account.service]);
+
+      account['resetContext']();
+      expect(servicesAtNotification).toEqual([servicesAtNotification[0], undefined]);
+    });
+
     it('initializes the Protocol buffers', async () => {
       const apiClient = new APIClient({platform: nodePlatform});
       apiClients.push(apiClient);
