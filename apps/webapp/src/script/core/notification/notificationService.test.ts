@@ -117,6 +117,8 @@ describe('NotificationService', () => {
         const droppedEvents = [
           message,
           {...message, type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE},
+          {...message, type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE, conversation: ''},
+          {...message, type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE, conversation: undefined},
           {...message, qualified_conversation: undefined},
         ] as BackendEvent[];
         await expect(process('dropped', droppedEvents)).resolves.toEqual([]);
@@ -127,6 +129,13 @@ describe('NotificationService', () => {
 
         const unaffectedEvents = [
           {...message, qualified_conversation: {...target, domain: 'other.example.com'}},
+          {...message, qualified_conversation: {...target, id: 'another-conversation'}},
+          {
+            ...message,
+            type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+            conversation: '',
+            qualified_conversation: undefined,
+          },
           {...message, conversation: 'another-conversation', qualified_conversation: undefined},
           {...message, type: CONVERSATION_EVENT.OTR_MESSAGE_ADD},
         ] as BackendEvent[];

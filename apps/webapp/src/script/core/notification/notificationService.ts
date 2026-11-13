@@ -213,19 +213,30 @@ export class NotificationService extends TypedEventEmitter<Events> {
     return isOutdatedNotificationStreamEvent(event, source, lastEventDate);
   }
 
+  private shouldDropIncomingMLSEvent(event: BackendEvent): boolean {
+    const target = this.ignoredMLSConversation;
+    if (
+      target === undefined ||
+      (event.type !== CONVERSATION_EVENT.MLS_MESSAGE_ADD && event.type !== CONVERSATION_EVENT.MLS_WELCOME_MESSAGE)
+    ) {
+      return false;
+    }
+
+    // Welcome events carry the conversation identity in qualified_conversation; the legacy field may be absent.
+    if (event.qualified_conversation !== undefined) {
+      return event.qualified_conversation.id === target.id && event.qualified_conversation.domain === target.domain;
+    }
+
+    return event.conversation === target.id;
+  }
+
   public async *handleNotification(
     notification: Notification,
     source: NotificationSource,
   ): AsyncGenerator<HandledEventPayload> {
     for (const event of notification.payload) {
-      if (
-        this.ignoredMLSConversation !== undefined &&
-        (event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD || event.type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE) &&
-        event.conversation === this.ignoredMLSConversation.id &&
-        (event.qualified_conversation === undefined ||
-          event.qualified_conversation.domain === this.ignoredMLSConversation.domain)
-      ) {
-        this.logger.warn('Debug: dropping incoming MLS event', {type: event.type, conversation: event.conversation});
+      if (this.shouldDropIncomingMLSEvent(event)) {
+        this.logger.warn('Debug: dropping incoming MLS event', {type: event.type});
         continue;
       }
       this.logger.debug(`Handling event of type "${event.type}"`, {event});
