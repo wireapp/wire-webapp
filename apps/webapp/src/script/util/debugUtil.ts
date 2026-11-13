@@ -20,6 +20,7 @@
 import {isNonEmptyString, isNullOrUndefined, isObject, isUndefined} from '@sindresorhus/is';
 import {Dexie} from 'dexie';
 import keyboardjs from 'keyboardjs';
+import ko from 'knockout';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
@@ -123,6 +124,7 @@ export type NotificationBackendDump = {
 };
 
 export class DebugUtil {
+  public readonly ignoredMLSConversation = ko.observable<QualifiedId>();
   private readonly logger: Logger;
   private readonly callingRepository: CallingRepository;
   private readonly clientRepository: ClientRepository;
@@ -342,6 +344,23 @@ export class DebugUtil {
     return (this.core.service?.conversation as any).resetMLSConversation(
       this.conversationState.activeConversation()?.qualifiedId,
     );
+  }
+
+  /** Missed MLS events are discarded permanently. Reloading clears the toggle. */
+  setIgnoreIncomingMLS(enabled: boolean): void {
+    const notificationService = this.core.service?.notification;
+    if (notificationService === undefined) {
+      throw new Error('Core services are not initialized');
+    }
+
+    const conversation = this.conversationState.activeConversation();
+    if (enabled && (conversation === undefined || !isMLSCapableConversation(conversation))) {
+      throw new Error('Select an MLS conversation first');
+    }
+
+    const ignoredConversation = enabled ? conversation?.qualifiedId : undefined;
+    notificationService.setIgnoredMLSConversation(ignoredConversation);
+    this.ignoredMLSConversation(ignoredConversation);
   }
 
   isPerformancePanelEnabled(): boolean {

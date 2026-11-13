@@ -26,7 +26,9 @@ import {isOutdatedNotificationStreamEvent} from './outdatedNotificationStreamEve
 
 import {APIClient} from '../../apiClient/apiClient';
 import {BackendEvent} from '../../apiClient/event/backendEvent';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 import {Notification} from '../../apiClient/notification/notification';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
 import {getLogger} from '../../logger/getLogger';
 import {ConversationService} from '../conversation';
@@ -75,6 +77,12 @@ export class NotificationService extends TypedEventEmitter<Events> {
   private readonly database: NotificationDatabaseRepository;
   private readonly logger = getLogger('@wireapp/core/NotificationService');
   public static readonly TOPIC = TOPIC;
+  private ignoredMLSConversation?: QualifiedId;
+
+  /** Debug helper: drop incoming MLS events before decryption, without pausing notification acknowledgement. */
+  public setIgnoredMLSConversation(conversation?: QualifiedId): void {
+    this.ignoredMLSConversation = conversation;
+  }
 
   constructor(
     apiClient: APIClient,
@@ -210,6 +218,16 @@ export class NotificationService extends TypedEventEmitter<Events> {
     source: NotificationSource,
   ): AsyncGenerator<HandledEventPayload> {
     for (const event of notification.payload) {
+      if (
+        this.ignoredMLSConversation !== undefined &&
+        (event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD || event.type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE) &&
+        event.conversation === this.ignoredMLSConversation.id &&
+        (event.qualified_conversation === undefined ||
+          event.qualified_conversation.domain === this.ignoredMLSConversation.domain)
+      ) {
+        this.logger.warn('Debug: dropping incoming MLS event', {type: event.type, conversation: event.conversation});
+        continue;
+      }
       this.logger.debug(`Handling event of type "${event.type}"`, {event});
       let lastEventDate: Date | undefined = undefined;
       try {

@@ -22,6 +22,8 @@ import {nodePlatform} from '../../apiClient/shims/node/platform';
 import {Notification} from '../../apiClient/notification/notification';
 
 import {APIClient} from '../../apiClient/apiClient';
+import {BackendEvent} from '../../apiClient/event/backendEvent';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 import {MemoryEngine} from '../storage/engine/memoryEngine';
 
 import {ConversationService} from '../conversation';
@@ -83,6 +85,62 @@ describe('NotificationService', () => {
   });
 
   describe('handleNotification', () => {
+    it.each([NotificationSource.NOTIFICATION_STREAM, NotificationSource.WEBSOCKET])(
+      'drops only targeted MLS events, acknowledges notifications and can resume (%s)',
+      async source => {
+        const storeEngine = new MemoryEngine();
+        await storeEngine.init('NotificationService.test');
+        const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
+        apiClients.push(apiClient);
+        const handleEvent = jest.fn(async (event: BackendEvent): Promise<HandledEventResult> => {
+          return {status: 'handled', payload: {event}};
+        });
+        const conversationService = {handleEvent} as unknown as ConversationService;
+        const service = new NotificationService(apiClient, storeEngine, conversationService);
+        const target = {id: 'conversation-id', domain: 'example.com'};
+        const message = {
+          type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
+          conversation: target.id,
+          qualified_conversation: target,
+        } as BackendEvent;
+        const process = async (id: string, payload: BackendEvent[]): Promise<HandledEventPayload[]> => {
+          const results: HandledEventPayload[] = [];
+          for await (const result of service.handleNotification({id, payload}, source)) {
+            results.push(result);
+          }
+          return results;
+        };
+
+        await expect(process('before', [message])).resolves.toEqual([{event: message}]);
+        handleEvent.mockClear();
+        service.setIgnoredMLSConversation(target);
+        const droppedEvents = [
+          message,
+          {...message, type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE},
+          {...message, qualified_conversation: undefined},
+        ] as BackendEvent[];
+        await expect(process('dropped', droppedEvents)).resolves.toEqual([]);
+        expect(handleEvent).not.toHaveBeenCalled();
+        await expect(storeEngine.read('amplify', 'z.storage.StorageKey.NOTIFICATION.LAST_ID')).resolves.toEqual({
+          value: 'dropped',
+        });
+
+        const unaffectedEvents = [
+          {...message, qualified_conversation: {...target, domain: 'other.example.com'}},
+          {...message, conversation: 'another-conversation', qualified_conversation: undefined},
+          {...message, type: CONVERSATION_EVENT.OTR_MESSAGE_ADD},
+        ] as BackendEvent[];
+        await expect(process('unaffected', unaffectedEvents)).resolves.toEqual(
+          unaffectedEvents.map(event => {
+            return {event};
+          }),
+        );
+
+        service.setIgnoredMLSConversation();
+        await expect(process('resumed', [message])).resolves.toEqual([{event: message}]);
+      },
+    );
+
     it('continues to yield a single handled payload', async () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
