@@ -86,6 +86,7 @@ const MeetingListItemComponent: FunctionComponent<MeetingListItemProps> = ({
     useMeetingPrepModal.getState().open({
       meetingTitle: title,
       meetingStartTime: start.toISOString(),
+      meetingEndTime: end.toISOString(),
       qualifiedMeetingId: meetingSeries.qualified_id,
       qualifiedConversationId: meetingSeries.qualified_conversation,
     });

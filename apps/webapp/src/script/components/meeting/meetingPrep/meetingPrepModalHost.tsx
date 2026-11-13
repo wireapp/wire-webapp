@@ -19,14 +19,25 @@
 
 import {type FunctionComponent, useMemo} from 'react';
 
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {createMeetingPrepPreview} from './createMeetingPrepPreview';
 import {MeetingPrepModal} from './meetingPrepModal';
+import {useMeetingPrepConversation} from './useMeetingPrepConversation';
 import {useMeetingPrepJoin} from './useMeetingPrepJoin';
+import {useMeetingPrepModal} from './useMeetingPrepModal';
 
+import {Config} from '../../../Config';
+import {troubleshooterFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {MediaStreamHandler} from '../../../repositories/media/MediaStreamHandler';
 import {UserState} from '../../../repositories/user/userState';
+import {navigate} from '../../../router/Router';
+
+const openTroubleshooting = (): void => {
+  navigate('/preferences/troubleshooting');
+};
 
 export const MeetingPrepModalHost: FunctionComponent = () => {
   const participant = container.resolve(UserState).self();
@@ -34,10 +45,29 @@ export const MeetingPrepModalHost: FunctionComponent = () => {
     return createMeetingPrepPreview(container.resolve(MediaStreamHandler));
   }, []);
   const joinMeeting = useMeetingPrepJoin();
+  const {isFeatureToggleEnabled} = useApplicationContext();
+  const {BRAND_NAME: brandName, URL: configUrls} = Config.getConfig();
+  const session = useMeetingPrepModal(state => {
+    return state.session;
+  });
+  // Memoised on the stored session, so the conversation subscriptions do not restart on every render.
+  const qualifiedConversationId = useMemo(() => {
+    return session.map(({qualifiedConversationId: conversationId}) => {
+      return conversationId;
+    });
+  }, [session]);
+  const {isCallInProgress, invitees} = useMeetingPrepConversation(qualifiedConversationId);
 
   return (
     <MeetingPrepModal
       participant={participant}
+      isCallInProgress={isCallInProgress}
+      invitees={invitees}
+      brandName={brandName}
+      supportUrl={configUrls.SUPPORT.CALL_ENCRYPTION}
+      openTroubleshooting={
+        isFeatureToggleEnabled(troubleshooterFeatureToggleName) ? Maybe.just(openTroubleshooting) : Maybe.nothing()
+      }
       requestPreviewStream={preview.requestPreviewStream}
       releasePreviewStream={preview.releasePreviewStream}
       joinMeeting={joinMeeting}

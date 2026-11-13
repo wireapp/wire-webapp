@@ -22,6 +22,8 @@ import {type FunctionComponent, type KeyboardEvent, useEffect, useRef, useState}
 import {JSX} from '@emotion/react/jsx-runtime';
 import {Maybe, maybe} from 'true-myth';
 
+import {getMeetingPrepJoinSentenceKey} from './meetingPrepJoinSentence';
+import {MeetingPrepPanel} from './meetingPrepPanel';
 import {
   meetingPrepAvatarStyles,
   meetingPrepBodyStyles,
@@ -29,9 +31,8 @@ import {
   meetingPrepControlsStyles,
   meetingPrepControlStyles,
   meetingPrepDeviceMenuStyles,
-  meetingPrepFooterStyles,
+  meetingPrepGridStyles,
   meetingPrepHeaderStyles,
-  meetingPrepHeaderTextStyles,
   meetingPrepMenuButtonStyles,
   meetingPrepMeterRowStyles,
   meetingPrepMeterStyles,
@@ -39,8 +40,6 @@ import {
   meetingPrepNoCameraStyles,
   meetingPrepSelfViewStyles,
   meetingPrepSurfaceStyles,
-  meetingPrepTimeStyles,
-  meetingPrepTitleStyles,
   meetingPrepToggleStyles,
   meetingPrepVideoStyles,
 } from './meetingPrepSurface.styles';
@@ -53,7 +52,6 @@ import type {
 } from './meetingPrepTypes';
 import {meetingPrepDeviceKinds, meetingPrepMediaKinds, meetingPrepPreviewErrors} from './meetingPrepTypes';
 
-import {Config} from '../../../Config';
 import {renderNoCameraMessage} from '../../../page/mainContent/panels/preferences/avPreferences/cameraPreferences';
 import {InputLevel} from '../../../page/mainContent/panels/preferences/avPreferences/inputLevel';
 import {useApplicationContext} from '../../../page/rootProvider';
@@ -61,8 +59,6 @@ import type {User} from '../../../repositories/entity/User';
 import {useMediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
 import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
-import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
-import {formatLocale} from '../../../util/timeUtil';
 import {Avatar, AVATAR_SIZE} from '../../avatar';
 import {groupVideoBackgroundInitializingOverlay} from '../../calling/GroupVideoGridTile.styles';
 import {useShowLoadingOverlay} from '../../calling/useShowLoadingOverlay';
@@ -70,14 +66,22 @@ import {VideoControlsSelect} from '../../calling/VideoControls/VideoControlsSele
 import {CameraIcon, CameraOffIcon, ChevronIcon, MicOffIcon, MicOnIcon} from '../../icon';
 
 export type MeetingPrepSurfaceProps = {
-  meetingTitle: string;
-  meetingStartTime: string;
-  participant: User;
-  onCancel: () => void;
-  onPermissionDenied: (kind: MeetingPrepDeviceKind) => void;
-  onJoin: (choice: MeetingPrepJoinChoice) => void | Promise<void>;
-  requestPreviewStream: RequestMeetingPrepPreview;
-  releasePreviewStream: (stream: MediaStream) => void;
+  /** The id of the meeting title, which names the dialog around the green room. */
+  readonly titleId: string;
+  readonly meetingTitle: string;
+  readonly meetingStartTime: string;
+  readonly meetingEndTime: Maybe<string>;
+  readonly isCallInProgress: boolean;
+  readonly invitees: readonly User[];
+  readonly brandName: string;
+  readonly supportUrl?: string;
+  readonly onTestConnection: Maybe<() => void>;
+  readonly participant: User;
+  readonly onCancel: () => void;
+  readonly onPermissionDenied: (kind: MeetingPrepDeviceKind) => void;
+  readonly onJoin: (choice: MeetingPrepJoinChoice) => void | Promise<void>;
+  readonly requestPreviewStream: RequestMeetingPrepPreview;
+  readonly releasePreviewStream: (stream: MediaStream) => void;
 };
 
 type DeviceOption = {
@@ -159,8 +163,15 @@ const usePreviewStream = (
 };
 
 export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
+  titleId,
   meetingTitle,
   meetingStartTime,
+  meetingEndTime,
+  isCallInProgress,
+  invitees,
+  brandName,
+  supportUrl,
+  onTestConnection,
   participant,
   onCancel,
   onPermissionDenied,
@@ -181,6 +192,9 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
   const reportedCameraPermissionErrorRef = useRef(false);
   const reportedMicrophonePermissionErrorRef = useRef(false);
   const [isJoining, setIsJoining] = useState(false);
+  // Kept after the failed preview clears its error, so the join sentence can still say why the user is muted.
+  // Cleared when the user turns the microphone on again, so the sentence follows the new attempt.
+  const [microphoneBlocked, setMicrophoneBlocked] = useState(false);
 
   useEffect(() => {
     closeButtonRef.current?.focus();
@@ -287,6 +301,7 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
       setMicrophoneEnabled(false);
       if (microphonePermissionDenied && !reportedMicrophonePermissionErrorRef.current) {
         reportedMicrophonePermissionErrorRef.current = true;
+        setMicrophoneBlocked(true);
         onPermissionDenied(meetingPrepDeviceKinds.microphone);
       }
     }
@@ -400,11 +415,7 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
     }
 
     if (showCameraPermissionError) {
-      return (
-        <div css={meetingPrepNoCameraStyles}>
-          {renderNoCameraMessage({brandName: Config.getConfig().BRAND_NAME, translate})}
-        </div>
-      );
+      return <div css={meetingPrepNoCameraStyles}>{renderNoCameraMessage({brandName, translate})}</div>;
     }
 
     return (
@@ -439,148 +450,154 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
         >
           <CloseIcon aria-hidden="true" />
         </button>
-        <div css={meetingPrepHeaderTextStyles}>
-          <h2 css={meetingPrepTitleStyles}>{meetingTitle}</h2>
-          <p css={meetingPrepTimeStyles}>
-            {translate('meetings.notifications.startsAt', {time: formatLocale(meetingStartTime, 'PP, p')})}
-          </p>
-        </div>
       </header>
 
       <div css={meetingPrepBodyStyles}>
-        <div css={meetingPrepSelfViewStyles}>
-          {!cameraEnabled ? (
-            <div css={meetingPrepAvatarStyles}>
-              <Avatar participant={participant} avatarSize={AVATAR_SIZE.X_LARGE} hideAvailabilityStatus />
-            </div>
-          ) : (
-            showVideo && renderCameraPreview()
-          )}
-          {showLoadingOverlay && (
-            <div
-              aria-busy={showLoadingOverlay}
-              css={groupVideoBackgroundInitializingOverlay}
-              data-uie-name="background-effect-initializing"
-            >
-              <Loading size={32} />
-            </div>
-          )}
-          {cameraEnabled && showCameraPermissionError && renderCameraPreview()}
-          <span css={meetingPrepNameStyles}>{participant.name()}</span>
-        </div>
-        <div css={meetingPrepMeterRowStyles}>
-          <div css={meetingPrepMeterStyles}>
-            {microphoneEnabled && <InputLevel disabled={meterStream === null} mediaStream={meterStream} />}
-          </div>
-          <div css={meetingPrepControlsStyles}>
-            <div css={meetingPrepControlStyles} ref={microphoneMenuRef}>
-              <button
-                type="button"
-                css={meetingPrepToggleStyles}
-                aria-pressed={microphoneEnabled}
-                aria-label={translate('preferencesAVMicrophone')}
-                onClick={() => {
-                  return setMicrophoneEnabled(enabled => {
-                    return !enabled;
-                  });
-                }}
-              >
-                {microphoneEnabled ? <MicOnIcon /> : <MicOffIcon />}
-              </button>
-              <button
-                type="button"
-                css={meetingPrepMenuButtonStyles}
-                aria-expanded={microphoneMenuOpen}
-                aria-label={translate('videoCallOverlayOpenMicrophoneAndSpeakerOptions')}
-                onClick={() => {
-                  setCameraMenuOpen(false);
-                  setMicrophoneMenuOpen(open => {
-                    return !open;
-                  });
-                }}
-              >
-                <ChevronIcon />
-              </button>
-              {microphoneMenuOpen && (
-                <div css={meetingPrepDeviceMenuStyles}>
-                  <VideoControlsSelect
-                    value={audioDeviceValue}
-                    id="meeting-prep-audio-devices"
-                    dataUieName="meeting-prep-audio-devices"
-                    options={audioDeviceOptions}
-                    menuIsOpen
-                    overlayMenu={false}
-                    onChange={selectAudioDevice}
-                    onKeyDown={event => {
-                      if (event.key === 'Escape') {
-                        event.stopPropagation();
-                        setMicrophoneMenuOpen(false);
-                      }
-                    }}
-                  />
+        <div css={meetingPrepGridStyles}>
+          <div>
+            <div css={meetingPrepSelfViewStyles}>
+              {!cameraEnabled ? (
+                <div css={meetingPrepAvatarStyles}>
+                  <Avatar participant={participant} avatarSize={AVATAR_SIZE.X_LARGE} hideAvailabilityStatus />
+                </div>
+              ) : (
+                showVideo && renderCameraPreview()
+              )}
+              {showLoadingOverlay && (
+                <div
+                  aria-busy={showLoadingOverlay}
+                  css={groupVideoBackgroundInitializingOverlay}
+                  data-uie-name="background-effect-initializing"
+                >
+                  <Loading size={32} />
                 </div>
               )}
+              {cameraEnabled && showCameraPermissionError && renderCameraPreview()}
+              <span css={meetingPrepNameStyles}>{participant.name()}</span>
             </div>
-            <div css={meetingPrepControlStyles} ref={cameraMenuRef}>
-              <button
-                type="button"
-                css={meetingPrepToggleStyles}
-                aria-pressed={cameraEnabled}
-                aria-label={translate('preferencesAVCamera')}
-                onClick={() => {
-                  return setCameraEnabled(enabled => {
-                    return !enabled;
-                  });
-                }}
-              >
-                {cameraEnabled ? <CameraIcon /> : <CameraOffIcon />}
-              </button>
-              <button
-                type="button"
-                css={meetingPrepMenuButtonStyles}
-                aria-expanded={cameraMenuOpen}
-                aria-label={translate('videoCallMenuMoreCameraSettings')}
-                onClick={() => {
-                  setMicrophoneMenuOpen(false);
-                  setCameraMenuOpen(open => {
-                    return !open;
-                  });
-                }}
-              >
-                <ChevronIcon />
-              </button>
-              {cameraMenuOpen && (
-                <div css={meetingPrepDeviceMenuStyles}>
-                  <VideoControlsSelect
-                    value={videoDeviceValue}
-                    id="meeting-prep-video-devices"
-                    dataUieName="meeting-prep-video-devices"
-                    options={videoDeviceOptions}
-                    menuIsOpen
-                    overlayMenu={false}
-                    onChange={selectVideoDevice}
-                    onKeyDown={event => {
-                      if (event.key === 'Escape') {
-                        event.stopPropagation();
-                        setCameraMenuOpen(false);
-                      }
+            <div css={meetingPrepMeterRowStyles}>
+              <div css={meetingPrepMeterStyles}>
+                {microphoneEnabled && <InputLevel disabled={meterStream === null} mediaStream={meterStream} />}
+              </div>
+              <div css={meetingPrepControlsStyles}>
+                <div css={meetingPrepControlStyles} ref={microphoneMenuRef}>
+                  <button
+                    type="button"
+                    css={meetingPrepToggleStyles}
+                    aria-pressed={microphoneEnabled}
+                    aria-label={translate('preferencesAVMicrophone')}
+                    onClick={() => {
+                      setMicrophoneBlocked(false);
+                      setMicrophoneEnabled(enabled => {
+                        return !enabled;
+                      });
                     }}
-                  />
+                  >
+                    {microphoneEnabled ? <MicOnIcon /> : <MicOffIcon />}
+                  </button>
+                  <button
+                    type="button"
+                    css={meetingPrepMenuButtonStyles}
+                    aria-expanded={microphoneMenuOpen}
+                    aria-label={translate('videoCallOverlayOpenMicrophoneAndSpeakerOptions')}
+                    onClick={() => {
+                      setCameraMenuOpen(false);
+                      setMicrophoneMenuOpen(open => {
+                        return !open;
+                      });
+                    }}
+                  >
+                    <ChevronIcon />
+                  </button>
+                  {microphoneMenuOpen && (
+                    <div css={meetingPrepDeviceMenuStyles}>
+                      <VideoControlsSelect
+                        value={audioDeviceValue}
+                        id="meeting-prep-audio-devices"
+                        dataUieName="meeting-prep-audio-devices"
+                        options={audioDeviceOptions}
+                        menuIsOpen
+                        overlayMenu={false}
+                        onChange={selectAudioDevice}
+                        onKeyDown={event => {
+                          if (event.key === 'Escape') {
+                            event.stopPropagation();
+                            setMicrophoneMenuOpen(false);
+                          }
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
+                <div css={meetingPrepControlStyles} ref={cameraMenuRef}>
+                  <button
+                    type="button"
+                    css={meetingPrepToggleStyles}
+                    aria-pressed={cameraEnabled}
+                    aria-label={translate('preferencesAVCamera')}
+                    onClick={() => {
+                      return setCameraEnabled(enabled => {
+                        return !enabled;
+                      });
+                    }}
+                  >
+                    {cameraEnabled ? <CameraIcon /> : <CameraOffIcon />}
+                  </button>
+                  <button
+                    type="button"
+                    css={meetingPrepMenuButtonStyles}
+                    aria-expanded={cameraMenuOpen}
+                    aria-label={translate('videoCallMenuMoreCameraSettings')}
+                    onClick={() => {
+                      setMicrophoneMenuOpen(false);
+                      setCameraMenuOpen(open => {
+                        return !open;
+                      });
+                    }}
+                  >
+                    <ChevronIcon />
+                  </button>
+                  {cameraMenuOpen && (
+                    <div css={meetingPrepDeviceMenuStyles}>
+                      <VideoControlsSelect
+                        value={videoDeviceValue}
+                        id="meeting-prep-video-devices"
+                        dataUieName="meeting-prep-video-devices"
+                        options={videoDeviceOptions}
+                        menuIsOpen
+                        overlayMenu={false}
+                        onChange={selectVideoDevice}
+                        onKeyDown={event => {
+                          if (event.key === 'Escape') {
+                            event.stopPropagation();
+                            setCameraMenuOpen(false);
+                          }
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
+          <MeetingPrepPanel
+            titleId={titleId}
+            meetingTitle={meetingTitle}
+            meetingStartTime={meetingStartTime}
+            meetingEndTime={meetingEndTime}
+            isCallInProgress={isCallInProgress}
+            invitees={invitees}
+            brandName={brandName}
+            supportUrl={supportUrl}
+            onTestConnection={onTestConnection}
+            joinSentence={translate(
+              getMeetingPrepJoinSentenceKey({microphoneEnabled, cameraEnabled, microphoneBlocked}),
+            )}
+            isJoining={isJoining}
+            onJoin={join}
+          />
         </div>
       </div>
-
-      <footer css={meetingPrepFooterStyles}>
-        <Button type="button" variant={ButtonVariant.TERTIARY} disabled={isJoining} onClick={onCancel}>
-          {translate('modalConfirmSecondary')}
-        </Button>
-        <Button type="button" variant={ButtonVariant.PRIMARY} disabled={isJoining} onClick={join}>
-          {translate('callJoin')}
-        </Button>
-      </footer>
     </section>
   );
 };
