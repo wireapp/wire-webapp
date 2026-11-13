@@ -74,6 +74,15 @@ export async function startApplication(
 
   const clock = createClock();
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
+  const config = Config.getConfig();
+  enableLogging({
+    clock,
+    consoleOutput: console,
+    locationSearch: window.location.search,
+    debugEnabled: config.FEATURE.ENABLE_DEBUG,
+    storage: Maybe.of(getStorage()),
+    configureLogging,
+  });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const fireAndForgetInvoker = createFireAndForgetInvoker({
     reportError(error) {
@@ -101,15 +110,6 @@ export async function startApplication(
   });
 
   const domContentLoadedAtMonotonicMicroseconds = await documentContentLoaded;
-  const config = Config.getConfig();
-  enableLogging({
-    clock,
-    consoleOutput: console,
-    locationSearch: window.location.search,
-    debugEnabled: config.FEATURE.ENABLE_DEBUG,
-    storage: Maybe.of(getStorage()),
-    configureLogging,
-  });
   const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
     fetchBuildMetadata: globalThis.fetch.bind(globalThis),
   });
