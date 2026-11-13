@@ -21,7 +21,7 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {Maybe} from 'true-myth';
 
 import {createPinoLogging} from './createPinoLogging';
-import {createConsoleOutput, encodeLogOutput} from './logOutput';
+import {createConsoleOutput, encodeLogOutput, type LogOutput} from './logOutput';
 import type {Logger} from './logger';
 
 function createTestLogging(namespaces: Maybe<string>): {
@@ -31,7 +31,9 @@ function createTestLogging(namespaces: Maybe<string>): {
 } {
   const clock = createDeterministicClock({initialUnixEpochMicroseconds: 1760000000000000n});
   const output = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
-  const logging = createPinoLogging(Maybe.just({clock, output: createConsoleOutput(output), namespaces}));
+  const logging = createPinoLogging(
+    Maybe.just({clock, persistenceOutput: Maybe.nothing<LogOutput>(), output: createConsoleOutput(output), namespaces}),
+  );
 
   return {logging, clock, output};
 }
@@ -68,7 +70,9 @@ describe('Wire logging through Pino browser', () => {
   it('forwards sanitized JSON lines to destinations and uses the injected clock on each call', () => {
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 1000n});
     const output = jest.fn();
-    const logging = createPinoLogging(Maybe.just({clock, output, namespaces: Maybe.just('*')}));
+    const logging = createPinoLogging(
+      Maybe.just({clock, persistenceOutput: Maybe.nothing<LogOutput>(), output, namespaces: Maybe.just('*')}),
+    );
     const logger = logging.getLogger('@wireapp/core/Account');
 
     logger.info('First event');
@@ -95,7 +99,14 @@ describe('Wire logging through Pino browser', () => {
   it('sanitizes every destination input before output, including errors and serialization failures', () => {
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 1000n});
     const destination = jest.fn();
-    const logging = createPinoLogging(Maybe.just({clock, output: destination, namespaces: Maybe.just('*')}));
+    const logging = createPinoLogging(
+      Maybe.just({
+        clock,
+        persistenceOutput: Maybe.nothing<LogOutput>(),
+        output: destination,
+        namespaces: Maybe.just('*'),
+      }),
+    );
     const logger = logging.getLogger('component');
     const cause = Object.assign(new Error('Bearer secret-cause'), {request: {body: 'private-request'}});
     const error = Object.assign(new Error('token=secret-error', {cause}), {config: {password: 'private-config'}});
@@ -163,9 +174,23 @@ describe('Wire logging through Pino browser', () => {
     const logging = createPinoLogging(Maybe.nothing());
     const logger = logging.getLogger('component');
     logger.debug('Before initialization');
-    logging.configure(Maybe.just({clock, output: createConsoleOutput(output), namespaces: Maybe.just('*')}));
+    logging.configure(
+      Maybe.just({
+        clock,
+        persistenceOutput: Maybe.nothing<LogOutput>(),
+        output: createConsoleOutput(output),
+        namespaces: Maybe.just('*'),
+      }),
+    );
     logger.debug('Enabled');
-    logging.configure(Maybe.just({clock, output: createConsoleOutput(output), namespaces: Maybe.nothing<string>()}));
+    logging.configure(
+      Maybe.just({
+        clock,
+        persistenceOutput: Maybe.nothing<LogOutput>(),
+        output: createConsoleOutput(output),
+        namespaces: Maybe.nothing<string>(),
+      }),
+    );
     logger.debug('Disabled');
 
     expect(output.debug).toHaveBeenCalledTimes(1);
@@ -228,7 +253,9 @@ describe('Wire logging through Pino browser', () => {
         return readTime();
       },
     };
-    const logging = createPinoLogging(Maybe.just({clock, output, namespaces: Maybe.nothing<string>()}));
+    const logging = createPinoLogging(
+      Maybe.just({clock, persistenceOutput: Maybe.nothing<LogOutput>(), output, namespaces: Maybe.nothing<string>()}),
+    );
 
     logging.getLogger('component').debug('Filtered', {
       get error(): unknown {
@@ -352,7 +379,7 @@ describe('Wire logging through Pino browser', () => {
     const error = Object.assign(new Error('Provider failure'), {
       config: {password: 'private-password'},
       request: {body: 'private-request'},
-      toJSON(): Record<string, unknown> {
+      toJSON() {
         return {message: 'Provider failure', config: this.config, request: this.request};
       },
     });
@@ -385,7 +412,14 @@ describe('Wire logging through Pino browser', () => {
     const failingOutput = jest.fn(() => {
       throw new Error('Output unavailable');
     });
-    logging.configure(Maybe.just({clock, output: failingOutput, namespaces: Maybe.just('*')}));
+    logging.configure(
+      Maybe.just({
+        clock,
+        persistenceOutput: Maybe.nothing<LogOutput>(),
+        output: failingOutput,
+        namespaces: Maybe.just('*'),
+      }),
+    );
     expect(() => {
       logging.getLogger('component').info('Failed output');
     }).not.toThrow();
