@@ -43,7 +43,6 @@ export class MessageTimerUpdateMessage extends SystemMessage {
 
     this.message_timer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
-    // The real user entity is only attached after mapping, so self is resolved from the sender id here
     if (isNonEmptyString(userId)) {
       this.from = userId;
       this.fromDomain = userDomain;

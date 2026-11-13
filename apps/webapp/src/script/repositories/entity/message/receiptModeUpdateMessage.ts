@@ -38,7 +38,6 @@ export class ReceiptModeUpdateMessage extends SystemMessage {
     this.type = CONVERSATION_EVENT.RECEIPT_MODE_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
 
-    // The real user entity is only attached after mapping, so self is resolved from the sender id here
     if (isNonEmptyString(userId)) {
       this.from = userId;
       this.fromDomain = userDomain;
