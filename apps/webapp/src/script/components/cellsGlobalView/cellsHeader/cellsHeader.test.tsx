@@ -22,7 +22,6 @@ import {render, screen, type RenderResult} from '@testing-library/react';
 import {StyledApp} from '../../../uiKit/layout/styledApp/styledApp';
 import {THEME_ID} from '../../../uiKit/identity/theme/theme';
 
-import {driveBulkActionsFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -31,17 +30,10 @@ import {translateForTest} from '../../../util/test/translateForTest';
 
 import {CellsHeader} from './cellsHeader';
 
-const renderCellsHeader = (
-  isBulkActionsEnabled: boolean,
-  onSelectionBarAnchorChange: jest.Mock,
-  searchValue = '',
-): RenderResult => {
+const renderCellsHeader = (onSelectionBarAnchorChange: jest.Mock, searchValue = ''): RenderResult => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,
-      isFeatureToggleEnabled: featureToggleName => {
-        return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
-      },
     }),
   );
 
@@ -62,9 +54,9 @@ const renderCellsHeader = (
 };
 
 describe('CellsHeader', () => {
-  it('keeps a full-width selection overlay anchor after the Files toolbar when enabled', () => {
+  it('keeps a full-width selection overlay anchor after the Files toolbar without a startup feature opt-in', () => {
     const onSelectionBarAnchorChange = jest.fn();
-    renderCellsHeader(true, onSelectionBarAnchorChange);
+    renderCellsHeader(onSelectionBarAnchorChange);
 
     const anchor = onSelectionBarAnchorChange.mock.calls.find(([element]) => {
       return element !== null;
@@ -73,16 +65,9 @@ describe('CellsHeader', () => {
     expect(anchor?.parentElement).toBe(screen.getByRole('heading', {name: 'cells.heading'}).closest('header'));
   });
 
-  it('does not render a selection overlay anchor when the feature flag is off', () => {
-    const onSelectionBarAnchorChange = jest.fn();
-    renderCellsHeader(false, onSelectionBarAnchorChange);
-
-    expect(onSelectionBarAnchorChange).not.toHaveBeenCalled();
-  });
-
   it('does not render a selection overlay anchor in search results', () => {
     const onSelectionBarAnchorChange = jest.fn();
-    renderCellsHeader(true, onSelectionBarAnchorChange, 'file name');
+    renderCellsHeader(onSelectionBarAnchorChange, 'file name');
 
     expect(onSelectionBarAnchorChange).not.toHaveBeenCalled();
   });

@@ -24,7 +24,6 @@ import {Maybe} from 'true-myth';
 import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
-import {driveBulkActionsFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -74,17 +73,10 @@ type RenderCellsTableResult = {
   rerenderWithNodes: (nodes: CellNode[]) => void;
   rerenderWithScope: (scopeKey: string) => void;
 };
-const renderCellsTable = (
-  selectionEnabled = true,
-  selectionScopeKey = 'filters:none',
-  isBulkActionsEnabled = true,
-): RenderCellsTableResult => {
+const renderCellsTable = (selectionEnabled = true, selectionScopeKey = 'filters:none'): RenderCellsTableResult => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateSelectionForTest,
-      isFeatureToggleEnabled: featureToggleName => {
-        return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
-      },
     }),
   );
   const renderTable = (nodes: CellNode[], scopeKey = selectionScopeKey): JSX.Element => {
@@ -123,7 +115,7 @@ const renderCellsTable = (
 };
 
 describe('CellsTable selection', () => {
-  it('selects files and folders, updates the count, and clears all selected rows', () => {
+  it('selects files and folders without a startup feature opt-in, updates the count, and clears all selected rows', () => {
     renderCellsTable();
 
     const checkboxes = screen.getAllByRole('checkbox');
@@ -186,13 +178,6 @@ describe('CellsTable selection', () => {
 
     expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
     expect(screen.getByRole('checkbox')).not.toBeChecked();
-  });
-
-  it('hides selection controls when the Drive bulk actions feature flag is off', () => {
-    renderCellsTable(true, 'filters:none', false);
-
-    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('does not render selection controls for active search results', () => {

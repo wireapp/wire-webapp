@@ -19,7 +19,6 @@
 
 import {
   applockRefactoredFeatureToggleName,
-  driveBulkActionsFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
   markAsUnreadFeatureToggleName,
   forTestsOnlyFeatureToggleName,
@@ -73,10 +72,6 @@ describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
 
     expect(previewDefaultEnabledStartupFeatureToggleNames).toEqual(expectedDefaultNames);
     expect(startupFeatureToggleNames).toEqual(expect.arrayContaining(previewDefaultEnabledStartupFeatureToggleNames));
-  });
-
-  it('enables Drive bulk actions by default in preview builds', () => {
-    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(driveBulkActionsFeatureToggleName);
   });
 
   it('keeps Drive bulk restore disabled by default in preview builds', () => {

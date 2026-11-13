@@ -31,7 +31,6 @@ import {THEME_ID} from '../../../../uiKit/identity/theme/theme';
 import en from '../../../../../i18n/en-US.json';
 
 import type {CellsRepository} from '../../../../repositories/cells/cellsRepository';
-import {driveBulkActionsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -109,7 +108,6 @@ const renderCellsHeader = (
     clock?: ReturnType<typeof createDeterministicClock>;
     onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   } = {},
-  isBulkActionsEnabled = true,
   translateFunction: typeof translate | typeof translateForTest = translateForTest,
 ): RenderResult => {
   const {clock, ...headerProperties} = properties;
@@ -117,9 +115,6 @@ const renderCellsHeader = (
     createRootContextValueForTest({
       translate: translateFunction,
       clock,
-      isFeatureToggleEnabled: featureToggleName => {
-        return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
-      },
     }),
   );
 
@@ -145,7 +140,6 @@ describe('CellsHeader', () => {
         },
         isSearchViewOpen: false,
       },
-      true,
       translate,
     );
 
@@ -153,7 +147,7 @@ describe('CellsHeader', () => {
     expect(container.querySelector('img')).not.toBeInTheDocument();
   });
 
-  it('keeps the breadcrumb strip clickable while providing a selection overlay anchor', () => {
+  it('provides a selection overlay anchor without a startup feature opt-in and keeps breadcrumbs clickable', () => {
     const onSelectionBarAnchorChange = jest.fn();
     const {container} = renderCellsHeader({isSearchViewOpen: false, onSelectionBarAnchorChange});
 
@@ -178,13 +172,6 @@ describe('CellsHeader', () => {
     } finally {
       window.location.hash = originalHash;
     }
-  });
-
-  it('does not render a selection overlay anchor when the feature flag is off', () => {
-    const onSelectionBarAnchorChange = jest.fn();
-    renderCellsHeader({isSearchViewOpen: false, onSelectionBarAnchorChange}, false);
-
-    expect(onSelectionBarAnchorChange).not.toHaveBeenCalled();
   });
 
   it('hides search and filters while viewing the recycle bin', () => {
@@ -268,7 +255,7 @@ describe('CellsHeader', () => {
       onEmptyBinSubmitted,
       onRefreshAfterEmptyBinOutcome,
     };
-    const rendered = renderCellsHeader({...properties, clock}, true);
+    const rendered = renderCellsHeader({...properties, clock});
     const rerender = (): void => {
       rendered.rerender(createHeaderTree(properties));
     };

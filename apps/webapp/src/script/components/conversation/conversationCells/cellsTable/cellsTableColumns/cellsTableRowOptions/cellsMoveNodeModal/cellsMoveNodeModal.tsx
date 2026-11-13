@@ -20,12 +20,10 @@
 import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {CellsFoldersListModalContent} from './cellsFoldersListModalContent/cellsFoldersListModalContent';
-import {LegacyCellsMoveNodeModal} from './legacy/legacyCellsMoveNodeModal';
 import {useGetCellsFolders} from './useGetCellsFolders/useGetCellsFolders';
 import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
 
 import {QualifiedId} from '../../../../../../../apiClient/user/qualifiedId';
-import {driveBulkActionsFeatureToggleName} from '../../../../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
 import {CellNode} from '../../../../../../../types/cellNode';
@@ -45,7 +43,7 @@ interface CellsMoveNodeModalProps {
   navigateToPath?: (params: {conversationQualifiedId: QualifiedId; path: string}) => void;
 }
 
-const FlaggedCellsMoveNodeModal: FunctionComponent<CellsMoveNodeModalProps> = ({
+export const CellsMoveNodeModal: FunctionComponent<CellsMoveNodeModalProps> = ({
   nodeToMove,
   isOpen,
   onClose,
@@ -187,14 +185,4 @@ const FlaggedCellsMoveNodeModal: FunctionComponent<CellsMoveNodeModalProps> = ({
       )}
     </CellsModal>
   );
-};
-
-export const CellsMoveNodeModal: FunctionComponent<CellsMoveNodeModalProps> = (props: CellsMoveNodeModalProps) => {
-  const {isFeatureToggleEnabled} = useApplicationContext();
-
-  if (!isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)) {
-    return <LegacyCellsMoveNodeModal {...props} />;
-  }
-
-  return <FlaggedCellsMoveNodeModal {...props} />;
 };
