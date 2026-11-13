@@ -19,7 +19,7 @@
 
 import {act, fireEvent, render, screen} from '@testing-library/react';
 import {ThemeProvider} from '../uiKit';
-import {task} from 'true-myth';
+import {Maybe, task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {MeetingStoreRoot} from '../components/meeting/meetingStore/meetingStoreRoot';
@@ -102,7 +102,7 @@ describe('meeting link post-login landing', () => {
     expect(screen.getByRole('heading', {name: 'Link meeting'})).toBeInTheDocument();
     expect(loadMeetings).not.toHaveBeenCalled();
     expect(screen.queryByRole('heading', {name: 'meetings.navigation.title'})).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', {name: 'modalConfirmSecondary'}));
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'}));
     expect(window.location.hash).toBe('#/conversation/conversation-id/example.com');
     page.unmount();
   });
@@ -127,6 +127,10 @@ describe('meeting link post-login landing', () => {
       <ThemeProvider>
         <MeetingPrepModal
           participant={participant}
+          isCallInProgress={false}
+          invitees={[]}
+          brandName="Wire"
+          openTroubleshooting={Maybe.nothing()}
           requestPreviewStream={pendingPreview}
           releasePreviewStream={jest.fn()}
           joinMeeting={joinMeeting}

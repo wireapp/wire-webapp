@@ -19,68 +19,72 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {media} from '../../../uiKit/utils/mediaQueries';
 import {videoOptionsMenuStyles} from '../../calling/VideoControls/VideoControls.styles';
 
+// Full page: the green room covers the app, so nothing behind it competes with the preview.
 export const meetingPrepSurfaceStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
-  maxHeight: 'calc(90vh - 2rem)',
+  height: '100%',
   minHeight: 0,
   backgroundColor: 'var(--modal-bg)',
-  borderRadius: '12px',
   overflow: 'hidden',
 };
 
 export const meetingPrepHeaderStyles: CSSObject = {
-  display: 'grid',
-  gridTemplateColumns: '40px 1fr 40px',
-  alignItems: 'center',
-  minHeight: '64px',
-  padding: '12px 16px',
-};
-
-export const meetingPrepHeaderTextStyles: CSSObject = {
   display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: '2px',
-  minWidth: 0,
-};
-
-export const meetingPrepTitleStyles: CSSObject = {
-  margin: 0,
-  fontSize: 'var(--font-size-large)',
-  fontWeight: 'var(--font-weight-semibold)',
-  textAlign: 'center',
-};
-
-export const meetingPrepTimeStyles: CSSObject = {
-  margin: 0,
-  color: 'var(--text-input-placeholder)',
-  fontSize: 'var(--font-size-small)',
-  textAlign: 'center',
+  justifyContent: 'flex-end',
+  flexShrink: 0,
+  minHeight: 56,
+  padding: '10px 16px',
 };
 
 export const meetingPrepCloseButtonStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  width: 36,
+  height: 36,
   padding: 0,
   border: 'none',
+  borderRadius: 8,
   background: 'transparent',
   cursor: 'pointer',
   color: 'var(--text-color)',
+
+  '&:hover': {
+    backgroundColor: 'var(--foreground-fade-8)',
+  },
 };
 
 export const meetingPrepBodyStyles: CSSObject = {
-  display: 'flex',
-  flexDirection: 'column',
+  display: 'grid',
   flex: '1 1 auto',
-  gap: '16px',
+  placeItems: 'center',
   minHeight: 0,
   overflowY: 'auto',
-  padding: '0 24px 8px',
+  padding: '0 24px 32px',
+
+  [media.desktop]: {
+    padding: '0 48px 40px',
+  },
+};
+
+// One column on narrow windows, the preview beside the panel from desktop width.
+export const meetingPrepGridStyles: CSSObject = {
+  display: 'grid',
+  gridTemplateColumns: 'minmax(0, 1fr)',
+  gap: 32,
+  alignItems: 'center',
+  width: '100%',
+  maxWidth: 1152,
+
+  [media.desktop]: {
+    gridTemplateColumns: 'minmax(0, 704px) minmax(320px, 400px)',
+    gap: 48,
+  },
 };
 
 export const meetingPrepSelfViewStyles: CSSObject = {
@@ -156,6 +160,8 @@ export const meetingPrepMeterRowStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+  minHeight: 36,
+  marginTop: 16,
 };
 
 export const meetingPrepMeterStyles: CSSObject = {
@@ -229,19 +235,5 @@ export const meetingPrepMenuButtonStyles: CSSObject = {
   color: 'var(--white)',
   'svg, svg > path, svg > g > path': {
     fill: 'var(--white)',
-  },
-};
-
-export const meetingPrepFooterStyles: CSSObject = {
-  display: 'flex',
-  gap: '12px',
-  padding: '16px 24px 24px',
-  button: {
-    flex: 1,
-    minHeight: '44px',
-    borderRadius: '8px',
-  },
-  'button:last-of-type': {
-    color: 'var(--white)',
   },
 };

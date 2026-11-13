@@ -17,9 +17,9 @@
  *
  */
 
-import {type FunctionComponent, useCallback, useRef} from 'react';
+import {type FunctionComponent, useCallback, useId, useRef} from 'react';
 
-import {maybe} from 'true-myth';
+import {Maybe, maybe} from 'true-myth';
 
 import {MeetingPrepSurface} from './meetingPrepSurface';
 import {type MeetingPrepDeviceKind, meetingPrepDeviceKinds, type RequestMeetingPrepPreview} from './meetingPrepTypes';
@@ -33,17 +33,28 @@ import {handleEscDown} from '../../../util/keyboardUtil';
 import {captureModalFocusContext} from '../../../util/modalFocusUtil';
 import {showNoAudioInputModal, showNoCameraModal} from '../../calling/devicePermissionModals';
 import {ModalComponent} from '../../Modals/ModalComponent';
-import {modalWrapperStyles} from '../shared/styles/meetingModalShell.styles';
+import {fullPageModalWrapperStyles} from '../shared/styles/meetingModalShell.styles';
 
 export type MeetingPrepModalProps = {
-  participant: User;
-  requestPreviewStream: RequestMeetingPrepPreview;
-  releasePreviewStream: (stream: MediaStream) => void;
-  joinMeeting: (qualifiedConversationId: QualifiedId, media: CallMediaChoice) => Promise<boolean>;
+  readonly participant: User;
+  readonly isCallInProgress: boolean;
+  readonly invitees: readonly User[];
+  readonly brandName: string;
+  readonly supportUrl?: string;
+  /** Opens Settings > Troubleshooting. Nothing when the troubleshooter is not available. */
+  readonly openTroubleshooting: Maybe<() => void>;
+  readonly requestPreviewStream: RequestMeetingPrepPreview;
+  readonly releasePreviewStream: (stream: MediaStream) => void;
+  readonly joinMeeting: (qualifiedConversationId: QualifiedId, media: CallMediaChoice) => Promise<boolean>;
 };
 
 export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
   participant,
+  isCallInProgress,
+  invitees,
+  brandName,
+  supportUrl,
+  openTroubleshooting,
   requestPreviewStream,
   releasePreviewStream,
   joinMeeting,
@@ -56,6 +67,7 @@ export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
     return state.close;
   });
   const isJoiningRef = useRef(false);
+  const titleId = useId();
 
   const requestClose = (): void => {
     if (isJoiningRef.current) {
@@ -63,6 +75,17 @@ export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
     }
     close();
   };
+
+  // The green room closes first, so the troubleshooting page is not hidden behind it.
+  const testConnection = openTroubleshooting.map(open => {
+    return (): void => {
+      if (isJoiningRef.current) {
+        return;
+      }
+      close();
+      open();
+    };
+  });
 
   const handlePermissionDenied = useCallback(
     (kind: MeetingPrepDeviceKind): void => {
@@ -84,7 +107,8 @@ export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
     <ModalComponent
       id="meeting-prep-modal"
       data-uie-name="meeting-prep-modal"
-      wrapperCSS={modalWrapperStyles}
+      wrapperCSS={fullPageModalWrapperStyles}
+      aria-labelledby={titleId}
       isShown={maybe.isJust(session)}
       onBgClick={requestClose}
       onKeyDown={event => {
@@ -93,8 +117,17 @@ export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
     >
       {maybe.isJust(session) && (
         <MeetingPrepSurface
+          // A new meeting opened over this one starts from a clean green room.
+          key={`${session.value.qualifiedMeetingId.id}@${session.value.qualifiedMeetingId.domain}`}
+          titleId={titleId}
           meetingTitle={session.value.meetingTitle}
           meetingStartTime={session.value.meetingStartTime}
+          meetingEndTime={Maybe.of(session.value.meetingEndTime)}
+          isCallInProgress={isCallInProgress}
+          invitees={invitees}
+          brandName={brandName}
+          supportUrl={supportUrl}
+          onTestConnection={testConnection}
           participant={participant}
           onCancel={requestClose}
           onPermissionDenied={handlePermissionDenied}

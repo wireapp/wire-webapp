@@ -19,8 +19,6 @@
 
 import {CSSObject, keyframes} from '@emotion/react';
 
-import {media} from '../../../uiKit/utils/mediaQueries';
-
 const easeOutQuint = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
 const fadeIn = keyframes({
@@ -85,83 +83,6 @@ export const callSecurityButtonStyles: CSSObject = {
     outline: '2px solid var(--accent-color)',
     outlineOffset: 2,
   },
-};
-
-export const callSecurityExplainerStyles: CSSObject = {
-  position: 'absolute',
-  zIndex: 20,
-  top: 'calc(100% + 8px)',
-  left: 0,
-  width: 'min(340px, calc(100vw - 16px))',
-  padding: '14px 16px 16px',
-  border: '1px solid var(--foreground-fade-16)',
-  borderRadius: 12,
-  backgroundColor: 'var(--dropdown-menu-bg)',
-  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.14)',
-  color: 'var(--main-color)',
-  textAlign: 'left',
-
-  [media.tabletUp]: {
-    left: '50%',
-    transform: 'translateX(-50%)',
-  },
-};
-
-export const callSecurityExplainerHeadStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'flex-start',
-  gap: 8,
-};
-
-// Same height as one title line, so the shield is centred on the first line even when the title wraps.
-export const callSecurityExplainerIconStyles: CSSObject = {
-  display: 'flex',
-  height: 20,
-  alignItems: 'center',
-  flexShrink: 0,
-};
-
-export const callSecurityExplainerTitleStyles: CSSObject = {
-  flex: 1,
-  margin: 0,
-  fontSize: 14,
-  fontWeight: 600,
-  lineHeight: '20px',
-  textWrap: 'balance',
-};
-
-export const callSecurityExplainerCloseStyles: CSSObject = {
-  display: 'inline-flex',
-  width: 24,
-  height: 24,
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: 0,
-  border: 'none',
-  margin: '-2px -4px 0 0',
-  background: 'transparent',
-  borderRadius: 6,
-  cursor: 'pointer',
-
-  '&:focus-visible': {
-    outline: '2px solid var(--accent-color)',
-  },
-};
-
-export const callSecurityExplainerBodyStyles: CSSObject = {
-  margin: '8px 0 0',
-  color: 'var(--foreground-fade-56)',
-  fontSize: 13,
-  lineHeight: '19px',
-};
-
-export const callSecurityExplainerLinkStyles: CSSObject = {
-  display: 'inline-block',
-  marginTop: 10,
-  color: 'var(--accent-color)',
-  fontSize: 13,
-  fontWeight: 500,
-  textDecoration: 'underline',
 };
 
 // Each state change fades its content in. With reduced motion on, the text simply changes.
