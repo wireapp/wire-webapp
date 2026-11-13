@@ -29,6 +29,7 @@ import {useApplicationContext} from '../../../../../page/rootProvider';
 import {CallState} from '../../../../../repositories/calling/CallState';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 
+// eslint-disable-next-line jest/no-restricted-jest-methods -- jsdom cannot load Less; keep the real portal component.
 jest.mock('../../../../../../style/default.less', () => {
   return {};
 });

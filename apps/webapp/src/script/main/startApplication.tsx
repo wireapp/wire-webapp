@@ -82,7 +82,6 @@ export async function startApplication(
 
   const clock = createClock();
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
-  const config = Config.getConfig();
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
   const persistentLogging = enableLogging({
     clock,
