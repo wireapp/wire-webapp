@@ -252,7 +252,11 @@ test('persists sanitized browser logs with console disabled across application r
       ownedFilenames.add(file.name);
     });
     expect(firstSessionFiles.length).toBeGreaterThan(0);
-    await expect.poll(() => page.workers()).toHaveLength(1);
+    await expect
+      .poll(() => {
+        return page.workers();
+      })
+      .toHaveLength(1);
     for (const worker of page.workers()) {
       expect(new URL(worker.url()).pathname).toBe('/min/browser-log-persistence.js');
     }
