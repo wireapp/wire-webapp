@@ -20,7 +20,6 @@
 import {CSSObject} from '@emotion/react';
 
 import {media} from '../../../uiKit/utils/mediaQueries';
-import {videoOptionsMenuStyles} from '../../calling/VideoControls/VideoControls.styles';
 
 // Full page: the green room covers the app, so nothing behind it competes with the preview.
 export const meetingPrepSurfaceStyles: CSSObject = {
@@ -103,22 +102,6 @@ export const meetingPrepVideoStyles: CSSObject = {
   transform: 'scaleX(-1)',
 };
 
-/** The call menu is reused here, with right-edge anchoring for the narrower prep card. */
-export const meetingPrepDeviceMenuStyles: CSSObject = {
-  ...videoOptionsMenuStyles,
-  right: 0,
-  left: 'auto',
-  transform: 'none',
-  width: 'min(320px, calc(100vw - 32px))',
-  maxWidth: 'calc(100vw - 32px)',
-  '@media (max-height: 500px)': {
-    '& [role="listbox"]': {
-      maxHeight: 170,
-      overflowY: 'auto',
-    },
-  },
-};
-
 export const meetingPrepAvatarStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
@@ -156,36 +139,13 @@ export const meetingPrepNameStyles: CSSObject = {
   textOverflow: 'ellipsis',
 };
 
-export const meetingPrepMeterRowStyles: CSSObject = {
+// Device choice and the input level live in the panel rows; the preview keeps the on/off toggles.
+export const meetingPrepControlsRowStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
+  justifyContent: 'flex-end',
   minHeight: 36,
   marginTop: 16,
-};
-
-export const meetingPrepMeterStyles: CSSObject = {
-  width: 'auto',
-  '.input-level': {
-    justifyContent: 'flex-start',
-    gap: '3px',
-  },
-  '.input-level__bullet, .input-level__bullet--disabled': {
-    width: '8px',
-    height: '8px',
-    minWidth: '8px',
-    flex: '0 0 8px',
-    borderRadius: '4px',
-    backgroundColor: '#ececec',
-    borderColor: '#d7d7d7',
-  },
-  '.input-level__bullet--active': {
-    backgroundColor: '#1f9d55',
-    borderColor: 'transparent',
-  },
-  '.input-level__bullet--active:nth-child(n + 17)': {
-    backgroundColor: '#e5484d',
-  },
 };
 
 export const meetingPrepControlsStyles: CSSObject = {
@@ -200,7 +160,7 @@ export const meetingPrepControlStyles: CSSObject = {
   alignItems: 'center',
   position: 'relative',
   height: '36px',
-  padding: '0 2px 0 6px',
+  padding: '0 2px',
   borderRadius: '18px',
   backgroundColor: 'var(--black)',
 };
@@ -216,23 +176,6 @@ export const meetingPrepToggleStyles: CSSObject = {
   borderRadius: '16px',
   cursor: 'pointer',
   backgroundColor: 'transparent',
-  'svg, svg > path, svg > g > path': {
-    fill: 'var(--white)',
-  },
-};
-
-export const meetingPrepMenuButtonStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '22px',
-  height: '32px',
-  padding: 0,
-  border: 'none',
-  borderRadius: '8px',
-  background: 'transparent',
-  cursor: 'pointer',
-  color: 'var(--white)',
   'svg, svg > path, svg > g > path': {
     fill: 'var(--white)',
   },

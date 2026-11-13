@@ -30,6 +30,8 @@ interface CloseOnEscapeOptions {
    * elsewhere (a device menu, a dialog on top), Escape goes where it would have gone.
    */
   readonly captureEscapeWhenFocused: boolean;
+  /** Close when keyboard focus moves outside rootRef, so an overlay never stays open over what Tab reaches next. */
+  readonly closeOnFocusOut?: boolean;
 }
 
 /**
@@ -41,7 +43,7 @@ export const useCloseOnEscapeOrOutsidePress = (
   isOpen: boolean,
   onEscape: () => void,
   onOutsidePress: () => void,
-  {captureEscapeWhenFocused}: CloseOnEscapeOptions = {captureEscapeWhenFocused: false},
+  {captureEscapeWhenFocused, closeOnFocusOut = false}: CloseOnEscapeOptions = {captureEscapeWhenFocused: false},
 ): void => {
   useEffect((): void | (() => void) => {
     const ownerDocument = rootRef.current?.ownerDocument;
@@ -63,18 +65,23 @@ export const useCloseOnEscapeOrOutsidePress = (
       }
       onEscape();
     };
-    const handlePointerDown = (event: MouseEvent): void => {
+    // A press, or a focus move with closeOnFocusOut, that lands outside the root.
+    const closeIfOutside = (event: Event): void => {
       if (rootRef.current !== null && !event.composedPath().includes(rootRef.current)) {
         onOutsidePress();
       }
     };
 
     ownerDocument.addEventListener('keydown', handleKeyDown, {capture: captureEscapeWhenFocused});
-    ownerDocument.addEventListener('mousedown', handlePointerDown);
+    ownerDocument.addEventListener('mousedown', closeIfOutside);
+    if (closeOnFocusOut) {
+      ownerDocument.addEventListener('focusin', closeIfOutside);
+    }
 
     return () => {
       ownerDocument.removeEventListener('keydown', handleKeyDown, {capture: captureEscapeWhenFocused});
-      ownerDocument.removeEventListener('mousedown', handlePointerDown);
+      ownerDocument.removeEventListener('mousedown', closeIfOutside);
+      ownerDocument.removeEventListener('focusin', closeIfOutside);
     };
-  }, [captureEscapeWhenFocused, isOpen, onEscape, onOutsidePress, rootRef]);
+  }, [captureEscapeWhenFocused, closeOnFocusOut, isOpen, onEscape, onOutsidePress, rootRef]);
 };

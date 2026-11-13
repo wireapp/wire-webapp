@@ -35,6 +35,7 @@ import {
   meetingPrepDeviceKinds,
   meetingPrepMediaKinds,
   meetingPrepPreviewErrors,
+  type PlayMeetingPrepSpeakerTest,
   type RequestMeetingPrepPreview,
 } from './meetingPrepTypes';
 
@@ -49,6 +50,18 @@ participant.name('Ada');
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForPrepTest}),
 );
+
+const silentSpeakerTest: PlayMeetingPrepSpeakerTest = () => {
+  return task.resolve(undefined);
+};
+
+const microphoneRow = (): HTMLElement => {
+  return screen.getByRole('button', {name: /meetings.prep.deviceMicrophone/});
+};
+
+const cameraRow = (): HTMLElement => {
+  return screen.getByRole('button', {name: /meetings.prep.deviceCamera/});
+};
 
 const device = (deviceId: string, label: string): MediaDeviceInfo => {
   return {deviceId, label, kind: 'audioinput', groupId: 'group'} as MediaDeviceInfo;
@@ -79,6 +92,7 @@ const renderSurface = (
     onPermissionDenied: (kind: MeetingPrepDeviceKind) => void;
     onJoin: (choice: {cameraEnabled: boolean; microphoneEnabled: boolean}) => void | Promise<void>;
     requestPreviewStream: RequestMeetingPrepPreview;
+    playSpeakerTest: PlayMeetingPrepSpeakerTest;
   }> = {},
 ): RenderSurfaceResult => {
   const onCancel = overrides.onCancel ?? jest.fn();
@@ -94,6 +108,7 @@ const renderSurface = (
         meetingEndTime={Maybe.nothing()}
         isCallInProgress={false}
         invitees={[]}
+        organizerId={Maybe.nothing()}
         brandName="Wire"
         onTestConnection={Maybe.nothing()}
         participant={participant}
@@ -102,6 +117,7 @@ const renderSurface = (
         onJoin={onJoin}
         requestPreviewStream={overrides.requestPreviewStream ?? pendingPreview}
         releasePreviewStream={jest.fn()}
+        playSpeakerTest={overrides.playSpeakerTest ?? silentSpeakerTest}
       />
     </ThemeProvider>,
     {wrapper: rootProviderWrapper},
@@ -121,6 +137,9 @@ describe('MeetingPrepSurface', () => {
     store.setAudioInputDeviceId('mic-1');
     store.setAudioOutputDeviceId('speaker-1');
     store.setVideoInputDeviceId('camera-1');
+    store.setAudioInputSupported(true);
+    store.setAudioOutputSupported(true);
+    store.setVideoInputSupported(true);
   });
 
   it('shows the meeting title, start time, and participant name', () => {
@@ -266,7 +285,7 @@ describe('MeetingPrepSurface', () => {
     expect(onJoin).toHaveBeenCalledWith({cameraEnabled: false, microphoneEnabled: false});
   });
 
-  it('says the browser blocks the microphone until the user turns it on again', async () => {
+  it('warns that the browser blocks the microphone until the user turns it on again', async () => {
     const onPermissionDenied = jest.fn();
     const requestPreviewStream: RequestMeetingPrepPreview = request => {
       return request.mediaKind === meetingPrepMediaKinds.audio
@@ -288,11 +307,11 @@ describe('MeetingPrepSurface', () => {
     await waitFor(() => {
       expect(onPermissionDenied).toHaveBeenCalledTimes(1);
     });
-    expect(screen.getByTestId('meeting-prep-join-sentence')).toHaveTextContent(
-      'meetings.prep.joinMicrophoneBlockedCameraOff',
-    );
+    expect(screen.getByTestId('meeting-prep-setup-callout')).toHaveTextContent('meetings.prep.setupMicrophoneBlocked');
+    expect(screen.getByTestId('meeting-prep-join-sentence')).toHaveTextContent('meetings.prep.joinMuted');
 
     fireEvent.click(screen.getByRole('button', {name: 'preferencesAVMicrophone'}));
+    expect(screen.queryByTestId('meeting-prep-setup-callout')).not.toBeInTheDocument();
     expect(screen.getByTestId('meeting-prep-join-sentence')).toHaveTextContent('meetings.prep.joinMicrophoneOnly');
   });
 
@@ -349,58 +368,111 @@ describe('MeetingPrepSurface', () => {
     expect(joinButton).toBeEnabled();
   });
 
-  it('writes the chosen microphone to the shared device store', () => {
+  it('writes the chosen microphone to the shared device store from its row', () => {
     renderSurface();
 
-    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
+    fireEvent.click(microphoneRow());
     fireEvent.click(screen.getByRole('option', {name: 'Mic 2'}));
 
     expect(mediaDevicesStore.getState().audio.input.activeId).toBe('mic-2');
+    expect(screen.queryByRole('option', {name: 'Mic 1'})).not.toBeInTheDocument();
   });
 
   it('closes the device list when the pointer goes outside it', () => {
     renderSurface();
 
-    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
+    fireEvent.click(microphoneRow());
     expect(screen.getByRole('option', {name: 'Mic 2'})).toBeInTheDocument();
 
-    fireEvent.pointerDown(screen.getByRole('heading', {name: 'Design review'}));
+    fireEvent.mouseDown(screen.getByRole('heading', {name: 'Design review'}));
 
     expect(screen.queryByRole('option', {name: 'Mic 2'})).not.toBeInTheDocument();
   });
 
-  it('closes the microphone device list without closing the prep screen on Escape', () => {
+  it('closes a device list on Escape and gives focus back to its row', () => {
     renderSurface();
 
-    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
-    fireEvent.keyDown(screen.getByRole('option', {name: 'Mic 1'}), {key: 'Escape'});
-
-    expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
-    expect(screen.queryByRole('option', {name: 'Mic 2'})).not.toBeInTheDocument();
-  });
-
-  it('closes the camera device list without closing the prep screen on Escape', () => {
-    renderSurface();
-
-    fireEvent.click(screen.getByRole('button', {name: 'videoCallMenuMoreCameraSettings'}));
+    fireEvent.click(cameraRow());
     fireEvent.keyDown(screen.getByRole('option', {name: 'Camera 1'}), {key: 'Escape'});
 
     expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
     expect(screen.queryByRole('option', {name: 'Camera 1'})).not.toBeInTheDocument();
+    expect(cameraRow()).toHaveFocus();
   });
 
-  it('keeps only one device list open and removes the preview when the camera is off', () => {
+  it('keeps only one device list open', () => {
     renderSurface();
 
-    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
-    fireEvent.click(screen.getByRole('button', {name: 'videoCallMenuMoreCameraSettings'}));
+    fireEvent.click(microphoneRow());
+    fireEvent.click(cameraRow());
 
     expect(screen.queryByRole('option', {name: 'Mic 2'})).not.toBeInTheDocument();
     expect(screen.getByRole('option', {name: 'Camera 1'})).toBeInTheDocument();
+  });
+
+  it('removes the preview and shows the avatar again when the camera goes off', () => {
+    renderSurface();
 
     fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
     fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
 
+    expect(screen.getByRole('button', {name: 'preferencesAVCamera'})).toHaveAttribute('aria-pressed', 'false');
+    expect(document.querySelector('video')).not.toBeInTheDocument();
     expect(screen.getByText('Ada')).toBeInTheDocument();
+  });
+
+  it('clears "camera not available" when the user picks another camera', async () => {
+    mediaDevicesStore.getState().setVideoInputDevices([device('camera-1', 'Camera 1'), device('camera-2', 'Camera 2')]);
+    const requestPreviewStream: RequestMeetingPrepPreview = request => {
+      return request.mediaKind === meetingPrepMediaKinds.video
+        ? task.reject(meetingPrepPreviewErrors.requestFailed)
+        : pendingPreview(request);
+    };
+    renderSurface({requestPreviewStream});
+
+    fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
+    await waitFor(() => {
+      expect(cameraRow()).toHaveTextContent('meetings.prep.deviceNotAvailable');
+    });
+
+    // Picking the camera that failed is not a new attempt.
+    fireEvent.click(cameraRow());
+    fireEvent.click(screen.getByRole('option', {name: 'Camera 1'}));
+    expect(cameraRow()).toHaveTextContent('meetings.prep.deviceNotAvailable');
+
+    fireEvent.click(cameraRow());
+    fireEvent.click(screen.getByRole('option', {name: 'Camera 2'}));
+
+    expect(cameraRow()).toHaveTextContent('Camera 2');
+    expect(screen.queryByTestId('meeting-prep-setup-callout')).not.toBeInTheDocument();
+  });
+
+  it('plays the speaker test on the selected speaker', () => {
+    const playSpeakerTest = jest.fn(silentSpeakerTest);
+    renderSurface({playSpeakerTest});
+
+    fireEvent.click(screen.getByTestId('meeting-prep-speaker-test'));
+
+    expect(playSpeakerTest).toHaveBeenCalledWith('speaker-1');
+  });
+
+  it('says the camera is not available until the user tries again', async () => {
+    const requestPreviewStream: RequestMeetingPrepPreview = request => {
+      return request.mediaKind === meetingPrepMediaKinds.video
+        ? task.reject(meetingPrepPreviewErrors.requestFailed)
+        : pendingPreview(request);
+    };
+    renderSurface({requestPreviewStream});
+
+    fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
+    await waitFor(() => {
+      expect(screen.getByTestId('meeting-prep-setup-callout')).toHaveTextContent(
+        'meetings.prep.setupCameraUnavailable',
+      );
+    });
+    expect(cameraRow()).toHaveTextContent('meetings.prep.deviceNotAvailable');
+
+    fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
+    expect(screen.queryByTestId('meeting-prep-setup-callout')).not.toBeInTheDocument();
   });
 });

@@ -55,3 +55,13 @@ export type MeetingPrepPreviewError = (typeof meetingPrepPreviewErrors)[keyof ty
 export type RequestMeetingPrepPreview = (
   request: MeetingPrepPreviewRequest,
 ) => Task<MediaStream, MeetingPrepPreviewError>;
+
+export const meetingPrepSpeakerTestErrors = {
+  playbackFailed: 'playbackFailed',
+} as const;
+
+export type MeetingPrepSpeakerTestError =
+  (typeof meetingPrepSpeakerTestErrors)[keyof typeof meetingPrepSpeakerTestErrors];
+
+/** Plays a short sound on the given speaker. Settles when the sound ends or stops; fails if it cannot play. */
+export type PlayMeetingPrepSpeakerTest = (speakerDeviceId: string) => Task<void, MeetingPrepSpeakerTestError>;

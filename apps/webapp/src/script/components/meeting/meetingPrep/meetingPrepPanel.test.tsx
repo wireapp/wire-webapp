@@ -55,6 +55,8 @@ const defaultProps: PanelProps = {
   meetingEndTime: Maybe.just('2026-06-01T09:30:00.000Z'),
   isCallInProgress: false,
   invitees: [createUser('ada', 'Ada'), createUser('bo', 'Bo'), createUser('cy', 'Cy')],
+  organizerId: Maybe.nothing(),
+  deviceSection: null,
   brandName: 'Wire',
   supportUrl: 'https://support.wire.test/encryption',
   onTestConnection: Maybe.nothing(),

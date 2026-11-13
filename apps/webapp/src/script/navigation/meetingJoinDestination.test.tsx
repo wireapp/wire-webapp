@@ -133,6 +133,9 @@ describe('meeting link post-login landing', () => {
           openTroubleshooting={Maybe.nothing()}
           requestPreviewStream={pendingPreview}
           releasePreviewStream={jest.fn()}
+          playSpeakerTest={() => {
+            return task.resolve(undefined);
+          }}
           joinMeeting={joinMeeting}
         />
       </ThemeProvider>,

@@ -26,15 +26,6 @@ describe('getMeetingPrepJoinSentenceKey', () => {
     [false, true, 'meetings.prep.joinCameraOnly'],
     [false, false, 'meetings.prep.joinMuted'],
   ])('microphone %s and camera %s give %s', (microphoneEnabled, cameraEnabled, key) => {
-    expect(getMeetingPrepJoinSentenceKey({microphoneEnabled, cameraEnabled, microphoneBlocked: false})).toBe(key);
-  });
-
-  it('says the browser blocks the microphone, with the camera on or off', () => {
-    expect(
-      getMeetingPrepJoinSentenceKey({microphoneEnabled: false, cameraEnabled: true, microphoneBlocked: true}),
-    ).toBe('meetings.prep.joinMicrophoneBlockedCameraOn');
-    expect(
-      getMeetingPrepJoinSentenceKey({microphoneEnabled: false, cameraEnabled: false, microphoneBlocked: true}),
-    ).toBe('meetings.prep.joinMicrophoneBlockedCameraOff');
+    expect(getMeetingPrepJoinSentenceKey({microphoneEnabled, cameraEnabled})).toBe(key);
   });
 });

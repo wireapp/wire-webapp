@@ -22,6 +22,7 @@ import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 import {Maybe, task} from 'true-myth';
 
 import {User} from '../../../repositories/entity/User';
+import {mediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -80,6 +81,9 @@ const renderModal = (
         openTroubleshooting={openTroubleshooting}
         requestPreviewStream={pendingPreview}
         releasePreviewStream={jest.fn()}
+        playSpeakerTest={() => {
+          return task.resolve(undefined);
+        }}
         joinMeeting={joinMeeting}
       />
     </ThemeProvider>,
@@ -130,13 +134,14 @@ describe('MeetingPrepModal', () => {
   });
 
   it('closes an open device list before closing the prep modal on Escape', () => {
+    mediaDevicesStore.getState().setAudioInputSupported(true);
     renderModal();
 
     act(() => {
       useMeetingPrepModal.getState().open(session);
     });
 
-    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
+    fireEvent.click(screen.getByRole('button', {name: /meetings.prep.deviceMicrophone/}));
     fireEvent.keyDown(screen.getByRole('listbox'), {key: KEY.ESC});
 
     expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
