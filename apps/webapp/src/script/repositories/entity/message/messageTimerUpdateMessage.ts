@@ -17,20 +17,30 @@
  *
  */
 
-import {isNan, isNull} from '@sindresorhus/is';
+import {isNan, isNonEmptyString, isNull} from '@sindresorhus/is';
+import {container} from 'tsyringe';
 
 import {SystemMessage} from './systemMessage';
 
 import {CONVERSATION_EVENT} from '../../../apiClient/event/conversationEvent';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate} from '../../../util/localizerUtil';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
 import {formatDuration} from '../../../util/timeUtil';
 import {ConversationEphemeralHandler} from '../../conversation/ConversationEphemeralHandler';
+import {UserState} from '../../user/userState';
+import {User} from '../User';
 
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number | null;
+  private readonly userState = container.resolve(UserState);
 
-  constructor(messageTimer: number | null, translate: Translate) {
+  constructor(
+    messageTimer: number | null,
+    userId: string | undefined,
+    userDomain: string | undefined,
+    translate: Translate,
+  ) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE;
@@ -38,7 +48,16 @@ export class MessageTimerUpdateMessage extends SystemMessage {
 
     this.message_timer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
-    this.caption = getCaption(this.message_timer, this.user().isMe, this.translate);
+    // The real user entity is only attached after mapping, so self is resolved from the sender id here
+    if (isNonEmptyString(userId)) {
+      this.from = userId;
+      this.fromDomain = userDomain;
+      this.user(new User(userId, userDomain ?? '', this.translate));
+    }
+
+    const isSelfUser =
+      isNonEmptyString(userId) && matchQualifiedIds(this.user().qualifiedId, this.userState.self()?.qualifiedId);
+    this.caption = getCaption(this.message_timer, isSelfUser, this.translate);
   }
 }
 
