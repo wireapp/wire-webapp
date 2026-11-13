@@ -25,6 +25,7 @@ import {
   UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
   getMLSGroupOutOfSyncErrorMissingUsers,
   isBrokenMLSConversationError,
+  isCoreCryptoMLSBufferedMessageError,
   isCoreCryptoMLSConversationAlreadyExistsError,
   isCoreCryptoMLSInvalidCredentialsError,
   isCoreCryptoMLSWrongEpochError,
@@ -88,7 +89,6 @@ describe('CoreCryptoMLSError helpers', () => {
       MlsError.StaleCommit.new(),
       MlsError.StaleProposal.new(),
       MlsError.DuplicateMessage.new(),
-      MlsError.BufferedFutureMessage.new(),
       MlsError.UnmergedPendingGroup.new(),
     ];
 
@@ -112,6 +112,33 @@ describe('CoreCryptoMLSError helpers', () => {
       const err = CoreCryptoError.Mls.new({mlsError: MlsError.Other.new({msg: 'some real failure'})});
       expect(shouldMLSDecryptionErrorBeIgnored(err)).toBe(false);
       expect(shouldMLSDecryptionErrorBeIgnored('not-an-error')).toBe(false);
+    });
+
+    it('returns false for buffered messages, which are tracked for recovery instead', () => {
+      for (const mlsError of [MlsError.BufferedFutureMessage.new(), MlsError.BufferedCommit.new()]) {
+        expect(shouldMLSDecryptionErrorBeIgnored(CoreCryptoError.Mls.new({mlsError}))).toBe(false);
+      }
+    });
+  });
+
+  describe('isCoreCryptoMLSBufferedMessageError', () => {
+    it('detects buffered future messages and buffered commits', () => {
+      expect(
+        isCoreCryptoMLSBufferedMessageError(CoreCryptoError.Mls.new({mlsError: MlsError.BufferedFutureMessage.new()})),
+      ).toBe(true);
+      expect(
+        isCoreCryptoMLSBufferedMessageError(CoreCryptoError.Mls.new({mlsError: MlsError.BufferedCommit.new()})),
+      ).toBe(true);
+    });
+
+    it('returns false for other errors or non-Error values', () => {
+      expect(
+        isCoreCryptoMLSBufferedMessageError(CoreCryptoError.Mls.new({mlsError: MlsError.DuplicateMessage.new()})),
+      ).toBe(false);
+      expect(isCoreCryptoMLSBufferedMessageError(CoreCryptoError.Mls.new({mlsError: MlsError.WrongEpoch.new()}))).toBe(
+        false,
+      );
+      expect(isCoreCryptoMLSBufferedMessageError('not-an-error')).toBe(false);
     });
   });
 

@@ -325,6 +325,14 @@ export const MlsError = {
       return isTaggedError(error, 'WrongEpoch');
     },
   },
+  BufferedCommit: {
+    new: () => {
+      return taggedError('BufferedCommit', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'BufferedCommit');
+    },
+  },
   UnmergedPendingGroup: {
     new: () => {
       return taggedError('UnmergedPendingGroup', undefined);

@@ -61,12 +61,15 @@ import {
   KeyPackageRef,
   MlsTransportError,
   MlsError,
+  MlsError_Tags,
   SignatureScheme,
   WireIdentity,
 } from '@wireapp/core-crypto';
 
 import {UPLOAD_COMMIT_BUNDLE_ABORT_REASONS, serializeAbortReason} from './coreCryptoMlsError';
 import {InitClientOptions, MLSService, MLSServiceEvents} from './mlsService';
+
+import {MlsBufferedMessageRecoveryRequiredError} from '../recovery/mlsBufferedMessageRecoveryRequiredError';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
 import {openDB, CoreDatabase} from '../../../storage/coreDb';
@@ -1449,6 +1452,112 @@ describe('MLSService', () => {
       ).rejects.toBe(wrongEpochError);
 
       expect(transactionContext.decryptMessage).toHaveBeenCalled();
+    });
+  });
+
+  describe('decryptMessage buffered message recovery', () => {
+    const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+    const conversationId = new ConversationId(Decoder.fromBase64(groupId).asBytes);
+    const qualifiedConversationId = {domain: 'example.com', id: 'conversation-id'};
+    const start = Date.parse('2026-01-01T12:00:00.000Z');
+    const at = (offsetMs: number): string => {
+      return new Date(start + offsetMs).toISOString();
+    };
+    const bufferedFutureMessageError = (): CoreCryptoError => {
+      return CoreCryptoError.Mls.new({mlsError: MlsError.BufferedFutureMessage.new()});
+    };
+    const bufferedCommitError = (): CoreCryptoError => {
+      return CoreCryptoError.Mls.new({mlsError: MlsError.BufferedCommit.new()});
+    };
+
+    it('ignores buffered messages while the buffered span is within the threshold', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+      transactionContext.decryptMessage
+        .mockRejectedValueOnce(bufferedFutureMessageError())
+        .mockRejectedValueOnce(bufferedCommitError());
+
+      await expect(
+        mlsService.decryptMessage(conversationId, new Uint8Array(), qualifiedConversationId, at(0)),
+      ).resolves.toBeUndefined();
+      await expect(
+        mlsService.decryptMessage(conversationId, new Uint8Array(), qualifiedConversationId, at(TimeInMillis.MINUTE)),
+      ).resolves.toBeUndefined();
+    });
+
+    it('requires recovery once messages have been buffered for longer than the threshold', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+      const lastError = bufferedCommitError();
+      transactionContext.decryptMessage
+        .mockRejectedValueOnce(bufferedFutureMessageError())
+        .mockRejectedValueOnce(lastError);
+
+      await mlsService.decryptMessage(conversationId, new Uint8Array(), qualifiedConversationId, at(0));
+      const result = mlsService.decryptMessage(
+        conversationId,
+        new Uint8Array(),
+        qualifiedConversationId,
+        at(TimeInMillis.MINUTE + 1),
+      );
+
+      await expect(result).rejects.toBeInstanceOf(MlsBufferedMessageRecoveryRequiredError);
+      await expect(result).rejects.toMatchObject({
+        groupId,
+        bufferedErrorType: MlsError_Tags.BufferedCommit,
+        cause: lastError,
+      });
+    });
+
+    it('restarts tracking after a message was decrypted successfully', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+      transactionContext.decryptMessage
+        .mockRejectedValueOnce(bufferedFutureMessageError())
+        .mockResolvedValueOnce(DecryptedMessage.Commit.new({identity: mockWireIdentity, isActive: true}))
+        .mockRejectedValueOnce(bufferedFutureMessageError());
+
+      await mlsService.decryptMessage(conversationId, new Uint8Array(), qualifiedConversationId, at(0));
+      await mlsService.decryptMessage(conversationId, new Uint8Array(), qualifiedConversationId, at(1));
+
+      await expect(
+        mlsService.decryptMessage(
+          conversationId,
+          new Uint8Array(),
+          qualifiedConversationId,
+          at(TimeInMillis.MINUTE + 1),
+        ),
+      ).resolves.toBeUndefined();
+    });
+
+    it('restarts tracking after recovery tracking was cleared', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+      transactionContext.decryptMessage.mockRejectedValue(bufferedFutureMessageError());
+
+      await mlsService.decryptMessage(conversationId, new Uint8Array(), qualifiedConversationId, at(0));
+      mlsService.clearBufferedMessageRecoveryTracking(groupId);
+
+      await expect(
+        mlsService.decryptMessage(
+          conversationId,
+          new Uint8Array(),
+          qualifiedConversationId,
+          at(TimeInMillis.MINUTE + 1),
+        ),
+      ).resolves.toBeUndefined();
+    });
+
+    it('does not track buffered messages without a valid event time', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+      transactionContext.decryptMessage.mockRejectedValue(bufferedFutureMessageError());
+
+      await mlsService.decryptMessage(conversationId, new Uint8Array(), qualifiedConversationId, '');
+
+      await expect(
+        mlsService.decryptMessage(
+          conversationId,
+          new Uint8Array(),
+          qualifiedConversationId,
+          at(TimeInMillis.MINUTE + 1),
+        ),
+      ).resolves.toBeUndefined();
     });
   });
 
