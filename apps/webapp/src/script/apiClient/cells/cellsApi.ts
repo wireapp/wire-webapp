@@ -44,7 +44,7 @@ import {Node, NodeVersions, RestNodeSchema, RestNodeVersionsSchema} from './cell
 import {CellsStorage} from './cellsStorage/cellsStorage';
 import {S3Service} from './cellsStorage/s3Service';
 
-import {getLogger, type Logger} from '../../commons/getLogger';
+import {getLogger, type Logger} from '../../logger/getLogger';
 import {AccessTokenStore} from '../auth';
 import {HttpClient} from '../http';
 import type {CookiePlatform} from '../platform';

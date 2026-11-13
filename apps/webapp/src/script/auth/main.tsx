@@ -45,12 +45,14 @@ import {Config} from '../Config';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
+import {enableLogging} from '../logger/enableLogging';
+import {configureLogging} from '../logger/getLogger';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {initializeDataDog} from '../util/dataDog';
 import {translate} from '../util/localizerUtil';
 import type {Translate} from '../util/localizerUtil';
-import {enableLogging} from '../util/loggerUtil';
+import {getStorage} from '../util/localStorage';
 import {supportsMLS} from '../util/util';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
@@ -69,7 +71,15 @@ const mainId = 'main';
 const startAuthApp = (): void => {
   exposeWrapperGlobals();
   const config = Config.getConfig();
-  enableLogging(config);
+  const clock = createClock();
+  enableLogging({
+    clock,
+    consoleOutput: console,
+    locationSearch: window.location.search,
+    debugEnabled: config.FEATURE.ENABLE_DEBUG,
+    storage: Maybe.of(getStorage()),
+    configureLogging,
+  });
 
   const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
   if (enforceDesktopApplication) {
@@ -93,7 +103,6 @@ const startAuthApp = (): void => {
     return;
   }
 
-  const clock = createClock();
   const apiClient = new APIClient({clock});
   function disposeAuthenticationClient(): void {
     apiClient.dispose();

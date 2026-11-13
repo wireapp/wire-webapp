@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger} from '../../../commons/getLogger';
+import {getLogger} from '../../../logger/getLogger';
 
 interface IntervalTask {
   firingDate: number;

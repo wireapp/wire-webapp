@@ -20,7 +20,7 @@
 import {isUndefined} from '@sindresorhus/is';
 
 import {ConversationOtrMessageAddEvent} from '../../apiClient/event/conversationEvent';
-import {getLogger} from '../../commons/getLogger';
+import {getLogger} from '../../logger/getLogger';
 import {GenericMessageType, MessageSendingState, PayloadBundle, PayloadBundleType} from '../conversation';
 import {
   AssetContent,

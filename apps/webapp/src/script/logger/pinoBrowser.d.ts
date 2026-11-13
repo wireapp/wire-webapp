@@ -17,11 +17,14 @@
  *
  */
 
-import {LogFactory} from './LogFactory';
-import type {Logger} from './logger';
+// Pino's published timestamp type describes Node's JSON fragment, while browser.js accepts epoch milliseconds.
+declare module 'pino/browser' {
+  import type {Logger, LoggerOptions, LevelMapping} from 'pino';
 
-export type {LogAttributes, Logger} from './logger';
+  type BrowserOptions = Omit<LoggerOptions, 'timestamp'> & {
+    readonly timestamp: () => number;
+  };
 
-export function getLogger(name: string): Logger {
-  return LogFactory.getLogger(name);
+  export const levels: LevelMapping;
+  export function pino(options: BrowserOptions): Logger;
 }

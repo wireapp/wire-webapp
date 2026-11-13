@@ -21,7 +21,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {EventEmitter} from 'events';
 
-import {getLogger, type Logger} from '../../commons/getLogger';
+import {getLogger, type Logger} from '../../logger/getLogger';
 import {AccessTokenData} from '../auth/';
 
 const millisecondsPerSecond = 1000;

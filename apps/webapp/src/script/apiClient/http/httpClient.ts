@@ -29,8 +29,8 @@ import {createIncrementalRetryBackoffPolicy, IncrementalRetryBackoffState} from 
 import {createIncrementalRetryBackoffRunner} from './incrementalRetryBackoffRunner';
 import {PriorityQueue} from './priorityQueue/priorityQueue';
 
-import {getLogger, type Logger} from '../../commons/getLogger';
 import {TimeUtil} from '../../commons/util';
+import {getLogger, type Logger} from '../../logger/getLogger';
 import {
   AccessTokenData,
   AccessTokenStore,

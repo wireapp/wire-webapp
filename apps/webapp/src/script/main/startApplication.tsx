@@ -28,6 +28,7 @@ import {createRoot} from 'react-dom/client';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
+import {configureLogging} from '../logger/getLogger';
 import {Runtime} from '../commons/util/Runtime';
 
 import {createApplicationServices} from './createApplicationServices';
@@ -53,8 +54,9 @@ import {StorageKey} from '../repositories/storage';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {translate} from '../util/localizerUtil';
+import {getStorage} from '../util/localStorage';
 import {getLogger} from '../util/logger';
-import {enableLogging} from '../util/loggerUtil';
+import {enableLogging} from '../logger/enableLogging';
 import {loadValue} from '../util/storageUtil';
 import {supportsMLS} from '../util/util';
 import {exposeWrapperGlobals} from '../util/wrapper';
@@ -72,6 +74,15 @@ export async function startApplication(
 
   const clock = createClock();
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
+  const config = Config.getConfig();
+  enableLogging({
+    clock,
+    consoleOutput: console,
+    locationSearch: window.location.search,
+    debugEnabled: config.FEATURE.ENABLE_DEBUG,
+    storage: Maybe.of(getStorage()),
+    configureLogging,
+  });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const fireAndForgetInvoker = createFireAndForgetInvoker({
     reportError(error) {
@@ -99,7 +110,6 @@ export async function startApplication(
   });
 
   const domContentLoadedAtMonotonicMicroseconds = await documentContentLoaded;
-  const config = Config.getConfig();
   const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
     fetchBuildMetadata: globalThis.fetch.bind(globalThis),
   });
@@ -107,7 +117,6 @@ export async function startApplication(
     return globalThis.navigator.onLine;
   }
 
-  enableLogging(config);
   exposeWrapperGlobals();
 
   const appContainer = document.getElementById('wire-app');

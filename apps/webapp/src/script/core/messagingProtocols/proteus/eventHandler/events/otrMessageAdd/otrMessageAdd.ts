@@ -21,7 +21,7 @@ import {ClientAction, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {ConversationOtrMessageAddEvent} from '../../../../../../apiClient/event/conversationEvent';
 import {Decoder} from '../../../../../../commons/base64/decoder';
-import {getLogger} from '../../../../../../commons/getLogger';
+import {getLogger} from '../../../../../../logger/getLogger';
 import {GenericMessageType} from '../../../../../conversation';
 import {DecryptionError} from '../../../../../errors/decryptionError';
 import {HandledEventPayload} from '../../../../../notification';

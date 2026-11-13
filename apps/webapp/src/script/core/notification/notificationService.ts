@@ -27,8 +27,8 @@ import {isOutdatedNotificationStreamEvent} from './outdatedNotificationStreamEve
 import {APIClient} from '../../apiClient/apiClient';
 import {BackendEvent} from '../../apiClient/event/backendEvent';
 import {Notification} from '../../apiClient/notification/notification';
-import {getLogger} from '../../commons/getLogger';
 import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
+import {getLogger} from '../../logger/getLogger';
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../coreError';
 import {DecryptionError} from '../errors/decryptionError';

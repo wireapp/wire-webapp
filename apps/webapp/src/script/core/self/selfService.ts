@@ -20,7 +20,7 @@
 import {APIClient} from '../../apiClient/apiClient';
 import {Self} from '../../apiClient/self/self';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
-import {getLogger} from '../../commons/getLogger';
+import {getLogger} from '../../logger/getLogger';
 
 export class SelfService {
   private readonly logger = getLogger('@wireapp/core/SelfService');

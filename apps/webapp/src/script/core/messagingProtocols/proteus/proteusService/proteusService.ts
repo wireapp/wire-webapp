@@ -42,7 +42,7 @@ import {QualifiedUserClients} from '../../../../apiClient/conversation/qualified
 import type {ConversationOtrMessageAddEvent} from '../../../../apiClient/event/conversationEvent';
 import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import type {QualifiedUserPreKeyBundleMap} from '../../../../apiClient/user/userPreKeyBundleMap';
-import {getLogger} from '../../../../commons/getLogger';
+import {getLogger} from '../../../../logger/getLogger';
 import {
   AddUsersFailureReasons,
   ProteusCreateConversationResponse,

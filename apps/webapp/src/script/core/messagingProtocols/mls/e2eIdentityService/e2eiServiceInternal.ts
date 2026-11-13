@@ -33,7 +33,7 @@ import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 import {InitialData} from './storage/e2eiStorage.schema';
 
 import {Decoder} from '../../../../commons/base64/decoder';
-import {getLogger} from '../../../../commons/getLogger';
+import {getLogger} from '../../../../logger/getLogger';
 import {CoreDatabase} from '../../../storage/coreDb';
 import {createMLSClientId} from '../utils/mlsId';
 

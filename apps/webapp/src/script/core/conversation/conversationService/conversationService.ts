@@ -58,9 +58,9 @@ import {
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {Decoder} from '../../../commons/base64/decoder';
-import {getLogger} from '../../../commons/getLogger';
 import {TypedEventEmitter} from '../../../commons/TypedEventEmitter/TypedEventEmitter';
 import {XOR} from '../../../commons/util/TypeUtil';
+import {getLogger} from '../../../logger/getLogger';
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {isMlsConversationNotFoundError} from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';

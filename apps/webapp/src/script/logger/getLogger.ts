@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,20 @@
  *
  */
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {Maybe} from 'true-myth';
 
-import {getStorage} from './localStorage';
+import {createPinoLogging, type LoggingDependencies} from './createPinoLogging';
+import type {Logger} from './logger';
 
-import {Configuration} from '../Config';
+export type {LogAttributes, Logger} from './logger';
 
-export function enableLogging(config: Configuration, search = window.location.search): void {
-  const storage = getStorage();
-  const namespace = new URLSearchParams(search).get('enableLogging');
-  const force = config.FEATURE.ENABLE_DEBUG;
+// Startup supplies effects explicitly; previously created component loggers share this configuration.
+const logging = createPinoLogging(Maybe.nothing());
 
-  if (isNonEmptyString(namespace)) {
-    storage?.setItem('debug', namespace);
-  } else if (force) {
-    storage?.setItem('debug', '*');
-  } else {
-    storage?.removeItem('debug');
-  }
+export function configureLogging(dependencies: Maybe<LoggingDependencies>): void {
+  logging.configure(dependencies);
+}
+
+export function getLogger(name: string): Logger {
+  return logging.getLogger(name);
 }
