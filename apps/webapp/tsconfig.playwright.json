@@ -19,6 +19,7 @@
     "test/e2e_tests/**/*.ts",
     "test/e2e_tests/**/*.tsx",
     "test/rspack-smoke/browser-smoke.ts",
+    "test/rspack-smoke/origin-private-file-system-browser-smoke.ts",
     "test/rspack-smoke/rspackSmokeAssetPathResolver.ts",
     "test/rspack-smoke/server.ts"
   ],

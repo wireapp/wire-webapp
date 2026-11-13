@@ -19,7 +19,7 @@
 import {match, P} from 'ts-pattern';
 import {Maybe, Result} from 'true-myth';
 
-export type RspackSmokeBuildVariant = 'internal' | 'public';
+export type RspackSmokeBuildVariant = 'development' | 'internal' | 'public';
 
 export type RspackSmokeServerOptions = {
   readonly buildVariant: RspackSmokeBuildVariant;
@@ -77,6 +77,9 @@ export function parseRspackSmokeServerOptions(
         const parsedPort = Number(portValue);
 
         return match([buildVariant, parsedPort] as const)
+          .with(['development', P.when(isValidPort)], ([validBuildVariant, validPort]) => {
+            return Maybe.just({buildVariant: validBuildVariant, port: validPort});
+          })
           .with(['internal', P.when(isValidPort)], ([validBuildVariant, validPort]) => {
             return Maybe.just({buildVariant: validBuildVariant, port: validPort});
           })
