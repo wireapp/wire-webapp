@@ -87,6 +87,7 @@ const MeetingListItemComponent: FunctionComponent<MeetingListItemProps> = ({
       meetingTitle: title,
       meetingStartTime: start.toISOString(),
       meetingEndTime: end.toISOString(),
+      qualifiedOrganizerId: meetingSeries.qualified_creator,
       qualifiedMeetingId: meetingSeries.qualified_id,
       qualifiedConversationId: meetingSeries.qualified_conversation,
     });

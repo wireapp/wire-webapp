@@ -24,26 +24,18 @@ import type {TranslationKey} from '../../../util/localizerUtil/translationTypes'
 interface MeetingPrepJoinState {
   readonly microphoneEnabled: boolean;
   readonly cameraEnabled: boolean;
-  readonly microphoneBlocked: boolean;
 }
 
 /**
- * The sentence under the Join button: how the user joins. A microphone blocked by the browser
- * is always muted, and the sentence says why.
+ * The sentence under the Join button: how the user joins. Why a device is off is the setup
+ * callout's job, so the sentence never repeats it.
  */
 export const getMeetingPrepJoinSentenceKey = ({
   microphoneEnabled,
   cameraEnabled,
-  microphoneBlocked,
 }: MeetingPrepJoinState): TranslationKey => {
-  return match({microphoneEnabled, cameraEnabled, microphoneBlocked})
+  return match({microphoneEnabled, cameraEnabled})
     .returnType<TranslationKey>()
-    .with({microphoneBlocked: true, cameraEnabled: true}, () => {
-      return 'meetings.prep.joinMicrophoneBlockedCameraOn';
-    })
-    .with({microphoneBlocked: true, cameraEnabled: false}, () => {
-      return 'meetings.prep.joinMicrophoneBlockedCameraOff';
-    })
     .with({microphoneEnabled: true, cameraEnabled: true}, () => {
       return 'meetings.prep.joinMicrophoneAndCamera';
     })
