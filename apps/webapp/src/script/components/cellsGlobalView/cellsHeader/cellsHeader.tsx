@@ -23,9 +23,7 @@ import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './cel
 import {CellsRefresh} from './cellsRefresh/cellsRefresh';
 import {CellsSearch} from './cellsSearch/cellsSeach';
 
-import {driveBulkActionsFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../page/rootProvider';
-import {selectionBarAnchorStyles} from '../../cells/common/cellsSelectionBar/cellsSelectionBar.styles';
 import {CellsFiltersBar} from '../../conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
 import type {FilterConfig} from '../../conversation/conversationCells/common/cellsFiltersBar/filterConfig';
 import {CellsTableLoader} from '../common/cellsTableLoader/cellsTableLoader';
@@ -37,7 +35,6 @@ interface CellsHeaderProps {
   onRefresh: () => void;
   searchStatus: 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
   filters: FilterConfig[];
-  onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
 }
 
 export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
@@ -47,10 +44,8 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   onRefresh,
   searchStatus,
   filters,
-  onSelectionBarAnchorChange,
 }: CellsHeaderProps) => {
-  const {translate, isFeatureToggleEnabled} = useApplicationContext();
-  const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName) && searchValue.length === 0;
+  const {translate} = useApplicationContext();
 
   return (
     <header css={wrapperStyles}>
@@ -64,7 +59,6 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
         {searchStatus === 'loading' && <CellsTableLoader />}
         {searchStatus === 'error' && <p>{translate('cells.search.failed')}</p>}
       </div>
-      {isSelectionBarEnabled && <div css={selectionBarAnchorStyles} ref={onSelectionBarAnchorChange} />}
     </header>
   );
 };
