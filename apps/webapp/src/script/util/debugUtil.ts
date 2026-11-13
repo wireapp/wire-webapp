@@ -48,6 +48,7 @@ import type {NotificationList} from '../apiClient/notification/notificationList'
 import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
 import type {FeatureList} from '../apiClient/team/feature/featureList.types';
 import type {QualifiedId} from '../apiClient/user/qualifiedId';
+import {EVENTS} from '../core/account';
 import type {BaseCreateConversationResponse} from '../core/conversation/conversationService/conversationService.types';
 import {NotificationSource} from '../core/notification';
 import {DatabaseKeys} from '../core/notification/notificationDatabaseRepository';
@@ -164,6 +165,10 @@ export class DebugUtil {
     this.propertiesRepository = properties;
 
     this.logger = getLogger('DebugUtil');
+
+    this.core.on(EVENTS.SERVICES_CHANGED, () => {
+      this.ignoredMLSConversation(undefined);
+    });
 
     keyboardjs.bind(['command+shift+1', 'ctrl+shift+1'], this.toggleDebugUi);
 

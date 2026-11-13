@@ -163,10 +163,12 @@ export enum EVENTS {
    * An unknown client is a client we don't yet have a session with
    */
   NEW_SESSION = 'new_session',
+  SERVICES_CHANGED = 'services_changed',
 }
 
 type Events = {
   [EVENTS.NEW_SESSION]: NewClient;
+  [EVENTS.SERVICES_CHANGED]: void;
 };
 
 export const AccountLocalStorageStore = LocalStorageStore('core_account');
@@ -618,6 +620,7 @@ export class Account extends TypedEventEmitter<Events> {
       team: teamService,
       user: userService,
     };
+    this.emit(EVENTS.SERVICES_CHANGED);
   };
 
   private readonly resetContext = (): void => {
@@ -626,6 +629,7 @@ export class Account extends TypedEventEmitter<Events> {
     this.connectionState = ConnectionState.CLOSED;
     delete this.apiClient.context;
     delete this.service;
+    this.emit(EVENTS.SERVICES_CHANGED);
   };
 
   /**
