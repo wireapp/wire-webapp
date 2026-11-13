@@ -122,6 +122,53 @@ describe('Wire logging through Pino browser', () => {
     expect(parseOutput(output.debug)['msg']).toBe('Enabled');
   });
 
+  it.each([
+    {pattern: 'Client', component: 'Client', enabled: true},
+    {pattern: 'Client', component: 'OtherClient', enabled: false},
+    {pattern: 'Client', component: 'ClientOther', enabled: false},
+    {pattern: '@wireapp/*', component: '@wireapp/', enabled: true},
+    {pattern: '*Client*', component: 'SomeClientName', enabled: true},
+    {pattern: 'a*b*c', component: 'abbbc', enabled: true},
+    {pattern: 'a*b*c', component: 'acb', enabled: false},
+    {pattern: 'ab*bc', component: 'abc', enabled: false},
+    {pattern: '**', component: 'anything', enabled: true},
+    {pattern: '*,-Client,Client', component: 'Client', enabled: true},
+    {pattern: '*,Client,-Client', component: 'Client', enabled: false},
+    {pattern: 'a.b+[c](d)', component: 'a.b+[c](d)', enabled: true},
+    {pattern: 'a.b', component: 'axb', enabled: false},
+    {pattern: '(a+)+$', component: 'a'.repeat(1000), enabled: false},
+    {pattern: '[', component: '[', enabled: true},
+    {pattern: '', component: '', enabled: false},
+    {pattern: ' , , ', component: '', enabled: false},
+    {pattern: ',Client,,', component: 'Client', enabled: true},
+    {pattern: '*,-', component: 'Client', enabled: false},
+    {pattern: '*,bad\nrule', component: 'Client', enabled: false},
+    {pattern: 'a'.repeat(256), component: 'a'.repeat(256), enabled: true},
+    {pattern: `*,${'a'.repeat(257)}`, component: 'Client', enabled: false},
+    {pattern: '*'.repeat(4097), component: 'Client', enabled: false},
+    {
+      pattern: Array.from({length: 64}, () => {
+        return '*';
+      }).join(','),
+      component: 'Client',
+      enabled: true,
+    },
+    {
+      pattern: Array.from({length: 65}, () => {
+        return '*';
+      }).join(','),
+      component: 'Client',
+      enabled: false,
+    },
+  ])('matches only bounded literal wildcard rules: $pattern / $component', testCase => {
+    const {pattern, component, enabled} = testCase;
+    const {logging, output} = createTestLogging(Maybe.just(pattern));
+
+    logging.getLogger(component).info('Selected');
+
+    expect(output.info).toHaveBeenCalledTimes(enabled ? 1 : 0);
+  });
+
   it('does not read time or attributes for a filtered call', () => {
     const readTime = jest.fn().mockReturnValue(1234);
     const readAttribute = jest.fn();

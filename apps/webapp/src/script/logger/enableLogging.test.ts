@@ -36,6 +36,8 @@ describe('logging startup', () => {
       calls: 1,
     },
     {search: '?enableLogging=-*', debugEnabled: true, expected: Maybe.just('-*'), calls: 0},
+    {search: '?enableLogging=(a%2B)%2B%24', debugEnabled: true, expected: Maybe.just('(a+)+$'), calls: 0},
+    {search: '?enableLogging=*,-', debugEnabled: true, expected: Maybe.just('*,-'), calls: 0},
   ])('restores main enablement: $search with ENABLE_DEBUG=$debugEnabled', testCase => {
     const {search, debugEnabled, expected, calls} = testCase;
     const storedValues = new Map<string, string>([['debug', 'old namespace']]);

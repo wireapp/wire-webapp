@@ -32,24 +32,67 @@ export type LoggingDependencies = {
   readonly namespaces: Maybe<string>;
 };
 
-type NamespaceRule = {readonly pattern: RegExp; readonly enabled: boolean};
+type NamespaceRule = {readonly matches: (component: string) => boolean; readonly enabled: boolean};
 type ComponentLogger = {readonly root: PinoLogger; readonly logger: PinoLogger};
 type Logging = {
   readonly getLogger: (component: string) => Logger;
   readonly configure: (dependencies: Maybe<LoggingDependencies>) => void;
 };
 
+function compileNamespacePattern(pattern: string): NamespaceRule['matches'] {
+  const segments = pattern.split('*');
+
+  function matches(component: string): boolean {
+    let position = 0;
+
+    return segments.every((segment, index) => {
+      if (segments.length === 1) {
+        return component === segment;
+      }
+      if (index === 0) {
+        position = segment.length;
+
+        return component.startsWith(segment);
+      }
+      if (index === segments.length - 1) {
+        return component.endsWith(segment) && component.length - segment.length >= position;
+      }
+      const foundAt = component.indexOf(segment, position);
+      position = foundAt + segment.length;
+
+      return foundAt !== -1;
+    });
+  }
+
+  return matches;
+}
+
 function compileNamespaces(namespaces: string): readonly NamespaceRule[] {
-  return namespaces.split(',').flatMap(namespace => {
-    const trimmed = namespace.trim();
-    const enabled = !trimmed.startsWith('-');
-    const pattern = enabled ? trimmed : trimmed.slice(1);
-    try {
-      return [{pattern: new RegExp(`^${pattern.replace(/\*/gu, '.*?')}$`), enabled}];
-    } catch {
-      return [];
-    }
+  // Reject the entire configuration rather than accidentally dropping an exclusion.
+  if (namespaces.length > 4096 || /\p{Cc}/u.test(namespaces)) {
+    return [];
+  }
+  const patterns = namespaces.split(',').map(namespace => {
+    return namespace.trim();
   });
+  if (
+    patterns.length > 64 ||
+    patterns.some(pattern => {
+      return pattern === '-' || pattern.length > 256;
+    })
+  ) {
+    return [];
+  }
+
+  return patterns
+    .filter(pattern => {
+      return pattern.length > 0;
+    })
+    .map(pattern => {
+      const enabled = !pattern.startsWith('-');
+
+      return {matches: compileNamespacePattern(enabled ? pattern : pattern.slice(1)), enabled};
+    });
 }
 
 export function createPinoLogging(initialDependencies: Maybe<LoggingDependencies>): Logging {
@@ -106,7 +149,7 @@ export function createPinoLogging(initialDependencies: Maybe<LoggingDependencies
           }
           if (componentLogger.isNothing || componentLogger.value.root !== root.value) {
             const enabled = namespaceRules.reduce((previous, rule) => {
-              return rule.pattern.test(component) ? rule.enabled : previous;
+              return rule.matches(component) ? rule.enabled : previous;
             }, false);
             componentLogger = Maybe.just({
               root: root.value,
