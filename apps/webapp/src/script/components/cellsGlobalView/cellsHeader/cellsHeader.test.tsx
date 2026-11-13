@@ -17,58 +17,52 @@
  *
  */
 
-import {render, screen, type RenderResult} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-import {StyledApp} from '../../../uiKit/layout/styledApp/styledApp';
-import {THEME_ID} from '../../../uiKit/identity/theme/theme';
+import {CellsHeader} from './cellsHeader';
 
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
+import {THEME_ID} from '../../../uiKit/identity/theme/theme';
+import {StyledApp} from '../../../uiKit/layout/styledApp/styledApp';
 import {translateForTest} from '../../../util/test/translateForTest';
 
-import {CellsHeader} from './cellsHeader';
+describe('global Files header', () => {
+  it('keeps search and refresh available with bulk feature toggles enabled', async () => {
+    const user = userEvent.setup();
+    const onRefresh = jest.fn();
+    const onSearch = jest.fn();
+    const wrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: () => {
+          return true;
+        },
+      }),
+    );
+    render(
+      <StyledApp themeId={THEME_ID.DEFAULT}>
+        <CellsHeader
+          searchValue=""
+          onSearch={onSearch}
+          onClearSearch={jest.fn()}
+          onRefresh={onRefresh}
+          searchStatus="idle"
+          filters={[]}
+        />
+      </StyledApp>,
+      {wrapper},
+    );
 
-const renderCellsHeader = (onSelectionBarAnchorChange: jest.Mock, searchValue = ''): RenderResult => {
-  const wrapper = createRootProviderWrapperForTest(
-    createRootContextValueForTest({
-      translate: translateForTest,
-    }),
-  );
+    await user.type(screen.getByPlaceholderText('cells.search.allFilesPlaceholder'), 'a');
+    await user.click(screen.getByRole('button', {name: 'cells.refreshButton'}));
 
-  return render(
-    <StyledApp themeId={THEME_ID.DEFAULT}>
-      <CellsHeader
-        searchValue={searchValue}
-        onSearch={jest.fn()}
-        onClearSearch={jest.fn()}
-        onRefresh={jest.fn()}
-        searchStatus="idle"
-        filters={[]}
-        onSelectionBarAnchorChange={onSelectionBarAnchorChange}
-      />
-    </StyledApp>,
-    {wrapper},
-  );
-};
-
-describe('CellsHeader', () => {
-  it('keeps a full-width selection overlay anchor after the Files toolbar without a startup feature opt-in', () => {
-    const onSelectionBarAnchorChange = jest.fn();
-    renderCellsHeader(onSelectionBarAnchorChange);
-
-    const anchor = onSelectionBarAnchorChange.mock.calls.find(([element]) => {
-      return element !== null;
-    })?.[0];
-
-    expect(anchor?.parentElement).toBe(screen.getByRole('heading', {name: 'cells.heading'}).closest('header'));
-  });
-
-  it('does not render a selection overlay anchor in search results', () => {
-    const onSelectionBarAnchorChange = jest.fn();
-    renderCellsHeader(onSelectionBarAnchorChange, 'file name');
-
-    expect(onSelectionBarAnchorChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('heading', {name: 'cells.heading'})).toBeInTheDocument();
+    expect(onSearch).toHaveBeenCalledWith('a');
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 });

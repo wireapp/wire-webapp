@@ -17,11 +17,10 @@
  *
  */
 
-import {useEffect, useState, type FunctionComponent} from 'react';
+import type {FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
-import {createPortal} from 'react-dom';
 
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
@@ -32,7 +31,6 @@ import {
   tableStyles,
   wrapperWithRowsStyles,
   wrapperStyles,
-  selectedTableCellRowStyles,
 } from './cellsTable.styles';
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
 import {FilePreviewProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
@@ -40,7 +38,6 @@ import {FilePreviewProvider} from './common/cellsFilePreviewModalContext/cellsFi
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {CellNode} from '../../../types/cellNode';
-import {CellsSelectionBar} from '../../cells/common/cellsSelectionBar/cellsSelectionBar';
 import {CellsSortDirection} from '../../conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
 import {
   CellsSortField,
@@ -54,9 +51,6 @@ interface CellsTableProps {
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
   isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
-  selectionEnabled: boolean;
-  selectionScopeKey: string;
-  selectionBarAnchor: HTMLElement | null;
 }
 
 interface CellsTableHeaderCellProps {
@@ -93,46 +87,8 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
   getDirectionFor,
   isSortingEnabled,
   onToggleSort,
-  selectionEnabled,
-  selectionScopeKey,
-  selectionBarAnchor,
 }: CellsTableProps) => {
   const {translate} = useApplicationContext();
-  const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
-    return new Set();
-  });
-
-  useEffect(() => {
-    setSelectedNodeIds(new Set());
-  }, [selectionEnabled, selectionScopeKey]);
-
-  useEffect(() => {
-    const currentNodeIds = new Set<string>();
-    for (const node of nodes) {
-      currentNodeIds.add(node.id);
-    }
-    setSelectedNodeIds(currentSelection => {
-      const nextSelection = new Set(currentSelection);
-      for (const nodeId of currentSelection) {
-        if (!currentNodeIds.has(nodeId)) {
-          nextSelection.delete(nodeId);
-        }
-      }
-      return nextSelection.size === currentSelection.size ? currentSelection : nextSelection;
-    });
-  }, [nodes]);
-
-  const handleToggleSelection = (nodeId: string, isSelected: boolean): void => {
-    setSelectedNodeIds(currentSelection => {
-      const nextSelection = new Set(currentSelection);
-      if (isSelected) {
-        nextSelection.add(nodeId);
-      } else {
-        nextSelection.delete(nodeId);
-      }
-      return nextSelection;
-    });
-  };
   const cellLabels = getCellsTableDataCellLabels(translate);
 
   const table = useReactTable({
@@ -143,9 +99,6 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
       isSortingEnabled,
       onToggleSort,
       translate,
-      selectedNodeIds,
-      onToggleSelection: handleToggleSelection,
-      selectionEnabled,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -156,17 +109,6 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
   return (
     <FilePreviewProvider>
       <div css={tableWrapperStyles}>
-        {selectionEnabled &&
-          selectionBarAnchor !== null &&
-          createPortal(
-            <CellsSelectionBar
-              selectedCount={selectedNodeIds.size}
-              onClear={() => {
-                return setSelectedNodeIds(new Set());
-              }}
-            />,
-            selectionBarAnchor,
-          )}
         <table css={tableStyles}>
           <thead>
             {table.getHeaderGroups().map(headerGroup => {
@@ -190,14 +132,7 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
             <tbody>
               {rows.map(row => {
                 return (
-                  <tr
-                    key={row.id}
-                    css={[
-                      tableCellRow,
-                      ...(selectionEnabled && selectedNodeIds.has(row.original.id) ? [selectedTableCellRowStyles] : []),
-                    ]}
-                    aria-selected={selectionEnabled && selectedNodeIds.has(row.original.id)}
-                  >
+                  <tr key={row.id} css={tableCellRow}>
                     {row.getVisibleCells().map(cell => {
                       return (
                         <td

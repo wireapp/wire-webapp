@@ -17,38 +17,22 @@
  *
  */
 
-import {fireEvent, render, screen} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {Maybe} from 'true-myth';
 
-import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
+import {CellsTable} from './cellsTable';
 
-import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {CellNode, CellNodeType} from '../../../types/cellNode';
-import type {Translate} from '../../../util/localizerUtil/translationTypes';
+import {THEME_ID} from '../../../uiKit/identity/theme/theme';
+import {StyledApp} from '../../../uiKit/layout/styledApp/styledApp';
 import {translateForTest} from '../../../util/test/translateForTest';
-
-import {CellsTable} from './cellsTable';
-
 import {CELLS_SELF_USER_DRIVE_ROLE} from '../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import type {JSX} from '@emotion/react/jsx-runtime';
-
-const translateSelectionForTest: Translate = (key, substitutions) => {
-  if (key === 'cells.selection.selectedCount') {
-    return `${substitutions?.count} selected`;
-  }
-  if (key === 'cells.selection.selectItem') {
-    return `Select ${substitutions?.name}`;
-  }
-  if (key === 'cells.selection.clear') {
-    return 'Clear selection';
-  }
-  return translateForTest(key);
-};
 
 const createNode = (id: string, type: CellNodeType): CellNode => {
   return {
@@ -69,121 +53,62 @@ const createNode = (id: string, type: CellNodeType): CellNode => {
   };
 };
 
-type RenderCellsTableResult = {
-  rerenderWithNodes: (nodes: CellNode[]) => void;
-  rerenderWithScope: (scopeKey: string) => void;
-};
-const renderCellsTable = (selectionEnabled = true, selectionScopeKey = 'filters:none'): RenderCellsTableResult => {
+const renderCellsTable = (themeId = THEME_ID.LIGHT, featureTogglesEnabled = true, onToggleSort = jest.fn()): void => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
-      translate: translateSelectionForTest,
+      translate: translateForTest,
+      isFeatureToggleEnabled: () => {
+        return featureTogglesEnabled;
+      },
     }),
   );
-  const renderTable = (nodes: CellNode[], scopeKey = selectionScopeKey): JSX.Element => {
-    return (
-      <ThemeProvider>
-        <CellsTable
-          nodes={nodes}
-          cellsRepository={{} as CellsRepository}
-          getDirectionFor={() => {
-            return undefined;
-          }}
-          isSortingEnabled
-          onToggleSort={jest.fn()}
-          selectionEnabled={selectionEnabled}
-          selectionScopeKey={scopeKey}
-          selectionBarAnchor={document.body}
-        />
-      </ThemeProvider>
-    );
-  };
-  const {rerender} = render(
-    renderTable([createNode('folder', CellNodeType.FOLDER), createNode('file', CellNodeType.FILE)]),
+
+  render(
+    <StyledApp themeId={themeId}>
+      <CellsTable
+        nodes={[createNode('folder', CellNodeType.FOLDER), createNode('file', CellNodeType.FILE)]}
+        cellsRepository={{} as CellsRepository}
+        getDirectionFor={() => {
+          return undefined;
+        }}
+        isSortingEnabled
+        onToggleSort={onToggleSort}
+      />
+    </StyledApp>,
     {wrapper},
   );
-
-  return {
-    rerenderWithNodes: (nodes: CellNode[]) => {
-      return rerender(renderTable(nodes));
-    },
-    rerenderWithScope: (scopeKey: string) => {
-      return rerender(
-        renderTable([createNode('folder', CellNodeType.FOLDER), createNode('file', CellNodeType.FILE)], scopeKey),
-      );
-    },
-  };
 };
 
-describe('CellsTable selection', () => {
-  it('selects files and folders without a startup feature opt-in, updates the count, and clears all selected rows', () => {
-    renderCellsTable();
+describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('global Files table in the %s theme', themeId => {
+  it.each([true, false])('shows files and folders without bulk selection when feature toggles are %s', enabled => {
+    renderCellsTable(themeId, enabled);
 
-    const checkboxes = screen.getAllByRole('checkbox');
-    expect(checkboxes).toHaveLength(2);
-    expect(checkboxes[0]).toHaveAccessibleName('Select folder name');
-
-    fireEvent.click(checkboxes[0]);
-    expect(screen.getByText('1 selected')).toBeInTheDocument();
-
-    fireEvent.click(screen.getAllByRole('checkbox')[1]);
-    expect(screen.getByText('2 selected')).toBeInTheDocument();
-    expect(screen.getAllByRole('checkbox')[0]).toBeChecked();
-    expect(screen.getAllByRole('checkbox')[1]).toBeChecked();
-
-    fireEvent.click(screen.getAllByRole('checkbox')[0]);
-    expect(screen.getByText('1 selected')).toBeInTheDocument();
-    expect(screen.getAllByRole('checkbox')[0]).not.toBeChecked();
-    expect(screen.getAllByRole('checkbox')[1]).toBeChecked();
-
-    fireEvent.click(screen.getByRole('button', {name: 'Clear selection'}));
-    expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
-    expect(screen.queryByText('2 selected')).not.toBeInTheDocument();
-    const clearedCheckboxes = screen.getAllByRole('checkbox');
-    expect(clearedCheckboxes[0]).not.toBeChecked();
-    expect(clearedCheckboxes[1]).not.toBeChecked();
+    expect(screen.getByRole('row', {name: /file name/})).toBeInTheDocument();
+    expect(screen.getByRole('row', {name: /folder name/})).toBeInTheDocument();
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'cells.selection.clear'})).not.toBeInTheDocument();
   });
 
-  it('preserves selection when opening a file from row options', async () => {
+  it('opens a file from row options without offering bulk selection', async () => {
     const user = userEvent.setup();
-    renderCellsTable();
-    const checkbox = screen.getAllByRole('checkbox')[0];
-    fireEvent.click(checkbox);
-    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    renderCellsTable(themeId);
 
     await user.click(screen.getAllByRole('button', {name: 'cells.options.label'})[1]);
     await user.click(screen.getByRole('menuitem', {name: 'cells.options.open'}));
 
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
-    expect(screen.getAllByRole('checkbox')[0]).toBeChecked();
-    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
   });
 
-  it('clears selected items when the active filter scope changes', () => {
-    const {rerenderWithScope} = renderCellsTable();
-    fireEvent.click(screen.getAllByRole('checkbox')[0]);
-    expect(screen.getByText('1 selected')).toBeInTheDocument();
+  it('keeps name sorting available without a selection column', async () => {
+    const user = userEvent.setup();
+    const onToggleSort = jest.fn();
+    renderCellsTable(themeId, true, onToggleSort);
 
-    rerenderWithScope('filters:tag-two');
+    await user.click(screen.getByRole('button', {name: 'cells.tableRow.name'}));
 
-    expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
-    expect(screen.getAllByRole('checkbox')[0]).not.toBeChecked();
-  });
-
-  it('removes selected items and count when a refresh removes nodes', () => {
-    const {rerenderWithNodes} = renderCellsTable();
-    fireEvent.click(screen.getAllByRole('checkbox')[0]);
-    expect(screen.getByText('1 selected')).toBeInTheDocument();
-
-    rerenderWithNodes([createNode('file', CellNodeType.FILE)]);
-
-    expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
-    expect(screen.getByRole('checkbox')).not.toBeChecked();
-  });
-
-  it('does not render selection controls for active search results', () => {
-    renderCellsTable(false);
-
-    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(onToggleSort).toHaveBeenCalledWith('name');
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
   });
 });
