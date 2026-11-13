@@ -294,6 +294,36 @@ test('reports rejected cleanup through the invoker without an unhandled rejectio
   expect(uncaughtPageErrors).toEqual([]);
 });
 
+test('warns about rejected authentication cleanup when structured logging is disabled', async ({page}) => {
+  const reportedWarnings: string[] = [];
+  const uncaughtPageErrors: string[] = [];
+  page.on('console', message => {
+    if (message.type() === 'warning') {
+      reportedWarnings.push(message.text());
+    }
+  });
+  page.on('pageerror', error => {
+    uncaughtPageErrors.push(error.message);
+  });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'serviceWorker', {
+      value: {
+        getRegistrations() {
+          return Promise.reject(new Error('simulated authentication cleanup failure'));
+        },
+      },
+    });
+  });
+
+  await page.goto('/auth?enabled-features=');
+  await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+
+  expect(reportedWarnings).toContainEqual(
+    expect.stringContaining('Legacy service worker cleanup failed; continuing application startup.'),
+  );
+  expect(uncaughtPageErrors).toEqual([]);
+});
+
 test('bundles the application entrypoint selected for the artifact', async ({request}, testInfo) => {
   const sourceMapResponse = await request.get('/min/app.js.map');
   const sourceMapText = await sourceMapResponse.text();

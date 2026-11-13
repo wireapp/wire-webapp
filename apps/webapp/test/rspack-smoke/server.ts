@@ -246,6 +246,9 @@ function respondToRequest(options: RequestHandlerOptions): void {
 
 function startSmokeServer(options: RspackSmokeServerOptions): void {
   const buildDirectoryName = match(options.buildVariant)
+    .with('development', () => {
+      return 'development';
+    })
     .with('internal', () => {
       return 'internal';
     })
@@ -303,7 +306,7 @@ function run(): void {
             return `Unknown smoke server option '${optionName}'`;
           })
           .with({kind: 'invalidArguments'}, () => {
-            return 'Usage: node server.ts --variant <internal|public> --port <1-65535>';
+            return 'Usage: node server.ts --variant <development|internal|public> --port <1-65535>';
           })
           .exhaustive();
 

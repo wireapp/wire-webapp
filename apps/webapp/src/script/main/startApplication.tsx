@@ -19,7 +19,7 @@
 
 import {createClock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isNull, isUndefined} from '@sindresorhus/is';
+import {isFunction, isNull, isUndefined} from '@sindresorhus/is';
 import 'core-js/full/reflect';
 
 import {ClientType} from '../apiClient/client/clientType';
@@ -57,6 +57,7 @@ import {translate} from '../util/localizerUtil';
 import {getStorage} from '../util/localStorage';
 import {getLogger} from '../util/logger';
 import {enableLogging} from '../logger/enableLogging';
+import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {loadValue} from '../util/storageUtil';
 import {supportsMLS} from '../util/util';
 import {exposeWrapperGlobals} from '../util/wrapper';
@@ -75,13 +76,46 @@ export async function startApplication(
   const clock = createClock();
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
   const config = Config.getConfig();
-  enableLogging({
+  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
+  const persistentLogging = enableLogging({
     clock,
     consoleOutput: console,
     locationSearch: window.location.search,
     debugEnabled: config.FEATURE.ENABLE_DEBUG,
     storage: Maybe.of(getStorage()),
     configureLogging,
+    startupFeatureToggles,
+    isElectron: Runtime.isElectron(),
+    createPersistenceOutput() {
+      return createBrowserLogPersistence({
+        clock,
+        lifecycle: {
+          isHidden() {
+            return document.visibilityState === 'hidden';
+          },
+          subscribeToVisibilityChanges(listener) {
+            document.addEventListener('visibilitychange', listener);
+
+            return function unsubscribe() {
+              document.removeEventListener('visibilitychange', listener);
+            };
+          },
+        },
+        createWorker() {
+          if (!isFunction(globalThis.Worker)) {
+            return Maybe.nothing();
+          }
+
+          return Maybe.just(
+            createLogWorkerConnection(
+              new Worker(new URL('../logger/browserLogPersistenceWorker.ts', import.meta.url), {
+                name: 'browser-log-persistence',
+              }),
+            ),
+          );
+        },
+      });
+    },
   });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const fireAndForgetInvoker = createFireAndForgetInvoker({
@@ -155,7 +189,6 @@ export async function startApplication(
     return doSimpleRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
   }
 
-  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
   const applicationServices = createApplicationServices({
     createApplicationObservability() {
       return createApplicationObservabilityFromConfig(config);
@@ -194,6 +227,9 @@ export async function startApplication(
   function disposeApplicationResources(): void {
     using disposableApiClient = apiClient;
     cleanupIncrementalHttpRetryBackoffReset();
+    if (persistentLogging.isJust) {
+      fireAndForgetInvoker.fireAndForget(persistentLogging.value.dispose);
+    }
   }
 
   globalThis.addEventListener('unload', disposeApplicationResources);

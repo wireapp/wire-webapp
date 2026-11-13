@@ -20,8 +20,12 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
+import type {BufferedLogOutput} from './createBufferedLogOutput';
 import type {LoggingDependencies} from './createPinoLogging';
 import {createConsoleOutput, type ConsoleLogOutput} from './logOutput';
+
+import {persistentBrowserLogsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
+import type {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
 
 type EnableLoggingOptions = {
   readonly clock: LoggingDependencies['clock'];
@@ -30,19 +34,52 @@ type EnableLoggingOptions = {
   readonly debugEnabled: boolean;
   readonly storage: Maybe<Pick<Storage, 'setItem' | 'removeItem'>>;
   readonly configureLogging: (dependencies: Maybe<LoggingDependencies>) => void;
+  readonly startupFeatureToggles: StartupFeatureToggles;
+  readonly isElectron: boolean;
+  readonly createPersistenceOutput: () => Maybe<BufferedLogOutput>;
 };
 
-export function enableLogging(options: EnableLoggingOptions): void {
-  const {clock, consoleOutput, locationSearch, debugEnabled, storage, configureLogging} = options;
+type BrowserLogPersistenceSelection = Pick<EnableLoggingOptions, 'isElectron' | 'startupFeatureToggles'>;
+
+function isBrowserLogPersistenceEnabled(options: BrowserLogPersistenceSelection): boolean {
+  const {isElectron, startupFeatureToggles} = options;
+
+  // Desktop already persists WebView console output through its native logger.
+  return !isElectron && startupFeatureToggles.isFeatureToggleEnabled(persistentBrowserLogsFeatureToggleName);
+}
+
+export function enableLogging(options: EnableLoggingOptions): Maybe<BufferedLogOutput> {
+  const {
+    clock,
+    consoleOutput,
+    locationSearch,
+    debugEnabled,
+    storage,
+    configureLogging,
+    startupFeatureToggles,
+    isElectron,
+    createPersistenceOutput,
+  } = options;
   const namespace = new URLSearchParams(locationSearch).get('enableLogging');
   const defaultNamespaces = debugEnabled ? Maybe.just('*') : Maybe.nothing<string>();
   const namespaces = isNonEmptyString(namespace) ? Maybe.just(namespace) : defaultNamespaces;
+  let persistence: Maybe<BufferedLogOutput> = Maybe.nothing();
+  if (isBrowserLogPersistenceEnabled({isElectron, startupFeatureToggles})) {
+    try {
+      persistence = createPersistenceOutput();
+    } catch {
+      // Unsupported or inaccessible browser capabilities must never prevent startup or console output.
+    }
+  }
 
   configureLogging(
     Maybe.just({
       clock,
       output: createConsoleOutput(consoleOutput),
       namespaces,
+      persistenceOutput: persistence.map(output => {
+        return output.write;
+      }),
     }),
   );
 
@@ -58,4 +95,6 @@ export function enableLogging(options: EnableLoggingOptions): void {
   } catch {
     // Logging configuration must also work when storage is unavailable.
   }
+
+  return persistence;
 }

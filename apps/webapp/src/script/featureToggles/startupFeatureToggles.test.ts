@@ -34,6 +34,8 @@ import {
   e2ePdfPreviewFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
+  persistentBrowserLogsFeatureToggleName,
+  previewDefaultEnabledStartupFeatureToggleNames,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
@@ -47,9 +49,23 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
   e2ePdfPreviewFeatureToggleName,
+  persistentBrowserLogsFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
+  it('keeps persistent browser logs disabled for release and preview builds and preserves explicit opt-in alongside other toggles', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch(
+      '?enabled-features=mark-as-unread,persistent-browser-logs',
+    );
+
+    expect(disabled.isFeatureToggleEnabled(persistentBrowserLogsFeatureToggleName)).toBe(false);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(persistentBrowserLogsFeatureToggleName);
+    expect(enabled.enabledFeatureToggleNames).toEqual([
+      markAsUnreadFeatureToggleName,
+      persistentBrowserLogsFeatureToggleName,
+    ]);
+  });
   it('keeps encrypted PDF previews disabled for release builds and allows explicit opt-in', () => {
     const disabled = createStartupFeatureTogglesFromLocationSearch('');
     const enabled = createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview');
@@ -256,6 +272,7 @@ describe('startupFeatureToggles', function () {
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,
       e2ePdfPreviewFeatureToggleName,
+      persistentBrowserLogsFeatureToggleName,
     ]);
   });
 
