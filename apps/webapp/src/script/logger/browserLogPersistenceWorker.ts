@@ -19,9 +19,10 @@
 
 import {createClock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isFunction} from '@sindresorhus/is';
+import {isFunction, isUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
+import {createAccountLogMaintenance} from './createAccountLogMaintenance';
 import {createLogWorkerProcessor} from './createLogWorkerProcessor';
 import {
   createOriginPrivateFileSystemLogStore,
@@ -35,6 +36,7 @@ import type {LogWorkerResponse} from './logWorkerProtocol';
 type LogPersistenceWorkerScope = {
   readonly navigator: {
     readonly storage: {readonly getDirectory: () => Promise<LogDirectory>};
+    readonly locks?: Pick<LockManager, 'request'>;
   };
   readonly crypto: Pick<Crypto, 'randomUUID'>;
   readonly FileSystemFileHandle: {readonly prototype: Pick<LogFileHandle, 'createSyncAccessHandle'>};
@@ -53,25 +55,69 @@ function supportsWorkerLogPersistence(): boolean {
   );
 }
 
-function initialize(): Maybe<LogStore> {
+function createStore(accountIdentifier?: string): LogStore {
+  return createOriginPrivateFileSystemLogStore({
+    clock: createClock(),
+    sessionIdentifier: workerScope.crypto.randomUUID(),
+    accountIdentifier,
+    configuration: logPersistenceConfiguration,
+    getDirectory() {
+      return workerScope.navigator.storage.getDirectory();
+    },
+  });
+}
+
+function runExclusive<Value>(operation: () => Promise<Value>): Promise<Value> {
+  const locks = workerScope.navigator.locks;
+  if (isUndefined(locks) || !isFunction(locks.request)) {
+    throw new Error('Account log coordination unsupported');
+  }
+
+  return locks.request('wire-browser-log-maintenance-v1', operation);
+}
+
+const accountMaintenance = createAccountLogMaintenance({
+  getDirectory() {
+    return workerScope.navigator.storage.getDirectory();
+  },
+  runExclusive,
+  createStore,
+  createGenerationIdentifier() {
+    return workerScope.crypto.randomUUID();
+  },
+});
+
+async function initialize(accountIdentifier?: string): Promise<Maybe<LogStore>> {
   if (!supportsWorkerLogPersistence()) {
     return Maybe.nothing();
   }
 
-  return Maybe.just(
-    createOriginPrivateFileSystemLogStore({
-      clock: createClock(),
-      sessionIdentifier: workerScope.crypto.randomUUID(),
-      configuration: logPersistenceConfiguration,
-      getDirectory() {
-        return workerScope.navigator.storage.getDirectory();
-      },
-    }),
-  );
+  if (!isUndefined(accountIdentifier)) {
+    return Maybe.just(await accountMaintenance.activateAccount(accountIdentifier));
+  }
+
+  if (isFunction(workerScope.navigator.locks?.request)) {
+    await accountMaintenance.observeAccountGenerations();
+  }
+  const store = createStore();
+
+  return Maybe.just({
+    async append(lines) {
+      if (isFunction(workerScope.navigator.locks?.request)) {
+        await runExclusive(() => {
+          return store.append(lines);
+        });
+      } else {
+        // Preserve pre-authentication logging on browsers without cross-worker coordination.
+        await store.append(lines);
+      }
+    },
+  });
 }
 
 const processor = createLogWorkerProcessor({
   initialize,
+  removeAccountLogs: accountMaintenance.removeAccount,
   maximumBatchBytes: logPersistenceConfiguration.maximumPendingBytes,
   respond(response) {
     workerScope.postMessage(response);

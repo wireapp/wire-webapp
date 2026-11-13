@@ -57,7 +57,15 @@ import {translate} from '../util/localizerUtil';
 import {getStorage} from '../util/localStorage';
 import {getLogger} from '../util/logger';
 import {enableLogging} from '../logger/enableLogging';
-import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
+import {
+  createBrowserLogPersistence,
+  createLogWorkerConnection,
+  type BrowserLogPersistence,
+} from '../logger/createBrowserLogPersistence';
+import {createBrowserLogLifecycle} from '../logger/createBrowserLogLifecycle';
+import {createLogWorkerClient, type LogWorkerConnection} from '../logger/createLogWorkerClient';
+import {getLogAccountIdentifier} from '../logger/logAccountIdentifier';
+import {logPersistenceConfiguration} from '../logger/logPersistenceConfiguration';
 import {loadValue} from '../util/storageUtil';
 import {supportsMLS} from '../util/util';
 import {exposeWrapperGlobals} from '../util/wrapper';
@@ -77,6 +85,22 @@ export async function startApplication(
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
   const config = Config.getConfig();
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
+  let browserLogPersistence: Maybe<BrowserLogPersistence> = Maybe.nothing();
+
+  function createLoggingWorker(): Maybe<LogWorkerConnection> {
+    if (!isFunction(globalThis.Worker)) {
+      return Maybe.nothing();
+    }
+
+    return Maybe.just(
+      createLogWorkerConnection(
+        new Worker(new URL('../logger/browserLogPersistenceWorker.ts', import.meta.url), {
+          name: 'browser-log-persistence',
+        }),
+      ),
+    );
+  }
+
   const persistentLogging = enableLogging({
     clock,
     consoleOutput: console,
@@ -87,7 +111,7 @@ export async function startApplication(
     startupFeatureToggles,
     isElectron: Runtime.isElectron(),
     createPersistenceOutput() {
-      return createBrowserLogPersistence({
+      browserLogPersistence = createBrowserLogPersistence({
         clock,
         lifecycle: {
           isHidden() {
@@ -101,23 +125,32 @@ export async function startApplication(
             };
           },
         },
-        createWorker() {
-          if (!isFunction(globalThis.Worker)) {
-            return Maybe.nothing();
-          }
-
-          return Maybe.just(
-            createLogWorkerConnection(
-              new Worker(new URL('../logger/browserLogPersistenceWorker.ts', import.meta.url), {
-                name: 'browser-log-persistence',
-              }),
-            ),
-          );
-        },
+        createWorker: createLoggingWorker,
       });
+
+      return browserLogPersistence;
     },
   });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
+  const browserLogLifecycle = createBrowserLogLifecycle({
+    persistence: browserLogPersistence,
+    isElectron: Runtime.isElectron(),
+    createCleanupClient() {
+      return createLoggingWorker().map(connection => {
+        return createLogWorkerClient({
+          connection,
+          clock,
+          responseTimeoutMilliseconds: logPersistenceConfiguration.workerResponseTimeoutMilliseconds,
+        });
+      });
+    },
+    getAccountIdentifier(account) {
+      return getLogAccountIdentifier({account, digest: crypto.subtle.digest.bind(crypto.subtle)});
+    },
+    reportFailure(error) {
+      fireAndForgetInvokerLogger.warn('Browser log account lifecycle operation failed', {error});
+    },
+  });
   const fireAndForgetInvoker = createFireAndForgetInvoker({
     reportError(error) {
       fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', {error});
@@ -237,6 +270,7 @@ export async function startApplication(
   createRoot(appContainer).render(
     <AppContainer
       config={config}
+      browserLogLifecycle={browserLogLifecycle}
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
       applicationObservability={applicationObservability}
       applicationBootstrapStartedAtMonotonicMicroseconds={applicationBootstrapStartedAtMonotonicMicroseconds}

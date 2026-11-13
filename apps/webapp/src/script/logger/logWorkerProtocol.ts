@@ -20,8 +20,12 @@
 import {isArray, isPlainObject, isSafeInteger, isString} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
+import {isLogAccountIdentifier} from './logAccountIdentifier';
+
 export type LogWorkerCommand =
-  {readonly type: 'initialize' | 'flush' | 'shutdown'} | {readonly type: 'append'; readonly lines: readonly string[]};
+  | {readonly type: 'initialize' | 'flush' | 'shutdown'}
+  | {readonly type: 'append'; readonly lines: readonly string[]}
+  | {readonly type: 'set-account' | 'remove-account'; readonly accountIdentifier: string};
 
 export type LogWorkerRequest = LogWorkerCommand & {readonly requestIdentifier: number};
 export type LogWorkerResponse = {
@@ -77,6 +81,13 @@ export function parseLogWorkerRequest(value: unknown, maximumBatchBytes: number)
 
   const requestIdentifier = value['requestIdentifier'];
   const commandType = value['type'];
+  if (commandType === 'set-account' || commandType === 'remove-account') {
+    const accountIdentifier = value['accountIdentifier'];
+
+    return isLogAccountIdentifier(accountIdentifier)
+      ? Maybe.just({type: commandType, requestIdentifier, accountIdentifier})
+      : Maybe.nothing();
+  }
   if (isControlCommand(commandType)) {
     return Maybe.just({type: commandType, requestIdentifier});
   }

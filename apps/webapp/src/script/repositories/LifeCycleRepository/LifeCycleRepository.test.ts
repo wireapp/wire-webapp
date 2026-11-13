@@ -240,6 +240,71 @@ describe('LifeCycleRepository', () => {
       (mockDependencies.clientRepository.constructCookieLabelKey as jest.Mock).mockReturnValue('cookie-key');
     });
 
+    it.each([true, false])(
+      'removes account logs only with explicit account-data removal: %s',
+      async shouldClearAllData => {
+        const removeAccountLogs = jest.fn<Promise<void>, [unknown]>();
+        const repository = new LifeCycleRepository({...mockDependencies, removeAccountLogs});
+        const redirect = jest.spyOn(repository, 'redirectToLogin').mockImplementation();
+        const user = new User('00000000-0000-4000-8000-000000000001', 'example.com', translateForTest);
+        jest.spyOn(mockDependencies.userRepository['userState'], 'self').mockReturnValue(user);
+
+        await repository.logout(SIGN_OUT_REASON.USER_REQUESTED, shouldClearAllData);
+
+        expect(removeAccountLogs.mock.calls).toEqual(shouldClearAllData ? [[user.qualifiedId]] : []);
+        expect(redirect).toHaveBeenCalledWith(SIGN_OUT_REASON.USER_REQUESTED);
+      },
+    );
+
+    it('still removes the captured account logs if core logout fails', async () => {
+      const removeAccountLogs = jest.fn<Promise<void>, [unknown]>();
+      const repository = new LifeCycleRepository({...mockDependencies, removeAccountLogs});
+      const redirect = jest.spyOn(repository, 'redirectToLogin').mockImplementation();
+      const user = new User('00000000-0000-4000-8000-000000000001', 'example.com', translateForTest);
+      jest.spyOn(mockDependencies.userRepository['userState'], 'self').mockReturnValue(user);
+      jest.spyOn(mockDependencies.core, 'logout').mockImplementation(async () => {
+        jest
+          .spyOn(mockDependencies.userRepository['userState'], 'self')
+          .mockReturnValue(new User('00000000-0000-4000-8000-000000000002', 'example.com', translateForTest));
+        throw new Error('Core logout failed');
+      });
+
+      await repository.logout(SIGN_OUT_REASON.USER_REQUESTED, true);
+
+      expect(removeAccountLogs).toHaveBeenCalledWith(user.qualifiedId);
+      expect(redirect).toHaveBeenCalledWith(SIGN_OUT_REASON.USER_REQUESTED);
+    });
+
+    it('removes account logs while offline before waiting for backend logout', async () => {
+      const removeAccountLogs = jest.fn<Promise<void>, [unknown]>();
+      const repository = new LifeCycleRepository({...mockDependencies, removeAccountLogs});
+      Object.assign(window.navigator, {onLine: false});
+      const subscribe = jest.spyOn(window, 'addEventListener').mockImplementation();
+      try {
+        await repository.logout(SIGN_OUT_REASON.USER_REQUESTED, true);
+
+        expect(removeAccountLogs).toHaveBeenCalledTimes(1);
+        expect(mockDependencies.core.logout).not.toHaveBeenCalled();
+        expect(subscribe).toHaveBeenCalledWith('online', expect.any(Function));
+      } finally {
+        subscribe.mockRestore();
+      }
+    });
+
+    it('completes logout even if account-log deletion fails', async () => {
+      const repository = new LifeCycleRepository({
+        ...mockDependencies,
+        async removeAccountLogs() {
+          throw new Error('Worker unavailable');
+        },
+      });
+      const redirect = jest.spyOn(repository, 'redirectToLogin').mockImplementation();
+
+      await repository.logout(SIGN_OUT_REASON.USER_REQUESTED, true);
+
+      expect(redirect).toHaveBeenCalledWith(SIGN_OUT_REASON.USER_REQUESTED);
+    });
+
     it.each([true, false])('completes logout without an email (clear data: %s)', async shouldClearAllData => {
       const user = new User('user-without-email', '', translateForTest);
       jest.mocked(mockDependencies.userRepository['userState'].self).mockReturnValue(user);

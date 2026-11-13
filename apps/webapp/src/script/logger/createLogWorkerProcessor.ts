@@ -24,7 +24,8 @@ import type {LogStore} from './createOriginPrivateFileSystemLogStore';
 import {parseLogWorkerRequest, type LogWorkerResponse} from './logWorkerProtocol';
 
 type LogWorkerProcessorOptions = {
-  readonly initialize: () => Maybe<LogStore>;
+  readonly initialize: (accountIdentifier?: string) => Maybe<LogStore> | Promise<Maybe<LogStore>>;
+  readonly removeAccountLogs?: (accountIdentifier: string) => Promise<void>;
   readonly respond: (response: LogWorkerResponse) => void;
   readonly close: () => void;
   readonly maximumBatchBytes: number;
@@ -75,6 +76,27 @@ export function createLogWorkerProcessor(options: LogWorkerProcessorOptions): Lo
     busy = true;
     try {
       await match(request.value)
+        .with({type: 'set-account'}, async command => {
+          store = Maybe.nothing();
+          store = await initialize(command.accountIdentifier);
+          if (store.isNothing) {
+            respondSafely({requestIdentifier, outcome: 'unsupported'});
+            closeSafely();
+
+            return;
+          }
+
+          await store.value.append([]);
+          respondSafely({requestIdentifier, outcome: 'complete'});
+        })
+        .with({type: 'remove-account'}, async command => {
+          if (options.removeAccountLogs === undefined) {
+            throw new Error('Account log removal unsupported');
+          }
+
+          await options.removeAccountLogs(command.accountIdentifier);
+          respondSafely({requestIdentifier, outcome: 'complete'});
+        })
         .with({type: 'shutdown'}, async () => {
           if (store.isJust) {
             await store.value.append([]);
@@ -85,7 +107,7 @@ export function createLogWorkerProcessor(options: LogWorkerProcessorOptions): Lo
         })
         .with({type: P.union('initialize', 'append', 'flush')}, async command => {
           if (store.isNothing) {
-            store = initialize();
+            store = await initialize();
           }
 
           if (store.isNothing) {
@@ -101,6 +123,10 @@ export function createLogWorkerProcessor(options: LogWorkerProcessorOptions): Lo
         .exhaustive();
     } catch {
       respondSafely({requestIdentifier, outcome: 'failed'});
+      if (request.value.type === 'set-account') {
+        // Failed ownership changes must never fall back to unattributed logging.
+        closeSafely();
+      }
     } finally {
       busy = false;
     }

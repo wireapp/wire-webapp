@@ -19,6 +19,7 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
 import {
@@ -38,7 +39,11 @@ type BrowserLogPersistenceOptions = {
   };
 };
 
-export function createBrowserLogPersistence(options: BrowserLogPersistenceOptions): Maybe<BufferedLogOutput> {
+export type BrowserLogPersistence = BufferedLogOutput & {
+  readonly setAccount: (getAccountIdentifier: () => Promise<string>) => Promise<void>;
+};
+
+export function createBrowserLogPersistence(options: BrowserLogPersistenceOptions): Maybe<BrowserLogPersistence> {
   const {clock, createWorker, lifecycle} = options;
   const connection = createWorker();
   if (connection.isNothing) {
@@ -52,6 +57,11 @@ export function createBrowserLogPersistence(options: BrowserLogPersistenceOption
   });
   const output = createBufferedLogOutput({clock, append: client.append, configuration: logPersistenceConfiguration});
   let lifecycleFailures = 0;
+  let transitionDroppedRecords = 0;
+  let acceptingRecords = true;
+  let disposed = false;
+  let accountTransition: Promise<void> | undefined;
+  let disposal: Promise<void> | undefined;
   const fireAndForgetInvoker = createFireAndForgetInvoker({
     reportError() {
       lifecycleFailures += 1;
@@ -61,7 +71,7 @@ export function createBrowserLogPersistence(options: BrowserLogPersistenceOption
   function flushWhenHidden(): void {
     // Best effort only: browser termination does not wait for asynchronous lifecycle work.
     if (lifecycle.isHidden()) {
-      fireAndForgetInvoker.fireAndForget(output.flush);
+      fireAndForgetInvoker.fireAndForget(flush);
     }
   }
 
@@ -69,8 +79,58 @@ export function createBrowserLogPersistence(options: BrowserLogPersistenceOption
   // Start initialization and retention without blocking application startup.
   fireAndForgetInvoker.fireAndForget(output.flush);
 
-  async function dispose(): Promise<void> {
+  async function flush(): Promise<void> {
+    await accountTransition;
+    if (!disposed) {
+      await output.flush();
+    }
+  }
+
+  async function bindAccount(getAccountIdentifier: () => Promise<string>): Promise<void> {
+    await output.flush();
+    await client.setAccount(await getAccountIdentifier());
+    acceptingRecords = !disposed;
+  }
+
+  async function completeAccountTransition(transition: Promise<void>): Promise<void> {
+    try {
+      await transition;
+    } finally {
+      accountTransition = undefined;
+    }
+  }
+
+  function setAccount(getAccountIdentifier: () => Promise<string>): Promise<void> {
+    acceptingRecords = false;
+    if (disposed) {
+      return Promise.resolve();
+    }
+    if (!isUndefined(accountTransition)) {
+      return Promise.reject(new Error('Log account transition already in progress'));
+    }
+
+    accountTransition = bindAccount(getAccountIdentifier);
+
+    return completeAccountTransition(accountTransition);
+  }
+
+  function write(line: string, level: Parameters<BufferedLogOutput['write']>[1]): void {
+    if (!acceptingRecords) {
+      transitionDroppedRecords += 1;
+
+      return;
+    }
+
+    output.write(line, level);
+  }
+
+  async function stopPersistence(): Promise<void> {
     stopObservingVisibility();
+    try {
+      await accountTransition;
+    } catch {
+      lifecycleFailures += 1;
+    }
     await output.dispose();
     try {
       await client.shutdown();
@@ -79,13 +139,27 @@ export function createBrowserLogPersistence(options: BrowserLogPersistenceOption
     }
   }
 
+  function dispose(): Promise<void> {
+    disposed = true;
+    acceptingRecords = false;
+    if (isUndefined(disposal)) {
+      disposal = stopPersistence();
+    }
+
+    return disposal;
+  }
+
   function getStatistics(): LogPersistenceStatistics {
     const statistics = output.getStatistics();
 
-    return {...statistics, failures: statistics.failures + lifecycleFailures};
+    return {
+      ...statistics,
+      failures: statistics.failures + lifecycleFailures,
+      droppedRecords: statistics.droppedRecords + transitionDroppedRecords,
+    };
   }
 
-  return Maybe.just({...output, dispose, getStatistics});
+  return Maybe.just({write, flush, setAccount, dispose, getStatistics});
 }
 
 export function createLogWorkerConnection(

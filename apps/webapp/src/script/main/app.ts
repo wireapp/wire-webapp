@@ -61,6 +61,7 @@ import {
   startNewVersionPolling,
 } from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
+import type {BrowserLogLifecycle} from '../logger/createBrowserLogLifecycle';
 import {initialiseSelfAndTeamConversations, initMLSGroupConversations, recoverMLSConversationsInBatches} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import type {ApplicationObservability} from '../observability/applicationObservability';
@@ -243,6 +244,7 @@ export class App {
     private readonly clock: Clock,
     private readonly fireAndForgetInvoker: FireAndForgetInvoker,
     private readonly conversationRepositoryOptions: ConversationRepositoryOptions,
+    private readonly browserLogLifecycle?: BrowserLogLifecycle,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => {
@@ -409,6 +411,7 @@ export class App {
       storageRepository: repositories.storage,
       userRepository: repositories.user,
       core: this.core,
+      removeAccountLogs: this.browserLogLifecycle?.removeAccount,
     });
 
     return repositories;
@@ -554,6 +557,9 @@ export class App {
         return undefined;
       }
 
+      this.fireAndForgetInvoker.fireAndForget(async () => {
+        await this.browserLogLifecycle?.setAccount(selfUser.qualifiedId);
+      });
       this.initializeCells({cellsRepository, selfUser});
 
       await initializeDataDog(this.config, selfUser.qualifiedId);

@@ -45,8 +45,10 @@ type PendingWorkerRequest = {
   readonly reject: (error: Error) => void;
 };
 
-type LogWorkerClient = {
+export type LogWorkerClient = {
   readonly append: (lines: readonly string[]) => Promise<void>;
+  readonly setAccount: (accountIdentifier: string) => Promise<void>;
+  readonly removeAccountLogs: (accountIdentifier: string) => Promise<void>;
   readonly shutdown: () => Promise<void>;
 };
 
@@ -152,5 +154,13 @@ export function createLogWorkerClient(options: LogWorkerClientOptions): LogWorke
     }
   }
 
-  return {append, shutdown};
+  function setAccount(accountIdentifier: string): Promise<void> {
+    return request({type: 'set-account', accountIdentifier});
+  }
+
+  function removeAccountLogs(accountIdentifier: string): Promise<void> {
+    return request({type: 'remove-account', accountIdentifier});
+  }
+
+  return {append, shutdown, setAccount, removeAccountLogs};
 }

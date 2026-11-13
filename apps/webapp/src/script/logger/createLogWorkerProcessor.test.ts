@@ -23,6 +23,60 @@ import {createLogWorkerProcessor} from './createLogWorkerProcessor';
 import type {LogWorkerResponse} from './logWorkerProtocol';
 
 describe('log worker message processing', () => {
+  it('binds ownership and supports cleanup without initializing a persistence writer', async () => {
+    const initialize = jest.fn(() => {
+      return Maybe.just({async append(): Promise<void> {}});
+    });
+    const removeAccountLogs = jest.fn<Promise<void>, [string]>();
+    const responses: LogWorkerResponse[] = [];
+    const processor = createLogWorkerProcessor({
+      initialize,
+      removeAccountLogs,
+      maximumBatchBytes: 256,
+      close() {},
+      respond(response) {
+        responses.push(response);
+      },
+    });
+    const accountIdentifier = 'a'.repeat(64);
+
+    await processor.receive({type: 'remove-account', accountIdentifier, requestIdentifier: 1});
+    expect(initialize).not.toHaveBeenCalled();
+    expect(removeAccountLogs).toHaveBeenCalledWith(accountIdentifier);
+    await processor.receive({type: 'set-account', accountIdentifier, requestIdentifier: 2});
+    expect(initialize).toHaveBeenCalledWith(accountIdentifier);
+    expect(responses).toEqual([
+      {requestIdentifier: 1, outcome: 'complete'},
+      {requestIdentifier: 2, outcome: 'complete'},
+    ]);
+  });
+
+  it('closes after an ownership failure instead of falling back to a global writer', async () => {
+    const close = jest.fn();
+    const initialize = jest.fn(async (): Promise<never> => {
+      throw new Error('Coordination unavailable');
+    });
+    const responses: LogWorkerResponse[] = [];
+    const processor = createLogWorkerProcessor({
+      initialize,
+      close,
+      maximumBatchBytes: 256,
+      respond(response) {
+        responses.push(response);
+      },
+    });
+
+    await processor.receive({type: 'set-account', accountIdentifier: 'a'.repeat(64), requestIdentifier: 1});
+    await processor.receive({type: 'append', lines: ['{}\n'], requestIdentifier: 2});
+
+    expect(initialize).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(responses).toEqual([
+      {requestIdentifier: 1, outcome: 'failed'},
+      {requestIdentifier: 2, outcome: 'failed'},
+    ]);
+  });
+
   it('initializes once and acknowledges initialization, batched writes, flush and shutdown in order', async () => {
     const append = jest.fn<Promise<void>, [readonly string[]]>();
     const initialize = jest.fn(() => {
@@ -121,6 +175,8 @@ describe('log worker message processing', () => {
   });
 
   it.each([
+    {type: 'set-account', requestIdentifier: 1, accountIdentifier: '../another-account'},
+    {type: 'remove-account', requestIdentifier: 1, accountIdentifier: ''},
     {type: 'append', requestIdentifier: 1, lines: ['{}\n{}\n']},
     {type: 'append', requestIdentifier: 1, lines: ['{}']},
     {type: 'append', requestIdentifier: 1, lines: [42]},

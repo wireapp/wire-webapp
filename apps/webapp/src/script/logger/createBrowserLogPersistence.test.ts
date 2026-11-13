@@ -24,6 +24,100 @@ import {createBrowserLogPersistence} from './createBrowserLogPersistence';
 import {createLogWorkerConnectionForTest} from './test/createLogWorkerConnectionForTest';
 
 describe('browser log persistence composition', () => {
+  it('flushes pre-authentication records before binding and drops records during the ownership transition', async () => {
+    const worker = createLogWorkerConnectionForTest();
+    worker.state.onPost = function respond(request): void {
+      worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+    };
+    const persistence = createBrowserLogPersistence({
+      clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+      createWorker() {
+        return Maybe.just(worker.connection);
+      },
+      lifecycle: {
+        isHidden() {
+          return false;
+        },
+        subscribeToVisibilityChanges() {
+          return function unsubscribe(): void {};
+        },
+      },
+    }).unwrapOrElse(() => {
+      throw new Error('Expected persistence');
+    });
+    await persistence.flush();
+    persistence.write('{"preAuthentication":true}', 'info');
+    const accountIdentity = Promise.withResolvers<string>();
+    const transition = persistence.setAccount(() => {
+      return accountIdentity.promise;
+    });
+    persistence.write('{"duringTransition":true}', 'info');
+    accountIdentity.resolve('a'.repeat(64));
+    await transition;
+    persistence.write('{"authenticated":true}', 'info');
+    await persistence.flush();
+
+    const relevantRequests = worker.requests.filter(request => {
+      return request.type === 'append' || request.type === 'set-account';
+    });
+    expect(
+      relevantRequests.map(request => {
+        if (request.type === 'append') {
+          return request.lines;
+        }
+        if (request.type === 'set-account') {
+          return request.accountIdentifier;
+        }
+
+        throw new Error('Unexpected ownership request');
+      }),
+    ).toEqual([['{"preAuthentication":true}\n'], 'a'.repeat(64), ['{"authenticated":true}\n']]);
+    expect(persistence.getStatistics().droppedRecords).toBe(1);
+    await persistence.dispose();
+  });
+
+  it('stops accepting records when account binding fails instead of persisting them as unattributed', async () => {
+    const worker = createLogWorkerConnectionForTest();
+    worker.state.onPost = function respond(request): void {
+      worker.emitMessage({
+        requestIdentifier: request.requestIdentifier,
+        outcome: request.type === 'set-account' ? 'failed' : 'complete',
+      });
+    };
+    const persistence = createBrowserLogPersistence({
+      clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+      createWorker() {
+        return Maybe.just(worker.connection);
+      },
+      lifecycle: {
+        isHidden() {
+          return false;
+        },
+        subscribeToVisibilityChanges() {
+          return function unsubscribe(): void {};
+        },
+      },
+    }).unwrapOrElse(() => {
+      throw new Error('Expected persistence');
+    });
+
+    await expect(
+      persistence.setAccount(async () => {
+        return 'a'.repeat(64);
+      }),
+    ).rejects.toThrow();
+    persistence.write('{"private":true}', 'info');
+    await persistence.flush();
+
+    expect(
+      worker.requests.some(request => {
+        return request.type === 'append';
+      }),
+    ).toBe(false);
+    expect(persistence.getStatistics().droppedRecords).toBe(1);
+    await persistence.dispose();
+  });
+
   it('returns Nothing without starting a queue if worker construction is unavailable', () => {
     const createWorker = jest.fn((): Maybe<never> => {
       return Maybe.nothing();

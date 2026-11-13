@@ -21,6 +21,7 @@ import type {Clock} from '@enormora/clock/clock';
 import {isNull, isObject, isSafeInteger, isUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
+import {isLogAccountIdentifier} from './logAccountIdentifier';
 import {logDirectoryName, type LogPersistenceConfiguration} from './logPersistenceConfiguration';
 
 export type LogFileHandle = {
@@ -75,6 +76,14 @@ const newlineByte = 10;
 
 // Only files owned by this version participate in retention. Never recurse into directories.
 const logFilenamePattern = /^log-(\d+)-([a-f0-9-]{36})-(\d+)(?:-account-[a-f0-9]{64})?\.jsonl$/u;
+
+export function isAccountLogFilename(filename: string, accountIdentifier: string): boolean {
+  return (
+    isLogAccountIdentifier(accountIdentifier) &&
+    logFilenamePattern.test(filename) &&
+    filename.endsWith(`-account-${accountIdentifier}.jsonl`)
+  );
+}
 
 function shouldRemoveLogFile(options: LogFileRetentionOptions): boolean {
   const {file, currentTimeMilliseconds, totalStoredBytes, incomingBatchBytes, configuration} = options;
@@ -162,7 +171,7 @@ export function createOriginPrivateFileSystemLogStore(options: OriginPrivateFile
     throw new Error('Invalid log session identifier');
   }
 
-  if (!isUndefined(accountIdentifier) && !/^[a-f0-9]{64}$/u.test(accountIdentifier)) {
+  if (!isUndefined(accountIdentifier) && !isLogAccountIdentifier(accountIdentifier)) {
     throw new Error('Invalid log account identifier');
   }
 

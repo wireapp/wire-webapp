@@ -22,8 +22,9 @@ import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {amplify} from 'amplify';
-import ky from 'ky';
 import {container} from 'tsyringe';
+
+import ky from 'ky';
 
 import {getOtherInstanceAction} from './getOtherInstanceAction';
 import {useAccentColor} from './hooks/useAccentColor';
@@ -41,6 +42,7 @@ import {useSingleInstance} from '../../hooks/useSingleInstance';
 import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import type {FetchLatestBuildMetadata} from '../../lifecycle/newVersionHandler';
 import {setAppLocale} from '../../localization/Localizer';
+import type {BrowserLogLifecycle} from '../../logger/createBrowserLogLifecycle';
 import {App} from '../../main/app';
 import type {ApplicationObservability} from '../../observability/applicationObservability';
 import {AppMain} from '../../page/appMain';
@@ -61,6 +63,7 @@ import {PrimaryModalComponent} from '../Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from '../Modals/QualityFeedbackModal';
 
 type AppProps = {
+  readonly browserLogLifecycle?: BrowserLogLifecycle;
   readonly config: Configuration;
   readonly clientType: ClientType;
   readonly applicationObservability: ApplicationObservability;
@@ -77,6 +80,7 @@ type AppProps = {
 export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) => {
   const {
     config,
+    browserLogLifecycle,
     clientType,
     applicationObservability,
     applicationBootstrapStartedAtMonotonicMicroseconds,
@@ -99,8 +103,9 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
       clock,
       fireAndForgetInvoker,
       {isMarkAsUnreadFeatureEnabled},
+      browserLogLifecycle,
     );
-  }, [config, fireAndForgetInvoker, translate, clock, isMarkAsUnreadFeatureEnabled]);
+  }, [config, fireAndForgetInvoker, translate, clock, isMarkAsUnreadFeatureEnabled, browserLogLifecycle]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;

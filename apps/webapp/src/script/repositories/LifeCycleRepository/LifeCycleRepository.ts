@@ -21,6 +21,7 @@ import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {Maybe} from 'true-myth';
 
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {URLParameter} from '../../auth/urlParameter';
 import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
@@ -77,6 +78,7 @@ export const doSimpleRedirect = (signOutReason: SIGN_OUT_REASON): void => {
 };
 
 export interface LifeCycleDependencies {
+  readonly removeAccountLogs?: (account?: Readonly<QualifiedId>) => Promise<void>;
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
   eventRepository: EventRepository;
@@ -135,6 +137,15 @@ export class LifeCycleRepository {
     }
     this.logger.info(`Logout process started. Reason: '${signOutReason}', Clear all data: ${shouldClearAllData}`);
     this.isCurrentlyLoggingOut = true;
+    const accountToRemove = this.dependencies.userRepository['userState'].self()?.qualifiedId;
+    if (shouldClearAllData && this.dependencies.removeAccountLogs !== undefined) {
+      try {
+        // Local diagnostic removal must not depend on connectivity or successful backend/crypto cleanup.
+        await this.dependencies.removeAccountLogs(accountToRemove);
+      } catch (error: unknown) {
+        this.logger.warn('Failed to remove account browser logs', {error});
+      }
+    }
 
     // Helper function to notify about logout completion and redirect
     const completeLogoutAndRedirect = (): void => {
