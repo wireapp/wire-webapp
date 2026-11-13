@@ -28,6 +28,7 @@ import {createRoot} from 'react-dom/client';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
+import {configureLogging} from '../logger/getLogger';
 import {Runtime} from '../commons/util/Runtime';
 
 import {createApplicationServices} from './createApplicationServices';
@@ -54,7 +55,7 @@ import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {translate} from '../util/localizerUtil';
 import {getLogger} from '../util/logger';
-import {enableLogging} from '../util/loggerUtil';
+import {enableLogging} from '../logger/enableLogging';
 import {loadValue} from '../util/storageUtil';
 import {supportsMLS} from '../util/util';
 import {exposeWrapperGlobals} from '../util/wrapper';
@@ -71,6 +72,12 @@ export async function startApplication(
   });
 
   const clock = createClock();
+  enableLogging({
+    clock,
+    consoleOutput: console,
+    locationSearch: window.location.search,
+    configureLogging,
+  });
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const fireAndForgetInvoker = createFireAndForgetInvoker({
@@ -107,7 +114,6 @@ export async function startApplication(
     return globalThis.navigator.onLine;
   }
 
-  enableLogging(config);
   exposeWrapperGlobals();
 
   const appContainer = document.getElementById('wire-app');

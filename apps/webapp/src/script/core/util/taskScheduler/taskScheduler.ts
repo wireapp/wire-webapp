@@ -19,7 +19,7 @@
 
 import {TaskSchedulerStore} from './taskScheduler.store';
 
-import {getLogger} from '../../../commons/getLogger';
+import {getLogger} from '../../../logger/getLogger';
 
 const logger = getLogger('@wireapp/core/TaskScheduler');
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger} from '../../../../../../../commons/getLogger';
+import {getLogger} from '../../../../../../../logger/getLogger';
 import {createFlushableQueue, type PromiseTask} from '../../../../../../queue/flushableQueue';
 import {sequentialQueueOptions} from '../../../../../../queue/sequentialQueueOptions';
 

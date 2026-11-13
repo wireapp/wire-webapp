@@ -17,11 +17,39 @@
  *
  */
 
-import {LogFactory} from '../../../commons/LogFactory';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {Maybe} from 'true-myth';
+
+import {createConsoleLogSink} from '../../../logger/consoleLogSink';
+import {configureLogging, type Logger} from '../../../logger/getLogger';
 
 import {HttpClient} from '../../http';
 import {FeatureAPI, isBackendError} from './featureApi';
 import {FEATURE_STATUS} from './featureList.types';
+
+type FeatureConsoleOutput = Record<keyof Logger, jest.Mock<void, unknown[]>>;
+
+function withFeatureLoggingTest(testBody: (output: FeatureConsoleOutput) => Promise<void>): () => Promise<void> {
+  async function runFeatureLoggingTest(): Promise<void> {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const output = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+
+    try {
+      configureLogging(
+        Maybe.just({
+          clock,
+          sinks: [createConsoleLogSink({output})],
+          namespaces: Maybe.nothing<string>(),
+        }),
+      );
+      await testBody(output);
+    } finally {
+      configureLogging(Maybe.nothing());
+    }
+  }
+
+  return runFeatureLoggingTest;
+}
 
 describe('isBackendError()', () => {
   it('exposes the backend error predicate from the feature API module', () => {
@@ -34,39 +62,37 @@ describe('isBackendError()', () => {
 });
 
 describe('FeatureAPI.getAllFeatures()', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  it('logs invalid responses and returns the original response unchanged', async () => {
-    const invalidResponse = {
-      appLock: {
-        status: FEATURE_STATUS.ENABLED,
-        config: {
-          enforceAppLock: 'enabled',
-          inactivityTimeoutSecs: 300,
+  it(
+    'logs invalid responses and returns the original response unchanged',
+    withFeatureLoggingTest(async output => {
+      const invalidResponse = {
+        appLock: {
+          status: FEATURE_STATUS.ENABLED,
+          config: {
+            enforceAppLock: 'enabled',
+            inactivityTimeoutSecs: 300,
+          },
         },
-      },
-      nextFeature: {status: 'enabled'},
-    };
-    const httpClient = {
-      sendJSON: jest.fn().mockResolvedValue({data: invalidResponse}),
-    } as unknown as HttpClient;
-    const featureLogger = LogFactory.getLogger('@wireapp/api-client/FeatureAPI');
-    const errorLogSpy = jest.spyOn(featureLogger, 'error');
+        nextFeature: {status: 'enabled'},
+      };
+      const httpClient = {
+        sendJSON: jest.fn().mockResolvedValue({data: invalidResponse}),
+      } as unknown as HttpClient;
 
-    jest.spyOn(LogFactory, 'getLogger').mockReturnValue(featureLogger);
+      const featureApi = new FeatureAPI(httpClient);
+      const actualResponse = await featureApi.getAllFeatures();
 
-    const featureApi = new FeatureAPI(httpClient);
-    const actualResponse = await featureApi.getAllFeatures();
-
-    expect(actualResponse).toBe(invalidResponse);
-    expect(errorLogSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Feature flags response failed schema validation.'),
-      expect.objectContaining({
-        validationErrors: expect.any(Object),
-        receivedResponse: invalidResponse,
-      }),
-    );
-  });
+      expect(actualResponse).toBe(invalidResponse);
+      expect(output.error).toHaveBeenCalledTimes(1);
+      const actualLogRecord: unknown = JSON.parse(String(output.error.mock.calls[0]?.[0]));
+      expect(actualLogRecord).toEqual(
+        expect.objectContaining({
+          component: '@wireapp/api-client/FeatureAPI',
+          msg: expect.stringContaining('Feature flags response failed schema validation.'),
+          validationErrors: expect.any(Object),
+          receivedResponse: invalidResponse,
+        }),
+      );
+    }),
+  );
 });

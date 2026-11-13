@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger as getComponentLogger, type Logger} from '../commons/getLogger';
+import {getLogger as getComponentLogger, type Logger} from '../logger/getLogger';
 
 const LOGGER_NAMESPACE = '@wireapp/webapp';
 
@@ -26,4 +26,4 @@ function getLogger(name: string): Logger {
 }
 
 export {getLogger, LOGGER_NAMESPACE};
-export type {LogAttributes, Logger} from '../commons/logger';
+export type {LogAttributes, Logger} from '../logger/logger';

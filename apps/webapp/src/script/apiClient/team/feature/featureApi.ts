@@ -45,7 +45,7 @@ import {
 } from './featureList.schema';
 import {FeatureList} from './featureList.types';
 
-import {getLogger, type Logger} from '../../../commons/getLogger';
+import {getLogger, type Logger} from '../../../logger/getLogger';
 import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
 
 import {FeatureConversationGuestLink, FeatureLockedError} from '.';

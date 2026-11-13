@@ -19,7 +19,6 @@
 
 import {Dexie, DexieError, IndexableType} from 'dexie';
 
-import {getLogger, type Logger} from '../../commons/getLogger';
 import type {CRUDEngine} from '../../core/storage/engine/crudEngine';
 import {
   LowDiskSpaceError,
@@ -28,6 +27,7 @@ import {
   RecordTypeError,
   UnsupportedError,
 } from '../../core/storage/engine/error';
+import {getLogger, type Logger} from '../../logger/getLogger';
 
 type DexieObservable = {_dbSchema?: Object};
 

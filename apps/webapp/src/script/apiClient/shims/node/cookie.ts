@@ -23,7 +23,7 @@ import {Cookie as ToughCookie} from 'tough-cookie';
 
 import {obfuscateCookie} from './obfuscateCookie';
 
-import {getLogger} from '../../../commons/getLogger';
+import {getLogger} from '../../../logger/getLogger';
 import {Cookie} from '../../auth/';
 import {CookieStore} from '../../auth/cookieStore';
 import {HttpClient} from '../../http/';

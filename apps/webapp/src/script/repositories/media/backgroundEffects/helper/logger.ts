@@ -26,7 +26,7 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 
-import type {Logger} from '../../../../commons/logger';
+import type {Logger} from '../../../../logger/logger';
 
 export function getSafeLogger(scope = 'worker'): Logger {
   const prefix = `[${scope}]`;

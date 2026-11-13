@@ -32,8 +32,8 @@ import {
   WEBSOCKET_STATE,
 } from './reconnectingWebsocket';
 
-import {getLogger, type Logger} from '../../commons/getLogger';
 import {StringUtil} from '../../commons/util';
+import {getLogger, type Logger} from '../../logger/getLogger';
 import {AuthAPI, InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
 import {MINIMUM_API_VERSION} from '../config';
 import {HttpClient, NetworkError} from '../http/';

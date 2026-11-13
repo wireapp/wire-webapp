@@ -105,10 +105,10 @@ import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '../apiClient/tcp/
 import {WebSocketClient} from '../apiClient/tcp/webSocketClient';
 import {FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../apiClient/user/qualifiedId';
-import {getLogger, type Logger} from '../commons/getLogger';
 import {TypedEventEmitter} from '../commons/TypedEventEmitter/TypedEventEmitter';
 import {StringUtil} from '../commons/util';
 import {TimeInMillis} from '../commons/util/TimeUtil';
+import {getLogger, type Logger} from '../logger/getLogger';
 
 type CryptoClientWithProtocol =
   readonly [CryptoClientType.CORE_CRYPTO, CoreCryptoWrapper] | readonly [CryptoClientType.CRYPTOBOX, CryptoboxWrapper];

@@ -23,7 +23,7 @@ import {AssetUploadData, PostAssetsResponseSchema} from './assetApi.schema';
 import {AssetRetentionPolicy} from './assetRetentionPolicy';
 import {isValidToken, isValidUUID} from './assetUtil';
 
-import {getLogger, type Logger} from '../../commons/getLogger';
+import {getLogger, type Logger} from '../../logger/getLogger';
 import {
   BackendError,
   handleProgressEvent,

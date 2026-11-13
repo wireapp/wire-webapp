@@ -74,7 +74,7 @@ import {SSOAPI} from './team/sso';
 import {UserAPI} from './user/';
 import {UserGroupAPI} from './userGroups/';
 
-import {getLogger, type Logger} from '../commons/getLogger';
+import {getLogger, type Logger} from '../logger/getLogger';
 
 const minimumMlsBackendVersion = 5;
 const minimumGuestLinkPasswordBackendVersion = 4;

@@ -23,7 +23,7 @@ import {DomainMlsError, DomainMlsErrorType, MlsErrorMapper} from './mlsErrorMapp
 
 import {SUBCONVERSATION_ID} from '../../../../apiClient/conversation/subconversation';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
-import {getLogger} from '../../../../commons/getLogger';
+import {getLogger} from '../../../../logger/getLogger';
 import {BaseCreateConversationResponse} from '../../../conversation';
 
 /** Context captured when epoch-mismatch recovery is triggered, for structured debugging. */

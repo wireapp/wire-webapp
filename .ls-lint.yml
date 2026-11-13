@@ -4,13 +4,17 @@ ls:
   apps/webapp/src/script/commons:
     # Keep exact legacy names without allowing new PascalCase modules.
     .*: camelCase
-    .ts: camelCase | regex:LogFactory
-    .*.ts: camelCase | regex:LogFactory
+    .ts: camelCase
+    .*.ts: camelCase
     .*.*.ts: camelCase
   apps/webapp/src/script/commons/TypedEventEmitter:
     .*: camelCase
     .ts: camelCase | regex:TypedEventEmitter
     .*.ts: camelCase
+    .*.*.ts: camelCase
+  apps/webapp/src/script/logger:
+    .ts: camelCase
+    .test.ts: camelCase
     .*.*.ts: camelCase
   apps/webapp/src/script/commons/config:
     .*: camelCase

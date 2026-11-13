@@ -42,7 +42,7 @@ import {PrekeyTracker} from './prekeysTracker';
 
 import {PreKey} from '../../../../../../apiClient/auth/preKey';
 import {Encoder} from '../../../../../../commons/base64/encoder';
-import {getLogger} from '../../../../../../commons/getLogger';
+import {getLogger} from '../../../../../../logger/getLogger';
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
 import type {CRUDEngine} from '../../../../../storage/engine/crudEngine';
 import {CoreCryptoConfig} from '../../../../common.types';

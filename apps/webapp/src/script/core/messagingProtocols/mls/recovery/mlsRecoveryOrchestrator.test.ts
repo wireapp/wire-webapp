@@ -21,7 +21,7 @@ import {SUBCONVERSATION_ID} from '../../../../apiClient/conversation/subconversa
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {noop} from 'noop-esm';
 
-import {LogFactory} from '../../../../commons/LogFactory';
+import {getLogger} from '../../../../logger/getLogger';
 
 import {DomainMlsError, MlsErrorMapper} from './mlsErrorMapper';
 import {
@@ -90,7 +90,7 @@ describe('MlsRecoveryOrchestrator', () => {
     const dependencies = baseDeps();
     dependencies.joinViaExternalCommit.mockRejectedValue(recoveryError);
     const mapper = makeMapperReturning({type: 'OrphanWelcome'} as DomainMlsError);
-    const logger = LogFactory.getLogger('recovery-error-test');
+    const logger = getLogger('recovery-error-test');
     logger.warn = jest.fn();
     const orchestrator = new MlsRecoveryOrchestratorImpl(
       mapper,

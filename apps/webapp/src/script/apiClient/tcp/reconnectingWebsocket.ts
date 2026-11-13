@@ -21,8 +21,8 @@ import {isError, isFunction, isNumber, isString, isUndefined} from '@sindresorhu
 import PartySocketWebSocket, {type CloseEvent, type ErrorEvent, type Options} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
 
-import {getLogger, type Logger} from '../../commons/getLogger';
 import {StringUtil, TimeUtil} from '../../commons/util';
+import {getLogger, type Logger} from '../../logger/getLogger';
 import type {WebSocketConstructor, WebSocketPlatform} from '../platform';
 import {BackFromSleepDetails, onBackFromSleep} from '../utils/backFromSleepHandler/backFromSleepHandler';
 

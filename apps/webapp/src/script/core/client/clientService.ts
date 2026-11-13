@@ -32,7 +32,7 @@ import {CreateClientPayload} from '../../apiClient/client/newClient';
 import {RegisteredClient} from '../../apiClient/client/registeredClient';
 import {BackendError} from '../../apiClient/http/backendError';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
-import {getLogger} from '../../commons/getLogger';
+import {getLogger} from '../../logger/getLogger';
 import type {ProteusService} from '../messagingProtocols/proteus';
 import {InitialPrekeys} from '../messagingProtocols/proteus/proteusService/cryptoClient';
 import {wipeCoreCryptoDb} from '../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';

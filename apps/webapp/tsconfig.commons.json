@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.type-check.json",
   "compilerOptions": {
+    "types": ["node"],
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
     "noUncheckedIndexedAccess": true,

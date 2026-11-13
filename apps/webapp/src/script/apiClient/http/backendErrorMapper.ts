@@ -20,7 +20,7 @@
 import {StatusCodes as StatusCode} from 'http-status-codes';
 import {z} from 'zod';
 
-import {getLogger} from '../../commons/getLogger';
+import {getLogger} from '../../logger/getLogger';
 import {
   IdentifierExistsError,
   InvalidCredentialsError,
