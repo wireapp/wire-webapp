@@ -23,10 +23,12 @@ import {create} from 'zustand';
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 
 export type MeetingPrepSession = {
-  meetingTitle: string;
-  meetingStartTime: string;
-  qualifiedMeetingId: QualifiedId;
-  qualifiedConversationId: QualifiedId;
+  readonly meetingTitle: string;
+  readonly meetingStartTime: string;
+  /** ISO end time. Only the meetings list passes it today; without it the green room shows the start time alone. */
+  readonly meetingEndTime?: string;
+  readonly qualifiedMeetingId: QualifiedId;
+  readonly qualifiedConversationId: QualifiedId;
 };
 
 type MeetingPrepModalState = {

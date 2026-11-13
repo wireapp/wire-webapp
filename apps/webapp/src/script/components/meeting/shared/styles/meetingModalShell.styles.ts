@@ -27,6 +27,18 @@ export const modalWrapperStyles: CSSObject = {
   margin: '1rem',
 };
 
+// The meeting green room fills the window instead of floating as a card.
+export const fullPageModalWrapperStyles: CSSObject = {
+  width: '100vw',
+  maxWidth: '100vw',
+  height: '100vh',
+  maxHeight: '100vh',
+  margin: 0,
+  border: 'none',
+  borderRadius: 0,
+  overflow: 'hidden',
+};
+
 export const narrowModalWrapperStyles: CSSObject = {
   maxWidth: '480px',
 };
