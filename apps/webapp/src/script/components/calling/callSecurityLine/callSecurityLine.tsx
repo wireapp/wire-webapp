@@ -29,13 +29,6 @@ import {CallPerson, diffCallPeople, getCallPeople} from './callPeople';
 import {
   callSecurityButtonStyles,
   callSecurityContentStyles,
-  callSecurityExplainerBodyStyles,
-  callSecurityExplainerCloseStyles,
-  callSecurityExplainerHeadStyles,
-  callSecurityExplainerIconStyles,
-  callSecurityExplainerLinkStyles,
-  callSecurityExplainerStyles,
-  callSecurityExplainerTitleStyles,
   callSecurityFadeInStyles,
   callSecurityIconStyles,
   callSecurityLabelStyles,
@@ -48,16 +41,15 @@ import {
 } from './callSecurityLine.styles';
 import {createKeyUpdateQueue, KeyUpdateMessage, KeyUpdateQueue} from './keyUpdateQueue';
 
+import {useCloseOnEscapeOrOutsidePress} from '../../../hooks/useCloseOnEscapeOrOutsidePress';
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {Participant} from '../../../repositories/calling/Participant';
-import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 import {InfoIcon} from '../../../uiKit/dataDisplay/icon/infoIcon';
 import {LockClosedIcon} from '../../../uiKit/dataDisplay/icon/lockClosedIcon';
-import {ShieldIcon} from '../../../uiKit/dataDisplay/icon/shieldIcon';
 import {UpdateIcon} from '../../../uiKit/dataDisplay/icon/updateIcon';
-import {isEscapeKey} from '../../../util/keyboardUtil';
 import type {Translate} from '../../../util/localizerUtil';
 import {Duration} from '../Duration';
+import {EncryptionExplainer} from '../encryptionExplainer/encryptionExplainer';
 
 /** How long the "Only people in this call…" sentence stays before the line settles. */
 export const CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS = 3000;
@@ -237,34 +229,11 @@ export const CallSecurityLine = ({
     triggerRef.current?.focus();
   }, []);
 
-  // Close on Escape and on a click outside. Listen on the line's own document, so it also works
-  // when the call runs in the detached calling window.
-  useEffect((): void | (() => void) => {
-    const ownerDocument = rootRef.current?.ownerDocument;
+  const dismissExplainer = useCallback((): void => {
+    setIsExplainerOpen(false);
+  }, []);
 
-    if (!isExplainerOpen || isNullOrUndefined(ownerDocument)) {
-      return undefined;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent): void => {
-      if (isEscapeKey(event)) {
-        closeExplainer();
-      }
-    };
-    const handlePointerDown = (event: MouseEvent): void => {
-      if (rootRef.current !== null && !event.composedPath().includes(rootRef.current)) {
-        setIsExplainerOpen(false);
-      }
-    };
-
-    ownerDocument.addEventListener('keydown', handleKeyDown);
-    ownerDocument.addEventListener('mousedown', handlePointerDown);
-
-    return () => {
-      ownerDocument.removeEventListener('keydown', handleKeyDown);
-      ownerDocument.removeEventListener('mousedown', handlePointerDown);
-    };
-  }, [isExplainerOpen, closeExplainer]);
+  useCloseOnEscapeOrOutsidePress(rootRef, isExplainerOpen, closeExplainer, dismissExplainer);
 
   if (phase === 'connecting') {
     return (
@@ -341,43 +310,15 @@ export const CallSecurityLine = ({
       </button>
 
       {isExplainerOpen && (
-        <div
+        <EncryptionExplainer
           id={explainerId}
-          role="region"
-          aria-labelledby={`${explainerId}-title`}
-          css={callSecurityExplainerStyles}
-          data-uie-name="call-security-explainer"
-        >
-          <div css={callSecurityExplainerHeadStyles}>
-            <span css={callSecurityExplainerIconStyles}>
-              <ShieldIcon color="var(--success-color)" width={16} height={16} aria-hidden="true" />
-            </span>
-            <p id={`${explainerId}-title`} css={callSecurityExplainerTitleStyles}>
-              {translate('callSecurityIntro')}
-            </p>
-            <button
-              type="button"
-              css={callSecurityExplainerCloseStyles}
-              aria-label={translate('callSecurityExplainerClose')}
-              onClick={closeExplainer}
-              data-uie-name="call-security-explainer-close"
-            >
-              <CloseIcon color="var(--foreground-fade-56)" width={12} height={12} aria-hidden="true" />
-            </button>
-          </div>
-          <p css={callSecurityExplainerBodyStyles}>{translate('callSecurityExplainerBody', {brandName})}</p>
-          {Boolean(supportUrl) && (
-            <a
-              css={callSecurityExplainerLinkStyles}
-              href={supportUrl}
-              rel="nofollow noopener noreferrer"
-              target="_blank"
-              data-uie-name="call-security-explainer-link"
-            >
-              {translate('callSecurityExplainerLink', {brandName})}
-            </a>
-          )}
-        </div>
+          title={translate('callSecurityIntro')}
+          body={translate('callSecurityExplainerBody', {brandName})}
+          closeLabel={translate('callSecurityExplainerClose')}
+          linkLabel={translate('callSecurityExplainerLink', {brandName})}
+          supportUrl={supportUrl}
+          onClose={closeExplainer}
+        />
       )}
     </div>
   );
