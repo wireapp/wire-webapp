@@ -20,7 +20,7 @@
 import {useEffect, useRef, useState} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import keyboardjs from 'keyboardjs';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
@@ -38,6 +38,7 @@ import {ConversationState} from '../../repositories/conversation/ConversationSta
 import {Button} from '../../uiKit/inputs/button/button';
 import {Input} from '../../uiKit/inputs/input/input';
 import {Switch} from '../../uiKit/inputs/switch/switch';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {CoreCryptoLogLevel} from '../../util/debugUtil';
 import {getLogger} from '../../util/logger';
 
@@ -74,6 +75,17 @@ export function ConfigToolbar(): JSX.Element | null {
   const [showConfig, setShowConfig] = useState(false);
   const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
   const [isAdvancingEpoch, setIsAdvancingEpoch] = useState(false);
+  const debug = window.wire?.app?.debug;
+  const {activeConversation} = useKoSubscribableChildren(container.resolve(ConversationState), ['activeConversation']);
+  const [ignoredMLSConversation, setIgnoredMLSConversation] = useState(debug?.ignoredMLSConversation());
+
+  useEffect(() => {
+    setIgnoredMLSConversation(debug?.ignoredMLSConversation());
+    const subscription = debug?.ignoredMLSConversation.subscribe(setIgnoredMLSConversation);
+    return () => {
+      subscription?.dispose();
+    };
+  }, [debug]);
   const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() ?? false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
   const [isMessageSendingActive, setIsMessageSendingActive] = useState(false);
@@ -597,6 +609,29 @@ export function ConfigToolbar(): JSX.Element | null {
       <Button disabled={isAdvancingEpoch} onClick={advanceEpoch}>
         {isAdvancingEpoch ? 'Advancing Epoch…' : 'Advance Epoch'}
       </Button>
+      <Button
+        disabled={
+          isUndefined(debug) ||
+          (isUndefined(ignoredMLSConversation) && (isUndefined(activeConversation) || !debug.canIgnoreIncomingMLS()))
+        }
+        aria-pressed={!isUndefined(ignoredMLSConversation)}
+        onClick={() => {
+          try {
+            debug?.setIgnoreIncomingMLS(isUndefined(ignoredMLSConversation));
+          } catch (error: unknown) {
+            logger.error('Error toggling incoming MLS events:', {error});
+          }
+        }}
+      >
+        {isUndefined(ignoredMLSConversation) ? 'Drop Incoming MLS Events' : 'Resume Incoming MLS Events'}
+      </Button>
+      {!isUndefined(ignoredMLSConversation) && (
+        <p role="status">
+          Dropping incoming MLS events for {ignoredMLSConversation.id}@{ignoredMLSConversation.domain}. Advance the
+          epoch from another client, then resume to test recovery. Dropped events will not be replayed. Reloading clears
+          this toggle.
+        </p>
+      )}
       <Button
         onClick={() => {
           return window.wire?.app?.debug?.refreshE2EIRevocationData();

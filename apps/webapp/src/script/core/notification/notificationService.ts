@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {NotificationBackendRepository} from './notificationBackendRepository';
@@ -26,7 +28,9 @@ import {isOutdatedNotificationStreamEvent} from './outdatedNotificationStreamEve
 
 import {APIClient} from '../../apiClient/apiClient';
 import {BackendEvent} from '../../apiClient/event/backendEvent';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 import {Notification} from '../../apiClient/notification/notification';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
 import {getLogger} from '../../logger/getLogger';
 import {ConversationService} from '../conversation';
@@ -75,6 +79,12 @@ export class NotificationService extends TypedEventEmitter<Events> {
   private readonly database: NotificationDatabaseRepository;
   private readonly logger = getLogger('@wireapp/core/NotificationService');
   public static readonly TOPIC = TOPIC;
+  private ignoredMLSConversation?: QualifiedId;
+
+  /** Debug helper: drop incoming MLS events before decryption, without pausing notification acknowledgement. */
+  public setIgnoredMLSConversation(conversation?: QualifiedId): void {
+    this.ignoredMLSConversation = conversation;
+  }
 
   constructor(
     apiClient: APIClient,
@@ -205,11 +215,32 @@ export class NotificationService extends TypedEventEmitter<Events> {
     return isOutdatedNotificationStreamEvent(event, source, lastEventDate);
   }
 
+  private shouldDropIncomingMLSEvent(event: BackendEvent): boolean {
+    const target = this.ignoredMLSConversation;
+    if (
+      isUndefined(target) ||
+      (event.type !== CONVERSATION_EVENT.MLS_MESSAGE_ADD && event.type !== CONVERSATION_EVENT.MLS_WELCOME_MESSAGE)
+    ) {
+      return false;
+    }
+
+    // Welcome events carry the conversation identity in qualified_conversation; the legacy field may be absent.
+    if (!isUndefined(event.qualified_conversation)) {
+      return event.qualified_conversation.id === target.id && event.qualified_conversation.domain === target.domain;
+    }
+
+    return event.conversation === target.id;
+  }
+
   public async *handleNotification(
     notification: Notification,
     source: NotificationSource,
   ): AsyncGenerator<HandledEventPayload> {
     for (const event of notification.payload) {
+      if (this.shouldDropIncomingMLSEvent(event)) {
+        this.logger.warn('Debug: dropping incoming MLS event', {type: event.type});
+        continue;
+      }
       this.logger.debug(`Handling event of type "${event.type}"`, {event});
       let lastEventDate: Date | undefined = undefined;
       try {
