@@ -65,7 +65,7 @@ describe('Wire logging through Pino browser', () => {
     expect(Object.keys(logger).sort()).toEqual(['debug', 'error', 'info', 'warn']);
   });
 
-  it('forwards Pino objects to the injected output and uses the injected clock on each call', () => {
+  it('forwards sanitized JSON lines to destinations and uses the injected clock on each call', () => {
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 1000n});
     const output = jest.fn();
     const logging = createPinoLogging(Maybe.just({clock, output, namespaces: Maybe.just('*')}));
@@ -77,12 +77,62 @@ describe('Wire logging through Pino browser', () => {
 
     expect(
       output.mock.calls.map(call => {
-        return call[0];
+        expect(typeof call[0]).toBe('string');
+
+        return JSON.parse(call[0]);
       }),
     ).toMatchObject([
       {level: 30, time: 1, component: '@wireapp/core/Account', msg: 'First event'},
       {level: 30, time: 11, component: '@wireapp/core/Account', msg: 'Second event'},
     ]);
+    expect(
+      output.mock.calls.map(call => {
+        return call[1];
+      }),
+    ).toEqual(['info', 'info']);
+  });
+
+  it('sanitizes every destination input before output, including errors and serialization failures', () => {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 1000n});
+    const destination = jest.fn();
+    const logging = createPinoLogging(Maybe.just({clock, output: destination, namespaces: Maybe.just('*')}));
+    const logger = logging.getLogger('component');
+    const cause = Object.assign(new Error('Bearer secret-cause'), {request: {body: 'private-request'}});
+    const error = Object.assign(new Error('token=secret-error', {cause}), {config: {password: 'private-config'}});
+    const circular: Record<string, unknown> = {nested: ['Cookie: session=secret-cookie']};
+    circular['self'] = circular;
+
+    logger.error('Bearer secret-message', {error, circular, url: 'https://example.com/?token=secret-url'});
+    logger.warn('Bearer secret-fallback', {
+      broken: {
+        toJSON(): never {
+          throw new Error('Serialization failed');
+        },
+      },
+    });
+
+    expect(destination).toHaveBeenCalledTimes(2);
+    destination.mock.calls.forEach(call => {
+      expect(call).toHaveLength(2);
+      const line: unknown = call[0];
+      expect(typeof line).toBe('string');
+      expect(line).not.toMatch(/secret-|private-|[\r\n]/u);
+      expect(() => {
+        JSON.parse(String(line));
+      }).not.toThrow();
+    });
+    expect(JSON.parse(destination.mock.calls[0]?.[0])).toMatchObject({
+      level: 50,
+      msg: 'Bearer [REDACTED]',
+      error: {message: 'token=[REDACTED]', cause: {message: 'Bearer [REDACTED]'}},
+      circular: {nested: ['Cookie: [REDACTED]'], self: '[Circular]'},
+      url: 'https://example.com/?[REDACTED]',
+    });
+    expect(JSON.parse(destination.mock.calls[1]?.[0])).toMatchObject({
+      level: 40,
+      msg: 'Bearer [REDACTED]',
+      serializationError: 'Unable to serialize log attributes',
+    });
   });
 
   it.each([

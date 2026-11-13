@@ -18,16 +18,15 @@
  */
 
 import {isError, isString} from '@sindresorhus/is';
-import {levels} from 'pino/browser';
 import {errWithCause} from 'pino-std-serializers';
 import {configure} from 'safe-stable-stringify';
 import {Maybe} from 'true-myth';
 
-import type {LogOutput} from './createPinoLogging';
 import type {Logger} from './logger';
 import {redactSensitiveString} from './redactSensitiveString';
 
 export type ConsoleLogOutput = Readonly<Record<keyof Logger, (message: string) => void>>;
+export type LogOutput = (line: string, level: keyof Logger) => void;
 const stringify = configure({deterministic: false});
 
 function protectLogValue(this: Record<string, unknown>, key: string, value: unknown): unknown {
@@ -80,12 +79,9 @@ export function encodeLogOutput(record: Readonly<Record<string, unknown>>): stri
 }
 
 export function createConsoleOutput(output: ConsoleLogOutput): LogOutput {
-  function write(record: Readonly<Record<string, unknown>>): void {
+  function write(line: string, level: keyof Logger): void {
     try {
-      const level = levels.labels[Number(record['level'])];
-      if (level === 'debug' || level === 'info' || level === 'warn' || level === 'error') {
-        output[level](encodeLogOutput(record));
-      }
+      output[level](line);
     } catch {
       // A broken console must not interrupt application logic.
     }

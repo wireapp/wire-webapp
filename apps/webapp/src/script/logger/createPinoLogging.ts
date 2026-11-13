@@ -19,13 +19,13 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import type {Logger as PinoLogger} from 'pino';
-import {pino} from 'pino/browser';
+import {levels, pino} from 'pino/browser';
 import {errWithCause} from 'pino-std-serializers';
 import {Maybe} from 'true-myth';
 
 import type {LogAttributes, Logger} from './logger';
+import {encodeLogOutput, type LogOutput} from './logOutput';
 
-export type LogOutput = (record: Readonly<Record<string, unknown>>) => void;
 export type LoggingDependencies = {
   readonly clock: Pick<Clock, 'currentUnixEpochMilliseconds'>;
   readonly output: LogOutput;
@@ -133,7 +133,12 @@ export function createPinoLogging(initialDependencies: Maybe<LoggingDependencies
         browser: {
           serialize: true,
           write(record: object): void {
-            configuration.output(record as Readonly<Record<string, unknown>>);
+            const structuredRecord = record as Readonly<Record<string, unknown>>;
+            const level = levels.labels[Number(structuredRecord['level'])];
+            if (level === 'debug' || level === 'info' || level === 'warn' || level === 'error') {
+              // Every destination receives the same sanitized JSON line, never raw Pino objects.
+              configuration.output(encodeLogOutput(structuredRecord), level);
+            }
           },
         },
       });
