@@ -21,6 +21,7 @@ import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
 import {logDirectoryName, logPersistenceConfiguration} from '../../src/script/logger/logPersistenceConfiguration';
+import type {LogWorkerCommand, LogWorkerResponse} from '../../src/script/logger/logWorkerProtocol';
 
 type BrowserLogFile = {
   readonly name: string;
@@ -203,6 +204,161 @@ test('loads the native persistence worker and acknowledges append, flush, and sh
       operation: 'remove',
     });
   }
+});
+
+test('loads the native persistence worker for account removal without deleting unrelated storage', async ({page}) => {
+  await page.goto('/config.js');
+  const firstAccountIdentifier = 'a'.repeat(64);
+  const secondAccountIdentifier = 'b'.repeat(64);
+  const outcomes = await page.evaluate(
+    async options => {
+      const {firstAccountIdentifier, secondAccountIdentifier, directoryName} = options;
+      const root = await navigator.storage.getDirectory();
+      const unrelatedFile = await root.getFileHandle('core-crypto-preserve', {create: true});
+      const unrelatedOutput = await unrelatedFile.createWritable();
+      await unrelatedOutput.write('unrelated application storage');
+      await unrelatedOutput.close();
+      const logDirectory = await root.getDirectoryHandle(directoryName, {create: true});
+      const foreignFile = await logDirectory.getFileHandle(`foreign-account-${firstAccountIdentifier}.jsonl`, {
+        create: true,
+      });
+      const foreignOutput = await foreignFile.createWritable();
+      await foreignOutput.write('unrelated file inside log directory');
+      await foreignOutput.close();
+      const accountWorker = new Worker('/min/browser-log-persistence.js');
+      const otherAccountWorker = new Worker('/min/browser-log-persistence.js');
+      const pendingAccountWorker = new Worker('/min/browser-log-persistence.js');
+      // This dedicated cleanup worker has no persistence writer and needs no enabled startup toggle.
+      const cleanupWorker = new Worker('/min/browser-log-persistence.js');
+      let nextRequestIdentifier = 0;
+      type SendCommandOptions = {readonly worker: Worker; readonly command: LogWorkerCommand};
+
+      function sendCommand(commandOptions: SendCommandOptions): Promise<LogWorkerResponse> {
+        const {worker, command} = commandOptions;
+        nextRequestIdentifier += 1;
+        const requestIdentifier = nextRequestIdentifier;
+
+        return new Promise((resolve, reject) => {
+          const timeout = window.setTimeout(() => {
+            reject(new Error('Account worker timed out'));
+          }, 10_000);
+          worker.addEventListener(
+            'message',
+            (event: MessageEvent<LogWorkerResponse>) => {
+              window.clearTimeout(timeout);
+              resolve(event.data);
+            },
+            {once: true},
+          );
+          worker.addEventListener(
+            'error',
+            () => {
+              window.clearTimeout(timeout);
+              reject(new Error('Account worker failed'));
+            },
+            {once: true},
+          );
+          worker.postMessage({...command, requestIdentifier});
+        });
+      }
+
+      const responses: LogWorkerResponse[] = [];
+      try {
+        responses.push(await sendCommand({worker: pendingAccountWorker, command: {type: 'initialize'}}));
+        responses.push(await sendCommand({worker: accountWorker, command: {type: 'initialize'}}));
+        responses.push(
+          await sendCommand({worker: accountWorker, command: {type: 'append', lines: ['{"unattributed":true}\n']}}),
+        );
+        responses.push(
+          await sendCommand({
+            worker: accountWorker,
+            command: {type: 'set-account', accountIdentifier: firstAccountIdentifier},
+          }),
+        );
+        responses.push(
+          await sendCommand({worker: accountWorker, command: {type: 'append', lines: ['{"firstAccount":true}\n']}}),
+        );
+        responses.push(
+          await sendCommand({
+            worker: otherAccountWorker,
+            command: {type: 'set-account', accountIdentifier: secondAccountIdentifier},
+          }),
+        );
+        responses.push(
+          await sendCommand({
+            worker: otherAccountWorker,
+            command: {type: 'append', lines: ['{"otherAccount":true}\n']},
+          }),
+        );
+        // Deletion must wait for a preceding write, or revoke it before it starts.
+        const concurrentOutcomes = await Promise.all([
+          sendCommand({
+            worker: cleanupWorker,
+            command: {type: 'remove-account', accountIdentifier: firstAccountIdentifier},
+          }),
+          sendCommand({worker: accountWorker, command: {type: 'append', lines: ['{"racingWrite":true}\n']}}),
+        ]);
+        const staleOutcome = await sendCommand({
+          worker: accountWorker,
+          command: {type: 'append', lines: ['{"staleWrite":true}\n']},
+        });
+        const staleBindingOutcome = await sendCommand({
+          worker: pendingAccountWorker,
+          command: {type: 'set-account', accountIdentifier: firstAccountIdentifier},
+        });
+        responses.push(
+          await sendCommand({worker: otherAccountWorker, command: {type: 'append', lines: ['{"stillActive":true}\n']}}),
+        );
+        responses.push(
+          await sendCommand({
+            worker: cleanupWorker,
+            command: {type: 'remove-account', accountIdentifier: firstAccountIdentifier},
+          }),
+        );
+        const preservedUnrelatedContents = await (await unrelatedFile.getFile()).text();
+        const preservedForeignContents = await (await foreignFile.getFile()).text();
+
+        return {
+          responses,
+          concurrentOutcomes,
+          staleOutcome,
+          staleBindingOutcome,
+          preservedUnrelatedContents,
+          preservedForeignContents,
+        };
+      } finally {
+        accountWorker.terminate();
+        otherAccountWorker.terminate();
+        pendingAccountWorker.terminate();
+        cleanupWorker.terminate();
+      }
+    },
+    {firstAccountIdentifier, secondAccountIdentifier, directoryName: logDirectoryName},
+  );
+
+  expect(
+    outcomes.responses.map(response => {
+      return response.outcome;
+    }),
+  ).toEqual(Array(9).fill('complete'));
+  expect(outcomes.concurrentOutcomes.at(0)?.outcome).toBe('complete');
+  expect(outcomes.staleOutcome.outcome).toBe('failed');
+  expect(outcomes.staleBindingOutcome.outcome).toBe('failed');
+  expect(outcomes.preservedUnrelatedContents).toBe('unrelated application storage');
+  expect(outcomes.preservedForeignContents).toBe('unrelated file inside log directory');
+  const files = await readBrowserLogFiles(page);
+  expect(
+    files
+      .map(file => {
+        return file.contents;
+      })
+      .toSorted(),
+  ).toEqual(['{"otherAccount":true}\n{"stillActive":true}\n', '{"unattributed":true}\n'].toSorted());
+  expect(
+    files.some(file => {
+      return file.name.endsWith(`-account-${firstAccountIdentifier}.jsonl`);
+    }),
+  ).toBe(false);
 });
 
 test('persists sanitized browser logs with console disabled across application reload', async ({page, context}) => {
