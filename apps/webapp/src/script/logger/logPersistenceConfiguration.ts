@@ -29,8 +29,8 @@ export type LogPersistenceConfiguration = {
 
 // Limits include the UTF-8 newline terminating every record.
 export const logPersistenceConfiguration: LogPersistenceConfiguration = {
-  maximumFileBytes: 1_048_576,
-  maximumTotalBytes: 10_485_760,
+  maximumFileBytes: 10_485_760,
+  maximumTotalBytes: 524_288_000,
   maximumAgeMilliseconds: 604_800_000,
   maximumPendingBytes: 262_144,
   batchTargetBytes: 65_536,
