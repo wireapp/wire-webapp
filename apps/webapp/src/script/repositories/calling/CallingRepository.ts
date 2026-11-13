@@ -2847,6 +2847,10 @@ export class CallingRepository {
       this.warnOutdatedClient(conversationId);
     }
 
+    if (reason === REASON.ANSWERED_ELSEWHERE) {
+      call.wasAnsweredElsewhere = true;
+    }
+
     const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE, REASON.REJECTED];
     const startedAt = call.startedAt();
     const startedAtOrZero = isNullOrUndefined(startedAt) || startedAt === 0 || isNan(startedAt) ? 0 : startedAt;
@@ -2879,21 +2883,24 @@ export class CallingRepository {
     });
 
     if (!stillActiveState.includes(reason)) {
-      this.injectDeactivateEvent(
-        call.conversation.qualifiedId,
-        call.initiator,
-        isNullOrUndefined(startedAt) || startedAt === 0 || isNan(startedAt) ? 0 : Date.now() - startedAt,
-        reason,
-        new Date().toISOString(),
-        EventSource.WEBSOCKET,
-      );
+      if (!call.wasAnsweredElsewhere) {
+        this.injectDeactivateEvent(
+          call.conversation.qualifiedId,
+          call.initiator,
+          isNullOrUndefined(startedAt) || startedAt === 0 || isNan(startedAt) ? 0 : Date.now() - startedAt,
+          reason,
+          new Date().toISOString(),
+          EventSource.WEBSOCKET,
+        );
+      }
       this.removeCall(call);
       return;
     }
     selfParticipant.releaseMediaStream(true);
     call.removeAllAudio();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
-    call.reason(reason);
+    const isGroupCall = call.conversation.isGroupOrChannel() || call.conversation.isMeeting();
+    call.reason(reason === REASON.ANSWERED_ELSEWHERE && isGroupCall ? REASON.STILL_ONGOING : reason);
   };
 
   hasActiveCall = (): boolean => {
@@ -3030,6 +3037,9 @@ export class CallingRepository {
       return;
     }
 
+    if (state === CALL_STATE.ANSWERED || state === CALL_STATE.MEDIA_ESTAB) {
+      call.wasAnsweredElsewhere = false;
+    }
     // If a call goes from a state to INCOMING, it means it's a group call that just ended
     call.reason(state === CALL_STATE.INCOMING ? REASON.STILL_ONGOING : undefined);
     call.state(state);
