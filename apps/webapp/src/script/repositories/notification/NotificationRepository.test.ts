@@ -589,7 +589,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if a group message timer is updated', () => {
-      message = new MessageTimerUpdateMessage(5000, translateForTest);
+      message = new MessageTimerUpdateMessage(5000, undefined, undefined, translateForTest);
       message.user(user);
 
       const expectedBody = translateForTest('notificationConversationMessageTimerUpdate');
@@ -598,7 +598,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if a group message timer is reset', () => {
-      message = new MessageTimerUpdateMessage(null, translateForTest);
+      message = new MessageTimerUpdateMessage(null, undefined, undefined, translateForTest);
       message.user(user);
 
       const expectedBody = translateForTest('notificationConversationMessageTimerReset');

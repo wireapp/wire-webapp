@@ -56,7 +56,7 @@ describe('Message', () => {
         }
         return `translated:${translationKey}`;
       });
-      const message = new MessageTimerUpdateMessage(1000, translate as any);
+      const message = new MessageTimerUpdateMessage(1000, undefined, undefined, translate as any);
 
       expect(message.caption).toBe('translated:conversationUpdatedTimer:1 translated:ephemeralUnitsSecond');
     });

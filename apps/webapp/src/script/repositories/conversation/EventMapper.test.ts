@@ -18,6 +18,8 @@
  */
 
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {container} from 'tsyringe';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
@@ -33,8 +35,11 @@ import {translate} from 'Util/localizerUtil';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
+import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
+import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
 import {SystemMessage} from 'Repositories/entity/message/systemMessage';
 import {eventShouldBeStored} from 'Repositories/event/EventTypeHandling';
+import {UserState} from 'Repositories/user/userState';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 
 import {EventMapper} from './EventMapper';
@@ -267,6 +272,116 @@ describe('Event Mapper', () => {
 
       expect(messageEntity.name()).toBe('translated:conversationSomeone');
       expect(translate).toHaveBeenCalledWith('conversationSomeone');
+    });
+
+    describe('message timer update', () => {
+      const userState = container.resolve(UserState);
+      const selfUser = new User('self-user-id', 'wire.com', translateForTest);
+      const mapper = new EventMapper(undefined, translateForTest);
+
+      const createTimerUpdateEvent = (messageTimer: number | null, from: string, domain?: string) => ({
+        conversation: conversation.id,
+        qualified_conversation: conversation.qualifiedId,
+        from,
+        qualified_from: domain === undefined ? undefined : {id: from, domain},
+        time: new Date().toISOString(),
+        type: CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE as const,
+        data: {message_timer: messageTimer},
+      });
+
+      beforeEach(() => {
+        selfUser.isMe = true;
+        userState.self(selfUser);
+      });
+
+      afterEach(() => {
+        userState.self(undefined as any);
+      });
+
+      it('uses the self caption when the self user updated the timer', () => {
+        const event = createTimerUpdateEvent(5000, selfUser.id, selfUser.domain);
+
+        const message = mapper.mapJsonEvent(event, conversation) as MessageTimerUpdateMessage;
+
+        expect(message.from).toBe(selfUser.id);
+        expect(message.fromDomain).toBe(selfUser.domain);
+        expect(message.caption).toBe('conversationUpdatedTimerYou');
+      });
+
+      it('uses the self caption when the self user reset the timer from an unqualified event', () => {
+        const event = createTimerUpdateEvent(null, selfUser.id);
+
+        const message = mapper.mapJsonEvent(event, conversation) as MessageTimerUpdateMessage;
+
+        expect(message.caption).toBe('conversationResetTimerYou');
+      });
+
+      it('uses the generic caption when another user updated the timer', () => {
+        const event = createTimerUpdateEvent(5000, 'other-user-id', selfUser.domain);
+
+        const message = mapper.mapJsonEvent(event, conversation) as MessageTimerUpdateMessage;
+
+        expect(message.caption).toBe('conversationUpdatedTimer');
+      });
+
+      it('uses the generic caption when the same user id comes from another domain', () => {
+        const event = createTimerUpdateEvent(5000, selfUser.id, 'other.domain');
+
+        const message = mapper.mapJsonEvent(event, conversation) as MessageTimerUpdateMessage;
+
+        expect(message.caption).toBe('conversationUpdatedTimer');
+      });
+    });
+
+    describe('receipt mode update', () => {
+      const userState = container.resolve(UserState);
+      const selfUser = new User('self-user-id', 'wire.com', translateForTest);
+      const mapper = new EventMapper(undefined, translateForTest);
+
+      const createReceiptModeUpdateEvent = (receiptMode: number, from: string, domain?: string) => ({
+        conversation: conversation.id,
+        qualified_conversation: conversation.qualifiedId,
+        from,
+        qualified_from: domain === undefined ? undefined : {id: from, domain},
+        time: new Date().toISOString(),
+        type: CONVERSATION_EVENT.RECEIPT_MODE_UPDATE as const,
+        data: {receipt_mode: receiptMode},
+      });
+
+      beforeEach(() => {
+        selfUser.isMe = true;
+        userState.self(selfUser);
+      });
+
+      afterEach(() => {
+        userState.self(undefined as any);
+      });
+
+      it('uses the self caption when the self user enabled read receipts', () => {
+        const event = createReceiptModeUpdateEvent(1, selfUser.id, selfUser.domain);
+
+        const message = mapper.mapJsonEvent(event, conversation) as ReceiptModeUpdateMessage;
+
+        expect(message.from).toBe(selfUser.id);
+        expect(message.fromDomain).toBe(selfUser.domain);
+        expect(message.caption).toBe('conversationReceiptsOnYou');
+      });
+
+      it('uses the self caption when the self user disabled read receipts from an unqualified event', () => {
+        const event = createReceiptModeUpdateEvent(0, selfUser.id);
+
+        const message = mapper.mapJsonEvent(event, conversation) as ReceiptModeUpdateMessage;
+
+        expect(message.caption).toBe('conversationReceiptsOffYou');
+      });
+
+      it('uses the generic caption when another user changed read receipts', () => {
+        const event = createReceiptModeUpdateEvent(1, 'other-user-id', selfUser.domain);
+
+        const message = mapper.mapJsonEvent(event, conversation) as ReceiptModeUpdateMessage;
+
+        expect(message.caption).toBe('conversationReceiptsOn');
+      });
     });
   });
 

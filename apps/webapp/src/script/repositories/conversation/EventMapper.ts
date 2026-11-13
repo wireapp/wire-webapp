@@ -869,8 +869,8 @@ export class EventMapper {
    * @param eventData Message data
    * @returns receipt mode update message entity
    */
-  private _mapEventReceiptModeUpdate({data: eventData}: LegacyEventRecord) {
-    return new ReceiptModeUpdateMessage(!!eventData.receipt_mode, this.translate);
+  private _mapEventReceiptModeUpdate({data: eventData, from, qualified_from}: LegacyEventRecord) {
+    return new ReceiptModeUpdateMessage(!!eventData.receipt_mode, from, qualified_from?.domain, this.translate);
   }
 
   /**
@@ -879,8 +879,8 @@ export class EventMapper {
    * @param eventData Message data
    * @returns message timer update message entity
    */
-  private _mapEventMessageTimerUpdate({data: eventData}: LegacyEventRecord) {
-    return new MessageTimerUpdateMessage(eventData.message_timer, this.translate);
+  private _mapEventMessageTimerUpdate({data: eventData, from, qualified_from}: LegacyEventRecord) {
+    return new MessageTimerUpdateMessage(eventData.message_timer, from, qualified_from?.domain, this.translate);
   }
 
   /**
