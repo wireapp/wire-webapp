@@ -77,6 +77,11 @@ const renderComponent = ({
       participantCount={1}
       isMaximized={false}
       onTileDoubleClick={jest.fn()}
+      isSelfPreviewMinimized={false}
+      allowSelfPreviewMinimize={false}
+      minimizeSelfPreviewLabel="Minimize self-video preview"
+      restoreSelfPreviewLabel="Restore self-video preview"
+      onToggleSelfPreviewMinimized={jest.fn()}
     />,
     {wrapper: rootProviderWrapper},
   );

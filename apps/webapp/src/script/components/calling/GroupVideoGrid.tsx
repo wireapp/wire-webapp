@@ -19,11 +19,12 @@
 
 import {CSSProperties, ReactNode, useEffect, useState, type FunctionComponent} from 'react';
 
-import {css} from '@emotion/react';
+import type {CSSObject} from '@emotion/react';
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
 import {groupVideoBackgroundInitializingOverlay} from './GroupVideoGridTile.styles';
+import {SelfPreviewControls} from './SelfPreviewControls';
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
@@ -36,6 +37,7 @@ import type {Grid} from '../../repositories/calling/videoGridHandler';
 import {Loading} from '../../uiKit/dataDisplay/loading/loading';
 import {QUERY} from '../../uiKit/utils/mediaQueries';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
+import type {TranslationKey} from '../../util/localizerUtil';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import * as Icon from '../icon';
 
@@ -52,6 +54,7 @@ export interface GroupVideoGripProps {
   selfParticipant: Participant;
   call: Call;
   setMaximizedParticipant?: (participant: Participant | null) => void;
+  allowSelfVideoMinimize?: boolean;
 }
 
 interface RowsAndColumns extends CSSProperties {
@@ -74,6 +77,11 @@ interface GroupVideoThumbnailProps {
   readonly minimized: boolean;
   readonly maximizedParticipant: Participant | null;
   readonly selfParticipant: Participant;
+  allowMinimize: boolean;
+  minimizeLabel: string;
+  restoreLabel: string;
+  isMinimized: boolean;
+  onToggleMinimized: () => void;
 }
 
 function GroupVideoThumbnail({
@@ -81,6 +89,11 @@ function GroupVideoThumbnail({
   minimized,
   maximizedParticipant,
   selfParticipant,
+  allowMinimize,
+  minimizeLabel,
+  restoreLabel,
+  isMinimized,
+  onToggleMinimized,
 }: GroupVideoThumbnailProps): ReactNode {
   const thumbnail = useKoSubscribableChildren(thumbnailParticipant, [
     'hasActiveVideo',
@@ -98,10 +111,77 @@ function GroupVideoThumbnail({
     'handRaisedAt',
   ]);
 
+  const selfVideoToggleControl = (
+    <button
+      type="button"
+      aria-label={isMinimized ? restoreLabel : minimizeLabel}
+      title={isMinimized ? restoreLabel : minimizeLabel}
+      onClick={onToggleMinimized}
+      data-uie-name={isMinimized ? 'restore-self-video-preview' : 'minimize-self-video-preview'}
+      css={{
+        alignItems: 'center',
+        backgroundColor: 'transparent',
+        border: 0,
+        borderRadius: 4,
+        color: isMinimized ? 'var(--white)' : 'var(--foreground)',
+        cursor: 'pointer',
+        display: 'flex',
+        height: 32,
+        justifyContent: 'center',
+        opacity: isMinimized ? 1 : 0,
+        padding: 6,
+        width: 32,
+        transition: 'opacity 120ms ease-out',
+        '.group-video__thumbnail:hover &, .group-video__thumbnail:focus-within &': {opacity: 1},
+        '&:focus-visible': {
+          outline: '2px solid var(--white)',
+          outlineOffset: 2,
+          opacity: 1,
+        },
+        '@media (hover: none)': {opacity: 1},
+      }}
+    >
+      {isMinimized ? (
+        <Icon.FullscreenIcon aria-hidden="true" css={{'&& path': {fill: 'currentColor'}}} />
+      ) : (
+        <Icon.MinusIcon aria-hidden="true" />
+      )}
+    </button>
+  );
+  const selfVideoWindowHeader = allowMinimize && (
+    <div
+      data-uie-name="self-video-preview-window-header"
+      css={{
+        backgroundColor: 'transparent',
+        border: 0,
+        boxShadow: 'none',
+        position: 'absolute',
+        right: 4,
+        top: 4,
+        zIndex: 2,
+      }}
+    >
+      {isMinimized ? (
+        <SelfPreviewControls
+          isMuted={selfIsMuted}
+          isHandRaised={!isNullOrUndefined(selfHandRaisedAt)}
+          restoreLabel={restoreLabel}
+          onRestore={onToggleMinimized}
+        />
+      ) : (
+        selfVideoToggleControl
+      )}
+    </div>
+  );
+
   return (
     <>
       {!isNullOrUndefined(thumbnail.videoStream) && maximizedParticipant === null && (
-        <GroupVideoThumbnailWrapper minimized={minimized}>
+        <GroupVideoThumbnailWrapper
+          minimized={minimized}
+          allowMinimize={allowMinimize}
+          selfPreviewMinimized={isMinimized}
+        >
           <Video
             className="group-video__thumbnail-video"
             autoPlay
@@ -115,6 +195,7 @@ function GroupVideoThumbnail({
             onCanPlay={onVideoCanPlay}
             css={{
               transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
+              visibility: isMinimized ? 'hidden' : 'visible',
             }}
             srcObject={thumbnail.processedVideoStream?.stream ?? thumbnail.videoStream}
           />
@@ -127,20 +208,25 @@ function GroupVideoThumbnail({
               <Loading size={32} />
             </div>
           )}
-          {selfIsMuted && !minimized && (
+          {selfIsMuted && !minimized && !isMinimized && (
             <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
               <Icon.MicOffIcon data-uie-name="mic-icon-off" />
             </span>
           )}
-          {!isNullOrUndefined(selfHandRaisedAt) && !minimized && (
+          {!isNullOrUndefined(selfHandRaisedAt) && !minimized && !isMinimized && (
             <span className="group-video-grid__element__label__hand_icon small" data-uie-name="status-call-audio-muted">
               ✋
             </span>
           )}
+          {selfVideoWindowHeader}
         </GroupVideoThumbnailWrapper>
       )}
       {!thumbnail.hasActiveVideo && (
-        <GroupVideoThumbnailWrapper minimized={minimized}>
+        <GroupVideoThumbnailWrapper
+          minimized={minimized}
+          allowMinimize={allowMinimize}
+          selfPreviewMinimized={isMinimized}
+        >
           <div
             css={{
               alignItems: 'center',
@@ -148,14 +234,15 @@ function GroupVideoThumbnail({
               height: '100%',
               justifyContent: 'center',
               width: '100%',
+              visibility: isMinimized ? 'hidden' : 'visible',
             }}
           >
-            {selfIsMuted && !minimized && (
+            {selfIsMuted && !minimized && !isMinimized && (
               <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
                 <Icon.MicOffIcon data-uie-name="mic-icon-off" />
               </span>
             )}
-            {!isNullOrUndefined(selfHandRaisedAt) && !minimized && (
+            {!isNullOrUndefined(selfHandRaisedAt) && !minimized && !isMinimized && (
               <span
                 className="group-video-grid__element__label__hand_icon small"
                 data-uie-name="status-call-audio-muted"
@@ -169,6 +256,7 @@ function GroupVideoThumbnail({
               hideAvailabilityStatus
             />
           </div>
+          {selfVideoWindowHeader}
         </GroupVideoThumbnailWrapper>
       )}
     </>
@@ -207,30 +295,45 @@ const calculateRowsAndColumns = (params: CalculateRowsAndColumsParams): RowsAndC
   return {'--columns': columns, '--rows': rows};
 };
 
-const GroupVideoThumbnailWrapper: FunctionComponent<{children?: ReactNode; minimized: boolean}> = ({
-  children,
-  minimized,
-}: {
+const GroupVideoThumbnailWrapper: FunctionComponent<{
   children?: ReactNode;
   minimized: boolean;
-}) => {
+  allowMinimize?: boolean;
+  selfPreviewMinimized?: boolean;
+}> = ({children, minimized, allowMinimize = false, selfPreviewMinimized = false}) => {
+  let thumbnailStyles: CSSObject | undefined;
+  if (selfPreviewMinimized) {
+    thumbnailStyles = {
+      backgroundColor: 'transparent',
+      border: 0,
+      borderRadius: 0,
+      bottom: 'unset',
+      boxShadow: 'none',
+      height: 40,
+      maxHeight: 'none',
+      maxWidth: 'none',
+      overflow: 'visible',
+      right: 8,
+      top: 8,
+      width: 72,
+    };
+  } else if (minimized) {
+    thumbnailStyles = {
+      bottom: 'unset',
+      boxShadow: '0 0 0 1px var(--gray-90)',
+      height: 40,
+      right: 8,
+      top: 8,
+      width: 70,
+    };
+  }
+
   return (
     <div
       className="group-video__thumbnail"
-      css={
-        minimized
-          ? css`
-              bottom: unset;
-              box-shadow: 0 0 0 1px var(--gray-90);
-              height: 40px;
-              right: 8px;
-              top: 8px;
-              width: 70px;
-            `
-          : undefined
-      }
+      css={thumbnailStyles}
       data-uie-name="self-video-thumbnail-wrapper"
-      aria-hidden="true"
+      aria-hidden={!allowMinimize}
     >
       {children}
     </div>
@@ -250,8 +353,8 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
   maximizedParticipant,
   call,
   setMaximizedParticipant,
+  allowSelfVideoMinimize = false,
 }: GroupVideoGripProps) => {
-  const {translate} = useApplicationContext();
   const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
   const isTablet = useActiveWindowMatchMedia(QUERY.tablet);
   const isDesktop = useActiveWindowMatchMedia(QUERY.desktop);
@@ -259,6 +362,25 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
   const isMedium = useActiveWindowMatchMedia(HEIGHT_QUERIES.MEDIUM);
   const isTall = useActiveWindowMatchMedia(HEIGHT_QUERIES.TALL);
 
+  const [isSelfVideoMinimized, setIsSelfVideoMinimized] = useState(false);
+  const {translate} = useApplicationContext();
+  // FormatJS extracts t({id, defaultMessage}); runtime strings still use the application localizer.
+  // eslint-disable-next-line id-length -- `t` is the configured FormatJS extraction function.
+  const t = ({id}: {id: TranslationKey; defaultMessage: string}): string => {
+    return translate(id);
+  };
+  const minimizeSelfPreviewLabel = t({
+    id: 'videoCallOverlayMinimizeSelfVideo',
+    defaultMessage: 'Minimize self-video preview',
+  });
+  const restoreSelfPreviewLabel = t({
+    id: 'videoCallOverlayRestoreSelfVideo',
+    defaultMessage: 'Restore self-video preview',
+  });
+
+  useEffect(() => {
+    setIsSelfVideoMinimized(false);
+  }, [call]);
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(
     calculateRowsAndColumns({
       totalCount: grid?.grid.length,
@@ -288,17 +410,25 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
   };
 
   const participants = (isNullOrUndefined(maximizedParticipant) ? grid.grid : [maximizedParticipant]).filter(Boolean);
+  const visibleParticipantCount = isSelfVideoMinimized
+    ? Math.max(
+        1,
+        participants.filter(participant => {
+          return participant !== selfParticipant;
+        }).length,
+      )
+    : participants.length;
 
   useEffect(() => {
     setRowsAndColumns(
       calculateRowsAndColumns({
-        totalCount: participants.length,
+        totalCount: visibleParticipantCount,
         isTablet: isTablet,
         isDesktop: isDesktop,
         isShort: isShort,
       }),
     );
-  }, [participants.length, isTablet, isDesktop, isShort]);
+  }, [visibleParticipantCount, isTablet, isDesktop, isShort]);
 
   useEffect(() => {
     const setParticipantsForDevice = (limits: {
@@ -380,6 +510,15 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
               participantCount={participants.length}
               isMaximized={!isNullOrUndefined(maximizedParticipant)}
               onTileDoubleClick={doubleClickedOnVideo}
+              isSelfPreviewMinimized={isSelfVideoMinimized}
+              allowSelfPreviewMinimize={allowSelfVideoMinimize}
+              minimizeSelfPreviewLabel={minimizeSelfPreviewLabel}
+              restoreSelfPreviewLabel={restoreSelfPreviewLabel}
+              onToggleSelfPreviewMinimized={() => {
+                return setIsSelfVideoMinimized(minimized => {
+                  return !minimized;
+                });
+              }}
             />
           );
         })}
@@ -390,6 +529,15 @@ const GroupVideoGrid: FunctionComponent<GroupVideoGripProps> = ({
           minimized={minimized}
           maximizedParticipant={maximizedParticipant}
           selfParticipant={selfParticipant}
+          allowMinimize={allowSelfVideoMinimize}
+          minimizeLabel={minimizeSelfPreviewLabel}
+          restoreLabel={restoreSelfPreviewLabel}
+          isMinimized={allowSelfVideoMinimize && isSelfVideoMinimized}
+          onToggleMinimized={() => {
+            return setIsSelfVideoMinimized(minimized => {
+              return !minimized;
+            });
+          }}
         />
       )}
     </div>

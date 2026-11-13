@@ -195,6 +195,106 @@ describe('GroupVideoGrid', () => {
     expect(thumbnailMutedIcons).not.toHaveLength(0);
   });
 
+  it('minimizes and restores the local preview without changing its video stream', () => {
+    const participant = createMockParticipant('self', 'client', {isMuted: true});
+    participant.handRaisedAt(1);
+    const stream = createMediaStream();
+    participant.videoState(VIDEO_STATE.STARTED);
+    participant.videoStream(stream);
+    const remoteParticipant = createMockParticipant('remote', 'remoteClient', {});
+    const remoteStream = createMediaStream();
+    remoteParticipant.videoState(VIDEO_STATE.STARTED);
+    remoteParticipant.videoStream(remoteStream);
+
+    const props: GroupVideoGripProps = {
+      grid: {grid: [remoteParticipant], thumbnail: participant},
+      maximizedParticipant: null,
+      selfParticipant: participant,
+      call: createMockCall(),
+      allowSelfVideoMinimize: true,
+    };
+    const {container, queryByTestId, getByRole, rerender} = render(<GroupVideoGrid {...props} />, {
+      wrapper: rootProviderWrapper,
+    });
+    const remoteVideo = requireValueForTest(container.querySelector('[data-user-id="remote"] video'));
+    expect(remoteVideo).toBeVisible();
+    expect(container.querySelector('[data-uie-name="mic-icon-off"]')).toBeInTheDocument();
+    expect(container.querySelector('.group-video-grid__element__label__hand_icon')).toBeVisible();
+    expect(queryByTestId('self-video-preview-window-header')).toBeInTheDocument();
+
+    fireEvent.click(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'}));
+    expect(queryByTestId('self-video-thumbnail-wrapper')).toBeInTheDocument();
+    const selfPreview = requireValueForTest(queryByTestId('self-video-thumbnail'));
+    expect(selfPreview).not.toBeVisible();
+    expect(remoteVideo).toBeVisible();
+    expect(remoteParticipant.videoStream()).toBe(remoteStream);
+    const selfPreviewControls = requireValueForTest(
+      container.querySelector('[data-uie-name="self-preview-minimized-controls"]'),
+    );
+    expect(selfPreviewControls.querySelector('[data-uie-name="self-preview-muted-indicator"]')).toBeVisible();
+    expect(selfPreviewControls.querySelector('[data-uie-name="self-preview-hand-raised-indicator"]')).toBeVisible();
+    expect(selfPreviewControls.querySelector('[data-uie-name="restore-self-video-preview"]')).toBeVisible();
+    expect(queryByTestId('self-video-preview-window-header')).toBeInTheDocument();
+    expect(participant.videoStream()).toBe(stream);
+
+    fireEvent.click(getByRole('button', {name: 'videoCallOverlayRestoreSelfVideo'}));
+    expect(queryByTestId('self-video-thumbnail-wrapper')).toBeInTheDocument();
+    expect(remoteVideo).toBeVisible();
+    expect(participant.videoStream()).toBe(stream);
+
+    fireEvent.click(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'}));
+    rerender(<GroupVideoGrid {...props} call={createMockCall()} />);
+    expect(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'})).toBeInTheDocument();
+  });
+
+  it('minimizes and restores only the self tile in a group grid', () => {
+    const selfParticipant = createMockParticipant('self', 'client', {isMuted: true});
+    selfParticipant.handRaisedAt(1);
+    const stream = createMediaStream();
+    selfParticipant.videoState(VIDEO_STATE.STARTED);
+    selfParticipant.videoStream(stream);
+    const remoteParticipant = createMockParticipant('remote', 'remoteClient', {});
+    const remoteStream = createMediaStream();
+    remoteParticipant.videoState(VIDEO_STATE.STARTED);
+    remoteParticipant.videoStream(remoteStream);
+    const props: GroupVideoGripProps = {
+      grid: {grid: [selfParticipant, remoteParticipant], thumbnail: null},
+      maximizedParticipant: null,
+      selfParticipant,
+      call: createMockCall(),
+      allowSelfVideoMinimize: true,
+    };
+    const {container, getByRole} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
+    const remoteVideo = requireValueForTest(container.querySelector('[data-user-id="remote"] video'));
+
+    expect(container.querySelector('.group-video-grid__element-video')).toBeInTheDocument();
+    expect(remoteVideo).toBeVisible();
+    expect(container.querySelector('[data-uie-name="mic-icon-off"]')).toBeInTheDocument();
+    expect(container.querySelector('.group-video-grid__element__label__hand_icon')).toBeVisible();
+    fireEvent.click(getByRole('button', {name: 'videoCallOverlayMinimizeSelfVideo'}));
+    const localVideo = requireValueForTest(container.querySelector('[data-user-id="self"] video'));
+    expect(localVideo).not.toBeVisible();
+    expect(remoteVideo).toBeVisible();
+    expect(getByRole('button', {name: 'videoCallOverlayRestoreSelfVideo'})).toBeInTheDocument();
+    expect(selfParticipant.videoStream()).toBe(stream);
+    expect(remoteParticipant.videoStream()).toBe(remoteStream);
+    const selfPreviewControls = requireValueForTest(
+      container.querySelector('[data-uie-name="self-preview-minimized-controls"]'),
+    );
+    expect(selfPreviewControls.querySelector('[data-uie-name="self-preview-muted-indicator"]')).toBeVisible();
+    expect(selfPreviewControls.querySelector('[data-uie-name="self-preview-hand-raised-indicator"]')).toBeVisible();
+    expect(selfPreviewControls.querySelector('[data-uie-name="restore-self-video-preview"]')).toBeVisible();
+    expect(
+      requireValueForTest(
+        container.querySelector<HTMLElement>('[data-uie-name="grids-wrapper"]'),
+      ).style.getPropertyValue('--columns'),
+    ).toBe('1');
+
+    fireEvent.click(getByRole('button', {name: 'videoCallOverlayRestoreSelfVideo'}));
+    expect(container.querySelector('.group-video-grid__element-video')).toBeInTheDocument();
+    expect(selfParticipant.videoStream()).toBe(stream);
+  });
+
   it('shows and hides the loading overlay while the raw thumbnail video is loading with background effects disabled', () => {
     const participant = createMockParticipant('userId', 'clientId', {});
     const videoStream = createMediaStream();
