@@ -17,8 +17,8 @@
  *
  */
 
-import {LogFactory} from '../../../../commons/LogFactory';
 import {TimeUtil} from '../../../../commons/util';
+import {getLogger} from '../../../../logger/getLogger';
 
 export const DEFAULT_BUFFERED_MLS_MESSAGE_RECOVERY_THRESHOLD_MS = TimeUtil.TimeInMillis.MINUTE;
 
@@ -42,7 +42,7 @@ type TimestampRange = {
  */
 export class BufferedMlsMessageRecoveryTracker {
   private readonly bufferedMessageRanges = new Map<string, TimestampRange>();
-  private readonly logger = LogFactory.getLogger('@wireapp/core/BufferedMlsMessageRecoveryTracker');
+  private readonly logger = getLogger('@wireapp/core/BufferedMlsMessageRecoveryTracker');
 
   constructor(private readonly recoveryThresholdMs: number = DEFAULT_BUFFERED_MLS_MESSAGE_RECOVERY_THRESHOLD_MS) {}
 
