@@ -282,6 +282,81 @@ describe('worker synchronous Origin Private File System log store', () => {
     expect(readLogFileContents(storage)).toEqual(['[]\n[]\n']);
   });
 
+  it('fills a 10 MiB file exactly and rotates before the next complete record', async () => {
+    const storage = createTestDirectory();
+    const writer = createStoreForTest({storage});
+    const filename = `log-1000000-${firstSessionIdentifier}-1.jsonl`;
+    const maximumFileBytes = 10 * 1024 * 1024;
+    await writer.append(['{}\n']);
+    storage.files.set(filename, encode(`"${'x'.repeat(maximumFileBytes - 6)}"\n`));
+
+    await writer.append(['{}\n']);
+
+    expect(storage.files.size).toBe(1);
+    expect(storage.files.get(filename)?.byteLength).toBe(maximumFileBytes);
+
+    await writer.append(['[]\n']);
+
+    expect([...storage.files.keys()]).toEqual([filename, `log-1000000-${firstSessionIdentifier}-2.jsonl`]);
+    expect(storage.files.get(filename)?.byteLength).toBe(maximumFileBytes);
+    expect(storage.files.get(`log-1000000-${firstSessionIdentifier}-2.jsonl`)).toEqual(encode('[]\n'));
+  });
+
+  it('retains 500 MiB and removes the oldest owned file before accepting more bytes', async () => {
+    const storage = createTestDirectory();
+    // Share one immutable buffer across file entries to exercise the real budget without allocating 500 MiB.
+    const fullFileContents = encode(`"${'x'.repeat(10 * 1024 * 1024 - 3)}"\n`);
+    const filenames = Array.from({length: 50}, (_unused, index) => {
+      return `log-${1000000 - 50 + index}-${firstSessionIdentifier}-1.jsonl`;
+    });
+    for (const filename of filenames) {
+      storage.files.set(filename, fullFileContents);
+    }
+    const writer = createStoreForTest({storage, sessionIdentifier: secondSessionIdentifier});
+
+    await writer.append([]);
+
+    expect([...storage.files.keys()]).toEqual(filenames);
+
+    await writer.append(['{}\n']);
+
+    const expectedFilenames = [...filenames.slice(1), `log-1000000-${secondSessionIdentifier}-1.jsonl`];
+    expect([...storage.files.keys()]).toEqual(expectedFilenames);
+  });
+
+  it('keeps files younger than seven days and expires them at seven days', async () => {
+    const storage = createTestDirectory();
+    const clock = createTestClock();
+    const writer = createStoreForTest({storage, clock});
+    await writer.append(['{}\n']);
+
+    clock.advanceByMilliseconds(7 * 24 * 60 * 60 * 1000 - 1);
+    await writer.append([]);
+
+    expect(readLogFileContents(storage)).toEqual(['{}\n']);
+
+    clock.advanceByMilliseconds(1);
+    await writer.append([]);
+
+    expect(storage.files.size).toBe(0);
+  });
+
+  it('rolls back quota failures without evicting committed logs or unrelated storage', async () => {
+    const storage = createTestDirectory();
+    const writer = createStoreForTest({storage});
+    await writer.append(['{}\n']);
+    const committedFilename = `log-1000000-${firstSessionIdentifier}-1.jsonl`;
+    storage.files.set('unrelated-account-file', encode('preserve this'));
+    storage.state.failure = 'write';
+
+    await expect(writer.append(['[]\n'])).rejects.toMatchObject({name: 'QuotaExceededError'});
+
+    expect(storage.files.get(committedFilename)).toEqual(encode('{}\n'));
+    expect(storage.files.get('unrelated-account-file')).toEqual(encode('preserve this'));
+    expect(storage.files.size).toBe(2);
+    expect(storage.state.writing).toBe(false);
+  });
+
   it('cleans expired, empty and oversized owned files without touching unrelated files or directories', async () => {
     const storage = createTestDirectory();
     storage.files.set(`log-0-${firstSessionIdentifier}-1.jsonl`, encode('{}\n'));
