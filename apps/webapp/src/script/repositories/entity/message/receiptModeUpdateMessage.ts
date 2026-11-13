@@ -17,20 +17,36 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+import {container} from 'tsyringe';
+
 import {SystemMessage} from './systemMessage';
 
 import {CONVERSATION_EVENT} from '../../../apiClient/event/conversationEvent';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate} from '../../../util/localizerUtil';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
+import {UserState} from '../../user/userState';
+import {User} from '../User';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
-  constructor(isReceiptEnabled: boolean, translate: Translate) {
+  private readonly userState = container.resolve(UserState);
+
+  constructor(isReceiptEnabled: boolean, userId: string, userDomain: string | undefined, translate: Translate) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.RECEIPT_MODE_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
 
-    this.caption = getCaption(isReceiptEnabled, this.user().isMe, this.translate);
+    if (isNonEmptyString(userId)) {
+      this.from = userId;
+      this.fromDomain = userDomain;
+      this.user(new User(userId, userDomain ?? '', this.translate));
+    }
+
+    const isSelfUser =
+      isNonEmptyString(userId) && matchQualifiedIds(this.user().qualifiedId, this.userState.self()?.qualifiedId);
+    this.caption = getCaption(isReceiptEnabled, isSelfUser, this.translate);
   }
 }
 
