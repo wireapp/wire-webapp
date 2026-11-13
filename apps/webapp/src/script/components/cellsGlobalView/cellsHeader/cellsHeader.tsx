@@ -23,7 +23,6 @@ import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './cel
 import {CellsRefresh} from './cellsRefresh/cellsRefresh';
 import {CellsSearch} from './cellsSearch/cellsSeach';
 
-import {driveBulkActionsFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {selectionBarAnchorStyles} from '../../cells/common/cellsSelectionBar/cellsSelectionBar.styles';
 import {CellsFiltersBar} from '../../conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
@@ -49,8 +48,8 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   filters,
   onSelectionBarAnchorChange,
 }: CellsHeaderProps) => {
-  const {translate, isFeatureToggleEnabled} = useApplicationContext();
-  const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName) && searchValue.length === 0;
+  const {translate} = useApplicationContext();
+  const isSelectionBarEnabled = searchValue.length === 0;
 
   return (
     <header css={wrapperStyles}>

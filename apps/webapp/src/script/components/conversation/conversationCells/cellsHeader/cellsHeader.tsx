@@ -34,7 +34,6 @@ import {CellsRefresh} from './cellsRefresh/cellsRefresh';
 import {CellsRootHomeIcon} from './cellsRootHomeIcon';
 
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
-import {driveBulkActionsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {CellsSearchInput} from '../../../cellsSearchInput/cellsSearchInput';
@@ -92,8 +91,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   onEmptyBinInProgressChange,
   getCurrentCellsPath,
 }: CellsHeaderProps) => {
-  const {translate, isFeatureToggleEnabled} = useApplicationContext();
-  const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
+  const {translate} = useApplicationContext();
   const canPerformCellsAction = useCellsActionPermissions();
   const currentPath = getCurrentCellsPath();
   const breadcrumbs = getBreadcrumbsFromPath({
@@ -174,7 +172,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
               }}
             />
           )}
-          {isSelectionBarEnabled && <div css={selectionBarBreadcrumbAnchorStyles} ref={onSelectionBarAnchorChange} />}
+          <div css={selectionBarBreadcrumbAnchorStyles} ref={onSelectionBarAnchorChange} />
         </div>
       )}
 

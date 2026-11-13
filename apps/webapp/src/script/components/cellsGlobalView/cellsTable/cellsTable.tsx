@@ -37,7 +37,6 @@ import {
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
 import {FilePreviewProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
-import {driveBulkActionsFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {CellNode} from '../../../types/cellNode';
@@ -98,15 +97,14 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
   selectionScopeKey,
   selectionBarAnchor,
 }: CellsTableProps) => {
-  const {translate, isFeatureToggleEnabled} = useApplicationContext();
-  const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
+  const {translate} = useApplicationContext();
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
   });
 
   useEffect(() => {
     setSelectedNodeIds(new Set());
-  }, [isSelectionEnabled, selectionScopeKey]);
+  }, [selectionEnabled, selectionScopeKey]);
 
   useEffect(() => {
     const currentNodeIds = new Set<string>();
@@ -147,7 +145,7 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
       translate,
       selectedNodeIds,
       onToggleSelection: handleToggleSelection,
-      selectionEnabled: isSelectionEnabled,
+      selectionEnabled,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -158,7 +156,7 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
   return (
     <FilePreviewProvider>
       <div css={tableWrapperStyles}>
-        {isSelectionEnabled &&
+        {selectionEnabled &&
           selectionBarAnchor !== null &&
           createPortal(
             <CellsSelectionBar
@@ -196,11 +194,9 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
                     key={row.id}
                     css={[
                       tableCellRow,
-                      ...(isSelectionEnabled && selectedNodeIds.has(row.original.id)
-                        ? [selectedTableCellRowStyles]
-                        : []),
+                      ...(selectionEnabled && selectedNodeIds.has(row.original.id) ? [selectedTableCellRowStyles] : []),
                     ]}
-                    aria-selected={isSelectionEnabled && selectedNodeIds.has(row.original.id)}
+                    aria-selected={selectionEnabled && selectedNodeIds.has(row.original.id)}
                   >
                     {row.getVisibleCells().map(cell => {
                       return (
