@@ -233,10 +233,11 @@ test('persists sanitized browser logs with console disabled across application r
     }
   });
   const ownedFilenames = new Set<string>();
-  const location = '/?enabled-features=mark-as-unread,persistent-browser-logs';
+  const location = '/?enabled-features=mark-as-unread,persistent-browser-logs&enableLogging=-*';
   try {
     await page.goto(location);
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+    expect(new URL(page.url()).searchParams.get('enableLogging')).toBe('-*');
     await expect
       .poll(async () => {
         const files = await readBrowserLogFiles(page);
@@ -260,6 +261,7 @@ test('persists sanitized browser logs with console disabled across application r
 
     await page.reload();
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+    expect(new URL(page.url()).searchParams.get('enableLogging')).toBe('-*');
     await expect
       .poll(async () => {
         return (await readBrowserLogFiles(page)).length;
