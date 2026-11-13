@@ -126,7 +126,7 @@ test('loads the native persistence worker and acknowledges append, flush, and sh
     });
   });
   await page.goto('/config.js');
-  // Six bounded batches cross the real file limit without exceeding the worker's message limit.
+  // Six bounded batches fit within one 10 MiB file and stay below the worker's per-message limit.
   const lines = Array.from({length: 18}, (_, sequence) => {
     return `${JSON.stringify({component: 'BrowserSmoke', msg: '[REDACTED]', sequence, detail: 'x'.repeat(65_536)})}\n`;
   });
@@ -179,7 +179,7 @@ test('loads the native persistence worker and acknowledges append, flush, and sh
       }),
     );
     const files = await readBrowserLogFiles(page);
-    expect(files).toHaveLength(2);
+    expect(files).toHaveLength(1);
     for (const file of files) {
       expect(file.sizeBytes).toBeLessThanOrEqual(logPersistenceConfiguration.maximumFileBytes);
     }
