@@ -382,6 +382,14 @@ describe('Event Mapper', () => {
 
         expect(message.caption).toBe('conversationReceiptsOn');
       });
+
+      it('uses the generic caption when the same user id comes from another domain', () => {
+        const event = createReceiptModeUpdateEvent(1, selfUser.id, 'other.domain');
+
+        const message = mapper.mapJsonEvent(event, conversation) as ReceiptModeUpdateMessage;
+
+        expect(message.caption).toBe('conversationReceiptsOn');
+      });
     });
   });
 

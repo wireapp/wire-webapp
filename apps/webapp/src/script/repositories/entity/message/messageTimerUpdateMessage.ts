@@ -35,12 +35,7 @@ export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number | null;
   private readonly userState = container.resolve(UserState);
 
-  constructor(
-    messageTimer: number | null,
-    userId: string | undefined,
-    userDomain: string | undefined,
-    translate: Translate,
-  ) {
+  constructor(messageTimer: number | null, userId: string, userDomain: string | undefined, translate: Translate) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE;
