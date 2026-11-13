@@ -23,6 +23,7 @@ import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {createMeetingPrepPreview} from './createMeetingPrepPreview';
+import {createMeetingPrepSpeakerTest} from './createMeetingPrepSpeakerTest';
 import {MeetingPrepModal} from './meetingPrepModal';
 import {useMeetingPrepConversation} from './useMeetingPrepConversation';
 import {useMeetingPrepJoin} from './useMeetingPrepJoin';
@@ -38,6 +39,10 @@ import {navigate} from '../../../router/Router';
 const openTroubleshooting = (): void => {
   navigate('/preferences/troubleshooting');
 };
+
+const playSpeakerTest = createMeetingPrepSpeakerTest(source => {
+  return new Audio(source);
+});
 
 export const MeetingPrepModalHost: FunctionComponent = () => {
   const participant = container.resolve(UserState).self();
@@ -70,6 +75,7 @@ export const MeetingPrepModalHost: FunctionComponent = () => {
       }
       requestPreviewStream={preview.requestPreviewStream}
       releasePreviewStream={preview.releasePreviewStream}
+      playSpeakerTest={playSpeakerTest}
       joinMeeting={joinMeeting}
     />
   );

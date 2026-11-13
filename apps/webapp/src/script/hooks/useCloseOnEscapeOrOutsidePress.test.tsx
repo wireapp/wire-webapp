@@ -26,13 +26,23 @@ import {useCloseOnEscapeOrOutsidePress} from './useCloseOnEscapeOrOutsidePress';
 interface OverlayProps {
   readonly isOpen: boolean;
   readonly captureEscapeWhenFocused: boolean;
+  readonly closeOnFocusOut?: boolean;
   readonly onEscape: () => void;
   readonly onOutsidePress: () => void;
 }
 
-const Overlay = ({isOpen, captureEscapeWhenFocused, onEscape, onOutsidePress}: OverlayProps): ReactElement => {
+const Overlay = ({
+  isOpen,
+  captureEscapeWhenFocused,
+  closeOnFocusOut = false,
+  onEscape,
+  onOutsidePress,
+}: OverlayProps): ReactElement => {
   const rootRef = useRef<HTMLDivElement>(null);
-  useCloseOnEscapeOrOutsidePress(rootRef, isOpen, onEscape, onOutsidePress, {captureEscapeWhenFocused});
+  useCloseOnEscapeOrOutsidePress(rootRef, isOpen, onEscape, onOutsidePress, {
+    captureEscapeWhenFocused,
+    closeOnFocusOut,
+  });
   return (
     <div ref={rootRef}>
       <button type="button">inside</button>
@@ -99,6 +109,22 @@ describe('useCloseOnEscapeOrOutsidePress', () => {
     fireEvent.mouseDown(screen.getByRole('button', {name: 'outside'}));
 
     expect(onEscape).not.toHaveBeenCalled();
+    expect(onOutsidePress).not.toHaveBeenCalled();
+  });
+
+  it('closes when focus leaves, only when asked to', () => {
+    const {onOutsidePress} = renderOverlay({closeOnFocusOut: true});
+    screen.getByRole('button', {name: 'inside'}).focus();
+    expect(onOutsidePress).not.toHaveBeenCalled();
+
+    screen.getByRole('button', {name: 'outside'}).focus();
+    expect(onOutsidePress).toHaveBeenCalledTimes(1);
+  });
+
+  it('stays open when focus leaves by default, as the in-call security line expects', () => {
+    const {onOutsidePress} = renderOverlay();
+    screen.getByRole('button', {name: 'outside'}).focus();
+
     expect(onOutsidePress).not.toHaveBeenCalled();
   });
 });

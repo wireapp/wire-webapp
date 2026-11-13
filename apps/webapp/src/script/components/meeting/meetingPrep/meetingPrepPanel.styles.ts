@@ -80,19 +80,17 @@ export const meetingPrepPanelTimeStyles: CSSObject = {
   fontVariantNumeric: 'tabular-nums',
 };
 
-export const meetingPrepInviteesStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 10,
-  marginTop: 4,
-  color: 'var(--text-input-placeholder)',
-  fontSize: 14,
-};
-
+// A link with an icon: easy to spot, but with no fill or border it reads as an option, not as a
+// step everyone must take before Join.
 export const meetingPrepLinkButtonStyles: CSSObject = {
+  display: 'inline-flex',
+  alignItems: 'center',
   alignSelf: 'flex-start',
-  padding: 0,
+  gap: 8,
+  margin: '0 0 0 -6px',
+  padding: '4px 6px',
   border: 'none',
+  borderRadius: 6,
   background: 'transparent',
   color: 'var(--accent-color)',
   cursor: 'pointer',
@@ -101,7 +99,7 @@ export const meetingPrepLinkButtonStyles: CSSObject = {
   fontWeight: 600,
 
   '&:hover:not(:disabled)': {
-    textDecoration: 'underline',
+    backgroundColor: 'var(--foreground-fade-8)',
   },
 
   '&:disabled': {
@@ -112,6 +110,17 @@ export const meetingPrepLinkButtonStyles: CSSObject = {
   '&:focus-visible': {
     outline: '2px solid var(--accent-color)',
     outlineOffset: 2,
+  },
+};
+
+export const meetingPrepLinkIconStyles: CSSObject = {
+  width: 16,
+  height: 14,
+  flexShrink: 0,
+
+  // The icon ships with a black fill; it takes the link colour in both themes.
+  path: {
+    fill: 'currentColor',
   },
 };
 

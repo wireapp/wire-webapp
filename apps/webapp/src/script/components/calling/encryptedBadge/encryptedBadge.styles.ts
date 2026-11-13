@@ -19,7 +19,17 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {callSecurityButtonStyles, callSecurityLineStyles} from '../callSecurityLine/callSecurityLine.styles';
+import {
+  callSecurityButtonStyles,
+  callSecurityLineStyles,
+  callSecurityRootStyles,
+} from '../callSecurityLine/callSecurityLine.styles';
+
+// Focusable from script only, so it shows no outline.
+export const encryptedBadgeRootStyles: CSSObject = {
+  ...callSecurityRootStyles,
+  outline: 'none',
+};
 
 /** The size of a status chip. The green room status chip uses it too, so both chips line up. */
 export const chipSizeStyles: CSSObject = {
