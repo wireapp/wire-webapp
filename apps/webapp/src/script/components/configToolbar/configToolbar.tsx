@@ -34,7 +34,6 @@ import {StartupFeatureToggleName, startupFeatureToggleNames} from '../../feature
 import {updateLocationSearchForStartupFeatureToggle} from '../../featureToggles/startupFeatureToggleQueryParameters';
 import {useClickOutside} from '../../hooks/useClickOutside';
 import {useApplicationContext} from '../../page/rootProvider';
-import {isMLSCapableConversation} from '../../repositories/conversation/ConversationSelectors';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
 import {Button} from '../../uiKit/inputs/button/button';
 import {Input} from '../../uiKit/inputs/input/input';
@@ -613,8 +612,7 @@ export function ConfigToolbar(): JSX.Element | null {
       <Button
         disabled={
           debug === undefined ||
-          (ignoredMLSConversation === undefined &&
-            (activeConversation === undefined || !isMLSCapableConversation(activeConversation)))
+          (ignoredMLSConversation === undefined && (activeConversation === undefined || !debug.canIgnoreIncomingMLS()))
         }
         aria-pressed={ignoredMLSConversation !== undefined}
         onClick={() => {

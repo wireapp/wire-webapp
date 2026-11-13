@@ -346,6 +346,11 @@ export class DebugUtil {
     );
   }
 
+  canIgnoreIncomingMLS(): boolean {
+    const conversation = this.conversationState.activeConversation();
+    return conversation !== undefined && isMLSCapableConversation(conversation);
+  }
+
   /** Missed MLS events are discarded permanently. Reloading clears the toggle. */
   setIgnoreIncomingMLS(enabled: boolean): void {
     const notificationService = this.core.service?.notification;
@@ -354,7 +359,7 @@ export class DebugUtil {
     }
 
     const conversation = this.conversationState.activeConversation();
-    if (enabled && (conversation === undefined || !isMLSCapableConversation(conversation))) {
+    if (enabled && !this.canIgnoreIncomingMLS()) {
       throw new Error('Select an MLS conversation first');
     }
 

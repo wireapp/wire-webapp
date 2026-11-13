@@ -51,6 +51,9 @@ describe('ConfigToolbar', () => {
         debug: {
           ignoredMLSConversation,
           setIgnoreIncomingMLS,
+          canIgnoreIncomingMLS: () => {
+            return conversationState.activeConversation() === conversation;
+          },
           isGzippingEnabled: () => {
             return false;
           },
