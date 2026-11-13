@@ -1001,7 +1001,7 @@ describe('ConversationService', () => {
           epoch: 5,
           group_id: mockGroupId,
         } as unknown as Conversation);
-        jest.mocked(conversationService.joinByExternalCommit).mockRejectedValueOnce(new Error('join failed'));
+        jest.spyOn(conversationService, 'joinByExternalCommit').mockRejectedValueOnce(new Error('join failed'));
 
         const result = await conversationService.handleEvent(createMLSMessageAddEventMock(conversationId));
 
