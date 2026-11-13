@@ -27,6 +27,8 @@ export type MeetingPrepSession = {
   readonly meetingStartTime: string;
   /** ISO end time. Only the meetings list passes it today; without it the green room shows the start time alone. */
   readonly meetingEndTime?: string;
+  /** The organizer, when the entry point knows it: the invitee list marks them. */
+  readonly qualifiedOrganizerId?: QualifiedId;
   readonly qualifiedMeetingId: QualifiedId;
   readonly qualifiedConversationId: QualifiedId;
 };

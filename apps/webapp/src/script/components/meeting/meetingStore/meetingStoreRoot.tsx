@@ -144,6 +144,7 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
         useMeetingPrepModal.getState().open({
           meetingTitle: payload.meetingTitle,
           meetingStartTime: payload.meetingStartTime,
+          qualifiedOrganizerId: payload.qualifiedCreator,
           qualifiedMeetingId: payload.qualifiedId,
           qualifiedConversationId: payload.qualifiedConversationId,
         });

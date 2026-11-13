@@ -19,17 +19,13 @@
 
 import {type ReactElement, useCallback, useId, useRef, useState} from 'react';
 
-import {encryptedBadgeButtonStyles} from './encryptedBadge.styles';
+import {encryptedBadgeButtonStyles, encryptedBadgeRootStyles} from './encryptedBadge.styles';
 
 import {useCloseOnEscapeOrOutsidePress} from '../../../hooks/useCloseOnEscapeOrOutsidePress';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {InfoIcon} from '../../../uiKit/dataDisplay/icon/infoIcon';
 import {LockClosedIcon} from '../../../uiKit/dataDisplay/icon/lockClosedIcon';
-import {
-  callSecurityIconStyles,
-  callSecurityLabelStyles,
-  callSecurityRootStyles,
-} from '../callSecurityLine/callSecurityLine.styles';
+import {callSecurityIconStyles, callSecurityLabelStyles} from '../callSecurityLine/callSecurityLine.styles';
 import {EncryptionExplainer} from '../encryptionExplainer/encryptionExplainer';
 
 interface EncryptedBadgeProps {
@@ -60,10 +56,12 @@ export const EncryptedBadge = ({explainerTitle, brandName, supportUrl}: Encrypte
   // The badge sits in the green room modal: with focus in the badge, Escape closes the explainer only.
   useCloseOnEscapeOrOutsidePress(rootRef, isExplainerOpen, closeExplainer, dismissExplainer, {
     captureEscapeWhenFocused: true,
+    closeOnFocusOut: true,
   });
 
   return (
-    <div ref={rootRef} css={callSecurityRootStyles}>
+    // tabIndex -1: a click on the explainer text keeps focus in the badge, so Escape still closes only the explainer.
+    <div ref={rootRef} tabIndex={-1} css={encryptedBadgeRootStyles}>
       <button
         ref={triggerRef}
         type="button"

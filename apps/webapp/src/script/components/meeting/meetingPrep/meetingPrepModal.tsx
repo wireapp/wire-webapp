@@ -22,7 +22,12 @@ import {type FunctionComponent, useCallback, useId, useRef} from 'react';
 import {Maybe, maybe} from 'true-myth';
 
 import {MeetingPrepSurface} from './meetingPrepSurface';
-import {type MeetingPrepDeviceKind, meetingPrepDeviceKinds, type RequestMeetingPrepPreview} from './meetingPrepTypes';
+import {
+  type MeetingPrepDeviceKind,
+  meetingPrepDeviceKinds,
+  type PlayMeetingPrepSpeakerTest,
+  type RequestMeetingPrepPreview,
+} from './meetingPrepTypes';
 import {useMeetingPrepModal} from './useMeetingPrepModal';
 
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
@@ -45,6 +50,7 @@ export type MeetingPrepModalProps = {
   readonly openTroubleshooting: Maybe<() => void>;
   readonly requestPreviewStream: RequestMeetingPrepPreview;
   readonly releasePreviewStream: (stream: MediaStream) => void;
+  readonly playSpeakerTest: PlayMeetingPrepSpeakerTest;
   readonly joinMeeting: (qualifiedConversationId: QualifiedId, media: CallMediaChoice) => Promise<boolean>;
 };
 
@@ -57,6 +63,7 @@ export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
   openTroubleshooting,
   requestPreviewStream,
   releasePreviewStream,
+  playSpeakerTest,
   joinMeeting,
 }: MeetingPrepModalProps) => {
   const {translate} = useApplicationContext();
@@ -125,6 +132,7 @@ export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
           meetingEndTime={Maybe.of(session.value.meetingEndTime)}
           isCallInProgress={isCallInProgress}
           invitees={invitees}
+          organizerId={Maybe.of(session.value.qualifiedOrganizerId)}
           brandName={brandName}
           supportUrl={supportUrl}
           onTestConnection={testConnection}
@@ -144,6 +152,7 @@ export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
           }}
           requestPreviewStream={requestPreviewStream}
           releasePreviewStream={releasePreviewStream}
+          playSpeakerTest={playSpeakerTest}
         />
       )}
     </ModalComponent>

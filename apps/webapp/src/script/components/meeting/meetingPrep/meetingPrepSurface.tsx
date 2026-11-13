@@ -17,25 +17,24 @@
  *
  */
 
-import {type FunctionComponent, type KeyboardEvent, useEffect, useRef, useState} from 'react';
+import {type FunctionComponent, useEffect, useRef, useState} from 'react';
 
 import {JSX} from '@emotion/react/jsx-runtime';
 import {Maybe, maybe} from 'true-myth';
 
+import {MeetingPrepDevices} from './meetingPrepDevices';
 import {getMeetingPrepJoinSentenceKey} from './meetingPrepJoinSentence';
 import {MeetingPrepPanel} from './meetingPrepPanel';
+import {getCameraHealth, getMeetingPrepSetupCallout, getMicrophoneHealth} from './meetingPrepSetup';
 import {
   meetingPrepAvatarStyles,
   meetingPrepBodyStyles,
   meetingPrepCloseButtonStyles,
+  meetingPrepControlsRowStyles,
   meetingPrepControlsStyles,
   meetingPrepControlStyles,
-  meetingPrepDeviceMenuStyles,
   meetingPrepGridStyles,
   meetingPrepHeaderStyles,
-  meetingPrepMenuButtonStyles,
-  meetingPrepMeterRowStyles,
-  meetingPrepMeterStyles,
   meetingPrepNameStyles,
   meetingPrepNoCameraStyles,
   meetingPrepSelfViewStyles,
@@ -48,12 +47,13 @@ import type {
   MeetingPrepJoinChoice,
   MeetingPrepMediaKind,
   MeetingPrepPreviewError,
+  PlayMeetingPrepSpeakerTest,
   RequestMeetingPrepPreview,
 } from './meetingPrepTypes';
 import {meetingPrepDeviceKinds, meetingPrepMediaKinds, meetingPrepPreviewErrors} from './meetingPrepTypes';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {renderNoCameraMessage} from '../../../page/mainContent/panels/preferences/avPreferences/cameraPreferences';
-import {InputLevel} from '../../../page/mainContent/panels/preferences/avPreferences/inputLevel';
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
 import {useMediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
@@ -62,8 +62,7 @@ import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
 import {Avatar, AVATAR_SIZE} from '../../avatar';
 import {groupVideoBackgroundInitializingOverlay} from '../../calling/GroupVideoGridTile.styles';
 import {useShowLoadingOverlay} from '../../calling/useShowLoadingOverlay';
-import {VideoControlsSelect} from '../../calling/VideoControls/VideoControlsSelect/VideoControlsSelect';
-import {CameraIcon, CameraOffIcon, ChevronIcon, MicOffIcon, MicOnIcon} from '../../icon';
+import {CameraIcon, CameraOffIcon, MicOffIcon, MicOnIcon} from '../../icon';
 
 export type MeetingPrepSurfaceProps = {
   /** The id of the meeting title, which names the dialog around the green room. */
@@ -73,6 +72,7 @@ export type MeetingPrepSurfaceProps = {
   readonly meetingEndTime: Maybe<string>;
   readonly isCallInProgress: boolean;
   readonly invitees: readonly User[];
+  readonly organizerId: Maybe<QualifiedId>;
   readonly brandName: string;
   readonly supportUrl?: string;
   readonly onTestConnection: Maybe<() => void>;
@@ -82,26 +82,7 @@ export type MeetingPrepSurfaceProps = {
   readonly onJoin: (choice: MeetingPrepJoinChoice) => void | Promise<void>;
   readonly requestPreviewStream: RequestMeetingPrepPreview;
   readonly releasePreviewStream: (stream: MediaStream) => void;
-};
-
-type DeviceOption = {
-  id: string;
-  label: string;
-};
-
-const toDeviceOptions = (devices: readonly MediaDeviceInfo[]): DeviceOption[] => {
-  return devices.map(device => {
-    return {id: device.deviceId, label: device.label};
-  });
-};
-
-const toSelectDeviceOptions = (
-  devices: readonly MediaDeviceInfo[],
-  suffix = '',
-): (DeviceOption & {value: string})[] => {
-  return toDeviceOptions(devices).map(device => {
-    return {...device, value: `${device.id}${suffix}`};
-  });
+  readonly playSpeakerTest: PlayMeetingPrepSpeakerTest;
 };
 
 type MeetingPrepPreviewState = {
@@ -169,6 +150,7 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
   meetingEndTime,
   isCallInProgress,
   invitees,
+  organizerId,
   brandName,
   supportUrl,
   onTestConnection,
@@ -178,23 +160,22 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
   onJoin,
   requestPreviewStream,
   releasePreviewStream,
+  playSpeakerTest,
 }: MeetingPrepSurfaceProps) => {
   const {translate} = useApplicationContext();
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [microphoneEnabled, setMicrophoneEnabled] = useState(false);
-  const [microphoneMenuOpen, setMicrophoneMenuOpen] = useState(false);
-  const [cameraMenuOpen, setCameraMenuOpen] = useState(false);
-  const microphoneMenuRef = useRef<HTMLDivElement | null>(null);
-  const cameraMenuRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const videoElementRef = useRef<HTMLVideoElement | null>(null);
   const isJoiningRef = useRef(false);
   const reportedCameraPermissionErrorRef = useRef(false);
   const reportedMicrophonePermissionErrorRef = useRef(false);
   const [isJoining, setIsJoining] = useState(false);
-  // Kept after the failed preview clears its error, so the join sentence can still say why the user is muted.
-  // Cleared when the user turns the microphone on again, so the sentence follows the new attempt.
+  // Kept after the failed preview clears its error, so the callout and the row can still say why the
+  // microphone is off. Cleared when the user turns it on again.
   const [microphoneBlocked, setMicrophoneBlocked] = useState(false);
+  // Same for a camera that failed to start, until the user turns it on again or picks another camera.
+  const [cameraUnavailable, setCameraUnavailable] = useState(false);
 
   useEffect(() => {
     closeButtonRef.current?.focus();
@@ -203,23 +184,29 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
   const {
     audioInputDevices,
     audioInputDeviceId,
+    isAudioInputSelectable,
     setAudioInputDeviceId,
     audioOutputDevices,
     audioOutputDeviceId,
+    isAudioOutputSelectable,
     setAudioOutputDeviceId,
     videoInputDevices,
     videoInputDeviceId,
+    isVideoInputSelectable,
     setVideoInputDeviceId,
   } = useMediaDevicesStore(state => {
     return {
       audioInputDevices: state.audio.input.devices,
       audioInputDeviceId: state.audio.input.activeId,
+      isAudioInputSelectable: state.audio.input.supported,
       setAudioInputDeviceId: state.setAudioInputDeviceId,
       audioOutputDevices: state.audio.output.devices,
       audioOutputDeviceId: state.audio.output.activeId,
+      isAudioOutputSelectable: state.audio.output.supported,
       setAudioOutputDeviceId: state.setAudioOutputDeviceId,
       videoInputDevices: state.video.input.devices,
       videoInputDeviceId: state.video.input.activeId,
+      isVideoInputSelectable: state.video.input.supported,
       setVideoInputDeviceId: state.setVideoInputDeviceId,
     };
   });
@@ -237,31 +224,6 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
     requestPreviewStream,
     releasePreviewStream,
   );
-
-  useEffect(() => {
-    if (!microphoneMenuOpen && !cameraMenuOpen) {
-      return undefined;
-    }
-
-    const closeOnOutsidePointer = (event: PointerEvent): void => {
-      const target = event.target;
-      if (!(target instanceof Node)) {
-        return;
-      }
-      const insideMicrophoneMenu = microphoneMenuRef.current?.contains(target) ?? false;
-      const insideCameraMenu = cameraMenuRef.current?.contains(target) ?? false;
-      if (insideMicrophoneMenu || insideCameraMenu) {
-        return;
-      }
-      setMicrophoneMenuOpen(false);
-      setCameraMenuOpen(false);
-    };
-
-    document.addEventListener('pointerdown', closeOnOutsidePointer);
-    return () => {
-      return document.removeEventListener('pointerdown', closeOnOutsidePointer);
-    };
-  }, [cameraMenuOpen, microphoneMenuOpen]);
 
   useEffect(() => {
     const videoElement = videoElementRef.current;
@@ -284,6 +246,9 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
 
     if (maybe.isJust(videoPreview.error)) {
       setCameraEnabled(false);
+      if (videoPreview.error.value === meetingPrepPreviewErrors.requestFailed) {
+        setCameraUnavailable(true);
+      }
       if (cameraPermissionDenied && !reportedCameraPermissionErrorRef.current) {
         reportedCameraPermissionErrorRef.current = true;
         onPermissionDenied(meetingPrepDeviceKinds.camera);
@@ -338,67 +303,16 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
   const meterStream =
     microphoneEnabled && audioStream !== null && audioStream.getAudioTracks().length > 0 ? audioStream : null;
 
-  const audioDeviceValue = [
-    {
-      value: `${audioInputDeviceId}-input`,
-      label:
-        audioInputDevices.find(device => {
-          return device.deviceId === audioInputDeviceId;
-        })?.label ?? '',
-    },
-    {
-      value: `${audioOutputDeviceId}-output`,
-      label:
-        audioOutputDevices.find(device => {
-          return device.deviceId === audioOutputDeviceId;
-        })?.label ?? '',
-    },
-  ];
-
-  const audioDeviceOptions = [
-    {
-      label: translate('videoCallaudioInputMicrophone'),
-      options: toSelectDeviceOptions(audioInputDevices, '-input'),
-    },
-    {
-      label: translate('videoCallaudioOutputSpeaker'),
-      options: toSelectDeviceOptions(audioOutputDevices, '-output'),
-    },
-  ];
-
-  const videoDeviceValue = [
-    {
-      value: videoInputDeviceId,
-      label:
-        videoInputDevices.find(device => {
-          return device.deviceId === videoInputDeviceId;
-        })?.label ?? '',
-    },
-  ];
-
-  const videoDeviceOptions = [
-    {
-      label: translate('videoCallvideoInputCamera'),
-      options: toSelectDeviceOptions(videoInputDevices),
-    },
-  ];
-
-  const selectAudioDevice = (option: {value?: string | number} | null): void => {
-    const value = String(option?.value);
-    const deviceId = value.replace(/-(input|output)$/, '');
-    if (value.endsWith('-input')) {
-      setAudioInputDeviceId(deviceId);
-    }
-    if (value.endsWith('-output')) {
-      setAudioOutputDeviceId(deviceId);
-    }
-    setMicrophoneMenuOpen(false);
-  };
-
-  const selectVideoDevice = (option: {value?: string | number} | null): void => {
-    setVideoInputDeviceId(String(option?.value));
-    setCameraMenuOpen(false);
-  };
+  const microphoneHealth = getMicrophoneHealth({
+    isBlocked: microphoneBlocked,
+    isEnabled: microphoneEnabled,
+    hasStream: meterStream !== null,
+  });
+  const cameraHealth = getCameraHealth({
+    isUnavailable: cameraUnavailable,
+    isEnabled: cameraEnabled,
+    hasStream: maybe.isJust(videoPreview.stream),
+  });
 
   const renderCameraPreview = (): JSX.Element => {
     if (showVideo) {
@@ -425,20 +339,8 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
     );
   };
 
-  const handleKeyDownCapture = (event: KeyboardEvent<HTMLElement>): void => {
-    if (event.key === 'Escape' && (microphoneMenuOpen || cameraMenuOpen)) {
-      event.stopPropagation();
-      setMicrophoneMenuOpen(false);
-      setCameraMenuOpen(false);
-    }
-  };
-
   return (
-    <section
-      css={meetingPrepSurfaceStyles}
-      data-uie-name="meeting-prep-surface"
-      onKeyDownCapture={handleKeyDownCapture}
-    >
+    <section css={meetingPrepSurfaceStyles} data-uie-name="meeting-prep-surface">
       <header css={meetingPrepHeaderStyles}>
         <button
           type="button"
@@ -475,12 +377,9 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
               {cameraEnabled && showCameraPermissionError && renderCameraPreview()}
               <span css={meetingPrepNameStyles}>{participant.name()}</span>
             </div>
-            <div css={meetingPrepMeterRowStyles}>
-              <div css={meetingPrepMeterStyles}>
-                {microphoneEnabled && <InputLevel disabled={meterStream === null} mediaStream={meterStream} />}
-              </div>
+            <div css={meetingPrepControlsRowStyles}>
               <div css={meetingPrepControlsStyles}>
-                <div css={meetingPrepControlStyles} ref={microphoneMenuRef}>
+                <div css={meetingPrepControlStyles}>
                   <button
                     type="button"
                     css={meetingPrepToggleStyles}
@@ -495,87 +394,22 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
                   >
                     {microphoneEnabled ? <MicOnIcon /> : <MicOffIcon />}
                   </button>
-                  <button
-                    type="button"
-                    css={meetingPrepMenuButtonStyles}
-                    aria-expanded={microphoneMenuOpen}
-                    aria-label={translate('videoCallOverlayOpenMicrophoneAndSpeakerOptions')}
-                    onClick={() => {
-                      setCameraMenuOpen(false);
-                      setMicrophoneMenuOpen(open => {
-                        return !open;
-                      });
-                    }}
-                  >
-                    <ChevronIcon />
-                  </button>
-                  {microphoneMenuOpen && (
-                    <div css={meetingPrepDeviceMenuStyles}>
-                      <VideoControlsSelect
-                        value={audioDeviceValue}
-                        id="meeting-prep-audio-devices"
-                        dataUieName="meeting-prep-audio-devices"
-                        options={audioDeviceOptions}
-                        menuIsOpen
-                        overlayMenu={false}
-                        onChange={selectAudioDevice}
-                        onKeyDown={event => {
-                          if (event.key === 'Escape') {
-                            event.stopPropagation();
-                            setMicrophoneMenuOpen(false);
-                          }
-                        }}
-                      />
-                    </div>
-                  )}
                 </div>
-                <div css={meetingPrepControlStyles} ref={cameraMenuRef}>
+                <div css={meetingPrepControlStyles}>
                   <button
                     type="button"
                     css={meetingPrepToggleStyles}
                     aria-pressed={cameraEnabled}
                     aria-label={translate('preferencesAVCamera')}
                     onClick={() => {
-                      return setCameraEnabled(enabled => {
+                      setCameraUnavailable(false);
+                      setCameraEnabled(enabled => {
                         return !enabled;
                       });
                     }}
                   >
                     {cameraEnabled ? <CameraIcon /> : <CameraOffIcon />}
                   </button>
-                  <button
-                    type="button"
-                    css={meetingPrepMenuButtonStyles}
-                    aria-expanded={cameraMenuOpen}
-                    aria-label={translate('videoCallMenuMoreCameraSettings')}
-                    onClick={() => {
-                      setMicrophoneMenuOpen(false);
-                      setCameraMenuOpen(open => {
-                        return !open;
-                      });
-                    }}
-                  >
-                    <ChevronIcon />
-                  </button>
-                  {cameraMenuOpen && (
-                    <div css={meetingPrepDeviceMenuStyles}>
-                      <VideoControlsSelect
-                        value={videoDeviceValue}
-                        id="meeting-prep-video-devices"
-                        dataUieName="meeting-prep-video-devices"
-                        options={videoDeviceOptions}
-                        menuIsOpen
-                        overlayMenu={false}
-                        onChange={selectVideoDevice}
-                        onKeyDown={event => {
-                          if (event.key === 'Escape') {
-                            event.stopPropagation();
-                            setCameraMenuOpen(false);
-                          }
-                        }}
-                      />
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -587,12 +421,44 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
             meetingEndTime={meetingEndTime}
             isCallInProgress={isCallInProgress}
             invitees={invitees}
+            organizerId={organizerId}
+            deviceSection={
+              <MeetingPrepDevices
+                callout={getMeetingPrepSetupCallout({microphone: microphoneHealth, camera: cameraHealth})}
+                microphone={{
+                  devices: audioInputDevices,
+                  selectedId: audioInputDeviceId,
+                  onSelect: setAudioInputDeviceId,
+                  isSelectable: isAudioInputSelectable,
+                }}
+                speaker={{
+                  devices: audioOutputDevices,
+                  selectedId: audioOutputDeviceId,
+                  onSelect: setAudioOutputDeviceId,
+                  isSelectable: isAudioOutputSelectable,
+                }}
+                camera={{
+                  devices: videoInputDevices,
+                  selectedId: videoInputDeviceId,
+                  onSelect: deviceId => {
+                    // Only another camera is a new attempt; picking the failed one again changes nothing.
+                    if (deviceId !== videoInputDeviceId) {
+                      setCameraUnavailable(false);
+                    }
+                    setVideoInputDeviceId(deviceId);
+                  },
+                  isSelectable: isVideoInputSelectable,
+                }}
+                microphoneHealth={microphoneHealth}
+                cameraHealth={cameraHealth}
+                microphoneStream={microphoneHealth === 'working' ? Maybe.of(meterStream) : Maybe.nothing()}
+                playSpeakerTest={playSpeakerTest}
+              />
+            }
             brandName={brandName}
             supportUrl={supportUrl}
             onTestConnection={onTestConnection}
-            joinSentence={translate(
-              getMeetingPrepJoinSentenceKey({microphoneEnabled, cameraEnabled, microphoneBlocked}),
-            )}
+            joinSentence={translate(getMeetingPrepJoinSentenceKey({microphoneEnabled, cameraEnabled}))}
             isJoining={isJoining}
             onJoin={join}
           />
