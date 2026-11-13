@@ -32,12 +32,7 @@ import {User} from '../User';
 export class ReceiptModeUpdateMessage extends SystemMessage {
   private readonly userState = container.resolve(UserState);
 
-  constructor(
-    isReceiptEnabled: boolean,
-    userId: string | undefined,
-    userDomain: string | undefined,
-    translate: Translate,
-  ) {
+  constructor(isReceiptEnabled: boolean, userId: string, userDomain: string | undefined, translate: Translate) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.RECEIPT_MODE_UPDATE;
