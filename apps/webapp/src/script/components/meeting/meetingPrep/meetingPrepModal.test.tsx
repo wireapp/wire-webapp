@@ -19,7 +19,7 @@
 
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
-import {task} from 'true-myth';
+import {Maybe, task} from 'true-myth';
 
 import {User} from '../../../repositories/entity/User';
 import {
@@ -62,7 +62,10 @@ const expectClosed = async (): Promise<void> => {
   });
 };
 
-const renderModal = (joinMeeting: jest.Mock = jest.fn().mockResolvedValue(true)): void => {
+const renderModal = (
+  joinMeeting: jest.Mock = jest.fn().mockResolvedValue(true),
+  openTroubleshooting: Maybe<() => void> = Maybe.nothing(),
+): void => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),
   );
@@ -71,6 +74,10 @@ const renderModal = (joinMeeting: jest.Mock = jest.fn().mockResolvedValue(true))
     <ThemeProvider>
       <MeetingPrepModal
         participant={participant}
+        isCallInProgress={false}
+        invitees={[]}
+        brandName="Wire"
+        openTroubleshooting={openTroubleshooting}
         requestPreviewStream={pendingPreview}
         releasePreviewStream={jest.fn()}
         joinMeeting={joinMeeting}
@@ -143,13 +150,13 @@ describe('MeetingPrepModal', () => {
     expect(screen.queryByRole('heading', {name: 'Design review'})).not.toBeInTheDocument();
   });
 
-  it('closes from Cancel, Escape, and the overlay', async () => {
+  it('closes from the close button, Escape, and the overlay', async () => {
     renderModal();
     act(() => {
       useMeetingPrepModal.getState().open(session);
     });
 
-    fireEvent.click(screen.getByRole('button', {name: 'modalConfirmSecondary'}));
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'}));
     await expectClosed();
 
     act(() => {
@@ -188,7 +195,7 @@ describe('MeetingPrepModal', () => {
     await expectClosed();
   });
 
-  it('ignores Cancel, Escape, and the overlay while the join is still running', async () => {
+  it('ignores close, Escape, and the overlay while the join is still running', async () => {
     let finishJoin: (joined: boolean) => void = () => {
       return undefined;
     };
@@ -207,10 +214,9 @@ describe('MeetingPrepModal', () => {
       expect(joinMeeting).toHaveBeenCalledTimes(1);
     });
 
-    expect(screen.getByRole('button', {name: 'modalConfirmSecondary'})).toBeDisabled();
     expect(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'})).toBeDisabled();
 
-    fireEvent.click(screen.getByRole('button', {name: 'modalConfirmSecondary'}));
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'}));
     const content = screen.getByRole('dialog').firstElementChild;
     if (content === null) {
       throw new Error('Expected modal content element');
@@ -227,7 +233,7 @@ describe('MeetingPrepModal', () => {
     await expectClosed();
   });
 
-  it('allows Cancel again after the join does not start', async () => {
+  it('allows closing again after the join does not start', async () => {
     let finishJoin: (joined: boolean) => void = () => {
       return undefined;
     };
@@ -246,8 +252,8 @@ describe('MeetingPrepModal', () => {
       finishJoin(false);
     });
 
-    expect(screen.getByRole('button', {name: 'modalConfirmSecondary'})).toBeEnabled();
-    fireEvent.click(screen.getByRole('button', {name: 'modalConfirmSecondary'}));
+    expect(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'})).toBeEnabled();
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'}));
     await expectClosed();
   });
 
@@ -264,5 +270,20 @@ describe('MeetingPrepModal', () => {
       expect(joinMeeting).toHaveBeenCalledTimes(1);
     });
     expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
+  });
+
+  it('closes the green room before it opens troubleshooting', async () => {
+    const openTroubleshooting = jest.fn(() => {
+      expect(useMeetingPrepModal.getState().session.isNothing).toBe(true);
+    });
+    renderModal(jest.fn().mockResolvedValue(true), Maybe.just(openTroubleshooting));
+    act(() => {
+      useMeetingPrepModal.getState().open(session);
+    });
+
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.prep.testConnection'}));
+
+    expect(openTroubleshooting).toHaveBeenCalledTimes(1);
+    await expectClosed();
   });
 });

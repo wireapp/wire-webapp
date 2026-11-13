@@ -19,7 +19,7 @@
 
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
-import {task} from 'true-myth';
+import {Maybe, task} from 'true-myth';
 
 import {mediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
 import {User} from '../../../repositories/entity/User';
@@ -41,7 +41,7 @@ import {
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 
 const translateForPrepTest: Translate = (key, substitutions) => {
-  return key === 'meetings.notifications.startsAt' ? `Starts at ${String(substitutions?.time)}` : key;
+  return key === 'meetings.prep.time' ? `${String(substitutions?.date)} at ${String(substitutions?.start)}` : key;
 };
 const participant = new User('self-id', 'example.com', translateForPrepTest);
 participant.name('Ada');
@@ -88,8 +88,14 @@ const renderSurface = (
   render(
     <ThemeProvider>
       <MeetingPrepSurface
+        titleId="meeting-prep-title"
         meetingTitle="Design review"
         meetingStartTime={meetingStartTime}
+        meetingEndTime={Maybe.nothing()}
+        isCallInProgress={false}
+        invitees={[]}
+        brandName="Wire"
+        onTestConnection={Maybe.nothing()}
         participant={participant}
         onCancel={onCancel}
         onPermissionDenied={onPermissionDenied}
@@ -122,16 +128,15 @@ describe('MeetingPrepSurface', () => {
 
     expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
     expect(screen.getByText('Ada')).toBeInTheDocument();
-    expect(screen.getByText(/Starts at /)).toBeInTheDocument();
+    expect(screen.getByTestId('meeting-prep-time')).toHaveTextContent(/^Mon 1 June at \d{1,2}:00/);
   });
 
-  it('leaves without joining from Cancel and from close', () => {
+  it('leaves without joining from close', () => {
     const {onCancel, onJoin} = renderSurface();
 
-    fireEvent.click(screen.getByRole('button', {name: 'modalConfirmSecondary'}));
     fireEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'}));
 
-    expect(onCancel).toHaveBeenCalledTimes(2);
+    expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onJoin).not.toHaveBeenCalled();
   });
 
@@ -259,6 +264,36 @@ describe('MeetingPrepSurface', () => {
 
     fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
     expect(onJoin).toHaveBeenCalledWith({cameraEnabled: false, microphoneEnabled: false});
+  });
+
+  it('says the browser blocks the microphone until the user turns it on again', async () => {
+    const onPermissionDenied = jest.fn();
+    const requestPreviewStream: RequestMeetingPrepPreview = request => {
+      return request.mediaKind === meetingPrepMediaKinds.audio
+        ? task.tryOrElse(
+            () => {
+              return meetingPrepPreviewErrors.microphonePermissionDenied;
+            },
+            () => {
+              return Promise.reject(new Error('microphone permission denied'));
+            },
+          )
+        : pendingPreview(request);
+    };
+
+    renderSurface({onPermissionDenied, requestPreviewStream});
+    expect(screen.getByTestId('meeting-prep-join-sentence')).toHaveTextContent('meetings.prep.joinMuted');
+
+    fireEvent.click(screen.getByRole('button', {name: 'preferencesAVMicrophone'}));
+    await waitFor(() => {
+      expect(onPermissionDenied).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.getByTestId('meeting-prep-join-sentence')).toHaveTextContent(
+      'meetings.prep.joinMicrophoneBlockedCameraOff',
+    );
+
+    fireEvent.click(screen.getByRole('button', {name: 'preferencesAVMicrophone'}));
+    expect(screen.getByTestId('meeting-prep-join-sentence')).toHaveTextContent('meetings.prep.joinMicrophoneOnly');
   });
 
   it('reports a microphone permission failure after enabling the microphone', async () => {
