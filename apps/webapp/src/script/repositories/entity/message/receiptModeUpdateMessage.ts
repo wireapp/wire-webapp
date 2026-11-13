@@ -18,21 +18,34 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {container} from 'tsyringe';
 
+import {UserState} from 'Repositories/user/userState';
 import {type Translate} from 'Util/localizerUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {SystemMessage} from './systemMessage';
 
 import {SystemMessageType} from '../../../message/systemMessageType';
+import {User} from '../User';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
-  constructor(isReceiptEnabled: boolean, translate: Translate) {
+  private readonly userState = container.resolve(UserState);
+
+  constructor(isReceiptEnabled: boolean, userId: string, userDomain: string | undefined, translate: Translate) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.RECEIPT_MODE_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
 
-    this.caption = getCaption(isReceiptEnabled, this.user().isMe, this.translate);
+    if (userId) {
+      this.from = userId;
+      this.fromDomain = userDomain;
+      this.user(new User(userId, userDomain ?? '', this.translate));
+    }
+
+    const isSelfUser = !!userId && matchQualifiedIds(this.user().qualifiedId, this.userState.self()?.qualifiedId);
+    this.caption = getCaption(isReceiptEnabled, isSelfUser, this.translate);
   }
 }
 
