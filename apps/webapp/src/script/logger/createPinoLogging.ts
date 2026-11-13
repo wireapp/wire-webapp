@@ -39,6 +39,10 @@ type Logging = {
   readonly configure: (dependencies: Maybe<LoggingDependencies>) => void;
 };
 
+const maximumNamespaceConfigurationLength = 4096;
+const maximumNamespaceRuleCount = 64;
+const maximumNamespacePatternLength = 256;
+
 function compileNamespacePattern(pattern: string): NamespaceRule['matches'] {
   const segments = pattern.split('*');
 
@@ -69,16 +73,16 @@ function compileNamespacePattern(pattern: string): NamespaceRule['matches'] {
 
 function compileNamespaces(namespaces: string): readonly NamespaceRule[] {
   // Reject the entire configuration rather than accidentally dropping an exclusion.
-  if (namespaces.length > 4096 || /\p{Cc}/u.test(namespaces)) {
+  if (namespaces.length > maximumNamespaceConfigurationLength || /\p{Cc}/u.test(namespaces)) {
     return [];
   }
   const patterns = namespaces.split(',').map(namespace => {
     return namespace.trim();
   });
   if (
-    patterns.length > 64 ||
+    patterns.length > maximumNamespaceRuleCount ||
     patterns.some(pattern => {
-      return pattern === '-' || pattern.length > 256;
+      return pattern === '-' || pattern.length > maximumNamespacePatternLength;
     })
   ) {
     return [];
