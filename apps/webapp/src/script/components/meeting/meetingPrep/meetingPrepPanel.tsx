@@ -17,17 +17,18 @@
  *
  */
 
-import {type ReactElement, useEffect, useState} from 'react';
+import {type ReactElement, type ReactNode, useEffect, useState} from 'react';
 
 import {type Maybe, maybe} from 'true-myth';
 import {match} from 'ts-pattern';
 
+import {MeetingPrepInvitees} from './meetingPrepInvitees';
 import {
   meetingPrepChipsStyles,
-  meetingPrepInviteesStyles,
   meetingPrepJoinSentenceStyles,
   meetingPrepJoinStyles,
   meetingPrepLinkButtonStyles,
+  meetingPrepLinkIconStyles,
   meetingPrepLiveDotStyles,
   meetingPrepPanelStyles,
   meetingPrepPanelTimeStyles,
@@ -36,12 +37,13 @@ import {
 } from './meetingPrepPanel.styles';
 import {getMeetingPrepStatus, getMillisecondsUntilStatusChange} from './meetingPrepStatus';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {formatLocale} from '../../../util/timeUtil';
-import {StackedAvatars} from '../../avatar';
 import {EncryptedBadge} from '../../calling/encryptedBadge/encryptedBadge';
+import {NetworkIcon} from '../../icon';
 
 /** One person invited is the user alone: the row says nothing then. */
 const MINIMUM_INVITEES_SHOWN = 2;
@@ -53,6 +55,9 @@ interface MeetingPrepPanelProps {
   readonly meetingEndTime: Maybe<string>;
   readonly isCallInProgress: boolean;
   readonly invitees: readonly User[];
+  readonly organizerId: Maybe<QualifiedId>;
+  /** The setup callout and device rows, built by the surface that owns the devices. */
+  readonly deviceSection: ReactNode;
   readonly brandName: string;
   readonly supportUrl?: string;
   readonly onTestConnection: Maybe<() => void>;
@@ -72,6 +77,8 @@ export const MeetingPrepPanel = ({
   meetingEndTime,
   isCallInProgress,
   invitees,
+  organizerId,
+  deviceSection,
   brandName,
   supportUrl,
   onTestConnection,
@@ -153,11 +160,10 @@ export const MeetingPrepPanel = ({
       </div>
 
       {invitees.length >= MINIMUM_INVITEES_SHOWN && (
-        <div css={meetingPrepInviteesStyles} data-uie-name="meeting-prep-invitees">
-          <StackedAvatars participants={[...invitees]} dataUieName="meeting-prep-invitees-avatars" />
-          <span>{translate('meetings.prep.invited', {count: invitees.length})}</span>
-        </div>
+        <MeetingPrepInvitees invitees={invitees} organizerId={organizerId} />
       )}
+
+      {deviceSection}
 
       {maybe.isJust(onTestConnection) && (
         <button
@@ -167,6 +173,8 @@ export const MeetingPrepPanel = ({
           disabled={isJoining}
           data-uie-name="meeting-prep-test-connection"
         >
+          {/* The Troubleshooting icon from the preferences, where the link leads. */}
+          <NetworkIcon css={meetingPrepLinkIconStyles} aria-hidden="true" />
           {translate('meetings.prep.testConnection')}
         </button>
       )}
