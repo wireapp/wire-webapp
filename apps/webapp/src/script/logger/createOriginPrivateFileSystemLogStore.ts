@@ -18,7 +18,7 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import {isNull, isObject, isSafeInteger} from '@sindresorhus/is';
+import {isNull, isObject, isSafeInteger, isUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
 import {logDirectoryName, type LogPersistenceConfiguration} from './logPersistenceConfiguration';
@@ -48,6 +48,8 @@ export type OriginPrivateFileSystemLogStoreOptions = {
   readonly getDirectory: () => Promise<LogDirectory>;
   readonly clock: Pick<Clock, 'currentUnixEpochMilliseconds'>;
   readonly sessionIdentifier: string;
+  // A stable digest of the authenticated qualified account ID; absent before authentication.
+  readonly accountIdentifier?: string;
   readonly configuration: LogPersistenceConfiguration;
 };
 
@@ -72,7 +74,7 @@ type LogFileRetentionOptions = {
 const newlineByte = 10;
 
 // Only files owned by this version participate in retention. Never recurse into directories.
-const logFilenamePattern = /^log-(\d+)-([a-f0-9-]{36})-(\d+)\.jsonl$/u;
+const logFilenamePattern = /^log-(\d+)-([a-f0-9-]{36})-(\d+)(?:-account-[a-f0-9]{64})?\.jsonl$/u;
 
 function shouldRemoveLogFile(options: LogFileRetentionOptions): boolean {
   const {file, currentTimeMilliseconds, totalStoredBytes, incomingBatchBytes, configuration} = options;
@@ -155,10 +157,16 @@ async function listLogFiles(directory: LogDirectory): Promise<readonly StoredLog
 }
 
 export function createOriginPrivateFileSystemLogStore(options: OriginPrivateFileSystemLogStoreOptions): LogStore {
-  const {getDirectory, clock, sessionIdentifier, configuration} = options;
+  const {getDirectory, clock, sessionIdentifier, accountIdentifier, configuration} = options;
   if (!/^[a-f0-9-]{36}$/u.test(sessionIdentifier)) {
     throw new Error('Invalid log session identifier');
   }
+
+  if (!isUndefined(accountIdentifier) && !/^[a-f0-9]{64}$/u.test(accountIdentifier)) {
+    throw new Error('Invalid log account identifier');
+  }
+
+  const accountFilenameSuffix = isUndefined(accountIdentifier) ? '' : `-account-${accountIdentifier}`;
 
   let activeFilename: Maybe<string> = Maybe.nothing();
   let sequence = 0;
@@ -223,7 +231,9 @@ export function createOriginPrivateFileSystemLogStore(options: OriginPrivateFile
     if (activeFile.isNothing || activeFile.value.sizeBytes + batchBytes > configuration.maximumFileBytes) {
       // Previous sessions may end with interrupted bytes; never reopen them for appending.
       sequence += 1;
-      activeFilename = Maybe.just(`log-${nowMilliseconds}-${sessionIdentifier}-${sequence}.jsonl`);
+      activeFilename = Maybe.just(
+        `log-${nowMilliseconds}-${sessionIdentifier}-${sequence}${accountFilenameSuffix}.jsonl`,
+      );
       activeFile = Maybe.nothing();
     }
 

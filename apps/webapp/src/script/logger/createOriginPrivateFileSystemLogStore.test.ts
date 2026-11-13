@@ -189,6 +189,7 @@ type TestStoreOptions = {
   readonly storage: ReturnType<typeof createTestDirectory>;
   readonly configuration?: LogPersistenceConfiguration;
   readonly sessionIdentifier?: string;
+  readonly accountIdentifier?: string;
   readonly clock?: ReturnType<typeof createTestClock>;
 };
 
@@ -197,6 +198,7 @@ function createStoreForTest(options: TestStoreOptions): ReturnType<typeof create
     storage,
     configuration = logPersistenceConfiguration,
     sessionIdentifier = firstSessionIdentifier,
+    accountIdentifier,
     clock = createTestClock(),
   } = options;
 
@@ -206,11 +208,143 @@ function createStoreForTest(options: TestStoreOptions): ReturnType<typeof create
     },
     clock,
     sessionIdentifier,
+    accountIdentifier,
     configuration,
   });
 }
 
 describe('worker synchronous Origin Private File System log store', () => {
+  it('generates distinct filenames for unattributed and account-specific writers', async () => {
+    const storage = createTestDirectory();
+    const firstAccountIdentifier = 'a'.repeat(64);
+    const secondAccountIdentifier = 'b'.repeat(64);
+    const legacyFilename = `log-999999-${secondSessionIdentifier}-1.jsonl`;
+    storage.files.set(legacyFilename, encode('{"legacy":true}\n'));
+    const preAuthenticationWriter = createStoreForTest({storage});
+    const firstAccountWriter = createStoreForTest({storage, accountIdentifier: firstAccountIdentifier});
+    const secondAccountWriter = createStoreForTest({storage, accountIdentifier: secondAccountIdentifier});
+
+    await preAuthenticationWriter.append(['{"preAuthentication":true}\n']);
+    await firstAccountWriter.append(['{"firstAccount":true}\n']);
+    await secondAccountWriter.append(['{"secondAccount":true}\n']);
+
+    expect([...storage.files.keys()]).toEqual([
+      legacyFilename,
+      `log-1000000-${firstSessionIdentifier}-1.jsonl`,
+      `log-1000000-${firstSessionIdentifier}-1-account-${firstAccountIdentifier}.jsonl`,
+      `log-1000000-${firstSessionIdentifier}-1-account-${secondAccountIdentifier}.jsonl`,
+    ]);
+    expect(readLogFileContents(storage)).toEqual([
+      '{"legacy":true}\n',
+      '{"preAuthentication":true}\n',
+      '{"firstAccount":true}\n',
+      '{"secondAccount":true}\n',
+    ]);
+  });
+
+  it('preserves account logs across writer restarts without reopening the previous session file', async () => {
+    const storage = createTestDirectory();
+    const accountIdentifier = 'a'.repeat(64);
+    const firstWriter = createStoreForTest({storage, accountIdentifier});
+    await firstWriter.append(['{"firstSession":true}\n']);
+    const secondWriter = createStoreForTest({storage, accountIdentifier, sessionIdentifier: secondSessionIdentifier});
+
+    await secondWriter.append(['{"secondSession":true}\n']);
+
+    expect([...storage.files.keys()]).toEqual([
+      `log-1000000-${firstSessionIdentifier}-1-account-${accountIdentifier}.jsonl`,
+      `log-1000000-${secondSessionIdentifier}-1-account-${accountIdentifier}.jsonl`,
+    ]);
+    expect(readLogFileContents(storage)).toEqual(['{"firstSession":true}\n', '{"secondSession":true}\n']);
+  });
+
+  it('shares the retention budget across account, pre-authentication and legacy files', async () => {
+    const storage = createTestDirectory();
+    const firstAccountIdentifier = 'a'.repeat(64);
+    const secondAccountIdentifier = 'b'.repeat(64);
+    const configuration = {...logPersistenceConfiguration, maximumTotalBytes: 6};
+    storage.files.set(`log-999999-${firstSessionIdentifier}-1.jsonl`, encode('{}\n'));
+    const firstWriter = createStoreForTest({storage, configuration, accountIdentifier: firstAccountIdentifier});
+    await firstWriter.append(['[]\n']);
+    const secondWriter = createStoreForTest({storage, configuration, accountIdentifier: secondAccountIdentifier});
+
+    await secondWriter.append(['42\n']);
+
+    expect([...storage.files.keys()]).toEqual([
+      `log-1000000-${firstSessionIdentifier}-1-account-${firstAccountIdentifier}.jsonl`,
+      `log-1000000-${firstSessionIdentifier}-1-account-${secondAccountIdentifier}.jsonl`,
+    ]);
+    expect(readLogFileContents(storage)).toEqual(['[]\n', '42\n']);
+  });
+
+  it('reuses and rotates account-specific files while preserving their filename suffix', async () => {
+    const storage = createTestDirectory();
+    const accountIdentifier = 'a'.repeat(64);
+    const writer = createStoreForTest({
+      storage,
+      accountIdentifier,
+      configuration: {...logPersistenceConfiguration, maximumFileBytes: 6},
+    });
+
+    await writer.append(['{}\n']);
+    await writer.append(['[]\n']);
+
+    expect([...storage.files.keys()]).toEqual([
+      `log-1000000-${firstSessionIdentifier}-1-account-${accountIdentifier}.jsonl`,
+    ]);
+
+    await writer.append(['42\n']);
+
+    expect([...storage.files.keys()]).toEqual([
+      `log-1000000-${firstSessionIdentifier}-1-account-${accountIdentifier}.jsonl`,
+      `log-1000000-${firstSessionIdentifier}-2-account-${accountIdentifier}.jsonl`,
+    ]);
+    expect(readLogFileContents(storage)).toEqual(['{}\n[]\n', '42\n']);
+  });
+
+  it('recognizes legacy and account-specific files for expiration while ignoring malformed account suffixes', async () => {
+    const storage = createTestDirectory();
+    const filenamePrefix = `log-0-${firstSessionIdentifier}-1`;
+    const accountIdentifier = 'a'.repeat(64);
+    const unrelatedFilenames = [
+      `${filenamePrefix}-account-${'a'.repeat(63)}.jsonl`,
+      `${filenamePrefix}-account-${'A'.repeat(64)}.jsonl`,
+      `${filenamePrefix}-account-${'g'.repeat(64)}.jsonl`,
+      `${filenamePrefix}-account-${accountIdentifier}.jsonl.backup`,
+    ];
+    storage.files.set(`${filenamePrefix}.jsonl`, encode('{}\n'));
+    storage.files.set(`${filenamePrefix}-account-${accountIdentifier}.jsonl`, encode('[]\n'));
+    for (const filename of unrelatedFilenames) {
+      storage.files.set(filename, encode('preserve this'));
+    }
+    const writer = createStoreForTest({
+      storage,
+      configuration: {...logPersistenceConfiguration, maximumAgeMilliseconds: 1000},
+    });
+
+    await writer.append([]);
+
+    expect([...storage.files.keys()]).toEqual(unrelatedFilenames);
+    expect(readLogFileContents(storage)).toEqual(
+      unrelatedFilenames.map(() => {
+        return 'preserve this';
+      }),
+    );
+  });
+
+  it.each(['', '../another-account', 'a'.repeat(63), 'a'.repeat(65), 'g'.repeat(64), 'A'.repeat(64)])(
+    'rejects invalid account identifiers before accessing storage: %s',
+    accountIdentifier => {
+      const storage = createTestDirectory();
+
+      expect(() => {
+        return createStoreForTest({storage, accountIdentifier});
+      }).toThrow('Invalid log account identifier');
+      expect(storage.files.size).toBe(0);
+      expect(storage.state.closeCount).toBe(0);
+    },
+  );
+
   it('writes exact JSONL, flushes once per batch, closes handles, and survives reinitialization', async () => {
     const storage = createTestDirectory();
     const firstWriter = createStoreForTest({storage});
