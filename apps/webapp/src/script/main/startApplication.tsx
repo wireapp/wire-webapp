@@ -54,6 +54,7 @@ import {StorageKey} from '../repositories/storage';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {translate} from '../util/localizerUtil';
+import {getStorage} from '../util/localStorage';
 import {getLogger} from '../util/logger';
 import {enableLogging} from '../logger/enableLogging';
 import {loadValue} from '../util/storageUtil';
@@ -72,12 +73,6 @@ export async function startApplication(
   });
 
   const clock = createClock();
-  enableLogging({
-    clock,
-    consoleOutput: console,
-    locationSearch: window.location.search,
-    configureLogging,
-  });
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const fireAndForgetInvoker = createFireAndForgetInvoker({
@@ -107,6 +102,14 @@ export async function startApplication(
 
   const domContentLoadedAtMonotonicMicroseconds = await documentContentLoaded;
   const config = Config.getConfig();
+  enableLogging({
+    clock,
+    consoleOutput: console,
+    locationSearch: window.location.search,
+    debugEnabled: config.FEATURE.ENABLE_DEBUG,
+    storage: Maybe.of(getStorage()),
+    configureLogging,
+  });
   const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
     fetchBuildMetadata: globalThis.fetch.bind(globalThis),
   });

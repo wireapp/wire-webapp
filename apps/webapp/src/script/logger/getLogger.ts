@@ -19,13 +19,13 @@
 
 import {Maybe} from 'true-myth';
 
+import {createPinoLogging, type LoggingDependencies} from './createPinoLogging';
 import type {Logger} from './logger';
-import {createLogging, type LoggingDependencies} from './structuredLogger';
 
 export type {LogAttributes, Logger} from './logger';
 
 // Startup supplies effects explicitly; previously created component loggers share this configuration.
-const logging = createLogging(Maybe.nothing());
+const logging = createPinoLogging(Maybe.nothing());
 
 export function configureLogging(dependencies: Maybe<LoggingDependencies>): void {
   logging.configure(dependencies);

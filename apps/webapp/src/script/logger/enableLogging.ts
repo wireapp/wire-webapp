@@ -20,26 +20,42 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
-import {createConsoleLogSink, type ConsoleLogOutput} from './consoleLogSink';
-import type {LoggingDependencies} from './structuredLogger';
+import type {LoggingDependencies} from './createPinoLogging';
+import {createConsoleOutput, type ConsoleLogOutput} from './logOutput';
 
 type EnableLoggingOptions = {
   readonly clock: LoggingDependencies['clock'];
   readonly consoleOutput: ConsoleLogOutput;
   readonly locationSearch: string;
+  readonly debugEnabled: boolean;
+  readonly storage: Maybe<Pick<Storage, 'setItem' | 'removeItem'>>;
   readonly configureLogging: (dependencies: Maybe<LoggingDependencies>) => void;
 };
 
 export function enableLogging(options: EnableLoggingOptions): void {
-  const {clock, consoleOutput, locationSearch, configureLogging} = options;
+  const {clock, consoleOutput, locationSearch, debugEnabled, storage, configureLogging} = options;
   const namespace = new URLSearchParams(locationSearch).get('enableLogging');
-  const namespaces = isNonEmptyString(namespace) ? Maybe.just(namespace) : Maybe.nothing<string>();
+  const defaultNamespaces = debugEnabled ? Maybe.just('*') : Maybe.nothing<string>();
+  const namespaces = isNonEmptyString(namespace) ? Maybe.just(namespace) : defaultNamespaces;
 
   configureLogging(
     Maybe.just({
       clock,
-      sinks: [createConsoleLogSink({output: consoleOutput})],
+      output: createConsoleOutput(consoleOutput),
       namespaces,
     }),
   );
+
+  // Preserve main's debug storage setting for reloads and the separate redux-logdown consumer.
+  try {
+    if (storage.isJust) {
+      if (namespaces.isJust) {
+        storage.value.setItem('debug', namespaces.value);
+      } else {
+        storage.value.removeItem('debug');
+      }
+    }
+  } catch {
+    // Logging configuration must also work when storage is unavailable.
+  }
 }

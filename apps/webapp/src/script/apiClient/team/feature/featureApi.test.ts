@@ -20,7 +20,7 @@
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {Maybe} from 'true-myth';
 
-import {createConsoleLogSink} from '../../../logger/consoleLogSink';
+import {createConsoleOutput} from '../../../logger/logOutput';
 import {configureLogging, type Logger} from '../../../logger/getLogger';
 
 import {HttpClient} from '../../http';
@@ -38,8 +38,8 @@ function withFeatureLoggingTest(testBody: (output: FeatureConsoleOutput) => Prom
       configureLogging(
         Maybe.just({
           clock,
-          sinks: [createConsoleLogSink({output})],
-          namespaces: Maybe.nothing<string>(),
+          output: createConsoleOutput(output),
+          namespaces: Maybe.just('*'),
         }),
       );
       await testBody(output);

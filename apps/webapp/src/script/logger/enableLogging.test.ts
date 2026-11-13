@@ -20,116 +20,95 @@
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {Maybe} from 'true-myth';
 
+import {createPinoLogging} from './createPinoLogging';
 import {enableLogging} from './enableLogging';
 
-import type {Logger} from './logger';
-import {createLogging} from './structuredLogger';
-
-type LoggingTestEnvironment = {
-  readonly logging: ReturnType<typeof createLogging>;
-  readonly output: Record<keyof Logger, jest.Mock<void, unknown[]>>;
-  readonly enableLoggingForSearch: (locationSearch: string) => void;
-};
-
-function withLoggingTest(testBody: (environment: LoggingTestEnvironment) => void): () => void {
-  function runLoggingTest(): void {
-    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 1234000n});
-    const logging = createLogging(Maybe.nothing());
+describe('logging startup', () => {
+  it.each([
+    {search: '', debugEnabled: false, expected: Maybe.nothing<string>(), calls: 0},
+    {search: '', debugEnabled: true, expected: Maybe.just('*'), calls: 1},
+    {search: '?enableLogging=', debugEnabled: false, expected: Maybe.nothing<string>(), calls: 0},
+    {search: '?enableLogging=', debugEnabled: true, expected: Maybe.just('*'), calls: 1},
+    {
+      search: '?enableLogging=@wireapp/*,-@wireapp/core/*',
+      debugEnabled: true,
+      expected: Maybe.just('@wireapp/*,-@wireapp/core/*'),
+      calls: 1,
+    },
+    {search: '?enableLogging=-*', debugEnabled: true, expected: Maybe.just('-*'), calls: 0},
+  ])('restores main enablement: $search with ENABLE_DEBUG=$debugEnabled', testCase => {
+    const {search, debugEnabled, expected, calls} = testCase;
+    const storedValues = new Map<string, string>([['debug', 'old namespace']]);
+    const storage = {
+      setItem(key: string, value: string): void {
+        storedValues.set(key, value);
+      },
+      removeItem(key: string): void {
+        storedValues.delete(key);
+      },
+    };
     const output = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+    const logging = createPinoLogging(Maybe.nothing());
+    const logger = logging.getLogger('@wireapp/webapp/Startup');
 
-    function enableLoggingForSearch(locationSearch: string): void {
+    enableLogging({
+      clock: createDeterministicClock({initialUnixEpochMicroseconds: 1000n}),
+      consoleOutput: output,
+      locationSearch: search,
+      debugEnabled,
+      storage: Maybe.just(storage),
+      configureLogging: logging.configure,
+    });
+    logger.debug('Startup');
+    logging.getLogger('@wireapp/core/Account').info('Excluded core');
+
+    expect(Maybe.of(storedValues.get('debug'))).toEqual(expected);
+    expect(output.debug).toHaveBeenCalledTimes(calls);
+    if (search.includes('-@wireapp/core')) {
+      expect(output.info).not.toHaveBeenCalled();
+    }
+  });
+
+  it('applies URL enablement when debug mode is off and storage is unavailable', () => {
+    const output = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+    const logging = createPinoLogging(Maybe.nothing());
+    enableLogging({
+      clock: createDeterministicClock({initialUnixEpochMicroseconds: 1000n}),
+      consoleOutput: output,
+      locationSearch: '?enableLogging=*',
+      debugEnabled: false,
+      storage: Maybe.nothing(),
+      configureLogging: logging.configure,
+    });
+
+    logging.getLogger('component').debug('Enabled');
+
+    expect(output.debug).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not let storage failures interrupt startup or disable configured logging', () => {
+    const output = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+    const logging = createPinoLogging(Maybe.nothing());
+    const storage = {
+      setItem(): never {
+        throw new Error('Storage unavailable');
+      },
+      removeItem(): never {
+        throw new Error('Storage unavailable');
+      },
+    };
+
+    expect(() => {
       enableLogging({
-        clock,
+        clock: createDeterministicClock({initialUnixEpochMicroseconds: 1000n}),
         consoleOutput: output,
-        locationSearch,
+        locationSearch: '',
+        debugEnabled: true,
+        storage: Maybe.just(storage),
         configureLogging: logging.configure,
       });
-    }
-
-    try {
-      testBody({logging, output, enableLoggingForSearch});
-    } finally {
-      logging.configure(Maybe.nothing());
-    }
-  }
-
-  return runLoggingTest;
-}
-
-describe('enableLogging', () => {
-  it(
-    'enables all namespaces by default using only injected dependencies',
-    withLoggingTest(environment => {
-      const {logging, output, enableLoggingForSearch} = environment;
-      enableLoggingForSearch('');
-
-      logging.getLogger('@wireapp/webapp/Startup').info('Application enabled');
-      logging.getLogger('@wireapp/core/Account').debug('Core enabled');
-
-      expect(JSON.parse(String(output.info.mock.calls[0]?.[0]))).toEqual({
-        level: 30,
-        time: 1234,
-        component: '@wireapp/webapp/Startup',
-        msg: 'Application enabled',
-      });
-      expect(JSON.parse(String(output.debug.mock.calls[0]?.[0]))).toEqual({
-        level: 20,
-        time: 1234,
-        component: '@wireapp/core/Account',
-        msg: 'Core enabled',
-      });
-    }),
-  );
-
-  it(
-    'applies URL namespace filters and exclusions to previously created loggers',
-    withLoggingTest(environment => {
-      const {logging, output, enableLoggingForSearch} = environment;
-      const logger = logging.getLogger('@wireapp/webapp/Startup');
-      const excludedLogger = logging.getLogger('@wireapp/core/Account');
-
-      enableLoggingForSearch('?enableLogging=@wireapp/*,-@wireapp/core/*');
-      logger.info('Startup enabled');
-      excludedLogger.info('Excluded');
-
-      expect(output.info).toHaveBeenCalledTimes(1);
-      expect(JSON.parse(String(output.info.mock.calls[0]?.[0]))).toEqual(
-        expect.objectContaining({
-          component: '@wireapp/webapp/Startup',
-          msg: 'Startup enabled',
-        }),
-      );
-
-      enableLoggingForSearch('?enableLogging=-*');
-      logger.info('Disabled');
-      expect(output.info).toHaveBeenCalledTimes(1);
-    }),
-  );
-
-  it(
-    'keeps logging enabled for an empty URL filter',
-    withLoggingTest(environment => {
-      const {logging, output, enableLoggingForSearch} = environment;
-      enableLoggingForSearch('?enableLogging=');
-
-      logging.getLogger('component').error('Default output');
-
-      expect(output.error).toHaveBeenCalledTimes(1);
-    }),
-  );
-
-  it(
-    'can restore default logging after a namespace exclusion',
-    withLoggingTest(environment => {
-      const {logging, output, enableLoggingForSearch} = environment;
-      const logger = logging.getLogger('component');
-      enableLoggingForSearch('?enableLogging=-*');
-      logger.info('Excluded');
-      enableLoggingForSearch('');
-      logger.info('Enabled');
-
-      expect(output.info).toHaveBeenCalledTimes(1);
-      expect(JSON.parse(String(output.info.mock.calls[0]?.[0]))).toEqual(expect.objectContaining({msg: 'Enabled'}));
-    }),
-  );
+    }).not.toThrow();
+    logging.getLogger('component').debug('Enabled');
+    expect(output.debug).toHaveBeenCalledTimes(1);
+  });
 });

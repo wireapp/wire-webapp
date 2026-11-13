@@ -52,6 +52,7 @@ import {Core} from '../service/coreSingleton';
 import {initializeDataDog} from '../util/dataDog';
 import {translate} from '../util/localizerUtil';
 import type {Translate} from '../util/localizerUtil';
+import {getStorage} from '../util/localStorage';
 import {supportsMLS} from '../util/util';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
@@ -75,6 +76,8 @@ const startAuthApp = (): void => {
     clock,
     consoleOutput: console,
     locationSearch: window.location.search,
+    debugEnabled: config.FEATURE.ENABLE_DEBUG,
+    storage: Maybe.of(getStorage()),
     configureLogging,
   });
 
