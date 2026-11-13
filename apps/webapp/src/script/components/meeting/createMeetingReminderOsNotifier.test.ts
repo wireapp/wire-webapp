@@ -25,6 +25,7 @@ import {isUndefined} from '@sindresorhus/is';
 
 import {createFactory} from '@enormora/objectory';
 import {Maybe, result} from 'true-myth';
+import {Availability} from '@wireapp/protocol-messaging';
 
 import type {MeetingReminderFirePayload} from './createMeetingReminderScheduler';
 import type {Translate} from '../../util/localizerUtil';
@@ -86,6 +87,9 @@ const createNotifierWithFakeNotificationApi = (
   currentReminderPayload: CreateMeetingReminderOsNotifierDependencies['currentReminderPayload'] = payload => {
     return Maybe.just(payload);
   },
+  getAvailability: CreateMeetingReminderOsNotifierDependencies['getAvailability'] = () => {
+    return Availability.Type.AVAILABLE;
+  },
 ): CreateNotifierWithFakeNotificationApiResult => {
   const requests: SystemNotificationRequest[] = [];
   const closedTags: string[] = [];
@@ -119,6 +123,7 @@ const createNotifierWithFakeNotificationApi = (
     openMeetingsList,
     openMeetingPrep,
     currentReminderPayload,
+    getAvailability,
     formatMeetingTime,
     translate,
     logger,
@@ -128,6 +133,20 @@ const createNotifierWithFakeNotificationApi = (
 };
 
 describe('createMeetingReminderOsNotifier', () => {
+  it('checks current availability when each reminder fires', () => {
+    let availability = Availability.Type.AWAY;
+    const {requests, notifier} = createNotifierWithFakeNotificationApi({}, undefined, () => {
+      return availability;
+    });
+
+    notifier.notify(meetingReminderFirePayloadFactory.build());
+    expect(requests).toEqual([]);
+
+    availability = Availability.Type.AVAILABLE;
+    notifier.notify(meetingReminderFirePayloadFactory.build({meetingStartTime: '2026-06-08T10:00:00.000Z'}));
+    expect(requests).toHaveLength(1);
+  });
+
   it('presents a notification requiring interaction and naming the meeting and its start time', () => {
     const {requests, notifier} = createNotifierWithFakeNotificationApi();
 

@@ -34,8 +34,9 @@ import {
   type ByRoleOptions,
 } from '@testing-library/react';
 import {amplify} from 'amplify';
-import {task} from 'true-myth';
+import {result, task} from 'true-myth';
 import {container} from 'tsyringe';
+import {Availability} from '@wireapp/protocol-messaging';
 
 import {useMeetingStore} from './meetingStoreProvider';
 import {
@@ -46,6 +47,8 @@ import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {UserState} from '../../../repositories/user/userState';
 import {Config} from '../../../Config';
+import * as browserNotificationApi from '../../../browser/notification/createSystemNotificationApiFromBrowserNotification';
+import type {SystemNotificationRequest} from '../../../notification/systemNotificationTypes';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -122,6 +125,7 @@ type RenderParameters = {
   readonly isMeetingsFeatureEnabled?: boolean;
   readonly apiVersion?: number;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
+  readonly initialAvailability?: Availability.Type;
 };
 
 type RenderMeetingStoreRootResult = {
@@ -256,10 +260,13 @@ const renderMeetingStoreRoot = ({
   isMeetingsFeatureEnabled = true,
   apiVersion = Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION,
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+  initialAvailability = Availability.Type.AVAILABLE,
 }: RenderParameters = {}): RenderMeetingStoreRootResult => {
   setMeetingsTeamFeature(isMeetingsFeatureEnabled ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED);
   setNegotiatedApiVersion(apiVersion);
-  container.resolve(UserState).self(new User(selfUserId.id, selfUserId.domain, translateForTest));
+  const selfUser = new User(selfUserId.id, selfUserId.domain, translateForTest);
+  selfUser.availability(initialAvailability);
+  container.resolve(UserState).self(selfUser);
 
   const mainViewModel = {
     content: {
@@ -295,6 +302,7 @@ const getRenderedMeetingTitles = (): string => {
 
 describe('MeetingStoreRoot', () => {
   afterEach(() => {
+    jest.restoreAllMocks();
     useMeetingNotificationStore.getState().clearNotifications();
     act(() => {
       container.resolve(TeamState).teamFeatures(undefined);
@@ -694,6 +702,60 @@ describe('MeetingStoreRoot', () => {
       }),
     ]);
   });
+
+  it.each([
+    {availability: Availability.Type.AWAY, expectedToasts: 0},
+    {availability: Availability.Type.AVAILABLE, expectedToasts: 1},
+  ])(
+    'shows the in-app reminder and $expectedToasts OS toasts when availability is $availability',
+    async ({availability, expectedToasts}) => {
+      const requests: SystemNotificationRequest[] = [];
+      jest.spyOn(browserNotificationApi, 'createBrowserSystemNotificationApi').mockReturnValue({
+        isSupported: () => {
+          return true;
+        },
+        getPermission: () => {
+          return 'granted';
+        },
+        requestPermission: async () => {
+          return 'granted';
+        },
+        show: request => {
+          requests.push(request);
+          return result.ok({
+            close: () => {
+              return result.ok(undefined);
+            },
+          });
+        },
+      });
+      const clock = createDeterministicClock({
+        initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-16T09:49:00.000Z')) * 1_000n,
+      });
+      renderMeetingStoreRoot({clock, initialAvailability: availability});
+
+      await waitFor(() => {
+        expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+      });
+
+      act(() => {
+        clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+      });
+
+      expect(useMeetingNotificationStore.getState().notifications).toEqual([
+        expect.objectContaining({kind: MeetingNotificationKind.REMINDER, meetingTitle: 'Weekly sync'}),
+      ]);
+      expect(requests).toHaveLength(expectedToasts);
+
+      if (availability === Availability.Type.AWAY) {
+        act(() => {
+          container.resolve(UserState).self().availability(Availability.Type.AVAILABLE);
+          clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+        });
+        expect(requests).toHaveLength(0);
+      }
+    },
+  );
 
   it('shows the T-10 reminder for a meeting the signed-in user created', async () => {
     const clock = createDeterministicClock({

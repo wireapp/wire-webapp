@@ -131,6 +131,9 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
     });
     const reminderOsNotifier = createMeetingReminderOsNotifier({
       notificationApi: createBrowserSystemNotificationApi(),
+      getAvailability: () => {
+        return container.resolve(UserState).self().availability();
+      },
       openMeetingsList: () => {
         return mainViewModel.list.openMeetingsList();
       },

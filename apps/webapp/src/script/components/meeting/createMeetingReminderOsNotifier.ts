@@ -19,6 +19,8 @@
 
 import {Maybe, maybe, result} from 'true-myth';
 
+import {Availability} from '@wireapp/protocol-messaging';
+
 import type {MeetingReminderFirePayload} from './createMeetingReminderScheduler';
 import {toMeetingIdKey} from './utils/toMeetingIdKey';
 
@@ -39,6 +41,7 @@ export type CreateMeetingReminderOsNotifierDependencies = {
   openMeetingsList: () => void;
   openMeetingPrep: (payload: MeetingReminderFirePayload) => void;
   currentReminderPayload: (payload: MeetingReminderFirePayload) => Maybe<MeetingReminderFirePayload>;
+  getAvailability: () => Availability.Type;
   formatMeetingTime: (meetingStartTime: string) => string;
   translate: Translate;
   logger: MeetingReminderOsNotifierLogger;
@@ -68,6 +71,7 @@ export const createMeetingReminderOsNotifier = ({
   openMeetingsList,
   openMeetingPrep,
   currentReminderPayload,
+  getAvailability,
   formatMeetingTime,
   translate,
   logger,
@@ -103,6 +107,11 @@ export const createMeetingReminderOsNotifier = ({
 
   return {
     notify: payload => {
+      if (getAvailability() === Availability.Type.AWAY) {
+        logger.info('skipping meeting reminder OS notification because user is away');
+        return;
+      }
+
       if (!notificationApi.isSupported()) {
         logger.info('skipping meeting reminder OS notification because notifications are unsupported');
         return;
