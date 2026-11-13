@@ -22,7 +22,18 @@ lint-file-names:
 lint-duplication:
     jscpd --config ./jscpd.json .
 
-# Check LESS formatting and Stylelint rules from the webapp workspace.
+# Reject circular imports outside the explicitly reviewed baseline.
+[group('lint')]
+lint-dependencies *dependencyCruiserArguments:
+    depcruise --config dependency-cruiser.config.mjs --ignore-known .dependency-cruiser-known-violations.json apps tools '*.js' '*.mjs' '*.cjs' "$@"
+
+# Write every existing cycle and its dependency path to a standalone HTML report.
+[group('lint')]
+report-dependencies:
+    mkdir -p target/reports/dependencies
+    just lint-dependencies --no-ignore-known --output-type err-html --output-to target/reports/dependencies/circular-dependencies.html
+
+# Check LESS formatting and Stylelint rules from the webapp source directory.
 [group('lint')]
 stylesheet-lint:
     cd apps/webapp && prettier --ignore-path ../../.prettierignore --check "**/*.less" && stylelint --ignore-path .gitignore "**/*.less"
@@ -33,9 +44,9 @@ stylesheet-lint:
 eslint fix="false":
     eslint . --config eslint.config.mjs --max-warnings=279 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
 
-# Run all repository lint checks, including ESLint, Prettier, Stylelint, and duplication.
+# Run all repository lint checks, including circular dependencies.
 [group('lint')]
-lint: eslint format-check stylesheet-lint lint-duplication
+lint: eslint format-check stylesheet-lint lint-duplication lint-dependencies
 
 # Check changed files with Prettier against BASE_REF and HEAD_REF.
 [group('format')]
@@ -62,6 +73,7 @@ type-check:
     tsc --project ./apps/webapp/tsconfig.rspack.json
     tsc --project ./apps/server/tsconfig.build.json --noEmit
     tsc --project ./apps/server/tsconfig.type-check.json
+    tsc --project ./apps/server/tsconfig.rspack.json
     tsc --project ./apps/server/bin/tsconfig.json
     tsc --project ./apps/webapp/tsconfig.api-client.json
     tsc --project ./apps/webapp/tsconfig.commons.json
@@ -74,21 +86,38 @@ build-server:
     tsc --project apps/server/tsconfig.build.json --outDir apps/server/build/server
     WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/server node apps/server/bin/copy_server_assets.js
 
+# Type-check and bundle the production server with its runtime assets.
+[group('build')]
+build-server-bundle:
+    tsc --project apps/server/tsconfig.build.json --noEmit
+    rspack build --config apps/server/rspack.config.mts --json=apps/server/build/server-bundle-stats.json
+    WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/bundle node apps/server/bin/copy_server_assets.js --bundle
+
+# Assemble the bundle with an existing webapp build and its shared metadata.
+[group('build')]
+assemble-server-bundle variant="public": build-server-bundle
+    node apps/server/bin/assembleBuild.mts {{variant}} artifact
+
+# Start the assembled bundle outside the repository with no installed packages.
+[group('testing')]
+verify-server-bundle:
+    node tools/serverPackaging/verifyServerBundle.mts
+
 # Build the internal production webapp with Rspack.
 [group('build')]
 build-webapp-internal:
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    cd apps/webapp && PATH="node_modules/.bin:$PATH" WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal rspack build --config rspack.config.mts
+    cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal rspack build --config rspack.config.mts
 
 # Build and assemble the internal server deployment artifact as a ZIP.
 [group('build')]
-package-server-internal: build-server build-webapp-internal
+package-server-internal: build-server-bundle build-webapp-internal
     node apps/server/bin/assembleBuild.mts internal artifact
     node tools/serverPackaging/zip.js
 
 # Build, verify, and package the public server deployment artifact as a ZIP.
 [group('build')]
-package-server-public: build-server build-webapp-public
+package-server-public: build-server-bundle build-webapp-public
     node apps/server/bin/assembleBuild.mts public artifact
     node tools/buildArtifact/verifyPublicProductionBundle.ts
     node tools/serverPackaging/zip.js
@@ -97,13 +126,13 @@ package-server-public: build-server build-webapp-public
 [group('build')]
 build-webapp-development:
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    cd apps/webapp && PATH="node_modules/.bin:$PATH" WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development rspack build --config rspack.config.dev.mts
+    cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development rspack build --config rspack.config.dev.mts
 
 # Build the public production webapp with Rspack.
 [group('build')]
 build-webapp-public:
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    cd apps/webapp && PATH="node_modules/.bin:$PATH" WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public rspack build --config rspack.config.public.mts
+    cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public rspack build --config rspack.config.public.mts
 
 # Prepare compiled server output for local development with its runtime assets.
 [group('development')]
@@ -207,7 +236,7 @@ translate-download:
 validate-build-artifact:
     node tools/buildArtifact/validateBuildArtifact.mts
 
-# Start the extracted ZIP with only lockfile-pinned server production dependencies.
+# Start the extracted ZIP outside the repository with no installed packages.
 [group('testing')]
 verify-server-package:
     node tools/serverPackaging/verifyServerPackage.mts

@@ -37,3 +37,5 @@ export type {
 } from './mlsRecoveryOrchestrator';
 export {MlsRecoveryOrchestratorImpl, minimalDefaultPolicies, OperationName} from './mlsRecoveryOrchestrator';
 export {MlsEpochRecoveryDeferredError} from './mlsEpochRecoveryDeferredError';
+export {MlsBufferedMessageRecoveryRequiredError} from './mlsBufferedMessageRecoveryRequiredError';
+export {BufferedMlsMessageRecoveryTracker} from './bufferedMlsMessageRecoveryTracker';

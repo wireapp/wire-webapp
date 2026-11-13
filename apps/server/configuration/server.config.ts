@@ -21,10 +21,12 @@ import fs from 'fs-extra';
 import logdown from 'logdown';
 import path from 'path';
 
+import {serverRuntimeDirectory} from '../serverRuntimeDirectory';
+
 import type {ConfigGeneratorParams} from './config.types';
 import type {Env} from './env';
 
-const ROBOTS_DIR = path.join(__dirname, 'robots');
+const ROBOTS_DIR = path.join(serverRuntimeDirectory, 'configuration', 'robots');
 const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');
 const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robots-disallow.txt');
 

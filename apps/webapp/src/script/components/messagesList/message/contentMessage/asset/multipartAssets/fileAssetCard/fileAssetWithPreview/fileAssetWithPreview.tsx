@@ -17,13 +17,11 @@
  *
  */
 
-import {CSSProperties, useState, type FunctionComponent} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {
-  contentWrapperStyles,
   errorIconStyles,
   errorTextStyles,
-  imageStyles,
   infoOverlayStyles,
   infoWrapperStyles,
   loaderIconStyles,
@@ -89,8 +87,12 @@ export const FileAssetWithPreview: FunctionComponent<FileAssetWithPreviewProps> 
         {!isError && <FileAssetOptions id={id} src={src} name={name} extension={extension} onOpen={showModal} />}
       </FileCard.Header>
       <FileCard.Content>
-        <button
-          css={contentWrapperStyles}
+        <FileCard.Preview
+          src={imagePreviewUrl}
+          imageVisible={isImageLoaded && hasImagePreview}
+          onImageLoad={() => {
+            return setIsImageLoaded(true);
+          }}
           onClick={() => {
             return showModal();
           }}
@@ -100,16 +102,6 @@ export const FileAssetWithPreview: FunctionComponent<FileAssetWithPreviewProps> 
           aria-expanded={isOpen}
           disabled={isError}
         >
-          <img
-            src={imagePreviewUrl}
-            style={{'--opacity': isImageLoaded && hasImagePreview ? 1 : 0} as CSSProperties}
-            alt=""
-            css={imageStyles}
-            onLoad={() => {
-              return setIsImageLoaded(true);
-            }}
-          />
-
           <div css={infoOverlayStyles}>
             <div css={infoWrapperStyles}>
               {shouldDisplayLoading && <div className="icon-spinner spin" css={loaderIconStyles} />}
@@ -123,7 +115,7 @@ export const FileAssetWithPreview: FunctionComponent<FileAssetWithPreviewProps> 
               )}
             </div>
           </div>
-        </button>
+        </FileCard.Preview>
       </FileCard.Content>
       <FilePreviewModal
         id={id}

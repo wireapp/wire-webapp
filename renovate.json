@@ -44,6 +44,12 @@
       "groupName": "webapp app configuration"
     },
     {
+      "description": "Keep browser Ky on 1.x while release tooling retains its existing Ky 2 error API",
+      "matchPackageNames": ["ky"],
+      "matchDepNames": ["ky"],
+      "allowedVersions": "<2"
+    },
+    {
       "matchManagers": ["github-actions"],
       "groupName": "github actions"
     },
@@ -155,6 +161,11 @@
       "description": "Keep emoji-picker-react on 4.16.1 because later versions change emoji data and runtime aliases used by Wire",
       "matchPackageNames": ["emoji-picker-react"],
       "allowedVersions": "4.16.1"
+    },
+    {
+      "description": "Keep libsodium-sumo pinned until WPB-29987 resolves the cross-platform backup regression",
+      "matchPackageNames": ["libsodium-sumo"],
+      "enabled": false
     }
   ]
 }

@@ -21,6 +21,12 @@ import {Result} from 'true-myth';
 import {parseRspackSmokeServerOptions} from './rspackSmokeServerOptions';
 
 describe('parseRspackSmokeServerOptions', () => {
+  it('parses the development build variant and port', () => {
+    const actualOptions = parseRspackSmokeServerOptions(['--variant', 'development', '--port', '4175']);
+
+    expect(actualOptions).toEqual(Result.ok({buildVariant: 'development', port: 4175}));
+  });
+
   it('parses the internal build variant and port', () => {
     const actualOptions = parseRspackSmokeServerOptions(['--variant', 'internal', '--port', '4173']);
 

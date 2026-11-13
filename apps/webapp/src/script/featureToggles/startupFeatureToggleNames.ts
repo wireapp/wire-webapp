@@ -18,30 +18,31 @@
  */
 
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
-export const callSecurityLineFeatureToggleName = 'call-security-line';
 export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
 export const forTestsOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
-export const driveBulkActionsFeatureToggleName = 'drive-bulk-actions';
 export const driveBulkRestoreFeatureToggleName = 'drive-bulk-restore';
 export const markAsUnreadFeatureToggleName = 'mark-as-unread';
 export const troubleshooterFeatureToggleName = 'troubleshooter';
 
 export const sendCallLogsFeatureToggleName = 'send-call-logs';
 export const minimizeSelfViewFeatureToggleName = 'minimize-self-view';
+export const e2ePdfPreviewFeatureToggleName = 'e2e-pdf-preview';
+export const persistentBrowserLogsFeatureToggleName = 'persistent-browser-logs';
 
 export const startupFeatureToggleRegistry = [
   {name: applockRefactoredFeatureToggleName, previewDefaultEnabled: false},
-  {name: callSecurityLineFeatureToggleName, previewDefaultEnabled: false},
   {name: conversationListCollapseFeatureToggleName, previewDefaultEnabled: false},
   {name: forTestsOnlyFeatureToggleName, previewDefaultEnabled: false},
   {name: disableMessagePreprocessingFeatureToggleName, previewDefaultEnabled: false},
-  {name: driveBulkActionsFeatureToggleName, previewDefaultEnabled: true},
   {name: driveBulkRestoreFeatureToggleName, previewDefaultEnabled: false},
   {name: markAsUnreadFeatureToggleName, previewDefaultEnabled: true},
   {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},
   {name: sendCallLogsFeatureToggleName, previewDefaultEnabled: false},
   {name: minimizeSelfViewFeatureToggleName, previewDefaultEnabled: false},
+  {name: e2ePdfPreviewFeatureToggleName, previewDefaultEnabled: true},
+  // Origin storage is unencrypted and survives logout/account changes; keep persistence explicitly opt-in.
+  {name: persistentBrowserLogsFeatureToggleName, previewDefaultEnabled: false},
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleRegistry)[number]['name'];

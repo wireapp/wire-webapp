@@ -220,7 +220,7 @@ export class BackgroundEffectsController {
   }
 
   public setMode(mode: EffectMode): void {
-    this.logger.info('Background effects mode', mode);
+    this.logger.info('Background effects mode', {mode});
     const renderFlags = modeToRenderFlags(mode, this.options.blurStrength, this.options.bgBlurRadius);
     this.options = {...this.options, mode, ...renderFlags};
     this.pushOptionsUpdate();
@@ -245,7 +245,7 @@ export class BackgroundEffectsController {
           return this.applyImageBitmap(bitmap, url);
         })
         .catch((error: unknown) => {
-          return this.logger.warn('Failed to set background image', error);
+          return this.logger.warn('Failed to set background image', {error});
         });
       return;
     }
@@ -256,7 +256,7 @@ export class BackgroundEffectsController {
   }
 
   public async setQuality(quality: QualityMode): Promise<void> {
-    this.logger.info('setQuality', quality);
+    this.logger.info('setQuality', {quality});
 
     this.qualityMode = quality;
 
@@ -386,7 +386,7 @@ export class BackgroundEffectsController {
       await this.inputTrack.applyConstraints(mediaConstraints);
       return newQualityTier;
     } catch (error: unknown) {
-      this.logger.warn('Failed to change resolution', error);
+      this.logger.warn('Failed to change resolution', {error});
       return this.maxQualityTier;
     }
   }
@@ -418,7 +418,7 @@ export class BackgroundEffectsController {
       return;
     }
 
-    this.logger.log(`onPerformanceSample: qualityController.update from: ${currentQualityTier} to ${tier.tier}`);
+    this.logger.info(`onPerformanceSample: qualityController.update from: ${currentQualityTier} to ${tier.tier}`);
     await this.applyQualityTier(tier.tier);
   }
 }

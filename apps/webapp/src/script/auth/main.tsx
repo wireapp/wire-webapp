@@ -21,7 +21,8 @@ import {FunctionComponent} from 'react';
 
 import {createClock} from '@enormora/clock/clock';
 import type {Clock} from '@enormora/clock/clock';
-import {isNull} from '@sindresorhus/is';
+import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isFunction, isNull} from '@sindresorhus/is';
 // Polyfill "Object.entries" & "Object.values"
 import 'core-js/full/object';
 import 'core-js/full/reflect';
@@ -42,15 +43,20 @@ import {
 } from '../browser/coreCryptoSupport';
 import {Runtime} from '../commons/util/Runtime';
 import {Config} from '../Config';
+import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
+import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
+import {enableLogging} from '../logger/enableLogging';
+import {configureLogging} from '../logger/getLogger';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {initializeDataDog} from '../util/dataDog';
 import {translate} from '../util/localizerUtil';
 import type {Translate} from '../util/localizerUtil';
-import {enableLogging} from '../util/loggerUtil';
+import {getStorage} from '../util/localStorage';
+import {getLogger} from '../util/logger';
 import {supportsMLS} from '../util/util';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
@@ -69,8 +75,54 @@ const mainId = 'main';
 const startAuthApp = (): void => {
   exposeWrapperGlobals();
   const config = Config.getConfig();
-  enableLogging(config);
+  const clock = createClock();
+  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
+  const persistentLogging = enableLogging({
+    clock,
+    consoleOutput: console,
+    locationSearch: window.location.search,
+    debugEnabled: config.FEATURE.ENABLE_DEBUG,
+    storage: Maybe.of(getStorage()),
+    configureLogging,
+    startupFeatureToggles,
+    isElectron: Runtime.isElectron(),
+    createPersistenceOutput() {
+      return createBrowserLogPersistence({
+        clock,
+        lifecycle: {
+          isHidden() {
+            return document.visibilityState === 'hidden';
+          },
+          subscribeToVisibilityChanges(listener) {
+            document.addEventListener('visibilitychange', listener);
 
+            return function unsubscribe() {
+              document.removeEventListener('visibilitychange', listener);
+            };
+          },
+        },
+        createWorker() {
+          if (!isFunction(globalThis.Worker)) {
+            return Maybe.nothing();
+          }
+
+          return Maybe.just(
+            createLogWorkerConnection(
+              new Worker(new URL('../logger/browserLogPersistenceWorker.ts', import.meta.url), {
+                name: 'browser-log-persistence',
+              }),
+            ),
+          );
+        },
+      });
+    },
+  });
+  const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
+  const fireAndForgetInvoker = createFireAndForgetInvoker({
+    reportError(error) {
+      fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', {error});
+    },
+  });
   const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
   if (enforceDesktopApplication) {
     window.location.replace(`${window.location.origin}/unsupported`);
@@ -93,10 +145,12 @@ const startAuthApp = (): void => {
     return;
   }
 
-  const clock = createClock();
   const apiClient = new APIClient({clock});
   function disposeAuthenticationClient(): void {
     apiClient.dispose();
+    if (persistentLogging.isJust) {
+      fireAndForgetInvoker.fireAndForget(persistentLogging.value.dispose);
+    }
   }
 
   globalThis.addEventListener('unload', disposeAuthenticationClient);
@@ -124,6 +178,7 @@ const startAuthApp = (): void => {
     if (isNull(container)) {
       throw new Error(`No container '${mainId}' found to render application`);
     }
+
     createRoot(container).render(
       <Provider store={store}>
         <Component translate={translate} clock={clock} />
@@ -138,7 +193,7 @@ const startAuthApp = (): void => {
     setAppLocale();
   };
 
-  void runApp();
+  fireAndForgetInvoker.fireAndForget(runApp);
 };
 
 startAuthApp();

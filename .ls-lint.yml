@@ -1,13 +1,47 @@
 ls:
   tools:
     .dir: camelCase
+  apps/webapp/src/script/commons:
+    # Keep exact legacy names without allowing new PascalCase modules.
+    .*: camelCase
+    .ts: camelCase
+    .*.ts: camelCase
+    .*.*.ts: camelCase
+  apps/webapp/src/script/commons/TypedEventEmitter:
+    .*: camelCase
+    .ts: camelCase | regex:TypedEventEmitter
+    .*.ts: camelCase
+    .*.*.ts: camelCase
+  apps/webapp/src/script/logger:
+    .ts: camelCase
+    .test.ts: camelCase
+    .*.*.ts: camelCase
+  apps/webapp/src/script/commons/config:
+    .*: camelCase
+    .ts: camelCase | regex:CommonConfig
+    .*.ts: camelCase
+    .*.*.ts: camelCase
+  apps/webapp/src/script/commons/util:
+    .*: camelCase
+    .ts: camelCase | regex:(AccentColor|ArrayUtil|DateUtil|RandomUtil|Runtime|StringUtil|TimeUtil|TypeUtil|UrlUtil|ValidationUtil)
+    .*.ts: camelCase | regex:(ArrayUtil|DateUtil|RandomUtil|Runtime|StringUtil|TypeUtil|UrlUtil|ValidationUtil)
+    .*.*.ts: camelCase
+  apps/webapp/src/script/commons/test/helpers:
+    .*: camelCase
+    .js: camelCase | regex:ExceptionHandler
   apps/webapp/src/script/commons/base64:
+    .*: camelCase
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+    .*.ts: camelCase
+    .*.*.ts: camelCase
   apps/webapp/src/script/commons/base64/test:
+    .*: camelCase
     .dir: camelCase
     .ts: camelCase
+    .*.ts: camelCase
+    .*.*.ts: camelCase
     .json: camelCase
   tools/{buildArtifact,releaseCli,releaseGithub,releaseMetadata}:
     .ts: camelCase

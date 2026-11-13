@@ -19,7 +19,6 @@
 
 import {
   applockRefactoredFeatureToggleName,
-  driveBulkActionsFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
   markAsUnreadFeatureToggleName,
   minimizeSelfViewFeatureToggleName,
@@ -53,7 +52,7 @@ describe('selectDefaultEnabledStartupFeatureToggleNames', () => {
   });
 
   it('preserves existing defaults without adding duplicate Edge defaults', () => {
-    const defaults = [minimizeSelfViewFeatureToggleName, driveBulkActionsFeatureToggleName] as const;
+    const defaults = [minimizeSelfViewFeatureToggleName, markAsUnreadFeatureToggleName] as const;
 
     expect(
       selectDefaultEnabledStartupFeatureToggleNames({
@@ -64,7 +63,7 @@ describe('selectDefaultEnabledStartupFeatureToggleNames', () => {
   });
 
   it('preserves existing defaults for an invalid application base URL', () => {
-    const defaults = [driveBulkActionsFeatureToggleName] as const;
+    const defaults = [markAsUnreadFeatureToggleName] as const;
 
     expect(
       selectDefaultEnabledStartupFeatureToggleNames({
@@ -118,10 +117,6 @@ describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
 
     expect(previewDefaultEnabledStartupFeatureToggleNames).toEqual(expectedDefaultNames);
     expect(startupFeatureToggleNames).toEqual(expect.arrayContaining(previewDefaultEnabledStartupFeatureToggleNames));
-  });
-
-  it('enables Drive bulk actions by default in preview builds', () => {
-    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(driveBulkActionsFeatureToggleName);
   });
 
   it('keeps Drive bulk restore disabled by default in preview builds', () => {

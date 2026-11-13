@@ -19,7 +19,7 @@
 
 import {createClock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isNull, isUndefined} from '@sindresorhus/is';
+import {isFunction, isNull, isUndefined} from '@sindresorhus/is';
 import 'core-js/full/reflect';
 
 import {ClientType} from '../apiClient/client/clientType';
@@ -28,6 +28,7 @@ import {createRoot} from 'react-dom/client';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
+import {configureLogging} from '../logger/getLogger';
 import {Runtime} from '../commons/util/Runtime';
 
 import {createApplicationServices} from './createApplicationServices';
@@ -56,8 +57,10 @@ import {StorageKey} from '../repositories/storage';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {translate} from '../util/localizerUtil';
+import {getStorage} from '../util/localStorage';
 import {getLogger} from '../util/logger';
-import {enableLogging} from '../util/loggerUtil';
+import {enableLogging} from '../logger/enableLogging';
+import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {loadValue} from '../util/storageUtil';
 import {supportsMLS} from '../util/util';
 import {exposeWrapperGlobals} from '../util/wrapper';
@@ -79,10 +82,52 @@ export async function startApplication(
 
   const clock = createClock();
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
+  const config = Config.getConfig();
+  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
+  const persistentLogging = enableLogging({
+    clock,
+    consoleOutput: console,
+    locationSearch: window.location.search,
+    debugEnabled: config.FEATURE.ENABLE_DEBUG,
+    storage: Maybe.of(getStorage()),
+    configureLogging,
+    startupFeatureToggles,
+    isElectron: Runtime.isElectron(),
+    createPersistenceOutput() {
+      return createBrowserLogPersistence({
+        clock,
+        lifecycle: {
+          isHidden() {
+            return document.visibilityState === 'hidden';
+          },
+          subscribeToVisibilityChanges(listener) {
+            document.addEventListener('visibilitychange', listener);
+
+            return function unsubscribe() {
+              document.removeEventListener('visibilitychange', listener);
+            };
+          },
+        },
+        createWorker() {
+          if (!isFunction(globalThis.Worker)) {
+            return Maybe.nothing();
+          }
+
+          return Maybe.just(
+            createLogWorkerConnection(
+              new Worker(new URL('../logger/browserLogPersistenceWorker.ts', import.meta.url), {
+                name: 'browser-log-persistence',
+              }),
+            ),
+          );
+        },
+      });
+    },
+  });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const fireAndForgetInvoker = createFireAndForgetInvoker({
     reportError(error) {
-      fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
+      fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', {error});
     },
   });
   const documentContentLoaded = waitForDocumentContentLoaded({
@@ -113,7 +158,6 @@ export async function startApplication(
     return globalThis.navigator.onLine;
   }
 
-  enableLogging(config);
   exposeWrapperGlobals();
 
   const appContainer = document.getElementById('wire-app');
@@ -152,7 +196,6 @@ export async function startApplication(
     return doSimpleRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
   }
 
-  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
   const applicationServices = createApplicationServices({
     createApplicationObservability() {
       return createApplicationObservabilityFromConfig(config);
@@ -191,6 +234,9 @@ export async function startApplication(
   function disposeApplicationResources(): void {
     using disposableApiClient = apiClient;
     cleanupIncrementalHttpRetryBackoffReset();
+    if (persistentLogging.isJust) {
+      fireAndForgetInvoker.fireAndForget(persistentLogging.value.dispose);
+    }
   }
 
   globalThis.addEventListener('unload', disposeApplicationResources);

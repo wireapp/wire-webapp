@@ -239,13 +239,10 @@ jobs:
           # Retain this legacy artifact prefix so previous release runs remain repairable.
           distribution_artifact_name="release-cloud-distribution-context-${RELEASE_VERSION}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           distribution_context_directory="${RUNNER_TEMP}/${distribution_artifact_name}"
-          mkdir -p \
-            "${distribution_context_directory}/apps/server" \
-            "${distribution_context_directory}/bin"
+          mkdir -p "${distribution_context_directory}/apps/server"
 
-          cp -a package.json .npmrc run.sh .env.defaults "${distribution_context_directory}/"
-          cp -a package-lock.json "${distribution_context_directory}/package-lock.json"
-          cp -a apps/server/Dockerfile apps/server/package.json "${distribution_context_directory}/apps/server/"
+          cp -a run.sh .env.defaults "${distribution_context_directory}/"
+          cp -a apps/server/Dockerfile "${distribution_context_directory}/apps/server/"
           cp -a apps/server/dist "${distribution_context_directory}/apps/server/dist"
 
           jq -n \

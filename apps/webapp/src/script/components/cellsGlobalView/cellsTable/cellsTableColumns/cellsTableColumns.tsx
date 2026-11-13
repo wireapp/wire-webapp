@@ -36,7 +36,6 @@ import {CellsTableTagsColumn} from './cellsTableTagsColumn/cellsTableTagsColumn'
 import type {RootContextValue} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {CellNode} from '../../../../types/cellNode';
-import {CellsSelectionCheckbox} from '../../../cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
 import {CellsSortDirection} from '../../../conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
 import {CellsTableSortableHeader} from '../../../conversation/conversationCells/common/cellsTableSortableHeader/cellsTableSortableHeader';
 import {CellsSortField} from '../../../conversation/conversationCells/common/useCellsSorting/useCellsSorting';
@@ -97,43 +96,16 @@ export const getCellsTableColumns = ({
   getDirectionFor,
   isSortingEnabled,
   onToggleSort,
-  selectedNodeIds,
-  onToggleSelection,
-  selectionEnabled,
 }: {
   cellsRepository: CellsRepository;
   translate: RootContextValue['translate'];
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
   isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
-  selectedNodeIds: Set<string>;
-  onToggleSelection: (nodeId: string, isSelected: boolean) => void;
-  selectionEnabled: boolean;
 }): GetCellsTableColumnsResult => {
   const labels = getCellsTableColumnLabels(translate);
 
   return [
-    ...(selectionEnabled
-      ? [
-          columnHelper.display({
-            id: 'selection',
-            size: 40,
-            cell: info => {
-              const node = info.row.original;
-              return (
-                <CellsSelectionCheckbox
-                  id={node.id}
-                  name={node.name}
-                  isChecked={selectedNodeIds.has(node.id)}
-                  onChange={isSelected => {
-                    onToggleSelection(node.id, isSelected);
-                  }}
-                />
-              );
-            },
-          }),
-        ]
-      : []),
     columnHelper.accessor('name', {
       header: isSortingEnabled
         ? () => {

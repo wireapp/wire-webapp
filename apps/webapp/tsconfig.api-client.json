@@ -7,6 +7,6 @@
     "noUnusedLocals": true,
     "tsBuildInfoFile": "../../target/buildcache/webapp-api-client-type-check.tsbuildinfo"
   },
-  "include": ["src/script/apiClient/**/*.ts", "src/script/apiClient/**/*.d.ts"],
+  "include": ["src/script/apiClient/**/*.ts", "src/script/apiClient/**/*.d.ts", "src/script/logger/pinoBrowser.d.ts"],
   "exclude": ["node_modules", "**/*.test.ts"]
 }

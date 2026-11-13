@@ -17,16 +17,13 @@
  *
  */
 
-import {LogFactory, type Logger} from '../commons/LogFactory';
+import {getLogger as getComponentLogger, type Logger} from '../logger/getLogger';
 
 const LOGGER_NAMESPACE = '@wireapp/webapp';
 
 function getLogger(name: string): Logger {
-  return LogFactory.getLogger(name, {
-    namespace: LOGGER_NAMESPACE,
-    separator: '/',
-  });
+  return getComponentLogger(`${LOGGER_NAMESPACE}/${name}`);
 }
 
 export {getLogger, LOGGER_NAMESPACE};
-export type {Logger};
+export type {LogAttributes, Logger} from '../logger/logger';

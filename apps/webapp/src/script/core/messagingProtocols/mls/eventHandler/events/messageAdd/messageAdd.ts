@@ -27,13 +27,13 @@ import {queueProposal} from './incomingProposalsQueue';
 import {ConversationMLSMessageAddEvent} from '../../../../../../apiClient/event/conversationEvent';
 import {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 import {Decoder} from '../../../../../../commons/base64/decoder';
-import {LogFactory} from '../../../../../../commons/LogFactory';
 import {TimeUtil} from '../../../../../../commons/util';
+import {getLogger} from '../../../../../../logger/getLogger';
 import {HandledEventPayload} from '../../../../../notification';
 import {parseFullQualifiedClientId} from '../../../../../util/fullyQualifiedClientIdUtils';
 import {MLSService} from '../../../mlsService/mlsService';
 
-const logger = LogFactory.getLogger('@wireapp/core/mls/messageAdd');
+const logger = getLogger('@wireapp/core/mls/messageAdd');
 
 interface HandleMLSMessageAddParams {
   event: ConversationMLSMessageAddEvent;
@@ -87,7 +87,7 @@ const scheduleProposal = ({
       eventTime: event.time,
     });
   }).catch((error: unknown) => {
-    logger.error('Failed to process proposal:', error);
+    logger.error('Failed to process proposal:', {error});
   });
 };
 
@@ -116,7 +116,7 @@ const handleBufferedMessage = (
     );
 
     if (payload.isErr) {
-      logger.warn('Discarding malformed buffered MLS message', payload.error);
+      logger.warn('Discarding malformed buffered MLS message', {error: payload.error});
       return null;
     }
 
@@ -183,6 +183,7 @@ export const handleMLSMessageAdd = async ({
     new ConversationId(groupIdBytes),
     encryptedData,
     qualifiedConversationId,
+    event.time,
   );
 
   if (decryptedMessage === undefined) {

@@ -99,7 +99,7 @@ export const exportCPBHistoryFromDatabase = async ({
 
       backupExporter.addConversation(new BackUpConversation(qualifiedId, name, lastModifiedTime));
     } else {
-      CPBLogger.error('Conversation data schema validation failed', error);
+      CPBLogger.error('Conversation data schema validation failed', {error});
     }
 
     if (index % PROGRESSION_STEP === 0) {
@@ -126,7 +126,7 @@ export const exportCPBHistoryFromDatabase = async ({
         ),
       );
     } else {
-      CPBLogger.error('User data schema validation failed', error);
+      CPBLogger.error('User data schema validation failed', {error});
     }
 
     if (index % PROGRESSION_STEP === 0) {
@@ -152,12 +152,12 @@ export const exportCPBHistoryFromDatabase = async ({
       const {edited_time, from, from_client_id, id, qualified_conversation, qualified_from, primary_key, time, type} =
         eventData;
       if (!isNonEmptyString(id)) {
-        CPBLogger.log('Event without id', eventData);
+        CPBLogger.info('Event without id', {eventData});
         return;
       }
       // ToDo: Add support for other types of messages and different types of content. Also figure out which fields are required.
       if (!isSupportedEventType(type)) {
-        CPBLogger.log('Unsupported message type', type);
+        CPBLogger.info('Unsupported message type', {type});
         return;
       }
 
@@ -179,7 +179,7 @@ export const exportCPBHistoryFromDatabase = async ({
           data: assetParseData,
         } = AssetContentSchema.safeParse(eventData.data);
         if (!assetParseSuccess) {
-          CPBLogger.error('Asset data schema validation failed', assetParseError);
+          CPBLogger.error('Asset data schema validation failed', {assetParseError});
           return;
         }
 
@@ -235,7 +235,7 @@ export const exportCPBHistoryFromDatabase = async ({
           data: locationParseData,
         } = LocationContentSchema.safeParse(eventData.data);
         if (!locationParseSuccess) {
-          CPBLogger.error('Location data schema validation failed', locationParseError);
+          CPBLogger.error('Location data schema validation failed', {locationParseError});
           return;
         }
         const location = new BackupMessageContent.Location(
@@ -258,7 +258,7 @@ export const exportCPBHistoryFromDatabase = async ({
         );
       }
     } else {
-      CPBLogger.error('Event data schema validation failed', error);
+      CPBLogger.error('Event data schema validation failed', {error});
     }
 
     if (index % PROGRESSION_COMPLETE === 0) {

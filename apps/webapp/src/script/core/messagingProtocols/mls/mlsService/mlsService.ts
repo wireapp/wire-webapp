@@ -42,6 +42,8 @@ import {
 
 import {ClientMLSError, ClientMLSErrorLabel} from './clientMlsError';
 import {
+  BufferedMessageError,
+  isCoreCryptoMLSBufferedMessageError,
   isCoreCryptoMLSConversationAlreadyExistsError,
   isMlsMessageRejectedError,
   serializeAbortReason,
@@ -72,9 +74,9 @@ import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {Converter} from '../../../../commons/base64/converter';
 import {Decoder} from '../../../../commons/base64/decoder';
 import {Encoder} from '../../../../commons/base64/encoder';
-import {LogFactory} from '../../../../commons/LogFactory';
 import {TypedEventEmitter} from '../../../../commons/TypedEventEmitter/TypedEventEmitter';
 import {TimeUtil} from '../../../../commons/util';
+import {getLogger} from '../../../../logger/getLogger';
 import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';
 import type {HandledEventPayload} from '../../../notification';
 import {CoreDatabase} from '../../../storage/coreDb';
@@ -86,6 +88,8 @@ import {User} from '../e2eIdentityService';
 import {E2EIServiceInternal, getAllConversationsCallback} from '../e2eIdentityService/e2eiServiceInternal';
 import {getSignatureAlgorithmForCiphersuite} from '../e2eIdentityService/helper';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../eventHandler/events';
+import {BufferedMlsMessageRecoveryTracker} from '../recovery/bufferedMlsMessageRecoveryTracker';
+import {MlsBufferedMessageRecoveryRequiredError} from '../recovery/mlsBufferedMessageRecoveryRequiredError';
 import {ClientId, HandlePendingProposalsParams} from '../types';
 import {createMLSClientId} from '../utils/mlsId';
 
@@ -141,7 +145,7 @@ type Events = {
 
 const MLS_CONVERSATION_RECOVERY_KEY = 'required';
 export class MLSService extends TypedEventEmitter<Events> {
-  logger = LogFactory.getLogger('@wireapp/core/MLSService');
+  logger = getLogger('@wireapp/core/MLSService');
   private _config?: ConfiguredMLSConfig;
   private clientInitialized = false;
   private epochObserverRegistered = false;
@@ -149,6 +153,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   private initialKeyPackageUploadDeferred = false;
   private readonly mlsTransport: MlsTransport;
   private readonly pendingProposalRetries = new Set<string>();
+  private readonly bufferedMessageRecoveryTracker = new BufferedMlsMessageRecoveryTracker();
 
   constructor(
     private readonly apiClient: APIClient,
@@ -362,7 +367,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           break;
       }
     } catch (error: unknown) {
-      this.logger.error(`Error while initializing client ${client.id}`, error);
+      this.logger.error('Error while initializing client', {error, clientId: client.id});
       throw error;
     }
     this.clientInitialized = true;
@@ -415,7 +420,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   };
 
   private toMlsTransportError(error: unknown): MlsTransportError {
-    this.logger.warn('Failed to upload commit bundle', error);
+    this.logger.warn('Failed to upload commit bundle', {error});
 
     if (error instanceof MLSInvalidLeafNodeSignatureError || error instanceof MLSInvalidLeafNodeIndexError) {
       this.logger.info('Rejecting commit bundle upload due to broken MLS conversation');
@@ -638,6 +643,8 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       //after we've successfully joined via external commit, we schedule periodic key material renewal
       const groupIdStr = Encoder.toBase64(conversationId.copyBytes()).asString;
+      // Buffered messages from before the rejoin are no longer relevant for recovery.
+      this.bufferedMessageRecoveryTracker.clear(groupIdStr);
       const newEpoch = await this.getEpoch(groupIdStr);
 
       // Schedule the next key material renewal
@@ -647,7 +654,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       this.emit(MLSServiceEvents.NEW_EPOCH, {groupId: groupIdStr, epoch: newEpoch});
       this.logger.info(`Joined MLS group with id ${groupIdStr} via external commit, new epoch: ${newEpoch}`);
     } catch (error: unknown) {
-      this.logger.warn('Failed to join MLS group via external commit', error);
+      this.logger.warn('Failed to join MLS group via external commit', {error});
       throw error;
     }
   }
@@ -664,17 +671,28 @@ export class MLSService extends TypedEventEmitter<Events> {
     });
   }
 
+  /**
+   * Decrypts an incoming MLS message.
+   *
+   * Returns `undefined` when CoreCrypto reports an error that can safely be ignored, including messages it buffered
+   * for later consumption. If messages of the group keep being buffered for longer than the recovery threshold
+   * (based on `eventTime`), a {@link MlsBufferedMessageRecoveryRequiredError} is thrown so the caller can verify
+   * the group epoch and recover from a missed commit.
+   */
   public async decryptMessage(
     conversationId: ConversationId,
     payload: Uint8Array,
     qualifiedConversationId: QualifiedId,
+    eventTime?: string,
   ): Promise<DecryptedMessage | undefined> {
+    const groupId = Encoder.toBase64(conversationId.copyBytes()).asString;
     try {
       const start = Date.now();
       this.logger.info('Decrypting message', {qualifiedConversationId});
       const decryptedMessage = await this.coreCryptoClient.transaction(cx => {
         return cx.decryptMessage(conversationId, payload);
       });
+      this.bufferedMessageRecoveryTracker.clear(groupId);
       await this.resumePendingProposalsAfterIncomingMessage(conversationId);
       this.logger.info('Message decrypted successfully', {qualifiedConversationId, duration: Date.now() - start});
       return decryptedMessage;
@@ -700,12 +718,49 @@ export class MLSService extends TypedEventEmitter<Events> {
         }),
         error,
       });
+      if (isCoreCryptoMLSBufferedMessageError(error)) {
+        return this.handleBufferedMessage(groupId, error, qualifiedConversationId, eventTime);
+      }
       // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
       if (shouldMLSDecryptionErrorBeIgnored(error)) {
         return undefined;
       }
       throw error;
     }
+  }
+
+  /**
+   * CoreCrypto buffered the message and will consume it once the missing messages arrive.
+   * If the group keeps buffering for too long, a commit was most likely missed and recovery is required.
+   */
+  private handleBufferedMessage(
+    groupId: string,
+    error: BufferedMessageError,
+    qualifiedConversationId: QualifiedId,
+    eventTime?: string,
+  ): undefined {
+    const timestamp = eventTime !== undefined ? new Date(eventTime).getTime() : Number.NaN;
+    if (Number.isNaN(timestamp)) {
+      this.logger.warn('Buffered MLS message has no valid event time, skipping recovery tracking', {
+        qualifiedConversationId,
+        groupId,
+        eventTime,
+      });
+      return undefined;
+    }
+
+    if (this.bufferedMessageRecoveryTracker.observeBufferedMessage(groupId, timestamp)) {
+      throw new MlsBufferedMessageRecoveryRequiredError(groupId, error.inner.mlsError.tag, error);
+    }
+    return undefined;
+  }
+
+  /**
+   * Stops tracking buffered messages for the given group, so a new tracking window starts with the next
+   * buffered message. Should be called once stale epoch recovery has been performed (or scheduled).
+   */
+  public clearBufferedMessageRecoveryTracking(groupId: string): void {
+    this.bufferedMessageRecoveryTracker.clear(groupId);
   }
 
   public async encryptMessage(conversationId: ConversationId, message: Uint8Array): Promise<Uint8Array> {
@@ -929,7 +984,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       await this.registerConversation(groupId, []);
       return true;
     } catch (error: unknown) {
-      this.logger.warn("Couldn't establish the MLS group", error);
+      this.logger.warn("Couldn't establish the MLS group", {error});
       // If conversation already existed, locally, nothing more to do, we've received a welcome message.
       if (isCoreCryptoMLSConversationAlreadyExistsError(error)) {
         this.logger.debug(`MLS Group with id ${groupId} already exists, skipping the initialisation.`);
@@ -1028,7 +1083,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         await this.updateKeyingMaterial(groupId, coreCryptoContext);
       });
     } catch (error: unknown) {
-      this.logger.error(`Error while renewing key material for groupId ${groupId}`, error);
+      this.logger.error('Error while renewing key material', {error, groupId});
       // Renewal runs from the recurring task scheduler, so there is no call site that could handle
       // this. Hand the failure to the consumer, which owns the MLS recovery orchestrator.
       this.emit(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, {error, groupId});
@@ -1079,7 +1134,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   public schedulePeriodicKeyPackagesBackendSync(clientId: string): Promise<void> {
     const task = async (): Promise<void> => {
-      this.logger.log('Executed Periodic check for key packages');
+      this.logger.info('Executed Periodic check for key packages');
       await this.verifyRemoteMLSKeyPackagesAmount(clientId);
     };
 
@@ -1135,7 +1190,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         await this.coreDatabase.put('mlsConversationRecovery', {required: true}, MLS_CONVERSATION_RECOVERY_KEY);
         isConversationRecoveryRequired = true;
       } catch (error: unknown) {
-        this.logger.error('Failed to persist MLS conversation recovery marker', error);
+        this.logger.error('Failed to persist MLS conversation recovery marker', {error});
       }
     }
 
@@ -1204,7 +1259,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         },
       });
     } catch (error: unknown) {
-      this.logger.error(`Failed to upload public keys for client ${client.id}`, error);
+      this.logger.error('Failed to upload public keys for client', {error, clientId: client.id});
       throw error;
     }
   }
@@ -1229,6 +1284,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async wipeConversation(groupId: string): Promise<void> {
+    this.bufferedMessageRecoveryTracker.clear(groupId);
     await this.cancelKeyMaterialRenewal(groupId);
     await this.cancelPendingProposalsTask(groupId);
 
@@ -1395,7 +1451,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         );
       }
     } catch (error: unknown) {
-      this.logger.error('Could not get pending proposals', error);
+      this.logger.error('Could not get pending proposals', {error});
     }
   }
 

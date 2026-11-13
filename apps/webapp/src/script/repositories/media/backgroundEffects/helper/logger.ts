@@ -26,9 +26,7 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'log';
-
-type Logger = Record<LogLevel, (...args: unknown[]) => void>;
+import type {Logger} from '../../../../logger/logger';
 
 export function getSafeLogger(scope = 'worker'): Logger {
   const prefix = `[${scope}]`;
@@ -37,7 +35,6 @@ export function getSafeLogger(scope = 'worker'): Logger {
     typeof globalThis !== 'undefined' && !isNullOrUndefined(globalThis.console) ? globalThis.console : undefined;
 
   return {
-    log: safeConsole?.log?.bind(safeConsole, prefix) ?? noop,
     debug: safeConsole?.debug?.bind(safeConsole, prefix) ?? noop,
     info: safeConsole?.info?.bind(safeConsole, prefix) ?? noop,
     warn: safeConsole?.warn?.bind(safeConsole, prefix) ?? noop,

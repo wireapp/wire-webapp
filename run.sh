@@ -6,4 +6,4 @@
 
 port=${NODE_PORT:-8080}
 
-PORT=$port node /dist/index.js
+PORT=$port node --enable-source-maps /dist/index.js

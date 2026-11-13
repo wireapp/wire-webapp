@@ -263,7 +263,6 @@ test('reports rejected cleanup through the invoker without an unhandled rejectio
     }
   });
   await page.addInitScript(() => {
-    localStorage.setItem('debug', '*');
     Object.defineProperty(navigator, 'serviceWorker', {
       value: {
         getRegistrations() {
@@ -273,12 +272,55 @@ test('reports rejected cleanup through the invoker without an unhandled rejectio
     });
   });
 
-  await page.goto('/');
+  await page.goto('/?enableLogging=*');
 
   await expect(page).toHaveURL(/\/auth\//);
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
-  expect(reportedErrors.join('\n')).toContain('failed to execute fire-and-forget action');
-  expect(reportedErrors.join('\n')).toContain('simulated cleanup failure');
+  const cleanupFailure = reportedErrors
+    .filter(message => {
+      return message.startsWith('{');
+    })
+    .map(message => {
+      return JSON.parse(message) as Record<string, unknown>;
+    });
+  expect(cleanupFailure).toContainEqual(
+    expect.objectContaining({
+      level: 50,
+      component: '@wireapp/webapp/FireAndForgetInvoker',
+      msg: 'failed to execute fire-and-forget action',
+      error: expect.objectContaining({message: 'simulated cleanup failure'}),
+    }),
+  );
+  expect(uncaughtPageErrors).toEqual([]);
+});
+
+test('warns about rejected authentication cleanup when structured logging is disabled', async ({page}) => {
+  const reportedWarnings: string[] = [];
+  const uncaughtPageErrors: string[] = [];
+  page.on('console', message => {
+    if (message.type() === 'warning') {
+      reportedWarnings.push(message.text());
+    }
+  });
+  page.on('pageerror', error => {
+    uncaughtPageErrors.push(error.message);
+  });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'serviceWorker', {
+      value: {
+        getRegistrations() {
+          return Promise.reject(new Error('simulated authentication cleanup failure'));
+        },
+      },
+    });
+  });
+
+  await page.goto('/auth?enabled-features=');
+  await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+
+  expect(reportedWarnings).toContainEqual(
+    expect.stringContaining('Legacy service worker cleanup failed; continuing application startup.'),
+  );
   expect(uncaughtPageErrors).toEqual([]);
 });
 

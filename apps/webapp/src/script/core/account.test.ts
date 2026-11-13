@@ -64,7 +64,9 @@ jest.mock('./conversation', () => {
   };
 });
 
-import {Account} from './account';
+import {Account, EVENTS} from './account';
+import {Maybe, result, task} from 'true-myth';
+import type {MetaClient} from './client/clientService';
 import {ConnectionState} from './connectionState/connectionState';
 import type {MLSService} from './messagingProtocols/mls';
 import {NotificationSource} from './notification';
@@ -118,6 +120,36 @@ const waitFor = (assertion: () => void): Promise<void> => {
 };
 
 describe('Account', () => {
+  describe('getLocalClient', () => {
+    it('returns Err when the client service has not been initialized', async () => {
+      const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
+      apiClients.push(apiClient);
+      const account = new Account(apiClient);
+
+      await expect(account.getLocalClient()).resolves.toEqual(
+        result.err(new Error('Client service is not initialized.')),
+      );
+    });
+
+    it.each([Maybe.just({id: 'local-client'} as MetaClient), Maybe.nothing<MetaClient>()])(
+      'preserves the client lookup outcome %s',
+      async localClient => {
+        const {account} = await createAccount();
+        jest.spyOn(getAccountServiceForTest(account).client, 'loadClient').mockReturnValue(task.resolve(localClient));
+
+        await expect(account.getLocalClient()).resolves.toEqual(result.ok(localClient));
+      },
+    );
+
+    it('preserves a failed client lookup', async () => {
+      const {account} = await createAccount();
+      const lookupError = new Error('Database unavailable');
+      jest.spyOn(getAccountServiceForTest(account).client, 'loadClient').mockReturnValue(task.reject(lookupError));
+
+      await expect(account.getLocalClient()).resolves.toEqual(result.err(lookupError));
+    });
+  });
+
   const CLIENT_ID = '4e37b32f57f6da55';
 
   afterEach(() => {
@@ -252,6 +284,23 @@ describe('Account', () => {
     mls_public_keys: {},
   };
   describe('"init"', () => {
+    it('notifies consumers when services are replaced or cleared', async () => {
+      const {account} = await createAccount();
+      const previousNotificationService = getAccountServiceForTest(account).notification;
+      const servicesAtNotification: Account['service'][] = [];
+      account.on(EVENTS.SERVICES_CHANGED, () => {
+        servicesAtNotification.push(account.service);
+      });
+
+      await account['initServices']({clientType: ClientType.TEMPORARY, userId: ''});
+
+      expect(getAccountServiceForTest(account).notification).not.toBe(previousNotificationService);
+      expect(servicesAtNotification).toEqual([account.service]);
+
+      account['resetContext']();
+      expect(servicesAtNotification).toEqual([servicesAtNotification[0], undefined]);
+    });
+
     it('initializes the Protocol buffers', async () => {
       const apiClient = new APIClient({platform: nodePlatform});
       apiClients.push(apiClient);

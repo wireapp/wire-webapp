@@ -861,7 +861,7 @@ export class NotificationRepository {
     const closeAttempt = handle.close();
 
     if (result.isErr(closeAttempt)) {
-      this.logger.error(failureMessage, closeAttempt.error);
+      this.logger.error(failureMessage, {error: closeAttempt.error});
       return;
     }
 
@@ -1015,7 +1015,7 @@ export class NotificationRepository {
     });
 
     if (result.isErr(notificationResult)) {
-      this.logger.error(`Failed to present notification for ${messageInfo}.`, notificationResult.error);
+      this.logger.error(`Failed to present notification for ${messageInfo}.`, {error: notificationResult.error});
       return;
     }
 

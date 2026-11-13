@@ -22,6 +22,7 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import murmurhash from 'murmurhash';
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {ClientEntity} from './ClientEntity';
@@ -148,7 +149,7 @@ export class ClientRepository {
       const status = isAxiosError(error) ? error.response?.status : undefined;
       const clientNotFoundBackend = status === HTTP_STATUS.NOT_FOUND;
       if (clientNotFoundBackend) {
-        this.logger.warn(`Local client no longer exists on the backend`, error);
+        this.logger.warn(`Local client no longer exists on the backend`, {error});
         throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
       }
 
@@ -251,10 +252,11 @@ export class ClientRepository {
    * @returns Cookie label key
    */
   constructCookieLabelKey(
-    login: string,
+    login: Maybe<string>,
     clientType: ClientType = this.loadCurrentClientType() ?? ClientType.PERMANENT,
   ): string {
-    const loginHash = murmurhash.v3(login !== '' ? login : this.selfUser().id, loginHashSeed);
+    const loginValue = login.unwrapOr('');
+    const loginHash = murmurhash.v3(isNonEmptyString(loginValue) ? loginValue : this.selfUser().id, loginHashSeed);
     return `${StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 
@@ -277,7 +279,7 @@ export class ClientRepository {
       const clientNotValidated = isErrorWithType(error) && error.type === ClientError.TYPE.NO_VALID_CLIENT;
       if (!clientNotValidated) {
         const errorMessage = isErrorWithCode(error) ? String(error.code) : toError(error).message;
-        this.logger.error(`Getting valid local client failed: ${errorMessage}`, error);
+        this.logger.error(`Getting valid local client failed: ${errorMessage}`, {error});
       }
 
       throw error;
@@ -537,7 +539,7 @@ export class ClientRepository {
         return clientEntities;
       })
       .catch((error: unknown) => {
-        this.logger.error(`Unable to retrieve clients for user '${userId}': ${toError(error).message}`, error);
+        this.logger.error(`Unable to retrieve clients for user '${userId}': ${toError(error).message}`, {error});
         throw error;
       });
   }

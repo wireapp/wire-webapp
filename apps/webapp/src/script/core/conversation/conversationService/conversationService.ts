@@ -58,9 +58,9 @@ import {
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {Decoder} from '../../../commons/base64/decoder';
-import {LogFactory} from '../../../commons/LogFactory';
 import {TypedEventEmitter} from '../../../commons/TypedEventEmitter/TypedEventEmitter';
 import {XOR} from '../../../commons/util/TypeUtil';
+import {getLogger} from '../../../logger/getLogger';
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {isMlsConversationNotFoundError} from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';
@@ -68,6 +68,7 @@ import {
   MlsRecoveryOrchestrator,
   MlsEpochRecoveryTrigger,
   MlsEpochRecoveryDeferredError,
+  MlsBufferedMessageRecoveryRequiredError,
   MlsRecoveryOrchestratorImpl,
   OperationName,
   createDefaultMlsErrorMapper,
@@ -106,7 +107,7 @@ type Events = {
 
 export class ConversationService extends TypedEventEmitter<Events> {
   public readonly messageTimer: MessageTimer;
-  private readonly logger = LogFactory.getLogger('@wireapp/core/ConversationService');
+  private readonly logger = getLogger('@wireapp/core/ConversationService');
   // Track groups currently undergoing recovery due to key material update failure to prevent duplicate work
   private groupIdConversationMap: Map<string, Conversation> = new Map();
   private MLSRecoveryOrchestrator?: MlsRecoveryOrchestrator;
@@ -150,12 +151,12 @@ export class ConversationService extends TypedEventEmitter<Events> {
         resetAndReestablish: (conversationId: QualifiedId) => {
           return this.handleBrokenMLSConversation(conversationId);
         },
-        recoverFromEpochMismatch: (
+        recoverFromEpochMismatch: async (
           conversationId: QualifiedId,
           subconvId?: SUBCONVERSATION_ID,
           trigger?: MlsEpochRecoveryTrigger,
         ) => {
-          return this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId, trigger);
+          await this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId, trigger);
         },
         addMissingUsers: (conversationId: QualifiedId, groupId: string, users: QualifiedId[]) => {
           return this.performAddUsersToMLSConversationAPI({conversationId, groupId, qualifiedUsers: users});
@@ -885,12 +886,14 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
   /**
    * Handles epoch mismatch in a subconversation.
+   * Rejoin failures are logged and not rethrown.
    * @param subconversation - subconversation
+   * @returns whether the local group is in sync with the backend (no mismatch, or rejoin succeeded)
    */
   private async handleSubconversationEpochMismatch(
     subconversation: Subconversation,
     parentGroupId: string,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const {
       parent_qualified_id: parentConversationId,
       group_id: groupId,
@@ -912,20 +915,24 @@ export class ConversationService extends TypedEventEmitter<Events> {
         await this.subconversationService.joinConferenceSubconversation(parentConversationId, parentGroupId);
       } catch (error: unknown) {
         const message = `There was an error while handling epoch mismatch in MLS subconversation (id: ${parentConversationId.id}, subconv: ${subconversationId}):`;
-        this.logger.error(message, error);
+        this.logger.error(message, {error});
+        return false;
       }
     }
+    return true;
   }
 
   /**
    * Handles epoch mismatch in a MLS conversation.
+   * Rejoin failures are logged and not rethrown.
    * @param mlsConversation - mls conversation
+   * @returns whether the local group is in sync with the backend (no mismatch, or rejoin succeeded)
    */
   private async handleConversationEpochMismatch(
     remoteMlsConversation: MLSConversation,
     onSuccessfulRejoin?: () => void,
     trigger?: MlsEpochRecoveryTrigger,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const {qualified_id: qualifiedId, group_id: groupId, epoch: backendEpoch} = remoteMlsConversation;
     const hasEpochMismatch = await this.hasEpochMismatch(groupId, backendEpoch, trigger?.operationName);
     if (!hasEpochMismatch) {
@@ -935,7 +942,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
         backendEpoch,
         trigger,
       });
-      return;
+      return true;
     }
 
     const localEpochBeforeRejoin = (await this.mlsService.getSafeEpoch(groupId)).match({
@@ -977,6 +984,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
         trigger,
       });
       onSuccessfulRejoin?.();
+      return true;
     } catch (error: unknown) {
       const message = `There was an error while handling epoch mismatch in MLS conversation (id: ${qualifiedId.id}):`;
       this.logger.error(message, {
@@ -987,6 +995,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
         localEpochBeforeRejoin,
         trigger,
       });
+      return false;
     }
   }
 
@@ -1102,7 +1111,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       return updatedMLSConversation;
     } catch (error: unknown) {
       if (!shouldRetry) {
-        this.logger.error(`Could not register MLS group with id ${groupId}: `, error);
+        this.logger.error(`Could not register MLS group with id ${groupId}: `, {error});
 
         throw error;
       }
@@ -1164,7 +1173,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
         this.logger.debug('No other users were added to the group.');
       }
     } catch (error: unknown) {
-      this.logger.error('Failed to establish MLS group', error);
+      this.logger.error('Failed to establish MLS group', {error});
       throw error;
     }
   }
@@ -1176,6 +1185,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * - WrongEpoch.handleMessageAdd → recover from epoch mismatch and re-run once (when LIVE).
    * - WrongEpoch during notification replay → defer recovery until runDeferredEpochRecovery.
    * - GroupOutOfSync.handleMessageAdd → not handled here; the error bubbles.
+   *
+   * If CoreCrypto keeps buffering messages of the group for too long (most likely a missed commit),
+   * the epoch is verified against the backend and the group is rejoined if needed.
    *
    * Returns decrypted payloads when available. Unknown or unrecoverable errors are logged
    * and result in an empty list so event processing can continue safely.
@@ -1209,6 +1221,11 @@ export class ConversationService extends TypedEventEmitter<Events> {
         return [];
       }
 
+      if (error instanceof MlsBufferedMessageRecoveryRequiredError && event.qualified_conversation !== undefined) {
+        await this.recoverFromProlongedMessageBuffering(event.qualified_conversation, event.subconv, error);
+        return [];
+      }
+
       // For unmapped or unrecoverable errors, avoid surfacing exceptions from event handling
       // and instead log and return no payloads so the event processing queue can continue safely.
       const isSafeMissingSubconversationGroup = event.subconv !== undefined && isMlsConversationNotFoundError(error);
@@ -1220,6 +1237,57 @@ export class ConversationService extends TypedEventEmitter<Events> {
         {error, event},
       );
       return [];
+    }
+  }
+
+  /**
+   * CoreCrypto only reports a wrong epoch once the epoch gap gets large enough, and keeps buffering messages until
+   * then. In conversations where the epoch rarely changes (e.g. 1:1 conversations) a missed commit would leave the
+   * conversation stuck, so once messages have been buffered for too long we verify the epoch and rejoin if needed.
+   *
+   * If the recovery fails (including a failed rejoin), the buffering window is kept so the next buffered message
+   * retries it.
+   */
+  private async recoverFromProlongedMessageBuffering(
+    conversationId: QualifiedId,
+    subconvId: SUBCONVERSATION_ID | undefined,
+    {groupId, bufferedErrorType}: MlsBufferedMessageRecoveryRequiredError,
+  ): Promise<void> {
+    this.logger.warn('MLS messages have been buffered for too long, verifying epoch', {
+      conversationId,
+      subconvId,
+      groupId,
+      bufferedErrorType,
+    });
+
+    try {
+      const isInSync = await this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId, {
+        operationName: OperationName.handleMessageAdd,
+        errorType: bufferedErrorType,
+        groupId,
+      });
+      if (!isInSync) {
+        this.logger.warn('Buffered MLS message recovery could not rejoin, will retry on next buffered message', {
+          conversationId,
+          subconvId,
+          groupId,
+        });
+        return;
+      }
+      this.mlsService.clearBufferedMessageRecoveryTracking(groupId);
+    } catch (error: unknown) {
+      if (error instanceof MlsEpochRecoveryDeferredError) {
+        // Recovery has been scheduled and will run once the notification replay completes.
+        this.mlsService.clearBufferedMessageRecoveryTracking(groupId);
+        return;
+      }
+
+      this.logger.warn('Buffered MLS message recovery failed, will retry on next buffered message', {
+        error,
+        conversationId,
+        subconvId,
+        groupId,
+      });
     }
   }
 
@@ -1251,12 +1319,15 @@ export class ConversationService extends TypedEventEmitter<Events> {
     throw new MlsEpochRecoveryDeferredError(conversationId, subconvId);
   }
 
+  /**
+   * @returns whether the local group is in sync with the backend after the recovery attempt
+   */
   private async recoverMLSGroupFromEpochMismatch(
     conversationId: QualifiedId,
     subconversationId?: SUBCONVERSATION_ID,
     trigger?: MlsEpochRecoveryTrigger,
     options: {isForced: boolean} = {isForced: false},
-  ): Promise<void> {
+  ): Promise<boolean> {
     if (!options.isForced && this.shouldDeferEpochRecovery(trigger)) {
       this.deferEpochRecovery(conversationId, subconversationId, trigger);
     }

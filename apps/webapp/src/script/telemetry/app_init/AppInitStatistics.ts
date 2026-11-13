@@ -61,7 +61,7 @@ export class AppInitStatistics {
   }
 
   log(): void {
-    this.logger.debug('App initialization statistics', this.statistics);
+    this.logger.debug('App initialization statistics', {statistics: this.statistics});
   }
 
   readonly updateBackendRequests = (number_of_requests: number): void => {

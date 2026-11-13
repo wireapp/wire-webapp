@@ -173,13 +173,13 @@ export class SelfRepository extends TypedEventEmitter<Events> {
    * @param supportedProtocols - an array of new supported protocols
    */
   private async updateSelfSupportedProtocols(supportedProtocols: CONVERSATION_PROTOCOL[]): Promise<void> {
-    this.logger.info('Supported protocols will get updated to:', supportedProtocols);
+    this.logger.info('Supported protocols will get updated to:', {supportedProtocols});
     try {
       await this.selfService.putSupportedProtocols(supportedProtocols);
       await this.userRepository.updateUserSupportedProtocols(this.selfUser.qualifiedId, supportedProtocols);
       this.emit('selfSupportedProtocolsUpdated', supportedProtocols);
     } catch (error: unknown) {
-      this.logger.error('Failed to update self supported protocols: ', error);
+      this.logger.error('Failed to update self supported protocols: ', {error});
     }
   }
 
@@ -190,7 +190,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
   public readonly refreshSelfSupportedProtocols = async (): Promise<CONVERSATION_PROTOCOL[]> => {
     const localSupportedProtocols = this.selfUser.supportedProtocols();
 
-    this.logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
+    this.logger.info('Evaluating self supported protocols, currently supported protocols:', {localSupportedProtocols});
 
     const currentSelf = await this.selfService.getSelf([]);
 

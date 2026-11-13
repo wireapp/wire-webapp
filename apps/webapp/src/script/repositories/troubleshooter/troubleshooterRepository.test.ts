@@ -28,6 +28,23 @@ import {
 } from './troubleshooterService';
 
 describe('troubleshooterRepository', () => {
+  it('discards a test that finishes after reset and allows a fresh test afterward', async () => {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const repository = createTroubleshooterRepository(createMockTroubleshooterService(clock), clock);
+    const oldTest = repository.testConnection();
+    repository.reset();
+    expect((await repository.testConnection()).isErr).toBe(true);
+    clock.advanceByMilliseconds(MOCK_CONNECTION_DELAY_MILLISECONDS);
+    await oldTest;
+    expect(repository.store.getState().connection.isNothing).toBe(true);
+    expect(repository.store.getState().running).toBe('idle');
+
+    const newTest = repository.testConnection();
+    clock.advanceByMilliseconds(MOCK_CONNECTION_DELAY_MILLISECONDS);
+    await newTest;
+    expect(repository.store.getState().connection.isJust).toBe(true);
+  });
+
   it('blocks concurrent tests, stores both results and shares them in one report', async () => {
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const repository = createTroubleshooterRepository(createMockTroubleshooterService(clock), clock);
@@ -48,11 +65,13 @@ describe('troubleshooterRepository', () => {
     const report = JSON.parse(repository.getReport('test-version'));
     expect(report).toMatchObject({simulated: true, version: 'test-version', includesMessagesOrCallContent: false});
     expect(report.connection).toHaveLength(1);
+    expect(report.connection[0].data.qualityChecks).toEqual(
+      expect.arrayContaining([expect.objectContaining({id: 'roundTrip', value: '42 ms'})]),
+    );
     expect(report.scan).toHaveLength(1);
     expect(report.scan[0].data.checks).toEqual(
       expect.arrayContaining([
         expect.objectContaining({id: 'udp', status: 'blocked', address: 'mock-relay.example.invalid', port: 3478}),
-        expect.objectContaining({id: 'roundTrip', value: '42 ms'}),
       ]),
     );
   });

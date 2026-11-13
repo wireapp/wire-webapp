@@ -52,6 +52,7 @@ interface ActiveSpeaker {
 export class Call {
   private readonly logger: Logger = getLogger('Call');
   public readonly reason: ko.Observable<number | undefined> = ko.observable();
+  public wasAnsweredElsewhere: boolean = false;
   public readonly startedAt: ko.Observable<number | undefined> = ko.observable();
   public readonly endedAt: ko.Observable<number> = ko.observable(0);
   public readonly state: ko.Observable<CALL_STATE> = ko.observable(CALL_STATE.UNKNOWN);
@@ -182,7 +183,7 @@ export class Call {
       try {
         audio.audioElement = AudioSpeakerFactory.createNewCallingAudioSpeaker(audio.stream);
       } catch (error: unknown) {
-        this.logger.warn('Fail to playAudioStreams:', error);
+        this.logger.warn('Fail to playAudioStreams:', {error});
       }
     });
     this.updateAudioStreamsSink();

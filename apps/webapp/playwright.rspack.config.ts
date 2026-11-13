@@ -21,6 +21,7 @@ import {resolve} from 'node:path';
 
 const internalBuildPort = 4173;
 const publicBuildPort = 4174;
+const developmentBuildPort = 4175;
 const smokeTestDirectory = resolve(__dirname, 'test/rspack-smoke');
 const smokeTestOutputDirectory = resolve(__dirname, 'test-results/rspack-smoke');
 const smokeReportDirectory = resolve(__dirname, 'playwright-report/rspack-smoke');
@@ -33,7 +34,10 @@ type BuildProjectOptions = {
   };
 };
 
-function createBuildProjectOptions(buildVariant: 'internal' | 'public', port: number): BuildProjectOptions {
+function createBuildProjectOptions(
+  buildVariant: 'development' | 'internal' | 'public',
+  port: number,
+): BuildProjectOptions {
   const baseURL = `http://127.0.0.1:${port}`;
 
   return {
@@ -47,7 +51,7 @@ function createBuildProjectOptions(buildVariant: 'internal' | 'public', port: nu
 
 export default defineConfig({
   testDir: smokeTestDirectory,
-  testMatch: '**/browser-smoke.ts',
+  testMatch: ['**/browser-smoke.ts', '**/origin-private-file-system-browser-smoke.ts'],
   tsconfig: resolve(__dirname, 'tsconfig.playwright.json'),
   fullyParallel: true,
   forbidOnly: process.env.CI === 'true',
@@ -62,10 +66,24 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
+    {
+      ...createBuildProjectOptions('development', developmentBuildPort),
+      testMatch: '**/origin-private-file-system-browser-smoke.ts',
+      grep: /loads the native persistence worker/,
+    },
     createBuildProjectOptions('internal', internalBuildPort),
     createBuildProjectOptions('public', publicBuildPort),
   ],
   webServer: [
+    {
+      command: `node test/rspack-smoke/server.ts --variant development --port ${developmentBuildPort}`,
+      cwd: __dirname,
+      url: `http://127.0.0.1:${developmentBuildPort}/`,
+      reuseExistingServer: false,
+      timeout: 60_000,
+      stdout: 'pipe',
+      stderr: 'pipe',
+    },
     {
       command: `node test/rspack-smoke/server.ts --variant internal --port ${internalBuildPort}`,
       cwd: __dirname,

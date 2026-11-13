@@ -42,7 +42,7 @@ import {QualifiedUserClients} from '../../../../apiClient/conversation/qualified
 import type {ConversationOtrMessageAddEvent} from '../../../../apiClient/event/conversationEvent';
 import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import type {QualifiedUserPreKeyBundleMap} from '../../../../apiClient/user/userPreKeyBundleMap';
-import {LogFactory} from '../../../../commons/LogFactory';
+import {getLogger} from '../../../../logger/getLogger';
 import {
   AddUsersFailureReasons,
   ProteusCreateConversationResponse,
@@ -76,7 +76,7 @@ export type EncryptionResult = {
 
 export class ProteusService {
   private readonly messageService: MessageService;
-  private readonly logger = LogFactory.getLogger('@wireapp/core/ProteusService');
+  private readonly logger = getLogger('@wireapp/core/ProteusService');
   private readonly dbName: string;
 
   constructor(
@@ -274,7 +274,7 @@ export class ProteusService {
         // We warn the consumer that there is a mismatch that did not prevent message sending
         await onClientMismatch?.(response, true);
       }
-      this.logger.log(`Successfully sent Proteus message to conversation '${conversationId.id}'`);
+      this.logger.info(`Successfully sent Proteus message to conversation '${conversationId.id}'`);
     }
 
     const sendingState = response.canceled === true ? MessageSendingState.CANCELED : MessageSendingState.OUTGOING_SENT;

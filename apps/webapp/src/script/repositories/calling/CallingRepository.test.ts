@@ -34,6 +34,8 @@ import {
   CALL_TYPE,
   CONV_TYPE,
   ERROR,
+  getAvsInstance,
+  LOG_LEVEL,
   QUALITY,
   REASON,
   STATE as CALL_STATE,
@@ -49,7 +51,7 @@ import {Conversation} from '../entity/Conversation';
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {User} from '../entity/User';
 import {CallingEvent} from '../event/CallingEvent';
-import {CALL} from '../event/Client';
+import {CALL, CONVERSATION as CLIENT_CONVERSATION} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {MediaType} from '../media/MediaType';
@@ -87,6 +89,22 @@ import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {BackgroundEffectSelection} from '../media/VideoBackgroundEffects';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {NoAudioInputError} from '../../error/noAudioInputError';
+
+const initializeBrowserAvs = (): Promise<Wcall> => {
+  const nodeVersion = Object.getOwnPropertyDescriptor(process.versions, 'node');
+  if (!nodeVersion) {
+    return getAvsInstance();
+  }
+
+  // jsdom exposes Node's version, which the browser AVS build checks during startup.
+  // AVS is only working in browser and worker environment.
+  Object.defineProperty(process.versions, 'node', {...nodeVersion, value: undefined});
+  try {
+    return getAvsInstance();
+  } finally {
+    Object.defineProperty(process.versions, 'node', nodeVersion);
+  }
+};
 
 type AudioFlowStat = {
   bytesReceived?: number;
@@ -250,7 +268,102 @@ function createSftCallingFixture(): SftCallingFixture {
   };
 }
 
+describe('AVS connection test', () => {
+  it('forwards the progress callback and propagates AVS connection test failures', async () => {
+    const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+    const error = new Error('Connection setup timed out');
+    const runConnectionTest: jest.MockedFunction<Wcall['runConnectionTest']> = jest.fn();
+    runConnectionTest.mockRejectedValue(error);
+    repository['wCall'] = {runConnectionTest} as unknown as Wcall;
+    repository['wUser'] = 1;
+    repository['selfUser'] = new User(createUuid(), '', translateForTest);
+    repository['selfClientId'] = createUuid();
+    const onProgress = jest.fn();
+
+    await expect(repository.startConnectionTest(onProgress)).rejects.toBe(error);
+    expect(runConnectionTest).toHaveBeenCalledWith(1, onProgress);
+    await expect(repository.startConnectionTest(onProgress)).rejects.toBe(error);
+  });
+});
+
+describe('CallingRepository AVS logging', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it.each([
+    {level: LOG_LEVEL.DEBUG, loggerMethod: 'debug', callLogLevel: 'DEBUG'},
+    {level: LOG_LEVEL.INFO, loggerMethod: 'info', callLogLevel: 'INFO '},
+    {level: LOG_LEVEL.WARN, loggerMethod: 'warn', callLogLevel: 'WARN '},
+    {level: LOG_LEVEL.ERROR, loggerMethod: 'error', callLogLevel: 'ERROR'},
+  ] as const)('forwards $loggerMethod messages without attributes and preserves callLog formatting', options => {
+    const {level, loggerMethod, callLogLevel} = options;
+    const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+    const loggerSpies = {
+      debug: jest.spyOn(repository['avsLogger'], 'debug').mockImplementation(noop),
+      info: jest.spyOn(repository['avsLogger'], 'info').mockImplementation(noop),
+      warn: jest.spyOn(repository['avsLogger'], 'warn').mockImplementation(noop),
+      error: jest.spyOn(repository['avsLogger'], 'error').mockImplementation(noop),
+    };
+
+    expect(repository.getCallLog()).toBeUndefined();
+
+    repository['avsLogHandler'](level, ' \nAVS diagnostic\t ', undefined);
+
+    const actualLoggerCalls = {
+      debug: loggerSpies.debug.mock.calls,
+      info: loggerSpies.info.mock.calls,
+      warn: loggerSpies.warn.mock.calls,
+      error: loggerSpies.error.mock.calls,
+    };
+    const expectedLoggerCalls = {debug: [], info: [], warn: [], error: [], [loggerMethod]: [['AVS diagnostic']]};
+    const expectedCallLogPattern = new RegExp(
+      `^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z \\[${callLogLevel}\\] AVS diagnostic$`,
+      'u',
+    );
+
+    expect(actualLoggerCalls).toEqual(expectedLoggerCalls);
+    expect(repository.getCallLog()).toEqual([expect.stringMatching(expectedCallLogPattern)]);
+  });
+
+  it.each([new Error('Socket closed'), {reason: 'Socket closed'}, 'Socket closed', 0, false, null])(
+    'preserves the error attribute and message-only callLog entry for %p',
+    error => {
+      const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+      const errorLogSpy = jest.spyOn(repository['avsLogger'], 'error').mockImplementation(noop);
+
+      repository['avsLogHandler'](LOG_LEVEL.ERROR, ' \nFailed AVS operation\t ', error);
+
+      expect(errorLogSpy).toHaveBeenCalledWith('Failed AVS operation', {error});
+      expect(errorLogSpy.mock.calls[0]?.[1]?.error).toBe(error);
+      expect(repository.getCallLog()).toEqual([
+        expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z \[ERROR\] Failed AVS operation$/u),
+      ]);
+    },
+  );
+
+  it('appends repeated AVS messages to the existing callLog in order', () => {
+    const repository = createCallingRepositoryWithoutEventSubscriptions({post: jest.fn()});
+    jest.spyOn(repository['avsLogger'], 'info').mockImplementation(noop);
+    jest.spyOn(repository['avsLogger'], 'warn').mockImplementation(noop);
+
+    repository['avsLogHandler'](LOG_LEVEL.INFO, 'First message', undefined);
+    const initialCallLog = repository.getCallLog();
+    repository['avsLogHandler'](LOG_LEVEL.WARN, 'Second message', new Error('Socket closed'));
+
+    const actualCallLog = repository.getCallLog();
+
+    expect(actualCallLog).toBe(initialCallLog);
+    expect(actualCallLog).toEqual([
+      expect.stringMatching(/ \[INFO \] First message$/u),
+      expect.stringMatching(/ \[WARN \] Second message$/u),
+    ]);
+  });
+});
+
 describe('CallingRepository', () => {
+  beforeAll(initializeBrowserAvs);
+
   afterEach(() => {
     testFactory.dispose();
   });
@@ -872,6 +985,38 @@ describe('CallingRepository', () => {
       );
     });
 
+    it('does not start AVS when the call ends while its MLS join is pending', async () => {
+      jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.MLS);
+      const subconversationService = getSubconversationServiceForTest();
+      const unsubscribe = jest.fn();
+      const {promise: subscribed, resolve: notifySubscribed} = Promise.withResolvers<void>();
+      const {promise: subscription, resolve: resolveSubscription} = Promise.withResolvers<() => void>();
+      jest.spyOn(subconversationService, 'subscribeToEpochUpdates').mockImplementationOnce(() => {
+        notifySubscribed();
+        return subscription;
+      });
+      const startAvs = jest.spyOn(wCall, 'start');
+
+      const start = callingRepository.startCall(conversation);
+      await subscribed;
+      const pendingCall = callingRepository.findCall(conversation.qualifiedId);
+      expect(pendingCall).toBeDefined();
+      if (pendingCall === undefined) {
+        throw new Error('Expected pending call');
+      }
+      const releaseMedia = jest.spyOn(pendingCall.getSelfParticipant(), 'releaseMediaStream');
+      callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+      resolveSubscription(unsubscribe);
+      await start;
+
+      expect(subconversationService.leaveConferenceSubconversation).toHaveBeenCalledWith(conversation.qualifiedId);
+      expect(callingRepository.findCall(conversation.qualifiedId)).toBeUndefined();
+      expect(releaseMedia).toHaveBeenCalledWith(true);
+      expect(unsubscribe).toHaveBeenCalledTimes(1);
+      expect(startAvs).not.toHaveBeenCalled();
+    });
+
     it('does not subscribe to epoch updates after initiating a call in 1:1 mls conversation', async () => {
       const conversationId = {domain: 'example.com', id: 'conversation1'};
 
@@ -984,6 +1129,7 @@ describe('CallingRepository', () => {
 
       jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
       callingRepository['conversationState'].conversations.push(mlsConversation);
+      callingRepository['callState'].calls([incomingCall]);
 
       await callingRepository.answerCall(incomingCall);
 
@@ -1019,6 +1165,7 @@ describe('CallingRepository', () => {
 
       jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
       callingRepository['conversationState'].conversations.push(mlsConversation);
+      callingRepository['callState'].calls([incomingCall]);
 
       await callingRepository.answerCall(incomingCall);
 
@@ -1148,6 +1295,7 @@ describe('CallingRepository', () => {
         const setMute = jest.spyOn(wCall, 'setMute');
         const answer = jest.spyOn(wCall, 'answer');
         callingRepository['conversationState'].conversations.push(conversation);
+        callingRepository['callState'].calls([incomingCall]);
 
         await callingRepository.answerCall(incomingCall, undefined, {cameraEnabled, microphoneEnabled});
 
@@ -1286,6 +1434,170 @@ describe('CallingRepository', () => {
       callingRepository['callState'].calls([incomingCall, activeCall, declinedCall]);
 
       expect(callingRepository['callState'].joinedCall()).toBe(activeCall);
+    });
+  });
+
+  describe('calls answered on another device', () => {
+    const createCallContext = (
+      conversationType: CONV_TYPE,
+      protocol = CONVERSATION_PROTOCOL.PROTEUS,
+      isOneToOne = conversationType === CONV_TYPE.ONEONONE,
+    ): {
+      call: Call;
+      callState: CallState;
+      eventRepository: {injectEvent: jest.Mock};
+      repository: CallingRepository;
+      conversation: Conversation;
+    } => {
+      const conversation = createConversation(
+        isOneToOne ? CONVERSATION_TYPE.ONE_TO_ONE : CONVERSATION_TYPE.REGULAR,
+        protocol,
+      );
+      const eventRepository = {injectEvent: jest.fn()};
+      const {repository, callState} = createCallingRepositoryForTest({
+        conversationState: {findConversation: jest.fn().mockReturnValue(conversation)} as unknown as ConversationState,
+        eventRepository,
+      });
+      const selfUser = new User(createUuid(), '', translateForTest);
+      selfUser.isMe = true;
+      repository['selfUser'] = selfUser;
+      repository['selfClientId'] = createUuid();
+      Object.defineProperty(repository, 'sendCallingEvent', {value: noop});
+      Object.defineProperty(repository, 'leaveMLSConference', {value: jest.fn().mockResolvedValue(undefined)});
+      const createCall = (): Call => {
+        return new Call(
+          {id: createUuid(), domain: ''},
+          conversation,
+          conversationType,
+          createSelfParticipant(),
+          CALL_TYPE.NORMAL,
+          buildMediaDevicesHandler(),
+        );
+      };
+      const call = createCall();
+      call.state(CALL_STATE.INCOMING);
+      callState.calls([call]);
+      return {call, callState, eventRepository, repository, conversation};
+    };
+
+    it.each([
+      [CONV_TYPE.CONFERENCE, CONVERSATION_PROTOCOL.PROTEUS],
+      [CONV_TYPE.CONFERENCE_MLS, CONVERSATION_PROTOCOL.MLS],
+    ])('does not emit a missed-call event for conference type %s', async (conversationType, protocol) => {
+      const {call, callState, eventRepository, repository, conversation} = createCallContext(
+        conversationType,
+        protocol,
+      );
+
+      await repository['callClosed'](REASON.ANSWERED_ELSEWHERE, conversation.id);
+      expect(call.reason()).toBe(REASON.STILL_ONGOING);
+      expect(call.wasAnsweredElsewhere).toBe(true);
+
+      repository['updateCallState'](conversation.id, CALL_STATE.INCOMING);
+      expect(callState.joinableCalls()).toContain(call);
+      await repository['callClosed'](REASON.NORMAL, conversation.id);
+
+      expect(callState.calls()).not.toContain(call);
+      expect(eventRepository.injectEvent).not.toHaveBeenCalled();
+    });
+
+    it('keeps the ordinary still-ongoing conference end event', async () => {
+      const {call, eventRepository, repository, conversation} = createCallContext(CONV_TYPE.CONFERENCE);
+
+      await repository['callClosed'](REASON.STILL_ONGOING, conversation.id);
+      await repository['callClosed'](REASON.NORMAL, conversation.id);
+
+      expect(call.reason()).toBe(REASON.STILL_ONGOING);
+      expect(eventRepository.injectEvent).toHaveBeenCalledWith(
+        expect.objectContaining({data: expect.objectContaining({reason: REASON.NORMAL})}),
+        expect.anything(),
+      );
+    });
+
+    it('does not emit a missed-call event for one-to-one calls using a conference engine', async () => {
+      const {call, eventRepository, repository, conversation} = createCallContext(
+        CONV_TYPE.CONFERENCE,
+        CONVERSATION_PROTOCOL.PROTEUS,
+        true,
+      );
+
+      await repository['callClosed'](REASON.ANSWERED_ELSEWHERE, conversation.id);
+      expect(call.reason()).toBe(REASON.ANSWERED_ELSEWHERE);
+      await repository['callClosed'](REASON.NORMAL, conversation.id);
+
+      expect(eventRepository.injectEvent).not.toHaveBeenCalled();
+    });
+
+    it.each([REASON.TIMEOUT, REASON.ERROR, REASON.LOST_MEDIA])(
+      'does not emit a missed-call event when an answered-elsewhere call ends with reason %s',
+      async reason => {
+        const {eventRepository, repository, conversation} = createCallContext(CONV_TYPE.CONFERENCE);
+
+        await repository['callClosed'](REASON.ANSWERED_ELSEWHERE, conversation.id);
+        await repository['callClosed'](reason, conversation.id);
+
+        expect(eventRepository.injectEvent).not.toHaveBeenCalled();
+      },
+    );
+
+    it('does not add a missed-call event when everyone leaves the conference', async () => {
+      const {eventRepository, repository, conversation} = createCallContext(CONV_TYPE.CONFERENCE);
+
+      await repository['callClosed'](REASON.ANSWERED_ELSEWHERE, conversation.id);
+      await repository['callClosed'](REASON.EVERYONE_LEFT, conversation.id);
+
+      const events = eventRepository.injectEvent.mock.calls.map(([event]) => {
+        return event;
+      });
+      expect(events).toContainEqual(expect.objectContaining({type: CLIENT_CONVERSATION.CALL_TIME_OUT}));
+      expect(events).not.toContainEqual(expect.objectContaining({type: CLIENT_CONVERSATION.VOICE_CHANNEL_DEACTIVATE}));
+    });
+
+    it('does not suppress the next call in the same conversation', async () => {
+      const {call, callState, eventRepository, repository, conversation} = createCallContext(CONV_TYPE.CONFERENCE);
+      const deactivationEvents = (): unknown[] => {
+        return eventRepository.injectEvent.mock.calls
+          .map(([event]) => {
+            return event;
+          })
+          .filter(event => {
+            return event.type === CLIENT_CONVERSATION.VOICE_CHANNEL_DEACTIVATE;
+          });
+      };
+
+      await repository['callClosed'](REASON.ANSWERED_ELSEWHERE, conversation.id);
+      await repository['callClosed'](REASON.NORMAL, conversation.id);
+      expect(callState.calls()).not.toContain(call);
+      expect(deactivationEvents()).toHaveLength(0);
+
+      repository['incomingCall'](
+        conversation.id,
+        Math.floor(Date.now() / 1000),
+        createUuid(),
+        createUuid(),
+        0,
+        0,
+        CONV_TYPE.CONFERENCE,
+      );
+      const [nextCall] = callState.calls();
+      expect(nextCall).toBeInstanceOf(Call);
+      expect(nextCall).not.toBe(call);
+      expect(nextCall.wasAnsweredElsewhere).toBe(false);
+
+      await repository['callClosed'](REASON.NORMAL, conversation.id);
+
+      expect(deactivationEvents()).toEqual([expect.objectContaining({data: expect.objectContaining({duration: 0})})]);
+    });
+
+    it('clears the answered-elsewhere state when this device joins the call', async () => {
+      const {eventRepository, repository, conversation} = createCallContext(CONV_TYPE.CONFERENCE);
+
+      await repository['callClosed'](REASON.ANSWERED_ELSEWHERE, conversation.id);
+      repository['updateCallState'](conversation.id, CALL_STATE.ANSWERED);
+      expect(repository['callState'].calls()[0].wasAnsweredElsewhere).toBe(false);
+      await repository['callClosed'](REASON.NORMAL, conversation.id);
+
+      expect(eventRepository.injectEvent).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -1546,10 +1858,9 @@ describe('CallingRepository', () => {
 
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidJsonString);
 
-      expect(callingRepository['logger'].warn).toHaveBeenCalledWith(
-        'Invalid network quality info JSON',
-        expect.any(Error),
-      );
+      expect(callingRepository['logger'].warn).toHaveBeenCalledWith('Invalid network quality info JSON', {
+        error: expect.any(Error),
+      });
     });
 
     it('logs warning when network quality info schema validation fails', () => {
@@ -1561,10 +1872,9 @@ describe('CallingRepository', () => {
 
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidQualityInfo);
 
-      expect(callingRepository['logger'].warn).toHaveBeenCalledWith(
-        'Invalid network quality info schema',
-        expect.any(z.ZodError),
-      );
+      expect(callingRepository['logger'].warn).toHaveBeenCalledWith('Invalid network quality info schema', {
+        error: expect.any(z.ZodError),
+      });
 
       expect(Warnings.showWarning).not.toHaveBeenCalled();
       expect(Warnings.hideWarning).not.toHaveBeenCalled();
@@ -1799,6 +2109,8 @@ describe('CallingRepository', () => {
 });
 
 describe('CallingRepository ISO', () => {
+  beforeAll(initializeBrowserAvs);
+
   describe('incoming call', () => {
     let avsUser: number;
     let avsCall: Wcall;
@@ -2073,6 +2385,8 @@ describe('CallingRepository ISO', () => {
 });
 
 describe.skip('E2E audio call', () => {
+  beforeAll(initializeBrowserAvs);
+
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: noop} as unknown as EventRepository,
   });
@@ -2213,6 +2527,8 @@ describe.skip('E2E audio call', () => {
 });
 
 describe('NotificationHandlingState', () => {
+  beforeAll(initializeBrowserAvs);
+
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: noop} as unknown as EventRepository,
     mediaDevicesHandler: {
@@ -2260,6 +2576,8 @@ describe('NotificationHandlingState', () => {
 });
 
 describe('init AVS state', () => {
+  beforeAll(initializeBrowserAvs);
+
   const {repository: client} = createCallingRepositoryForTest({
     eventRepository: {injectEvent: noop} as unknown as EventRepository,
     mediaDevicesHandler: {

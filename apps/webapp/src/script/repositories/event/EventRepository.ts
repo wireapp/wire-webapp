@@ -167,7 +167,7 @@ export class EventRepository {
   //##############################################################################
 
   private readonly updateConnectivityStatus = (state: ConnectionState): void => {
-    this.logger.log('Websocket connection state changed to', state);
+    this.logger.info('Websocket connection state changed to', {state});
     switch (state) {
       case ConnectionState.CONNECTING: {
         Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
@@ -210,7 +210,7 @@ export class EventRepository {
       } catch (error: unknown) {
         if (source === EventSource.NOTIFICATION_STREAM) {
           const eventType = (payload as {event?: {type?: string}}).event?.type ?? 'unknown';
-          this.logger.warn(`Failed to handle event of type "${eventType}": ${toError(error).message}`, error);
+          this.logger.warn(`Failed to handle event of type "${eventType}": ${toError(error).message}`, {error});
         } else {
           throw error;
         }
@@ -641,7 +641,7 @@ export class EventRepository {
       !isUndefined(actorId) && typeof actorId.id === 'string' && typeof actorId.domain === 'string';
 
     if (!hasValidQualifiedId || !hasValidActorId) {
-      this.logger.warn(`Ignored ${event.type} event without valid qualified IDs`, event);
+      this.logger.warn(`Ignored ${event.type} event without valid qualified IDs`, {event});
       return;
     }
 
@@ -736,7 +736,7 @@ export class EventRepository {
       }
     } catch (error: unknown) {
       if (error instanceof EventValidationError) {
-        this.logger.warn(`Event validation failed: ${error.message}`, error);
+        this.logger.warn(`Event validation failed: ${error.message}`, {error});
         return;
       }
       throw error;

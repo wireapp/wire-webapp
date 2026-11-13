@@ -19,6 +19,8 @@
 
 import {isError, isNonEmptyString, isString} from '@sindresorhus/is';
 
+import {redactSensitiveString} from '../../logger/redactSensitiveString';
+
 const uuidTimeLowEndIndex = 8;
 const uuidTimeMidEndIndex = 12;
 const uuidTimeHighEndIndex = 16;
@@ -46,13 +48,6 @@ export function bytesToUUID(uuid: Buffer | Uint8Array): string {
 const maxSize = 10_000;
 const maximumSafeLogMessageLength = 200;
 const maximumSafeErrorNameLength = 100;
-const redactedValue = '[REDACTED]';
-const loggableUrlPattern = /\b(?:wss?|https?):\/\/[^\s"'<>]+/giu;
-const sensitiveQueryParameterPattern =
-  /\b(access_token|sync_marker|marker_token|token|client|client_id)=([^&\s"']*)/giu;
-const bearerCredentialPattern = /\b(authorization\s*:\s*)?bearer\s+[^\s,;]+/giu;
-const cookieHeaderPattern = /\b(?:set-cookie|cookie)\s*:\s*[^;\s]*(?:;[^\r\n]*)?/giu;
-const jsonWebTokenPattern = /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gu;
 const safeErrorNamePattern = /^[A-Za-z0-9_.:-]+$/u;
 const newlinePattern = /[\r\n]+/gu;
 
@@ -77,15 +72,21 @@ export function serializeArgs(args: any[]): any[] {
 }
 
 // Helper function to prevent circular references
-function getCircularReplacer() {
-  const seen = new WeakSet();
-  return (_key: string, value: any) => {
+function getCircularReplacer(): (key: string, value: unknown) => unknown {
+  const seen = new WeakSet<object>();
+
+  return (_key: string, value: unknown) => {
     if (typeof value === 'object' && value !== null) {
       if (seen.has(value)) {
         return '[Circular]';
       }
       seen.add(value);
+
+      if (isError(value)) {
+        return {...value, name: value.name, message: value.message, stack: value.stack, cause: value.cause};
+      }
     }
+
     return value;
   };
 }
@@ -124,30 +125,6 @@ export type SafeErrorDetails = {
   readonly errorName: string;
   readonly errorMessage: string;
 };
-
-function sanitizeUrlForLog(urlValue: string): string {
-  try {
-    const url = new URL(urlValue);
-    return url.search.length > 0 ? `${url.origin}${url.pathname}?${redactedValue}` : `${url.origin}${url.pathname}`;
-  } catch {
-    return urlValue;
-  }
-}
-
-function redactSensitiveString(value: string): string {
-  const valueWithSanitizedUrls = value.replace(loggableUrlPattern, sanitizeUrlForLog);
-  const valueWithSanitizedQueryParameters = valueWithSanitizedUrls.replace(
-    sensitiveQueryParameterPattern,
-    `$1=${redactedValue}`,
-  );
-  const valueWithSanitizedHeaders = valueWithSanitizedQueryParameters
-    .replace(bearerCredentialPattern, (_matchedValue, authorizationPrefix: string | undefined) => {
-      return `${authorizationPrefix ?? ''}Bearer ${redactedValue}`;
-    })
-    .replace(cookieHeaderPattern, `Cookie: ${redactedValue}`);
-
-  return valueWithSanitizedHeaders.replace(jsonWebTokenPattern, redactedValue);
-}
 
 export function sanitizeLogMessage(message: string): string {
   return redactSensitiveString(message.replace(newlinePattern, ' ')).slice(0, maximumSafeLogMessageLength);

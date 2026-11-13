@@ -100,7 +100,7 @@ const initialiseMigrationOfProteusConversation = async (
   } catch (error: unknown) {
     mlsMigrationLogger.error(
       `Error while initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,
-      error,
+      {error},
     );
   }
 };

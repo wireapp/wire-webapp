@@ -17,12 +17,11 @@
  *
  */
 
-import logdown from 'logdown';
 import {v4 as uuidv4} from 'uuid';
 
 import {EventEmitter} from 'events';
 
-import {LogFactory} from '../../commons/LogFactory';
+import {getLogger, type Logger} from '../../logger/getLogger';
 import {AccessTokenData} from '../auth/';
 
 const millisecondsPerSecond = 1000;
@@ -36,7 +35,7 @@ export interface AccessTokenStore {
 }
 
 export class AccessTokenStore extends EventEmitter {
-  private readonly logger: logdown.Logger;
+  private readonly logger: Logger;
 
   public static readonly TOPIC = TOPIC;
   public accessTokenData?: AccessTokenData;
@@ -58,11 +57,11 @@ export class AccessTokenStore extends EventEmitter {
   constructor() {
     super();
 
-    this.logger = LogFactory.getLogger('@wireapp/api-client/AccessTokenStore');
+    this.logger = getLogger('@wireapp/api-client/AccessTokenStore');
   }
 
   public delete = async (): Promise<void> => {
-    this.logger.log('Deleting local access token');
+    this.logger.info('Deleting local access token');
     this.accessTokenData = undefined;
     this.tokenExpirationDate = undefined;
     this.markerToken = undefined;
@@ -70,7 +69,7 @@ export class AccessTokenStore extends EventEmitter {
 
   public updateToken = async (accessToken: AccessTokenData): Promise<AccessTokenData> => {
     if (this.accessTokenData !== accessToken) {
-      this.logger.log('Saving local access token');
+      this.logger.info('Saving local access token');
       this.tokenExpirationDate = Date.now() + accessToken.expires_in * millisecondsPerSecond;
       this.accessTokenData = accessToken;
       this.emit(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, this.accessTokenData);
@@ -80,7 +79,7 @@ export class AccessTokenStore extends EventEmitter {
 
   public getNextMarkerToken = (): string => {
     const newMarkerToken = uuidv4();
-    this.logger.info('Generated new marker token:', newMarkerToken, 'Previous marker token:', this.markerToken);
+    this.logger.info('Generated new marker token:', {newMarkerToken, previousMarkerToken: this.markerToken});
     this.markerToken = newMarkerToken;
     return this.markerToken;
   };

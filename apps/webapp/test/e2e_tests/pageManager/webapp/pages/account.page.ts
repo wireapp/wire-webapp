@@ -17,7 +17,7 @@
  *
  */
 
-import {Page, Locator} from '@playwright/test';
+import {Page, Locator, type Response} from '@playwright/test';
 
 type PrivacySectionResult = Locator & {appLock: {checkbox: Locator; label: Locator}};
 export class AccountPage {
@@ -132,6 +132,12 @@ export class AccountPage {
       this.page.getByLabel('Change your picture').click(),
     ]);
     await filePicker.setFiles(imagePath);
+  }
+
+  waitForProfilePictureSave(): Promise<Response> {
+    return this.page.waitForResponse(response => {
+      return response.request().method() === 'PUT' && /\/self$/.test(new URL(response.url()).pathname);
+    });
   }
 
   async changeEmailAddress(newEmail: string): Promise<void> {

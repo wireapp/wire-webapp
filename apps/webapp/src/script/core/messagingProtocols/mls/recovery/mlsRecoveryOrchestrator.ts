@@ -23,7 +23,7 @@ import {DomainMlsError, DomainMlsErrorType, MlsErrorMapper} from './mlsErrorMapp
 
 import {SUBCONVERSATION_ID} from '../../../../apiClient/conversation/subconversation';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
-import {LogFactory} from '../../../../commons/LogFactory';
+import {getLogger} from '../../../../logger/getLogger';
 import {BaseCreateConversationResponse} from '../../../conversation';
 
 /** Context captured when epoch-mismatch recovery is triggered, for structured debugging. */
@@ -191,7 +191,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
     private readonly policies: PolicyTable,
     private readonly deps: OrchestratorDeps,
     private readonly inProgressRecoveries: Set<string> = new Set(),
-    private readonly logger = LogFactory.getLogger('@wireapp/core/MlsRecoveryOrchestrator'),
+    private readonly logger = getLogger('@wireapp/core/MlsRecoveryOrchestrator'),
   ) {}
 
   /**

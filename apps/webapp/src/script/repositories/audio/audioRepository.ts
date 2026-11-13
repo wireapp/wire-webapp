@@ -85,7 +85,7 @@ export class AudioRepository {
     }
     Object.values(this.audioElements).forEach(element => {
       element.setSinkId?.(currentOutputDevice).catch((error: unknown) => {
-        this.logger.warn(error);
+        this.logger.warn('Failed to set audio output device', {error, currentOutputDevice});
       });
     });
   }
@@ -155,7 +155,7 @@ export class AudioRepository {
       case AUDIO_PLAY_PERMISSION.ALLOWED:
         try {
           await this.playAudio(audioElement, playInLoop);
-          this.logger.log(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
+          this.logger.info(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
         } catch (error: unknown) {
           if (error instanceof Error) {
             this.logger.error(`Failed to play sound '${audioId}': ${error.message}`);
@@ -195,7 +195,7 @@ export class AudioRepository {
     const audioElement = this.getSoundById(audioId);
     if (!audioElement?.paused) {
       // This log is used by QA
-      this.logger.log(`Stopping sound '${audioId}'`);
+      this.logger.info(`Stopping sound '${audioId}'`);
       audioElement.pause();
       audioElement.load();
     }

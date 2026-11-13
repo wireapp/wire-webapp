@@ -78,6 +78,10 @@ describe('Preferences', () => {
   const mainViewModel = {
     content: {
       repositories: {
+        calling: {
+          startConnectionTest: jest.fn(),
+          startScanTest: jest.fn(),
+        },
         media: {
           devicesHandler: mockDevicesHandler,
         },

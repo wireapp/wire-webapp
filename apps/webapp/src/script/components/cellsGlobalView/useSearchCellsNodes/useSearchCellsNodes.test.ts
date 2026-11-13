@@ -377,7 +377,7 @@ describe('useSearchCellsNodes', () => {
       return fireAndForgetInvoker.waitUntilAllSettled();
     });
 
-    expect(logger.debug).toHaveBeenCalledWith('Ignoring stale request version:', 1);
+    expect(logger.debug).toHaveBeenCalledWith('Ignoring stale request version:', {requestVersion: 1});
     expect(
       useCellsStore.getState().nodes.map(node => {
         return node.name;

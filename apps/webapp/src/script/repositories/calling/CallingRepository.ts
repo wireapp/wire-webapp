@@ -244,9 +244,11 @@ type SFTRequestCallback = (
 ) => number;
 
 export class CallingRepository {
+  private readonly pendingCallSetups = new WeakSet<Call>();
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
   private readonly logger: Logger;
+  private readonly avsLogger = avsLogger;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private isReady: boolean = false;
@@ -256,6 +258,53 @@ export class CallingRepository {
   private selfUser: User | null = null;
   private wCall?: Wcall;
   private wUser: number = 0;
+  private connectionTest?: {id: string; closed?: boolean; stream?: MediaStream};
+
+  readonly startConnectionTest = async (
+    onProgress?: Parameters<Wcall['runConnectionTest']>[1],
+  ): ReturnType<Wcall['runConnectionTest']> => {
+    const avs = this.wCall;
+    if (
+      isUndefined(avs) ||
+      !isFunction(avs.runConnectionTest) ||
+      this.wUser === 0 ||
+      isNullOrUndefined(this.selfUser) ||
+      !isNonEmptyString(this.selfClientId)
+    ) {
+      throw new Error('AVS connection testing is unavailable');
+    }
+    if (!isUndefined(this.connectionTest)) {
+      throw new Error('An AVS connection test is already running');
+    }
+
+    const id = `avs-connection-test:${this.serializeQualifiedId(this.selfUser.qualifiedId)}:${this.selfClientId}`;
+    const connectionTest = {id};
+    this.connectionTest = connectionTest;
+    try {
+      return await avs.runConnectionTest(this.wUser, onProgress);
+    } finally {
+      if (this.connectionTest === connectionTest) {
+        this.stopConnectionTestMedia(this.connectionTest);
+        this.connectionTest = undefined;
+      }
+    }
+  };
+
+  private stopConnectionTestMedia(connectionTest: NonNullable<CallingRepository['connectionTest']>): void {
+    connectionTest.closed = true;
+    connectionTest.stream?.getTracks().forEach(track => {
+      track.stop();
+    });
+    connectionTest.stream = undefined;
+  }
+
+  readonly startScanTest = async (): ReturnType<Wcall['scanTest']> => {
+    const avs = this.wCall;
+    if (isUndefined(avs) || !isFunction(avs.scanTest) || this.wUser === 0) {
+      throw new Error('AVS scan testing is unavailable');
+    }
+    return avs.scanTest(this.wUser);
+  };
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
   private isOnAvsStagingSft = false;
@@ -639,7 +688,7 @@ export class CallingRepository {
           try {
             wCall.setBackground(this.wUser, 0);
           } catch (error: unknown) {
-            this.logger.warn(`Informed AVS about background mode failed. ${error}`);
+            this.logger.warn('Informed AVS about background mode failed.', {error});
           }
         } else {
           this.logger.warn('Skipping AVS background notification because AVS user ID is not initialized.');
@@ -660,14 +709,18 @@ export class CallingRepository {
       [LOG_LEVEL.WARN]: 'WARN ',
       [LOG_LEVEL.ERROR]: 'ERROR',
     };
-    const logFunctions: Record<LOG_LEVEL, Function> = {
-      [LOG_LEVEL.DEBUG]: avsLogger.debug,
-      [LOG_LEVEL.INFO]: avsLogger.log,
-      [LOG_LEVEL.WARN]: avsLogger.warn,
-      [LOG_LEVEL.ERROR]: avsLogger.error,
+    const logFunctions: Readonly<Record<LOG_LEVEL, Logger['info']>> = {
+      [LOG_LEVEL.DEBUG]: this.avsLogger.debug,
+      [LOG_LEVEL.INFO]: this.avsLogger.info,
+      [LOG_LEVEL.WARN]: this.avsLogger.warn,
+      [LOG_LEVEL.ERROR]: this.avsLogger.error,
     };
     const trimmedMessage = message.trim();
-    logFunctions[level].call(avsLogger, trimmedMessage, error);
+    if (isUndefined(error)) {
+      logFunctions[level](trimmedMessage);
+    } else {
+      logFunctions[level](trimmedMessage, {error});
+    }
     this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
   };
 
@@ -792,9 +845,9 @@ export class CallingRepository {
       qualityInfo = NetworkQualityInfoSchema.parse(parsedQualityInfo);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        this.logger.warn('Invalid network quality info schema', error);
+        this.logger.warn('Invalid network quality info schema', {error});
       } else {
-        this.logger.warn('Invalid network quality info JSON', error);
+        this.logger.warn('Invalid network quality info JSON', {error});
       }
 
       return;
@@ -819,7 +872,7 @@ export class CallingRepository {
 
     switch (quality) {
       case QUALITY.NORMAL: {
-        this.logger.log(
+        this.logger.info(
           `Normal call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
         );
         break;
@@ -859,6 +912,22 @@ export class CallingRepository {
     return this.callState.calls().find((callInstance: Call) => {
       return matchQualifiedIds(callInstance.conversation.qualifiedId, conversationId);
     });
+  }
+
+  private isCallAttemptActive(call: Call): boolean {
+    return this.findCall(call.conversation.qualifiedId) === call && call.endedAt() === 0;
+  }
+
+  private async cleanupPendingCall(call: Call): Promise<void> {
+    this.pendingCallSetups.delete(call);
+    const joinedMls = call.conversationType === CONV_TYPE.CONFERENCE_MLS && call.epochCache.isEnabled();
+    call.epochCache.clean();
+    call.epochCache.disable();
+    this.removeCall(call);
+    if (joinedMls) {
+      callingSubscriptions.removeCall(call.conversation.qualifiedId);
+      await this.subconversationService.leaveConferenceSubconversation(call.conversation.qualifiedId);
+    }
   }
 
   private findParticipant(
@@ -995,7 +1064,7 @@ export class CallingRepository {
         throw error;
       }
 
-      this.logger.warn('Failed to warm up media streams', error);
+      this.logger.warn('Failed to warm up media streams', {error});
       return false;
     } finally {
       backgroundEffectsStore.getState().setIsInitializing(false);
@@ -1422,17 +1491,23 @@ export class CallingRepository {
     const convId = this.serializeQualifiedId(conversationId);
     const cameraRequested = media?.cameraEnabled === true && this.teamState.isVideoCallingEnabled();
     const callType = cameraRequested ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
-    this.logger.log(`Starting a call of type "${callType}" in conversation ID "${convId}"...`);
+    this.logger.info(`Starting a call of type "${callType}" in conversation ID "${convId}"...`);
+    let call: Call | undefined;
+    let avsStarted = false;
     try {
       const rejectedCallInConversation = this.findCall(conversationId);
       if (!isUndefined(rejectedCallInConversation)) {
         // if there is a rejected call, we can remove it from the store
         rejectedCallInConversation.state(CALL_STATE.NONE);
-        this.removeCall(rejectedCallInConversation);
+        if (this.pendingCallSetups.has(rejectedCallInConversation)) {
+          await this.cleanupPendingCall(rejectedCallInConversation);
+        } else {
+          this.removeCall(rejectedCallInConversation);
+        }
       }
       const selfParticipant = new Participant(this.selfUser, this.selfClientId);
       const conversationType = this.getConversationType(conversation);
-      const call = new Call(
+      call = new Call(
         this.selfUser.qualifiedId,
         conversation,
         conversationType,
@@ -1441,6 +1516,7 @@ export class CallingRepository {
         this.mediaDevicesHandler,
       );
       this.storeCall(call);
+      this.pendingCallSetups.add(call);
 
       // Temporary feature to toggle Staging SFT
       this.setSetupSftConfig(call);
@@ -1457,7 +1533,7 @@ export class CallingRepository {
           this.showNoAudioInputModal();
 
           call.state(CALL_STATE.NONE);
-          this.removeCall(call);
+          await this.cleanupPendingCall(call);
 
           return;
         }
@@ -1465,9 +1541,13 @@ export class CallingRepository {
         throw error;
       }
 
-      if (this.isMLSConference(conversation)) {
+      if (this.isMLSConference(conversation) && this.isCallAttemptActive(call)) {
         call.epochCache.enable();
-        await this.joinMlsConferenceSubconversation(conversation);
+        await this.joinMlsConferenceSubconversation(conversation, call);
+      }
+      if (!this.isCallAttemptActive(call)) {
+        await this.cleanupPendingCall(call);
+        return;
       }
 
       /**
@@ -1475,7 +1555,7 @@ export class CallingRepository {
        * we are stuck in muted state so we should call the AVS function setMute(this.wUser, 0) before initiating the call to fix this
        * Further info: https://wearezeta.atlassian.net/browse/SQCALL-551
        */
-      if (media !== undefined) {
+      if (!isUndefined(media)) {
         this.applyChosenMicrophone(call, media.microphoneEnabled);
       } else {
         this.wCall?.setMute(this.wUser, 0);
@@ -1488,6 +1568,8 @@ export class CallingRepository {
         this.callState.cbrEncoding(),
         this.getMeetingCallFlag(conversation),
       );
+      avsStarted = true;
+      this.pendingCallSetups.delete(call);
       if (this.isMLSConference(conversation)) {
         this.setCachedEpochInfos(call);
       }
@@ -1498,16 +1580,18 @@ export class CallingRepository {
 
       return call;
     } catch (error: unknown) {
-      if (isTruthy(error)) {
-        this.logger.error('Failed starting call', error);
+      const wasCancelled = !isUndefined(call) && !this.isCallAttemptActive(call);
+      if (!wasCancelled && isTruthy(error)) {
+        this.logger.error('Failed starting call', {error});
       }
-      if (this.isMLSConference(conversation)) {
-        await this.leaveMLSConferenceBecauseError(conversation);
+      if (!isUndefined(call) && !avsStarted) {
+        if (!wasCancelled) {
+          call.state(CALL_STATE.NONE);
+        }
+        await this.cleanupPendingCall(call);
       }
-      const failedCall = this.findCall(conversationId);
-      if (!isUndefined(failedCall)) {
-        failedCall.state(CALL_STATE.NONE);
-        this.removeCall(failedCall);
+      if (wasCancelled) {
+        return;
       }
       throw error;
     }
@@ -1529,7 +1613,7 @@ export class CallingRepository {
       this.requestConfig();
       this.logger.info('SetupSftConfig: Switch SFT setup use Staging SFT: true->false');
     }
-    this.logger.info('SetupSftConfig: Use Staging SFT', this.isOnAvsStagingSft);
+    this.logger.info('SetupSftConfig: Use Staging SFT', {isOnAvsStagingSft: this.isOnAvsStagingSft});
   }
 
   private serializeQualifiedId(id: QualifiedId): string {
@@ -1626,7 +1710,7 @@ export class CallingRepository {
       );
       selfParticipant.startedScreenSharingAt(Date.now());
     } catch (error: unknown) {
-      this.logger.info('Failed to get screen sharing stream', error);
+      this.logger.info('Failed to get screen sharing stream', {error});
     }
   };
 
@@ -1695,7 +1779,7 @@ export class CallingRepository {
 
       call.analyticsScreenSharing = true;
     } catch (error: unknown) {
-      this.logger.error('Error in toggleScreenShareWithVideo:', error);
+      this.logger.error('Error in toggleScreenShareWithVideo:', {error});
       if (!isNullOrUndefined(screenStream)) {
         screenStream.getTracks().forEach(track => {
           track.stop();
@@ -1837,13 +1921,18 @@ export class CallingRepository {
 
   async answerCall(call: Call, callType?: CALL_TYPE, media?: CallMediaChoice): Promise<void> {
     void this.setViewModeMinimized();
+    this.pendingCallSetups.add(call);
 
     // Temporary feature to toggle Staging SFT
     this.setSetupSftConfig(call);
 
     const {conversation} = call;
     try {
-      if (media !== undefined) {
+      if (!this.isCallAttemptActive(call)) {
+        await this.cleanupPendingCall(call);
+        return;
+      }
+      if (!isUndefined(media)) {
         callType = media.cameraEnabled ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
       } else {
         callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
@@ -1892,18 +1981,23 @@ export class CallingRepository {
       const shouldContinueCall = userConsentWithDegradation && (await this.pushClients(call, true));
       if (shouldContinueCall !== true) {
         this.rejectCall(conversation.qualifiedId);
+        await this.cleanupPendingCall(call);
         return;
       }
-      if (media !== undefined) {
+      if (!isUndefined(media)) {
         this.applyChosenMicrophone(call, media.microphoneEnabled);
       } else {
         this.setMute(call.muteState() !== MuteState.NOT_MUTED);
       }
 
-      if (this.isMLSConference(conversation)) {
+      if (this.isMLSConference(conversation) && this.isCallAttemptActive(call)) {
         // Enable the epoch cache to save all epoch infos while init avs!
         call.epochCache.enable();
-        await this.joinMlsConferenceSubconversation(conversation);
+        await this.joinMlsConferenceSubconversation(conversation, call);
+      }
+      if (!this.isCallAttemptActive(call)) {
+        await this.cleanupPendingCall(call);
+        return;
       }
 
       this.wCall?.answer(
@@ -1912,6 +2006,7 @@ export class CallingRepository {
         callType,
         this.callState.cbrEncoding(),
       );
+      this.pendingCallSetups.delete(call);
 
       if (this.isMLSConference(conversation)) {
         this.setCachedEpochInfos(call);
@@ -1921,19 +2016,20 @@ export class CallingRepository {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
     } catch (error: unknown) {
+      if (!this.isCallAttemptActive(call)) {
+        await this.cleanupPendingCall(call);
+        return;
+      }
       if (error instanceof NoAudioInputError) {
-        this.logger.warn('Failed answering call because microphone is unavailable', error);
+        this.logger.warn('Failed answering call because microphone is unavailable', {error});
         this.showNoAudioInputModal();
       } else if (isTruthy(error)) {
-        this.logger.error('Failed answering call', error);
+        this.logger.error('Failed answering call', {error});
       }
 
       this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.CALL_SETUP_ERROR);
       call.reason(REASON.ERROR);
-
-      if (this.isMLSConference(conversation)) {
-        await this.leaveMLSConferenceBecauseError(conversation);
-      }
+      await this.cleanupPendingCall(call);
     }
   }
 
@@ -1966,20 +2062,10 @@ export class CallingRepository {
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
   };
 
-  private readonly leaveMLSConferenceBecauseError = async (conversationId: QualifiedId): Promise<void> => {
-    const call = this.findCall(conversationId);
-    if (call !== undefined) {
-      call.epochCache.clean();
-      call.epochCache.disable();
-    }
-    await this.leaveMLSConference(conversationId);
-    callingSubscriptions.removeCall(conversationId);
-  };
-
-  private readonly joinMlsConferenceSubconversation = async ({
-    qualifiedId,
-    groupId,
-  }: MLSConversation): Promise<void> => {
+  private readonly joinMlsConferenceSubconversation = async (
+    {qualifiedId, groupId}: MLSConversation,
+    call: Call,
+  ): Promise<void> => {
     const serializeSelfUser = isNullOrUndefined(this.selfUser) ? 'unknown' : this.serializeQualifiedId(this.selfUser);
     const serializeConversationId = this.serializeQualifiedId(qualifiedId);
 
@@ -1996,6 +2082,11 @@ export class CallingRepository {
         return this.setEpochInfo(qualifiedId, data);
       },
     );
+
+    if (!this.isCallAttemptActive(call)) {
+      unsubscribe();
+      return;
+    }
 
     callingSubscriptions.addCall(qualifiedId, unsubscribe);
     this.logger.info(`Call Epoch Info: _join, user: ${serializeSelfUser}, conversation: ${serializeConversationId}`);
@@ -2205,7 +2296,7 @@ export class CallingRepository {
       const startedAtOrZero = isNullOrUndefined(startedAt) || startedAt === 0 || isNan(startedAt) ? 0 : startedAt;
       const isCallTooShort = endedAtOrZero - startedAtOrZero <= TIME_IN_MILLIS.MINUTE;
       const isFeedbackMuted =
-        currentUserDate !== undefined && (currentUserDate === null || currentDate < currentUserDate);
+        !isUndefined(currentUserDate) && (currentUserDate === null || currentDate < currentUserDate);
 
       if (isFeedbackMuted || isCallTooShort) {
         trackingHelpers.trackCallQualityFeedback({
@@ -2217,7 +2308,7 @@ export class CallingRepository {
         setQualityFeedbackModalShown(true);
       }
     } catch (error: unknown) {
-      this.logger.warn(`Storage data can't found: ${(error as Error).message}`);
+      this.logger.warn("Storage data can't found", {error});
       setConversationId(conversationId);
       setQualityFeedbackModalShown(true);
     }
@@ -2242,13 +2333,18 @@ export class CallingRepository {
       if (reason === LEAVE_CALL_REASON.USER_IS_REMOVED_FROM_CONVERSATION) {
         this.removeCall(call);
       }
+      if (this.pendingCallSetups.has(call)) {
+        void this.cleanupPendingCall(call).catch((error: unknown) => {
+          this.logger.error('Failed to clean up pending call', {error});
+        });
+      }
     }
 
     if (isTelemetryEnabledAtCurrentEnvironment()) {
       this.showCallQualityFeedbackModal(conversationId);
     }
 
-    this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
+    this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, {stack: new Error().stack});
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     this.wCall?.end(this.wUser, conversationIdStr);
     AvsDebugger.reset();
@@ -2336,12 +2432,12 @@ export class CallingRepository {
       try {
         await this.mediaDevicesHandler.initializeMediaDevices(camera, false);
       } catch (error: unknown) {
-        this.logger.warn('Failed to initialize media devices:', error);
+        this.logger.warn('Failed to initialize media devices:', {error});
       }
 
       return stream;
     } catch (error: unknown) {
-      this.logger.error('Failed to get media stream:', error);
+      this.logger.error('Failed to get media stream:', {error});
       throw error;
     }
   }
@@ -2570,7 +2666,7 @@ export class CallingRepository {
     }
 
     this.sendCallingMessage(conversationId, payload, options, myClientsOnly === 1).catch((error: unknown) => {
-      this.logger.warn('Failed to send calling message, aborting call', error);
+      this.logger.warn('Failed to send calling message, aborting call', {error});
       this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_SEND_CALLING_MESSAGE);
     });
     return 0;
@@ -2662,7 +2758,7 @@ export class CallingRepository {
     const avsSftResponseFailedCode = 1000;
     _sendSFTRequest().catch((error: unknown) => {
       this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${toError(error).message}`, error);
-      avsLogger.warn(`Request to sft server failed with error`, error);
+      avsLogger.warn(`Request to sft server failed with error`, {error});
       const user = this.wUser;
       if (isUndefined(user)) {
         return;
@@ -2685,7 +2781,7 @@ export class CallingRepository {
       this.wCall?.configUpdate(this.wUser, 0, serializedConfig);
     };
     _requestConfig().catch((error: unknown) => {
-      this.logger.warn('Failed fetching calling config', error);
+      this.logger.warn('Failed fetching calling config', {error});
       this.wCall?.configUpdate(this.wUser, 1, '');
     });
 
@@ -2693,6 +2789,11 @@ export class CallingRepository {
   };
 
   private readonly callClosed = async (reason: REASON, convId: SerializedConversationId): Promise<void> => {
+    const connectionTest = this.connectionTest;
+    if (connectionTest?.id === convId) {
+      this.stopConnectionTestMedia(connectionTest);
+      return;
+    }
     Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
@@ -2746,6 +2847,10 @@ export class CallingRepository {
       this.warnOutdatedClient(conversationId);
     }
 
+    if (reason === REASON.ANSWERED_ELSEWHERE) {
+      call.wasAnsweredElsewhere = true;
+    }
+
     const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE, REASON.REJECTED];
     const startedAt = call.startedAt();
     const startedAtOrZero = isNullOrUndefined(startedAt) || startedAt === 0 || isNan(startedAt) ? 0 : startedAt;
@@ -2778,21 +2883,24 @@ export class CallingRepository {
     });
 
     if (!stillActiveState.includes(reason)) {
-      this.injectDeactivateEvent(
-        call.conversation.qualifiedId,
-        call.initiator,
-        isNullOrUndefined(startedAt) || startedAt === 0 || isNan(startedAt) ? 0 : Date.now() - startedAt,
-        reason,
-        new Date().toISOString(),
-        EventSource.WEBSOCKET,
-      );
+      if (!call.wasAnsweredElsewhere) {
+        this.injectDeactivateEvent(
+          call.conversation.qualifiedId,
+          call.initiator,
+          isNullOrUndefined(startedAt) || startedAt === 0 || isNan(startedAt) ? 0 : Date.now() - startedAt,
+          reason,
+          new Date().toISOString(),
+          EventSource.WEBSOCKET,
+        );
+      }
       this.removeCall(call);
       return;
     }
     selfParticipant.releaseMediaStream(true);
     call.removeAllAudio();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
-    call.reason(reason);
+    const isGroupCall = call.conversation.isGroupOrChannel() || call.conversation.isMeeting();
+    call.reason(reason === REASON.ANSWERED_ELSEWHERE && isGroupCall ? REASON.STILL_ONGOING : reason);
   };
 
   hasActiveCall = (): boolean => {
@@ -2849,14 +2957,11 @@ export class CallingRepository {
     const conversationId = this.parseQualifiedId(convId);
     const conversation = this.getConversationById(conversationId);
     if (isUndefined(conversation) || isNullOrUndefined(this.selfUser) || !isNonEmptyString(this.selfClientId)) {
-      this.logger.warn(
-        'Unable to process incoming call',
-        JSON.stringify({
-          conversationId,
-          selfClientId: this.selfClientId,
-          selfUser: this.selfUser,
-        }),
-      );
+      this.logger.warn('Unable to process incoming call', {
+        conversationId,
+        selfClientId: this.selfClientId,
+        selfUser: this.selfUser,
+      });
       return;
     }
 
@@ -2873,7 +2978,7 @@ export class CallingRepository {
     ) {
       this.logger.info(
         `Skipping incoming ring, last incoming SETUP is older than ${EventRepository.CONFIG.E_CALL_EVENT_LIFETIME}ms`,
-        conversationId,
+        {conversationId},
       );
       this.rejectCall(conversationId);
       return;
@@ -2883,7 +2988,13 @@ export class CallingRepository {
     if (!isUndefined(storedCall)) {
       // A call that has been picked up by another device can still be in storage.
       // When a second call arrives in the same conversation, we need to clean that call first
-      this.removeCall(storedCall);
+      if (this.pendingCallSetups.has(storedCall)) {
+        void this.cleanupPendingCall(storedCall).catch((error: unknown) => {
+          this.logger.error('Failed to clean up replaced call', {error});
+        });
+      } else {
+        this.removeCall(storedCall);
+      }
     }
     const canRing = !conversation.showNotificationsNothing() && shouldRing !== 0 && !isNan(shouldRing) && this.isReady;
     const selfParticipant = new Participant(this.selfUser, this.selfClientId);
@@ -2926,6 +3037,9 @@ export class CallingRepository {
       return;
     }
 
+    if (state === CALL_STATE.ANSWERED || state === CALL_STATE.MEDIA_ESTAB) {
+      call.wasAnsweredElsewhere = false;
+    }
     // If a call goes from a state to INCOMING, it means it's a group call that just ended
     call.reason(state === CALL_STATE.INCOMING ? REASON.STILL_ONGOING : undefined);
     call.state(state);
@@ -3109,6 +3223,21 @@ export class CallingRepository {
     camera: boolean,
     screen: boolean,
   ): Promise<MediaStream> => {
+    const connectionTest = this.connectionTest;
+    if (connectionTest?.id === convId) {
+      const stream = await this.getMediaStream({audio, camera, screen}, true);
+      if (this.connectionTest !== connectionTest || connectionTest.closed === true) {
+        stream.getTracks().forEach(track => {
+          track.stop();
+        });
+        throw new Error('AVS connection test already ended');
+      }
+      connectionTest.stream?.getTracks().forEach(track => {
+        track.stop();
+      });
+      connectionTest.stream = stream;
+      return stream;
+    }
     const call = this.findCall(this.parseQualifiedId(convId));
     if (isUndefined(call)) {
       return Promise.reject();
@@ -3132,7 +3261,7 @@ export class CallingRepository {
 
       return mediaStream;
     } catch (error: unknown) {
-      this.logger.warn('Failed to get call media stream', error);
+      this.logger.warn('Failed to get call media stream', {error});
 
       this.handleMediaStreamError(call, query, error);
 
@@ -3286,7 +3415,7 @@ export class CallingRepository {
   };
 
   private readonly metricsReceived = (metricName: string, metrics: string): void => {
-    this.logger.info('Calling metrics:', metrics);
+    this.logger.info('Calling metrics:', {metrics});
   };
 
   private readonly sendCallingEvent = (
@@ -3333,6 +3462,11 @@ export class CallingRepository {
    * @note Should only used by "window.onbeforeunload".
    */
   destroy(): void {
+    const connectionTest = this.connectionTest;
+    if (!isUndefined(connectionTest)) {
+      this.wCall?.end(this.wUser, connectionTest.id);
+      void this.callClosed(REASON.CANCELED, connectionTest.id);
+    }
     this.callState.calls().forEach((call: Call) => {
       this.wCall?.end(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId));
     });

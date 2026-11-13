@@ -53,6 +53,7 @@ import {LegalHoldModal} from '../components/Modals/LegalHoldModal/LegalHoldModal
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from '../components/Modals/UserModal';
 import {Config} from '../Config';
+import type {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
@@ -78,6 +79,7 @@ import {useMatchMedia} from '../uiKit/layout/matchMedia/matchMedia';
 import {StyledApp} from '../uiKit/layout/styledApp/styledApp';
 import {QUERY} from '../uiKit/utils/mediaQueries';
 import {canUseMeetings} from '../util/canUseMeetings';
+import {canUseTroubleshooter} from '../util/canUseTroubleshooter';
 import {useKoSubscribableChildren} from '../util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from '../util/isDetachedCallingFeatureEnabled';
 import {MainViewModel} from '../view_model/MainViewModel';
@@ -99,6 +101,7 @@ type AppMainProps = {
   readonly conversationState?: ConversationState;
   readonly callState?: CallState;
   readonly clock: Clock;
+  readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
   readonly locked: boolean;
 };
@@ -112,6 +115,7 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
     conversationState = container.resolve(ConversationState),
     callState = container.resolve(CallState),
     clock,
+    isFeatureToggleEnabled,
     locked,
   } = properties;
   const translate = mainView.translate;
@@ -291,7 +295,9 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
         return mainView.list.openPreferencesAudioVideo();
       },
       '/preferences/troubleshooting': () => {
-        return mainView.list.openPreferences(ContentState.PREFERENCES_TROUBLESHOOTING);
+        return canUseTroubleshooter(isFeatureToggleEnabled)
+          ? mainView.list.openPreferences(ContentState.PREFERENCES_TROUBLESHOOTING)
+          : navigate('/');
       },
       '/preferences/devices': () => {
         return mainView.list.openPreferencesDevices();

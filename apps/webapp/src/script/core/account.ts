@@ -22,9 +22,9 @@ import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {once} from 'lodash';
-import logdown from 'logdown';
 import {asyncNoop, noop} from 'noop-esm';
 import {TimeoutError} from 'p-queue';
+import {task, type Maybe, type Task} from 'true-myth';
 
 import type {CoreCryptoLogLevel} from '@wireapp/core-crypto';
 
@@ -105,10 +105,10 @@ import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '../apiClient/tcp/
 import {WebSocketClient} from '../apiClient/tcp/webSocketClient';
 import {FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../apiClient/user/qualifiedId';
-import {LogFactory} from '../commons/LogFactory';
 import {TypedEventEmitter} from '../commons/TypedEventEmitter/TypedEventEmitter';
 import {StringUtil} from '../commons/util';
 import {TimeInMillis} from '../commons/util/TimeUtil';
+import {getLogger, type Logger} from '../logger/getLogger';
 
 type CryptoClientWithProtocol =
   readonly [CryptoClientType.CORE_CRYPTO, CoreCryptoWrapper] | readonly [CryptoClientType.CRYPTOBOX, CryptoboxWrapper];
@@ -163,17 +163,19 @@ export enum EVENTS {
    * An unknown client is a client we don't yet have a session with
    */
   NEW_SESSION = 'new_session',
+  SERVICES_CHANGED = 'services_changed',
 }
 
 type Events = {
   [EVENTS.NEW_SESSION]: NewClient;
+  [EVENTS.SERVICES_CHANGED]: void;
 };
 
 export const AccountLocalStorageStore = LocalStorageStore('core_account');
 
 export class Account extends TypedEventEmitter<Events> {
   private readonly apiClient: APIClient;
-  private readonly logger: logdown.Logger;
+  private readonly logger: Logger;
   /** this is the client the consumer is currently using. Will be set as soon as `initClient` is called and will be rest upon logout */
   private currentClient?: RegisteredClient;
   private storeEngine?: CRUDEngine;
@@ -239,7 +241,7 @@ export class Account extends TypedEventEmitter<Events> {
     this.clock = options.clock ?? createClock();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
-    this.logger = LogFactory.getLogger('@wireapp/core/Account');
+    this.logger = getLogger('@wireapp/core/Account');
     const accountLogger = this.logger;
     this.recurringTaskScheduler = new RecurringTaskScheduler(
       {
@@ -256,7 +258,7 @@ export class Account extends TypedEventEmitter<Events> {
       },
       createFireAndForgetInvoker({
         reportError(error) {
-          accountLogger.error('failed to execute fire-and-forget action', error);
+          accountLogger.error('failed to execute fire-and-forget action', {error});
         },
       }),
     );
@@ -266,7 +268,7 @@ export class Account extends TypedEventEmitter<Events> {
         try {
           await this.persistCookie(this.storeEngine, cookie);
         } catch (error: unknown) {
-          this.logger.error('Failed to save cookie:', error);
+          this.logger.error('Failed to save cookie:', {error});
         }
       }
     });
@@ -441,8 +443,12 @@ export class Account extends TypedEventEmitter<Events> {
     return client;
   };
 
-  public getLocalClient(): Promise<MetaClient | undefined> | undefined {
-    return this.service?.client.loadClient();
+  public getLocalClient(): Task<Maybe<MetaClient>, Error> {
+    if (isUndefined(this.service)) {
+      return task.reject(new Error('Client service is not initialized.'));
+    }
+
+    return this.service.client.loadClient();
   }
 
   /**
@@ -577,7 +583,7 @@ export class Account extends TypedEventEmitter<Events> {
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
-    const subconversationService = new SubconversationService(this.apiClient, this.db, mlsService);
+    const subconversationService = new SubconversationService(this.apiClient, this.db, this.clock, mlsService);
     const conversationService = new ConversationService(
       this.apiClient,
       proteusService,
@@ -614,6 +620,7 @@ export class Account extends TypedEventEmitter<Events> {
       team: teamService,
       user: userService,
     };
+    this.emit(EVENTS.SERVICES_CHANGED);
   };
 
   private readonly resetContext = (): void => {
@@ -622,6 +629,7 @@ export class Account extends TypedEventEmitter<Events> {
     this.connectionState = ConnectionState.CLOSED;
     delete this.apiClient.context;
     delete this.service;
+    this.emit(EVENTS.SERVICES_CHANGED);
   };
 
   /**
@@ -646,7 +654,7 @@ export class Account extends TypedEventEmitter<Events> {
     try {
       await this.service?.client.deleteLocalClient();
     } catch (error: unknown) {
-      this.logger.error('Failed to delete local client during logout cleanup:', error);
+      this.logger.error('Failed to delete local client during logout cleanup:', {error});
     }
 
     try {
@@ -654,14 +662,14 @@ export class Account extends TypedEventEmitter<Events> {
         await wipeCoreCryptoDb(this.storeEngine, this.clock);
       }
     } catch (error: unknown) {
-      this.logger.error('Failed to wipe crypto database during logout cleanup:', error);
+      this.logger.error('Failed to wipe crypto database during logout cleanup:', {error});
     }
 
     try {
       // needs to be wiped last
       await this.encryptedDb?.wipe();
     } catch (error: unknown) {
-      this.logger.error('Failed to delete encrypted database during logout cleanup:', error);
+      this.logger.error('Failed to delete encrypted database during logout cleanup:', {error});
     }
   };
 
@@ -674,7 +682,7 @@ export class Account extends TypedEventEmitter<Events> {
         await deleteIdentity(this.storeEngine, false);
       }
     } catch (error: unknown) {
-      this.logger.error('Failed to delete identity during logout cleanup:', error);
+      this.logger.error('Failed to delete identity during logout cleanup:', {error});
     }
 
     try {
@@ -682,7 +690,7 @@ export class Account extends TypedEventEmitter<Events> {
         await deleteDB(this.db);
       }
     } catch (error: unknown) {
-      this.logger.error('Failed to delete database during logout cleanup:', error);
+      this.logger.error('Failed to delete database during logout cleanup:', {error});
     }
 
     await this.wipeCommonData();
@@ -698,7 +706,7 @@ export class Account extends TypedEventEmitter<Events> {
         await deleteIdentity(this.storeEngine, true);
       }
     } catch (error: unknown) {
-      this.logger.error('Failed to delete identity during logout cleanup:', error);
+      this.logger.error('Failed to delete identity during logout cleanup:', {error});
     }
 
     await this.wipeCommonData();
@@ -1058,12 +1066,12 @@ export class Account extends TypedEventEmitter<Events> {
     }
 
     if (error instanceof TimeoutError) {
-      this.logger.warn('Notification decryption task timed out', error);
+      this.logger.warn('Notification decryption task timed out', {error});
       return;
     }
 
     if (isQueueFlushedError(error)) {
-      this.logger.info('Notification processing queue was flushed, ignoring error', error);
+      this.logger.info('Notification processing queue was flushed, ignoring error', {error});
     }
   };
 
@@ -1258,7 +1266,7 @@ export class Account extends TypedEventEmitter<Events> {
 
       this.logger.info(
         'Finished inserting notifications for decryption from the legacy endpoint to the process queue',
-        results,
+        {results},
       );
 
       // We need to wait for the notification stream to be fully handled before releasing the message sending queue.

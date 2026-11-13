@@ -188,7 +188,7 @@ export const E2EIVerificationMessage: FunctionComponent<E2EIVerificationMessageP
     try {
       await E2EIHandler.getInstance().enroll({resetTimers: true});
     } catch (error: unknown) {
-      logger.error('Failed to enroll user certificate: ', error);
+      logger.error('Failed to enroll user certificate: ', {error});
     }
   };
 

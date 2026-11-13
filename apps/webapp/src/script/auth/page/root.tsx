@@ -79,7 +79,7 @@ type LanguageMessages = typeof englishMessages;
 const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
 const authFireAndForgetInvoker = createFireAndForgetInvoker({
   reportError(error) {
-    fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
+    fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', {error});
   },
 });
 

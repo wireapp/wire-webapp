@@ -21,11 +21,7 @@ import {isUndefined} from '@sindresorhus/is';
 import {Maybe, Result, Task, Unit} from 'true-myth';
 import {match, P} from 'ts-pattern';
 
-import {
-  compareWebAppVersions,
-  updateWebAppPackageDocuments,
-  validateMatchingWebAppPackageVersions,
-} from './webappVersion.ts';
+import {compareWebAppVersions, updateWebAppPackageDocuments, validateWebAppPackageVersion} from './webappVersion.ts';
 import type {WebAppVersion} from './webappVersion.ts';
 import {
   createWebAppVersionSynchronizationRequest,
@@ -295,17 +291,13 @@ function prepareSynchronizationCommit(
 ): Task<Unit, Error> {
   const packageDocumentsResult = updateWebAppPackageDocuments({
     rootPackageDocument: options.mainSnapshot.rootPackageDocument,
-    webAppPackageDocument: options.mainSnapshot.webAppPackageDocument,
     targetVersion: options.webAppVersion,
   });
   if (packageDocumentsResult.isErr) {
     return Task.reject(packageDocumentsResult.error);
   }
 
-  const currentVersionResult = validateMatchingWebAppPackageVersions(
-    options.mainSnapshot.rootPackageDocument,
-    options.mainSnapshot.webAppPackageDocument,
-  );
+  const currentVersionResult = validateWebAppPackageVersion(options.mainSnapshot.rootPackageDocument);
   if (currentVersionResult.isErr) {
     return Task.reject(currentVersionResult.error);
   }
@@ -325,10 +317,7 @@ function prepareSynchronizationCommit(
       return dependencies.gitClient.readWorkingTreePackageDocuments();
     })
     .andThen(packageDocuments => {
-      const packageVersionsResult = validateMatchingWebAppPackageVersions(
-        packageDocuments.rootPackageDocument,
-        packageDocuments.webAppPackageDocument,
-      );
+      const packageVersionsResult = validateWebAppPackageVersion(packageDocuments.rootPackageDocument);
       if (packageVersionsResult.isErr) {
         return Task.reject(packageVersionsResult.error);
       }
@@ -518,10 +507,7 @@ function reconcileAndSynchronizeWebAppVersion(
   options: ReconcileAndSynchronizeWebAppVersionOptions,
   dependencies: WebAppVersionSynchronizationDependencies,
 ): Task<WebAppVersionSynchronizationResult, Error> {
-  const packageVersionsResult = validateMatchingWebAppPackageVersions(
-    options.mainSnapshot.rootPackageDocument,
-    options.mainSnapshot.webAppPackageDocument,
-  );
+  const packageVersionsResult = validateWebAppPackageVersion(options.mainSnapshot.rootPackageDocument);
   if (packageVersionsResult.isErr) {
     return Task.reject(packageVersionsResult.error);
   }

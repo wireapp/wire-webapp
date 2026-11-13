@@ -50,12 +50,28 @@ export const isCoreCryptoMLSOrphanWelcomeError = (
   return CoreCryptoError.Mls.instanceOf(error) && MlsError.OrphanWelcome.instanceOf(error.inner.mlsError);
 };
 
+/**
+ * The incoming message has been buffered by CoreCrypto: either it targets a future epoch, or it is a commit that
+ * arrived out of order. CoreCrypto will consume it once the missing messages arrive. If they never arrive
+ * (e.g. a missed commit), the group is stuck and needs to be recovered.
+ */
+export type BufferedMessageError = CoreCryptoMlsErrorWith<
+  InstanceType<typeof MlsError.BufferedFutureMessage> | InstanceType<typeof MlsError.BufferedCommit>
+>;
+
+export const isCoreCryptoMLSBufferedMessageError = (error: unknown): error is BufferedMessageError => {
+  return (
+    CoreCryptoError.Mls.instanceOf(error) &&
+    (MlsError.BufferedFutureMessage.instanceOf(error.inner.mlsError) ||
+      MlsError.BufferedCommit.instanceOf(error.inner.mlsError))
+  );
+};
+
 const isIgnorableMlsError = (error: MlsError): boolean => {
   return (
     MlsError.StaleCommit.instanceOf(error) ||
     MlsError.StaleProposal.instanceOf(error) ||
     MlsError.DuplicateMessage.instanceOf(error) ||
-    MlsError.BufferedFutureMessage.instanceOf(error) ||
     MlsError.UnmergedPendingGroup.instanceOf(error)
   );
 };

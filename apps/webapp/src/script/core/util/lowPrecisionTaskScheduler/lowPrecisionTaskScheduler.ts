@@ -17,7 +17,7 @@
  *
  */
 
-import {LogFactory} from '../../../commons/LogFactory';
+import {getLogger} from '../../../logger/getLogger';
 
 interface IntervalTask {
   firingDate: number;
@@ -34,7 +34,7 @@ interface CancelLowPrecisionTaskParams {
   intervalDelay: number;
 }
 
-const logger = LogFactory.getLogger('@wireapp/core/TaskScheduler');
+const logger = getLogger('@wireapp/core/TaskScheduler');
 const intervals: Record<number, {timeoutId: NodeJS.Timeout; tasks: Record<string, IntervalTask>}> = {};
 
 const addTask = ({key, firingDate, task, intervalDelay}: ScheduleLowPrecisionTaskParams): void => {

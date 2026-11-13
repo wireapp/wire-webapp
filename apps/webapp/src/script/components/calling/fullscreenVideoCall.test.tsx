@@ -43,10 +43,7 @@ import {
   createRootProviderWrapperForTest,
 } from '../../page/testSupport/rootContextTestSupport';
 import {translate} from '../../util/localizerUtil';
-import {
-  callSecurityLineFeatureToggleName,
-  minimizeSelfViewFeatureToggleName,
-} from '../../featureToggles/startupFeatureToggleNames';
+import {minimizeSelfViewFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 import {useCallAlertState} from './useCallAlertState';
@@ -109,46 +106,12 @@ describe('fullscreenVideoCall', () => {
     jest.useRealTimers();
   });
 
-  it('shows the security line in the timer when the feature is enabled', () => {
-    const wrapper = createRootProviderWrapperForTest(
-      createRootContextValueForTest({
-        translate: translateForTest,
-        isFeatureToggleEnabled: featureName => {
-          return featureName === callSecurityLineFeatureToggleName;
-        },
-      }),
+  it('always shows the security line in the timer', () => {
+    const {getByTestId} = render(
+      withThemeAndRootContext(<FullscreenVideoCall {...createProps()} />, rootProviderWrapper),
     );
 
-    const {getByTestId} = render(withThemeAndRootContext(<FullscreenVideoCall {...createProps()} />, wrapper));
-
     expect(getByTestId('video-timer').contains(getByTestId('call-security-line'))).toBe(true);
-  });
-
-  it('shows the calling timer', async () => {
-    const props = createProps();
-
-    const {getByText, queryByTestId} = render(withTheme(withTheme(<FullscreenVideoCall {...props} />)), {
-      wrapper: rootProviderWrapper,
-    });
-    expect(queryByTestId('call-security-line')).toBeNull();
-    const now = Date.now();
-
-    jest.setSystemTime(now);
-    act(() => {
-      props.call.startedAt(Date.now());
-    });
-
-    await waitFor(() => {
-      return expect(getByText('00:00')).toBeDefined();
-    });
-
-    act(() => {
-      jest.advanceTimersByTime(1001);
-    });
-
-    await waitFor(() => {
-      return expect(getByText('00:01')).toBeDefined();
-    });
   });
 
   it('keeps the one-on-one self preview unchanged when minimization is disabled by default', () => {

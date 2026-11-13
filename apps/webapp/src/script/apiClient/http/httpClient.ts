@@ -19,7 +19,6 @@
 
 import axios, {AxiosError, AxiosHeaders, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import axiosRetry, {isNetworkOrIdempotentRequestError, exponentialDelay} from 'axios-retry';
-import logdown from 'logdown';
 import {gzip} from 'pako';
 import {Maybe} from 'true-myth';
 
@@ -30,8 +29,8 @@ import {createIncrementalRetryBackoffPolicy, IncrementalRetryBackoffState} from 
 import {createIncrementalRetryBackoffRunner} from './incrementalRetryBackoffRunner';
 import {PriorityQueue} from './priorityQueue/priorityQueue';
 
-import {LogFactory} from '../../commons/LogFactory';
 import {TimeUtil} from '../../commons/util';
+import {getLogger, type Logger} from '../../logger/getLogger';
 import {
   AccessTokenData,
   AccessTokenStore,
@@ -89,7 +88,7 @@ const longRunningRetryThresholdInMilliseconds = TimeUtil.TimeInMillis.MINUTE;
 
 export class HttpClient extends EventEmitter {
   public readonly client: AxiosInstance;
-  private readonly logger: logdown.Logger;
+  private readonly logger: Logger;
   private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
   private readonly incrementalRetryBackoffPolicy = createIncrementalRetryBackoffPolicy();
@@ -156,7 +155,7 @@ export class HttpClient extends EventEmitter {
       incrementalRetryBackoffPolicy: this.incrementalRetryBackoffPolicy,
     });
 
-    this.logger = LogFactory.getLogger('@wireapp/api-client/http/HttpClient');
+    this.logger = getLogger('@wireapp/api-client/http/HttpClient');
 
     this.requestQueue = new PriorityQueue({
       maxRetries: 0,
@@ -294,7 +293,7 @@ export class HttpClient extends EventEmitter {
           // On invalid cookie the application is supposed to logout.
           this.logger.warn(
             `Cannot renew access token for "${config.method}" request to "${config.url}" because cookie/token is invalid: ${mappedError.message}`,
-            mappedError,
+            {error: mappedError},
           );
           this.emit(HttpClient.TOPIC.ON_INVALID_TOKEN, mappedError);
         }
@@ -341,10 +340,9 @@ export class HttpClient extends EventEmitter {
     }
 
     const accessToken = await this.postAccess(expiredAccessToken);
-    this.logger.info(
-      `Received updated access token. It will expire in "${accessToken.expires_in}" seconds.`,
-      ObfuscationUtil.obfuscateAccessToken(accessToken),
-    );
+    this.logger.info(`Received updated access token. It will expire in "${accessToken.expires_in}" seconds.`, {
+      accessToken: ObfuscationUtil.obfuscateAccessToken(accessToken),
+    });
     return this.accessTokenStore.updateToken(accessToken);
   }
 

@@ -26,7 +26,6 @@ import {ListWrapper} from './listWrapper';
 import {Runtime} from '../../../commons/util/Runtime';
 import * as Icon from '../../../components/icon';
 import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
-import {troubleshooterFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {
   ClientNotificationData,
   Notification,
@@ -34,6 +33,7 @@ import {
 } from '../../../repositories/notification/PreferenceNotificationRepository';
 import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {TabIndex} from '../../../uiKit/utils/enums';
+import {canUseTroubleshooter} from '../../../util/canUseTroubleshooter';
 import {WebAppEvents} from '../../../webAppEvents';
 import {useApplicationContext} from '../../rootProvider';
 import {ContentState, useAppState} from '../../useAppState';
@@ -180,7 +180,7 @@ const Preferences: FunctionComponent<PreferencesProps> = ({
     },
     {
       IconComponent: Icon.NetworkIcon,
-      hidden: !isFeatureToggleEnabled(troubleshooterFeatureToggleName),
+      hidden: !canUseTroubleshooter(isFeatureToggleEnabled),
       id: ContentState.PREFERENCES_TROUBLESHOOTING,
       label: translate('preferencesTroubleshooting'),
       uieName: 'go-troubleshooting',

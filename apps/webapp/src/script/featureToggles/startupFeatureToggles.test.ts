@@ -24,34 +24,57 @@ import {
 } from './startupFeatureToggles';
 import {
   applockRefactoredFeatureToggleName,
-  callSecurityLineFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
-  driveBulkActionsFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
   minimizeSelfViewFeatureToggleName,
+  e2ePdfPreviewFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
+  persistentBrowserLogsFeatureToggleName,
+  previewDefaultEnabledStartupFeatureToggleNames,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
-  callSecurityLineFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
-  driveBulkActionsFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
   minimizeSelfViewFeatureToggleName,
+  e2ePdfPreviewFeatureToggleName,
+  persistentBrowserLogsFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
+  it('keeps persistent browser logs disabled for release and preview builds and preserves explicit opt-in alongside other toggles', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch(
+      '?enabled-features=mark-as-unread,persistent-browser-logs',
+    );
+
+    expect(disabled.isFeatureToggleEnabled(persistentBrowserLogsFeatureToggleName)).toBe(false);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(persistentBrowserLogsFeatureToggleName);
+    expect(enabled.enabledFeatureToggleNames).toEqual([
+      markAsUnreadFeatureToggleName,
+      persistentBrowserLogsFeatureToggleName,
+    ]);
+  });
+  it('keeps encrypted PDF previews disabled for release builds and allows explicit opt-in', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview');
+
+    expect(disabled.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)).toBe(false);
+    expect(enabled.isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName)).toBe(true);
+    expect(enabled.enabledFeatureToggleNames).toEqual([e2ePdfPreviewFeatureToggleName]);
+  });
+
   it('keeps Mark as unread disabled by default for release builds and allows explicit opt-in', () => {
     const disabled = createStartupFeatureTogglesFromLocationSearch('');
     const enabled = createStartupFeatureTogglesFromLocationSearch('?enabled-features=mark-as-unread');
@@ -93,20 +116,6 @@ describe('startupFeatureToggles', function () {
     expect(enabled.enabledFeatureToggleNames).toEqual([minimizeSelfViewFeatureToggleName]);
   });
 
-  it('keeps the call security line disabled by default', () => {
-    const toggles = createStartupFeatureTogglesFromLocationSearch('');
-
-    expect(toggles.isFeatureToggleEnabled(callSecurityLineFeatureToggleName)).toBe(false);
-  });
-
-  it('enables the call security line when selected in developer settings', () => {
-    const toggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${callSecurityLineFeatureToggleName}`,
-    );
-
-    expect(toggles.isFeatureToggleEnabled(callSecurityLineFeatureToggleName)).toBe(true);
-  });
-
   it('enables the troubleshooter when selected in developer settings', () => {
     const toggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${troubleshooterFeatureToggleName}`,
@@ -125,30 +134,14 @@ describe('startupFeatureToggles', function () {
     expect(enabled.isFeatureToggleEnabled(sendCallLogsFeatureToggleName)).toBe(true);
   });
 
-  it('keeps Drive bulk actions disabled by default', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('');
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(false);
-  });
-
-  it('enables Drive bulk actions when selected in developer settings', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(true);
-  });
-
   it('keeps Drive bulk restore disabled until its separate toggle is enabled', () => {
-    const bulkActionsOnly = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName}`,
-    );
-    const bulkActionsWithRestore = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName},${driveBulkRestoreFeatureToggleName}`,
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${driveBulkRestoreFeatureToggleName}`,
     );
 
-    expect(bulkActionsOnly.isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName)).toBe(false);
-    expect(bulkActionsWithRestore.isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName)).toBe(true);
+    expect(disabled.isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName)).toBe(false);
+    expect(enabled.isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName)).toBe(true);
   });
 
   it('enables a whitelisted feature toggle when present in the query parameter', () => {
@@ -265,16 +258,16 @@ describe('startupFeatureToggles', function () {
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       applockRefactoredFeatureToggleName,
-      callSecurityLineFeatureToggleName,
       conversationListCollapseFeatureToggleName,
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
-      driveBulkActionsFeatureToggleName,
       driveBulkRestoreFeatureToggleName,
       markAsUnreadFeatureToggleName,
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,
       minimizeSelfViewFeatureToggleName,
+      e2ePdfPreviewFeatureToggleName,
+      persistentBrowserLogsFeatureToggleName,
     ]);
   });
 

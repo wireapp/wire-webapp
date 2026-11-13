@@ -159,53 +159,8 @@ jobs:
         run: |
           npx just package-server-public
 
-      - name: Install unzip for artifact verification
-        run: |
-          apt-get update
-          apt-get install --yes --no-install-recommends unzip
-          rm -rf /var/lib/apt/lists/*
-
-      - name: Verify public Rspack deployment package
-        env:
-          BUILD_ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
-          EXPECTED_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
-          EXPECTED_VERSION: ${{ steps.public_rspack_build.outputs.expected_version }}
-        run: |
-          set -euo pipefail
-
-          test -f "$BUILD_ARTIFACT_PATH"
-          unzip -tq "$BUILD_ARTIFACT_PATH"
-          npx just validate-build-artifact
-
-          archive_entries="$(unzip -Z1 "$BUILD_ARTIFACT_PATH")"
-          required_entry_scripts=(
-            static/min/app.js
-            static/min/auth.js
-            static/min/checkBrowser.js
-            static/min/runtime.js
-            static/min/vendor.js
-            static/min/dexie.js
-            static/min/pdf.worker.mjs
-            static/min/worker.js
-          )
-
-          for entry_script_path in "${required_entry_scripts[@]}"; do
-            if ! grep -Fqx -- "$entry_script_path" <<< "$archive_entries"; then
-              echo "Public Rspack deployment package is missing required entry script: $entry_script_path" >&2
-              exit 1
-            fi
-          done
-
-          public_rspack_runtime="$(unzip -p "$BUILD_ARTIFACT_PATH" static/min/runtime.js)"
-          if ! grep -Fq 'rspackChunk_wireapp_webapp' <<< "$public_rspack_runtime"; then
-            echo "Public deployment package does not contain the Rspack runtime fingerprint." >&2
-            exit 1
-          fi
-
-          if grep -Fq 'webpackChunk_wireapp_webapp' <<< "$public_rspack_runtime"; then
-            echo "Public deployment package contains the Webpack runtime fingerprint." >&2
-            exit 1
-          fi
+      - name: Verify isolated production server bundle
+        run: npx just verify-server-bundle
 
       - name: Upload Rspack smoke diagnostics
         if: ${{ failure() }}
@@ -320,6 +275,22 @@ jobs:
       - name: Stylelint
         run: npx just stylesheet-lint
 
+      - name: Check circular dependencies
+        run: npx just lint-dependencies
+
+      - name: Report all circular dependencies
+        if: ${{ !cancelled() }}
+        run: npx just report-dependencies
+
+      - name: Upload circular dependency report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: circular-dependencies
+          path: target/reports/dependencies/
+          if-no-files-found: error
+          retention-days: 3
+
   unit-tests:
     runs-on: ubuntu-26.04-arm
     name: unit tests
@@ -362,7 +333,6 @@ jobs:
   public-production-package:
     runs-on: ubuntu-26.04
     name: Public production package verification
-    if: ${{ github.event_name == 'pull_request' }}
     needs:
       - generated-artifacts
       - type-check
@@ -402,8 +372,10 @@ jobs:
           EXPECTED_VERSION="${expected_version}" \
             npx just validate-build-artifact
 
-      - name: Verify extracted ZIP with isolated production dependencies
-        run: npx just verify-server-package
+      - name: Verify extracted ZIP without installed packages
+        run: |
+          bash tools/serverPackaging/verifyBrowserArchive.sh apps/server/dist/s3/ebs.zip
+          npx just verify-server-package
 
       - name: Build and smoke-test sparse production Docker context
         env:
@@ -415,8 +387,8 @@ jobs:
           mkdir -p \
             "${DISTRIBUTION_CONTEXT_PATH}/apps/server"
 
-          cp -a package.json package-lock.json .npmrc run.sh .env.defaults "${DISTRIBUTION_CONTEXT_PATH}/"
-          cp -a apps/server/Dockerfile apps/server/package.json apps/server/dist "${DISTRIBUTION_CONTEXT_PATH}/apps/server/"
+          cp -a run.sh .env.defaults "${DISTRIBUTION_CONTEXT_PATH}/"
+          cp -a apps/server/Dockerfile apps/server/dist "${DISTRIBUTION_CONTEXT_PATH}/apps/server/"
 
           docker build \
             "${DISTRIBUTION_CONTEXT_PATH}" \
@@ -426,6 +398,12 @@ jobs:
           docker run --rm --entrypoint sh "${DOCKER_IMAGE_TAG}" -c '
             set -eu
             test -s /dist/index.js
+            test -s /dist/index.js.map
+            test -s /dist/dbs/GeoLite2-Country.mmdb
+            test ! -e /app/node_modules
+            test ! -e /dist/node_modules
+            test ! -e /app/package.json
+            test ! -e /dist/package.json
             test -s /dist/version.json
             test -d /dist/static
             test -s /app/run.sh
@@ -435,7 +413,6 @@ jobs:
             grep -q "^URL_ACCOUNT_BASE=" /dist/.env.defaults
             grep -q "^BACKEND_REST=" /dist/.env.defaults
             grep -q "^BACKEND_WS=" /dist/.env.defaults
-            node -e "const configuration = require(\"/dist/config.js\"); if (configuration.clientConfig.VERSION !== configuration.buildMetadata.version) process.exit(1)"
 
             ENFORCE_HTTPS=false NODE_PORT=8080 /bin/bash /app/run.sh &
             server_pid=$!

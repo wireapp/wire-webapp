@@ -74,7 +74,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
           frameDuration = millisecondsPerSecond / configuredFrameRate;
         }
         timestamp = performance.now();
-        this.logger.log(`[virtual-background] processor start frameDuration=${frameDuration}`);
+        this.logger.info(`[virtual-background] processor start frameDuration=${frameDuration}`);
       },
       pull: async controller => {
         if (!running) {
@@ -111,7 +111,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
         }
       },
       cancel: reason => {
-        this.logger.log(`[virtual-background] video processor cancelled: ${reason}`);
+        this.logger.info(`[virtual-background] video processor cancelled: ${reason}`);
         running = false;
         close();
       },

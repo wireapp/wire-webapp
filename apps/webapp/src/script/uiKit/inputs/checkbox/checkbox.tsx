@@ -31,6 +31,7 @@ export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<
   markInvalid?: boolean;
   aligncenter?: boolean;
   labelBeforeCheckbox?: boolean;
+  checkboxSize?: 'small' | 'regular';
 }
 
 const StyledLabel: FunctionComponent<StyledLabelProps> = ({
@@ -38,6 +39,7 @@ const StyledLabel: FunctionComponent<StyledLabelProps> = ({
   markInvalid,
   aligncenter = false,
   labelBeforeCheckbox = false,
+  checkboxSize = 'regular',
   children,
   ...props
 }) => {
@@ -57,12 +59,14 @@ const StyledLabel: FunctionComponent<StyledLabelProps> = ({
             position: 'absolute',
             top: '50%',
             transform: 'translateY(-50%)',
+            width: checkboxSize === 'small' ? '0.6875rem' : '0.9375rem',
+            height: checkboxSize === 'small' ? '0.5625rem' : '0.8125rem',
             ...(labelBeforeCheckbox
               ? {
                   right: '11px',
                 }
               : {
-                  left: '4px',
+                  left: '0.21875rem',
                 }),
           },
           ...(disabled !== true && {
@@ -86,8 +90,8 @@ const StyledLabel: FunctionComponent<StyledLabelProps> = ({
             boxSizing: 'border-box',
             content: '""',
             display: 'inline-block',
-            minWidth: '22px',
-            height: '22px',
+            minWidth: checkboxSize === 'small' ? '1.125rem' : '1.375rem',
+            height: checkboxSize === 'small' ? '1.125rem' : '1.375rem',
             lineHeight: '1.4rem',
             margin: '0 8px 0 0px',
             color: theme.general.color,
@@ -98,7 +102,7 @@ const StyledLabel: FunctionComponent<StyledLabelProps> = ({
           }),
           alignItems: 'center',
           position: 'relative',
-          margin: '0 0 0 -16px',
+          margin: checkboxSize === 'small' ? '0 0 0 -12px' : '0 0 0 -16px',
           width: aligncenter ? 'auto' : '100%',
           lineHeight: '1.4rem',
           display: 'flex',
@@ -120,6 +124,7 @@ const StyledLabel: FunctionComponent<StyledLabelProps> = ({
 export interface CheckboxProps<T = HTMLInputElement> extends InputProps<T> {
   id?: string;
   aligncenter?: boolean;
+  checkboxSize?: 'small' | 'regular';
   labelBeforeCheckbox?: boolean;
   outlineOffset?: string;
 }
@@ -134,6 +139,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
       wrapperCSS = {},
       markInvalid,
       aligncenter,
+      checkboxSize = 'regular',
       labelBeforeCheckbox,
       outlineOffset = '0.4rem',
       ...props
@@ -164,10 +170,10 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
           type="checkbox"
           id={id ?? inputId}
           style={{
-            height: '22px',
+            height: checkboxSize === 'small' ? '1.125rem' : '1.375rem',
             marginBottom: '0',
             opacity: 0,
-            width: '22px',
+            width: checkboxSize === 'small' ? '1.125rem' : '1.375rem',
             cursor: disabled === true ? 'not-allowed' : 'pointer',
           }}
           disabled={disabled}
@@ -181,6 +187,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
           disabled={disabled}
           markInvalid={markInvalid}
           aligncenter={aligncenter}
+          checkboxSize={checkboxSize}
           labelBeforeCheckbox={labelBeforeCheckbox}
         >
           {children}

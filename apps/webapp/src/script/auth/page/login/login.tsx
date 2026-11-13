@@ -23,7 +23,7 @@ import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {StatusCodes} from 'http-status-codes';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
-import {useNavigate} from 'react-router';
+import {useLocation, useNavigate} from 'react-router';
 
 import {separator} from './login.styles';
 
@@ -72,7 +72,7 @@ import * as ConversationSelector from '../../module/selector/conversationSelecto
 import {QUERY_KEY, ROUTE} from '../../route';
 import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
-import {getOAuthQueryString} from '../../util/oauthUtil';
+import {getOAuthQueryString, withOAuthQuery} from '../../util/oauthUtil';
 import {getPrefixedSSOCode} from '../../util/urlUtil';
 import {EntropyContainer} from '../entropyContainer';
 import {Page} from '../page';
@@ -113,6 +113,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   const twoFactorExpiryMinutes = 10;
   const twoFactorExpiryMilliseconds = millisecondsPerSecond * secondsPerMinute * twoFactorExpiryMinutes;
   const navigate = useNavigate();
+  const location = useLocation();
   const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
 
   const {accountCreationEnabled, shouldDisplayWarning} = account;
@@ -130,7 +131,8 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, getOAuthQueryString(window.location));
+  const shouldEnterSSO = isOauth && isEnterpriseLoginV2Enabled && location.pathname !== ROUTE.PASSWORD_LOGIN;
 
   const [routeAction, setRouteAction] = useState<'login' | 'verify'>('login');
 
@@ -180,7 +182,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend unless we're following the guest link flow
     if (isNonEmptyString(defaultSSOCode) && embedded !== true) {
-      navigate(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`);
+      navigate(withOAuthQuery(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`), {replace: true});
     }
   }, [defaultSSOCode, embedded, navigate]);
 
@@ -193,10 +195,10 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
       doCheckConversationCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
-        logger.warn('Invalid conversation code', error);
+        logger.warn('Invalid conversation code', {error});
       });
       doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
-        logger.warn('Failed to fetch conversation info', error);
+        logger.warn('Failed to fetch conversation info', {error});
       });
     }
   }, [doCheckConversationCode, doGetConversationInfoByCode]);
@@ -213,10 +215,17 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error: unknown) {
-      logger.error('Unable to login immediately', error);
+      logger.error('Unable to login immediately', {error});
       setShowEntropyForm(false);
+      if (isBackendError(error) && error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
+        return navigate(withOAuthQuery(ROUTE.CLIENTS));
+      }
+      // Reuse an existing session before asking the user to authenticate with email or SSO.
+      if (shouldEnterSSO) {
+        navigate(withOAuthQuery(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`), {replace: true});
+      }
     }
-  }, [doInit, doInitializeClient, getEntropy, isOauth, navigate]);
+  }, [defaultSSOCode, doInit, doInitializeClient, getEntropy, isOauth, navigate, shouldEnterSSO]);
 
   useEffect(() => {
     void resetAuthError();
@@ -304,7 +313,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
             if (entropy.current !== undefined) {
               await pushEntropyData(entropy.current);
             }
-            navigate(ROUTE.CLIENTS);
+            navigate(withOAuthQuery(ROUTE.CLIENTS));
             break;
           }
 
@@ -568,7 +577,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
                         type="button"
                         variant={ButtonVariant.SECONDARY}
                         onClick={() => {
-                          return navigate(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`);
+                          return navigate(withOAuthQuery(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`));
                         }}
                         style={{marginTop: '16px'}}
                         data-uie-name="go-sso-login"

@@ -33,17 +33,14 @@ export type WebAppPackageDocument = Readonly<Record<string, unknown>>;
 
 export type WebAppPackageVersions = {
   readonly rootVersion: WebAppVersion;
-  readonly webAppVersion: WebAppVersion;
 };
 
 export type WebAppPackageDocuments = {
   readonly rootPackageDocument: WebAppPackageDocument;
-  readonly webAppPackageDocument: WebAppPackageDocument;
 };
 
 export type UpdateWebAppPackageDocumentsOptions = {
   readonly rootPackageDocument: unknown;
-  readonly webAppPackageDocument: unknown;
   readonly targetVersion: string;
 };
 
@@ -79,10 +76,7 @@ function validatePackageDocumentVersion(
   return versionResult;
 }
 
-function validateWebAppPackageDocuments(
-  rootPackageDocument: unknown,
-  webAppPackageDocument: unknown,
-): Result<ValidatedWebAppPackageDocuments, Error> {
+function validateWebAppPackageDocuments(rootPackageDocument: unknown): Result<ValidatedWebAppPackageDocuments, Error> {
   const validatedRootPackageDocumentResult = validateWebAppPackageDocument(rootPackageDocument, 'package.json');
 
   if (validatedRootPackageDocumentResult.isErr) {
@@ -90,17 +84,6 @@ function validateWebAppPackageDocuments(
   }
 
   const {value: validatedRootPackageDocument} = validatedRootPackageDocumentResult;
-
-  const validatedWebAppPackageDocumentResult = validateWebAppPackageDocument(
-    webAppPackageDocument,
-    'apps/webapp/package.json',
-  );
-
-  if (validatedWebAppPackageDocumentResult.isErr) {
-    return Result.err(new Error(validatedWebAppPackageDocumentResult.error.message));
-  }
-
-  const {value: validatedWebAppPackageDocument} = validatedWebAppPackageDocumentResult;
 
   const rootVersionResult = validatePackageDocumentVersion(validatedRootPackageDocument, 'package.json');
 
@@ -110,30 +93,9 @@ function validateWebAppPackageDocuments(
 
   const {value: rootVersion} = rootVersionResult;
 
-  const webAppVersionResult = validatePackageDocumentVersion(
-    validatedWebAppPackageDocument,
-    'apps/webapp/package.json',
-  );
-
-  if (webAppVersionResult.isErr) {
-    return Result.err(new Error(webAppVersionResult.error.message));
-  }
-
-  const {value: webAppVersion} = webAppVersionResult;
-
-  if (rootVersion !== webAppVersion) {
-    return Result.err(
-      new Error(
-        `WebApp package versions disagree: package.json=${rootVersion}, apps/webapp/package.json=${webAppVersion}`,
-      ),
-    );
-  }
-
   return Result.ok({
     rootPackageDocument: validatedRootPackageDocument,
-    webAppPackageDocument: validatedWebAppPackageDocument,
     rootVersion,
-    webAppVersion,
   });
 }
 
@@ -196,11 +158,8 @@ export function compareWebAppVersions(
   return Result.ok(semver.compare(leftVersionResult.value, rightVersionResult.value));
 }
 
-export function validateMatchingWebAppPackageVersions(
-  rootPackageDocument: unknown,
-  webAppPackageDocument: unknown,
-): Result<WebAppPackageVersions, Error> {
-  const validatedPackageDocumentsResult = validateWebAppPackageDocuments(rootPackageDocument, webAppPackageDocument);
+export function validateWebAppPackageVersion(rootPackageDocument: unknown): Result<WebAppPackageVersions, Error> {
+  const validatedPackageDocumentsResult = validateWebAppPackageDocuments(rootPackageDocument);
 
   if (validatedPackageDocumentsResult.isErr) {
     return Result.err(new Error(validatedPackageDocumentsResult.error.message));
@@ -210,17 +169,13 @@ export function validateMatchingWebAppPackageVersions(
 
   return Result.ok({
     rootVersion: validatedPackageDocuments.rootVersion,
-    webAppVersion: validatedPackageDocuments.webAppVersion,
   });
 }
 
 export function updateWebAppPackageDocuments(
   options: UpdateWebAppPackageDocumentsOptions,
 ): Result<WebAppPackageDocuments, Error> {
-  const validatedPackageDocumentsResult = validateWebAppPackageDocuments(
-    options.rootPackageDocument,
-    options.webAppPackageDocument,
-  );
+  const validatedPackageDocumentsResult = validateWebAppPackageDocuments(options.rootPackageDocument);
 
   if (validatedPackageDocumentsResult.isErr) {
     return Result.err(new Error(validatedPackageDocumentsResult.error.message));
@@ -235,10 +190,9 @@ export function updateWebAppPackageDocuments(
   const {value: targetVersion} = targetVersionResult;
 
   const {value: validatedPackageDocuments} = validatedPackageDocumentsResult;
-  const {rootPackageDocument, webAppPackageDocument} = validatedPackageDocuments;
+  const {rootPackageDocument} = validatedPackageDocuments;
 
   return Result.ok({
     rootPackageDocument: {...rootPackageDocument, version: targetVersion},
-    webAppPackageDocument: {...webAppPackageDocument, version: targetVersion},
   });
 }

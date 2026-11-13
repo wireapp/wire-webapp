@@ -580,7 +580,7 @@ describe('APIClient', () => {
       jest.spyOn(client['logger'], 'warn').mockReturnValue(undefined);
 
       await client.logout();
-      expect(client['logger'].warn).toHaveBeenCalledWith(testError);
+      expect(client['logger'].warn).toHaveBeenCalledWith('Failed to log out on the backend', {error: testError});
     });
 
     it('skips request when told to', async () => {

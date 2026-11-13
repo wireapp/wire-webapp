@@ -36,6 +36,7 @@ import path from 'path';
 import type {BuildMetadata} from './configuration/buildMetadata';
 import type {ClientConfig} from './configuration/client.config';
 import type {ServerConfig} from './configuration/server.config';
+import {createResponseCompression} from './http/responseCompression';
 import {AppleAssociationRoute} from './routes/appleassociation/appleAssociationRoute';
 import {createClientVersionCheckRoute} from './routes/clientVersionCheck/clientVersionCheckRoute';
 import {ConfigRoute} from './routes/config/configRoute';
@@ -72,6 +73,7 @@ class Server {
     this.app = express();
     this.app.disable('x-powered-by');
     this.staticAssetsApp = express();
+    this.staticAssetsApp.use(createResponseCompression());
     this.routesApp = express();
     this.routesApp.disable('x-powered-by');
     this.init();

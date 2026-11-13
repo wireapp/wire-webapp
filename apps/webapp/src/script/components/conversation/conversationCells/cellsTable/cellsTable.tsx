@@ -79,10 +79,7 @@ import {useBulkRestore} from './restoreBinSelection/useBulkRestore';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
-import {
-  driveBulkActionsFeatureToggleName,
-  driveBulkRestoreFeatureToggleName,
-} from '../../../../featureToggles/startupFeatureToggleNames';
+import {driveBulkRestoreFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import type {Conversation} from '../../../../repositories/entity/Conversation';
@@ -256,8 +253,7 @@ export const CellsTable = ({
   const canPerformAnyBulkAction = BULK_ACTIONS.some(action => {
     return canPerformCurrentDriveAction(action);
   });
-  const isSelectionEnabled =
-    selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName) && canPerformAnyBulkAction;
+  const isSelectionEnabled = selectionEnabled && canPerformAnyBulkAction;
   const isBulkRestoreEnabled = isSelectionEnabled && isFeatureToggleEnabled(driveBulkRestoreFeatureToggleName);
   const activeDriveDrag = useRef<CapturedDriveDrag | null>(null);
   const isDropMoveSubmitting = useRef(false);

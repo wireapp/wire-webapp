@@ -33,7 +33,6 @@ import {
   CELLS_SELF_USER_DRIVE_ROLE,
 } from '../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
-import {driveBulkActionsFeatureToggleName} from '../../../../../featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -116,7 +115,6 @@ const createEmptyBinTree = ({
 const renderEmptyBinAction = (
   cellsRepository: CellsRepository,
   {
-    enabled = true,
     role = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
     clock,
     getCurrentCellsPath = () => {
@@ -126,7 +124,6 @@ const renderEmptyBinAction = (
     onEmptyBinSubmitted = jest.fn(),
     onInProgressChange = jest.fn(),
   }: {
-    enabled?: boolean;
     role?: typeof CELLS_SELF_USER_DRIVE_ROLE.EDITOR | typeof CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
     clock?: ReturnType<typeof createDeterministicClock>;
     getCurrentCellsPath?: () => string;
@@ -138,9 +135,6 @@ const renderEmptyBinAction = (
   const rootContext = createRootContextValueForTest({
     translate: translateForTest,
     clock,
-    isFeatureToggleEnabled: featureName => {
-      return enabled && featureName === driveBulkActionsFeatureToggleName;
-    },
   });
   const wrapper = createRootProviderWrapperForTest(rootContext);
 
@@ -158,7 +152,7 @@ const renderEmptyBinAction = (
 };
 
 describe('CellsEmptyBinAction', () => {
-  it('shows a no-count confirmation and cancel sends no request', async () => {
+  it('shows confirmation without a startup feature opt-in and cancel sends no request', async () => {
     const user = userEvent.setup();
     const cellsRepository = createRepository();
     const onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(true);
@@ -284,7 +278,7 @@ describe('CellsEmptyBinAction', () => {
     expect(onInProgressChange).toHaveBeenLastCalledWith(false);
   });
 
-  it('does not render outside the Bin root, for viewers, or when the feature is disabled', () => {
+  it('does not render outside the Bin root or for viewers', () => {
     renderEmptyBinAction(createRepository(), {
       getCurrentCellsPath: () => {
         return 'recycle_bin/nested';
@@ -293,9 +287,6 @@ describe('CellsEmptyBinAction', () => {
     expect(screen.queryByRole('button', {name: 'cells.emptyBin.button'})).not.toBeInTheDocument();
 
     renderEmptyBinAction(createRepository(), {role: CELLS_SELF_USER_DRIVE_ROLE.VIEWER});
-    expect(screen.queryByRole('button', {name: 'cells.emptyBin.button'})).not.toBeInTheDocument();
-
-    renderEmptyBinAction(createRepository(), {enabled: false});
     expect(screen.queryByRole('button', {name: 'cells.emptyBin.button'})).not.toBeInTheDocument();
   });
 

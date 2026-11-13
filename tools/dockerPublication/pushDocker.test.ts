@@ -297,18 +297,14 @@ describe('pushDocker metadata', () => {
     }).toThrow(configurationManifestPath);
   });
 
-  it('installs only the server production workspace from the npm lockfile', () => {
+  it('deploys the prebuilt server without npm installation or dependency search paths', () => {
     const dockerfilePath = path.join(process.cwd(), 'apps/server/Dockerfile');
     const dockerfileContents = readFileSync(dockerfilePath, 'utf8');
 
-    assert.match(dockerfileContents, /COPY package\.json package-lock\.json \.npmrc \.\//);
-    assert.match(dockerfileContents, /COPY apps\/server\/package\.json \.\/apps\/server\/package\.json/);
-    assert.doesNotMatch(dockerfileContents, /libraries\//);
-    assert.match(
-      dockerfileContents,
-      /RUN npm clean-install --omit=dev --workspace=@wireapp\/server --include-workspace-root=false --ignore-scripts/,
-    );
-    assert.doesNotMatch(dockerfileContents, /yarn|YARN/);
+    assert.match(dockerfileContents, /COPY apps\/server\/dist \/dist/);
+    assert.doesNotMatch(dockerfileContents, /npm|yarn|node_modules|NODE_PATH|ENV PATH|package\.json|package-lock/);
+    const launcherContents = readFileSync(path.join(process.cwd(), 'run.sh'), 'utf8');
+    assert.match(launcherContents, /PORT=\$port node --enable-source-maps \/dist\/index\.js/);
   });
 
   it('uses the working directory when no custom Docker context is configured', () => {

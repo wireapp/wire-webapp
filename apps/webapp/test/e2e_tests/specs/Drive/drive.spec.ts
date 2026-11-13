@@ -21,7 +21,6 @@ import {User} from '../../data/user';
 import {PageManager} from '../../pageManager';
 import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from '../../utils/sendImage.util';
 import {getTextFilePath, getVideoFilePath, TextFileName, VideoFileName} from '../../utils/asset.util';
-import {driveBulkActionsFeatureToggleName} from '../../../../src/script/featureToggles/startupFeatureToggleNames';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup} from '../../utils/userActions';
@@ -209,9 +208,7 @@ test.describe('Conversations', () => {
     'recovers from a failed bulk move after an explicit Drive refresh',
     {tag: ['@crit-flow-cells', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(
-        withLogin(userA, {startupFeatureToggles: {[driveBulkActionsFeatureToggleName]: true}}),
-      );
+      const page = await createPage(withLogin(userA));
       const pageManager = await PageManager.from(page);
       await connectWithUser(pageManager, userB);
       const {pages} = pageManager.webapp;

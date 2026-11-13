@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {NotificationBackendRepository} from './notificationBackendRepository';
@@ -26,9 +28,11 @@ import {isOutdatedNotificationStreamEvent} from './outdatedNotificationStreamEve
 
 import {APIClient} from '../../apiClient/apiClient';
 import {BackendEvent} from '../../apiClient/event/backendEvent';
+import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 import {Notification} from '../../apiClient/notification/notification';
-import {LogFactory} from '../../commons/LogFactory';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
+import {getLogger} from '../../logger/getLogger';
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../coreError';
 import {DecryptionError} from '../errors/decryptionError';
@@ -73,8 +77,14 @@ export class NotificationService extends TypedEventEmitter<Events> {
   private readonly apiClient: APIClient;
   private readonly backend: NotificationBackendRepository;
   private readonly database: NotificationDatabaseRepository;
-  private readonly logger = LogFactory.getLogger('@wireapp/core/NotificationService');
+  private readonly logger = getLogger('@wireapp/core/NotificationService');
   public static readonly TOPIC = TOPIC;
+  private ignoredMLSConversation?: QualifiedId;
+
+  /** Debug helper: drop incoming MLS events before decryption, without pausing notification acknowledgement. */
+  public setIgnoredMLSConversation(conversation?: QualifiedId): void {
+    this.ignoredMLSConversation = conversation;
+  }
 
   constructor(
     apiClient: APIClient,
@@ -165,7 +175,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
       notifications.length > 0
         ? `Start processing ${notifications.length} notifications since notification id ${lastNotificationId}`
         : `No notification to process from the stream`;
-    this.logger.log(logMessage);
+    this.logger.info(logMessage);
     for (const [index, notification] of notifications.entries()) {
       if (abortHandler?.signal.aborted === true) {
         /* Stop handling notifications if the websocket has been disconnected.
@@ -182,7 +192,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
         results.success++;
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : error;
-        this.logger.error(`Error while processing notification ${notification.id}: ${message}`, error);
+        this.logger.error(`Error while processing notification ${notification.id}: ${message}`, {error});
         results.error++;
       }
     }
@@ -205,12 +215,33 @@ export class NotificationService extends TypedEventEmitter<Events> {
     return isOutdatedNotificationStreamEvent(event, source, lastEventDate);
   }
 
+  private shouldDropIncomingMLSEvent(event: BackendEvent): boolean {
+    const target = this.ignoredMLSConversation;
+    if (
+      isUndefined(target) ||
+      (event.type !== CONVERSATION_EVENT.MLS_MESSAGE_ADD && event.type !== CONVERSATION_EVENT.MLS_WELCOME_MESSAGE)
+    ) {
+      return false;
+    }
+
+    // Welcome events carry the conversation identity in qualified_conversation; the legacy field may be absent.
+    if (!isUndefined(event.qualified_conversation)) {
+      return event.qualified_conversation.id === target.id && event.qualified_conversation.domain === target.domain;
+    }
+
+    return event.conversation === target.id;
+  }
+
   public async *handleNotification(
     notification: Notification,
     source: NotificationSource,
   ): AsyncGenerator<HandledEventPayload> {
     for (const event of notification.payload) {
-      this.logger.debug(`Handling event of type "${event.type}"`, event);
+      if (this.shouldDropIncomingMLSEvent(event)) {
+        this.logger.warn('Debug: dropping incoming MLS event', {type: event.type});
+        continue;
+      }
+      this.logger.debug(`Handling event of type "${event.type}"`, {event});
       let lastEventDate: Date | undefined = undefined;
       try {
         lastEventDate = await this.database.getLastEventDate();
@@ -230,10 +261,9 @@ export class NotificationService extends TypedEventEmitter<Events> {
           yield* payloads;
         }
       } catch (error: unknown) {
-        this.logger.error(
-          `There was an error with notification ID "${notification.id}": ${(error as Error).message}`,
+        this.logger.error(`There was an error with notification ID "${notification.id}": ${(error as Error).message}`, {
           error,
-        );
+        });
         const notificationError: NotificationError = {
           error: error as Error,
           notification,

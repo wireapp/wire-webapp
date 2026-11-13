@@ -214,6 +214,6 @@ export const mapEventRecord = (message: BackupMessage): EventRecord | undefined 
     return mapTextMessageToEventRecord(message as TextBackupMessage);
   }
 
-  CPBLogger.error('Unknown message type', message);
+  CPBLogger.error('Unknown message type', {message});
   return undefined;
 };

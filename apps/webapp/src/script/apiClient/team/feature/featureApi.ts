@@ -18,7 +18,6 @@
  */
 
 import {AxiosRequestConfig} from 'axios';
-import logdown from 'logdown';
 
 import {InvalidAppLockTimeoutError} from './featureError';
 import {
@@ -46,7 +45,7 @@ import {
 } from './featureList.schema';
 import {FeatureList} from './featureList.types';
 
-import {LogFactory} from '../../../commons/LogFactory';
+import {getLogger, type Logger} from '../../../logger/getLogger';
 import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
 
 import {FeatureConversationGuestLink, FeatureLockedError} from '.';
@@ -56,10 +55,10 @@ export const isBackendError = (error: unknown): error is BackendError => {
 };
 
 export class FeatureAPI {
-  private readonly logger: logdown.Logger;
+  private readonly logger: Logger;
 
   constructor(private readonly client: HttpClient) {
-    this.logger = LogFactory.getLogger('@wireapp/api-client/FeatureAPI');
+    this.logger = getLogger('@wireapp/api-client/FeatureAPI');
   }
 
   /**

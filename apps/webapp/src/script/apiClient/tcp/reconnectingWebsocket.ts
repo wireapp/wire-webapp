@@ -18,12 +18,11 @@
  */
 
 import {isError, isFunction, isNumber, isString, isUndefined} from '@sindresorhus/is';
-import logdown from 'logdown';
 import PartySocketWebSocket, {type CloseEvent, type ErrorEvent, type Options} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
 
-import {LogFactory} from '../../commons/LogFactory';
 import {StringUtil, TimeUtil} from '../../commons/util';
+import {getLogger, type Logger} from '../../logger/getLogger';
 import type {WebSocketConstructor, WebSocketPlatform} from '../platform';
 import {BackFromSleepDetails, onBackFromSleep} from '../utils/backFromSleepHandler/backFromSleepHandler';
 
@@ -191,7 +190,7 @@ export class ReconnectingWebsocket {
     reconnectionDelayGrowFactor: 1.3,
   };
 
-  private readonly logger: logdown.Logger;
+  private readonly logger: Logger;
   private socket?: ReconnectingWebsocketWrapper;
   private isConnectionRequested = false;
   private pingerId?: IntervalIdentifier;
@@ -226,7 +225,7 @@ export class ReconnectingWebsocket {
     private readonly onReconnect: (context: WebSocketReconnectContext) => Promise<string>,
     private readonly options: ReconnectingWebsocketOptions,
   ) {
-    this.logger = LogFactory.getLogger('@wireapp/api-client/tcp/ReconnectingWebsocket');
+    this.logger = getLogger('@wireapp/api-client/tcp/ReconnectingWebsocket');
 
     if (options.pingInterval.isJust) {
       this.PING_INTERVAL = options.pingInterval.value;

@@ -18,9 +18,10 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import {isUndefined} from '@sindresorhus/is';
+import {isError, isUndefined} from '@sindresorhus/is';
 import axios from 'axios';
 import {StatusCodes} from 'http-status-codes';
+import {Maybe, task, type Task} from 'true-myth';
 
 import {APIClient} from '../../apiClient/apiClient';
 import {LoginData} from '../../apiClient/auth/loginData';
@@ -29,14 +30,25 @@ import {ClientCapabilityData} from '../../apiClient/client/clientCapabilityData'
 import {ClientType} from '../../apiClient/client/clientType';
 import {CreateClientPayload} from '../../apiClient/client/newClient';
 import {RegisteredClient} from '../../apiClient/client/registeredClient';
+import {BackendError} from '../../apiClient/http/backendError';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
-import {LogFactory} from '../../commons/LogFactory';
+import {getLogger} from '../../logger/getLogger';
 import type {ProteusService} from '../messagingProtocols/proteus';
 import {InitialPrekeys} from '../messagingProtocols/proteus/proteusService/cryptoClient';
 import {wipeCoreCryptoDb} from '../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
 import type {CRUDEngine} from '../storage/engine/crudEngine';
+import {RecordNotFoundError} from '../storage/engine/error';
 
 import {ClientInfo, ClientBackendRepository, ClientDatabaseRepository} from './';
+
+/** `HttpClient` turns error responses with a body into a `BackendError`, other failures stay an `AxiosError`. */
+function isNotFoundError(error: unknown): boolean {
+  if (error instanceof BackendError) {
+    return Number(error.code) === StatusCodes.NOT_FOUND;
+  }
+
+  return axios.isAxiosError(error) && error.response?.status === StatusCodes.NOT_FOUND;
+}
 
 export interface MetaClient extends RegisteredClient {
   domain?: string;
@@ -50,7 +62,7 @@ export interface MetaClient extends RegisteredClient {
 export class ClientService {
   private readonly database: ClientDatabaseRepository;
   private readonly backend: ClientBackendRepository;
-  private readonly logger = LogFactory.getLogger('@wireapp/core/Client');
+  private readonly logger = getLogger('@wireapp/core/Client');
 
   constructor(
     private readonly apiClient: APIClient,
@@ -94,53 +106,79 @@ export class ClientService {
     try {
       await this.backend.deleteClient(localClientId, password);
     } catch (error: unknown) {
-      this.logger.warn('Failed to delete client on backend', error);
+      this.logger.warn('Failed to delete client on backend', {error});
     }
     return this.database.deleteLocalClient();
   }
 
-  private async getLocalClient(): Promise<MetaClient | undefined> {
-    try {
-      return await this.database.getLocalClient();
-    } catch {
-      return undefined;
-    }
+  private getLocalClient(): Task<Maybe<MetaClient>, Error> {
+    return task
+      .tryOrElse(
+        error => {
+          return isError(error) ? error : new Error('Failed to read the local client', {cause: error});
+        },
+        () => {
+          return this.database.getLocalClient();
+        },
+      )
+      .map<Maybe<MetaClient>>(client => {
+        return Maybe.just(client);
+      })
+      .orElse(error => {
+        if (error instanceof RecordNotFoundError) {
+          return task.resolve(Maybe.nothing<MetaClient>());
+        }
+
+        return task.reject(error);
+      });
   }
 
   /**
    * Will try to load the local client from the database into memory.
-   * Will return undefined if the client is not found in the database or if the client does not exist on the backend.
-   * If the client doesn't exist on backend it will purge the database and return undefined.
+   * Returns Nothing if the local record is missing or the backend confirms the client was removed.
+   * If the client doesn't exist on the backend it will clean up the identity before returning Nothing.
    * If the client is found on the backend it will update the local client in the database and return it.
+   * Any other failure (database error, network error, ...) is a rejected Task.
    *
-   * @return the loaded client or undefined
+   * @return Just the loaded client, or Nothing for confirmed absence
    */
-  public async loadClient(): Promise<MetaClient | undefined> {
-    const loadedClient = await this.getLocalClient();
-
-    if (loadedClient === undefined) {
-      return undefined;
-    }
-
-    try {
-      const remoteClient = await this.apiClient.api.client.getClient(loadedClient.id);
-      return this.database.updateLocalClient(remoteClient);
-    } catch (error: unknown) {
-      const notFoundOnBackend = axios.isAxiosError(error) ? error.response?.status === StatusCodes.NOT_FOUND : false;
-      if (notFoundOnBackend && this.storeEngine !== undefined) {
-        const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
-        await this.proteusService.wipe();
-        // The MLS/CoreCrypto keystore is scoped to the user (not the client id), so it survives
-        // a plain proteus wipe and would otherwise let a re-registered client inherit stale MLS key material.
-        await wipeCoreCryptoDb(this.storeEngine, this.clock);
-        if (shouldDeleteWholeDatabase) {
-          await this.storeEngine.clearTables();
-        }
-        const log = `No valid client on backend, deleting identity (deleting content: ${shouldDeleteWholeDatabase ? 'yes' : 'no'})`;
-        this.logger.warn(log);
+  public loadClient(): Task<Maybe<MetaClient>, Error> {
+    return this.getLocalClient().andThen(loadedClient => {
+      if (loadedClient.isNothing) {
+        return task.resolve(loadedClient);
       }
-    }
-    return undefined;
+
+      return task.tryOrElse(
+        error => {
+          return isError(error) ? error : new Error('Failed to load the local client', {cause: error});
+        },
+        async () => {
+          let remoteClient: RegisteredClient;
+          try {
+            remoteClient = await this.apiClient.api.client.getClient(loadedClient.value.id);
+          } catch (error: unknown) {
+            if (!isNotFoundError(error)) {
+              throw error;
+            }
+            if (this.storeEngine !== undefined) {
+              const shouldDeleteWholeDatabase = loadedClient.value.type === ClientType.TEMPORARY;
+              await this.proteusService.wipe();
+              // The keystore is scoped to the user, so a new client must not inherit stale MLS key material.
+              await wipeCoreCryptoDb(this.storeEngine, this.clock);
+              if (shouldDeleteWholeDatabase) {
+                await this.storeEngine.clearTables();
+              }
+              const log = `No valid client on backend, deleting identity (deleting content: ${shouldDeleteWholeDatabase ? 'yes' : 'no'})`;
+              this.logger.warn(log);
+            }
+
+            return Maybe.nothing<MetaClient>();
+          }
+
+          return Maybe.just(await this.database.updateLocalClient(remoteClient));
+        },
+      );
+    });
   }
 
   private createLocalClient(client: RegisteredClient, domain?: string): Promise<MetaClient> {

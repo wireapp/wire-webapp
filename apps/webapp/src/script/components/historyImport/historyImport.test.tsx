@@ -37,8 +37,6 @@ import * as BackupUtil from '../../util/backupUtil';
 import * as Util from '../../util/util';
 
 import {HistoryImport} from './historyImport';
-import type {Container} from 'react-dom/client';
-import type {OptionsReceived} from '@testing-library/dom/node_modules/pretty-format';
 
 describe('HistoryImport', () => {
   const createFile = (content = 'backup', name = 'backup.wbu'): File => {
@@ -52,11 +50,7 @@ describe('HistoryImport', () => {
     user: User;
     container: HTMLElement;
     baseElement: HTMLElement;
-    debug: (
-      baseElement?: Container | (Element | Document) | Array<Container | (Element | Document)> | undefined,
-      maxLength?: number | undefined,
-      options?: OptionsReceived | undefined,
-    ) => void;
+    debug: ReturnType<typeof render>['debug'];
     rerender: (ui: React.ReactNode) => void;
     unmount: () => void;
     asFragment: () => DocumentFragment;

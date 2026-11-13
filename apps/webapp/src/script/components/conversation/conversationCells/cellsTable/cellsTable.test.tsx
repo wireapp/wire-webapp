@@ -36,10 +36,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../../page/testSupport/rootContextTestSupport';
-import {
-  driveBulkActionsFeatureToggleName,
-  driveBulkRestoreFeatureToggleName,
-} from '../../../../featureToggles/startupFeatureToggleNames';
+import {driveBulkRestoreFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {CellNode, CellNodeType} from '../../../../types/cellNode';
 import type {Translate} from '../../../../util/localizerUtil/translationTypes';
 import {translateForTest} from '../../../../util/test/translateForTest';
@@ -111,10 +108,13 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
     return 'Move to bin';
   }
   if (key === 'cells.bulkMoveToBin.confirmation.title') {
-    return 'Move selected items to Bin?';
+    return 'Move items to bin';
   }
-  if (key === 'cells.bulkMoveToBin.confirmation.description') {
-    return `Move ${substitutions?.count} selected items to Bin. Selected folders and their contents will also move to Bin.`;
+  if (key === 'cells.bulkMoveToBin.confirmation.description.multiple') {
+    return `${substitutions?.count} selected items will move to the recycle bin.`;
+  }
+  if (key === 'cells.bulkMoveToBin.confirmation.description.single') {
+    return '1 selected item will move to the recycle bin.';
   }
   if (key === 'cells.bulkMoveToBin.destination') {
     return 'Bin';
@@ -219,7 +219,7 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
     return 'Restore file';
   }
   if (key === 'cells.bulkRestore.confirmation.multiple') {
-    return `Restore ${substitutions?.count} selected items to their original location?`;
+    return `The ${substitutions?.count} items will be restored and available again to everyone in this conversation.`;
   }
   if (key === 'cells.restoreNestedNodeModal.button') {
     return 'Restore Parent Folder';
@@ -282,7 +282,6 @@ const renderCellsTable = ({
   folderDropResetKey,
   selectionEnabled = true,
   selectionScopeKey = 'conversation:/files',
-  isBulkActionsEnabled = true,
   isBulkRestoreEnabled = true,
   cellsRepository = {} as CellsRepository,
   initialNodes,
@@ -304,7 +303,6 @@ const renderCellsTable = ({
   readonly folderDropResetKey?: number;
   readonly selectionEnabled?: boolean;
   readonly selectionScopeKey?: string;
-  readonly isBulkActionsEnabled?: boolean;
   readonly isBulkRestoreEnabled?: boolean;
   readonly cellsRepository?: CellsRepository;
   readonly initialNodes?: CellNode[];
@@ -333,10 +331,7 @@ const renderCellsTable = ({
       fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
       clock,
       isFeatureToggleEnabled: featureToggleName => {
-        return (
-          (isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName) ||
-          (isBulkRestoreEnabled && featureToggleName === driveBulkRestoreFeatureToggleName)
-        );
+        return isBulkRestoreEnabled && featureToggleName === driveBulkRestoreFeatureToggleName;
       },
     }),
   );
@@ -418,20 +413,8 @@ const renderCellsTable = ({
 };
 
 describe('CellsTable selection', () => {
-  it.each([
-    {label: 'a viewer', selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER, isBulkActionsEnabled: true},
-    {
-      label: 'an editor with the feature flag off',
-      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
-      isBulkActionsEnabled: false,
-    },
-    {
-      label: 'a viewer with the feature flag off',
-      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
-      isBulkActionsEnabled: false,
-    },
-  ])('hides page and row selection for $label', ({selfUserDriveRole, isBulkActionsEnabled}) => {
-    renderCellsTable({selfUserDriveRole, isBulkActionsEnabled});
+  it('hides page and row selection for a viewer', () => {
+    renderCellsTable({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER});
 
     expect(screen.getByRole('row', {name: /Marketing images/})).toBeInTheDocument();
     expect(screen.getByRole('row', {name: /Wire logs.pdf/})).toBeInTheDocument();
@@ -598,9 +581,8 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('button', {name: 'Move to bin'}));
 
     const confirmation = await screen.findByRole('dialog');
-    expect(within(confirmation).getByRole('heading', {name: 'Move selected items to Bin?'})).toBeInTheDocument();
-    expect(within(confirmation).getByText(/Move 2 selected items to Bin/)).toBeInTheDocument();
-    expect(within(confirmation).getByText(/Selected folders and their contents/)).toBeInTheDocument();
+    expect(within(confirmation).getByRole('heading', {name: 'Move items to bin'})).toBeInTheDocument();
+    expect(within(confirmation).getByText('2 selected items will move to the recycle bin.')).toBeInTheDocument();
 
     await user.click(within(confirmation).getByRole('button', {name: 'Cancel'}));
     await waitFor(() => {
@@ -668,6 +650,7 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     await user.click(screen.getByRole('button', {name: 'Move to bin'}));
     const confirmation = await screen.findByRole('dialog');
+    expect(within(confirmation).getByText('1 selected item will move to the recycle bin.')).toBeInTheDocument();
     const confirmButton = within(confirmation).getByRole('button', {name: 'Move to Bin'});
     await user.click(confirmButton);
 
@@ -2035,15 +2018,6 @@ describe('CellsTable selection', () => {
     } finally {
       window.location.hash = originalHash;
     }
-  });
-
-  it('hides selection controls when the Drive bulk actions feature flag is off', () => {
-    renderCellsTable({isBulkActionsEnabled: false});
-
-    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
   });
 
   it('browses destinations without listing selected items, moving, or clearing selection', async () => {
@@ -3661,8 +3635,8 @@ describe('CellsTable row modifier selection', () => {
     }
   });
 
-  it('does not select a row when bulk selection is disabled', () => {
-    renderCellsTable({isBulkActionsEnabled: false});
+  it('does not select a row when selection is out of scope', () => {
+    renderCellsTable({selectionEnabled: false});
     fireEvent.click(screen.getByRole('button', {name: 'Wire logs.pdf', hidden: true}), {metaKey: true});
     expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
   });
@@ -3961,7 +3935,11 @@ describe('CellsTable restoring selected Bin items', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select b.txt'}));
     await user.click(screen.getByRole('button', {name: 'Restore'}));
     const confirmation = await screen.findByRole('dialog');
-    expect(within(confirmation).getByText('Restore 2 selected items to their original location?')).toBeInTheDocument();
+    expect(
+      within(confirmation).getByText(
+        'The 2 items will be restored and available again to everyone in this conversation.',
+      ),
+    ).toBeInTheDocument();
     await user.click(within(confirmation).getByRole('button', {name: 'Restore selected items'}));
 
     await waitFor(() => {
@@ -4096,7 +4074,7 @@ describe('CellsTable restoring selected Bin items', () => {
     expect(
       within(confirmation).getByText(/The folder Reports with all its files will be restored\./),
     ).toBeInTheDocument();
-    expect(within(confirmation).getByText(/Restore 2 selected items to their original location/)).toBeInTheDocument();
+    expect(within(confirmation).getByText(/The 2 items will be restored and available again/)).toBeInTheDocument();
     await user.click(within(confirmation).getByRole('button', {name: 'Restore selected items'}));
 
     await waitFor(() => {
@@ -4121,7 +4099,7 @@ describe('CellsTable restoring selected Bin items', () => {
       await user.click(screen.getByRole('checkbox', {name: 'Select nested.txt'}));
       await user.click(screen.getByRole('button', {name: 'Restore'}));
       const confirmation = await screen.findByRole('dialog');
-      expect(within(confirmation).getByText(/Restore 2 selected items to their original location/)).toBeInTheDocument();
+      expect(within(confirmation).getByText(/The 2 items will be restored and available again/)).toBeInTheDocument();
       expect(
         within(confirmation).getByText(/The folder Reports with all its files will be restored/),
       ).toBeInTheDocument();
@@ -4193,8 +4171,8 @@ describe('CellsTable restoring selected Bin items', () => {
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
 
-  it('does not offer Restore when bulk actions are disabled', () => {
-    renderCellsTable({isBulkActionsEnabled: false, initialNodes: [createBinNode('a.txt')]});
+  it('does not offer Restore when selection is out of scope', () => {
+    renderCellsTable({selectionEnabled: false, initialNodes: [createBinNode('a.txt')]});
 
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();

@@ -30,7 +30,12 @@ module.exports = {
     '^.+\\.(ts|tsx)$': '@swc/jest',
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|uuid|noop-esm|@sindresorhus/is)/)'],
+  moduleNameMapper: {
+    '^@enormora/clock/deterministic-clock$': '<rootDir>/../../node_modules/@enormora/clock/deterministic-clock.js',
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(true-myth|@enormora/clock|p-timeout|p-cancelable|uuid|noop-esm|@sindresorhus/is)/)',
+  ],
   coverageDirectory: '../../target/coverage/apps/webapp/apiClient',
   coverageReporters: rootJestConfiguration.coverageReporters,
   coverageThreshold: {

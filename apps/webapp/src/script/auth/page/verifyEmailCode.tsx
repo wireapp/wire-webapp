@@ -68,7 +68,7 @@ const VerifyEmailCodeComponent: FunctionComponent<Props & ConnectedProps & Dispa
       navigate(ROUTE.SET_HANDLE, {state: {isNewAccount: true}});
     } catch (error: unknown) {
       trackTelemetryPageView(PageView.ACCOUNT_VERIFICATION_FAILED_SCREEN_2_5);
-      logger.error('Failed to create personal account', error);
+      logger.error('Failed to create personal account', {error});
     }
   };
 
@@ -81,7 +81,7 @@ const VerifyEmailCodeComponent: FunctionComponent<Props & ConnectedProps & Dispa
     try {
       await doSendActivationCode(account.email);
     } catch (error: unknown) {
-      logger.error('Failed to send email code', error);
+      logger.error('Failed to send email code', {error});
     }
   };
 

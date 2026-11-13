@@ -17,11 +17,11 @@
  *
  */
 
-import {LogFactory} from '../../../../../../../commons/LogFactory';
+import {getLogger} from '../../../../../../../logger/getLogger';
 import {createFlushableQueue, type PromiseTask} from '../../../../../../queue/flushableQueue';
 import {sequentialQueueOptions} from '../../../../../../queue/sequentialQueueOptions';
 
-const logger = LogFactory.getLogger('@wireapp/core/mls/IncomingProposalsQueue');
+const logger = getLogger('@wireapp/core/mls/IncomingProposalsQueue');
 
 const proposalsQueue = createFlushableQueue({autoStart: false, ...sequentialQueueOptions});
 

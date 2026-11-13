@@ -18,7 +18,6 @@
  */
 
 import {Dexie, DexieError, IndexableType} from 'dexie';
-import logdown from 'logdown';
 
 import type {CRUDEngine} from '../../core/storage/engine/crudEngine';
 import {
@@ -28,19 +27,17 @@ import {
   RecordTypeError,
   UnsupportedError,
 } from '../../core/storage/engine/error';
+import {getLogger, type Logger} from '../../logger/getLogger';
 
 type DexieObservable = {_dbSchema?: Object};
 
 export class IndexedDBEngine implements CRUDEngine {
   private db = new Dexie('') satisfies DexieObservable;
-  private readonly logger: logdown.Logger;
+  private readonly logger: Logger;
   public storeName = '';
 
   constructor() {
-    this.logger = logdown('@wireapp/store-engine-dexie', {
-      logger: console,
-      markdown: false,
-    });
+    this.logger = getLogger('@wireapp/store-engine-dexie');
   }
 
   // Check if IndexedDB is accessible (which won't be the case when browsing with Firefox in private mode or being on

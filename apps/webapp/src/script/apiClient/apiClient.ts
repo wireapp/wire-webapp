@@ -19,7 +19,6 @@
 
 import {isFunction, isUndefined} from '@sindresorhus/is';
 import 'core-js/actual/symbol/dispose';
-import logdown from 'logdown';
 
 import {EventEmitter} from 'events';
 
@@ -47,7 +46,7 @@ import {ConversationAPI} from './conversation/';
 import {Backend} from './env/backend';
 import {GenericAPI} from './generic/genericApi';
 import {GiphyAPI} from './giphy/giphyApi';
-import {BackendError, HttpClient} from './http/';
+import {HttpClient} from './http/';
 import {MeetingsAPI} from './meetings/meetingsApi';
 import {NotificationAPI} from './notification/';
 import {OAuthAPI} from './oauth/oAuthApi';
@@ -75,7 +74,7 @@ import {SSOAPI} from './team/sso';
 import {UserAPI} from './user/';
 import {UserGroupAPI} from './userGroups/';
 
-import {LogFactory} from '../commons/LogFactory';
+import {getLogger, type Logger} from '../logger/getLogger';
 
 const minimumMlsBackendVersion = 5;
 const minimumGuestLinkPasswordBackendVersion = 4;
@@ -184,7 +183,7 @@ export type BackendVersionResponse = {
 
 /** Owns a cookie subscription until disposal, independently of session and WebSocket state. */
 export class APIClient extends EventEmitter implements Disposable {
-  private readonly logger: logdown.Logger;
+  private readonly logger: Logger;
 
   // APIs
   public api: Apis;
@@ -212,7 +211,7 @@ export class APIClient extends EventEmitter implements Disposable {
     this.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, (accessToken: AccessTokenData) => {
       return this.emit(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, accessToken);
     });
-    this.logger = LogFactory.getLogger('@wireapp/api-client/Client');
+    this.logger = getLogger('@wireapp/api-client/Client');
 
     const httpClient = new HttpClient(this.config, this.accessTokenStore, {cookie: this.config.platform.cookie});
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient, {
@@ -246,7 +245,7 @@ export class APIClient extends EventEmitter implements Disposable {
   }
 
   private configureApis(backendFeatures: BackendFeatures): Apis {
-    this.logger.info('configuring APIs with config:', backendFeatures);
+    this.logger.info('configuring APIs with config:', {backendFeatures});
 
     const assetAPI = new AssetAPI(this.transport.http, this.config.platform.buffer);
 
@@ -385,10 +384,9 @@ export class APIClient extends EventEmitter implements Disposable {
 
     const accessToken = await this.api.auth.postLogin(loginData);
 
-    this.logger.info(
-      `Saved initial access token. It will expire in "${accessToken.expires_in}" seconds.`,
-      ObfuscationUtil.obfuscateAccessToken(accessToken),
-    );
+    this.logger.info(`Saved initial access token. It will expire in "${accessToken.expires_in}" seconds.`, {
+      accessToken: ObfuscationUtil.obfuscateAccessToken(accessToken),
+    });
 
     await this.accessTokenStore.updateToken(accessToken);
 
@@ -430,7 +428,7 @@ export class APIClient extends EventEmitter implements Disposable {
         await this.api.auth.postLogout();
       }
     } catch (error: unknown) {
-      this.logger.warn(error);
+      this.logger.warn('Failed to log out on the backend', {error});
     }
 
     CookieStore.deleteCookie();
@@ -448,7 +446,7 @@ export class APIClient extends EventEmitter implements Disposable {
       const self = await this.api.self.getSelf();
       selfDomain = self.qualified_id?.domain;
     } catch (error: unknown) {
-      this.logger.warn('Could not get self user', (error as BackendError).message);
+      this.logger.warn('Could not get self user', {error});
     }
 
     this.context =
