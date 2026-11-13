@@ -63,7 +63,7 @@
     "http-proxy-middleware": "3.0.10",
     "http-status-codes": "2.3.0",
     "idb": "8.0.4",
-    "immer": "11.2.9",
+    "immer": "11.2.10",
     "jimp": "0.22.12",
     "js-cookie": "3.0.8",
     "jszip": "3.10.2",
