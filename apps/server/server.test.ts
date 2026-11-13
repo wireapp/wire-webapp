@@ -329,3 +329,33 @@ describe('server response security headers', () => {
     });
   });
 });
+
+describe('server response compression', () => {
+  it.each([
+    {acceptEncoding: 'gzip', expectedEncoding: 'gzip'},
+    {acceptEncoding: 'deflate', expectedEncoding: 'deflate'},
+    {acceptEncoding: 'br, gzip;q=0.8, deflate;q=0.5', expectedEncoding: 'gzip'},
+    {acceptEncoding: 'br, deflate;q=0.8, gzip;q=0.5', expectedEncoding: 'deflate'},
+    {acceptEncoding: '*', expectedEncoding: 'gzip'},
+    {acceptEncoding: 'gzip;q=0, deflate', expectedEncoding: 'deflate'},
+    {acceptEncoding: 'gzip;q=0.5, identity;q=1', expectedEncoding: null},
+    {acceptEncoding: 'br', expectedEncoding: null},
+    {acceptEncoding: 'zstd', expectedEncoding: null},
+    {acceptEncoding: 'identity', expectedEncoding: null},
+    {acceptEncoding: 'gzip;q=0, deflate;q=0, br', expectedEncoding: null},
+  ])('restricts compression to gzip and deflate for $acceptEncoding', async testCase => {
+    const clientConfiguration = {...createClientConfiguration(), BRAND_NAME: 'Example application '.repeat(200)};
+
+    await withHttpServer(clientConfiguration, mainBuildMetadata, async baseUrl => {
+      const response = await fetch(`${baseUrl}/config.js`, {
+        headers: {'Accept-Encoding': testCase.acceptEncoding},
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get('content-encoding')).toBe(testCase.expectedEncoding);
+      expect(response.headers.get('vary')).toContain('Accept-Encoding');
+      expect(response.headers.get('cache-control')).toBe(nonCacheHeaders.cacheControl);
+      expect(await response.text()).toContain(`window.wire.env = ${JSON.stringify(clientConfiguration)};`);
+    });
+  });
+});
