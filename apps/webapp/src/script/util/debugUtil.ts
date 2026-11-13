@@ -353,13 +353,13 @@ export class DebugUtil {
 
   canIgnoreIncomingMLS(): boolean {
     const conversation = this.conversationState.activeConversation();
-    return conversation !== undefined && isMLSCapableConversation(conversation);
+    return !isUndefined(conversation) && isMLSCapableConversation(conversation);
   }
 
   /** Missed MLS events are discarded permanently. Reloading clears the toggle. */
   setIgnoreIncomingMLS(enabled: boolean): void {
     const notificationService = this.core.service?.notification;
-    if (notificationService === undefined) {
+    if (isUndefined(notificationService)) {
       throw new Error('Core services are not initialized');
     }
 

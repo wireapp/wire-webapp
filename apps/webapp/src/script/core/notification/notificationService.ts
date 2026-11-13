@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {NotificationBackendRepository} from './notificationBackendRepository';
@@ -216,14 +218,14 @@ export class NotificationService extends TypedEventEmitter<Events> {
   private shouldDropIncomingMLSEvent(event: BackendEvent): boolean {
     const target = this.ignoredMLSConversation;
     if (
-      target === undefined ||
+      isUndefined(target) ||
       (event.type !== CONVERSATION_EVENT.MLS_MESSAGE_ADD && event.type !== CONVERSATION_EVENT.MLS_WELCOME_MESSAGE)
     ) {
       return false;
     }
 
     // Welcome events carry the conversation identity in qualified_conversation; the legacy field may be absent.
-    if (event.qualified_conversation !== undefined) {
+    if (!isUndefined(event.qualified_conversation)) {
       return event.qualified_conversation.id === target.id && event.qualified_conversation.domain === target.domain;
     }
 

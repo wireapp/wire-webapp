@@ -20,7 +20,7 @@
 import {useEffect, useRef, useState} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import keyboardjs from 'keyboardjs';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
@@ -611,21 +611,21 @@ export function ConfigToolbar(): JSX.Element | null {
       </Button>
       <Button
         disabled={
-          debug === undefined ||
-          (ignoredMLSConversation === undefined && (activeConversation === undefined || !debug.canIgnoreIncomingMLS()))
+          isUndefined(debug) ||
+          (isUndefined(ignoredMLSConversation) && (isUndefined(activeConversation) || !debug.canIgnoreIncomingMLS()))
         }
-        aria-pressed={ignoredMLSConversation !== undefined}
+        aria-pressed={!isUndefined(ignoredMLSConversation)}
         onClick={() => {
           try {
-            debug?.setIgnoreIncomingMLS(ignoredMLSConversation === undefined);
+            debug?.setIgnoreIncomingMLS(isUndefined(ignoredMLSConversation));
           } catch (error: unknown) {
             logger.error('Error toggling incoming MLS events:', {error});
           }
         }}
       >
-        {ignoredMLSConversation === undefined ? 'Drop Incoming MLS Events' : 'Resume Incoming MLS Events'}
+        {isUndefined(ignoredMLSConversation) ? 'Drop Incoming MLS Events' : 'Resume Incoming MLS Events'}
       </Button>
-      {ignoredMLSConversation !== undefined && (
+      {!isUndefined(ignoredMLSConversation) && (
         <p role="status">
           Dropping incoming MLS events for {ignoredMLSConversation.id}@{ignoredMLSConversation.domain}. Advance the
           epoch from another client, then resume to test recovery. Dropped events will not be replayed. Reloading clears
