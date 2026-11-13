@@ -148,7 +148,7 @@
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.3",
-    "@testing-library/user-event": "14.6.8",
+    "@testing-library/user-event": "14.6.9",
     "@tony.ganchev/eslint-plugin-header": "3.4.4",
     "@types/color": "3.0.7",
     "@types/copy": "0.3.5",
