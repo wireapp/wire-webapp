@@ -17,7 +17,7 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, type RenderResult} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
 import {User} from '../../../../repositories/entity/User';
@@ -93,5 +93,68 @@ describe('UserListItem', () => {
 
     const rerenderedAvatar = container.querySelector('[data-uie-name="element-avatar-user"]');
     expect(rerenderedAvatar).toBe(initialAvatar);
+  });
+
+  describe('pending onboarding', () => {
+    const createPendingUser = (): User => {
+      const user = new User('user-id', 'example.com', translateForTest);
+      user.name('Alice Example');
+      user.username('alice');
+      user.isPendingOnboarding(true);
+      return user;
+    };
+
+    const renderUserListItem = (user: User, showPendingOnboarding?: boolean): RenderResult => {
+      return render(
+        <UserListItem
+          canSelect={false}
+          external={false}
+          isHighlighted={false}
+          isSelected={false}
+          isSelfVerified={false}
+          mode={UserlistMode.COMPACT}
+          noInteraction={false}
+          noUnderline={false}
+          onClick={noop}
+          onKeyDown={noop}
+          showArrow={false}
+          showPendingOnboarding={showPendingOnboarding}
+          user={user}
+        />,
+        {wrapper: rootProviderWrapper},
+      );
+    };
+
+    it('keeps the handle as subtitle and shows the badge', () => {
+      const {getByTestId} = renderUserListItem(createPendingUser(), true);
+
+      expect(getByTestId('status-username').textContent).toBe('@alice');
+      expect(getByTestId('status-pending-onboarding')).toBeDefined();
+    });
+
+    it('shows the pending onboarding subtitle when the user has no handle', () => {
+      const user = createPendingUser();
+      user.username('');
+      const {getByTestId} = renderUserListItem(user, true);
+
+      expect(getByTestId('status-username').textContent).toBe('userOnboardingPending');
+      expect(getByTestId('status-pending-onboarding')).toBeDefined();
+    });
+
+    it('does not show the pending onboarding state when it is not requested', () => {
+      const {getByTestId, queryByTestId} = renderUserListItem(createPendingUser());
+
+      expect(getByTestId('status-username').textContent).toBe('@alice');
+      expect(queryByTestId('status-pending-onboarding')).toBeNull();
+    });
+
+    it('does not show the pending onboarding state for contactable users', () => {
+      const user = createPendingUser();
+      user.isPendingOnboarding(false);
+      const {getByTestId, queryByTestId} = renderUserListItem(user, true);
+
+      expect(getByTestId('status-username').textContent).toBe('@alice');
+      expect(queryByTestId('status-pending-onboarding')).toBeNull();
+    });
   });
 });

@@ -21,7 +21,7 @@ import {Fragment, type FunctionComponent} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
 
-import {badgesWrapper, icon} from './userStatusBadges.styles';
+import {badgesWrapper, icon, pendingOnboardingIcon} from './userStatusBadges.styles';
 
 import {RootContextValue, useApplicationContext} from '../../../../page/rootProvider';
 import {Tooltip} from '../../../../uiKit/dataDisplay/tooltip/tooltip';
@@ -32,6 +32,7 @@ type CreateBadgeToComponentMapResult = {
   readonly federated: () => JSX.Element;
   readonly external: () => JSX.Element;
   readonly verified: () => JSX.Element;
+  readonly pendingOnboarding: () => JSX.Element;
 };
 function createBadgeToComponentMap(translate: RootContextValue['translate']): CreateBadgeToComponentMapResult {
   return {
@@ -61,6 +62,19 @@ function createBadgeToComponentMap(translate: RootContextValue['translate']): Cr
         <span css={icon}>
           <Icon.VerifiedIcon data-uie-name="status-verified" />
         </span>
+      );
+    },
+    pendingOnboarding: () => {
+      const label = translate('userOnboardingPending');
+      return (
+        <Tooltip css={pendingOnboardingIcon} body={label}>
+          <Icon.PendingIcon
+            data-uie-name="status-pending-onboarding"
+            role="img"
+            aria-hidden={false}
+            aria-label={label}
+          />
+        </Tooltip>
       );
     },
   } as const;

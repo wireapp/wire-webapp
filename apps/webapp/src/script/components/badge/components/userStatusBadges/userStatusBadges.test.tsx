@@ -33,7 +33,9 @@ const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 describe('UserBadges', () => {
   it('should render all the badges passed in config', () => {
     const {getByTestId} = render(
-      <UserStatusBadges config={{guest: true, federated: true, external: true, verified: true}} />,
+      <UserStatusBadges
+        config={{guest: true, federated: true, external: true, verified: true, pendingOnboarding: true}}
+      />,
       {wrapper: rootProviderWrapper},
     );
 
@@ -41,6 +43,15 @@ describe('UserBadges', () => {
     expect(getByTestId('status-federated-user')).toBeDefined();
     expect(getByTestId('status-external')).toBeDefined();
     expect(getByTestId('status-verified')).toBeDefined();
+    expect(getByTestId('status-pending-onboarding')).toBeDefined();
+  });
+
+  it('should label the pending onboarding badge for assistive technologies', () => {
+    const {getByRole} = render(<UserStatusBadges config={{pendingOnboarding: true}} />, {
+      wrapper: rootProviderWrapper,
+    });
+
+    expect(getByRole('img', {name: 'userOnboardingPending'})).toBeDefined();
   });
 
   it('should not render badges that are not included in the config or are falsy', () => {
