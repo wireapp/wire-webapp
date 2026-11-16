@@ -78,7 +78,10 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   const [backgroundJobUuids, setBackgroundJobUuids] = useState<string[]>([]);
   const requestPending = useRef(false);
   const isMounted = useRef(false);
-  const statusReporter = useBulkActionStatusReporter('emptyBin');
+  const statusReporter = useBulkActionStatusReporter(
+    'emptyBin',
+    `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`,
+  );
 
   const currentCellsPath = getCurrentCellsPath();
   const isAtBinRoot = isEmptyBinRootPath(currentCellsPath);
