@@ -75,6 +75,7 @@ type ScheduleMeetingModalState = {
   mode: ScheduleMeetingMode;
   formState: ScheduleMeetingFormState;
   errors: ScheduleMeetingFormErrors;
+  hasSubmitted: boolean;
   editingMeetingId: Maybe<QualifiedId>;
   qualifiedConversation: Maybe<QualifiedId>;
   originalTitle: string;
@@ -119,6 +120,7 @@ const initialState = {
   mode: scheduleMeetingModes.create,
   formState: emptyFormState,
   errors: emptyScheduleMeetingFormErrors(),
+  hasSubmitted: false,
   editingMeetingId: Maybe.nothing<QualifiedId>(),
   qualifiedConversation: Maybe.nothing<QualifiedId>(),
   originalTitle: '',
@@ -137,6 +139,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
         mode: scheduleMeetingModes.create,
         formState: getDefaultScheduleMeetingFormState(clock),
         errors: emptyScheduleMeetingFormErrors(),
+        hasSubmitted: false,
         editingMeetingId: Maybe.nothing(),
         qualifiedConversation: Maybe.nothing(),
         originalTitle: '',
@@ -157,6 +160,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
         mode: scheduleMeetingModes.edit,
         formState,
         errors: emptyScheduleMeetingFormErrors(),
+        hasSubmitted: false,
         editingMeetingId: maybe.just(meetingSeries.qualified_id),
         qualifiedConversation: maybe.just(qualifiedConversation),
         originalTitle: formState.title,
@@ -266,7 +270,10 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       return set(state => {
         return {
           formState: {...state.formState, password},
-          errors: {...state.errors, ...getMeetingPasswordErrors(password, state.formState.passwordConfirmation)},
+          errors: {
+            ...state.errors,
+            ...getMeetingPasswordErrors(password, state.formState.passwordConfirmation, state.hasSubmitted),
+          },
         };
       });
     },
@@ -274,7 +281,10 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       return set(state => {
         return {
           formState: {...state.formState, passwordConfirmation},
-          errors: {...state.errors, ...getMeetingPasswordErrors(state.formState.password, passwordConfirmation)},
+          errors: {
+            ...state.errors,
+            ...getMeetingPasswordErrors(state.formState.password, passwordConfirmation, state.hasSubmitted),
+          },
         };
       });
     },
@@ -290,7 +300,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
         clock,
         mode,
       });
-      set({errors});
+      set({errors, hasSubmitted: true});
       return errors;
     },
     clearErrors: () => {

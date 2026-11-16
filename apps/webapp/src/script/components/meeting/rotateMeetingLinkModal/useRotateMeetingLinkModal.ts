@@ -31,6 +31,7 @@ type RotateMeetingLinkModalState = {
   password: string;
   passwordConfirmation: string;
   errors: MeetingPasswordErrors;
+  hasSubmitted: boolean;
   isSubmitting: boolean;
   error?: string;
   isWarningShown: boolean;
@@ -40,6 +41,7 @@ type RotateMeetingLinkModalState = {
   reset: () => void;
   setPassword: (password: string) => void;
   setPasswordConfirmation: (passwordConfirmation: string) => void;
+  validate: () => MeetingPasswordErrors;
   startSubmitting: () => void;
   setFailure: (error: string) => void;
   showWarning: (meetingId: QualifiedId) => void;
@@ -57,6 +59,7 @@ const initialState = {
   password: '',
   passwordConfirmation: '',
   errors: emptyErrors(),
+  hasSubmitted: false,
   isSubmitting: false,
   error: undefined,
   isWarningShown: false,
@@ -76,10 +79,21 @@ export const useRotateMeetingLinkModal = create<RotateMeetingLinkModalState>((se
       return set(initialState);
     },
     setPassword: password => {
-      return set({password, errors: getMeetingPasswordErrors(password, get().passwordConfirmation)});
+      return set({
+        password,
+        errors: getMeetingPasswordErrors(password, get().passwordConfirmation, get().hasSubmitted),
+      });
     },
     setPasswordConfirmation: passwordConfirmation => {
-      return set({passwordConfirmation, errors: getMeetingPasswordErrors(get().password, passwordConfirmation)});
+      return set({
+        passwordConfirmation,
+        errors: getMeetingPasswordErrors(get().password, passwordConfirmation, get().hasSubmitted),
+      });
+    },
+    validate: () => {
+      const errors = getMeetingPasswordErrors(get().password, get().passwordConfirmation);
+      set({errors, hasSubmitted: true});
+      return errors;
     },
     startSubmitting: () => {
       return set({isSubmitting: true, error: undefined});
