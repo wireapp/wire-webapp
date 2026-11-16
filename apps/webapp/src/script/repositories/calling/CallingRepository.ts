@@ -2873,11 +2873,16 @@ export class CallingRepository {
     const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE, REASON.REJECTED];
     const startedAt = call.startedAt();
     const startedAtOrZero = isNullOrUndefined(startedAt) || startedAt === 0 || isNan(startedAt) ? 0 : startedAt;
+    const endedAt = call.endedAt();
+    const durationInSeconds =
+      startedAtOrZero > 0 && Number.isFinite(startedAtOrZero) && Number.isFinite(endedAt) && endedAt >= startedAtOrZero
+        ? Math.ceil((endedAt - startedAtOrZero) / TIME_IN_MILLIS.SECOND)
+        : 0;
 
     this.sendCallingEvent(EventName.CALLING.ENDED_CALL, call, {
       [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
       [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
-      [Segmentation.CALL.DURATION]: Math.ceil((call.endedAt() - startedAtOrZero) / TIME_IN_MILLIS.SECOND),
+      [Segmentation.CALL.DURATION]: durationInSeconds,
       [Segmentation.CALL.END_REASON]: reason,
       [Segmentation.CALL.REASON]: this.getCallEndReasonText(reason),
       [Segmentation.CALL.PARTICIPANTS]: call.analyticsMaximumParticipants,

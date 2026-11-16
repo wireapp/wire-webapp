@@ -1131,6 +1131,7 @@ describe('CallingRepository', () => {
       callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
       expect(call.endedAt()).toBeGreaterThan(0);
       await callingRepository['callClosed'](REASON.STILL_ONGOING, conversation.id);
+      sendCallingEvent.mockClear();
       callingRepository['updateCallState'](conversation.id, CALL_STATE.INCOMING);
       expect(callingRepository.findCall(conversation.qualifiedId)).toBe(call);
 
@@ -1143,11 +1144,15 @@ describe('CallingRepository', () => {
 
       callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
       await callingRepository['callClosed'](REASON.STILL_ONGOING, conversation.id);
-      expect(sendCallingEvent).toHaveBeenCalledWith(
+      const endedCallEvents = sendCallingEvent.mock.calls.filter(([eventName]) => {
+        return eventName === EventName.CALLING.ENDED_CALL;
+      });
+      expect(endedCallEvents).toHaveLength(1);
+      expect(endedCallEvents[0]).toEqual([
         EventName.CALLING.ENDED_CALL,
         call,
         expect.objectContaining({[Segmentation.CALL.DURATION]: 0}),
-      );
+      ]);
     });
 
     it('rejoins a retained MLS group call with a fresh epoch subscription', async () => {
