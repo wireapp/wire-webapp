@@ -199,7 +199,7 @@
     "babel-plugin-transform-import-meta": "2.3.3",
     "baseline-browser-mapping": "2.11.37",
     "browserslist": "4.29.5",
-    "concurrently": "9.2.5",
+    "concurrently": "10.0.7",
     "copy": "0.3.2",
     "cosmiconfig": "9.0.2",
     "countly-sdk-web": "24.11.4",
