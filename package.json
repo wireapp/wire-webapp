@@ -239,7 +239,7 @@
     "jest-websocket-mock": "2.5.0",
     "js-yaml": "4.3.2",
     "jscpd": "5.4.3",
-    "jsdom": "29.1.1",
+    "jsdom": "31.0.1",
     "jsdom-worker": "0.3.0",
     "less": "4.9.1",
     "less-loader": "12.3.3",
