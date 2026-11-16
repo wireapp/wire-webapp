@@ -94,6 +94,7 @@ describe('meeting links in the existing auth flow', () => {
       return expect(sendJSON).toHaveBeenCalledWith(expect.objectContaining({method: 'get'}));
     });
     expect(page.getByTestId('status-join-headline')).toHaveTextContent('Join meeting');
+    expect(page.getByText('Join meeting as temporary guest (access expires after 24 hours)')).toBeInTheDocument();
     expect(sendJSON).toHaveBeenCalledTimes(1);
     expect(page.queryByText('Private meeting title')).toBeNull();
     if (mode === 'guest') {
