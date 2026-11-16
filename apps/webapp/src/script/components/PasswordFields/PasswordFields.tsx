@@ -17,9 +17,9 @@
  *
  */
 
-import type {FunctionComponent} from 'react';
+import {useRef, type FunctionComponent} from 'react';
 
-import {errorMessageStyles} from './PasswordFields.styles';
+import {clearButtonStyles, errorMessageStyles, passwordInputStyles} from './PasswordFields.styles';
 
 import {ValidationUtil} from '../../commons/util';
 import {Config} from '../../Config';
@@ -54,6 +54,26 @@ export const PasswordFields: FunctionComponent<PasswordFieldsProps> = ({
   onPasswordConfirmationChange,
   isPasswordConfirmationMarkInvalid,
 }: PasswordFieldsProps) => {
+  const confirmationRef = useRef<HTMLInputElement>(null);
+  const clearButton = (
+    value: string,
+    onClear: () => void,
+    input: React.RefObject<HTMLInputElement | null>,
+  ): React.ReactNode => {
+    return value.length > 0 ? (
+      <button
+        type="button"
+        aria-label={translate('password.clear')}
+        onClick={() => {
+          onClear();
+          input.current?.focus();
+        }}
+        css={clearButtonStyles}
+      >
+        ×
+      </button>
+    ) : null;
+  };
   return (
     <>
       <Input
@@ -72,6 +92,14 @@ export const PasswordFields: FunctionComponent<PasswordFieldsProps> = ({
         hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
         autoComplete="off"
         value={passwordValue}
+        inputCSS={passwordInputStyles}
+        endContent={clearButton(
+          passwordValue,
+          () => {
+            return onPasswordValueChange('');
+          },
+          passwordValueRef,
+        )}
         ref={passwordValueRef}
         onChange={event => {
           return onPasswordValueChange(event.currentTarget.value);
@@ -97,6 +125,15 @@ export const PasswordFields: FunctionComponent<PasswordFieldsProps> = ({
         id="modal_pswd_confirmation"
         autoComplete="off"
         value={passwordConfirmationValue}
+        inputCSS={passwordInputStyles}
+        endContent={clearButton(
+          passwordConfirmationValue,
+          () => {
+            return onPasswordConfirmationChange('');
+          },
+          confirmationRef,
+        )}
+        ref={confirmationRef}
         onChange={event => {
           return onPasswordConfirmationChange(event.currentTarget.value);
         }}
