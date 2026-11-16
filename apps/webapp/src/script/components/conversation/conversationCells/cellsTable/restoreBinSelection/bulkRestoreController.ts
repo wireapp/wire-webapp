@@ -164,6 +164,7 @@ export const createBulkRestoreController = (initialOptions: BulkRestoreOptions):
       const didRefresh = await refreshAndReportSuccess();
       const statusKind = outcome === 'completed' && !didRefresh ? 'finished-unknown' : outcome;
       if (!mounted || generation !== requestGeneration) {
+        options.publishStatus({...status, kind: statusKind});
         return;
       }
       if (!options.isCurrentScope(scopeKey)) {
