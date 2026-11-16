@@ -34,7 +34,7 @@ module.exports = {
   },
   transform: {
     '^.+\\.(ts|tsx)$': '@swc/jest',
-    '^.+\\.(js|jsx)$': '@swc/jest',
+    '^.+\\.(js|jsx|mjs)$': '@swc/jest',
   },
   moduleNameMapper: {
     '^@enormora/clock$': '<rootDir>/../../node_modules/@enormora/clock/index.js',
@@ -43,7 +43,7 @@ module.exports = {
     '^@enormora/fire-and-forget$': '<rootDir>/../../node_modules/@enormora/fire-and-forget/index.js',
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(true-myth|uuid|noop-esm|p-queue|p-timeout|eventemitter3|@sindresorhus/is|@faker-js/faker|@enormora/clock|@enormora/fire-and-forget)/)',
+    '/node_modules/(?!(nock|@mswjs/interceptors|@open-draft/until|rettime|true-myth|uuid|noop-esm|p-queue|p-timeout|eventemitter3|@sindresorhus/is|@faker-js/faker|@enormora/clock|@enormora/fire-and-forget)/)',
   ],
   coveragePathIgnorePatterns: ['<rootDir>/src/script/apiClient/'],
   coverageDirectory: '../../target/coverage/apps/webapp/core',

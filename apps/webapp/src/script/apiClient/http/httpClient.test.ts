@@ -69,6 +69,17 @@ function createAxiosResponseForTest<ResponseValue>(data: ResponseValue): AxiosRe
 }
 
 describe('HttpClient', () => {
+  beforeEach(() => {
+    if (!nock.isActive()) {
+      nock.activate();
+    }
+  });
+
+  afterEach(() => {
+    nock.cleanAll();
+    nock.restore();
+  });
+
   const testConfig = {urls: {rest: 'https://test.zinfra.io', ws: '', name: 'test'}};
   const mockedAccessTokenStore: Partial<AccessTokenStore> = {
     accessTokenData: {

@@ -20,7 +20,7 @@
 import {nodePlatform} from '../apiClient/shims/node/platform';
 
 import {AuthAPI} from '../apiClient/auth/authApi';
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isPlainObject} from '@sindresorhus/is';
 import {ClientAPI} from '../apiClient/client/clientApi';
 import {ClientCapability} from '../apiClient/client/clientCapability';
 import {ClientClassification} from '../apiClient/client/clientClassification';
@@ -39,7 +39,7 @@ import {UserType} from '../apiClient/user/user';
 import {ReconnectingWebsocket} from '../apiClient/tcp/reconnectingWebsocket';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {WS} from 'jest-websocket-mock';
-import nock, {cleanAll} from 'nock';
+import nock from 'nock';
 import {v4 as uuidv4} from 'uuid';
 
 import {APIClient} from '../apiClient/apiClient';
@@ -174,6 +174,10 @@ describe('Account', () => {
   const websocketServerAddress = `${MOCK_BACKEND.ws}/v${MINIMUM_API_VERSION}/events?access_token=${accessTokenData.access_token}&marker=${markerId}`;
 
   beforeEach(() => {
+    if (!nock.isActive()) {
+      nock.activate();
+    }
+
     nock(MOCK_BACKEND.rest)
       .post(AuthAPI.URL.LOGIN, body => {
         return body.email && body.password;
@@ -181,8 +185,10 @@ describe('Account', () => {
       .query(() => {
         return true;
       })
-      .reply((_, body: any) => {
-        if (body.password === 'wrong') {
+      .reply(async (request: Request): Promise<nock.ReplyFnResult> => {
+        const loginRequestBody: unknown = await request.json();
+
+        if (isPlainObject(loginRequestBody) && loginRequestBody.password === 'wrong') {
           return [
             HTTP_STATUS.FORBIDDEN,
             JSON.stringify({
@@ -192,6 +198,7 @@ describe('Account', () => {
             }),
           ];
         }
+
         return [HTTP_STATUS.OK, JSON.stringify(accessTokenData)];
       });
 
@@ -271,7 +278,8 @@ describe('Account', () => {
   });
 
   afterEach(() => {
-    cleanAll();
+    nock.cleanAll();
+    nock.restore();
   });
 
   const currentClient: RegisteredClient = {

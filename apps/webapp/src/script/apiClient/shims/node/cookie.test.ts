@@ -44,9 +44,16 @@ describe('getCookieExpiration', () => {
 });
 
 describe('sendRequestWithCookie', () => {
+  beforeEach(() => {
+    if (!nock.isActive()) {
+      nock.activate();
+    }
+  });
+
   afterEach(() => {
-    CookieStore.deleteCookie();
     nock.cleanAll();
+    nock.restore();
+    CookieStore.deleteCookie();
   });
 
   it('sends a stored session cookie and preserves existing request headers', async () => {

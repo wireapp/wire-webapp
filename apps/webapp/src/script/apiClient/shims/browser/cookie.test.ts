@@ -31,9 +31,16 @@ import {CookieStore} from '../../auth/cookieStore';
 import {HttpClient} from '../../http/httpClient';
 
 describe('browser cookies', () => {
+  beforeEach(() => {
+    if (!nock.isActive()) {
+      nock.activate();
+    }
+  });
+
   afterEach(() => {
-    CookieStore.deleteCookie();
     nock.cleanAll();
+    nock.restore();
+    CookieStore.deleteCookie();
   });
 
   it('returns authentication tokens without reading response cookies into the Node cookie store', async () => {
