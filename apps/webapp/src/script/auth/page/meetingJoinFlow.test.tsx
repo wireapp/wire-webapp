@@ -243,6 +243,38 @@ describe('meeting links in the existing auth flow', () => {
     });
   };
 
+  it('lets a registered member retry a wrong meeting password and opens the meeting after success', async () => {
+    let joins = 0;
+    const sendJSON = jest.fn().mockImplementation(async request => {
+      if (request.method === 'get') {
+        throw wrongPassword();
+      }
+      if (joins++ === 0) {
+        throw wrongPassword();
+      }
+      return {data: {...metadata, qualified_conversation: conversation}};
+    });
+    const setup = setupRealReducerJoin(sendJSON, {
+      ...initialRootState,
+      selfState: {...initialRootState.selfState, self: {...initialRootState.selfState.self, name: 'Member'}},
+      clientState: {...initialRootState.clientState, clients: []},
+    });
+    const page = setup.renderPage();
+    await waitFor(() => {return expect(setup.store.getState().conversationState.hasPassword).toBe(true)});
+    fireEvent.click(page.getByTestId('do-join-as-member'));
+    fireEvent.change(page.getByTestId('guest-link-join-password-input'), {target: {value: 'wrong-password'}});
+    fireEvent.click(page.getByTestId('guest-link-join-submit-button'));
+    await waitFor(() => {
+      expect(joins).toBe(1);
+    });
+    expect(page.getByText('Unable to join the meeting. Check the password and try again.')).toBeVisible();
+    await submitCorrectPassword(page);
+    expect(joins).toBe(2);
+    expect(JSON.parse(window.localStorage.getItem('LOGIN_CONVERSATION_KEY') ?? '{}')).toEqual({
+      data: {conversation: conversation.id, domain: conversation.domain, meetingPrep: prep},
+    });
+  });
+
   it('reuses registration when the name is unchanged on the same mount', async () => {
     const {page, register, getJoins} = await setupPasswordRetry();
     await submitCorrectPassword(page);

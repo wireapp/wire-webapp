@@ -34,6 +34,7 @@ import {Modal} from '../../uiKit/surface/modal/modal';
 import {H2} from '../../uiKit/typography/heading/heading';
 import {Link} from '../../uiKit/typography/link/link';
 import {Text} from '../../uiKit/typography/text/text';
+import {getJoinLink, isJoinLinkPasswordError, JOIN_LINK_KIND} from '../util/joinLink';
 
 export interface JoinGuestLinkPasswordModalProps {
   onSubmitPassword: (password: string) => void;
@@ -52,29 +53,41 @@ const JoinGuestLinkPasswordModal: FunctionComponent<JoinGuestLinkPasswordModalPr
 }: JoinGuestLinkPasswordModalProps) => {
   const {translate} = useApplicationContext();
   const [passwordValue, setPasswordValue] = useState<string>('');
+  const [submittedError, setSubmittedError] = useState<{error: JoinGuestLinkPasswordModalProps['error']} | null>(null);
+  const isMeeting = getJoinLink().kind === JOIN_LINK_KIND.MEETING;
+  const conversationHeadline = isNonEmptyString(conversationName)
+    ? translate('guestLinkPasswordModal.headline', {conversationName})
+    : translate('guestLinkPasswordModal.headlineDefault');
 
   const onSubmit = (event: FormEvent<HTMLFormElement | HTMLButtonElement>): void => {
     event.preventDefault();
+    setSubmittedError({error});
     onSubmitPassword(passwordValue);
   };
 
   const Error: FunctionComponent = () => {
-    if (error?.code === HTTP_STATUS.FORBIDDEN || error?.code === HTTP_STATUS.BAD_REQUEST) {
-      return <ErrorMessage>{translate('guestLinkPasswordModal.passwordIncorrect')}</ErrorMessage>;
+    if (error === null || (isMeeting && (submittedError === null || submittedError.error === error))) {
+      return null;
     }
-    return null;
+    if (!isMeeting && error.code !== HTTP_STATUS.FORBIDDEN && error.code !== HTTP_STATUS.BAD_REQUEST) {
+      return null;
+    }
+    let errorKey: 'guestLinkPasswordModal.passwordIncorrect' | 'meetingJoin.passwordFailed' | 'meetingJoin.joinFailed' =
+      'guestLinkPasswordModal.passwordIncorrect';
+    if (isMeeting) {
+      errorKey = isJoinLinkPasswordError(error) ? 'meetingJoin.passwordFailed' : 'meetingJoin.joinFailed';
+    }
+    return <ErrorMessage>{translate(errorKey)}</ErrorMessage>;
   };
 
   return (
     <Modal onClose={onClose}>
       <Container style={{maxWidth: '400px'}}>
         <H2 style={{whiteSpace: 'break-spaces', fontWeight: 500, marginTop: '10px', textAlign: 'center'}}>
-          {isNonEmptyString(conversationName)
-            ? translate('guestLinkPasswordModal.headline', {conversationName})
-            : translate('guestLinkPasswordModal.headlineDefault')}
+          {isMeeting ? translate('meetingJoin.passwordHeadline') : conversationHeadline}
         </H2>
         <Text block fontSize="var(--font-size-base)" style={{marginBottom: 24}}>
-          {translate('guestLinkPasswordModal.description')}
+          {translate(isMeeting ? 'meetingJoin.passwordDescription' : 'guestLinkPasswordModal.description')}
         </Text>
         <Form
           name="guest-password-join-form"
@@ -89,8 +102,12 @@ const JoinGuestLinkPasswordModal: FunctionComponent<JoinGuestLinkPasswordModalPr
             data-uie-name="guest-link-join-password-input"
             name="guest-join-password"
             required
-            placeholder={translate('guestLinkPasswordModal.passwordInputLabel')}
-            label={translate('guestLinkPasswordModal.passwordInputLabel')}
+            placeholder={translate(
+              isMeeting ? 'meetingJoin.passwordInputLabel' : 'guestLinkPasswordModal.passwordInputLabel',
+            )}
+            label={translate(
+              isMeeting ? 'meetingJoin.passwordInputLabel' : 'guestLinkPasswordModal.passwordInputLabel',
+            )}
             id="guest_link_join_password"
             className="modal__input"
             type="password"
@@ -118,7 +135,7 @@ const JoinGuestLinkPasswordModal: FunctionComponent<JoinGuestLinkPasswordModalPr
           }}
           data-uie-name="guest-link-join-submit-button"
         >
-          {translate('guestLinkPasswordModal.joinConversation')}
+          {translate(isMeeting ? 'meetingJoin.joinHeadline' : 'guestLinkPasswordModal.joinConversation')}
         </Button>
       </Container>
     </Modal>
