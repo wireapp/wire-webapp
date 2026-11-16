@@ -34,6 +34,7 @@ import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {handleEscDown} from '../../../util/keyboardUtil';
 import {ModalComponent} from '../../Modals/ModalComponent';
+import {translateMeetingPasswordError} from '../shared/validation/meetingPasswordValidation';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -76,10 +77,8 @@ export const ScheduleMeetingModal: FunctionComponent = () => {
       startInPast: isUndefined(errors.startInPast) ? undefined : translate(errors.startInPast),
       endInPast: isUndefined(errors.endInPast) ? undefined : translate(errors.endInPast),
       endBeforeStart: isUndefined(errors.endBeforeStart) ? undefined : translate(errors.endBeforeStart),
-      password: isUndefined(errors.password) ? undefined : translate(errors.password),
-      passwordConfirmation: isUndefined(errors.passwordConfirmation)
-        ? undefined
-        : translate(errors.passwordConfirmation),
+      password: translateMeetingPasswordError(translate, errors.password),
+      passwordConfirmation: translateMeetingPasswordError(translate, errors.passwordConfirmation),
     };
   }, [errors, translate]);
 
