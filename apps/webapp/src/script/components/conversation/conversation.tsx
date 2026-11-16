@@ -787,6 +787,7 @@ function ConversationContent({
                   {isFileTabActive && (
                     <SharedDriveUploadProvider controller={sharedDriveUploadController}>
                       <ConversationCells
+                        key={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
                         activeConversation={activeConversation}
                         userRepository={repositories.user}
                         cellsRepository={repositories.cells}
