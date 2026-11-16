@@ -82,20 +82,23 @@ describe('browser log persistence composition', () => {
     const writingAfterBinding = binding.inspect(() => {
       output.write('{"after":true}', 'info');
     });
-    expect(output.bindAccount(accountIdentifier)).toBe(binding);
-    expect((await output.bindAccount('b'.repeat(64))).isErr).toBe(true);
-    output.write('{"during":true}', 'info');
     const request = await bindingRequest.promise;
-    expect(request.type).toBe('bind-account');
-    worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+    try {
+      expect(output.bindAccount(accountIdentifier)).toBe(binding);
+      expect((await output.bindAccount('b'.repeat(64))).isErr).toBe(true);
+      output.write('{"during":true}', 'info');
+      expect(request.type).toBe('bind-account');
+    } finally {
+      worker.state.onPost = nextRequest => {
+        worker.emitMessage({requestIdentifier: nextRequest.requestIdentifier, outcome: 'complete'});
+      };
+      worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+    }
     expect(await binding).toEqual(Result.ok(Unit));
     expect(await writingAfterBinding).toEqual(Result.ok(Unit));
     const requestCount = worker.requests.length;
     expect(await output.bindAccount(accountIdentifier)).toEqual(Result.ok(Unit));
     expect(worker.requests).toHaveLength(requestCount);
-    worker.state.onPost = nextRequest => {
-      worker.emitMessage({requestIdentifier: nextRequest.requestIdentifier, outcome: 'complete'});
-    };
     await output.flush();
 
     expect(worker.requests).toEqual([
@@ -147,14 +150,17 @@ describe('browser log persistence composition', () => {
     output.write('{"pending":true}', 'info');
     const binding = output.bindAccount('a'.repeat(64));
     const flushing = output.flush();
-    hide();
-    output.write('{"during":true}', 'info');
-    clock.advanceByMilliseconds(logPersistenceConfiguration.flushIntervalMilliseconds);
-    expect(worker.requests.at(-1)).toEqual(request);
-    worker.state.onPost = nextRequest => {
-      worker.emitMessage({requestIdentifier: nextRequest.requestIdentifier, outcome: 'complete'});
-    };
-    worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+    try {
+      hide();
+      output.write('{"during":true}', 'info');
+      clock.advanceByMilliseconds(logPersistenceConfiguration.flushIntervalMilliseconds);
+      expect(worker.requests.at(-1)).toEqual(request);
+    } finally {
+      worker.state.onPost = nextRequest => {
+        worker.emitMessage({requestIdentifier: nextRequest.requestIdentifier, outcome: 'complete'});
+      };
+      worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+    }
     expect((await binding).isOk).toBe(true);
     await flushing;
 
@@ -228,10 +234,13 @@ describe('browser log persistence composition', () => {
 
     const completion = task.fromPromise(writeWithinScope());
     const request = await shutdownRequest.promise;
-    expect(worker.requests.at(-2)).toMatchObject({type: 'append', lines: ['{"beforeScopeExit":true}\n']});
-    expect(worker.state.terminated).toBe(false);
-    expect(completion.isPending).toBe(true);
-    worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+    try {
+      expect(worker.requests.at(-2)).toMatchObject({type: 'append', lines: ['{"beforeScopeExit":true}\n']});
+      expect(worker.state.terminated).toBe(false);
+      expect(completion.isPending).toBe(true);
+    } finally {
+      worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+    }
     const expectedCompletion = exitMode === 'throw' ? Result.err(new Error('Scope failed')) : Result.ok(undefined);
     expect(await completion).toEqual(expectedCompletion);
 
@@ -274,11 +283,14 @@ describe('browser log persistence composition', () => {
     const binding = output.bindAccount('a'.repeat(64));
     const request = await bindingRequest.promise;
     const disposing = output.dispose();
-    expect(worker.requests.at(-1)).toEqual(request);
-    worker.state.onPost = nextRequest => {
-      worker.emitMessage({requestIdentifier: nextRequest.requestIdentifier, outcome: 'complete'});
-    };
-    worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+    try {
+      expect(worker.requests.at(-1)).toEqual(request);
+    } finally {
+      worker.state.onPost = nextRequest => {
+        worker.emitMessage({requestIdentifier: nextRequest.requestIdentifier, outcome: 'complete'});
+      };
+      worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+    }
     await binding;
     await disposing;
 
