@@ -44,6 +44,7 @@ interface IsLoggedInColumnProps {
 }
 
 interface GuestLoginColumnProps {
+  isMeeting: boolean;
   enteredName: string;
   onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   checkNameValidity: (event: React.FormEvent) => Promise<void>;
@@ -140,6 +141,7 @@ const IsLoggedInColumn: FunctionComponent<IsLoggedInColumnProps> = ({
 };
 
 const GuestLoginColumn: FunctionComponent<GuestLoginColumnProps> = ({
+  isMeeting,
   enteredName,
   nameInput,
   onNameChange,
@@ -166,7 +168,7 @@ const GuestLoginColumn: FunctionComponent<GuestLoginColumnProps> = ({
           >
             <>
               <H2 center>{translate('conversationJoin.noAccountHead')}</H2>
-              <Muted>{translate('conversationJoin.subhead')}</Muted>
+              <Muted>{translate(isMeeting ? 'meetingJoin.temporaryGuestSubhead' : 'conversationJoin.subhead')}</Muted>
               <Form style={{marginTop: 30}}>
                 <Input
                   id="enter-name"
