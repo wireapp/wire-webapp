@@ -105,12 +105,14 @@ interface SharedDriveUploadStatusProviderProps {
   readonly children: ReactNode;
   readonly initialDismissedUpload?: Maybe<DismissedUpload>;
   readonly initialMoveStatus?: Maybe<SharedDriveMoveStatus>;
+  readonly resetOnScopeChange?: Maybe<string>;
 }
 
 export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploadStatusProviderProps> = ({
   children,
   initialDismissedUpload = Maybe.nothing(),
   initialMoveStatus = Maybe.nothing(),
+  resetOnScopeChange = Maybe.nothing(),
 }: SharedDriveUploadStatusProviderProps) => {
   const [dismissedUpload, setDismissedUpload] = useState<Maybe<DismissedUpload>>(initialDismissedUpload);
   const [moveStatuses, setMoveStatuses] = useState<ReadonlyMap<string, SharedDriveMoveStatus>>(() => {
@@ -138,6 +140,22 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
   const [backgroundMoveController] = useState(() => {
     return createSharedDriveBackgroundMoveController(updateMoveStatus);
   });
+  const previousScopeKey = useRef(resetOnScopeChange);
+  useEffect(() => {
+    const previous = previousScopeKey.current;
+    previousScopeKey.current = resetOnScopeChange;
+    if (
+      maybe.isNothing(previous) ||
+      maybe.isNothing(resetOnScopeChange) ||
+      previous.value === resetOnScopeChange.value
+    ) {
+      return;
+    }
+    backgroundMoveController.stopAll();
+    dismissedMoveStatusIds.current.clear();
+    setDismissedUpload(Maybe.nothing());
+    setMoveStatuses(new Map());
+  }, [backgroundMoveController, resetOnScopeChange]);
   useEffect(() => {
     return backgroundMoveController.stopAll;
   }, [backgroundMoveController]);
@@ -189,4 +207,16 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
 
 export const useSharedDriveUploadStatus = (): SharedDriveUploadStatusContextValue => {
   return useContext(SharedDriveUploadStatusContext);
+};
+
+export const SharedDriveUploadStatusScope: FunctionComponent<{
+  readonly enabled: boolean;
+  readonly scopeKey: Maybe<string>;
+  readonly children: ReactNode;
+}> = ({enabled, scopeKey, children}) => {
+  return enabled ? (
+    <SharedDriveUploadStatusProvider resetOnScopeChange={scopeKey}>{children}</SharedDriveUploadStatusProvider>
+  ) : (
+    <>{children}</>
+  );
 };

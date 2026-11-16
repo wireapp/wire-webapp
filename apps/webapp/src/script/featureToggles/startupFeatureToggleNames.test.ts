@@ -20,6 +20,7 @@
 import {
   applockRefactoredFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
+  driveBulkActionProgressFeatureToggleName,
   markAsUnreadFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   previewDefaultEnabledStartupFeatureToggleNames,
@@ -80,6 +81,14 @@ describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
       previewDefaultEnabled: false,
     });
     expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(driveBulkRestoreFeatureToggleName);
+  });
+
+  it('keeps Drive bulk action progress persistence disabled by default in preview builds', () => {
+    expect(startupFeatureToggleRegistry).toContainEqual({
+      name: driveBulkActionProgressFeatureToggleName,
+      previewDefaultEnabled: false,
+    });
+    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(driveBulkActionProgressFeatureToggleName);
   });
 
   it('keeps the test-only flag explicitly opted out of preview defaults', () => {
