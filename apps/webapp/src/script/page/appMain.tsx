@@ -45,6 +45,7 @@ import {CallingContainer} from '../components/calling/CallingOverlayContainer';
 import {ChooseScreen} from '../components/calling/ChooseScreen';
 import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
 import {ConfigToolbar} from '../components/configToolbar/configToolbar';
+import {SharedDriveUploadStatusProvider} from '../components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {ErrorFallback} from '../components/errorFallback';
 import {CreateConversationModal} from '../components/Modals/CreateConversation/CreateConversaionModal';
 import {FileHistoryModal} from '../components/Modals/FileHistoryModal/FileHistoryModal';
@@ -414,15 +415,17 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
               <LeftSidebar listViewModel={mainView.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
             )}
 
-            {showMainContent && (
-              <MainContent
-                selfUser={selfUser}
-                isRightSidebarOpen={isTruthy(currentState)}
-                openRightSidebar={toggleRightSidebar}
-                reloadApp={app.refresh}
-                appLockRepository={appLockRepository}
-              />
-            )}
+            <SharedDriveUploadStatusProvider>
+              {showMainContent && (
+                <MainContent
+                  selfUser={selfUser}
+                  isRightSidebarOpen={isTruthy(currentState)}
+                  openRightSidebar={toggleRightSidebar}
+                  reloadApp={app.refresh}
+                  appLockRepository={appLockRepository}
+                />
+              )}
+            </SharedDriveUploadStatusProvider>
 
             {isTruthy(currentState) ? (
               <RightSidebar

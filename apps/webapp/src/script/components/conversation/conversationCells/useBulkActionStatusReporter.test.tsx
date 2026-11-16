@@ -20,7 +20,7 @@
 import type {ReactElement, ReactNode} from 'react';
 
 import {act, renderHook} from '@testing-library/react';
-import {maybe, type Maybe} from 'true-myth';
+import {Maybe, maybe} from 'true-myth';
 
 import {SharedDriveUploadStatusProvider, useSharedDriveUploadStatus} from './sharedDriveUploadStatusContext';
 import type {SharedDriveMoveStatus} from './sharedDriveUploadStatusContext';
@@ -30,6 +30,7 @@ const items = [
   {id: 'file-1', name: 'a.txt', isFolder: false},
   {id: 'folder-1', name: 'Reports', isFolder: true},
 ];
+const conversationQualifiedId = 'conversation@example.com';
 
 interface ReporterView {
   readonly reporter: BulkActionStatusReporter;
@@ -43,8 +44,8 @@ const renderReporter = (onReview?: () => void): ReturnType<typeof renderHook<Rep
   return renderHook(
     (): ReporterView => {
       return {
-        reporter: useBulkActionStatusReporter('restore', onReview),
-        shown: useSharedDriveUploadStatus().moveStatus,
+        reporter: useBulkActionStatusReporter('restore', conversationQualifiedId, onReview),
+        shown: useSharedDriveUploadStatus().getMoveStatus(conversationQualifiedId),
       };
     },
     {wrapper},
@@ -52,6 +53,71 @@ const renderReporter = (onReview?: () => void): ReturnType<typeof renderHook<Rep
 };
 
 describe('useBulkActionStatusReporter', () => {
+  it('retains a conversation status while its view unmounts and remounts', () => {
+    let isConversationMounted = true;
+    const wrapper = ({children}: {children: ReactNode}): ReactElement => {
+      return (
+        <SharedDriveUploadStatusProvider>{isConversationMounted ? children : null}</SharedDriveUploadStatusProvider>
+      );
+    };
+    const {result, rerender} = renderHook(useSharedDriveUploadStatus, {wrapper});
+    const status: SharedDriveMoveStatus = {
+      id: 'move-status',
+      conversationQualifiedId,
+      action: 'move',
+      kind: 'processing',
+      items,
+      destinationPath: 'Reports',
+    };
+
+    act(() => {
+      result.current.updateMoveStatus(status);
+    });
+    isConversationMounted = false;
+    rerender();
+    isConversationMounted = true;
+    rerender();
+
+    expect(result.current.getMoveStatus(conversationQualifiedId)).toEqual(Maybe.just(status));
+  });
+
+  it('keeps status for each conversation when another conversation starts an action', () => {
+    const wrapper = ({children}: {children: ReactNode}): ReactElement => {
+      return <SharedDriveUploadStatusProvider>{children}</SharedDriveUploadStatusProvider>;
+    };
+    const {result} = renderHook(useSharedDriveUploadStatus, {wrapper});
+    const firstStatus: SharedDriveMoveStatus = {
+      id: 'first-status',
+      conversationQualifiedId,
+      action: 'move',
+      kind: 'processing',
+      items,
+      destinationPath: 'First folder',
+    };
+    const secondConversationQualifiedId = 'other@example.com';
+    const secondStatus: SharedDriveMoveStatus = {
+      ...firstStatus,
+      id: 'second-status',
+      conversationQualifiedId: secondConversationQualifiedId,
+      kind: 'completed',
+    };
+
+    act(() => {
+      result.current.updateMoveStatus(firstStatus);
+      result.current.updateMoveStatus(secondStatus);
+    });
+
+    expect(result.current.getMoveStatus(conversationQualifiedId)).toEqual(Maybe.just(firstStatus));
+    expect(result.current.getMoveStatus(secondConversationQualifiedId)).toEqual(Maybe.just(secondStatus));
+
+    act(() => {
+      result.current.dismissMoveStatus(firstStatus.id);
+    });
+
+    expect(maybe.isNothing(result.current.getMoveStatus(conversationQualifiedId))).toBe(true);
+    expect(result.current.getMoveStatus(secondConversationQualifiedId)).toEqual(Maybe.just(secondStatus));
+  });
+
   it('shows nothing until an action starts', () => {
     const {result} = renderReporter();
 

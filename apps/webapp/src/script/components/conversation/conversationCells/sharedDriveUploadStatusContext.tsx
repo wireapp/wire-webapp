@@ -17,7 +17,15 @@
  *
  */
 
-import {createContext, type ReactNode, useCallback, useContext, useRef, useState, type FunctionComponent} from 'react';
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+  type FunctionComponent,
+} from 'react';
 
 import {Maybe, maybe} from 'true-myth';
 
@@ -42,6 +50,7 @@ export type SharedDriveMoveStatusKind =
 
 export interface SharedDriveMoveStatus extends SharedDriveMoveSummary {
   readonly id: string;
+  readonly conversationQualifiedId: string;
   readonly kind: SharedDriveMoveStatusKind;
   /** Retries the check for an outcome that needs review; the popup offers it as a button when set. */
   readonly onReview?: () => void;
@@ -52,7 +61,7 @@ export interface SharedDriveMoveStatus extends SharedDriveMoveSummary {
 type SharedDriveUploadStatusContextValue = {
   readonly dismissedUpload: Maybe<DismissedUpload>;
   readonly dismissUpload: (upload: DismissedUpload) => void;
-  readonly moveStatus: Maybe<SharedDriveMoveStatus>;
+  readonly getMoveStatus: (conversationQualifiedId: string) => Maybe<SharedDriveMoveStatus>;
   readonly updateMoveStatus: (status: SharedDriveMoveStatus) => void;
   readonly createMoveStatusId: () => string;
   readonly dismissMoveStatus: (id: string) => void;
@@ -65,7 +74,9 @@ const SharedDriveUploadStatusContext = createContext<SharedDriveUploadStatusCont
   dismissUpload: () => {
     return undefined;
   },
-  moveStatus: Maybe.nothing(),
+  getMoveStatus: () => {
+    return Maybe.nothing();
+  },
   updateMoveStatus: () => {
     return undefined;
   },
@@ -93,31 +104,49 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
   initialMoveStatus = Maybe.nothing(),
 }: SharedDriveUploadStatusProviderProps) => {
   const [dismissedUpload, setDismissedUpload] = useState<Maybe<DismissedUpload>>(initialDismissedUpload);
-  const [moveStatus, setMoveStatus] = useState<Maybe<SharedDriveMoveStatus>>(initialMoveStatus);
+  const [moveStatuses, setMoveStatuses] = useState<ReadonlyMap<string, SharedDriveMoveStatus>>(() => {
+    return maybe.isJust(initialMoveStatus)
+      ? new Map([[initialMoveStatus.value.conversationQualifiedId, initialMoveStatus.value]])
+      : new Map();
+  });
+  const getMoveStatus = (conversationQualifiedId: string): Maybe<SharedDriveMoveStatus> => {
+    return Maybe.of(moveStatuses.get(conversationQualifiedId));
+  };
   const moveStatusSequence = useRef(0);
   const createMoveStatusId = useCallback(() => {
     moveStatusSequence.current += 1;
     return `shared-drive-move-${moveStatusSequence.current}`;
   }, []);
-  const dismissedMoveStatusId = useRef<Maybe<string>>(Maybe.nothing());
+  const dismissedMoveStatusIds = useRef(new Set<string>());
   const updateMoveStatus = useCallback((status: SharedDriveMoveStatus) => {
-    if (maybe.isJust(dismissedMoveStatusId.current)) {
-      if (dismissedMoveStatusId.current.value === status.id) {
-        return;
-      }
-      dismissedMoveStatusId.current = Maybe.nothing();
+    if (dismissedMoveStatusIds.current.has(status.id)) {
+      return;
     }
-    setMoveStatus(Maybe.just(status));
+    setMoveStatuses(current => {
+      return new Map(current).set(status.conversationQualifiedId, status);
+    });
   }, []);
   const dismissMoveStatus = useCallback((id: string) => {
-    dismissedMoveStatusId.current = Maybe.just(id);
-    setMoveStatus(current => {
-      return maybe.isJust(current) && current.value.id === id ? Maybe.nothing() : current;
+    dismissedMoveStatusIds.current.add(id);
+    setMoveStatuses(current => {
+      const next = new Map(current);
+      for (const [conversationQualifiedId, status] of next) {
+        if (status.id === id) {
+          next.delete(conversationQualifiedId);
+        }
+      }
+      return next;
     });
   }, []);
   const clearMoveStatus = useCallback((id: string) => {
-    setMoveStatus(current => {
-      return maybe.isJust(current) && current.value.id === id ? Maybe.nothing() : current;
+    setMoveStatuses(current => {
+      const next = new Map(current);
+      for (const [conversationQualifiedId, status] of next) {
+        if (status.id === id) {
+          next.delete(conversationQualifiedId);
+        }
+      }
+      return next;
     });
   }, []);
   const dismissUpload = useCallback((upload: DismissedUpload) => {
@@ -129,7 +158,7 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
       value={{
         dismissedUpload,
         dismissUpload,
-        moveStatus,
+        getMoveStatus,
         updateMoveStatus,
         createMoveStatusId,
         dismissMoveStatus,

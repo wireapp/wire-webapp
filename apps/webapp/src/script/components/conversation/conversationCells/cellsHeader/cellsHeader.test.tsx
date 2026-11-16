@@ -88,13 +88,14 @@ const uploadStatusController = {
 
 // The status popup host is rendered next to the header so bulk action progress is observable.
 const createHeaderTree = (properties: Partial<typeof defaultProperties>): ReactElement => {
+  const {id, domain} = properties.conversationQualifiedId ?? defaultProperties.conversationQualifiedId;
   return (
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <SharedDriveUploadStatusProvider>
         <CellsHeader {...defaultProperties} {...properties} />
         <SharedDriveUploadStatusPopupHost
           controller={uploadStatusController}
-          conversationQualifiedId="conversation@example.com"
+          conversationQualifiedId={`${id}@${domain}`}
           isEnabled
           isFileTabActive
         />

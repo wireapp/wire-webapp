@@ -41,7 +41,6 @@ import {
   createDraftSharedDriveUploadStrategy,
   createSharedDriveUploadController,
 } from './conversationCells/sharedDriveUploadController';
-import {SharedDriveUploadStatusProvider} from './conversationCells/sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from './conversationCells/sharedDriveUploadStatusPopupHost';
 import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
 import {isConversationFileUploadAllowed} from './conversationFileDropzone/isConversationFileUploadAllowed/isConversationFileUploadAllowed';
@@ -741,7 +740,7 @@ function ConversationContent({
         inputProps={getInputProps()}
       >
         {!isNullOrUndefined(activeConversation) && (
-          <SharedDriveUploadStatusProvider>
+          <>
             <TitleBar
               repositories={repositories}
               conversation={activeConversation}
@@ -907,7 +906,7 @@ function ConversationContent({
               isEnabled
               isFileTabActive={isFileTabActive}
             />
-          </SharedDriveUploadStatusProvider>
+          </>
         )}
 
         {isGiphyModalOpen && isNonEmptyString(inputValue) && (
