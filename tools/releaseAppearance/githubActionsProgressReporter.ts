@@ -17,7 +17,6 @@
  *
  */
 
-import * as actionsCore from '@actions/core';
 import {Maybe} from 'true-myth';
 import {match} from 'ts-pattern';
 
@@ -32,7 +31,11 @@ import {
   pullRequestDiscoveryConcurrency,
 } from './releaseAppearanceProgress.ts';
 
-type ActionsCoreProgressAdapter = Pick<typeof actionsCore, 'endGroup' | 'info' | 'startGroup'>;
+type ActionsCoreProgressAdapter = {
+  readonly endGroup: () => void;
+  readonly info: (message: string) => void;
+  readonly startGroup: (name: string) => void;
+};
 
 type ProgressPhase = 'discovery' | 'comments';
 
@@ -248,8 +251,4 @@ export function createGitHubActionsProgressReporter(
       finishProgress({phase: 'comments', progress});
     },
   };
-}
-
-export function createDefaultGitHubActionsProgressReporter(): ReleaseAppearanceProgressReporter {
-  return createGitHubActionsProgressReporter({actionsCore});
 }
