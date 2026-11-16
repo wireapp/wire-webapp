@@ -22,3 +22,15 @@ import type {CSSObject} from '@emotion/react';
 export const errorMessageStyles: CSSObject = {
   marginBottom: 18,
 };
+
+export const clearButtonStyles: CSSObject = {
+  position: 'absolute',
+  right: 44,
+  top: '50%',
+  transform: 'translateY(-50%)',
+  border: 0,
+  background: 'transparent',
+  cursor: 'pointer',
+};
+
+export const passwordInputStyles: CSSObject = {paddingRight: 80};
