@@ -48,7 +48,7 @@ interface SharedDriveBackgroundActionController {
   readonly stopAll: () => void;
 }
 
-const kindForOutcome = (outcome: CellsBackgroundActionOutcome): SharedDriveMoveStatusKind => {
+export const getBackgroundActionStatusKind = (outcome: CellsBackgroundActionOutcome): SharedDriveMoveStatusKind => {
   switch (outcome) {
     case 'all-finished':
       return 'completed';
@@ -102,7 +102,7 @@ export const createSharedDriveBackgroundActionController = (
         if (!observations.delete(status.id)) {
           return;
         }
-        publishStatus({...status, kind: kindForOutcome(outcome)});
+        publishStatus({...status, kind: getBackgroundActionStatusKind(outcome)});
         onOutcome(outcome);
       },
     });
