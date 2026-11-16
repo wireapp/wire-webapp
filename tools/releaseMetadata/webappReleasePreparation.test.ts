@@ -10,7 +10,8 @@
 
 import assert from 'node:assert';
 
-import {Task, Unit} from 'true-myth';
+import {isUndefined} from '@sindresorhus/is';
+import {Maybe, Task, Unit} from 'true-myth';
 
 import {prepareWebAppRelease} from './webappReleaseReservation.ts';
 import type {
@@ -20,7 +21,12 @@ import type {
   PrepareWebAppReleaseOptions,
   VerifyWebAppReleaseCommitAncestorOptions,
   WebAppReleaseBranchRef,
+  PlanNextWebAppReleaseOptions,
 } from './webappReleaseReservation.ts';
+import {resolveWebAppReleaseHistoryBase} from './webappReleaseReservationGit.ts';
+import type {ExecuteWebAppReleaseGitCommand} from './webappReleaseHistoryGit.ts';
+import {readWebAppReleaseHistory} from './webappReleaseHistoryGit.ts';
+import {planWebAppRelease} from './webappReleasePlan.ts';
 import type {StableWebAppRelease} from './webappStableReleaseGit.ts';
 import {validateWebAppVersion} from './webappVersion.ts';
 
@@ -33,11 +39,14 @@ const historicalReleaseCommitSha = 'e'.repeat(40);
 type PreparationTestOptions = {
   readonly releaseBranches?: readonly WebAppReleaseBranchRef[];
   readonly branchCommitPreparation?: (options: PrepareRemoteReleaseBranchCommitOptions) => Task<Unit, Error>;
+  readonly executeGitCommand?: ExecuteWebAppReleaseGitCommand;
+  readonly stableReleases?: readonly StableWebAppRelease[];
 };
 
 type PreparationTestDependencies = {
   readonly dependencies: PrepareWebAppReleaseDependencies;
   readonly plannedVersions: string[];
+  readonly plannedRanges: PlanNextWebAppReleaseOptions[];
   readonly createdBranches: CreateWebAppReleaseReservationBranchOptions[];
   readonly preparedBranchCommits: PrepareRemoteReleaseBranchCommitOptions[];
   readonly ancestorChecks: VerifyWebAppReleaseCommitAncestorOptions[];
@@ -52,10 +61,11 @@ function createStableRelease(version: string, tagName: string, commitSha: string
 
 function createPreparationTestDependencies(options: PreparationTestOptions = {}): PreparationTestDependencies {
   const plannedVersions: string[] = [];
+  const plannedRanges: PlanNextWebAppReleaseOptions[] = [];
   const createdBranches: CreateWebAppReleaseReservationBranchOptions[] = [];
   const preparedBranchCommits: PrepareRemoteReleaseBranchCommitOptions[] = [];
   const ancestorChecks: VerifyWebAppReleaseCommitAncestorOptions[] = [];
-  const stableReleases = [createStableRelease('1.0.0', 'v1.0.0', stableCommitSha)];
+  const stableReleases = options.stableReleases ?? [createStableRelease('1.0.0', 'v1.0.0', stableCommitSha)];
 
   const dependencies: PrepareWebAppReleaseDependencies = {
     readStableWebAppReleases() {
@@ -64,23 +74,35 @@ function createPreparationTestDependencies(options: PreparationTestOptions = {})
     readRemoteReleaseBranches() {
       return Task.resolve(options.releaseBranches ?? []);
     },
-    isCommitAncestor(ancestorOptions) {
+    resolveHistoryBase(ancestorOptions) {
       ancestorChecks.push(ancestorOptions);
 
-      return Task.resolve(true);
+      return isUndefined(options.executeGitCommand)
+        ? Task.resolve(ancestorOptions.baseCommit)
+        : resolveWebAppReleaseHistoryBase({...ancestorOptions, executeGitCommand: options.executeGitCommand});
     },
     planNextWebAppRelease(planOptions) {
       plannedVersions.push(planOptions.currentVersion);
-      const nextVersionResult = validateWebAppVersion('1.1.0');
-      assert(nextVersionResult.isOk);
+      plannedRanges.push(planOptions);
 
-      return Task.resolve({
-        baseCommit: stableCommitSha,
-        targetCommit: planOptions.targetCommit,
-        currentVersion: planOptions.currentVersion,
-        versionBump: 'minor',
-        nextVersion: nextVersionResult.value,
-        pullRequests: [],
+      return planWebAppRelease(planOptions, {
+        readFirstParentHistory(historyOptions) {
+          return isUndefined(options.executeGitCommand)
+            ? Task.resolve({...historyOptions, commits: [dispatchCommitSha]})
+            : readWebAppReleaseHistory(historyOptions, {executeGitCommand: options.executeGitCommand});
+        },
+        listPullRequestsForCommit() {
+          return Task.resolve([
+            {
+              number: 101,
+              title: 'Add a feature',
+              baseBranch: 'main',
+              mergedAt: Maybe.just('2026-11-16T08:00:00Z'),
+              mergeCommitSha: Maybe.just(dispatchCommitSha),
+              labels: ['semver:minor'],
+            },
+          ]);
+        },
       });
     },
     createReleaseBranch(branchOptions) {
@@ -91,13 +113,58 @@ function createPreparationTestDependencies(options: PreparationTestOptions = {})
     prepareRemoteReleaseBranchCommit(branchOptions) {
       preparedBranchCommits.push(branchOptions);
 
-      return options.branchCommitPreparation === undefined
+      return isUndefined(options.branchCommitPreparation)
         ? Task.resolve(Unit)
         : options.branchCommitPreparation(branchOptions);
     },
   };
 
-  return {dependencies, plannedVersions, createdBranches, preparedBranchCommits, ancestorChecks};
+  return {dependencies, plannedVersions, plannedRanges, createdBranches, preparedBranchCommits, ancestorChecks};
+}
+
+type HistoryGitTestOptions = {
+  readonly ancestor?: boolean;
+  readonly mergeBaseOutput?: string;
+  readonly firstParentOutput?: string;
+  readonly unrelated?: boolean;
+};
+
+const hotfixMergeBaseCommit = 'fa0cc66f836e16d77fc8e5cea0167d5a38221fda';
+
+function createHistoryGitFake(options: HistoryGitTestOptions): ExecuteWebAppReleaseGitCommand {
+  return async function executeGitCommand(commandArguments): Promise<string> {
+    if (commandArguments.at(0) === 'rev-parse') {
+      return commandArguments.at(-1)?.replace('^{commit}', '') ?? '';
+    }
+
+    if (commandArguments.at(0) === 'rev-list' && commandArguments.includes('--count')) {
+      return options.ancestor || commandArguments.at(-1)?.startsWith(hotfixMergeBaseCommit) ? '0\t3' : '2\t3';
+    }
+
+    if (commandArguments.includes('--reverse')) {
+      expect(commandArguments).toEqual([
+        'rev-list',
+        '--reverse',
+        '--first-parent',
+        `${options.ancestor ? stableCommitSha : hotfixMergeBaseCommit}..${dispatchCommitSha}`,
+      ]);
+
+      return dispatchCommitSha;
+    }
+
+    if (commandArguments.at(0) === 'merge-base') {
+      expect(commandArguments).toEqual(['merge-base', '--all', stableCommitSha, dispatchCommitSha]);
+      if (options.unrelated) {
+        throw new Error('No common ancestor');
+      }
+
+      return options.mergeBaseOutput ?? hotfixMergeBaseCommit;
+    }
+
+    expect(commandArguments).toEqual(['rev-list', '--first-parent', dispatchCommitSha]);
+
+    return options.firstParentOutput ?? `${dispatchCommitSha}\n${hotfixMergeBaseCommit}`;
+  };
 }
 
 function prepareRelease(
@@ -108,6 +175,94 @@ function prepareRelease(
 }
 
 describe('prepareWebAppRelease', () => {
+  it.each([
+    {ancestor: true, expectedBaseCommit: stableCommitSha},
+    {ancestor: false, expectedBaseCommit: hotfixMergeBaseCommit},
+  ])('start keeps the latest stable version with ancestor=$ancestor', async options => {
+    const testDependencies = createPreparationTestDependencies({
+      stableReleases: [
+        createStableRelease('1.2.0', 'v1.2.0', historicalReleaseCommitSha),
+        createStableRelease('1.2.1', 'v1.2.1', stableCommitSha),
+      ],
+      executeGitCommand: createHistoryGitFake(options),
+    });
+    const actualResult = await prepareRelease(
+      {operation: 'start', targetCommit: dispatchCommitSha},
+      testDependencies.dependencies,
+    ).toPromise();
+
+    assert(actualResult.isOk);
+    expect(testDependencies.plannedRanges).toEqual([
+      {
+        currentVersion: '1.2.1',
+        baseCommit: options.expectedBaseCommit,
+        targetCommit: dispatchCommitSha,
+      },
+    ]);
+    expect(actualResult.value).toMatchObject({
+      version: '1.3.0',
+      releaseBranch: 'release/1.3.0',
+      stableBaseVersion: '1.2.1',
+      stableBaseTag: 'v1.2.1',
+      stableBaseCommitSha: stableCommitSha,
+    });
+    expect(testDependencies.createdBranches).toHaveLength(1);
+  });
+
+  it('continue accepts diverged hotfix history after verifying the reserved remote commit', async () => {
+    const testDependencies = createPreparationTestDependencies({
+      releaseBranches: [{releaseBranch: 'release/1.3.0', releaseCommitSha: dispatchCommitSha}],
+      executeGitCommand: createHistoryGitFake({}),
+      branchCommitPreparation() {
+        expect(testDependencies.ancestorChecks).toEqual([]);
+
+        return Task.resolve(Unit);
+      },
+    });
+    const actualResult = await prepareRelease({operation: 'continue'}, testDependencies.dependencies).toPromise();
+
+    assert(actualResult.isOk);
+    expect(actualResult.value).toMatchObject({version: '1.3.0', releaseCommitSha: dispatchCommitSha, action: 'reused'});
+    expect(testDependencies.preparedBranchCommits).toEqual([
+      {
+        releaseBranch: 'release/1.3.0',
+        expectedCommitSha: dispatchCommitSha,
+      },
+    ]);
+    expect(testDependencies.plannedRanges).toEqual([]);
+    expect(testDependencies.createdBranches).toEqual([]);
+  });
+
+  it.each([
+    {history: {unrelated: true}, diagnostic: 'merge-base'},
+    {history: {mergeBaseOutput: ''}, diagnostic: 'exactly one valid merge-base'},
+    {
+      history: {mergeBaseOutput: `${hotfixMergeBaseCommit}\n${historicalReleaseCommitSha}`},
+      diagnostic: 'exactly one valid merge-base',
+    },
+    {history: {mergeBaseOutput: 'invalid'}, diagnostic: 'exactly one valid merge-base'},
+    {history: {mergeBaseOutput: dispatchCommitSha}, diagnostic: 'predates'},
+    {history: {firstParentOutput: dispatchCommitSha}, diagnostic: 'not on the target first-parent history'},
+    {history: {firstParentOutput: 'invalid'}, diagnostic: 'invalid first-parent history'},
+  ])('rejects invalid history $diagnostic for start and continue', async options => {
+    for (const operation of ['start', 'continue'] as const) {
+      const testDependencies = createPreparationTestDependencies({
+        executeGitCommand: createHistoryGitFake(options.history),
+        releaseBranches:
+          operation === 'continue' ? [{releaseBranch: 'release/1.3.0', releaseCommitSha: dispatchCommitSha}] : [],
+      });
+      const actualResult = await prepareRelease(
+        operation === 'start' ? {operation, targetCommit: dispatchCommitSha} : {operation},
+        testDependencies.dependencies,
+      ).toPromise();
+
+      assert(actualResult.isErr);
+      expect(actualResult.error.message).toContain(options.diagnostic);
+      expect(testDependencies.plannedRanges).toEqual([]);
+      expect(testDependencies.createdBranches).toEqual([]);
+    }
+  });
+
   it('start plans from v1.0.0 and creates release/1.1.0 at the exact dispatch SHA', async () => {
     const testDependencies = createPreparationTestDependencies();
     const actualResult = await prepareRelease(

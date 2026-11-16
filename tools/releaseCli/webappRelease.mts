@@ -30,7 +30,7 @@ import type {
 } from '../releaseMetadata/webappReleaseReservation.ts';
 import {
   createWebAppReleaseReservationBranch,
-  isWebAppReleaseCommitAncestor,
+  resolveWebAppReleaseHistoryBase,
   prepareRemoteWebAppReleaseBranchCommit,
   readRemoteWebAppReleaseBranches,
 } from '../releaseMetadata/webappReleaseReservationGit.ts';
@@ -66,10 +66,10 @@ function createReleasePreparationDependencies(
         remoteName: originRemoteName,
       });
     },
-    isCommitAncestor(ancestorOptions) {
+    resolveHistoryBase(ancestorOptions) {
       const {baseCommit, targetCommit} = ancestorOptions;
 
-      return isWebAppReleaseCommitAncestor({
+      return resolveWebAppReleaseHistoryBase({
         baseCommit,
         targetCommit,
         executeGitCommand: executeRuntimeGitCommand,

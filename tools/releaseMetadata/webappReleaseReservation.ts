@@ -17,6 +17,7 @@
  *
  */
 
+import {isError} from '@sindresorhus/is';
 import {Maybe, Result, task} from 'true-myth';
 import type {Task, Unit} from 'true-myth';
 
@@ -73,7 +74,7 @@ export type CreateWebAppReleaseReservationBranchOptions = {
 export type PrepareWebAppReleaseDependencies = {
   readonly readStableWebAppReleases: () => Task<readonly StableWebAppRelease[], Error>;
   readonly readRemoteReleaseBranches: () => Task<readonly WebAppReleaseBranchRef[], Error>;
-  readonly isCommitAncestor: (options: VerifyWebAppReleaseCommitAncestorOptions) => Task<boolean, Error>;
+  readonly resolveHistoryBase: (options: VerifyWebAppReleaseCommitAncestorOptions) => Task<string, Error>;
   readonly planNextWebAppRelease: (options: PlanNextWebAppReleaseOptions) => Task<WebAppReleasePlan, Error>;
   readonly prepareRemoteReleaseBranchCommit: (options: PrepareRemoteReleaseBranchCommitOptions) => Task<Unit, Error>;
   readonly createReleaseBranch: (
@@ -113,13 +114,13 @@ const likelyWebAppSemVerReleaseBranchPattern = /^release\/(?:v)?\d/;
 const historicalWebAppDateReleaseBranchPattern = /^release\/\d{4}-\d{2}-\d{2}(?:\.\d+)?$/;
 
 function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+  return isError(error) ? error.message : String(error);
 }
 
 function isLikelyWebAppSemVerReleaseBranchName(branchName: string): boolean {
   return (
     likelyWebAppSemVerReleaseBranchPattern.test(branchName) &&
-    historicalWebAppDateReleaseBranchPattern.test(branchName) === false
+    !historicalWebAppDateReleaseBranchPattern.test(branchName)
   );
 }
 
@@ -186,7 +187,7 @@ export function inspectActiveWebAppReleaseReservations(
       continue;
     }
 
-    if (fullCommitShaPattern.test(releaseBranch.releaseCommitSha) === false) {
+    if (!fullCommitShaPattern.test(releaseBranch.releaseCommitSha)) {
       return Result.err(new Error(`Malformed commit SHA on WebApp release branch ${releaseBranch.releaseBranch}`));
     }
 
@@ -229,13 +230,13 @@ async function executeWebAppReleaseStart(
   const {
     readStableWebAppReleases,
     readRemoteReleaseBranches,
-    isCommitAncestor,
+    resolveHistoryBase,
     planNextWebAppRelease,
     createReleaseBranch,
   } = dependencies;
 
   const targetCommit = requestedTargetCommit.toLowerCase();
-  if (fullCommitShaPattern.test(requestedTargetCommit) === false) {
+  if (!fullCommitShaPattern.test(requestedTargetCommit)) {
     throw new Error('Invalid target commit: expected a full 40-character hexadecimal SHA');
   }
 
@@ -288,23 +289,17 @@ async function executeWebAppReleaseStart(
     });
   }
 
-  const stableBaseIsAncestor = await readTaskValue(
-    isCommitAncestor({
+  const historyBaseCommit = await readTaskValue(
+    resolveHistoryBase({
       baseCommit: latestStableRelease.commitSha,
       targetCommit,
     }),
   );
 
-  if (stableBaseIsAncestor === false) {
-    throw new Error(
-      `Stable WebApp release ${latestStableRelease.tagName} commit is not an ancestor of target commit ${targetCommit}`,
-    );
-  }
-
   const releasePlan = await readTaskValue(
     planNextWebAppRelease({
       currentVersion: latestStableRelease.version,
-      baseCommit: latestStableRelease.commitSha,
+      baseCommit: historyBaseCommit,
       targetCommit,
     }),
   );
@@ -339,7 +334,7 @@ async function executeWebAppReleaseStart(
 async function executeWebAppReleaseContinuation(
   dependencies: PrepareWebAppReleaseDependencies,
 ): Promise<WebAppReleasePreparation> {
-  const {readStableWebAppReleases, readRemoteReleaseBranches, prepareRemoteReleaseBranchCommit, isCommitAncestor} =
+  const {readStableWebAppReleases, readRemoteReleaseBranches, prepareRemoteReleaseBranchCommit, resolveHistoryBase} =
     dependencies;
 
   const stableReleases = await readTaskValue(readStableWebAppReleases());
@@ -385,18 +380,12 @@ async function executeWebAppReleaseContinuation(
     }),
   );
 
-  const stableBaseIsAncestor = await readTaskValue(
-    isCommitAncestor({
+  await readTaskValue(
+    resolveHistoryBase({
       baseCommit: latestStableRelease.commitSha,
       targetCommit: activeReservation.releaseCommitSha,
     }),
   );
-
-  if (stableBaseIsAncestor === false) {
-    throw new Error(
-      `Stable WebApp release ${latestStableRelease.tagName} commit is not an ancestor of active release commit ${activeReservation.releaseCommitSha}`,
-    );
-  }
 
   return createReservationResult({
     operation: 'continue',

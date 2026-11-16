@@ -31,6 +31,7 @@ import {
   isWebAppReleaseCommitAncestor,
   prepareRemoteWebAppReleaseBranchCommit,
   readRemoteWebAppReleaseBranches,
+  resolveWebAppReleaseHistoryBase,
 } from './webappReleaseReservationGit.ts';
 import {prepareWebAppRelease} from './webappReleaseReservation.ts';
 import type {
@@ -247,12 +248,12 @@ function createReleasePreparationGitDependencies(
     });
   }
 
-  function verifyStableBaseAncestry(
+  function resolveHistoryBase(
     ancestorOptions: VerifyWebAppReleaseCommitAncestorOptions,
-  ): ReturnType<typeof isWebAppReleaseCommitAncestor> {
+  ): ReturnType<typeof resolveWebAppReleaseHistoryBase> {
     const {baseCommit, targetCommit} = ancestorOptions;
 
-    return isWebAppReleaseCommitAncestor({
+    return resolveWebAppReleaseHistoryBase({
       baseCommit,
       targetCommit,
       executeGitCommand,
@@ -263,7 +264,7 @@ function createReleasePreparationGitDependencies(
     readStableWebAppReleases,
     readRemoteReleaseBranches,
     prepareRemoteReleaseBranchCommit,
-    isCommitAncestor: verifyStableBaseAncestry,
+    resolveHistoryBase,
     planNextWebAppRelease() {
       return Task.reject(new Error('Continue must not plan a release'));
     },
