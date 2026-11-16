@@ -30,23 +30,25 @@ import {translateForTest} from '../../../../../../../../../../util/test/translat
 
 describe('VideoPlayButton', () => {
   const RootWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
-  const wrapper = ({children}: {children: ReactNode}): ReactElement => {return (
-    <ThemeProvider>
-      <RootWrapper>{children}</RootWrapper>
-    </ThemeProvider>
-  )};
+  const wrapper = ({children}: {children: ReactNode}): ReactElement => {
+    return (
+      <ThemeProvider>
+        <RootWrapper>{children}</RootWrapper>
+      </ThemeProvider>
+    );
+  };
 
   it('does not throw when the media element ref has been detached (null)', () => {
     const detachedElement = null as unknown as HTMLMediaElement;
 
-    expect(() =>
-      {return render(
+    expect(() => {
+      return render(
         <VideoPlayButton mediaElement={detachedElement} isPlaying={false} onPlay={jest.fn()} onPause={jest.fn()} />,
         {
           wrapper,
         },
-      )},
-    ).not.toThrow();
+      );
+    }).not.toThrow();
   });
 
   it('subscribes to playing and pause events of an attached media element', () => {
