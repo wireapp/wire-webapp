@@ -324,7 +324,7 @@
     },
     "typescript": "6.0.3",
     "xml2js": "0.6.2",
-    "@stablelib/utf8": "1.0.2",
+    "@stablelib/utf8": "2.1.0",
     "jest-config": "30.5.2",
     "jest-runner": "30.5.2",
     "jest-runtime": "30.5.2",
