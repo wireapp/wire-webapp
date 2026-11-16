@@ -252,7 +252,7 @@ export const CellsTable = ({
     updateMoveStatus: publishMoveStatus,
     createMoveStatusId,
     clearMoveStatus,
-    observeBackgroundMove,
+    observeBackgroundAction,
   } = useSharedDriveUploadStatus();
   const moveStatusConversationById = useRef(new Map<string, string>());
   const currentConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
@@ -564,7 +564,8 @@ export const CellsTable = ({
     summary: SharedDriveMoveSummary,
     jobUuids: readonly string[],
   ): void => {
-    observeBackgroundMove({
+    observeBackgroundAction({
+      actionName: 'move',
       status: {
         id: moveStatusId,
         conversationQualifiedId: moveStatusConversationById.current.get(moveStatusId) ?? currentConversationQualifiedId,
@@ -574,7 +575,7 @@ export const CellsTable = ({
       jobUuids,
       cellsRepository,
       clock,
-      random,
+      pollingPolicy: createBulkJobPollingPolicy(random),
       onOutcome: outcome => {
         handleBackgroundMoveOutcome(outcome, moveStatusId);
       },
