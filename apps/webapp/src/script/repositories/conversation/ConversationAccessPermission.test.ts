@@ -17,6 +17,8 @@
  *
  */
 
+import {objectEntries} from 'ts-extras';
+
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '../../apiClient/conversation/conversation';
 
 import {ACCESS_STATE, TEAM} from './AccessState';
@@ -64,8 +66,8 @@ describe('ConversationAccessPermissions', () => {
   };
 
   const accessStateMapper = <V>(teamObject: {[state in keyof typeof ACCESS_STATE.TEAM]: V}): [TEAM, V][] => {
-    return Object.entries(teamObject).map(([state, value]) => {
-      return [ACCESS_STATE.TEAM[state as keyof typeof ACCESS_STATE.TEAM], value];
+    return objectEntries(teamObject).map(([state, value]) => {
+      return [ACCESS_STATE.TEAM[state], value];
     });
   };
 

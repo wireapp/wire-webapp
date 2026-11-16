@@ -20,6 +20,7 @@
 import {Fragment, type FunctionComponent} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
+import {objectEntries} from 'ts-extras';
 
 import {badgesWrapper, icon} from './userStatusBadges.styles';
 
@@ -76,7 +77,7 @@ interface UserStatusBadgesProps {
 export const UserStatusBadges: FunctionComponent<UserStatusBadgesProps> = ({config}: UserStatusBadgesProps) => {
   const {translate} = useApplicationContext();
   const badgeToComponentMap = createBadgeToComponentMap(translate);
-  const badges = Object.entries(config).filter(([, shouldShow]) => {
+  const badges = objectEntries(config).filter(([, shouldShow]) => {
     return shouldShow;
   });
   const badgesCount = badges.length;
@@ -88,7 +89,7 @@ export const UserStatusBadges: FunctionComponent<UserStatusBadgesProps> = ({conf
   return (
     <div css={badgesWrapper(badgesCount)}>
       {badges.map(([badge]) => {
-        return <Fragment key={badge}>{badgeToComponentMap[badge as BadgeKey]()}</Fragment>;
+        return <Fragment key={badge}>{badgeToComponentMap[badge]()}</Fragment>;
       })}
     </div>
   );
