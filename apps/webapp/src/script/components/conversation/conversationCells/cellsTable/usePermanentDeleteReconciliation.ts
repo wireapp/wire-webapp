@@ -100,6 +100,10 @@ const isAuthoritativeRejection = (error: unknown): boolean => {
   );
 };
 
+const getFailedRequestStatusKind = (error: unknown): SharedDriveMoveStatusKind => {
+  return isAuthoritativeRejection(error) ? 'request-failed' : 'status-unknown';
+};
+
 const isFailureReason = (reason: PermanentDeleteReviewReason | null): reason is 'job-failed' | 'refresh-failed' => {
   return reason === 'job-failed' || reason === 'refresh-failed';
 };
@@ -159,6 +163,10 @@ export const usePermanentDeleteReconciliation = (
       generationRef.current === generation &&
       optionsRef.current.isCurrentScope(context.scopeKey, context.path)
     );
+  };
+
+  const continueAsTerminal = (status: SharedDriveMoveStatus, statusKind: SharedDriveMoveStatusKind): void => {
+    optionsRef.current.onContinueAfterViewLeave({kind: 'terminal', status, statusKind});
   };
 
   const continueAfterViewLeave = (context: PermanentDeleteReconciliationContext): void => {
@@ -352,7 +360,7 @@ export const usePermanentDeleteReconciliation = (
       const evidence = getCellsBackgroundActionEvidence(response, 'delete');
       if (!isCurrent(context, requestGeneration)) {
         if (evidence.hasCompleted) {
-          optionsRef.current.onContinueAfterViewLeave({kind: 'terminal', status, statusKind: 'completed'});
+          continueAsTerminal(status, 'completed');
         } else {
           continueAfterViewLeave({...context, jobUuids: evidence.jobUuids});
         }
@@ -371,20 +379,12 @@ export const usePermanentDeleteReconciliation = (
       }
     } catch (error) {
       if (!isMountedRef.current || generationRef.current !== requestGeneration) {
-        optionsRef.current.onContinueAfterViewLeave({
-          kind: 'terminal',
-          status,
-          statusKind: isAuthoritativeRejection(error) ? 'request-failed' : 'status-unknown',
-        });
+        continueAsTerminal(status, getFailedRequestStatusKind(error));
         return;
       }
       optionsRef.current.reportError(error);
       if (!isCurrent(context, requestGeneration)) {
-        optionsRef.current.onContinueAfterViewLeave({
-          kind: 'terminal',
-          status,
-          statusKind: isAuthoritativeRejection(error) ? 'request-failed' : 'status-unknown',
-        });
+        continueAsTerminal(status, getFailedRequestStatusKind(error));
         return;
       }
       if (isAuthoritativeRejection(error)) {
