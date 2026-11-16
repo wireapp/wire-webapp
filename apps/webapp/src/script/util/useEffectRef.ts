@@ -17,8 +17,13 @@
  *
  */
 
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 
-export function useEffectRef<T extends Element>(value?: T): [T | undefined, (node: T) => void] {
-  return useState<T | undefined>(value);
+export function useEffectRef<T extends Element>(value?: T): [T | undefined, (node: T | null) => void] {
+  const [element, setElement] = useState<T | undefined>(value);
+  const setRef = useCallback((node: T | null) => {
+    setElement(node ?? undefined);
+  }, []);
+
+  return [element, setRef];
 }
