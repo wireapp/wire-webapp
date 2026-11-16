@@ -19,26 +19,41 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {Maybe} from 'true-myth';
+import {Maybe, task, Unit} from 'true-myth';
 
 import {
   createBufferedLogOutput,
   type BufferedLogOutput,
   type LogPersistenceStatistics,
+  type LogOutputTransition,
+  type LogOutputTransitionFailure,
 } from './createBufferedLogOutput';
 import {createLogWorkerClient, type LogWorkerConnection} from './createLogWorkerClient';
 import {logPersistenceConfiguration} from './logPersistenceConfiguration';
 
+type BrowserLogLifecycle = {
+  readonly isHidden: () => boolean;
+  readonly subscribeToVisibilityChanges: (listener: () => void) => () => void;
+};
+
 type BrowserLogPersistenceOptions = {
   readonly clock: Pick<Clock, 'setTimeout' | 'clearTimeout'>;
   readonly createWorker: () => Maybe<LogWorkerConnection>;
-  readonly lifecycle: {
-    readonly isHidden: () => boolean;
-    readonly subscribeToVisibilityChanges: (listener: () => void) => () => void;
-  };
+  readonly lifecycle: BrowserLogLifecycle;
 };
 
-export function createBrowserLogPersistence(options: BrowserLogPersistenceOptions): Maybe<BufferedLogOutput> {
+type PendingAccountBinding = {
+  readonly accountIdentifier: string;
+  readonly completion: LogOutputTransition;
+};
+
+export type BrowserLogPersistence = BufferedLogOutput &
+  AsyncDisposable & {
+    // Drops/counts writes during the transition; a failed transition remains closed to writes and flush recovery.
+    readonly bindAccount: (accountIdentifier: string) => LogOutputTransition;
+  };
+
+export function createBrowserLogPersistence(options: BrowserLogPersistenceOptions): Maybe<BrowserLogPersistence> {
   const {clock, createWorker, lifecycle} = options;
   const connection = createWorker();
   if (connection.isNothing) {
@@ -51,6 +66,9 @@ export function createBrowserLogPersistence(options: BrowserLogPersistenceOption
     responseTimeoutMilliseconds: logPersistenceConfiguration.workerResponseTimeoutMilliseconds,
   });
   const output = createBufferedLogOutput({clock, append: client.append, configuration: logPersistenceConfiguration});
+  let boundAccount: Maybe<string> = Maybe.nothing();
+  let binding: Maybe<PendingAccountBinding> = Maybe.nothing();
+  let disposed = false;
   let lifecycleFailures = 0;
   const fireAndForgetInvoker = createFireAndForgetInvoker({
     reportError() {
@@ -69,7 +87,51 @@ export function createBrowserLogPersistence(options: BrowserLogPersistenceOption
   // Start initialization and retention without blocking application startup.
   fireAndForgetInvoker.fireAndForget(output.flush);
 
+  function bindAccount(accountIdentifier: string): LogOutputTransition {
+    if (disposed) {
+      return task.reject('unavailable');
+    }
+    if (binding.isJust) {
+      return binding.value.accountIdentifier === accountIdentifier ? binding.value.completion : task.reject('busy');
+    }
+    const isAlreadyBound = boundAccount
+      .map(identifier => {
+        return identifier === accountIdentifier;
+      })
+      .unwrapOr(false);
+    if (isAlreadyBound) {
+      return task.resolve();
+    }
+
+    boundAccount = Maybe.nothing();
+    const completion = bindAfterDrain(accountIdentifier);
+    binding = Maybe.just({accountIdentifier, completion});
+
+    return completion;
+  }
+
+  function bindAfterDrain(accountIdentifier: string): LogOutputTransition {
+    return output
+      .runWithWriteBarrier(() => {
+        return task
+          .tryOr<void, LogOutputTransitionFailure>('operation-failed', () => {
+            return client.bindAccount(accountIdentifier);
+          })
+          .map(() => {
+            return Unit;
+          });
+      })
+      .inspect(() => {
+        boundAccount = Maybe.just(accountIdentifier);
+        binding = Maybe.nothing();
+      })
+      .inspectRejected(() => {
+        binding = Maybe.nothing();
+      });
+  }
+
   async function dispose(): Promise<void> {
+    disposed = true;
     stopObservingVisibility();
     await output.dispose();
     try {
@@ -85,7 +147,14 @@ export function createBrowserLogPersistence(options: BrowserLogPersistenceOption
     return {...statistics, failures: statistics.failures + lifecycleFailures};
   }
 
-  return Maybe.just({...output, dispose, getStatistics});
+  return Maybe.just({
+    write: output.write,
+    flush: output.flush,
+    bindAccount,
+    dispose,
+    [Symbol.asyncDispose]: dispose,
+    getStatistics,
+  });
 }
 
 export function createLogWorkerConnection(

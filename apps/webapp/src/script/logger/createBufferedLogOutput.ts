@@ -20,6 +20,7 @@
 import type {Clock, TimeoutIdentifier} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isUndefined} from '@sindresorhus/is';
+import {task, type Unit, type Task} from 'true-myth';
 
 import type {LogOutput} from './logOutput';
 import type {LogPersistenceConfiguration} from './logPersistenceConfiguration';
@@ -46,7 +47,17 @@ export type BufferedLogOutput = {
   readonly getStatistics: () => LogPersistenceStatistics;
 };
 
-export function createBufferedLogOutput(options: BufferedLogOutputOptions): BufferedLogOutput {
+export type LogOutputTransitionFailure = 'unavailable' | 'busy' | 'drain-failed' | 'operation-failed';
+
+export type LogOutputTransition = Task<Unit, LogOutputTransitionFailure>;
+
+type LogOutputTransitionOperation = () => LogOutputTransition;
+
+type BufferedLogOutputWithBarrier = BufferedLogOutput & {
+  readonly runWithWriteBarrier: (operation: LogOutputTransitionOperation) => LogOutputTransition;
+};
+
+export function createBufferedLogOutput(options: BufferedLogOutputOptions): BufferedLogOutputWithBarrier {
   const {append, clock, configuration} = options;
   const encoder = new TextEncoder();
   const maximumRecordBytes = Math.min(
@@ -65,6 +76,8 @@ export function createBufferedLogOutput(options: BufferedLogOutputOptions): Buff
   let timer: TimeoutIdentifier | undefined;
   let draining: Promise<void> | undefined;
   let flushRequested = false;
+  let barrierClosed = false;
+  let transition: LogOutputTransition | undefined;
   const fireAndForgetInvoker = createFireAndForgetInvoker({
     reportError() {
       failures += 1;
@@ -162,7 +175,7 @@ export function createBufferedLogOutput(options: BufferedLogOutputOptions): Buff
   }
 
   function write(line: string): void {
-    if (disposed || suspended) {
+    if (shouldDropIncomingRecord()) {
       droppedRecords += 1;
 
       return;
@@ -206,10 +219,63 @@ export function createBufferedLogOutput(options: BufferedLogOutputOptions): Buff
     scheduleFlush();
   }
 
+  function shouldDropIncomingRecord(): boolean {
+    return disposed || suspended || barrierClosed;
+  }
+
   async function flush(): Promise<void> {
+    if (barrierClosed) {
+      await transition;
+
+      return;
+    }
+
     // Explicit calls provide one recovery opportunity; failures never start a retry loop.
     suspended = false;
     await startDrain(true);
+  }
+
+  function runWithWriteBarrier(operation: LogOutputTransitionOperation): LogOutputTransition {
+    if (disposed) {
+      return task.reject('unavailable');
+    }
+    if (!isUndefined(transition)) {
+      return task.reject('busy');
+    }
+
+    // Close admission synchronously, before awaiting any earlier worker acknowledgement.
+    barrierClosed = true;
+    transition = drainAndTransition(operation);
+
+    return transition;
+  }
+
+  function drainAndTransition(operation: LogOutputTransitionOperation): LogOutputTransition {
+    return task
+      .tryOr<void, LogOutputTransitionFailure>('operation-failed', () => {
+        suspended = false;
+
+        return startDrain(true);
+      })
+      .andThen(() => {
+        if (suspended) {
+          return task.reject<Unit, LogOutputTransitionFailure>('drain-failed');
+        }
+
+        return operation();
+      })
+      .inspect(() => {
+        barrierClosed = false;
+        transition = undefined;
+      })
+      .inspectRejected(failure => {
+        if (failure !== 'drain-failed') {
+          failures += 1;
+          suspended = true;
+        }
+
+        transition = undefined;
+      });
   }
 
   async function dispose(): Promise<void> {
@@ -219,8 +285,13 @@ export function createBufferedLogOutput(options: BufferedLogOutputOptions): Buff
   }
 
   function getStatistics(): LogPersistenceStatistics {
-    return {droppedRecords, failures, pendingBytes: pendingBytes + inFlightBytes, suspended};
+    return {
+      droppedRecords,
+      failures,
+      pendingBytes: pendingBytes + inFlightBytes,
+      suspended: suspended || barrierClosed,
+    };
   }
 
-  return {write, flush, dispose, getStatistics};
+  return {write, flush, dispose, getStatistics, runWithWriteBarrier};
 }

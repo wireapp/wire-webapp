@@ -20,7 +20,7 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
-import type {BufferedLogOutput} from './createBufferedLogOutput';
+import type {BrowserLogPersistence} from './createBrowserLogPersistence';
 import type {LoggingDependencies} from './createPinoLogging';
 import {createConsoleOutput, type ConsoleLogOutput} from './logOutput';
 
@@ -36,7 +36,7 @@ type EnableLoggingOptions = {
   readonly configureLogging: (dependencies: Maybe<LoggingDependencies>) => void;
   readonly startupFeatureToggles: StartupFeatureToggles;
   readonly isElectron: boolean;
-  readonly createPersistenceOutput: () => Maybe<BufferedLogOutput>;
+  readonly createPersistenceOutput: () => Maybe<BrowserLogPersistence>;
 };
 
 type BrowserLogPersistenceSelection = Pick<EnableLoggingOptions, 'isElectron' | 'startupFeatureToggles'>;
@@ -48,7 +48,7 @@ function isBrowserLogPersistenceEnabled(options: BrowserLogPersistenceSelection)
   return !isElectron && startupFeatureToggles.isFeatureToggleEnabled(persistentBrowserLogsFeatureToggleName);
 }
 
-export function enableLogging(options: EnableLoggingOptions): Maybe<BufferedLogOutput> {
+export function enableLogging(options: EnableLoggingOptions): Maybe<BrowserLogPersistence> {
   const {
     clock,
     consoleOutput,
@@ -63,7 +63,7 @@ export function enableLogging(options: EnableLoggingOptions): Maybe<BufferedLogO
   const namespace = new URLSearchParams(locationSearch).get('enableLogging');
   const defaultNamespaces = debugEnabled ? Maybe.just('*') : Maybe.nothing<string>();
   const namespaces = isNonEmptyString(namespace) ? Maybe.just(namespace) : defaultNamespaces;
-  let persistence: Maybe<BufferedLogOutput> = Maybe.nothing();
+  let persistence: Maybe<BrowserLogPersistence> = Maybe.nothing();
   if (isBrowserLogPersistenceEnabled({isElectron, startupFeatureToggles})) {
     try {
       persistence = createPersistenceOutput();
