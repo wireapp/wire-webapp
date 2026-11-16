@@ -21,6 +21,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import express, {type Request, type Response} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Maybe, maybe} from 'true-myth';
+import {arrayIncludes} from 'ts-extras';
 
 import type {BuildMetadata} from '../configuration/buildMetadata';
 import type {ServerConfig} from '../configuration/server.config';
@@ -67,7 +68,7 @@ export function RedirectRoutes(config: ServerConfig, buildMetadata: BuildMetadat
   const router = express.Router();
 
   router.get('/robots.txt', async (req, res) => {
-    const robotsContent = (config.ROBOTS.ALLOWED_HOSTS as readonly string[]).includes(req.hostname)
+    const robotsContent = arrayIncludes(config.ROBOTS.ALLOWED_HOSTS, req.hostname)
       ? config.ROBOTS.ALLOW
       : config.ROBOTS.DISALLOW;
     return res.contentType('text/plain; charset=UTF-8').send(robotsContent);

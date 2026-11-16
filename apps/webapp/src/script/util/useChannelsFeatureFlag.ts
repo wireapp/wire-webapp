@@ -18,6 +18,7 @@
  */
 
 import {isString, isUndefined} from '@sindresorhus/is';
+import {arrayIncludes} from 'ts-extras';
 import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from './componentUtil';
@@ -68,7 +69,7 @@ const useCanCreateChannels = (): boolean => {
     channelFeature?.status === FEATURE_STATUS.ENABLED &&
     isString(selfRole) &&
     allowedRoles !== undefined &&
-    allowedRoles.includes(selfRole as Role)
+    arrayIncludes(allowedRoles, selfRole)
   ) {
     return true;
   }
@@ -87,7 +88,7 @@ const useCanCreatePublicChannels = (): boolean => {
     channelFeature !== null &&
     isString(selfRole) &&
     allowedRoles !== undefined &&
-    allowedRoles.includes(selfRole as Role)
+    arrayIncludes(allowedRoles, selfRole)
   ) {
     return true;
   }

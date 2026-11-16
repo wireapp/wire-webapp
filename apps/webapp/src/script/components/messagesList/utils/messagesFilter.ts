@@ -18,6 +18,7 @@
  */
 
 import {isNonEmptyArray} from '@sindresorhus/is';
+import {arrayIncludes} from 'ts-extras';
 
 import {CONVERSATION_EVENT} from '../../../apiClient/event/conversationEvent';
 import {isMemberMessage} from '../../../guards/Message';
@@ -39,11 +40,11 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]): MessageEntit
         CONVERSATION_EVENT.MEMBER_JOIN,
         CONVERSATION_EVENT.MEMBER_LEAVE,
         ClientEvent.CONVERSATION.GROUP_CREATION,
-      ] as string[];
+      ];
 
       const uniqMemberMessages = uniqMessages.filter(isMemberMessage);
 
-      if (isNonEmptyArray(uniqMemberMessages) && typesToFilter.includes(currentMessage.type)) {
+      if (isNonEmptyArray(uniqMemberMessages) && arrayIncludes(typesToFilter, currentMessage.type)) {
         switch (currentMessage.type) {
           case ClientEvent.CONVERSATION.GROUP_CREATION:
             // Dont show duplicated group creation messages
@@ -65,10 +66,10 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]): MessageEntit
     }
 
     if (currentMessage.isSystem()) {
-      const systemMessagesToFilter = [CONVERSATION_EVENT.RENAME, CONVERSATION_EVENT.PROTOCOL_UPDATE] as string[];
-      if (systemMessagesToFilter.includes(currentMessage.type)) {
+      const systemMessagesToFilter = [CONVERSATION_EVENT.RENAME, CONVERSATION_EVENT.PROTOCOL_UPDATE];
+      if (arrayIncludes(systemMessagesToFilter, currentMessage.type)) {
         const uniqUpdateMessages = uniqMessages.filter((message): message is SystemMessage => {
-          return message.isSystem() && systemMessagesToFilter.includes(message.type);
+          return message.isSystem() && arrayIncludes(systemMessagesToFilter, message.type);
         });
 
         if (uniqUpdateMessages.length > 0) {

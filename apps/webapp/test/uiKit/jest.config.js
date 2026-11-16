@@ -53,6 +53,6 @@ module.exports = {
       },
     ],
   },
-  transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is|noop-esm)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is|noop-esm|ts-extras)/)'],
   reporters: rootJestConfiguration.reporters,
 };

@@ -17,6 +17,8 @@
  *
  */
 
+import {arrayIncludes} from 'ts-extras';
+
 import {partition} from './arrayUtil';
 
 import {Config} from '../Config';
@@ -41,7 +43,7 @@ export const isAllowedFile = (name: string, type: string): boolean => {
   const [imageFileExtensions, imageContentTypes] = partition(allowedImages, allowedImageType => {
     return allowedImageType.startsWith('.');
   });
-  if ((imageContentTypes as readonly string[]).includes(type)) {
+  if (arrayIncludes(imageContentTypes, type)) {
     return true;
   }
   const allowedExtensions = [...imageFileExtensions, ...Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS];

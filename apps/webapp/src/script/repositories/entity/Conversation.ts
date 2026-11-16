@@ -28,6 +28,7 @@ import {
 } from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {isDefined} from 'ts-extras';
 import {container} from 'tsyringe';
 import {Cancelable, debounce} from 'underscore';
 
@@ -1080,9 +1081,7 @@ export class Conversation {
       .map(message_et => {
         return this._checkForDuplicate(message_et);
       })
-      .filter((messageEntity): messageEntity is ContentMessage => {
-        return messageEntity !== undefined;
-      });
+      .filter(isDefined);
 
     this.messages_unordered.unshift(...message_ets);
   }

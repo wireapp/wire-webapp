@@ -19,6 +19,7 @@
 
 import {isUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
+import {arrayIncludes} from 'ts-extras';
 
 import {Config} from '../../../../Config';
 import type {RootContextValue} from '../../../../page/rootProvider';
@@ -103,10 +104,7 @@ const validateFileSize = ({files, maxSize, translate}: ValidateFileSizeParams): 
   const imageMaxSizeInMB = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / bytesMultiplier / bytesMultiplier;
 
   const oversizedImages = files.filter(file => {
-    return (
-      (CONFIG.ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type) &&
-      file.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE
-    );
+    return arrayIncludes(CONFIG.ALLOWED_IMAGE_TYPES, file.type) && file.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE;
   });
 
   const oversizedFiles = files.filter(file => {

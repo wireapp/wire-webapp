@@ -20,6 +20,7 @@
 import React from 'react';
 
 import {CSSObject} from '@emotion/serialize';
+import {objectKeys} from 'ts-extras';
 
 import {ACCENT_ID} from '../../Config';
 import {User} from '../../repositories/entity/User';
@@ -62,7 +63,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
             justifyContent: 'space-between',
           }}
         >
-          {(Object.keys(ACCENT_ID) as (keyof typeof ACCENT_ID)[]).map(key => {
+          {objectKeys(ACCENT_ID).map(key => {
             const id = ACCENT_ID[key];
             const name = translate(`preferencesAccountAccentColor${key}`);
             const color = User.ACCENT_COLOR[id];

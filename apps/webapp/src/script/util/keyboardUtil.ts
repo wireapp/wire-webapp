@@ -20,6 +20,7 @@
 import type {KeyboardEvent as ReactKeyboardEvent, SyntheticEvent as ReactEvent} from 'react';
 
 import {isString} from '@sindresorhus/is';
+import {arrayIncludes} from 'ts-extras';
 
 import {Runtime} from '../commons/util/Runtime';
 
@@ -115,7 +116,7 @@ export const handleKeyDown = ({
   callback: (event?: ReactKeyboardEvent<Element> | KeyboardEvent) => void;
   keys: (typeof KEY)[keyof typeof KEY][];
 }): boolean => {
-  if (keys.includes(event.key as (typeof KEY)[keyof typeof KEY])) {
+  if (arrayIncludes(keys, event.key)) {
     if ('preventDefault' in event) {
       event.preventDefault();
     }

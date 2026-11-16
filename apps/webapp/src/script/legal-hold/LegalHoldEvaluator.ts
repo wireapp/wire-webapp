@@ -18,6 +18,7 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
+import {arrayIncludes} from 'ts-extras';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
@@ -52,7 +53,7 @@ export const isConversationOnLegalHold = (conversation: Conversation): boolean =
 };
 
 export const hasMessageLegalHoldFlag = (mappedEvent: MappedEvent): boolean => {
-  const supportsLegalHoldFlag = [CONVERSATION.MESSAGE_ADD].includes(mappedEvent.type as CONVERSATION);
+  const supportsLegalHoldFlag = arrayIncludes([CONVERSATION.MESSAGE_ADD], mappedEvent.type);
   const mappedEventData = mappedEvent.data;
   const hasLegalHoldFlag =
     !isNullOrUndefined(mappedEventData) &&

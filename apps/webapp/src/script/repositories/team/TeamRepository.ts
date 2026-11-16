@@ -20,6 +20,7 @@
 import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {task} from 'true-myth';
+import {isDefined} from 'ts-extras';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
@@ -498,9 +499,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
           return id === user;
         });
       })
-      .filter((user): user is User => {
-        return user !== undefined;
-      });
+      .filter(isDefined);
   }
 
   getTeamConversationRoles(): Promise<ConversationRolesList> {

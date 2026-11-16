@@ -18,6 +18,7 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
+import {isDefined} from 'ts-extras';
 
 import {getFirstMeetingInstanceOnOrAfter, getNextMeetingInstance} from './getMeetingInstancesInRange';
 
@@ -104,9 +105,7 @@ export const getMeetingInstancePage = (
     .map(meetingSeries => {
       return getFirstMeetingInstanceOnOrAfter(meetingSeries, from);
     })
-    .filter((meetingInstance): meetingInstance is MeetingInstance => {
-      return meetingInstance !== undefined;
-    })
+    .filter(isDefined)
     .toSorted(compareMeetingInstances);
 
   return getNextMeetingInstancePage({candidates}, limit);

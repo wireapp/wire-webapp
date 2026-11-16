@@ -17,6 +17,8 @@
  *
  */
 
+import {arrayIncludes, objectValues} from 'ts-extras';
+
 import {CallViewTab} from '../view_model/CallingViewModel';
 
 interface CallViewOption {
@@ -25,12 +27,12 @@ interface CallViewOption {
 }
 
 export const isCallViewOption = (option: unknown): option is CallViewOption => {
-  const callViewValues = Object.values(CallViewTab) as string[];
+  const callViewValues = objectValues(CallViewTab);
   return (
     option !== null &&
     typeof option === 'object' &&
     'value' in option &&
     typeof option?.value === 'string' &&
-    callViewValues.includes(option.value)
+    arrayIncludes(callViewValues, option.value)
   );
 };
