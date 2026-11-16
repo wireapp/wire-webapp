@@ -343,6 +343,23 @@ export const CellsTable = ({
       permanentDeleteStatusReporter.report('completed');
       setSelectedNodeIds(new Set());
     },
+    onContinueAfterViewLeave: continuation => {
+      if (continuation.kind === 'terminal') {
+        publishMoveStatus({...continuation.status, kind: continuation.statusKind});
+        return;
+      }
+      observeBackgroundAction({
+        actionName: 'delete',
+        cellsRepository,
+        status: continuation.status,
+        jobUuids: continuation.jobUuids,
+        clock,
+        pollingPolicy: createBulkJobPollingPolicy(random),
+        onOutcome: () => {
+          return undefined;
+        },
+      });
+    },
     reportError: error => {
       console.error(error);
     },
@@ -768,12 +785,12 @@ export const CellsTable = ({
       return;
     }
 
-    permanentDeleteStatusReporter.start(
+    const status = permanentDeleteStatusReporter.start(
       currentSelectedNodes.map(node => {
         return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
       }),
     );
-    await deletePermanently(nodeIds, scopeKey, path);
+    await deletePermanently(nodeIds, scopeKey, path, status);
   };
   const [activeFolderDropTargetId, setActiveFolderDropTargetId] = useState<string | null>(null);
   const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
