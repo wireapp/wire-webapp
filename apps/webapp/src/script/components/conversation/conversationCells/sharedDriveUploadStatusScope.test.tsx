@@ -26,11 +26,15 @@ import {Maybe, maybe} from 'true-myth';
 import {SharedDriveUploadStatusScope, useSharedDriveUploadStatus} from './sharedDriveUploadStatusContext';
 
 const StatusProbe = ({conversationId}: {readonly conversationId: string}): ReactElement => {
-  const {createMoveStatusId, getMoveStatus, updateMoveStatus} = useSharedDriveUploadStatus();
+  const {createMoveStatusId, dismissUpload, dismissedUpload, getMoveStatus, updateMoveStatus} =
+    useSharedDriveUploadStatus();
   const status = getMoveStatus(conversationId);
   return (
     <div>
-      <span>{maybe.isJust(status) ? status.value.kind : 'empty'}</span>
+      <span data-uie-name="bulk-status">{maybe.isJust(status) ? status.value.kind : 'empty'}</span>
+      <span data-uie-name="dismissed-upload">
+        {maybe.isJust(dismissedUpload) ? dismissedUpload.value.uploadId : 'none'}
+      </span>
       <button
         type="button"
         onClick={() => {
@@ -46,6 +50,14 @@ const StatusProbe = ({conversationId}: {readonly conversationId: string}): React
       >
         Start
       </button>
+      <button
+        type="button"
+        onClick={() => {
+          dismissUpload({conversationQualifiedId: conversationId, uploadId: 'upload-1'});
+        }}
+      >
+        Dismiss upload
+      </button>
     </div>
   );
 };
@@ -53,13 +65,15 @@ const StatusProbe = ({conversationId}: {readonly conversationId: string}): React
 const StatusTree = ({
   enabled,
   conversationId,
+  viewId,
 }: {
   readonly enabled: boolean;
   readonly conversationId: string;
+  readonly viewId: string;
 }): ReactElement => {
   return (
     <SharedDriveUploadStatusScope enabled={enabled} scopeKey={Maybe.nothing()}>
-      <SharedDriveUploadStatusScope enabled={!enabled} scopeKey={Maybe.just(conversationId)}>
+      <SharedDriveUploadStatusScope enabled={!enabled} scopeKey={Maybe.just(`${conversationId}:${viewId}`)}>
         <StatusProbe conversationId={conversationId} />
       </SharedDriveUploadStatusScope>
     </SharedDriveUploadStatusScope>
@@ -74,14 +88,29 @@ describe('SharedDriveUploadStatusScope', () => {
     'keeps status across conversations only when the feature is enabled: $enabled',
     async ({enabled, expectedOnReturn}) => {
       const user = userEvent.setup();
-      const view = render(<StatusTree enabled={enabled} conversationId="conversation-1" />);
+      const view = render(<StatusTree enabled={enabled} conversationId="conversation-1" viewId="folder-a" />);
 
       await user.click(screen.getByRole('button', {name: 'Start'}));
-      expect(screen.getByText('processing')).toBeInTheDocument();
-      view.rerender(<StatusTree enabled={enabled} conversationId="conversation-2" />);
-      expect(screen.getByText('empty')).toBeInTheDocument();
-      view.rerender(<StatusTree enabled={enabled} conversationId="conversation-1" />);
-      expect(screen.getByText(expectedOnReturn)).toBeInTheDocument();
+      expect(screen.getByTestId('bulk-status')).toHaveTextContent('processing');
+      view.rerender(<StatusTree enabled={enabled} conversationId="conversation-2" viewId="folder-a" />);
+      expect(screen.getByTestId('bulk-status')).toHaveTextContent('empty');
+      view.rerender(<StatusTree enabled={enabled} conversationId="conversation-1" viewId="folder-a" />);
+      expect(screen.getByTestId('bulk-status')).toHaveTextContent(expectedOnReturn);
     },
   );
+
+  it.each([
+    {enabled: false, expectedAfterNavigation: 'empty'},
+    {enabled: true, expectedAfterNavigation: 'processing'},
+  ])('keeps bulk status across Files views only when enabled: $enabled', async ({enabled, expectedAfterNavigation}) => {
+    const user = userEvent.setup();
+    const view = render(<StatusTree enabled={enabled} conversationId="conversation-1" viewId="folder-a" />);
+
+    await user.click(screen.getByRole('button', {name: 'Start'}));
+    await user.click(screen.getByRole('button', {name: 'Dismiss upload'}));
+    view.rerender(<StatusTree enabled={enabled} conversationId="conversation-1" viewId="folder-b" />);
+
+    expect(screen.getByTestId('bulk-status')).toHaveTextContent(expectedAfterNavigation);
+    expect(screen.getByTestId('dismissed-upload')).toHaveTextContent('upload-1');
+  });
 });
