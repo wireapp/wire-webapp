@@ -19,6 +19,7 @@
 
 import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isNumber, isUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
+import {isDefined} from 'ts-extras';
 import {isObject} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -412,9 +413,7 @@ export class ConversationMapper {
     }
     const {members} = conversationData;
 
-    const allMembers = [...(members?.others ?? []), members?.self].filter(member => {
-      return member !== undefined;
-    });
+    const allMembers = [...(members?.others ?? []), members?.self].filter(isDefined);
     return allMembers.reduce<Record<string, string>>((roles, member) => {
       if (member.conversation_role === undefined) {
         return roles;
@@ -665,9 +664,7 @@ export class ConversationMapper {
       .map(({qualified_id}) => {
         return qualified_id;
       })
-      .filter((qualifiedId): qualifiedId is QualifiedId => {
-        return qualifiedId !== undefined;
-      });
+      .filter(isDefined);
 
     if (isNonEmptyArray(qualified_others)) {
       updates.qualified_others = qualified_others;

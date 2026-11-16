@@ -33,6 +33,7 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {asyncNoop, noop} from 'noop-esm';
 import {Task, task} from 'true-myth';
+import {isDefined} from 'ts-extras';
 import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
 
@@ -1635,9 +1636,7 @@ export class ConversationRepository {
         .map(conversation_id => {
           return this.conversationState.findConversation(conversation_id);
         })
-        .filter((conversationEntity): conversationEntity is Conversation => {
-          return !isUndefined(conversationEntity);
-        });
+        .filter(isDefined);
     });
   }
 
@@ -4614,9 +4613,7 @@ export class ConversationRepository {
             .map(user => {
               return user.qualified_id;
             })
-            .filter((qualifiedId): qualifiedId is QualifiedId => {
-              return qualifiedId !== undefined;
-            })
+            .filter(isDefined)
         : (eventData.user_ids ?? []).map(userId => {
             return {domain: '', id: userId};
           });

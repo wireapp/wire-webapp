@@ -21,6 +21,7 @@ import {useEffect, useState, type JSX} from 'react';
 
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {Maybe, task} from 'true-myth';
+import {isPresent, isPropertyDefined} from 'ts-extras';
 import {useStore} from 'zustand';
 
 import {PreferencesPage} from './components/preferencesPage';
@@ -111,9 +112,7 @@ export const TroubleshootingPreferences = ({repository}: {repository: Troublesho
     })
     .unwrapOr(undefined);
   const {networkTone, networkRows, relayRuns, tlsRuns, stunRuns} = getScanResults(scanReport);
-  const stunErrors = stunRuns.filter(run => {
-    return run.error !== undefined;
-  });
+  const stunErrors = stunRuns.filter(isPropertyDefined('error'));
   const relayPorts = [
     ...new Set(
       relayRuns.map(run => {
@@ -194,9 +193,7 @@ export const TroubleshootingPreferences = ({repository}: {repository: Troublesho
     jitter: measuredQuality?.jitterMs,
     packetLoss: measuredQuality?.packetLossPercent,
   };
-  const hasMeasurements = Object.values(measurements).some(value => {
-    return value !== undefined && value !== null;
-  });
+  const hasMeasurements = Object.values(measurements).some(isPresent);
   const failedStep = connectionSteps.find(step => {
     return state.connectionProgress[step]?.status === 'error';
   });
@@ -885,7 +882,7 @@ export const TroubleshootingPreferences = ({repository}: {repository: Troublesho
                                   return (
                                     <div key={id}>
                                       <dt css={[styles.statusStyles('bad'), {gridColumn: '1 / -1'}]}>
-                                        {error?.message}
+                                        {error.message}
                                       </dt>
                                       <dd css={{gridColumn: '1 / -1'}}>
                                         {server !== undefined && (

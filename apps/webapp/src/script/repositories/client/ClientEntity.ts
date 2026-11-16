@@ -19,6 +19,7 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import ko from 'knockout';
+import {arrayIncludes, objectKeys} from 'ts-extras';
 
 import {ClientMapper} from './ClientMapper';
 
@@ -37,7 +38,7 @@ export const MLSPublicKeys = {
 } as const;
 
 export const isKnownSignature = (signature: unknown): signature is keyof typeof MLSPublicKeys => {
-  return signature !== undefined && typeof signature === 'string' && Object.keys(MLSPublicKeys).includes(signature);
+  return arrayIncludes(objectKeys(MLSPublicKeys), signature);
 };
 
 export class ClientEntity {

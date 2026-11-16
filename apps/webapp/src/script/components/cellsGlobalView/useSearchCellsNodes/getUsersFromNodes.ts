@@ -19,8 +19,8 @@
 
 import {isNonEmptyArray} from '@sindresorhus/is';
 import {RestNode} from 'cells-sdk-ts';
+import {isPresent} from 'ts-extras';
 
-import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import type {User} from '../../../repositories/entity/User';
 import {UserRepository} from '../../../repositories/user/userRepository';
 import {getUserQualifiedIdFromNode} from '../../cells/common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
@@ -41,6 +41,6 @@ export const getUsersFromNodes = async ({
       .map(node => {
         return getUserQualifiedIdFromNode(node);
       })
-      .filter(Boolean) as QualifiedId[],
+      .filter(isPresent),
   );
 };

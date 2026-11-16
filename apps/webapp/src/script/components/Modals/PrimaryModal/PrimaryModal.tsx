@@ -20,6 +20,7 @@
 import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, useMemo, useCallback} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
+import {arrayIncludes, objectKeys} from 'ts-extras';
 
 import {CheckboxOption} from './CheckboxOption/CheckboxOption';
 import {MessageContent} from './Content/MessageContent';
@@ -225,8 +226,9 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
       },
     };
 
-    if (Object.keys(actions).includes(content?.currentType ?? '')) {
-      actions[content?.currentType as keyof typeof actions]();
+    const currentType = content?.currentType;
+    if (arrayIncludes(objectKeys(actions), currentType)) {
+      actions[currentType]();
       return;
     }
     action();

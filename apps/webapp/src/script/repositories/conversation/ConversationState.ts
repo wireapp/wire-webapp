@@ -19,6 +19,7 @@
 
 import {isNonEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
+import {isDefined, isPresent} from 'ts-extras';
 import {container, singleton} from 'tsyringe';
 
 import {
@@ -183,9 +184,7 @@ export class ConversationState {
   getSelfConversations(includeMLS: boolean): Conversation[] {
     const baseConversations = [this.selfProteusConversation()];
     const selfConversations = includeMLS ? baseConversations.concat(this.selfMLSConversation()) : baseConversations;
-    return selfConversations.filter((conversation): conversation is Conversation => {
-      return conversation !== undefined;
-    });
+    return selfConversations.filter(isDefined);
   }
 
   getSelfProteusConversation(): Conversation {
@@ -293,9 +292,7 @@ export class ConversationState {
 
   isSelfConversation(conversationId: QualifiedId): boolean {
     const selfConversationIds: QualifiedId[] = [this.selfProteusConversation(), this.selfMLSConversation()]
-      .filter((conversation): conversation is Conversation => {
-        return !isNullOrUndefined(conversation);
-      })
+      .filter(isPresent)
       .map(conversation => {
         return conversation.qualifiedId;
       });

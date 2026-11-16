@@ -17,6 +17,8 @@
  *
  */
 
+import {arrayIncludes, objectValues} from 'ts-extras';
+
 import {OAuthBody} from '../../apiClient/oauth/oAuthBody';
 import {Scope} from '../page/oAuthPermissions';
 import {QUERY_KEY} from '../route';
@@ -51,8 +53,8 @@ export const withOAuthQuery = (route: string, location: Pick<Location, 'hash'> =
  */
 export const oAuthScope = (oauthBody: OAuthBody): Scope[] => {
   return oauthBody.scope.split(/\+|%20|\s/).filter(scope => {
-    return Object.values(Scope).includes(scope as Scope);
-  }) as Scope[];
+    return arrayIncludes(objectValues(Scope), scope);
+  });
 };
 
 /**

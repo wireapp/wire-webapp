@@ -20,6 +20,8 @@
 import {useEffect, useMemo, useState, type FunctionComponent} from 'react';
 import * as React from 'react';
 
+import {arrayIncludes, objectValues} from 'ts-extras';
+
 import {QUERY, QueryKeys} from '../../utils';
 
 type Query = string | QueryKeys;
@@ -28,7 +30,7 @@ const resolveMediaQuery = (query: Query): string => {
   if (typeof query !== 'string') {
     return QUERY[query];
   }
-  return (Object.values(QueryKeys) as string[]).includes(query) ? QUERY[query as QueryKeys] : query;
+  return arrayIncludes(objectValues(QueryKeys), query) ? QUERY[query] : query;
 };
 
 export type MatchMediaProps = React.PropsWithChildren<{

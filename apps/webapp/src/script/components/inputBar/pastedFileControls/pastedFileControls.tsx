@@ -20,6 +20,7 @@
 import {FC} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
+import {arrayIncludes} from 'ts-extras';
 
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
@@ -34,7 +35,7 @@ interface PastedFileControlsProps {
 
 export const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, onSend}) => {
   const {translate} = useApplicationContext();
-  const isSupportedFileType = (Config.getConfig().ALLOWED_IMAGE_TYPES as readonly string[]).includes(pastedFile.type);
+  const isSupportedFileType = arrayIncludes(Config.getConfig().ALLOWED_IMAGE_TYPES, pastedFile.type);
   const pastedFilePreviewUrl = isSupportedFileType ? URL.createObjectURL(pastedFile) : '';
 
   return (

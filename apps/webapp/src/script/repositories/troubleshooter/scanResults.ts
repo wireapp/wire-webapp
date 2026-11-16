@@ -17,6 +17,8 @@
  *
  */
 
+import {isTruthy} from 'ts-extras';
+
 import type {ScanCandidate, ScanReport} from '@wireapp/avs';
 
 const DEFAULT_ICE_PORT = 3478;
@@ -110,7 +112,7 @@ const candidateAddress = (candidate: ScanCandidate): string => {
 };
 
 const addresses = (candidates: readonly ScanCandidate[]): string[] => {
-  return [...new Set(candidates.map(candidateAddress).filter(Boolean))];
+  return [...new Set(candidates.map(candidateAddress).filter(isTruthy))];
 };
 
 const summarize = (local: string[], publicAddresses: string[], mdnsNames: string[]): NetworkSummary => {

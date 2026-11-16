@@ -20,6 +20,7 @@
 import {UIEvent, useCallback, useEffect, useMemo, useState, type ReactElement} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
+import {arrayIncludes} from 'ts-extras';
 import {container} from 'tsyringe';
 
 import {
@@ -299,7 +300,7 @@ function ConversationContent({
 
       if (!isHittingUploadLimit(droppedFiles, repositories.asset, translate)) {
         Array.from(droppedFiles).forEach(file => {
-          const isSupportedImage = (CONFIG.ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type);
+          const isSupportedImage = arrayIncludes(CONFIG.ALLOWED_IMAGE_TYPES, file.type);
 
           if (isSupportedImage) {
             images.push(file);

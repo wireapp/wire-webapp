@@ -30,6 +30,7 @@ import {
 } from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {arrayIncludes} from 'ts-extras';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
@@ -1293,7 +1294,7 @@ export class MessageRepository {
       return;
     }
 
-    const typeToConfirm = (EventTypeHandling.CONFIRM as string[]).includes(messageEntity.type);
+    const typeToConfirm = arrayIncludes(EventTypeHandling.CONFIRM, messageEntity.type);
 
     if (messageEntity.user().isMe || !typeToConfirm) {
       return;
@@ -1644,7 +1645,7 @@ export class MessageRepository {
         }
       }
       this.conversationRepositoryProvider().checkMessageTimer(messageEntity);
-      if ((EventTypeHandling.STORE as string[]).includes(messageEntity.type) || messageEntity.hasAssetImage()) {
+      if (arrayIncludes(EventTypeHandling.STORE, messageEntity.type) || messageEntity.hasAssetImage()) {
         return await this.eventService.updateEvent(messageEntity.primary_key, changes);
       }
     } catch (error: unknown) {

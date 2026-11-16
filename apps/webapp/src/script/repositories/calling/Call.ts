@@ -19,6 +19,7 @@
 
 import {isNan, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
+import {isDefined} from 'ts-extras';
 
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
@@ -229,9 +230,7 @@ export class Call {
       .map(({userId, clientId}) => {
         return this.getParticipant(userId, clientId);
       })
-      .filter((participant): participant is Participant => {
-        return participant !== undefined;
-      })
+      .filter(isDefined)
       // Limit them to 4.
       .slice(0, maximumDisplayedParticipantNames)
       // Sort them by name

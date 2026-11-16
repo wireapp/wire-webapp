@@ -17,6 +17,8 @@
  *
  */
 
+import {arrayIncludes} from 'ts-extras';
+
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 
 /** @see https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Errors */
@@ -31,13 +33,12 @@ export const MEDIA_STREAM_ERROR_TYPES = {
 };
 
 export function isMediaStreamDeviceError(errorStr: string): boolean {
-  return MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(errorStr as MEDIA_STREAM_ERROR);
+  return arrayIncludes(MEDIA_STREAM_ERROR_TYPES.DEVICE, errorStr);
 }
 
 export function isMediaStreamReadDeviceError(errorStr: string): boolean {
-  return [
-    MEDIA_STREAM_ERROR.NOT_READABLE_ERROR,
-    MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR,
-    MEDIA_STREAM_ERROR.NOT_FOUND_ERROR,
-  ].includes(errorStr as MEDIA_STREAM_ERROR);
+  return arrayIncludes(
+    [MEDIA_STREAM_ERROR.NOT_READABLE_ERROR, MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR, MEDIA_STREAM_ERROR.NOT_FOUND_ERROR],
+    errorStr,
+  );
 }
