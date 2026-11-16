@@ -37,6 +37,10 @@ import type {CellsRepository} from '../../../../../repositories/cells/cellsRepos
 import {TrashIcon} from '../../../../../uiKit/dataDisplay/icon/trashIcon';
 import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
 import {getCellsBackgroundActionEvidence} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
+import type {
+  CellsBackgroundActionOutcome,
+  CellsBackgroundActionPollingPolicy,
+} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
 import {CellsModal} from '../../common/cellsModal/cellsModal';
 import {
   CELLS_ACTION,
@@ -48,6 +52,30 @@ import {useBulkActionStatusReporter} from '../../useBulkActionStatusReporter';
 const BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS = 1000;
 const BACKGROUND_DELETE_STATUS_RETRY_BACKOFF_FACTOR = 2;
 const MAX_BACKGROUND_DELETE_STATUS_RETRIES = 5;
+
+const BACKGROUND_DELETE_POLLING_POLICY: CellsBackgroundActionPollingPolicy = {
+  pollIntervalMs: BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS,
+  maxUnknownRetries: MAX_BACKGROUND_DELETE_STATUS_RETRIES,
+  maxPollAttempts: Maybe.nothing(),
+  getUnknownRetryDelay: retryIndex => {
+    return BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS * BACKGROUND_DELETE_STATUS_RETRY_BACKOFF_FACTOR ** retryIndex;
+  },
+};
+
+interface EmptyBinOutcomeState {
+  readonly status: EmptyBinStatus;
+  readonly requiresReview: boolean;
+  /** A terminal outcome ends the job observation; an unknown one keeps the jobs so the user can check again. */
+  readonly isTerminal: boolean;
+}
+
+const EMPTY_BIN_OUTCOME: Readonly<Record<CellsBackgroundActionOutcome, EmptyBinOutcomeState>> = {
+  'all-finished': {status: 'completed', requiresReview: false, isTerminal: true},
+  'mixed-terminal': {status: 'partial', requiresReview: true, isTerminal: true},
+  'all-failed': {status: 'failed', requiresReview: true, isTerminal: true},
+  'status-unknown': {status: 'unknown', requiresReview: true, isTerminal: false},
+  'check-limit': {status: 'unknown', requiresReview: true, isTerminal: false},
+};
 
 interface CellsEmptyBinActionProps {
   cellsRepository: CellsRepository;
@@ -170,6 +198,28 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
     }
   }, [isAtBinRoot, refreshAfterOutcome]);
 
+  const refreshOrDeferUntilBackInBin = (): void => {
+    if (isSameBinView()) {
+      void refreshAfterOutcome();
+    } else {
+      needsRefreshOnReturn.current = true;
+    }
+  };
+
+  const handleBackgroundOutcome = (outcome: CellsBackgroundActionOutcome): void => {
+    if (!isMounted.current || currentScopeKey.current !== initialScopeKey) {
+      return;
+    }
+
+    const {status: nextStatus, requiresReview: needsReview, isTerminal} = EMPTY_BIN_OUTCOME[outcome];
+    if (isTerminal) {
+      setBackgroundJobUuids([]);
+    }
+    setStatus(nextStatus);
+    setRequiresReview(needsReview);
+    refreshOrDeferUntilBackInBin();
+  };
+
   const observeDeleteJobs = (jobUuids: readonly string[]): void => {
     if (maybe.isNothing(backgroundStatus.current)) {
       return;
@@ -180,55 +230,8 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
       status: backgroundStatus.current.value,
       jobUuids,
       clock,
-      pollingPolicy: {
-        pollIntervalMs: BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS,
-        maxUnknownRetries: MAX_BACKGROUND_DELETE_STATUS_RETRIES,
-        maxPollAttempts: Maybe.nothing(),
-        getUnknownRetryDelay: retryIndex => {
-          return (
-            BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS * BACKGROUND_DELETE_STATUS_RETRY_BACKOFF_FACTOR ** retryIndex
-          );
-        },
-      },
-      onOutcome: outcome => {
-        if (!isMounted.current || currentScopeKey.current !== initialScopeKey) {
-          return;
-        }
-        const refreshOrDefer = (): void => {
-          if (isSameBinView()) {
-            void refreshAfterOutcome();
-          } else {
-            needsRefreshOnReturn.current = true;
-          }
-        };
-        if (outcome === 'all-finished') {
-          setBackgroundJobUuids([]);
-          setStatus('completed');
-          setRequiresReview(false);
-          refreshOrDefer();
-          return;
-        }
-
-        if (outcome === 'mixed-terminal') {
-          setBackgroundJobUuids([]);
-          setStatus('partial');
-          setRequiresReview(true);
-          refreshOrDefer();
-          return;
-        }
-
-        if (outcome === 'all-failed') {
-          setBackgroundJobUuids([]);
-          setStatus('failed');
-          setRequiresReview(true);
-          refreshOrDefer();
-          return;
-        }
-
-        setStatus('unknown');
-        setRequiresReview(true);
-        refreshOrDefer();
-      },
+      pollingPolicy: BACKGROUND_DELETE_POLLING_POLICY,
+      onOutcome: handleBackgroundOutcome,
     });
   };
 
