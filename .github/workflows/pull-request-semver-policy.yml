@@ -56,14 +56,14 @@ jobs:
           PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           pull_request_json="$(gh api "repos/${GH_REPO}/pulls/${PULL_REQUEST_NUMBER}")"
-          target_branch_json="$(jq -ce '.base.ref | select(type == "string")' <<< "$pull_request_json")"
+          target_branch="$(jq -er '.base.ref | select(type == "string")' <<< "$pull_request_json")"
           pull_request_labels_json="$(jq -ce '.labels | map(.name)' <<< "$pull_request_json")"
-          printf 'target_branch_json=%s\n' "$target_branch_json" >> "$GITHUB_OUTPUT"
+          printf 'target_branch=%s\n' "$target_branch" >> "$GITHUB_OUTPUT"
           printf 'pull_request_labels_json=%s\n' "$pull_request_labels_json" >> "$GITHUB_OUTPUT"
 
       - name: Validate pull request release impact
         if: ${{ github.event_name == 'pull_request' }}
         env:
-          TARGET_BRANCH: ${{ fromJSON(steps.policy_input.outputs.target_branch_json) }}
+          TARGET_BRANCH: ${{ steps.policy_input.outputs.target_branch }}
           PULL_REQUEST_LABELS_JSON: ${{ steps.policy_input.outputs.pull_request_labels_json }}
         run: node ./tools/releaseCli/pullRequestSemverPolicy.mts
