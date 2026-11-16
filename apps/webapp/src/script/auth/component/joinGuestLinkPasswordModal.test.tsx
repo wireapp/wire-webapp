@@ -98,4 +98,40 @@ describe('JoinGuestLinkPasswordModal', () => {
     joinConversationButton.click();
     expect(onSubmitPasswordMock).toHaveBeenCalledTimes(0);
   });
+
+  it('shows only a new meeting failure after submission and distinguishes password errors from request errors', () => {
+    const originalUrl = window.location.href;
+    window.history.replaceState(null, '', '?meeting_domain=example.com&meeting_key=key&meeting_code=code');
+    try {
+      const staleError = new Error('Earlier failure');
+      const {getByText, getByLabelText, getByTestId, queryByText, rerender} = render(
+        withTheme(withIntl(<JoinGuestLinkPasswordModal {...props} error={staleError} />)),
+      );
+      expect(getByText(translate('meetingJoin.passwordHeadline'))).toBeInTheDocument();
+      expect(getByLabelText(/Meeting password/)).toBeInTheDocument();
+      expect(queryByText(translate('meetingJoin.joinFailed'))).not.toBeInTheDocument();
+      fireEvent.change(getByTestId('guest-link-join-password-input'), {target: {value: 'wrong'}});
+      fireEvent.click(getByTestId('guest-link-join-submit-button'));
+      rerender(withTheme(withIntl(<JoinGuestLinkPasswordModal {...props} error={staleError} />)));
+      expect(queryByText(translate('meetingJoin.joinFailed'))).not.toBeInTheDocument();
+      rerender(withTheme(withIntl(<JoinGuestLinkPasswordModal {...props} error={new Error('Request failed')} />)));
+      expect(getByText(translate('meetingJoin.joinFailed'))).toBeInTheDocument();
+      fireEvent.click(getByTestId('guest-link-join-submit-button'));
+      expect(queryByText(translate('meetingJoin.joinFailed'))).not.toBeInTheDocument();
+      rerender(
+        withTheme(
+          withIntl(
+            <JoinGuestLinkPasswordModal
+              {...props}
+              error={Object.assign(new Error('wrong password'), {label: 'invalid-meeting-password'})}
+            />,
+          ),
+        ),
+      );
+      expect(getByText(translate('meetingJoin.passwordFailed'))).toBeInTheDocument();
+      expect(getByText(translate('guestLinkPasswordModal.learnMoreLink'))).toBeInTheDocument();
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
+  });
 });
