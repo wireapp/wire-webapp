@@ -275,7 +275,7 @@ describe('CellsHeader', () => {
       clock.advanceByMilliseconds(1000);
       await Promise.resolve();
     });
-    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
 
     currentPath = 'recycle_bin';
     rerender();
