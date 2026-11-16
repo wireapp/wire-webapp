@@ -17,6 +17,26 @@
  *
  */
 
+import type {BuildMetadata} from '@wireapp/core-crypto';
+
+export const version = jest.fn(() => {
+  return 'test-core-crypto-version';
+});
+
+export const buildMetadata = jest.fn((): BuildMetadata => {
+  return {
+    timestamp: '2026-01-01T00:00:00Z',
+    cargoDebug: 'false',
+    cargoFeatures: '',
+    optLevel: '3',
+    targetTriple: 'wasm32-unknown-unknown',
+    gitBranch: 'test-branch',
+    gitDescribe: 'test-core-crypto-version',
+    gitSha: '0123456789abcdef0123456789abcdef01234567',
+    gitDirty: 'false',
+  };
+});
+
 export interface CommitBundle {}
 export enum PublicGroupStateEncryptionType {
   Plaintext = 1,
