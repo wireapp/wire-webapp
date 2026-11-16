@@ -25,6 +25,7 @@ import {
   useSharedDriveUploadStatus,
   type SharedDriveBulkAction,
   type SharedDriveMoveItem,
+  type SharedDriveMoveStatus,
   type SharedDriveMoveStatusKind,
 } from './sharedDriveUploadStatusContext';
 
@@ -35,7 +36,7 @@ interface StartedStatus {
 }
 
 export interface BulkActionStatusReporter {
-  readonly start: (items: readonly SharedDriveMoveItem[]) => void;
+  readonly start: (items: readonly SharedDriveMoveItem[]) => SharedDriveMoveStatus;
   readonly report: (kind: SharedDriveMoveStatusKind) => void;
   readonly setReviewing: (isReviewing: boolean) => void;
   readonly clear: () => void;
@@ -67,12 +68,12 @@ export const useBulkActionStatusReporter = (
 
   // Stable so callers can list them as effect dependencies without re-publishing on every render.
   const start = useCallback(
-    (items: readonly SharedDriveMoveItem[]): void => {
+    (items: readonly SharedDriveMoveItem[]): SharedDriveMoveStatus => {
       const current = {id: createMoveStatusId(), items, conversationQualifiedId};
       started.current = Maybe.just(current);
       lastKind.current = Maybe.just('processing');
       isReviewing.current = false;
-      updateMoveStatus({
+      const status: SharedDriveMoveStatus = {
         id: current.id,
         conversationQualifiedId: current.conversationQualifiedId,
         action,
@@ -80,7 +81,9 @@ export const useBulkActionStatusReporter = (
         items,
         destinationPath: '',
         ...(hasReview && {onReview: review}),
-      });
+      };
+      updateMoveStatus(status);
+      return status;
     },
     [action, conversationQualifiedId, createMoveStatusId, hasReview, review, updateMoveStatus],
   );

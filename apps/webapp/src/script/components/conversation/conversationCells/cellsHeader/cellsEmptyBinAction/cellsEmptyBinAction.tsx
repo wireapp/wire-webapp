@@ -36,15 +36,13 @@ import {useApplicationContext} from '../../../../../page/rootProvider';
 import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {TrashIcon} from '../../../../../uiKit/dataDisplay/icon/trashIcon';
 import {Button, ButtonVariant} from '../../../../../uiKit/inputs/button/button';
-import {
-  getCellsBackgroundActionEvidence,
-  observeCellsBackgroundActionJobs,
-} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
+import {getCellsBackgroundActionEvidence} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import {CellsModal} from '../../common/cellsModal/cellsModal';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,
 } from '../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {useSharedDriveUploadStatus, type SharedDriveMoveStatus} from '../../sharedDriveUploadStatusContext';
 import {useBulkActionStatusReporter} from '../../useBulkActionStatusReporter';
 
 const BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS = 1000;
@@ -76,8 +74,12 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   const [requiresReview, setRequiresReview] = useState(false);
   const [refreshFailed, setRefreshFailed] = useState(false);
   const [backgroundJobUuids, setBackgroundJobUuids] = useState<string[]>([]);
+  const backgroundStatus = useRef<Maybe<SharedDriveMoveStatus>>(Maybe.nothing());
+  const hasDeleteRequestStarted = useRef(false);
+  const needsRefreshOnReturn = useRef(false);
   const requestPending = useRef(false);
   const isMounted = useRef(false);
+  const {observeBackgroundAction} = useSharedDriveUploadStatus();
   const statusReporter = useBulkActionStatusReporter(
     'emptyBin',
     `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`,
@@ -127,7 +129,7 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   useEffect(() => {
     return () => {
       // Leaving while the outcome is unknown must not leave the popup stuck on progress.
-      if (isStatusProcessing()) {
+      if (isStatusProcessing() && !hasDeleteRequestStarted.current) {
         reportStatus('status-unknown');
       }
     };
@@ -162,14 +164,21 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   }, [isSameBinView, onRefreshAfterEmptyBinOutcome]);
 
   useEffect(() => {
-    if (status !== 'processing' || backgroundJobUuids.length === 0) {
-      return undefined;
+    if (isAtBinRoot && needsRefreshOnReturn.current) {
+      needsRefreshOnReturn.current = false;
+      void refreshAfterOutcome();
     }
+  }, [isAtBinRoot, refreshAfterOutcome]);
 
-    return observeCellsBackgroundActionJobs({
+  const observeDeleteJobs = (jobUuids: readonly string[]): void => {
+    if (maybe.isNothing(backgroundStatus.current)) {
+      return;
+    }
+    observeBackgroundAction({
       cellsRepository,
       actionName: 'delete',
-      jobUuids: backgroundJobUuids,
+      status: backgroundStatus.current.value,
+      jobUuids,
       clock,
       pollingPolicy: {
         pollIntervalMs: BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS,
@@ -181,13 +190,22 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
           );
         },
       },
-      isCurrent: isCurrentScope,
       onOutcome: outcome => {
+        if (!isMounted.current || currentScopeKey.current !== initialScopeKey) {
+          return;
+        }
+        const refreshOrDefer = (): void => {
+          if (isSameBinView()) {
+            void refreshAfterOutcome();
+          } else {
+            needsRefreshOnReturn.current = true;
+          }
+        };
         if (outcome === 'all-finished') {
           setBackgroundJobUuids([]);
           setStatus('completed');
           setRequiresReview(false);
-          void refreshAfterOutcome();
+          refreshOrDefer();
           return;
         }
 
@@ -195,7 +213,7 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
           setBackgroundJobUuids([]);
           setStatus('partial');
           setRequiresReview(true);
-          void refreshAfterOutcome();
+          refreshOrDefer();
           return;
         }
 
@@ -203,26 +221,16 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
           setBackgroundJobUuids([]);
           setStatus('failed');
           setRequiresReview(true);
-          void refreshAfterOutcome();
+          refreshOrDefer();
           return;
         }
 
         setStatus('unknown');
         setRequiresReview(true);
-        void refreshAfterOutcome();
+        refreshOrDefer();
       },
     });
-  }, [
-    backgroundJobUuids,
-    canEmptyBin,
-    cellsRepository,
-    clock,
-    currentCellsPath,
-    isCurrentScope,
-    refreshAfterOutcome,
-    scopeKey,
-    status,
-  ]);
+  };
 
   if (!canEmptyBin) {
     return null;
@@ -241,9 +249,10 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
     }
 
     requestPending.current = true;
+    hasDeleteRequestStarted.current = false;
     setIsSubmitting(true);
     setIsConfirmationOpen(false);
-    statusReporter.start([]);
+    backgroundStatus.current = Maybe.just(statusReporter.start([]));
     setStatus('submitting');
     setRefreshFailed(false);
 
@@ -259,14 +268,15 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
 
           onEmptyBinSubmitted();
           deleteRequestStarted = true;
+          hasDeleteRequestStarted.current = true;
         },
       });
-      if (!isSameBinView()) {
-        return;
-      }
-
       const actionEvidence = getCellsBackgroundActionEvidence(response, 'delete');
       if (actionEvidence.hasCompleted) {
+        statusReporter.report('completed');
+        if (!isSameBinView()) {
+          return;
+        }
         setStatus('completed');
         setRequiresReview(false);
         await refreshAfterOutcome();
@@ -274,15 +284,24 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
       }
 
       if (actionEvidence.jobUuids.length > 0) {
+        observeDeleteJobs(actionEvidence.jobUuids);
+        if (!isSameBinView()) {
+          return;
+        }
         setBackgroundJobUuids([...actionEvidence.jobUuids]);
         setStatus('processing');
         return;
       }
 
+      statusReporter.report('status-unknown');
+      if (!isSameBinView()) {
+        return;
+      }
       setStatus('unknown');
       setRequiresReview(true);
       await refreshAfterOutcome();
     } catch {
+      statusReporter.report(deleteRequestStarted ? 'status-unknown' : 'request-failed');
       if (!isSameBinView()) {
         return;
       }
@@ -316,6 +335,8 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
     }
 
     setStatus('processing');
+    statusReporter.report('processing');
+    observeDeleteJobs(backgroundJobUuids);
   };
 
   const statusMessage = status === 'idle' ? '' : translate(`cells.emptyBin.status.${status}`);
