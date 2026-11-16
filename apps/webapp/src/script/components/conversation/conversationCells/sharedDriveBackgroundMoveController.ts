@@ -61,7 +61,17 @@ export const createSharedDriveBackgroundMoveController = (
 ): SharedDriveBackgroundMoveController => {
   const observations = new Map<string, {cancel: () => void}>();
 
-  const start = ({status, jobUuids, cellsRepository, clock, random, onOutcome}: BackgroundMoveObservation): void => {
+  const start = ({
+    status: originatingStatus,
+    jobUuids,
+    cellsRepository,
+    clock,
+    random,
+    onOutcome,
+  }: BackgroundMoveObservation): void => {
+    // The review callback belongs to the view that started the action and stops working once that view is gone.
+    // A view that is still mounted publishes its own status with the callback again.
+    const {onReview: _onReview, isReviewing: _isReviewing, ...status} = originatingStatus;
     if (observations.has(status.id)) {
       return;
     }

@@ -67,6 +67,31 @@ describe('createSharedDriveBackgroundMoveController', () => {
     expect(cancel).not.toHaveBeenCalled();
   });
 
+  it('does not republish the originating view’s review callback, which stops working once that view is gone', () => {
+    const publishStatus = jest.fn();
+    let observed: Parameters<typeof observeCellsBackgroundActionJobs>[0] | undefined;
+    const controller = createSharedDriveBackgroundMoveController(publishStatus, options => {
+      observed = options;
+      return jest.fn();
+    });
+
+    controller.start({
+      status: {...status, onReview: jest.fn(), isReviewing: true},
+      jobUuids: ['job-1'],
+      cellsRepository: {getBackgroundMoveInfo: jest.fn()},
+      clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+      random: () => {
+        return 0.5;
+      },
+      onOutcome: jest.fn(),
+    });
+    observed?.onStatusSnapshot?.([]);
+    observed?.onOutcome('mixed-terminal');
+
+    expect(publishStatus).toHaveBeenNthCalledWith(1, status);
+    expect(publishStatus).toHaveBeenNthCalledWith(2, {...status, kind: 'partial'});
+  });
+
   it('cancels in-flight polling when the app status provider is disposed', () => {
     const cancel = jest.fn();
     const controller = createSharedDriveBackgroundMoveController(jest.fn(), () => {
