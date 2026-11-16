@@ -267,7 +267,7 @@
     "simple-git": "4.0.2",
     "sinon": "22.1.0",
     "style-loader": "4.0.0",
-    "stylelint": "17.16.0",
+    "stylelint": "18.0.0",
     "stylelint-config-idiomatic-order": "10.0.0",
     "svg-inline-loader": "0.8.2",
     "tough-cookie": "4.1.4",
@@ -317,7 +317,7 @@
       "eslint": "^8.0.0 || ^9.0.0"
     },
     "stylelint-order": {
-      "stylelint": "^14.0.0 || ^15.0.0 || ^16.0.1 || ^17.0.0"
+      "stylelint": "^14.0.0 || ^15.0.0 || ^16.0.1 || ^17.0.0 || ^18.0.0"
     },
     "libsodium-wrappers-sumo@0.7.9": {
       "libsodium-sumo": "0.7.15"
