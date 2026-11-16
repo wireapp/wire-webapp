@@ -17,6 +17,9 @@
  *
  */
 
+import {isOneOf} from '@sindresorhus/is';
+import {objectEntries, objectKeys} from 'ts-extras';
+
 import {ACCESS_STATE, TEAM} from './AccessState';
 
 import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS} from '../../apiClient/conversation/conversation';
@@ -156,6 +159,8 @@ export interface UpdatedAccessRights {
  */
 export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRights {
   const newAccessRights: UpdatedAccessRights = {accessModes: [], accessRole: []};
+  const isAccessRole = isOneOf(objectKeys(CONVERSATION_ACCESS_ROLE));
+  const isAccessMode = isOneOf(objectKeys(CONVERSATION_ACCESS));
 
   teamPermissionsForAccessState(accessState)
     //turn the permissions into a bitwise value ie. 11011
@@ -165,17 +170,15 @@ export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRigh
     .toReversed()
     //find the name of the feature with the correct sigfigs
     .map((bit: '1' | '0', bitIndex) => {
-      return Object.entries(ACCESS).find(([, bitmask]) => {
+      return objectEntries(ACCESS).find(([, bitmask]) => {
         return bitmask === +bit << bitIndex;
       })?.[0];
     })
     .forEach(feature => {
-      const accessRole = CONVERSATION_ACCESS_ROLE[feature as keyof typeof CONVERSATION_ACCESS_ROLE];
-      const accessModes = CONVERSATION_ACCESS[feature as keyof typeof CONVERSATION_ACCESS];
-      if (accessRole !== undefined) {
-        newAccessRights.accessRole.push(accessRole);
-      } else if (accessModes !== undefined) {
-        newAccessRights.accessModes.push(accessModes);
+      if (isAccessRole(feature)) {
+        newAccessRights.accessRole.push(CONVERSATION_ACCESS_ROLE[feature]);
+      } else if (isAccessMode(feature)) {
+        newAccessRights.accessModes.push(CONVERSATION_ACCESS[feature]);
       }
     });
 
