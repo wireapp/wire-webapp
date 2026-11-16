@@ -256,7 +256,7 @@ export const CellsTable = ({
     setMoveJobUuids,
     createMoveStatusId,
     clearMoveStatus,
-    observeBackgroundMove,
+    observeBackgroundAction,
   } = useSharedDriveUploadStatus();
   const currentConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
   const updateMoveStatus = useCallback(
@@ -559,11 +559,17 @@ export const CellsTable = ({
   };
 
   const startBackgroundMoveObservation = (moveStatusId: string): void => {
-    observeBackgroundMove({
-      operationId: moveStatusId,
+    const operation = getMoveOperation(moveStatusId);
+    if (operation === undefined || !isMoveStatusCurrent(operation.status.conversationQualifiedId, moveStatusId)) {
+      return;
+    }
+    observeBackgroundAction({
+      actionName: 'move',
+      status: operation.status,
+      jobUuids: operation.jobUuids,
       cellsRepository,
       clock,
-      random,
+      pollingPolicy: createBulkJobPollingPolicy(random),
       onOutcome: outcome => {
         const conversation = getMoveOperation(moveStatusId)?.status.conversationQualifiedId;
         if (conversation !== undefined && isMoveStatusCurrent(conversation, moveStatusId)) {

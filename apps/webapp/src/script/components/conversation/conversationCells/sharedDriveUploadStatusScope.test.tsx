@@ -24,6 +24,7 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import userEvent from '@testing-library/user-event';
 import {Maybe, maybe} from 'true-myth';
 
+import {createBulkJobPollingPolicy} from './common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
 import {
   SharedDriveUploadStatusProvider,
   SharedDriveUploadStatusScope,
@@ -115,13 +116,15 @@ describe('SharedDriveUploadStatusScope', () => {
     });
     const getBackgroundMoveInfo = jest.fn();
     act(() => {
-      return result.current.observeBackgroundMove({
-        operationId: status.id,
+      return result.current.observeBackgroundAction({
+        actionName: 'move',
+        status,
+        jobUuids: ['job-1'],
         cellsRepository: {getBackgroundMoveInfo},
         clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
-        random: () => {
+        pollingPolicy: createBulkJobPollingPolicy(() => {
           return 0.5;
-        },
+        }),
         onOutcome: jest.fn(),
       });
     });
