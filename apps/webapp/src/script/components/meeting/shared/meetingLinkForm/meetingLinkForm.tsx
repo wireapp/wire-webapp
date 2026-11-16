@@ -17,12 +17,11 @@
  *
  */
 
-import type {FunctionComponent} from 'react';
+import type {FunctionComponent, ReactNode} from 'react';
 
 import {
   embeddedPasswordActionsStyles,
   embeddedPasswordDescriptionStyles,
-  embeddedPasswordHeadingStyles,
   embeddedPasswordSectionStyles,
   passwordFieldsStyles,
 } from './meetingLinkForm.styles';
@@ -36,20 +35,24 @@ interface MeetingLinkFormProps extends Omit<PasswordFieldsProps, 'translate'> {
   translate: PasswordFieldsProps['translate'];
   copyDisabled: boolean;
   onGeneratePassword: (password: string) => void;
+  description?: string;
+  heading?: ReactNode;
 }
 
 export const MeetingLinkForm: FunctionComponent<MeetingLinkFormProps> = ({
   translate,
   onGeneratePassword,
   copyDisabled,
+  description,
+  heading,
   ...passwordFieldsProps
 }: MeetingLinkFormProps) => {
   return (
     <div css={embeddedPasswordSectionStyles}>
       <div>
-        <h3 css={embeddedPasswordHeadingStyles}>{translate('meetings.meetingLink.title')}</h3>
+        {heading}
         <p css={embeddedPasswordDescriptionStyles}>
-          {translate('meetings.meetingLinkForm.description', {brandName: Config.getConfig().BRAND_NAME})}
+          {description ?? translate('meetings.meetingLinkForm.description', {brandName: Config.getConfig().BRAND_NAME})}
         </p>
       </div>
       <div css={embeddedPasswordActionsStyles}>
