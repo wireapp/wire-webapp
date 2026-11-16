@@ -18,7 +18,7 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import {isNull, isObject, isSafeInteger, isString, isUndefined} from '@sindresorhus/is';
+import {isNull, isObject, isSafeInteger, isString} from '@sindresorhus/is';
 import {Maybe, Result} from 'true-myth';
 
 import {logDirectoryName, type LogPersistenceConfiguration} from './logPersistenceConfiguration';
@@ -49,7 +49,7 @@ export type OriginPrivateFileSystemLogStoreOptions = {
   readonly clock: Pick<Clock, 'currentUnixEpochMilliseconds'>;
   readonly sessionIdentifier: string;
   // A caller-derived SHA-256 digest encoded as lowercase hex, never a raw account ID or domain.
-  readonly accountIdentifier?: string;
+  readonly accountIdentifier: Maybe<string>;
   readonly configuration: LogPersistenceConfiguration;
 };
 
@@ -81,12 +81,11 @@ function isValidSessionIdentifier(sessionIdentifier: unknown): boolean {
   return isString(sessionIdentifier) && /^[a-f0-9-]{36}$/u.test(sessionIdentifier);
 }
 
-function isValidOptionalAccountIdentifier(accountIdentifier: unknown): boolean {
+function isValidAccountIdentifier(accountIdentifier: unknown): boolean {
   return (
-    isUndefined(accountIdentifier) ||
-    (isString(accountIdentifier) &&
-      accountIdentifier.length === accountIdentifierLength &&
-      /^[a-f0-9]{64}$/u.test(accountIdentifier))
+    isString(accountIdentifier) &&
+    accountIdentifier.length === accountIdentifierLength &&
+    /^[a-f0-9]{64}$/u.test(accountIdentifier)
   );
 }
 
@@ -177,11 +176,15 @@ export function createOriginPrivateFileSystemLogStore(
   if (!isValidSessionIdentifier(sessionIdentifier)) {
     return Result.err(new Error('Invalid log session identifier'));
   }
-  if (!isValidOptionalAccountIdentifier(accountIdentifier)) {
+  if (!accountIdentifier.map(isValidAccountIdentifier).unwrapOr(true)) {
     return Result.err(new Error('Invalid log account identifier'));
   }
 
-  const accountSuffix = isUndefined(accountIdentifier) ? '' : `-${accountIdentifier}`;
+  const accountSuffix = accountIdentifier
+    .map(identifier => {
+      return `-${identifier}`;
+    })
+    .unwrapOr('');
 
   let activeFilename: Maybe<string> = Maybe.nothing();
   let sequence = 0;

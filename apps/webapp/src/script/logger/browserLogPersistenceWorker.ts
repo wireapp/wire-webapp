@@ -61,6 +61,7 @@ function initialize(): Maybe<LogStore> {
   const storeResult = createOriginPrivateFileSystemLogStore({
     clock: createClock(),
     sessionIdentifier: workerScope.crypto.randomUUID(),
+    accountIdentifier: Maybe.nothing(),
     configuration: logPersistenceConfiguration,
     getDirectory() {
       return workerScope.navigator.storage.getDirectory();
