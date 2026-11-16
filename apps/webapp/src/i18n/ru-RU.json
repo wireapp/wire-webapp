@@ -1931,6 +1931,7 @@
   "preferencesAbout": "О программе",
   "preferencesAboutAVSVersion": "Версия AVS {version}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
+  "preferencesAboutCoreCryptoVersion": "Версия CoreCrypto {version}",
   "preferencesAboutDesktopVersion": "Версия для компьютера {version}",
   "preferencesAboutPrivacyPolicy": "Политика конфиденциальности",
   "preferencesAboutSupport": "Поддержка",

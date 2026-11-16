@@ -1931,6 +1931,7 @@
   "preferencesAbout": "Über Wire",
   "preferencesAboutAVSVersion": "AVS-Version {version}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
+  "preferencesAboutCoreCryptoVersion": "CoreCrypto version {version}",
   "preferencesAboutDesktopVersion": "Desktop-Version {version}",
   "preferencesAboutPrivacyPolicy": "Datenschutzrichtlinie",
   "preferencesAboutSupport": "Support",
