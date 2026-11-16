@@ -11,14 +11,19 @@ permissions: {}
 
 concurrency:
   group: pull-request-semver-policy-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  # Only new commits supersede running validation; metadata bursts should not
+  # repeatedly discard dependency installation.
+  # GitHub still replaces pending runs. Read current PR state below because scheduling
+  # order does not guarantee that the surviving run has the newest event payload.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.action == 'synchronize' }}
 
 jobs:
   pull-request-semver-policy:
     name: Pull request SemVer policy
     runs-on: ubuntu-26.04
     permissions:
-      contents: read # required for checkout; labels come from the event payload
+      contents: read # required for checkout
+      pull-requests: read # read current labels and target branch immediately before validation
     steps:
       - name: Record merge queue validation
         if: ${{ github.event_name == 'merge_group' }}
@@ -41,9 +46,24 @@ jobs:
         # Skip lifecycle scripts because policy analysis does not need WebApp configuration.
         run: npm clean-install --ignore-scripts && npx just apply-patches
 
+      - name: Read current pull request policy input
+        id: policy_input
+        if: ${{ github.event_name == 'pull_request' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          pull_request_json="$(gh api "repos/${GH_REPO}/pulls/${PULL_REQUEST_NUMBER}")"
+          target_branch_json="$(jq -ce '.base.ref | select(type == "string")' <<< "$pull_request_json")"
+          pull_request_labels_json="$(jq -ce '.labels | map(.name)' <<< "$pull_request_json")"
+          printf 'target_branch_json=%s\n' "$target_branch_json" >> "$GITHUB_OUTPUT"
+          printf 'pull_request_labels_json=%s\n' "$pull_request_labels_json" >> "$GITHUB_OUTPUT"
+
       - name: Validate pull request release impact
         if: ${{ github.event_name == 'pull_request' }}
         env:
-          TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
-          PULL_REQUEST_LABELS_JSON: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          TARGET_BRANCH: ${{ fromJSON(steps.policy_input.outputs.target_branch_json) }}
+          PULL_REQUEST_LABELS_JSON: ${{ steps.policy_input.outputs.pull_request_labels_json }}
         run: node ./tools/releaseCli/pullRequestSemverPolicy.mts
