@@ -109,7 +109,7 @@ const startAuthApp = (): void => {
           return Maybe.just(
             createLogWorkerConnection(
               new Worker(new URL('../logger/browserLogPersistenceWorker.ts', import.meta.url), {
-                name: 'browser-log-persistence',
+                name: 'wire-browser-log-persistence',
               }),
             ),
           );

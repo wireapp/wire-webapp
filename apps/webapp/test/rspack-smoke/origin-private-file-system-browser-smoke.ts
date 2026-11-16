@@ -123,7 +123,7 @@ async function verifyNativePersistenceAccountBinding(
   bindingOrder: 'before initialization' | 'after unattributed writes',
 ): Promise<void> {
   const context = page.context();
-  await context.route('**/browser-log-persistence.js', async route => {
+  await context.route('**/wire-browser-log-persistence.js', async route => {
     const response = await route.fetch();
     await route.fulfill({
       response,
@@ -140,7 +140,7 @@ async function verifyNativePersistenceAccountBinding(
     const outcomes = await page.evaluate(
       async options => {
         const {lines, accountIdentifier, bindingOrder} = options;
-        const worker = new Worker('/min/browser-log-persistence.js', {name: 'browser-log-persistence'});
+        const worker = new Worker('/min/wire-browser-log-persistence.js', {name: 'wire-browser-log-persistence'});
         const commands: LogWorkerCommand[] = [
           {type: 'initialize'},
           ...Array.from({length: 6}, (_, batchIndex) => {
@@ -293,7 +293,7 @@ test('persists sanitized browser logs with console disabled across application r
       })
       .toHaveLength(1);
     for (const worker of page.workers()) {
-      expect(new URL(worker.url()).pathname).toBe('/min/browser-log-persistence.js');
+      expect(new URL(worker.url()).pathname).toBe('/min/wire-browser-log-persistence.js');
     }
     expect(await page.locator('html').getAttribute('data-unexpected-log-storage-access')).toBeNull();
     expect(consoleRecords).toEqual([]);
@@ -378,7 +378,7 @@ test('keeps startup and console logging working when logging worker construction
     const NativeWorker = window.Worker;
     Object.defineProperty(window, 'Worker', {
       value: function createWorker(source: string | URL, options?: WorkerOptions) {
-        if (new URL(source.toString(), window.location.href).pathname.endsWith('/browser-log-persistence.js')) {
+        if (new URL(source.toString(), window.location.href).pathname.endsWith('/wire-browser-log-persistence.js')) {
           throw new Error('Logging worker construction failed');
         }
 
@@ -408,7 +408,7 @@ test('starts without main-thread filesystem access while worker initialization n
   context,
 }) => {
   await context.route('**/*.js', async route => {
-    const isPersistenceWorker = new URL(route.request().url()).pathname.endsWith('/browser-log-persistence.js');
+    const isPersistenceWorker = new URL(route.request().url()).pathname.endsWith('/wire-browser-log-persistence.js');
     if (isPersistenceWorker) {
       const response = await route.fetch();
       const prefix = `Object.defineProperty(navigator.storage, 'getDirectory', {value() {
@@ -486,7 +486,7 @@ test.describe('Electron logging selection', () => {
 });
 
 test('disables unsupported synchronous access handles without a main-thread fallback', async ({page, context}) => {
-  await context.route('**/browser-log-persistence.js', async route => {
+  await context.route('**/wire-browser-log-persistence.js', async route => {
     const response = await route.fetch();
     const prefix =
       "Object.defineProperty(FileSystemFileHandle.prototype, 'createSyncAccessHandle', {value: undefined});\n";
@@ -527,7 +527,7 @@ test('disables unsupported synchronous access handles without a main-thread fall
 });
 
 test('keeps console logging functional after a persistence worker crashes', async ({page, context}) => {
-  await context.route('**/browser-log-persistence.js', async route => {
+  await context.route('**/wire-browser-log-persistence.js', async route => {
     const response = await route.fetch();
     await route.fulfill({
       response,

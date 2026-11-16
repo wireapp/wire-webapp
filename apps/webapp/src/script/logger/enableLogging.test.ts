@@ -18,22 +18,56 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {noop} from 'noop-esm';
 import {Maybe} from 'true-myth';
 
 import {createPinoLogging} from './createPinoLogging';
 import {enableLogging} from './enableLogging';
-import {createBufferedLogOutput, type BufferedLogOutput} from './createBufferedLogOutput';
-import {logPersistenceConfiguration} from './logPersistenceConfiguration';
+import {createBrowserLogPersistence, type BrowserLogPersistence} from './createBrowserLogPersistence';
+import {createLogWorkerConnectionForTest} from './test/createLogWorkerConnectionForTest';
 
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 
 const disabledPersistenceOptions = {
   startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(''),
   isElectron: false,
-  createPersistenceOutput(): Maybe<BufferedLogOutput> {
-    return Maybe.nothing();
+  createPersistenceOutput() {
+    return Maybe.nothing<BrowserLogPersistence>();
   },
 };
+
+type TestPersistenceOptions = {
+  readonly clock: ReturnType<typeof createDeterministicClock>;
+  readonly append: (lines: readonly string[]) => Promise<void>;
+};
+
+function createTestPersistence(options: TestPersistenceOptions): Maybe<BrowserLogPersistence> {
+  const {clock, append} = options;
+  const worker = createLogWorkerConnectionForTest();
+  worker.state.onPost = async request => {
+    try {
+      await append(request.type === 'append' ? request.lines : []);
+      worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+    } catch {
+      worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'failed'});
+    }
+  };
+
+  return createBrowserLogPersistence({
+    clock,
+    createWorker() {
+      return Maybe.just(worker.connection);
+    },
+    lifecycle: {
+      isHidden() {
+        return false;
+      },
+      subscribeToVisibilityChanges() {
+        return noop;
+      },
+    },
+  });
+}
 
 describe('logging startup', () => {
   it.each([
@@ -145,7 +179,7 @@ describe('logging startup', () => {
       const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
       const append = jest.fn<Promise<void>, [readonly string[]]>();
       const createPersistenceOutput = jest.fn(() => {
-        return Maybe.just(createBufferedLogOutput({clock, append, configuration: logPersistenceConfiguration}));
+        return createTestPersistence({clock, append});
       });
       const logging = createPinoLogging(Maybe.nothing());
       const locationSearch = `?enabled-features=mark-as-unread${persistenceEnabled ? ',persistent-browser-logs' : ''}${consoleEnabled ? '&enableLogging=selected' : ''}`;
@@ -212,15 +246,12 @@ describe('logging startup', () => {
       startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch('?enabled-features=persistent-browser-logs'),
       isElectron: false,
       createPersistenceOutput() {
-        return Maybe.just(
-          createBufferedLogOutput({
-            clock,
-            configuration: logPersistenceConfiguration,
-            async append() {
-              throw Object.assign(new Error('Quota exceeded'), {name: 'QuotaExceededError'});
-            },
-          }),
-        );
+        return createTestPersistence({
+          clock,
+          async append() {
+            throw Object.assign(new Error('Quota exceeded'), {name: 'QuotaExceededError'});
+          },
+        });
       },
     });
     if (persistence.isNothing) {
@@ -232,6 +263,63 @@ describe('logging startup', () => {
 
     expect(consoleOutput.error).toHaveBeenCalledTimes(1);
     expect(persistence.value.getStatistics()).toMatchObject({failures: 1, suspended: true, droppedRecords: 1});
+  });
+
+  it('exposes binding through startup and keeps console logging independent of failed binding', async () => {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const worker = createLogWorkerConnectionForTest();
+    const logging = createPinoLogging(Maybe.nothing());
+    const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+    worker.state.onPost = request => {
+      worker.emitMessage({
+        requestIdentifier: request.requestIdentifier,
+        outcome: request.type === 'bind-account' ? 'failed' : 'complete',
+      });
+    };
+    const persistence = enableLogging({
+      clock,
+      consoleOutput,
+      locationSearch: '?enableLogging=*',
+      debugEnabled: false,
+      storage: Maybe.nothing(),
+      configureLogging: logging.configure,
+      startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch('?enabled-features=persistent-browser-logs'),
+      isElectron: false,
+      createPersistenceOutput() {
+        return createBrowserLogPersistence({
+          clock,
+          createWorker() {
+            return Maybe.just(worker.connection);
+          },
+          lifecycle: {
+            isHidden() {
+              return false;
+            },
+            subscribeToVisibilityChanges() {
+              return noop;
+            },
+          },
+        });
+      },
+    }).unwrapOrElse(() => {
+      throw new Error('Expected persistence');
+    });
+
+    const binding = persistence.bindAccount('a'.repeat(64));
+    logging.getLogger('component').info('Visible during binding');
+    expect((await binding).isErr).toBe(true);
+    logging.getLogger('component').error('Visible after failure');
+    await persistence.flush();
+
+    expect(consoleOutput.info).toHaveBeenCalledTimes(1);
+    expect(consoleOutput.error).toHaveBeenCalledTimes(1);
+    expect(
+      worker.requests.map(request => {
+        return request.type;
+      }),
+    ).toEqual(['initialize', 'bind-account']);
+    expect(persistence.getStatistics()).toMatchObject({failures: 1, suspended: true, droppedRecords: 2});
+    await persistence.dispose();
   });
 
   it.each(['unsupported', 'failed'] as const)('preserves console logging when persistence setup is %s', failure => {
