@@ -18,27 +18,32 @@
  */
 
 const presetEnvConfig = {
-  corejs: {version: '3', proposals: false},
   debug: false,
   modules: false,
-  useBuiltIns: 'usage',
 };
 
 module.exports = {
   env: {
     test: {
-      plugins: ['@emotion', 'babel-plugin-transform-import-meta'],
+      plugins: ['babel-plugin-transform-import-meta'],
       presets: [
-        ['@babel/preset-react', {importSource: '@emotion/react', runtime: 'automatic'}],
-        '@babel/preset-typescript',
+        ['@babel/preset-typescript', {onlyRemoveTypeImports: false}],
         ['@babel/preset-env', {...presetEnvConfig, modules: 'commonjs'}],
       ],
     },
   },
-  plugins: [['@babel/plugin-proposal-decorators', {legacy: true}], '@emotion'],
+  plugins: [
+    ['@babel/plugin-proposal-decorators', {version: 'legacy'}],
+    ['babel-plugin-polyfill-corejs3', {method: 'usage-global', version: '3', proposals: false}],
+  ],
   presets: [
-    ['@babel/preset-react', {importSource: '@emotion/react', runtime: 'automatic'}],
-    '@babel/preset-typescript',
+    ['@babel/preset-typescript', {onlyRemoveTypeImports: false}],
     ['@babel/preset-env', presetEnvConfig],
+  ],
+  overrides: [
+    {
+      test: /\.(?:jsx?|tsx)$/,
+      presets: [['@babel/preset-react', {importSource: '@emotion/react', runtime: 'automatic'}]],
+    },
   ],
 };
