@@ -345,6 +345,23 @@
     }
   }
 
+  &__header:has(+ .modal__body .meeting-link-confirmation) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 64px;
+    min-height: 64px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border-color);
+
+    .modal__header__button {
+      top: 50%;
+      left: 16px;
+      right: auto;
+      transform: translateY(-50%);
+    }
+  }
+
   &__body {
     overflow: auto;
     padding: 0 16px;
