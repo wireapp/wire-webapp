@@ -37,7 +37,7 @@ import type {Grid} from '../../repositories/calling/videoGridHandler';
 import {Loading} from '../../uiKit/dataDisplay/loading/loading';
 import {QUERY} from '../../uiKit/utils/mediaQueries';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
-import type {TranslationKey} from '../../util/localizerUtil';
+import type {TranslationKey} from '../../util/localizerUtil/translationTypes';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import * as Icon from '../icon';
 
