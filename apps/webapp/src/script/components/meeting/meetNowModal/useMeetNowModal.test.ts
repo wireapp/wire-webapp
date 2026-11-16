@@ -18,7 +18,10 @@
  */
 
 import {MEETING_TITLE_MAX_LENGTH, meetingTitleErrorKeys} from '../shared/validation/meetingTitleValidation';
-import {meetingPasswordErrorKey} from '../shared/validation/meetingPasswordValidation';
+import {
+  meetingPasswordConfirmationRequiredKey,
+  meetingPasswordErrorKey,
+} from '../shared/validation/meetingPasswordValidation';
 
 import {
   getDefaultMeetNowFormState,
@@ -92,6 +95,16 @@ describe('useMeetNowModal', () => {
     useMeetNowModal.getState().setPasswordConfirmation('ValidPassword1!');
 
     expect(useMeetNowModal.getState().errors.password).toBeUndefined();
+    expect(useMeetNowModal.getState().errors.passwordConfirmation).toBeUndefined();
+  });
+
+  it('requires confirmation after submit and clears the error when it matches', () => {
+    useMeetNowModal.getState().open();
+    useMeetNowModal.getState().setPassword('ValidPassword1!');
+    expect(useMeetNowModal.getState().errors.passwordConfirmation).toBeUndefined();
+
+    expect(useMeetNowModal.getState().validate().passwordConfirmation).toBe(meetingPasswordConfirmationRequiredKey);
+    useMeetNowModal.getState().setPasswordConfirmation('ValidPassword1!');
     expect(useMeetNowModal.getState().errors.passwordConfirmation).toBeUndefined();
   });
 });
