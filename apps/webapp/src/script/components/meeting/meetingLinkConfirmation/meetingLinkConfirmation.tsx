@@ -25,7 +25,7 @@ import {
   meetingLinkConfirmationStyles,
 } from './meetingLinkConfirmation.styles';
 
-import {Button, ButtonVariant, Input, ShieldIcon} from '../../../uiKit';
+import {Button, ButtonVariant, ShieldIcon} from '../../../uiKit';
 import type {Translate} from '../../../util/localizerUtil/translationTypes';
 import {CopyToClipboardButton} from '../../copyToClipboardButton';
 
@@ -57,17 +57,19 @@ export const MeetingLinkConfirmationMessage = ({
 }: MeetingLinkConfirmationMessageProps): JSX.Element => {
   return (
     <>
-      <p id="meeting-link-description">{translate('meetings.meetingLink.description')}</p>
-      <Input
+      <p id="meeting-link-description" className="meeting-link-confirmation">
+        {translate('meetings.meetingLink.description')}
+      </p>
+      <div
+        role="textbox"
         aria-label={translate('meetings.meetingLink.title')}
         aria-describedby="meeting-link-description"
-        id="meeting-link"
-        label=""
-        readOnly
-        type="text"
-        value={link}
-        wrapperCSS={meetingLinkConfirmationInputStyles}
-      />
+        aria-readonly="true"
+        tabIndex={0}
+        css={meetingLinkConfirmationInputStyles}
+      >
+        {link}
+      </div>
       {hasPassword ? (
         <p css={meetingLinkConfirmationStatusStyles} role="note">
           <ShieldIcon aria-hidden="true" /> {translate('guestOptionsInfoPasswordSecured')}
