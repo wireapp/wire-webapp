@@ -19,6 +19,8 @@
 
 import {MLSStaleMessageError} from '../../../../apiClient/conversation/conversationError';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import {BackendError} from '../../../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../../../apiClient/http/backendErrorLabel';
 import {Encoder} from '../../../../commons/base64/encoder';
 
 import {CoreCryptoError, MlsError} from '@wireapp/core-crypto';
@@ -43,6 +45,18 @@ function map(error: unknown, extra?: {groupId?: string}): DomainMlsError {
 describe('MlsErrorMapper', () => {
   afterEach(() => {
     jest.restoreAllMocks();
+  });
+
+  it.each([
+    new BackendError('missing proposals', BackendErrorLabel.MLS_COMMIT_MISSING_REFERENCES),
+    makeRejectedError(
+      serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_COMMIT_MISSING_REFERENCES}),
+    ),
+  ])('maps missing commit references and preserves context: %s', error => {
+    const mapped = map(error, {groupId: groupIdBase64});
+    expect(mapped.type).toBe('CommitMissingReferences');
+    expect(mapped.cause).toBe(error);
+    expect(mapped.context).toEqual({qualifiedConversationId: id, groupId: groupIdBase64});
   });
 
   it('maps WrongEpoch via stale message class instance', () => {

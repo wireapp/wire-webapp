@@ -23,7 +23,9 @@ import {noop} from 'noop-esm';
 
 import {getLogger} from '../../../../logger/getLogger';
 
-import {DomainMlsError, MlsErrorMapper} from './mlsErrorMapper';
+import {createDefaultMlsErrorMapper, DomainMlsError, MlsErrorMapper} from './mlsErrorMapper';
+import {CoreCryptoError, MlsError, MlsError_Tags} from '@wireapp/core-crypto';
+import {serializeAbortReason, UPLOAD_COMMIT_BUNDLE_ABORT_REASONS} from '../mlsService/coreCryptoMlsError';
 import {
   MlsRecoveryOrchestratorImpl,
   minimalDefaultPolicies,
@@ -51,6 +53,187 @@ describe('MlsRecoveryOrchestrator', () => {
       wipeMLSConversation: jest.fn().mockResolvedValue(undefined),
     };
   };
+
+  describe('policy-driven retries before recovery', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it.each([
+      {maxRetries: 2, delayMs: 10, backoffFactor: 3},
+      {maxRetries: 3, delayMs: 20, backoffFactor: 1},
+      {maxRetries: 0, delayMs: 10, backoffFactor: 2},
+    ])('uses the configured retry count and delays: %o', async backoff => {
+      const deps = baseDeps();
+      // Any mapped error can opt in; this test deliberately uses a different error type.
+      const mapper = makeMapperReturning({type: MlsError_Tags.Other});
+      const policies: PolicyTable = {
+        Other: {
+          action: RecoveryActionKind.JoinViaExternalCommit,
+          retryConfig: {beforeRecovery: backoff, reRunOriginalOperation: true},
+        },
+      };
+      const orchestrator = new MlsRecoveryOrchestratorImpl(mapper, policies, deps);
+      const callback = jest.fn().mockRejectedValue(new Error('operation failed'));
+      deps.joinViaExternalCommit.mockImplementation(async () => {
+        expect(callback).toHaveBeenCalledTimes(backoff.maxRetries + 1);
+        callback.mockResolvedValue('recovered');
+      });
+      const result = orchestrator.execute({
+        context: {operationName: OperationName.send, qualifiedConversationId: qid()},
+        callBack: callback,
+      });
+
+      for (let attempt = 0; attempt < backoff.maxRetries; attempt++) {
+        await jest.advanceTimersByTimeAsync(backoff.delayMs * backoff.backoffFactor ** attempt - 1);
+        expect(callback).toHaveBeenCalledTimes(attempt + 1);
+        expect(deps.joinViaExternalCommit).not.toHaveBeenCalled();
+        await jest.advanceTimersByTimeAsync(1);
+      }
+
+      await expect(result).resolves.toBe('recovered');
+      expect(callback).toHaveBeenCalledTimes(backoff.maxRetries + 2);
+      expect(deps.joinViaExternalCommit).toHaveBeenCalledTimes(1);
+      expect(jest.getTimerCount()).toBe(0);
+    });
+  });
+
+  describe('missing commit references', () => {
+    const error = CoreCryptoError.Mls.new({
+      mlsError: MlsError.MessageRejected.new({
+        reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_COMMIT_MISSING_REFERENCES}),
+      }),
+    });
+    const context = {operationName: OperationName.send, qualifiedConversationId: qid(), groupId: 'group'};
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('retries with 1s, 2s and 4s backoff, then rejoins before replaying the send', async () => {
+      const deps = baseDeps();
+      const orchestrator = new MlsRecoveryOrchestratorImpl(createDefaultMlsErrorMapper(), minimalDefaultPolicies, deps);
+      const callback = jest.fn().mockRejectedValue(error);
+      deps.joinViaExternalCommit.mockImplementation(async () => {
+        expect(callback).toHaveBeenCalledTimes(4);
+        callback.mockResolvedValue('sent');
+      });
+      const result = orchestrator.execute({context, callBack: callback});
+
+      for (const [index, delay] of [1_000, 2_000, 4_000].entries()) {
+        await jest.advanceTimersByTimeAsync(delay - 1);
+        expect(callback).toHaveBeenCalledTimes(index + 1);
+        expect(deps.joinViaExternalCommit).not.toHaveBeenCalled();
+        await jest.advanceTimersByTimeAsync(1);
+      }
+
+      await expect(result).resolves.toBe('sent');
+      expect(deps.joinViaExternalCommit).toHaveBeenCalledTimes(1);
+      expect(deps.joinViaExternalCommit).toHaveBeenCalledWith(qid());
+      expect(callback).toHaveBeenCalledTimes(5);
+    });
+
+    it.each([1, 2, 3])('does not rejoin when retry %s succeeds', async retryCount => {
+      const deps = baseDeps();
+      const orchestrator = new MlsRecoveryOrchestratorImpl(createDefaultMlsErrorMapper(), minimalDefaultPolicies, deps);
+      const callback = jest.fn().mockResolvedValue('sent');
+      for (let attempt = 0; attempt < retryCount; attempt++) {
+        callback.mockRejectedValueOnce(error);
+      }
+      const result = orchestrator.execute({context, callBack: callback});
+      await jest.runAllTimersAsync();
+
+      await expect(result).resolves.toBe('sent');
+      expect(callback).toHaveBeenCalledTimes(retryCount + 1);
+      expect(deps.joinViaExternalCommit).not.toHaveBeenCalled();
+    });
+
+    it('retries an out-of-band failure by invoking the real operation', async () => {
+      const deps = baseDeps();
+      const orchestrator = new MlsRecoveryOrchestratorImpl(createDefaultMlsErrorMapper(), minimalDefaultPolicies, deps);
+      const callback = jest.fn().mockResolvedValue(undefined);
+      const result = orchestrator.execute({
+        context: {...context, operationName: OperationName.keyMaterialUpdate},
+        seedError: error,
+        callBack: callback,
+      });
+      expect(callback).not.toHaveBeenCalled();
+      await jest.advanceTimersByTimeAsync(1_000);
+      await expect(result).resolves.toBeUndefined();
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(deps.joinViaExternalCommit).not.toHaveBeenCalled();
+    });
+
+    it('honors disabled retries', async () => {
+      const deps = baseDeps();
+      const orchestrator = new MlsRecoveryOrchestratorImpl(createDefaultMlsErrorMapper(), minimalDefaultPolicies, deps);
+      const callback = jest.fn().mockRejectedValue(error);
+      await expect(orchestrator.execute({context, callBack: callback, retry: false})).rejects.toBe(error);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(jest.getTimerCount()).toBe(0);
+      expect(deps.joinViaExternalCommit).not.toHaveBeenCalled();
+    });
+
+    it('stops if the operation still fails after rejoining', async () => {
+      const deps = baseDeps();
+      const orchestrator = new MlsRecoveryOrchestratorImpl(createDefaultMlsErrorMapper(), minimalDefaultPolicies, deps);
+      const callback = jest.fn().mockRejectedValue(error);
+      const result = expect(orchestrator.execute({context, callBack: callback})).rejects.toBe(error);
+      await jest.runAllTimersAsync();
+      await result;
+
+      expect(callback).toHaveBeenCalledTimes(5);
+      expect(deps.joinViaExternalCommit).toHaveBeenCalledTimes(1);
+    });
+
+    it('propagates rejoin failure without replaying the operation', async () => {
+      const deps = baseDeps();
+      const rejoinError = new Error('rejoin failed');
+      deps.joinViaExternalCommit.mockRejectedValue(rejoinError);
+      const orchestrator = new MlsRecoveryOrchestratorImpl(createDefaultMlsErrorMapper(), minimalDefaultPolicies, deps);
+      const callback = jest.fn().mockRejectedValue(error);
+      const result = expect(orchestrator.execute({context, callBack: callback})).rejects.toBe(rejoinError);
+      await jest.runAllTimersAsync();
+      await result;
+
+      expect(callback).toHaveBeenCalledTimes(4);
+    });
+
+    it('does not restart missing-reference retries when the error changes', async () => {
+      const deps = baseDeps();
+      const otherError = new Error('unrecoverable');
+      const orchestrator = new MlsRecoveryOrchestratorImpl(createDefaultMlsErrorMapper(), minimalDefaultPolicies, deps);
+      const callback = jest.fn().mockRejectedValueOnce(error).mockRejectedValue(otherError);
+      const result = expect(orchestrator.execute({context, callBack: callback})).rejects.toBe(otherError);
+      await jest.runAllTimersAsync();
+      await result;
+
+      expect(callback).toHaveBeenCalledTimes(2);
+      expect(deps.joinViaExternalCommit).not.toHaveBeenCalled();
+    });
+
+    it('fulfills a failed external join through recovery without replaying it again', async () => {
+      const deps = baseDeps();
+      const orchestrator = new MlsRecoveryOrchestratorImpl(createDefaultMlsErrorMapper(), minimalDefaultPolicies, deps);
+      const callback = jest.fn().mockRejectedValue(error);
+      const result = orchestrator.execute({context: {...context, operationName: OperationName.joinExternalCommit}, callBack: callback});
+      await jest.runAllTimersAsync();
+      await expect(result).resolves.toBeUndefined();
+
+      expect(callback).toHaveBeenCalledTimes(4);
+      expect(deps.joinViaExternalCommit).toHaveBeenCalledTimes(1);
+    });
+  });
 
   it('does nothing when callback succeeds', async () => {
     const deps = baseDeps();
@@ -214,7 +397,7 @@ describe('MlsRecoveryOrchestrator', () => {
     const policies: PolicyTable = {
       GroupOutOfSync: {
         action: RecoveryActionKind.AddMissingUsers,
-        retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+        retryConfig: {reRunOriginalOperation: true},
       },
     };
     const orch = new MlsRecoveryOrchestratorImpl(mapper, policies, deps);
@@ -236,7 +419,7 @@ describe('MlsRecoveryOrchestrator', () => {
     const policies: PolicyTable = {
       GroupOutOfSync: {
         action: RecoveryActionKind.AddMissingUsers,
-        retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+        retryConfig: {reRunOriginalOperation: true},
       },
     };
     const orch = new MlsRecoveryOrchestratorImpl(mapper, policies, deps);
@@ -273,7 +456,7 @@ describe('MlsRecoveryOrchestrator', () => {
     const deps = baseDeps();
     const mapper = makeMapperReturning({type: 'ConversationAlreadyExists'} as DomainMlsError);
     const policies: PolicyTable = {
-      ConversationAlreadyExists: {action: RecoveryActionKind.Unknown, retryConfig: {maxAttempts: 0}},
+      ConversationAlreadyExists: {action: RecoveryActionKind.Unknown, retryConfig: {}},
     };
     const orch = new MlsRecoveryOrchestratorImpl(mapper, policies, deps);
 
@@ -331,7 +514,7 @@ describe('MlsRecoveryOrchestrator', () => {
       WrongEpoch: {
         send: {
           action: 'RecoverFromEpochMismatch',
-          retryConfig: {maxAttempts: 1, reRunOriginalOperation: true, delayMs: 50},
+          retryConfig: {reRunOriginalOperation: true, delayMs: 50},
         },
       },
     } as any;

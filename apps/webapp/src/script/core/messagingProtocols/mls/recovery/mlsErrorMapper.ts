@@ -27,6 +27,8 @@ import {MlsError_Tags} from '@wireapp/core-crypto';
 
 import {MLSStaleMessageError, MLSGroupOutOfSyncError} from '../../../../apiClient/conversation/conversationError';
 import {SUBCONVERSATION_ID} from '../../../../apiClient/conversation/subconversation';
+import {BackendError} from '../../../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../../../apiClient/http/backendErrorLabel';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {Encoder} from '../../../../commons/base64/encoder';
 // Reuse existing type-guards from the MLS layer
@@ -35,6 +37,7 @@ import {
   isCoreCryptoMLSConversationAlreadyExistsError,
   isCoreCryptoMLSOrphanWelcomeError,
   isMLSStaleMessageError,
+  isMLSCommitMissingReferencesError,
   isMLSGroupOutOfSyncError,
   isBrokenMLSConversationError,
   getMLSGroupOutOfSyncErrorMissingUsers,
@@ -46,7 +49,8 @@ import {
  *
  * These are intentionally decoupled from concrete error classes to keep the orchestrator stable.
  */
-export type DomainMlsErrorType = MlsError_Tags | 'KeyMaterialUpdateFailure' | 'GroupOutOfSync' | 'GroupNotEstablished';
+export type DomainMlsErrorType =
+  MlsError_Tags | 'KeyMaterialUpdateFailure' | 'GroupOutOfSync' | 'GroupNotEstablished' | 'CommitMissingReferences';
 
 /**
  * Normalized error shape produced by the mapper.
@@ -147,6 +151,18 @@ const WrongEpochHandler: ErrorHandler = {
   },
 };
 
+const CommitMissingReferencesHandler: ErrorHandler = {
+  canHandle: error => {
+    return (
+      isMLSCommitMissingReferencesError(error) ||
+      (error instanceof BackendError && error.label === BackendErrorLabel.MLS_COMMIT_MISSING_REFERENCES)
+    );
+  },
+  map: (error, context) => {
+    return {type: 'CommitMissingReferences', cause: error, context};
+  },
+};
+
 /** Local MLS state indicates the conversation is broken/not established. */
 const BrokenConversationHandler: ErrorHandler = {
   canHandle: err => {
@@ -242,6 +258,7 @@ const FallbackHandler: ErrorHandler = {
 export function createDefaultMlsErrorMapper(): MlsErrorMapper {
   return new ChainedMlsErrorMapper([
     WrongEpochHandler,
+    CommitMissingReferencesHandler,
     BrokenConversationHandler,
     GroupOutOfSyncHandler,
     ConversationAlreadyExistsHandler,

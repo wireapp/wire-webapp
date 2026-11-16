@@ -301,6 +301,10 @@ describe('MLSService', () => {
         serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION}),
       ],
       [
+        new BackendError('missing proposals', BackendErrorLabel.MLS_COMMIT_MISSING_REFERENCES, StatusCode.BAD_REQUEST),
+        serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_COMMIT_MISSING_REFERENCES}),
+      ],
+      [
         new MLSStaleMessageError('stale message'),
         serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
       ],
