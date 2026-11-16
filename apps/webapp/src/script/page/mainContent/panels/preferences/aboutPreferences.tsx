@@ -21,6 +21,8 @@ import {useMemo, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
+import {buildMetadata, version as coreCryptoVersion} from '@wireapp/core-crypto';
+
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 
@@ -34,6 +36,8 @@ interface AboutPreferencesProps {
   selfUser: User;
 }
 
+const shortCommitLength = 7;
+
 const AboutPreferences: FunctionComponent<AboutPreferencesProps> = ({selfUser}: AboutPreferencesProps) => {
   const {translate} = useApplicationContext();
   const config = Config.getConfig();
@@ -41,6 +45,7 @@ const AboutPreferences: FunctionComponent<AboutPreferencesProps> = ({selfUser}: 
   const websiteUrl = externalUrl.website;
   const privacyPolicyUrl = externalUrl.privacyPolicy;
   const desktopConfig = Config.getDesktopConfig();
+  const coreCryptoBuild = {version: coreCryptoVersion(), commit: buildMetadata().gitSha};
 
   const termsOfUseUrl = useMemo(() => {
     if (!isNullOrUndefined(selfUser)) {
@@ -118,6 +123,10 @@ const AboutPreferences: FunctionComponent<AboutPreferencesProps> = ({selfUser}: 
           {translate('preferencesAboutVersion', {brandName: config.BRAND_NAME, version: config.VERSION})}
         </p>
         <p className="preferences-detail">{translate('preferencesAboutAVSVersion', {version: config.AVS_VERSION})}</p>
+        <p className="preferences-detail" title={coreCryptoBuild.commit}>
+          {translate('preferencesAboutCoreCryptoVersion', {version: coreCryptoBuild.version})}
+          {isNonEmptyString(coreCryptoBuild.commit) && ` (${coreCryptoBuild.commit.slice(0, shortCommitLength)})`}
+        </p>
         <p className="preferences-detail">{translate('preferencesAboutCopyright')}</p>
       </PreferencesSection>
     </PreferencesPage>
