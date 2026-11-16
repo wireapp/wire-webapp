@@ -27,11 +27,11 @@ import {runBulkRestore, type BulkRestoreDependencies, type BulkRestoreOutcome} f
 
 import type {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
-import {observeCellsBackgroundActionJobs} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import {createBulkJobPollingPolicy} from '../../common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
 import {getCellsApiPath} from '../../common/getCellsApiPath/getCellsApiPath';
 import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';
-import type {SharedDriveMoveStatusKind} from '../../sharedDriveUploadStatusContext';
+import type {BackgroundActionObservation} from '../../sharedDriveBackgroundActionController';
+import type {SharedDriveMoveStatus, SharedDriveMoveStatusKind} from '../../sharedDriveUploadStatusContext';
 
 const REVIEW_REFRESH_DEADLINE_MS = 20_000;
 
@@ -48,13 +48,19 @@ export interface UseBulkRestoreOptions {
   readonly onStatusChange: (kind: SharedDriveMoveStatusKind) => void;
   readonly onStatusCleared: () => void;
   readonly reportError: (error: unknown) => void;
+  readonly observeBackgroundAction: (observation: BackgroundActionObservation) => void;
+  readonly publishStatus: (status: SharedDriveMoveStatus) => void;
 }
 
 export interface BulkRestoreState {
   readonly isPending: boolean;
   readonly isRefreshingReview: boolean;
   readonly reviewReason: BulkRestoreReviewReason | null;
-  readonly restore: (targets: readonly RestoreTarget[], scopeKey: string) => Promise<void>;
+  readonly restore: (
+    targets: readonly RestoreTarget[],
+    scopeKey: string,
+    status: SharedDriveMoveStatus,
+  ) => Promise<void>;
   readonly refreshReview: () => Promise<void>;
   readonly reset: () => void;
 }
@@ -72,17 +78,12 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
   const isRefreshingReviewRef = useRef(false);
   const reviewReasonRef = useRef<BulkRestoreReviewReason | null>(null);
   const generationRef = useRef(0);
-  const cancelJobObservationRef = useRef<(() => void) | undefined>(undefined);
 
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
       generationRef.current += 1;
-      if (isPendingRef.current) {
-        optionsRef.current.onStatusChange('status-unknown');
-      }
-      cancelJobObservationRef.current?.();
     };
   }, []);
 
@@ -111,29 +112,11 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
     return rootParent.Uuid;
   };
 
-  const observeJobs: BulkRestoreDependencies['observeJobs'] = jobUuids => {
-    return new Promise(resolve => {
-      const {cellsRepository, clock, random} = optionsRef.current;
-      const cancelObservation = observeCellsBackgroundActionJobs({
-        actionName: 'restore',
-        cellsRepository,
-        jobUuids,
-        clock,
-        pollingPolicy: createBulkJobPollingPolicy(random),
-        isCurrent: () => {
-          return isMountedRef.current;
-        },
-        onOutcome: resolve,
-      });
-      cancelJobObservationRef.current = () => {
-        cancelObservation();
-        // Stopping the polling yields no outcome, so settle the wait or the restore would never finish.
-        resolve('status-unknown');
-      };
-    });
-  };
-
-  const restore = async (targets: readonly RestoreTarget[], scopeKey: string): Promise<void> => {
+  const restore = async (
+    targets: readonly RestoreTarget[],
+    scopeKey: string,
+    status: SharedDriveMoveStatus,
+  ): Promise<void> => {
     if (isPendingRef.current || reviewReasonRef.current !== null || !optionsRef.current.isCurrentScope(scopeKey)) {
       return;
     }
@@ -142,6 +125,20 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
     const generation = ++generationRef.current;
     setIsPending(true);
     optionsRef.current.onStatusChange('processing');
+    const observeJobs: BulkRestoreDependencies['observeJobs'] = jobUuids => {
+      return new Promise(resolve => {
+        const {cellsRepository, clock, random, observeBackgroundAction} = optionsRef.current;
+        observeBackgroundAction({
+          actionName: 'restore',
+          cellsRepository,
+          status,
+          jobUuids,
+          clock,
+          pollingPolicy: createBulkJobPollingPolicy(random),
+          onOutcome: resolve,
+        });
+      });
+    };
     try {
       const outcome = await runBulkRestore({
         targets,
@@ -155,11 +152,12 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
         },
       });
       if (!isMountedRef.current || generationRef.current !== generation) {
+        optionsRef.current.publishStatus({...status, kind: outcome});
         return;
       }
       if (!optionsRef.current.isCurrentScope(scopeKey)) {
         // The view moved on: skip refreshing it, but do not leave the status popup stuck on processing.
-        optionsRef.current.onStatusChange(outcome);
+        optionsRef.current.publishStatus({...status, kind: outcome});
         return;
       }
 
@@ -170,7 +168,7 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
       }
       if (!optionsRef.current.isCurrentScope(scopeKey)) {
         // Refreshing can itself move the view (e.g. to the Bin root); still report so the popup is not left processing.
-        optionsRef.current.onStatusChange(statusKind);
+        optionsRef.current.publishStatus({...status, kind: statusKind});
         return;
       }
 
@@ -229,11 +227,6 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
 
   const reset = useCallback((): void => {
     generationRef.current += 1;
-    if (isPendingRef.current) {
-      optionsRef.current.onStatusChange('status-unknown');
-    }
-    cancelJobObservationRef.current?.();
-    cancelJobObservationRef.current = undefined;
     isPendingRef.current = false;
     isRefreshingReviewRef.current = false;
     reviewReasonRef.current = null;
