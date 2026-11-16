@@ -45,9 +45,7 @@ const AboutPreferences: FunctionComponent<AboutPreferencesProps> = ({selfUser}: 
   const websiteUrl = externalUrl.website;
   const privacyPolicyUrl = externalUrl.privacyPolicy;
   const desktopConfig = Config.getDesktopConfig();
-  const coreCryptoBuild = useMemo(() => {
-    return {version: coreCryptoVersion(), commit: buildMetadata().gitSha};
-  }, []);
+  const coreCryptoBuild = {version: coreCryptoVersion(), commit: buildMetadata().gitSha};
 
   const termsOfUseUrl = useMemo(() => {
     if (!isNullOrUndefined(selfUser)) {
