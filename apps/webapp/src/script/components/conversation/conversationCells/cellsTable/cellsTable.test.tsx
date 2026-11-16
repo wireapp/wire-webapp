@@ -27,7 +27,7 @@ import {BackendError} from '../../../../apiClient/http/backendError';
 import {StatusCode} from '../../../../apiClient/http';
 import {ThemeProvider, themes, THEME_ID} from '../../../../uiKit/identity/theme/theme';
 import {PrimaryModalComponent} from '../../../Modals/PrimaryModal/PrimaryModal';
-import {JobsTaskStatus} from 'cells-sdk-ts';
+import {JobsTaskStatus, RestActionStatus} from 'cells-sdk-ts';
 import {Maybe} from 'true-myth';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import type {Conversation} from '../../../../repositories/entity/Conversation';
@@ -780,6 +780,74 @@ describe('CellsTable selection', () => {
     });
     expect(deleteNodes).toHaveBeenCalledTimes(1);
     expect(getBackgroundActionInfo).toHaveBeenCalledWith({name: 'delete', jobUuid: 'delete-job'});
+  });
+
+  it('completes a move-to-bin job after leaving the Files table', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const deleteNodes = jest.fn().mockResolvedValue({
+      Status: 'Background',
+      BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+    });
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: 'Running'})
+      .mockResolvedValueOnce({Status: 'Finished'});
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    const table = renderCellsTable({
+      cellsRepository: {deleteNodes, getBackgroundActionInfo} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+      clock,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Move to Bin'}));
+    await waitFor(() => {
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+
+    table.hideTable();
+    expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+      await waitFor(() => {
+        expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
+    expect(onRefreshAfterBulkMoveToBinOutcome).not.toHaveBeenCalled();
+    table.showTable();
+    expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
+  });
+
+  it('starts move-to-bin observation when the request settles after leaving Files', async () => {
+    const user = userEvent.setup();
+    const request = Promise.withResolvers<Awaited<ReturnType<CellsRepository['deleteNodes']>>>();
+    const deleteNodes = jest.fn().mockReturnValue(request.promise);
+    const getBackgroundActionInfo = jest.fn().mockResolvedValue({Status: 'Finished'});
+    const table = renderCellsTable({
+      cellsRepository: {deleteNodes, getBackgroundActionInfo} as unknown as CellsRepository,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Move to Bin'}));
+    table.hideTable();
+
+    await act(async () => {
+      request.resolve({
+        Status: RestActionStatus.Background,
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      });
+      await request.promise;
+    });
+
+    await waitFor(() => {
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
   });
 
   it('retries failed Move to Bin status reads with jittered backoff without repeating the delete', async () => {
