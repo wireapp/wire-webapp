@@ -38,6 +38,17 @@ const testConfig: Config = {urls: APIClient.BACKEND.PRODUCTION};
 const apiClients: APIClient[] = [];
 
 describe('APIClient', () => {
+  beforeEach(() => {
+    if (!nock.isActive()) {
+      nock.activate();
+    }
+  });
+
+  afterEach(() => {
+    nock.cleanAll();
+    nock.restore();
+  });
+
   it('retains the final standalone SDK version independently of webapp releases', () => {
     expect(APIClient.VERSION).toBe('27.96.0');
   });
