@@ -20,7 +20,13 @@
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {Maybe} from 'true-myth';
 
-import {createOriginPrivateFileSystemLogStore, type LogDirectory} from './createOriginPrivateFileSystemLogStore';
+import {unwrap, unwrapErr} from '../util/test/resultTestSupport';
+
+import {
+  createOriginPrivateFileSystemLogStore,
+  type LogDirectory,
+  type LogStore,
+} from './createOriginPrivateFileSystemLogStore';
 import {
   logDirectoryName,
   logPersistenceConfiguration,
@@ -189,46 +195,139 @@ type TestStoreOptions = {
   readonly storage: ReturnType<typeof createTestDirectory>;
   readonly configuration?: LogPersistenceConfiguration;
   readonly sessionIdentifier?: string;
+  readonly accountIdentifier: Maybe<string>;
   readonly clock?: ReturnType<typeof createTestClock>;
 };
 
-function createStoreForTest(options: TestStoreOptions): ReturnType<typeof createOriginPrivateFileSystemLogStore> {
+function createStoreForTest(options: TestStoreOptions): LogStore {
   const {
     storage,
     configuration = logPersistenceConfiguration,
     sessionIdentifier = firstSessionIdentifier,
+    accountIdentifier,
     clock = createTestClock(),
   } = options;
 
-  return createOriginPrivateFileSystemLogStore({
-    async getDirectory() {
-      return storage.directory;
-    },
-    clock,
-    sessionIdentifier,
-    configuration,
-  });
+  return unwrap(
+    createOriginPrivateFileSystemLogStore({
+      async getDirectory() {
+        return storage.directory;
+      },
+      clock,
+      sessionIdentifier,
+      accountIdentifier,
+      configuration,
+    }),
+  );
 }
 
 describe('worker synchronous Origin Private File System log store', () => {
   it('writes exact JSONL, flushes once per batch, closes handles, and survives reinitialization', async () => {
     const storage = createTestDirectory();
-    const firstWriter = createStoreForTest({storage});
+    const firstWriter = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     const line = '{"msg":"[REDACTED]","escaped":"\\u0025","unicode":"€"}\n';
     await firstWriter.append([line, '{"second":true}\n']);
     expect(storage.state.flushCount).toBe(1);
     expect(storage.state.closeCount).toBe(1);
-    const secondWriter = createStoreForTest({storage, sessionIdentifier: secondSessionIdentifier});
+    const secondWriter = createStoreForTest({
+      storage,
+      sessionIdentifier: secondSessionIdentifier,
+      accountIdentifier: Maybe.nothing(),
+    });
     await secondWriter.append(['{"third":true}\n']);
 
     expect(readLogFileContents(storage)).toEqual([`${line}{"second":true}\n`, '{"third":true}\n']);
+    expect([...storage.files.keys()]).toEqual([
+      `log-1000000-${firstSessionIdentifier}-1.jsonl`,
+      `log-1000000-${secondSessionIdentifier}-1.jsonl`,
+    ]);
     expect(storage.state.writing).toBe(false);
+  });
+
+  it('suffixes account filenames and shares retention with legacy files and other accounts', async () => {
+    const storage = createTestDirectory();
+    const accountIdentifier = 'a'.repeat(64);
+    const legacyFilename = `log-999998-${firstSessionIdentifier}-1.jsonl`;
+    const otherAccountFilename = `log-999999-${firstSessionIdentifier}-1-${'b'.repeat(64)}.jsonl`;
+    const accountFilename = `log-1000000-${firstSessionIdentifier}-1-${accountIdentifier}.jsonl`;
+    storage.files.set(legacyFilename, encode('{}\n'));
+    storage.files.set(otherAccountFilename, encode('{}\n'));
+    const writer = createStoreForTest({
+      storage,
+      accountIdentifier: Maybe.just(accountIdentifier),
+      configuration: {
+        maximumFileBytes: logPersistenceConfiguration.maximumFileBytes,
+        maximumTotalBytes: 9,
+        maximumAgeMilliseconds: logPersistenceConfiguration.maximumAgeMilliseconds,
+        maximumPendingBytes: logPersistenceConfiguration.maximumPendingBytes,
+        batchTargetBytes: logPersistenceConfiguration.batchTargetBytes,
+        flushIntervalMilliseconds: logPersistenceConfiguration.flushIntervalMilliseconds,
+        workerResponseTimeoutMilliseconds: logPersistenceConfiguration.workerResponseTimeoutMilliseconds,
+      },
+    });
+
+    await writer.append(['{}\n']);
+
+    expect([...storage.files.keys()]).toEqual([legacyFilename, otherAccountFilename, accountFilename]);
+
+    await writer.append(['[]\n']);
+
+    expect([...storage.files.keys()]).toEqual([otherAccountFilename, accountFilename]);
+
+    await writer.append(['{}\n']);
+
+    expect([...storage.files.keys()]).toEqual([accountFilename]);
+    expect(readLogFileContents(storage)).toEqual(['{}\n[]\n{}\n']);
+  });
+
+  it.each([
+    '',
+    firstSessionIdentifier,
+    'account.example',
+    '../account',
+    'a'.repeat(63),
+    'a'.repeat(65),
+    'A'.repeat(64),
+    'g'.repeat(64),
+    `${'a'.repeat(63)}\n`,
+    `${'a'.repeat(64)}\n`,
+  ])('returns Err for invalid account identifier %j before accessing storage', accountIdentifier => {
+    const getDirectory = jest.fn(async () => {
+      throw new Error('Unexpected storage access');
+    });
+
+    const storeResult = createOriginPrivateFileSystemLogStore({
+      getDirectory,
+      clock: createTestClock(),
+      sessionIdentifier: firstSessionIdentifier,
+      accountIdentifier: Maybe.just(accountIdentifier),
+      configuration: logPersistenceConfiguration,
+    });
+
+    expect(unwrapErr(storeResult).message).toBe('Invalid log account identifier');
+    expect(getDirectory).not.toHaveBeenCalled();
+  });
+
+  it('returns Err for an invalid session identifier before accessing storage', () => {
+    const getDirectory = jest.fn(async () => {
+      throw new Error('Unexpected storage access');
+    });
+    const storeResult = createOriginPrivateFileSystemLogStore({
+      getDirectory,
+      clock: createTestClock(),
+      sessionIdentifier: 'invalid-session',
+      accountIdentifier: Maybe.nothing(),
+      configuration: logPersistenceConfiguration,
+    });
+
+    expect(unwrapErr(storeResult).message).toBe('Invalid log session identifier');
+    expect(getDirectory).not.toHaveBeenCalled();
   });
 
   it('handles short synchronous writes without splitting or changing multibyte records', async () => {
     const storage = createTestDirectory();
     storage.state.maximumWriteBytes = 1;
-    const writer = createStoreForTest({storage});
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     await writer.append(['"€"\n']);
 
     expect(readLogFileContents(storage)).toEqual(['"€"\n']);
@@ -239,7 +338,11 @@ describe('worker synchronous Origin Private File System log store', () => {
     const storage = createTestDirectory();
     const interruptedContents = '{"interrupted":';
     storage.files.set(`log-1000000-${firstSessionIdentifier}-1.jsonl`, encode(interruptedContents));
-    const writer = createStoreForTest({storage, sessionIdentifier: secondSessionIdentifier});
+    const writer = createStoreForTest({
+      storage,
+      sessionIdentifier: secondSessionIdentifier,
+      accountIdentifier: Maybe.nothing(),
+    });
     await writer.append(['{}\n']);
 
     expect(readLogFileContents(storage)).toEqual([interruptedContents, '{}\n']);
@@ -249,7 +352,7 @@ describe('worker synchronous Origin Private File System log store', () => {
   it('fails safely instead of looping if a synchronous write makes no progress', async () => {
     const storage = createTestDirectory();
     storage.state.maximumWriteBytes = 0;
-    const writer = createStoreForTest({storage});
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     await expect(writer.append(['{}\n'])).rejects.toThrow('Incomplete log file write');
 
     expect(storage.state.writing).toBe(false);
@@ -259,7 +362,7 @@ describe('worker synchronous Origin Private File System log store', () => {
   it('rejects legacy asynchronous access methods before writing and releases the handle', async () => {
     const storage = createTestDirectory();
     storage.state.legacySize = true;
-    const writer = createStoreForTest({storage});
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     await expect(writer.append(['{}\n'])).rejects.toThrow('Synchronous access handles are unsupported');
 
     expect(readLogFileContents(storage)).toEqual(['']);
@@ -272,7 +375,16 @@ describe('worker synchronous Origin Private File System log store', () => {
     const storage = createTestDirectory();
     const writer = createStoreForTest({
       storage,
-      configuration: {...logPersistenceConfiguration, maximumFileBytes: 6, maximumTotalBytes: 9},
+      configuration: {
+        maximumFileBytes: 6,
+        maximumTotalBytes: 9,
+        maximumAgeMilliseconds: logPersistenceConfiguration.maximumAgeMilliseconds,
+        maximumPendingBytes: logPersistenceConfiguration.maximumPendingBytes,
+        batchTargetBytes: logPersistenceConfiguration.batchTargetBytes,
+        flushIntervalMilliseconds: logPersistenceConfiguration.flushIntervalMilliseconds,
+        workerResponseTimeoutMilliseconds: logPersistenceConfiguration.workerResponseTimeoutMilliseconds,
+      },
+      accountIdentifier: Maybe.nothing(),
     });
     await writer.append(['{}\n', '{}\n']);
     await writer.append(['[]\n']);
@@ -284,7 +396,7 @@ describe('worker synchronous Origin Private File System log store', () => {
 
   it('fills a 10 MiB file exactly and rotates before the next complete record', async () => {
     const storage = createTestDirectory();
-    const writer = createStoreForTest({storage});
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     const filename = `log-1000000-${firstSessionIdentifier}-1.jsonl`;
     const maximumFileBytes = 10 * 1024 * 1024;
     await writer.append(['{}\n']);
@@ -312,7 +424,11 @@ describe('worker synchronous Origin Private File System log store', () => {
     for (const filename of filenames) {
       storage.files.set(filename, fullFileContents);
     }
-    const writer = createStoreForTest({storage, sessionIdentifier: secondSessionIdentifier});
+    const writer = createStoreForTest({
+      storage,
+      sessionIdentifier: secondSessionIdentifier,
+      accountIdentifier: Maybe.nothing(),
+    });
 
     await writer.append([]);
 
@@ -327,7 +443,7 @@ describe('worker synchronous Origin Private File System log store', () => {
   it('keeps files younger than seven days and expires them at seven days', async () => {
     const storage = createTestDirectory();
     const clock = createTestClock();
-    const writer = createStoreForTest({storage, clock});
+    const writer = createStoreForTest({storage, clock, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
 
     clock.advanceByMilliseconds(7 * 24 * 60 * 60 * 1000 - 1);
@@ -343,7 +459,7 @@ describe('worker synchronous Origin Private File System log store', () => {
 
   it('rolls back quota failures without evicting committed logs or unrelated storage', async () => {
     const storage = createTestDirectory();
-    const writer = createStoreForTest({storage});
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
     const committedFilename = `log-1000000-${firstSessionIdentifier}-1.jsonl`;
     storage.files.set('unrelated-account-file', encode('preserve this'));
@@ -368,7 +484,16 @@ describe('worker synchronous Origin Private File System log store', () => {
     const writer = createStoreForTest({
       storage,
       clock,
-      configuration: {...logPersistenceConfiguration, maximumFileBytes: 3, maximumAgeMilliseconds: 1000},
+      configuration: {
+        maximumFileBytes: 3,
+        maximumTotalBytes: logPersistenceConfiguration.maximumTotalBytes,
+        maximumAgeMilliseconds: 1000,
+        maximumPendingBytes: logPersistenceConfiguration.maximumPendingBytes,
+        batchTargetBytes: logPersistenceConfiguration.batchTargetBytes,
+        flushIntervalMilliseconds: logPersistenceConfiguration.flushIntervalMilliseconds,
+        workerResponseTimeoutMilliseconds: logPersistenceConfiguration.workerResponseTimeoutMilliseconds,
+      },
+      accountIdentifier: Maybe.nothing(),
     });
     await writer.append([]);
 
@@ -379,7 +504,7 @@ describe('worker synchronous Origin Private File System log store', () => {
   it('expires an active file and starts a new one for later records', async () => {
     const storage = createTestDirectory();
     const clock = createTestClock();
-    const writer = createStoreForTest({storage, clock});
+    const writer = createStoreForTest({storage, clock, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
     clock.advanceByMilliseconds(logPersistenceConfiguration.maximumAgeMilliseconds);
     await writer.append(['[]\n']);
@@ -389,7 +514,7 @@ describe('worker synchronous Origin Private File System log store', () => {
 
   it('recovers when the formerly active file is unexpectedly deleted', async () => {
     const storage = createTestDirectory();
-    const writer = createStoreForTest({storage});
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
     storage.files.clear();
     await writer.append(['[]\n']);
@@ -399,7 +524,7 @@ describe('worker synchronous Origin Private File System log store', () => {
 
   it('recovers when a listed file disappears before it can be read', async () => {
     const storage = createTestDirectory();
-    const writer = createStoreForTest({storage});
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
     storage.state.failure = 'missing';
     await writer.append(['[]\n']);
@@ -410,7 +535,7 @@ describe('worker synchronous Origin Private File System log store', () => {
 
   it.each(['write', 'flush'] as const)('rolls back a failed %s and can recover into a new file', async failure => {
     const storage = createTestDirectory();
-    const writer = createStoreForTest({storage});
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
     storage.state.failure = failure;
     await expect(writer.append(['[]\n'])).rejects.toThrow();
@@ -429,7 +554,7 @@ describe('worker synchronous Origin Private File System log store', () => {
 
   it('removes a partially written file when rollback cannot restore whole records', async () => {
     const storage = createTestDirectory();
-    const writer = createStoreForTest({storage});
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
     storage.state.failure = 'write';
     storage.state.maximumWriteBytes = 1;
@@ -442,7 +567,7 @@ describe('worker synchronous Origin Private File System log store', () => {
 
   it.each(['read', 'size', 'close'] as const)('closes handles and can recover after failed %s', async failure => {
     const storage = createTestDirectory();
-    const writer = createStoreForTest({storage});
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
     storage.state.failure = failure;
     await expect(writer.append(['[]\n'])).rejects.toThrow();
@@ -455,7 +580,7 @@ describe('worker synchronous Origin Private File System log store', () => {
 
   it('refuses to append to an interrupted record', async () => {
     const storage = createTestDirectory();
-    const writer = createStoreForTest({storage});
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
     for (const filename of storage.files.keys()) {
       storage.files.set(filename, encode('{"interrupted":'));
@@ -468,7 +593,19 @@ describe('worker synchronous Origin Private File System log store', () => {
 
   it('fails closed on a cleanup access conflict and recovers when the file is available', async () => {
     const storage = createTestDirectory();
-    const writer = createStoreForTest({storage, configuration: {...logPersistenceConfiguration, maximumTotalBytes: 3}});
+    const writer = createStoreForTest({
+      storage,
+      configuration: {
+        maximumFileBytes: logPersistenceConfiguration.maximumFileBytes,
+        maximumTotalBytes: 3,
+        maximumAgeMilliseconds: logPersistenceConfiguration.maximumAgeMilliseconds,
+        maximumPendingBytes: logPersistenceConfiguration.maximumPendingBytes,
+        batchTargetBytes: logPersistenceConfiguration.batchTargetBytes,
+        flushIntervalMilliseconds: logPersistenceConfiguration.flushIntervalMilliseconds,
+        workerResponseTimeoutMilliseconds: logPersistenceConfiguration.workerResponseTimeoutMilliseconds,
+      },
+      accountIdentifier: Maybe.nothing(),
+    });
     await writer.append(['{}\n']);
     storage.state.failure = 'remove';
     await expect(writer.append(['[]\n'])).rejects.toThrow('Cannot remove file');
@@ -482,7 +619,19 @@ describe('worker synchronous Origin Private File System log store', () => {
 
   it('rejects oversized batches', async () => {
     const storage = createTestDirectory();
-    const writer = createStoreForTest({storage, configuration: {...logPersistenceConfiguration, maximumFileBytes: 3}});
+    const writer = createStoreForTest({
+      storage,
+      configuration: {
+        maximumFileBytes: 3,
+        maximumTotalBytes: logPersistenceConfiguration.maximumTotalBytes,
+        maximumAgeMilliseconds: logPersistenceConfiguration.maximumAgeMilliseconds,
+        maximumPendingBytes: logPersistenceConfiguration.maximumPendingBytes,
+        batchTargetBytes: logPersistenceConfiguration.batchTargetBytes,
+        flushIntervalMilliseconds: logPersistenceConfiguration.flushIntervalMilliseconds,
+        workerResponseTimeoutMilliseconds: logPersistenceConfiguration.workerResponseTimeoutMilliseconds,
+      },
+      accountIdentifier: Maybe.nothing(),
+    });
     await expect(writer.append(['{}\n{}\n'])).rejects.toThrow('Log batch exceeds storage limits');
 
     expect(storage.files.size).toBe(0);
@@ -490,7 +639,7 @@ describe('worker synchronous Origin Private File System log store', () => {
 
   it('preserves committed logs after a file access conflict and recovers when access is available', async () => {
     const storage = createTestDirectory();
-    const writer = createStoreForTest({storage});
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
     storage.state.failure = 'open';
     await expect(writer.append(['[]\n'])).rejects.toMatchObject({name: 'NoModificationAllowedError'});
