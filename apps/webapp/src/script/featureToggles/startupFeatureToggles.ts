@@ -18,6 +18,7 @@
  */
 
 import {Maybe} from 'true-myth';
+import {setHas} from 'ts-extras';
 
 import {StartupFeatureToggleName, startupFeatureToggleNames} from './startupFeatureToggleNames';
 
@@ -42,16 +43,14 @@ function isNonEmptyFeatureToggleName(featureToggleName: string): boolean {
   return featureToggleName.length > 0;
 }
 
-function isAllowedStartupFeatureToggleName(featureToggleName: string): featureToggleName is StartupFeatureToggleName {
-  return allowedStartupFeatureToggleNameSet.has(featureToggleName as StartupFeatureToggleName);
-}
-
 function toEnabledFeatureToggleNameList(serializedFeatureToggleNames: string): readonly StartupFeatureToggleName[] {
   return serializedFeatureToggleNames
     .split(',')
     .map(trimFeatureToggleName)
     .filter(isNonEmptyFeatureToggleName)
-    .filter(isAllowedStartupFeatureToggleName);
+    .filter(featureToggleName => {
+      return setHas(allowedStartupFeatureToggleNameSet, featureToggleName);
+    });
 }
 
 function readEnabledFeatureToggleNameListFromLocationSearch(

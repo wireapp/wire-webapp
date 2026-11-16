@@ -17,6 +17,8 @@
  *
  */
 
+import {objectEntries} from 'ts-extras';
+
 import {FileType} from './fileType';
 
 const extensions: Record<Exclude<FileType, 'other'>, string[]> = {
@@ -66,9 +68,9 @@ const extensions: Record<Exclude<FileType, 'other'>, string[]> = {
 export const getFileTypeFromExtension = (extension: string): FileType => {
   const ext = extension.toLowerCase().replace(/^\./, '');
 
-  const type = Object.entries(extensions).find(([, fileExtensions]) => {
+  const type = objectEntries(extensions).find(([, fileExtensions]) => {
     return fileExtensions.includes(ext);
-  })?.[0] as FileType | undefined;
+  })?.[0];
 
   return type ?? 'other';
 };

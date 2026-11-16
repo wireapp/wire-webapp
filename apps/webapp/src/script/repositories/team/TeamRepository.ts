@@ -20,7 +20,7 @@
 import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {task} from 'true-myth';
-import {isDefined} from 'ts-extras';
+import {isDefined, objectEntries} from 'ts-extras';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
@@ -280,8 +280,8 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       return undefined;
     }
 
-    const missingPreviousFeature = Object.entries(previousFeatures ?? {}).some(([key, previousValue]) => {
-      return previousValue !== undefined && (features as Record<string, unknown>)[key] === undefined;
+    const missingPreviousFeature = objectEntries(previousFeatures ?? {}).some(([key, previousValue]) => {
+      return previousValue !== undefined && features[key] === undefined;
     });
     // Compatibility defaults may include optional features the backend never supplied.
     if (missingPreviousFeature && !this.teamState.isTeamFeatureConfigFallback()) {

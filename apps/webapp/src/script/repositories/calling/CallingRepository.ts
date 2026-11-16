@@ -23,6 +23,7 @@ import axios from 'axios';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
 import {Maybe} from 'true-myth';
+import {objectEntries, objectFromEntries} from 'ts-extras';
 import {container} from 'tsyringe';
 import 'webrtc-adapter';
 import {z} from 'zod';
@@ -976,11 +977,13 @@ export class CallingRepository {
       screen: selfParticipant.videoStream(),
     };
 
-    const missingStreams = Object.fromEntries(
-      Object.entries(query).filter(([type, requested]) => {
-        return requested === true && isUndefined(currentStreams[type as keyof typeof currentStreams]);
+    const missingStreams = objectFromEntries(
+      objectEntries(query).filter((streamRequest: readonly [keyof MediaStreamQuery, boolean | undefined]) => {
+        const [type, requested] = streamRequest;
+
+        return requested === true && isUndefined(currentStreams[type]);
       }),
-    ) as MediaStreamQuery;
+    );
 
     if (Object.keys(missingStreams).length === 0) {
       return selfParticipant.getMediaStream();
