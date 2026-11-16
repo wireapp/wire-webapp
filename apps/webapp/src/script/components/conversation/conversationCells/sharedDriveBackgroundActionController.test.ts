@@ -19,7 +19,8 @@
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
-import {createSharedDriveBackgroundMoveController} from './sharedDriveBackgroundMoveController';
+import {createBulkJobPollingPolicy} from './common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
+import {createSharedDriveBackgroundActionController} from './sharedDriveBackgroundActionController';
 import type {observeCellsBackgroundActionJobs} from './common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import type {SharedDriveMoveStatus} from './sharedDriveUploadStatusContext';
 
@@ -32,7 +33,7 @@ const status: SharedDriveMoveStatus = {
   destinationPath: 'Reports',
 };
 
-describe('createSharedDriveBackgroundMoveController', () => {
+describe('createSharedDriveBackgroundActionController', () => {
   it('keeps observing until the move completes and publishes the result', () => {
     const publishStatus = jest.fn();
     const onOutcome = jest.fn();
@@ -42,15 +43,16 @@ describe('createSharedDriveBackgroundMoveController', () => {
       observed = options;
       return cancel;
     });
-    const controller = createSharedDriveBackgroundMoveController(publishStatus, observeJobs);
+    const controller = createSharedDriveBackgroundActionController(publishStatus, observeJobs);
     const request = {
+      actionName: 'move' as const,
       status,
       jobUuids: ['job-1'],
       cellsRepository: {getBackgroundMoveInfo: jest.fn()},
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
-      random: () => {
+      pollingPolicy: createBulkJobPollingPolicy(() => {
         return 0.5;
-      },
+      }),
       onOutcome,
     };
 
@@ -70,46 +72,74 @@ describe('createSharedDriveBackgroundMoveController', () => {
   it('does not republish the originating view’s review callback, which stops working once that view is gone', () => {
     const publishStatus = jest.fn();
     let observed: Parameters<typeof observeCellsBackgroundActionJobs>[0] | undefined;
-    const controller = createSharedDriveBackgroundMoveController(publishStatus, options => {
+    const controller = createSharedDriveBackgroundActionController(publishStatus, options => {
       observed = options;
       return jest.fn();
     });
 
     controller.start({
-      status: {...status, onReview: jest.fn(), isReviewing: true},
+      actionName: 'restore',
+      status: {...status, action: 'restore', onReview: jest.fn(), isReviewing: true},
       jobUuids: ['job-1'],
-      cellsRepository: {getBackgroundMoveInfo: jest.fn()},
+      cellsRepository: {getBackgroundActionInfo: jest.fn()},
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
-      random: () => {
+      pollingPolicy: createBulkJobPollingPolicy(() => {
         return 0.5;
-      },
+      }),
       onOutcome: jest.fn(),
     });
     observed?.onStatusSnapshot?.([]);
     observed?.onOutcome('mixed-terminal');
 
-    expect(publishStatus).toHaveBeenNthCalledWith(1, status);
-    expect(publishStatus).toHaveBeenNthCalledWith(2, {...status, kind: 'partial'});
+    const restoreStatus = {...status, action: 'restore'};
+    expect(publishStatus).toHaveBeenNthCalledWith(1, restoreStatus);
+    expect(publishStatus).toHaveBeenNthCalledWith(2, {...restoreStatus, kind: 'partial'});
   });
 
   it('cancels in-flight polling when the app status provider is disposed', () => {
     const cancel = jest.fn();
-    const controller = createSharedDriveBackgroundMoveController(jest.fn(), () => {
+    const controller = createSharedDriveBackgroundActionController(jest.fn(), () => {
       return cancel;
     });
 
     controller.start({
+      actionName: 'move',
       status,
       jobUuids: ['job-1'],
       cellsRepository: {getBackgroundMoveInfo: jest.fn()},
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
-      random: () => {
+      pollingPolicy: createBulkJobPollingPolicy(() => {
         return 0.5;
-      },
+      }),
       onOutcome: jest.fn(),
     });
     controller.stopAll();
 
     expect(cancel).toHaveBeenCalledTimes(1);
+  });
+
+  it('observes a move-to-bin job through the delete endpoint', () => {
+    const publishStatus = jest.fn();
+    let observed: Parameters<typeof observeCellsBackgroundActionJobs>[0] | undefined;
+    const controller = createSharedDriveBackgroundActionController(publishStatus, options => {
+      observed = options;
+      return jest.fn();
+    });
+
+    controller.start({
+      actionName: 'delete',
+      status: {...status, id: 'move-to-bin'},
+      jobUuids: ['delete-job'],
+      cellsRepository: {getBackgroundActionInfo: jest.fn()},
+      clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+      pollingPolicy: createBulkJobPollingPolicy(() => {
+        return 0.5;
+      }),
+      onOutcome: jest.fn(),
+    });
+
+    expect(observed?.actionName).toBe('delete');
+    observed?.onOutcome('all-finished');
+    expect(publishStatus).toHaveBeenLastCalledWith({...status, id: 'move-to-bin', kind: 'completed'});
   });
 });

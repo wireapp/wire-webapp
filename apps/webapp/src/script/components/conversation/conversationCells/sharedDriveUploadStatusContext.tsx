@@ -31,9 +31,9 @@ import {
 import {Maybe, maybe} from 'true-myth';
 
 import {
-  createSharedDriveBackgroundMoveController,
-  type BackgroundMoveObservation,
-} from './sharedDriveBackgroundMoveController';
+  createSharedDriveBackgroundActionController,
+  type BackgroundActionObservation,
+} from './sharedDriveBackgroundActionController';
 import type {DismissedUpload} from './sharedDriveUploadStatus';
 
 export interface SharedDriveMoveItem {
@@ -71,7 +71,7 @@ type SharedDriveUploadStatusContextValue = {
   readonly createMoveStatusId: () => string;
   readonly dismissMoveStatus: (id: string) => void;
   readonly clearMoveStatus: (id: string) => void;
-  readonly observeBackgroundMove: (observation: BackgroundMoveObservation) => void;
+  readonly observeBackgroundAction: (observation: BackgroundActionObservation) => void;
   readonly isProvided: boolean;
 };
 
@@ -95,7 +95,7 @@ const SharedDriveUploadStatusContext = createContext<SharedDriveUploadStatusCont
   clearMoveStatus: () => {
     return undefined;
   },
-  observeBackgroundMove: () => {
+  observeBackgroundAction: () => {
     return undefined;
   },
   isProvided: false,
@@ -137,8 +137,8 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
       return new Map(current).set(status.conversationQualifiedId, status);
     });
   }, []);
-  const [backgroundMoveController] = useState(() => {
-    return createSharedDriveBackgroundMoveController(updateMoveStatus);
+  const [backgroundActionController] = useState(() => {
+    return createSharedDriveBackgroundActionController(updateMoveStatus);
   });
   const previousScopeKey = useRef(resetOnScopeChange);
   useEffect(() => {
@@ -156,8 +156,8 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
     setMoveStatuses(new Map());
   }, [backgroundMoveController, resetOnScopeChange]);
   useEffect(() => {
-    return backgroundMoveController.stopAll;
-  }, [backgroundMoveController]);
+    return backgroundActionController.stopAll;
+  }, [backgroundActionController]);
   const dismissMoveStatus = useCallback((id: string) => {
     dismissedMoveStatusIds.current.add(id);
     setMoveStatuses(current => {
@@ -195,7 +195,7 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
         createMoveStatusId,
         dismissMoveStatus,
         clearMoveStatus,
-        observeBackgroundMove: backgroundMoveController.start,
+        observeBackgroundAction: backgroundActionController.start,
         isProvided: true,
       }}
     >
