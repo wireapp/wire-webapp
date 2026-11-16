@@ -17,8 +17,9 @@
  *
  */
 
-import {isArray, isPlainObject, isSafeInteger, isString} from '@sindresorhus/is';
+import {isArray, isObject, isPlainObject, isSafeInteger, isString} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
+import {objectHasOwn} from 'ts-extras';
 
 const accountIdentifierLength = 64;
 
@@ -90,6 +91,10 @@ function parseBatch(value: unknown, maximumBatchBytes: number): Maybe<readonly s
   }
 
   return Maybe.just(value);
+}
+
+export function isLogWorkerAccountBindingAttempt(value: unknown): boolean {
+  return isObject(value) && objectHasOwn(value, 'type') && value.type === 'bind-account';
 }
 
 export function parseLogWorkerRequest(value: unknown, maximumBatchBytes: number): Maybe<LogWorkerRequest> {

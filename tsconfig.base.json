@@ -19,10 +19,11 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     // Temporary compatibility mapping: legacy CommonJS projects cannot resolve
-    // the ESM-only package's declaration through package exports. Remove this
+    // ESM-only packages' declarations through package exports. Remove this
     // when those projects are migrated deliberately to modern resolution.
     "paths": {
-      "@sindresorhus/is": ["node_modules/@sindresorhus/is/distribution/index.d.ts"]
+      "@sindresorhus/is": ["node_modules/@sindresorhus/is/distribution/index.d.ts"],
+      "ts-extras": ["node_modules/ts-extras/distribution/index.d.ts"]
     },
     "noUnusedLocals": true,
     "resolveJsonModule": true,

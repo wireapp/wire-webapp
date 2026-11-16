@@ -29,6 +29,7 @@ process.env.TZ = 'UTC';
 const esmPackagesToTransform = [
   '@enormora/fire-and-forget',
   'true-myth',
+  'ts-extras',
   'p-timeout',
   'p-queue',
   'eventemitter3',

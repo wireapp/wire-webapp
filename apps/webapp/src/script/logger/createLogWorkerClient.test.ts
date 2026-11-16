@@ -29,6 +29,106 @@ function createTestClock(): ReturnType<typeof createDeterministicClock> {
 }
 
 describe('bounded log worker client', () => {
+  it('binds before the first append without sending an implicit initialization afterward', async () => {
+    const worker = createLogWorkerConnectionForTest();
+    const client = createLogWorkerClient({
+      connection: worker.connection,
+      clock: createTestClock(),
+      responseTimeoutMilliseconds: 1000,
+    });
+    worker.state.onPost = function respond(request): void {
+      worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+    };
+    const accountIdentifier = 'a'.repeat(64);
+    await client.bindAccount(accountIdentifier);
+    await client.append(['{}\n']);
+    await client.append([]);
+
+    expect(worker.requests).toEqual([
+      {type: 'bind-account', requestIdentifier: 1, accountIdentifier},
+      {type: 'append', requestIdentifier: 2, lines: ['{}\n']},
+      {type: 'flush', requestIdentifier: 3},
+    ]);
+  });
+
+  it('binds after initialization using the existing request acknowledgement mechanism', async () => {
+    const worker = createLogWorkerConnectionForTest();
+    const client = createLogWorkerClient({
+      connection: worker.connection,
+      clock: createTestClock(),
+      responseTimeoutMilliseconds: 1000,
+    });
+    worker.state.onPost = function respond(request): void {
+      worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+    };
+    const accountIdentifier = 'a'.repeat(64);
+    await client.append(['{"before":true}\n']);
+    await client.bindAccount(accountIdentifier);
+    await client.append(['{"after":true}\n']);
+
+    expect(worker.requests).toEqual([
+      {type: 'initialize', requestIdentifier: 1},
+      {type: 'append', requestIdentifier: 2, lines: ['{"before":true}\n']},
+      {type: 'bind-account', requestIdentifier: 3, accountIdentifier},
+      {type: 'append', requestIdentifier: 4, lines: ['{"after":true}\n']},
+    ]);
+  });
+
+  it('propagates failed binding to the caller', async () => {
+    const worker = createLogWorkerConnectionForTest();
+    const client = createLogWorkerClient({
+      connection: worker.connection,
+      clock: createTestClock(),
+      responseTimeoutMilliseconds: 1000,
+    });
+    const binding = client.bindAccount('a'.repeat(64));
+    const rejectedBinding = expect(binding).rejects.toThrow('Log persistence worker rejected the operation');
+    worker.emitMessage({requestIdentifier: 1, outcome: 'failed'});
+
+    await rejectedBinding;
+    expect(worker.requests).toEqual([{type: 'bind-account', requestIdentifier: 1, accountIdentifier: 'a'.repeat(64)}]);
+  });
+
+  it('rejects overlapping commands while binding is awaiting acknowledgement', async () => {
+    const worker = createLogWorkerConnectionForTest();
+    const client = createLogWorkerClient({
+      connection: worker.connection,
+      clock: createTestClock(),
+      responseTimeoutMilliseconds: 1000,
+    });
+    const accountIdentifier = 'a'.repeat(64);
+    const binding = client.bindAccount(accountIdentifier);
+    await expect(client.append(['{}\n'])).rejects.toThrow('not accepting commands');
+    await expect(client.bindAccount('b'.repeat(64))).rejects.toThrow('not accepting commands');
+    expect(worker.requests).toEqual([{type: 'bind-account', requestIdentifier: 1, accountIdentifier}]);
+
+    worker.emitMessage({requestIdentifier: 1, outcome: 'complete'});
+    await binding;
+    const writing = client.append(['{}\n']);
+    worker.emitMessage({requestIdentifier: 2, outcome: 'complete'});
+    await writing;
+
+    expect(worker.requests).toEqual([
+      {type: 'bind-account', requestIdentifier: 1, accountIdentifier},
+      {type: 'append', requestIdentifier: 2, lines: ['{}\n']},
+    ]);
+  });
+
+  it('rejects binding while another request is awaiting acknowledgement', async () => {
+    const worker = createLogWorkerConnectionForTest();
+    const client = createLogWorkerClient({
+      connection: worker.connection,
+      clock: createTestClock(),
+      responseTimeoutMilliseconds: 1000,
+    });
+    const initializing = client.append([]);
+    await expect(client.bindAccount('a'.repeat(64))).rejects.toThrow('not accepting commands');
+    worker.emitMessage({requestIdentifier: 1, outcome: 'complete'});
+    await initializing;
+
+    expect(worker.requests).toEqual([{type: 'initialize', requestIdentifier: 1}]);
+  });
+
   it('initializes before forwarding ordered sanitized lines and supports explicit flush and shutdown', async () => {
     const worker = createLogWorkerConnectionForTest();
     const client = createLogWorkerClient({

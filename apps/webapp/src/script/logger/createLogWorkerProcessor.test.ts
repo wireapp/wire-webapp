@@ -251,6 +251,63 @@ describe('log worker message processing', () => {
     expect(respond).toHaveBeenLastCalledWith({requestIdentifier: 4, outcome: 'failed'});
   });
 
+  it('stops unattributed logging for a binding attempt with an invalid request identifier', async () => {
+    const append = jest.fn<Promise<void>, [readonly string[]]>();
+    const initialize = jest.fn(() => {
+      return Maybe.just({append});
+    });
+    const respond = jest.fn();
+    const close = jest.fn();
+    const processor = createLogWorkerProcessor({initialize, respond, close, maximumBatchBytes: 256});
+    await processor.receive({type: 'append', requestIdentifier: 1, lines: ['{}\n']});
+    await processor.receive({type: 'bind-account', requestIdentifier: -1, accountIdentifier: 'a'.repeat(64)});
+    expect(respond).toHaveBeenLastCalledWith({requestIdentifier: 0, outcome: 'failed'});
+    await processor.receive({type: 'append', requestIdentifier: 2, lines: ['[]\n']});
+
+    expect(append.mock.calls).toEqual([[['{}\n']]]);
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(respond).toHaveBeenLastCalledWith({requestIdentifier: 2, outcome: 'failed'});
+  });
+
+  it('keeps an initialized worker available after a malformed non-binding command', async () => {
+    const append = jest.fn<Promise<void>, [readonly string[]]>();
+    const initialize = jest.fn(() => {
+      return Maybe.just({append});
+    });
+    const respond = jest.fn();
+    const close = jest.fn();
+    const processor = createLogWorkerProcessor({initialize, respond, close, maximumBatchBytes: 256});
+    await processor.receive({type: 'append', requestIdentifier: 1, lines: ['{}\n']});
+    await processor.receive({type: 'append', requestIdentifier: 2, lines: ['unterminated']});
+    expect(respond).toHaveBeenLastCalledWith({requestIdentifier: 0, outcome: 'failed'});
+    await processor.receive({type: 'append', requestIdentifier: 3, lines: ['[]\n']});
+
+    expect(initialize).toHaveBeenCalledTimes(1);
+    expect(append.mock.calls).toEqual([[['{}\n']], [['[]\n']]]);
+    expect(close).not.toHaveBeenCalled();
+    expect(respond).toHaveBeenLastCalledWith({requestIdentifier: 3, outcome: 'complete'});
+  });
+
+  it('ignores an inherited binding command type without stopping persistence', async () => {
+    const append = jest.fn<Promise<void>, [readonly string[]]>();
+    const initialize = jest.fn(() => {
+      return Maybe.just({append});
+    });
+    const respond = jest.fn();
+    const close = jest.fn();
+    const processor = createLogWorkerProcessor({initialize, respond, close, maximumBatchBytes: 256});
+    const inheritedBindingAttempt: unknown = Object.create({type: 'bind-account'});
+    await processor.receive(inheritedBindingAttempt);
+
+    expect(initialize).not.toHaveBeenCalled();
+    expect(respond).toHaveBeenLastCalledWith({requestIdentifier: 0, outcome: 'failed'});
+    await processor.receive({type: 'append', requestIdentifier: 1, lines: ['{}\n']});
+
+    expect(close).not.toHaveBeenCalled();
+    expect(append).toHaveBeenCalledWith(['{}\n']);
+    expect(respond).toHaveBeenLastCalledWith({requestIdentifier: 1, outcome: 'complete'});
+  });
+
   it('stops unattributed logging when binding is rejected during an in-flight write', async () => {
     const blockedWrite = Promise.withResolvers<void>();
     const append = jest.fn(() => {
@@ -335,12 +392,21 @@ describe('log worker message processing', () => {
     {type: 'flush', requestIdentifier: -1},
     {type: 'raw-record', requestIdentifier: 1, record: {message: 'unsafe'}},
   ])('rejects malformed or oversized messages without invoking storage: %j', async message => {
-    const initialize = jest.fn();
+    const append = jest.fn<Promise<void>, [readonly string[]]>();
+    const initialize = jest.fn(() => {
+      return Maybe.just({append});
+    });
     const respond = jest.fn();
-    const processor = createLogWorkerProcessor({initialize, respond, close() {}, maximumBatchBytes: 6});
+    const close = jest.fn();
+    const processor = createLogWorkerProcessor({initialize, respond, close, maximumBatchBytes: 6});
     await processor.receive(message);
 
     expect(initialize).not.toHaveBeenCalled();
     expect(respond).toHaveBeenCalledWith({requestIdentifier: 0, outcome: 'failed'});
+    await processor.receive({type: 'append', requestIdentifier: 2, lines: ['{}\n']});
+
+    expect(close).not.toHaveBeenCalled();
+    expect(append).toHaveBeenCalledWith(['{}\n']);
+    expect(respond).toHaveBeenLastCalledWith({requestIdentifier: 2, outcome: 'complete'});
   });
 });

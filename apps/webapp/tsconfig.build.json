@@ -6,6 +6,7 @@
     "declarationMap": false,
     "paths": {
       "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
+      "ts-extras": ["../../node_modules/ts-extras/distribution/index.d.ts"],
       "@enormora/clock/clock": ["../../node_modules/@enormora/clock/clock.entry-point.d.ts"],
     }
   },

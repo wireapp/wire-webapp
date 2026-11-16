@@ -18,10 +18,14 @@
  */
 
 import {Maybe} from 'true-myth';
-import {match, P} from 'ts-pattern';
 
 import type {LogStore} from './createOriginPrivateFileSystemLogStore';
-import {parseLogWorkerRequest, type LogWorkerCommand, type LogWorkerResponse} from './logWorkerProtocol';
+import {
+  isLogWorkerAccountBindingAttempt,
+  parseLogWorkerRequest,
+  type LogWorkerCommand,
+  type LogWorkerResponse,
+} from './logWorkerProtocol';
 
 type LogWorkerProcessorOptions = {
   readonly initialize: (accountIdentifier: Maybe<string>) => Maybe<LogStore>;
@@ -34,19 +38,6 @@ type LogWorkerProcessor = {
   readonly receive: (message: unknown) => Promise<void>;
 };
 
-type LogWorkerStorageState = {
-  readonly accountIdentifier: Maybe<string>;
-  readonly store: Maybe<LogStore>;
-};
-
-type LogWorkerCommandPlan =
-  | {readonly type: 'shutdown'}
-  | {
-      readonly type: 'persist';
-      readonly storage: LogWorkerStorageState;
-      readonly lines: readonly string[];
-    };
-
 function isWorkerAcceptingCommands(workerIsBusy: boolean, workerIsStopped: boolean): boolean {
   return !workerIsBusy && !workerIsStopped;
 }
@@ -55,37 +46,10 @@ function shouldStopAfterRejectedBinding(command: LogWorkerCommand, workerIsStopp
   return command.type === 'bind-account' && !workerIsStopped;
 }
 
-function planLogWorkerCommand(command: LogWorkerCommand, storage: LogWorkerStorageState): LogWorkerCommandPlan {
-  return match(command)
-    .returnType<LogWorkerCommandPlan>()
-    .with({type: 'shutdown'}, () => {
-      return {type: 'shutdown'};
-    })
-    .with({type: 'bind-account'}, bindingCommand => {
-      const isSameAccount = storage.accountIdentifier.unwrapOr('') === bindingCommand.accountIdentifier;
-
-      return {
-        type: 'persist',
-        storage: {
-          accountIdentifier: Maybe.just(bindingCommand.accountIdentifier),
-          // Batches release their handles, so switching stores preserves earlier unattributed files.
-          store: isSameAccount ? storage.store : Maybe.nothing(),
-        },
-        lines: [],
-      };
-    })
-    .with({type: 'append'}, appendCommand => {
-      return {type: 'persist', storage, lines: appendCommand.lines};
-    })
-    .with({type: P.union('initialize', 'flush')}, () => {
-      return {type: 'persist', storage, lines: []};
-    })
-    .exhaustive();
-}
-
 export function createLogWorkerProcessor(options: LogWorkerProcessorOptions): LogWorkerProcessor {
   const {initialize, respond, close, maximumBatchBytes} = options;
-  let storage: LogWorkerStorageState = {accountIdentifier: Maybe.nothing(), store: Maybe.nothing()};
+  let store: Maybe<LogStore> = Maybe.nothing();
+  let accountIdentifier: Maybe<string> = Maybe.nothing();
   let busy = false;
   let stopped = false;
 
@@ -110,15 +74,18 @@ export function createLogWorkerProcessor(options: LogWorkerProcessorOptions): Lo
     const request = parseLogWorkerRequest(message, maximumBatchBytes);
     if (request.isNothing) {
       respondSafely({requestIdentifier: 0, outcome: 'failed'});
-      closeSafely();
+      if (isLogWorkerAccountBindingAttempt(message)) {
+        closeSafely();
+      }
 
       return;
     }
 
-    const {requestIdentifier} = request.value;
+    const command = request.value;
+    const {requestIdentifier} = command;
     if (!isWorkerAcceptingCommands(busy, stopped)) {
       respondSafely({requestIdentifier, outcome: 'failed'});
-      if (shouldStopAfterRejectedBinding(request.value, stopped)) {
+      if (shouldStopAfterRejectedBinding(command, stopped)) {
         closeSafely();
       }
 
@@ -127,10 +94,9 @@ export function createLogWorkerProcessor(options: LogWorkerProcessorOptions): Lo
 
     busy = true;
     try {
-      const plan = planLogWorkerCommand(request.value, storage);
-      if (plan.type === 'shutdown') {
-        if (storage.store.isJust) {
-          await storage.store.value.append([]);
+      if (command.type === 'shutdown') {
+        if (store.isJust) {
+          await store.value.append([]);
         }
 
         respondSafely({requestIdentifier, outcome: 'complete'});
@@ -139,23 +105,30 @@ export function createLogWorkerProcessor(options: LogWorkerProcessorOptions): Lo
         return;
       }
 
-      storage = plan.storage;
-      if (storage.store.isNothing) {
-        storage = {...storage, store: initialize(storage.accountIdentifier)};
+      if (command.type === 'bind-account') {
+        if (accountIdentifier.unwrapOr('') !== command.accountIdentifier) {
+          accountIdentifier = Maybe.just(command.accountIdentifier);
+          // Batches release their handles, so switching stores preserves earlier unattributed files.
+          store = Maybe.nothing();
+        }
       }
 
-      if (storage.store.isNothing) {
+      if (store.isNothing) {
+        store = initialize(accountIdentifier);
+      }
+
+      if (store.isNothing) {
         respondSafely({requestIdentifier, outcome: 'unsupported'});
         closeSafely();
 
         return;
       }
 
-      await storage.store.value.append(plan.lines);
+      await store.value.append(command.type === 'append' ? command.lines : []);
       respondSafely({requestIdentifier, outcome: 'complete'});
     } catch {
       respondSafely({requestIdentifier, outcome: 'failed'});
-      if (request.value.type === 'bind-account') {
+      if (command.type === 'bind-account') {
         closeSafely();
       }
     } finally {
