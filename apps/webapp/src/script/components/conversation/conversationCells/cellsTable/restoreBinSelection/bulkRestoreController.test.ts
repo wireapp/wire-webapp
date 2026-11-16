@@ -126,4 +126,31 @@ describe('createBulkRestoreController', () => {
     expect(publishStatus).toHaveBeenCalledWith({...status, kind: 'completed'});
     expect(onRefreshAndReportSuccess).not.toHaveBeenCalled();
   });
+
+  it.each([
+    {didRefresh: true, expectedKind: 'completed'},
+    {didRefresh: false, expectedKind: 'finished-unknown'},
+  ])(
+    'publishes the outcome when the view disposes during the refresh after a restore (refreshed: $didRefresh)',
+    async ({didRefresh, expectedKind}) => {
+      const refresh = Promise.withResolvers<boolean>();
+      const refreshStarted = Promise.withResolvers<void>();
+      const {options, onRefreshAndReportSuccess, publishStatus} = createOptions(
+        jest.fn().mockResolvedValue({Status: RestActionStatus.Performed}),
+      );
+      onRefreshAndReportSuccess.mockImplementation(() => {
+        refreshStarted.resolve();
+        return refresh.promise;
+      });
+      const controller = createBulkRestoreController(options);
+
+      const restoring = controller.restore([target], 'bin-scope', status);
+      await refreshStarted.promise;
+      controller.dispose();
+      refresh.resolve(didRefresh);
+      await restoring;
+
+      expect(publishStatus).toHaveBeenCalledWith({...status, kind: expectedKind});
+    },
+  );
 });
