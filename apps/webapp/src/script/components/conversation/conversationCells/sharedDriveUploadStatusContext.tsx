@@ -31,10 +31,10 @@ import {
 import {Maybe, maybe} from 'true-myth';
 
 import {
-  createSharedDriveBackgroundMoveController,
-  type BackgroundMoveObservation,
+  createSharedDriveBackgroundActionController,
+  type BackgroundActionObservation,
   type BackgroundMoveOperation,
-} from './sharedDriveBackgroundMoveController';
+} from './sharedDriveBackgroundActionController';
 import type {SharedDriveMoveStatus} from './sharedDriveMoveStatus';
 import type {DismissedUpload} from './sharedDriveUploadStatus';
 
@@ -58,7 +58,7 @@ type SharedDriveUploadStatusContextValue = {
   readonly setMoveJobUuids: (id: string, jobUuids: readonly string[]) => void;
   readonly dismissMoveStatus: (id: string) => void;
   readonly clearMoveStatus: (id: string) => void;
-  readonly observeBackgroundMove: (observation: BackgroundMoveObservation) => void;
+  readonly observeBackgroundAction: (observation: BackgroundActionObservation) => void;
   readonly isProvided: boolean;
 };
 
@@ -94,7 +94,7 @@ const SharedDriveUploadStatusContext = createContext<SharedDriveUploadStatusCont
   clearMoveStatus: () => {
     return undefined;
   },
-  observeBackgroundMove: () => {
+  observeBackgroundAction: () => {
     return undefined;
   },
   isProvided: false,
@@ -172,18 +172,18 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
     },
     [isMoveStatusCurrent],
   );
-  const [backgroundMoveController] = useState(() => {
-    return createSharedDriveBackgroundMoveController(updateMoveStatus);
+  const [backgroundActionController] = useState(() => {
+    return createSharedDriveBackgroundActionController(updateMoveStatus);
   });
   const startMoveStatus = useCallback(
     (status: SharedDriveMoveStatus) => {
       currentMoveIds.current.set(status.conversationQualifiedId, {id: status.id, scopeKey: currentScopeKey.current});
-      backgroundMoveController.register(status);
+      backgroundActionController.register(status);
       setMoveStatuses(current => {
         return new Map(current).set(status.conversationQualifiedId, status);
       });
     },
-    [backgroundMoveController],
+    [backgroundActionController],
   );
   const previousScopeKey = useRef(resetOnScopeChange);
   useEffect(() => {
@@ -196,14 +196,14 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
     ) {
       return;
     }
-    backgroundMoveController.stopAll();
+    backgroundActionController.stopAll();
     currentMoveIds.current.clear();
     dismissedMoveStatusIds.current.clear();
     setMoveStatuses(new Map());
-  }, [backgroundMoveController, resetOnScopeChange]);
+  }, [backgroundActionController, resetOnScopeChange]);
   useEffect(() => {
-    return backgroundMoveController.stopAll;
-  }, [backgroundMoveController]);
+    return backgroundActionController.stopAll;
+  }, [backgroundActionController]);
   const dismissMoveStatus = useCallback((id: string) => {
     dismissedMoveStatusIds.current.add(id);
     setMoveStatuses(current => {
@@ -246,17 +246,17 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
         isMoveStatusCurrent,
         updateMoveStatus,
         createMoveStatusId,
-        getMoveOperation: backgroundMoveController.get,
-        setMoveJobUuids: backgroundMoveController.setJobUuids,
+        getMoveOperation: backgroundActionController.get,
+        setMoveJobUuids: backgroundActionController.setJobUuids,
         dismissMoveStatus,
         clearMoveStatus,
-        observeBackgroundMove: observation => {
-          const operation = backgroundMoveController.get(observation.operationId);
+        observeBackgroundAction: observation => {
+          const operation = backgroundActionController.get(observation.status.id);
           if (
             operation !== undefined &&
-            isMoveStatusCurrent(operation.status.conversationQualifiedId, observation.operationId)
+            isMoveStatusCurrent(operation.status.conversationQualifiedId, observation.status.id)
           ) {
-            backgroundMoveController.start(observation);
+            backgroundActionController.start(observation);
           }
         },
         isProvided: true,
