@@ -19,12 +19,12 @@
 
 import type {ReactNode} from 'react';
 
-import {act, renderHook, waitFor} from '@testing-library/react';
+import {act, renderHook} from '@testing-library/react';
 import {task} from 'true-myth';
 import {AddUsersFailureReasons} from '../../../core/conversation';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
-import {removeCurrentModal, usePrimaryModalState} from '../../Modals/PrimaryModal';
+import {usePrimaryModalState} from '../../Modals/PrimaryModal';
 
 import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
 import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
@@ -183,20 +183,12 @@ describe('useMeetNowSubmit', () => {
       submitResult = await result.current.submit(formState);
     });
 
-    expect(submitResult).toBe(meetNowSubmitResults.linkConfirmationOpened);
+    expect(submitResult).toBe(meetNowSubmitResults.joined);
     expect(meetNowMeeting).toHaveBeenCalledWith(meetNowCommand);
     expect(loadMeetings).not.toHaveBeenCalled();
     expect(startAudio).not.toHaveBeenCalled();
-    expect(useMeetingPrepModal.getState().session.isNothing).toBe(true);
-    expect(usePrimaryModalState.getState().currentModalContent.titleText).toBe('meetings.meetingLink.title');
-
-    await act(async () => {
-      removeCurrentModal();
-    });
-
-    await waitFor(() => {
-      expect(useMeetingPrepModal.getState().session.isJust).toBe(true);
-    });
+    expect(useMeetingPrepModal.getState().session.isJust).toBe(true);
+    expect(usePrimaryModalState.getState().currentModalContent.titleText).not.toBe('meetings.meetingLink.title');
   });
 
   it('returns creationFailed when meeting creation fails', async () => {
@@ -245,7 +237,7 @@ describe('useMeetNowSubmit', () => {
       {wrapper: createWrapper(store, mainViewModel)},
     );
 
-    let submitResult: MeetNowSubmitResult = meetNowSubmitResults.linkConfirmationOpened;
+    let submitResult: MeetNowSubmitResult = meetNowSubmitResults.joined;
     await act(async () => {
       submitResult = await result.current.submit(formState);
     });

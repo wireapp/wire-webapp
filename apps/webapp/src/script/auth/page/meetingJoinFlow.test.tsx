@@ -260,7 +260,9 @@ describe('meeting links in the existing auth flow', () => {
       clientState: {...initialRootState.clientState, clients: []},
     });
     const page = setup.renderPage();
-    await waitFor(() => {return expect(setup.store.getState().conversationState.hasPassword).toBe(true)});
+    await waitFor(() => {
+      return expect(setup.store.getState().conversationState.hasPassword).toBe(true);
+    });
     fireEvent.click(page.getByTestId('do-join-as-member'));
     fireEvent.change(page.getByTestId('guest-link-join-password-input'), {target: {value: 'wrong-password'}});
     fireEvent.click(page.getByTestId('guest-link-join-submit-button'));

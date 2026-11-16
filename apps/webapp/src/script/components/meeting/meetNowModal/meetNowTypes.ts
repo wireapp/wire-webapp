@@ -47,7 +47,6 @@ export const meetNowSubmitResults = {
   creationFailed: 'creationFailed',
   setupFailed: 'setupFailed',
   joined: 'joined',
-  linkConfirmationOpened: 'linkConfirmationOpened',
   joinBlocked: 'joinBlocked',
   joinFailed: 'joinFailed',
 } as const;
