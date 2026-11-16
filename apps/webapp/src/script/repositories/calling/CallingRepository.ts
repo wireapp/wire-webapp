@@ -1931,6 +1931,15 @@ export class CallingRepository {
 
   async answerCall(call: Call, callType?: CALL_TYPE, media?: CallMediaChoice): Promise<void> {
     void this.setViewModeMinimized();
+    if (
+      this.findCall(call.conversation.qualifiedId) === call &&
+      call.state() === CALL_STATE.INCOMING &&
+      call.reason() === REASON.STILL_ONGOING &&
+      !this.pendingCallSetups.has(call)
+    ) {
+      call.endedAt(0);
+      call.startedAt(undefined);
+    }
     this.pendingCallSetups.add(call);
 
     // Temporary feature to toggle Staging SFT
