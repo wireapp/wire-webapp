@@ -1930,6 +1930,7 @@
   "preferencesAVTryAgain": "Try Again",
   "preferencesAbout": "About",
   "preferencesAboutAVSVersion": "AVS version {version}",
+  "preferencesAboutCoreCryptoVersion": "CoreCrypto version {version}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
   "preferencesAboutDesktopVersion": "Desktop version {version}",
   "preferencesAboutPrivacyPolicy": "Privacy policy",
