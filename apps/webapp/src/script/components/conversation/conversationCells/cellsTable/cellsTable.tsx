@@ -429,6 +429,8 @@ export const CellsTable = ({
     },
     onStatusChange: restoreStatusReporter.report,
     onStatusCleared: restoreStatusReporter.clear,
+    observeBackgroundAction,
+    publishStatus: publishMoveStatus,
     reportError: error => {
       console.error(error);
     },
@@ -760,12 +762,12 @@ export const CellsTable = ({
       return;
     }
 
-    restoreStatusReporter.start(
+    const status = restoreStatusReporter.start(
       currentSelectedNodes.map(node => {
         return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
       }),
     );
-    void bulkRestore.restore(currentResolution.targets, scopeKey);
+    void bulkRestore.restore(currentResolution.targets, scopeKey, status);
   };
 
   const handlePermanentDelete = async (nodeIds: string[], scopeKey: string, path: string): Promise<void> => {
