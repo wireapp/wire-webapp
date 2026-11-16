@@ -37,13 +37,17 @@ describe('MeetingLinkConfirmationMessage', () => {
     );
 
     expect(screen.getByText('meetings.meetingLink.description')).toBeInTheDocument();
-    expect(screen.getByLabelText('meetings.meetingLink.title')).toHaveValue('https://wire.example/meeting-link');
-    expect(screen.getByDisplayValue('https://wire.example/meeting-link')).toHaveAttribute(
+    expect(screen.getByRole('textbox', {name: 'meetings.meetingLink.title'})).toHaveTextContent(
+      'https://wire.example/meeting-link',
+    );
+    expect(screen.getByRole('textbox', {name: 'meetings.meetingLink.title'})).toHaveAttribute(
       'aria-describedby',
       'meeting-link-description',
     );
-    expect(screen.getByDisplayValue('https://wire.example/meeting-link')).toHaveAttribute('readonly');
+    expect(screen.getByRole('textbox', {name: 'meetings.meetingLink.title'})).toHaveAttribute('aria-readonly', 'true');
+    expect(screen.getByRole('textbox', {name: 'meetings.meetingLink.title'})).toHaveAttribute('tabindex', '0');
     expect(screen.getByRole('button', {name: 'meetings.meetingLink.copyLink'})).toBeInTheDocument();
+    expect(window.getComputedStyle(screen.getByTestId('copy-to-clipboard-icon')).fill).toBe('currentColor');
   });
 
   it('shows password protection only for secured links', () => {

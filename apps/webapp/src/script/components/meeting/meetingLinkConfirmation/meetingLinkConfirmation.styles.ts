@@ -29,6 +29,11 @@ export const meetingLinkConfirmationStyles: CSSObject = {
 
 export const meetingLinkConfirmationInputStyles: CSSObject = {
   marginTop: '16px',
+  padding: '12px 16px',
+  border: '1px solid var(--border-color)',
+  borderRadius: '12px',
+  overflowWrap: 'anywhere',
+  userSelect: 'text',
 };
 
 export const meetingLinkConfirmationStatusStyles: CSSObject = {
