@@ -197,7 +197,7 @@
     "autoprefixer": "10.6.2",
     "babel-jest": "30.5.2",
     "babel-plugin-transform-import-meta": "2.3.3",
-    "baseline-browser-mapping": "2.11.35",
+    "baseline-browser-mapping": "2.11.37",
     "browserslist": "4.29.5",
     "concurrently": "9.2.5",
     "copy": "0.3.2",
