@@ -27,6 +27,7 @@ import {createStore, type StoreApi} from 'zustand/vanilla';
 import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from '../meetingSubmitErrors';
+import {meetingPasswordConfirmationRequiredKey} from '../shared/validation/meetingPasswordValidation';
 import {ConversationState} from '../../../repositories/conversation/ConversationState';
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
@@ -158,6 +159,17 @@ const renderModal = (
 };
 
 describe('ScheduleMeetingModal', () => {
+  it('requires confirmation after submit and clears the error when it matches', () => {
+    useScheduleMeetingModal.getState().openCreate(clock);
+    useScheduleMeetingModal.getState().setPassword('ValidPassword1!');
+    expect(useScheduleMeetingModal.getState().errors.passwordConfirmation).toBeUndefined();
+    expect(useScheduleMeetingModal.getState().validate(clock).passwordConfirmation).toBe(
+      meetingPasswordConfirmationRequiredKey,
+    );
+    useScheduleMeetingModal.getState().setPasswordConfirmation('ValidPassword1!');
+    expect(useScheduleMeetingModal.getState().errors.passwordConfirmation).toBeUndefined();
+    useScheduleMeetingModal.getState().reset(clock);
+  });
   afterEach(() => {
     act(() => {
       useScheduleMeetingModal.getState().close();
