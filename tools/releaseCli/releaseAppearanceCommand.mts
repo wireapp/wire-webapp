@@ -27,7 +27,7 @@ import process from 'node:process';
 import {fileURLToPath} from 'node:url';
 import {promisify} from 'node:util';
 
-import {createDefaultGitHubActionsProgressReporter} from '../releaseAppearance/githubActionsProgressReporter.ts';
+import {createGitHubActionsProgressReporter} from '../releaseAppearance/githubActionsProgressReporter.ts';
 import {createGitHubClient} from '../releaseAppearance/githubClient.ts';
 import {
   createBetaCommand,
@@ -189,7 +189,7 @@ function createRuntimeDependencies(commandEnvironment: CommandEnvironment): Rele
     executeGitCommand: executeRuntimeGitCommand,
     githubClient,
     now: readMonotonicTime,
-    progressReporter: createDefaultGitHubActionsProgressReporter(),
+    progressReporter: createGitHubActionsProgressReporter({actionsCore}),
     writeFailure: writeRuntimeFailure,
     writeInformation: writeRuntimeInformation,
     async writeSummary(summary): Promise<void> {
