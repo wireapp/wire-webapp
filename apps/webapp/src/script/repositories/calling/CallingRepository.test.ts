@@ -89,6 +89,8 @@ import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {BackgroundEffectSelection} from '../media/VideoBackgroundEffects';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {NoAudioInputError} from '../../error/noAudioInputError';
+import {EventName} from '../tracking/eventName';
+import {Segmentation} from '../tracking/segmentation';
 
 const initializeBrowserAvs = (): Promise<Wcall> => {
   const nodeVersion = Object.getOwnPropertyDescriptor(process.versions, 'node');
@@ -1103,6 +1105,111 @@ describe('CallingRepository', () => {
     beforeEach(() => {
       const subscribeToEpochUpdates = jest.mocked(getSubconversationServiceForTest().subscribeToEpochUpdates);
       subscribeToEpochUpdates?.mockClear();
+    });
+
+    it('rejoins a retained group call after leaving while it is still ongoing', async () => {
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.PROTEUS);
+      const call = new Call(
+        {domain: 'example.com', id: 'caller'},
+        conversation,
+        CONV_TYPE.CONFERENCE,
+        createSelfParticipant(),
+        CALL_TYPE.NORMAL,
+        buildMediaDevicesHandler(),
+      );
+      call.state(CALL_STATE.INCOMING);
+      callingRepository['conversationState'].conversations.push(conversation);
+      callingRepository['callState'].calls([call]);
+      jest.spyOn(callingRepository, 'pushClients').mockResolvedValue(true);
+      const answerAvs = jest.spyOn(wCall, 'answer');
+      const sendCallingEvent = jest.spyOn(callingRepository as any, 'sendCallingEvent');
+
+      await callingRepository.answerCall(call);
+      expect(answerAvs).toHaveBeenCalledTimes(1);
+
+      callingRepository['updateCallState'](conversation.id, CALL_STATE.MEDIA_ESTAB);
+      callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+      expect(call.endedAt()).toBeGreaterThan(0);
+      await callingRepository['callClosed'](REASON.STILL_ONGOING, conversation.id);
+      sendCallingEvent.mockClear();
+      callingRepository['updateCallState'](conversation.id, CALL_STATE.INCOMING);
+      expect(callingRepository.findCall(conversation.qualifiedId)).toBe(call);
+
+      await callingRepository.answerCall(call);
+
+      expect(answerAvs).toHaveBeenCalledTimes(2);
+      expect(call.endedAt()).toBe(0);
+      expect(call.startedAt()).toBeUndefined();
+      expect(callingRepository.findCall(conversation.qualifiedId)).toBe(call);
+
+      callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+      await callingRepository['callClosed'](REASON.STILL_ONGOING, conversation.id);
+      const endedCallEvents = sendCallingEvent.mock.calls.filter(([eventName]) => {
+        return eventName === EventName.CALLING.ENDED_CALL;
+      });
+      expect(endedCallEvents).toHaveLength(1);
+      expect(endedCallEvents[0]).toEqual([
+        EventName.CALLING.ENDED_CALL,
+        call,
+        expect.objectContaining({[Segmentation.CALL.DURATION]: 0}),
+      ]);
+    });
+
+    it('rejoins a retained MLS group call with a fresh epoch subscription', async () => {
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.MLS);
+      const call = new Call(
+        {domain: 'example.com', id: 'caller'},
+        conversation,
+        CONV_TYPE.CONFERENCE_MLS,
+        createSelfParticipant(),
+        CALL_TYPE.NORMAL,
+        buildMediaDevicesHandler(),
+      );
+      call.state(CALL_STATE.INCOMING);
+      callingRepository['conversationState'].conversations.push(conversation);
+      callingRepository['callState'].calls([call]);
+      jest.spyOn(callingRepository, 'pushClients').mockResolvedValue(true);
+      const unsubscribeFirst = jest.fn();
+      const unsubscribeSecond = jest.fn();
+      const subscribe = jest.spyOn(getSubconversationServiceForTest(), 'subscribeToEpochUpdates');
+      subscribe.mockResolvedValueOnce(unsubscribeFirst).mockResolvedValueOnce(unsubscribeSecond);
+      const answerAvs = jest.spyOn(wCall, 'answer');
+
+      await callingRepository.answerCall(call);
+      callingRepository['updateCallState'](conversation.id, CALL_STATE.MEDIA_ESTAB);
+      callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+      await callingRepository['callClosed'](REASON.STILL_ONGOING, conversation.id);
+      callingRepository['updateCallState'](conversation.id, CALL_STATE.INCOMING);
+      expect(callingRepository.findCall(conversation.qualifiedId)).toBe(call);
+
+      await callingRepository.answerCall(call);
+
+      expect(subscribe).toHaveBeenCalledTimes(2);
+      expect(unsubscribeFirst).toHaveBeenCalledTimes(1);
+      expect(unsubscribeSecond).not.toHaveBeenCalled();
+      expect(answerAvs).toHaveBeenCalledTimes(2);
+      expect(callingRepository.findCall(conversation.qualifiedId)).toBe(call);
+    });
+
+    it('does not revive an ended incoming call without the still-ongoing reason', async () => {
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.PROTEUS);
+      const call = new Call(
+        {domain: 'example.com', id: 'caller'},
+        conversation,
+        CONV_TYPE.CONFERENCE,
+        createSelfParticipant(),
+        CALL_TYPE.NORMAL,
+        buildMediaDevicesHandler(),
+      );
+      call.state(CALL_STATE.INCOMING);
+      call.endedAt(Date.now());
+      callingRepository['callState'].calls([call]);
+      const answerAvs = jest.spyOn(wCall, 'answer');
+
+      await callingRepository.answerCall(call);
+
+      expect(answerAvs).not.toHaveBeenCalled();
+      expect(callingRepository.findCall(conversation.qualifiedId)).toBeUndefined();
     });
 
     it('subscribes to epoch updates after answering a mls conference call', async () => {
