@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, type FunctionComponent} from 'react';
+import {type FunctionComponent, useState} from 'react';
 
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
 import {copyText} from '../../util/clipboardUtil';
@@ -66,7 +66,12 @@ export const CopyToClipboardButton: FunctionComponent<CopyToClipboardButtonProps
       variant={variant}
       data-uie-name="do-copy-to-clipboard"
     >
-      <Icon.CopyIcon data-uie-name="copy-to-clipboard-icon" width="16" height="16" css={{marginRight: '10px'}} />
+      <Icon.CopyIcon
+        data-uie-name="copy-to-clipboard-icon"
+        width="16"
+        height="16"
+        css={{marginRight: '10px', fill: 'currentColor'}}
+      />
       {isCopying ? copySuccessText : displayText}
     </Button>
   );
