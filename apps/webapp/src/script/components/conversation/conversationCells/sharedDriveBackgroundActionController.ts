@@ -20,27 +20,35 @@
 import type {Clock} from '@enormora/clock/clock';
 
 import {observeCellsBackgroundActionJobs} from './common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
-import type {CellsBackgroundActionOutcome} from './common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
-import {createBulkJobPollingPolicy} from './common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
+import type {
+  CellsBackgroundActionOutcome,
+  CellsBackgroundActionPollingPolicy,
+} from './common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
 import type {SharedDriveMoveStatus, SharedDriveMoveStatusKind} from './sharedDriveUploadStatusContext';
 
 import type {CellsRepository} from '../../../repositories/cells/cellsRepository';
 
-export interface BackgroundMoveObservation {
+type BackgroundActionSource =
+  | {readonly actionName: 'move'; readonly cellsRepository: Pick<CellsRepository, 'getBackgroundMoveInfo'>}
+  | {
+      readonly actionName: 'delete' | 'restore';
+      readonly cellsRepository: Pick<CellsRepository, 'getBackgroundActionInfo'>;
+    };
+
+export type BackgroundActionObservation = BackgroundActionSource & {
   readonly status: SharedDriveMoveStatus;
   readonly jobUuids: readonly string[];
-  readonly cellsRepository: Pick<CellsRepository, 'getBackgroundMoveInfo'>;
   readonly clock: Clock;
-  readonly random: () => number;
+  readonly pollingPolicy: CellsBackgroundActionPollingPolicy;
   readonly onOutcome: (outcome: CellsBackgroundActionOutcome) => void;
-}
+};
 
-interface SharedDriveBackgroundMoveController {
-  readonly start: (observation: BackgroundMoveObservation) => void;
+interface SharedDriveBackgroundActionController {
+  readonly start: (observation: BackgroundActionObservation) => void;
   readonly stopAll: () => void;
 }
 
-const kindForOutcome = (outcome: CellsBackgroundActionOutcome): SharedDriveMoveStatusKind => {
+export const getBackgroundActionStatusKind = (outcome: CellsBackgroundActionOutcome): SharedDriveMoveStatusKind => {
   switch (outcome) {
     case 'all-finished':
       return 'completed';
@@ -54,14 +62,15 @@ const kindForOutcome = (outcome: CellsBackgroundActionOutcome): SharedDriveMoveS
   }
 };
 
-/** Owns move polling for as long as the app's status provider remains mounted. */
-export const createSharedDriveBackgroundMoveController = (
+/** Owns bulk job polling for as long as the app's status provider remains mounted. */
+export const createSharedDriveBackgroundActionController = (
   publishStatus: (status: SharedDriveMoveStatus) => void,
   observeJobs: typeof observeCellsBackgroundActionJobs = observeCellsBackgroundActionJobs,
-): SharedDriveBackgroundMoveController => {
+): SharedDriveBackgroundActionController => {
   const observations = new Map<string, {cancel: () => void}>();
 
-  const start = ({status, jobUuids, cellsRepository, clock, random, onOutcome}: BackgroundMoveObservation): void => {
+  const start = (request: BackgroundActionObservation): void => {
+    const {status, jobUuids, clock, pollingPolicy, onOutcome} = request;
     if (observations.has(status.id)) {
       return;
     }
@@ -72,12 +81,15 @@ export const createSharedDriveBackgroundMoveController = (
       },
     };
     observations.set(status.id, observation);
+    const source: BackgroundActionSource =
+      request.actionName === 'move'
+        ? {actionName: 'move', cellsRepository: request.cellsRepository}
+        : {actionName: request.actionName, cellsRepository: request.cellsRepository};
     observation.cancel = observeJobs({
-      actionName: 'move',
-      cellsRepository,
+      ...source,
       jobUuids,
       clock,
-      pollingPolicy: createBulkJobPollingPolicy(random),
+      pollingPolicy,
       isCurrent: () => {
         return observations.has(status.id);
       },
@@ -90,7 +102,7 @@ export const createSharedDriveBackgroundMoveController = (
         if (!observations.delete(status.id)) {
           return;
         }
-        publishStatus({...status, kind: kindForOutcome(outcome)});
+        publishStatus({...status, kind: getBackgroundActionStatusKind(outcome)});
         onOutcome(outcome);
       },
     });
