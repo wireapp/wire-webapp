@@ -19,6 +19,7 @@
 import {
   getMeetingPasswordErrors,
   meetingPasswordConfirmationErrorKey,
+  meetingPasswordConfirmationRequiredKey,
   meetingPasswordErrorKey,
 } from './meetingPasswordValidation';
 
@@ -32,6 +33,20 @@ describe('getMeetingPasswordError', () => {
       password: undefined,
       passwordConfirmation: meetingPasswordConfirmationErrorKey,
     });
+  });
+
+  it('requires a confirmation when a password is provided', () => {
+    expect(getMeetingPasswordErrors('ValidPassword1!', '')).toEqual({
+      password: undefined,
+      passwordConfirmation: meetingPasswordConfirmationRequiredKey,
+    });
+  });
+
+  it('waits until submit to require an empty confirmation', () => {
+    expect(getMeetingPasswordErrors('ValidPassword1!', '', false).passwordConfirmation).toBeUndefined();
+    expect(getMeetingPasswordErrors('ValidPassword1!', 'DifferentPassword1!', false).passwordConfirmation).toBe(
+      meetingPasswordConfirmationErrorKey,
+    );
   });
 
   it('allows a valid matching password and confirmation', () => {

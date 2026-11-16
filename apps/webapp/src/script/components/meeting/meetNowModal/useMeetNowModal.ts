@@ -43,6 +43,7 @@ type MeetNowModalState = {
   isOpen: boolean;
   formState: MeetNowFormState;
   errors: MeetNowFormErrors;
+  hasSubmitted: boolean;
   open: () => void;
   close: () => void;
   reset: () => void;
@@ -59,6 +60,7 @@ const initialState = {
   isOpen: false,
   formState: getDefaultMeetNowFormState(),
   errors: emptyMeetNowFormErrors(),
+  hasSubmitted: false,
 };
 
 export const getMeetNowFormErrors = ({title, password, passwordConfirmation}: MeetNowFormState): MeetNowFormErrors => {
@@ -90,6 +92,7 @@ export const useMeetNowModal = create<MeetNowModalState>((set, get) => {
         isOpen: true,
         formState: getDefaultMeetNowFormState(),
         errors: emptyMeetNowFormErrors(),
+        hasSubmitted: false,
       });
     },
     close: () => {
@@ -99,6 +102,7 @@ export const useMeetNowModal = create<MeetNowModalState>((set, get) => {
       return set({
         formState: getDefaultMeetNowFormState(),
         errors: emptyMeetNowFormErrors(),
+        hasSubmitted: false,
       });
     },
     setTitle: title => {
@@ -127,7 +131,10 @@ export const useMeetNowModal = create<MeetNowModalState>((set, get) => {
       return set(state => {
         return {
           formState: {...state.formState, password},
-          errors: {...state.errors, ...getMeetingPasswordErrors(password, state.formState.passwordConfirmation)},
+          errors: {
+            ...state.errors,
+            ...getMeetingPasswordErrors(password, state.formState.passwordConfirmation, state.hasSubmitted),
+          },
         };
       });
     },
@@ -135,13 +142,16 @@ export const useMeetNowModal = create<MeetNowModalState>((set, get) => {
       return set(state => {
         return {
           formState: {...state.formState, passwordConfirmation},
-          errors: {...state.errors, ...getMeetingPasswordErrors(state.formState.password, passwordConfirmation)},
+          errors: {
+            ...state.errors,
+            ...getMeetingPasswordErrors(state.formState.password, passwordConfirmation, state.hasSubmitted),
+          },
         };
       });
     },
     validate: () => {
       const errors = getMeetNowFormErrors(get().formState);
-      set({errors});
+      set({errors, hasSubmitted: true});
       return errors;
     },
     clearErrors: () => {
