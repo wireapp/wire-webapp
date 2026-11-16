@@ -97,10 +97,6 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
     onMoveStart(moveSummary);
 
     const moveResult = await onMove();
-    if (!isCurrentDialog.current) {
-      return;
-    }
-
     if (moveResult.isErr) {
       onMoveError();
       return;
@@ -108,7 +104,7 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
 
     if (moveResult.isOk) {
       const canCloseAfterMove = onMoveResult(moveResult.value, moveSummary);
-      if (canCloseAfterMove) {
+      if (canCloseAfterMove && isCurrentDialog.current) {
         onClose();
       }
     }

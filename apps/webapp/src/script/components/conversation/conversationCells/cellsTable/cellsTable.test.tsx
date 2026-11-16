@@ -324,6 +324,8 @@ const renderCellsTable = ({
   rerenderWithResetKey: (resetKey: number) => void;
   rerenderWithSelectionScope: (scopeKey: string, isSelectionEnabled?: boolean) => void;
   rerenderWithNodes: (nodes: CellNode[]) => void;
+  hideTable: () => void;
+  showTable: () => void;
 } => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
@@ -349,35 +351,38 @@ const renderCellsTable = ({
     scopeKey = selectionScopeKey,
     isSelectionEnabled = selectionEnabled,
     nodes = initialNodes ?? [folder, file],
+    isTableVisible = true,
   ): ReactElement => {
     return (
       <ThemeProvider theme={themes[themeId]}>
         <SharedDriveUploadStatusProvider>
           <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
-            <CellsTable
-              nodes={nodes}
-              isNodesLoading={false}
-              cellsRepository={cellsRepository}
-              conversation={{} as Conversation}
-              conversationQualifiedId={conversationQualifiedId}
-              conversationName="Conversation"
-              onRefresh={onRefresh}
-              onRefreshAndReportSuccess={onRefreshAndReportSuccess}
-              onRefreshAfterBulkMoveToBinOutcome={onRefreshAfterBulkMoveToBinOutcome}
-              onFolderDropTargetChange={onFolderDropTargetChange}
-              onDropFilesToFolder={onDropFilesToFolder}
-              onDropReadError={onDropReadError}
-              folderDropResetKey={resetKey}
-              getDirectionFor={() => {
-                return undefined;
-              }}
-              isSortingEnabled
-              onToggleSort={jest.fn()}
-              selectionEnabled={isSelectionEnabled}
-              selectionScopeKey={scopeKey}
-              selectionBarAnchor={selectionBarAnchor}
-              random={random}
-            />
+            {isTableVisible && (
+              <CellsTable
+                nodes={nodes}
+                isNodesLoading={false}
+                cellsRepository={cellsRepository}
+                conversation={{} as Conversation}
+                conversationQualifiedId={conversationQualifiedId}
+                conversationName="Conversation"
+                onRefresh={onRefresh}
+                onRefreshAndReportSuccess={onRefreshAndReportSuccess}
+                onRefreshAfterBulkMoveToBinOutcome={onRefreshAfterBulkMoveToBinOutcome}
+                onFolderDropTargetChange={onFolderDropTargetChange}
+                onDropFilesToFolder={onDropFilesToFolder}
+                onDropReadError={onDropReadError}
+                folderDropResetKey={resetKey}
+                getDirectionFor={() => {
+                  return undefined;
+                }}
+                isSortingEnabled
+                onToggleSort={jest.fn()}
+                selectionEnabled={isSelectionEnabled}
+                selectionScopeKey={scopeKey}
+                selectionBarAnchor={selectionBarAnchor}
+                random={random}
+              />
+            )}
           </CellsSelfUserDriveRoleProvider>
           <SharedDriveUploadStatusPopupHost
             controller={uploadStatusController}
@@ -400,6 +405,14 @@ const renderCellsTable = ({
     onDropReadError,
     onFolderDropTargetChange,
     unmount,
+    hideTable: () => {
+      return rerender(
+        renderTable(folderDropResetKey, selectionScopeKey, selectionEnabled, initialNodes ?? [folder, file], false),
+      );
+    },
+    showTable: () => {
+      return rerender(renderTable());
+    },
     rerenderWithResetKey: (resetKey: number) => {
       return rerender(renderTable(resetKey));
     },
@@ -3160,6 +3173,84 @@ describe('CellsTable selection', () => {
     expect(onRefresh).toHaveBeenCalledTimes(1);
     expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    window.location.hash = originalHash;
+  });
+
+  it.each([THEME_ID.LIGHT, THEME_ID.DARK])(
+    'finishes a background move after the Files table unmounts in %s',
+    async themeId => {
+      const originalHash = window.location.hash;
+      window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+      const user = userEvent.setup();
+      const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+      const onRefresh = jest.fn();
+      const repository = {
+        getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+        moveNodes: jest.fn().mockResolvedValue({
+          Status: 'Background',
+          BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}],
+        }),
+        getBackgroundMoveInfo: jest
+          .fn()
+          .mockResolvedValueOnce({Status: 'Running'})
+          .mockResolvedValueOnce({Status: 'Finished'}),
+      } as unknown as CellsRepository;
+      const table = renderCellsTable({cellsRepository: repository, onRefresh, clock, themeId});
+
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Move'}));
+      const dialog = await screen.findByRole('dialog');
+      await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+      await waitFor(() => {
+        expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
+      });
+
+      table.hideTable();
+      expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
+      await act(async () => {
+        clock.advanceByMilliseconds(1000);
+        await waitFor(() => {
+          expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
+        });
+      });
+
+      expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
+      expect(onRefresh).not.toHaveBeenCalled();
+      table.showTable();
+      expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
+      window.location.hash = originalHash;
+    },
+  );
+
+  it('starts background observation when the move request settles after leaving Files', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const moveRequest = Promise.withResolvers<Awaited<ReturnType<CellsRepository['moveNodes']>>>();
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockReturnValue(moveRequest.promise),
+      getBackgroundMoveInfo: jest.fn().mockResolvedValue({Status: 'Finished'}),
+    } as unknown as CellsRepository;
+    const table = renderCellsTable({cellsRepository: repository, clock});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+    expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
+
+    table.hideTable();
+    await act(async () => {
+      moveRequest.resolve({Status: 'Background', BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]});
+      await moveRequest.promise;
+    });
+
+    await waitFor(() => {
+      expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
     window.location.hash = originalHash;
   });
 

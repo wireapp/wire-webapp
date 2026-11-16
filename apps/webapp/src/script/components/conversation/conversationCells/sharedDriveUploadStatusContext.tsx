@@ -22,6 +22,7 @@ import {
   type ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
   type FunctionComponent,
@@ -29,6 +30,10 @@ import {
 
 import {Maybe, maybe} from 'true-myth';
 
+import {
+  createSharedDriveBackgroundMoveController,
+  type BackgroundMoveObservation,
+} from './sharedDriveBackgroundMoveController';
 import type {DismissedUpload} from './sharedDriveUploadStatus';
 
 export interface SharedDriveMoveItem {
@@ -66,6 +71,7 @@ type SharedDriveUploadStatusContextValue = {
   readonly createMoveStatusId: () => string;
   readonly dismissMoveStatus: (id: string) => void;
   readonly clearMoveStatus: (id: string) => void;
+  readonly observeBackgroundMove: (observation: BackgroundMoveObservation) => void;
   readonly isProvided: boolean;
 };
 
@@ -87,6 +93,9 @@ const SharedDriveUploadStatusContext = createContext<SharedDriveUploadStatusCont
     return undefined;
   },
   clearMoveStatus: () => {
+    return undefined;
+  },
+  observeBackgroundMove: () => {
     return undefined;
   },
   isProvided: false,
@@ -126,6 +135,12 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
       return new Map(current).set(status.conversationQualifiedId, status);
     });
   }, []);
+  const [backgroundMoveController] = useState(() => {
+    return createSharedDriveBackgroundMoveController(updateMoveStatus);
+  });
+  useEffect(() => {
+    return backgroundMoveController.stopAll;
+  }, [backgroundMoveController]);
   const dismissMoveStatus = useCallback((id: string) => {
     dismissedMoveStatusIds.current.add(id);
     setMoveStatuses(current => {
@@ -163,6 +178,7 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
         createMoveStatusId,
         dismissMoveStatus,
         clearMoveStatus,
+        observeBackgroundMove: backgroundMoveController.start,
         isProvided: true,
       }}
     >
