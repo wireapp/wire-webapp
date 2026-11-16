@@ -322,6 +322,7 @@ const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & Disp
                 <EntropyContainer onSetEntropy={handleSubmit} />
               ) : (
                 <GuestLoginColumn
+                  isMeeting={joinLink.kind === JOIN_LINK_KIND.MEETING}
                   enteredName={enteredName}
                   nameInput={nameInput}
                   onNameChange={onNameChange}
