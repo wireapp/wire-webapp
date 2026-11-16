@@ -17,30 +17,50 @@
  *
  */
 
-import {ValidationError} from '../../../../auth/module/action/validationError';
-import type {TranslationKey} from '../../../../util/localizerUtil';
+import {Config} from '../../../../Config';
+import type {Translate} from '../../../../util/localizerUtil';
 import {isValidPassword} from '../../../../util/stringUtil';
 
-export const meetingPasswordErrorKey = ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH as TranslationKey;
-export const meetingPasswordConfirmationErrorKey = ValidationError.FIELD.CONFIRM_PASSWORD
-  .PATTERN_MISMATCH as TranslationKey;
+export const meetingPasswordErrorKey = 'ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH';
+export const meetingPasswordConfirmationErrorKey = 'meetings.password.mismatch';
+export const meetingPasswordConfirmationRequiredKey = 'meetings.password.confirmationRequired';
 
-export type MeetingPasswordErrorKey = typeof meetingPasswordErrorKey | typeof meetingPasswordConfirmationErrorKey;
+export type MeetingPasswordErrorKey =
+  | typeof meetingPasswordErrorKey
+  | typeof meetingPasswordConfirmationErrorKey
+  | typeof meetingPasswordConfirmationRequiredKey;
 
 export type MeetingPasswordErrors = {
   password: typeof meetingPasswordErrorKey | undefined;
-  passwordConfirmation: typeof meetingPasswordConfirmationErrorKey | undefined;
+  passwordConfirmation:
+    typeof meetingPasswordConfirmationErrorKey | typeof meetingPasswordConfirmationRequiredKey | undefined;
 };
 
-export const getMeetingPasswordErrors = (password?: string, passwordConfirmation?: string): MeetingPasswordErrors => {
+export const translateMeetingPasswordError = (
+  translate: Translate,
+  error: MeetingPasswordErrorKey | undefined,
+): string | undefined => {
+  return error === undefined
+    ? undefined
+    : translate(error, {minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH});
+};
+
+export const getMeetingPasswordErrors = (
+  password?: string,
+  passwordConfirmation?: string,
+  requireConfirmation = true,
+): MeetingPasswordErrors => {
   const hasPassword = Boolean(password?.trim());
   const hasPasswordConfirmation = Boolean(passwordConfirmation?.trim());
+  let passwordConfirmationError: MeetingPasswordErrors['passwordConfirmation'];
+  if (hasPassword && requireConfirmation && !hasPasswordConfirmation) {
+    passwordConfirmationError = meetingPasswordConfirmationRequiredKey;
+  } else if (hasPasswordConfirmation && password !== passwordConfirmation) {
+    passwordConfirmationError = meetingPasswordConfirmationErrorKey;
+  }
 
   return {
     password: hasPassword && !isValidPassword(password ?? '') ? meetingPasswordErrorKey : undefined,
-    passwordConfirmation:
-      hasPasswordConfirmation && (!hasPassword || password !== passwordConfirmation)
-        ? meetingPasswordConfirmationErrorKey
-        : undefined,
+    passwordConfirmation: passwordConfirmationError,
   };
 };
