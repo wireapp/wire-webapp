@@ -85,7 +85,7 @@ export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUplo
   const {
     dismissedUpload: contextDismissedUpload,
     dismissUpload: onDismissUpload,
-    moveStatus,
+    getMoveStatus,
     dismissMoveStatus,
     isProvided,
   } = useSharedDriveUploadStatus();
@@ -280,6 +280,7 @@ export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUplo
     return controller.subscribe(updateStatus);
   }, [controller, conversationQualifiedId, readStatuses]);
 
+  const moveStatus = getMoveStatus(conversationQualifiedId);
   if (isFileTabActive && maybe.isJust(moveStatus)) {
     const move = moveStatus.value;
     const copy = getBulkActionStatusCopy(move.action);
