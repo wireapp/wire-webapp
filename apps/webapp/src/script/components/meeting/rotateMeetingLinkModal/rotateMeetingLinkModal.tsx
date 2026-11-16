@@ -35,7 +35,6 @@ import {showMeetingLinkConfirmation} from '../meetingLinkConfirmation/meetingLin
 import {useMeetingStore} from '../meetingStore/meetingStoreProvider';
 import {rotateMeetingLinkErrors} from '../meetingStore/rotateMeetingLinkErrors';
 import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';
-import {translateMeetingPasswordError} from '../shared/validation/meetingPasswordValidation';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -47,6 +46,7 @@ import {
   submitButtonStyles,
   wrapperStyles,
 } from '../shared/styles/meetingModalShell.styles';
+import {translateMeetingPasswordError} from '../shared/validation/meetingPasswordValidation';
 
 const logger = getLogger('RotateMeetingLinkModal');
 
