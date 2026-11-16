@@ -32,6 +32,7 @@ import {Input} from '../../../uiKit/inputs/input/input';
 import {getOverlayPortalContainer} from '../../../uiKit/utils/overlayPortal';
 import {MeetingParticipantsPicker} from '../meetingParticipantsPicker';
 import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';
+import {embeddedPasswordHeadingStyles} from '../shared/meetingLinkForm/meetingLinkForm.styles';
 import {useMeetingParticipants} from '../shared/participants/useMeetingParticipants';
 import {
   scheduleMeetingParticipantsSectionCss,
@@ -142,6 +143,7 @@ export const MeetNowForm: FunctionComponent<MeetNowFormProps> = ({
       </div>
       <MeetingLinkForm
         translate={translate}
+        heading={<h3 css={embeddedPasswordHeadingStyles}>{translate('meetings.meetingLink.title')}</h3>}
         onGeneratePassword={password => {
           onPasswordChange?.(password);
           onPasswordConfirmationChange?.(password);
