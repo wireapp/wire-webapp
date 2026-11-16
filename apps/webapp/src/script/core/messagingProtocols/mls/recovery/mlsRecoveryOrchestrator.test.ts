@@ -226,7 +226,10 @@ describe('MlsRecoveryOrchestrator', () => {
       const deps = baseDeps();
       const orchestrator = new MlsRecoveryOrchestratorImpl(createDefaultMlsErrorMapper(), minimalDefaultPolicies, deps);
       const callback = jest.fn().mockRejectedValue(error);
-      const result = orchestrator.execute({context: {...context, operationName: OperationName.joinExternalCommit}, callBack: callback});
+      const result = orchestrator.execute({
+        context: {...context, operationName: OperationName.joinExternalCommit},
+        callBack: callback,
+      });
       await jest.runAllTimersAsync();
       await expect(result).resolves.toBeUndefined();
 
