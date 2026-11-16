@@ -153,7 +153,6 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
     }
     backgroundMoveController.stopAll();
     dismissedMoveStatusIds.current.clear();
-    setDismissedUpload(Maybe.nothing());
     setMoveStatuses(new Map());
   }, [backgroundMoveController, resetOnScopeChange]);
   useEffect(() => {

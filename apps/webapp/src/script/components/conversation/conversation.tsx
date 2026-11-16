@@ -746,7 +746,9 @@ function ConversationContent({
         {!isNullOrUndefined(activeConversation) && (
           <SharedDriveUploadStatusScope
             enabled={!isFeatureToggleEnabled(driveBulkActionProgressFeatureToggleName)}
-            scopeKey={Maybe.just(`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`)}
+            scopeKey={Maybe.just(
+              `${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}:${isFileTabActive ? getCellsFilesPath() : 'outside-files'}`,
+            )}
           >
             <TitleBar
               repositories={repositories}
