@@ -17,6 +17,7 @@
  *
  */
 
+import {isError, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {Maybe, Result, Task, Unit, task} from 'true-myth';
 
 import type {ExecuteWebAppReleaseGitCommand} from './webappReleaseHistoryGit.ts';
@@ -66,7 +67,7 @@ const remoteReleaseBranchPrefix = 'refs/heads/release/';
 const remoteReleaseBranchReferenceFieldCount = 2;
 
 function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+  return isError(error) ? error.message : String(error);
 }
 
 function executeGitCommand(options: ExecuteGitCommandOptions): Task<string, Error> {
@@ -90,7 +91,7 @@ function parseRemoteReleaseBranches(
   const {commandOutput, expectedReference} = options;
   const releaseBranches: WebAppReleaseBranchRef[] = [];
   const outputLines = commandOutput.split(/\r?\n/).filter(outputLine => {
-    return outputLine.length > 0;
+    return isNonEmptyString(outputLine);
   });
 
   for (const outputLine of outputLines) {
@@ -101,15 +102,15 @@ function parseRemoteReleaseBranches(
       commitShaMaybe.isNothing ||
       gitReferenceMaybe.isNothing ||
       outputFields.length > remoteReleaseBranchReferenceFieldCount ||
-      fullCommitShaPattern.test(commitShaMaybe.value) === false ||
-      gitReferenceMaybe.value.startsWith(remoteReleaseBranchPrefix) === false
+      !fullCommitShaPattern.test(commitShaMaybe.value) ||
+      !gitReferenceMaybe.value.startsWith(remoteReleaseBranchPrefix)
     ) {
       return Result.err(new Error(`Git returned a malformed remote release branch reference: ${outputLine}`));
     }
 
     const commitSha = commitShaMaybe.value;
     const gitReference = gitReferenceMaybe.value;
-    if (expectedReference.length > 0 && gitReference !== expectedReference) {
+    if (isNonEmptyString(expectedReference) && gitReference !== expectedReference) {
       return Result.err(new Error(`Git returned an unexpected remote reference: ${gitReference}`));
     }
 
@@ -160,7 +161,7 @@ async function executeRemoteWebAppReleaseBranchCommitPreparation(
     throw releaseBranchVersionResult.error;
   }
 
-  if (fullCommitShaPattern.test(expectedCommitSha) === false) {
+  if (!fullCommitShaPattern.test(expectedCommitSha)) {
     throw new Error('Invalid expected release commit: expected a full 40-character hexadecimal SHA');
   }
 
@@ -186,7 +187,7 @@ async function executeRemoteWebAppReleaseBranchCommitPreparation(
   }
 
   const fetchedCommitSha = fetchedCommitResult.value.trim().toLowerCase();
-  if (fullCommitShaPattern.test(fetchedCommitSha) === false) {
+  if (!fullCommitShaPattern.test(fetchedCommitSha)) {
     throw new Error(`Unable to resolve fetched WebApp release branch ${releaseBranch} to a full commit SHA`);
   }
 
@@ -207,7 +208,7 @@ export function prepareRemoteWebAppReleaseBranchCommit(
 
   return task.tryOrElse(
     (error: unknown): Error => {
-      return error instanceof Error ? error : new Error(String(error));
+      return isError(error) ? error : new Error(String(error));
     },
     async (): Promise<Unit> => {
       return executeRemoteWebAppReleaseBranchCommitPreparation({
@@ -253,11 +254,11 @@ export function isWebAppReleaseCommitAncestor(
   options: VerifyWebAppReleaseCommitAncestorGitOptions,
 ): Task<boolean, Error> {
   const {executeGitCommand: runGitCommand, baseCommit, targetCommit} = options;
-  if (fullCommitShaPattern.test(baseCommit) === false) {
+  if (!fullCommitShaPattern.test(baseCommit)) {
     return Task.reject(new Error('Invalid base commit: expected a full 40-character hexadecimal SHA'));
   }
 
-  if (fullCommitShaPattern.test(targetCommit) === false) {
+  if (!fullCommitShaPattern.test(targetCommit)) {
     return Task.reject(new Error('Invalid target commit: expected a full 40-character hexadecimal SHA'));
   }
 
@@ -279,6 +280,67 @@ export function isWebAppReleaseCommitAncestor(
   });
 }
 
+export function resolveWebAppReleaseHistoryBase(
+  options: VerifyWebAppReleaseCommitAncestorGitOptions,
+): Task<string, Error> {
+  const {executeGitCommand: runGitCommand, baseCommit, targetCommit} = options;
+
+  return isWebAppReleaseCommitAncestor(options).andThen(stableBaseIsAncestor => {
+    if (stableBaseIsAncestor) {
+      return Task.resolve(baseCommit.toLowerCase());
+    }
+
+    return executeGitCommand({
+      executeGitCommand: runGitCommand,
+      commandArguments: ['merge-base', '--all', baseCommit.toLowerCase(), targetCommit.toLowerCase()],
+    })
+      .mapRejected(error => {
+        return new Error(
+          `Unable to determine release history merge-base for ${baseCommit} and ${targetCommit}; histories may be unrelated: ${error.message}`,
+          {cause: error},
+        );
+      })
+      .andThen(commandOutput => {
+        const mergeBases = commandOutput.trim().split(/\s+/);
+        if (!isNonEmptyArray(mergeBases) || mergeBases.length !== 1 || !fullCommitShaPattern.test(mergeBases[0])) {
+          return Task.reject<string, Error>(new Error('Release history requires exactly one valid merge-base'));
+        }
+
+        const [mergeBase] = mergeBases;
+        const historyBaseCommit = mergeBase.toLowerCase();
+        if (historyBaseCommit === targetCommit.toLowerCase()) {
+          return Task.reject<string, Error>(new Error('Release target predates the latest stable release'));
+        }
+
+        return executeGitCommand({
+          executeGitCommand: runGitCommand,
+          commandArguments: ['rev-list', '--first-parent', targetCommit.toLowerCase()],
+        }).andThen(firstParentOutput => {
+          const firstParentCommits = firstParentOutput.trim().split(/\s+/);
+          if (
+            firstParentCommits.some(commitSha => {
+              return !fullCommitShaPattern.test(commitSha);
+            })
+          ) {
+            return Task.reject<string, Error>(new Error('Git returned an invalid first-parent history'));
+          }
+
+          if (
+            !firstParentCommits.some(commitSha => {
+              return commitSha.toLowerCase() === historyBaseCommit;
+            })
+          ) {
+            return Task.reject<string, Error>(
+              new Error('Release history merge-base is not on the target first-parent history'),
+            );
+          }
+
+          return Task.resolve(historyBaseCommit);
+        });
+      });
+  });
+}
+
 export function createWebAppReleaseReservationBranch(
   options: CreateWebAppReleaseReservationBranchGitOptions,
 ): Task<WebAppReleaseReservationAction, Error> {
@@ -288,7 +350,7 @@ export function createWebAppReleaseReservationBranch(
     return Task.reject(releaseBranchVersionResult.error);
   }
 
-  if (fullCommitShaPattern.test(requestedTargetCommit) === false) {
+  if (!fullCommitShaPattern.test(requestedTargetCommit)) {
     return Task.reject(new Error('Invalid target commit: expected a full 40-character hexadecimal SHA'));
   }
 
