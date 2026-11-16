@@ -35,7 +35,6 @@ import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {handleEscDown} from '../../../util/keyboardUtil';
 import {ModalComponent} from '../../Modals/ModalComponent';
-import {translateMeetingPasswordError} from '../shared/validation/meetingPasswordValidation';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -47,6 +46,7 @@ import {
   submitButtonStyles,
   wrapperStyles,
 } from '../shared/styles/meetingModalShell.styles';
+import {translateMeetingPasswordError} from '../shared/validation/meetingPasswordValidation';
 
 export const MeetNowModal: FunctionComponent = () => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
