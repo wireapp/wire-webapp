@@ -23,11 +23,21 @@ import {JobsTaskStatus, RestActionStatus} from 'cells-sdk-ts';
 import {Maybe} from 'true-myth';
 
 import {CellNode, CellNodeType} from '../../../../../types/cellNode';
+import {createSharedDriveBackgroundActionController} from '../../sharedDriveBackgroundActionController';
+import type {SharedDriveMoveStatus} from '../../sharedDriveUploadStatusContext';
 
 import type {RestoreTarget} from './resolveRestoreTargets';
 import {useBulkRestore, type BulkRestoreState, type UseBulkRestoreOptions} from './useBulkRestore';
 
 const conversationQualifiedId = {id: 'conversation-id', domain: 'wire.test'};
+const restoreStatus: SharedDriveMoveStatus = {
+  id: 'restore-1',
+  conversationQualifiedId: 'conversation-id@wire.test',
+  action: 'restore',
+  items: [],
+  destinationPath: '',
+  kind: 'processing',
+};
 
 const createNode = (path: string): CellNode => {
   return {
@@ -66,6 +76,7 @@ interface BulkRestoreTestSetup {
   readonly onStatusChange: jest.Mock;
   readonly onStatusCleared: jest.Mock;
   readonly reportError: jest.Mock;
+  readonly publishStatus: jest.Mock;
   readonly options: UseBulkRestoreOptions;
 }
 
@@ -79,6 +90,8 @@ const createSetup = (): BulkRestoreTestSetup => {
   const onStatusChange = jest.fn();
   const onStatusCleared = jest.fn();
   const reportError = jest.fn();
+  const publishStatus = jest.fn();
+  const backgroundActionController = createSharedDriveBackgroundActionController(publishStatus);
   const options: UseBulkRestoreOptions = {
     cellsRepository: {restoreNodes, lookupNodeByPath, getBackgroundActionInfo},
     clock,
@@ -94,6 +107,8 @@ const createSetup = (): BulkRestoreTestSetup => {
     onStatusChange,
     onStatusCleared,
     reportError,
+    observeBackgroundAction: backgroundActionController.start,
+    publishStatus,
   };
   return {
     clock,
@@ -105,6 +120,7 @@ const createSetup = (): BulkRestoreTestSetup => {
     onStatusChange,
     onStatusCleared,
     reportError,
+    publishStatus,
     options,
   };
 };
@@ -117,7 +133,7 @@ describe('useBulkRestore', () => {
     });
 
     await act(async () => {
-      await result.current.restore([selected('a.txt'), selected('b.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt'), selected('b.txt')], 'bin-scope', restoreStatus);
     });
 
     expect(restoreNodes).toHaveBeenCalledTimes(1);
@@ -135,7 +151,7 @@ describe('useBulkRestore', () => {
     });
 
     await act(async () => {
-      await result.current.restore([parentOf('Folder')], 'bin-scope');
+      await result.current.restore([parentOf('Folder')], 'bin-scope', restoreStatus);
     });
 
     expect(lookupNodeByPath).toHaveBeenCalledWith({path: expect.stringContaining('recycle_bin/Folder')});
@@ -150,7 +166,7 @@ describe('useBulkRestore', () => {
     });
 
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
 
     expect(result.current.reviewReason).toBe('request-failed');
@@ -165,7 +181,7 @@ describe('useBulkRestore', () => {
     });
 
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
     expect(result.current.reviewReason).toBe('refresh-failed');
     expect(onRestoreSettled).not.toHaveBeenCalled();
@@ -186,7 +202,7 @@ describe('useBulkRestore', () => {
       return useBulkRestore(options);
     });
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
 
     await act(async () => {
@@ -211,7 +227,7 @@ describe('useBulkRestore', () => {
 
     let restoreRequest: Promise<void> | undefined;
     await act(async () => {
-      restoreRequest = result.current.restore([selected('a.txt')], 'bin-scope');
+      restoreRequest = result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
       await Promise.resolve();
     });
     expect(result.current.isPending).toBe(true);
@@ -236,7 +252,7 @@ describe('useBulkRestore', () => {
     });
 
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
 
     expect(onStatusChange.mock.calls).toEqual([['processing'], ['completed']]);
@@ -250,7 +266,7 @@ describe('useBulkRestore', () => {
     });
 
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
 
     expect(onStatusChange.mock.calls).toEqual([['processing'], ['request-failed']]);
@@ -264,7 +280,7 @@ describe('useBulkRestore', () => {
     });
 
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
 
     expect(onStatusChange.mock.calls).toEqual([['processing'], ['finished-unknown']]);
@@ -277,7 +293,7 @@ describe('useBulkRestore', () => {
       return useBulkRestore(options);
     });
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
     expect(onStatusCleared).not.toHaveBeenCalled();
 
@@ -289,17 +305,18 @@ describe('useBulkRestore', () => {
   });
 
   it('still reports the real outcome when the scope changed during the restore, without refreshing', async () => {
-    const {onRefreshAndReportSuccess, onRestoreSettled, onStatusChange, options} = createSetup();
+    const {onRefreshAndReportSuccess, onRestoreSettled, onStatusChange, publishStatus, options} = createSetup();
     const isCurrentScope = jest.fn().mockReturnValueOnce(true).mockReturnValue(false);
     const {result} = renderHook(() => {
       return useBulkRestore({...options, isCurrentScope});
     });
 
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
 
-    expect(onStatusChange.mock.calls).toEqual([['processing'], ['completed']]);
+    expect(onStatusChange).toHaveBeenLastCalledWith('processing');
+    expect(publishStatus).toHaveBeenLastCalledWith({...restoreStatus, kind: 'completed'});
     expect(onRefreshAndReportSuccess).not.toHaveBeenCalled();
     expect(onRestoreSettled).not.toHaveBeenCalled();
   });
@@ -313,7 +330,7 @@ describe('useBulkRestore', () => {
     });
 
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
 
     expect(reportError).toHaveBeenCalledWith(error);
@@ -326,7 +343,7 @@ describe('useBulkRestore', () => {
       return useBulkRestore(options);
     });
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
     let resolveRefresh: (didRefresh: boolean) => void = () => {
       return undefined;
@@ -365,8 +382,8 @@ describe('useBulkRestore', () => {
 
     await act(async () => {
       await Promise.all([
-        result.current.restore([selected('a.txt')], 'bin-scope'),
-        result.current.restore([selected('a.txt')], 'bin-scope'),
+        result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus),
+        result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus),
       ]);
     });
 
@@ -385,7 +402,7 @@ describe('useBulkRestore', () => {
     });
 
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
 
     expect(restoreNodes).not.toHaveBeenCalled();
@@ -412,7 +429,7 @@ describe('useBulkRestore', () => {
     let restoreA: Promise<void> | undefined;
     let restoreB: Promise<void> | undefined;
     act(() => {
-      restoreA = result.current.restore([selected('a.txt')], 'A');
+      restoreA = result.current.restore([selected('a.txt')], 'A', restoreStatus);
     });
     await waitFor(() => {
       return expect(resolvers).toHaveLength(1);
@@ -420,7 +437,7 @@ describe('useBulkRestore', () => {
     act(() => {
       currentScope = 'B';
       result.current.reset();
-      restoreB = result.current.restore([selected('b.txt')], 'B');
+      restoreB = result.current.restore([selected('b.txt')], 'B', restoreStatus);
     });
     await waitFor(() => {
       return expect(resolvers).toHaveLength(2);
@@ -449,7 +466,7 @@ describe('useBulkRestore', () => {
       return useBulkRestore(options);
     });
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'A');
+      await result.current.restore([selected('a.txt')], 'A', restoreStatus);
     });
     onRefreshAndReportSuccess.mockImplementationOnce(() => {
       return new Promise(resolve => {
@@ -474,7 +491,7 @@ describe('useBulkRestore', () => {
   });
 
   it('does not refresh or settle when the response arrives after unmount', async () => {
-    const {restoreNodes, onRefreshAndReportSuccess, onRestoreSettled, options} = createSetup();
+    const {restoreNodes, onRefreshAndReportSuccess, onRestoreSettled, publishStatus, options} = createSetup();
     let resolveRestore: ((response: {Status: string}) => void) | undefined;
     restoreNodes.mockImplementation(() => {
       return new Promise(resolve => {
@@ -487,7 +504,7 @@ describe('useBulkRestore', () => {
 
     let restoreRequest: Promise<void> | undefined;
     act(() => {
-      restoreRequest = result.current.restore([selected('a.txt')], 'bin-scope');
+      restoreRequest = result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
     await waitFor(() => {
       expect(resolveRestore).toBeDefined();
@@ -500,16 +517,19 @@ describe('useBulkRestore', () => {
 
     expect(onRefreshAndReportSuccess).not.toHaveBeenCalled();
     expect(onRestoreSettled).not.toHaveBeenCalled();
+    expect(publishStatus).toHaveBeenLastCalledWith({...restoreStatus, kind: 'completed'});
   });
 
-  describe('when background polling is cancelled before an outcome is known', () => {
+  describe('when background polling continues after leaving the Bin', () => {
     const startPollingRestore = async (): Promise<{
       readonly setup: BulkRestoreTestSetup;
       readonly view: ReturnType<typeof renderHook<BulkRestoreState, unknown>>;
       readonly restoreRequest: Promise<void>;
     }> => {
       const setup = createSetup();
-      setup.getBackgroundActionInfo.mockResolvedValue({Status: JobsTaskStatus.Running});
+      setup.getBackgroundActionInfo
+        .mockResolvedValueOnce({Status: JobsTaskStatus.Running})
+        .mockResolvedValueOnce({Status: JobsTaskStatus.Finished});
       setup.restoreNodes.mockResolvedValue({
         Status: RestActionStatus.Background,
         BackgroundActions: [{Name: 'restore', JobUuid: 'job-1', Status: JobsTaskStatus.Running}],
@@ -519,7 +539,7 @@ describe('useBulkRestore', () => {
       });
       let restoreRequest: Promise<void> = Promise.resolve();
       await act(async () => {
-        restoreRequest = view.result.current.restore([selected('a.txt')], 'bin-scope');
+        restoreRequest = view.result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
         await Promise.resolve();
       });
       await waitFor(() => {
@@ -528,7 +548,7 @@ describe('useBulkRestore', () => {
       return {setup, view, restoreRequest};
     };
 
-    it('reports status-unknown and settles the restore when reset', async () => {
+    it('reports completion after reset', async () => {
       const {setup, view, restoreRequest} = await startPollingRestore();
       expect(setup.onStatusChange).toHaveBeenLastCalledWith('processing');
 
@@ -536,23 +556,25 @@ describe('useBulkRestore', () => {
         view.result.current.reset();
       });
       await act(async () => {
+        setup.clock.advanceByMilliseconds(1000);
         await restoreRequest;
       });
 
-      expect(setup.onStatusChange).toHaveBeenLastCalledWith('status-unknown');
+      expect(setup.publishStatus).toHaveBeenLastCalledWith({...restoreStatus, kind: 'completed'});
       expect(setup.onRefreshAndReportSuccess).not.toHaveBeenCalled();
       expect(view.result.current.isPending).toBe(false);
     });
 
-    it('reports status-unknown and settles the restore when unmounted', async () => {
+    it('reports completion after unmount', async () => {
       const {setup, view, restoreRequest} = await startPollingRestore();
 
       view.unmount();
       await act(async () => {
+        setup.clock.advanceByMilliseconds(1000);
         await restoreRequest;
       });
 
-      expect(setup.onStatusChange).toHaveBeenLastCalledWith('status-unknown');
+      expect(setup.publishStatus).toHaveBeenLastCalledWith({...restoreStatus, kind: 'completed'});
       expect(setup.onRefreshAndReportSuccess).not.toHaveBeenCalled();
     });
   });
@@ -564,7 +586,7 @@ describe('useBulkRestore', () => {
       return useBulkRestore(options);
     });
     await act(async () => {
-      await result.current.restore([selected('a.txt')], 'bin-scope');
+      await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
     });
     onRefreshAndReportSuccess.mockClear();
     onRefreshAndReportSuccess.mockReturnValue(
@@ -582,7 +604,7 @@ describe('useBulkRestore', () => {
   });
   describe('when the view changes while the Bin refreshes after the restore', () => {
     it('still reports a completed restore whose refresh succeeded', async () => {
-      const {onRefreshAndReportSuccess, onStatusChange, options} = createSetup();
+      const {onRefreshAndReportSuccess, publishStatus, options} = createSetup();
       let isScopeCurrent = true;
       onRefreshAndReportSuccess.mockImplementation(() => {
         isScopeCurrent = false;
@@ -598,10 +620,10 @@ describe('useBulkRestore', () => {
       });
 
       await act(async () => {
-        await result.current.restore([selected('a.txt')], 'bin-scope');
+        await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
       });
 
-      expect(onStatusChange).toHaveBeenLastCalledWith('completed');
+      expect(publishStatus).toHaveBeenLastCalledWith({...restoreStatus, kind: 'completed'});
     });
 
     it.each([
@@ -618,7 +640,7 @@ describe('useBulkRestore', () => {
         },
       ],
     ] as const)('still reports the %s outcome instead of leaving the popup on processing', async (outcome, respond) => {
-      const {restoreNodes, onRefreshAndReportSuccess, onStatusChange, options} = createSetup();
+      const {restoreNodes, onRefreshAndReportSuccess, publishStatus, options} = createSetup();
       restoreNodes.mockImplementation(respond);
       let isScopeCurrent = true;
       onRefreshAndReportSuccess.mockImplementation(() => {
@@ -635,10 +657,10 @@ describe('useBulkRestore', () => {
       });
 
       await act(async () => {
-        await result.current.restore([selected('a.txt')], 'bin-scope');
+        await result.current.restore([selected('a.txt')], 'bin-scope', restoreStatus);
       });
 
-      expect(onStatusChange).toHaveBeenLastCalledWith(outcome);
+      expect(publishStatus).toHaveBeenLastCalledWith({...restoreStatus, kind: outcome});
     });
   });
 });
