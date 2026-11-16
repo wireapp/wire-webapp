@@ -1350,6 +1350,68 @@ describe('CellsTable selection', () => {
     }
   });
 
+  it('reports a permanent delete completed after leaving the Bin table', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const request = Promise.withResolvers<Awaited<ReturnType<CellsRepository['deleteNodes']>>>();
+    const repository = {deleteNodes: jest.fn().mockReturnValue(request.promise)} as unknown as CellsRepository;
+
+    try {
+      const table = renderCellsTable({cellsRepository: repository});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+      table.hideTable();
+
+      await act(async () => {
+        request.resolve({Status: RestActionStatus.Performed});
+        await request.promise;
+      });
+
+      expect(screen.getByText('cells.bulkDelete.status.deleted')).toBeInTheDocument();
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('continues a permanent delete job after leaving the Bin table', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: 'Running'})
+      .mockResolvedValueOnce({Status: 'Finished'});
+    const repository = {
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: RestActionStatus.Background,
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      }),
+      getBackgroundActionInfo,
+    } as unknown as CellsRepository;
+
+    try {
+      const table = renderCellsTable({cellsRepository: repository});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+      await waitFor(() => {
+        expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+      });
+      table.hideTable();
+
+      await waitFor(() => {
+        expect(screen.getByText('cells.bulkDelete.status.deleted')).toBeInTheDocument();
+      });
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
   it.each([THEME_ID.LIGHT, THEME_ID.DARK])(
     'shows an authoritative delete rejection without treating it as pending work in %s',
     async themeId => {
