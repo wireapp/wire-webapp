@@ -38,6 +38,7 @@ const esmPackagesToTransform = [
   '@enormora/objectory',
   '@enormora/clock',
   '@sindresorhus/is',
+  '@stablelib/utf8',
   '@faker-js/faker',
 ];
 
