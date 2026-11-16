@@ -38,6 +38,7 @@ import {KEY} from '../../../util/keyboardUtil';
 import {RotateMeetingLinkModal} from './rotateMeetingLinkModal';
 import {useRotateMeetingLinkModal} from './useRotateMeetingLinkModal';
 import {rotateMeetingLinkErrors} from '../meetingStore/rotateMeetingLinkErrors';
+import {meetingPasswordConfirmationRequiredKey} from '../shared/validation/meetingPasswordValidation';
 
 const meetingId = {id: 'meeting-id', domain: 'example.com'};
 const rotatedLink = 'https://wire.example/new-link';
@@ -127,9 +128,23 @@ describe('RotateMeetingLinkModal', () => {
     });
   });
 
+  it('waits until submission to require password confirmation', () => {
+    renderModal(jest.fn().mockReturnValue(task.resolve(meeting)));
+    fireEvent.change(screen.getByLabelText('modalGuestLinkJoinLabel'), {target: {value: 'ValidPassword1!'}});
+    expect(useRotateMeetingLinkModal.getState().errors.passwordConfirmation).toBeUndefined();
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.rotateLink.submit'}));
+    expect(useRotateMeetingLinkModal.getState().errors.passwordConfirmation).toBe(
+      meetingPasswordConfirmationRequiredKey,
+    );
+    fireEvent.change(screen.getByLabelText('modalGuestLinkJoinConfirmLabel'), {target: {value: 'ValidPassword1!'}});
+    expect(useRotateMeetingLinkModal.getState().errors.passwordConfirmation).toBeUndefined();
+  });
+
   it('shows the password warning before rotating a password-protected meeting without a new password', () => {
     const rotateMeetingLink = jest.fn().mockReturnValue(task.resolve(meeting));
     renderModal(rotateMeetingLink, [{...meeting, has_password: true}]);
+    expect(screen.getByText('meetings.rotateLink.description')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', {name: 'meetings.meetingLink.title'})).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', {name: 'meetings.rotateLink.submit'}));
 
@@ -196,10 +211,12 @@ describe('RotateMeetingLinkModal', () => {
       passwordConfirmation: '',
       error: undefined,
     });
-    expect(screen.getByDisplayValue(rotatedLink)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', {name: 'meetings.meetingLink.title'})).toHaveTextContent(rotatedLink);
+    expect(screen.getByRole('textbox', {name: 'meetings.meetingLink.title'})).toHaveAttribute('tabindex', '0');
+    expect(screen.getByText('meetings.meetingLink.description')).toHaveClass('meeting-link-confirmation');
 
     unmount();
-    expect(screen.getByDisplayValue(rotatedLink)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', {name: 'meetings.meetingLink.title'})).toHaveTextContent(rotatedLink);
   });
 
   it('keeps the generation modal open after a failed rotation and allows retry', async () => {
