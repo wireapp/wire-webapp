@@ -35,6 +35,7 @@ import {showMeetingLinkConfirmation} from '../meetingLinkConfirmation/meetingLin
 import {useMeetingStore} from '../meetingStore/meetingStoreProvider';
 import {rotateMeetingLinkErrors} from '../meetingStore/rotateMeetingLinkErrors';
 import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';
+import {translateMeetingPasswordError} from '../shared/validation/meetingPasswordValidation';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -110,7 +111,7 @@ export const RotateMeetingLinkModal = (): JSX.Element => {
   };
 
   const handleRotate = (): void => {
-    const errors = state.errors;
+    const errors = state.validate();
     const meetingId = state.meetingId;
     // State controls the rendered UI; the ref closes the same-tick/stale-closure double-submit race before React re-renders.
     if (
@@ -165,18 +166,15 @@ export const RotateMeetingLinkModal = (): JSX.Element => {
           <form id="rotate-meeting-link-form" onSubmit={handleSubmit} noValidate>
             <MeetingLinkForm
               translate={translate}
+              description={translate('meetings.rotateLink.description')}
               onGeneratePassword={password => {
                 state.setPassword(password);
                 state.setPasswordConfirmation(password);
               }}
               passwordValue={state.password}
               passwordValueRef={passwordInputRef}
-              passwordError={!isUndefined(state.errors.password) ? translate(state.errors.password) : undefined}
-              passwordConfirmationError={
-                !isUndefined(state.errors.passwordConfirmation)
-                  ? translate(state.errors.passwordConfirmation)
-                  : undefined
-              }
+              passwordError={translateMeetingPasswordError(translate, state.errors.password)}
+              passwordConfirmationError={translateMeetingPasswordError(translate, state.errors.passwordConfirmation)}
               onPasswordValueChange={state.setPassword}
               isPasswordInputMarkInvalid={!isUndefined(state.errors.password)}
               passwordConfirmationValue={state.passwordConfirmation}
