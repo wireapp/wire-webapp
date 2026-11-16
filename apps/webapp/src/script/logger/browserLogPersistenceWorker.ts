@@ -20,7 +20,7 @@
 import {createClock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isFunction} from '@sindresorhus/is';
-import {Maybe} from 'true-myth';
+import {Maybe, toolbelt} from 'true-myth';
 
 import {createLogWorkerProcessor} from './createLogWorkerProcessor';
 import {
@@ -58,16 +58,16 @@ function initialize(): Maybe<LogStore> {
     return Maybe.nothing();
   }
 
-  return Maybe.just(
-    createOriginPrivateFileSystemLogStore({
-      clock: createClock(),
-      sessionIdentifier: workerScope.crypto.randomUUID(),
-      configuration: logPersistenceConfiguration,
-      getDirectory() {
-        return workerScope.navigator.storage.getDirectory();
-      },
-    }),
-  );
+  const storeResult = createOriginPrivateFileSystemLogStore({
+    clock: createClock(),
+    sessionIdentifier: workerScope.crypto.randomUUID(),
+    configuration: logPersistenceConfiguration,
+    getDirectory() {
+      return workerScope.navigator.storage.getDirectory();
+    },
+  });
+
+  return toolbelt.toMaybe(storeResult);
 }
 
 const processor = createLogWorkerProcessor({

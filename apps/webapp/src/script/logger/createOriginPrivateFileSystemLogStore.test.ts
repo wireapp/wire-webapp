@@ -20,7 +20,13 @@
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {Maybe} from 'true-myth';
 
-import {createOriginPrivateFileSystemLogStore, type LogDirectory} from './createOriginPrivateFileSystemLogStore';
+import {unwrap, unwrapErr} from '../util/test/resultTestSupport';
+
+import {
+  createOriginPrivateFileSystemLogStore,
+  type LogDirectory,
+  type LogStore,
+} from './createOriginPrivateFileSystemLogStore';
 import {
   logDirectoryName,
   logPersistenceConfiguration,
@@ -189,25 +195,30 @@ type TestStoreOptions = {
   readonly storage: ReturnType<typeof createTestDirectory>;
   readonly configuration?: LogPersistenceConfiguration;
   readonly sessionIdentifier?: string;
+  readonly accountIdentifier?: string;
   readonly clock?: ReturnType<typeof createTestClock>;
 };
 
-function createStoreForTest(options: TestStoreOptions): ReturnType<typeof createOriginPrivateFileSystemLogStore> {
+function createStoreForTest(options: TestStoreOptions): LogStore {
   const {
     storage,
     configuration = logPersistenceConfiguration,
     sessionIdentifier = firstSessionIdentifier,
+    accountIdentifier,
     clock = createTestClock(),
   } = options;
 
-  return createOriginPrivateFileSystemLogStore({
-    async getDirectory() {
-      return storage.directory;
-    },
-    clock,
-    sessionIdentifier,
-    configuration,
-  });
+  return unwrap(
+    createOriginPrivateFileSystemLogStore({
+      async getDirectory() {
+        return storage.directory;
+      },
+      clock,
+      sessionIdentifier,
+      accountIdentifier,
+      configuration,
+    }),
+  );
 }
 
 describe('worker synchronous Origin Private File System log store', () => {
@@ -222,7 +233,82 @@ describe('worker synchronous Origin Private File System log store', () => {
     await secondWriter.append(['{"third":true}\n']);
 
     expect(readLogFileContents(storage)).toEqual([`${line}{"second":true}\n`, '{"third":true}\n']);
+    expect([...storage.files.keys()]).toEqual([
+      `log-1000000-${firstSessionIdentifier}-1.jsonl`,
+      `log-1000000-${secondSessionIdentifier}-1.jsonl`,
+    ]);
     expect(storage.state.writing).toBe(false);
+  });
+
+  it('suffixes account filenames and shares retention with legacy files and other accounts', async () => {
+    const storage = createTestDirectory();
+    const accountIdentifier = 'a'.repeat(64);
+    const legacyFilename = `log-999998-${firstSessionIdentifier}-1.jsonl`;
+    const otherAccountFilename = `log-999999-${firstSessionIdentifier}-1-${'b'.repeat(64)}.jsonl`;
+    const accountFilename = `log-1000000-${firstSessionIdentifier}-1-${accountIdentifier}.jsonl`;
+    storage.files.set(legacyFilename, encode('{}\n'));
+    storage.files.set(otherAccountFilename, encode('{}\n'));
+    const writer = createStoreForTest({
+      storage,
+      accountIdentifier,
+      configuration: {...logPersistenceConfiguration, maximumTotalBytes: 9},
+    });
+
+    await writer.append(['{}\n']);
+
+    expect([...storage.files.keys()]).toEqual([legacyFilename, otherAccountFilename, accountFilename]);
+
+    await writer.append(['[]\n']);
+
+    expect([...storage.files.keys()]).toEqual([otherAccountFilename, accountFilename]);
+
+    await writer.append(['{}\n']);
+
+    expect([...storage.files.keys()]).toEqual([accountFilename]);
+    expect(readLogFileContents(storage)).toEqual(['{}\n[]\n{}\n']);
+  });
+
+  it.each([
+    '',
+    firstSessionIdentifier,
+    'account.example',
+    '../account',
+    'a'.repeat(63),
+    'a'.repeat(65),
+    'A'.repeat(64),
+    'g'.repeat(64),
+    `${'a'.repeat(63)}\n`,
+    `${'a'.repeat(64)}\n`,
+  ])('returns Err for invalid account identifier %j before accessing storage', accountIdentifier => {
+    const getDirectory = jest.fn(async () => {
+      throw new Error('Unexpected storage access');
+    });
+
+    const storeResult = createOriginPrivateFileSystemLogStore({
+      getDirectory,
+      clock: createTestClock(),
+      sessionIdentifier: firstSessionIdentifier,
+      accountIdentifier,
+      configuration: logPersistenceConfiguration,
+    });
+
+    expect(unwrapErr(storeResult).message).toBe('Invalid log account identifier');
+    expect(getDirectory).not.toHaveBeenCalled();
+  });
+
+  it('returns Err for an invalid session identifier before accessing storage', () => {
+    const getDirectory = jest.fn(async () => {
+      throw new Error('Unexpected storage access');
+    });
+    const storeResult = createOriginPrivateFileSystemLogStore({
+      getDirectory,
+      clock: createTestClock(),
+      sessionIdentifier: 'invalid-session',
+      configuration: logPersistenceConfiguration,
+    });
+
+    expect(unwrapErr(storeResult).message).toBe('Invalid log session identifier');
+    expect(getDirectory).not.toHaveBeenCalled();
   });
 
   it('handles short synchronous writes without splitting or changing multibyte records', async () => {

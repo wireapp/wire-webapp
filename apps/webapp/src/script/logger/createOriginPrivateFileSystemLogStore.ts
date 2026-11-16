@@ -18,8 +18,8 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import {isNull, isObject, isSafeInteger} from '@sindresorhus/is';
-import {Maybe} from 'true-myth';
+import {isNull, isObject, isSafeInteger, isString, isUndefined} from '@sindresorhus/is';
+import {Maybe, Result} from 'true-myth';
 
 import {logDirectoryName, type LogPersistenceConfiguration} from './logPersistenceConfiguration';
 
@@ -48,6 +48,8 @@ export type OriginPrivateFileSystemLogStoreOptions = {
   readonly getDirectory: () => Promise<LogDirectory>;
   readonly clock: Pick<Clock, 'currentUnixEpochMilliseconds'>;
   readonly sessionIdentifier: string;
+  // A caller-derived SHA-256 digest encoded as lowercase hex, never a raw account ID or domain.
+  readonly accountIdentifier?: string;
   readonly configuration: LogPersistenceConfiguration;
 };
 
@@ -70,9 +72,23 @@ type LogFileRetentionOptions = {
 };
 
 const newlineByte = 10;
+const accountIdentifierLength = 64;
 
 // Only files owned by this version participate in retention. Never recurse into directories.
-const logFilenamePattern = /^log-(\d+)-([a-f0-9-]{36})-(\d+)\.jsonl$/u;
+const logFilenamePattern = /^log-(\d+)-([a-f0-9-]{36})-(\d+)(?:-[a-f0-9]{64})?\.jsonl$/u;
+
+function isValidSessionIdentifier(sessionIdentifier: unknown): boolean {
+  return isString(sessionIdentifier) && /^[a-f0-9-]{36}$/u.test(sessionIdentifier);
+}
+
+function isValidOptionalAccountIdentifier(accountIdentifier: unknown): boolean {
+  return (
+    isUndefined(accountIdentifier) ||
+    (isString(accountIdentifier) &&
+      accountIdentifier.length === accountIdentifierLength &&
+      /^[a-f0-9]{64}$/u.test(accountIdentifier))
+  );
+}
 
 function shouldRemoveLogFile(options: LogFileRetentionOptions): boolean {
   const {file, currentTimeMilliseconds, totalStoredBytes, incomingBatchBytes, configuration} = options;
@@ -154,11 +170,18 @@ async function listLogFiles(directory: LogDirectory): Promise<readonly StoredLog
   });
 }
 
-export function createOriginPrivateFileSystemLogStore(options: OriginPrivateFileSystemLogStoreOptions): LogStore {
-  const {getDirectory, clock, sessionIdentifier, configuration} = options;
-  if (!/^[a-f0-9-]{36}$/u.test(sessionIdentifier)) {
-    throw new Error('Invalid log session identifier');
+export function createOriginPrivateFileSystemLogStore(
+  options: OriginPrivateFileSystemLogStoreOptions,
+): Result<LogStore, Error> {
+  const {getDirectory, clock, sessionIdentifier, accountIdentifier, configuration} = options;
+  if (!isValidSessionIdentifier(sessionIdentifier)) {
+    return Result.err(new Error('Invalid log session identifier'));
   }
+  if (!isValidOptionalAccountIdentifier(accountIdentifier)) {
+    return Result.err(new Error('Invalid log account identifier'));
+  }
+
+  const accountSuffix = isUndefined(accountIdentifier) ? '' : `-${accountIdentifier}`;
 
   let activeFilename: Maybe<string> = Maybe.nothing();
   let sequence = 0;
@@ -223,7 +246,7 @@ export function createOriginPrivateFileSystemLogStore(options: OriginPrivateFile
     if (activeFile.isNothing || activeFile.value.sizeBytes + batchBytes > configuration.maximumFileBytes) {
       // Previous sessions may end with interrupted bytes; never reopen them for appending.
       sequence += 1;
-      activeFilename = Maybe.just(`log-${nowMilliseconds}-${sessionIdentifier}-${sequence}.jsonl`);
+      activeFilename = Maybe.just(`log-${nowMilliseconds}-${sessionIdentifier}-${sequence}${accountSuffix}.jsonl`);
       activeFile = Maybe.nothing();
     }
 
@@ -281,5 +304,5 @@ export function createOriginPrivateFileSystemLogStore(options: OriginPrivateFile
     }
   }
 
-  return {append};
+  return Result.ok({append});
 }
