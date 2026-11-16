@@ -35,6 +35,7 @@ import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {handleEscDown} from '../../../util/keyboardUtil';
 import {ModalComponent} from '../../Modals/ModalComponent';
+import {translateMeetingPasswordError} from '../shared/validation/meetingPasswordValidation';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -70,10 +71,10 @@ export const MeetNowModal: FunctionComponent = () => {
     return isUndefined(errors.title) ? undefined : translate(errors.title);
   }, [errors.title, translate]);
   const passwordError = useMemo(() => {
-    return isUndefined(errors.password) ? undefined : translate(errors.password);
+    return translateMeetingPasswordError(translate, errors.password);
   }, [errors.password, translate]);
   const passwordConfirmationError = useMemo(() => {
-    return isUndefined(errors.passwordConfirmation) ? undefined : translate(errors.passwordConfirmation);
+    return translateMeetingPasswordError(translate, errors.passwordConfirmation);
   }, [errors.passwordConfirmation, translate]);
 
   const dismissModal = (): void => {

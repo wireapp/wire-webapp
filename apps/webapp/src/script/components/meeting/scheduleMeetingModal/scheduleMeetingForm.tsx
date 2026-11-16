@@ -50,6 +50,7 @@ import {getOverlayPortalContainer} from '../../../uiKit/utils/overlayPortal';
 import {getRegionalDateLocale} from '../../../util/timeUtil';
 import {MeetingParticipantsPicker} from '../meetingParticipantsPicker';
 import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';
+import {embeddedPasswordHeadingStyles} from '../shared/meetingLinkForm/meetingLinkForm.styles';
 import {useMeetingParticipants} from '../shared/participants/useMeetingParticipants';
 import {
   scheduleMeetingFormBottomWrapperCss,
@@ -299,6 +300,7 @@ export const ScheduleMeetingForm: FunctionComponent<ScheduleMeetingFormProps> = 
         {mode === scheduleMeetingModes.create && (
           <MeetingLinkForm
             translate={translate}
+            heading={<h3 css={embeddedPasswordHeadingStyles}>{translate('meetings.meetingLink.title')}</h3>}
             onGeneratePassword={password => {
               onPasswordChange?.(password);
               onPasswordConfirmationChange?.(password);
