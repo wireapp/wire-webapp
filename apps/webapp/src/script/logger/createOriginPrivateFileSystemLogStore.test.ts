@@ -22,6 +22,7 @@ import {Maybe} from 'true-myth';
 
 import {unwrap, unwrapErr} from '../util/test/resultTestSupport';
 
+import {createLogWorkerProcessor} from './createLogWorkerProcessor';
 import {
   createOriginPrivateFileSystemLogStore,
   type LogDirectory,
@@ -222,6 +223,36 @@ function createStoreForTest(options: TestStoreOptions): LogStore {
 }
 
 describe('worker synchronous Origin Private File System log store', () => {
+  it('preserves unattributed log files when the worker binds an account after writing', async () => {
+    const storage = createTestDirectory();
+    const accountIdentifier = 'a'.repeat(64);
+    const respond = jest.fn();
+    const processor = createLogWorkerProcessor({
+      initialize(accountIdentifier) {
+        return Maybe.just(createStoreForTest({storage, accountIdentifier}));
+      },
+      respond,
+      close() {},
+      maximumBatchBytes: logPersistenceConfiguration.maximumPendingBytes,
+    });
+    await processor.receive({type: 'append', requestIdentifier: 1, lines: ['{"before":true}\n']});
+    await processor.receive({type: 'bind-account', requestIdentifier: 2, accountIdentifier});
+    await processor.receive({type: 'append', requestIdentifier: 3, lines: ['{"after":true}\n']});
+    await processor.receive({type: 'shutdown', requestIdentifier: 4});
+
+    expect([...storage.files.keys()]).toEqual([
+      `log-1000000-${firstSessionIdentifier}-1.jsonl`,
+      `log-1000000-${firstSessionIdentifier}-1-${accountIdentifier}.jsonl`,
+    ]);
+    expect(readLogFileContents(storage)).toEqual(['{"before":true}\n', '{"after":true}\n']);
+    expect(storage.state.writing).toBe(false);
+    expect(respond.mock.calls).toEqual(
+      [1, 2, 3, 4].map(requestIdentifier => {
+        return [{requestIdentifier, outcome: 'complete'}];
+      }),
+    );
+  });
+
   it('writes exact JSONL, flushes once per batch, closes handles, and survives reinitialization', async () => {
     const storage = createTestDirectory();
     const firstWriter = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});

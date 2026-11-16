@@ -17,17 +17,40 @@
  *
  */
 
-import {isArray, isPlainObject, isSafeInteger, isString} from '@sindresorhus/is';
+import {isArray, isObject, isPlainObject, isSafeInteger, isString} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
+import {objectHasOwn} from 'ts-extras';
+
+const accountIdentifierLength = 64;
 
 export type LogWorkerCommand =
-  {readonly type: 'initialize' | 'flush' | 'shutdown'} | {readonly type: 'append'; readonly lines: readonly string[]};
+  | {readonly type: 'initialize' | 'flush' | 'shutdown'}
+  | {readonly type: 'append'; readonly lines: readonly string[]}
+  // A caller-derived SHA-256 digest encoded as lowercase hex, never a raw account ID or domain.
+  | {readonly type: 'bind-account'; readonly accountIdentifier: string};
 
 export type LogWorkerRequest = LogWorkerCommand & {readonly requestIdentifier: number};
 export type LogWorkerResponse = {
   readonly requestIdentifier: number;
   readonly outcome: 'complete' | 'failed' | 'unsupported';
 };
+
+type IdentifiedLogWorkerMessage = {
+  readonly requestIdentifier: number;
+  readonly [propertyName: string]: unknown;
+};
+
+function hasValidRequestIdentifier(value: unknown): value is IdentifiedLogWorkerMessage {
+  return isPlainObject(value) && isRequestIdentifier(value['requestIdentifier']);
+}
+
+function isAccountIdentifier(value: unknown): value is string {
+  return isString(value) && value.length === accountIdentifierLength && /^[a-f0-9]{64}$/u.test(value);
+}
+
+function isLogWorkerOutcome(value: unknown): value is LogWorkerResponse['outcome'] {
+  return value === 'complete' || value === 'failed' || value === 'unsupported';
+}
 
 function isControlCommand(value: unknown): value is 'initialize' | 'flush' | 'shutdown' {
   return value === 'initialize' || value === 'flush' || value === 'shutdown';
@@ -70,13 +93,26 @@ function parseBatch(value: unknown, maximumBatchBytes: number): Maybe<readonly s
   return Maybe.just(value);
 }
 
+export function isLogWorkerAccountBindingAttempt(value: unknown): boolean {
+  return isObject(value) && objectHasOwn(value, 'type') && value.type === 'bind-account';
+}
+
 export function parseLogWorkerRequest(value: unknown, maximumBatchBytes: number): Maybe<LogWorkerRequest> {
-  if (!isPlainObject(value) || !isRequestIdentifier(value['requestIdentifier'])) {
+  if (!hasValidRequestIdentifier(value)) {
     return Maybe.nothing();
   }
 
   const requestIdentifier = value['requestIdentifier'];
   const commandType = value['type'];
+  if (commandType === 'bind-account') {
+    const accountIdentifier = value['accountIdentifier'];
+    if (isAccountIdentifier(accountIdentifier)) {
+      return Maybe.just({type: 'bind-account', requestIdentifier, accountIdentifier});
+    }
+
+    return Maybe.nothing();
+  }
+
   if (isControlCommand(commandType)) {
     return Maybe.just({type: commandType, requestIdentifier});
   }
@@ -91,12 +127,12 @@ export function parseLogWorkerRequest(value: unknown, maximumBatchBytes: number)
 }
 
 export function parseLogWorkerResponse(value: unknown): Maybe<LogWorkerResponse> {
-  if (!isPlainObject(value) || !isRequestIdentifier(value['requestIdentifier'])) {
+  if (!hasValidRequestIdentifier(value)) {
     return Maybe.nothing();
   }
 
   const outcome = value['outcome'];
-  if (outcome !== 'complete' && outcome !== 'failed' && outcome !== 'unsupported') {
+  if (!isLogWorkerOutcome(outcome)) {
     return Maybe.nothing();
   }
 

@@ -18,13 +18,17 @@
  */
 
 import {Maybe} from 'true-myth';
-import {match, P} from 'ts-pattern';
 
 import type {LogStore} from './createOriginPrivateFileSystemLogStore';
-import {parseLogWorkerRequest, type LogWorkerResponse} from './logWorkerProtocol';
+import {
+  isLogWorkerAccountBindingAttempt,
+  parseLogWorkerRequest,
+  type LogWorkerCommand,
+  type LogWorkerResponse,
+} from './logWorkerProtocol';
 
 type LogWorkerProcessorOptions = {
-  readonly initialize: () => Maybe<LogStore>;
+  readonly initialize: (accountIdentifier: Maybe<string>) => Maybe<LogStore>;
   readonly respond: (response: LogWorkerResponse) => void;
   readonly close: () => void;
   readonly maximumBatchBytes: number;
@@ -34,9 +38,18 @@ type LogWorkerProcessor = {
   readonly receive: (message: unknown) => Promise<void>;
 };
 
+function isWorkerAcceptingCommands(workerIsBusy: boolean, workerIsStopped: boolean): boolean {
+  return !workerIsBusy && !workerIsStopped;
+}
+
+function shouldStopAfterRejectedBinding(command: LogWorkerCommand, workerIsStopped: boolean): boolean {
+  return command.type === 'bind-account' && !workerIsStopped;
+}
+
 export function createLogWorkerProcessor(options: LogWorkerProcessorOptions): LogWorkerProcessor {
   const {initialize, respond, close, maximumBatchBytes} = options;
   let store: Maybe<LogStore> = Maybe.nothing();
+  let accountIdentifier: Maybe<string> = Maybe.nothing();
   let busy = false;
   let stopped = false;
 
@@ -61,46 +74,63 @@ export function createLogWorkerProcessor(options: LogWorkerProcessorOptions): Lo
     const request = parseLogWorkerRequest(message, maximumBatchBytes);
     if (request.isNothing) {
       respondSafely({requestIdentifier: 0, outcome: 'failed'});
+      if (isLogWorkerAccountBindingAttempt(message)) {
+        closeSafely();
+      }
 
       return;
     }
 
-    const {requestIdentifier} = request.value;
-    if (busy || stopped) {
+    const command = request.value;
+    const {requestIdentifier} = command;
+    if (!isWorkerAcceptingCommands(busy, stopped)) {
       respondSafely({requestIdentifier, outcome: 'failed'});
+      if (shouldStopAfterRejectedBinding(command, stopped)) {
+        closeSafely();
+      }
 
       return;
     }
 
     busy = true;
     try {
-      await match(request.value)
-        .with({type: 'shutdown'}, async () => {
-          if (store.isJust) {
-            await store.value.append([]);
-          }
+      if (command.type === 'shutdown') {
+        if (store.isJust) {
+          await store.value.append([]);
+        }
 
-          respondSafely({requestIdentifier, outcome: 'complete'});
-          closeSafely();
-        })
-        .with({type: P.union('initialize', 'append', 'flush')}, async command => {
-          if (store.isNothing) {
-            store = initialize();
-          }
+        respondSafely({requestIdentifier, outcome: 'complete'});
+        closeSafely();
 
-          if (store.isNothing) {
-            respondSafely({requestIdentifier, outcome: 'unsupported'});
-            closeSafely();
+        return;
+      }
 
-            return;
-          }
+      if (command.type === 'bind-account') {
+        if (accountIdentifier.unwrapOr('') !== command.accountIdentifier) {
+          accountIdentifier = Maybe.just(command.accountIdentifier);
+          // Batches release their handles, so switching stores preserves earlier unattributed files.
+          store = Maybe.nothing();
+        }
+      }
 
-          await store.value.append(command.type === 'append' ? command.lines : []);
-          respondSafely({requestIdentifier, outcome: 'complete'});
-        })
-        .exhaustive();
+      if (store.isNothing) {
+        store = initialize(accountIdentifier);
+      }
+
+      if (store.isNothing) {
+        respondSafely({requestIdentifier, outcome: 'unsupported'});
+        closeSafely();
+
+        return;
+      }
+
+      await store.value.append(command.type === 'append' ? command.lines : []);
+      respondSafely({requestIdentifier, outcome: 'complete'});
     } catch {
       respondSafely({requestIdentifier, outcome: 'failed'});
+      if (command.type === 'bind-account') {
+        closeSafely();
+      }
     } finally {
       busy = false;
     }

@@ -53,7 +53,7 @@ function supportsWorkerLogPersistence(): boolean {
   );
 }
 
-function initialize(): Maybe<LogStore> {
+function initialize(accountIdentifier: Maybe<string>): Maybe<LogStore> {
   if (!supportsWorkerLogPersistence()) {
     return Maybe.nothing();
   }
@@ -61,7 +61,7 @@ function initialize(): Maybe<LogStore> {
   const storeResult = createOriginPrivateFileSystemLogStore({
     clock: createClock(),
     sessionIdentifier: workerScope.crypto.randomUUID(),
-    accountIdentifier: Maybe.nothing(),
+    accountIdentifier,
     configuration: logPersistenceConfiguration,
     getDirectory() {
       return workerScope.navigator.storage.getDirectory();

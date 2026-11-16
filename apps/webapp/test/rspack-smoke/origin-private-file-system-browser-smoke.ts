@@ -21,6 +21,7 @@ import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
 import {logDirectoryName, logPersistenceConfiguration} from '../../src/script/logger/logPersistenceConfiguration';
+import type {LogWorkerCommand} from '../../src/script/logger/logWorkerProtocol';
 
 type BrowserLogFile = {
   readonly name: string;
@@ -117,7 +118,11 @@ async function readBrowserLogFiles(page: Page): Promise<readonly BrowserLogFile[
   });
 }
 
-test('loads the native persistence worker and acknowledges append, flush, and shutdown', async ({page, context}) => {
+async function verifyNativePersistenceAccountBinding(
+  page: Page,
+  bindingOrder: 'before initialization' | 'after unattributed writes',
+): Promise<void> {
+  const context = page.context();
   await context.route('**/browser-log-persistence.js', async route => {
     const response = await route.fetch();
     await route.fulfill({
@@ -131,68 +136,90 @@ test('loads the native persistence worker and acknowledges append, flush, and sh
     return `${JSON.stringify({component: 'BrowserSmoke', msg: '[REDACTED]', sequence, detail: 'x'.repeat(65_536)})}\n`;
   });
   try {
-    const outcomes = await page.evaluate(async lines => {
-      const worker = new Worker('/min/browser-log-persistence.js', {name: 'browser-log-persistence'});
-      const commands = [
-        ...Array.from({length: 6}, (_, batchIndex) => {
-          return {
-            type: 'append',
-            requestIdentifier: batchIndex + 2,
-            lines: lines.slice(batchIndex * 3, batchIndex * 3 + 3),
-          };
-        }),
-        {type: 'flush', requestIdentifier: 8},
-        {type: 'shutdown', requestIdentifier: 9},
-      ];
-      const remainingCommands = commands.values();
-      const responses: unknown[] = [];
-      try {
-        await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            reject(new Error('Native persistence worker did not acknowledge its commands'));
-          }, 10_000);
-          worker.addEventListener('error', () => {
-            clearTimeout(timeout);
-            reject(new Error('Native persistence worker failed to load'));
-          });
-          worker.addEventListener('message', (event: MessageEvent<unknown>) => {
-            responses.push(event.data);
-            const nextCommand = remainingCommands.next();
-            if (nextCommand.done === true) {
+    const accountIdentifier = '0123456789abcdef'.repeat(4);
+    const outcomes = await page.evaluate(
+      async options => {
+        const {lines, accountIdentifier, bindingOrder} = options;
+        const worker = new Worker('/min/browser-log-persistence.js', {name: 'browser-log-persistence'});
+        const commands: LogWorkerCommand[] = [
+          {type: 'initialize'},
+          ...Array.from({length: 6}, (_, batchIndex) => {
+            return {
+              type: 'append' as const,
+              lines: lines.slice(batchIndex * 3, batchIndex * 3 + 3),
+            };
+          }),
+          {type: 'flush'},
+          {type: 'shutdown'},
+        ];
+        commands.splice(bindingOrder === 'before initialization' ? 0 : 4, 0, {
+          type: 'bind-account',
+          accountIdentifier,
+        });
+        const remainingCommands = commands
+          .map((command, index) => {
+            return {...command, requestIdentifier: index + 1};
+          })
+          .values();
+        const responses: unknown[] = [];
+        try {
+          await new Promise<void>((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              reject(new Error('Native persistence worker did not acknowledge its commands'));
+            }, 10_000);
+            worker.addEventListener('error', () => {
               clearTimeout(timeout);
-              resolve();
-            } else {
-              worker.postMessage(nextCommand.value);
+              reject(new Error('Native persistence worker failed to load'));
+            });
+            worker.addEventListener('message', (event: MessageEvent<unknown>) => {
+              responses.push(event.data);
+              const nextCommand = remainingCommands.next();
+              if (nextCommand.done === true) {
+                clearTimeout(timeout);
+                resolve();
+              } else {
+                worker.postMessage(nextCommand.value);
+              }
+            });
+            const firstCommand = remainingCommands.next();
+            if (firstCommand.done === false) {
+              worker.postMessage(firstCommand.value);
             }
           });
-          worker.postMessage({type: 'initialize', requestIdentifier: 1});
-        });
-      } finally {
-        worker.terminate();
-      }
+        } finally {
+          worker.terminate();
+        }
 
-      return responses;
-    }, lines);
+        return responses;
+      },
+      {lines, accountIdentifier, bindingOrder},
+    );
     expect(outcomes).toEqual(
-      Array.from({length: 9}, (_, index) => {
+      Array.from({length: 10}, (_, index) => {
         return {requestIdentifier: index + 1, outcome: 'complete'};
       }),
     );
     const files = await readBrowserLogFiles(page);
-    expect(files).toHaveLength(1);
+    expect(files).toHaveLength(bindingOrder === 'before initialization' ? 1 : 2);
     for (const file of files) {
       expect(file.sizeBytes).toBeLessThanOrEqual(logPersistenceConfiguration.maximumFileBytes);
     }
+    const accountFiles = files.filter(file => {
+      return file.name.endsWith(`-${accountIdentifier}.jsonl`);
+    });
+    const unattributedFiles = files.filter(file => {
+      return file.name.endsWith(`-${accountIdentifier}.jsonl`) === false;
+    });
     expect(
-      files
-        .toSorted((left, right) => {
-          return left.name.localeCompare(right.name);
-        })
-        .map(file => {
-          return file.contents;
-        })
-        .join(''),
-    ).toBe(lines.join(''));
+      accountFiles.map(file => {
+        return file.contents;
+      }),
+    ).toEqual([lines.slice(bindingOrder === 'before initialization' ? 0 : 9).join('')]);
+    expect(
+      unattributedFiles.map(file => {
+        return file.contents;
+      }),
+    ).toEqual(bindingOrder === 'before initialization' ? [] : [lines.slice(0, 9).join('')]);
   } finally {
     const files = await readBrowserLogFiles(page);
     await inspectBrowserLogs(page, {
@@ -203,6 +230,14 @@ test('loads the native persistence worker and acknowledges append, flush, and sh
       operation: 'remove',
     });
   }
+}
+
+test('loads the native persistence worker and binds an account before initialization', async ({page}) => {
+  await verifyNativePersistenceAccountBinding(page, 'before initialization');
+});
+
+test('loads the native persistence worker and binds an account after unattributed writes', async ({page}) => {
+  await verifyNativePersistenceAccountBinding(page, 'after unattributed writes');
 });
 
 test('persists sanitized browser logs with console disabled across application reload', async ({page, context}) => {

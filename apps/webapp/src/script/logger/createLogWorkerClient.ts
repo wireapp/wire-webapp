@@ -46,6 +46,7 @@ type PendingWorkerRequest = {
 };
 
 type LogWorkerClient = {
+  readonly bindAccount: (accountIdentifier: string) => Promise<void>;
   readonly append: (lines: readonly string[]) => Promise<void>;
   readonly shutdown: () => Promise<void>;
 };
@@ -126,6 +127,11 @@ export function createLogWorkerClient(options: LogWorkerClientOptions): LogWorke
     });
   }
 
+  async function bindAccount(accountIdentifier: string): Promise<void> {
+    await request({type: 'bind-account', accountIdentifier});
+    initialized = true;
+  }
+
   async function append(lines: readonly string[]): Promise<void> {
     const wasInitialized = initialized;
     if (!initialized) {
@@ -152,5 +158,5 @@ export function createLogWorkerClient(options: LogWorkerClientOptions): LogWorke
     }
   }
 
-  return {append, shutdown};
+  return {bindAccount, append, shutdown};
 }
