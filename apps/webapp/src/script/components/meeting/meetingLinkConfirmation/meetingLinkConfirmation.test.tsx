@@ -18,6 +18,8 @@
  */
 
 import {render, screen} from '@testing-library/react';
+
+import en from '../../../../i18n/en-US.json';
 import {ThemeProvider} from '../../../uiKit';
 
 import {translateForTest} from '../../../util/test/translateForTest';
@@ -47,10 +49,11 @@ describe('MeetingLinkConfirmationMessage', () => {
     expect(screen.getByRole('textbox', {name: 'meetings.meetingLink.title'})).toHaveAttribute('aria-readonly', 'true');
     expect(screen.getByRole('textbox', {name: 'meetings.meetingLink.title'})).toHaveAttribute('tabindex', '0');
     expect(screen.getByRole('button', {name: 'meetings.meetingLink.copyLink'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'meetings.meetingLink.cancel'})).toBeInTheDocument();
     expect(window.getComputedStyle(screen.getByTestId('copy-to-clipboard-icon')).fill).toBe('currentColor');
   });
 
-  it('shows password protection only for secured links', () => {
+  it('shows the correct guidance for both password states', () => {
     const {rerender} = render(
       <ThemeProvider>
         <MeetingLinkConfirmationMessage
@@ -60,7 +63,7 @@ describe('MeetingLinkConfirmationMessage', () => {
         />
       </ThemeProvider>,
     );
-    expect(screen.queryByText('guestOptionsInfoPasswordSecured')).not.toBeInTheDocument();
+    expect(screen.getByRole('note')).toHaveTextContent('meetings.meetingLink.passwordUnprotected');
     rerender(
       <ThemeProvider>
         <MeetingLinkConfirmationMessage
@@ -70,6 +73,18 @@ describe('MeetingLinkConfirmationMessage', () => {
         />
       </ThemeProvider>,
     );
-    expect(screen.getByText('guestOptionsInfoPasswordSecured')).toBeInTheDocument();
+    expect(screen.getByRole('note')).toHaveTextContent('meetings.meetingLink.passwordProtected');
+    expect(screen.getByRole('note')).not.toHaveTextContent('meetings.meetingLink.passwordUnprotected');
+  });
+
+  it('uses the meeting link copy from the story', () => {
+    expect(en['meetings.meetingLink.description']).toBe('Anyone with the link can access the meeting.');
+    expect(en['meetings.meetingLink.passwordProtected']).toBe(
+      'The link is password protected. To set a new password, generate a new link.',
+    );
+    expect(en['meetings.meetingLink.passwordUnprotected']).toBe(
+      'This link is not password protected. Make sure to share it only with the right people. To add a password, generate a new link.',
+    );
+    expect(en['meetings.meetingLink.cancel']).toBe('Cancel');
   });
 });
