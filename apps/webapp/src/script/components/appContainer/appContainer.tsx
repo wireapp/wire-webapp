@@ -22,14 +22,16 @@ import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {amplify} from 'amplify';
-import ky from 'ky';
 import {container} from 'tsyringe';
+
+import ky from 'ky';
 
 import {getOtherInstanceAction} from './getOtherInstanceAction';
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
 import {ClientType} from '../../apiClient/client/clientType';
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
@@ -61,6 +63,7 @@ import {PrimaryModalComponent} from '../Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from '../Modals/QualityFeedbackModal';
 
 type AppProps = {
+  readonly onAuthenticatedAccount: (qualifiedId: Readonly<QualifiedId>) => Promise<void>;
   readonly config: Configuration;
   readonly clientType: ClientType;
   readonly applicationObservability: ApplicationObservability;
@@ -76,6 +79,7 @@ type AppProps = {
 
 export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) => {
   const {
+    onAuthenticatedAccount,
     config,
     clientType,
     applicationObservability,
@@ -206,6 +210,7 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
         init={onProgress => {
           return app.initApp(clientType, onProgress, {
             dependencies: {
+              onAuthenticatedAccount,
               applicationObservability,
               fetchLatestBuildMetadata,
               fireAndForgetInvoker,

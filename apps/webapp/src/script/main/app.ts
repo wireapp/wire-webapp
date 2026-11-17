@@ -31,6 +31,7 @@ import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {refreshApplication} from './applicationRefresh';
+import {loadAuthenticatedSelfUser} from './loadAuthenticatedSelfUser';
 import {loadLocalClient} from './loadLocalClient';
 import {reportStartupFailure} from './reportStartupFailure';
 
@@ -177,6 +178,7 @@ type ApplicationStartupTimingInput = {
 };
 
 type ApplicationStartupDependencies = {
+  readonly onAuthenticatedAccount: (qualifiedId: Readonly<QualifiedId>) => Promise<void>;
   readonly applicationObservability: ApplicationObservability;
   readonly fetchLatestBuildMetadata: FetchLatestBuildMetadata;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
@@ -546,7 +548,12 @@ export class App {
       let selfUser: User;
 
       try {
-        selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
+        selfUser = await loadAuthenticatedSelfUser({
+          getSelf: () => {
+            return this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
+          },
+          onAuthenticatedAccount: startupInput.dependencies.onAuthenticatedAccount,
+        });
       } catch (error: unknown) {
         this.logger.error('Could not get self user', {error});
         await reportStartup('failure');

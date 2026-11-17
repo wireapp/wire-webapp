@@ -32,6 +32,8 @@ import {configureLogging} from '../logger/getLogger';
 import {Runtime} from '../commons/util/Runtime';
 
 import {createApplicationServices} from './createApplicationServices';
+import {createAccountIdentifier} from '../logger/createAccountIdentifier';
+import {createAuthenticatedAccountBinding} from '../logger/createAuthenticatedAccountBinding';
 import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
@@ -118,6 +120,15 @@ export async function startApplication(
     },
   });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
+  const onAuthenticatedAccount = createAuthenticatedAccountBinding({
+    persistence: persistentLogging,
+    hashQualifiedId(qualifiedId) {
+      return createAccountIdentifier({qualifiedId, encoder: new TextEncoder(), crypto: globalThis.crypto.subtle});
+    },
+    reportFailure() {
+      console.warn('Persistent browser logging disabled: authenticated account binding failed');
+    },
+  });
   const fireAndForgetInvoker = createFireAndForgetInvoker({
     reportError(error) {
       fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', {error});
@@ -236,6 +247,7 @@ export async function startApplication(
 
   createRoot(appContainer).render(
     <AppContainer
+      onAuthenticatedAccount={onAuthenticatedAccount}
       config={config}
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
       applicationObservability={applicationObservability}
