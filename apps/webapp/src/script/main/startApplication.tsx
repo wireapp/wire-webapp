@@ -38,11 +38,6 @@ import {logRuntimeIdentity, logStartupRuntimeIdentity} from '../logger/logRuntim
 import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
-import {
-  getCurrentCoreCryptoBrowserEnvironment,
-  isCoreCryptoEnabled,
-  redirectIfCoreCryptoUnsupported,
-} from '../browser/coreCryptoSupport';
 import {AppContainer} from '../components/appContainer/appContainer';
 import {Config} from '../Config';
 import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeStartupFeatureToggleUrl';
@@ -62,7 +57,6 @@ import {getLogger} from '../util/logger';
 import {enableLogging} from '../logger/enableLogging';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {loadValue} from '../util/storageUtil';
-import {supportsMLS} from '../util/util';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
 export async function startApplication(
@@ -199,22 +193,6 @@ export async function startApplication(
   if (enforceDesktopApplication) {
     const unSupportedPageUrl = `${window.location.origin}/unsupported`;
     window.location.replace(unSupportedPageUrl);
-    return;
-  }
-
-  const coreCryptoEnabled = isCoreCryptoEnabled({
-    supportsMls: supportsMLS(),
-    useCoreCryptoOverride: config.FEATURE.USE_CORE_CRYPTO,
-  });
-  const redirectedForCoreCryptoSupport = redirectIfCoreCryptoUnsupported({
-    coreCryptoEnabled,
-    environment: getCurrentCoreCryptoBrowserEnvironment(),
-    onUnsupported(message) {
-      console.error(message);
-      window.location.replace(`${window.location.origin}/unsupported`);
-    },
-  });
-  if (redirectedForCoreCryptoSupport) {
     return;
   }
 

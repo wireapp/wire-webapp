@@ -17,22 +17,19 @@
  *
  */
 
-type JspiWebAssembly = {
-  readonly Suspending?: unknown;
-  readonly promising?: unknown;
-};
-
-type OpfsStorageManager = {
-  readonly getDirectory?: unknown;
-};
+import {isFunction} from '@sindresorhus/is';
+import {jspi} from 'wasm-feature-detect';
 
 export type CoreCryptoBrowserEnvironment = {
-  readonly webAssembly?: JspiWebAssembly;
-  readonly storageManager?: OpfsStorageManager;
+  readonly storageManager?: {readonly getDirectory?: unknown};
   readonly workerConstructor?: unknown;
 };
 
 export type CoreCryptoBrowserFeature = 'JS Promise Integration' | 'Origin Private File System' | 'Web Workers';
+
+export type CoreCryptoSupport = {
+  readonly missingFeatures: readonly CoreCryptoBrowserFeature[];
+};
 
 export const isCoreCryptoEnabled = ({
   supportsMls,
@@ -44,57 +41,35 @@ export const isCoreCryptoEnabled = ({
   return supportsMls || useCoreCryptoOverride;
 };
 
-/**
- * CoreCrypto 11 stores SQLite in OPFS. Its synchronous file access runs in a
- * worker, while JS Promise Integration lets WASM wait for that worker without
- * blocking the browser's main thread.
- */
-export const getMissingCoreCryptoBrowserFeatures = ({
-  webAssembly,
-  storageManager,
-  workerConstructor,
-}: CoreCryptoBrowserEnvironment): readonly CoreCryptoBrowserFeature[] => {
+/** Detect requirements without importing CoreCrypto: its bindings throw at module evaluation without JSPI. */
+export async function detectCoreCryptoSupport({
+  coreCryptoEnabled,
+  detectJspi = jspi,
+  environment = {
+    storageManager: globalThis.navigator?.storage,
+    workerConstructor: globalThis.Worker,
+  },
+}: {
+  readonly coreCryptoEnabled: boolean;
+  readonly detectJspi?: () => Promise<boolean>;
+  readonly environment?: CoreCryptoBrowserEnvironment;
+}): Promise<CoreCryptoSupport> {
   const missingFeatures: CoreCryptoBrowserFeature[] = [];
-
-  if (typeof webAssembly?.Suspending !== 'function' || typeof webAssembly.promising !== 'function') {
+  // JSPI is required even with MLS disabled: the application statically imports the bindings.
+  if (
+    !(await detectJspi().catch(() => {
+      return false;
+    }))
+  ) {
     missingFeatures.push('JS Promise Integration');
   }
-  if (typeof storageManager?.getDirectory !== 'function') {
-    missingFeatures.push('Origin Private File System');
+  if (coreCryptoEnabled) {
+    if (!isFunction(environment.storageManager?.getDirectory)) {
+      missingFeatures.push('Origin Private File System');
+    }
+    if (!isFunction(environment.workerConstructor)) {
+      missingFeatures.push('Web Workers');
+    }
   }
-  if (typeof workerConstructor !== 'function') {
-    missingFeatures.push('Web Workers');
-  }
-
-  return missingFeatures;
-};
-
-export const getCurrentCoreCryptoBrowserEnvironment = (): CoreCryptoBrowserEnvironment => {
-  return {
-    webAssembly: globalThis.WebAssembly as unknown as JspiWebAssembly,
-    storageManager: globalThis.navigator.storage as OpfsStorageManager,
-    workerConstructor: globalThis.Worker,
-  };
-};
-
-export const redirectIfCoreCryptoUnsupported = ({
-  coreCryptoEnabled,
-  environment,
-  onUnsupported,
-}: {
-  coreCryptoEnabled: boolean;
-  environment: CoreCryptoBrowserEnvironment;
-  onUnsupported: (message: string) => void;
-}): boolean => {
-  if (!coreCryptoEnabled) {
-    return false;
-  }
-
-  const missingFeatures = getMissingCoreCryptoBrowserFeatures(environment);
-  if (missingFeatures.length === 0) {
-    return false;
-  }
-
-  onUnsupported(`This browser cannot run CoreCrypto because it lacks: ${missingFeatures.join(', ')}.`);
-  return true;
-};
+  return {missingFeatures};
+}
