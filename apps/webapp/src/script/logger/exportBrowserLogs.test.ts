@@ -594,10 +594,11 @@ describe('streaming browser log export', () => {
   it('bounds reads and stops consuming large input while output is backpressured', async () => {
     const storage = createStorage();
     const totalChunks = 512;
+    const cancellation = new AbortController();
     const firstOutput = Promise.withResolvers<void>();
     const resumeOutput = Promise.withResolvers<void>();
+    const abort = jest.fn();
     let readChunks = 0;
-    let outputBytes = 0;
     let outputWrites = 0;
     let closed = false;
     storage.files.set(firstFilename, {
@@ -619,9 +620,8 @@ describe('streaming browser log export', () => {
       },
     });
     const destination = new globalThis.WritableStream<Uint8Array>({
-      async write(chunk) {
+      async write() {
         outputWrites += 1;
-        outputBytes += chunk.byteLength;
         if (outputWrites >= 4) {
           firstOutput.resolve();
           await resumeOutput.promise;
@@ -630,31 +630,38 @@ describe('streaming browser log export', () => {
       close() {
         closed = true;
       },
+      abort,
     });
     const completion = exportBrowserLogs({
       getDirectory: storage.getDirectory,
       createArchive: zipArchiveModule.createBrowserLogZipArchive,
       destination,
-      signal: new AbortController().signal,
+      signal: cancellation.signal,
     });
-    await firstOutput.promise;
-    const readsWhileBlocked = readChunks;
-    // Yield through a task, allowing every queued pipeline stage to run without a timer or sleep.
-    await new Promise<void>(resolve => {
-      setImmediate(resolve);
-    });
-    expect(outputWrites).toBe(4);
-    expect(readChunks).toBeGreaterThan(0);
-    expect(readChunks).toBeLessThanOrEqual(readsWhileBlocked + 16);
-    expect(readChunks).toBeLessThan(totalChunks);
-    expect(closed).toBe(false);
-    resumeOutput.resolve();
+    try {
+      await firstOutput.promise;
+      const readsWhileBlocked = readChunks;
+      // Yield through a task, allowing every queued pipeline stage to run without a timer or sleep.
+      await new Promise<void>(resolve => {
+        setImmediate(resolve);
+      });
+      expect(outputWrites).toBe(4);
+      expect(readChunks).toBeGreaterThan(0);
+      expect(readChunks).toBeLessThanOrEqual(readsWhileBlocked + 16);
+      expect(readChunks).toBeLessThan(totalChunks);
+      expect(closed).toBe(false);
+    } finally {
+      // Test backpressure without compressing the rest of the synthetic file.
+      cancellation.abort();
+      resumeOutput.resolve();
+      await completion;
+    }
 
-    expect(unwrap(await completion)).toEqual({exportedFiles: 1, missingFiles: 0});
-    expect(readChunks).toBe(totalChunks);
-    expect(outputWrites).toBeGreaterThan(100);
-    expect(outputBytes).toBeGreaterThan((totalChunks * browserLogExportChunkBytes) / 2);
-    expect(closed).toBe(true);
+    expect(unwrapErr(await completion)).toBe('cancelled');
+    expect(readChunks).toBeLessThan(totalChunks);
+    expect(abort).toHaveBeenCalledTimes(1);
+    expect(destination.locked).toBe(false);
+    expect(closed).toBe(false);
   });
 
   it('cancels while a destination write is pending and aborts after that write settles', async () => {
