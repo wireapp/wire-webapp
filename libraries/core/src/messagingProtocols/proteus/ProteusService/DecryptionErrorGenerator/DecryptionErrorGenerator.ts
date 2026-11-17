@@ -23,8 +23,7 @@ import {
   isProteusDuplicateMessageError,
   isProteusRemoteIdentityChangedError,
   isProteusSessionNotFoundError,
-  isProteusError,
-  ProteusErrorType,
+  isProteusOtherError,
 } from '@wireapp/core-crypto';
 
 import {DecryptionError} from '../../../../errors/DecryptionError';
@@ -63,10 +62,11 @@ function getErrorCode(error: unknown): number {
     return ProteusErrors.DuplicateMessage;
   }
 
-  if (isProteusError(error, ProteusErrorType.Other)) {
-    return typeof error.context.context.errorCode === 'number'
-      ? error.context.context.errorCode
-      : ProteusErrors.Unknown;
+  if (isProteusOtherError(error)) {
+    // CoreCrypto 9.3.3 emits a flat context, while its TypeScript declarations describe a nested one.
+    const context: {errorCode?: unknown; context?: {errorCode?: unknown}} = error.context;
+    const errorCode = typeof context.errorCode === 'number' ? context.errorCode : context.context?.errorCode;
+    return typeof errorCode === 'number' ? errorCode : ProteusErrors.Unknown;
   }
 
   if (hasProteusErrorCode(error)) {

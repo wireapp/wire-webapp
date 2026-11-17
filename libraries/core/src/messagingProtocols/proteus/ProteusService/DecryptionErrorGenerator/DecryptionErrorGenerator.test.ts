@@ -25,14 +25,14 @@ import {DecryptionError} from '../../../../errors/DecryptionError';
 
 const basePayload = {userId: {id: 'user1', domain: 'domain'}, clientId: 'client1'};
 
-const createStructuredProteusError = (errorCode?: number) =>
+const createStructuredProteusError = (errorCode?: unknown, nested = false) =>
   Object.assign(new Error('proteus decryption error'), {
     name: 'ProteusErrorOther',
     errorStack: [],
     type: ErrorType.Proteus,
     context: {
       type: ProteusErrorType.Other,
-      context: errorCode === undefined ? {} : {errorCode},
+      ...(nested ? {context: {errorCode}} : {errorCode}),
     },
   });
 
@@ -49,11 +49,21 @@ describe('generateDecryptionError', () => {
     },
   );
 
-  it('falls back to the unknown code for a malformed structured CoreCrypto Proteus error', () => {
-    const coreCryptoError = createStructuredProteusError();
+  it.each([ProteusErrors.TooDistantFuture, ProteusErrors.PreKeyMessageUnMatchedSignature])(
+    'preserves nested CoreCrypto Proteus error code %s for compatibility with the declared shape',
+    errorCode => {
+      const error = generateDecryptionError(basePayload, createStructuredProteusError(errorCode, true));
+      expect(error.code).toBe(errorCode);
+    },
+  );
 
-    const error = generateDecryptionError(basePayload, coreCryptoError);
+  it.each([undefined, null, '212'])('falls back to the unknown code for an invalid runtime error code %s', code => {
+    const error = generateDecryptionError(basePayload, createStructuredProteusError(code));
+    expect(error.code).toBe(ProteusErrors.Unknown);
+  });
 
+  it('falls back to the unknown code when the nested context has no error code', () => {
+    const error = generateDecryptionError(basePayload, createStructuredProteusError(undefined, true));
     expect(error.code).toBe(ProteusErrors.Unknown);
   });
 

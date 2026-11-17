@@ -149,6 +149,7 @@ export const isProteusDuplicateMessageError = (error: unknown) =>
   isProteusError(error, ProteusErrorType.DuplicateMessage);
 export const isProteusRemoteIdentityChangedError = (error: unknown) =>
   isProteusError(error, ProteusErrorType.RemoteIdentityChanged);
+export const isProteusOtherError = (error: unknown) => isProteusError(error, ProteusErrorType.Other);
 
 export const isMlsOrphanWelcomeError = (error: unknown) =>
   isCoreCryptoError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.OrphanWelcome;
