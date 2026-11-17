@@ -549,8 +549,8 @@ export class App {
 
       try {
         selfUser = await loadAuthenticatedSelfUser({
-          getSelf: () => {
-            return this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
+          getSelf() {
+            return application.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
           },
           onAuthenticatedAccount: startupInput.dependencies.onAuthenticatedAccount,
         });
