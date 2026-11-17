@@ -47,6 +47,7 @@ export const mapMeetingInstanceToScheduleFormState = (
     end: maybe.just(anchorInstance.end),
     recurrence: meetingSeries.recurrence,
     selectedUsers,
+    invitedEmails: [],
     participantsFilter: '',
     password: '',
     passwordConfirmation: '',

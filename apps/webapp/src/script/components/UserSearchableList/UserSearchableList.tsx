@@ -114,7 +114,16 @@ export const UserSearchableList: FunctionComponent<UserListProps> = ({
    * This is needed for large teams (>= 2000 members)
    */
   const fetchMembersFromBackend = useDebouncedCallback(async (query: string, ignoreMembers: User[]) => {
-    const resultUsers = await searchRepository.searchByName(query, selfUser.teamId);
+    if (currentFilter.current !== query) {
+      return;
+    }
+    let resultUsers: User[];
+    try {
+      resultUsers = await searchRepository.searchByName(query, selfUser.teamId);
+    } catch {
+      // A rejected federation lookup should leave the picker usable.
+      return;
+    }
     const selfTeamId = selfUser.teamId;
     const foundMembers = resultUsers.filter(user => {
       return user.teamId === selfTeamId;
@@ -137,6 +146,12 @@ export const UserSearchableList: FunctionComponent<UserListProps> = ({
       setRemoteTeamMembers(nextRemoteTeamMembers);
     }
   }, SEARCH_MEMBERS_DEBOUNCE_MILLISECONDS);
+
+  useEffect(() => {
+    if (allowRemoteSearch !== true) {
+      fetchMembersFromBackend.cancel();
+    }
+  }, [allowRemoteSearch, fetchMembersFromBackend]);
 
   // Filter all list items if a filter is provided
 
@@ -231,7 +246,10 @@ export const UserSearchableList: FunctionComponent<UserListProps> = ({
       }) !== true && user.type === UserType.REGULAR
     );
   });
-  const isEmptyUserList = userList.length === 0 && (filteredSelectedUsers?.length ?? 0) === 0;
+  const isEmptyUserList =
+    userList.length === 0 &&
+    (filteredSelectedUsers?.length ?? 0) === 0 &&
+    (userListProps.selectedExtraItems?.length ?? 0) === 0;
   const isSearching = isNonEmptyString(filter);
   const noResultsDataUieName = !isSearching ? 'status-all-added' : 'status-no-matches';
   const noResultsTranslationText = !isSearching ? 'searchListEveryoneParticipates' : 'searchListNoMatches';

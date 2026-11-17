@@ -19,7 +19,7 @@
 
 import {useId, type FunctionComponent} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {Button, Popover} from 'react-aria-components';
 
 import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';
@@ -29,15 +29,19 @@ import {
   chevronIconStyles,
   controlStyles,
   dialogStyles,
+  emailErrorStyles,
   listContainerStyles,
   popoverOverlayStyles,
   popoverStyles,
   searchIconStyles,
   searchInputStyles,
+  triggerWrapperStyles,
   valueContainerStyles,
   wrapperStyles,
 } from './meetingParticipantsPicker.styles';
 import {isAllowedMeetingParticipant} from './participantPickerUtils';
+import {SelectedEmailInvitee} from './selectedEmailInvitee';
+import {useMeetingEmailInvitees} from './useMeetingEmailInvitees';
 import {useMeetingParticipantsPicker} from './useMeetingParticipantsPicker';
 
 import {useApplicationContext} from '../../../page/rootProvider';
@@ -58,6 +62,8 @@ export interface MeetingParticipantsPickerProps {
   dataUieName?: string;
   users: User[];
   selectedUsers: User[];
+  invitedEmails?: string[];
+  onInvitedEmailsChange?: (emails: string[]) => void;
   onSelectedUsersChange: (users: User[]) => void;
   filter: string;
   onFilterChange: (filter: string) => void;
@@ -81,6 +87,8 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
   dataUieName,
   users,
   selectedUsers,
+  invitedEmails,
+  onInvitedEmailsChange,
   onSelectedUsersChange,
   filter,
   onFilterChange,
@@ -100,11 +108,12 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
 }: MeetingParticipantsPickerProps) => {
   const {translate} = useApplicationContext();
   const listboxId = useId();
+  const emailErrorId = useId();
   const portalContainer = popoverPortalContainer ?? getOverlayPortalContainer();
   const allowedUsers = users.filter(isAllowedMeetingParticipant);
 
   const fieldLabel = isNonEmptyString(label)
-    ? formatParticipantsFieldLabel(label, selectedUsers.length, translate)
+    ? formatParticipantsFieldLabel(label, selectedUsers.length + (invitedEmails?.length ?? 0), translate)
     : undefined;
   const searchPlaceholder = placeholder ?? translate('meetings.scheduleModal.participantsPlaceholder');
   const showPlaceholder = filter.length === 0;
@@ -129,6 +138,15 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
     onFilterChange,
     conversationRepository,
   });
+  const {emailError, clearEmailError, handleEmailKeyDown, removeEmail} = useMeetingEmailInvitees({
+    invitedEmails,
+    onInvitedEmailsChange,
+    onFilterChange,
+    isOpen,
+  });
+  const selectedEmailItems = (invitedEmails ?? []).map(email => {
+    return <SelectedEmailInvitee key={email} email={email} noUnderline={noUnderline} onRemove={removeEmail} />;
+  });
 
   return (
     <div css={wrapperStyles} data-uie-name={dataUieName}>
@@ -138,54 +156,68 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
         </InputLabel>
       )}
 
-      <div
-        ref={triggerRef}
-        css={controlStyles({isDisabled: disabled, isOpen, markInvalid})}
-        data-uie-name={isNonEmptyString(dataUieName) ? `${dataUieName}-control` : undefined}
-        data-disabled={disabled || undefined}
-        aria-expanded={isOpen}
-        aria-haspopup="listbox"
-        aria-controls={isOpen ? listboxId : undefined}
-      >
-        <div css={valueContainerStyles}>
-          <SearchIcon aria-hidden="true" css={searchIconStyles} />
-          <input
-            id={id}
-            css={searchInputStyles}
-            type="text"
-            role="combobox"
-            aria-autocomplete="list"
-            aria-expanded={isOpen}
-            aria-controls={isOpen ? listboxId : undefined}
-            value={filter}
-            disabled={disabled}
-            placeholder={showPlaceholder ? searchPlaceholder : ''}
-            aria-label={isNonEmptyString(fieldLabel) ? undefined : searchPlaceholder}
-            data-uie-name={isNonEmptyString(dataUieName) ? `${dataUieName}-input` : undefined}
-            onChange={event => {
-              onFilterChange(event.target.value);
-              if (!isOpen) {
-                handleOpenChange(true);
-              }
-            }}
-            onFocus={() => {
-              if (!disabled && !isOpen) {
-                handleOpenChange(true);
-              }
-            }}
-          />
-        </div>
-        <Button
-          css={chevronButtonStyles}
-          isDisabled={disabled}
-          aria-label={fieldLabel ?? searchPlaceholder}
-          data-uie-name={isNonEmptyString(dataUieName) ? `${dataUieName}-toggle` : undefined}
-          onPress={() => {
-            return handleOpenChange(!isOpen);
-          }}
+      <div ref={triggerRef} css={triggerWrapperStyles}>
+        <div
+          css={controlStyles({isDisabled: disabled, isOpen, markInvalid: markInvalid || emailError.isJust})}
+          data-uie-name={isNonEmptyString(dataUieName) ? `${dataUieName}-control` : undefined}
+          data-disabled={disabled || undefined}
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+          aria-controls={isOpen ? listboxId : undefined}
         >
-          <ChevronDownIcon aria-hidden="true" width={16} height={16} css={chevronIconStyles(isOpen)} />
-        </Button>
+          <div css={valueContainerStyles}>
+            <SearchIcon aria-hidden="true" css={searchIconStyles} />
+            <input
+              id={id}
+              css={searchInputStyles}
+              type="text"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={isOpen}
+              aria-controls={isOpen ? listboxId : undefined}
+              aria-invalid={emailError.isJust}
+              aria-describedby={emailError.isJust ? emailErrorId : undefined}
+              value={filter}
+              disabled={disabled}
+              placeholder={showPlaceholder ? searchPlaceholder : ''}
+              aria-label={isNonEmptyString(fieldLabel) ? undefined : searchPlaceholder}
+              data-uie-name={isNonEmptyString(dataUieName) ? `${dataUieName}-input` : undefined}
+              onChange={event => {
+                onFilterChange(event.target.value);
+                clearEmailError();
+                if (!isOpen) {
+                  handleOpenChange(true);
+                }
+              }}
+              onKeyDown={handleEmailKeyDown}
+              onFocus={() => {
+                if (!disabled && !isOpen) {
+                  handleOpenChange(true);
+                }
+              }}
+            />
+          </div>
+          <Button
+            css={chevronButtonStyles}
+            isDisabled={disabled}
+            aria-label={fieldLabel ?? searchPlaceholder}
+            data-uie-name={isNonEmptyString(dataUieName) ? `${dataUieName}-toggle` : undefined}
+            onPress={() => {
+              return handleOpenChange(!isOpen);
+            }}
+          >
+            <ChevronDownIcon aria-hidden="true" width={16} height={16} css={chevronIconStyles(isOpen)} />
+          </Button>
+        </div>
+        {emailError.isJust && (
+          <div id={emailErrorId} role="alert" css={emailErrorStyles}>
+            {translate(
+              emailError.value === 'invalid'
+                ? 'meetings.scheduleModal.emailInvalid'
+                : 'meetings.scheduleModal.emailDuplicate',
+            )}
+          </div>
+        )}
       </div>
 
       <Popover
@@ -217,6 +249,7 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
               users={allowedUsers}
               filter={filter}
               selected={selectedUsers}
+              selectedExtraItems={selectedEmailItems}
               isSelectable
               onUpdateSelectedUsers={handleSelectedUsersChange}
               searchRepository={searchRepository}
@@ -225,7 +258,7 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
               conversationState={conversationState}
               teamState={teamState}
               noUnderline={noUnderline}
-              allowRemoteSearch
+              allowRemoteSearch={isUndefined(onInvitedEmailsChange) || !filter.includes('@')}
               filterRemoteTeamUsers
               showAllProvidedUsers
               hideEmptyState={matchingConversations.length > 0}
