@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState, type FunctionComponent} from 'react';
+import {useEffect, useId, useState, type FunctionComponent} from 'react';
 
 import {Maybe} from 'true-myth';
 
@@ -78,6 +78,7 @@ export const FileFullscreenModal: FunctionComponent<FileFullscreenModalProps> = 
   isEditMode = false,
   checkIsInRecycleBin = isInRecycleBin,
 }: FileFullscreenModalProps) => {
+  const modalDomId = useId();
   const sourceConversationFromContext = useFileFullscreenModalSourceConversation();
   const sourceConversationForMetadata = sourceConversation ?? sourceConversationFromContext;
   const notInRecycleBin = !checkIsInRecycleBin();
@@ -103,7 +104,7 @@ export const FileFullscreenModal: FunctionComponent<FileFullscreenModalProps> = 
   }, [canEdit, isEditMode, notInRecycleBin]);
 
   return (
-    <FullscreenModal id={id} isOpen={isOpen} onClose={onCloseModal}>
+    <FullscreenModal id={modalDomId} isOpen={isOpen} onClose={onCloseModal}>
       <FileHeader
         onClose={onCloseModal}
         fileName={fileName}
