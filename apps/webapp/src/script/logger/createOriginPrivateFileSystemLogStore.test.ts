@@ -37,15 +37,30 @@ import {
 const firstSessionIdentifier = '00000000-0000-4000-8000-000000000001';
 const secondSessionIdentifier = '00000000-0000-4000-8000-000000000002';
 
+type TestStorageFailure =
+  | 'none'
+  | 'open'
+  | 'read'
+  | 'write'
+  | 'flush'
+  | 'close'
+  | 'remove'
+  | 'size'
+  | 'missing'
+  | 'metadata'
+  | 'missing-metadata';
+
 function encode(contents: string): Uint8Array {
   return new TextEncoder().encode(contents);
 }
 
-function createTestDirectory(): {
+function createTestDirectory(clock = createTestClock()): {
   readonly directory: LogDirectory;
   readonly files: Map<string, Uint8Array>;
+  readonly modificationTimes: Map<string, number>;
+  readonly clock: ReturnType<typeof createTestClock>;
   readonly state: {
-    failure: 'none' | 'open' | 'read' | 'write' | 'flush' | 'close' | 'remove' | 'size' | 'missing';
+    failure: TestStorageFailure;
     rollbackFails: boolean;
     legacySize: boolean;
     writing: boolean;
@@ -55,8 +70,10 @@ function createTestDirectory(): {
   };
 } {
   const files = new Map<string, Uint8Array>();
+  const modificationTimes = new Map<string, number>();
+  const initialModificationTimeMilliseconds = clock.currentUnixEpochMilliseconds;
   const state = {
-    failure: 'none' as 'none' | 'open' | 'read' | 'write' | 'flush' | 'close' | 'remove' | 'size' | 'missing',
+    failure: 'none' as TestStorageFailure,
     rollbackFails: false,
     legacySize: false,
     writing: false,
@@ -83,6 +100,7 @@ function createTestDirectory(): {
       }
 
       files.delete(name);
+      modificationTimes.delete(name);
     },
     async getFileHandle(name, options) {
       if (state.failure === 'missing' && options?.create !== true) {
@@ -97,6 +115,7 @@ function createTestDirectory(): {
         }
 
         files.set(name, new Uint8Array());
+        modificationTimes.set(name, clock.currentUnixEpochMilliseconds);
       }
 
       function getContents(): Uint8Array {
@@ -107,7 +126,17 @@ function createTestDirectory(): {
 
       return {
         async getFile() {
-          return {size: getContents().byteLength};
+          if (state.failure === 'metadata') {
+            throw new Error('Cannot read file metadata');
+          }
+          if (state.failure === 'missing-metadata') {
+            files.delete(name);
+          }
+
+          return {
+            size: getContents().byteLength,
+            lastModified: modificationTimes.get(name) ?? initialModificationTimeMilliseconds,
+          };
         },
         async createSyncAccessHandle() {
           expect(state.writing).toBe(false);
@@ -147,6 +176,7 @@ function createTestDirectory(): {
               next.set(previous);
               next.set(buffer.subarray(0, count), options.at);
               files.set(name, next);
+              modificationTimes.set(name, clock.currentUnixEpochMilliseconds);
               if (state.failure === 'write') {
                 throw Object.assign(new Error('Storage full'), {name: 'QuotaExceededError'});
               }
@@ -159,6 +189,7 @@ function createTestDirectory(): {
               }
 
               files.set(name, getContents().slice(0, sizeBytes));
+              modificationTimes.set(name, clock.currentUnixEpochMilliseconds);
             },
             flush() {
               state.flushCount += 1;
@@ -179,7 +210,7 @@ function createTestDirectory(): {
     },
   };
 
-  return {directory, files, state};
+  return {directory, files, modificationTimes, clock, state};
 }
 
 function readLogFileContents(storage: ReturnType<typeof createTestDirectory>): readonly string[] {
@@ -206,7 +237,7 @@ function createStoreForTest(options: TestStoreOptions): LogStore {
     configuration = logPersistenceConfiguration,
     sessionIdentifier = firstSessionIdentifier,
     accountIdentifier,
-    clock = createTestClock(),
+    clock = storage.clock,
   } = options;
 
   return unwrap(
@@ -283,6 +314,8 @@ describe('worker synchronous Origin Private File System log store', () => {
     const accountFilename = `log-1000000-${firstSessionIdentifier}-1-${accountIdentifier}.jsonl`;
     storage.files.set(legacyFilename, encode('{}\n'));
     storage.files.set(otherAccountFilename, encode('{}\n'));
+    storage.modificationTimes.set(legacyFilename, 999998);
+    storage.modificationTimes.set(otherAccountFilename, 999999);
     const writer = createStoreForTest({
       storage,
       accountIdentifier: Maybe.just(accountIdentifier),
@@ -471,9 +504,9 @@ describe('worker synchronous Origin Private File System log store', () => {
     expect([...storage.files.keys()]).toEqual(expectedFilenames);
   });
 
-  it('keeps files younger than seven days and expires them at seven days', async () => {
+  it('retains files at exactly seven days and expires them one millisecond later', async () => {
     const storage = createTestDirectory();
-    const clock = createTestClock();
+    const clock = storage.clock;
     const writer = createStoreForTest({storage, clock, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
 
@@ -485,7 +518,85 @@ describe('worker synchronous Origin Private File System log store', () => {
     clock.advanceByMilliseconds(1);
     await writer.append([]);
 
+    expect(readLogFileContents(storage)).toEqual(['{}\n']);
+
+    clock.advanceByMilliseconds(1);
+    await writer.append([]);
+
     expect(storage.files.size).toBe(0);
+  });
+
+  it('retains an old filename when writes have refreshed its modification time', async () => {
+    const storage = createTestDirectory();
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
+    await writer.append(['{}\n']);
+    const originalFilenames = [...storage.files.keys()];
+    storage.clock.advanceByMilliseconds(logPersistenceConfiguration.maximumAgeMilliseconds - 1);
+    await writer.append(['[]\n']);
+    storage.clock.advanceByMilliseconds(2);
+    await writer.append([]);
+
+    expect([...storage.files.keys()]).toEqual(originalFilenames);
+    expect(readLogFileContents(storage)).toEqual(['{}\n[]\n']);
+  });
+
+  it('expires recently named files by modification time across accounts and unattributed logs', async () => {
+    const storage = createTestDirectory();
+    const accountIdentifier = 'a'.repeat(64);
+    const expiredFilenames = [
+      `log-1000000-${firstSessionIdentifier}-1.jsonl`,
+      `log-1000000-${firstSessionIdentifier}-2-${accountIdentifier}.jsonl`,
+      `log-1000000-${firstSessionIdentifier}-3-${'b'.repeat(64)}.jsonl`,
+    ];
+    const expiredModificationTimeMilliseconds =
+      storage.clock.currentUnixEpochMilliseconds - logPersistenceConfiguration.maximumAgeMilliseconds - 1;
+    for (const filename of expiredFilenames) {
+      storage.files.set(filename, encode('{}\n'));
+      storage.modificationTimes.set(filename, expiredModificationTimeMilliseconds);
+    }
+    storage.files.set('unrelated.jsonl', encode('keep this'));
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.just(accountIdentifier)});
+
+    await writer.append(['[]\n']);
+
+    expect([...storage.files.keys()]).toEqual([
+      'unrelated.jsonl',
+      `log-1000000-${firstSessionIdentifier}-1-${accountIdentifier}.jsonl`,
+    ]);
+    expect(readLogFileContents(storage)).toEqual(['keep this', '[]\n']);
+  });
+
+  it('evicts globally by modification order rather than creation order before reserving batch space', async () => {
+    const storage = createTestDirectory();
+    const accountIdentifier = 'a'.repeat(64);
+    const oldestCreatedFilename = `log-999997-${firstSessionIdentifier}-1.jsonl`;
+    const newestCreatedFilename = `log-999999-${firstSessionIdentifier}-1-${'b'.repeat(64)}.jsonl`;
+    const middleCreatedFilename = `log-999998-${firstSessionIdentifier}-1-${accountIdentifier}.jsonl`;
+    storage.files.set(oldestCreatedFilename, encode('{}\n'));
+    storage.files.set(newestCreatedFilename, encode('[]\n'));
+    storage.files.set(middleCreatedFilename, encode('42\n'));
+    storage.files.set('unrelated.jsonl', encode('outside the log budget'));
+    storage.modificationTimes.set(oldestCreatedFilename, 999999);
+    storage.modificationTimes.set(newestCreatedFilename, 999997);
+    storage.modificationTimes.set(middleCreatedFilename, 999998);
+    const writer = createStoreForTest({
+      storage,
+      accountIdentifier: Maybe.just(accountIdentifier),
+      configuration: {...logPersistenceConfiguration, maximumTotalBytes: 6},
+    });
+
+    await writer.append([]);
+
+    expect([...storage.files.keys()]).toEqual([oldestCreatedFilename, middleCreatedFilename, 'unrelated.jsonl']);
+
+    await writer.append(['{}\n']);
+
+    expect([...storage.files.keys()]).toEqual([
+      oldestCreatedFilename,
+      'unrelated.jsonl',
+      `log-1000000-${firstSessionIdentifier}-1-${accountIdentifier}.jsonl`,
+    ]);
+    expect(readLogFileContents(storage)).toEqual(['{}\n', 'outside the log budget', '{}\n']);
   });
 
   it('rolls back quota failures without evicting committed logs or unrelated storage', async () => {
@@ -507,11 +618,12 @@ describe('worker synchronous Origin Private File System log store', () => {
   it('cleans expired, empty and oversized owned files without touching unrelated files or directories', async () => {
     const storage = createTestDirectory();
     storage.files.set(`log-0-${firstSessionIdentifier}-1.jsonl`, encode('{}\n'));
+    storage.modificationTimes.set(`log-0-${firstSessionIdentifier}-1.jsonl`, 0);
     storage.files.set(`log-1000000-${firstSessionIdentifier}-2.jsonl`, encode(''));
     storage.files.set(`log-1000000-${firstSessionIdentifier}-3.jsonl`, encode('{}\n{}\n'));
     storage.files.set('private-user-file.jsonl', encode('keep this'));
     storage.files.set('log-malformed.jsonl', encode('keep this too'));
-    const clock = createTestClock();
+    const clock = storage.clock;
     const writer = createStoreForTest({
       storage,
       clock,
@@ -534,10 +646,10 @@ describe('worker synchronous Origin Private File System log store', () => {
 
   it('expires an active file and starts a new one for later records', async () => {
     const storage = createTestDirectory();
-    const clock = createTestClock();
+    const clock = storage.clock;
     const writer = createStoreForTest({storage, clock, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
-    clock.advanceByMilliseconds(logPersistenceConfiguration.maximumAgeMilliseconds);
+    clock.advanceByMilliseconds(logPersistenceConfiguration.maximumAgeMilliseconds + 1);
     await writer.append(['[]\n']);
 
     expect(readLogFileContents(storage)).toEqual(['[]\n']);
@@ -553,15 +665,36 @@ describe('worker synchronous Origin Private File System log store', () => {
     expect(readLogFileContents(storage)).toEqual(['[]\n']);
   });
 
-  it('recovers when a listed file disappears before it can be read', async () => {
+  it.each(['missing', 'missing-metadata'] as const)(
+    'recovers when a listed file disappears during %s',
+    async failure => {
+      const storage = createTestDirectory();
+      const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
+      await writer.append(['{}\n']);
+      storage.state.failure = failure;
+      await writer.append(['[]\n']);
+
+      expect(readLogFileContents(storage)).toEqual(['[]\n']);
+      expect(storage.state.writing).toBe(false);
+    },
+  );
+
+  it('preserves committed logs and rejects appends when file metadata cannot be read', async () => {
     const storage = createTestDirectory();
     const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
     await writer.append(['{}\n']);
-    storage.state.failure = 'missing';
+    const originalFilenames = [...storage.files.keys()];
+    storage.state.failure = 'metadata';
+
+    await expect(writer.append(['[]\n'])).rejects.toThrow('Cannot read file metadata');
+
+    expect([...storage.files.keys()]).toEqual(originalFilenames);
+    expect(readLogFileContents(storage)).toEqual(['{}\n']);
+    expect(storage.state.writing).toBe(false);
+    storage.state.failure = 'none';
     await writer.append(['[]\n']);
 
-    expect(readLogFileContents(storage)).toEqual(['[]\n']);
-    expect(storage.state.writing).toBe(false);
+    expect(readLogFileContents(storage)).toEqual(['{}\n[]\n']);
   });
 
   it.each(['write', 'flush'] as const)('rolls back a failed %s and can recover into a new file', async failure => {

@@ -24,7 +24,7 @@ import {Maybe, Result} from 'true-myth';
 import {logDirectoryName, type LogPersistenceConfiguration} from './logPersistenceConfiguration';
 
 export type LogFileHandle = {
-  readonly getFile: () => Promise<{readonly size: number}>;
+  readonly getFile: () => Promise<{readonly size: number; readonly lastModified: number}>;
   readonly createSyncAccessHandle: () => Promise<LogAccessHandle>;
 };
 
@@ -55,7 +55,7 @@ export type OriginPrivateFileSystemLogStoreOptions = {
 
 type StoredLogFile = {
   readonly name: string;
-  readonly createdAtMilliseconds: number;
+  readonly modifiedAtMilliseconds: number;
   readonly sizeBytes: number;
 };
 
@@ -91,7 +91,7 @@ export function isValidAccountIdentifier(accountIdentifier: unknown): boolean {
 
 function shouldRemoveLogFile(options: LogFileRetentionOptions): boolean {
   const {file, currentTimeMilliseconds, totalStoredBytes, incomingBatchBytes, configuration} = options;
-  const expired = currentTimeMilliseconds - file.createdAtMilliseconds >= configuration.maximumAgeMilliseconds;
+  const expired = file.modifiedAtMilliseconds < currentTimeMilliseconds - configuration.maximumAgeMilliseconds;
 
   return (
     expired ||
@@ -154,7 +154,7 @@ async function listLogFiles(directory: LogDirectory): Promise<readonly StoredLog
 
     try {
       const file = await (await directory.getFileHandle(entry.name)).getFile();
-      files.push({name: entry.name, createdAtMilliseconds, sizeBytes: file.size});
+      files.push({name: entry.name, modifiedAtMilliseconds: file.lastModified, sizeBytes: file.size});
     } catch (error: unknown) {
       if (!isMissingEntry(error)) {
         throw error;
@@ -163,7 +163,7 @@ async function listLogFiles(directory: LogDirectory): Promise<readonly StoredLog
   }
 
   return files.toSorted((left, right) => {
-    const ageDifference = left.createdAtMilliseconds - right.createdAtMilliseconds;
+    const ageDifference = left.modifiedAtMilliseconds - right.modifiedAtMilliseconds;
 
     return ageDifference === 0 ? left.name.localeCompare(right.name) : ageDifference;
   });
