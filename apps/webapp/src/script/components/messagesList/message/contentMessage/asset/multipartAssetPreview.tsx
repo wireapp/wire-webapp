@@ -19,6 +19,7 @@
 
 import {FC, useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
@@ -149,7 +150,7 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
         {showText && <span>{displayText}</span>}
       </div>
 
-      {shouldDisplayImagePreview && assetUuid !== undefined && assetUuid !== '' && (
+      {shouldDisplayImagePreview && isNonEmptyString(assetUuid) && (
         <FileFullscreenModal
           id={assetUuid}
           isOpen={isModalOpen}
