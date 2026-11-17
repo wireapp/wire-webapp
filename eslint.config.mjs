@@ -133,7 +133,7 @@ const webappImportResolvers = [
 
 const importSettings = {
   'import-x/extensions': importResolutionExtensions,
-  'import-x/external-module-folders': ['node_modules', 'node_modules/@types'],
+  'import-x/external-module-folders': ['node_modules', 'node_modules/@types', 'apps/webapp/node_modules'],
   'import-x/parsers': {
     '@typescript-eslint/parser': ['.ts', '.tsx', '.mts', '.cts'],
   },
