@@ -42,6 +42,12 @@ export function CoreCryptoUpgradeModal(): ReactElement | null {
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <ModalComponent
         isShown
+        onKeyDown={event => {
+          // Let Tab reach ModalComponent's document-level focus trap.
+          if (event.key !== 'Tab') {
+            event.stopPropagation();
+          }
+        }}
         id="core-crypto-upgrade-modal"
         data-uie-name="core-crypto-upgrade-modal"
         aria-labelledby="core-crypto-upgrade-title"

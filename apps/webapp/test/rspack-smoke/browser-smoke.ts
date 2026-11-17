@@ -173,6 +173,45 @@ test('loads the application entry points and redirects an unauthenticated visito
   expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
 });
 
+for (const entryPath of ['/', '/auth']) {
+  for (const isDesktopApp of [false, true]) {
+    test(`shows ${isDesktopApp ? 'Desktop' : 'browser'} upgrade instructions before loading ${entryPath} without JSPI`, async ({
+      page,
+    }, testInfo) => {
+      const baseUrl = Maybe.of(testInfo.project.use.baseURL).unwrapOr('');
+      const diagnostics = captureRuntimeDiagnostics({page, baseUrl});
+      await page.addInitScript(desktop => {
+        Reflect.deleteProperty(WebAssembly, 'Suspending');
+        Reflect.deleteProperty(WebAssembly, 'promising');
+        if (desktop) {
+          Object.defineProperty(navigator, 'userAgent', {
+            value: 'Mozilla/5.0 Chrome/136.0.0.0 Electron/36.0.0 Wire/3.0.0',
+            configurable: true,
+          });
+        }
+      }, isDesktopApp);
+
+      await page.goto(entryPath);
+      const dialog = page.getByRole('dialog', {name: isDesktopApp ? 'Update required' : 'Browser update required'});
+      await expect(dialog).toBeVisible();
+      await expect(dialog).toContainText(
+        isDesktopApp
+          ? 'Update Wire Desktop to the latest version'
+          : "Your browser doesn't support the features Wire needs.",
+      );
+      const reloadButton = dialog.getByRole('button', {name: 'Reload Wire'});
+      await expect(reloadButton).toBeFocused();
+      await page.keyboard.press('Tab');
+      await expect(reloadButton).toBeFocused();
+      await page.keyboard.press('Shift+Tab');
+      await expect(reloadButton).toBeFocused();
+      await page.keyboard.press('Escape');
+      await expect(dialog).toBeVisible();
+      expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
+    });
+  }
+}
+
 test('starts when service-worker cleanup finishes after DOMContentLoaded', async ({page}) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'serviceWorker', {

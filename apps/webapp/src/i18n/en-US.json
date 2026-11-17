@@ -1093,6 +1093,11 @@
   "conversationsSecondaryLineYouWereRemoved": "You were removed",
   "conversationsWelcome": "Welcome to {brandName} 👋",
   "cookiePolicyStrings.bannerText": "We use cookies to personalize your experience on our website. By continuing to use the website, you agree to the use of cookies.{newline}Further information on cookies can be found in our <strong>privacy policy</strong>.",
+  "coreCryptoUpgradeBrowserMessage": "Your browser doesn't support the features Wire needs. Update your browser to the latest version and reload Wire. If your organization manages the updates, contact your administrator.",
+  "coreCryptoUpgradeBrowserTitle": "Browser update required",
+  "coreCryptoUpgradeDesktopMessage": "This version of Wire Desktop can no longer run Wire. Update Wire Desktop to the latest version, then restart the app to continue. If updates are managed by your organisation, contact your administrator.",
+  "coreCryptoUpgradeDesktopTitle": "Update required",
+  "coreCryptoUpgradeReload": "Reload Wire",
   "createAccount.headLine": "Set up your account",
   "createAccount.nextButton": "Next",
   "createConversationAccessHeader": "Access",
@@ -2616,10 +2621,5 @@
   "wireLinux": "{brandName} for Linux",
   "wireMacos": "{brandName} for macOS",
   "wireWindows": "{brandName} for Windows",
-  "wire_for_web": "{brandName} for Web",
-  "coreCryptoUpgradeBrowserTitle": "Browser update required",
-  "coreCryptoUpgradeDesktopTitle": "Update required",
-  "coreCryptoUpgradeDesktopMessage": "This version of Wire Desktop can no longer run Wire. Update Wire Desktop to the latest version, then restart the app to continue. If updates are managed by your organisation, contact your administrator.",
-  "coreCryptoUpgradeBrowserMessage": "Your browser doesn't support the features Wire needs. Update your browser to the latest version and reload Wire. If your organization manages the updates, contact your administrator.",
-  "coreCryptoUpgradeReload": "Reload Wire"
+  "wire_for_web": "{brandName} for Web"
 }
