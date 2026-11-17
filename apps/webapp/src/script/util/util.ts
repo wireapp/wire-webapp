@@ -24,6 +24,7 @@ import {noop} from 'noop-esm';
 import {isTabKey} from './keyboardUtil';
 import {getLogger} from './logger';
 
+import {supportsMLS as supportsMlsCapability} from '../browser/supportsMls';
 import {Decoder} from '../commons/base64/decoder';
 import {Encoder} from '../commons/base64/encoder';
 import {Runtime} from '../commons/util/Runtime';
@@ -404,7 +405,7 @@ export const setContextMenuPosition = (event: React.KeyboardEvent): MouseEvent =
   });
 };
 
-export {supportsMLS} from '../browser/supportsMls';
+export const supportsMLS = supportsMlsCapability;
 
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
