@@ -37,6 +37,7 @@ export interface ScheduleMeetingFormState {
   end: Maybe<Date>;
   recurrence: ScheduleMeetingRecurrenceOption;
   selectedUsers: User[];
+  invitedEmails?: string[];
   participantsFilter: string;
   password: string;
   passwordConfirmation: string;

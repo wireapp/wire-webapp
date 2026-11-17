@@ -64,6 +64,7 @@ export const getDefaultScheduleMeetingFormState = (clock: Clock): ScheduleMeetin
     end: maybe.just(getDefaultMeetingEndDateTime(start)),
     recurrence: 'doesNotRepeat',
     selectedUsers: [],
+    invitedEmails: [],
     participantsFilter: '',
     password: '',
     passwordConfirmation: '',
@@ -83,6 +84,7 @@ type ScheduleMeetingModalState = {
   originalEnd: Maybe<Date>;
   originalRecurrence: ScheduleMeetingRecurrenceOption;
   originalSelectedUsers: User[];
+  originalInvitedEmails: string[];
   openCreate: (clock: Clock) => void;
   openEdit: (
     meetingSeries: MeetingSeries,
@@ -97,6 +99,7 @@ type ScheduleMeetingModalState = {
   setEnd: (end: Maybe<Date>) => void;
   setRecurrence: (recurrence: ScheduleMeetingRecurrenceOption) => void;
   setSelectedUsers: (selectedUsers: User[]) => void;
+  setInvitedEmails: (invitedEmails: string[]) => void;
   setParticipantsFilter: (participantsFilter: string) => void;
   setPassword: (password: string) => void;
   setPasswordConfirmation: (passwordConfirmation: string) => void;
@@ -110,6 +113,7 @@ const emptyFormState: ScheduleMeetingFormState = {
   end: maybe.nothing(),
   recurrence: 'doesNotRepeat',
   selectedUsers: [],
+  invitedEmails: [],
   participantsFilter: '',
   password: '',
   passwordConfirmation: '',
@@ -128,6 +132,7 @@ const initialState = {
   originalEnd: Maybe.nothing<Date>(),
   originalRecurrence: 'doesNotRepeat' as ScheduleMeetingRecurrenceOption,
   originalSelectedUsers: [] as User[],
+  originalInvitedEmails: [] as string[],
 };
 
 export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, get) => {
@@ -147,6 +152,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
         originalEnd: Maybe.nothing<Date>(),
         originalRecurrence: 'doesNotRepeat',
         originalSelectedUsers: [],
+        originalInvitedEmails: [],
       });
     },
     openEdit: (
@@ -168,6 +174,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
         originalEnd: formState.end,
         originalRecurrence: formState.recurrence,
         originalSelectedUsers,
+        originalInvitedEmails: formState.invitedEmails ?? [],
       });
     },
     close: () => {
@@ -179,6 +186,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
         originalEnd: Maybe.nothing<Date>(),
         originalRecurrence: 'doesNotRepeat',
         originalSelectedUsers: [],
+        originalInvitedEmails: [],
       });
     },
     reset: clock => {
@@ -259,6 +267,11 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
     setSelectedUsers: selectedUsers => {
       return set(state => {
         return {formState: {...state.formState, selectedUsers}};
+      });
+    },
+    setInvitedEmails: invitedEmails => {
+      return set(state => {
+        return {formState: {...state.formState, invitedEmails}};
       });
     },
     setParticipantsFilter: participantsFilter => {

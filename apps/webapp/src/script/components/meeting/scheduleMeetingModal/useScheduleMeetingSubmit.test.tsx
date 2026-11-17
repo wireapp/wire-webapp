@@ -86,6 +86,8 @@ const updateCommand = {
   originalRecurrence: 'doesNotRepeat' as const,
   selectedUsers: [],
   originalSelectedUsers: [],
+  invitedEmails: [],
+  originalInvitedEmails: [],
   qualifiedConversation: maybe.just({id: 'conversation-id', domain: 'example.com'}),
 };
 

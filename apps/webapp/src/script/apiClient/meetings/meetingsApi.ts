@@ -145,6 +145,24 @@ export class MeetingsAPI {
     return this.parseMeetingWithConversationResponse(response.data);
   }
 
+  public async addInvitedEmails(meetingId: QualifiedId, emails: string[]): Promise<void> {
+    await this.client.sendJSON<void>({
+      data: {emails},
+      method: 'post',
+      url: `${this.generateMeetingUrl(meetingId)}/invitations`,
+      ...disableInfiniteNetworkRetries,
+    });
+  }
+
+  public async removeInvitedEmails(meetingId: QualifiedId, emails: string[]): Promise<void> {
+    await this.client.sendJSON<void>({
+      data: {emails},
+      method: 'post',
+      url: `${this.generateMeetingUrl(meetingId)}/invitations/delete`,
+      ...disableInfiniteNetworkRetries,
+    });
+  }
+
   /** Generate a new guest link for an existing meeting. */
   public async rotateMeetingLink(meetingId: QualifiedId, password?: string): Promise<MeetingWithConversation> {
     const config: AxiosRequestConfig = {

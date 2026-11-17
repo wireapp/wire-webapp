@@ -61,6 +61,7 @@ export const ScheduleMeetingModal: FunctionComponent = () => {
     setEnd,
     setRecurrence,
     setSelectedUsers,
+    setInvitedEmails,
     setParticipantsFilter,
     setPassword,
     setPasswordConfirmation,
@@ -154,6 +155,7 @@ export const ScheduleMeetingModal: FunctionComponent = () => {
             onEndChange={setEnd}
             onRecurrenceChange={setRecurrence}
             onSelectedUsersChange={setSelectedUsers}
+            onInvitedEmailsChange={setInvitedEmails}
             onParticipantsFilterChange={setParticipantsFilter}
             onPasswordChange={setPassword}
             onPasswordConfirmationChange={setPasswordConfirmation}
