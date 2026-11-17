@@ -19,6 +19,7 @@
 
 import {FC, useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
@@ -29,6 +30,7 @@ import {CellsRepository} from '../../../../../repositories/cells/cellsRepository
 import {MultipleFilesIcon} from '../../../../../uiKit/dataDisplay/icon/files/multipleFilesIcon';
 import {PlayIcon} from '../../../../../uiKit/dataDisplay/icon/playIcon';
 import {isPreviewableImage} from '../../../../../util/imageUtil';
+import type {Translate} from '../../../../../util/localizerUtil/translationTypes';
 import {getFileExtension, getName} from '../../../../../util/util';
 import {FileTypeIcon} from '../../../../conversation/common/fileTypeIcon/fileTypeIcon';
 import {FileFullscreenModal} from '../../../../FileFullscreenModal/FileFullscreenModal';
@@ -40,6 +42,7 @@ interface MultipartAssetPreviewProps {
   cellsRepository?: CellsRepository;
   senderName: string;
   timestamp: number;
+  translate: Translate;
 }
 
 export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
@@ -48,10 +51,11 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
   cellsRepository = container.resolve(CellsRepository),
   senderName,
   timestamp,
+  translate,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const firstAsset = cellAssets[0];
-  const modalId = `multipart-preview-${firstAsset?.uuid ?? 'unknown'}`;
+  const assetUuid = firstAsset?.uuid;
 
   const extension = firstAsset?.initialName != null ? getFileExtension(firstAsset.initialName) : '';
   const isImage = firstAsset?.contentType?.startsWith('image');
@@ -100,6 +104,7 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
         }}
         style={{cursor: 'pointer'}}
         role="button"
+        aria-label={translate('cells.filePreviewButton.ariaLabel', {name: fileName})}
         tabIndex={0}
         onKeyDown={event => {
           if (event.key === 'Enter' || event.key === ' ') {
@@ -145,9 +150,9 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
         {showText && <span>{displayText}</span>}
       </div>
 
-      {shouldDisplayImagePreview && (
+      {shouldDisplayImagePreview && isNonEmptyString(assetUuid) && (
         <FileFullscreenModal
-          id={modalId}
+          id={assetUuid}
           isOpen={isModalOpen}
           onClose={() => {
             return setIsModalOpen(false);

@@ -229,6 +229,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
                         attachmentsCountCopy={attachmentsCountCopy}
                         senderName={senderName}
                         timestamp={timestamp}
+                        translate={translate}
                       />
                     )}
                   </>
