@@ -86,6 +86,7 @@ export interface ScheduleMeetingFormProps {
   onEndChange: (end: Maybe<Date>) => void;
   onRecurrenceChange: (recurrence: ScheduleMeetingRecurrenceOption) => void;
   onSelectedUsersChange: (users: User[]) => void;
+  onInvitedEmailsChange?: (emails: string[]) => void;
   onParticipantsFilterChange: (filter: string) => void;
   onPasswordChange?: (password: string) => void;
   onPasswordConfirmationChange?: (password: string) => void;
@@ -102,6 +103,7 @@ export const ScheduleMeetingForm: FunctionComponent<ScheduleMeetingFormProps> = 
   onEndChange,
   onRecurrenceChange,
   onSelectedUsersChange,
+  onInvitedEmailsChange,
   onParticipantsFilterChange,
   onPasswordChange,
   onPasswordConfirmationChange,
@@ -285,6 +287,8 @@ export const ScheduleMeetingForm: FunctionComponent<ScheduleMeetingFormProps> = 
             dataUieName="schedule-meeting-participants"
             users={users}
             selectedUsers={formState.selectedUsers}
+            invitedEmails={formState.invitedEmails ?? []}
+            onInvitedEmailsChange={onInvitedEmailsChange}
             onSelectedUsersChange={onSelectedUsersChange}
             filter={formState.participantsFilter}
             onFilterChange={onParticipantsFilterChange}
@@ -293,7 +297,7 @@ export const ScheduleMeetingForm: FunctionComponent<ScheduleMeetingFormProps> = 
             teamRepository={teamRepository}
             conversationRepository={conversationRepository}
             label={translate('meetings.scheduleModal.participantsLabel')}
-            placeholder={translate('meetings.scheduleModal.participantsPlaceholder')}
+            placeholder={translate('meetings.scheduleModal.participantsEmailPlaceholder')}
             popoverPortalContainer={portalContainer}
           />
         </div>

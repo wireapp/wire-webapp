@@ -23,6 +23,8 @@ import type {UpdateMeeting} from '../../apiClient/meetings/updateMeeting';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 export interface MeetingsDataSource {
+  addInvitedEmails(meetingId: QualifiedId, emails: string[]): Promise<void>;
+  removeInvitedEmails(meetingId: QualifiedId, emails: string[]): Promise<void>;
   createMeeting(payload: CreateMeeting): Promise<CreatedMeetingWithConversation>;
   deleteMeeting(meetingId: QualifiedId): Promise<void>;
   getMeeting(meetingId: QualifiedId): Promise<Meeting>;

@@ -28,6 +28,7 @@ export const isMeetingPersistedDespiteSubmitError = (error: MeetingSubmitErrors)
     case meetingSubmitErrors.addParticipantsFailed:
     case meetingSubmitErrors.conversationSetupFailed:
     case meetingSubmitErrors.removeParticipantsFailed:
+    case meetingSubmitErrors.emailInvitationsFailed:
     case meetingSubmitErrors.conversationRenameFailed:
       return true;
     default:

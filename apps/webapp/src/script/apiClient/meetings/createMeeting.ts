@@ -26,6 +26,7 @@ export enum MeetingType {
 
 export interface CreateMeeting {
   end_time: string;
+  invited_emails?: string[];
   password?: string;
   recurrence?: MeetingRecurrence;
   start_time: string;

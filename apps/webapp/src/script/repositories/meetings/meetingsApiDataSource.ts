@@ -29,6 +29,14 @@ import type {
 export class MeetingsApiDataSource implements MeetingsDataSource {
   constructor(private readonly meetingsApi: MeetingsAPI) {}
 
+  addInvitedEmails(...args: Parameters<MeetingsDataSource['addInvitedEmails']>): Promise<void> {
+    return this.meetingsApi.addInvitedEmails(...args);
+  }
+
+  removeInvitedEmails(...args: Parameters<MeetingsDataSource['removeInvitedEmails']>): Promise<void> {
+    return this.meetingsApi.removeInvitedEmails(...args);
+  }
+
   createMeeting(...args: Parameters<MeetingsDataSource['createMeeting']>): Promise<CreatedMeetingWithConversation> {
     return this.meetingsApi.createMeeting(...args);
   }

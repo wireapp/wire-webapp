@@ -60,6 +60,7 @@ export const MEET_NOW_ERROR_TRANSLATION_KEYS = {
   originalMeetingTimesMissing: meetNowCreateFailureKeys,
   addParticipantsFailed: persistedSetupFailureKeys.addParticipantsFailed,
   removeParticipantsFailed: meetNowCreateFailureKeys,
+  emailInvitationsFailed: meetNowCreateFailureKeys,
   conversationRenameFailed: conversationRenameFailedKeys,
   deleteFailed: meetNowCreateFailureKeys,
   deleteSucceededButLocalCleanupFailed: meetNowCreateFailureKeys,
@@ -115,6 +116,10 @@ export const getScheduleMeetingSubmitErrorTranslationKeys = (
     removeParticipantsFailed: {
       titleKey: updateFailureTitleKey,
       messageKey: 'meetings.scheduleModal.error.removeParticipantsFailed',
+    },
+    emailInvitationsFailed: {
+      titleKey: updateFailureTitleKey,
+      messageKey: 'meetings.scheduleModal.error.emailInvitationsFailed',
     },
     conversationRenameFailed: conversationRenameFailedKeys,
     deleteFailed: {

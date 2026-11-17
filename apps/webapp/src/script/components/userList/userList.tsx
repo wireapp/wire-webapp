@@ -17,7 +17,18 @@
  *
  */
 
-import {ChangeEvent, Fragment, useCallback, useId, useMemo, useState, type FunctionComponent, ReactNode} from 'react';
+import {
+  ChangeEvent,
+  Fragment,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type FunctionComponent,
+  ReactNode,
+} from 'react';
 
 import {isEmptyArray, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -60,6 +71,7 @@ interface UserListProps {
   onSelectUser?: (user: User) => void;
   reducedUserCount?: number;
   selectedUsers?: User[];
+  selectedExtraItems?: ReactNode[];
   showEmptyAdmin?: boolean;
   teamState?: TeamState;
   truncate?: boolean;
@@ -82,6 +94,7 @@ export const UserList: FunctionComponent<UserListProps> = ({
   conversation,
   truncate = false,
   selectedUsers = [],
+  selectedExtraItems = [],
   maxVisibleUsers = 7,
   reducedUserCount = 5,
   showEmptyAdmin = false,
@@ -108,6 +121,13 @@ export const UserList: FunctionComponent<UserListProps> = ({
   }, [users, filterDeletedUsers]);
 
   const [isSelectedContactsOpen, setIsSelectedContactsOpen] = useState(false);
+  const previousSelectedExtraCount = useRef(0);
+  useEffect(() => {
+    if (selectedExtraItems.length > previousSelectedExtraCount.current) {
+      setIsSelectedContactsOpen(true);
+    }
+    previousSelectedExtraCount.current = selectedExtraItems.length;
+  }, [selectedExtraItems.length]);
   const [internalContactsOpen, setInternalContactsOpen] = useState(true);
 
   const hasMoreUsers = !truncate && filteredUsers.length > maxShownUsers;
@@ -216,7 +236,7 @@ export const UserList: FunctionComponent<UserListProps> = ({
       );
     };
 
-    const selectedUsersCount = selectedUsers.length;
+    const selectedUsersCount = selectedUsers.length + selectedExtraItems.length;
     const hasSelectedUsers = selectedUsersCount > 0;
 
     const isContactsOpen = controlledContactsOpen ?? internalContactsOpen;
@@ -259,10 +279,11 @@ export const UserList: FunctionComponent<UserListProps> = ({
             >
               {isSelectedContactsOpen &&
                 selectedUsers.map((user, index) => {
-                  const isLastItem = index === selectedUsersCount - 1;
+                  const isLastItem = index === selectedUsers.length - 1 && selectedExtraItems.length === 0;
 
                   return renderListItem(user, isLastItem);
                 })}
+              {isSelectedContactsOpen && selectedExtraItems}
             </ul>
           </Fragment>
         )}

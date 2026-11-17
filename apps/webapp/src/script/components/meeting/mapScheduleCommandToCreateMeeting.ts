@@ -36,6 +36,7 @@ export const mapScheduleCommandToCreateMeeting = (
     start_time: command.start.toISOString(),
     end_time: command.end.toISOString(),
     type: MeetingType.SCHEDULED,
+    ...((command.invitedEmails?.length ?? 0) > 0 && {invited_emails: command.invitedEmails}),
     tzid: deviceTimeZone.ianaTimeZoneId,
     ...(recurrence !== undefined && {recurrence}),
     ...(isNonEmptyString(command.password?.trim()) && {
