@@ -51,6 +51,8 @@ module.exports = defineConfig({
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
+    // Playwright also applies these headers to manually created browser contexts.
+    extraHTTPHeaders: process.env.GITHUB_ACTIONS === 'true' ? {'Accept-Encoding': 'identity'} : undefined,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: {
       mode: 'on-first-retry',
