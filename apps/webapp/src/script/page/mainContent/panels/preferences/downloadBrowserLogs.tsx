@@ -17,7 +17,7 @@
  *
  */
 
-import {useRef, useState, type FunctionComponent, type ReactElement} from 'react';
+import {useRef, useState, type FunctionComponent, type ReactNode} from 'react';
 
 import type {Maybe} from 'true-myth';
 
@@ -27,15 +27,13 @@ import type {BrowserLogDownload} from '../../../../logger/createBrowserLogDownlo
 import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
 import type {Translate} from '../../../../util/localizerUtil/translationTypes';
 
-type DownloadBrowserLogsOptions = {
+type DownloadBrowserLogsProps = {
   readonly downloadBrowserLogs: Maybe<BrowserLogDownload>;
   readonly translate: Translate;
 };
 
-export const DownloadBrowserLogs: FunctionComponent<DownloadBrowserLogsOptions> = function DownloadBrowserLogs(
-  options: DownloadBrowserLogsOptions,
-): ReactElement | null {
-  const {downloadBrowserLogs, translate} = options;
+export const DownloadBrowserLogs: FunctionComponent<DownloadBrowserLogsProps> = properties => {
+  const {downloadBrowserLogs, translate} = properties;
   const exportInProgress = useRef(false);
   const [isExporting, setIsExporting] = useState(false);
   const [hasFailed, setHasFailed] = useState(false);
@@ -62,6 +60,14 @@ export const DownloadBrowserLogs: FunctionComponent<DownloadBrowserLogsOptions> 
     }
   }
 
+  function renderFailureMessage(): ReactNode {
+    if (hasFailed) {
+      return <p role="alert">{translate('preferencesBrowserLogsFailed')}</p>;
+    }
+
+    return null;
+  }
+
   if (downloadBrowserLogs.isNothing) {
     return null;
   }
@@ -80,7 +86,7 @@ export const DownloadBrowserLogs: FunctionComponent<DownloadBrowserLogsOptions> 
           {translate('preferencesBrowserLogsDownload')}
         </Button>
       </div>
-      {hasFailed && <p role="alert">{translate('preferencesBrowserLogsFailed')}</p>}
+      {renderFailureMessage()}
     </PreferencesSection>
   );
 };
