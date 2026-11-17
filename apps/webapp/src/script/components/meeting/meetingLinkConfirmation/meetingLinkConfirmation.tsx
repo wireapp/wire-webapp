@@ -70,11 +70,15 @@ export const MeetingLinkConfirmationMessage = ({
       >
         {link}
       </div>
-      {hasPassword ? (
-        <p css={meetingLinkConfirmationStatusStyles} role="note">
-          <ShieldIcon aria-hidden="true" /> {translate('guestOptionsInfoPasswordSecured')}
-        </p>
-      ) : null}
+      <p css={meetingLinkConfirmationStatusStyles} role="note">
+        {hasPassword ? (
+          <>
+            <ShieldIcon aria-hidden="true" /> {translate('meetings.meetingLink.passwordProtected')}
+          </>
+        ) : (
+          translate('meetings.meetingLink.passwordUnprotected')
+        )}
+      </p>
       <footer css={meetingLinkConfirmationStyles}>
         <CopyToClipboardButton
           textToCopy={link}
@@ -89,7 +93,7 @@ export const MeetingLinkConfirmationMessage = ({
             onClose?.();
           }}
         >
-          {translate('meetings.meetingLink.close')}
+          {translate('meetings.meetingLink.cancel')}
         </Button>
       </footer>
     </>
