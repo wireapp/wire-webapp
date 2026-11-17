@@ -19,7 +19,7 @@
 
 import React, {useCallback, useEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
-import {isNan, isNullOrUndefined} from '@sindresorhus/is';
+import {isNan, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import classNames from 'classnames';
 import {container} from 'tsyringe';
 
@@ -41,6 +41,7 @@ import {
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
 
 import {Config} from '../../../Config';
+import {noteTakerFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {isCallViewOption} from '../../../guards/CallView';
 import {isMediaDevice} from '../../../guards/MediaDevice';
 import {useActiveWindowMatchMedia} from '../../../hooks/useActiveWindowMatchMedia';
@@ -65,6 +66,7 @@ import {ContextMenuEntry, showContextMenu} from '../../../ui/contextMenu';
 import {BlurHighIcon} from '../../../uiKit/dataDisplay/icon/blurHighIcon';
 import {BlurLowIcon} from '../../../uiKit/dataDisplay/icon/blurLowIcon';
 import {CircleIcon} from '../../../uiKit/dataDisplay/icon/circleIcon';
+import {EditDocumentIcon} from '../../../uiKit/dataDisplay/icon/editDocumentIcon';
 import {EmojiIcon} from '../../../uiKit/dataDisplay/icon/emojiIcon';
 import {GridIcon} from '../../../uiKit/dataDisplay/icon/gridIcon';
 import {ImageIcon} from '../../../uiKit/dataDisplay/icon/imageIcon';
@@ -77,6 +79,7 @@ import {handleKeyDown, isEscapeKey, KEY} from '../../../util/keyboardUtil';
 import {CallViewTab} from '../../../view_model/CallingViewModel';
 import {WebAppEvents} from '../../../webAppEvents';
 import * as Icon from '../../icon';
+import {useNoteTakerPanelStore} from '../noteTaker/useNoteTakerPanelStore';
 
 type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';
 
@@ -177,6 +180,7 @@ interface VideoControlsProps {
   setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
   sendEmoji: (emoji: string, call: Call) => void;
   onOpenBackgroundSettings?: () => void;
+  onToggleNoteTaker?: () => void;
   isWebGLAvailable: boolean;
 }
 
@@ -203,11 +207,13 @@ export const VideoControls: FunctionComponent<VideoControlsProps> = ({
   setMaximizedParticipant,
   sendEmoji,
   onOpenBackgroundSettings,
+  onToggleNoteTaker,
   isWebGLAvailable = true,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: VideoControlsProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  const {isOpen: isNoteTakerOpen, isRecording, setOpen: setNoteTakerOpen} = useNoteTakerPanelStore();
   const selfParticipant = call.getSelfParticipant();
   const {
     sharesScreen: selfSharesScreen,
@@ -1142,6 +1148,44 @@ export const VideoControls: FunctionComponent<VideoControlsProps> = ({
               </button>
             </li>
           </>
+        )}
+        {isFeatureToggleEnabled(noteTakerFeatureToggleName) && (
+          <li className="video-controls__item">
+            <button
+              type="button"
+              className={classNames('video-controls__button_primary', {active: isNoteTakerOpen})}
+              data-uie-name="do-toggle-call-note-taker"
+              aria-label="Call notes"
+              title="Call notes"
+              aria-expanded={isNoteTakerOpen}
+              aria-controls="call-note-taker-panel"
+              onClick={() => {
+                if (!isUndefined(onToggleNoteTaker)) {
+                  onToggleNoteTaker();
+                } else {
+                  setNoteTakerOpen(!isNoteTakerOpen);
+                }
+              }}
+              css={{position: 'relative'}}
+            >
+              <EditDocumentIcon width={16} height={16} />
+              {isRecording && (
+                <span
+                  aria-label="Note taker running"
+                  css={{
+                    position: 'absolute',
+                    top: 4,
+                    right: 4,
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: 'var(--accent-color, #e62d50)',
+                    border: '1px solid var(--app-bg-secondary)',
+                  }}
+                />
+              )}
+            </button>
+          </li>
         )}
       </div>
     </ul>

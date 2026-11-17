@@ -17,204 +17,380 @@
  *
  */
 
+import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
+import {Maybe, result, task, type Task} from 'true-myth';
 
-import type {SpeechEngine} from './speechEngine';
-
-import type {Call} from '../../../repositories/calling/Call';
-import {MuteState} from '../../../repositories/calling/CallState';
+import {createAudioChunker, type AudioChunker, removeOverlap, type AudioChunk} from './audioChunker';
+import {toSpeechError, type SpeechEngine} from './speechEngine';
 
 const SAMPLE_RATE = 16000;
 const BUFFER_SIZE = 4096;
-const CHUNK_SECONDS = 8;
 const STREAM_POLL_MS = 500;
-const SILENCE_ENERGY = 0.00001;
-const MAX_QUEUED_CHUNKS = 15;
+const MAX_QUEUED_SECONDS = 120;
+const MICROSECONDS_PER_MILLISECOND = 1000;
 
+/** Capture boundary: the application adapts its calling repository here. */
+export interface NoteTakerCall {
+  getSelfParticipant(): {audioStream(): MediaStream | undefined; user: {name(): string}};
+  getNoteTakerAudioParticipant(
+    trackId: string,
+  ): {clientId: string; user: {qualifiedId: {id: string; domain: string}; name(): string}} | undefined;
+  getNoteTakerAudioStreams(): MediaStream[];
+  isMicrophoneMuted(): boolean;
+  subscribeMicrophoneMute(listener: () => void): {dispose(): void};
+}
+
+export interface NoteTakerSession {
+  start(): Task<void, Error>;
+  stop(): Promise<void>;
+  cancel(): void;
+}
+
+export type Speaker = string;
 export interface TranscriptEntry {
   seconds: number;
   text: string;
+  speaker: Speaker;
+  speakerName?: string;
+}
+export interface TranscriptionStats {
+  inferenceMs: number;
+  audioSeconds: number;
+  queuedSeconds: number;
+  provisional?: boolean;
 }
 
-/** Experimental mixed-audio capture. Never stops or modifies the call's tracks. */
-export class NoteTakerSession {
-  private context?: AudioContext;
-  private processor?: ScriptProcessorNode;
-  private timer?: ReturnType<typeof setInterval>;
-  private sources = new Map<MediaStreamTrack, {source: MediaStreamAudioSourceNode; gain: GainNode}>();
-  private chunks: Float32Array[] = [];
-  private sampleCount = 0;
-  private capturedSamples = 0;
-  private queue: {audio: Float32Array; seconds: number}[] = [];
-  private processing?: Promise<void>;
-  private stopped = false;
-  private muteSubscription?: {dispose(): void};
-  private stopPromise?: Promise<void>;
-  private cancelled = false;
+export interface NoteTakerAudioPlatform {
+  createContext(): AudioContext;
+  createStream(tracks: MediaStreamTrack[]): MediaStream;
+}
 
-  constructor(
-    private call: Call,
-    private engine: SpeechEngine,
-    private onEntry: (entry: TranscriptEntry) => void,
-    private onError: (error: unknown) => void,
-  ) {}
+const browserAudioPlatform: NoteTakerAudioPlatform = {
+  createContext: () => {
+    return new AudioContext({sampleRate: SAMPLE_RATE});
+  },
+  createStream: tracks => {
+    return new MediaStream(tracks);
+  },
+};
 
-  async start(): Promise<void> {
-    const context = new AudioContext({sampleRate: SAMPLE_RATE});
-    this.context = context;
-    // ScriptProcessor keeps this prototype small; inference runs off the UI thread.
-    const processor = context.createScriptProcessor(BUFFER_SIZE, 1, 1);
-    this.processor = processor;
-    processor.onaudioprocess = event => {
-      if (this.stopped) {
-        return;
-      }
-      const audio = event.inputBuffer.getChannelData(0).slice();
-      this.chunks.push(audio);
-      this.sampleCount += audio.length;
-      if (this.sampleCount >= context.sampleRate * CHUNK_SECONDS) {
-        this.flush();
-      }
-    };
-    // Output is silence: only listen to the call, never play the capture back.
-    processor.connect(context.destination);
-    this.syncSources();
-    this.muteSubscription = this.call.muteState.subscribe(() => {
-      this.syncSources();
+/** Separate local/remote taps. Never stops or modifies the call's tracks. */
+export function createNoteTakerSession(
+  clock: Clock,
+  call: NoteTakerCall,
+  engine: SpeechEngine,
+  onEntry: (entry: TranscriptEntry) => void,
+  onError: (error: unknown) => void,
+  onStats?: (stats: TranscriptionStats) => void,
+  onPreview?: (entry: TranscriptEntry) => void,
+  audioPlatform: NoteTakerAudioPlatform = browserAudioPlatform,
+): NoteTakerSession {
+  let audioContext: Maybe<AudioContext> = Maybe.nothing();
+  let timer: Maybe<ReturnType<Clock['setInterval']>> = Maybe.nothing();
+  const sources = new Map<MediaStreamTrack, {source: MediaStreamAudioSourceNode; gain: GainNode; speaker: Speaker}>();
+  const channels = new Map<Speaker, {processor: ScriptProcessorNode; chunker: AudioChunker}>();
+  const previousText: Record<Speaker, string> = {};
+  let queue: (AudioChunk & {speaker: Speaker; speakerName: string; trackId?: string})[] = [];
+  const previews = new Map<Speaker, AudioChunk & {speaker: Speaker; speakerName: string; trackId?: string}>();
+  const finalizing: Record<Speaker, number> = {};
+  let processing: Maybe<Promise<void>> = Maybe.nothing();
+  let stopped = false;
+  let muteSubscription: Maybe<{dispose(): void}> = Maybe.nothing();
+  let stopPromise: Maybe<Promise<void>> = Maybe.nothing();
+  let cancelled = false;
+
+  function start(): Task<void, Error> {
+    return task.tryOrElse(toSpeechError, async () => {
+      const context = audioPlatform.createContext();
+      audioContext = Maybe.just(context);
+      createChannel('You');
+      syncSources();
+      muteSubscription = Maybe.just(
+        call.subscribeMicrophoneMute(() => {
+          syncSources();
+        }),
+      );
+      timer = Maybe.just(
+        clock.setInterval(() => {
+          const synced = result.tryOrElse(toSpeechError, syncSources);
+          if (synced.isErr) {
+            disconnect();
+            onError(synced.error);
+          }
+        }, STREAM_POLL_MS),
+      );
+      await context.resume();
     });
-    this.timer = setInterval(() => {
-      return this.syncSources();
-    }, STREAM_POLL_MS);
-    await context.resume();
   }
 
-  private syncSources(): void {
-    const context = this.context;
-    const processor = this.processor;
-    if (isUndefined(context) || isUndefined(processor)) {
+  function createChannel(speaker: Speaker, trackId?: string): void {
+    if (audioContext.isNothing) {
       return;
     }
-    const selfStream = this.call.getSelfParticipant().audioStream();
-    const localTracks = new Set(selfStream?.getAudioTracks() ?? []);
+    const context = audioContext.value;
+    const offsetSeconds = context.currentTime;
+    let attribution = getSpeakerName(speaker, trackId);
+    const chunker = createAudioChunker(chunk => {
+      enqueue({...chunk, seconds: chunk.seconds + offsetSeconds, speaker, ...attribution});
+    });
+    // ScriptProcessor keeps the capture small; inference runs in the worker.
+    const processor = context.createScriptProcessor(BUFFER_SIZE, 1, 1);
+    processor.onaudioprocess = event => {
+      if (!stopped) {
+        const nextAttribution = getSpeakerName(speaker, trackId);
+        if (
+          nextAttribution.speakerName !== attribution.speakerName ||
+          !attribution.identity.equals(nextAttribution.identity)
+        ) {
+          // Preserve the name at capture time; inference may finish after another person speaks.
+          if (attribution.identity.isJust) {
+            chunker.finish();
+          }
+          attribution = nextAttribution;
+        }
+        chunker.push(event.inputBuffer.getChannelData(0));
+        if (!isUndefined(onPreview)) {
+          const preview = chunker.preview();
+          if (!isUndefined(preview)) {
+            // Replace queued drafts instead of building a backlog of outdated hypotheses.
+            previews.set(speaker, {...preview, seconds: preview.seconds + offsetSeconds, speaker, ...attribution});
+            scheduleDrain();
+          }
+        }
+      }
+    };
+    processor.connect(context.destination); // Output stays silent; no capture playback.
+    channels.set(speaker, {processor, chunker});
+  }
+
+  function getSpeakerName(
+    speaker: Speaker,
+    trackId?: string,
+  ): {speakerName: string; trackId?: string; identity: Maybe<string>} {
+    if (speaker === 'You') {
+      const name = call.getSelfParticipant().user.name();
+      return {speakerName: name.length > 0 ? name : 'You', trackId, identity: Maybe.just('self')};
+    }
+    if (isUndefined(trackId)) {
+      return {speakerName: 'Remote participant', identity: Maybe.nothing()};
+    }
+    const participant = Maybe.of(call.getNoteTakerAudioParticipant(trackId));
+    const name = participant
+      .map(value => {
+        return value.user.name();
+      })
+      .unwrapOr('Remote participant');
+    const identity = participant.map(value => {
+      return JSON.stringify([value.user.qualifiedId.domain, value.user.qualifiedId.id, value.clientId]);
+    });
+    return {speakerName: name.length > 0 ? name : 'Remote participant', trackId, identity};
+  }
+
+  function syncSources(): void {
+    if (audioContext.isNothing) {
+      return;
+    }
+    const context = audioContext.value;
+    const localTracks = new Set(call.getSelfParticipant().audioStream()?.getAudioTracks() ?? []);
     const tracks = new Set(
-      this.call.getNoteTakerAudioStreams().flatMap(stream => {
+      call.getNoteTakerAudioStreams().flatMap(stream => {
         return stream.getAudioTracks();
       }),
     );
-    for (const [track, nodes] of this.sources) {
+    for (const [track, nodes] of sources) {
       if (!tracks.has(track) || track.readyState === 'ended') {
         nodes.source.disconnect();
         nodes.gain.disconnect();
-        this.sources.delete(track);
+        sources.delete(track);
+        if (nodes.speaker !== 'You') {
+          const channel = channels.get(nodes.speaker);
+          channel?.chunker.finish();
+          if (!isUndefined(channel)) {
+            channel.processor.onaudioprocess = null;
+            channel.processor.disconnect();
+            channels.delete(nodes.speaker);
+          }
+        }
       }
     }
     for (const track of tracks) {
       if (track.readyState === 'ended') {
         continue;
       }
-      let nodes = this.sources.get(track);
+      const speaker = localTracks.has(track) ? 'You' : `remote:${track.id}`;
+      let nodes = sources.get(track);
       if (isUndefined(nodes)) {
-        const source = context.createMediaStreamSource(new MediaStream([track]));
+        if (!channels.has(speaker)) {
+          createChannel(speaker, track.id);
+        }
+        const processor = channels.get(speaker)?.processor;
+        if (isUndefined(processor)) {
+          continue;
+        }
+        const source = context.createMediaStreamSource(audioPlatform.createStream([track]));
         const gain = context.createGain();
         source.connect(gain);
         gain.connect(processor);
-        nodes = {source, gain};
-        this.sources.set(track, nodes);
+        nodes = {source, gain, speaker};
+        sources.set(track, nodes);
       }
-      // AVS can mute transmission without disabling the underlying microphone track.
-      nodes.gain.gain.value = localTracks.has(track) && this.call.muteState() !== MuteState.NOT_MUTED ? 0 : 1;
+      // AVS can mute transmission without disabling its microphone track.
+      nodes.gain.gain.value = speaker === 'You' && call.isMicrophoneMuted() ? 0 : 1;
     }
   }
 
-  private flush(): void {
-    if (this.sampleCount === 0) {
+  function queuedSeconds(): number {
+    return queue.reduce((total, chunk) => {
+      return total + chunk.audio.length / SAMPLE_RATE;
+    }, 0);
+  }
+
+  function enqueue(chunk: AudioChunk & {speaker: Speaker; speakerName: string; trackId?: string}): void {
+    if (cancelled) {
       return;
     }
-    const audio = new Float32Array(this.sampleCount);
-    let offset = 0;
-    for (const chunk of this.chunks) {
-      audio.set(chunk, offset);
-      offset += chunk.length;
-    }
-    const seconds = this.capturedSamples / SAMPLE_RATE;
-    this.capturedSamples += this.sampleCount;
-    this.chunks = [];
-    this.sampleCount = 0;
-    // Skip near-silence to avoid wasting inference and Whisper's silence hallucinations.
-    const energy =
-      audio.reduce((sum, sample) => {
-        return sum + sample * sample;
-      }, 0) / audio.length;
-    if (energy < SILENCE_ENERGY) {
-      return;
-    }
-    if (this.queue.length >= MAX_QUEUED_CHUNKS) {
-      this.onError(
-        new Error('Transcription cannot keep up on this device. Capture stopped; export the partial transcript.'),
+    if (queuedSeconds() >= MAX_QUEUED_SECONDS) {
+      disconnect();
+      onError(
+        new Error('Transcription cannot keep up. Capture stopped; queued audio is finishing. Try a smaller model.'),
       );
-      void this.stop();
       return;
     }
-    this.queue.push({audio, seconds});
-    this.processing ??= this.drain();
+    finalizing[chunk.speaker] = chunk.seconds;
+    const preview = previews.get(chunk.speaker);
+    if (!isUndefined(preview) && preview.seconds <= chunk.seconds) {
+      previews.delete(chunk.speaker);
+    }
+    queue.push(chunk);
+    scheduleDrain();
   }
 
-  private async drain(): Promise<void> {
-    try {
-      while (this.queue.length > 0 && !this.cancelled) {
-        const item = this.queue.shift();
+  function scheduleDrain(): void {
+    if (processing.isNothing) {
+      processing = Maybe.just(drain());
+    }
+  }
+
+  async function drain(): Promise<void> {
+    const drained = await task.tryOrElse(toSpeechError, async () => {
+      while ((queue.length > 0 || previews.size > 0) && !cancelled) {
+        // Final chunks take priority; there is only one queued preview per speaker.
+        let item = queue.shift();
+        const provisional = isUndefined(item);
         if (isUndefined(item)) {
-          break;
+          item = previews.values().next().value;
+          if (isUndefined(item)) {
+            break;
+          }
+          previews.delete(item.speaker);
         }
-        const text = (await this.engine.transcribe(item.audio)).trim();
-        if (text.length > 0 && !this.cancelled) {
-          this.onEntry({seconds: item.seconds, text});
+        const started = clock.currentMonotonicMicroseconds;
+        // Worker engines transfer this buffer, so retain its duration before it detaches.
+        const audioSeconds = item.audio.length / SAMPLE_RATE;
+        const transcription = await engine.transcribe(item.audio);
+        if (transcription.isErr) {
+          if (!cancelled) {
+            disconnect();
+            queue = [];
+            onError(transcription.error);
+          }
+          return;
+        }
+        const rawText = transcription.value.trim();
+        const text = item.overlap ? removeOverlap(previousText[item.speaker] ?? '', rawText) : rawText;
+        const entry = {
+          seconds: item.seconds,
+          text,
+          speaker: item.speaker,
+          speakerName: item.speakerName,
+        };
+        if (!cancelled) {
+          if (provisional) {
+            // An in-flight preview cannot overwrite a chunk that has already been finalized.
+            if (!stopped && item.seconds > (finalizing[item.speaker] ?? -Infinity)) {
+              onPreview?.(entry);
+            }
+          } else {
+            previousText[item.speaker] = rawText;
+            if (text.length > 0) {
+              onEntry(entry);
+            }
+            onPreview?.({seconds: item.seconds, text: '', speaker: item.speaker});
+          }
+        }
+        if (!cancelled) {
+          onStats?.({
+            inferenceMs: Number(clock.currentMonotonicMicroseconds - started) / MICROSECONDS_PER_MILLISECOND,
+            audioSeconds,
+            queuedSeconds: queuedSeconds(),
+            ...(provisional ? {provisional: true} : {}),
+          });
         }
       }
-    } catch (error) {
-      if (!this.cancelled) {
-        this.onError(error);
-        this.disconnect();
-        this.queue = [];
-      }
-    } finally {
-      this.processing = undefined;
+    });
+    processing = Maybe.nothing();
+    if (drained.isErr && !cancelled) {
+      disconnect();
+      queue = [];
+      onError(drained.error);
     }
   }
 
-  private disconnect(): void {
-    this.stopped = true;
-    clearInterval(this.timer);
-    this.muteSubscription?.dispose();
-    if (!isUndefined(this.processor)) {
-      this.processor.onaudioprocess = null;
-      this.processor.disconnect();
+  function disconnect(): void {
+    stopped = true;
+    previews.clear();
+    if (timer.isJust) {
+      clock.clearInterval(timer.value);
+      timer = Maybe.nothing();
     }
-    for (const {source, gain} of this.sources.values()) {
+    if (muteSubscription.isJust) {
+      muteSubscription.value.dispose();
+      muteSubscription = Maybe.nothing();
+    }
+    for (const {processor} of channels.values()) {
+      processor.onaudioprocess = null;
+      processor.disconnect();
+    }
+    for (const {source, gain} of sources.values()) {
       source.disconnect();
       gain.disconnect();
     }
-    this.sources.clear();
-    void this.context?.close();
-    this.context = undefined;
-  }
-
-  stop(): Promise<void> {
-    if (isUndefined(this.stopPromise)) {
-      this.disconnect();
-      this.flush();
-      this.stopPromise = (async (): Promise<void> => {
-        await this.processing;
-        this.engine.dispose();
-      })();
+    sources.clear();
+    if (audioContext.isJust) {
+      const closingContext = audioContext.value;
+      void task.tryOrElse(toSpeechError, () => {
+        return closingContext.close();
+      });
     }
-    return this.stopPromise;
+    audioContext = Maybe.nothing();
   }
 
-  cancel(): void {
-    this.cancelled = true;
-    this.disconnect();
-    this.queue = [];
-    this.engine.dispose();
+  function stop(): Promise<void> {
+    if (stopPromise.isJust) {
+      return stopPromise.value;
+    }
+    disconnect();
+    const stopping = Promise.resolve().then(async (): Promise<void> => {
+      for (const {chunker} of channels.values()) {
+        chunker.finish();
+      }
+      channels.clear();
+      if (processing.isJust) {
+        await processing.value;
+      }
+      engine.dispose();
+    });
+    stopPromise = Maybe.just(stopping);
+    return stopping;
   }
+
+  function cancel(): void {
+    cancelled = true;
+    disconnect();
+    channels.clear();
+    queue = [];
+    engine.dispose();
+  }
+  return {start, stop, cancel};
 }

@@ -36,6 +36,8 @@ import {
   videoTopBarStyles,
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
+import {noteTakerSlotStyles} from './noteTaker/noteTaker.styles';
+import {useNoteTakerPanelStore} from './noteTaker/useNoteTakerPanelStore';
 import {Pagination} from './Pagination/Pagination';
 import {useCallAlertState} from './useCallAlertState';
 import {VideoBackgroundPerformancePanel} from './VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
@@ -44,6 +46,7 @@ import {VideoControls} from './VideoControls/VideoControls';
 
 import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
 import {Config} from '../../Config';
+import {noteTakerFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useActiveWindowMatchMedia} from '../../hooks/useActiveWindowMatchMedia';
 import {useToggleState} from '../../hooks/useToggleState';
 import {useApplicationContext} from '../../page/rootProvider';
@@ -141,7 +144,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: FullscreenVideoCallProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const selfParticipant = call.getSelfParticipant();
   const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesCamera']);
@@ -201,12 +204,27 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
     return callingRepository.setViewModeDetached();
   };
 
-  const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
+  const [isParticipantsListOpen, toggleParticipantsListState] = useToggleState(false);
+  const {isOpen: isNoteTakerOpen, setOpen: setNoteTakerOpen, setPanelTarget} = useNoteTakerPanelStore();
+  const toggleParticipantsList = (): void => {
+    setNoteTakerOpen(false);
+    toggleParticipantsListState();
+  };
+  const toggleNoteTaker = (): void => {
+    if (isParticipantsListOpen) {
+      toggleParticipantsListState();
+    }
+    setIsBackgroundSidebarOpen(false);
+    setNoteTakerOpen(!isNoteTakerOpen);
+  };
   const [isBackgroundSidebarOpen, setIsBackgroundSidebarOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const backgroundSidebarHandler = (newValue: boolean): void => {
     setIsBackgroundSidebarOpen(newValue);
+    if (newValue) {
+      setNoteTakerOpen(false);
+    }
 
     if (isBackgroundSidebarOpen && !newValue) {
       wrapperRef.current?.focus();
@@ -339,7 +357,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
         'app--large-offset': hasOffset && !isMiniMode,
       })}
     >
-      <div id="video-calling" className="video-calling">
+      <div id="video-calling" className="video-calling" css={{minWidth: 0}}>
         <div css={videoTopBarStyles}>
           <div id="video-title" className="video-title">
             {/* Calling conversation name and duration */}
@@ -515,6 +533,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
               call={call}
               propertiesRepository={propertiesRepository}
               isMuted={isMuted}
+              onToggleNoteTaker={toggleNoteTaker}
               isParticipantsListOpen={isParticipantsListOpen}
               toggleParticipantsList={toggleParticipantsList}
               canShareScreen={canShareScreen}
@@ -541,6 +560,9 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
           </>
         )}
       </div>
+      {isFeatureToggleEnabled(noteTakerFeatureToggleName) && isNoteTakerOpen && (
+        <div ref={setPanelTarget} css={noteTakerSlotStyles} data-uie-name="call-note-taker-slot" />
+      )}
       {!isMobile && isParticipantsListOpen && (
         <CallingParticipantList
           handRaisedParticipants={handRaisedParticipants}

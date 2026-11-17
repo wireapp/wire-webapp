@@ -672,6 +672,7 @@ export class CallingRepository {
     wCall.init(avsEnv);
     wCall.setUserMediaHandler(this.getCallMediaStream);
     wCall.setAudioStreamHandler(this.updateCallAudioStreams);
+    wCall.setAudioSourceHandler?.(this.updateCallAudioSource);
     wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
     this.isConferenceCallingSupported = wCall.isConferenceCallingSupported();
     let last = Date.now();
@@ -3309,6 +3310,16 @@ export class CallingRepository {
         }),
       );
     }
+  };
+
+  private readonly updateCallAudioSource = (
+    convId: SerializedConversationId,
+    trackId: string,
+    userId: string,
+    clientId: string,
+  ): void => {
+    const call = this.findCall(this.parseQualifiedId(convId));
+    call?.setNoteTakerAudioIdentity(trackId, this.parseQualifiedId(userId), clientId);
   };
 
   private readonly updateCallAudioStreams = (

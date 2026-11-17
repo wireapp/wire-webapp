@@ -17,7 +17,7 @@
  *
  */
 
-import {act, render, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {QUERY} from '../../uiKit/utils/mediaQueries';
 import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
@@ -43,6 +43,9 @@ import {
   createRootProviderWrapperForTest,
 } from '../../page/testSupport/rootContextTestSupport';
 import {translate} from '../../util/localizerUtil';
+
+import {useNoteTakerPanelStore} from './noteTaker/useNoteTakerPanelStore';
+import {noteTakerFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
@@ -99,6 +102,37 @@ describe('fullscreenVideoCall', () => {
   afterEach(() => {
     jest.restoreAllMocks();
     jest.useRealTimers();
+  });
+
+  it('hides the note taker control when its startup flag is disabled', () => {
+    const {queryByRole} = render(
+      withThemeAndRootContext(<FullscreenVideoCall {...createProps()} />, rootProviderWrapper),
+    );
+    expect(queryByRole('button', {name: 'Call notes'})).not.toBeInTheDocument();
+  });
+
+  it('toggles the note taker sidebar from the call controls when opted in', () => {
+    useNoteTakerPanelStore.setState({isOpen: false, panelTarget: null});
+    const enabledContext = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: name => {
+          return name === noteTakerFeatureToggleName;
+        },
+      }),
+    );
+    const {getByRole, container} = render(
+      withThemeAndRootContext(<FullscreenVideoCall {...createProps()} />, enabledContext),
+    );
+    const button = getByRole('button', {name: 'Call notes'});
+    fireEvent.click(button);
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+    expect(useNoteTakerPanelStore.getState().panelTarget).toBe(
+      container.querySelector('[data-uie-name="call-note-taker-slot"]'),
+    );
+    fireEvent.click(button);
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    expect(useNoteTakerPanelStore.getState().panelTarget).toBeNull();
   });
 
   it('always shows the security line in the timer', () => {

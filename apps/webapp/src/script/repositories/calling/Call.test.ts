@@ -122,6 +122,14 @@ describe('Call', () => {
     call.addParticipant(thirdParticipant);
   });
 
+  it('maps AVS receiver tracks to participant identity and handles a sender switch', () => {
+    call.setNoteTakerAudioIdentity('receiver-1', firstParticipant.user.qualifiedId, firstParticipant.clientId);
+    expect(call.getNoteTakerAudioParticipant('receiver-1')).toBe(firstParticipant);
+    call.setNoteTakerAudioIdentity('receiver-1', secondParticipant.user.qualifiedId, secondParticipant.clientId);
+    expect(call.getNoteTakerAudioParticipant('receiver-1')).toBe(secondParticipant);
+    expect(call.getNoteTakerAudioParticipant('unknown')).toBeUndefined();
+  });
+
   afterEach(() => {
     callingRepository['callState'].calls([]);
     callingRepository['conversationState'].conversations([]);
