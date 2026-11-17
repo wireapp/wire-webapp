@@ -20,6 +20,7 @@
 import {render} from '@testing-library/react';
 import type {ReactElement, ReactNode} from 'react';
 
+import {useEffectRef} from '../../../../../../../../../../util/useEffectRef';
 import {ThemeProvider} from '../../../../../../../../../../uiKit/identity/theme/theme';
 import {VideoPlayButton} from './videoPlayButton';
 import {
@@ -38,16 +39,21 @@ describe('VideoPlayButton', () => {
     );
   };
 
-  it('does not throw when the media element ref has been detached (null)', () => {
-    const detachedElement = null as unknown as HTMLMediaElement;
+  it('does not throw when the video element it listens to unmounts', () => {
+    const Host = ({showVideo}: {showVideo: boolean}): ReactElement => {
+      const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
+
+      return (
+        <>
+          {showVideo && <video ref={setVideoElement} />}
+          <VideoPlayButton mediaElement={videoElement} isPlaying={false} onPlay={jest.fn()} onPause={jest.fn()} />
+        </>
+      );
+    };
+    const {rerender} = render(<Host showVideo />, {wrapper});
 
     expect(() => {
-      return render(
-        <VideoPlayButton mediaElement={detachedElement} isPlaying={false} onPlay={jest.fn()} onPause={jest.fn()} />,
-        {
-          wrapper,
-        },
-      );
+      rerender(<Host showVideo={false} />);
     }).not.toThrow();
   });
 

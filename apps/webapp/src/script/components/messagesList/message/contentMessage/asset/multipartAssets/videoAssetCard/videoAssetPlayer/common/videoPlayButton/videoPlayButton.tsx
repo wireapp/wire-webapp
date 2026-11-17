@@ -19,7 +19,7 @@
 
 import {ReactNode, useEffect, type FunctionComponent} from 'react';
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isUndefined} from '@sindresorhus/is';
 
 import {wrapperStyles, playButtonStyles, wrapperStylesFullscreen} from './videoPlayButton.styles';
 
@@ -51,7 +51,7 @@ export const VideoPlayButton: FunctionComponent<VideoPlayButtonProps> = ({
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   useEffect(() => {
-    if (isNullOrUndefined(mediaElement)) {
+    if (isUndefined(mediaElement)) {
       return undefined;
     }
 
