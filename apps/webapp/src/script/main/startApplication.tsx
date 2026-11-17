@@ -34,7 +34,7 @@ import {Runtime} from '../commons/util/Runtime';
 import {createApplicationServices} from './createApplicationServices';
 import {createAccountIdentifier} from '../logger/createAccountIdentifier';
 import {createAuthenticatedAccountBinding} from '../logger/createAuthenticatedAccountBinding';
-import {logRuntimeIdentity} from '../logger/logRuntimeIdentity';
+import {logRuntimeIdentity, logStartupRuntimeIdentity} from '../logger/logRuntimeIdentity';
 import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
@@ -127,7 +127,17 @@ export async function startApplication(
     version: config.VERSION,
     assetVersion: config.ASSET_VERSION,
   };
-  logRuntimeIdentity(runtimeIdentity);
+  logStartupRuntimeIdentity({
+    logger: runtimeIdentity.logger,
+    hostname: runtimeIdentity.hostname,
+    origin: runtimeIdentity.origin,
+    version: runtimeIdentity.version,
+    assetVersion: runtimeIdentity.assetVersion,
+    clock,
+    consoleOutput: console,
+    isDesktopApp: Runtime.isDesktopApp(),
+    locationSearch: window.location.search,
+  });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const fireAndForgetInvoker = createFireAndForgetInvoker({
     reportError(error) {

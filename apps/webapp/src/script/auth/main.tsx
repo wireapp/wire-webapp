@@ -50,7 +50,7 @@ import {setAppLocale} from '../localization/Localizer';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {enableLogging} from '../logger/enableLogging';
 import {configureLogging} from '../logger/getLogger';
-import {logRuntimeIdentity} from '../logger/logRuntimeIdentity';
+import {logStartupRuntimeIdentity} from '../logger/logRuntimeIdentity';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {initializeDataDog} from '../util/dataDog';
@@ -118,7 +118,11 @@ const startAuthApp = (): void => {
       });
     },
   });
-  logRuntimeIdentity({
+  logStartupRuntimeIdentity({
+    clock,
+    consoleOutput: console,
+    isDesktopApp: Runtime.isDesktopApp(),
+    locationSearch: window.location.search,
     logger: getLogger('RuntimeIdentity'),
     hostname: window.location.hostname,
     origin: window.location.origin,
