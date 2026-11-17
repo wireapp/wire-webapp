@@ -49,6 +49,8 @@ import {Config} from '../Config';
 import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeStartupFeatureToggleUrl';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
+import {createBrowserLogDownload} from '../logger/createBrowserLogDownload';
+import {createBrowserLogZipArchive} from '../logger/createBrowserLogZipArchive';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
 import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
@@ -81,6 +83,18 @@ export async function startApplication(
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
   const config = Config.getConfig();
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
+  const downloadBrowserLogs = createBrowserLogDownload({
+    startupFeatureToggles,
+    isElectron: Runtime.isElectron(),
+    showSaveFilePicker: isFunction(window.showSaveFilePicker)
+      ? Maybe.just(window.showSaveFilePicker.bind(window))
+      : Maybe.nothing(),
+    clock,
+    getDirectory() {
+      return navigator.storage.getDirectory();
+    },
+    createArchive: createBrowserLogZipArchive,
+  });
   const persistentLogging = enableLogging({
     clock,
     consoleOutput: console,
@@ -285,6 +299,7 @@ export async function startApplication(
 
   createRoot(appContainer).render(
     <AppContainer
+      downloadBrowserLogs={downloadBrowserLogs}
       cleanupAccountLogs={cleanupAccountLogs}
       onAuthenticatedAccount={onAuthenticatedAccount}
       config={config}

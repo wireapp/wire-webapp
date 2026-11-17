@@ -22,8 +22,10 @@ import {ReactNode, ReactElement, createContext, useContext, useMemo} from 'react
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNull} from '@sindresorhus/is';
+import type {Maybe} from 'true-myth';
 
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
+import type {BrowserLogDownload} from '../logger/createBrowserLogDownload';
 import type {Translate} from '../util/localizerUtil';
 import {MainViewModel} from '../view_model/MainViewModel';
 
@@ -35,6 +37,7 @@ export type ApplicationNavigation = {
 };
 
 export type RootContextValue = {
+  readonly downloadBrowserLogs: Maybe<BrowserLogDownload>;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly mainViewModel: MainViewModel;
   readonly clock: Clock;
