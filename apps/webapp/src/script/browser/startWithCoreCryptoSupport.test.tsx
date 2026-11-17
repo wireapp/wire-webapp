@@ -70,7 +70,7 @@ describe('startWithCoreCryptoSupport', () => {
       });
       expect(start).not.toHaveBeenCalled();
       expect(screen.queryByText('Initial loader')).not.toBeInTheDocument();
-      const dialog = screen.getByRole('dialog', {name: 'coreCryptoUpgradeTitle'});
+      const dialog = screen.getByRole('dialog', {name: 'coreCryptoUpgradeBrowserTitle'});
       expect(within(dialog).getByText('coreCryptoUpgradeBrowserMessage')).toBeInTheDocument();
       expect(within(dialog).getByRole('button', {name: 'coreCryptoUpgradeReload'})).toHaveFocus();
     },

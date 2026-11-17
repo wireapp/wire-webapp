@@ -2617,8 +2617,9 @@
   "wireMacos": "{brandName} for macOS",
   "wireWindows": "{brandName} for Windows",
   "wire_for_web": "{brandName} for Web",
-  "coreCryptoUpgradeTitle": "Update required",
+  "coreCryptoUpgradeBrowserTitle": "Browser update required",
+  "coreCryptoUpgradeDesktopTitle": "Update required",
   "coreCryptoUpgradeDesktopMessage": "This version of Wire Desktop can no longer run Wire. Update Wire Desktop to the latest version, then restart the app to continue. If updates are managed by your organisation, contact your administrator.",
-  "coreCryptoUpgradeBrowserMessage": "Your browser does not support the features Wire needs. Update your browser to the latest version, then reload Wire to continue. If updates are managed by your organisation, contact your administrator.",
+  "coreCryptoUpgradeBrowserMessage": "Your browser doesn't support the features Wire needs. Update your browser to the latest version and reload Wire. If your organization manages the updates, contact your administrator.",
   "coreCryptoUpgradeReload": "Reload Wire"
 }

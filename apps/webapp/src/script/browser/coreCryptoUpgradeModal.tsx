@@ -49,7 +49,7 @@ export function CoreCryptoUpgradeModal(): ReactElement | null {
         wrapperCSS={{padding: 24, maxWidth: 'calc(100vw - 32px)', overflowY: 'auto'}}
       >
         <H2 id="core-crypto-upgrade-title" css={{marginTop: 0}}>
-          {translate('coreCryptoUpgradeTitle')}
+          {translate(isDesktopApp ? 'coreCryptoUpgradeDesktopTitle' : 'coreCryptoUpgradeBrowserTitle')}
         </H2>
         <Text block id="core-crypto-upgrade-message" css={{marginBottom: 24}}>
           {translate(isDesktopApp ? 'coreCryptoUpgradeDesktopMessage' : 'coreCryptoUpgradeBrowserMessage')}
