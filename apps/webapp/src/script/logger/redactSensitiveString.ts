@@ -28,6 +28,10 @@ const jsonWebTokenPattern = /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+
 function sanitizeUrlForLog(urlValue: string): string {
   try {
     const url = new URL(urlValue);
+    if (urlValue === url.origin) {
+      return url.origin;
+    }
+
     return url.search.length > 0 ? `${url.origin}${url.pathname}?${redactedValue}` : `${url.origin}${url.pathname}`;
   } catch {
     return urlValue;

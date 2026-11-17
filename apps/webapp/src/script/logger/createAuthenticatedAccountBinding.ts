@@ -29,12 +29,13 @@ type AuthenticatedAccountBindingDependencies = {
   readonly persistence: Maybe<Pick<BrowserLogPersistence, 'bindAccount' | 'dispose'>>;
   readonly hashQualifiedId: (qualifiedId: Readonly<QualifiedId>) => Promise<string>;
   readonly reportFailure: () => void;
+  readonly onAccountBound: () => void;
 };
 
 export function createAuthenticatedAccountBinding(
   dependencies: AuthenticatedAccountBindingDependencies,
 ): (qualifiedId: Readonly<QualifiedId>) => Promise<void> {
-  const {fireAndForgetInvoker, persistence, hashQualifiedId, reportFailure} = dependencies;
+  const {fireAndForgetInvoker, persistence, hashQualifiedId, reportFailure, onAccountBound} = dependencies;
 
   async function disablePersistence(): Promise<void> {
     // Disposal closes write admission synchronously; cleanup acknowledgements are never awaited by startup.
@@ -63,7 +64,11 @@ export function createAuthenticatedAccountBinding(
       const accountIdentifier = await hashQualifiedId(qualifiedId);
       // bindAccount closes the existing write barrier immediately. Its Task contains worker failures as Results.
       // Await hashing to start that transition before ordinary authenticated work, but never await the worker.
-      const binding = persistence.value.bindAccount(accountIdentifier).inspectRejected(handleFailure);
+      const binding = persistence.value
+        .bindAccount(accountIdentifier)
+        // The successful Task resolves only after the write barrier reopens for the account store.
+        .inspect(onAccountBound)
+        .inspectRejected(handleFailure);
       fireAndForgetInvoker.fireAndForget(async () => {
         await binding;
       });

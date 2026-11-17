@@ -18,6 +18,22 @@
  */
 
 import {getSafeErrorDetails, redactSensitiveData, sanitizeLogMessage} from '../commons/util/StringUtil';
+import {redactSensitiveString} from './redactSensitiveString';
+
+describe('origin sanitization', () => {
+  it.each(['https://app.wire.com', 'http://localhost:8080', 'https://custom.example.com:8443'])(
+    'preserves the canonical origin %s without adding a path',
+    origin => {
+      expect(redactSensitiveString(origin)).toBe(origin);
+    },
+  );
+
+  it('still removes credentials, query values, and fragments from URLs', () => {
+    const actualSanitizedUrl = redactSensitiveString('https://user:secret@example.com/?token=private#private');
+
+    expect(actualSanitizedUrl).toBe('https://example.com/?[REDACTED]');
+  });
+});
 
 describe('redactSensitiveData', () => {
   it('redacts Bearer token in plain strings', () => {

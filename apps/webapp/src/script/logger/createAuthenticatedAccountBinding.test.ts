@@ -25,7 +25,9 @@ import {Maybe, task} from 'true-myth';
 import {createAuthenticatedAccountBinding} from './createAuthenticatedAccountBinding';
 import {createBrowserLogPersistence, type BrowserLogPersistence} from './createBrowserLogPersistence';
 import {createLogWorkerProcessor} from './createLogWorkerProcessor';
+import {createPinoLogging} from './createPinoLogging';
 import {logPersistenceConfiguration} from './logPersistenceConfiguration';
+import {logRuntimeIdentity} from './logRuntimeIdentity';
 import {createLogWorkerConnectionForTest} from './test/createLogWorkerConnectionForTest';
 
 import {loadAuthenticatedSelfUser} from '../main/loadAuthenticatedSelfUser';
@@ -63,12 +65,83 @@ function createPersistenceFixture(): {
 }
 
 describe('authenticated account log binding', () => {
+  it('persists runtime identity at startup and again only after the account write barrier reopens', async () => {
+    const {persistence, worker, fireAndForgetInvoker} = createPersistenceFixture();
+    await using cleanup = persistence;
+    const logging = createPinoLogging(
+      Maybe.just({
+        clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+        output: noop,
+        namespaces: Maybe.nothing<string>(),
+        persistenceOutput: Maybe.just(persistence.write),
+      }),
+    );
+    const runtimeIdentity = {
+      logger: logging.getLogger('RuntimeIdentity'),
+      hostname: 'wire-webapp-beta.wire.com',
+      origin: 'https://wire-webapp-beta.wire.com',
+      version: '1.2.3',
+      assetVersion: '1.2.3-abcdef',
+    };
+    logRuntimeIdentity(runtimeIdentity);
+    await persistence.flush();
+    const startupAppend = worker.requests.at(-1);
+    if (startupAppend?.type !== 'append') {
+      throw new Error('Expected startup identity to be persisted');
+    }
+    expect(startupAppend).toMatchObject({type: 'append', lines: [expect.stringContaining('WebApp runtime identity')]});
+
+    const bindingPosted = Promise.withResolvers<void>();
+    worker.state.onPost = request => {
+      if (request.type === 'bind-account') {
+        bindingPosted.resolve();
+      } else {
+        worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+      }
+    };
+    const onAccountBound = jest.fn(() => {
+      logRuntimeIdentity(runtimeIdentity);
+    });
+    const onAuthenticatedAccount = createAuthenticatedAccountBinding({
+      fireAndForgetInvoker,
+      persistence: Maybe.just(persistence),
+      async hashQualifiedId(): Promise<string> {
+        return accountIdentifier;
+      },
+      onAccountBound,
+      reportFailure: noop,
+    });
+    try {
+      await onAuthenticatedAccount(qualifiedId);
+      await bindingPosted.promise;
+      expect(persistence.getStatistics()).toMatchObject({suspended: true, droppedRecords: 0});
+      expect(onAccountBound).not.toHaveBeenCalled();
+      expect(worker.requests.at(-1)).toMatchObject({type: 'bind-account', accountIdentifier});
+    } finally {
+      worker.state.onPost = request => {
+        worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+      };
+      const request = worker.requests.at(-1);
+      if (request?.type === 'bind-account') {
+        worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+      }
+    }
+    await fireAndForgetInvoker.waitUntilAllSettled();
+    await persistence.flush();
+
+    expect(onAccountBound).toHaveBeenCalledTimes(1);
+    expect(persistence.getStatistics()).toMatchObject({suspended: false, droppedRecords: 0});
+    expect(worker.requests.at(-1)).toMatchObject({type: 'append', lines: startupAppend.lines});
+  });
+
   it('does nothing when persistence is disabled or unsupported, including no crypto access', async () => {
     const fireAndForgetInvoker = createFireAndForgetInvoker({reportError: noop});
     const hashQualifiedId = jest.fn();
     const reportFailure = jest.fn();
+    const onAccountBound = jest.fn();
     const notify = createAuthenticatedAccountBinding({
       fireAndForgetInvoker,
+      onAccountBound,
       persistence: Maybe.nothing(),
       hashQualifiedId,
       reportFailure,
@@ -77,6 +150,7 @@ describe('authenticated account log binding', () => {
     await expect(notify(qualifiedId)).resolves.toBeUndefined();
     expect(hashQualifiedId).not.toHaveBeenCalled();
     expect(reportFailure).not.toHaveBeenCalled();
+    expect(onAccountBound).not.toHaveBeenCalled();
   });
 
   it('starts the write barrier after hashing and before startup continues without awaiting acknowledgement', async () => {
@@ -98,6 +172,7 @@ describe('authenticated account log binding', () => {
     const reportFailure = jest.fn();
     const onAuthenticatedAccount = createAuthenticatedAccountBinding({
       fireAndForgetInvoker,
+      onAccountBound: noop,
       persistence: Maybe.just(persistence),
       hashQualifiedId,
       reportFailure,
@@ -186,6 +261,7 @@ describe('authenticated account log binding', () => {
     await persistence.flush();
     const onAuthenticatedAccount = createAuthenticatedAccountBinding({
       fireAndForgetInvoker,
+      onAccountBound: noop,
       persistence: Maybe.just(persistence),
       hashQualifiedId() {
         hashingStarted.resolve();
@@ -245,6 +321,7 @@ describe('authenticated account log binding', () => {
       const reportFailure = jest.fn();
       const onAuthenticatedAccount = createAuthenticatedAccountBinding({
         fireAndForgetInvoker,
+        onAccountBound: noop,
         persistence: Maybe.just(persistence),
         hashQualifiedId() {
           if (failure === 'unavailable') {
@@ -279,6 +356,7 @@ describe('authenticated account log binding', () => {
   it('handles a rejected binding Task, keeps writes closed, and preserves successful login', async () => {
     const {persistence, worker, fireAndForgetInvoker} = createPersistenceFixture();
     const reportFailure = jest.fn();
+    const onAccountBound = jest.fn();
     worker.state.onPost = request => {
       worker.emitMessage({
         requestIdentifier: request.requestIdentifier,
@@ -288,6 +366,7 @@ describe('authenticated account log binding', () => {
     const failed = Promise.withResolvers<void>();
     const onAuthenticatedAccount = createAuthenticatedAccountBinding({
       fireAndForgetInvoker,
+      onAccountBound,
       persistence: Maybe.just(persistence),
       async hashQualifiedId() {
         return accountIdentifier;
@@ -312,6 +391,7 @@ describe('authenticated account log binding', () => {
     await persistence.flush();
     expect(persistence.getStatistics()).toMatchObject({suspended: true, failures: 1, droppedRecords: 1});
     expect(reportFailure).toHaveBeenCalledTimes(1);
+    expect(onAccountBound).not.toHaveBeenCalled();
     expect(
       worker.requests.some(request => {
         return request.type === 'append';
@@ -332,6 +412,7 @@ describe('authenticated account log binding', () => {
     });
     const notify = createAuthenticatedAccountBinding({
       fireAndForgetInvoker,
+      onAccountBound: noop,
       persistence: Maybe.just({bindAccount, dispose}),
       async hashQualifiedId(): Promise<string> {
         throw new Error('Hash rejected');
@@ -354,6 +435,7 @@ describe('authenticated account log binding', () => {
     const dispose = jest.fn(asyncNoop);
     const notify = createAuthenticatedAccountBinding({
       fireAndForgetInvoker,
+      onAccountBound: noop,
       persistence: Maybe.just({
         bindAccount(): never {
           throw new Error('Binding threw');

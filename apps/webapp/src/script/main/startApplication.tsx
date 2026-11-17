@@ -34,6 +34,7 @@ import {Runtime} from '../commons/util/Runtime';
 import {createApplicationServices} from './createApplicationServices';
 import {createAccountIdentifier} from '../logger/createAccountIdentifier';
 import {createAuthenticatedAccountBinding} from '../logger/createAuthenticatedAccountBinding';
+import {logRuntimeIdentity, logStartupRuntimeIdentity} from '../logger/logRuntimeIdentity';
 import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
@@ -119,6 +120,24 @@ export async function startApplication(
       });
     },
   });
+  const runtimeIdentity = {
+    logger: getLogger('RuntimeIdentity'),
+    hostname: window.location.hostname,
+    origin: window.location.origin,
+    version: config.VERSION,
+    assetVersion: config.ASSET_VERSION,
+  };
+  logStartupRuntimeIdentity({
+    logger: runtimeIdentity.logger,
+    hostname: runtimeIdentity.hostname,
+    origin: runtimeIdentity.origin,
+    version: runtimeIdentity.version,
+    assetVersion: runtimeIdentity.assetVersion,
+    clock,
+    consoleOutput: console,
+    isDesktopApp: Runtime.isDesktopApp(),
+    locationSearch: window.location.search,
+  });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const fireAndForgetInvoker = createFireAndForgetInvoker({
     reportError(error) {
@@ -129,6 +148,9 @@ export async function startApplication(
   const onAuthenticatedAccount = createAuthenticatedAccountBinding({
     fireAndForgetInvoker,
     persistence: persistentLogging,
+    onAccountBound() {
+      logRuntimeIdentity(runtimeIdentity);
+    },
     hashQualifiedId(qualifiedId) {
       return createAccountIdentifier({qualifiedId, encoder: new TextEncoder(), crypto: globalThis.crypto.subtle});
     },
