@@ -19,6 +19,8 @@
 
 import {useEffect, useRef, type ReactElement} from 'react';
 
+import {isEmptyArray} from '@sindresorhus/is';
+
 import {useCoreCryptoSupport} from './coreCryptoSupportContext';
 
 import {ModalComponent} from '../components/Modals/ModalComponent';
@@ -27,14 +29,20 @@ import {Button} from '../uiKit/inputs/button/button';
 import {StyledApp} from '../uiKit/layout/styledApp/styledApp';
 import {H2} from '../uiKit/typography/heading/heading';
 import {Text} from '../uiKit/typography/text/text';
+import type {Translate} from '../util/localizerUtil';
 
-export function CoreCryptoUpgradeModal(): ReactElement | null {
-  const {support, isDesktopApp, translate} = useCoreCryptoSupport();
+type CoreCryptoUpgradeModalProps = {
+  readonly isDesktopApp: boolean;
+  readonly translate: Translate;
+};
+
+export function CoreCryptoUpgradeModal({isDesktopApp, translate}: CoreCryptoUpgradeModalProps): ReactElement | null {
+  const support = useCoreCryptoSupport();
   const reloadButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     reloadButton.current?.focus();
   }, []);
-  if (support.missingFeatures.length === 0) {
+  if (isEmptyArray(support.missingFeatures)) {
     return null;
   }
 

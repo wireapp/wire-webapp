@@ -17,9 +17,9 @@
  *
  */
 
-import {startWithCoreCryptoSupport} from '../browser/startWithCoreCryptoSupport';
+import {startBrowserApplication} from '../browser/startBrowserApplication';
 
-await startWithCoreCryptoSupport('main', async () => {
+await startBrowserApplication('main', async support => {
   const {startAuthApp} = await import('./startAuthApp');
-  startAuthApp();
+  startAuthApp(support);
 });

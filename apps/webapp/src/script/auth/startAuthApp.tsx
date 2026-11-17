@@ -26,7 +26,6 @@ import {isFunction, isNull} from '@sindresorhus/is';
 // Polyfill "Object.entries" & "Object.values"
 import 'core-js/full/object';
 import 'core-js/full/reflect';
-import {createRoot} from 'react-dom/client';
 import {Provider} from 'react-redux';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
@@ -36,6 +35,8 @@ import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
 import {Root} from './page/root';
 
+import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
+import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
 import {Runtime} from '../commons/util/Runtime';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
@@ -67,7 +68,7 @@ retireLegacyServiceWorker({
 
 const mainId = 'main';
 
-export const startAuthApp = (): void => {
+export const startAuthApp = (support: CoreCryptoSupport): void => {
   exposeWrapperGlobals();
   const config = Config.getConfig();
   const clock = createClock();
@@ -169,7 +170,9 @@ export const startAuthApp = (): void => {
       throw new Error(`No container '${mainId}' found to render application`);
     }
 
-    createRoot(container).render(
+    renderWithCoreCryptoSupport(
+      container,
+      support,
       <Provider store={store}>
         <Component translate={translate} clock={clock} />
       </Provider>,

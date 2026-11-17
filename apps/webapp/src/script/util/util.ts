@@ -17,7 +17,7 @@
  *
  */
 
-import {isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {isNull, isNullOrUndefined} from '@sindresorhus/is';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {noop} from 'noop-esm';
 
@@ -404,14 +404,7 @@ export const setContextMenuPosition = (event: React.KeyboardEvent): MouseEvent =
   });
 };
 
-const supportsSecretStorage = (): boolean => {
-  return !Runtime.isDesktopApp() || !isUndefined(window.systemCrypto);
-};
-
-// disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
-export const supportsMLS = (): boolean => {
-  return supportsSecretStorage();
-};
+export {supportsMLS} from '../browser/supportsMls';
 
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 

@@ -24,7 +24,6 @@ import 'core-js/full/reflect';
 
 import {ClientType} from '../apiClient/client/clientType';
 
-import {createRoot} from 'react-dom/client';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
@@ -39,6 +38,8 @@ import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {AppContainer} from '../components/appContainer/appContainer';
+import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
+import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
 import {Config} from '../Config';
 import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeStartupFeatureToggleUrl';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
@@ -61,6 +62,7 @@ import {exposeWrapperGlobals} from '../util/wrapper';
 
 export async function startApplication(
   defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[],
+  support: CoreCryptoSupport,
 ): Promise<void> {
   initializeStartupFeatureToggleUrl({
     url: new URL(window.location.href),
@@ -247,7 +249,9 @@ export async function startApplication(
 
   globalThis.addEventListener('unload', disposeApplicationResources);
 
-  createRoot(appContainer).render(
+  renderWithCoreCryptoSupport(
+    appContainer,
+    support,
     <AppContainer
       onAuthenticatedAccount={onAuthenticatedAccount}
       config={config}

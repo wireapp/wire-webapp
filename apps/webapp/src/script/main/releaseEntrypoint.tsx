@@ -17,9 +17,9 @@
  *
  */
 
-import {startWithCoreCryptoSupport} from '../browser/startWithCoreCryptoSupport';
+import {startBrowserApplication} from '../browser/startBrowserApplication';
 
-await startWithCoreCryptoSupport('wire-app', async () => {
+await startBrowserApplication('wire-app', async support => {
   const {startApplication} = await import('./startApplication');
-  await startApplication([]);
+  await startApplication([], support);
 });

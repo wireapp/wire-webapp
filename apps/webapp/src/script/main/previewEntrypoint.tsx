@@ -17,10 +17,10 @@
  *
  */
 
-import {startWithCoreCryptoSupport} from '../browser/startWithCoreCryptoSupport';
+import {startBrowserApplication} from '../browser/startBrowserApplication';
 import {previewDefaultEnabledStartupFeatureToggleNames} from '../featureToggles/startupFeatureToggleNames';
 
-await startWithCoreCryptoSupport('wire-app', async () => {
+await startBrowserApplication('wire-app', async support => {
   const {startApplication} = await import('./startApplication');
-  await startApplication(previewDefaultEnabledStartupFeatureToggleNames);
+  await startApplication(previewDefaultEnabledStartupFeatureToggleNames, support);
 });

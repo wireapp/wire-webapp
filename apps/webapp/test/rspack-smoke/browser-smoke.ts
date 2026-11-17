@@ -180,6 +180,12 @@ for (const entryPath of ['/', '/auth']) {
     }, testInfo) => {
       const baseUrl = Maybe.of(testInfo.project.use.baseURL).unwrapOr('');
       const diagnostics = captureRuntimeDiagnostics({page, baseUrl});
+      const capabilityErrors: string[] = [];
+      page.on('console', message => {
+        if (message.type() === 'error') {
+          capabilityErrors.push(message.text());
+        }
+      });
       await page.addInitScript(desktop => {
         Reflect.deleteProperty(WebAssembly, 'Suspending');
         Reflect.deleteProperty(WebAssembly, 'promising');
@@ -207,10 +213,28 @@ for (const entryPath of ['/', '/auth']) {
       await expect(reloadButton).toBeFocused();
       await page.keyboard.press('Escape');
       await expect(dialog).toBeVisible();
+      expect(capabilityErrors).toContainEqual(expect.stringContaining('JS Promise Integration'));
       expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
     });
   }
 }
+
+test('reports missing filesystem support when JSPI is available', async ({page}) => {
+  const capabilityErrors: string[] = [];
+  page.on('console', message => {
+    if (message.type() === 'error') {
+      capabilityErrors.push(message.text());
+    }
+  });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator.storage, 'getDirectory', {value: undefined, configurable: true});
+  });
+
+  await page.goto('/');
+  await expect(page.getByRole('dialog', {name: 'Browser update required'})).toBeVisible();
+  expect(capabilityErrors).toContainEqual(expect.stringContaining('Origin Private File System'));
+  expect(capabilityErrors).not.toContainEqual(expect.stringContaining('JS Promise Integration'));
+});
 
 test('starts when service-worker cleanup finishes after DOMContentLoaded', async ({page}) => {
   await page.addInitScript(() => {
@@ -372,6 +396,10 @@ test('bundles the application entrypoint selected for the artifact', async ({req
   expect(sourceMapResponse.ok()).toBe(true);
   expect(sourceMapText).toContain(`/main/${expectedEntrypoint}Entrypoint.tsx`);
   expect(sourceMapText).not.toContain(`/main/${excludedEntrypoint}Entrypoint.tsx`);
+  expect(sourceMapText).not.toContain('/browser/coreCryptoUpgradeModal.tsx');
+  expect(sourceMapText).not.toContain('/browser/showCoreCryptoUpgrade.tsx');
+  expect(sourceMapText).not.toContain('/localization/Localizer.ts');
+  expect(sourceMapText).not.toContain('/util/util.ts');
 });
 
 async function expectStartupSelectionSurvivesAuthentication(page: Page, selection: string): Promise<void> {

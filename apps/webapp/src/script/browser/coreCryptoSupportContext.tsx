@@ -23,18 +23,10 @@ import {isNull} from '@sindresorhus/is';
 
 import type {CoreCryptoSupport} from './coreCryptoSupport';
 
-import type {Translate} from '../util/localizerUtil';
-
-export type CoreCryptoSupportContextValue = {
-  readonly support: CoreCryptoSupport;
-  readonly isDesktopApp: boolean;
-  readonly translate: Translate;
-};
-
 // This context is available before the application, repositories, or CoreCrypto exist.
-export const CoreCryptoSupportContext = createContext<CoreCryptoSupportContextValue | null>(null);
+export const CoreCryptoSupportContext = createContext<CoreCryptoSupport | null>(null);
 
-export function useCoreCryptoSupport(): CoreCryptoSupportContextValue {
+export function useCoreCryptoSupport(): CoreCryptoSupport {
   const value = useContext(CoreCryptoSupportContext);
   if (isNull(value)) {
     throw new Error('CoreCryptoSupportContext has not been set');
