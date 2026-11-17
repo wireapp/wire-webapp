@@ -140,6 +140,17 @@ export class Call {
     return selfParticipant ?? this.selfParticipant;
   }
 
+  /** Read-only audio tap for the opt-in note taker experiment. */
+  getNoteTakerAudioStreams(): MediaStream[] {
+    const local = this.getSelfParticipant().audioStream();
+    return [
+      ...(isUndefined(local) ? [] : [local]),
+      ...Object.values(this.audios).map(audio => {
+        return audio.stream;
+      }),
+    ];
+  }
+
   addAudio(audioId: string, stream: MediaStream): void {
     this.audios[audioId] = {audioElement: null, stream};
   }

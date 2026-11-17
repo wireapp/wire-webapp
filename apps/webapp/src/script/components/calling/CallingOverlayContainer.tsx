@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 
 import {ChooseScreen} from './ChooseScreen';
 import {FullscreenVideoCall} from './FullscreenVideoCall';
+import {NoteTaker} from './noteTaker/noteTaker';
 import {useCallAlertState} from './useCallAlertState';
 
 import {Call} from '../../repositories/calling/Call';
@@ -56,11 +57,14 @@ function CallingContainer(props: CallingContainerProps): ReactNode {
   const callState = isUndefined(props.callState) ? container.resolve(CallState) : props.callState;
   const {joinedCall} = useKoSubscribableChildren(callState, ['joinedCall']);
 
-  if (isUndefined(joinedCall)) {
-    return null;
-  }
-
-  return <CallingContainerWithJoinedCall {...props} callState={callState} joinedCall={joinedCall} />;
+  return (
+    <Fragment>
+      <NoteTaker call={joinedCall} />
+      {!isUndefined(joinedCall) && (
+        <CallingContainerWithJoinedCall {...props} callState={callState} joinedCall={joinedCall} />
+      )}
+    </Fragment>
+  );
 }
 
 function CallingContainerWithJoinedCall({

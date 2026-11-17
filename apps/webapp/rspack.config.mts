@@ -265,6 +265,11 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       new rspack.CopyRspackPlugin({
         patterns: [
           {
+            context: path.resolve(rootPath, 'node_modules/onnxruntime-web/dist'),
+            from: 'ort-wasm-simd-threaded*.{mjs,wasm}',
+            to: 'min/note-taker',
+          },
+          {
             context: path.resolve(rootPath, 'node_modules/@mediapipe/tasks-vision/wasm'),
             from: '*',
             to: 'min/mediapipe/wasm',
