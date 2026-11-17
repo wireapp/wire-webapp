@@ -251,7 +251,7 @@
     "patch-package": "8.0.1",
     "path-browserify": "1.0.1",
     "playwright": "1.65.0",
-    "postcss": "8.5.32",
+    "postcss": "8.5.33",
     "postcss-import": "17.0.1",
     "postcss-less": "7.1.1",
     "postcss-loader": "8.2.1",
