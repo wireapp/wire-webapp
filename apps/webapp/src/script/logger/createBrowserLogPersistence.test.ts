@@ -18,11 +18,16 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {noop} from 'noop-esm';
 import {Maybe, Result, task, Unit} from 'true-myth';
 
 import {createBrowserLogPersistence, type BrowserLogPersistence} from './createBrowserLogPersistence';
+import {createAccountLogCleanup} from './createAccountLogCleanup';
+import {createAuthenticatedAccountBinding} from './createAuthenticatedAccountBinding';
+import type {LogDirectory} from './createOriginPrivateFileSystemLogStore';
 import {createLogWorkerConnectionForTest} from './test/createLogWorkerConnectionForTest';
+import {logDirectoryFactory, qualifiedAccountIdentityFactory} from './test/logDeletionTestFactories';
 import type {LogWorkerRequest} from './logWorkerProtocol';
 import {logPersistenceConfiguration} from './logPersistenceConfiguration';
 
@@ -70,6 +75,126 @@ function createTestPersistence(): BrowserLogPersistenceTestFixture {
 }
 
 describe('browser log persistence composition', () => {
+  it.each(['append', 'bind-account'] as const)(
+    'cannot recreate deleted files after a pending %s completes',
+    async pendingCommand => {
+      const {output, worker, clock} = createTestPersistence();
+      await output.flush();
+      const accountIdentifier = 'a'.repeat(64);
+      const filename = `log-1-${'b'.repeat(36)}-1-${accountIdentifier}.jsonl`;
+      const files = new Set<string>();
+      const pendingRequest = Promise.withResolvers<LogWorkerRequest>();
+      worker.state.onPost = request => {
+        if (request.type === pendingCommand) {
+          pendingRequest.resolve(request);
+        } else {
+          worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+        }
+      };
+      if (pendingCommand === 'append') {
+        output.write('{"pending":true}', 'info');
+      }
+      const transition = pendingCommand === 'bind-account' ? output.bindAccount(accountIdentifier) : output.flush();
+      const request = await pendingRequest.promise;
+      expect(request.type).toBe(pendingCommand);
+      if (pendingCommand === 'append') {
+        output.write('{"buffered":true}', 'info');
+      }
+      const removeEntry = jest.fn(async (name: string): Promise<void> => {
+        expect(worker.state.terminated).toBe(true);
+        files.delete(name);
+      });
+      const directory: LogDirectory = logDirectoryFactory.build({
+        async getDirectoryHandle() {
+          return directory;
+        },
+        async *values() {
+          for (const name of files) {
+            yield {name, kind: 'file' as const};
+          }
+        },
+        removeEntry,
+      });
+      const getDirectory = jest.fn(async () => {
+        return directory;
+      });
+      const cleanup = createAccountLogCleanup({
+        isElectron: false,
+        persistence: Maybe.just(output),
+        async hashQualifiedId() {
+          return accountIdentifier;
+        },
+        getDirectory,
+        reportFailure() {
+          throw new Error('Unexpected cleanup failure');
+        },
+      });
+      const deleting = cleanup(Maybe.just(qualifiedAccountIdentityFactory.build()));
+      output.write('{"afterCleanupStarted":true}', 'info');
+      expect(output.getStatistics().droppedRecords).toBe(1);
+      expect(getDirectory).not.toHaveBeenCalled();
+      worker.state.onPost = nextRequest => {
+        if (nextRequest.type === 'bind-account') {
+          files.add(filename);
+        }
+        worker.emitMessage({requestIdentifier: nextRequest.requestIdentifier, outcome: 'complete'});
+      };
+      // Simulate the delayed write committing before its acknowledgement.
+      files.add(filename);
+      worker.emitMessage({requestIdentifier: request.requestIdentifier, outcome: 'complete'});
+      await transition;
+      await deleting;
+      expect(files.size).toBe(0);
+      expect(removeEntry).toHaveBeenCalledWith(filename);
+      const requestCount = worker.requests.length;
+      output.write('{"afterDeletion":true}', 'info');
+      clock.advanceByMilliseconds(60_000);
+      await output.flush();
+      expect((await output.bindAccount(accountIdentifier)).isErr).toBe(true);
+      expect(worker.requests).toHaveLength(requestCount);
+      expect(worker.state.terminated).toBe(true);
+    },
+  );
+
+  it('rejects a delayed authenticated binding after cleanup has terminated the worker', async () => {
+    const {output, worker} = createTestPersistence();
+    const hashing = Promise.withResolvers<string>();
+    const reportFailure = jest.fn();
+    const notifyAccount = createAuthenticatedAccountBinding({
+      persistence: Maybe.just(output),
+      fireAndForgetInvoker: createFireAndForgetInvoker({reportError: noop}),
+      onAccountBound: noop,
+      hashQualifiedId() {
+        return hashing.promise;
+      },
+      reportFailure,
+    });
+    const authenticating = notifyAccount(qualifiedAccountIdentityFactory.build());
+    const cleanup = createAccountLogCleanup({
+      isElectron: false,
+      persistence: Maybe.just(output),
+      async hashQualifiedId() {
+        return 'a'.repeat(64);
+      },
+      async getDirectory(): Promise<never> {
+        throw {name: 'NotFoundError'};
+      },
+      reportFailure,
+    });
+    await cleanup(Maybe.just(qualifiedAccountIdentityFactory.build()));
+    const requestCount = worker.requests.length;
+    hashing.resolve('a'.repeat(64));
+    await authenticating;
+    await output.flush();
+    expect(worker.state.terminated).toBe(true);
+    expect(worker.requests).toHaveLength(requestCount);
+    expect(
+      worker.requests.some(request => {
+        return request.type === 'bind-account';
+      }),
+    ).toBe(false);
+  });
+
   it('binds before initial writes, shares repeated binding and skips an already bound account', async () => {
     const {output, worker} = createTestPersistence();
     await using persistence = output;

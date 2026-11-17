@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import {Maybe} from 'true-myth';
 
 import {WebAppEvents} from '../../webAppEvents';
 
@@ -44,6 +45,7 @@ import {translateForTest} from '../../util/test/translateForTest';
 
 const createMockDependencies = (): LifeCycleDependencies => {
   return {
+    cleanupAccountLogs: jest.fn(),
     clientRepository: {
       isCurrentClientPermanent: jest.fn(),
       constructCookieLabelKey: jest.fn(),
@@ -228,6 +230,68 @@ describe('LifeCycleRepository', () => {
   });
 
   describe('logout', () => {
+    it.each(
+      Object.values(SIGN_OUT_REASON).flatMap(reason => {
+        return [
+          {reason, clearAllData: true, deletesLogs: true},
+          {reason, clearAllData: false, deletesLogs: false},
+        ];
+      }),
+    )('follows the clear-data contract for $reason (clear: $clearAllData)', async options => {
+      const {reason, clearAllData, deletesLogs} = options;
+      const qualifiedId = {domain: 'example.com', id: 'current-account'};
+      const user = new User(qualifiedId.id, qualifiedId.domain, translateForTest);
+      jest.spyOn(mockDependencies.userRepository['userState'], 'self').mockReturnValue(user);
+
+      await lifeCycleRepository.logout(reason, clearAllData);
+
+      expect(mockDependencies.cleanupAccountLogs).toHaveBeenCalledTimes(deletesLogs ? 1 : 0);
+      if (deletesLogs) {
+        expect(mockDependencies.cleanupAccountLogs).toHaveBeenCalledWith(Maybe.just(qualifiedId));
+      }
+    });
+
+    it('passes Nothing when account identity is missing and continues logout', async () => {
+      await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, true);
+
+      expect(mockDependencies.cleanupAccountLogs).toHaveBeenCalledWith(Maybe.nothing());
+      expect(mockDependencies.core.logout).toHaveBeenCalled();
+      expect(lifeCycleRepository.redirectToLogin).toHaveBeenCalled();
+    });
+
+    it('awaits account log cleanup before core logout and redirect, ignoring concurrent requests', async () => {
+      const cleanup = Promise.withResolvers<void>();
+      jest.spyOn(mockDependencies, 'cleanupAccountLogs').mockReturnValue(cleanup.promise);
+      const logout = lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, true);
+      await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, true);
+      expect(mockDependencies.cleanupAccountLogs).toHaveBeenCalledTimes(1);
+      expect(mockDependencies.core.logout).not.toHaveBeenCalled();
+      expect(lifeCycleRepository.redirectToLogin).not.toHaveBeenCalled();
+      cleanup.resolve();
+      await logout;
+      expect(mockDependencies.core.logout).toHaveBeenCalled();
+      expect(lifeCycleRepository.redirectToLogin).toHaveBeenCalled();
+    });
+
+    it('cleans logs while offline without waiting for backend logout', async () => {
+      Object.defineProperty(navigator, 'onLine', {value: false, configurable: true});
+      const subscribe = jest.spyOn(window, 'addEventListener').mockImplementation();
+      try {
+        await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, true);
+        expect(mockDependencies.cleanupAccountLogs).toHaveBeenCalledTimes(1);
+        expect(mockDependencies.core.logout).not.toHaveBeenCalled();
+      } finally {
+        subscribe.mockRestore();
+      }
+    });
+
+    it('continues logout when account log cleanup fails', async () => {
+      jest.spyOn(mockDependencies, 'cleanupAccountLogs').mockRejectedValue(new Error('Storage denied'));
+      await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, true);
+      expect(mockDependencies.core.logout).toHaveBeenCalled();
+      expect(lifeCycleRepository.redirectToLogin).toHaveBeenCalled();
+    });
+
     beforeEach(() => {
       jest.spyOn(lifeCycleRepository, 'redirectToLogin').mockImplementation();
       jest.spyOn(CacheRepository, 'clearLocalStorage').mockReturnValue(['key1', 'key2']);

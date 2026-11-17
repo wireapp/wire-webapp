@@ -75,13 +75,13 @@ const newlineByte = 10;
 const accountIdentifierLength = 64;
 
 // Only files owned by this version participate in retention. Never recurse into directories.
-const logFilenamePattern = /^log-(\d+)-([a-f0-9-]{36})-(\d+)(?:-[a-f0-9]{64})?\.jsonl$/u;
+export const logFilenamePattern = /^log-(\d+)-([a-f0-9-]{36})-(\d+)(?:-([a-f0-9]{64}))?\.jsonl$/u;
 
 function isValidSessionIdentifier(sessionIdentifier: unknown): boolean {
   return isString(sessionIdentifier) && /^[a-f0-9-]{36}$/u.test(sessionIdentifier);
 }
 
-function isValidAccountIdentifier(accountIdentifier: unknown): boolean {
+export function isValidAccountIdentifier(accountIdentifier: unknown): boolean {
   return (
     isString(accountIdentifier) &&
     accountIdentifier.length === accountIdentifierLength &&
@@ -135,7 +135,7 @@ function isValidWriteCount(writtenBytes: number, remainingBytes: number): boolea
   return isSafeInteger(writtenBytes) && writtenBytes > 0 && writtenBytes <= remainingBytes;
 }
 
-function isMissingEntry(error: unknown): boolean {
+export function isMissingEntry(error: unknown): boolean {
   return isObject(error) && 'name' in error && error.name === 'NotFoundError';
 }
 
