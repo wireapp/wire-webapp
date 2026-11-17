@@ -20,8 +20,13 @@
 import {CSSObject} from '@emotion/react';
 
 import {overlayPortalZIndex} from '../../../uiKit/utils/overlayPortal';
+import {listItem} from '../../participantItemContent/participantItem.styles';
 
 export const wrapperStyles: CSSObject = {
+  width: '100%',
+};
+
+export const triggerWrapperStyles: CSSObject = {
   width: '100%',
 };
 
@@ -164,6 +169,20 @@ export const dialogStyles: CSSObject = {
   flexDirection: 'column',
   maxHeight: '280px',
   outline: 'none',
+};
+
+export const emailErrorStyles: CSSObject = {
+  color: 'var(--danger-color)',
+  fontSize: 'var(--font-size-small)',
+  lineHeight: '16px',
+  marginTop: '4px',
+  paddingLeft: '16px',
+};
+
+export const selectedEmailContentStyles: CSSObject = {
+  ...listItem(),
+  paddingLeft: 16,
+  color: 'var(--main-color)',
 };
 
 const sectionHeaderBorderStyles: CSSObject = {

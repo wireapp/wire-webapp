@@ -398,12 +398,14 @@ describe('createMeetingStore', () => {
       translateForTest,
     );
     const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(conversation));
-    const store = createMeetingStore(createDeps({safeGetConversationById}));
+    const getMeeting = jest.fn().mockReturnValue(task.resolve({...apiMeeting, invited_emails: ['guest@example.com']}));
+    const store = createMeetingStore(createDeps({safeGetConversationById, getMeeting}));
 
     const result = await store.getState().loadMeetingForEdit(listMeetingInstance);
 
     expect(result.isOk).toBe(true);
     expect(safeGetConversationById).toHaveBeenCalledWith(listMeetingInstance.meetingSeries.qualified_conversation);
+    expect(getMeeting).toHaveBeenCalledWith(listMeetingInstance.meetingSeries.qualified_id);
 
     if (!result.isOk) {
       throw new Error('Expected loadMeetingForEdit to succeed');
@@ -413,6 +415,7 @@ describe('createMeetingStore', () => {
     expect(result.value.formState.start.value).toEqual(new Date('2026-06-16T10:00:00.000Z'));
     assert(maybe.isJust(result.value.formState.end));
     expect(result.value.formState.end.value).toEqual(new Date('2026-06-16T11:00:00.000Z'));
+    expect(result.value.formState.invitedEmails).toEqual(['guest@example.com']);
   });
 
   it('prefills edit form with the edit anchor times for recurring meetings', async () => {

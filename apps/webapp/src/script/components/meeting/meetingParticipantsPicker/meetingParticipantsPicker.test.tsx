@@ -21,6 +21,7 @@ import {useState, type FunctionComponent} from 'react';
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {isUndefined} from '@sindresorhus/is';
 
 import {User} from '../../../repositories/entity/User';
 import type {Conversation} from '../../../repositories/entity/Conversation';
@@ -138,6 +139,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 
 const ControlledPicker: FunctionComponent<{
   initialSelected?: User[];
+  initialEmails?: string[];
   initialFilter?: string;
   searchByName?: (query: string, teamId?: string) => Promise<User[]>;
   availableUsers?: User[];
@@ -145,6 +147,7 @@ const ControlledPicker: FunctionComponent<{
   conversationRepository?: Pick<ConversationRepository, 'getAllGroupConversations'>;
 }> = ({
   initialSelected = [],
+  initialEmails,
   initialFilter = '',
   searchByName = searchRepositoryDouble.searchByName,
   availableUsers = users,
@@ -152,6 +155,7 @@ const ControlledPicker: FunctionComponent<{
   conversationRepository,
 }: {
   initialSelected?: User[];
+  initialEmails?: string[];
   initialFilter?: string;
   searchByName?: (query: string, teamId?: string) => Promise<User[]>;
   availableUsers?: User[];
@@ -159,6 +163,7 @@ const ControlledPicker: FunctionComponent<{
   conversationRepository?: Pick<ConversationRepository, 'getAllGroupConversations'>;
 }) => {
   const [selectedUsers, setSelectedUsers] = useState<User[]>(initialSelected);
+  const [invitedEmails, setInvitedEmails] = useState(initialEmails ?? []);
   const [filter, setFilter] = useState(initialFilter);
   const selfUser = availableUsers[0] ?? users[0];
 
@@ -169,9 +174,12 @@ const ControlledPicker: FunctionComponent<{
       label={label}
       users={availableUsers}
       selectedUsers={selectedUsers}
+      invitedEmails={isUndefined(initialEmails) ? undefined : invitedEmails}
+      onInvitedEmailsChange={isUndefined(initialEmails) ? undefined : setInvitedEmails}
       onSelectedUsersChange={setSelectedUsers}
       filter={filter}
       onFilterChange={setFilter}
+      placeholder={isUndefined(initialEmails) ? undefined : 'meetings.scheduleModal.participantsEmailPlaceholder'}
       selfUser={selfUser}
       searchRepository={{...searchRepositoryDouble, searchByName}}
       teamRepository={teamRepositoryDouble}
@@ -187,6 +195,130 @@ const getSearchInput = (accessibleName = PARTICIPANTS_LABEL): HTMLElement => {
 };
 
 describe('MeetingParticipantsPicker', () => {
+  it('validates typed and pasted emails separately from a selected Wire user', async () => {
+    const user = userEvent.setup();
+    const onSubmit = jest.fn();
+    const wireUser = createUser('email-owner', 'Email Owner', 'email-owner');
+    wireUser.email('guest@example.com');
+    render(
+      withThemeAndRootContext(
+        <form
+          onSubmit={event => {
+            event.preventDefault();
+            onSubmit();
+          }}
+        >
+          <ControlledPicker availableUsers={[wireUser]} initialSelected={[wireUser]} initialEmails={[]} />
+          <button type="submit">Submit meeting</button>
+        </form>,
+        rootProviderWrapper,
+      ),
+    );
+
+    await user.click(getSearchInput(PARTICIPANTS_LABEL_WITH_COUNT));
+    const input = getSearchInput(PARTICIPANTS_LABEL_WITH_COUNT);
+    expect(input).toHaveAttribute('placeholder', 'meetings.scheduleModal.participantsEmailPlaceholder');
+    await user.type(input, '  guest@example.com  {Enter}');
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', {name: SELECTED_CONTACTS_LABEL})).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('guest@example.com')).toBeInTheDocument();
+    expect(screen.getByText('guest@example.com').closest('[data-uie-name="selected-search-list"]')).toHaveAttribute(
+      'data-uie-value',
+      '2',
+    );
+
+    await user.type(input, 'GUEST@example.com{Enter}');
+    expect(screen.getByRole('alert')).toHaveTextContent('meetings.scheduleModal.emailDuplicate');
+    expect(screen.getByRole('alert').parentElement).toContainElement(input);
+    expect(screen.getByRole('listbox')).not.toContainElement(screen.getByRole('alert'));
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    const pickerToggle = screen.getByRole('button', {name: PARTICIPANTS_LABEL_WITH_COUNT});
+    await user.click(pickerToggle);
+    await user.click(pickerToggle);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(input).toHaveAttribute('aria-invalid', 'false');
+    await user.clear(input);
+    await user.type(input, 'invalid@{Enter}');
+    expect(screen.getByRole('alert')).toHaveTextContent('meetings.scheduleModal.emailInvalid');
+    await user.clear(input);
+    await user.paste('second@example.com');
+    await user.keyboard('{Enter}');
+    expect(screen.getByText('second@example.com')).toBeInTheDocument();
+    await user.click(screen.getAllByRole('checkbox', {name: 'meetings.scheduleModal.emailUnselect'})[0]);
+    expect(screen.queryByText('guest@example.com')).not.toBeInTheDocument();
+    expect(screen.getByText('Email Owner')).toBeInTheDocument();
+  });
+
+  it('keeps email entry disabled in the name-only picker', async () => {
+    const user = userEvent.setup();
+    render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
+
+    const input = getSearchInput();
+    await user.type(input, 'guest@example.com{Enter}');
+    expect(input).toHaveValue('guest@example.com');
+    expect(screen.queryByRole('button', {name: SELECTED_CONTACTS_LABEL})).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('does not send email queries to remote people search', async () => {
+    const searchByName = jest.fn().mockResolvedValue([]);
+    render(
+      withThemeAndRootContext(<ControlledPicker initialEmails={[]} searchByName={searchByName} />, rootProviderWrapper),
+    );
+
+    fireEvent.change(getSearchInput(), {target: {value: 'guest@test.copm'}});
+    await new Promise(resolve => {
+      setTimeout(resolve, 400);
+    });
+    expect(searchByName).not.toHaveBeenCalled();
+
+    fireEvent.change(getSearchInput(), {target: {value: 'Alice'}});
+    await waitFor(() => {
+      expect(searchByName).toHaveBeenCalledWith('Alice', undefined);
+    });
+  });
+
+  it('remains usable when remote people search rejects a query', async () => {
+    const searchByName = jest.fn().mockRejectedValue(new Error('domain not allowed'));
+    render(withThemeAndRootContext(<ControlledPicker searchByName={searchByName} />, rootProviderWrapper));
+
+    fireEvent.change(getSearchInput(), {target: {value: 'unknown'}});
+    await waitFor(() => {
+      expect(searchByName).toHaveBeenCalled();
+    });
+    expect(getSearchInput()).toHaveValue('unknown');
+  });
+
+  it('opens Selected when the first invitee is an email address', async () => {
+    const user = userEvent.setup();
+    render(withThemeAndRootContext(<ControlledPicker availableUsers={[]} initialEmails={[]} />, rootProviderWrapper));
+
+    await user.type(getSearchInput(), 'first@example.com{Enter}');
+    expect(screen.getByRole('button', {name: SELECTED_CONTACTS_LABEL})).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('first@example.com')).toBeInTheDocument();
+  });
+
+  it('shows email invitees with Wire users in the selected collapsible section', async () => {
+    const user = userEvent.setup();
+    render(
+      withThemeAndRootContext(
+        <ControlledPicker initialSelected={[users[1]]} initialEmails={['guest@example.com']} />,
+        rootProviderWrapper,
+      ),
+    );
+
+    await user.click(getSearchInput(PARTICIPANTS_LABEL_WITH_COUNT));
+    const selectedToggle = screen.getByRole('button', {name: SELECTED_CONTACTS_LABEL});
+    expect(selectedToggle).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('guest@example.com')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', {name: 'meetings.scheduleModal.emailUnselect'})).toBeChecked();
+    expect(screen.getByText('guest@example.com').closest('[data-uie-name="selected-search-list"]')).toHaveAttribute(
+      'data-uie-value',
+      '2',
+    );
+    await user.click(selectedToggle);
+    expect(screen.queryByText('guest@example.com')).not.toBeInTheDocument();
+  });
   it('renders label and search input', () => {
     render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
 

@@ -39,6 +39,7 @@ export type MapScheduleFormToUpdateMeetingCommandParams = {
   originalEnd: Date;
   originalRecurrence: ScheduleMeetingRecurrenceOption;
   originalSelectedUsers: User[];
+  originalInvitedEmails?: string[];
 };
 
 export const mapScheduleFormToUpdateMeetingCommand = ({
@@ -50,6 +51,7 @@ export const mapScheduleFormToUpdateMeetingCommand = ({
   originalEnd,
   originalRecurrence,
   originalSelectedUsers,
+  originalInvitedEmails,
 }: MapScheduleFormToUpdateMeetingCommandParams): Result<UpdateMeetingCommand, ScheduleFormErrors> => {
   const timesResult = requireScheduleMeetingTimesForUpdate(formState);
 
@@ -71,6 +73,8 @@ export const mapScheduleFormToUpdateMeetingCommand = ({
     originalRecurrence,
     selectedUsers: formState.selectedUsers,
     originalSelectedUsers,
+    invitedEmails: formState.invitedEmails ?? [],
+    originalInvitedEmails: originalInvitedEmails ?? [],
     qualifiedConversation,
   });
 };

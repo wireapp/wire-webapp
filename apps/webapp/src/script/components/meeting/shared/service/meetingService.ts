@@ -195,20 +195,62 @@ export const updateMeeting = (
   deps: MeetingServiceDeps,
 ): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
   const {usersToAdd, userIdsToRemove} = computeParticipantDiff(command.originalSelectedUsers, command.selectedUsers);
+  const originalEmails = new Set(
+    (command.originalInvitedEmails ?? []).map(email => {
+      return email.toLowerCase();
+    }),
+  );
+  const selectedEmails = new Set(
+    (command.invitedEmails ?? []).map(email => {
+      return email.toLowerCase();
+    }),
+  );
+  const emailsToAdd = (command.invitedEmails ?? []).filter(email => {
+    return !originalEmails.has(email.toLowerCase());
+  });
+  const emailsToRemove = (command.originalInvitedEmails ?? []).filter(email => {
+    return !selectedEmails.has(email.toLowerCase());
+  });
+
+  const syncEmails = (success: MeetingSubmitSuccess): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+    const add =
+      emailsToAdd.length > 0
+        ? deps.meetingsRepository.addInvitedEmails(command.meetingId, emailsToAdd)
+        : task.resolve(undefined);
+    return add
+      .mapRejected(() => {
+        return meetingSubmitErrors.emailInvitationsFailed;
+      })
+      .andThen(() => {
+        const remove =
+          emailsToRemove.length > 0
+            ? deps.meetingsRepository.removeInvitedEmails(command.meetingId, emailsToRemove)
+            : task.resolve(undefined);
+        return remove
+          .mapRejected(() => {
+            return meetingSubmitErrors.emailInvitationsFailed;
+          })
+          .map(() => {
+            return success;
+          });
+      });
+  };
 
   if (!hasMeetingMetadataChanged(command)) {
-    return syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove).andThen(submitSuccess => {
-      if ((isEmptyArray(usersToAdd) && isEmptyArray(userIdsToRemove)) || command.qualifiedConversation.isNothing) {
-        return task.resolve(submitSuccess);
-      }
+    return syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove)
+      .andThen(submitSuccess => {
+        if ((isEmptyArray(usersToAdd) && isEmptyArray(userIdsToRemove)) || command.qualifiedConversation.isNothing) {
+          return task.resolve(submitSuccess);
+        }
 
-      return syncMeetingConversationName(deps.conversationRepository, {
-        qualifiedConversationId: command.qualifiedConversation.value,
-        title: command.title,
-      }).map(() => {
-        return submitSuccess;
-      });
-    });
+        return syncMeetingConversationName(deps.conversationRepository, {
+          qualifiedConversationId: command.qualifiedConversation.value,
+          title: command.title,
+        }).map(() => {
+          return submitSuccess;
+        });
+      })
+      .andThen(syncEmails);
   }
 
   return deps.meetingsRepository
@@ -233,5 +275,6 @@ export const updateMeeting = (
             return submitSuccess;
           });
         });
-    });
+    })
+    .andThen(syncEmails);
 };

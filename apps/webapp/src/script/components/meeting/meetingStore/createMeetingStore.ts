@@ -272,20 +272,28 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
       loadMeetingForEdit: meetingInstance => {
         const {meetingSeries} = meetingInstance;
 
-        return deps.conversationRepository
-          .safeGetConversationById(meetingSeries.qualified_conversation)
+        return deps.meetingsRepository
+          .getMeeting(meetingSeries.qualified_id)
           .mapRejected(() => {
             return meetingSubmitErrors.updateFailed;
           })
-          .map(conversation => {
-            const selectedUsers = [...conversation.participating_user_ets()];
-            const formState = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers, deps.clock);
+          .andThen(apiMeeting => {
+            return deps.conversationRepository
+              .safeGetConversationById(meetingSeries.qualified_conversation)
+              .mapRejected(() => {
+                return meetingSubmitErrors.updateFailed;
+              })
+              .map(conversation => {
+                const selectedUsers = [...conversation.participating_user_ets()];
+                const formState = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers, deps.clock);
+                formState.invitedEmails = apiMeeting.invited_emails ?? [];
 
-            return {
-              formState,
-              qualifiedConversation: meetingSeries.qualified_conversation,
-              originalSelectedUsers: selectedUsers,
-            };
+                return {
+                  formState,
+                  qualifiedConversation: meetingSeries.qualified_conversation,
+                  originalSelectedUsers: selectedUsers,
+                };
+              });
           });
       },
     };

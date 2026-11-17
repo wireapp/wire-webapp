@@ -75,6 +75,7 @@ export const mapScheduleFormToMeetingCommand = (
     end,
     recurrence: formState.recurrence,
     selectedUsers: formState.selectedUsers,
+    ...((formState.invitedEmails?.length ?? 0) > 0 && {invitedEmails: formState.invitedEmails}),
     ...(isNonEmptyString(formState.password?.trim()) ? {password: formState.password} : {}),
   });
 };

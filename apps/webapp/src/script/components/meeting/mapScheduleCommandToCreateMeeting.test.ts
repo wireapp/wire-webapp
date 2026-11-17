@@ -27,6 +27,21 @@ const futureStartIso = futureStartDate.toISOString();
 const futureEndIso = futureEndDate.toISOString();
 
 describe('mapScheduleCommandToCreateMeeting', () => {
+  it('includes selected email invitees in the create payload', () => {
+    const result = mapScheduleCommandToCreateMeeting(
+      {
+        title: 'Weekly sync',
+        start: futureStartDate,
+        end: futureEndDate,
+        recurrence: 'weekly',
+        selectedUsers: [],
+        invitedEmails: ['guest@example.com'],
+      },
+      {ianaTimeZoneId: 'Europe/Berlin'},
+    );
+
+    expect(result.invited_emails).toEqual(['guest@example.com']);
+  });
   it('maps title, times, recurrence, and device tzid', () => {
     const result = mapScheduleCommandToCreateMeeting(
       {

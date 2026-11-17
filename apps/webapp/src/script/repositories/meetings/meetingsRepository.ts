@@ -29,6 +29,28 @@ import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 export class MeetingsRepository {
   constructor(private readonly dataSource: MeetingsDataSource) {}
 
+  addInvitedEmails(meetingId: QualifiedId, emails: string[]): Task<void, unknown> {
+    return task.tryOrElse(
+      error => {
+        return error;
+      },
+      () => {
+        return this.dataSource.addInvitedEmails(meetingId, emails);
+      },
+    );
+  }
+
+  removeInvitedEmails(meetingId: QualifiedId, emails: string[]): Task<void, unknown> {
+    return task.tryOrElse(
+      error => {
+        return error;
+      },
+      () => {
+        return this.dataSource.removeInvitedEmails(meetingId, emails);
+      },
+    );
+  }
+
   createMeeting(payload: CreateMeeting): Task<CreatedMeetingWithConversation, unknown> {
     return task.tryOrElse(
       error => {
