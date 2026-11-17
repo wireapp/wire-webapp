@@ -17,6 +17,7 @@
  *
  */
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {Maybe} from 'true-myth';
 
 import type {BrowserLogPersistence} from './createBrowserLogPersistence';
@@ -24,6 +25,7 @@ import type {BrowserLogPersistence} from './createBrowserLogPersistence';
 import type {QualifiedId} from '../apiClient/user/qualifiedId';
 
 type AuthenticatedAccountBindingDependencies = {
+  readonly fireAndForgetInvoker: Pick<FireAndForgetInvoker, 'fireAndForget'>;
   readonly persistence: Maybe<Pick<BrowserLogPersistence, 'bindAccount' | 'dispose'>>;
   readonly hashQualifiedId: (qualifiedId: Readonly<QualifiedId>) => Promise<string>;
   readonly reportFailure: () => void;
@@ -32,21 +34,17 @@ type AuthenticatedAccountBindingDependencies = {
 export function createAuthenticatedAccountBinding(
   dependencies: AuthenticatedAccountBindingDependencies,
 ): (qualifiedId: Readonly<QualifiedId>) => Promise<void> {
-  const {persistence, hashQualifiedId, reportFailure} = dependencies;
+  const {fireAndForgetInvoker, persistence, hashQualifiedId, reportFailure} = dependencies;
 
   async function disablePersistence(): Promise<void> {
-    try {
-      // Disposal closes write admission synchronously; cleanup acknowledgements are never awaited by startup.
-      if (persistence.isJust) {
-        await persistence.value.dispose();
-      }
-    } catch {
-      // Cleanup is best effort. Console logging remains configured independently.
+    // Disposal closes write admission synchronously; cleanup acknowledgements are never awaited by startup.
+    if (persistence.isJust) {
+      await persistence.value.dispose();
     }
   }
 
   function handleFailure(): void {
-    void disablePersistence();
+    fireAndForgetInvoker.fireAndForget(disablePersistence);
     try {
       reportFailure();
     } catch {
@@ -60,10 +58,15 @@ export function createAuthenticatedAccountBinding(
     }
 
     try {
+      // Startup supplies fresh, unattributed persistence for each document; logout/login navigate away.
+      // Records accepted while hashing stay unattributed and are drained before binding switches stores.
       const accountIdentifier = await hashQualifiedId(qualifiedId);
       // bindAccount closes the existing write barrier immediately. Its Task contains worker failures as Results.
       // Await hashing to start that transition before ordinary authenticated work, but never await the worker.
-      void persistence.value.bindAccount(accountIdentifier).inspectRejected(handleFailure);
+      const binding = persistence.value.bindAccount(accountIdentifier).inspectRejected(handleFailure);
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await binding;
+      });
     } catch {
       handleFailure();
     }

@@ -120,19 +120,20 @@ export async function startApplication(
     },
   });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
+  const fireAndForgetInvoker = createFireAndForgetInvoker({
+    reportError(error) {
+      fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', {error});
+    },
+  });
   const persistentLoggingLogger = getLogger('BrowserLogPersistence');
   const onAuthenticatedAccount = createAuthenticatedAccountBinding({
+    fireAndForgetInvoker,
     persistence: persistentLogging,
     hashQualifiedId(qualifiedId) {
       return createAccountIdentifier({qualifiedId, encoder: new TextEncoder(), crypto: globalThis.crypto.subtle});
     },
     reportFailure() {
       persistentLoggingLogger.warn('Persistent browser logging disabled: authenticated account binding failed');
-    },
-  });
-  const fireAndForgetInvoker = createFireAndForgetInvoker({
-    reportError(error) {
-      fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', {error});
     },
   });
   const documentContentLoaded = waitForDocumentContentLoaded({
