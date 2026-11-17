@@ -163,6 +163,7 @@ describe('browser log persistence composition', () => {
     const notifyAccount = createAuthenticatedAccountBinding({
       persistence: Maybe.just(output),
       fireAndForgetInvoker: createFireAndForgetInvoker({reportError: noop}),
+      onAccountBound: noop,
       hashQualifiedId() {
         return hashing.promise;
       },

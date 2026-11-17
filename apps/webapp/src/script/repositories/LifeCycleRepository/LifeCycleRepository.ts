@@ -138,11 +138,8 @@ export class LifeCycleRepository {
     this.logger.info(`Logout process started. Reason: '${signOutReason}', Clear all data: ${shouldClearAllData}`);
     this.isCurrentlyLoggingOut = true;
 
-    // A data-clearing flag alone is not account removal: preserve diagnostics on automatic sign-outs/repair.
-    const removesLocalAccount =
-      signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED ||
-      (shouldClearAllData && [SIGN_OUT_REASON.USER_REQUESTED, SIGN_OUT_REASON.ACCOUNT_DELETED].includes(signOutReason));
-    if (removesLocalAccount) {
+    // Match Desktop's SIGNED_OUT clearData contract independently of the sign-out reason.
+    if (shouldClearAllData) {
       const accountIdentity = Maybe.of(this.dependencies.userRepository['userState'].self()?.qualifiedId).map(
         qualifiedId => {
           return {...qualifiedId};

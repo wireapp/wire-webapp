@@ -231,24 +231,13 @@ describe('LifeCycleRepository', () => {
 
   describe('logout', () => {
     it.each(
-      [
-        {reason: SIGN_OUT_REASON.USER_REQUESTED, deletesWithClearing: true, deletesWithoutClearing: false},
-        {reason: SIGN_OUT_REASON.ACCOUNT_DELETED, deletesWithClearing: true, deletesWithoutClearing: false},
-        {reason: SIGN_OUT_REASON.CLIENT_REMOVED, deletesWithClearing: true, deletesWithoutClearing: true},
-        {reason: SIGN_OUT_REASON.SESSION_EXPIRED, deletesWithClearing: false, deletesWithoutClearing: false},
-        {reason: SIGN_OUT_REASON.MLS_CLIENT_MISMATCH, deletesWithClearing: false, deletesWithoutClearing: false},
-        {reason: SIGN_OUT_REASON.APP_INIT, deletesWithClearing: false, deletesWithoutClearing: false},
-        {reason: SIGN_OUT_REASON.INDEXED_DB, deletesWithClearing: false, deletesWithoutClearing: false},
-        {reason: SIGN_OUT_REASON.MULTIPLE_TABS, deletesWithClearing: false, deletesWithoutClearing: false},
-        {reason: SIGN_OUT_REASON.NO_APP_CONFIG, deletesWithClearing: false, deletesWithoutClearing: false},
-        {reason: SIGN_OUT_REASON.NOT_SIGNED_IN, deletesWithClearing: false, deletesWithoutClearing: false},
-      ].flatMap(scenario => {
+      Object.values(SIGN_OUT_REASON).flatMap(reason => {
         return [
-          {reason: scenario.reason, clearAllData: true, deletesLogs: scenario.deletesWithClearing},
-          {reason: scenario.reason, clearAllData: false, deletesLogs: scenario.deletesWithoutClearing},
+          {reason, clearAllData: true, deletesLogs: true},
+          {reason, clearAllData: false, deletesLogs: false},
         ];
       }),
-    )('classifies account removal for $reason (clear: $clearAllData)', async options => {
+    )('follows the clear-data contract for $reason (clear: $clearAllData)', async options => {
       const {reason, clearAllData, deletesLogs} = options;
       const qualifiedId = {domain: 'example.com', id: 'current-account'};
       const user = new User(qualifiedId.id, qualifiedId.domain, translateForTest);
