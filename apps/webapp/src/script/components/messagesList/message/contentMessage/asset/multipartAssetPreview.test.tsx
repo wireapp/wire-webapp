@@ -65,6 +65,7 @@ const renderPreview = (): void => {
           attachmentsCountCopy="1 file"
           senderName="Alice"
           timestamp={1}
+          translate={translateForTest}
         />
       </CellsSelfUserDriveRoleProvider>,
       rootProviderWrapper,

@@ -25,11 +25,11 @@ import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {useGetMultipartAsset} from './multipartAssets/useGetMultipartAsset/useGetMultipartAsset';
 
-import {useApplicationContext} from '../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {MultipleFilesIcon} from '../../../../../uiKit/dataDisplay/icon/files/multipleFilesIcon';
 import {PlayIcon} from '../../../../../uiKit/dataDisplay/icon/playIcon';
 import {isPreviewableImage} from '../../../../../util/imageUtil';
+import type {Translate} from '../../../../../util/localizerUtil/translationTypes';
 import {getFileExtension, getName} from '../../../../../util/util';
 import {FileTypeIcon} from '../../../../conversation/common/fileTypeIcon/fileTypeIcon';
 import {FileFullscreenModal} from '../../../../FileFullscreenModal/FileFullscreenModal';
@@ -41,6 +41,7 @@ interface MultipartAssetPreviewProps {
   cellsRepository?: CellsRepository;
   senderName: string;
   timestamp: number;
+  translate: Translate;
 }
 
 export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
@@ -49,8 +50,8 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
   cellsRepository = container.resolve(CellsRepository),
   senderName,
   timestamp,
+  translate,
 }) => {
-  const {translate} = useApplicationContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const firstAsset = cellAssets[0];
   const assetUuid = firstAsset?.uuid;

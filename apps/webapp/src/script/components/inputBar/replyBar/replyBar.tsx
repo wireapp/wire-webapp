@@ -106,6 +106,7 @@ export const ReplyBar: FunctionComponent<ReplyBarProps> = ({replyMessageEntity, 
                   attachmentsCountCopy={attachmentsCountCopy}
                   senderName={senderName}
                   timestamp={timestamp}
+                  translate={translate}
                 />
               )}
             </>
