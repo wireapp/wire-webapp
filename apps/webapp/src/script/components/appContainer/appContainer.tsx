@@ -22,9 +22,8 @@ import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
-
 import ky from 'ky';
+import {container} from 'tsyringe';
 
 import {getOtherInstanceAction} from './getOtherInstanceAction';
 import {useAccentColor} from './hooks/useAccentColor';

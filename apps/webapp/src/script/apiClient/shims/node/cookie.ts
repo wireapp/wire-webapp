@@ -19,7 +19,6 @@
 
 import {isNull, isNullOrUndefined} from '@sindresorhus/is';
 import {AxiosHeaders, AxiosRequestConfig, AxiosResponse} from 'axios';
-
 import {Cookie as ToughCookie} from 'tough-cookie';
 
 import {obfuscateCookie} from './obfuscateCookie';
