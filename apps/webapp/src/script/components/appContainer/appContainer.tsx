@@ -23,6 +23,7 @@ import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {amplify} from 'amplify';
 import ky from 'ky';
+import type {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {getOtherInstanceAction} from './getOtherInstanceAction';
@@ -62,6 +63,7 @@ import {PrimaryModalComponent} from '../Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from '../Modals/QualityFeedbackModal';
 
 type AppProps = {
+  readonly cleanupAccountLogs: (qualifiedId: Maybe<Readonly<QualifiedId>>) => Promise<void>;
   readonly onAuthenticatedAccount: (qualifiedId: Readonly<QualifiedId>) => Promise<void>;
   readonly config: Configuration;
   readonly clientType: ClientType;
@@ -78,6 +80,7 @@ type AppProps = {
 
 export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) => {
   const {
+    cleanupAccountLogs,
     onAuthenticatedAccount,
     config,
     clientType,
@@ -102,8 +105,9 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
       clock,
       fireAndForgetInvoker,
       {isMarkAsUnreadFeatureEnabled},
+      cleanupAccountLogs,
     );
-  }, [config, fireAndForgetInvoker, translate, clock, isMarkAsUnreadFeatureEnabled]);
+  }, [config, fireAndForgetInvoker, translate, clock, isMarkAsUnreadFeatureEnabled, cleanupAccountLogs]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;

@@ -35,6 +35,7 @@ import {createApplicationServices} from './createApplicationServices';
 import {createAccountIdentifier} from '../logger/createAccountIdentifier';
 import {createAuthenticatedAccountBinding} from '../logger/createAuthenticatedAccountBinding';
 import {logRuntimeIdentity, logStartupRuntimeIdentity} from '../logger/logRuntimeIdentity';
+import {createAccountLogCleanup} from '../logger/createAccountLogCleanup';
 import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
@@ -145,6 +146,19 @@ export async function startApplication(
     },
   });
   const persistentLoggingLogger = getLogger('BrowserLogPersistence');
+  const cleanupAccountLogs = createAccountLogCleanup({
+    isElectron: Runtime.isElectron(),
+    persistence: persistentLogging,
+    hashQualifiedId(qualifiedId) {
+      return createAccountIdentifier({qualifiedId, encoder: new TextEncoder(), crypto: globalThis.crypto.subtle});
+    },
+    async getDirectory() {
+      return navigator.storage.getDirectory();
+    },
+    reportFailure() {
+      persistentLoggingLogger.warn('Account browser log deletion incomplete');
+    },
+  });
   const onAuthenticatedAccount = createAuthenticatedAccountBinding({
     fireAndForgetInvoker,
     persistence: persistentLogging,
@@ -271,6 +285,7 @@ export async function startApplication(
 
   createRoot(appContainer).render(
     <AppContainer
+      cleanupAccountLogs={cleanupAccountLogs}
       onAuthenticatedAccount={onAuthenticatedAccount}
       config={config}
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}

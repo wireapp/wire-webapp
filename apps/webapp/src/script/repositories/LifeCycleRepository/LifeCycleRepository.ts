@@ -21,6 +21,7 @@ import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {Maybe} from 'true-myth';
 
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {URLParameter} from '../../auth/urlParameter';
 import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
@@ -77,6 +78,7 @@ export const doSimpleRedirect = (signOutReason: SIGN_OUT_REASON): void => {
 };
 
 export interface LifeCycleDependencies {
+  readonly cleanupAccountLogs: (qualifiedId: Maybe<Readonly<QualifiedId>>) => Promise<void>;
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
   eventRepository: EventRepository;
@@ -135,6 +137,24 @@ export class LifeCycleRepository {
     }
     this.logger.info(`Logout process started. Reason: '${signOutReason}', Clear all data: ${shouldClearAllData}`);
     this.isCurrentlyLoggingOut = true;
+
+    // A data-clearing flag alone is not account removal: preserve diagnostics on automatic sign-outs/repair.
+    const removesLocalAccount =
+      signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED ||
+      (shouldClearAllData && [SIGN_OUT_REASON.USER_REQUESTED, SIGN_OUT_REASON.ACCOUNT_DELETED].includes(signOutReason));
+    if (removesLocalAccount) {
+      const accountIdentity = Maybe.of(this.dependencies.userRepository['userState'].self()?.qualifiedId).map(
+        qualifiedId => {
+          return {...qualifiedId};
+        },
+      );
+      try {
+        // Start before session destruction and the offline branch; composition closes persistence immediately.
+        await this.dependencies.cleanupAccountLogs(accountIdentity);
+      } catch {
+        this.logger.warn('Account browser log deletion failed');
+      }
+    }
 
     // Helper function to notify about logout completion and redirect
     const completeLogoutAndRedirect = (): void => {

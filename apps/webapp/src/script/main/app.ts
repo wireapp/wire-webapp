@@ -27,7 +27,7 @@ import 'core-js/full/reflect';
 import pWaitFor from 'p-wait-for';
 import platform from 'platform';
 import {pdfjs} from 'react-pdf';
-import {task} from 'true-myth';
+import {task, type Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {refreshApplication} from './applicationRefresh';
@@ -245,6 +245,7 @@ export class App {
     private readonly clock: Clock,
     private readonly fireAndForgetInvoker: FireAndForgetInvoker,
     private readonly conversationRepositoryOptions: ConversationRepositoryOptions,
+    private readonly cleanupAccountLogs: (qualifiedId: Maybe<Readonly<QualifiedId>>) => Promise<void>,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => {
@@ -405,6 +406,7 @@ export class App {
 
     // Initialize LifeCycleRepository with all required dependencies
     repositories.lifeCycle = new LifeCycleRepository({
+      cleanupAccountLogs: this.cleanupAccountLogs,
       clientRepository: repositories.client,
       conversationRepository: repositories.conversation,
       eventRepository: repositories.event,
