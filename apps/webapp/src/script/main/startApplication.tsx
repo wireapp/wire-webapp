@@ -120,13 +120,14 @@ export async function startApplication(
     },
   });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
+  const persistentLoggingLogger = getLogger('BrowserLogPersistence');
   const onAuthenticatedAccount = createAuthenticatedAccountBinding({
     persistence: persistentLogging,
     hashQualifiedId(qualifiedId) {
       return createAccountIdentifier({qualifiedId, encoder: new TextEncoder(), crypto: globalThis.crypto.subtle});
     },
     reportFailure() {
-      console.warn('Persistent browser logging disabled: authenticated account binding failed');
+      persistentLoggingLogger.warn('Persistent browser logging disabled: authenticated account binding failed');
     },
   });
   const fireAndForgetInvoker = createFireAndForgetInvoker({
