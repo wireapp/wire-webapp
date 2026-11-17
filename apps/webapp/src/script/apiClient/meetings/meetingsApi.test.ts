@@ -191,6 +191,36 @@ describe('MeetingsAPI', () => {
     );
   });
 
+  it('posts email invitation additions and removals to their respective routes', async () => {
+    using client = new APIClient({...testConfig, platform: nodePlatform});
+    jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
+      data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
+    } as never);
+    await client.useVersion(MINIMUM_API_VERSION, 19);
+    const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: undefined} as never);
+    const id = {id: 'meeting-id', domain: 'example.com'};
+
+    await client.api.meetings.addInvitedEmails(id, ['new@example.com']);
+    await client.api.meetings.removeInvitedEmails(id, ['old@example.com']);
+
+    expect(sendJSONSpy).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        data: {emails: ['new@example.com']},
+        method: 'post',
+        url: '/meetings/example.com/meeting-id/invitations',
+      }),
+    );
+    expect(sendJSONSpy).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        data: {emails: ['old@example.com']},
+        method: 'post',
+        url: '/meetings/example.com/meeting-id/invitations/delete',
+      }),
+    );
+  });
+
   it.each([
     ['secret-password', {password: 'secret-password'}],
     [undefined, {}],

@@ -61,6 +61,7 @@ type SubmitMeetingParams = {
   originalEnd: Maybe<Date>;
   originalRecurrence: ScheduleMeetingFormState['recurrence'];
   originalSelectedUsers: User[];
+  originalInvitedEmails: string[];
   clock: Clock;
   scheduleMeeting: (command: ScheduleMeetingCommand) => Task<ScheduleMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
@@ -78,6 +79,7 @@ const submitMeeting = ({
   originalEnd,
   originalRecurrence,
   originalSelectedUsers,
+  originalInvitedEmails,
   clock,
   scheduleMeeting,
   updateMeeting,
@@ -109,6 +111,7 @@ const submitMeeting = ({
     originalEnd: originalEnd.value,
     originalRecurrence,
     originalSelectedUsers,
+    originalInvitedEmails,
   });
 
   if (commandResult.isErr) {
@@ -160,6 +163,9 @@ export const useScheduleMeetingSubmit = (): UseScheduleMeetingSubmitResult => {
   const originalSelectedUsers = useScheduleMeetingModal(state => {
     return state.originalSelectedUsers;
   });
+  const originalInvitedEmails = useScheduleMeetingModal(state => {
+    return state.originalInvitedEmails;
+  });
 
   const submit = useCallback(
     async (formState: ScheduleMeetingFormState): Promise<ScheduleMeetingSubmitResult> => {
@@ -175,6 +181,7 @@ export const useScheduleMeetingSubmit = (): UseScheduleMeetingSubmitResult => {
         originalEnd,
         originalRecurrence,
         originalSelectedUsers,
+        originalInvitedEmails,
         clock,
         scheduleMeeting,
         updateMeeting,
@@ -242,6 +249,7 @@ export const useScheduleMeetingSubmit = (): UseScheduleMeetingSubmitResult => {
       originalStart,
       originalEnd,
       originalSelectedUsers,
+      originalInvitedEmails,
       qualifiedConversation,
       scheduleMeeting,
       translate,
