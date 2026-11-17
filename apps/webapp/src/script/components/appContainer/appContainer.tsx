@@ -43,6 +43,7 @@ import {useSingleInstance} from '../../hooks/useSingleInstance';
 import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import type {FetchLatestBuildMetadata} from '../../lifecycle/newVersionHandler';
 import {setAppLocale} from '../../localization/Localizer';
+import type {BrowserLogDownload} from '../../logger/createBrowserLogDownload';
 import {App} from '../../main/app';
 import type {ApplicationObservability} from '../../observability/applicationObservability';
 import {AppMain} from '../../page/appMain';
@@ -63,6 +64,7 @@ import {PrimaryModalComponent} from '../Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from '../Modals/QualityFeedbackModal';
 
 type AppProps = {
+  readonly downloadBrowserLogs: Maybe<BrowserLogDownload>;
   readonly cleanupAccountLogs: (qualifiedId: Maybe<Readonly<QualifiedId>>) => Promise<void>;
   readonly onAuthenticatedAccount: (qualifiedId: Readonly<QualifiedId>) => Promise<void>;
   readonly config: Configuration;
@@ -80,6 +82,7 @@ type AppProps = {
 
 export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) => {
   const {
+    downloadBrowserLogs,
     cleanupAccountLogs,
     onAuthenticatedAccount,
     config,
@@ -168,6 +171,7 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
 
   const rootContextValue = useMemo(() => {
     return {
+      downloadBrowserLogs,
       fireAndForgetInvoker,
       mainViewModel: mainView,
       clock,
@@ -189,7 +193,15 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
         },
       },
     };
-  }, [clock, doesApplicationNeedForceReload, fireAndForgetInvoker, isFeatureToggleEnabled, mainView, translate]);
+  }, [
+    clock,
+    doesApplicationNeedForceReload,
+    downloadBrowserLogs,
+    fireAndForgetInvoker,
+    isFeatureToggleEnabled,
+    mainView,
+    translate,
+  ]);
 
   const otherInstanceAction = getOtherInstanceAction({
     hasOtherInstance,

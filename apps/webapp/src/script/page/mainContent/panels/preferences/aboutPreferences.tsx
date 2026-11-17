@@ -25,6 +25,7 @@ import {buildMetadata, version as coreCryptoVersion} from '@wireapp/core-crypto'
 
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
+import {DownloadBrowserLogs} from './downloadBrowserLogs';
 
 import {Config} from '../../../../Config';
 import {externalUrl} from '../../../../externalRoute';
@@ -39,7 +40,7 @@ interface AboutPreferencesProps {
 const shortCommitLength = 7;
 
 const AboutPreferences: FunctionComponent<AboutPreferencesProps> = ({selfUser}: AboutPreferencesProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, downloadBrowserLogs} = useApplicationContext();
   const config = Config.getConfig();
 
   const websiteUrl = externalUrl.website;
@@ -86,6 +87,7 @@ const AboutPreferences: FunctionComponent<AboutPreferencesProps> = ({selfUser}: 
           </ul>
         </PreferencesSection>
       )}
+      <DownloadBrowserLogs downloadBrowserLogs={downloadBrowserLogs} translate={translate} />
       {showWireSection && (
         <PreferencesSection title={config.BRAND_NAME}>
           <ul className="preferences-about-list">

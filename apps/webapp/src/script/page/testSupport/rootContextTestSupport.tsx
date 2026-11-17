@@ -24,6 +24,7 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {createFireAndForgetInvoker, type FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
+import {Maybe} from 'true-myth';
 
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import type {Translate} from '../../util/localizerUtil';
@@ -88,6 +89,7 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
 
   return {
     doesApplicationNeedForceReload,
+    downloadBrowserLogs: Maybe.nothing(),
     fireAndForgetInvoker,
     isFeatureToggleEnabled,
     mainViewModel,

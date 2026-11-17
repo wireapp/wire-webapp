@@ -26,6 +26,7 @@ import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Navigate, Route, Routes} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
+import {Maybe} from 'true-myth';
 
 import {ClientManager} from './clientManager';
 import {ConversationJoin} from './conversationJoin';
@@ -49,7 +50,7 @@ import {VerifyEmailLink} from './verifyEmailLink';
 import type englishMessages from '../../../i18n/en-US.json';
 import {pathWithParams} from '../../commons/util/UrlUtil';
 import {Config} from '../../Config';
-import {RootProvider} from '../../page/rootProvider';
+import {RootProvider, type RootContextValue} from '../../page/rootProvider';
 import {Loading} from '../../uiKit/dataDisplay/loading/loading';
 import {THEME_ID} from '../../uiKit/identity/theme/theme';
 import {ContainerXS} from '../../uiKit/layout/container/container';
@@ -102,12 +103,13 @@ const RootComponent: FunctionComponent<RootProps & ConnectedProps & DispatchProp
   translate,
   clock,
 }) => {
-  const rootContextValue = useMemo(() => {
+  const rootContextValue = useMemo<RootContextValue>(() => {
     return {
       fireAndForgetInvoker: authFireAndForgetInvoker,
       mainViewModel: createAuthMainViewModel(),
       clock,
       doesApplicationNeedForceReload: false,
+      downloadBrowserLogs: Maybe.nothing(),
       isFeatureToggleEnabled() {
         return false;
       },
