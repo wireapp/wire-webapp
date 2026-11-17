@@ -19,9 +19,14 @@
 
 import {useEffect, useRef, type ReactElement} from 'react';
 
-import {Dialog, Heading, Modal, ModalOverlay, Button} from 'react-aria-components';
-
 import {useCoreCryptoSupport} from './coreCryptoSupportContext';
+
+import {ModalComponent} from '../components/Modals/ModalComponent';
+import {THEME_ID} from '../uiKit/identity/theme/theme';
+import {Button} from '../uiKit/inputs/button/button';
+import {StyledApp} from '../uiKit/layout/styledApp/styledApp';
+import {H2} from '../uiKit/typography/heading/heading';
+import {Text} from '../uiKit/typography/text/text';
 
 export function CoreCryptoUpgradeModal(): ReactElement | null {
   const {support, isDesktopApp, translate} = useCoreCryptoSupport();
@@ -34,39 +39,32 @@ export function CoreCryptoUpgradeModal(): ReactElement | null {
   }
 
   return (
-    <ModalOverlay
-      isOpen
-      isDismissable={false}
-      isKeyboardDismissDisabled
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(0, 0, 0, 0.4)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 24,
-        fontFamily: 'system-ui, sans-serif',
-        zIndex: 10000,
-      }}
-    >
-      <Modal style={{background: '#fff', color: '#17181a', borderRadius: 12, padding: 32, maxWidth: 480}}>
-        <Dialog aria-describedby="core-crypto-upgrade-message" style={{outline: 'none'}}>
-          <Heading slot="title">{translate('coreCryptoUpgradeTitle')}</Heading>
-          <p id="core-crypto-upgrade-message">
-            {translate(isDesktopApp ? 'coreCryptoUpgradeDesktopMessage' : 'coreCryptoUpgradeBrowserMessage')}
-          </p>
-          <Button
-            ref={reloadButton}
-            onPress={() => {
-              window.location.reload();
-            }}
-            style={{padding: '10px 20px', cursor: 'pointer'}}
-          >
-            {translate('coreCryptoUpgradeReload')}
-          </Button>
-        </Dialog>
-      </Modal>
-    </ModalOverlay>
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <ModalComponent
+        isShown
+        id="core-crypto-upgrade-modal"
+        data-uie-name="core-crypto-upgrade-modal"
+        aria-labelledby="core-crypto-upgrade-title"
+        aria-describedby="core-crypto-upgrade-message"
+        wrapperCSS={{padding: 24, maxWidth: 'calc(100vw - 32px)', overflowY: 'auto'}}
+      >
+        <H2 id="core-crypto-upgrade-title" css={{marginTop: 0}}>
+          {translate('coreCryptoUpgradeTitle')}
+        </H2>
+        <Text block id="core-crypto-upgrade-message" css={{marginBottom: 24}}>
+          {translate(isDesktopApp ? 'coreCryptoUpgradeDesktopMessage' : 'coreCryptoUpgradeBrowserMessage')}
+        </Text>
+        <Button
+          ref={reloadButton}
+          type="button"
+          onClick={() => {
+            window.location.reload();
+          }}
+          data-uie-name="do-reload-wire"
+        >
+          {translate('coreCryptoUpgradeReload')}
+        </Button>
+      </ModalComponent>
+    </StyledApp>
   );
 }
