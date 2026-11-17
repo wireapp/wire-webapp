@@ -32,6 +32,7 @@
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/kalium-backup": "0.0.4",
     "@wireapp/protocol-messaging": "1.64.0",
+    "@zip.js/zip.js": "2.25.0",
     "amplify": "git+https://github.com/wireapp/amplify.git#c28502cf2a3c99291cc2cda667e7c9fd10f5ddf1",
     "ansi-regex": "5.0.1",
     "axios": "1.21.1",
