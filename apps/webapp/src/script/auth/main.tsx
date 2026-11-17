@@ -50,6 +50,7 @@ import {setAppLocale} from '../localization/Localizer';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {enableLogging} from '../logger/enableLogging';
 import {configureLogging} from '../logger/getLogger';
+import {logRuntimeIdentity} from '../logger/logRuntimeIdentity';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {initializeDataDog} from '../util/dataDog';
@@ -116,6 +117,13 @@ const startAuthApp = (): void => {
         },
       });
     },
+  });
+  logRuntimeIdentity({
+    logger: getLogger('RuntimeIdentity'),
+    hostname: window.location.hostname,
+    origin: window.location.origin,
+    version: config.VERSION,
+    assetVersion: config.ASSET_VERSION,
   });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const fireAndForgetInvoker = createFireAndForgetInvoker({
