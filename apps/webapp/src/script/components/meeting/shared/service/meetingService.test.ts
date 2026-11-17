@@ -388,6 +388,8 @@ describe('updateMeeting', () => {
     safeAddUsers: jest.Mock<any, any, any>;
     safeRemoveMembers: jest.Mock<any, any, any>;
     establishMeetingConversation: jest.Mock<any, any, any>;
+    addInvitedEmails: jest.Mock<any, any, any>;
+    removeInvitedEmails: jest.Mock<any, any, any>;
   };
   const createDeps = ({
     updateMeetingMock = jest.fn().mockReturnValue(
@@ -404,6 +406,8 @@ describe('updateMeeting', () => {
     safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     safeRemoveMembers = jest.fn().mockReturnValue(task.resolve(undefined)),
     establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+    addInvitedEmails = jest.fn().mockReturnValue(task.resolve(undefined)),
+    removeInvitedEmails = jest.fn().mockReturnValue(task.resolve(undefined)),
   }: {
     updateMeetingMock?: jest.Mock;
     saveMeetingConversationFromBackend?: jest.Mock;
@@ -412,9 +416,13 @@ describe('updateMeeting', () => {
     safeAddUsers?: jest.Mock;
     safeRemoveMembers?: jest.Mock;
     establishMeetingConversation?: jest.Mock;
+    addInvitedEmails?: jest.Mock;
+    removeInvitedEmails?: jest.Mock;
   } = {}): CreateDepsResult2 => {
     const meetingsRepository = {
       updateMeeting: updateMeetingMock,
+      addInvitedEmails,
+      removeInvitedEmails,
       getMeetingsList: jest.fn(),
     } as unknown as MeetingsRepository;
 
@@ -442,8 +450,49 @@ describe('updateMeeting', () => {
       safeAddUsers,
       safeRemoveMembers,
       establishMeetingConversation,
+      addInvitedEmails,
+      removeInvitedEmails,
     };
   };
+
+  it('sends only case insensitive email additions and removals', async () => {
+    const {deps, addInvitedEmails, removeInvitedEmails, updateMeetingMock} = createDeps();
+    const result = await updateMeeting(
+      updateCommand({
+        originalInvitedEmails: ['Same@Example.com', 'old@example.com'],
+        invitedEmails: ['same@example.com', 'new@example.com'],
+      }),
+      deps,
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(updateMeetingMock).not.toHaveBeenCalled();
+    expect(addInvitedEmails).toHaveBeenCalledWith(meetingId, ['new@example.com']);
+    expect(removeInvitedEmails).toHaveBeenCalledWith(meetingId, ['old@example.com']);
+  });
+
+  it('does not send email requests for unchanged addresses', async () => {
+    const {deps, addInvitedEmails, removeInvitedEmails} = createDeps();
+    const result = await updateMeeting(
+      updateCommand({
+        originalInvitedEmails: ['Same@Example.com'],
+        invitedEmails: ['same@example.com'],
+      }),
+      deps,
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(addInvitedEmails).not.toHaveBeenCalled();
+    expect(removeInvitedEmails).not.toHaveBeenCalled();
+  });
+
+  it('reports an email invitation failure as a partial save', async () => {
+    const {deps} = createDeps({addInvitedEmails: jest.fn().mockReturnValue(task.reject(new Error('network')))});
+    const result = await updateMeeting(updateCommand({invitedEmails: ['new@example.com']}), deps);
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.emailInvitationsFailed);
+  });
 
   it('updates metadata, applies participant diff, and returns failedToAdd', async () => {
     const alice = createUser('1');

@@ -52,6 +52,15 @@ const baseFormState = (): ScheduleMeetingFormState => {
 };
 
 describe('mapScheduleFormToMeetingCommand', () => {
+  it('keeps email invitees separate from selected Wire users', () => {
+    const result = mapScheduleFormToMeetingCommand({...baseFormState(), invitedEmails: ['guest@example.com']}, clock);
+
+    expect(result.isOk).toBe(true);
+    if (result.isOk) {
+      expect(result.value.invitedEmails).toEqual(['guest@example.com']);
+      expect(result.value.selectedUsers).toEqual([]);
+    }
+  });
   it('maps validated form state to a meeting command', () => {
     const alice = createUser('1');
     const bob = createUser('2');

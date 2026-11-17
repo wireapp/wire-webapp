@@ -68,6 +68,8 @@ describe('mapScheduleFormToUpdateMeetingCommand', () => {
       originalRecurrence: 'doesNotRepeat',
       selectedUsers: [],
       originalSelectedUsers: [],
+      invitedEmails: [],
+      originalInvitedEmails: [],
       qualifiedConversation: maybe.just(qualifiedConversation),
     });
   });
