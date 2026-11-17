@@ -54,6 +54,9 @@ describe('ConfigToolbar', () => {
           canIgnoreIncomingMLS: () => {
             return conversationState.activeConversation() === conversation;
           },
+          canBreakProteusConversation: () => {
+            return false;
+          },
           isGzippingEnabled: () => {
             return false;
           },
@@ -91,6 +94,61 @@ describe('ConfigToolbar', () => {
       expect(setIgnoreIncomingMLS).toHaveBeenLastCalledWith(false);
       expect(screen.queryByRole('status')).not.toBeInTheDocument();
       expect(screen.getByRole('button', {name: 'Drop Incoming MLS Events'})).toBeDisabled();
+    } finally {
+      window.wire = originalWire;
+      act(() => {
+        conversationState.activeConversation(previousConversation);
+      });
+    }
+  });
+
+  it('breaks the active Proteus conversation and reports the number of advanced sessions', async () => {
+    const originalWire = window.wire;
+    const conversationState = container.resolve(ConversationState);
+    const previousConversation = conversationState.activeConversation();
+    const conversation = new Conversation('proteus-id', 'example.com', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const breakActiveProteusConversation = jest.fn().mockResolvedValue(2);
+    window.wire = {
+      ...originalWire,
+      app: {
+        debug: {
+          ignoredMLSConversation: ko.observable<QualifiedId>(),
+          canIgnoreIncomingMLS: () => {
+            return false;
+          },
+          canBreakProteusConversation: () => {
+            return conversationState.activeConversation() === conversation;
+          },
+          breakActiveProteusConversation,
+          isGzippingEnabled: () => {
+            return false;
+          },
+          isEnabledAvsDebugger: () => {
+            return false;
+          },
+          isEnabledAvsStagingSFT: () => {
+            return false;
+          },
+          isPerformancePanelEnabled: () => {
+            return false;
+          },
+        },
+      },
+    } as unknown as typeof window.wire;
+
+    try {
+      conversationState.activeConversation(undefined);
+      render(withTheme(<ConfigToolbar />), {wrapper: rootProviderWrapper});
+      act(() => {
+        openDebugToolbar();
+      });
+      expect(screen.getByRole('button', {name: 'Break Proteus Conversation'})).toBeDisabled();
+      act(() => {
+        conversationState.activeConversation(conversation);
+      });
+      await userEvent.click(screen.getByRole('button', {name: 'Break Proteus Conversation'}));
+      expect(breakActiveProteusConversation).toHaveBeenCalledTimes(1);
+      expect(await screen.findByRole('status')).toHaveTextContent('Discarded encrypted messages for 2 sessions.');
     } finally {
       window.wire = originalWire;
       act(() => {

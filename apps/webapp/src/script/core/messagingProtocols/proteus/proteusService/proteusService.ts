@@ -57,6 +57,7 @@ import type {CRUDEngine} from '../../../storage/engine/crudEngine';
 import {handleOtrMessageAdd} from '../eventHandler/events';
 import {getGenericMessageParams} from '../utility/getGenericMessageParams';
 import {isClearFromMismatch} from '../utility/isClearFromMismatch';
+import {getRecipientsForConversation} from '../utility/recipients';
 import {
   buildEncryptedPayloads,
   constructSessionId,
@@ -348,6 +349,51 @@ export class ProteusService {
       unknowns,
       failed,
     };
+  }
+
+  /**
+   * Debug only. Encrypts `messageCount` throwaway messages for every other client in the conversation and discards
+   * the ciphertext. Each session's message counter moves past the gap a recipient can bridge, so recipients fail to
+   * decrypt every following message from this client until the session is reset.
+   *
+   * @returns the number of sessions that were advanced
+   */
+  public async debugDiscardEncryptedMessages(conversationId: QualifiedId, messageCount: number): Promise<number> {
+    const selfUserId = this.apiClient.validatedUserId;
+    const selfClientId = this.apiClient.validatedClientId;
+    const conversationRecipients = await getRecipientsForConversation({apiClient: this.apiClient, conversationId});
+    const recipients: QualifiedUserClients = Object.fromEntries(
+      Object.entries(conversationRecipients).map(([domain, userClients]) => {
+        const selfClientIds = userClients[selfUserId];
+        if (selfClientIds === undefined) {
+          return [domain, userClients];
+        }
+        const otherSelfClientIds = selfClientIds.filter(clientId => {
+          return clientId !== selfClientId;
+        });
+        return [domain, {...userClients, [selfUserId]: otherSelfClientIds}];
+      }),
+    );
+
+    const {sessions} = await initSessions({
+      recipients,
+      apiClient: this.apiClient,
+      cryptoClient: this.cryptoClient,
+      logger: this.logger,
+    });
+    if (sessions.length === 0) {
+      return 0;
+    }
+
+    const plainText = new TextEncoder().encode('discarded debug message');
+    for (let messageIndex = 0; messageIndex < messageCount; messageIndex++) {
+      await this.cryptoClient.encrypt(sessions, plainText);
+    }
+
+    this.logger.warn(
+      `Discarded ${messageCount} encrypted messages for ${sessions.length} sessions in conversation '${conversationId.id}'`,
+    );
+    return sessions.length;
   }
 
   async wipe(): Promise<void> {

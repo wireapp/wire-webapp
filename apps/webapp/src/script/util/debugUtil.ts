@@ -61,7 +61,7 @@ import {ClientRepository} from '../repositories/client';
 import {ClientState} from '../repositories/client/ClientState';
 import {ConnectionRepository} from '../repositories/connection/connectionRepository';
 import {ConversationRepository} from '../repositories/conversation/ConversationRepository';
-import {isMLSCapableConversation} from '../repositories/conversation/ConversationSelectors';
+import {isMLSCapableConversation, isProteusConversation} from '../repositories/conversation/ConversationSelectors';
 import {ConversationState} from '../repositories/conversation/ConversationState';
 import type {MessageRepository} from '../repositories/conversation/MessageRepository';
 import {Conversation} from '../repositories/entity/Conversation';
@@ -83,6 +83,8 @@ const debugDumpIndentationSpaces = 2;
 const debugFrameRectangleSizeInPixels = 10;
 const debugFrameUpdateIntervalInMilliseconds = 500;
 const debugCaptureFramesPerSecond = 25;
+/** Proteus recipients cannot bridge a counter gap of this size, so subsequent messages fail to decrypt. */
+const discardedProteusMessageCountForBrokenConversation = 1001;
 type TeamSupportedProtocolsFeature = NonNullable<FeatureList['mls']>;
 type MLSMigrationFeature = NonNullable<FeatureList['mlsMigration']>;
 type DebugEventInfo = {conversation: Conversation; event: ConversationEvent; user?: User};
@@ -452,6 +454,34 @@ export class DebugUtil {
     const proteusService = coreServices.proteus;
     const sessionId = proteusService.constructSessionId(userId, clientId);
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
+  }
+
+  canBreakProteusConversation(): boolean {
+    const conversation = this.conversationState.activeConversation();
+    return !isUndefined(conversation) && isProteusConversation(conversation);
+  }
+
+  /**
+   * Encrypts and discards enough messages for every client in the active Proteus conversation that recipients can no
+   * longer decrypt messages from this client.
+   *
+   * @returns the number of sessions that were advanced
+   */
+  async breakActiveProteusConversation(): Promise<number> {
+    const proteusService = this.core.service?.proteus;
+    if (isUndefined(proteusService)) {
+      throw new Error('Core services are not initialized');
+    }
+
+    const conversation = this.conversationState.activeConversation();
+    if (isUndefined(conversation) || !isProteusConversation(conversation)) {
+      throw new Error('Select a Proteus conversation first');
+    }
+
+    return proteusService.debugDiscardEncryptedMessages(
+      conversation.qualifiedId,
+      discardedProteusMessageCountForBrokenConversation,
+    );
   }
 
   async setTeamSupportedProtocols(

@@ -75,6 +75,8 @@ export function ConfigToolbar(): JSX.Element | null {
   const [showConfig, setShowConfig] = useState(false);
   const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
   const [isAdvancingEpoch, setIsAdvancingEpoch] = useState(false);
+  const [isBreakingProteusConversation, setIsBreakingProteusConversation] = useState(false);
+  const [breakProteusConversationStatus, setBreakProteusConversationStatus] = useState<string>();
   const debug = window.wire?.app?.debug;
   const {activeConversation} = useKoSubscribableChildren(container.resolve(ConversationState), ['activeConversation']);
   const [ignoredMLSConversation, setIgnoredMLSConversation] = useState(debug?.ignoredMLSConversation());
@@ -473,6 +475,20 @@ export function ConfigToolbar(): JSX.Element | null {
     }
   };
 
+  const breakProteusConversation = async (): Promise<void> => {
+    setIsBreakingProteusConversation(true);
+    setBreakProteusConversationStatus(undefined);
+    try {
+      const sessionCount = await debug?.breakActiveProteusConversation();
+      setBreakProteusConversationStatus(`Discarded encrypted messages for ${sessionCount ?? 0} sessions.`);
+    } catch (error: unknown) {
+      logger.error('Error breaking Proteus conversation:', {error});
+      setBreakProteusConversationStatus('Breaking the Proteus conversation failed. See the logs for details.');
+    } finally {
+      setIsBreakingProteusConversation(false);
+    }
+  };
+
   const downloadNotificationsDump = async (): Promise<void> => {
     setIsDownloadingNotifications(true);
     try {
@@ -632,6 +648,18 @@ export function ConfigToolbar(): JSX.Element | null {
           this toggle.
         </p>
       )}
+      <Button
+        disabled={
+          isUndefined(debug) ||
+          isUndefined(activeConversation) ||
+          !debug.canBreakProteusConversation() ||
+          isBreakingProteusConversation
+        }
+        onClick={breakProteusConversation}
+      >
+        {isBreakingProteusConversation ? 'Breaking Proteus Conversation…' : 'Break Proteus Conversation'}
+      </Button>
+      {isNonEmptyString(breakProteusConversationStatus) && <p role="status">{breakProteusConversationStatus}</p>}
       <Button
         onClick={() => {
           return window.wire?.app?.debug?.refreshE2EIRevocationData();

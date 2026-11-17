@@ -820,4 +820,58 @@ describe('ProteusService', () => {
       }).rejects.toThrow(NonFederatingBackendsError);
     });
   });
+
+  describe('debugDiscardEncryptedMessages', () => {
+    it('encrypts and discards the given number of messages for every client except the sending client', async () => {
+      const {
+        services,
+        data: {firstUser, domain},
+      } = await prepareDataForEncryption();
+      const selfUserId = {id: services.apiClient.validatedUserId, domain};
+      const selfClientId = services.apiClient.validatedClientId;
+      const otherSelfClientId = 'de67218b77d02d42';
+      const conversationId = generateQualifiedId(domain);
+      const messageCount = 3;
+      MockedRecipients.getRecipientsForConversation.mockResolvedValue({
+        [domain]: {
+          [firstUser.id.id]: [firstUser.clients.first, firstUser.clients.second],
+          [selfUserId.id]: [selfClientId, otherSelfClientId],
+        },
+      });
+      jest.spyOn(services.cryptoClient, 'sessionExists').mockResolvedValue(true);
+      const encryptSpy = jest.spyOn(services.cryptoClient, 'encrypt').mockResolvedValue(new Map());
+
+      const sessionCount = await services.proteusService.debugDiscardEncryptedMessages(conversationId, messageCount);
+
+      const expectedSessions = [
+        firstUser.sessions.first,
+        firstUser.sessions.second,
+        constructSessionId({userId: selfUserId, clientId: otherSelfClientId}),
+      ];
+      expect(MockedRecipients.getRecipientsForConversation).toHaveBeenCalledWith(
+        expect.objectContaining({conversationId}),
+      );
+      expect(sessionCount).toBe(expectedSessions.length);
+      expect(encryptSpy).toHaveBeenCalledTimes(messageCount);
+      for (const [sessions] of encryptSpy.mock.calls) {
+        expect(sessions).toEqual(expectedSessions);
+      }
+    });
+
+    it('does not encrypt anything when the conversation has no other clients', async () => {
+      const {services, data} = await prepareDataForEncryption();
+      MockedRecipients.getRecipientsForConversation.mockResolvedValue({
+        [data.domain]: {[services.apiClient.validatedUserId]: [services.apiClient.validatedClientId]},
+      });
+      const encryptSpy = jest.spyOn(services.cryptoClient, 'encrypt');
+
+      const sessionCount = await services.proteusService.debugDiscardEncryptedMessages(
+        generateQualifiedId(data.domain),
+        3,
+      );
+
+      expect(sessionCount).toBe(0);
+      expect(encryptSpy).not.toHaveBeenCalled();
+    });
+  });
 });
