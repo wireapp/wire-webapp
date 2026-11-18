@@ -17,13 +17,14 @@
  *
  */
 
-import {isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {isNull, isNullOrUndefined} from '@sindresorhus/is';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {noop} from 'noop-esm';
 
 import {isTabKey} from './keyboardUtil';
 import {getLogger} from './logger';
 
+import {supportsMLS as supportsMlsCapability} from '../browser/supportsMls';
 import {Decoder} from '../commons/base64/decoder';
 import {Encoder} from '../commons/base64/encoder';
 import {Runtime} from '../commons/util/Runtime';
@@ -404,14 +405,7 @@ export const setContextMenuPosition = (event: React.KeyboardEvent): MouseEvent =
   });
 };
 
-const supportsSecretStorage = (): boolean => {
-  return !Runtime.isDesktopApp() || !isUndefined(window.systemCrypto);
-};
-
-// disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
-export const supportsMLS = (): boolean => {
-  return supportsSecretStorage();
-};
+export const supportsMLS = supportsMlsCapability;
 
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 

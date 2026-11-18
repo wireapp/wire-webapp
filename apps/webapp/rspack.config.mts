@@ -229,7 +229,8 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       splitChunks: {
         cacheGroups: {
           dexie: {
-            chunks: 'initial',
+            // Startup imports the applications lazily; keep the Dexie asset referenced by both HTML templates.
+            chunks: 'all',
             enforce: true,
             name: 'dexie',
             priority: 2,

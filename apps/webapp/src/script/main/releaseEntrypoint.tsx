@@ -17,6 +17,9 @@
  *
  */
 
-import {startApplication} from './startApplication';
+import {startBrowserApplication} from '../browser/startBrowserApplication';
 
-await startApplication([]);
+await startBrowserApplication('wire-app', async support => {
+  const {startApplication} = await import('./startApplication');
+  await startApplication([], support);
+});

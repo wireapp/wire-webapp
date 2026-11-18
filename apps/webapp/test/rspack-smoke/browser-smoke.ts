@@ -173,6 +173,103 @@ test('loads the application entry points and redirects an unauthenticated visito
   expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
 });
 
+for (const entryPath of ['/', '/auth']) {
+  for (const isDesktopApp of [false, true]) {
+    test(`shows ${isDesktopApp ? 'Desktop' : 'browser'} upgrade instructions before loading ${entryPath} without JSPI`, async ({
+      page,
+    }, testInfo) => {
+      const baseUrl = Maybe.of(testInfo.project.use.baseURL).unwrapOr('');
+      const diagnostics = captureRuntimeDiagnostics({page, baseUrl});
+      const capabilityErrors: string[] = [];
+      page.on('console', message => {
+        if (message.type() === 'error') {
+          capabilityErrors.push(message.text());
+        }
+      });
+      await page.addInitScript(desktop => {
+        Reflect.deleteProperty(WebAssembly, 'Suspending');
+        Reflect.deleteProperty(WebAssembly, 'promising');
+        if (desktop) {
+          Object.defineProperty(navigator, 'userAgent', {
+            value: 'Mozilla/5.0 Chrome/136.0.0.0 Electron/36.0.0 Wire/3.0.0',
+            configurable: true,
+          });
+        }
+      }, isDesktopApp);
+
+      await page.goto(entryPath);
+      const dialog = page.getByRole('dialog', {
+        name: isDesktopApp
+          ? 'Update your Desktop app to continue using Wire.'
+          : 'Update your browser to continue using Wire.',
+      });
+      await expect(dialog).toBeVisible();
+      await expect(dialog.getByRole('button')).toHaveCount(0);
+      await expect(dialog).toBeFocused();
+      await page.keyboard.press('Tab');
+      await expect(dialog).toBeFocused();
+      await page.keyboard.press('Shift+Tab');
+      await expect(dialog).toBeFocused();
+      await page.keyboard.press('Escape');
+      await expect(dialog).toBeVisible();
+      expect(capabilityErrors).toContainEqual(expect.stringContaining('JS Promise Integration'));
+      expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
+    });
+  }
+}
+
+for (const entryPath of ['/', '/auth']) {
+  test(`reports a rejected JSPI probe and shows upgrade instructions on ${entryPath}`, async ({page}, testInfo) => {
+    const baseUrl = Maybe.of(testInfo.project.use.baseURL).unwrapOr('');
+    const diagnostics = captureRuntimeDiagnostics({page, baseUrl});
+    const capabilityErrors: string[] = [];
+    page.on('console', message => {
+      if (message.type() === 'error') {
+        capabilityErrors.push(message.text());
+      }
+    });
+    await page.addInitScript(() => {
+      Object.defineProperty(globalThis, 'WebAssembly', {
+        configurable: true,
+        value: new Proxy(WebAssembly, {
+          has(target, property) {
+            if (property === 'Suspending') {
+              throw new Error('simulated JSPI detection failure');
+            }
+            return Reflect.has(target, property);
+          },
+        }),
+      });
+    });
+
+    await page.goto(entryPath);
+    await expect(page.getByRole('dialog', {name: 'Update your browser to continue using Wire.'})).toBeVisible();
+    expect(capabilityErrors).toContainEqual(expect.stringContaining('JSPI feature detection failed'));
+    expect(capabilityErrors).toContainEqual(expect.stringContaining('simulated JSPI detection failure'));
+    expect(capabilityErrors).toContainEqual(
+      expect.stringContaining('missing required browser capabilities: JS Promise Integration'),
+    );
+    expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
+  });
+}
+
+test('reports missing filesystem support when JSPI is available', async ({page}) => {
+  const capabilityErrors: string[] = [];
+  page.on('console', message => {
+    if (message.type() === 'error') {
+      capabilityErrors.push(message.text());
+    }
+  });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator.storage, 'getDirectory', {value: undefined, configurable: true});
+  });
+
+  await page.goto('/');
+  await expect(page.getByRole('dialog', {name: 'Update your browser to continue using Wire.'})).toBeVisible();
+  expect(capabilityErrors).toContainEqual(expect.stringContaining('Origin Private File System'));
+  expect(capabilityErrors).not.toContainEqual(expect.stringContaining('JS Promise Integration'));
+});
+
 test('starts when service-worker cleanup finishes after DOMContentLoaded', async ({page}) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'serviceWorker', {
@@ -276,21 +373,24 @@ test('reports rejected cleanup through the invoker without an unhandled rejectio
 
   await expect(page).toHaveURL(/\/auth\//);
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
-  const cleanupFailure = reportedErrors
-    .filter(message => {
-      return message.startsWith('{');
+  await expect
+    .poll(() => {
+      return reportedErrors
+        .filter(message => {
+          return message.startsWith('{');
+        })
+        .map(message => {
+          return JSON.parse(message) as Record<string, unknown>;
+        });
     })
-    .map(message => {
-      return JSON.parse(message) as Record<string, unknown>;
-    });
-  expect(cleanupFailure).toContainEqual(
-    expect.objectContaining({
-      level: 50,
-      component: '@wireapp/webapp/FireAndForgetInvoker',
-      msg: 'failed to execute fire-and-forget action',
-      error: expect.objectContaining({message: 'simulated cleanup failure'}),
-    }),
-  );
+    .toContainEqual(
+      expect.objectContaining({
+        level: 50,
+        component: '@wireapp/webapp/FireAndForgetInvoker',
+        msg: 'failed to execute fire-and-forget action',
+        error: expect.objectContaining({message: 'simulated cleanup failure'}),
+      }),
+    );
   expect(uncaughtPageErrors).toEqual([]);
 });
 
@@ -333,6 +433,10 @@ test('bundles the application entrypoint selected for the artifact', async ({req
   expect(sourceMapResponse.ok()).toBe(true);
   expect(sourceMapText).toContain(`/main/${expectedEntrypoint}Entrypoint.tsx`);
   expect(sourceMapText).not.toContain(`/main/${excludedEntrypoint}Entrypoint.tsx`);
+  expect(sourceMapText).not.toContain('/browser/coreCryptoUpgradeModal.tsx');
+  expect(sourceMapText).not.toContain('/browser/showCoreCryptoUpgrade.tsx');
+  expect(sourceMapText).not.toContain('/localization/Localizer.ts');
+  expect(sourceMapText).not.toContain('/util/util.ts');
 });
 
 async function expectStartupSelectionSurvivesAuthentication(page: Page, selection: string): Promise<void> {

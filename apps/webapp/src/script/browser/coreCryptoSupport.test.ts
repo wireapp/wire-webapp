@@ -17,51 +17,60 @@
  *
  */
 
-import {noop} from 'noop-esm';
-
 import {
-  type CoreCryptoBrowserEnvironment,
-  getMissingCoreCryptoBrowserFeatures,
+  getCoreCryptoSupport,
   isCoreCryptoEnabled,
-  redirectIfCoreCryptoUnsupported,
+  type CoreCryptoCapabilities,
+  type CoreCryptoBrowserFeature,
 } from './coreCryptoSupport';
 
-const supportedEnvironment: CoreCryptoBrowserEnvironment = {
-  webAssembly: {Suspending: noop, promising: noop},
-  storageManager: {getDirectory: noop},
-  workerConstructor: noop,
+type SupportScenario = {
+  readonly name: string;
+  readonly capabilities: CoreCryptoCapabilities;
+  readonly missingFeatures: readonly CoreCryptoBrowserFeature[];
 };
 
-describe('getMissingCoreCryptoBrowserFeatures', () => {
-  it('accepts an environment with JSPI, OPFS, and Web Workers', () => {
-    expect(getMissingCoreCryptoBrowserFeatures(supportedEnvironment)).toEqual([]);
-  });
+const scenarios: readonly SupportScenario[] = [
+  {
+    name: 'supports all requirements',
+    capabilities: {supportsJspi: true, supportsOpfs: true, supportsWebWorkers: true, coreCryptoEnabled: true},
+    missingFeatures: [],
+  },
+  {
+    name: 'requires JSPI when CoreCrypto is enabled',
+    capabilities: {supportsJspi: false, supportsOpfs: true, supportsWebWorkers: true, coreCryptoEnabled: true},
+    missingFeatures: ['JS Promise Integration'],
+  },
+  {
+    name: 'requires OPFS when CoreCrypto is enabled',
+    capabilities: {supportsJspi: true, supportsOpfs: false, supportsWebWorkers: true, coreCryptoEnabled: true},
+    missingFeatures: ['Origin Private File System'],
+  },
+  {
+    name: 'requires workers when CoreCrypto is enabled',
+    capabilities: {supportsJspi: true, supportsOpfs: true, supportsWebWorkers: false, coreCryptoEnabled: true},
+    missingFeatures: ['Web Workers'],
+  },
+  {
+    name: 'reports all missing requirements together',
+    capabilities: {supportsJspi: false, supportsOpfs: false, supportsWebWorkers: false, coreCryptoEnabled: true},
+    missingFeatures: ['JS Promise Integration', 'Origin Private File System', 'Web Workers'],
+  },
+  {
+    name: 'does not require OPFS or workers when CoreCrypto is disabled',
+    capabilities: {supportsJspi: true, supportsOpfs: false, supportsWebWorkers: false, coreCryptoEnabled: false},
+    missingFeatures: [],
+  },
+  {
+    name: 'still requires JSPI when CoreCrypto is disabled because the bindings are imported',
+    capabilities: {supportsJspi: false, supportsOpfs: false, supportsWebWorkers: false, coreCryptoEnabled: false},
+    missingFeatures: ['JS Promise Integration'],
+  },
+];
 
-  it.each([
-    {
-      environment: {...supportedEnvironment, webAssembly: {promising: noop}},
-      missingFeature: 'JS Promise Integration',
-    },
-    {
-      environment: {...supportedEnvironment, storageManager: undefined},
-      missingFeature: 'Origin Private File System',
-    },
-    {
-      environment: {...supportedEnvironment, workerConstructor: undefined},
-      missingFeature: 'Web Workers',
-    },
-  ] as const)('reports $missingFeature when it is unavailable', ({environment, missingFeature}) => {
-    expect(getMissingCoreCryptoBrowserFeatures(environment)).toEqual([missingFeature]);
-  });
-
-  it('requires both JSPI functions and rejects non-function feature members', () => {
-    expect(
-      getMissingCoreCryptoBrowserFeatures({
-        webAssembly: {Suspending: true, promising: true},
-        storageManager: {getDirectory: 'getDirectory'},
-        workerConstructor: {},
-      }),
-    ).toEqual(['JS Promise Integration', 'Origin Private File System', 'Web Workers']);
+describe('getCoreCryptoSupport', () => {
+  it.each(scenarios)('$name', ({capabilities, missingFeatures}) => {
+    expect(getCoreCryptoSupport(capabilities)).toEqual({missingFeatures});
   });
 });
 
@@ -76,47 +85,4 @@ describe('isCoreCryptoEnabled', () => {
       expect(isCoreCryptoEnabled({supportsMls, useCoreCryptoOverride})).toBe(expected);
     },
   );
-});
-
-describe('redirectIfCoreCryptoUnsupported', () => {
-  it('does not redirect an old desktop client when CoreCrypto remains disabled', () => {
-    const onUnsupported = jest.fn();
-
-    const redirected = redirectIfCoreCryptoUnsupported({
-      coreCryptoEnabled: false,
-      environment: {},
-      onUnsupported,
-    });
-
-    expect(redirected).toBe(false);
-    expect(onUnsupported).not.toHaveBeenCalled();
-  });
-
-  it('does not redirect when every required feature is available', () => {
-    const onUnsupported = jest.fn();
-
-    const redirected = redirectIfCoreCryptoUnsupported({
-      coreCryptoEnabled: true,
-      environment: supportedEnvironment,
-      onUnsupported,
-    });
-
-    expect(redirected).toBe(false);
-    expect(onUnsupported).not.toHaveBeenCalled();
-  });
-
-  it('reports missing features and redirects when CoreCrypto is enabled', () => {
-    const onUnsupported = jest.fn();
-
-    const redirected = redirectIfCoreCryptoUnsupported({
-      coreCryptoEnabled: true,
-      environment: {},
-      onUnsupported,
-    });
-
-    expect(redirected).toBe(true);
-    expect(onUnsupported).toHaveBeenCalledWith(
-      'This browser cannot run CoreCrypto because it lacks: JS Promise Integration, Origin Private File System, Web Workers.',
-    );
-  });
 });

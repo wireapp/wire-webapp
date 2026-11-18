@@ -24,7 +24,6 @@ import 'core-js/full/reflect';
 
 import {ClientType} from '../apiClient/client/clientType';
 
-import {createRoot} from 'react-dom/client';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
@@ -39,12 +38,9 @@ import {createAccountLogCleanup} from '../logger/createAccountLogCleanup';
 import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
-import {
-  getCurrentCoreCryptoBrowserEnvironment,
-  isCoreCryptoEnabled,
-  redirectIfCoreCryptoUnsupported,
-} from '../browser/coreCryptoSupport';
 import {AppContainer} from '../components/appContainer/appContainer';
+import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
+import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
 import {Config} from '../Config';
 import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeStartupFeatureToggleUrl';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
@@ -65,11 +61,11 @@ import {getLogger} from '../util/logger';
 import {enableLogging} from '../logger/enableLogging';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {loadValue} from '../util/storageUtil';
-import {supportsMLS} from '../util/util';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
 export async function startApplication(
   defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[],
+  support: CoreCryptoSupport,
 ): Promise<void> {
   initializeStartupFeatureToggleUrl({
     url: new URL(window.location.href),
@@ -230,22 +226,6 @@ export async function startApplication(
     return;
   }
 
-  const coreCryptoEnabled = isCoreCryptoEnabled({
-    supportsMls: supportsMLS(),
-    useCoreCryptoOverride: config.FEATURE.USE_CORE_CRYPTO,
-  });
-  const redirectedForCoreCryptoSupport = redirectIfCoreCryptoUnsupported({
-    coreCryptoEnabled,
-    environment: getCurrentCoreCryptoBrowserEnvironment(),
-    onUnsupported(message) {
-      console.error(message);
-      window.location.replace(`${window.location.origin}/unsupported`);
-    },
-  });
-  if (redirectedForCoreCryptoSupport) {
-    return;
-  }
-
   const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
 
   if (isUndefined(shouldPersist)) {
@@ -297,7 +277,9 @@ export async function startApplication(
 
   globalThis.addEventListener('unload', disposeApplicationResources);
 
-  createRoot(appContainer).render(
+  renderWithCoreCryptoSupport(
+    appContainer,
+    support,
     <AppContainer
       downloadApplicationLogs={downloadApplicationLogs}
       cleanupAccountLogs={cleanupAccountLogs}

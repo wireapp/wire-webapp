@@ -17,8 +17,10 @@
  *
  */
 
-import {startApplication} from './startApplication';
-
+import {startBrowserApplication} from '../browser/startBrowserApplication';
 import {previewDefaultEnabledStartupFeatureToggleNames} from '../featureToggles/startupFeatureToggleNames';
 
-await startApplication(previewDefaultEnabledStartupFeatureToggleNames);
+await startBrowserApplication('wire-app', async support => {
+  const {startApplication} = await import('./startApplication');
+  await startApplication(previewDefaultEnabledStartupFeatureToggleNames, support);
+});
