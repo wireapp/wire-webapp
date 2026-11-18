@@ -1093,6 +1093,8 @@
   "conversationsSecondaryLineYouWereRemoved": "ඔබව ඉවත් කර ඇත",
   "conversationsWelcome": "Welcome to {brandName} 👋",
   "cookiePolicyStrings.bannerText": "අපගේ වියමන අඩවියෙහි ඔබගේ අත්දැකීම් පුද්ගලීකරණය සඳහා දත්තකඩ භාවිතා කරන්නෙමු. ඔබ අඩවිය දිගටම භාවිතා කිරීමෙන්, දත්තකඩ භාවිතයට එකඟ වේ.{newline}දත්තකඩ පිළිබඳව වැඩිදුර තොරතුරු අපගේ <strong>රහස්‍යතා ප්‍රතිපත්තියෙහි</strong> ඇත.",
+  "coreCryptoUpgradeBrowserTitle": "Update your browser to continue using {brandName}.",
+  "coreCryptoUpgradeDesktopTitle": "Update your Desktop app to continue using {brandName}.",
   "createAccount.headLine": "ඔබගේ ගිණුම පිහිටුවන්න",
   "createAccount.nextButton": "ඊළඟ",
   "createConversationAccessHeader": "Access",

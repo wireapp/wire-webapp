@@ -1093,6 +1093,8 @@
   "conversationsSecondaryLineYouWereRemoved": "あなたは削除されました",
   "conversationsWelcome": "Welcome to {brandName} 👋",
   "cookiePolicyStrings.bannerText": "私たちは当社のウェブサイト上のあなたの経験をパーソナライズするために cookie を使用します。ウェブサイトを利用し続けることによりあなたは cookie の使用に同意します。{newline}cookie に関するさらなる情報は、私たち <strong>プライバシー ポリシー</strong> で見つけることができます。",
+  "coreCryptoUpgradeBrowserTitle": "Update your browser to continue using {brandName}.",
+  "coreCryptoUpgradeDesktopTitle": "Update your Desktop app to continue using {brandName}.",
   "createAccount.headLine": "あなたのアカウントをセットアップします",
   "createAccount.nextButton": "次へ",
   "createConversationAccessHeader": "Access",

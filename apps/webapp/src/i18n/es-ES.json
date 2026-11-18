@@ -1093,6 +1093,8 @@
   "conversationsSecondaryLineYouWereRemoved": "Te han eliminado",
   "conversationsWelcome": "Welcome to {brandName} 👋",
   "cookiePolicyStrings.bannerText": "Utilizamos «cookies» para personalizar su experiencia en nuestro sitio web. Al seguir utilizando el sitio, acepta el uso de las «cookies».{newline}Encontrará más información en la <strong>normativa de privacidad</strong>.",
+  "coreCryptoUpgradeBrowserTitle": "Update your browser to continue using {brandName}.",
+  "coreCryptoUpgradeDesktopTitle": "Update your Desktop app to continue using {brandName}.",
   "createAccount.headLine": "Configurar tu cuenta",
   "createAccount.nextButton": "Siguiente",
   "createConversationAccessHeader": "Access",
