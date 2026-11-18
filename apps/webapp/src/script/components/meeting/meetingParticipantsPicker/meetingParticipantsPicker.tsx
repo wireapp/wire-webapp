@@ -56,6 +56,7 @@ import {ChevronDownIcon} from '../../../uiKit/dataDisplay/icon/chevronDownIcon';
 import {SearchIcon} from '../../../uiKit/dataDisplay/icon/searchIcon';
 import {InputLabel} from '../../../uiKit/inputs/inputLabel/inputLabel';
 import {getOverlayPortalContainer} from '../../../uiKit/utils/overlayPortal';
+import {isValidEmail} from '../../../util/validationUtil';
 import {UserSearchableList} from '../../UserSearchableList';
 
 export interface MeetingParticipantsPickerProps {
@@ -261,7 +262,7 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
               conversationState={conversationState}
               teamState={teamState}
               noUnderline={noUnderline}
-              allowRemoteSearch={isUndefined(onInvitedEmailsChange) || isFederated || !filter.includes('@')}
+              allowRemoteSearch={isUndefined(onInvitedEmailsChange) || isFederated || !isValidEmail(filter.trim())}
               filterRemoteTeamUsers={!isFederated}
               includeFederatedSearchResults={isFederated}
               showAllProvidedUsers
@@ -271,7 +272,7 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
               onContactsOpenChange={setIsContactsOpen}
               dataUieName={isNonEmptyString(dataUieName) ? `${dataUieName}-list` : undefined}
             />
-            {!isUndefined(onInvitedEmailsChange) && filter.includes('@') && (
+            {!isUndefined(onInvitedEmailsChange) && isValidEmail(filter.trim()) && (
               <button
                 type="button"
                 css={inviteByEmailActionStyles}
