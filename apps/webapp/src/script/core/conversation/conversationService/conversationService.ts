@@ -23,6 +23,7 @@ import {ConversationId} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {
+  AddUsersFailure,
   AddUsersParams,
   BaseCreateConversationResponse,
   KeyPackageClaimUser,
@@ -453,12 +454,23 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }): Promise<BaseCreateConversationResponse> {
     this.validateDomainMatch(selfUserId.domain, conversationQualifiedId.domain);
 
-    const failures = await this.mlsService.registerConversation(groupId, userIdsToAdd.concat(selfUserId), {
-      creator: {
-        user: selfUserId,
-        client: selfClientId,
-      },
-    });
+    let failures: AddUsersFailure[];
+    if (await this.mlsService.conversationExists(groupId)) {
+      // Recovery may have joined the group already. Resume membership setup without creating it again.
+      const response = await this.performAddUsersToMLSConversationAPI({
+        conversationId: conversationQualifiedId,
+        groupId,
+        qualifiedUsers: [...userIdsToAdd, {...selfUserId, skipOwnClientId: selfClientId}],
+      });
+      failures = response.failedToAdd ?? [];
+    } else {
+      failures = await this.mlsService.registerConversation(groupId, userIdsToAdd.concat(selfUserId), {
+        creator: {
+          user: selfUserId,
+          client: selfClientId,
+        },
+      });
+    }
 
     // We fetch the fresh version of the conversation created on backend with the newly added users
     const conversation = await this.apiClient.api.conversation.getConversation(conversationQualifiedId);

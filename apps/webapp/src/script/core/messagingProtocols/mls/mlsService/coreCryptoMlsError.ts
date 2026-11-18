@@ -122,6 +122,7 @@ export const shouldMLSDecryptionErrorBeIgnored = (error: unknown): error is Erro
 export const UPLOAD_COMMIT_BUNDLE_ABORT_REASONS = {
   BROKEN_MLS_CONVERSATION: 'BROKEN_MLS_CONVERSATION',
   MLS_STALE_MESSAGE: 'MLS_STALE_MESSAGE',
+  MLS_COMMIT_MISSING_REFERENCES: 'MLS_COMMIT_MISSING_REFERENCES',
   MLS_GROUP_OUT_OF_SYNC: 'MLS_GROUP_OUT_OF_SYNC',
   OTHER: 'OTHER',
 };
@@ -157,6 +158,10 @@ export function isBrokenMLSConversationError(error: unknown): error is MessageRe
 
 export function isMLSStaleMessageError(error: unknown): error is MessageRejectedError {
   return hasAbortReason(error, UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE);
+}
+
+export function isMLSCommitMissingReferencesError(error: unknown): error is MessageRejectedError {
+  return hasAbortReason(error, UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_COMMIT_MISSING_REFERENCES);
 }
 
 export function isMLSGroupOutOfSyncError(error: unknown): error is MessageRejectedError {

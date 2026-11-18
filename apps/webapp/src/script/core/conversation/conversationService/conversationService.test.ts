@@ -757,6 +757,101 @@ describe('ConversationService', () => {
     });
   });
 
+  describe('establishMLSGroupConversation recovery', () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it.each([true, false])(
+      'resumes establishment after external rejoin (missing clients: %s)',
+      async hasMissingClients => {
+        const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+        jest.useFakeTimers();
+        const groupId = 'group-establish-recovery';
+        const conversationId = {id: 'conversation-establish-recovery', domain: 'staging.zinfra.io'};
+        const selfUser = {id: 'self-user', domain: conversationId.domain};
+        const otherUser = {id: 'other-user', domain: conversationId.domain};
+        const selfClientId = 'self-client';
+        const missingReferences = makeMlsMessageRejectedError(
+          serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_COMMIT_MISSING_REFERENCES}),
+        );
+        let localGroupExists = false;
+        jest.spyOn(mlsService, 'conversationExists').mockImplementation(async () => {
+          return localGroupExists;
+        });
+        const register = jest.spyOn(mlsService, 'registerConversation').mockImplementation(async () => {
+          if (localGroupExists) {
+            throw CoreCryptoError.Mls.new({
+              mlsError: MlsError.ConversationAlreadyExists.new({conversationId: new Uint8Array([1])}),
+            });
+          }
+          // Rejected registration rolls back its transaction, so no local group remains.
+          throw missingReferences;
+        });
+        const groupInfo = new Uint8Array([2]);
+        jest.spyOn(apiClient.api.conversation, 'getGroupInfo').mockResolvedValue(groupInfo);
+        const rejoin = jest.spyOn(mlsService, 'joinByExternalCommit').mockImplementation(async getGroupInfo => {
+          expect(register).toHaveBeenCalledTimes(4);
+          expect(await getGroupInfo()).toBe(groupInfo);
+          localGroupExists = true;
+        });
+        const existingClients = ['self-user:self-client@staging.zinfra.io'];
+        jest.spyOn(mlsService, 'getClientIdsInGroup').mockResolvedValue(existingClients);
+        const keyPackages = hasMissingClients ? [new Uint8Array([3])] : [];
+        const failedToAdd: AddUsersFailure[] = [
+          {reason: AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED, users: [otherUser]},
+        ];
+        jest.spyOn(mlsService, 'getKeyPackagesPayload').mockResolvedValue({keyPackages, failures: failedToAdd});
+        let membershipUpdated = false;
+        jest.spyOn(mlsService, 'addUsersToExistingConversation').mockImplementation(async () => {
+          expect(localGroupExists).toBe(true);
+          membershipUpdated = true;
+        });
+        const joinedConversation = {
+          qualified_id: conversationId,
+          group_id: groupId,
+          protocol: CONVERSATION_PROTOCOL.MLS,
+          epoch: 1,
+        } as Conversation;
+        const updatedConversation = {...joinedConversation, epoch: 2};
+        jest.spyOn(apiClient.api.conversation, 'getConversation').mockImplementation(async () => {
+          return membershipUpdated ? updatedConversation : joinedConversation;
+        });
+
+        const result = conversationService
+          .establishMLSGroupConversation(groupId, [otherUser], selfUser, selfClientId, conversationId)
+          .then(
+            response => {
+              return {response};
+            },
+            error => {
+              return {error};
+            },
+          );
+        await jest.runAllTimersAsync();
+        expect(await result).toEqual({
+          response: {
+            conversation: hasMissingClients ? updatedConversation : joinedConversation,
+            failedToAdd,
+          },
+        });
+
+        expect(register).toHaveBeenCalledTimes(4);
+        expect(rejoin).toHaveBeenCalledTimes(1);
+        expect(mlsService.getClientIdsInGroup).toHaveBeenCalledWith(groupId);
+        expect(mlsService.getKeyPackagesPayload).toHaveBeenCalledWith(
+          [otherUser, {...selfUser, skipOwnClientId: selfClientId}],
+          existingClients,
+        );
+        expect(mlsService.addUsersToExistingConversation).toHaveBeenCalledTimes(hasMissingClients ? 1 : 0);
+        if (hasMissingClients) {
+          expect(mlsService.addUsersToExistingConversation).toHaveBeenCalledWith(groupId, keyPackages);
+        }
+        expect(mlsService.updateKeyingMaterialForConversation).not.toHaveBeenCalled();
+      },
+    );
+  });
+
   describe('domain mismatch guards', () => {
     it('throws when establishing MLS group conversation with mismatched self and conversation domains', async () => {
       const [conversationService, {mlsService}] = await buildConversationService();

@@ -70,6 +70,8 @@ import {
   ConversationMLSMessageAddEvent,
   ConversationMLSWelcomeEvent,
 } from '../../../../apiClient/event/conversationEvent';
+import {BackendError} from '../../../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../../../apiClient/http/backendErrorLabel';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {Converter} from '../../../../commons/base64/converter';
 import {Decoder} from '../../../../commons/base64/decoder';
@@ -428,6 +430,12 @@ export class MLSService extends TypedEventEmitter<Events> {
         reason: serializeAbortReason({
           message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION,
         }),
+      });
+    }
+
+    if (error instanceof BackendError && error.label === BackendErrorLabel.MLS_COMMIT_MISSING_REFERENCES) {
+      return MlsTransportError.MessageRejected.new({
+        reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_COMMIT_MISSING_REFERENCES}),
       });
     }
 

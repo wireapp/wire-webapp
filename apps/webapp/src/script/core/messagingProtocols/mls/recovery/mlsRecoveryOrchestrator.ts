@@ -81,7 +81,15 @@ export enum RecoveryActionKind {
  * Retry behavior for an operation under recovery.
  */
 export type RetryPolicy = {
-  maxAttempts: number;
+  /** Retry the complete operation before performing the recovery action. */
+  beforeRecovery?: {
+    /** Number of retries after the initial failed attempt. */
+    maxRetries: number;
+    /** Delay before the first retry; subsequent delays grow by backoffFactor. */
+    delayMs: number;
+    backoffFactor: number;
+  };
+  /** Delay after successful recovery, before re-running the original operation. */
   delayMs?: number;
   /**
    * Whether to retry the original operation once after a successful recovery
@@ -195,15 +203,22 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
   ) {}
 
   /**
-   * Execute the provided callback, and on failure, map and perform a configured recovery.
+   * Execute the callback, then apply any configured delayed retries before recovery.
    * If {@link RetryPolicy.reRunOriginalOperation} is true, the callback is re-invoked once after recovery.
    */
   public async execute(params: executeParams<void>): Promise<void>;
   public async execute<T>(params: executeParams<T>): Promise<T>;
-  public async execute<T>({context, callBack, retry = true, seedError}: executeParams<T>): Promise<T | void> {
+  public async execute<T>(params: executeParams<T>): Promise<T | void> {
+    return this.executeAttempt(params, 0);
+  }
+
+  private async executeAttempt<T>(
+    {context, callBack, retry = true, seedError}: executeParams<T>,
+    retryCount: number,
+  ): Promise<T | void> {
     try {
       this.logger.info('Executing MLS operation with recovery orchestration', {context});
-      if (seedError !== undefined) {
+      if (!isUndefined(seedError)) {
         throw seedError;
       }
       return await callBack();
@@ -223,6 +238,15 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
         throw rawError;
       }
 
+      // Retry outside the failed transaction so incoming state can be processed between attempts.
+      const backoff = policy.retryConfig.beforeRecovery;
+      if (!isUndefined(backoff) && retryCount < backoff.maxRetries) {
+        const delayMs = backoff.delayMs * backoff.backoffFactor ** retryCount;
+        this.logger.info('Retrying MLS operation before recovery', {context, retryCount, delayMs});
+        await this.sleep(delayMs);
+        return this.executeAttempt({context, callBack, retry}, retryCount + 1);
+      }
+
       const key = this.getRecoveryKey(context, policy.action);
       await this.performRecovery(context, normalizedError, policy, key);
       await this.maybeDelay(policy.retryConfig);
@@ -238,7 +262,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
   private getPolicyFor = (err: DomainMlsError, ctx: OperationContext): RecoveryPolicy => {
     const entry = this.policies[err.type];
     if (entry === undefined) {
-      return {action: RecoveryActionKind.Unknown, retryConfig: {maxAttempts: 0}};
+      return {action: RecoveryActionKind.Unknown, retryConfig: {}};
     }
 
     if (isRecoveryPolicy(entry)) {
@@ -246,7 +270,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
     }
 
     const perOperationPolicy = entry;
-    return perOperationPolicy[ctx.operationName] ?? {action: RecoveryActionKind.Unknown, retryConfig: {maxAttempts: 0}};
+    return perOperationPolicy[ctx.operationName] ?? {action: RecoveryActionKind.Unknown, retryConfig: {}};
   };
 
   /**
@@ -394,6 +418,12 @@ function extractErrorDetails(error: unknown): unknown {
   return isEmptyObject(details) ? '(no meaningful data)' : details;
 }
 
+const commitMissingReferencesBackoff = {
+  maxRetries: 3,
+  delayMs: 1_000,
+  backoffFactor: 2,
+};
+
 /**
  *
  * Highlights:
@@ -404,101 +434,127 @@ function extractErrorDetails(error: unknown): unknown {
  * - OrphanWelcome (welcome): attempt join via external commit; do not re-run.
  */
 export const minimalDefaultPolicies: PolicyTable = {
+  CommitMissingReferences: {
+    send: {
+      action: RecoveryActionKind.JoinViaExternalCommit,
+      retryConfig: {beforeRecovery: commitMissingReferencesBackoff, reRunOriginalOperation: true},
+    },
+    establishGroup: {
+      action: RecoveryActionKind.JoinViaExternalCommit,
+      retryConfig: {beforeRecovery: commitMissingReferencesBackoff, reRunOriginalOperation: true},
+    },
+    addUsers: {
+      action: RecoveryActionKind.JoinViaExternalCommit,
+      retryConfig: {beforeRecovery: commitMissingReferencesBackoff, reRunOriginalOperation: true},
+    },
+    removeUsers: {
+      action: RecoveryActionKind.JoinViaExternalCommit,
+      retryConfig: {beforeRecovery: commitMissingReferencesBackoff, reRunOriginalOperation: true},
+    },
+    keyMaterialUpdate: {
+      action: RecoveryActionKind.JoinViaExternalCommit,
+      retryConfig: {beforeRecovery: commitMissingReferencesBackoff, reRunOriginalOperation: true},
+    },
+    joinExternalCommit: {
+      action: RecoveryActionKind.JoinViaExternalCommit,
+      retryConfig: {beforeRecovery: commitMissingReferencesBackoff, reRunOriginalOperation: false},
+    },
+  },
   WrongEpoch: {
     // For join operations, recover from epoch mismatch; do not re-run original op
     joinExternalCommit: {
       action: RecoveryActionKind.RecoverFromEpochMismatch,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: false},
+      retryConfig: {reRunOriginalOperation: false},
     },
     // For non-join operations, recover from epoch mismatch and retry original once
     send: {
       action: RecoveryActionKind.RecoverFromEpochMismatch,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+      retryConfig: {reRunOriginalOperation: true},
     },
     establishGroup: {
       action: RecoveryActionKind.RecoverFromEpochMismatch,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+      retryConfig: {reRunOriginalOperation: true},
     },
     addUsers: {
       action: RecoveryActionKind.RecoverFromEpochMismatch,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+      retryConfig: {reRunOriginalOperation: true},
     },
     removeUsers: {
       action: RecoveryActionKind.RecoverFromEpochMismatch,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+      retryConfig: {reRunOriginalOperation: true},
     },
     // For inbound message-add processing, fix epoch and allow normal flow to progress (no auto re-run)
     handleMessageAdd: {
       action: RecoveryActionKind.RecoverFromEpochMismatch,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+      retryConfig: {reRunOriginalOperation: true},
     },
     // Once the epoch is re-synced, publishing keying material again in a fresh transaction can
     // succeed, so the original operation is worth re-running.
     keyMaterialUpdate: {
       action: RecoveryActionKind.RecoverFromEpochMismatch,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+      retryConfig: {reRunOriginalOperation: true},
     },
   },
   // Use per-operation semantics so typed operations re-run once post-recovery
   GroupNotEstablished: {
     joinExternalCommit: {
       action: RecoveryActionKind.ResetAndReestablish,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: false},
+      retryConfig: {reRunOriginalOperation: false},
     },
     establishGroup: {
       action: RecoveryActionKind.ResetAndReestablish,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+      retryConfig: {reRunOriginalOperation: true},
     },
-    send: {action: RecoveryActionKind.ResetAndReestablish, retryConfig: {maxAttempts: 1, reRunOriginalOperation: true}},
+    send: {action: RecoveryActionKind.ResetAndReestablish, retryConfig: {reRunOriginalOperation: true}},
     addUsers: {
       action: RecoveryActionKind.ResetAndReestablish,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+      retryConfig: {reRunOriginalOperation: true},
     },
     removeUsers: {
       action: RecoveryActionKind.ResetAndReestablish,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+      retryConfig: {reRunOriginalOperation: true},
     },
     keyMaterialUpdate: {
       action: RecoveryActionKind.ResetAndReestablish,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: false},
+      retryConfig: {reRunOriginalOperation: false},
     },
   },
   GroupOutOfSync: {
     establishGroup: {
       action: RecoveryActionKind.AddMissingUsers,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+      retryConfig: {reRunOriginalOperation: true},
     },
-    send: {action: RecoveryActionKind.AddMissingUsers, retryConfig: {maxAttempts: 1, reRunOriginalOperation: true}},
-    addUsers: {action: RecoveryActionKind.AddMissingUsers, retryConfig: {maxAttempts: 1, reRunOriginalOperation: true}},
+    send: {action: RecoveryActionKind.AddMissingUsers, retryConfig: {reRunOriginalOperation: true}},
+    addUsers: {action: RecoveryActionKind.AddMissingUsers, retryConfig: {reRunOriginalOperation: true}},
     removeUsers: {
       action: RecoveryActionKind.AddMissingUsers,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+      retryConfig: {reRunOriginalOperation: true},
     },
     keyMaterialUpdate: {
       action: RecoveryActionKind.AddMissingUsers,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: false},
+      retryConfig: {reRunOriginalOperation: false},
     },
   },
   ConversationAlreadyExists: {
     establishGroup: {
       action: RecoveryActionKind.JoinViaExternalCommit,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: false},
+      retryConfig: {reRunOriginalOperation: false},
     },
     // For welcome handling, wipe local state; do not auto re-run the original callback
     handleWelcome: {
       action: RecoveryActionKind.WipeAndReprocessWelcome,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+      retryConfig: {reRunOriginalOperation: true},
     },
   },
   OrphanWelcome: {
     establishGroup: {
       action: RecoveryActionKind.JoinViaExternalCommit,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: false},
+      retryConfig: {reRunOriginalOperation: false},
     },
     // For orphan welcome, attempt an external commit join; no auto re-run
     handleWelcome: {
       action: RecoveryActionKind.JoinViaExternalCommit,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: false},
+      retryConfig: {reRunOriginalOperation: false},
     },
   },
 };
