@@ -65,14 +65,14 @@ describe('startupFeatureToggles', function () {
       websocketListenerLifecycleFeatureToggleName,
     ]);
   });
-  it('keeps persistent browser logs disabled for release and preview builds and preserves explicit opt-in alongside other toggles', () => {
+  it('defaults persistent browser logs on in preview builds and supports release opt-in alongside other toggles', () => {
     const disabled = createStartupFeatureTogglesFromLocationSearch('');
     const enabled = createStartupFeatureTogglesFromLocationSearch(
       '?enabled-features=mark-as-unread,persistent-browser-logs',
     );
 
     expect(disabled.isFeatureToggleEnabled(persistentBrowserLogsFeatureToggleName)).toBe(false);
-    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(persistentBrowserLogsFeatureToggleName);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(persistentBrowserLogsFeatureToggleName);
     expect(enabled.enabledFeatureToggleNames).toEqual([
       markAsUnreadFeatureToggleName,
       persistentBrowserLogsFeatureToggleName,
