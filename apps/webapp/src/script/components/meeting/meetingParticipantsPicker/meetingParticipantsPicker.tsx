@@ -30,6 +30,7 @@ import {
   controlStyles,
   dialogStyles,
   emailErrorStyles,
+  inviteByEmailActionStyles,
   listContainerStyles,
   popoverOverlayStyles,
   popoverStyles,
@@ -63,6 +64,7 @@ export interface MeetingParticipantsPickerProps {
   users: User[];
   selectedUsers: User[];
   invitedEmails?: string[];
+  isFederated?: boolean;
   onInvitedEmailsChange?: (emails: string[]) => void;
   onSelectedUsersChange: (users: User[]) => void;
   filter: string;
@@ -88,6 +90,7 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
   users,
   selectedUsers,
   invitedEmails,
+  isFederated = false,
   onInvitedEmailsChange,
   onSelectedUsersChange,
   filter,
@@ -138,7 +141,7 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
     onFilterChange,
     conversationRepository,
   });
-  const {emailError, clearEmailError, handleEmailKeyDown, removeEmail} = useMeetingEmailInvitees({
+  const {emailError, clearEmailError, handleEmailKeyDown, selectEmail, removeEmail} = useMeetingEmailInvitees({
     invitedEmails,
     onInvitedEmailsChange,
     onFilterChange,
@@ -258,8 +261,9 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
               conversationState={conversationState}
               teamState={teamState}
               noUnderline={noUnderline}
-              allowRemoteSearch={isUndefined(onInvitedEmailsChange) || !filter.includes('@')}
-              filterRemoteTeamUsers
+              allowRemoteSearch={isUndefined(onInvitedEmailsChange) || isFederated || !filter.includes('@')}
+              filterRemoteTeamUsers={!isFederated}
+              includeFederatedSearchResults={isFederated}
               showAllProvidedUsers
               hideEmptyState={matchingConversations.length > 0}
               showSelectedUsersRegardlessOfFilter
@@ -267,6 +271,18 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
               onContactsOpenChange={setIsContactsOpen}
               dataUieName={isNonEmptyString(dataUieName) ? `${dataUieName}-list` : undefined}
             />
+            {!isUndefined(onInvitedEmailsChange) && filter.includes('@') && (
+              <button
+                type="button"
+                css={inviteByEmailActionStyles}
+                data-uie-name="invite-by-email"
+                onClick={() => {
+                  return selectEmail(filter);
+                }}
+              >
+                {translate('meetings.scheduleModal.inviteByEmail')}
+              </button>
+            )}
             <MeetingConversationsSearchableList
               id={id}
               conversations={matchingConversations}
