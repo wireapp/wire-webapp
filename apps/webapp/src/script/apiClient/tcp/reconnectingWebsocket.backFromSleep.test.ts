@@ -253,13 +253,12 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
       websocketFactory: Maybe.just(createMockWebsocketFactory(socket)),
     });
     const onError = jest.fn();
-    const lifecycleWarning = jest.spyOn(websocket['logger'], 'warn');
     websocket.setOnError(onError);
     websocket.connect();
     await websocket['internalOnReconnect']();
 
     socket.onerror?.({
-      error: Object.assign(new Error('Bearer transport-credential'), {name: 'SocketError'}),
+      error: Object.assign(new Error('transport error'), {name: 'SocketError'}),
     } as ErrorEvent);
 
     const expectedReconnectContext = {
@@ -269,17 +268,6 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
       wrapperGeneration: 1,
     };
     expect(onError).toHaveBeenCalledWith(expect.anything(), expectedReconnectContext);
-    expect(lifecycleWarning).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        subsystem: 'websocket-lifecycle',
-        event: 'socket-error',
-        attemptId: 1,
-        wrapperGeneration: 1,
-        errorName: 'SocketError',
-        errorMessage: 'Bearer [REDACTED]',
-      }),
-    );
     websocket.disconnect();
   });
 

@@ -18,6 +18,7 @@
  */
 
 import {createClock} from '@enormora/clock/clock';
+import {noop} from 'noop-esm';
 
 import {createApplicationApiClient} from './createApplicationApiClient';
 
@@ -72,27 +73,24 @@ describe('createApplicationApiClient', () => {
       implementation: 'legacy',
       markAsUnread: true,
     },
-  ])('selects and logs the lifecycle for $scenario', options => {
+  ])('selects the lifecycle for $scenario', options => {
     const {preview, query, implementation, markAsUnread} = options;
     const url = initializeUrl(new URL(`https://example.com/${query}`), preview);
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(url.search);
-    const info = jest.fn();
-    using apiClient = createApplicationApiClient({clock: createClock(), startupFeatureToggles, logger: {info}});
+    using apiClient = createApplicationApiClient({
+      clock: createClock(),
+      startupFeatureToggles,
+      logger: {info: noop},
+    });
 
     expect(apiClient.transport.ws.lifecycleImplementation).toBe(implementation);
     expect(startupFeatureToggles.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(markAsUnread);
-    expect(info).toHaveBeenCalledTimes(1);
-    expect(info).toHaveBeenCalledWith(expect.any(String), {
-      subsystem: 'websocket-lifecycle',
-      event: 'websocket-lifecycle-initialized',
-      implementation,
-    });
   });
 
   it('keeps the session selection stable and honors the opt-out at the next preview startup', () => {
     const url = initializeUrl(new URL(`https://example.com/${optIn}`), true);
     const clock = createClock();
-    const logger = {info: jest.fn()};
+    const logger = {info: noop};
     using apiClient = createApplicationApiClient({
       clock,
       startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(url.search),

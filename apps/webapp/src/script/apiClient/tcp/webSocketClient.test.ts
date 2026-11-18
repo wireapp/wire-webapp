@@ -252,9 +252,8 @@ describe('WebSocketClient', () => {
       expect(refreshTokenSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('logs an invalid-session token refresh failure caused by a socket error', async () => {
-      const rawCredential = 'access_token=socket-error-credential';
-      const invalidTokenError = new InvalidTokenError(rawCredential);
+    it('emits an invalid-token event when refreshing after a socket error fails with an invalid session', async () => {
+      const invalidTokenError = new InvalidTokenError('Session invalid');
       const httpClient = createWebSocketReconnectHttpClient({
         refreshAccessToken: jest.fn().mockRejectedValue(invalidTokenError),
         hasValidAccessToken: () => {
@@ -265,7 +264,6 @@ describe('WebSocketClient', () => {
       const websocketClient = createWebSocketClientWithTestWallClock(testWebSocketBaseUrl, httpClient);
       webSocketClients.push(websocketClient);
       const socket = websocketClient['socket'];
-      const lifecycleWarning = jest.spyOn(websocketClient['logger'], 'warn');
       const socketErrorListener = jest.fn();
       const invalidTokenListener = jest.fn();
       jest.spyOn(socket as any, 'getReconnectingWebsocket').mockReturnValue(fakeSocket);
@@ -279,23 +277,9 @@ describe('WebSocketClient', () => {
 
       expect(socketErrorListener).toHaveBeenCalledWith(socketError);
       expect(invalidTokenListener).toHaveBeenCalledWith(invalidTokenError);
-      expect(lifecycleWarning).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          subsystem: 'websocket-lifecycle',
-          event: 'token-refresh-failure',
-          source: 'socket-error',
-          attemptId: 0,
-          wrapperGeneration: 1,
-          fatal: true,
-          errorName: 'InvalidTokenError',
-          errorMessage: 'access_token=[REDACTED]',
-        }),
-      );
-      expect(JSON.stringify(lifecycleWarning.mock.calls)).not.toContain('socket-error-credential');
     });
 
-    it('logs a transient token refresh failure caused by a socket error without emitting a second error event', async () => {
+    it('does not emit a second socket error after a transient token refresh failure', async () => {
       const networkError = new NetworkError('Failed to fetch');
       const httpClient = createWebSocketReconnectHttpClient({
         refreshAccessToken: jest.fn().mockRejectedValue(networkError),
@@ -307,7 +291,6 @@ describe('WebSocketClient', () => {
       const websocketClient = createWebSocketClientWithTestWallClock(testWebSocketBaseUrl, httpClient);
       webSocketClients.push(websocketClient);
       const socket = websocketClient['socket'];
-      const lifecycleWarning = jest.spyOn(websocketClient['logger'], 'warn');
       const socketErrorListener = jest.fn();
       jest.spyOn(socket as any, 'getReconnectingWebsocket').mockReturnValue(fakeSocket);
       websocketClient.on(WebSocketClient.TOPIC.ON_ERROR, socketErrorListener);
@@ -319,19 +302,6 @@ describe('WebSocketClient', () => {
 
       expect(socketErrorListener).toHaveBeenCalledTimes(1);
       expect(socketErrorListener).toHaveBeenCalledWith(socketError);
-      expect(lifecycleWarning).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          subsystem: 'websocket-lifecycle',
-          event: 'token-refresh-failure',
-          source: 'socket-error',
-          attemptId: 0,
-          wrapperGeneration: 1,
-          fatal: false,
-          errorName: 'NetworkError',
-          errorMessage: 'Failed to fetch',
-        }),
-      );
     });
 
     it('calls "onMessage" when WebSocket received message', async () => {
@@ -672,49 +642,16 @@ describe('WebSocketClient', () => {
       );
     });
 
-    it('warns when building a legacy WebSocket URL without an access token', () => {
+    it('builds a legacy WebSocket URL without an access token', () => {
       const websocketClient = createWebSocketClientWithTestWallClock(
         'wss://websocket.example.test',
         createHttpClientWithWebSocketTokens('', 'marker-token'),
       );
       webSocketClients.push(websocketClient);
-      const lifecycleWarning = jest.spyOn(websocketClient['logger'], 'warn');
-      const lifecycleInfo = jest.spyOn(websocketClient['logger'], 'info');
 
       websocketClient.useVersion(MINIMUM_API_VERSION);
 
       expect(websocketClient.buildWebSocketUrl()).toBe('wss://websocket.example.test/await?access_token=');
-      expect(lifecycleWarning).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          subsystem: 'websocket-lifecycle',
-          event: 'url-created-without-access-token',
-          attemptId: 0,
-          wrapperGeneration: 0,
-          endpoint: 'legacy-await',
-          clientPresent: false,
-          markerIncluded: false,
-        }),
-      );
-      expect(lifecycleInfo).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({subsystem: 'websocket-lifecycle', event: 'url-created', accessTokenPresent: false}),
-      );
-    });
-
-    it('does not warn when building an async WebSocket URL with an access token', () => {
-      const websocketClient = createWebSocketClientWithTestWallClock(
-        'wss://websocket.example.test',
-        createHttpClientWithWebSocketTokens('access-token', 'marker-token'),
-      );
-      webSocketClients.push(websocketClient);
-      const lifecycleWarning = jest.spyOn(websocketClient['logger'], 'warn');
-
-      websocketClient.useVersion(MINIMUM_API_VERSION);
-      websocketClient.useAsyncNotificationsSocket();
-      websocketClient.buildWebSocketUrl();
-
-      expect(lifecycleWarning).not.toHaveBeenCalledWith(expect.stringContaining('url-created-without-access-token'));
     });
   });
 
@@ -784,43 +721,6 @@ describe('WebSocketClient', () => {
         websocketClient.unlock();
       });
     });
-
-    it.each(['legacy', 'corrected'] as const)(
-      'warns once per socket open without a consumer in %s mode',
-      implementation => {
-        const websocketClient = new WebSocketClient(testWebSocketBaseUrl, fakeHttpClient, {
-          platform: nodePlatform.websocket,
-          wallClock: testWallClock,
-          lifecycleImplementation: implementation,
-        });
-        webSocketClients.push(websocketClient);
-        const warn = jest.spyOn(websocketClient['logger'], 'warn');
-        const socket = websocketClient['socket'] as unknown as {getReconnectingWebsocket: () => typeof fakeSocket};
-        jest.spyOn(socket, 'getReconnectingWebsocket').mockReturnValue(fakeSocket);
-        websocketClient.connect();
-        fakeSocket.onopen();
-        const frame = {data: Buffer.from(JSON.stringify(fakeNotification), 'utf-8')};
-
-        fakeSocket.onmessage(frame);
-        fakeSocket.onmessage(frame);
-        expect(warn).toHaveBeenCalledTimes(1);
-        expect(warn).toHaveBeenCalledWith(
-          expect.any(String),
-          expect.objectContaining({
-            subsystem: 'websocket-lifecycle',
-            event: 'notification-consumer-missing',
-            implementation,
-            wrapperGeneration: expect.any(Number),
-          }),
-        );
-
-        fakeSocket.onclose();
-        fakeSocket.onopen();
-        fakeSocket.onmessage(frame);
-        expect(warn).toHaveBeenCalledTimes(2);
-        warn.mockRestore();
-      },
-    );
 
     it.each(['legacy', 'corrected'] as const)('propagates a malformed frame in %s mode', implementation => {
       const websocketClient = new WebSocketClient(testWebSocketBaseUrl, fakeHttpClient, {

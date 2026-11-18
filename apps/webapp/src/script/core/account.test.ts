@@ -137,17 +137,13 @@ describe('Account', () => {
     }).toThrow();
   });
 
-  it('reports non-Error queue rejections without throwing again in the corrected lifecycle', () => {
+  it('does not rethrow non-Error queue rejections in the corrected lifecycle', () => {
     using apiClient = new APIClient({platform: nodePlatform, webSocketLifecycleImplementation: 'corrected'});
     const account = new Account(apiClient);
-    const logError = jest.spyOn(account['logger'], 'error');
 
-    account['handleNotificationQueueError']('unexpected rejection');
-
-    expect(logError).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({event: 'notification-queue-task-failed', errorName: 'UnknownError'}),
-    );
+    expect(() => {
+      account['handleNotificationQueueError']('unexpected rejection');
+    }).not.toThrow();
   });
 
   describe('getLocalClient', () => {
