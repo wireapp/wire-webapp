@@ -128,6 +128,28 @@ const waitFor = (assertion: () => void): Promise<void> => {
 };
 
 describe('Account', () => {
+  it('preserves non-Error queue rejection propagation in the legacy lifecycle', () => {
+    using apiClient = new APIClient({platform: nodePlatform, webSocketLifecycleImplementation: 'legacy'});
+    const account = new Account(apiClient);
+
+    expect(() => {
+      account['handleNotificationQueueError']('unexpected rejection');
+    }).toThrow();
+  });
+
+  it('reports non-Error queue rejections without throwing again in the corrected lifecycle', () => {
+    using apiClient = new APIClient({platform: nodePlatform, webSocketLifecycleImplementation: 'corrected'});
+    const account = new Account(apiClient);
+    const logError = jest.spyOn(account['logger'], 'error');
+
+    account['handleNotificationQueueError']('unexpected rejection');
+
+    expect(logError).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({event: 'notification-queue-task-failed', errorName: 'UnknownError'}),
+    );
+  });
+
   describe('getLocalClient', () => {
     it('returns Err when the client service has not been initialized', async () => {
       const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});

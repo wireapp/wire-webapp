@@ -1353,26 +1353,23 @@ export class Account extends TypedEventEmitter<Events> {
 
         this.notificationProcessingQueue
           .add(() => {
-            return match(notification)
-              .with({type: ConsumableEvent.SYNCHRONIZATION}, synchronization => {
-                return this.handleSynchronizationNotification({
-                  notification: synchronization,
-                  onConnectionStateChanged,
-                  connectionContext,
-                  signal,
-                });
-              })
-              .with({type: ConsumableEvent.EVENT}, event => {
-                return this.decryptAckEmitNotification({
-                  notification: event,
-                  handleEvent,
-                  source,
-                  onNotificationStreamProgress,
-                  connectionContext,
-                  signal,
-                });
-              })
-              .exhaustive();
+            if (notification.type === ConsumableEvent.SYNCHRONIZATION) {
+              return this.handleSynchronizationNotification({
+                notification,
+                onConnectionStateChanged,
+                connectionContext,
+                signal,
+              });
+            }
+
+            return this.decryptAckEmitNotification({
+              notification,
+              handleEvent,
+              source,
+              onNotificationStreamProgress,
+              connectionContext,
+              signal,
+            });
           })
           .catch(this.handleNotificationQueueError);
       } catch (error: unknown) {
@@ -1387,6 +1384,11 @@ export class Account extends TypedEventEmitter<Events> {
   }
 
   private readonly handleNotificationQueueError = (error: unknown): void => {
+    const preserveLegacyRejection = this.webSocketLifecycleImplementation === 'legacy' && !(error instanceof Error);
+    if (preserveLegacyRejection) {
+      throw error;
+    }
+
     if (error instanceof TimeoutError) {
       this.logger.warn('Notification decryption task timed out', {error});
       return;
@@ -1534,7 +1536,7 @@ export class Account extends TypedEventEmitter<Events> {
   private readonly createLegacyMissedNotificationsHandler = (
     onMissedNotifications: (notificationId: string) => void,
   ) => {
-    return (notificationId: string) => {
+    return async (notificationId: string) => {
       if (this.hasMLSDevice) {
         void queueConversationRejoin('all-conversations', () => {
           const accountServices = this.service;
@@ -1578,7 +1580,7 @@ export class Account extends TypedEventEmitter<Events> {
     checkSocketCancellation = false,
   }: {
     handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>;
-    handleMissedNotifications: (notificationId: string) => void;
+    handleMissedNotifications: (notificationId: string) => Promise<void>;
     onConnectionStateChanged: (state: ConnectionState) => void;
     getCurrentWebSocketConnectionContext?: () => Maybe<WebSocketConnectionContext>;
     ownsConnection?: () => boolean;
@@ -1625,7 +1627,7 @@ export class Account extends TypedEventEmitter<Events> {
         },
         notificationId => {
           if (!isObsolete()) {
-            handleMissedNotifications(notificationId);
+            void handleMissedNotifications(notificationId);
           }
         },
         abortController.unwrapOr(undefined),

@@ -178,10 +178,7 @@ export class WebSocketClient extends EventEmitter {
         ...this.openConnectionContext.unwrapOr({}),
         errorName: StringUtil.getSafeErrorDetails(error).errorName,
       });
-      if (!this.usesCorrectedLifecycle) {
-        throw error;
-      }
-      return;
+      throw error;
     }
     this.logger.debug('WebSocket notification parsed and ready for dispatch', {
       subsystem: 'websocket-lifecycle',
@@ -616,8 +613,7 @@ export class WebSocketClient extends EventEmitter {
       accessTokenStore: {getAccessToken, getNextMarkerToken},
     } = this.client;
     const accessToken = getAccessToken?.() ?? '';
-    const skipMarker = this.usesCorrectedLifecycle && this.useLegacySocket;
-    const markerToken = skipMarker ? '' : (getNextMarkerToken?.() ?? '');
+    const markerToken = getNextMarkerToken?.() ?? '';
     const markerIncluded = !this.useLegacySocket && markerToken.length > 0;
 
     if (!Boolean(this.versionPrefix)) {

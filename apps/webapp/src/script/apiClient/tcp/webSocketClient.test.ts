@@ -822,6 +822,22 @@ describe('WebSocketClient', () => {
       },
     );
 
+    it.each(['legacy', 'corrected'] as const)('propagates a malformed frame in %s mode', implementation => {
+      const websocketClient = new WebSocketClient(testWebSocketBaseUrl, fakeHttpClient, {
+        platform: nodePlatform.websocket,
+        wallClock: testWallClock,
+        lifecycleImplementation: implementation,
+      });
+      webSocketClients.push(websocketClient);
+      const listener = jest.fn();
+      websocketClient.on(WebSocketClient.TOPIC.ON_MESSAGE, listener);
+
+      expect(() => {
+        websocketClient['onMessage']('{malformed');
+      }).toThrow(SyntaxError);
+      expect(listener).not.toHaveBeenCalled();
+    });
+
     it('does not open the transport if a synchronous state callback disconnects it', () => {
       const websocketClient = createWebSocketClientWithTestWallClock(testWebSocketBaseUrl, fakeHttpClient);
       webSocketClients.push(websocketClient);
