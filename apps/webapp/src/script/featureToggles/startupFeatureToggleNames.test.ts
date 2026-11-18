@@ -27,6 +27,7 @@ import {
   sendCallLogsFeatureToggleName,
   startupFeatureToggleNames,
   startupFeatureToggleRegistry,
+  noteTakerFeatureToggleName,
 } from './startupFeatureToggleNames';
 
 describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
@@ -88,5 +89,12 @@ describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
       previewDefaultEnabled: false,
     });
     expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(forTestsOnlyFeatureToggleName);
+  });
+  it('keeps the experimental note taker disabled by default', () => {
+    expect(startupFeatureToggleRegistry).toContainEqual({
+      name: noteTakerFeatureToggleName,
+      previewDefaultEnabled: false,
+    });
+    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(noteTakerFeatureToggleName);
   });
 });

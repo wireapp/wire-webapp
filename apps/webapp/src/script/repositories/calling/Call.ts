@@ -75,6 +75,7 @@ export class Call {
   public readonly maximizedParticipant: ko.Observable<Participant | null>;
   public readonly isActive: ko.PureComputed<boolean>;
   public readonly epochCache = new CallingEpochCache();
+  private readonly noteTakerAudioIdentities = new Map<string, {userId: QualifiedId; clientId: ClientId}>();
   private readonly audios: Record<string, {audioElement: HTMLAudioElement | null; stream: MediaStream}> = {};
   /**
    * set to `true` if anyone has enabled their video during a call (used for analytics)
@@ -140,11 +141,39 @@ export class Call {
     return selfParticipant ?? this.selfParticipant;
   }
 
+  /** Experimental AVS hook: identity of the authenticated sender currently feeding a receiver track. */
+  setNoteTakerAudioIdentity(trackId: string, userId: QualifiedId, clientId: ClientId): void {
+    this.noteTakerAudioIdentities.set(trackId, {userId, clientId});
+  }
+
+  getNoteTakerAudioParticipant(trackId: string): Participant | undefined {
+    const identity = this.noteTakerAudioIdentities.get(trackId);
+    return isUndefined(identity) ? undefined : this.getParticipant(identity.userId, identity.clientId);
+  }
+
+  /** Read-only audio tap for the opt-in note taker experiment. */
+  getNoteTakerAudioStreams(): MediaStream[] {
+    const local = this.getSelfParticipant().audioStream();
+    return [
+      ...(isUndefined(local) ? [] : [local]),
+      ...Object.values(this.audios).map(audio => {
+        return audio.stream;
+      }),
+    ];
+  }
+
   addAudio(audioId: string, stream: MediaStream): void {
+    // Sender metadata can refresh the same stream without replacing its audio element.
+    if (this.audios[audioId]?.stream === stream) {
+      return;
+    }
     this.audios[audioId] = {audioElement: null, stream};
   }
 
   removeAudio(audioId: string): void {
+    this.audios[audioId]?.stream.getAudioTracks().forEach(track => {
+      this.noteTakerAudioIdentities.delete(track.id);
+    });
     this.releaseStream(this.audios[audioId]?.stream);
     const audioElement = this.audios[audioId]?.audioElement;
     if (!isNullOrUndefined(audioElement)) {

@@ -25,11 +25,13 @@ export const driveBulkRestoreFeatureToggleName = 'drive-bulk-restore';
 export const markAsUnreadFeatureToggleName = 'mark-as-unread';
 export const troubleshooterFeatureToggleName = 'troubleshooter';
 
+export const noteTakerFeatureToggleName = 'note-taker';
 export const sendCallLogsFeatureToggleName = 'send-call-logs';
 export const e2ePdfPreviewFeatureToggleName = 'e2e-pdf-preview';
 export const persistentBrowserLogsFeatureToggleName = 'persistent-browser-logs';
 
 export const startupFeatureToggleRegistry = [
+  {name: noteTakerFeatureToggleName, previewDefaultEnabled: false},
   {name: applockRefactoredFeatureToggleName, previewDefaultEnabled: false},
   {name: conversationListCollapseFeatureToggleName, previewDefaultEnabled: false},
   {name: forTestsOnlyFeatureToggleName, previewDefaultEnabled: false},
