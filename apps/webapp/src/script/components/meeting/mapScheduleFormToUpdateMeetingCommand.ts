@@ -39,7 +39,7 @@ export type MapScheduleFormToUpdateMeetingCommandParams = {
   originalEnd: Date;
   originalRecurrence: ScheduleMeetingRecurrenceOption;
   originalSelectedUsers: User[];
-  originalInvitedEmails?: string[];
+  originalInvitedEmails: string[];
 };
 
 export const mapScheduleFormToUpdateMeetingCommand = ({
@@ -73,8 +73,8 @@ export const mapScheduleFormToUpdateMeetingCommand = ({
     originalRecurrence,
     selectedUsers: formState.selectedUsers,
     originalSelectedUsers,
-    invitedEmails: formState.invitedEmails ?? [],
-    originalInvitedEmails: originalInvitedEmails ?? [],
+    invitedEmails: formState.invitedEmails,
+    originalInvitedEmails,
     qualifiedConversation,
   });
 };

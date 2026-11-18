@@ -50,10 +50,12 @@ describe('mapScheduleCommandToCreateMeeting', () => {
         end: futureEndDate,
         recurrence: 'weekly',
         selectedUsers: [],
+        invitedEmails: [],
       },
       {ianaTimeZoneId: 'Pacific/Auckland'},
     );
 
+    expect(result).not.toHaveProperty('invited_emails');
     expect(result).toEqual({
       title: 'Weekly sync',
       start_time: futureStartIso,
@@ -72,6 +74,7 @@ describe('mapScheduleCommandToCreateMeeting', () => {
         end: futureEndDate,
         recurrence: 'weekly',
         selectedUsers: [],
+        invitedEmails: [],
         password: 'secret',
       },
       {ianaTimeZoneId: 'Pacific/Auckland'},
@@ -83,6 +86,7 @@ describe('mapScheduleCommandToCreateMeeting', () => {
         end: futureEndDate,
         recurrence: 'weekly',
         selectedUsers: [],
+        invitedEmails: [],
         password: '  ',
       },
       {ianaTimeZoneId: 'Pacific/Auckland'},
