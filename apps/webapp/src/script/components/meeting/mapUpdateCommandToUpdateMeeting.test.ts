@@ -52,6 +52,8 @@ const baseUpdateCommand = (overrides: Partial<UpdateMeetingCommand> = {}): Updat
     originalRecurrence: 'doesNotRepeat',
     selectedUsers: [],
     originalSelectedUsers: [],
+    invitedEmails: [],
+    originalInvitedEmails: [],
     qualifiedConversation: maybe.just(qualifiedConversation),
     ...overrides,
   };

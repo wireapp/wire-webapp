@@ -30,7 +30,7 @@ export type MeetNowMeetingCommand = {
 };
 
 export type ScheduleMeetingCommand = {
-  invitedEmails?: string[];
+  invitedEmails: string[];
   title: string;
   start: Date;
   end: Date;
@@ -40,8 +40,8 @@ export type ScheduleMeetingCommand = {
 };
 
 export type UpdateMeetingCommand = {
-  invitedEmails?: string[];
-  originalInvitedEmails?: string[];
+  invitedEmails: string[];
+  originalInvitedEmails: string[];
   meetingId: QualifiedId;
   title: string;
   start: Date;
