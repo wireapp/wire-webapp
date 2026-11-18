@@ -51,6 +51,7 @@ const scheduleCommand: ScheduleMeetingCommand = {
   end: futureEndDate,
   recurrence: 'doesNotRepeat',
   selectedUsers: [],
+  invitedEmails: [],
 };
 
 const updateCommand = (overrides: Partial<UpdateMeetingCommand> = {}): UpdateMeetingCommand => {
@@ -66,6 +67,8 @@ const updateCommand = (overrides: Partial<UpdateMeetingCommand> = {}): UpdateMee
     originalRecurrence: 'doesNotRepeat',
     selectedUsers: [],
     originalSelectedUsers: [],
+    invitedEmails: [],
+    originalInvitedEmails: [],
     qualifiedConversation: maybe.just(qualifiedConversation),
     ...overrides,
   };
@@ -495,6 +498,20 @@ describe('updateMeeting', () => {
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.emailInvitationsFailed);
   });
 
+  it('reports a failed email removal after the add succeeds', async () => {
+    const addInvitedEmails = jest.fn().mockReturnValue(task.resolve(undefined));
+    const removeInvitedEmails = jest.fn().mockReturnValue(task.reject(new Error('network')));
+    const {deps} = createDeps({addInvitedEmails, removeInvitedEmails});
+    const result = await updateMeeting(
+      updateCommand({originalInvitedEmails: ['old@example.com'], invitedEmails: ['new@example.com']}),
+      deps,
+    );
+
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.emailInvitationsFailed);
+    expect(addInvitedEmails).toHaveBeenCalledWith(meetingId, ['new@example.com']);
+    expect(removeInvitedEmails).toHaveBeenCalledWith(meetingId, ['old@example.com']);
+  });
+
   it('updates metadata, applies participant diff, and returns failedToAdd', async () => {
     const alice = createUser('1');
     const bob = createUser('2');
@@ -555,6 +572,8 @@ describe('updateMeeting', () => {
       updateCommand({
         selectedUsers: [participant],
         originalSelectedUsers: [],
+        invitedEmails: [],
+        originalInvitedEmails: [],
       }),
       deps,
     );
@@ -610,6 +629,8 @@ describe('updateMeeting', () => {
         originalRecurrence: 'weekly',
         selectedUsers: [participant],
         originalSelectedUsers: [],
+        invitedEmails: [],
+        originalInvitedEmails: [],
       }),
       deps,
     );
