@@ -218,7 +218,7 @@ describe('Server Config', () => {
 
         expect(config.CSP).toBeDefined();
         expect(config.CSP.connectSrc).toContain("'self'");
-        expect(config.CSP.connectSrc).toContain('https://cdn.longpipe.dev');
+        expect(config.CSP.connectSrc).not.toContain('https://cdn.longpipe.dev');
         expect(config.CSP.connectSrc).toContain('https://prod-nginz-https.wire.com');
         expect(config.CSP.connectSrc).toContain('wss://prod-nginz-ssl.wire.com');
       });

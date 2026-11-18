@@ -129,6 +129,7 @@ describe('LongpipeBackgroundSession', () => {
       expect.any(MediaStream),
       expect.objectContaining({
         preset: 'auto',
+        weightsBaseUrl: '/assets/longpipe/models/v0.0.5',
         adaptive: true,
         audio: 'drop',
         background: {blur: {strength: 'low'}},

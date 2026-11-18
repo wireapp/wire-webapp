@@ -31,6 +31,7 @@ import {BACKGROUND_RESOLUTIONS, type QualityMode} from './backgroundEffectsResol
 import {getLogger} from '../../util/logger';
 
 const POLL_INTERVAL_MS = 1000;
+const MODEL_WEIGHTS_BASE_URL = '/assets/longpipe/models/v0.0.5';
 const DOWNGRADE_SAMPLES = 5;
 const UPGRADE_SAMPLES = 15;
 const CHANGE_COOLDOWN_MS = 10000;
@@ -221,6 +222,7 @@ export class LongpipeBackgroundSession {
       }
       const pipeline = this.createPipeline(new MediaStream([pipelineInput]), {
         model: 'longpipe',
+        weightsBaseUrl: MODEL_WEIGHTS_BASE_URL,
         preset: 'auto',
         adaptive: true,
         audio: 'drop',
