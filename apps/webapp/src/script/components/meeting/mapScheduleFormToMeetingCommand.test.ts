@@ -45,6 +45,7 @@ const baseFormState = (): ScheduleMeetingFormState => {
     end: maybe.just(futureEndDate),
     recurrence: 'weekly',
     selectedUsers: [],
+    invitedEmails: [],
     participantsFilter: 'alice',
     password: '',
     passwordConfirmation: '',
@@ -79,6 +80,7 @@ describe('mapScheduleFormToMeetingCommand', () => {
       end: futureEndDate,
       recurrence: 'weekly',
       selectedUsers: [alice, bob],
+      invitedEmails: [],
     });
   });
 
@@ -99,6 +101,7 @@ describe('mapScheduleFormToMeetingCommand', () => {
       end: futureEndDate,
       recurrence: 'weekly',
       selectedUsers: [],
+      invitedEmails: [],
       password: 'ValidPassword1!',
     });
   });

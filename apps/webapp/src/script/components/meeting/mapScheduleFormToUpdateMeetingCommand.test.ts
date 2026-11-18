@@ -36,6 +36,7 @@ const baseFormState = (): ScheduleMeetingFormState => {
     end: maybe.just(futureEndDate),
     recurrence: 'weekly',
     selectedUsers: [],
+    invitedEmails: [],
     participantsFilter: '',
     password: '',
     passwordConfirmation: '',
@@ -53,6 +54,7 @@ describe('mapScheduleFormToUpdateMeetingCommand', () => {
       originalEnd: futureEndDate,
       originalRecurrence: 'doesNotRepeat',
       originalSelectedUsers: [],
+      originalInvitedEmails: [],
     });
 
     expect(result.isOk).toBe(true);
@@ -87,6 +89,7 @@ describe('mapScheduleFormToUpdateMeetingCommand', () => {
       originalEnd: futureEndDate,
       originalRecurrence: 'weekly',
       originalSelectedUsers: [],
+      originalInvitedEmails: [],
     });
 
     expect(result.isErr).toBe(true);
@@ -109,6 +112,7 @@ describe('mapScheduleFormToUpdateMeetingCommand', () => {
       originalEnd: pastEndDate,
       originalRecurrence: 'weekly',
       originalSelectedUsers: [],
+      originalInvitedEmails: [],
     });
 
     expect(result.isOk).toBe(true);
