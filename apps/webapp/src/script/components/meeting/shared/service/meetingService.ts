@@ -27,6 +27,7 @@ import type {MeetingWithConversation} from '../../../../apiClient/meetings/meeti
 import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import type {AddUsersFailure} from '../../../../core/conversation';
 import type {User} from '../../../../repositories/entity/User';
+import {getLogger} from '../../../../util/logger';
 import {computeParticipantDiff} from '../../computeMeetingParticipantDiff';
 import {mapMeetNowCommandToCreateMeeting} from '../../mapMeetNowCommandToCreateMeeting';
 import {mapScheduleCommandToCreateMeeting} from '../../mapScheduleCommandToCreateMeeting';
@@ -39,6 +40,8 @@ import {
 import type {MeetingServiceDeps} from '../../meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../../meetingSubmitErrors';
 import type {MeetNowMeetingCommand, ScheduleMeetingCommand, UpdateMeetingCommand} from '../types/meetingCommandTypes';
+
+const logger = getLogger('meetingService');
 
 export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
 
@@ -195,20 +198,21 @@ export const updateMeeting = (
   deps: MeetingServiceDeps,
 ): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
   const {usersToAdd, userIdsToRemove} = computeParticipantDiff(command.originalSelectedUsers, command.selectedUsers);
+  // Compare addresses without case so changing only letter case does not resend invitations.
   const originalEmails = new Set(
-    (command.originalInvitedEmails ?? []).map(email => {
+    command.originalInvitedEmails.map(email => {
       return email.toLowerCase();
     }),
   );
   const selectedEmails = new Set(
-    (command.invitedEmails ?? []).map(email => {
+    command.invitedEmails.map(email => {
       return email.toLowerCase();
     }),
   );
-  const emailsToAdd = (command.invitedEmails ?? []).filter(email => {
+  const emailsToAdd = command.invitedEmails.filter(email => {
     return !originalEmails.has(email.toLowerCase());
   });
-  const emailsToRemove = (command.originalInvitedEmails ?? []).filter(email => {
+  const emailsToRemove = command.originalInvitedEmails.filter(email => {
     return !selectedEmails.has(email.toLowerCase());
   });
 
@@ -218,7 +222,8 @@ export const updateMeeting = (
         ? deps.meetingsRepository.addInvitedEmails(command.meetingId, emailsToAdd)
         : task.resolve(undefined);
     return add
-      .mapRejected(() => {
+      .mapRejected(error => {
+        logger.warn('Failed to add invited emails', {error, meetingId: command.meetingId});
         return meetingSubmitErrors.emailInvitationsFailed;
       })
       .andThen(() => {
@@ -227,7 +232,8 @@ export const updateMeeting = (
             ? deps.meetingsRepository.removeInvitedEmails(command.meetingId, emailsToRemove)
             : task.resolve(undefined);
         return remove
-          .mapRejected(() => {
+          .mapRejected(error => {
+            logger.warn('Failed to remove invited emails', {error, meetingId: command.meetingId});
             return meetingSubmitErrors.emailInvitationsFailed;
           })
           .map(() => {
