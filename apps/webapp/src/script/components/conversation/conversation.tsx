@@ -20,8 +20,8 @@
 import {UIEvent, useCallback, useEffect, useMemo, useState, type ReactElement} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
-import {arrayIncludes} from 'ts-extras';
 import {Maybe} from 'true-myth';
+import {arrayIncludes} from 'ts-extras';
 import {container} from 'tsyringe';
 
 import {
