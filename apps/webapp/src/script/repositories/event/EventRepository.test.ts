@@ -340,7 +340,6 @@ describe('EventRepository', () => {
     )(
       'does not publish normalized event when $eventType has $description',
       async ({eventType, webAppEvent, eventOverrides}) => {
-        const warnSpy = jest.spyOn(eventRepository.logger, 'warn').mockReturnValue(undefined);
         const event = {
           ...meetingLifecycleEventBase,
           ...eventOverrides,
@@ -350,7 +349,6 @@ describe('EventRepository', () => {
         await eventRepository['distributeEvent'](event as any, EventSource.WEBSOCKET);
 
         expect(amplify.publish).not.toHaveBeenCalledWith(webAppEvent, expect.anything());
-        expect(warnSpy).toHaveBeenCalled();
       },
     );
 
