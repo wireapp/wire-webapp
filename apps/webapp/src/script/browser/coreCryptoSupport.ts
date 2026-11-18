@@ -17,12 +17,11 @@
  *
  */
 
-import {isFunction} from '@sindresorhus/is';
-import {jspi} from 'wasm-feature-detect';
-
-export type CoreCryptoBrowserEnvironment = {
-  readonly storageManager?: {readonly getDirectory?: unknown};
-  readonly workerConstructor?: unknown;
+export type CoreCryptoCapabilities = {
+  readonly supportsJspi: boolean;
+  readonly supportsOpfs: boolean;
+  readonly supportsWebWorkers: boolean;
+  readonly coreCryptoEnabled: boolean;
 };
 
 export type CoreCryptoBrowserFeature = 'JS Promise Integration' | 'Origin Private File System' | 'Web Workers';
@@ -41,35 +40,23 @@ export const isCoreCryptoEnabled = ({
   return supportsMls || useCoreCryptoOverride;
 };
 
-/** Detect requirements without importing CoreCrypto: its bindings throw at module evaluation without JSPI. */
-export async function detectCoreCryptoSupport({
+/** Evaluate requirements without probing the browser or importing CoreCrypto. */
+export function getCoreCryptoSupport({
+  supportsJspi,
+  supportsOpfs,
+  supportsWebWorkers,
   coreCryptoEnabled,
-  detectJspi = jspi,
-  environment = {
-    storageManager: globalThis.navigator?.storage,
-    workerConstructor: globalThis.Worker,
-  },
-}: {
-  readonly coreCryptoEnabled: boolean;
-  readonly detectJspi?: () => Promise<boolean>;
-  readonly environment?: CoreCryptoBrowserEnvironment;
-}): Promise<CoreCryptoSupport> {
+}: CoreCryptoCapabilities): CoreCryptoSupport {
   const missingFeatures: CoreCryptoBrowserFeature[] = [];
   // JSPI is required even with MLS disabled: the application statically imports the bindings.
-  if (
-    !(await detectJspi().catch(() => {
-      return false;
-    }))
-  ) {
+  if (!supportsJspi) {
     missingFeatures.push('JS Promise Integration');
   }
-  if (coreCryptoEnabled) {
-    if (!isFunction(environment.storageManager?.getDirectory)) {
-      missingFeatures.push('Origin Private File System');
-    }
-    if (!isFunction(environment.workerConstructor)) {
-      missingFeatures.push('Web Workers');
-    }
+  if (coreCryptoEnabled && !supportsOpfs) {
+    missingFeatures.push('Origin Private File System');
+  }
+  if (coreCryptoEnabled && !supportsWebWorkers) {
+    missingFeatures.push('Web Workers');
   }
   return {missingFeatures};
 }

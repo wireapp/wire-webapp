@@ -17,7 +17,10 @@
  *
  */
 
-import {detectCoreCryptoSupport, isCoreCryptoEnabled, type CoreCryptoSupport} from './coreCryptoSupport';
+import {isFunction} from '@sindresorhus/is';
+import {jspi} from 'wasm-feature-detect';
+
+import {getCoreCryptoSupport, isCoreCryptoEnabled, type CoreCryptoSupport} from './coreCryptoSupport';
 import {startWithCoreCryptoSupport} from './startWithCoreCryptoSupport';
 import {supportsMLS} from './supportsMls';
 
@@ -30,8 +33,19 @@ export async function startBrowserApplication(
   start: (support: CoreCryptoSupport) => Promise<void>,
 ): Promise<void> {
   await startWithCoreCryptoSupport({
-    detectSupport() {
-      return detectCoreCryptoSupport({
+    async detectSupport() {
+      let supportsJspi: boolean;
+      try {
+        supportsJspi = await jspi();
+      } catch (error) {
+        console.error('JSPI feature detection failed', error);
+        // Boundary policy: fail closed and show upgrade instructions if probing fails unexpectedly.
+        supportsJspi = false;
+      }
+      return getCoreCryptoSupport({
+        supportsJspi,
+        supportsOpfs: isFunction(globalThis.navigator?.storage?.getDirectory),
+        supportsWebWorkers: isFunction(globalThis.Worker),
         coreCryptoEnabled: isCoreCryptoEnabled({
           supportsMls: supportsMLS(),
           useCoreCryptoOverride: Config.getConfig().FEATURE.USE_CORE_CRYPTO,

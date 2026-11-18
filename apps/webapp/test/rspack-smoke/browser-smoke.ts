@@ -219,6 +219,41 @@ for (const entryPath of ['/', '/auth']) {
   }
 }
 
+for (const entryPath of ['/', '/auth']) {
+  test(`reports a rejected JSPI probe and shows upgrade instructions on ${entryPath}`, async ({page}, testInfo) => {
+    const baseUrl = Maybe.of(testInfo.project.use.baseURL).unwrapOr('');
+    const diagnostics = captureRuntimeDiagnostics({page, baseUrl});
+    const capabilityErrors: string[] = [];
+    page.on('console', message => {
+      if (message.type() === 'error') {
+        capabilityErrors.push(message.text());
+      }
+    });
+    await page.addInitScript(() => {
+      Object.defineProperty(globalThis, 'WebAssembly', {
+        configurable: true,
+        value: new Proxy(WebAssembly, {
+          has(target, property) {
+            if (property === 'Suspending') {
+              throw new Error('simulated JSPI detection failure');
+            }
+            return Reflect.has(target, property);
+          },
+        }),
+      });
+    });
+
+    await page.goto(entryPath);
+    await expect(page.getByRole('dialog', {name: 'Browser update required'})).toBeVisible();
+    expect(capabilityErrors).toContainEqual(expect.stringContaining('JSPI feature detection failed'));
+    expect(capabilityErrors).toContainEqual(expect.stringContaining('simulated JSPI detection failure'));
+    expect(capabilityErrors).toContainEqual(
+      expect.stringContaining('missing required browser capabilities: JS Promise Integration'),
+    );
+    expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
+  });
+}
+
 test('reports missing filesystem support when JSPI is available', async ({page}) => {
   const capabilityErrors: string[] = [];
   page.on('console', message => {

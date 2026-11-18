@@ -17,74 +17,60 @@
  *
  */
 
-import {noop} from 'noop-esm';
+import {
+  getCoreCryptoSupport,
+  isCoreCryptoEnabled,
+  type CoreCryptoCapabilities,
+  type CoreCryptoBrowserFeature,
+} from './coreCryptoSupport';
 
-import {detectCoreCryptoSupport, isCoreCryptoEnabled} from './coreCryptoSupport';
+type SupportScenario = {
+  readonly name: string;
+  readonly capabilities: CoreCryptoCapabilities;
+  readonly missingFeatures: readonly CoreCryptoBrowserFeature[];
+};
 
-const environment = {storageManager: {getDirectory: noop}, workerConstructor: noop};
+const scenarios: readonly SupportScenario[] = [
+  {
+    name: 'supports all requirements',
+    capabilities: {supportsJspi: true, supportsOpfs: true, supportsWebWorkers: true, coreCryptoEnabled: true},
+    missingFeatures: [],
+  },
+  {
+    name: 'requires JSPI when CoreCrypto is enabled',
+    capabilities: {supportsJspi: false, supportsOpfs: true, supportsWebWorkers: true, coreCryptoEnabled: true},
+    missingFeatures: ['JS Promise Integration'],
+  },
+  {
+    name: 'requires OPFS when CoreCrypto is enabled',
+    capabilities: {supportsJspi: true, supportsOpfs: false, supportsWebWorkers: true, coreCryptoEnabled: true},
+    missingFeatures: ['Origin Private File System'],
+  },
+  {
+    name: 'requires workers when CoreCrypto is enabled',
+    capabilities: {supportsJspi: true, supportsOpfs: true, supportsWebWorkers: false, coreCryptoEnabled: true},
+    missingFeatures: ['Web Workers'],
+  },
+  {
+    name: 'reports all missing requirements together',
+    capabilities: {supportsJspi: false, supportsOpfs: false, supportsWebWorkers: false, coreCryptoEnabled: true},
+    missingFeatures: ['JS Promise Integration', 'Origin Private File System', 'Web Workers'],
+  },
+  {
+    name: 'does not require OPFS or workers when CoreCrypto is disabled',
+    capabilities: {supportsJspi: true, supportsOpfs: false, supportsWebWorkers: false, coreCryptoEnabled: false},
+    missingFeatures: [],
+  },
+  {
+    name: 'still requires JSPI when CoreCrypto is disabled because the bindings are imported',
+    capabilities: {supportsJspi: false, supportsOpfs: false, supportsWebWorkers: false, coreCryptoEnabled: false},
+    missingFeatures: ['JS Promise Integration'],
+  },
+];
 
-describe('detectCoreCryptoSupport', () => {
-  it('allows supported clients to start', async () => {
-    await expect(
-      detectCoreCryptoSupport({
-        coreCryptoEnabled: true,
-        environment,
-        detectJspi: async () => {
-          return true;
-        },
-      }),
-    ).resolves.toEqual({missingFeatures: []});
-  });
-
-  it.each([true, false])(
-    'requires JSPI even when CoreCrypto enabled is %s because its module is imported',
-    async coreCryptoEnabled => {
-      await expect(
-        detectCoreCryptoSupport({
-          coreCryptoEnabled,
-          environment,
-          detectJspi: async () => {
-            return false;
-          },
-        }),
-      ).resolves.toEqual({missingFeatures: ['JS Promise Integration']});
-    },
-  );
-
-  it('treats a failed feature probe as unsupported', async () => {
-    await expect(
-      detectCoreCryptoSupport({
-        coreCryptoEnabled: true,
-        environment,
-        detectJspi: async () => {
-          throw new Error('No WASM');
-        },
-      }),
-    ).resolves.toEqual({missingFeatures: ['JS Promise Integration']});
-  });
-
-  it('reports missing storage and workers for CoreCrypto', async () => {
-    await expect(
-      detectCoreCryptoSupport({
-        coreCryptoEnabled: true,
-        environment: {},
-        detectJspi: async () => {
-          return true;
-        },
-      }),
-    ).resolves.toEqual({missingFeatures: ['Origin Private File System', 'Web Workers']});
-  });
-
-  it('does not require storage or workers when CoreCrypto is disabled', async () => {
-    await expect(
-      detectCoreCryptoSupport({
-        coreCryptoEnabled: false,
-        environment: {},
-        detectJspi: async () => {
-          return true;
-        },
-      }),
-    ).resolves.toEqual({missingFeatures: []});
+describe('getCoreCryptoSupport', () => {
+  it.each(scenarios)('$name', ({capabilities, missingFeatures}) => {
+    expect(getCoreCryptoSupport(capabilities)).toEqual({missingFeatures});
   });
 });
 
