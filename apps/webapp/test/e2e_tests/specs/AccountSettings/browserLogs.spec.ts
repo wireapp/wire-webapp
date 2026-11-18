@@ -44,16 +44,23 @@ test('downloads browser logs through a real Chromium writable file stream', asyn
   );
   const accountIdentifier = 'a'.repeat(64);
   const sessionIdentifier = '00000000-0000-4000-8000-000000000001';
+  const midnightMilliseconds = Date.UTC(2025, 10, 18);
+  const olderAccountTimestamp = midnightMilliseconds + 1000;
   const logFiles = [
     {
-      sourceFilename: `log-${Date.UTC(2026, 10, 17, 23, 59, 59, 999)}-${sessionIdentifier}-1.jsonl`,
-      archivePath: '2026-11-17/browser-2026-11-17T23-59-59.999Z-1.jsonl',
+      sourceFilename: `log-${midnightMilliseconds - 1}-${sessionIdentifier}-1.jsonl`,
+      archivePath: '2025-11-17/application.jsonl',
       contents: '{"msg":"unattributed browser log"}\n',
     },
     {
-      sourceFilename: `log-${Date.UTC(2026, 10, 18)}-${sessionIdentifier}-2-${accountIdentifier}.jsonl`,
-      archivePath: `2026-11-18/accounts/${accountIdentifier}/browser-2026-11-18T00-00-00.000Z-2.jsonl`,
-      contents: '{"msg":"account browser log"}\n',
+      sourceFilename: `log-${olderAccountTimestamp}-${sessionIdentifier}-2-${accountIdentifier}.jsonl`,
+      archivePath: `2025-11-18/accounts/${accountIdentifier}/application.old.${olderAccountTimestamp}-0.jsonl`,
+      contents: '{"msg":"older account browser log"}\n',
+    },
+    {
+      sourceFilename: `log-${olderAccountTimestamp + 1}-${sessionIdentifier}-3-${accountIdentifier}.jsonl`,
+      archivePath: `2025-11-18/accounts/${accountIdentifier}/application.jsonl`,
+      contents: '{"msg":"newest account browser log"}\n',
     },
   ];
   await page.evaluate(

@@ -19,7 +19,7 @@
 
 import {Blob as NodeBlob} from 'node:buffer';
 import {CompressionStream, DecompressionStream, ReadableStream, TransformStream, WritableStream} from 'node:stream/web';
-import {Maybe} from 'true-myth';
+import {Maybe, Result} from 'true-myth';
 
 import {unwrap, unwrapErr} from '../util/test/resultTestSupport';
 
@@ -34,8 +34,8 @@ import {logDirectoryName} from './logPersistenceConfiguration';
 
 const firstFilename = 'log-1000-00000000-0000-4000-8000-000000000001-1.jsonl';
 const secondFilename = 'log-2000-00000000-0000-4000-8000-000000000002-1.jsonl';
-const firstArchivePath = '1970-01-01/browser-1970-01-01T00-00-01.000Z-1.jsonl';
-const secondArchivePath = '1970-01-01/browser-1970-01-01T00-00-02.000Z-1.jsonl';
+const primaryArchivePath = '1970-01-01/application.jsonl';
+const firstRotatedArchivePath = '1970-01-01/application.old.1000-0.jsonl';
 const sensitiveFailure = new Error('account-secret: private log contents');
 
 // jsdom does not expose Web Streams. Install real streams before loading zip.js
@@ -266,14 +266,19 @@ describe('streaming browser log export', () => {
     };
     const firstAccountFile = createFile('{}\n[]\n');
     const secondAccountFile = createFile('');
+    const olderAccountFile = createFile('{"older":true}\n');
     const nextDayFilename = secondFilename.replace('2000', String(Date.UTC(1970, 0, 2)));
     storage.files.set(firstFilename, legacyFile);
+    storage.files.set(firstFilename.replace('.jsonl', `-${firstAccountIdentifier}.jsonl`), olderAccountFile);
     storage.files.set(secondFilename.replace('.jsonl', `-${firstAccountIdentifier}.jsonl`), firstAccountFile);
+    storage.files.set(secondFilename.replace('.jsonl', `-${secondAccountIdentifier}.jsonl`), secondAccountFile);
     storage.files.set(nextDayFilename.replace('.jsonl', `-${secondAccountIdentifier}.jsonl`), secondAccountFile);
     const expectedFiles = new Map([
-      [firstArchivePath, legacyFile],
-      [`1970-01-01/accounts/${firstAccountIdentifier}/browser-1970-01-01T00-00-02.000Z-1.jsonl`, firstAccountFile],
-      [`1970-01-02/accounts/${secondAccountIdentifier}/browser-1970-01-02T00-00-00.000Z-1.jsonl`, secondAccountFile],
+      [primaryArchivePath, legacyFile],
+      [`1970-01-01/accounts/${firstAccountIdentifier}/application.jsonl`, firstAccountFile],
+      [`1970-01-01/accounts/${firstAccountIdentifier}/application.old.1000-0.jsonl`, olderAccountFile],
+      [`1970-01-01/accounts/${secondAccountIdentifier}/application.jsonl`, secondAccountFile],
+      [`1970-01-02/accounts/${secondAccountIdentifier}/application.jsonl`, secondAccountFile],
     ]);
     storage.files.set('unrelated.jsonl', createFile('private unrelated contents'));
     storage.files.set('log-malformed.jsonl', createFile('unrelated'));
@@ -289,7 +294,7 @@ describe('streaming browser log export', () => {
     });
     const archive = await readArchive(output.chunks);
 
-    expect(unwrap(result)).toEqual({exportedFiles: 3, missingFiles: 0});
+    expect(unwrap(result)).toEqual({exportedFiles: 5, missingFiles: 0});
     expect([...archive.keys()].sort()).toEqual([...expectedFiles.keys()].sort());
     for (const [filename, file] of expectedFiles) {
       const actualContents = Maybe.of(archive.get(filename)).unwrapOrElse(() => {
@@ -301,11 +306,18 @@ describe('streaming browser log export', () => {
     expect(storage.files).toEqual(originalFiles);
   });
 
-  it('writes unique ZIP entries for the same creation time and sequence across sessions', async () => {
+  it.each(['forward', 'reverse'] as const)('assigns stable names with %s discovery order', async order => {
     const storage = createStorage();
-    storage.files.set(firstFilename, createFile('{"session":1}\n'));
-    storage.files.set(firstFilename.replace('000000000001', '000000000002'), createFile('{"session":2}\n'));
-    storage.files.set(firstFilename.replace('000000000001', '000000000003'), createFile('{"session":3}\n'));
+    const sources = [
+      [firstFilename, 'old session 1, sequence 1\n'],
+      [firstFilename.replace('-1.jsonl', '-2.jsonl'), 'old session 1, sequence 2\n'],
+      [firstFilename.replace('000000000001', '000000000002'), 'old session 2\n'],
+      [secondFilename, 'new session 2\n'],
+      [secondFilename.replace('000000000002', '000000000003'), 'new session 3\n'],
+    ] as const;
+    for (const [filename, contents] of order === 'forward' ? sources : sources.toReversed()) {
+      storage.files.set(filename, createFile(contents));
+    }
     const output = createDestination();
 
     const result = await exportBrowserLogs({
@@ -315,22 +327,22 @@ describe('streaming browser log export', () => {
       signal: new AbortController().signal,
     });
     const archive = await readArchive(output.chunks);
-    const archivedPaths = [...archive.keys()];
-    const expectedPaths = [
-      firstArchivePath,
-      '1970-01-01/browser-1970-01-01T00-00-01.000Z-1-2.jsonl',
-      '1970-01-01/browser-1970-01-01T00-00-01.000Z-1-3.jsonl',
-    ];
-    const archivedContents = [...archive.values()].map(bytes => {
-      return new TextDecoder().decode(bytes);
+    const archivedLogs = [...archive].map(([path, bytes]) => {
+      return [path, new TextDecoder().decode(bytes)];
     });
+    const expectedLogs = [
+      [primaryArchivePath, 'new session 2\n'],
+      ['1970-01-01/application.old.2000-0.jsonl', 'new session 3\n'],
+      [firstRotatedArchivePath, 'old session 1, sequence 1\n'],
+      ['1970-01-01/application.old.1000-1.jsonl', 'old session 1, sequence 2\n'],
+      ['1970-01-01/application.old.1000-2.jsonl', 'old session 2\n'],
+    ];
 
-    expect(unwrap(result)).toEqual({exportedFiles: 3, missingFiles: 0});
-    expect(archivedPaths).toEqual(expectedPaths);
-    expect(archivedContents).toEqual(['{"session":1}\n', '{"session":2}\n', '{"session":3}\n']);
+    expect(unwrap(result)).toEqual({exportedFiles: 5, missingFiles: 0});
+    expect(archivedLogs).toEqual(expectedLogs);
   });
 
-  it.each(['handle', 'file'] as const)('skips a file removed by cleanup before opening its %s', async removal => {
+  it.each(['handle', 'file'] as const)('skips a missing primary without renaming older files (%s)', async removal => {
     const storage = createStorage();
     storage.files.set(firstFilename, createFile('{}\n'));
     storage.files.set(secondFilename, createFile('[]\n'));
@@ -340,7 +352,7 @@ describe('streaming browser log export', () => {
         return directory;
       },
       async getFileHandle(name) {
-        if (name === firstFilename) {
+        if (name === secondFilename) {
           if (removal === 'handle') {
             throw missingFile();
           }
@@ -362,7 +374,7 @@ describe('streaming browser log export', () => {
     const archive = await readArchive(output.chunks);
 
     expect(unwrap(result)).toEqual({exportedFiles: 1, missingFiles: 1});
-    expect([...archive.keys()]).toEqual([secondArchivePath]);
+    expect([...archive.keys()]).toEqual([firstRotatedArchivePath]);
   });
 
   it.each(['append', 'truncate', 'delete', 'unreadable'] as const)(
@@ -413,7 +425,7 @@ describe('streaming browser log export', () => {
       signal: new AbortController().signal,
     });
     const archive = await readArchive(output.chunks);
-    const archivedContents = Maybe.of(archive.get(firstArchivePath)).unwrapOrElse(() => {
+    const archivedContents = Maybe.of(archive.get(primaryArchivePath)).unwrapOrElse(() => {
       throw new Error('Missing archived file');
     });
 
@@ -431,8 +443,8 @@ describe('streaming browser log export', () => {
         return directory;
       },
       async getFileHandle(name) {
-        if (name === secondFilename) {
-          storage.files.set(firstFilename, createFile('{}\n{"later":true}\n'));
+        if (name === firstFilename) {
+          storage.files.set(secondFilename, createFile('[]\n{"later":true}\n'));
         }
 
         return storage.directory.getFileHandle(name);
@@ -448,13 +460,13 @@ describe('streaming browser log export', () => {
       signal: new AbortController().signal,
     });
     const archive = await readArchive(output.chunks);
-    const archivedContents = Maybe.of(archive.get(firstArchivePath)).unwrapOrElse(() => {
+    const archivedContents = Maybe.of(archive.get(primaryArchivePath)).unwrapOrElse(() => {
       throw new Error('Missing archived file');
     });
 
     expect(unwrap(result).exportedFiles).toBe(2);
-    expect(new TextDecoder().decode(archivedContents)).toBe('{}\n');
-    expect(storage.files.get(firstFilename)?.size).toBeGreaterThan(3);
+    expect(new TextDecoder().decode(archivedContents)).toBe('[]\n');
+    expect(storage.files.get(secondFilename)?.size).toBeGreaterThan(3);
   });
 
   it.each(['negative-size', 'invalid-modification-time', 'short-read'] as const)(
@@ -641,11 +653,11 @@ describe('streaming browser log export', () => {
     const storage = createStorage();
     const totalChunks = 512;
     const cancellation = new AbortController();
-    const firstOutput = Promise.withResolvers<void>();
+    const outputBlocked = Promise.withResolvers<'output-blocked'>();
     const resumeOutput = Promise.withResolvers<void>();
     const abort = jest.fn();
     let readChunks = 0;
-    let outputWrites = 0;
+    let readsAtBlockedWrite = 0;
     let closed = false;
     storage.files.set(firstFilename, {
       size: totalChunks * browserLogExportChunkBytes,
@@ -667,9 +679,9 @@ describe('streaming browser log export', () => {
     });
     const destination = new globalThis.WritableStream<Uint8Array>({
       async write() {
-        outputWrites += 1;
-        if (outputWrites >= 4) {
-          firstOutput.resolve();
+        if (readChunks > 0) {
+          readsAtBlockedWrite = readChunks;
+          outputBlocked.resolve('output-blocked');
           await resumeOutput.promise;
         }
       },
@@ -685,15 +697,13 @@ describe('streaming browser log export', () => {
       signal: cancellation.signal,
     });
     try {
-      await firstOutput.promise;
-      const readsWhileBlocked = readChunks;
-      // Yield through a task, allowing every queued pipeline stage to run without a timer or sleep.
+      expect(await Promise.race([outputBlocked.promise, completion])).toBe('output-blocked');
+      // Let queued pipeline work advance while the destination holds the write.
       await new Promise<void>(resolve => {
         setImmediate(resolve);
       });
-      expect(outputWrites).toBe(4);
       expect(readChunks).toBeGreaterThan(0);
-      expect(readChunks).toBeLessThanOrEqual(readsWhileBlocked + 16);
+      expect(readChunks).toBeLessThanOrEqual(readsAtBlockedWrite + 16);
       expect(readChunks).toBeLessThan(totalChunks);
       expect(closed).toBe(false);
     } finally {
@@ -787,33 +797,55 @@ describe('streaming browser log export', () => {
     expect(output.close).not.toHaveBeenCalled();
   });
 
-  it('bounds central-directory metadata and aborts rather than silently omitting excess files', async () => {
+  it.each([
+    {
+      fileCount: maximumBrowserLogExportFiles,
+      expectedResult: Result.ok({exportedFiles: maximumBrowserLogExportFiles, missingFiles: 0}),
+      expectedOpenedFiles: maximumBrowserLogExportFiles,
+      expectedAborts: 0,
+      expectedCloses: 1,
+    },
+    {
+      fileCount: maximumBrowserLogExportFiles + 1,
+      expectedResult: Result.err('limit-exceeded'),
+      expectedOpenedFiles: 0,
+      expectedAborts: 1,
+      expectedCloses: 0,
+    },
+  ])('enforces the manifest limit before streaming $fileCount files', async testCase => {
+    const {fileCount, expectedResult, expectedOpenedFiles, expectedAborts, expectedCloses} = testCase;
     const storage = createStorage();
-    for (let sequence = 0; sequence <= maximumBrowserLogExportFiles; sequence += 1) {
+    for (let sequence = 0; sequence < fileCount; sequence += 1) {
       storage.files.set(firstFilename.replace('-1.jsonl', `-${sequence}.jsonl`), createFile(''));
     }
+    const getFileHandle = jest.fn(storage.directory.getFileHandle);
+    const directory: BrowserLogExportDirectory = {
+      ...storage.directory,
+      async getDirectoryHandle() {
+        return directory;
+      },
+      getFileHandle,
+    };
     const output = createDestination();
-    let includedFiles = 0;
     const result = await exportBrowserLogs({
-      getDirectory: storage.getDirectory,
+      async getDirectory() {
+        return directory;
+      },
       createArchive() {
         return {
           async addFile(options) {
             await options.readable.pipeTo(new globalThis.WritableStream<Uint8Array>());
-            includedFiles += 1;
           },
-          async close() {
-            throw new Error('Must not finalize an incomplete collection');
-          },
+          async close() {},
         };
       },
       destination: output.destination,
       signal: new AbortController().signal,
     });
 
-    expect(unwrapErr(result)).toBe('limit-exceeded');
-    expect(includedFiles).toBe(maximumBrowserLogExportFiles);
-    expect(output.abort).toHaveBeenCalledTimes(1);
-    expect(output.close).not.toHaveBeenCalled();
+    expect(result).toEqual(expectedResult);
+    expect(getFileHandle).toHaveBeenCalledTimes(expectedOpenedFiles);
+    expect(output.abort).toHaveBeenCalledTimes(expectedAborts);
+    expect(output.close).toHaveBeenCalledTimes(expectedCloses);
   });
 });

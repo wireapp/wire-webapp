@@ -24,10 +24,16 @@ import {logFilenamePattern} from './createOriginPrivateFileSystemLogStore';
 
 type SelectBrowserLogFileOptions = {
   readonly entry: Pick<FileSystemHandle, 'name' | 'kind'>;
-  readonly archivePaths: ReadonlySet<string>;
+  readonly discoveredFiles: number;
 };
 
-type BrowserLogFileSelection = {
+export type BrowserLogSource = {
+  readonly sourceFilename: string;
+  readonly archiveDirectory: string;
+  readonly createdAtMilliseconds: number;
+};
+
+type BrowserLogArchiveEntryPath = {
   readonly sourceFilename: string;
   readonly archivePath: string;
 };
@@ -47,57 +53,87 @@ function isValidCreationTimestamp(milliseconds: number): boolean {
   return isSafeInteger(milliseconds) && milliseconds >= 0 && milliseconds <= lastFourDigitYearMilliseconds;
 }
 
-function createArchivePath(sourceFilename: string, archivePaths: ReadonlySet<string>): Maybe<string> {
-  const match = logFilenamePattern.exec(sourceFilename);
-  if (isNull(match)) {
-    return Maybe.nothing();
-  }
-  const [, creationTimestamp, , sequence, accountIdentifier] = match;
-  const createdAtMilliseconds = Number(creationTimestamp);
-  if (!isValidCreationTimestamp(createdAtMilliseconds)) {
-    return Maybe.nothing();
-  }
-  if (isUndefined(sequence)) {
-    return Maybe.nothing();
-  }
-
-  const creationTime = new Date(createdAtMilliseconds).toISOString();
-  const creationDate = creationTime.slice(0, utcDateLength);
-  const archiveDirectory = isUndefined(accountIdentifier)
-    ? creationDate
-    : `${creationDate}/accounts/${accountIdentifier}`;
-  const pathWithoutExtension = `${archiveDirectory}/browser-${creationTime.replaceAll(':', '-')}-${sequence}`;
-  const ordinaryPath = `${pathWithoutExtension}.jsonl`;
-
-  // A collision suffix adds a segment ordinary paths cannot have. The ordinal is unique within this export.
-  return Maybe.just(
-    archivePaths.has(ordinaryPath) ? `${pathWithoutExtension}-${archivePaths.size + 1}.jsonl` : ordinaryPath,
-  );
-}
-
-function exceedsMetadataLimit(options: SelectBrowserLogFileOptions): boolean {
-  const {entry, archivePaths} = options;
-
-  // Owned filenames contain only ASCII, so character and byte counts agree.
-  return archivePaths.size >= maximumBrowserLogExportFiles || entry.name.length > maximumFilenameBytes;
-}
-
 export function selectBrowserLogFile(
   options: SelectBrowserLogFileOptions,
-): Result<Maybe<BrowserLogFileSelection>, 'limit-exceeded'> {
-  const {entry, archivePaths} = options;
+): Result<Maybe<BrowserLogSource>, 'limit-exceeded'> {
+  const {entry} = options;
   if (entry.kind !== 'file') {
     return Result.ok(Maybe.nothing());
   }
-  const archivePath = createArchivePath(entry.name, archivePaths);
-  if (archivePath.isNothing) {
+  const match = logFilenamePattern.exec(entry.name);
+  if (isNull(match)) {
+    return Result.ok(Maybe.nothing());
+  }
+  const [, creationTimestamp, , , accountIdentifier] = match;
+  const createdAtMilliseconds = Number(creationTimestamp);
+  if (!isValidCreationTimestamp(createdAtMilliseconds)) {
     return Result.ok(Maybe.nothing());
   }
   if (exceedsMetadataLimit(options)) {
     return Result.err('limit-exceeded');
   }
 
-  return Result.ok(Maybe.just({sourceFilename: entry.name, archivePath: archivePath.value}));
+  const creationDate = new Date(createdAtMilliseconds).toISOString().slice(0, utcDateLength);
+  const archiveDirectory = isUndefined(accountIdentifier)
+    ? creationDate
+    : `${creationDate}/accounts/${accountIdentifier}`;
+  return Result.ok(Maybe.just({sourceFilename: entry.name, archiveDirectory, createdAtMilliseconds}));
+}
+
+function exceedsMetadataLimit(options: SelectBrowserLogFileOptions): boolean {
+  const {entry, discoveredFiles} = options;
+
+  // Owned filenames contain only ASCII, so character and byte counts agree.
+  return discoveredFiles >= maximumBrowserLogExportFiles || entry.name.length > maximumFilenameBytes;
+}
+
+function compareAscii(left: string, right: string): number {
+  if (left === right) {
+    return 0;
+  }
+
+  return left < right ? -1 : 1;
+}
+
+function compareBrowserLogSources(left: BrowserLogSource, right: BrowserLogSource): number {
+  const directoryOrder = compareAscii(left.archiveDirectory, right.archiveDirectory);
+  if (directoryOrder !== 0) {
+    return directoryOrder;
+  }
+  const newestFirstOrder = right.createdAtMilliseconds - left.createdAtMilliseconds;
+  if (newestFirstOrder !== 0) {
+    return newestFirstOrder;
+  }
+
+  // Comparing the full source name breaks ties by the persisted session and sequence without locale rules.
+  return compareAscii(left.sourceFilename, right.sourceFilename);
+}
+
+export function createBrowserLogArchiveManifest(
+  sources: readonly BrowserLogSource[],
+): readonly BrowserLogArchiveEntryPath[] {
+  let previousDirectory: string | undefined;
+  let previousTimestamp: number | undefined;
+  let collisionIndex = 0;
+
+  return sources.toSorted(compareBrowserLogSources).map(source => {
+    const {sourceFilename, archiveDirectory, createdAtMilliseconds} = source;
+    if (archiveDirectory !== previousDirectory) {
+      previousDirectory = archiveDirectory;
+      previousTimestamp = createdAtMilliseconds;
+      collisionIndex = 0;
+
+      return {sourceFilename, archivePath: `${archiveDirectory}/application.jsonl`};
+    }
+    if (createdAtMilliseconds !== previousTimestamp) {
+      previousTimestamp = createdAtMilliseconds;
+      collisionIndex = 0;
+    }
+    const archivePath = `${archiveDirectory}/application.old.${createdAtMilliseconds}-${collisionIndex}.jsonl`;
+    collisionIndex += 1;
+
+    return {sourceFilename, archivePath};
+  });
 }
 
 function isValidFileMetadata(file: Pick<File, 'size' | 'lastModified'>): boolean {

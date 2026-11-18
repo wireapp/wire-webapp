@@ -21,9 +21,11 @@ import {Maybe, Result, task, type Task} from 'true-myth';
 
 import {
   checkBrowserLogExportCancellation,
+  createBrowserLogArchiveManifest,
   parseBrowserLogFileMetadata,
   selectBrowserLogFile,
   verifyBrowserLogFileUnchanged,
+  type BrowserLogSource,
 } from './browserLogExportPolicy';
 import type {
   BrowserLogArchive,
@@ -165,20 +167,26 @@ function streamLogDirectory(
 
   return task
     .tryOr<Result<BrowserLogExportSummary, BrowserLogExportFailure>, BrowserLogExportFailure>('failed', async () => {
-      const archivePaths = new Set<string>();
-      let missingFiles = 0;
-      // Keep iteration sequential and stack-bounded; no manifest or recursive Task chain.
+      const sources: BrowserLogSource[] = [];
       for await (const entry of directory.values()) {
         const selection = checkBrowserLogExportCancellation(signal.aborted).andThen(() => {
-          return selectBrowserLogFile({entry, archivePaths});
+          return selectBrowserLogFile({entry, discoveredFiles: sources.length});
         });
         if (selection.isErr) {
           return Result.err(selection.error);
         }
-        if (selection.value.isNothing) {
-          continue;
+        if (selection.value.isJust) {
+          sources.push(selection.value.value);
         }
-        const {sourceFilename, archivePath} = selection.value.value;
+      }
+
+      let exportedFiles = 0;
+      let missingFiles = 0;
+      // Fix names at discovery. A missing primary is skipped without promoting another file.
+      for (const {sourceFilename, archivePath} of createBrowserLogArchiveManifest(sources)) {
+        if (signal.aborted) {
+          return Result.err('cancelled');
+        }
         const fileExport = await exportLogFile({directory, sourceFilename, archivePath, archive, signal});
         if (fileExport.isErr) {
           return Result.err(fileExport.error);
@@ -186,11 +194,11 @@ function streamLogDirectory(
         if (fileExport.value === 'missing') {
           missingFiles += 1;
         } else {
-          archivePaths.add(archivePath);
+          exportedFiles += 1;
         }
       }
 
-      return Result.ok({exportedFiles: archivePaths.size, missingFiles});
+      return Result.ok({exportedFiles, missingFiles});
     })
     .andThen(outcome => {
       return outcome;
