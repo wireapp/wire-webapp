@@ -1093,6 +1093,8 @@
   "conversationsSecondaryLineYouWereRemoved": "уклоњени сте",
   "conversationsWelcome": "Welcome to {brandName} 👋",
   "cookiePolicyStrings.bannerText": "Ми користимо колачиће да би прилагодили ваше искуство на нашој веб страници. Настављајући да користите веб страницу, прихватате употребу колачића.{newline}Даљње информације о колачићима могу се наћи у нашој <strong>политици приватности</strong>.",
+  "coreCryptoUpgradeBrowserTitle": "Update your browser to continue using {brandName}.",
+  "coreCryptoUpgradeDesktopTitle": "Update your Desktop app to continue using {brandName}.",
   "createAccount.headLine": "Подесите свој налог",
   "createAccount.nextButton": "Следећи",
   "createConversationAccessHeader": "Access",

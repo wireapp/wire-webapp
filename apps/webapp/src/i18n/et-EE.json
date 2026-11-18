@@ -1093,6 +1093,8 @@
   "conversationsSecondaryLineYouWereRemoved": "Sind eemaldati vestlusest",
   "conversationsWelcome": "Welcome to {brandName} 👋",
   "cookiePolicyStrings.bannerText": "Me kasutame küpsiseid, personaliseerimaks sinu kogemust meie veebisaidil. Veebisaiti kasutades nõustud küpsiste kasutusega.{newline}Täpsem informatsioon küpsiste kohta on leitav meie <strong>privaatsuspoliitikas</strong>.",
+  "coreCryptoUpgradeBrowserTitle": "Update your browser to continue using {brandName}.",
+  "coreCryptoUpgradeDesktopTitle": "Update your Desktop app to continue using {brandName}.",
   "createAccount.headLine": "Seadista oma konto",
   "createAccount.nextButton": "Järgmine",
   "createConversationAccessHeader": "Access",

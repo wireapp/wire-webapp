@@ -1093,6 +1093,8 @@
   "conversationsSecondaryLineYouWereRemoved": "Вы были удалены",
   "conversationsWelcome": "Приветствуем вас в {brandName} 👋",
   "cookiePolicyStrings.bannerText": "Мы используем файлы cookie для персонализации вашего опыта на нашем веб-сайте.\nПродолжая использовать веб-сайт, вы соглашаетесь на использование файлов cookie.{newline}Дополнительную информацию о файлах cookie можно найти в нашей<strong>политике конфиденциальности</strong>.",
+  "coreCryptoUpgradeBrowserTitle": "Обновите ваш браузер, чтобы продолжать использовать {brandName}.",
+  "coreCryptoUpgradeDesktopTitle": "Обновите ваше приложение для рабочего стола, чтобы продолжать использовать {brandName}.",
   "createAccount.headLine": "Настройка учетной записи",
   "createAccount.nextButton": "Вперед",
   "createConversationAccessHeader": "Доступ",

@@ -1093,6 +1093,8 @@
   "conversationsSecondaryLineYouWereRemoved": "Вас видалили",
   "conversationsWelcome": "Welcome to {brandName} 👋",
   "cookiePolicyStrings.bannerText": "Ми використовуємо cookies, щоб персоналізувати вашу присутність на нашому веб-сайті. Продовжуючи користуватись веб-сайтом, ви погоджуєтесь на використання cookies.{newline}Більше інформації про використання cookies ви можете знайти у нашій <strong>Політиці приватності</strong>.",
+  "coreCryptoUpgradeBrowserTitle": "Update your browser to continue using {brandName}.",
+  "coreCryptoUpgradeDesktopTitle": "Update your Desktop app to continue using {brandName}.",
   "createAccount.headLine": "Налаштуйте ваш акаунт",
   "createAccount.nextButton": "Далі",
   "createConversationAccessHeader": "Access",

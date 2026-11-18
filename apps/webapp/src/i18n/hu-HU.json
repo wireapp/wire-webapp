@@ -1093,6 +1093,8 @@
   "conversationsSecondaryLineYouWereRemoved": "El lettél távolítva",
   "conversationsWelcome": "Welcome to {brandName} 👋",
   "cookiePolicyStrings.bannerText": "Webes sütiket (cookie) használunk, hogy személyessé tegyük a weboldal által nyújtott élményt. A weboldal használatának folytatásával elfogadod a sütik használatát.{newline}A sütikkel kapcsolatban további információt találhatsz az <strong>adatvédelmi szabályzatunkban</strong>.",
+  "coreCryptoUpgradeBrowserTitle": "Update your browser to continue using {brandName}.",
+  "coreCryptoUpgradeDesktopTitle": "Update your Desktop app to continue using {brandName}.",
   "createAccount.headLine": "Fiók beállítása",
   "createAccount.nextButton": "Tovább",
   "createConversationAccessHeader": "Access",

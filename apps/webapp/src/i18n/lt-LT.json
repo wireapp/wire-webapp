@@ -1093,6 +1093,8 @@
   "conversationsSecondaryLineYouWereRemoved": "Jūs buvote pašalinti",
   "conversationsWelcome": "Welcome to {brandName} 👋",
   "cookiePolicyStrings.bannerText": "Naudojame slapukus suasmeninti patirtį mūsų svetainėje. Naršydami svetainę sutinkate su slapukų naudojimu.{newline}Daugiau informacijos apie slapukus galite rasti <b>privatumo politikoje</b>.",
+  "coreCryptoUpgradeBrowserTitle": "Update your browser to continue using {brandName}.",
+  "coreCryptoUpgradeDesktopTitle": "Update your Desktop app to continue using {brandName}.",
   "createAccount.headLine": "Konfigūruokite paskyrą",
   "createAccount.nextButton": "Kitas",
   "createConversationAccessHeader": "Access",

@@ -1093,6 +1093,8 @@
   "conversationsSecondaryLineYouWereRemoved": "Çıkartıldınız",
   "conversationsWelcome": "Welcome to {brandName} 👋",
   "cookiePolicyStrings.bannerText": "Web sitemizdeki deneyiminizi kişiselleştirmek için çerezleri kullanıyoruz. Web sitesini kullanmaya devam ederek, çerezlerin kullanılmasını kabul etmiş olursunuz.{newline}Çerezler hakkında daha fazla bilgiyi <strong>Gizlilik Politikamızda</strong> bulabilirsiniz.",
+  "coreCryptoUpgradeBrowserTitle": "Update your browser to continue using {brandName}.",
+  "coreCryptoUpgradeDesktopTitle": "Update your Desktop app to continue using {brandName}.",
   "createAccount.headLine": "Hesabınızı ayarlayın",
   "createAccount.nextButton": "İleri",
   "createConversationAccessHeader": "Access",
