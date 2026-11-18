@@ -17,6 +17,8 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 import {unwrap, unwrapErr} from '../util/test/resultTestSupport';
 
 import {
@@ -27,31 +29,56 @@ import {
 } from './browserLogExportPolicy';
 
 const unattributedFilename = 'log-1000-00000000-0000-4000-8000-000000000001-1.jsonl';
+const unattributedArchivePath = '1970-01-01/browser-1970-01-01T00-00-01.000Z-1.jsonl';
 
 describe('browser log export policy', () => {
-  it.each(['', `-${'a'.repeat(64)}`, `-${'b'.repeat(64)}`])('selects owned files with account suffix %s', suffix => {
-    const filename = unattributedFilename.replace('.jsonl', `${suffix}.jsonl`);
-    const selection = selectBrowserLogFile({entry: {kind: 'file', name: filename}, exportedFiles: 0});
+  it.each([
+    [Date.UTC(2026, 10, 17, 23, 59, 59, 999), '2026-11-17', '23-59-59.999', ''],
+    [Date.UTC(2026, 10, 18), '2026-11-18', '00-00-00.000', 'a'.repeat(64)],
+  ])('groups timestamp %s by UTC creation date and account', (timestamp, date, time, accountIdentifier) => {
+    const accountSuffix = accountIdentifier === '' ? '' : `-${accountIdentifier}`;
+    const sourceFilename = `log-${timestamp}-00000000-0000-4000-8000-000000000001-1${accountSuffix}.jsonl`;
+    const selection = selectBrowserLogFile({
+      entry: {kind: 'file', name: sourceFilename},
+      archivePaths: new Set(),
+    });
+    const archiveDirectory = accountIdentifier === '' ? date : `${date}/accounts/${accountIdentifier}`;
+    const archivePath = `${archiveDirectory}/browser-${date}T${time}Z-1.jsonl`;
 
-    expect(unwrap(selection).unwrapOr('missing')).toBe(filename);
+    expect(unwrap(selection)).toEqual(Maybe.just({sourceFilename, archivePath}));
   });
 
   it.each([
     {kind: 'directory' as const, name: unattributedFilename},
     {kind: 'file' as const, name: 'private.jsonl'},
     {kind: 'file' as const, name: unattributedFilename.replace('1000', '99999999999999999999')},
+    {kind: 'file' as const, name: unattributedFilename.replace('1000', '8640000000000001')},
+    {kind: 'file' as const, name: unattributedFilename.replace('1000', '253402300800000')},
   ])('ignores unrelated entry $name even at the metadata limit', entry => {
-    const selection = selectBrowserLogFile({entry, exportedFiles: maximumBrowserLogExportFiles});
+    const archivePaths = new Set(
+      Array.from({length: maximumBrowserLogExportFiles}, (_, index) => {
+        return String(index);
+      }),
+    );
+    const selection = selectBrowserLogFile({entry, archivePaths});
 
     expect(unwrap(selection).isNothing).toBe(true);
   });
 
   it('allows the last permitted entry and rejects the next owned file', () => {
     const entry = {kind: 'file' as const, name: unattributedFilename};
-    const lastPermitted = selectBrowserLogFile({entry, exportedFiles: maximumBrowserLogExportFiles - 1});
-    const excess = selectBrowserLogFile({entry, exportedFiles: maximumBrowserLogExportFiles});
+    const archivePaths = new Set(
+      Array.from({length: maximumBrowserLogExportFiles - 1}, (_, index) => {
+        return String(index);
+      }),
+    );
+    const lastPermitted = selectBrowserLogFile({entry, archivePaths});
+    archivePaths.add(unattributedArchivePath);
+    const excess = selectBrowserLogFile({entry, archivePaths});
 
-    expect(unwrap(lastPermitted).unwrapOr('missing')).toBe(unattributedFilename);
+    expect(unwrap(lastPermitted)).toEqual(
+      Maybe.just({sourceFilename: unattributedFilename, archivePath: unattributedArchivePath}),
+    );
     expect(unwrapErr(excess)).toBe('limit-exceeded');
   });
 

@@ -59,6 +59,7 @@ function createDirectory(entries: readonly Pick<FileSystemHandle, 'name' | 'kind
 
 describe('account browser log deletion', () => {
   it('deletes exact owned account files across sessions/dates and preserves all other entries', async () => {
+    const filenameOutsideArchiveDateRange = `log-253402300800000-${sessionIdentifier}-1-${accountIdentifier}.jsonl`;
     const preservedFilenames = [
       `log-1-${sessionIdentifier}-1-${'b'.repeat(64)}.jsonl`,
       `log-1-${sessionIdentifier}-1.jsonl`,
@@ -70,7 +71,7 @@ describe('account browser log deletion', () => {
       'unrelated.txt',
     ];
     const entries: Pick<FileSystemHandle, 'name' | 'kind'>[] = [
-      ...[firstFilename, secondFilename, ...preservedFilenames].map(name => {
+      ...[firstFilename, secondFilename, filenameOutsideArchiveDateRange, ...preservedFilenames].map(name => {
         return logDirectoryEntryFactory.build({name});
       }),
       logDirectoryEntryFactory.build({

@@ -17,14 +17,19 @@
  *
  */
 
-import {isNull, isSafeInteger} from '@sindresorhus/is';
+import {isNull, isSafeInteger, isUndefined} from '@sindresorhus/is';
 import {Maybe, Result} from 'true-myth';
 
 import {logFilenamePattern} from './createOriginPrivateFileSystemLogStore';
 
 type SelectBrowserLogFileOptions = {
   readonly entry: Pick<FileSystemHandle, 'name' | 'kind'>;
-  readonly exportedFiles: number;
+  readonly archivePaths: ReadonlySet<string>;
+};
+
+type BrowserLogFileSelection = {
+  readonly sourceFilename: string;
+  readonly archivePath: string;
 };
 
 export type BrowserLogFileMetadata = {
@@ -35,36 +40,64 @@ export type BrowserLogFileMetadata = {
 // Streaming ZIP writers still retain central-directory metadata for every entry.
 export const maximumBrowserLogExportFiles = 4096;
 const maximumFilenameBytes = 1024;
+const lastFourDigitYearMilliseconds = Date.parse('9999-12-31T23:59:59.999Z');
+const utcDateLength = 10;
 
-function isOwnedLogFile(entry: SelectBrowserLogFileOptions['entry']): boolean {
-  if (entry.kind !== 'file') {
-    return false;
-  }
-  const match = logFilenamePattern.exec(entry.name);
+function isValidCreationTimestamp(milliseconds: number): boolean {
+  return isSafeInteger(milliseconds) && milliseconds >= 0 && milliseconds <= lastFourDigitYearMilliseconds;
+}
+
+function createArchivePath(sourceFilename: string, archivePaths: ReadonlySet<string>): Maybe<string> {
+  const match = logFilenamePattern.exec(sourceFilename);
   if (isNull(match)) {
-    return false;
+    return Maybe.nothing();
+  }
+  const [, creationTimestamp, , sequence, accountIdentifier] = match;
+  const createdAtMilliseconds = Number(creationTimestamp);
+  if (!isValidCreationTimestamp(createdAtMilliseconds)) {
+    return Maybe.nothing();
+  }
+  if (isUndefined(sequence)) {
+    return Maybe.nothing();
   }
 
-  return isSafeInteger(Number(match.at(1)));
+  const creationTime = new Date(createdAtMilliseconds).toISOString();
+  const creationDate = creationTime.slice(0, utcDateLength);
+  const archiveDirectory = isUndefined(accountIdentifier)
+    ? creationDate
+    : `${creationDate}/accounts/${accountIdentifier}`;
+  const pathWithoutExtension = `${archiveDirectory}/browser-${creationTime.replaceAll(':', '-')}-${sequence}`;
+  const ordinaryPath = `${pathWithoutExtension}.jsonl`;
+
+  // A collision suffix adds a segment ordinary paths cannot have. The ordinal is unique within this export.
+  return Maybe.just(
+    archivePaths.has(ordinaryPath) ? `${pathWithoutExtension}-${archivePaths.size + 1}.jsonl` : ordinaryPath,
+  );
 }
 
 function exceedsMetadataLimit(options: SelectBrowserLogFileOptions): boolean {
-  const {entry, exportedFiles} = options;
+  const {entry, archivePaths} = options;
 
   // Owned filenames contain only ASCII, so character and byte counts agree.
-  return exportedFiles >= maximumBrowserLogExportFiles || entry.name.length > maximumFilenameBytes;
+  return archivePaths.size >= maximumBrowserLogExportFiles || entry.name.length > maximumFilenameBytes;
 }
 
-export function selectBrowserLogFile(options: SelectBrowserLogFileOptions): Result<Maybe<string>, 'limit-exceeded'> {
-  const {entry} = options;
-  if (!isOwnedLogFile(entry)) {
+export function selectBrowserLogFile(
+  options: SelectBrowserLogFileOptions,
+): Result<Maybe<BrowserLogFileSelection>, 'limit-exceeded'> {
+  const {entry, archivePaths} = options;
+  if (entry.kind !== 'file') {
+    return Result.ok(Maybe.nothing());
+  }
+  const archivePath = createArchivePath(entry.name, archivePaths);
+  if (archivePath.isNothing) {
     return Result.ok(Maybe.nothing());
   }
   if (exceedsMetadataLimit(options)) {
     return Result.err('limit-exceeded');
   }
 
-  return Result.ok(Maybe.just(entry.name));
+  return Result.ok(Maybe.just({sourceFilename: entry.name, archivePath: archivePath.value}));
 }
 
 function isValidFileMetadata(file: Pick<File, 'size' | 'lastModified'>): boolean {

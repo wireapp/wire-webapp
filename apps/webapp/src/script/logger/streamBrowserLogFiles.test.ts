@@ -88,7 +88,7 @@ describe('OPFS browser log export source', () => {
       },
       archive: {
         async addFile(options: BrowserLogArchiveEntry) {
-          expect(options.filename).toBe(filename);
+          expect(options.filename).toBe('1970-01-01/browser-1970-01-01T00-00-01.000Z-1.jsonl');
           const reader = options.readable.getReader();
           try {
             while (true) {

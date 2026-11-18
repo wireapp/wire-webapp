@@ -48,7 +48,8 @@ type OpenedBrowserLogFile = {
 
 type ExportBrowserLogFileOptions = {
   readonly directory: BrowserLogExportDirectory;
-  readonly filename: string;
+  readonly sourceFilename: string;
+  readonly archivePath: string;
   readonly archive: Pick<BrowserLogArchive, 'addFile'>;
   readonly signal: AbortSignal;
 };
@@ -99,11 +100,11 @@ function openLogDirectory(
 
 function openLogFile(
   directory: BrowserLogExportDirectory,
-  filename: string,
+  sourceFilename: string,
 ): Task<Maybe<OpenedBrowserLogFile>, 'failed'> {
   return task.tryOr('failed', async () => {
     try {
-      const fileHandle = await directory.getFileHandle(filename);
+      const fileHandle = await directory.getFileHandle(sourceFilename);
       const file = await fileHandle.getFile();
 
       return Maybe.just({fileHandle, file});
@@ -118,9 +119,9 @@ function openLogFile(
 }
 
 function exportLogFile(options: ExportBrowserLogFileOptions): Task<'exported' | 'missing', BrowserLogExportFailure> {
-  const {directory, filename, archive, signal} = options;
+  const {directory, sourceFilename, archivePath, archive, signal} = options;
 
-  return openLogFile(directory, filename).andThen(openedFile => {
+  return openLogFile(directory, sourceFilename).andThen(openedFile => {
     return openedFile.match<Task<'exported' | 'missing', BrowserLogExportFailure>>({
       Nothing() {
         return task.resolve('missing' as const);
@@ -133,7 +134,7 @@ function exportLogFile(options: ExportBrowserLogFileOptions): Task<'exported' | 
             .fromResult(checkBrowserLogExportCancellation(signal.aborted))
             .andThen(() => {
               return task.tryOr('failed' as const, () => {
-                return archive.addFile({filename, readable: createFileReadable(file)});
+                return archive.addFile({filename: archivePath, readable: createFileReadable(file)});
               });
             })
             .andThen(() => {
@@ -164,12 +165,12 @@ function streamLogDirectory(
 
   return task
     .tryOr<Result<BrowserLogExportSummary, BrowserLogExportFailure>, BrowserLogExportFailure>('failed', async () => {
-      let exportedFiles = 0;
+      const archivePaths = new Set<string>();
       let missingFiles = 0;
       // Keep iteration sequential and stack-bounded; no manifest or recursive Task chain.
       for await (const entry of directory.values()) {
         const selection = checkBrowserLogExportCancellation(signal.aborted).andThen(() => {
-          return selectBrowserLogFile({entry, exportedFiles});
+          return selectBrowserLogFile({entry, archivePaths});
         });
         if (selection.isErr) {
           return Result.err(selection.error);
@@ -177,18 +178,19 @@ function streamLogDirectory(
         if (selection.value.isNothing) {
           continue;
         }
-        const fileExport = await exportLogFile({directory, filename: selection.value.value, archive, signal});
+        const {sourceFilename, archivePath} = selection.value.value;
+        const fileExport = await exportLogFile({directory, sourceFilename, archivePath, archive, signal});
         if (fileExport.isErr) {
           return Result.err(fileExport.error);
         }
         if (fileExport.value === 'missing') {
           missingFiles += 1;
         } else {
-          exportedFiles += 1;
+          archivePaths.add(archivePath);
         }
       }
 
-      return Result.ok({exportedFiles, missingFiles});
+      return Result.ok({exportedFiles: archivePaths.size, missingFiles});
     })
     .andThen(outcome => {
       return outcome;

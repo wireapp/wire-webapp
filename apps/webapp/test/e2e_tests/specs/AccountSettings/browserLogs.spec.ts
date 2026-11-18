@@ -42,17 +42,34 @@ test('downloads browser logs through a real Chromium writable file stream', asyn
     },
     withLogin(user, {startupFeatureToggles: {'persistent-browser-logs': true}}),
   );
-  const filename = await page.evaluate(async directoryName => {
-    const root = await navigator.storage.getDirectory();
-    const directory = await root.getDirectoryHandle(directoryName, {create: true});
-    const filename = `log-${Date.now()}-00000000-0000-4000-8000-000000000001-1.jsonl`;
-    const file = await directory.getFileHandle(filename, {create: true});
-    const writable = await file.createWritable();
-    await writable.write('{"msg":"browser log download regression"}\n');
-    await writable.close();
-
-    return filename;
-  }, logDirectoryName);
+  const accountIdentifier = 'a'.repeat(64);
+  const sessionIdentifier = '00000000-0000-4000-8000-000000000001';
+  const logFiles = [
+    {
+      sourceFilename: `log-${Date.UTC(2026, 10, 17, 23, 59, 59, 999)}-${sessionIdentifier}-1.jsonl`,
+      archivePath: '2026-11-17/browser-2026-11-17T23-59-59.999Z-1.jsonl',
+      contents: '{"msg":"unattributed browser log"}\n',
+    },
+    {
+      sourceFilename: `log-${Date.UTC(2026, 10, 18)}-${sessionIdentifier}-2-${accountIdentifier}.jsonl`,
+      archivePath: `2026-11-18/accounts/${accountIdentifier}/browser-2026-11-18T00-00-00.000Z-2.jsonl`,
+      contents: '{"msg":"account browser log"}\n',
+    },
+  ];
+  await page.evaluate(
+    async options => {
+      const {directoryName, logFiles} = options;
+      const root = await navigator.storage.getDirectory();
+      const directory = await root.getDirectoryHandle(directoryName, {create: true});
+      for (const {sourceFilename, contents} of logFiles) {
+        const file = await directory.getFileHandle(sourceFilename, {create: true});
+        const writable = await file.createWritable();
+        await writable.write(contents);
+        await writable.close();
+      }
+    },
+    {directoryName: logDirectoryName, logFiles},
+  );
 
   const {components} = PageManager.from(page).webapp;
   await components.conversationSidebar().clickPreferencesButton();
@@ -80,20 +97,22 @@ test('downloads browser logs through a real Chromium writable file stream', asyn
   });
   try {
     const entries = await reader.getEntries();
-    expect(
-      entries.map(entry => {
-        return entry.filename;
+    const expectedLogs = new Map(
+      logFiles.map(logFile => {
+        return [logFile.archivePath, logFile.contents];
       }),
-    ).toContain(filename);
+    );
+    const archivedLogs = new Map<string, string>();
     for (const entry of entries) {
-      if (entry.filename === filename) {
+      if (expectedLogs.has(entry.filename)) {
         if (entry.directory) {
           throw new Error('Expected a log file in the archive');
         }
         const contents = await entry.getData(new Uint8ArrayWriter());
-        expect(new TextDecoder().decode(contents)).toBe('{"msg":"browser log download regression"}\n');
+        archivedLogs.set(entry.filename, new TextDecoder().decode(contents));
       }
     }
+    expect(archivedLogs).toEqual(expectedLogs);
   } finally {
     await reader.close();
   }

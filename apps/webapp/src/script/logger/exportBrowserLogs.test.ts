@@ -34,6 +34,8 @@ import {logDirectoryName} from './logPersistenceConfiguration';
 
 const firstFilename = 'log-1000-00000000-0000-4000-8000-000000000001-1.jsonl';
 const secondFilename = 'log-2000-00000000-0000-4000-8000-000000000002-1.jsonl';
+const firstArchivePath = '1970-01-01/browser-1970-01-01T00-00-01.000Z-1.jsonl';
+const secondArchivePath = '1970-01-01/browser-1970-01-01T00-00-02.000Z-1.jsonl';
 const sensitiveFailure = new Error('account-secret: private log contents');
 
 // jsdom does not expose Web Streams. Install real streams before loading zip.js
@@ -254,10 +256,25 @@ describe('streaming browser log export', () => {
 
   it('includes every account and unattributed logs, preserving exact bytes and source files', async () => {
     const storage = createStorage();
-    storage.files.set(firstFilename, createFile('{ "message": "Grüße 🌍" }\r\n{"incomplete":'));
-    storage.files.set(secondFilename.replace('.jsonl', `-${'a'.repeat(64)}.jsonl`), createFile('{}\n[]\n'));
-    storage.files.set(secondFilename.replace('.jsonl', `-${'b'.repeat(64)}.jsonl`), createFile(''));
-    const expectedFiles = new Map(storage.files);
+    const firstAccountIdentifier = 'a'.repeat(64);
+    const secondAccountIdentifier = 'b'.repeat(64);
+    const legacyFile = {
+      ...createFile(
+        '{ "time": "1970-01-01T00:00:01.000Z", "message": "Grüße 🌍" }\r\n{"time":"1970-01-02T00:00:01.000Z"}\n{"incomplete":',
+      ),
+      lastModified: Date.UTC(1970, 0, 2, 0, 0, 1),
+    };
+    const firstAccountFile = createFile('{}\n[]\n');
+    const secondAccountFile = createFile('');
+    const nextDayFilename = secondFilename.replace('2000', String(Date.UTC(1970, 0, 2)));
+    storage.files.set(firstFilename, legacyFile);
+    storage.files.set(secondFilename.replace('.jsonl', `-${firstAccountIdentifier}.jsonl`), firstAccountFile);
+    storage.files.set(nextDayFilename.replace('.jsonl', `-${secondAccountIdentifier}.jsonl`), secondAccountFile);
+    const expectedFiles = new Map([
+      [firstArchivePath, legacyFile],
+      [`1970-01-01/accounts/${firstAccountIdentifier}/browser-1970-01-01T00-00-02.000Z-1.jsonl`, firstAccountFile],
+      [`1970-01-02/accounts/${secondAccountIdentifier}/browser-1970-01-02T00-00-00.000Z-1.jsonl`, secondAccountFile],
+    ]);
     storage.files.set('unrelated.jsonl', createFile('private unrelated contents'));
     storage.files.set('log-malformed.jsonl', createFile('unrelated'));
     storage.files.set(firstFilename.replace('1000', '99999999999999999999'), createFile('invalid timestamp'));
@@ -282,6 +299,35 @@ describe('streaming browser log export', () => {
       expect(actualContents).toEqual(expectedContents);
     }
     expect(storage.files).toEqual(originalFiles);
+  });
+
+  it('writes unique ZIP entries for the same creation time and sequence across sessions', async () => {
+    const storage = createStorage();
+    storage.files.set(firstFilename, createFile('{"session":1}\n'));
+    storage.files.set(firstFilename.replace('000000000001', '000000000002'), createFile('{"session":2}\n'));
+    storage.files.set(firstFilename.replace('000000000001', '000000000003'), createFile('{"session":3}\n'));
+    const output = createDestination();
+
+    const result = await exportBrowserLogs({
+      getDirectory: storage.getDirectory,
+      createArchive: zipArchiveModule.createBrowserLogZipArchive,
+      destination: output.destination,
+      signal: new AbortController().signal,
+    });
+    const archive = await readArchive(output.chunks);
+    const archivedPaths = [...archive.keys()];
+    const expectedPaths = [
+      firstArchivePath,
+      '1970-01-01/browser-1970-01-01T00-00-01.000Z-1-2.jsonl',
+      '1970-01-01/browser-1970-01-01T00-00-01.000Z-1-3.jsonl',
+    ];
+    const archivedContents = [...archive.values()].map(bytes => {
+      return new TextDecoder().decode(bytes);
+    });
+
+    expect(unwrap(result)).toEqual({exportedFiles: 3, missingFiles: 0});
+    expect(archivedPaths).toEqual(expectedPaths);
+    expect(archivedContents).toEqual(['{"session":1}\n', '{"session":2}\n', '{"session":3}\n']);
   });
 
   it.each(['handle', 'file'] as const)('skips a file removed by cleanup before opening its %s', async removal => {
@@ -316,7 +362,7 @@ describe('streaming browser log export', () => {
     const archive = await readArchive(output.chunks);
 
     expect(unwrap(result)).toEqual({exportedFiles: 1, missingFiles: 1});
-    expect([...archive.keys()]).toEqual([secondFilename]);
+    expect([...archive.keys()]).toEqual([secondArchivePath]);
   });
 
   it.each(['append', 'truncate', 'delete', 'unreadable'] as const)(
@@ -367,7 +413,7 @@ describe('streaming browser log export', () => {
       signal: new AbortController().signal,
     });
     const archive = await readArchive(output.chunks);
-    const archivedContents = Maybe.of(archive.get(firstFilename)).unwrapOrElse(() => {
+    const archivedContents = Maybe.of(archive.get(firstArchivePath)).unwrapOrElse(() => {
       throw new Error('Missing archived file');
     });
 
@@ -402,7 +448,7 @@ describe('streaming browser log export', () => {
       signal: new AbortController().signal,
     });
     const archive = await readArchive(output.chunks);
-    const archivedContents = Maybe.of(archive.get(firstFilename)).unwrapOrElse(() => {
+    const archivedContents = Maybe.of(archive.get(firstArchivePath)).unwrapOrElse(() => {
       throw new Error('Missing archived file');
     });
 
