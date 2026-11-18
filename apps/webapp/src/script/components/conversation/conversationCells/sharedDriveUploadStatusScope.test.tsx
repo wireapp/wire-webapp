@@ -24,7 +24,11 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import userEvent from '@testing-library/user-event';
 import {Maybe, maybe} from 'true-myth';
 
-import {SharedDriveUploadStatusProvider, SharedDriveUploadStatusScope, useSharedDriveUploadStatus} from './sharedDriveUploadStatusContext';
+import {
+  SharedDriveUploadStatusProvider,
+  SharedDriveUploadStatusScope,
+  useSharedDriveUploadStatus,
+} from './sharedDriveUploadStatusContext';
 
 const StatusProbe = ({conversationId}: {readonly conversationId: string}): ReactElement => {
   const {createMoveStatusId, dismissUpload, dismissedUpload, getMoveStatus, startMoveStatus} =
@@ -84,9 +88,13 @@ const StatusTree = ({
 describe('SharedDriveUploadStatusScope', () => {
   it('rejects a pending move result after its Files scope is gone', () => {
     let scope = 'folder-a';
-    const wrapper = ({children}: {children: ReactNode}): ReactElement => {return (
-      <SharedDriveUploadStatusProvider resetOnScopeChange={Maybe.just(scope)}>{children}</SharedDriveUploadStatusProvider>
-    )};
+    const wrapper = ({children}: {children: ReactNode}): ReactElement => {
+      return (
+        <SharedDriveUploadStatusProvider resetOnScopeChange={Maybe.just(scope)}>
+          {children}
+        </SharedDriveUploadStatusProvider>
+      );
+    };
     const {result, rerender} = renderHook(useSharedDriveUploadStatus, {wrapper});
     const status = {
       id: 'move-a',
@@ -97,18 +105,26 @@ describe('SharedDriveUploadStatusScope', () => {
       destinationPath: 'Reports',
     };
 
-    act(() => {return result.current.startMoveStatus(status)});
+    act(() => {
+      return result.current.startMoveStatus(status);
+    });
     scope = 'folder-b';
     rerender();
-    act(() => {return result.current.updateMoveStatus({...status, kind: 'completed'})});
+    act(() => {
+      return result.current.updateMoveStatus({...status, kind: 'completed'});
+    });
     const getBackgroundMoveInfo = jest.fn();
-    act(() => {return result.current.observeBackgroundMove({
-      operationId: status.id,
-      cellsRepository: {getBackgroundMoveInfo},
-      clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
-      random: () => {return 0.5},
-      onOutcome: jest.fn(),
-    })});
+    act(() => {
+      return result.current.observeBackgroundMove({
+        operationId: status.id,
+        cellsRepository: {getBackgroundMoveInfo},
+        clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+        random: () => {
+          return 0.5;
+        },
+        onOutcome: jest.fn(),
+      });
+    });
 
     expect(maybe.isNothing(result.current.getMoveStatus('conversation-1'))).toBe(true);
     expect(result.current.isMoveStatusCurrent('conversation-1', 'move-a')).toBe(false);

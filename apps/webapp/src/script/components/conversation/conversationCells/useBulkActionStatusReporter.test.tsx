@@ -119,9 +119,9 @@ describe('useBulkActionStatusReporter', () => {
   });
 
   it('ignores an older operation after a new one starts in the same conversation', () => {
-    const wrapper = ({children}: {children: ReactNode}): ReactElement => {return (
-      <SharedDriveUploadStatusProvider>{children}</SharedDriveUploadStatusProvider>
-    )};
+    const wrapper = ({children}: {children: ReactNode}): ReactElement => {
+      return <SharedDriveUploadStatusProvider>{children}</SharedDriveUploadStatusProvider>;
+    };
     const {result} = renderHook(useSharedDriveUploadStatus, {wrapper});
     const first: SharedDriveMoveStatus = {
       id: 'first',
