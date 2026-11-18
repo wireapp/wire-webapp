@@ -86,7 +86,7 @@ test('downloads browser logs through a real Chromium writable file stream', asyn
   await expect(page.locator('html')).toHaveAttribute('data-log-picker-activation', 'true');
   await expect(page.locator('html')).toHaveAttribute(
     'data-log-picker-filename',
-    /^wire-logs-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}\.zip$/,
+    /^wire-logs-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}Z\.zip$/,
   );
   await expect(downloadButton).toBeEnabled();
   await expect(page.getByRole('alert')).not.toBeVisible();

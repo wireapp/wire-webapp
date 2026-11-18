@@ -34,6 +34,7 @@ describe('browser log export policy', () => {
   it.each([
     [Date.UTC(2026, 10, 17, 23, 59, 59, 999), '2026-11-17', ''],
     [Date.UTC(2026, 10, 18), '2026-11-18', 'a'.repeat(64)],
+    [Date.UTC(2026, 10, 18, 0, 30), '2026-11-18', ''],
   ])('groups timestamp %s by UTC creation date and account', (timestamp, date, accountIdentifier) => {
     const accountSuffix = accountIdentifier === '' ? '' : `-${accountIdentifier}`;
     const sourceFilename = `log-${timestamp}-00000000-0000-4000-8000-000000000001-1${accountSuffix}.jsonl`;

@@ -21,7 +21,6 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {isFunction} from '@sindresorhus/is';
-import {format} from 'date-fns';
 import {Maybe} from 'true-myth';
 
 import {
@@ -48,6 +47,8 @@ type BrowserLogDownloadOptions = {
   readonly createArchive: (options: BrowserLogArchiveOptions) => BrowserLogArchive;
 };
 
+const isoTimestampMinuteLength = 16;
+
 function isSavePickerCancellation(error: unknown): boolean {
   return error instanceof DOMException && error.name === 'AbortError';
 }
@@ -71,9 +72,13 @@ export function createBrowserLogDownload(options: BrowserLogDownloadOptions): Ma
   async function downloadBrowserLogs(): Promise<BrowserLogDownloadOutcome> {
     let fileHandle: Pick<FileSystemFileHandle, 'createWritable'>;
     try {
+      const utcMinute = new Date(clock.currentUnixEpochMilliseconds)
+        .toISOString()
+        .slice(0, isoTimestampMinuteLength)
+        .replace(/[T:]/gu, '-');
       // This must run in the click's call stack, before any asynchronous work.
       fileHandle = await pickSaveFile({
-        suggestedName: `wire-logs-${format(clock.currentUnixEpochMilliseconds, 'yyyy-MM-dd-HH-mm')}.zip`,
+        suggestedName: `wire-logs-${utcMinute}Z.zip`,
         types: [{description: 'ZIP archive', accept: {'application/zip': ['.zip']}}],
       });
     } catch (error: unknown) {
