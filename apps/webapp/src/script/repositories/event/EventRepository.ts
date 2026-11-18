@@ -45,17 +45,16 @@ import {
 } from '../../apiClient/event/conversationEvent';
 import {MEETING_EVENT} from '../../apiClient/event/meetingEvent';
 import {USER_EVENT} from '../../apiClient/event/userEvent';
-import {StringUtil} from '../../commons/util';
 import {Runtime} from '../../commons/util/Runtime';
 import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '../../core';
 import {NotificationSource, HandledEventPayload} from '../../core/notification';
 import {sequentialQueueOptions} from '../../core/queue/sequentialQueueOptions';
 import {CryptographyError} from '../../error/cryptographyError';
 import {EventError} from '../../error/eventError';
+import {getSafeNotificationErrorDetails} from '../../logger/getSafeNotificationErrorDetails';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {getLogger, type LogAttributes, Logger} from '../../util/logger';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
-import {toError} from '../../util/toError';
 import {isAxiosError} from '../../util/typePredicateUtil';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {WebAppEvents} from '../../webAppEvents';
@@ -218,7 +217,15 @@ export class EventRepository {
       } catch (error: unknown) {
         if (source === EventSource.NOTIFICATION_STREAM) {
           const eventType = (payload as {event?: {type?: string}}).event?.type ?? 'unknown';
-          this.logger.warn(`Failed to handle event of type "${eventType}": ${toError(error).message}`, {error});
+          const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
+          this.logger.warn('Could not handle an event during notification catch-up', {
+            subsystem: 'websocket-lifecycle',
+            event: 'notification-event-handling-failed',
+            eventType,
+            source,
+            errorName,
+            errorMessage,
+          });
         } else {
           throw error;
         }
@@ -385,11 +392,13 @@ export class EventRepository {
           } else {
             legacyDisconnect = noop;
           }
+          const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
           repository.logger.warn('Connection setup failed', {
             subsystem: 'websocket-lifecycle',
             event: 'connect-failure',
             ...lifecycle,
-            errorName: StringUtil.getSafeErrorDetails(error).errorName,
+            errorName,
+            errorMessage,
           });
         }
       } finally {
@@ -557,7 +566,6 @@ export class EventRepository {
       // In Electron, use window focus events instead of visibilitychange
       const handleFocus = (): void => {
         if (navigator.onLine) {
-          this.logger.info('Window focused, verifying connection...');
           void verifyConnectionHealthAndReconnect('focus');
         }
       };
@@ -570,7 +578,6 @@ export class EventRepository {
       // In browser, use visibilitychange
       const handleVisibilityChange = (): void => {
         if (document.visibilityState === 'visible' && navigator.onLine) {
-          this.logger.info('Tab became visible, verifying connection...');
           void verifyConnectionHealthAndReconnect('visibility');
         }
       };
@@ -795,7 +802,7 @@ export class EventRepository {
       !isUndefined(actorId) && typeof actorId.id === 'string' && typeof actorId.domain === 'string';
 
     if (!hasValidQualifiedId || !hasValidActorId) {
-      this.logger.warn(`Ignored ${event.type} event without valid qualified IDs`, {event});
+      this.logger.warn('Ignored meeting event without valid qualified IDs', {eventType: event.type});
       return;
     }
 
@@ -845,12 +852,12 @@ export class EventRepository {
     source: EventSource,
   ): Promise<IncomingEvent | undefined> {
     if (isTruthy(decryptionError)) {
-      this.logger.warn(`Decryption Error: '${event.type}'`, {
+      this.logger.warn('Could not decrypt a notification event', {
+        subsystem: 'websocket-lifecycle',
+        event: 'notification-event-decryption-failed',
         source,
         eventType: event.type,
-        date: event.time,
-        code: decryptionError.code,
-        message: decryptionError.message,
+        errorCode: decryptionError.code,
       });
 
       const ignoredCodes = [
@@ -890,7 +897,15 @@ export class EventRepository {
       }
     } catch (error: unknown) {
       if (error instanceof EventValidationError) {
-        this.logger.warn(`Event validation failed: ${error.message}`, {error});
+        const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
+        this.logger.warn('Notification event validation failed', {
+          subsystem: 'websocket-lifecycle',
+          event: 'notification-event-validation-failed',
+          eventType: event.type,
+          source,
+          errorName,
+          errorMessage,
+        });
         return;
       }
       throw error;

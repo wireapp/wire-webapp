@@ -32,8 +32,8 @@ import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 import {Notification} from '../../apiClient/notification/notification';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
-import {getSafeErrorDetails} from '../../commons/util/StringUtil';
 import {getLogger} from '../../logger/getLogger';
+import {getSafeNotificationErrorDetails} from '../../logger/getSafeNotificationErrorDetails';
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../coreError';
 import {DecryptionError} from '../errors/decryptionError';
@@ -172,17 +172,18 @@ export class NotificationService extends TypedEventEmitter<Events> {
     }
 
     const results = {total: notifications.length, error: 0, success: 0};
-    const logMessage =
-      notifications.length > 0
-        ? `Start processing ${notifications.length} notifications since notification id ${lastNotificationId}`
-        : `No notification to process from the stream`;
-    this.logger.info(logMessage);
     for (const [index, notification] of notifications.entries()) {
       if (abortHandler?.signal.aborted === true) {
         /* Stop handling notifications if the websocket has been disconnected.
          * Upon reconnecting we are going to restart handling the notification stream for where we left of
          */
-        this.logger.warn(`Stop processing notifications as connection to websocket was closed`);
+        this.logger.debug('Stopped processing catch-up notifications after disconnect', {
+          subsystem: 'websocket-lifecycle',
+          event: 'legacy-catchup-cancelled',
+          processed: index,
+          total: notifications.length,
+        });
+
         return results;
       }
       try {
@@ -192,10 +193,12 @@ export class NotificationService extends TypedEventEmitter<Events> {
         });
         results.success++;
       } catch (error: unknown) {
+        const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
         this.logger.error('Could not process a catch-up notification', {
           subsystem: 'websocket-lifecycle',
           event: 'catchup-notification-failed',
-          errorName: getSafeErrorDetails(error).errorName,
+          errorName,
+          errorMessage,
         });
         results.error++;
       }
@@ -264,11 +267,14 @@ export class NotificationService extends TypedEventEmitter<Events> {
           yield* payloads;
         }
       } catch (error: unknown) {
+        const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
         this.logger.error('Could not process a notification event', {
           subsystem: 'websocket-lifecycle',
           event: 'notification-event-processing-failed',
           eventType: event.type,
-          errorName: getSafeErrorDetails(error).errorName,
+          source,
+          errorName,
+          errorMessage,
         });
         const notificationError: NotificationError = {
           error: error as Error,

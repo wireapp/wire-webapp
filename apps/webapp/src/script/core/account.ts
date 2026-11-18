@@ -110,9 +110,9 @@ import {WebSocketClient} from '../apiClient/tcp/webSocketClient';
 import {FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {TypedEventEmitter} from '../commons/TypedEventEmitter/TypedEventEmitter';
-import {StringUtil} from '../commons/util';
 import {TimeInMillis} from '../commons/util/TimeUtil';
 import {getLogger, type LogAttributes, type Logger} from '../logger/getLogger';
+import {getSafeNotificationErrorDetails} from '../logger/getSafeNotificationErrorDetails';
 
 type CryptoClientWithProtocol =
   readonly [CryptoClientType.CORE_CRYPTO, CoreCryptoWrapper] | readonly [CryptoClientType.CRYPTOBOX, CryptoboxWrapper];
@@ -938,13 +938,23 @@ export class Account extends TypedEventEmitter<Events> {
       cleanup(reason === 'offline' || reason === 'superseded' ? reason : 'disconnect');
     }
 
-    function logListenerRemoval(reason: WebSocketCleanupReason | 'legacy-listener-replacement'): void {
-      account.logger.info('Notification listener removed', {
+    function logListenerRemoval(
+      reason: WebSocketCleanupReason | 'legacy-listener-replacement',
+      removalScope: 'owned' | 'all-listeners' | 'all-notification-listeners',
+    ): void {
+      const connectionContext = currentWebSocketConnectionContext.unwrapOr<Partial<WebSocketConnectionContext>>({});
+      account.logger.info('Notification listener removal completed', {
         subsystem: 'websocket-lifecycle',
         event: 'notification-listener-removed',
-        ...lifecycle,
-        ...currentWebSocketConnectionContext.unwrapOr({}),
+        listenerOwnerId: removalScope === 'owned' ? listenerOwnerId : undefined,
+        initiatingListenerOwnerId: removalScope === 'owned' ? undefined : listenerOwnerId,
+        connectCycleId: lifecycle.connectCycleId,
+        attemptId: connectionContext.attemptId,
+        wrapperGeneration: connectionContext.wrapperGeneration,
+        useLegacy,
+        implementation,
         reason,
+        removalScope,
         notificationListenerCount: websocket.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE),
         stateListenerCount: websocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE),
       });
@@ -970,7 +980,7 @@ export class Account extends TypedEventEmitter<Events> {
         }
         account.cleanupWebSocketConnection = Maybe.nothing();
         subscription.remove();
-        logListenerRemoval(reason);
+        logListenerRemoval(reason, 'owned');
       }
       abortSocketController(socketCancellation);
       flushProposalsQueue();
@@ -980,16 +990,18 @@ export class Account extends TypedEventEmitter<Events> {
         account.apiClient.disconnect();
         publishConnectionState(ConnectionState.CLOSED);
         websocket.removeAllListeners();
-        logListenerRemoval(reason);
+        logListenerRemoval(reason, 'all-listeners');
       } else if (transportInUse) {
         try {
           account.apiClient.disconnect();
         } catch (error: unknown) {
+          const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
           account.logger.warn('WebSocket disconnect failed during cleanup', {
             subsystem: 'websocket-lifecycle',
             event: 'connection-cleanup-disconnect-failed',
             ...cleanupContext,
-            errorName: StringUtil.getSafeErrorDetails(error).errorName,
+            errorName,
+            errorMessage,
           });
         }
       }
@@ -1043,7 +1055,7 @@ export class Account extends TypedEventEmitter<Events> {
       const listenersToReplace = websocket.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE);
       websocket.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
       if (listenersToReplace > 0) {
-        logListenerRemoval('legacy-listener-replacement');
+        logListenerRemoval('legacy-listener-replacement', 'all-notification-listeners');
       }
     }
     const subscription = this.setupWebSocketListeners({
@@ -1118,13 +1130,15 @@ export class Account extends TypedEventEmitter<Events> {
         try {
           await legacyProcessNotificationStream(Maybe.just(abortController));
         } catch (error: unknown) {
+          const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
           account.logger.warn('Legacy notification catch-up failed', {
             subsystem: 'websocket-lifecycle',
             event: 'legacy-catchup-failure',
             ...lifecycle,
             ...reconnectContext,
             obsolete: abortController.signal.aborted,
-            errorName: StringUtil.getSafeErrorDetails(error).errorName,
+            errorName,
+            errorMessage,
           });
 
           if (abortController.signal.aborted) {
@@ -1214,11 +1228,13 @@ export class Account extends TypedEventEmitter<Events> {
       if (isObsoleteInitialization()) {
         return noop;
       }
+      const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
       this.logger.warn('Notification connection setup failed', {
         subsystem: 'websocket-lifecycle',
         event: 'connection-setup-failed',
         ...lifecycle,
-        errorName: StringUtil.getSafeErrorDetails(error).errorName,
+        errorName,
+        errorMessage,
       });
       if (usesCorrectedLifecycle) {
         cleanup('setup-failed');
@@ -1296,11 +1312,14 @@ export class Account extends TypedEventEmitter<Events> {
               await handleEvent(message, source);
             }
           } catch (error: unknown) {
+            const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
             this.logger.error('Legacy notification processing failed', {
               subsystem: 'websocket-lifecycle',
               event: 'legacy-notification-failure',
               ...connectionContext.unwrapOr({}),
-              errorName: StringUtil.getSafeErrorDetails(error).errorName,
+              source,
+              errorName,
+              errorMessage,
             });
           }
         })
@@ -1350,11 +1369,14 @@ export class Account extends TypedEventEmitter<Events> {
           })
           .catch(this.handleNotificationQueueError);
       } catch (error: unknown) {
+        const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
         this.logger.error('Consumable notification handling failed', {
           subsystem: 'websocket-lifecycle',
           event: 'consumable-notification-handling-failure',
           ...connectionContext.unwrapOr({}),
-          errorName: StringUtil.getSafeErrorDetails(error).errorName,
+          source,
+          errorName,
+          errorMessage,
         });
       }
     };
@@ -1367,17 +1389,23 @@ export class Account extends TypedEventEmitter<Events> {
     }
 
     if (error instanceof TimeoutError) {
-      this.logger.warn('Notification decryption task timed out', {error});
+      this.logger.warn('Notification decryption task timed out', {
+        subsystem: 'websocket-lifecycle',
+        event: 'notification-queue-task-timed-out',
+        errorName: getSafeNotificationErrorDetails(error).errorName,
+      });
       return;
     }
 
     if (isQueueFlushedError(error)) {
       return;
     }
+    const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
     this.logger.error('Notification queue task failed', {
       subsystem: 'websocket-lifecycle',
       event: 'notification-queue-task-failed',
-      errorName: StringUtil.getSafeErrorDetails(error).errorName,
+      errorName,
+      errorMessage,
     });
   };
 
@@ -1477,11 +1505,14 @@ export class Account extends TypedEventEmitter<Events> {
         this.apiClient.transport.ws.acknowledgeNotification(notification);
       }
     } catch (error: unknown) {
+      const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
       this.logger.error('Consumable notification processing failed', {
         subsystem: 'websocket-lifecycle',
         event: 'consumable-notification-processing-failure',
         ...connectionContext.unwrapOr({}),
-        errorName: StringUtil.getSafeErrorDetails(error).errorName,
+        source,
+        errorName,
+        errorMessage,
       });
     }
   }
