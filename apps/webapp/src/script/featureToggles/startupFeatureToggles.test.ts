@@ -36,6 +36,7 @@ import {
   forTestsOnlyFeatureToggleName,
   persistentBrowserLogsFeatureToggleName,
   previewDefaultEnabledStartupFeatureToggleNames,
+  websocketListenerLifecycleFeatureToggleName,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
@@ -50,9 +51,20 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   sendCallLogsFeatureToggleName,
   e2ePdfPreviewFeatureToggleName,
   persistentBrowserLogsFeatureToggleName,
+  websocketListenerLifecycleFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
+  it('accepts the WebSocket listener lifecycle alongside other explicit selections', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch(
+      '?enabled-features=mark-as-unread,websocket-listener-lifecycle',
+    );
+
+    expect(toggles.enabledFeatureToggleNames).toEqual([
+      markAsUnreadFeatureToggleName,
+      websocketListenerLifecycleFeatureToggleName,
+    ]);
+  });
   it('keeps persistent browser logs disabled for release and preview builds and preserves explicit opt-in alongside other toggles', () => {
     const disabled = createStartupFeatureTogglesFromLocationSearch('');
     const enabled = createStartupFeatureTogglesFromLocationSearch(
@@ -267,6 +279,7 @@ describe('startupFeatureToggles', function () {
       sendCallLogsFeatureToggleName,
       e2ePdfPreviewFeatureToggleName,
       persistentBrowserLogsFeatureToggleName,
+      websocketListenerLifecycleFeatureToggleName,
     ]);
   });
 

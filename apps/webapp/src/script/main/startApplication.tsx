@@ -31,6 +31,7 @@ import {configureLogging} from '../logger/getLogger';
 import {Runtime} from '../commons/util/Runtime';
 
 import {createApplicationServices} from './createApplicationServices';
+import {createApplicationApiClient} from './createApplicationApiClient';
 import {createAccountIdentifier} from '../logger/createAccountIdentifier';
 import {createAuthenticatedAccountBinding} from '../logger/createAuthenticatedAccountBinding';
 import {logRuntimeIdentity, logStartupRuntimeIdentity} from '../logger/logRuntimeIdentity';
@@ -241,7 +242,11 @@ export async function startApplication(
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
   const {applicationObservability} = applicationServices;
-  const apiClient = new APIClient({clock: applicationServices.clock});
+  const apiClient = createApplicationApiClient({
+    clock: applicationServices.clock,
+    startupFeatureToggles,
+    logger: getLogger('WebSocketLifecycle'),
+  });
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
     apiClient,

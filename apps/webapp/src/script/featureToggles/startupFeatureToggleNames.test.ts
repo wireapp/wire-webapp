@@ -28,9 +28,16 @@ import {
   sendCallLogsFeatureToggleName,
   startupFeatureToggleNames,
   startupFeatureToggleRegistry,
+  websocketListenerLifecycleFeatureToggleName,
 } from './startupFeatureToggleNames';
 
 describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
+  it('registers the corrected WebSocket listener lifecycle as enabled by default in preview builds', () => {
+    expect(startupFeatureToggleRegistry).toContainEqual({
+      name: websocketListenerLifecycleFeatureToggleName,
+      previewDefaultEnabled: true,
+    });
+  });
   it('enables Mark as unread by default in preview builds', () => {
     expect(startupFeatureToggleRegistry).toContainEqual({
       name: markAsUnreadFeatureToggleName,
