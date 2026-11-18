@@ -18,34 +18,57 @@
 
 import {isNull} from '@sindresorhus/is';
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
-import {Maybe} from 'true-myth';
+import {Maybe, task} from 'true-myth';
 
-import {DownloadBrowserLogs} from './downloadBrowserLogs';
+import {DownloadApplicationLogs} from './downloadApplicationLogs';
 
-import type {BrowserLogDownload, BrowserLogDownloadOutcome} from '../../../../logger/createBrowserLogDownload';
+import englishTranslations from '../../../../../i18n/en-US.json';
+import type {ApplicationLogDownload} from '../../../../logger/applicationLogDownload';
 import {ThemeProvider} from '../../../../uiKit/identity/theme/theme';
-import {translateForTest} from '../../../../util/test/translateForTest';
+import type {TranslationKey} from '../../../../util/localizerUtil/translationTypes';
 
-function renderDownload(downloadBrowserLogs: Maybe<BrowserLogDownload>): void {
+function translateToEnglish(key: TranslationKey): string {
+  return englishTranslations[key];
+}
+
+function renderDownload(downloadApplicationLogs: Maybe<ApplicationLogDownload>): void {
   render(
     <ThemeProvider>
-      <DownloadBrowserLogs downloadBrowserLogs={downloadBrowserLogs} translate={translateForTest} />
+      <DownloadApplicationLogs downloadApplicationLogs={downloadApplicationLogs} translate={translateToEnglish} />
     </ThemeProvider>,
   );
 }
 
-describe('DownloadBrowserLogs', () => {
+describe('DownloadApplicationLogs', () => {
+  it('labels the diagnostic logs section and download button', () => {
+    renderDownload(
+      Maybe.just(() => {
+        return task.resolve('saved');
+      }),
+    );
+
+    expect(screen.getByRole('group', {name: 'Diagnostic logs'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Download application logs'})).toBeEnabled();
+  });
+
   it('renders nothing when the download capability is unavailable', () => {
     renderDownload(Maybe.nothing());
+    expect(screen.queryByRole('group', {name: 'Diagnostic logs'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it.each(['saved', 'cancelled', 'failed'] as const)(
     'restores the button after %s and only reports failures',
     async outcome => {
-      const completion = Promise.withResolvers<BrowserLogDownloadOutcome>();
+      const completion = Promise.withResolvers<void>();
       const download = jest.fn(() => {
-        return completion.promise;
+        return task
+          .tryOr('failed' as const, () => {
+            return completion.promise;
+          })
+          .andThen(() => {
+            return outcome === 'failed' ? task.reject(outcome) : task.resolve(outcome);
+          });
       });
       renderDownload(Maybe.just(download));
       const button = screen.getByRole('button');
@@ -58,7 +81,7 @@ describe('DownloadBrowserLogs', () => {
       fireEvent.click(button);
       expect(download).toHaveBeenCalledTimes(1);
       await act(async () => {
-        completion.resolve(outcome);
+        completion.resolve();
       });
       expect(button).toBeEnabled();
       expect(isNull(screen.queryByRole('alert'))).toBe(outcome !== 'failed');
@@ -70,16 +93,24 @@ describe('DownloadBrowserLogs', () => {
     },
   );
 
-  it('recovers from unexpected rejections and clears the error on retry', async () => {
-    const retry = Promise.withResolvers<BrowserLogDownloadOutcome>();
+  it('recovers from an unexpected throw and clears the error on retry', async () => {
+    const retry = Promise.withResolvers<'saved'>();
     const download = jest
-      .fn<ReturnType<BrowserLogDownload>, []>()
-      .mockRejectedValueOnce(new Error('Unexpected failure'))
-      .mockReturnValueOnce(retry.promise);
+      .fn<ReturnType<ApplicationLogDownload>, []>()
+      .mockImplementationOnce(() => {
+        throw new Error('Unexpected failure');
+      })
+      .mockImplementationOnce(() => {
+        return task.tryOr('failed' as const, () => {
+          return retry.promise;
+        });
+      });
     renderDownload(Maybe.just(download));
     const button = screen.getByRole('button');
     fireEvent.click(button);
-    expect(await screen.findByRole('alert')).toHaveTextContent(translateForTest('preferencesBrowserLogsFailed'));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Application logs could not be downloaded. Please try again.',
+    );
     expect(button).toBeEnabled();
     fireEvent.click(button);
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();

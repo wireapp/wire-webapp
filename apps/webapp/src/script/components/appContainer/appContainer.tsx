@@ -43,7 +43,7 @@ import {useSingleInstance} from '../../hooks/useSingleInstance';
 import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import type {FetchLatestBuildMetadata} from '../../lifecycle/newVersionHandler';
 import {setAppLocale} from '../../localization/Localizer';
-import type {BrowserLogDownload} from '../../logger/createBrowserLogDownload';
+import type {ApplicationLogDownload} from '../../logger/applicationLogDownload';
 import {App} from '../../main/app';
 import type {ApplicationObservability} from '../../observability/applicationObservability';
 import {AppMain} from '../../page/appMain';
@@ -64,7 +64,7 @@ import {PrimaryModalComponent} from '../Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from '../Modals/QualityFeedbackModal';
 
 type AppProps = {
-  readonly downloadBrowserLogs: Maybe<BrowserLogDownload>;
+  readonly downloadApplicationLogs: Maybe<ApplicationLogDownload>;
   readonly cleanupAccountLogs: (qualifiedId: Maybe<Readonly<QualifiedId>>) => Promise<void>;
   readonly onAuthenticatedAccount: (qualifiedId: Readonly<QualifiedId>) => Promise<void>;
   readonly config: Configuration;
@@ -82,7 +82,7 @@ type AppProps = {
 
 export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) => {
   const {
-    downloadBrowserLogs,
+    downloadApplicationLogs,
     cleanupAccountLogs,
     onAuthenticatedAccount,
     config,
@@ -171,7 +171,7 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
 
   const rootContextValue = useMemo(() => {
     return {
-      downloadBrowserLogs,
+      downloadApplicationLogs,
       fireAndForgetInvoker,
       mainViewModel: mainView,
       clock,
@@ -196,7 +196,7 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
   }, [
     clock,
     doesApplicationNeedForceReload,
-    downloadBrowserLogs,
+    downloadApplicationLogs,
     fireAndForgetInvoker,
     isFeatureToggleEnabled,
     mainView,

@@ -109,7 +109,7 @@ const RootComponent: FunctionComponent<RootProps & ConnectedProps & DispatchProp
       mainViewModel: createAuthMainViewModel(),
       clock,
       doesApplicationNeedForceReload: false,
-      downloadBrowserLogs: Maybe.nothing(),
+      downloadApplicationLogs: Maybe.nothing(),
       isFeatureToggleEnabled() {
         return false;
       },

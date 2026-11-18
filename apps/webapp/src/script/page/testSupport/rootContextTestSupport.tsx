@@ -89,7 +89,7 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
 
   return {
     doesApplicationNeedForceReload,
-    downloadBrowserLogs: Maybe.nothing(),
+    downloadApplicationLogs: Maybe.nothing(),
     fireAndForgetInvoker,
     isFeatureToggleEnabled,
     mainViewModel,

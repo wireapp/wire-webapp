@@ -83,7 +83,7 @@ export async function startApplication(
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
   const config = Config.getConfig();
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
-  const downloadBrowserLogs = createBrowserLogDownload({
+  const downloadApplicationLogs = createBrowserLogDownload({
     startupFeatureToggles,
     isElectron: Runtime.isElectron(),
     showSaveFilePicker: isFunction(window.showSaveFilePicker)
@@ -299,7 +299,7 @@ export async function startApplication(
 
   createRoot(appContainer).render(
     <AppContainer
-      downloadBrowserLogs={downloadBrowserLogs}
+      downloadApplicationLogs={downloadApplicationLogs}
       cleanupAccountLogs={cleanupAccountLogs}
       onAuthenticatedAccount={onAuthenticatedAccount}
       config={config}
