@@ -303,6 +303,19 @@ describe('meetingSchema', () => {
     ).toBe(false);
   });
 
+  it('keeps the meeting list loadable when a stored address contains an ampersand', () => {
+    const meetings = [
+      {...validMeeting, invited_emails: ['a&b@example.com']},
+      {...validMeeting, title: 'Second meeting'},
+    ];
+    const result = meetingsListResponseSchema.safeParse(meetings);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toHaveLength(2);
+      expect(result.data[0].invited_emails).toEqual(['a&b@example.com']);
+    }
+  });
+
   it('validates meetings list responses', () => {
     expect(meetingsListResponseSchema.safeParse([validMeeting]).success).toBe(true);
     expect(meetingsListResponseSchema.safeParse([{title: 'invalid'}]).success).toBe(false);
