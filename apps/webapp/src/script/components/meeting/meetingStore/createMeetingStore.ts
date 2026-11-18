@@ -285,8 +285,12 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
               })
               .map(conversation => {
                 const selectedUsers = [...conversation.participating_user_ets()];
-                const formState = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers, deps.clock);
-                formState.invitedEmails = apiMeeting.invited_emails ?? [];
+                const formState = mapMeetingInstanceToScheduleFormState(
+                  meetingInstance,
+                  selectedUsers,
+                  deps.clock,
+                  apiMeeting.invited_emails ?? [],
+                );
 
                 return {
                   formState,

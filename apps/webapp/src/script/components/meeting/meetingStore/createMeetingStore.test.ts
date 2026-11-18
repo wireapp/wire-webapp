@@ -37,6 +37,7 @@ import {unwrap, unwrapErr} from '../../../util/test/resultTestSupport';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 import {createMeetingStore} from './createMeetingStore';
+import {meetingSubmitErrors} from '../meetingSubmitErrors';
 import type {MeetingStoreDeps, MeetingStoreServiceTasks} from './meetingStoreDeps';
 
 describe('createMeetingStore', () => {
@@ -346,6 +347,7 @@ describe('createMeetingStore', () => {
       end: new Date('2026-06-16T11:00:00.000Z'),
       recurrence: 'doesNotRepeat' as const,
       selectedUsers: [],
+      invitedEmails: [],
     };
 
     const result = await store.getState().scheduleMeeting(scheduleCommand);
@@ -374,6 +376,7 @@ describe('createMeetingStore', () => {
     const meetNowCommand = {
       title: 'Standup',
       selectedUsers: [],
+      invitedEmails: [],
     };
 
     const result = await store.getState().meetNowMeeting(meetNowCommand);
@@ -388,6 +391,17 @@ describe('createMeetingStore', () => {
     expect(getMeeting).toHaveBeenCalledWith(apiMeeting.qualified_id);
     expect(getMeetingsList).not.toHaveBeenCalled();
     expect(store.getState().meetingSeries).toEqual([expect.objectContaining(meetingSeriesEntry)]);
+  });
+
+  it('returns updateFailed when fetching a meeting for edit fails', async () => {
+    const getMeeting = jest.fn().mockReturnValue(task.reject(new Error('network error')));
+    const safeGetConversationById = jest.fn();
+    const store = createMeetingStore(createDeps({getMeeting, safeGetConversationById}));
+
+    const result = await store.getState().loadMeetingForEdit(listMeetingInstance);
+
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.updateFailed);
+    expect(safeGetConversationById).not.toHaveBeenCalled();
   });
 
   it('loads meeting data for edit via safeGetConversationById', async () => {
