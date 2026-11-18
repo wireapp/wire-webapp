@@ -92,7 +92,7 @@ describe('experimental AVS audio identity hook', () => {
     expect(identities()).toEqual([]);
   });
 
-  it('forwards track and user/client IDs through the public AVS hook', () => {
+  it('extends the stream callback with sender metadata only when opted in', () => {
     const handler = jest.fn();
     const context = createContext({
       exports: {},
@@ -110,17 +110,33 @@ describe('experimental AVS audio identity hook', () => {
       }),
     });
     runInContext(pcSource, context);
+    const streams = [{}];
     context.connectionsStore = {
       getPeerConnectionBySelf: () => {
-        return [{convid: 'conversation'}];
+        return [
+          {
+            convid: 'conversation',
+            rtc: {},
+            audioStreams: {'receiver-1': {streamId: 'original-stream', streams, track: {readyState: 'live'}}},
+          },
+        ];
       },
     };
-    context.exports.default.setAudioSourceHandler(handler);
+    context.exports.default.setAudioStreamHandler(handler);
     context.createWorker();
     context.worker.onmessage({
       data: {op: 'audioSource', self: 7, track_id: 'receiver-1', userid: 'Bob', clientid: 'client-Bob'},
     });
-    expect(handler).toHaveBeenCalledWith('conversation', 'receiver-1', 'Bob', 'client-Bob');
+    expect(handler).not.toHaveBeenCalled();
+    context.exports.default.setAudioStreamHandler(handler, true);
+    context.worker.onmessage({
+      data: {op: 'audioSource', self: 7, track_id: 'receiver-1', userid: 'Bob', clientid: 'client-Bob'},
+    });
+    expect(handler).toHaveBeenCalledWith('conversation', 'original-stream', streams, {
+      trackId: 'receiver-1',
+      userId: 'Bob',
+      clientId: 'client-Bob',
+    });
   });
 
   it('forwards peer identity for direct calls when the identity arrives after the track', () => {
@@ -142,16 +158,17 @@ describe('experimental AVS audio identity hook', () => {
         return {
           convid: 'conversation',
           conv_type: 0,
-          rtc: {
-            getReceivers: () => {
-              return [{track: {id: 'receiver-1', kind: 'audio'}}];
-            },
-          },
+          rtc: {},
+          audioStreams: {'receiver-1': {streamId: 'original-stream', streams: [], track: {readyState: 'live'}}},
         };
       },
     };
-    context.exports.default.setAudioSourceHandler(handler);
+    context.exports.default.setAudioStreamHandler(handler, true);
     context.pc_SetRemoteUserClientId(7, 1, 2);
-    expect(handler).toHaveBeenCalledWith('conversation', 'receiver-1', 'Bob', 'client-Bob');
+    expect(handler).toHaveBeenCalledWith('conversation', 'original-stream', [], {
+      trackId: 'receiver-1',
+      userId: 'Bob',
+      clientId: 'client-Bob',
+    });
   });
 });

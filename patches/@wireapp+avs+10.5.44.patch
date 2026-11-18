@@ -1,37 +1,30 @@
 diff --git a/node_modules/@wireapp/avs/dist/avs_pc.d.ts b/node_modules/@wireapp/avs/dist/avs_pc.d.ts
-index 453d8d7..8e4dbc3 100644
+index 453d8d7..318cea8 100644
 --- a/node_modules/@wireapp/avs/dist/avs_pc.d.ts
 +++ b/node_modules/@wireapp/avs/dist/avs_pc.d.ts
-@@ -1,3 +1,4 @@
-+export type AudioSourceHandler = (convid: string, trackId: string, userid: string, clientid: string) => void;
+@@ -1,11 +1,11 @@
  import { WcallLogHandler } from "./avs_wcall";
  export type UserMediaHandler = (convid: string, useAudio: boolean, useVideo: boolean, useScreenShare: boolean) => Promise<MediaStream>;
- export type AudioStreamHandler = (convid: string, stream_id: string, streams: readonly MediaStream[] | null) => void;
-@@ -5,6 +6,7 @@ export type VideoStreamHandler = (convid: string, remote_userid: string, remote_
+-export type AudioStreamHandler = (convid: string, stream_id: string, streams: readonly MediaStream[] | null) => void;
++export type AudioStreamHandler = (convid: string, stream_id: string, streams: readonly MediaStream[] | null, source?: {trackId: string; userId: string; clientId: string}) => void;
+ export type VideoStreamHandler = (convid: string, remote_userid: string, remote_clientid: string, streams: readonly MediaStream[] | null) => void;
  declare function pc_InitModule(module: any, logh: WcallLogHandler): void;
  declare function pc_SetUserMediaHandler(umh: UserMediaHandler): void;
  declare function pc_IsConferenceCallingSupported(): boolean;
-+declare function pc_SetAudioSourceHandler(handler: AudioSourceHandler): void;
- declare function pc_SetAudioStreamHandler(ash: AudioStreamHandler): void;
+-declare function pc_SetAudioStreamHandler(ash: AudioStreamHandler): void;
++declare function pc_SetAudioStreamHandler(ash: AudioStreamHandler, withSource?: boolean): void;
  declare function pc_SetVideoStreamHandler(vsh: VideoStreamHandler): void;
  declare function pc_ReplaceTrack(convid: string, newTrack: MediaStreamTrack): void;
-@@ -16,6 +18,7 @@ declare const _default: {
-     init: typeof pc_InitModule;
-     setUserMediaHandler: typeof pc_SetUserMediaHandler;
-     setAudioStreamHandler: typeof pc_SetAudioStreamHandler;
-+    setAudioSourceHandler: typeof pc_SetAudioSourceHandler;
-     setVideoStreamHandler: typeof pc_SetVideoStreamHandler;
-     isConferenceCallingSupported: typeof pc_IsConferenceCallingSupported;
-     replaceTrack: typeof pc_ReplaceTrack;
+ declare function pc_GetStats(convid: string): Promise<Array<{
 diff --git a/node_modules/@wireapp/avs/dist/avs_pc.js b/node_modules/@wireapp/avs/dist/avs_pc.js
-index 76f9c31..ca826f6 100644
+index 76f9c31..aaf8f6d 100644
 --- a/node_modules/@wireapp/avs/dist/avs_pc.js
 +++ b/node_modules/@wireapp/avs/dist/avs_pc.js
 @@ -7,6 +7,7 @@ var em_module;
  var logFn = null;
  var userMediaHandler = null;
  var audioStreamHandler = null;
-+var audioSourceHandler = null;
++var includeAudioSource = false;
  var videoStreamHandler = null;
  var insertableLegacy = false;
  var insertableStreams = false;
@@ -48,26 +41,35 @@ index 76f9c31..ca826f6 100644
              var _b = event.data, level = _b.level, logString = _b.logString;
              pc_log(level, logString);
          }
-+        else if (op === 'audioSource' && audioSourceHandler) {
-+            var sources = connectionsStore.getPeerConnectionBySelf(self);
-+            sources.forEach(function (pc) {
-+                audioSourceHandler(pc.convid, event.data.track_id, event.data.userid, event.data.clientid);
++        else if (op === 'audioSource' && includeAudioSource) {
++            var pcs = connectionsStore.getPeerConnectionBySelf(self);
++            pcs.forEach(function(pc) {
++                updateAudioSource(pc, event.data.track_id, event.data.userid, event.data.clientid);
 +            });
 +        }
          else if (op === 'setvstream') {
              var _c = event.data, userid = _c.userid, clientid = _c.clientid, ssrc = _c.ssrc, track_id = _c.track_id;
              pc_log(LOG_LEVEL_INFO, "setvstream: called");
-@@ -641,6 +648,9 @@ function pc_Create(hnd, privacy, conv_type) {
+@@ -639,8 +646,16 @@ function pc_Create(hnd, privacy, conv_type) {
+             }
+         }
          if (event.track.kind == "audio" && audioStreamHandler) {
-             pc_log(LOG_LEVEL_INFO, "onTrack: calling ash(".concat(pc.convid.substring(0, 8), ", ").concat(label, ") with ").concat(event.streams.length, " streams"));
-             audioStreamHandler(pc.convid, hnd.toString() + label, event.streams);
-+            if (audioSourceHandler && pc.conv_type !== CONV_TYPE_CONFERENCE && pc.remote_userid) {
-+                audioSourceHandler(pc.convid, event.track.id, pc.remote_userid, pc.remote_clientid);
+-            pc_log(LOG_LEVEL_INFO, "onTrack: calling ash(".concat(pc.convid.substring(0, 8), ", ").concat(label, ") with ").concat(event.streams.length, " streams"));
+-            audioStreamHandler(pc.convid, hnd.toString() + label, event.streams);
++            var streamId = hnd.toString() + label;
++            if (includeAudioSource) {
++                var audioStreams = pc.audioStreams || {};
++                audioStreams[event.track.id] = {streamId: streamId, streams: event.streams, track: event.track};
++                pc.audioStreams = audioStreams;
 +            }
++            var source = includeAudioSource && pc.conv_type !== CONV_TYPE_CONFERENCE && pc.remote_userid && pc.remote_clientid
++                ? {trackId: event.track.id, userId: pc.remote_userid, clientId: pc.remote_clientid} : undefined;
++            if (source) audioStreamHandler(pc.convid, streamId, event.streams, source);
++            else audioStreamHandler(pc.convid, streamId, event.streams);
          }
          if (event.track.kind == "video" && videoStreamHandler) {
              var userid = pc.remote_userid;
-@@ -939,6 +949,7 @@ function setupReceiverTransform(pc, receiver) {
+@@ -939,6 +954,7 @@ function setupReceiverTransform(pc, receiver) {
      worker.postMessage({
          op: 'setupReceiver',
          self: pc.self,
@@ -75,67 +77,73 @@ index 76f9c31..ca826f6 100644
          readableStream: readableStream,
          writableStream: writableStream,
      }, [readableStream, writableStream]);
-@@ -1288,6 +1299,13 @@ function pc_SetRemoteUserClientId(hnd, useridPtr, clientidPtr) {
+@@ -1086,6 +1102,10 @@ function pc_RemoveUserInfo(hnd, labelPtr) {
+         return;
+     }
+     if (pc.users.hasOwnProperty(label)) {
++        var audioStreams = pc.audioStreams || {};
++        Object.keys(audioStreams).forEach(function(trackId) {
++            if (audioStreams[trackId].streamId === hnd.toString() + label) delete audioStreams[trackId];
++        });
+         if (audioStreamHandler) {
+             pc_log(LOG_LEVEL_INFO, "pcRemoveUserInfo: calling ash(".concat(pc.convid.substring(0, 8), ", ").concat(label, ") with 0 streams"));
+             audioStreamHandler(pc.convid, hnd.toString() + label, null);
+@@ -1288,6 +1308,11 @@ function pc_SetRemoteUserClientId(hnd, useridPtr, clientidPtr) {
      }
      pc.remote_userid = em_module.UTF8ToString(useridPtr);
      pc.remote_clientid = em_module.UTF8ToString(clientidPtr);
-+    if (audioSourceHandler && pc.conv_type !== CONV_TYPE_CONFERENCE && pc.remote_userid && pc.rtc) {
-+        pc.rtc.getReceivers().forEach(function (receiver) {
-+            if (receiver.track.kind === 'audio') {
-+                audioSourceHandler(pc.convid, receiver.track.id, pc.remote_userid, pc.remote_clientid);
-+            }
++    if (includeAudioSource && pc.conv_type !== CONV_TYPE_CONFERENCE && pc.remote_userid && pc.remote_clientid) {
++        Object.keys(pc.audioStreams || {}).forEach(function(trackId) {
++            updateAudioSource(pc, trackId, pc.remote_userid, pc.remote_clientid);
 +        });
 +    }
  }
  /* Data Channel related */
  function pc_CreateDataChannel(hnd, labelPtr) {
-@@ -1412,6 +1430,9 @@ function pc_SetUserMediaHandler(umh) {
+@@ -1412,8 +1437,16 @@ function pc_SetUserMediaHandler(umh) {
  function pc_IsConferenceCallingSupported() {
      return insertableStreams || insertableLegacy;
  }
-+function pc_SetAudioSourceHandler(handler) {
-+    audioSourceHandler = handler;
+-function pc_SetAudioStreamHandler(ash) {
++function updateAudioSource(pc, trackId, userId, clientId) {
++    var audio = pc.audioStreams && pc.audioStreams[trackId];
++    if (includeAudioSource && audioStreamHandler && pc.rtc && audio && audio.track.readyState !== 'ended') {
++        audioStreamHandler(pc.convid, audio.streamId, audio.streams, {trackId: trackId, userId: userId, clientId: clientId});
++    }
 +}
- function pc_SetAudioStreamHandler(ash) {
++function pc_SetAudioStreamHandler(ash, withSource) {
++    if (withSource === void 0) { withSource = false; }
      audioStreamHandler = ash;
++    includeAudioSource = withSource;
  }
-@@ -1524,6 +1545,7 @@ exports.default = {
-     init: pc_InitModule,
-     setUserMediaHandler: pc_SetUserMediaHandler,
-     setAudioStreamHandler: pc_SetAudioStreamHandler,
-+    setAudioSourceHandler: pc_SetAudioSourceHandler,
-     setVideoStreamHandler: pc_SetVideoStreamHandler,
-     isConferenceCallingSupported: pc_IsConferenceCallingSupported,
-     replaceTrack: pc_ReplaceTrack,
+ function pc_SetVideoStreamHandler(vsh) {
+     videoStreamHandler = vsh;
 diff --git a/node_modules/@wireapp/avs/dist/avs_wcall.d.ts b/node_modules/@wireapp/avs/dist/avs_wcall.d.ts
-index 3368211..8a04422 100644
+index 3368211..4d0276a 100644
 --- a/node_modules/@wireapp/avs/dist/avs_wcall.d.ts
 +++ b/node_modules/@wireapp/avs/dist/avs_wcall.d.ts
-@@ -1,4 +1,4 @@
--import { UserMediaHandler, AudioStreamHandler, VideoStreamHandler } from "./avs_pc";
-+import { UserMediaHandler, AudioStreamHandler, VideoStreamHandler, AudioSourceHandler } from "./avs_pc";
- import { ScanReport } from "./avs_scan";
- export type { ScanCandidate, ScanReport, ScanRun } from "./avs_scan";
- import { ConnectionTestProgress, ConnectionTestResult } from "./avs_connection_test";
-@@ -197,6 +197,7 @@ export declare class Wcall {
+@@ -196,7 +196,7 @@ export declare class Wcall {
+     getMode(): number;
      setConfigVersion(sft_version: number, turn_version: number): void;
      setUserMediaHandler(userMediaHandler: UserMediaHandler): void;
-     setAudioStreamHandler(audioStreamHandler: AudioStreamHandler): void;
-+    setAudioSourceHandler(handler: AudioSourceHandler): void;
+-    setAudioStreamHandler(audioStreamHandler: AudioStreamHandler): void;
++    setAudioStreamHandler(audioStreamHandler: AudioStreamHandler, withSource?: boolean): void;
      setVideoStreamHandler(videoStreamHandler: VideoStreamHandler): void;
      isConferenceCallingSupported(): boolean;
      replaceTrack(convid: string, newTrack: MediaStreamTrack): void;
 diff --git a/node_modules/@wireapp/avs/dist/avs_wcall.js b/node_modules/@wireapp/avs/dist/avs_wcall.js
-index f0f6a47..fbbabd8 100644
+index f0f6a47..fe608e0 100644
 --- a/node_modules/@wireapp/avs/dist/avs_wcall.js
 +++ b/node_modules/@wireapp/avs/dist/avs_wcall.js
-@@ -737,6 +737,9 @@ var Wcall = /** @class */ (function () {
+@@ -737,8 +737,9 @@ var Wcall = /** @class */ (function () {
      Wcall.prototype.setUserMediaHandler = function (userMediaHandler) {
          avs_pc_1.default.setUserMediaHandler(userMediaHandler);
      };
-+    Wcall.prototype.setAudioSourceHandler = function (handler) {
-+        avs_pc_1.default.setAudioSourceHandler(handler);
-+    };
-     Wcall.prototype.setAudioStreamHandler = function (audioStreamHandler) {
-         avs_pc_1.default.setAudioStreamHandler(audioStreamHandler);
+-    Wcall.prototype.setAudioStreamHandler = function (audioStreamHandler) {
+-        avs_pc_1.default.setAudioStreamHandler(audioStreamHandler);
++    Wcall.prototype.setAudioStreamHandler = function (audioStreamHandler, withSource) {
++        if (withSource === void 0) { withSource = false; }
++        avs_pc_1.default.setAudioStreamHandler(audioStreamHandler, withSource);
      };
+     Wcall.prototype.setVideoStreamHandler = function (videoStreamHandler) {
+         avs_pc_1.default.setVideoStreamHandler(videoStreamHandler);

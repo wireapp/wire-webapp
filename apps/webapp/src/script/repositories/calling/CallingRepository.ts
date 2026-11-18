@@ -671,8 +671,7 @@ export class CallingRepository {
     const avsEnv = Runtime.isFirefox() || Runtime.isSafari() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     wCall.init(avsEnv);
     wCall.setUserMediaHandler(this.getCallMediaStream);
-    wCall.setAudioStreamHandler(this.updateCallAudioStreams);
-    wCall.setAudioSourceHandler?.(this.updateCallAudioSource);
+    wCall.setAudioStreamHandler(this.updateCallAudioStreams, true);
     wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
     this.isConferenceCallingSupported = wCall.isConferenceCallingSupported();
     let last = Date.now();
@@ -3312,24 +3311,19 @@ export class CallingRepository {
     }
   };
 
-  private readonly updateCallAudioSource = (
-    convId: SerializedConversationId,
-    trackId: string,
-    userId: string,
-    clientId: string,
-  ): void => {
-    const call = this.findCall(this.parseQualifiedId(convId));
-    call?.setNoteTakerAudioIdentity(trackId, this.parseQualifiedId(userId), clientId);
-  };
-
   private readonly updateCallAudioStreams = (
     convId: SerializedConversationId,
     streamId: string,
     streams: readonly MediaStream[] | null,
+    source?: {trackId: string; userId: string; clientId: string},
   ): void => {
     const call = this.findCall(this.parseQualifiedId(convId));
     if (isUndefined(call)) {
       return;
+    }
+
+    if (!isUndefined(source)) {
+      call.setNoteTakerAudioIdentity(source.trackId, this.parseQualifiedId(source.userId), source.clientId);
     }
 
     if (streams === null || streams.length === 0) {

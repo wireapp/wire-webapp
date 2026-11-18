@@ -163,6 +163,10 @@ export class Call {
   }
 
   addAudio(audioId: string, stream: MediaStream): void {
+    // Sender metadata can refresh the same stream without replacing its audio element.
+    if (this.audios[audioId]?.stream === stream) {
+      return;
+    }
     this.audios[audioId] = {audioElement: null, stream};
   }
 

@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {noop} from 'noop-esm';
 
 import {CALL_TYPE, CONV_TYPE, Wcall} from '@wireapp/avs';
 
@@ -120,6 +121,40 @@ describe('Call', () => {
     call.addParticipant(secondParticipant);
     call.addParticipant(firstParticipant);
     call.addParticipant(thirdParticipant);
+  });
+
+  it('updates stream sender metadata without replacing the playing audio element', () => {
+    const stream = new MediaStream([new window.RTCAudioSource().createTrack()]);
+    const findCall = jest.spyOn(callingRepository, 'findCall').mockReturnValue(call);
+    const play = jest.spyOn(call, 'playAudioStreams').mockImplementation(noop);
+    const identity = jest.spyOn(call, 'setNoteTakerAudioIdentity');
+    try {
+      callingRepository['updateCallAudioStreams']('conversation', 'receiver', [stream]);
+      const audio = call['audios']['receiver'];
+      const element = document.createElement('audio');
+      audio.audioElement = element;
+      callingRepository['updateCallAudioStreams']('conversation', 'receiver', [stream], {
+        trackId: 'track',
+        userId: 'alice@wire.test',
+        clientId: 'alice-client',
+      });
+      expect(identity).toHaveBeenLastCalledWith('track', {id: 'alice', domain: 'wire.test'}, 'alice-client');
+      callingRepository['updateCallAudioStreams']('conversation', 'receiver', [stream], {
+        trackId: 'track',
+        userId: 'bob@wire.test',
+        clientId: 'bob-client',
+      });
+      expect(identity).toHaveBeenLastCalledWith('track', {id: 'bob', domain: 'wire.test'}, 'bob-client');
+      expect(call['audios']['receiver'].audioElement).toBe(element);
+      expect(call['audios']['receiver']).toBe(audio);
+    } finally {
+      stream.getTracks().forEach(track => {
+        track.stop();
+      });
+      findCall.mockRestore();
+      play.mockRestore();
+      identity.mockRestore();
+    }
   });
 
   it('maps AVS receiver tracks to participant identity and handles a sender switch', () => {
