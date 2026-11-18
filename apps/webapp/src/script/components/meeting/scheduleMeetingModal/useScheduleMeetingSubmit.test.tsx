@@ -61,6 +61,7 @@ const formState = {
   end: maybe.just(futureEndDate),
   recurrence: 'doesNotRepeat' as const,
   selectedUsers: [],
+  invitedEmails: [],
   participantsFilter: '',
   password: '',
   passwordConfirmation: '',
@@ -72,6 +73,7 @@ const scheduleCommand = {
   end: futureEndDate,
   recurrence: 'doesNotRepeat' as const,
   selectedUsers: [],
+  invitedEmails: [],
 };
 
 const updateCommand = {
@@ -338,6 +340,29 @@ describe('useScheduleMeetingSubmit', () => {
 
     expect(submitResult).toBe(scheduleMeetingSubmitResults.submitFailed);
     expect(updateMeeting).not.toHaveBeenCalled();
+  });
+
+  it('keeps fetched email invitees as the original edit selection', () => {
+    const invitedEmails = ['guest@example.com'];
+    useScheduleMeetingModal.getState().openEdit(
+      {
+        title: formState.title,
+        qualified_id: {id: 'meeting-id', domain: 'example.com'},
+        qualified_creator: {id: 'creator-id', domain: 'example.com'},
+        qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+        series_start_date: '2026-06-16T10:00:00.000Z',
+        series_end_date: '2026-06-16T11:00:00.000Z',
+        duration_ms: 3_600_000,
+        recurrence: 'doesNotRepeat',
+        conversation_id: 'conversation-id',
+        tzid: 'Europe/Berlin',
+        has_password: false,
+      },
+      {...formState, invitedEmails},
+      {id: 'conversation-id', domain: 'example.com'},
+      [],
+    );
+    expect(useScheduleMeetingModal.getState().originalInvitedEmails).toEqual(invitedEmails);
   });
 
   const openEditMeetingModal = ({
