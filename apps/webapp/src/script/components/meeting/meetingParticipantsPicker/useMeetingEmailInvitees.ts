@@ -37,6 +37,7 @@ interface UseMeetingEmailInviteesResult {
   emailError: Maybe<MeetingEmailError>;
   clearEmailError: () => void;
   handleEmailKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
+  selectEmail: (email: string) => void;
   removeEmail: (email: string) => void;
 }
 
@@ -54,14 +55,11 @@ export const useMeetingEmailInvitees = ({
     }
   }, [isOpen]);
 
-  const handleEmailKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
-    if (event.key !== 'Enter' || isUndefined(onInvitedEmailsChange)) {
+  const selectEmail = (value: string): void => {
+    if (isUndefined(onInvitedEmailsChange)) {
       return;
     }
-
-    event.preventDefault();
-    event.stopPropagation();
-    const email = event.currentTarget.value.trim();
+    const email = value.trim();
     if (!email.includes('@')) {
       return;
     }
@@ -83,6 +81,15 @@ export const useMeetingEmailInvitees = ({
     setEmailError(Maybe.nothing());
   };
 
+  const handleEmailKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
+    if (event.key !== 'Enter' || isUndefined(onInvitedEmailsChange)) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    selectEmail(event.currentTarget.value);
+  };
+
   const removeEmail = (email: string): void => {
     onInvitedEmailsChange?.(
       invitedEmails.filter(item => {
@@ -97,6 +104,7 @@ export const useMeetingEmailInvitees = ({
       setEmailError(Maybe.nothing());
     },
     handleEmailKeyDown,
+    selectEmail,
     removeEmail,
   };
 };

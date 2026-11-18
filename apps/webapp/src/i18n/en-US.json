@@ -1538,6 +1538,7 @@
   "meetings.scheduleModal.editTitle": "Edit Meeting",
   "meetings.scheduleModal.emailDuplicate": "This email address is already invited",
   "meetings.scheduleModal.emailInvalid": "Enter a valid email address",
+  "meetings.scheduleModal.inviteByEmail": "Invite by email",
   "meetings.scheduleModal.emailUnselect": "Unselect {email}",
   "meetings.scheduleModal.endsLabel": "Ends",
   "meetings.scheduleModal.error.addParticipantsFailed": "The meeting was saved, but some participants could not be added. Please try again.",

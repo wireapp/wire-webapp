@@ -141,6 +141,7 @@ const ControlledPicker: FunctionComponent<{
   initialSelected?: User[];
   initialEmails?: string[];
   initialFilter?: string;
+  isFederated?: boolean;
   searchByName?: (query: string, teamId?: string) => Promise<User[]>;
   availableUsers?: User[];
   label?: string;
@@ -149,6 +150,7 @@ const ControlledPicker: FunctionComponent<{
   initialSelected = [],
   initialEmails,
   initialFilter = '',
+  isFederated = false,
   searchByName = searchRepositoryDouble.searchByName,
   availableUsers = users,
   label = PARTICIPANTS_LABEL,
@@ -157,6 +159,7 @@ const ControlledPicker: FunctionComponent<{
   initialSelected?: User[];
   initialEmails?: string[];
   initialFilter?: string;
+  isFederated?: boolean;
   searchByName?: (query: string, teamId?: string) => Promise<User[]>;
   availableUsers?: User[];
   label?: string;
@@ -175,6 +178,7 @@ const ControlledPicker: FunctionComponent<{
       users={availableUsers}
       selectedUsers={selectedUsers}
       invitedEmails={isUndefined(initialEmails) ? undefined : invitedEmails}
+      isFederated={isFederated}
       onInvitedEmailsChange={isUndefined(initialEmails) ? undefined : setInvitedEmails}
       onSelectedUsersChange={setSelectedUsers}
       filter={filter}
@@ -276,6 +280,32 @@ describe('MeetingParticipantsPicker', () => {
     await waitFor(() => {
       expect(searchByName).toHaveBeenCalledWith('Alice', undefined);
     });
+  });
+
+  it('searches federated name@domain and offers a separate email invitation', async () => {
+    const user = userEvent.setup();
+    const federatedUser = createUser('remote', 'Remote Person', 'remote');
+    federatedUser.teamId = 'remote-team';
+    const searchByName = jest.fn().mockResolvedValue([federatedUser]);
+    render(
+      withThemeAndRootContext(
+        <ControlledPicker initialEmails={[]} isFederated searchByName={searchByName} />,
+        rootProviderWrapper,
+      ),
+    );
+
+    const input = getSearchInput();
+    await user.type(input, 'remote@example.com');
+    await waitFor(() => {return expect(searchByName).toHaveBeenCalledWith('remote@example.com', undefined)});
+    await user.click(await screen.findByRole('button', {name: CONTACTS_LABEL}));
+    await waitFor(() => {return expect(screen.getByText('Remote Person')).toBeInTheDocument()});
+    expect(screen.getByRole('button', {name: 'meetings.scheduleModal.inviteByEmail'})).toBeInTheDocument();
+    await user.click(screen.getByText('Remote Person'));
+    expect(screen.getByRole('button', {name: SELECTED_CONTACTS_LABEL})).toBeInTheDocument();
+    await user.type(input, 'remote@example.com');
+    await user.click(screen.getByRole('button', {name: 'meetings.scheduleModal.inviteByEmail'}));
+    expect(screen.getByText('remote@example.com')).toBeInTheDocument();
+    expect(input).toHaveValue('');
   });
 
   it('remains usable when remote people search rejects a query', async () => {
