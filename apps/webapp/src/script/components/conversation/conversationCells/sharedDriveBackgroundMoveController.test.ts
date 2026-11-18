@@ -43,9 +43,11 @@ describe('createSharedDriveBackgroundMoveController', () => {
       return cancel;
     });
     const controller = createSharedDriveBackgroundMoveController(publishStatus, observeJobs);
+    controller.register(status);
+    controller.setJobUuids(status.id, ['job-1']);
+    expect(controller.get(status.id)).toEqual({status, jobUuids: ['job-1']});
     const request = {
-      status,
-      jobUuids: ['job-1'],
+      operationId: status.id,
       cellsRepository: {getBackgroundMoveInfo: jest.fn()},
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
       random: () => {
@@ -74,10 +76,11 @@ describe('createSharedDriveBackgroundMoveController', () => {
       observed = options;
       return jest.fn();
     });
+    controller.register({...status, onReview: jest.fn(), isReviewing: true});
+    controller.setJobUuids(status.id, ['job-1']);
 
     controller.start({
-      status: {...status, onReview: jest.fn(), isReviewing: true},
-      jobUuids: ['job-1'],
+      operationId: status.id,
       cellsRepository: {getBackgroundMoveInfo: jest.fn()},
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
       random: () => {
@@ -97,10 +100,11 @@ describe('createSharedDriveBackgroundMoveController', () => {
     const controller = createSharedDriveBackgroundMoveController(jest.fn(), () => {
       return cancel;
     });
+    controller.register(status);
+    controller.setJobUuids(status.id, ['job-1']);
 
     controller.start({
-      status,
-      jobUuids: ['job-1'],
+      operationId: status.id,
       cellsRepository: {getBackgroundMoveInfo: jest.fn()},
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
       random: () => {

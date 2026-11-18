@@ -27,8 +27,7 @@ import type {SharedDriveMoveStatus, SharedDriveMoveStatusKind} from './sharedDri
 import type {CellsRepository} from '../../../repositories/cells/cellsRepository';
 
 export interface BackgroundMoveObservation {
-  readonly status: SharedDriveMoveStatus;
-  readonly jobUuids: readonly string[];
+  readonly operationId: string;
   readonly cellsRepository: Pick<CellsRepository, 'getBackgroundMoveInfo'>;
   readonly clock: Clock;
   readonly random: () => number;
@@ -36,8 +35,16 @@ export interface BackgroundMoveObservation {
 }
 
 interface SharedDriveBackgroundMoveController {
+  readonly register: (status: SharedDriveMoveStatus) => void;
+  readonly get: (id: string) => BackgroundMoveOperation | undefined;
+  readonly setJobUuids: (id: string, jobUuids: readonly string[]) => void;
   readonly start: (observation: BackgroundMoveObservation) => void;
   readonly stopAll: () => void;
+}
+
+export interface BackgroundMoveOperation {
+  readonly status: SharedDriveMoveStatus;
+  readonly jobUuids: readonly string[];
 }
 
 const kindForOutcome = (outcome: CellsBackgroundActionOutcome): SharedDriveMoveStatusKind => {
@@ -60,18 +67,28 @@ export const createSharedDriveBackgroundMoveController = (
   observeJobs: typeof observeCellsBackgroundActionJobs = observeCellsBackgroundActionJobs,
 ): SharedDriveBackgroundMoveController => {
   const observations = new Map<string, {cancel: () => void}>();
+  const operations = new Map<string, BackgroundMoveOperation>();
+  const register = (status: SharedDriveMoveStatus): void => {
+    operations.set(status.id, {status, jobUuids: []});
+  };
+  const get = (id: string): BackgroundMoveOperation | undefined => {
+    return operations.get(id);
+  };
+  const setJobUuids = (id: string, jobUuids: readonly string[]): void => {
+    const operation = operations.get(id);
+    if (operation !== undefined) {
+      operations.set(id, {...operation, jobUuids});
+    }
+  };
 
-  const start = ({
-    status: originatingStatus,
-    jobUuids,
-    cellsRepository,
-    clock,
-    random,
-    onOutcome,
-  }: BackgroundMoveObservation): void => {
+  const start = ({operationId, cellsRepository, clock, random, onOutcome}: BackgroundMoveObservation): void => {
+    const operation = operations.get(operationId);
+    if (operation === undefined || operation.jobUuids.length === 0) {
+      return;
+    }
     // The review callback belongs to the view that started the action and stops working once that view is gone.
     // A view that is still mounted publishes its own status with the callback again.
-    const {onReview: _onReview, isReviewing: _isReviewing, ...status} = originatingStatus;
+    const {onReview: _onReview, isReviewing: _isReviewing, ...status} = operation.status;
     if (observations.has(status.id)) {
       return;
     }
@@ -85,7 +102,7 @@ export const createSharedDriveBackgroundMoveController = (
     observation.cancel = observeJobs({
       actionName: 'move',
       cellsRepository,
-      jobUuids,
+      jobUuids: operation.jobUuids,
       clock,
       pollingPolicy: createBulkJobPollingPolicy(random),
       isCurrent: () => {
@@ -111,7 +128,8 @@ export const createSharedDriveBackgroundMoveController = (
       observation.cancel();
     }
     observations.clear();
+    operations.clear();
   };
 
-  return {start, stopAll};
+  return {register, get, setJobUuids, start, stopAll};
 };

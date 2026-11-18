@@ -47,9 +47,9 @@ interface CellsBulkMovePreviewPresentationProps {
   selectedItems: readonly SharedDriveMoveItem[];
   destinationPath: string;
   onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
-  onMoveStart: (summary: SharedDriveMoveSummary) => void;
-  onMoveResult: (response: RestPerformActionResponse, summary: SharedDriveMoveSummary) => boolean;
-  onMoveError: () => void;
+  onMoveStart: (summary: SharedDriveMoveSummary) => string;
+  onMoveResult: (response: RestPerformActionResponse, operationId: string) => boolean;
+  onMoveError: (operationId: string) => void;
   isMoveDisabled: boolean;
   isMoveLoading: boolean;
   isBackgroundMovePending: boolean;
@@ -94,16 +94,16 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
       items: selectedItems,
       destinationPath: destinationPath.length > 0 ? destinationPath : translate('cells.sharedDrive.title'),
     };
-    onMoveStart(moveSummary);
+    const operationId = onMoveStart(moveSummary);
 
     const moveResult = await onMove();
     if (moveResult.isErr) {
-      onMoveError();
+      onMoveError(operationId);
       return;
     }
 
     if (moveResult.isOk) {
-      const canCloseAfterMove = onMoveResult(moveResult.value, moveSummary);
+      const canCloseAfterMove = onMoveResult(moveResult.value, operationId);
       if (canCloseAfterMove && isCurrentDialog.current) {
         onClose();
       }

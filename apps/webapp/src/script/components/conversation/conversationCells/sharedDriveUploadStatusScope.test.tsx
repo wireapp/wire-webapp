@@ -17,16 +17,17 @@
  *
  */
 
-import type {ReactElement} from 'react';
+import type {ReactElement, ReactNode} from 'react';
 
-import {render, screen} from '@testing-library/react';
+import {act, render, renderHook, screen} from '@testing-library/react';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import userEvent from '@testing-library/user-event';
 import {Maybe, maybe} from 'true-myth';
 
-import {SharedDriveUploadStatusScope, useSharedDriveUploadStatus} from './sharedDriveUploadStatusContext';
+import {SharedDriveUploadStatusProvider, SharedDriveUploadStatusScope, useSharedDriveUploadStatus} from './sharedDriveUploadStatusContext';
 
 const StatusProbe = ({conversationId}: {readonly conversationId: string}): ReactElement => {
-  const {createMoveStatusId, dismissUpload, dismissedUpload, getMoveStatus, updateMoveStatus} =
+  const {createMoveStatusId, dismissUpload, dismissedUpload, getMoveStatus, startMoveStatus} =
     useSharedDriveUploadStatus();
   const status = getMoveStatus(conversationId);
   return (
@@ -38,7 +39,7 @@ const StatusProbe = ({conversationId}: {readonly conversationId: string}): React
       <button
         type="button"
         onClick={() => {
-          updateMoveStatus({
+          startMoveStatus({
             id: createMoveStatusId(),
             conversationQualifiedId: conversationId,
             action: 'move',
@@ -81,6 +82,38 @@ const StatusTree = ({
 };
 
 describe('SharedDriveUploadStatusScope', () => {
+  it('rejects a pending move result after its Files scope is gone', () => {
+    let scope = 'folder-a';
+    const wrapper = ({children}: {children: ReactNode}): ReactElement => {return (
+      <SharedDriveUploadStatusProvider resetOnScopeChange={Maybe.just(scope)}>{children}</SharedDriveUploadStatusProvider>
+    )};
+    const {result, rerender} = renderHook(useSharedDriveUploadStatus, {wrapper});
+    const status = {
+      id: 'move-a',
+      conversationQualifiedId: 'conversation-1',
+      action: 'move' as const,
+      kind: 'processing' as const,
+      items: [],
+      destinationPath: 'Reports',
+    };
+
+    act(() => {return result.current.startMoveStatus(status)});
+    scope = 'folder-b';
+    rerender();
+    act(() => {return result.current.updateMoveStatus({...status, kind: 'completed'})});
+    const getBackgroundMoveInfo = jest.fn();
+    act(() => {return result.current.observeBackgroundMove({
+      operationId: status.id,
+      cellsRepository: {getBackgroundMoveInfo},
+      clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+      random: () => {return 0.5},
+      onOutcome: jest.fn(),
+    })});
+
+    expect(maybe.isNothing(result.current.getMoveStatus('conversation-1'))).toBe(true);
+    expect(result.current.isMoveStatusCurrent('conversation-1', 'move-a')).toBe(false);
+    expect(getBackgroundMoveInfo).not.toHaveBeenCalled();
+  });
   it.each([
     {enabled: false, expectedOnReturn: 'empty'},
     {enabled: true, expectedOnReturn: 'processing'},

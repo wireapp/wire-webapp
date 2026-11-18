@@ -33,6 +33,7 @@ import {Maybe, maybe} from 'true-myth';
 import {
   createSharedDriveBackgroundMoveController,
   type BackgroundMoveObservation,
+  type BackgroundMoveOperation,
 } from './sharedDriveBackgroundMoveController';
 import type {DismissedUpload} from './sharedDriveUploadStatus';
 
@@ -67,8 +68,12 @@ type SharedDriveUploadStatusContextValue = {
   readonly dismissedUpload: Maybe<DismissedUpload>;
   readonly dismissUpload: (upload: DismissedUpload) => void;
   readonly getMoveStatus: (conversationQualifiedId: string) => Maybe<SharedDriveMoveStatus>;
+  readonly startMoveStatus: (status: SharedDriveMoveStatus) => void;
+  readonly isMoveStatusCurrent: (conversationQualifiedId: string, id: string) => boolean;
   readonly updateMoveStatus: (status: SharedDriveMoveStatus) => void;
   readonly createMoveStatusId: () => string;
+  readonly getMoveOperation: (id: string) => BackgroundMoveOperation | undefined;
+  readonly setMoveJobUuids: (id: string, jobUuids: readonly string[]) => void;
   readonly dismissMoveStatus: (id: string) => void;
   readonly clearMoveStatus: (id: string) => void;
   readonly observeBackgroundMove: (observation: BackgroundMoveObservation) => void;
@@ -83,11 +88,23 @@ const SharedDriveUploadStatusContext = createContext<SharedDriveUploadStatusCont
   getMoveStatus: () => {
     return Maybe.nothing();
   },
+  startMoveStatus: () => {
+    return undefined;
+  },
+  isMoveStatusCurrent: () => {
+    return false;
+  },
   updateMoveStatus: () => {
     return undefined;
   },
   createMoveStatusId: () => {
     return 'shared-drive-move-1';
+  },
+  getMoveOperation: () => {
+    return undefined;
+  },
+  setMoveJobUuids: () => {
+    return undefined;
   },
   dismissMoveStatus: () => {
     return undefined;
@@ -108,6 +125,15 @@ interface SharedDriveUploadStatusProviderProps {
   readonly resetOnScopeChange?: Maybe<string>;
 }
 
+interface CurrentMove {
+  readonly id: string;
+  readonly scopeKey: Maybe<string>;
+}
+
+const sameScope = (first: Maybe<string>, second: Maybe<string>): boolean => {
+  return maybe.isNothing(first) ? maybe.isNothing(second) : maybe.isJust(second) && first.value === second.value;
+};
+
 export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploadStatusProviderProps> = ({
   children,
   initialDismissedUpload = Maybe.nothing(),
@@ -120,6 +146,20 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
       ? new Map([[initialMoveStatus.value.conversationQualifiedId, initialMoveStatus.value]])
       : new Map();
   });
+  const currentScopeKey = useRef(resetOnScopeChange);
+  currentScopeKey.current = resetOnScopeChange;
+  const currentMoveIds = useRef(
+    new Map<string, CurrentMove>(
+      maybe.isJust(initialMoveStatus)
+        ? [
+            [
+              initialMoveStatus.value.conversationQualifiedId,
+              {id: initialMoveStatus.value.id, scopeKey: resetOnScopeChange},
+            ],
+          ]
+        : [],
+    ),
+  );
   const getMoveStatus = (conversationQualifiedId: string): Maybe<SharedDriveMoveStatus> => {
     return Maybe.of(moveStatuses.get(conversationQualifiedId));
   };
@@ -129,17 +169,40 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
     return `shared-drive-move-${moveStatusSequence.current}`;
   }, []);
   const dismissedMoveStatusIds = useRef(new Set<string>());
-  const updateMoveStatus = useCallback((status: SharedDriveMoveStatus) => {
-    if (dismissedMoveStatusIds.current.has(status.id)) {
-      return;
-    }
-    setMoveStatuses(current => {
-      return new Map(current).set(status.conversationQualifiedId, status);
-    });
+  const isMoveStatusCurrent = useCallback((conversationQualifiedId: string, id: string): boolean => {
+    const current = currentMoveIds.current.get(conversationQualifiedId);
+    return current !== undefined && current.id === id && sameScope(current.scopeKey, currentScopeKey.current);
   }, []);
+  const updateMoveStatus = useCallback(
+    (status: SharedDriveMoveStatus) => {
+      if (
+        dismissedMoveStatusIds.current.has(status.id) ||
+        !isMoveStatusCurrent(status.conversationQualifiedId, status.id)
+      ) {
+        return;
+      }
+      setMoveStatuses(current => {
+        if (!isMoveStatusCurrent(status.conversationQualifiedId, status.id)) {
+          return current;
+        }
+        return new Map(current).set(status.conversationQualifiedId, status);
+      });
+    },
+    [isMoveStatusCurrent],
+  );
   const [backgroundMoveController] = useState(() => {
     return createSharedDriveBackgroundMoveController(updateMoveStatus);
   });
+  const startMoveStatus = useCallback(
+    (status: SharedDriveMoveStatus) => {
+      currentMoveIds.current.set(status.conversationQualifiedId, {id: status.id, scopeKey: currentScopeKey.current});
+      backgroundMoveController.register(status);
+      setMoveStatuses(current => {
+        return new Map(current).set(status.conversationQualifiedId, status);
+      });
+    },
+    [backgroundMoveController],
+  );
   const previousScopeKey = useRef(resetOnScopeChange);
   useEffect(() => {
     const previous = previousScopeKey.current;
@@ -152,6 +215,7 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
       return;
     }
     backgroundMoveController.stopAll();
+    currentMoveIds.current.clear();
     dismissedMoveStatusIds.current.clear();
     setMoveStatuses(new Map());
   }, [backgroundMoveController, resetOnScopeChange]);
@@ -171,6 +235,11 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
     });
   }, []);
   const clearMoveStatus = useCallback((id: string) => {
+    for (const [conversationQualifiedId, current] of currentMoveIds.current) {
+      if (current.id === id) {
+        currentMoveIds.current.delete(conversationQualifiedId);
+      }
+    }
     setMoveStatuses(current => {
       const next = new Map(current);
       for (const [conversationQualifiedId, status] of next) {
@@ -191,11 +260,23 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
         dismissedUpload,
         dismissUpload,
         getMoveStatus,
+        startMoveStatus,
+        isMoveStatusCurrent,
         updateMoveStatus,
         createMoveStatusId,
+        getMoveOperation: backgroundMoveController.get,
+        setMoveJobUuids: backgroundMoveController.setJobUuids,
         dismissMoveStatus,
         clearMoveStatus,
-        observeBackgroundMove: backgroundMoveController.start,
+        observeBackgroundMove: observation => {
+          const operation = backgroundMoveController.get(observation.operationId);
+          if (
+            operation !== undefined &&
+            isMoveStatusCurrent(operation.status.conversationQualifiedId, observation.operationId)
+          ) {
+            backgroundMoveController.start(observation);
+          }
+        },
         isProvided: true,
       }}
     >

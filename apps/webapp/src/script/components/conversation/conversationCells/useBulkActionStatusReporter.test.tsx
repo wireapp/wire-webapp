@@ -71,7 +71,7 @@ describe('useBulkActionStatusReporter', () => {
     };
 
     act(() => {
-      result.current.updateMoveStatus(status);
+      result.current.startMoveStatus(status);
     });
     isConversationMounted = false;
     rerender();
@@ -103,8 +103,8 @@ describe('useBulkActionStatusReporter', () => {
     };
 
     act(() => {
-      result.current.updateMoveStatus(firstStatus);
-      result.current.updateMoveStatus(secondStatus);
+      result.current.startMoveStatus(firstStatus);
+      result.current.startMoveStatus(secondStatus);
     });
 
     expect(result.current.getMoveStatus(conversationQualifiedId)).toEqual(Maybe.just(firstStatus));
@@ -116,6 +116,31 @@ describe('useBulkActionStatusReporter', () => {
 
     expect(maybe.isNothing(result.current.getMoveStatus(conversationQualifiedId))).toBe(true);
     expect(result.current.getMoveStatus(secondConversationQualifiedId)).toEqual(Maybe.just(secondStatus));
+  });
+
+  it('ignores an older operation after a new one starts in the same conversation', () => {
+    const wrapper = ({children}: {children: ReactNode}): ReactElement => {return (
+      <SharedDriveUploadStatusProvider>{children}</SharedDriveUploadStatusProvider>
+    )};
+    const {result} = renderHook(useSharedDriveUploadStatus, {wrapper});
+    const first: SharedDriveMoveStatus = {
+      id: 'first',
+      conversationQualifiedId,
+      action: 'move',
+      kind: 'processing',
+      items,
+      destinationPath: 'First folder',
+    };
+    const second: SharedDriveMoveStatus = {...first, id: 'second', destinationPath: 'Second folder'};
+
+    act(() => {
+      result.current.startMoveStatus(first);
+      result.current.startMoveStatus(second);
+      result.current.updateMoveStatus({...first, kind: 'completed'});
+    });
+
+    expect(result.current.getMoveStatus(conversationQualifiedId)).toEqual(Maybe.just(second));
+    expect(result.current.isMoveStatusCurrent(conversationQualifiedId, 'first')).toBe(false);
   });
 
   it('shows nothing until an action starts', () => {

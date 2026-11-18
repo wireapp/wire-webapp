@@ -250,22 +250,30 @@ export const CellsTable = ({
   const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
   const {
     updateMoveStatus: publishMoveStatus,
+    startMoveStatus: publishMoveStart,
+    isMoveStatusCurrent,
+    getMoveOperation,
+    setMoveJobUuids,
     createMoveStatusId,
     clearMoveStatus,
     observeBackgroundMove,
   } = useSharedDriveUploadStatus();
-  const moveStatusConversationById = useRef(new Map<string, string>());
   const currentConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
   const updateMoveStatus = useCallback(
     (status: Omit<SharedDriveMoveStatus, 'conversationQualifiedId'>): void => {
-      const originatingConversationQualifiedId =
-        moveStatusConversationById.current.get(status.id) ?? currentConversationQualifiedId;
-      moveStatusConversationById.current.set(status.id, originatingConversationQualifiedId);
-      publishMoveStatus({...status, conversationQualifiedId: originatingConversationQualifiedId});
+      const operation = getMoveOperation(status.id);
+      if (operation !== undefined) {
+        publishMoveStatus({...status, conversationQualifiedId: operation.status.conversationQualifiedId});
+      }
     },
-    [currentConversationQualifiedId, publishMoveStatus],
+    [getMoveOperation, publishMoveStatus],
   );
-  const backgroundMoveSummary = useRef<Maybe<SharedDriveMoveSummary>>(Maybe.nothing());
+  const startMoveStatus = useCallback(
+    (status: Omit<SharedDriveMoveStatus, 'conversationQualifiedId'>): void => {
+      publishMoveStart({...status, conversationQualifiedId: currentConversationQualifiedId});
+    },
+    [currentConversationQualifiedId, publishMoveStart],
+  );
   const activeMoveStatusId = useRef<Maybe<string>>(Maybe.nothing());
   const isTableMounted = useRef(true);
   useEffect(() => {
@@ -423,8 +431,9 @@ export const CellsTable = ({
     permanentDeleteReviewReason,
     reportPermanentDeleteStatus,
   ]);
-  const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
-  const [backgroundMoveStatusId, setBackgroundMoveStatusId] = useState('');
+  const backgroundMoveJobUuids = maybe.isJust(activeMoveStatusId.current)
+    ? (getMoveOperation(activeMoveStatusId.current.value)?.jobUuids ?? [])
+    : [];
 
   useEffect(() => {
     const didSelectionScopeChange = previousSelectionScopeKey.current !== selectionScopeKey;
@@ -481,15 +490,12 @@ export const CellsTable = ({
     };
   }, [bulkRestoreModalId, permanentDeleteModalId]);
 
-  const handleBulkMoveRequestError = (): void => {
-    if (maybe.isJust(activeMoveStatusId.current) && maybe.isJust(backgroundMoveSummary.current)) {
-      updateMoveStatus({
-        id: activeMoveStatusId.current.value,
-        kind: 'request-failed',
-        ...backgroundMoveSummary.current.value,
-      });
+  const handleBulkMoveRequestError = (id: string): void => {
+    const operation = getMoveOperation(id);
+    if (operation === undefined || !isMoveStatusCurrent(operation.status.conversationQualifiedId, id)) {
+      return;
     }
-    backgroundMoveSummary.current = Maybe.nothing();
+    updateMoveStatus({...operation.status, kind: 'request-failed'});
     if (!isTableMounted.current) {
       return;
     }
@@ -513,19 +519,18 @@ export const CellsTable = ({
       clearMoveStatus(activeMoveStatusId.current.value);
     }
     activeMoveStatusId.current = Maybe.nothing();
-    backgroundMoveSummary.current = Maybe.nothing();
     setSelectedNodeIds(new Set());
     dispatchMove({type: 'resolved'});
     setIsBulkMovePreviewOpen(false);
   };
 
-  const handleBulkMoveStart = (summary: SharedDriveMoveSummary): void => {
+  const handleBulkMoveStart = (summary: SharedDriveMoveSummary): string => {
     const id = createMoveStatusId();
     activeMoveStatusId.current = Maybe.just(id);
-    backgroundMoveSummary.current = Maybe.just(summary);
     dispatchMove({type: 'request-started'});
     setIsBulkMovePreviewOpen(false);
-    updateMoveStatus({id, kind: 'processing', ...summary});
+    startMoveStatus({id, kind: 'processing', ...summary});
+    return id;
   };
 
   const handleBackgroundMoveOutcome = (outcome: CellsBackgroundActionOutcome, moveStatusId: string): void => {
@@ -535,9 +540,6 @@ export const CellsTable = ({
 
     if (outcome === 'all-finished') {
       activeMoveStatusId.current = Maybe.nothing();
-      backgroundMoveSummary.current = Maybe.nothing();
-      setBackgroundMoveStatusId('');
-      setBackgroundMoveJobUuids([]);
       dispatchMove({type: 'resolved'});
       setIsBulkMovePreviewOpen(false);
       onRefresh();
@@ -546,10 +548,7 @@ export const CellsTable = ({
 
     if (outcome === 'mixed-terminal' || outcome === 'all-failed') {
       activeMoveStatusId.current = Maybe.just(moveStatusId);
-      setBackgroundMoveJobUuids([]);
       dispatchMove({type: 'needs-review', reason: outcome === 'mixed-terminal' ? 'partial' : 'failed'});
-      backgroundMoveSummary.current = Maybe.nothing();
-      setBackgroundMoveStatusId('');
       setIsBulkMovePreviewOpen(false);
       return;
     }
@@ -559,24 +558,17 @@ export const CellsTable = ({
     setIsBulkMovePreviewOpen(false);
   };
 
-  const startBackgroundMoveObservation = (
-    moveStatusId: string,
-    summary: SharedDriveMoveSummary,
-    jobUuids: readonly string[],
-  ): void => {
+  const startBackgroundMoveObservation = (moveStatusId: string): void => {
     observeBackgroundMove({
-      status: {
-        id: moveStatusId,
-        conversationQualifiedId: moveStatusConversationById.current.get(moveStatusId) ?? currentConversationQualifiedId,
-        kind: 'processing',
-        ...summary,
-      },
-      jobUuids,
+      operationId: moveStatusId,
       cellsRepository,
       clock,
       random,
       onOutcome: outcome => {
-        handleBackgroundMoveOutcome(outcome, moveStatusId);
+        const conversation = getMoveOperation(moveStatusId)?.status.conversationQualifiedId;
+        if (conversation !== undefined && isMoveStatusCurrent(conversation, moveStatusId)) {
+          handleBackgroundMoveOutcome(outcome, moveStatusId);
+        }
       },
     });
   };
@@ -597,10 +589,12 @@ export const CellsTable = ({
     });
   }, [nodes]);
 
-  const handleBulkMoveResult = (response: RestPerformActionResponse, summary: SharedDriveMoveSummary): boolean => {
-    const moveStatusId = maybe.isJust(activeMoveStatusId.current)
-      ? activeMoveStatusId.current.value
-      : createMoveStatusId();
+  const handleBulkMoveResult = (response: RestPerformActionResponse, moveStatusId: string): boolean => {
+    const operation = getMoveOperation(moveStatusId);
+    if (operation === undefined || !isMoveStatusCurrent(operation.status.conversationQualifiedId, moveStatusId)) {
+      return false;
+    }
+    const summary = operation.status;
     const outcomeEvidence = getBulkMoveOutcomeEvidence(
       response.AffectedNodes,
       summary.items.map(({id}) => {
@@ -614,12 +608,10 @@ export const CellsTable = ({
       outcomeEvidence === 'complete' || (response.AffectedNodes === undefined && hasFinishedMoveJobs);
     if (response.Status === RestActionStatus.Performed && !isMoveComplete) {
       updateMoveStatus({
-        id: moveStatusId,
-        kind: outcomeEvidence === 'partial' ? 'partial' : 'finished-unknown',
         ...summary,
+        kind: outcomeEvidence === 'partial' ? 'partial' : 'finished-unknown',
       });
       activeMoveStatusId.current = Maybe.just(moveStatusId);
-      backgroundMoveSummary.current = Maybe.nothing();
       if (isTableMounted.current) {
         dispatchMove({type: 'needs-review', reason: outcomeEvidence === 'partial' ? 'partial' : 'finished-unknown'});
         setIsBulkMovePreviewOpen(false);
@@ -628,9 +620,8 @@ export const CellsTable = ({
     }
 
     if (response.Status === RestActionStatus.Performed) {
-      updateMoveStatus({id: moveStatusId, kind: 'completed', ...summary});
+      updateMoveStatus({...summary, kind: 'completed'});
       activeMoveStatusId.current = Maybe.nothing();
-      backgroundMoveSummary.current = Maybe.nothing();
       if (isTableMounted.current) {
         dispatchMove({type: 'resolved'});
         onRefresh();
@@ -640,9 +631,8 @@ export const CellsTable = ({
 
     const uniqueMoveJobUuids = [...moveEvidence.jobUuids];
     if (uniqueMoveJobUuids.length === 0) {
-      updateMoveStatus({id: moveStatusId, kind: 'status-unknown', ...summary});
+      updateMoveStatus({...summary, kind: 'status-unknown'});
       activeMoveStatusId.current = Maybe.just(moveStatusId);
-      backgroundMoveSummary.current = Maybe.nothing();
       if (isTableMounted.current) {
         dispatchMove({type: 'needs-review', reason: 'status-unknown'});
         setIsBulkMovePreviewOpen(false);
@@ -650,37 +640,29 @@ export const CellsTable = ({
       return false;
     }
 
-    activeMoveStatusId.current = Maybe.nothing();
-    backgroundMoveSummary.current = Maybe.just(summary);
+    setMoveJobUuids(moveStatusId, uniqueMoveJobUuids);
     if (isTableMounted.current) {
-      setBackgroundMoveStatusId(moveStatusId);
-      setBackgroundMoveJobUuids(uniqueMoveJobUuids);
       dispatchMove({type: 'background-started'});
     }
-    updateMoveStatus({id: moveStatusId, kind: 'processing', ...summary});
-    startBackgroundMoveObservation(moveStatusId, summary, uniqueMoveJobUuids);
+    updateMoveStatus({...summary, kind: 'processing'});
+    startBackgroundMoveObservation(moveStatusId);
     return true;
   };
 
   const handleRetryBackgroundMoveStatus = (): void => {
-    if (backgroundMoveJobUuids.length === 0) {
+    if (backgroundMoveJobUuids.length === 0 || maybe.isNothing(activeMoveStatusId.current)) {
       return;
     }
 
     dispatchMove({type: 'background-started'});
-    if (maybe.isJust(backgroundMoveSummary.current)) {
+    const moveStatusId = activeMoveStatusId.current.value;
+    const operation = getMoveOperation(moveStatusId);
+    if (operation !== undefined) {
       updateMoveStatus({
-        id: backgroundMoveStatusId,
+        ...operation.status,
         kind: 'processing',
-        ...backgroundMoveSummary.current.value,
       });
-    }
-    if (maybe.isJust(backgroundMoveSummary.current)) {
-      startBackgroundMoveObservation(
-        backgroundMoveStatusId,
-        backgroundMoveSummary.current.value,
-        backgroundMoveJobUuids,
-      );
+      startBackgroundMoveObservation(moveStatusId);
     }
   };
 
@@ -989,7 +971,7 @@ export const CellsTable = ({
     setIsBulkMoveToBinConfirmationOpen(false);
     const statusId = createMoveStatusId();
     bulkMoveToBinStatusId.current = Maybe.just(statusId);
-    updateMoveStatus({id: statusId, kind: 'processing', ...captured.summary});
+    startMoveStatus({id: statusId, kind: 'processing', ...captured.summary});
 
     try {
       const response = await cellsRepository.deleteNodes({uuids: captured.nodeIds, permanently: false});
@@ -1022,6 +1004,7 @@ export const CellsTable = ({
     capturedBulkMoveToBin,
     isCapturedBulkMoveToBinSelectionCurrent,
     createMoveStatusId,
+    startMoveStatus,
     updateMoveStatus,
     cellsRepository,
     resetBulkMoveToBinAfterScopeChange,
@@ -1159,7 +1142,7 @@ export const CellsTable = ({
       }),
       destinationPath: normalizeCellsPath(destination.path, conversationQualifiedId),
     };
-    handleBulkMoveStart(summary);
+    const moveStatusId = handleBulkMoveStart(summary);
     try {
       const response = await cellsRepository.moveNodes({
         currentPaths: selected.map(node => {
@@ -1167,9 +1150,9 @@ export const CellsTable = ({
         }),
         targetPath: getCellsApiPath({conversationQualifiedId, currentPath: summary.destinationPath}),
       });
-      handleBulkMoveResult(response, summary);
+      handleBulkMoveResult(response, moveStatusId);
     } catch {
-      handleBulkMoveRequestError();
+      handleBulkMoveRequestError(moveStatusId);
     } finally {
       isDropMoveSubmitting.current = false;
     }

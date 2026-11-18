@@ -52,7 +52,7 @@ export const useBulkActionStatusReporter = (
   conversationQualifiedId: string,
   onReview?: () => void,
 ): BulkActionStatusReporter => {
-  const {updateMoveStatus, createMoveStatusId, clearMoveStatus} = useSharedDriveUploadStatus();
+  const {startMoveStatus, updateMoveStatus, createMoveStatusId, clearMoveStatus} = useSharedDriveUploadStatus();
   const onReviewRef = useRef(onReview);
   onReviewRef.current = onReview;
   const started = useRef<Maybe<StartedStatus>>(Maybe.nothing());
@@ -72,7 +72,7 @@ export const useBulkActionStatusReporter = (
       started.current = Maybe.just(current);
       lastKind.current = Maybe.just('processing');
       isReviewing.current = false;
-      updateMoveStatus({
+      startMoveStatus({
         id: current.id,
         conversationQualifiedId: current.conversationQualifiedId,
         action,
@@ -82,7 +82,7 @@ export const useBulkActionStatusReporter = (
         ...(hasReview && {onReview: review}),
       });
     },
-    [action, conversationQualifiedId, createMoveStatusId, hasReview, review, updateMoveStatus],
+    [action, conversationQualifiedId, createMoveStatusId, hasReview, review, startMoveStatus],
   );
   const report = useCallback(
     (kind: SharedDriveMoveStatusKind): void => {

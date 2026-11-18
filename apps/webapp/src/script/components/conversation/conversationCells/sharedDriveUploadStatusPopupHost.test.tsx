@@ -55,12 +55,14 @@ const translateMoveSummaryForTest: Translate = (key, substitutions) => {
 type TestMoveStatus = SharedDriveMoveStatus;
 
 const MoveStatusPollControl: FunctionComponent<{readonly status: TestMoveStatus}> = ({status}) => {
-  const {updateMoveStatus} = useSharedDriveUploadStatus();
+  const {isMoveStatusCurrent, startMoveStatus, updateMoveStatus} = useSharedDriveUploadStatus();
   return (
     <button
       type="button"
       onClick={() => {
-        return updateMoveStatus(status);
+        return isMoveStatusCurrent(status.conversationQualifiedId, status.id)
+          ? updateMoveStatus(status)
+          : startMoveStatus(status);
       }}
     >
       Poll move status
