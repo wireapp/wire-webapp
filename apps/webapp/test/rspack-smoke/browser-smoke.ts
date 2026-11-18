@@ -198,19 +198,18 @@ for (const entryPath of ['/', '/auth']) {
       }, isDesktopApp);
 
       await page.goto(entryPath);
-      const dialog = page.getByRole('dialog', {name: isDesktopApp ? 'Update required' : 'Browser update required'});
+      const dialog = page.getByRole('dialog', {
+        name: isDesktopApp
+          ? 'Update your Desktop app to continue using Wire.'
+          : 'Update your browser to continue using Wire.',
+      });
       await expect(dialog).toBeVisible();
-      await expect(dialog).toContainText(
-        isDesktopApp
-          ? 'Update Wire Desktop to the latest version'
-          : "Your browser doesn't support the features Wire needs.",
-      );
-      const reloadButton = dialog.getByRole('button', {name: 'Reload Wire'});
-      await expect(reloadButton).toBeFocused();
+      await expect(dialog.getByRole('button')).toHaveCount(0);
+      await expect(dialog).toBeFocused();
       await page.keyboard.press('Tab');
-      await expect(reloadButton).toBeFocused();
+      await expect(dialog).toBeFocused();
       await page.keyboard.press('Shift+Tab');
-      await expect(reloadButton).toBeFocused();
+      await expect(dialog).toBeFocused();
       await page.keyboard.press('Escape');
       await expect(dialog).toBeVisible();
       expect(capabilityErrors).toContainEqual(expect.stringContaining('JS Promise Integration'));
@@ -244,7 +243,7 @@ for (const entryPath of ['/', '/auth']) {
     });
 
     await page.goto(entryPath);
-    await expect(page.getByRole('dialog', {name: 'Browser update required'})).toBeVisible();
+    await expect(page.getByRole('dialog', {name: 'Update your browser to continue using Wire.'})).toBeVisible();
     expect(capabilityErrors).toContainEqual(expect.stringContaining('JSPI feature detection failed'));
     expect(capabilityErrors).toContainEqual(expect.stringContaining('simulated JSPI detection failure'));
     expect(capabilityErrors).toContainEqual(
@@ -266,7 +265,7 @@ test('reports missing filesystem support when JSPI is available', async ({page})
   });
 
   await page.goto('/');
-  await expect(page.getByRole('dialog', {name: 'Browser update required'})).toBeVisible();
+  await expect(page.getByRole('dialog', {name: 'Update your browser to continue using Wire.'})).toBeVisible();
   expect(capabilityErrors).toContainEqual(expect.stringContaining('Origin Private File System'));
   expect(capabilityErrors).not.toContainEqual(expect.stringContaining('JS Promise Integration'));
 });

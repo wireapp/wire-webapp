@@ -25,10 +25,8 @@ import {useCoreCryptoSupport} from './coreCryptoSupportContext';
 
 import {ModalComponent} from '../components/Modals/ModalComponent';
 import {THEME_ID} from '../uiKit/identity/theme/theme';
-import {Button} from '../uiKit/inputs/button/button';
 import {StyledApp} from '../uiKit/layout/styledApp/styledApp';
 import {H2} from '../uiKit/typography/heading/heading';
-import {Text} from '../uiKit/typography/text/text';
 import type {Translate} from '../util/localizerUtil';
 
 type CoreCryptoUpgradeModalProps = {
@@ -38,9 +36,9 @@ type CoreCryptoUpgradeModalProps = {
 
 export function CoreCryptoUpgradeModal({isDesktopApp, translate}: CoreCryptoUpgradeModalProps): ReactElement | null {
   const support = useCoreCryptoSupport();
-  const reloadButton = useRef<HTMLButtonElement>(null);
+  const dialog = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    reloadButton.current?.focus();
+    dialog.current?.focus();
   }, []);
   if (isEmptyArray(support.missingFeatures)) {
     return null;
@@ -50,6 +48,8 @@ export function CoreCryptoUpgradeModal({isDesktopApp, translate}: CoreCryptoUpgr
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <ModalComponent
         isShown
+        ref={dialog}
+        tabIndex={-1}
         onKeyDown={event => {
           // Let Tab reach ModalComponent's document-level focus trap.
           if (event.key !== 'Tab') {
@@ -59,25 +59,11 @@ export function CoreCryptoUpgradeModal({isDesktopApp, translate}: CoreCryptoUpgr
         id="core-crypto-upgrade-modal"
         data-uie-name="core-crypto-upgrade-modal"
         aria-labelledby="core-crypto-upgrade-title"
-        aria-describedby="core-crypto-upgrade-message"
         wrapperCSS={{padding: 24, maxWidth: 'calc(100vw - 32px)', overflowY: 'auto'}}
       >
-        <H2 id="core-crypto-upgrade-title" css={{marginTop: 0}}>
+        <H2 id="core-crypto-upgrade-title" css={{margin: 0}}>
           {translate(isDesktopApp ? 'coreCryptoUpgradeDesktopTitle' : 'coreCryptoUpgradeBrowserTitle')}
         </H2>
-        <Text block id="core-crypto-upgrade-message" css={{marginBottom: 24}}>
-          {translate(isDesktopApp ? 'coreCryptoUpgradeDesktopMessage' : 'coreCryptoUpgradeBrowserMessage')}
-        </Text>
-        <Button
-          ref={reloadButton}
-          type="button"
-          onClick={() => {
-            window.location.reload();
-          }}
-          data-uie-name="do-reload-wire"
-        >
-          {translate('coreCryptoUpgradeReload')}
-        </Button>
       </ModalComponent>
     </StyledApp>
   );

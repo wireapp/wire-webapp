@@ -19,7 +19,7 @@
 
 import type {ReactElement} from 'react';
 
-import {act, screen, within} from '@testing-library/react';
+import {act, screen} from '@testing-library/react';
 import type {Root} from 'react-dom/client';
 
 import type {CoreCryptoSupport} from './coreCryptoSupport';
@@ -103,8 +103,8 @@ describe('renderWithCoreCryptoSupport', () => {
     expect(start).not.toHaveBeenCalled();
     expect(screen.queryByText('Initial loader')).not.toBeInTheDocument();
     const dialog = screen.getByRole('dialog', {name: 'coreCryptoUpgradeBrowserTitle'});
-    expect(within(dialog).getByText('coreCryptoUpgradeBrowserMessage')).toBeInTheDocument();
-    expect(within(dialog).getByRole('button', {name: 'coreCryptoUpgradeReload'})).toHaveFocus();
+    expect(dialog).toHaveFocus();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('keeps Desktop upgrade instructions available before application startup', () => {
@@ -117,6 +117,7 @@ describe('renderWithCoreCryptoSupport', () => {
         ),
       );
     });
-    expect(screen.getByText('coreCryptoUpgradeDesktopMessage')).toBeInTheDocument();
+    expect(screen.getByRole('dialog', {name: 'coreCryptoUpgradeDesktopTitle'})).toHaveFocus();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });
