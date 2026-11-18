@@ -266,11 +266,6 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       new rspack.CopyRspackPlugin({
         patterns: [
           {
-            context: path.resolve(rootPath, 'node_modules/@mediapipe/tasks-vision/wasm'),
-            from: '*',
-            to: 'min/mediapipe/wasm',
-          },
-          {
             context: path.resolve(configDirectoryPath, 'resource'),
             from: '**/*',
             to: '.',

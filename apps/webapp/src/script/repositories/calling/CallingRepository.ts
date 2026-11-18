@@ -608,6 +608,12 @@ export class CallingRepository {
 
     selfParticipant.processedVideoStream(media);
 
+    media.onTrackChanged = () => {
+      if (selfParticipant.processedVideoStream() === media && !selfParticipant.sharesScreen()) {
+        this.changeMediaSource(media.stream, MediaType.VIDEO, false, activeCall);
+      }
+    };
+
     if (changeAvsSendingMediaSource) {
       this.changeMediaSource(media.stream, MediaType.VIDEO, false, activeCall);
     }

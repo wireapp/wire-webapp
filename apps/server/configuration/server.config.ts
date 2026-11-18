@@ -31,7 +31,7 @@ const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');
 const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robots-disallow.txt');
 
 const defaultCSP = {
-  connectSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
+  connectSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com', 'https://cdn.longpipe.dev'],
   defaultSrc: ["'self'"],
   fontSrc: ["'self'", 'data:'],
   frameSrc: [
