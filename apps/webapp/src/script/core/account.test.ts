@@ -632,6 +632,7 @@ describe('Account', () => {
       it('ignores late catch-up results after the socket opens again', async () => {
         const {account, apiClient} = dependencies;
         const websocket = apiClient.transport.ws;
+        const unlock = jest.spyOn(websocket, 'unlock');
         const connect = jest.spyOn(apiClient, 'connect').mockReturnValue(websocket);
         const pendingCatchUp = Promise.withResolvers<{total: number; success: number; error: number}>();
         const live = Promise.withResolvers<void>();
@@ -668,6 +669,7 @@ describe('Account', () => {
         await account['notificationProcessingQueue'].queue.onIdle();
 
         expect(onLive).toHaveBeenCalledTimes(1);
+        expect(unlock).toHaveBeenCalledTimes(1);
         expect(websocket.isLocked()).toBe(false);
         disconnect();
       });
@@ -721,6 +723,60 @@ describe('Account', () => {
         expect(acknowledgeEvent.mock.invocationCallOrder[0]).toBeLessThan(
           acknowledgeMarker.mock.invocationCallOrder[0] ?? 0,
         );
+        disconnect();
+      });
+
+      it('does not acknowledge an in-flight consumable delivery on a replacement socket', async () => {
+        const {account, apiClient} = dependencies;
+        const websocket = apiClient.transport.ws;
+        const connect = jest.spyOn(apiClient, 'connect').mockReturnValue(websocket);
+        jest.spyOn(account, 'getClientCapabilities').mockReturnValue([ClientCapability.CONSUMABLE_NOTIFICATIONS]);
+        const acknowledge = jest.spyOn(websocket, 'acknowledgeNotification');
+        const deliveryStarted = Promise.withResolvers<void>();
+        const finishDelivery = Promise.withResolvers<void>();
+        const onEvent = jest.fn().mockImplementationOnce(async () => {
+          deliveryStarted.resolve();
+          await finishDelivery.promise;
+        });
+        const disconnect = await account.listen({useLegacy: false, onEvent});
+        const openSocket = connect.mock.lastCall?.[0];
+        if (openSocket === undefined) {
+          throw new Error('Expected WebSocket open callback');
+        }
+
+        const previousSocket = new AbortController();
+        await openSocket(previousSocket, {
+          attemptId: 1,
+          wrapperGeneration: 1,
+          reconnectAttemptCount: 1,
+          reconnectSequenceRetryCount: 0,
+        });
+        const event = {
+          type: ConsumableEvent.EVENT,
+          data: {
+            delivery_tag: 1,
+            event: {id: uuidv4(), payload: [{type: USER_EVENT.DELETE, id: 'previous-delivery'}]},
+          },
+        };
+        websocket['onMessage'](JSON.stringify(event));
+        await deliveryStarted.promise;
+        websocket.emit(WebSocketClient.TOPIC.ON_STATE_CHANGE, WEBSOCKET_STATE.CLOSED);
+        await openSocket(new AbortController(), {
+          attemptId: 2,
+          wrapperGeneration: 2,
+          reconnectAttemptCount: 1,
+          reconnectSequenceRetryCount: 0,
+        });
+        finishDelivery.resolve();
+        await account['notificationProcessingQueue'].queue.onIdle();
+        expect(previousSocket.signal.aborted).toBe(true);
+        expect(acknowledge).not.toHaveBeenCalled();
+
+        const nextEvent = {...event, data: {...event.data, delivery_tag: 2}};
+        websocket['onMessage'](JSON.stringify(nextEvent));
+        await account['notificationProcessingQueue'].queue.onIdle();
+        expect(acknowledge).toHaveBeenCalledTimes(1);
+        expect(acknowledge).toHaveBeenCalledWith(nextEvent);
         disconnect();
       });
 

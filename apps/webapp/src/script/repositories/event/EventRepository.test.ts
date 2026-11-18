@@ -18,13 +18,20 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
+import {APIClient} from '../../apiClient/apiClient';
+import {ClientClassification} from '../../apiClient/client/clientClassification';
+import {ClientType} from '../../apiClient/client/clientType';
 import {BackendEvent} from '../../apiClient/event/backendEvent';
 import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 import {MEETING_EVENT} from '../../apiClient/event/meetingEvent';
 import {USER_EVENT} from '../../apiClient/event/userEvent';
-import {type Account, ConnectionState} from '../../core';
+import {browserPlatform} from '../../apiClient/shims/browser/platform';
+import {type OnConnect, WebSocketClient} from '../../apiClient/tcp/webSocketClient';
+import {Account, ConnectionState} from '../../core';
+import {NotificationSource} from '../../core/notification';
 import {WebAppEvents} from '../../webAppEvents';
 import {amplify} from 'amplify';
+import {asyncNoop} from 'noop-esm';
 import {Maybe} from 'true-myth';
 import {Runtime} from '../../commons/util/Runtime';
 
@@ -568,6 +575,110 @@ describe('EventRepository', () => {
         expect.objectContaining({connectionCycle: {signal: Maybe.nothing(), connectCycleId: 1}}),
       );
       expect(disconnect).toHaveBeenCalledTimes(1);
+    });
+
+    it('recovers notifications after a healthy transport loses its application consumer', async () => {
+      jest.spyOn(Runtime, 'isElectron').mockReturnValue(true);
+      using apiClient = new APIClient({platform: browserPlatform, webSocketLifecycleImplementation: 'corrected'});
+      const account = new Account(apiClient);
+      account['currentClient'] = {
+        id: 'test-client',
+        class: ClientClassification.DESKTOP,
+        type: ClientType.TEMPORARY,
+        time: '2026-01-01T00:00:00.000Z',
+        capabilities: [],
+        cookie: 'test-client',
+        mls_public_keys: {},
+      };
+      const missedEvent: BackendEvent = {
+        type: USER_EVENT.DELETE,
+        id: 'missed',
+        qualified_id: {id: 'missed', domain: 'example.com'},
+      };
+      const missedNotification = {id: 'missed-notification', payload: [missedEvent]};
+      type ProcessNotificationStream = NonNullable<
+        Account['service']
+      >['notification']['legacyProcessNotificationStream'];
+      account.service = {
+        client: {putClientCapabilities: asyncNoop},
+        conversation: {runDeferredEpochRecovery: asyncNoop},
+        notification: {
+          legacyProcessNotificationStream: jest
+            .fn<ReturnType<ProcessNotificationStream>, Parameters<ProcessNotificationStream>>()
+            .mockResolvedValueOnce({total: 0, error: 0, success: 0})
+            .mockImplementationOnce(async handleNotification => {
+              await handleNotification(missedNotification, NotificationSource.NOTIFICATION_STREAM, {done: 1, total: 1});
+
+              return {total: 1, error: 0, success: 1};
+            }),
+          async *handleNotification(notification: typeof missedNotification) {
+            for (const event of notification.payload) {
+              yield {event};
+            }
+          },
+        },
+      } as unknown as NonNullable<Account['service']>;
+
+      const websocket = apiClient.transport.ws;
+      jest.spyOn(websocket, 'checkHealth').mockResolvedValue(true);
+      const replacementRequested = Promise.withResolvers<OnConnect>();
+      const connect = jest.spyOn(apiClient, 'connect').mockReturnValueOnce(websocket);
+      connect.mockImplementationOnce(onOpen => {
+        replacementRequested.resolve(requireValueForTest(onOpen));
+
+        return websocket;
+      });
+      const consumeEvent = jest
+        .spyOn(eventRepository as unknown as {handleEvent: EventRepository['handleEvent']}, 'handleEvent')
+        .mockResolvedValue(undefined);
+      const firstSocket = new AbortController();
+      await eventRepository.connectWebSocket(account, true, jest.fn());
+      try {
+        const initialOpen = requireValueForTest(connect.mock.calls.at(0)?.[0]);
+        await initialOpen(firstSocket, {
+          attemptId: 1,
+          wrapperGeneration: 1,
+          reconnectAttemptCount: 1,
+          reconnectSequenceRetryCount: 0,
+        });
+        await account['notificationProcessingQueue'].queue.onIdle();
+        expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+
+        const oldStateListeners = websocket.listeners(WebSocketClient.TOPIC.ON_STATE_CHANGE);
+        websocket.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
+        websocket['onMessage'](JSON.stringify(missedNotification));
+        expect(consumeEvent).not.toHaveBeenCalled();
+        await expect(websocket.checkHealth()).resolves.toBe(true);
+        await expect(account.isWebsocketHealthy()).resolves.toBe(false);
+
+        window.dispatchEvent(new Event('focus'));
+        const replacementOpen = await replacementRequested.promise;
+        expect(firstSocket.signal.aborted).toBe(true);
+        expect(eventRepository.notificationHandlingState()).not.toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+        expect(websocket.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(1);
+        const currentStateListeners = websocket.listeners(WebSocketClient.TOPIC.ON_STATE_CHANGE);
+        expect(currentStateListeners).toHaveLength(1);
+        expect(currentStateListeners).not.toEqual(oldStateListeners);
+
+        await replacementOpen(new AbortController(), {
+          attemptId: 2,
+          wrapperGeneration: 2,
+          reconnectAttemptCount: 1,
+          reconnectSequenceRetryCount: 0,
+        });
+        await account['notificationProcessingQueue'].queue.onIdle();
+        expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+
+        const liveEvent = {...missedEvent, id: 'live', qualified_id: {id: 'live', domain: 'example.com'}};
+        websocket['onMessage'](JSON.stringify({id: 'live-notification', payload: [liveEvent]}));
+        await account['notificationProcessingQueue'].queue.onIdle();
+        expect(consumeEvent.mock.calls).toEqual([
+          [{event: missedEvent}, NotificationSource.NOTIFICATION_STREAM],
+          [{event: liveEvent}, NotificationSource.WEBSOCKET],
+        ]);
+      } finally {
+        eventRepository.disconnectWebSocket();
+      }
     });
 
     it('should compute time offset on initialization', async () => {
