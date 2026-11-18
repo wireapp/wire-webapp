@@ -224,7 +224,7 @@ describe('ReconnectingWebsocket', () => {
   };
 
   const getServerAddress = (): Promise<string> => {
-    if (isUndefined(server) === false) {
+    if (!isUndefined(server)) {
       const address = server.address();
       if (isNullOrUndefined(address) === true || isString(address) === true) {
         throw new Error('Server address is unavailable');
@@ -259,7 +259,7 @@ describe('ReconnectingWebsocket', () => {
     });
     activeConnections.length = 0;
 
-    if (isUndefined(server) === false) {
+    if (!isUndefined(server)) {
       server.close(() => {
         server = undefined;
         done();

@@ -199,19 +199,23 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     await websocket['internalOnReconnect']();
     await websocket['internalOnReconnect']();
 
-    expect(onReconnect).toHaveBeenNthCalledWith(1, {
+    const [firstAttempt, secondAttempt] = onReconnect.mock.calls;
+    expect(firstAttempt?.[0]).toEqual({
       attemptId: 1,
       reconnectAttemptCount: 1,
       reconnectSequenceRetryCount: 0,
       wrapperGeneration: 1,
     });
-    expect(onReconnect).toHaveBeenNthCalledWith(2, {
+    expect(secondAttempt?.[0]).toEqual({
       attemptId: 2,
       reconnectAttemptCount: 2,
       reconnectSequenceRetryCount: 1,
       wrapperGeneration: 1,
     });
+    expect(firstAttempt?.[1]()).toBe(false);
+    expect(secondAttempt?.[1]()).toBe(true);
     websocket.disconnect();
+    expect(secondAttempt?.[1]()).toBe(false);
   });
 
   it('passes the active reconnect context to the socket-open callback', async () => {
@@ -364,6 +368,37 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     expect(onOpen).toHaveBeenCalledTimes(1);
     expect(onMessage).toHaveBeenCalledTimes(1);
     expect(onMessage).toHaveBeenCalledWith('active message');
+    websocket.disconnect();
+  });
+
+  it('ignores a delayed close event from an explicitly disconnected wrapper', () => {
+    const previousSocket = createMockSocket(WEBSOCKET_STATE.OPEN);
+    const nextSocket = createMockSocket(WEBSOCKET_STATE.OPEN);
+    const {backFromSleepHandler} = createBackFromSleepHandlerTestDependencies();
+    const websocket = new ReconnectingWebsocket(jest.fn(), {
+      platform: nodePlatform.websocket,
+      backFromSleepHandler: Maybe.just(backFromSleepHandler),
+      pingInterval: Maybe.nothing(),
+      wallClock: createTestWallClock(0),
+      websocketFactory: Maybe.just(createMockWebsocketFactory(previousSocket, nextSocket)),
+      lifecycleImplementation: 'corrected',
+    });
+    const onClose = jest.fn();
+    const onMessage = jest.fn();
+    websocket.setOnClose(onClose);
+    websocket.setOnMessage(onMessage);
+    websocket.connect();
+    websocket.disconnect();
+    previousSocket.readyState = WEBSOCKET_STATE.CLOSING;
+    websocket.connect();
+
+    const closeEvent = {reason: 'Disconnected', code: CloseEventCode.NORMAL_CLOSURE, wasClean: true};
+    previousSocket.onclose?.(closeEvent as CloseEvent);
+    nextSocket.onmessage?.({data: Buffer.from('current frame')} as MessageEvent);
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(onMessage).toHaveBeenCalledWith('current frame');
+    websocket.disconnect();
   });
 
   it('does not throw or reconnect when back from sleep is detected without a socket instance', () => {

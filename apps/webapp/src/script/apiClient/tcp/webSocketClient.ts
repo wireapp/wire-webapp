@@ -17,7 +17,7 @@
  *
  */
 
-import {isPromise} from '@sindresorhus/is';
+import {isEmptyString, isPromise, isUndefined} from '@sindresorhus/is';
 import type {ErrorEvent} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
 
@@ -29,6 +29,7 @@ import {
   ReconnectingWebsocket,
   ReconnectingWebsocketWallClock,
   WebSocketReconnectContext,
+  type WebSocketLifecycleImplementation,
   WEBSOCKET_STATE,
 } from './reconnectingWebsocket';
 
@@ -70,6 +71,7 @@ export interface WebSocketClient {
 export type OnConnect = (abortHandler: AbortController, reconnectContext: WebSocketReconnectContext) => void;
 
 export type WebSocketClientOptions = {
+  readonly lifecycleImplementation?: WebSocketLifecycleImplementation;
   readonly platform: WebSocketPlatform;
   readonly wallClock: ReconnectingWebsocketWallClock;
 };
@@ -81,11 +83,16 @@ export class WebSocketClient extends EventEmitter {
   private readonly logger: Logger;
   private readonly socket: ReconnectingWebsocket;
   private readonly wallClock: ReconnectingWebsocketWallClock;
+  public readonly lifecycleImplementation: WebSocketLifecycleImplementation;
+  private readonly usesCorrectedLifecycle: boolean;
   private websocketState: WEBSOCKET_STATE;
   public client: HttpClient;
   private isSocketLocked: boolean;
   private bufferedMessages: string[];
-  private abortHandler?: AbortController;
+  private abortHandler: Maybe<AbortController> = Maybe.nothing();
+  private connectionRequest: Maybe<{readonly onConnect: Maybe<OnConnect>}> = Maybe.nothing();
+  private openConnectionContext: Maybe<WebSocketReconnectContext> = Maybe.nothing();
+  private warnedAboutMissingConsumer = false;
   private versionPrefix = '';
 
   public static readonly TOPIC = TOPIC;
@@ -100,7 +107,10 @@ export class WebSocketClient extends EventEmitter {
     this.baseUrl = baseUrl;
     this.client = client;
     this.wallClock = options.wallClock;
+    this.lifecycleImplementation = options.lifecycleImplementation ?? 'legacy';
+    this.usesCorrectedLifecycle = this.lifecycleImplementation === 'corrected';
     this.socket = new ReconnectingWebsocket(this.onReconnect, {
+      lifecycleImplementation: this.lifecycleImplementation,
       platform: options.platform,
       backFromSleepHandler: Maybe.nothing(),
       pingInterval: Maybe.nothing(),
@@ -126,20 +136,61 @@ export class WebSocketClient extends EventEmitter {
     }
   }
 
-  private readonly onMessage = (data: string): void => {
-    if (!Boolean(data)) {
+  private readonly onMessage = (message: string): void => {
+    if (isEmptyString(message)) {
       this.logger.warn('Received empty message from WebSocket');
       return;
     }
 
-    if (this.isLocked()) {
-      this.bufferedMessages.push(data);
-    } else {
-      const notification = this.useLegacySocket
-        ? JSON.parse(data)
-        : ConsumableNotificationSchema.parse(JSON.parse(data));
-      this.emit(WebSocketClient.TOPIC.ON_MESSAGE, notification);
+    const notificationListenerCount = this.listenerCount(TOPIC.ON_MESSAGE);
+    if (notificationListenerCount === 0) {
+      if (!this.warnedAboutMissingConsumer) {
+        this.warnedAboutMissingConsumer = true;
+        this.logger.warn('WebSocket application frame has no notification consumer', {
+          subsystem: 'websocket-lifecycle',
+          event: 'notification-consumer-missing',
+          implementation: this.lifecycleImplementation,
+          ...this.openConnectionContext.unwrapOr({}),
+          locked: this.isLocked(),
+        });
+      }
     }
+
+    if (this.isLocked()) {
+      this.bufferedMessages.push(message);
+      return;
+    }
+    const shouldSkipDispatch = this.usesCorrectedLifecycle && notificationListenerCount === 0;
+    if (shouldSkipDispatch) {
+      return;
+    }
+
+    let notification: Notification | ConsumableNotification;
+    try {
+      notification = this.useLegacySocket
+        ? JSON.parse(message)
+        : ConsumableNotificationSchema.parse(JSON.parse(message));
+    } catch (error: unknown) {
+      this.logger.warn('Could not parse WebSocket notification', {
+        subsystem: 'websocket-lifecycle',
+        event: 'notification-parse-failed',
+        implementation: this.lifecycleImplementation,
+        ...this.openConnectionContext.unwrapOr({}),
+        errorName: StringUtil.getSafeErrorDetails(error).errorName,
+      });
+      if (!this.usesCorrectedLifecycle) {
+        throw error;
+      }
+      return;
+    }
+    this.logger.debug('WebSocket notification parsed and ready for dispatch', {
+      subsystem: 'websocket-lifecycle',
+      event: 'notification-dispatch',
+      implementation: this.lifecycleImplementation,
+      ...this.openConnectionContext.unwrapOr({}),
+      notificationListenerCount,
+    });
+    this.emit(TOPIC.ON_MESSAGE, notification);
   };
 
   private readonly onError = async (error: ErrorEvent, reconnectContext: WebSocketReconnectContext): Promise<void> => {
@@ -162,9 +213,25 @@ export class WebSocketClient extends EventEmitter {
     }
   };
 
-  private readonly onReconnect = async (reconnectContext: WebSocketReconnectContext): Promise<string> => {
-    await this.waitForValidAccessTokenBeforeReconnect(reconnectContext);
+  private readonly onReconnect = async (
+    reconnectContext: WebSocketReconnectContext,
+    isCurrentAttempt: () => boolean = () => {
+      return true;
+    },
+  ): Promise<string> => {
+    const websocket = this;
+    function assertCurrentAttempt(): void {
+      const attemptIsObsolete = websocket.usesCorrectedLifecycle && !isCurrentAttempt();
+      if (attemptIsObsolete) {
+        throw new DOMException('WebSocket attempt was cancelled', 'AbortError');
+      }
+    }
+
+    assertCurrentAttempt();
+    await this.waitForValidAccessTokenBeforeReconnect(reconnectContext, assertCurrentAttempt);
+    assertCurrentAttempt();
     await this.verifyAuthenticatedSessionBeforeReconnect(reconnectContext);
+    assertCurrentAttempt();
 
     return this.buildWebSocketUrl(reconnectContext);
   };
@@ -174,14 +241,24 @@ export class WebSocketClient extends EventEmitter {
   };
 
   private readonly onClose = (): void => {
-    this.abortHandler?.abort();
+    this.abortOpenConnection();
+    this.openConnectionContext = Maybe.nothing();
     this.bufferedMessages = [];
+    if (this.usesCorrectedLifecycle) {
+      this.isSocketLocked = false;
+    }
     this.onStateChange(this.socket.getState());
   };
 
   private readonly onLongRunningRetry = (retryDetails: LongRunningRetryDetails): void => {
     this.emit(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, retryDetails);
   };
+
+  private abortOpenConnection(): void {
+    if (this.abortHandler.isJust) {
+      this.abortHandler.value.abort();
+    }
+  }
 
   /**
    * Attaches all listeners to the websocket and establishes the connection.
@@ -197,16 +274,53 @@ export class WebSocketClient extends EventEmitter {
    */
   public connect(clientId?: string, onConnect?: OnConnect): WebSocketClient {
     this.clientId = clientId;
+    const connectionRequest = Maybe.just({onConnect: Maybe.of(onConnect)});
+    if (this.usesCorrectedLifecycle) {
+      this.connectionRequest = connectionRequest;
+      this.abortOpenConnection();
+    }
 
     this.onStateChange(WEBSOCKET_STATE.CONNECTING);
+    const requestWasReplaced = this.usesCorrectedLifecycle && this.connectionRequest !== connectionRequest;
+    if (requestWasReplaced) {
+      return this;
+    }
     this.socket.setOnMessage(this.onMessage);
     this.socket.setOnError(this.onError);
     this.socket.setOnLongRunningRetry(this.onLongRunningRetry);
     this.socket.setOnOpen((_event, reconnectContext) => {
+      this.warnedAboutMissingConsumer = false;
+      if (!this.usesCorrectedLifecycle) {
+        this.openConnectionContext = Maybe.just(reconnectContext);
+        this.onOpen();
+        if (!isUndefined(onConnect)) {
+          const abortController = new AbortController();
+          this.abortHandler = Maybe.just(abortController);
+          onConnect(abortController, reconnectContext);
+        }
+        return;
+      }
+      this.abortOpenConnection();
+      const abortController = new AbortController();
+      this.abortHandler = Maybe.just(abortController);
+      // A replaced wrapper can close after the new wrapper is already active.
+      if (this.openConnectionContext.isJust) {
+        this.bufferedMessages = [];
+        this.isSocketLocked = false;
+        this.onStateChange(WEBSOCKET_STATE.CLOSED);
+      }
+      if (abortController.signal.aborted) {
+        return;
+      }
+      this.openConnectionContext = Maybe.just(reconnectContext);
       this.onOpen();
-      if (onConnect !== undefined) {
-        this.abortHandler = new AbortController();
-        void onConnect(this.abortHandler, reconnectContext);
+      if (!abortController.signal.aborted) {
+        const connect = this.connectionRequest.andThen(request => {
+          return request.onConnect;
+        });
+        if (connect.isJust) {
+          connect.value(abortController, reconnectContext);
+        }
       }
     });
     this.socket.setOnClose(this.onClose);
@@ -225,7 +339,10 @@ export class WebSocketClient extends EventEmitter {
     return this.accessTokenRefreshPromise;
   }
 
-  private async waitForValidAccessTokenBeforeReconnect(reconnectContext: WebSocketReconnectContext): Promise<void> {
+  private async waitForValidAccessTokenBeforeReconnect(
+    reconnectContext: WebSocketReconnectContext,
+    assertCurrentAttempt: () => void,
+  ): Promise<void> {
     let retryCount = 0;
     const tokenValidationStartTimestampInMilliseconds = this.wallClock.currentTimestampInMilliseconds;
     const tokenIsValid = this.client.hasValidAccessToken();
@@ -251,6 +368,7 @@ export class WebSocketClient extends EventEmitter {
     }
 
     while (true) {
+      assertCurrentAttempt();
       const refreshStartTimestampInMilliseconds = this.wallClock.currentTimestampInMilliseconds;
       this.logger.debug('Refreshing access token before WebSocket reconnect', {
         subsystem: 'websocket-lifecycle',
@@ -263,6 +381,7 @@ export class WebSocketClient extends EventEmitter {
       try {
         await this.refreshAccessToken();
       } catch (error: unknown) {
+        assertCurrentAttempt();
         if (this.isInvalidSessionError(error)) {
           const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
           this.logger.warn('WebSocket access token refresh failed', {
@@ -418,8 +537,20 @@ export class WebSocketClient extends EventEmitter {
   }
 
   public disconnect(reason?: string): void {
-    if (this.socket !== undefined) {
+    if (!this.usesCorrectedLifecycle) {
       this.socket.disconnect(reason);
+      return;
+    }
+    this.abortOpenConnection();
+    this.abortHandler = Maybe.nothing();
+    this.connectionRequest = Maybe.nothing();
+    this.openConnectionContext = Maybe.nothing();
+    this.bufferedMessages = [];
+    this.isSocketLocked = false;
+    try {
+      this.socket.disconnect(reason);
+    } finally {
+      this.onStateChange(WEBSOCKET_STATE.CLOSED);
     }
   }
 
@@ -429,12 +560,32 @@ export class WebSocketClient extends EventEmitter {
    * connecting the websocket and the unlocking the websocket will be emitted.
    */
   public readonly unlock = (): void => {
-    this.logger.info(`Unlocking WebSocket - Emitting "${this.bufferedMessages.length}" unprocessed messages`);
+    const signal = this.usesCorrectedLifecycle
+      ? this.abortHandler.map(controller => {
+          return controller.signal;
+        })
+      : Maybe.nothing<AbortSignal>();
+    const bufferedMessages = this.bufferedMessages;
+    if (this.usesCorrectedLifecycle) {
+      this.bufferedMessages = [];
+    }
+    this.logger.debug('WebSocket unlocked', {
+      subsystem: 'websocket-lifecycle',
+      event: 'socket-unlocked',
+      ...this.openConnectionContext.unwrapOr({}),
+      bufferedNotificationCount: bufferedMessages.length,
+    });
     this.isSocketLocked = false;
-    for (const bufferedMessage of this.bufferedMessages) {
+    for (const bufferedMessage of bufferedMessages) {
+      const socketClosed = signal.isJust && signal.value.aborted;
+      if (socketClosed) {
+        break;
+      }
       this.onMessage(bufferedMessage);
     }
-    this.bufferedMessages = [];
+    if (!this.usesCorrectedLifecycle) {
+      this.bufferedMessages = [];
+    }
   };
 
   /**
@@ -444,8 +595,16 @@ export class WebSocketClient extends EventEmitter {
    * during fetching notifications from the notification stream.
    */
   public readonly lock = (): void => {
-    this.logger.info('Locking WebSocket');
+    const alreadyLocked = this.usesCorrectedLifecycle && this.isSocketLocked;
+    if (alreadyLocked) {
+      return;
+    }
     this.isSocketLocked = true;
+    this.logger.debug('WebSocket locked', {
+      subsystem: 'websocket-lifecycle',
+      event: 'socket-locked',
+      ...this.openConnectionContext.unwrapOr({}),
+    });
   };
 
   public isLocked(): boolean {
@@ -457,7 +616,8 @@ export class WebSocketClient extends EventEmitter {
       accessTokenStore: {getAccessToken, getNextMarkerToken},
     } = this.client;
     const accessToken = getAccessToken?.() ?? '';
-    const markerToken = getNextMarkerToken?.() ?? '';
+    const skipMarker = this.usesCorrectedLifecycle && this.useLegacySocket;
+    const markerToken = skipMarker ? '' : (getNextMarkerToken?.() ?? '');
     const markerIncluded = !this.useLegacySocket && markerToken.length > 0;
 
     if (!Boolean(this.versionPrefix)) {
