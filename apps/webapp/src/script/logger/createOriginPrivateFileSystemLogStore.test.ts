@@ -526,18 +526,47 @@ describe('worker synchronous Origin Private File System log store', () => {
     expect(storage.files.size).toBe(0);
   });
 
-  it('retains an old filename when writes have refreshed its modification time', async () => {
+  it('rotates on the first nonempty append after UTC midnight and writes the batch intact', async () => {
+    const storage = createTestDirectory();
+    const clock = storage.clock;
+    const midnightMilliseconds = Date.UTC(2026, 10, 18);
+    clock.advanceByMilliseconds(midnightMilliseconds - clock.currentUnixEpochMilliseconds - 2);
+    const accountIdentifier = 'a'.repeat(64);
+    const writer = createStoreForTest({storage, accountIdentifier: Maybe.just(accountIdentifier)});
+    const firstFilename = `log-${midnightMilliseconds - 2}-${firstSessionIdentifier}-1-${accountIdentifier}.jsonl`;
+    await writer.append(['{}\n']);
+    clock.advanceByMilliseconds(1);
+    await writer.append(['[]\n']);
+
+    clock.advanceByMilliseconds(1);
+    await writer.append([]);
+    expect([...storage.files.keys()]).toEqual([firstFilename]);
+
+    clock.advanceByMilliseconds(1);
+    await writer.append(['{"message":"Grüße 🌍"}\n', '{"message":"second record"}\n']);
+    await writer.append(['{"message":"same UTC day"}\n']);
+
+    const secondFilename = `log-${midnightMilliseconds + 1}-${firstSessionIdentifier}-2-${accountIdentifier}.jsonl`;
+    expect([...storage.files.keys()]).toEqual([firstFilename, secondFilename]);
+    expect(storage.files.get(firstFilename)).toEqual(encode('{}\n[]\n'));
+    expect(storage.files.get(secondFilename)).toEqual(
+      encode('{"message":"Grüße 🌍"}\n{"message":"second record"}\n{"message":"same UTC day"}\n'),
+    );
+  });
+
+  it('retains legacy files spanning multiple days based on modification time', async () => {
     const storage = createTestDirectory();
     const writer = createStoreForTest({storage, accountIdentifier: Maybe.nothing()});
-    await writer.append(['{}\n']);
-    const originalFilenames = [...storage.files.keys()];
-    storage.clock.advanceByMilliseconds(logPersistenceConfiguration.maximumAgeMilliseconds - 1);
-    await writer.append(['[]\n']);
-    storage.clock.advanceByMilliseconds(2);
+    const filename = `log-1000000-${firstSessionIdentifier}-1.jsonl`;
+    const contents = '{"time":"1970-01-01T00:16:40.000Z"}\n{"time":"1970-01-02T00:16:40.000Z"}\n';
+    storage.files.set(filename, encode(contents));
+    const oneDayMilliseconds = 24 * 60 * 60 * 1000;
+    storage.modificationTimes.set(filename, 1_000_000 + oneDayMilliseconds);
+    storage.clock.advanceByMilliseconds(logPersistenceConfiguration.maximumAgeMilliseconds + 1);
     await writer.append([]);
 
-    expect([...storage.files.keys()]).toEqual(originalFilenames);
-    expect(readLogFileContents(storage)).toEqual(['{}\n[]\n']);
+    expect([...storage.files.keys()]).toEqual([filename]);
+    expect(readLogFileContents(storage)).toEqual([contents]);
   });
 
   it('expires recently named files by modification time across accounts and unattributed logs', async () => {
