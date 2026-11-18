@@ -31,6 +31,7 @@ import {
 interface StartedStatus {
   readonly id: string;
   readonly items: readonly SharedDriveMoveItem[];
+  readonly conversationQualifiedId: string;
 }
 
 export interface BulkActionStatusReporter {
@@ -48,9 +49,10 @@ export interface BulkActionStatusReporter {
  */
 export const useBulkActionStatusReporter = (
   action: SharedDriveBulkAction,
+  conversationQualifiedId: string,
   onReview?: () => void,
 ): BulkActionStatusReporter => {
-  const {updateMoveStatus, createMoveStatusId, clearMoveStatus} = useSharedDriveUploadStatus();
+  const {startMoveStatus, updateMoveStatus, createMoveStatusId, clearMoveStatus} = useSharedDriveUploadStatus();
   const onReviewRef = useRef(onReview);
   onReviewRef.current = onReview;
   const started = useRef<Maybe<StartedStatus>>(Maybe.nothing());
@@ -66,12 +68,13 @@ export const useBulkActionStatusReporter = (
   // Stable so callers can list them as effect dependencies without re-publishing on every render.
   const start = useCallback(
     (items: readonly SharedDriveMoveItem[]): void => {
-      const current = {id: createMoveStatusId(), items};
+      const current = {id: createMoveStatusId(), items, conversationQualifiedId};
       started.current = Maybe.just(current);
       lastKind.current = Maybe.just('processing');
       isReviewing.current = false;
-      updateMoveStatus({
+      startMoveStatus({
         id: current.id,
+        conversationQualifiedId: current.conversationQualifiedId,
         action,
         kind: 'processing',
         items,
@@ -79,15 +82,16 @@ export const useBulkActionStatusReporter = (
         ...(hasReview && {onReview: review}),
       });
     },
-    [action, createMoveStatusId, hasReview, review, updateMoveStatus],
+    [action, conversationQualifiedId, createMoveStatusId, hasReview, review, startMoveStatus],
   );
   const report = useCallback(
     (kind: SharedDriveMoveStatusKind): void => {
       if (maybe.isJust(started.current)) {
-        const {id, items} = started.current.value;
+        const {id, items, conversationQualifiedId: startedConversationQualifiedId} = started.current.value;
         lastKind.current = Maybe.just(kind);
         updateMoveStatus({
           id,
+          conversationQualifiedId: startedConversationQualifiedId,
           action,
           kind,
           items,

@@ -18,7 +18,7 @@
  */
 
 import {act, render, screen, waitFor, within, type RenderResult} from '@testing-library/react';
-import type {FunctionComponent} from 'react';
+import type {FunctionComponent, ReactElement} from 'react';
 import {Maybe} from 'true-myth';
 import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
@@ -55,12 +55,14 @@ const translateMoveSummaryForTest: Translate = (key, substitutions) => {
 type TestMoveStatus = SharedDriveMoveStatus;
 
 const MoveStatusPollControl: FunctionComponent<{readonly status: TestMoveStatus}> = ({status}) => {
-  const {updateMoveStatus} = useSharedDriveUploadStatus();
+  const {isMoveStatusCurrent, startMoveStatus, updateMoveStatus} = useSharedDriveUploadStatus();
   return (
     <button
       type="button"
       onClick={() => {
-        return updateMoveStatus(status);
+        return isMoveStatusCurrent(status.conversationQualifiedId, status.id)
+          ? updateMoveStatus(status)
+          : startMoveStatus(status);
       }}
     >
       Poll move status
@@ -143,12 +145,13 @@ const renderHost = (
   isEnabled = true,
   isFileTabActive = true,
   translate = translateForTest,
-  moveStatus?: TestMoveStatus,
+  moveStatus?: Omit<TestMoveStatus, 'conversationQualifiedId'>,
 ): RenderResult => {
+  const scopedMoveStatus = moveStatus ? {...moveStatus, conversationQualifiedId: scope} : undefined;
   return render(
-    moveStatus ? (
-      <SharedDriveUploadStatusProvider initialMoveStatus={Maybe.just(moveStatus)}>
-        <MoveStatusPollControl status={moveStatus} />
+    scopedMoveStatus ? (
+      <SharedDriveUploadStatusProvider initialMoveStatus={Maybe.just(scopedMoveStatus)}>
+        <MoveStatusPollControl status={scopedMoveStatus} />
         <SharedDriveUploadStatusPopupHost
           controller={controller}
           conversationQualifiedId={scope}
@@ -1171,5 +1174,52 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     renderHost(controller, conversationQualifiedId);
 
     expect(document.querySelector('[data-uie-name="shared-drive-upload-status-popup"]')).toBeInTheDocument();
+  });
+
+  it('keeps bulk statuses with their conversations when switching between them', async () => {
+    const user = userEvent.setup();
+    const controller = createController([]);
+    const firstStatus: TestMoveStatus = {
+      id: 'first-move',
+      conversationQualifiedId,
+      action: 'move',
+      kind: 'processing',
+      items: [{id: 'first-file', name: 'first.txt', isFolder: false}],
+      destinationPath: 'First folder',
+    };
+    const secondStatus: TestMoveStatus = {
+      ...firstStatus,
+      id: 'second-move',
+      conversationQualifiedId: otherConversationQualifiedId,
+      items: [{id: 'second-file', name: 'second.txt', isFolder: false}],
+      destinationPath: 'Second folder',
+    };
+    const host = (scope: string): ReactElement => {
+      return (
+        <SharedDriveUploadStatusProvider initialMoveStatus={Maybe.just(firstStatus)}>
+          <MoveStatusPollControl status={secondStatus} />
+          <SharedDriveUploadStatusPopupHost
+            controller={controller}
+            conversationQualifiedId={scope}
+            isEnabled
+            isFileTabActive
+          />
+        </SharedDriveUploadStatusProvider>
+      );
+    };
+    const view = render(host(conversationQualifiedId), {
+      wrapper: createRootProviderWrapperForTest(
+        createRootContextValueForTest({translate: translateMoveSummaryForTest}),
+      ),
+    });
+
+    expect(screen.getByText('first.txt')).toBeInTheDocument();
+    view.rerender(host(otherConversationQualifiedId));
+    expect(screen.queryByText('first.txt')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Poll move status'}));
+    expect(screen.getByText('second.txt')).toBeInTheDocument();
+    view.rerender(host(conversationQualifiedId));
+    expect(screen.getByText('first.txt')).toBeInTheDocument();
+    expect(screen.queryByText('second.txt')).not.toBeInTheDocument();
   });
 });

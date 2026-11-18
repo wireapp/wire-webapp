@@ -20,6 +20,7 @@
 import {UIEvent, useCallback, useEffect, useMemo, useState, type ReactElement} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
+import {Maybe} from 'true-myth';
 import {arrayIncludes} from 'ts-extras';
 import {container} from 'tsyringe';
 
@@ -42,7 +43,7 @@ import {
   createDraftSharedDriveUploadStrategy,
   createSharedDriveUploadController,
 } from './conversationCells/sharedDriveUploadController';
-import {SharedDriveUploadStatusProvider} from './conversationCells/sharedDriveUploadStatusContext';
+import {SharedDriveUploadStatusScope} from './conversationCells/sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from './conversationCells/sharedDriveUploadStatusPopupHost';
 import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
 import {isConversationFileUploadAllowed} from './conversationFileDropzone/isConversationFileUploadAllowed/isConversationFileUploadAllowed';
@@ -60,6 +61,7 @@ import {parseAccountDeepLink} from './utils/parseAccountDeepLink';
 import {CONVERSATION_CELLS_STATE} from '../../apiClient/conversation/conversation';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
+import {driveBulkActionProgressFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
@@ -137,7 +139,7 @@ function ConversationContent({
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
-  const {fireAndForgetInvoker, translate, clock} = useApplicationContext();
+  const {fireAndForgetInvoker, translate, clock, isFeatureToggleEnabled} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
@@ -742,7 +744,12 @@ function ConversationContent({
         inputProps={getInputProps()}
       >
         {!isNullOrUndefined(activeConversation) && (
-          <SharedDriveUploadStatusProvider>
+          <SharedDriveUploadStatusScope
+            enabled={!isFeatureToggleEnabled(driveBulkActionProgressFeatureToggleName)}
+            scopeKey={Maybe.just(
+              `${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}:${isFileTabActive ? getCellsFilesPath() : 'outside-files'}`,
+            )}
+          >
             <TitleBar
               repositories={repositories}
               conversation={activeConversation}
@@ -788,6 +795,7 @@ function ConversationContent({
                   {isFileTabActive && (
                     <SharedDriveUploadProvider controller={sharedDriveUploadController}>
                       <ConversationCells
+                        key={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
                         activeConversation={activeConversation}
                         userRepository={repositories.user}
                         cellsRepository={repositories.cells}
@@ -908,7 +916,7 @@ function ConversationContent({
               isEnabled
               isFileTabActive={isFileTabActive}
             />
-          </SharedDriveUploadStatusProvider>
+          </SharedDriveUploadStatusScope>
         )}
 
         {isGiphyModalOpen && isNonEmptyString(inputValue) && (

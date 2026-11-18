@@ -25,6 +25,7 @@ import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {AppLock} from './appLock';
@@ -45,6 +46,7 @@ import {CallingContainer} from '../components/calling/CallingOverlayContainer';
 import {ChooseScreen} from '../components/calling/ChooseScreen';
 import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
 import {ConfigToolbar} from '../components/configToolbar/configToolbar';
+import {SharedDriveUploadStatusScope} from '../components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {ErrorFallback} from '../components/errorFallback';
 import {CreateConversationModal} from '../components/Modals/CreateConversation/CreateConversaionModal';
 import {FileHistoryModal} from '../components/Modals/FileHistoryModal/FileHistoryModal';
@@ -53,7 +55,10 @@ import {LegalHoldModal} from '../components/Modals/LegalHoldModal/LegalHoldModal
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from '../components/Modals/UserModal';
 import {Config} from '../Config';
-import type {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
+import {
+  driveBulkActionProgressFeatureToggleName,
+  type StartupFeatureToggleName,
+} from '../featureToggles/startupFeatureToggleNames';
 import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
@@ -414,15 +419,20 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
               <LeftSidebar listViewModel={mainView.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
             )}
 
-            {showMainContent && (
-              <MainContent
-                selfUser={selfUser}
-                isRightSidebarOpen={isTruthy(currentState)}
-                openRightSidebar={toggleRightSidebar}
-                reloadApp={app.refresh}
-                appLockRepository={appLockRepository}
-              />
-            )}
+            <SharedDriveUploadStatusScope
+              enabled={isFeatureToggleEnabled(driveBulkActionProgressFeatureToggleName)}
+              scopeKey={Maybe.nothing()}
+            >
+              {showMainContent && (
+                <MainContent
+                  selfUser={selfUser}
+                  isRightSidebarOpen={isTruthy(currentState)}
+                  openRightSidebar={toggleRightSidebar}
+                  reloadApp={app.refresh}
+                  appLockRepository={appLockRepository}
+                />
+              )}
+            </SharedDriveUploadStatusScope>
 
             {isTruthy(currentState) ? (
               <RightSidebar
