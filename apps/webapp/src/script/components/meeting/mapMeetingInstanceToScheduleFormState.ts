@@ -37,6 +37,7 @@ export const mapMeetingInstanceToScheduleFormState = (
   meetingInstance: MeetingInstance,
   selectedUsers: User[],
   clock: Clock,
+  invitedEmails: string[] = [],
 ): ScheduleMeetingFormState => {
   const {meetingSeries} = meetingInstance;
   const anchorInstance = getEditAnchorMeetingInstance(meetingSeries, clock.currentDate);
@@ -47,7 +48,7 @@ export const mapMeetingInstanceToScheduleFormState = (
     end: maybe.just(anchorInstance.end),
     recurrence: meetingSeries.recurrence,
     selectedUsers,
-    invitedEmails: [],
+    invitedEmails,
     participantsFilter: '',
     password: '',
     passwordConfirmation: '',
