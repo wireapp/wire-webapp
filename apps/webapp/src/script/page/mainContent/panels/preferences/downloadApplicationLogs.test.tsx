@@ -47,14 +47,13 @@ describe('DownloadApplicationLogs', () => {
       }),
     );
 
-    expect(screen.getByRole('region', {name: 'Diagnostic logs'})).toBeInTheDocument();
-    expect(screen.getByRole('heading', {level: 3, name: 'Diagnostic logs'})).toBeInTheDocument();
+    expect(screen.getByRole('group', {name: 'Diagnostic logs'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Download application logs'})).toBeEnabled();
   });
 
   it('renders nothing when the download capability is unavailable', () => {
     renderDownload(Maybe.nothing());
-    expect(screen.queryByRole('region')).not.toBeInTheDocument();
+    expect(screen.queryByRole('group', {name: 'Diagnostic logs'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
