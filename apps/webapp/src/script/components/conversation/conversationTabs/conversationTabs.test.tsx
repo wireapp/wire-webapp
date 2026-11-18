@@ -18,10 +18,11 @@
  */
 
 import {act, render, type RenderResult} from '@testing-library/react';
-import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
+import {THEME_ID, ThemeProvider, themes} from '../../../uiKit/identity/theme/theme';
 import {Maybe} from 'true-myth';
 
 import type {UploadState} from '../../../repositories/cells/upload';
+import {driveOffboardingFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -101,24 +102,75 @@ const renderTabs = (
   controller: SharedDriveUploadController,
   isUploadStatusIndicatorEnabled = true,
   dismissedUpload: Maybe<DismissedUpload> = Maybe.nothing<DismissedUpload>(),
+  onIndexChange: (index: number) => void = jest.fn(),
+  activeTabIndex = 0,
+  themeId = THEME_ID.DEFAULT,
+  isDriveOffboardingEnabled = false,
 ): RenderResult => {
   return render(
-    <ThemeProvider>
+    <ThemeProvider theme={themes[themeId]}>
       <SharedDriveUploadStatusProvider initialDismissedUpload={dismissedUpload}>
         <ConversationTabs
-          activeTabIndex={0}
-          onIndexChange={jest.fn()}
+          activeTabIndex={activeTabIndex}
+          onIndexChange={onIndexChange}
           conversationQualifiedId={conversationQualifiedId}
           sharedDriveUploadController={controller}
           isUploadStatusIndicatorEnabled={isUploadStatusIndicatorEnabled}
         />
       </SharedDriveUploadStatusProvider>
     </ThemeProvider>,
-    {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}))},
+    {
+      wrapper: createRootProviderWrapperForTest(
+        createRootContextValueForTest({
+          isFeatureToggleEnabled: name => {
+            return name === driveOffboardingFeatureToggleName && isDriveOffboardingEnabled;
+          },
+          translate: translateForTest,
+        }),
+      ),
+    },
   );
 };
 
 describe('ConversationTabs', () => {
+  it.each([false, true])('keeps Shared Drive tab visible with offboarding flag %s', isEnabled => {
+    const {controller} = createController();
+    const view = renderTabs(
+      controller,
+      true,
+      Maybe.nothing<DismissedUpload>(),
+      jest.fn(),
+      0,
+      THEME_ID.DEFAULT,
+      isEnabled,
+    );
+
+    expect(view.getByRole('tab', {name: 'conversationDetailsActionCellsTitle'})).toBeInTheDocument();
+  });
+
+  it.each([THEME_ID.LIGHT, THEME_ID.DARK])('restores a direct Files link in %s theme', themeId => {
+    const previousHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation/example.com/files';
+    const onIndexChange = jest.fn();
+    const {controller} = createController();
+    const view = renderTabs(controller, true, Maybe.nothing<DismissedUpload>(), onIndexChange, 1, themeId);
+
+    expect(onIndexChange).toHaveBeenCalledWith(1);
+    const filesTab = view.getByRole('tab', {name: 'conversationDetailsActionCellsTitle'});
+    expect(filesTab).toHaveAttribute('aria-selected', 'true');
+    expect(filesTab).toHaveAttribute('aria-controls', 'conversation-tabpanel-files');
+    filesTab.focus();
+    expect(filesTab).toHaveFocus();
+    expect(view.getByRole('tab', {name: 'cells.tableRow.conversationName'})).toHaveAttribute('aria-selected', 'false');
+
+    act(() => {
+      window.location.hash = '#/conversation/conversation/example.com';
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    });
+    expect(onIndexChange).toHaveBeenCalledWith(0);
+    window.location.hash = previousHash;
+  });
+
   it('does not render a shared drive upload icon when there is no file upload', () => {
     const {controller} = createController();
     const view = renderTabs(controller);

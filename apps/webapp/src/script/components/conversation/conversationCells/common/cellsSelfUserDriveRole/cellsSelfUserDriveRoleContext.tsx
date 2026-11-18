@@ -31,12 +31,18 @@ export type CellsSelfUserDriveRole = (typeof CELLS_SELF_USER_DRIVE_ROLE)[keyof t
 interface GetSelfUserDriveRoleParams {
   conversationTeamId?: string;
   selfUserTeamId?: string;
+  isCellsEnabledForTeam?: boolean;
 }
 
 export const getSelfUserDriveRole = ({
   conversationTeamId,
   selfUserTeamId,
+  isCellsEnabledForTeam = true,
 }: GetSelfUserDriveRoleParams): CellsSelfUserDriveRole => {
+  if (!isCellsEnabledForTeam) {
+    return CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
+  }
+
   if (!isNonEmptyString(conversationTeamId)) {
     return CELLS_SELF_USER_DRIVE_ROLE.EDITOR;
   }

@@ -23,6 +23,7 @@ export const forTestsOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
 export const driveBulkRestoreFeatureToggleName = 'drive-bulk-restore';
 export const driveBulkActionProgressFeatureToggleName = 'drive-bulk-action-progress';
+export const driveOffboardingFeatureToggleName = 'drive-offboarding';
 export const markAsUnreadFeatureToggleName = 'mark-as-unread';
 export const troubleshooterFeatureToggleName = 'troubleshooter';
 
@@ -36,6 +37,7 @@ export const startupFeatureToggleRegistry = [
   {name: disableMessagePreprocessingFeatureToggleName, previewDefaultEnabled: false},
   {name: driveBulkRestoreFeatureToggleName, previewDefaultEnabled: false},
   {name: driveBulkActionProgressFeatureToggleName, previewDefaultEnabled: true},
+  {name: driveOffboardingFeatureToggleName, previewDefaultEnabled: true},
   {name: markAsUnreadFeatureToggleName, previewDefaultEnabled: true},
   {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},
   {name: sendCallLogsFeatureToggleName, previewDefaultEnabled: false},

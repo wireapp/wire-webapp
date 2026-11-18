@@ -21,8 +21,14 @@ import {act, fireEvent, render} from '@testing-library/react';
 import {type ReactElement} from 'react';
 import {ConnectionStatus} from '../../../apiClient/connection/connectionStatus';
 import {CONVERSATION_CELLS_STATE, CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
-import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {
+  CONVERSATION_PROTOCOL,
+  FEATURE_STATUS,
+  type FeatureList,
+} from '../../../apiClient/team/feature/featureList.types';
 import {UserType} from '../../../apiClient/user/user';
+import {Config} from '../../../Config';
+import {driveOffboardingFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {ConnectionEntity} from '../../../repositories/connection/connectionEntity';
@@ -91,6 +97,14 @@ let conversationRepository: ConversationRepository;
 let searchRepository: SearchRepository;
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+const sharedDriveFeatureRootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({
+    isFeatureToggleEnabled: name => {
+      return name === driveOffboardingFeatureToggleName;
+    },
+    translate: translateForTest,
+  }),
+);
 const viewerPermissionRootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({
     isFeatureToggleEnabled: () => {
@@ -191,6 +205,15 @@ const getDefaultParams = (): GetDefaultParamsResult => {
 };
 
 describe('ConversationDetails', () => {
+  const enableCellsEnvironmentForTest = (): void => {
+    const config = Config.getConfig();
+    jest.spyOn(Config, 'getConfig').mockReturnValue({...config, FEATURE: {...config.FEATURE, ENABLE_CELLS: true}});
+  };
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   afterAll(() => {
     testFactory.dispose();
   });
@@ -204,11 +227,13 @@ describe('ConversationDetails', () => {
     {selfUserTeamId: 'conversation-team', expectedStatus: 'cells.sharedDriveAccess.editorAccess'},
     {selfUserTeamId: 'other-team', expectedStatus: 'cells.sharedDriveAccess.viewerAccess'},
   ])('opens Shared Drive settings with $expectedStatus', ({selfUserTeamId, expectedStatus}) => {
+    enableCellsEnvironmentForTest();
     const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     conversation.teamId = 'conversation-team';
 
     const defaultProps = getDefaultParams();
+    defaultProps.teamState.teamFeatures({cells: {status: FEATURE_STATUS.ENABLED}} as FeatureList);
     defaultProps.selfUser.teamId = selfUserTeamId;
     const togglePanel = jest.fn();
     const {getByTestId} = render(
@@ -227,6 +252,63 @@ describe('ConversationDetails', () => {
     fireEvent.click(getByTestId('go-shared-drive'));
 
     expect(togglePanel).toHaveBeenCalledWith(PanelState.SHARED_DRIVE, conversation);
+  });
+
+  it('keeps Shared Drive in details with viewer access when team Cells is disabled', () => {
+    enableCellsEnvironmentForTest();
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    conversation.teamId = 'conversation-team';
+    const props = getDefaultParams();
+    props.selfUser.teamId = 'conversation-team';
+    const togglePanel = jest.fn();
+
+    const view = render(
+      withThemeAndRootContext(
+        <ConversationDetails {...props} activeConversation={conversation} togglePanel={togglePanel} />,
+        sharedDriveFeatureRootProviderWrapper,
+      ),
+    );
+
+    expect(view.getByTestId('go-shared-drive')).toBeInTheDocument();
+    expect(view.getByTestId('status-cells-info')).toHaveTextContent('cells.sharedDriveAccess.viewerAccess');
+    fireEvent.click(view.getByTestId('go-shared-drive'));
+    expect(togglePanel).toHaveBeenCalledWith(PanelState.SHARED_DRIVE, conversation);
+  });
+
+  it('omits Shared Drive from details when conversation Cells is disabled', () => {
+    enableCellsEnvironmentForTest();
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.cellsState(CONVERSATION_CELLS_STATE.DISABLED);
+    const props = getDefaultParams();
+
+    const view = render(
+      withThemeAndRootContext(
+        <ConversationDetails {...props} activeConversation={conversation} />,
+        sharedDriveFeatureRootProviderWrapper,
+      ),
+    );
+
+    expect(view.queryByTestId('go-shared-drive')).not.toBeInTheDocument();
+  });
+
+  it('keeps Shared Drive visible with existing access when offboarding is off', () => {
+    enableCellsEnvironmentForTest();
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    conversation.teamId = 'conversation-team';
+    const props = getDefaultParams();
+    props.selfUser.teamId = 'conversation-team';
+
+    const view = render(
+      withThemeAndRootContext(
+        <ConversationDetails {...props} activeConversation={conversation} />,
+        rootProviderWrapper,
+      ),
+    );
+
+    expect(view.getByTestId('go-shared-drive')).toBeInTheDocument();
+    expect(view.getByTestId('status-cells-info')).toHaveTextContent('cells.sharedDriveAccess.editorAccess');
   });
 
   it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(

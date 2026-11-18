@@ -33,6 +33,7 @@ import {
 import * as Icon from '../../../../../components/icon';
 import {PanelActions} from '../../../../../components/panel/panelActions';
 import {ReceiptModeToggle} from '../../../../../components/toggle/ReceiptModeToggle';
+import {driveOffboardingFeatureToggleName} from '../../../../../featureToggles/startupFeatureToggleNames';
 import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from '../../../../../repositories/conversation/ConversationRoleRepository';
 import {supportsReadReceipts} from '../../../../../repositories/conversation/ConversationSelectors';
@@ -121,7 +122,7 @@ function ConversationDetailsOptionsContent({
   firstParticipant,
   isParticipantBlocked,
 }: ConversationDetailsOptionsContentProps): ReactElement {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const {isMutable, receiptMode, is1to1, isRequest, isSelfUserRemoved, isChannel, isGroupOrChannel, cellsState} =
     useKoSubscribableChildren(activeConversation, [
       'isMutable',
@@ -133,7 +134,8 @@ function ConversationDetailsOptionsContent({
       'isGroupOrChannel',
       'cellsState',
     ]);
-  const {isSelfDeletingMessagesEnabled, isTeam} = useKoSubscribableChildren(teamState, [
+  const {isCellsEnabled, isSelfDeletingMessagesEnabled, isTeam} = useKoSubscribableChildren(teamState, [
+    'isCellsEnabled',
     'isSelfDeletingMessagesEnabled',
     'isTeam',
   ]);
@@ -159,7 +161,15 @@ function ConversationDetailsOptionsContent({
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
   const isTeamConversation = isNonEmptyString(teamId);
   const isCellsConversation = isNonEmptyString(cellsState) && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
-  const selfUserDriveRole = getSelfUserDriveRole({conversationTeamId: teamId, selfUserTeamId: selfUser.teamId});
+  const isDriveOffboardingEnabled =
+    isFeatureToggleEnabled(driveOffboardingFeatureToggleName) &&
+    !isCellsEnabled &&
+    cellsState === CONVERSATION_CELLS_STATE.READY;
+  const selfUserDriveRole = getSelfUserDriveRole({
+    conversationTeamId: teamId,
+    selfUserTeamId: selfUser.teamId,
+    isCellsEnabledForTeam: !isDriveOffboardingEnabled,
+  });
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotificationsGroup = isMutable && isGroupOrChannel;
   const showOptionTimedMessages = isActiveGroupParticipant && isSelfDeletingMessagesEnabled;
