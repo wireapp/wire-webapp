@@ -78,7 +78,6 @@ export function DownloadApplicationLogs(properties: DownloadApplicationLogsProps
         <Button
           type="button"
           variant={ButtonVariant.TERTIARY}
-          data-uie-name="download-application-logs"
           disabled={isExporting}
           aria-busy={isExporting}
           onClick={handleDownload}

@@ -81,7 +81,9 @@ test('downloads browser logs through a real Chromium writable file stream', asyn
   const {components} = PageManager.from(page).webapp;
   await components.conversationSidebar().clickPreferencesButton();
   await page.getByRole('button', {name: 'About', exact: true}).click();
-  const downloadButton = page.getByTestId('download-application-logs');
+  const downloadButton = page
+    .getByRole('group', {name: 'Diagnostic logs', exact: true})
+    .getByRole('button', {name: 'Download application logs', exact: true});
   await downloadButton.click();
   await expect(page.locator('html')).toHaveAttribute('data-log-picker-activation', 'true');
   await expect(page.locator('html')).toHaveAttribute(
