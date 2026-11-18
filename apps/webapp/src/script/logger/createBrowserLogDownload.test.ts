@@ -18,10 +18,11 @@
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {WritableStream} from 'node:stream/web';
-import {Maybe} from 'true-myth';
+import {Maybe, Result} from 'true-myth';
 import {match} from 'ts-pattern';
 
-import {createBrowserLogDownload, type BrowserLogDownload} from './createBrowserLogDownload';
+import type {ApplicationLogDownload} from './applicationLogDownload';
+import {createBrowserLogDownload} from './createBrowserLogDownload';
 import type {BrowserLogArchive, BrowserLogArchiveOptions, BrowserLogExportDirectory} from './exportBrowserLogs';
 
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
@@ -48,7 +49,7 @@ function withWritableStream(test: () => Promise<void>): () => Promise<void> {
   };
 }
 
-function requireDownloadForTest(download: Maybe<BrowserLogDownload>): BrowserLogDownload {
+function requireDownloadForTest(download: Maybe<ApplicationLogDownload>): ApplicationLogDownload {
   return download.unwrapOrElse(() => {
     throw new Error('Expected browser log downloads to be available');
   });
@@ -169,7 +170,7 @@ describe('browser log download', () => {
         types: [{description: 'ZIP archive', accept: {'application/zip': ['.zip']}}],
       });
       expect(dependencies.getDirectory).not.toHaveBeenCalled();
-      expect(await completion).toBe('saved');
+      expect(await completion).toEqual(Result.ok('saved'));
       expect(dependencies.write).toHaveBeenCalledWith(new Uint8Array([80, 75, 5, 6]));
       expect(dependencies.close).toHaveBeenCalledTimes(1);
       expect(dependencies.abort).not.toHaveBeenCalled();
@@ -183,7 +184,7 @@ describe('browser log download', () => {
       const download = requireDownloadForTest(createBrowserLogDownload(dependencies));
       dependencies.clock.advanceByMilliseconds(60_000);
 
-      expect(await download()).toBe('saved');
+      expect(await download()).toEqual(Result.ok('saved'));
       expect(dependencies.pickSaveFile).toHaveBeenNthCalledWith(
         1,
         expect.objectContaining({suggestedName: 'wire-logs-2026-11-17-09-06Z.zip'}),
@@ -191,7 +192,7 @@ describe('browser log download', () => {
 
       dependencies.clock.advanceByMilliseconds(60_000);
 
-      expect(await download()).toBe('saved');
+      expect(await download()).toEqual(Result.ok('saved'));
       expect(dependencies.pickSaveFile).toHaveBeenNthCalledWith(
         2,
         expect.objectContaining({suggestedName: 'wire-logs-2026-11-17-09-07Z.zip'}),
@@ -211,7 +212,7 @@ describe('browser log download', () => {
     dependencies.pickSaveFile.mockRejectedValueOnce(new DOMException('Cancelled', 'AbortError'));
     const download = requireDownloadForTest(createBrowserLogDownload(dependencies));
 
-    expect(await download()).toBe('cancelled');
+    expect(await download()).toEqual(Result.ok('cancelled'));
     expect(dependencies.pickSaveFile).toHaveBeenCalledWith(expect.objectContaining({suggestedName}));
   });
 
@@ -219,7 +220,7 @@ describe('browser log download', () => {
     const dependencies = createDownloadDependencies();
     dependencies.pickSaveFile.mockRejectedValueOnce(new DOMException('Cancelled', 'AbortError'));
     const download = requireDownloadForTest(createBrowserLogDownload(dependencies));
-    expect(await download()).toBe('cancelled');
+    expect(await download()).toEqual(Result.ok('cancelled'));
     expect(dependencies.getDirectory).not.toHaveBeenCalled();
     expect(dependencies.createArchive).not.toHaveBeenCalled();
   });
@@ -230,7 +231,7 @@ describe('browser log download', () => {
       throw new DOMException('Permission denied', 'SecurityError');
     });
     const download = requireDownloadForTest(createBrowserLogDownload(dependencies));
-    expect(await download()).toBe('failed');
+    expect(await download()).toEqual(Result.err('failed'));
     expect(dependencies.getDirectory).not.toHaveBeenCalled();
   });
 
@@ -238,7 +239,7 @@ describe('browser log download', () => {
     const dependencies = createDownloadDependencies();
     dependencies.pickSaveFile.mockRejectedValueOnce({name: 'AbortError'});
     const download = requireDownloadForTest(createBrowserLogDownload(dependencies));
-    expect(await download()).toBe('failed');
+    expect(await download()).toEqual(Result.err('failed'));
     expect(dependencies.getDirectory).not.toHaveBeenCalled();
   });
 
@@ -250,7 +251,7 @@ describe('browser log download', () => {
       },
     });
     const download = requireDownloadForTest(createBrowserLogDownload(dependencies));
-    expect(await download()).toBe('failed');
+    expect(await download()).toEqual(Result.err('failed'));
     expect(dependencies.getDirectory).not.toHaveBeenCalled();
   });
 
@@ -273,7 +274,7 @@ describe('browser log download', () => {
           })
           .exhaustive();
         const download = requireDownloadForTest(createBrowserLogDownload(dependencies));
-        expect(await download()).toBe('failed');
+        expect(await download()).toEqual(Result.err('failed'));
         // An already errored stream does not invoke its sink's abort callback again.
         expect(dependencies.abort).toHaveBeenCalledTimes(failure === 'close' ? 0 : 1);
       })();

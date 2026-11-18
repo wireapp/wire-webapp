@@ -21,8 +21,9 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {isFunction} from '@sindresorhus/is';
-import {Maybe} from 'true-myth';
+import {Maybe, Result, task, type Task} from 'true-myth';
 
+import type {ApplicationLogDownload, ApplicationLogDownloadOutcome} from './applicationLogDownload';
 import {
   exportBrowserLogs,
   type BrowserLogArchive,
@@ -32,9 +33,6 @@ import {
 
 import {persistentBrowserLogsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import type {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
-
-export type BrowserLogDownloadOutcome = 'saved' | 'cancelled' | 'failed';
-export type BrowserLogDownload = () => Promise<BrowserLogDownloadOutcome>;
 
 type BrowserLogDownloadOptions = {
   readonly startupFeatureToggles: StartupFeatureToggles;
@@ -53,7 +51,7 @@ function isSavePickerCancellation(error: unknown): boolean {
   return error instanceof DOMException && error.name === 'AbortError';
 }
 
-export function createBrowserLogDownload(options: BrowserLogDownloadOptions): Maybe<BrowserLogDownload> {
+export function createBrowserLogDownload(options: BrowserLogDownloadOptions): Maybe<ApplicationLogDownload> {
   const {startupFeatureToggles, isElectron, showSaveFilePicker, clock, getDirectory, createArchive} = options;
   if (isElectron) {
     return Maybe.nothing();
@@ -69,7 +67,7 @@ export function createBrowserLogDownload(options: BrowserLogDownloadOptions): Ma
     return Maybe.nothing();
   }
 
-  async function downloadBrowserLogs(): Promise<BrowserLogDownloadOutcome> {
+  async function saveBrowserLogs(): Promise<Result<ApplicationLogDownloadOutcome, 'failed'>> {
     let fileHandle: Pick<FileSystemFileHandle, 'createWritable'>;
     try {
       const utcMinute = new Date(clock.currentUnixEpochMilliseconds)
@@ -83,31 +81,32 @@ export function createBrowserLogDownload(options: BrowserLogDownloadOptions): Ma
       });
     } catch (error: unknown) {
       if (isSavePickerCancellation(error)) {
-        return 'cancelled';
+        return Result.ok('cancelled');
       }
 
-      return 'failed';
+      return Result.err('failed');
     }
 
-    try {
-      const destination = await fileHandle.createWritable();
+    const destination = await fileHandle.createWritable();
+    const exportResult = await exportBrowserLogs({
+      destination,
+      getDirectory,
+      createArchive,
+      signal: new AbortController().signal,
+    });
 
-      return await exportBrowserLogs({
-        destination,
-        getDirectory,
-        createArchive,
-        signal: new AbortController().signal,
-      }).match({
-        Resolved() {
-          return 'saved' as const;
-        },
-        Rejected() {
-          return 'failed' as const;
-        },
-      });
-    } catch {
-      return 'failed';
-    }
+    return exportResult.match({
+      Ok() {
+        return Result.ok('saved');
+      },
+      Err() {
+        return Result.err('failed');
+      },
+    });
+  }
+
+  function downloadBrowserLogs(): Task<ApplicationLogDownloadOutcome, 'failed'> {
+    return task.tryOr('failed' as const, saveBrowserLogs).andThen(task.fromResult);
   }
 
   return Maybe.just(downloadBrowserLogs);

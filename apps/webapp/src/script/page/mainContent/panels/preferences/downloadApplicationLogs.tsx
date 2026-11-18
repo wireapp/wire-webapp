@@ -17,29 +17,28 @@
  *
  */
 
-import {useRef, useState, type FunctionComponent, type ReactNode} from 'react';
+import {Fragment, useId, useRef, useState, type ReactElement, type ReactNode} from 'react';
 
 import type {Maybe} from 'true-myth';
 
-import {PreferencesSection} from './components/preferencesSection';
-
-import type {BrowserLogDownload} from '../../../../logger/createBrowserLogDownload';
+import type {ApplicationLogDownload} from '../../../../logger/applicationLogDownload';
 import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
 import type {Translate} from '../../../../util/localizerUtil/translationTypes';
 
-type DownloadBrowserLogsProps = {
-  readonly downloadBrowserLogs: Maybe<BrowserLogDownload>;
+type DownloadApplicationLogsProps = {
+  readonly downloadApplicationLogs: Maybe<ApplicationLogDownload>;
   readonly translate: Translate;
 };
 
-export const DownloadBrowserLogs: FunctionComponent<DownloadBrowserLogsProps> = properties => {
-  const {downloadBrowserLogs, translate} = properties;
+export function DownloadApplicationLogs(properties: DownloadApplicationLogsProps): ReactElement | null {
+  const {downloadApplicationLogs, translate} = properties;
+  const headingId = useId();
   const exportInProgress = useRef(false);
   const [isExporting, setIsExporting] = useState(false);
   const [hasFailed, setHasFailed] = useState(false);
 
   async function handleDownload(): Promise<void> {
-    if (downloadBrowserLogs.isNothing) {
+    if (downloadApplicationLogs.isNothing) {
       return;
     }
     if (exportInProgress.current) {
@@ -49,9 +48,9 @@ export const DownloadBrowserLogs: FunctionComponent<DownloadBrowserLogsProps> = 
     setIsExporting(true);
     setHasFailed(false);
     try {
-      // Invoke directly: the operation opens the picker before its first await.
-      const outcome = await downloadBrowserLogs.value();
-      setHasFailed(outcome === 'failed');
+      // Invoke in the click's call stack so the operation can use the user activation.
+      const downloadResult = await downloadApplicationLogs.value();
+      setHasFailed(downloadResult.isErr);
     } catch {
       setHasFailed(true);
     } finally {
@@ -62,31 +61,37 @@ export const DownloadBrowserLogs: FunctionComponent<DownloadBrowserLogsProps> = 
 
   function renderFailureMessage(): ReactNode {
     if (hasFailed) {
-      return <p role="alert">{translate('preferencesBrowserLogsFailed')}</p>;
+      return <p role="alert">{translate('preferencesApplicationLogsFailed')}</p>;
     }
 
     return null;
   }
 
-  if (downloadBrowserLogs.isNothing) {
+  if (downloadApplicationLogs.isNothing) {
     return null;
   }
 
   return (
-    <PreferencesSection title={translate('preferencesBrowserLogsTitle')} hasSeparator>
-      <div className="preferences-option">
-        <Button
-          type="button"
-          variant={ButtonVariant.TERTIARY}
-          data-uie-name="download-browser-logs"
-          disabled={isExporting}
-          aria-busy={isExporting}
-          onClick={handleDownload}
-        >
-          {translate('preferencesBrowserLogsDownload')}
-        </Button>
-      </div>
-      {renderFailureMessage()}
-    </PreferencesSection>
+    <Fragment>
+      <hr className="preferences-separator" />
+      <section aria-labelledby={headingId} className="preferences-section">
+        <h3 className="preferences-header" id={headingId}>
+          {translate('preferencesApplicationLogsTitle')}
+        </h3>
+        <div className="preferences-option">
+          <Button
+            type="button"
+            variant={ButtonVariant.TERTIARY}
+            data-uie-name="download-application-logs"
+            disabled={isExporting}
+            aria-busy={isExporting}
+            onClick={handleDownload}
+          >
+            {translate('preferencesApplicationLogsDownload')}
+          </Button>
+        </div>
+        {renderFailureMessage()}
+      </section>
+    </Fragment>
   );
-};
+}
