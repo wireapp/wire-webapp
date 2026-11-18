@@ -308,6 +308,17 @@ describe('MeetingParticipantsPicker', () => {
     expect(input).toHaveValue('');
   });
 
+  it('keeps @handle searches available on non-federated backends', async () => {
+    const searchByName = jest.fn().mockResolvedValue([]);
+    render(withThemeAndRootContext(<ControlledPicker initialEmails={[]} searchByName={searchByName} />, rootProviderWrapper));
+
+    fireEvent.change(getSearchInput(), {target: {value: '@jane.doe'}});
+    await waitFor(() => {
+      expect(searchByName).toHaveBeenCalledWith('@jane.doe', undefined);
+    });
+    expect(screen.queryByRole('button', {name: 'meetings.scheduleModal.inviteByEmail'})).not.toBeInTheDocument();
+  });
+
   it('remains usable when remote people search rejects a query', async () => {
     const searchByName = jest.fn().mockRejectedValue(new Error('domain not allowed'));
     render(withThemeAndRootContext(<ControlledPicker searchByName={searchByName} />, rootProviderWrapper));
