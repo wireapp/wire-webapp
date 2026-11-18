@@ -40,6 +40,7 @@ const baseFormState = (): ScheduleMeetingFormState => {
     end: maybe.just(futureEndDate),
     recurrence: 'weekly',
     selectedUsers: [],
+    invitedEmails: [],
     participantsFilter: '',
     password: '',
     passwordConfirmation: '',

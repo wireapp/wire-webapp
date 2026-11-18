@@ -174,7 +174,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
         originalEnd: formState.end,
         originalRecurrence: formState.recurrence,
         originalSelectedUsers,
-        originalInvitedEmails: formState.invitedEmails ?? [],
+        originalInvitedEmails: formState.invitedEmails,
       });
     },
     close: () => {
