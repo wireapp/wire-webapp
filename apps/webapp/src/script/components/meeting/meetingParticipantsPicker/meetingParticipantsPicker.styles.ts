@@ -209,3 +209,18 @@ export const listContainerStyles: CSSObject = {
     },
   },
 };
+
+export const inviteByEmailActionStyles: CSSObject = {
+  background: 'none',
+  border: 'none',
+  borderTop: '1px solid var(--border-color)',
+  color: 'var(--accent-color)',
+  cursor: 'pointer',
+  display: 'block',
+  padding: '12px 16px',
+  textAlign: 'left',
+  width: '100%',
+  '&:hover, &:focus-visible': {
+    backgroundColor: 'var(--background-fadeout)',
+  },
+};
