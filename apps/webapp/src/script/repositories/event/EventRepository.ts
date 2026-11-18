@@ -22,6 +22,8 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
 import PromiseQueue from 'p-queue';
+import {Maybe} from 'true-myth';
+import {arrayIncludes} from 'ts-extras';
 import {container} from 'tsyringe';
 
 import {ClientEvent} from './Client';
@@ -43,17 +45,16 @@ import {
 } from '../../apiClient/event/conversationEvent';
 import {MEETING_EVENT} from '../../apiClient/event/meetingEvent';
 import {USER_EVENT} from '../../apiClient/event/userEvent';
-import {StringUtil} from '../../commons/util';
 import {Runtime} from '../../commons/util/Runtime';
 import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '../../core';
 import {NotificationSource, HandledEventPayload} from '../../core/notification';
 import {sequentialQueueOptions} from '../../core/queue/sequentialQueueOptions';
 import {CryptographyError} from '../../error/cryptographyError';
 import {EventError} from '../../error/eventError';
+import {getSafeNotificationErrorDetails} from '../../logger/getSafeNotificationErrorDetails';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
-import {getLogger, Logger} from '../../util/logger';
+import {getLogger, type LogAttributes, Logger} from '../../util/logger';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
-import {toError} from '../../util/toError';
 import {isAxiosError} from '../../util/typePredicateUtil';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {WebAppEvents} from '../../webAppEvents';
@@ -86,6 +87,8 @@ type EventRepositorySource = {
 
 type WebSocketConnectTrigger =
   'initial' | 'online' | 'focus' | 'visibility' | 'heartbeat-closed' | 'heartbeat-unhealthy';
+
+const transitioningConnectionStates = [ConnectionState.CONNECTING, ConnectionState.PROCESSING_NOTIFICATIONS] as const;
 
 function getNotificationHandlingStateName(notificationHandlingState: NOTIFICATION_HANDLING_STATE): string {
   return notificationHandlingState.split('.').at(-1) ?? notificationHandlingState;
@@ -166,10 +169,14 @@ export class EventRepository {
   // WebSocket handling
   //##############################################################################
 
-  private readonly updateConnectivityStatus = (state: ConnectionState): void => {
-    this.logger.info('Websocket connection state changed to', {state});
+  private readonly updateConnectivityStatus = (state: ConnectionState, usesCorrectedLifecycle = false): void => {
     switch (state) {
       case ConnectionState.CONNECTING: {
+        const leavingLive =
+          usesCorrectedLifecycle && this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+        if (leavingLive) {
+          this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
+        }
         Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
         Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
         return;
@@ -210,7 +217,15 @@ export class EventRepository {
       } catch (error: unknown) {
         if (source === EventSource.NOTIFICATION_STREAM) {
           const eventType = (payload as {event?: {type?: string}}).event?.type ?? 'unknown';
-          this.logger.warn(`Failed to handle event of type "${eventType}": ${toError(error).message}`, {error});
+          const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
+          this.logger.warn('Could not handle an event during notification catch-up', {
+            subsystem: 'websocket-lifecycle',
+            event: 'notification-event-handling-failed',
+            eventType,
+            source,
+            errorName,
+            errorMessage,
+          });
         } else {
           throw error;
         }
@@ -243,68 +258,153 @@ export class EventRepository {
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     dryRun = false,
   ): Promise<void> {
-    await this.handleTimeDrift();
-
+    const implementation = account.webSocketLifecycleImplementation;
+    const usesCorrectedLifecycle = implementation === 'corrected';
+    if (usesCorrectedLifecycle) {
+      this.disconnectWebSocket();
+    }
     const cleanupHandlers: (() => void)[] = [];
-    let actualDisconnect: () => void = noop;
-    let connectionInProgress = false;
+    let connection: Maybe<{readonly cancellation: Maybe<AbortController>; initializing: boolean}> = Maybe.nothing();
+    // The rollback path keeps this callback until the replacement finishes initialization.
+    let legacyDisconnect = noop;
+    let disposed = false;
     let healthCheckInProgress = false;
-    let currentConnectionState: ConnectionState | undefined;
+    let currentConnectionState: Maybe<ConnectionState> = Maybe.nothing();
+    let connectionStateRevision = 0;
     let connectCycleId = 0;
 
-    const getBrowserConnectionContext = (): string => {
-      return `connectCycleId=${connectCycleId} connectionInProgress=${connectionInProgress} notificationState=${getNotificationHandlingStateName(this.notificationHandlingState())} navigatorOnline=${navigator.onLine} visibility=${document.visibilityState} focused=${document.hasFocus()}`;
-    };
+    const repository = this;
 
-    const connect = async (trigger: WebSocketConnectTrigger): Promise<void> => {
-      if (connectionInProgress) {
-        this.logger.debug(
-          `[WebSocketLifecycle] layer=event-repository event=connect-skip trigger=${trigger} ${getBrowserConnectionContext()} reason=connection-in-progress`,
-        );
+    function getBrowserConnectionContext(): LogAttributes {
+      return {
+        connectCycleId,
+        connectionInProgress: isConnectionInitializing(),
+        notificationState: getNotificationHandlingStateName(repository.notificationHandlingState()),
+        navigatorOnline: navigator.onLine,
+        visibility: document.visibilityState,
+        focused: document.hasFocus(),
+      };
+    }
+
+    function applyConnectionState(state: ConnectionState): void {
+      connectionStateRevision += 1;
+      currentConnectionState = Maybe.just(state);
+      repository.updateConnectivityStatus(state, usesCorrectedLifecycle);
+    }
+
+    function cancelConnection(reason: 'superseded' | 'offline' | 'disconnect'): void {
+      if (!usesCorrectedLifecycle) {
+        legacyDisconnect();
+        return;
+      }
+      const previousCancellation = connection.andThen(attempt => {
+        return attempt.cancellation;
+      });
+      connection = Maybe.nothing();
+      if (previousCancellation.isJust) {
+        previousCancellation.value.abort(reason);
+      }
+    }
+
+    function isConnectionInitializing(): boolean {
+      return connection.isJust && connection.value.initializing;
+    }
+
+    function shouldSkipConnect(): boolean {
+      return disposed || isConnectionInitializing();
+    }
+
+    async function connect(trigger: WebSocketConnectTrigger): Promise<void> {
+      if (shouldSkipConnect()) {
+        repository.logger.debug('Skipped WebSocket connection attempt', {
+          subsystem: 'websocket-lifecycle',
+          event: 'connect-skip',
+          trigger,
+          ...getBrowserConnectionContext(),
+          reason: 'connection-in-progress',
+        });
         return;
       }
 
-      connectCycleId += 1;
-      const currentConnectCycleId = connectCycleId;
-      this.logger.info(
-        `[WebSocketLifecycle] layer=event-repository event=connect-start trigger=${trigger} connectCycleId=${currentConnectCycleId} ${getBrowserConnectionContext()}`,
-      );
-      connectionInProgress = true;
-      actualDisconnect();
+      if (usesCorrectedLifecycle) {
+        cancelConnection('superseded');
+      }
+      const currentConnectCycleId = ++connectCycleId;
+      const attempt = {
+        cancellation: usesCorrectedLifecycle ? Maybe.just(new AbortController()) : Maybe.nothing<AbortController>(),
+        initializing: true,
+      };
+      const currentAttempt = Maybe.just(attempt);
+      connection = currentAttempt;
+      if (!usesCorrectedLifecycle) {
+        cancelConnection('superseded');
+      }
+      const leavingLive =
+        usesCorrectedLifecycle && currentConnectionState.unwrapOr(ConnectionState.CLOSED) === ConnectionState.LIVE;
+      if (leavingLive) {
+        applyConnectionState(ConnectionState.CONNECTING);
+      }
+      const lifecycle = {trigger, connectCycleId: currentConnectCycleId, implementation};
+      repository.logger.info('Connection attempt started', {
+        subsystem: 'websocket-lifecycle',
+        event: 'connect-start',
+        ...lifecycle,
+      });
       try {
-        actualDisconnect = await account.listen({
+        const disconnect = await account.listen({
+          connectionCycle: {
+            signal: attempt.cancellation.map(controller => {
+              return controller.signal;
+            }),
+            connectCycleId: currentConnectCycleId,
+          },
           useLegacy,
           onConnectionStateChanged: (
             connectionState: ConnectionState,
             connectionContext: WebSocketConnectionContext | undefined,
           ) => {
-            currentConnectionState = connectionState;
-            this.updateConnectivityStatus(connectionState);
-            const lifecycleConnectionContext = isUndefined(connectionContext)
-              ? ''
-              : ` attemptId=${connectionContext.attemptId} wrapperGeneration=${connectionContext.wrapperGeneration}`;
-            this.logger.info(
-              `[WebSocketLifecycle] layer=event-repository event=connection-state-change connectCycleId=${currentConnectCycleId} state=${connectionState.toUpperCase()}${lifecycleConnectionContext}`,
-            );
+            const isObsolete = usesCorrectedLifecycle && connection !== currentAttempt;
+            if (isObsolete) {
+              return;
+            }
+            applyConnectionState(connectionState);
+            repository.logger.debug('Connection state applied', {
+              subsystem: 'websocket-lifecycle',
+              event: 'connection-state-change',
+              ...lifecycle,
+              ...connectionContext,
+              state: connectionState,
+            });
           },
-          onEvent: this.handleIncomingEvent,
-          onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
-          onNotificationStreamProgress: onNotificationStreamProgress,
+          onEvent: repository.handleIncomingEvent,
+          onMissedNotifications: repository.triggerMissedSystemEventMessageRendering,
+          onNotificationStreamProgress,
           dryRun,
         });
-        this.logger.info(
-          `[WebSocketLifecycle] layer=event-repository event=connect-setup-success trigger=${trigger} connectCycleId=${currentConnectCycleId}`,
-        );
+        if (!usesCorrectedLifecycle) {
+          legacyDisconnect = disconnect;
+        }
       } catch (error: unknown) {
-        const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
-        actualDisconnect = noop;
-        this.logger.warn(
-          `[WebSocketLifecycle] layer=event-repository event=connect-failure trigger=${trigger} connectCycleId=${currentConnectCycleId} errorName=${errorName} errorMessage=${errorMessage}`,
-        );
+        if (connection === currentAttempt) {
+          connection = Maybe.nothing();
+          if (usesCorrectedLifecycle) {
+            applyConnectionState(ConnectionState.CLOSED);
+          } else {
+            legacyDisconnect = noop;
+          }
+          const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
+          repository.logger.warn('Connection setup failed', {
+            subsystem: 'websocket-lifecycle',
+            event: 'connect-failure',
+            ...lifecycle,
+            errorName,
+            errorMessage,
+          });
+        }
       } finally {
-        connectionInProgress = false;
+        attempt.initializing = false;
       }
-    };
+    }
 
     const handleOnline = (): void => {
       if (!navigator.onLine) {
@@ -317,69 +417,111 @@ export class EventRepository {
 
     const verifyConnectionHealthAndReconnect = async (trigger: 'focus' | 'visibility' | 'heartbeat'): Promise<void> => {
       if (!navigator.onLine) {
-        this.logger.debug(
-          `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=offline ${getBrowserConnectionContext()}`,
-        );
+        this.logger.debug('Skipped WebSocket health check', {
+          subsystem: 'websocket-lifecycle',
+          event: 'health-check-skip',
+          trigger,
+          reason: 'offline',
+          ...getBrowserConnectionContext(),
+        });
         return;
       }
 
-      if (connectionInProgress) {
-        this.logger.debug(
-          `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=connection-in-progress ${getBrowserConnectionContext()}`,
-        );
+      if (shouldSkipConnect()) {
+        this.logger.debug('Skipped WebSocket health check', {
+          subsystem: 'websocket-lifecycle',
+          event: 'health-check-skip',
+          trigger,
+          reason: 'connection-in-progress',
+          ...getBrowserConnectionContext(),
+        });
         return;
       }
 
-      const isTransitioningConnectionState =
-        currentConnectionState === ConnectionState.CONNECTING ||
-        currentConnectionState === ConnectionState.PROCESSING_NOTIFICATIONS;
-      if (isTransitioningConnectionState) {
-        this.logger.debug(
-          `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=connection-transitioning connectionState=${currentConnectionState?.toUpperCase() ?? 'UNKNOWN'} ${getBrowserConnectionContext()}`,
-        );
+      const stateBeforeProbe = currentConnectionState;
+      const isTransitioning =
+        stateBeforeProbe.isJust && arrayIncludes(transitioningConnectionStates, stateBeforeProbe.value);
+      if (isTransitioning) {
+        this.logger.debug('Skipped WebSocket health check', {
+          subsystem: 'websocket-lifecycle',
+          event: 'health-check-skip',
+          trigger,
+          reason: 'connection-transitioning',
+          connectionState: stateBeforeProbe.value.toUpperCase(),
+          ...getBrowserConnectionContext(),
+        });
         return;
       }
 
       if (this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.CLOSED) {
-        this.logger.info(
-          `[WebSocketLifecycle] layer=event-repository event=reconnect-requested trigger=${trigger === 'heartbeat' ? 'heartbeat-closed' : trigger} connectCycleId=${connectCycleId + 1}`,
-        );
+        this.logger.info('WebSocket reconnect requested', {
+          subsystem: 'websocket-lifecycle',
+          event: 'reconnect-requested',
+          trigger: trigger === 'heartbeat' ? 'heartbeat-closed' : trigger,
+          connectCycleId: connectCycleId + 1,
+        });
         await connect(`${trigger === 'heartbeat' ? 'heartbeat-closed' : trigger}`);
         return;
       }
 
       if (healthCheckInProgress) {
-        this.logger.debug(
-          `[WebSocketLifecycle] layer=event-repository event=health-check-skip trigger=${trigger} reason=health-check-in-progress ${getBrowserConnectionContext()}`,
-        );
+        this.logger.debug('Skipped WebSocket health check', {
+          subsystem: 'websocket-lifecycle',
+          event: 'health-check-skip',
+          trigger,
+          reason: 'health-check-in-progress',
+          ...getBrowserConnectionContext(),
+        });
         return;
       }
 
       healthCheckInProgress = true;
+      const checkedConnection = connection;
+      const checkedStateRevision = connectionStateRevision;
       try {
-        this.logger.debug(
-          `[WebSocketLifecycle] layer=event-repository event=health-check-start trigger=${trigger} connectCycleId=${connectCycleId}`,
-        );
+        this.logger.debug('WebSocket health check started', {
+          subsystem: 'websocket-lifecycle',
+          event: 'health-check-start',
+          trigger,
+          connectCycleId,
+        });
         let isHealthy: boolean;
         try {
           isHealthy = await account.isWebsocketHealthy();
         } catch {
           isHealthy = false;
         }
+        const isObsolete =
+          usesCorrectedLifecycle &&
+          (disposed || connection !== checkedConnection || connectionStateRevision !== checkedStateRevision);
+        if (isObsolete) {
+          return;
+        }
         if (isHealthy) {
-          this.logger.debug(
-            `[WebSocketLifecycle] layer=event-repository event=health-check-result trigger=${trigger} connectCycleId=${connectCycleId} healthy=true`,
-          );
+          this.logger.debug('WebSocket health check completed', {
+            subsystem: 'websocket-lifecycle',
+            event: 'health-check-result',
+            trigger,
+            connectCycleId,
+            healthy: true,
+          });
         } else {
-          this.logger.warn(
-            `[WebSocketLifecycle] layer=event-repository event=health-check-result trigger=${trigger} connectCycleId=${connectCycleId} healthy=false`,
-          );
+          this.logger.warn('WebSocket health check completed', {
+            subsystem: 'websocket-lifecycle',
+            event: 'health-check-result',
+            trigger,
+            connectCycleId,
+            healthy: false,
+          });
         }
         if (!isHealthy) {
           const reconnectTrigger: WebSocketConnectTrigger = trigger === 'heartbeat' ? 'heartbeat-unhealthy' : trigger;
-          this.logger.info(
-            `[WebSocketLifecycle] layer=event-repository event=reconnect-requested trigger=${reconnectTrigger} connectCycleId=${connectCycleId + 1}`,
-          );
+          this.logger.info('WebSocket reconnect requested', {
+            subsystem: 'websocket-lifecycle',
+            event: 'reconnect-requested',
+            trigger: reconnectTrigger,
+            connectCycleId: connectCycleId + 1,
+          });
           await connect(reconnectTrigger);
         }
       } finally {
@@ -389,15 +531,41 @@ export class EventRepository {
 
     const handleOffline = (): void => {
       this.logger.warn('Internet connection lost');
-      actualDisconnect();
-      Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
+      cancelConnection('offline');
+      if (usesCorrectedLifecycle) {
+        applyConnectionState(ConnectionState.CLOSED);
+      } else {
+        Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
+      }
     };
+
+    function disconnect(): void {
+      if (usesCorrectedLifecycle) {
+        disposed = true;
+        repository.disconnectWebSocket = noop;
+      }
+      cleanupHandlers.forEach(cleanup => {
+        cleanup();
+      });
+      cancelConnection('disconnect');
+      if (usesCorrectedLifecycle) {
+        repository.notificationHandlingState(NOTIFICATION_HANDLING_STATE.CLOSED);
+      }
+    }
+
+    if (usesCorrectedLifecycle) {
+      this.disconnectWebSocket = disconnect;
+    }
+
+    await this.handleTimeDrift();
+    if (disposed) {
+      return;
+    }
 
     if (Runtime.isElectron()) {
       // In Electron, use window focus events instead of visibilitychange
       const handleFocus = (): void => {
         if (navigator.onLine) {
-          this.logger.info('Window focused, verifying connection...');
           void verifyConnectionHealthAndReconnect('focus');
         }
       };
@@ -410,7 +578,6 @@ export class EventRepository {
       // In browser, use visibilitychange
       const handleVisibilityChange = (): void => {
         if (document.visibilityState === 'visible' && navigator.onLine) {
-          this.logger.info('Tab became visible, verifying connection...');
           void verifyConnectionHealthAndReconnect('visibility');
         }
       };
@@ -440,16 +607,10 @@ export class EventRepository {
       window.clearInterval(heartbeatInterval);
     });
 
-    // Connect first to get the actual disconnect function
     await connect('initial');
-
-    // Then override disconnect to include cleanup
-    this.disconnectWebSocket = () => {
-      cleanupHandlers.forEach(cleanup => {
-        cleanup();
-      });
-      actualDisconnect();
-    };
+    if (!usesCorrectedLifecycle) {
+      this.disconnectWebSocket = disconnect;
+    }
   }
 
   /**
@@ -641,7 +802,7 @@ export class EventRepository {
       !isUndefined(actorId) && typeof actorId.id === 'string' && typeof actorId.domain === 'string';
 
     if (!hasValidQualifiedId || !hasValidActorId) {
-      this.logger.warn(`Ignored ${event.type} event without valid qualified IDs`, {event});
+      this.logger.warn('Ignored meeting event without valid qualified IDs', {eventType: event.type});
       return;
     }
 
@@ -691,12 +852,12 @@ export class EventRepository {
     source: EventSource,
   ): Promise<IncomingEvent | undefined> {
     if (isTruthy(decryptionError)) {
-      this.logger.warn(`Decryption Error: '${event.type}'`, {
+      this.logger.warn('Could not decrypt a notification event', {
+        subsystem: 'websocket-lifecycle',
+        event: 'notification-event-decryption-failed',
         source,
         eventType: event.type,
-        date: event.time,
-        code: decryptionError.code,
-        message: decryptionError.message,
+        errorCode: decryptionError.code,
       });
 
       const ignoredCodes = [
@@ -736,7 +897,15 @@ export class EventRepository {
       }
     } catch (error: unknown) {
       if (error instanceof EventValidationError) {
-        this.logger.warn(`Event validation failed: ${error.message}`, {error});
+        const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
+        this.logger.warn('Notification event validation failed', {
+          subsystem: 'websocket-lifecycle',
+          event: 'notification-event-validation-failed',
+          eventType: event.type,
+          source,
+          errorName,
+          errorMessage,
+        });
         return;
       }
       throw error;

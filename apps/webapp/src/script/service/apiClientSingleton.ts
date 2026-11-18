@@ -22,7 +22,10 @@ import {singleton} from 'tsyringe';
 
 import {APIClient as APIClientUnconfigured} from '../apiClient/apiClient';
 import {browserPlatform} from '../apiClient/shims/browser/platform';
-import type {ReconnectingWebsocketWallClock} from '../apiClient/tcp/reconnectingWebsocket';
+import type {
+  ReconnectingWebsocketWallClock,
+  WebSocketLifecycleImplementation,
+} from '../apiClient/tcp/reconnectingWebsocket';
 import {Config} from '../Config';
 
 const wireClientHeaderName = 'Wire-Client';
@@ -31,6 +34,7 @@ const wireClientIdentifier = 'Web';
 
 type APIClientProperties = {
   readonly clock?: Clock;
+  readonly webSocketLifecycleImplementation?: WebSocketLifecycleImplementation;
 };
 
 type RetryBackoffResettableHttpClient = {
@@ -39,7 +43,8 @@ type RetryBackoffResettableHttpClient = {
 
 @singleton()
 export class APIClient extends APIClientUnconfigured {
-  constructor({clock = createClock()}: APIClientProperties = {}) {
+  constructor(options: APIClientProperties = {}) {
+    const {clock = createClock(), webSocketLifecycleImplementation = 'legacy'} = options;
     const webAppConfiguration = Config.getConfig();
     const apiClientClock: ReconnectingWebsocketWallClock = {
       get currentTimestampInMilliseconds() {
@@ -71,6 +76,7 @@ export class APIClient extends APIClientUnconfigured {
         ws: webAppConfiguration.BACKEND_WS,
       },
       wallClock: apiClientClock,
+      webSocketLifecycleImplementation,
     };
 
     super(unconfiguredApiClientConfiguration);

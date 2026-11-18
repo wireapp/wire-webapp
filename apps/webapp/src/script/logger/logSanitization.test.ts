@@ -91,7 +91,7 @@ describe('getSafeErrorDetails', () => {
     );
 
     expect(actualErrorDetails).toEqual({
-      errorMessage: '"Bearer [REDACTED]"',
+      errorMessage: 'Bearer [REDACTED]',
       errorName: 'RequestError',
     });
   });

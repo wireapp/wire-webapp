@@ -18,13 +18,21 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
+import {APIClient} from '../../apiClient/apiClient';
+import {ClientClassification} from '../../apiClient/client/clientClassification';
+import {ClientType} from '../../apiClient/client/clientType';
 import {BackendEvent} from '../../apiClient/event/backendEvent';
 import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 import {MEETING_EVENT} from '../../apiClient/event/meetingEvent';
 import {USER_EVENT} from '../../apiClient/event/userEvent';
-import {ConnectionState} from '../../core';
+import {browserPlatform} from '../../apiClient/shims/browser/platform';
+import {type OnConnect, WebSocketClient} from '../../apiClient/tcp/webSocketClient';
+import {Account, ConnectionState} from '../../core';
+import {NotificationSource} from '../../core/notification';
 import {WebAppEvents} from '../../webAppEvents';
 import {amplify} from 'amplify';
+import {asyncNoop} from 'noop-esm';
+import {Maybe} from 'true-myth';
 import {Runtime} from '../../commons/util/Runtime';
 
 import {ClientConversationEvent} from '../conversation/EventBuilder';
@@ -240,12 +248,11 @@ describe('EventRepository', () => {
       expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.CONNECTIVITY_RECOVERY);
     });
 
-    it('should log the connection state change', () => {
-      const logSpy = jest.spyOn(eventRepository.logger, 'info').mockReturnValue(undefined);
-
+    it('returns to stream handling while reconnecting from LIVE', () => {
       eventRepository['updateConnectivityStatus'](ConnectionState.LIVE);
+      eventRepository['updateConnectivityStatus'](ConnectionState.CONNECTING, true);
 
-      expect(logSpy).toHaveBeenCalledWith('Websocket connection state changed to', {state: ConnectionState.LIVE});
+      expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.STREAM);
     });
   });
 
@@ -333,7 +340,6 @@ describe('EventRepository', () => {
     )(
       'does not publish normalized event when $eventType has $description',
       async ({eventType, webAppEvent, eventOverrides}) => {
-        const warnSpy = jest.spyOn(eventRepository.logger, 'warn').mockReturnValue(undefined);
         const event = {
           ...meetingLifecycleEventBase,
           ...eventOverrides,
@@ -343,7 +349,6 @@ describe('EventRepository', () => {
         await eventRepository['distributeEvent'](event as any, EventSource.WEBSOCKET);
 
         expect(amplify.publish).not.toHaveBeenCalledWith(webAppEvent, expect.anything());
-        expect(warnSpy).toHaveBeenCalled();
       },
     );
 
@@ -388,6 +393,7 @@ describe('EventRepository', () => {
       );
 
       mockAccount = {
+        webSocketLifecycleImplementation: 'corrected',
         listen: jest.fn().mockResolvedValue(jest.fn()),
         isWebsocketHealthy: jest.fn().mockResolvedValue(true),
       };
@@ -408,6 +414,7 @@ describe('EventRepository', () => {
     });
 
     afterEach(() => {
+      eventRepository.disconnectWebSocket();
       jest.restoreAllMocks();
     });
 
@@ -491,6 +498,7 @@ describe('EventRepository', () => {
       await eventRepository.connectWebSocket(mockAccount, true, progressCallback, false);
 
       expect(mockAccount.listen).toHaveBeenCalledWith({
+        connectionCycle: {signal: expect.objectContaining({isJust: true}), connectCycleId: 1},
         useLegacy: true,
         onConnectionStateChanged: expect.any(Function),
         onEvent: expect.any(Function),
@@ -504,6 +512,171 @@ describe('EventRepository', () => {
       mockAccount.listen.mockRejectedValueOnce(new Error('Connection failed'));
 
       await expect(eventRepository.connectWebSocket(mockAccount, false, jest.fn())).resolves.not.toThrow();
+    });
+
+    it('cancels an initializing reconnect on offline and ignores its late state changes', async () => {
+      type ListenOptions = NonNullable<Parameters<Account['listen']>[0]>;
+      function getCycleSignal(options: ListenOptions): AbortSignal {
+        const signal = options.connectionCycle?.signal ?? Maybe.nothing();
+
+        return signal.unwrapOrElse(() => {
+          throw new Error('Expected the corrected lifecycle to have a cancellation signal');
+        });
+      }
+
+      const pendingReconnect = Promise.withResolvers<() => void>();
+      const nextCycleStarted = Promise.withResolvers<ListenOptions>();
+      mockAccount.listen
+        .mockImplementationOnce((options: ListenOptions) => {
+          options.onConnectionStateChanged?.(ConnectionState.LIVE);
+
+          return Promise.resolve(jest.fn());
+        })
+        .mockReturnValueOnce(pendingReconnect.promise)
+        .mockImplementationOnce((options: ListenOptions) => {
+          options.onConnectionStateChanged?.(ConnectionState.LIVE);
+          nextCycleStarted.resolve(options);
+
+          return Promise.resolve(jest.fn());
+        });
+      await eventRepository.connectWebSocket(mockAccount, true, jest.fn());
+      const initialCycle: ListenOptions = mockAccount.listen.mock.calls.at(0)?.[0];
+
+      window.dispatchEvent(new Event('online'));
+      const pendingCycle: ListenOptions = mockAccount.listen.mock.calls.at(1)?.[0];
+      expect(getCycleSignal(initialCycle).reason).toBe('superseded');
+      window.dispatchEvent(new Event('offline'));
+      expect(getCycleSignal(pendingCycle).reason).toBe('offline');
+      expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.CLOSED);
+
+      window.dispatchEvent(new Event('online'));
+      const activeCycle = await nextCycleStarted.promise;
+      pendingCycle.onConnectionStateChanged?.(ConnectionState.CLOSED);
+      pendingReconnect.resolve(jest.fn());
+      await pendingReconnect.promise;
+
+      expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      expect(getCycleSignal(activeCycle).aborted).toBe(false);
+      eventRepository.disconnectWebSocket();
+      expect(getCycleSignal(activeCycle).reason).toBe('disconnect');
+    });
+
+    it('uses the returned disconnect callback for the legacy lifecycle', async () => {
+      const disconnect = jest.fn();
+      mockAccount.webSocketLifecycleImplementation = 'legacy';
+      mockAccount.listen.mockResolvedValue(disconnect);
+      await eventRepository.connectWebSocket(mockAccount, true, jest.fn());
+
+      window.dispatchEvent(new Event('offline'));
+
+      expect(mockAccount.listen).toHaveBeenCalledWith(
+        expect.objectContaining({connectionCycle: {signal: Maybe.nothing(), connectCycleId: 1}}),
+      );
+      expect(disconnect).toHaveBeenCalledTimes(1);
+    });
+
+    it('recovers notifications after a healthy transport loses its application consumer', async () => {
+      jest.spyOn(Runtime, 'isElectron').mockReturnValue(true);
+      using apiClient = new APIClient({platform: browserPlatform, webSocketLifecycleImplementation: 'corrected'});
+      const account = new Account(apiClient);
+      account['currentClient'] = {
+        id: 'test-client',
+        class: ClientClassification.DESKTOP,
+        type: ClientType.TEMPORARY,
+        time: '2026-01-01T00:00:00.000Z',
+        capabilities: [],
+        cookie: 'test-client',
+        mls_public_keys: {},
+      };
+      const missedEvent: BackendEvent = {
+        type: USER_EVENT.DELETE,
+        id: 'missed',
+        qualified_id: {id: 'missed', domain: 'example.com'},
+      };
+      const missedNotification = {id: 'missed-notification', payload: [missedEvent]};
+      type ProcessNotificationStream = NonNullable<
+        Account['service']
+      >['notification']['legacyProcessNotificationStream'];
+      account.service = {
+        client: {putClientCapabilities: asyncNoop},
+        conversation: {runDeferredEpochRecovery: asyncNoop},
+        notification: {
+          legacyProcessNotificationStream: jest
+            .fn<ReturnType<ProcessNotificationStream>, Parameters<ProcessNotificationStream>>()
+            .mockResolvedValueOnce({total: 0, error: 0, success: 0})
+            .mockImplementationOnce(async handleNotification => {
+              await handleNotification(missedNotification, NotificationSource.NOTIFICATION_STREAM, {done: 1, total: 1});
+
+              return {total: 1, error: 0, success: 1};
+            }),
+          async *handleNotification(notification: typeof missedNotification) {
+            for (const event of notification.payload) {
+              yield {event};
+            }
+          },
+        },
+      } as unknown as NonNullable<Account['service']>;
+
+      const websocket = apiClient.transport.ws;
+      jest.spyOn(websocket, 'checkHealth').mockResolvedValue(true);
+      const replacementRequested = Promise.withResolvers<OnConnect>();
+      const connect = jest.spyOn(apiClient, 'connect').mockReturnValueOnce(websocket);
+      connect.mockImplementationOnce(onOpen => {
+        replacementRequested.resolve(requireValueForTest(onOpen));
+
+        return websocket;
+      });
+      const consumeEvent = jest
+        .spyOn(eventRepository as unknown as {handleEvent: EventRepository['handleEvent']}, 'handleEvent')
+        .mockResolvedValue(undefined);
+      const firstSocket = new AbortController();
+      await eventRepository.connectWebSocket(account, true, jest.fn());
+      try {
+        const initialOpen = requireValueForTest(connect.mock.calls.at(0)?.[0]);
+        await initialOpen(firstSocket, {
+          attemptId: 1,
+          wrapperGeneration: 1,
+          reconnectAttemptCount: 1,
+          reconnectSequenceRetryCount: 0,
+        });
+        await account['notificationProcessingQueue'].queue.onIdle();
+        expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+
+        const oldStateListeners = websocket.listeners(WebSocketClient.TOPIC.ON_STATE_CHANGE);
+        websocket.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
+        websocket['onMessage'](JSON.stringify(missedNotification));
+        expect(consumeEvent).not.toHaveBeenCalled();
+        await expect(websocket.checkHealth()).resolves.toBe(true);
+        await expect(account.isWebsocketHealthy()).resolves.toBe(false);
+
+        window.dispatchEvent(new Event('focus'));
+        const replacementOpen = await replacementRequested.promise;
+        expect(firstSocket.signal.aborted).toBe(true);
+        expect(eventRepository.notificationHandlingState()).not.toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+        expect(websocket.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(1);
+        const currentStateListeners = websocket.listeners(WebSocketClient.TOPIC.ON_STATE_CHANGE);
+        expect(currentStateListeners).toHaveLength(1);
+        expect(currentStateListeners).not.toEqual(oldStateListeners);
+
+        await replacementOpen(new AbortController(), {
+          attemptId: 2,
+          wrapperGeneration: 2,
+          reconnectAttemptCount: 1,
+          reconnectSequenceRetryCount: 0,
+        });
+        await account['notificationProcessingQueue'].queue.onIdle();
+        expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+
+        const liveEvent = {...missedEvent, id: 'live', qualified_id: {id: 'live', domain: 'example.com'}};
+        websocket['onMessage'](JSON.stringify({id: 'live-notification', payload: [liveEvent]}));
+        await account['notificationProcessingQueue'].queue.onIdle();
+        expect(consumeEvent.mock.calls).toEqual([
+          [{event: missedEvent}, NotificationSource.NOTIFICATION_STREAM],
+          [{event: liveEvent}, NotificationSource.WEBSOCKET],
+        ]);
+      } finally {
+        eventRepository.disconnectWebSocket();
+      }
     });
 
     it('should compute time offset on initialization', async () => {
@@ -640,6 +813,21 @@ describe('EventRepository', () => {
 
           expect(mockAccount.isWebsocketHealthy).toHaveBeenCalledTimes(1);
           expect(mockAccount.listen).toHaveBeenCalledTimes(1);
+        });
+
+        it('ignores a probe result from before an automatic reconnect', async () => {
+          const setState = await setup();
+          const pendingHealthCheck = Promise.withResolvers<boolean>();
+          mockAccount.isWebsocketHealthy.mockReturnValueOnce(pendingHealthCheck.promise);
+          triggerVisibility();
+
+          setState(ConnectionState.CLOSED);
+          setState(ConnectionState.LIVE);
+          pendingHealthCheck.resolve(false);
+          await pendingHealthCheck.promise;
+
+          expect(mockAccount.listen).not.toHaveBeenCalled();
+          expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         });
 
         it('reconnects when health check throws', async () => {

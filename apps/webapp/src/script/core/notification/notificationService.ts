@@ -33,6 +33,7 @@ import {Notification} from '../../apiClient/notification/notification';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
 import {getLogger} from '../../logger/getLogger';
+import {getSafeNotificationErrorDetails} from '../../logger/getSafeNotificationErrorDetails';
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../coreError';
 import {DecryptionError} from '../errors/decryptionError';
@@ -171,17 +172,18 @@ export class NotificationService extends TypedEventEmitter<Events> {
     }
 
     const results = {total: notifications.length, error: 0, success: 0};
-    const logMessage =
-      notifications.length > 0
-        ? `Start processing ${notifications.length} notifications since notification id ${lastNotificationId}`
-        : `No notification to process from the stream`;
-    this.logger.info(logMessage);
     for (const [index, notification] of notifications.entries()) {
       if (abortHandler?.signal.aborted === true) {
         /* Stop handling notifications if the websocket has been disconnected.
          * Upon reconnecting we are going to restart handling the notification stream for where we left of
          */
-        this.logger.warn(`Stop processing notifications as connection to websocket was closed`);
+        this.logger.debug('Stopped processing catch-up notifications after disconnect', {
+          subsystem: 'websocket-lifecycle',
+          event: 'legacy-catchup-cancelled',
+          processed: index,
+          total: notifications.length,
+        });
+
         return results;
       }
       try {
@@ -191,8 +193,13 @@ export class NotificationService extends TypedEventEmitter<Events> {
         });
         results.success++;
       } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : error;
-        this.logger.error(`Error while processing notification ${notification.id}: ${message}`, {error});
+        const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
+        this.logger.error('Could not process a catch-up notification', {
+          subsystem: 'websocket-lifecycle',
+          event: 'catchup-notification-failed',
+          errorName,
+          errorMessage,
+        });
         results.error++;
       }
     }
@@ -241,7 +248,6 @@ export class NotificationService extends TypedEventEmitter<Events> {
         this.logger.warn('Debug: dropping incoming MLS event', {type: event.type});
         continue;
       }
-      this.logger.debug(`Handling event of type "${event.type}"`, {event});
       let lastEventDate: Date | undefined = undefined;
       try {
         lastEventDate = await this.database.getLastEventDate();
@@ -261,8 +267,14 @@ export class NotificationService extends TypedEventEmitter<Events> {
           yield* payloads;
         }
       } catch (error: unknown) {
-        this.logger.error(`There was an error with notification ID "${notification.id}": ${(error as Error).message}`, {
-          error,
+        const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
+        this.logger.error('Could not process a notification event', {
+          subsystem: 'websocket-lifecycle',
+          event: 'notification-event-processing-failed',
+          eventType: event.type,
+          source,
+          errorName,
+          errorMessage,
         });
         const notificationError: NotificationError = {
           error: error as Error,
