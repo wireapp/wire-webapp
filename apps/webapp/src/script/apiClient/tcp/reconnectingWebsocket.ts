@@ -261,18 +261,30 @@ export class ReconnectingWebsocket {
     Maybe.of(this.socket).match({
       Just: socket => {
         const state = this.getState();
-        this.logger.info(
-          `[WebSocketLifecycle] event=runtime-resumed observedIntervalMs=${details.observedIntervalMilliseconds} expectedIntervalMs=${details.expectedIntervalMilliseconds} suspensionDurationMs=${details.suspensionDurationMilliseconds} state=${getWebSocketStateName(state)} ${this.getActiveLifecycleContext()}`,
-        );
+        this.logger.info('Runtime resumed with a WebSocket wrapper', {
+          subsystem: 'websocket-lifecycle',
+          event: 'runtime-resumed',
+          observedIntervalMs: details.observedIntervalMilliseconds,
+          expectedIntervalMs: details.expectedIntervalMilliseconds,
+          suspensionDurationMs: details.suspensionDurationMilliseconds,
+          state: getWebSocketStateName(state),
+          ...this.getActiveLifecycleContext(),
+        });
 
         this.stopPinging();
         this.hasUnansweredPing = false;
         this.replaceSocketWrapper(socket, 'back-from-sleep', 'Back from sleep');
       },
       Nothing: () => {
-        this.logger.debug(
-          `[WebSocketLifecycle] event=runtime-resumed-no-wrapper observedIntervalMs=${details.observedIntervalMilliseconds} expectedIntervalMs=${details.expectedIntervalMilliseconds} suspensionDurationMs=${details.suspensionDurationMilliseconds} state=CLOSED ${this.getActiveLifecycleContext()}`,
-        );
+        this.logger.debug('Runtime resumed without a WebSocket wrapper', {
+          subsystem: 'websocket-lifecycle',
+          event: 'runtime-resumed-no-wrapper',
+          observedIntervalMs: details.observedIntervalMilliseconds,
+          expectedIntervalMs: details.expectedIntervalMilliseconds,
+          suspensionDurationMs: details.suspensionDurationMilliseconds,
+          state: 'CLOSED',
+          ...this.getActiveLifecycleContext(),
+        });
       },
     });
   };
@@ -287,9 +299,13 @@ export class ReconnectingWebsocket {
       errorCandidate = errorEvent.message;
     }
     const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(errorCandidate);
-    this.logger.warn(
-      `[WebSocketLifecycle] event=socket-error ${this.getLifecycleContext(reconnectContext)} errorName=${errorName} errorMessage=${errorMessage}`,
-    );
+    this.logger.warn('WebSocket reported an error', {
+      subsystem: 'websocket-lifecycle',
+      event: 'socket-error',
+      ...this.getLifecycleContext(reconnectContext),
+      errorName,
+      errorMessage,
+    });
     if (this.onError !== undefined) {
       this.onError(error, reconnectContext);
     }
@@ -299,12 +315,19 @@ export class ReconnectingWebsocket {
     const data = this.options.platform.bufferToString(event.data);
 
     if (data === PingMessage.PONG) {
-      this.logger.debug(`[WebSocketLifecycle] event=pong-received ${this.getActiveLifecycleContext()}`);
+      this.logger.debug('WebSocket pong received', {
+        subsystem: 'websocket-lifecycle',
+        event: 'pong-received',
+        ...this.getActiveLifecycleContext(),
+      });
       this.hasUnansweredPing = false;
       if (this.pendingHealthChecks.size > 0) {
-        this.logger.debug(
-          `[WebSocketLifecycle] event=health-check-pong state=${getWebSocketStateName(this.getState())} ${this.getActiveLifecycleContext()}`,
-        );
+        this.logger.debug('WebSocket health check received a pong', {
+          subsystem: 'websocket-lifecycle',
+          event: 'health-check-pong',
+          state: getWebSocketStateName(this.getState()),
+          ...this.getActiveLifecycleContext(),
+        });
       }
       this.resolvePendingHealthChecks(true);
 
@@ -318,10 +341,15 @@ export class ReconnectingWebsocket {
 
   private readonly internalOnOpen = (event: Event): void => {
     const reconnectContext = this.getReconnectContext();
-    const durationInMilliseconds = this.getActiveAttemptDurationInMilliseconds();
-    this.logger.info(
-      `[WebSocketLifecycle] event=socket-open ${this.getLifecycleContext(reconnectContext)} durationMs=${durationInMilliseconds} reconnectAttempt=${reconnectContext.reconnectAttemptCount} sequenceRetry=${reconnectContext.reconnectSequenceRetryCount}`,
-    );
+    const durationInMilliseconds = this.getActiveAttemptDurationInMilliseconds().unwrapOr(undefined);
+    this.logger.info('WebSocket opened', {
+      subsystem: 'websocket-lifecycle',
+      event: 'socket-open',
+      ...this.getLifecycleContext(reconnectContext),
+      durationMs: durationInMilliseconds,
+      reconnectAttempt: reconnectContext.reconnectAttemptCount,
+      sequenceRetry: reconnectContext.reconnectSequenceRetryCount,
+    });
     this.stopConnectingWatchdog('socket-opened');
     this.resetLongRunningRetrySequence();
     if (this.socket !== undefined) {
@@ -341,9 +369,16 @@ export class ReconnectingWebsocket {
     const reconnectingSocket = this.socket;
     const reconnectContext = this.getReconnectContext();
 
-    this.logger.info(
-      `[WebSocketLifecycle] event=reconnect-start ${this.getLifecycleContext(reconnectContext)} state=${getWebSocketStateName(this.getState())} reconnectAttempt=${reconnectContext.reconnectAttemptCount} sequenceRetry=${reconnectContext.reconnectSequenceRetryCount} pingEnabled=${this.isPingingEnabled} watchdogActive=${this.connectingTimeoutId !== undefined}`,
-    );
+    this.logger.info('WebSocket reconnect started', {
+      subsystem: 'websocket-lifecycle',
+      event: 'reconnect-start',
+      ...this.getLifecycleContext(reconnectContext),
+      state: getWebSocketStateName(this.getState()),
+      reconnectAttempt: reconnectContext.reconnectAttemptCount,
+      sequenceRetry: reconnectContext.reconnectSequenceRetryCount,
+      pingEnabled: this.isPingingEnabled,
+      watchdogActive: this.connectingTimeoutId !== undefined,
+    });
 
     // The ping is needed to keep the connection alive as long as possible.
     // Otherwise the connection would be closed after 1 min of inactivity and re-established.
@@ -352,21 +387,33 @@ export class ReconnectingWebsocket {
       this.startPinging();
     }
 
-    this.logger.debug(`[WebSocketLifecycle] event=url-resolution-start ${this.getLifecycleContext(reconnectContext)}`);
+    this.logger.debug('WebSocket URL resolution started', {
+      subsystem: 'websocket-lifecycle',
+      event: 'url-resolution-start',
+      ...this.getLifecycleContext(reconnectContext),
+    });
     let websocketUrl: string;
     try {
       websocketUrl = await this.onReconnect(reconnectContext);
     } catch (error: unknown) {
       const durationInMilliseconds = this.options.wallClock.currentTimestampInMilliseconds - nowInMilliseconds;
       const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
-      this.logger.warn(
-        `[WebSocketLifecycle] event=url-resolution-failure ${this.getLifecycleContext(reconnectContext)} durationMs=${durationInMilliseconds} errorName=${errorName} errorMessage=${errorMessage}`,
-      );
+      this.logger.warn('WebSocket URL resolution failed', {
+        subsystem: 'websocket-lifecycle',
+        event: 'url-resolution-failure',
+        ...this.getLifecycleContext(reconnectContext),
+        durationMs: durationInMilliseconds,
+        errorName,
+        errorMessage,
+      });
       throw error;
     }
-    this.logger.info(
-      `[WebSocketLifecycle] event=url-resolution-success ${this.getLifecycleContext(reconnectContext)} durationMs=${this.options.wallClock.currentTimestampInMilliseconds - nowInMilliseconds}`,
-    );
+    this.logger.info('WebSocket URL resolved', {
+      subsystem: 'websocket-lifecycle',
+      event: 'url-resolution-success',
+      ...this.getLifecycleContext(reconnectContext),
+      durationMs: this.options.wallClock.currentTimestampInMilliseconds - nowInMilliseconds,
+    });
     const socket = reconnectingSocket;
 
     if (!this.isConnectionRequested || this.socket !== socket) {
@@ -381,10 +428,17 @@ export class ReconnectingWebsocket {
   };
 
   private readonly internalOnClose = (event: CloseEvent): void => {
-    const reason = Boolean(event?.reason) ? StringUtil.formatSafeLogValue(event.reason) : 'none';
-    this.logger.info(
-      `[WebSocketLifecycle] event=socket-close ${this.getActiveLifecycleContext()} state=${getWebSocketStateName(this.getState())} code=${event?.code ?? 'unknown'} wasClean=${event?.wasClean ?? 'unknown'} durationMs=${this.getActiveAttemptDurationInMilliseconds()} reason=${reason}`,
-    );
+    const reason = Maybe.of(event?.reason).map(StringUtil.sanitizeLogMessage).unwrapOr(undefined);
+    this.logger.info('WebSocket closed', {
+      subsystem: 'websocket-lifecycle',
+      event: 'socket-close',
+      ...this.getActiveLifecycleContext(),
+      state: getWebSocketStateName(this.getState()),
+      code: event?.code,
+      wasClean: event?.wasClean,
+      durationMs: this.getActiveAttemptDurationInMilliseconds().unwrapOr(undefined),
+      reason,
+    });
     this.stopConnectingWatchdog('socket-closed');
     this.stopPinging();
     this.resolvePendingHealthChecks(false);
@@ -408,28 +462,45 @@ export class ReconnectingWebsocket {
 
   private readonly sendPing = (): void => {
     if (this.socket === undefined) {
-      this.logger.debug(`[WebSocketLifecycle] event=ping-skip reason=no-wrapper ${this.getActiveLifecycleContext()}`);
+      this.logger.debug('Skipped WebSocket ping', {
+        subsystem: 'websocket-lifecycle',
+        event: 'ping-skip',
+        reason: 'no-wrapper',
+        ...this.getActiveLifecycleContext(),
+      });
       return;
     }
 
     if (this.socket.readyState !== WEBSOCKET_STATE.OPEN) {
-      this.logger.debug(
-        `[WebSocketLifecycle] event=ping-skip reason=not-open state=${getWebSocketStateName(this.socket.readyState)} ${this.getActiveLifecycleContext()}`,
-      );
+      this.logger.debug('Skipped WebSocket ping', {
+        subsystem: 'websocket-lifecycle',
+        event: 'ping-skip',
+        reason: 'not-open',
+        state: getWebSocketStateName(this.socket.readyState),
+        ...this.getActiveLifecycleContext(),
+      });
       return;
     }
 
     if (this.hasUnansweredPing) {
-      this.logger.warn(
-        `[WebSocketLifecycle] event=ping-timeout ${this.getActiveLifecycleContext()} timeoutMs=${this.PING_INTERVAL} state=${getWebSocketStateName(this.getState())} lastMessageAgeMs=${this.getLastMessageAgeInMilliseconds()}`,
-      );
+      this.logger.warn('WebSocket ping timed out', {
+        subsystem: 'websocket-lifecycle',
+        event: 'ping-timeout',
+        ...this.getActiveLifecycleContext(),
+        timeoutMs: this.PING_INTERVAL,
+        state: getWebSocketStateName(this.getState()),
+        lastMessageAgeMs: this.getLastMessageAgeInMilliseconds().unwrapOr(undefined),
+      });
       this.stopPinging();
       this.socket.reconnect();
       return;
     }
-    this.logger.debug(
-      `[WebSocketLifecycle] event=ping-send ${this.getActiveLifecycleContext()} lastMessageAgeMs=${this.getLastMessageAgeInMilliseconds()}`,
-    );
+    this.logger.debug('Sending WebSocket ping', {
+      subsystem: 'websocket-lifecycle',
+      event: 'ping-send',
+      ...this.getActiveLifecycleContext(),
+      lastMessageAgeMs: this.getLastMessageAgeInMilliseconds().unwrapOr(undefined),
+    });
     this.hasUnansweredPing = true;
     this.send(PingMessage.PING);
   };
@@ -443,7 +514,11 @@ export class ReconnectingWebsocket {
     try {
       socket.reconnect(CloseEventCode.NORMAL_CLOSURE);
     } catch {
-      this.logger.warn(`[WebSocketLifecycle] event=reconnect-in-place-failure ${this.getActiveLifecycleContext()}`);
+      this.logger.warn('WebSocket reconnect in place failed', {
+        subsystem: 'websocket-lifecycle',
+        event: 'reconnect-in-place-failure',
+        ...this.getActiveLifecycleContext(),
+      });
     }
   }
 
@@ -452,9 +527,13 @@ export class ReconnectingWebsocket {
     reconnectContext: WebSocketReconnectContext,
   ): void {
     this.stopConnectingWatchdog('watchdog-restarted');
-    this.logger.debug(
-      `[WebSocketLifecycle] event=connecting-watchdog-start ${this.getLifecycleContext(reconnectContext)} state=${getWebSocketStateName(socket.readyState)} timeoutMs=${connectingTimeoutInMilliseconds}`,
-    );
+    this.logger.debug('WebSocket connection watchdog started', {
+      subsystem: 'websocket-lifecycle',
+      event: 'connecting-watchdog-start',
+      ...this.getLifecycleContext(reconnectContext),
+      state: getWebSocketStateName(socket.readyState),
+      timeoutMs: connectingTimeoutInMilliseconds,
+    });
 
     this.connectingTimeoutId = this.options.wallClock.setTimeout(() => {
       if (this.socket !== socket) {
@@ -467,9 +546,13 @@ export class ReconnectingWebsocket {
         return;
       }
 
-      this.logger.warn(
-        `[WebSocketLifecycle] event=connecting-watchdog-timeout ${this.getLifecycleContext(reconnectContext)} state=${getWebSocketStateName(socket.readyState)} durationMs=${connectingTimeoutInMilliseconds}`,
-      );
+      this.logger.warn('WebSocket connection watchdog timed out', {
+        subsystem: 'websocket-lifecycle',
+        event: 'connecting-watchdog-timeout',
+        ...this.getLifecycleContext(reconnectContext),
+        state: getWebSocketStateName(socket.readyState),
+        durationMs: connectingTimeoutInMilliseconds,
+      });
 
       this.replaceSocketWrapper(socket, 'connecting-timeout', 'Connecting timeout');
     }, connectingTimeoutInMilliseconds);
@@ -479,9 +562,12 @@ export class ReconnectingWebsocket {
     if (!isUndefined(this.connectingTimeoutId)) {
       this.options.wallClock.clearTimeout(this.connectingTimeoutId);
       this.connectingTimeoutId = undefined;
-      this.logger.debug(
-        `[WebSocketLifecycle] event=connecting-watchdog-stop ${this.getActiveLifecycleContext()} reason=${reason}`,
-      );
+      this.logger.debug('WebSocket connection watchdog stopped', {
+        subsystem: 'websocket-lifecycle',
+        event: 'connecting-watchdog-stop',
+        ...this.getActiveLifecycleContext(),
+        reason,
+      });
     }
   }
 
@@ -498,16 +584,24 @@ export class ReconnectingWebsocket {
     this.hasUnansweredPing = false;
     this.stopConnectingWatchdog('wrapper-replaced');
 
-    this.logger.info(
-      `[WebSocketLifecycle] event=wrapper-replace oldWrapperGeneration=${this.activeWrapperGeneration.unwrapOr(0)} ${this.getActiveLifecycleContext()} reason=${replacementReason} state=${getWebSocketStateName(socket.readyState)}`,
-    );
+    this.logger.info('Replacing WebSocket wrapper', {
+      subsystem: 'websocket-lifecycle',
+      event: 'wrapper-replace',
+      oldWrapperGeneration: this.activeWrapperGeneration.unwrapOr(0),
+      ...this.getActiveLifecycleContext(),
+      reason: replacementReason,
+      state: getWebSocketStateName(socket.readyState),
+    });
 
     try {
       socket.close(CloseEventCode.NORMAL_CLOSURE, closeReason);
     } catch {
-      this.logger.warn(
-        `[WebSocketLifecycle] event=wrapper-close-failure ${this.getActiveLifecycleContext()} reason=${replacementReason}`,
-      );
+      this.logger.warn('Could not close the previous WebSocket wrapper', {
+        subsystem: 'websocket-lifecycle',
+        event: 'wrapper-close-failure',
+        ...this.getActiveLifecycleContext(),
+        reason: replacementReason,
+      });
     }
 
     this.createAndBindSocketWrapper(replacementReason);
@@ -515,7 +609,10 @@ export class ReconnectingWebsocket {
 
   public connect(): void {
     this.isConnectionRequested = true;
-    this.logger.info('[WebSocketLifecycle] event=connect-requested');
+    this.logger.info('WebSocket connection requested', {
+      subsystem: 'websocket-lifecycle',
+      event: 'connect-requested',
+    });
     this.startBackFromSleepHandler();
     this.resetLongRunningRetrySequence();
     this.stopPinging();
@@ -531,7 +628,10 @@ export class ReconnectingWebsocket {
     }
 
     if (!isUndefined(existingSocket)) {
-      this.logger.info('[WebSocketLifecycle] event=closed-wrapper-replacement');
+      this.logger.info('Replacing closed WebSocket wrapper', {
+        subsystem: 'websocket-lifecycle',
+        event: 'closed-wrapper-replacement',
+      });
     }
 
     this.createAndBindSocketWrapper(isUndefined(existingSocket) ? 'initial-connect' : 'closed-wrapper');
@@ -547,9 +647,13 @@ export class ReconnectingWebsocket {
     this.activeWrapperGeneration = Maybe.just(this.wrapperGeneration);
     this.socket = nextSocket;
     this.bindSocketHandlers(nextSocket);
-    this.logger.info(
-      `[WebSocketLifecycle] event=wrapper-created wrapperGeneration=${this.wrapperGeneration} state=${getWebSocketStateName(nextSocket.readyState)} reason=${reason}`,
-    );
+    this.logger.info('WebSocket wrapper created', {
+      subsystem: 'websocket-lifecycle',
+      event: 'wrapper-created',
+      wrapperGeneration: this.wrapperGeneration,
+      state: getWebSocketStateName(nextSocket.readyState),
+      reason,
+    });
   }
 
   private bindSocketHandlers(socket: ReconnectingWebsocketWrapper): void {
@@ -594,23 +698,32 @@ export class ReconnectingWebsocket {
   public checkHealth(timeoutMs = TimeUtil.TimeInMillis.SECOND * healthCheckTimeoutInSeconds): Promise<boolean> {
     const state = this.getState();
     if (isUndefined(this.socket)) {
-      this.logger.debug(
-        `[WebSocketLifecycle] event=health-check-no-wrapper state=${getWebSocketStateName(state)} ${this.getActiveLifecycleContext()}`,
-      );
+      this.logger.debug('WebSocket health check found no wrapper', {
+        subsystem: 'websocket-lifecycle',
+        event: 'health-check-no-wrapper',
+        state: getWebSocketStateName(state),
+        ...this.getActiveLifecycleContext(),
+      });
       return Promise.resolve(false);
     }
 
     if (state === WEBSOCKET_STATE.CONNECTING || state === WEBSOCKET_STATE.CLOSING) {
-      this.logger.debug(
-        `[WebSocketLifecycle] event=health-check-transitioning state=${getWebSocketStateName(state)} ${this.getActiveLifecycleContext()}`,
-      );
+      this.logger.debug('WebSocket health check found a transitioning socket', {
+        subsystem: 'websocket-lifecycle',
+        event: 'health-check-transitioning',
+        state: getWebSocketStateName(state),
+        ...this.getActiveLifecycleContext(),
+      });
       return Promise.resolve(true);
     }
 
     if (state !== WEBSOCKET_STATE.OPEN) {
-      this.logger.debug(
-        `[WebSocketLifecycle] event=health-check-not-open state=${getWebSocketStateName(state)} ${this.getActiveLifecycleContext()}`,
-      );
+      this.logger.debug('WebSocket health check found the socket closed', {
+        subsystem: 'websocket-lifecycle',
+        event: 'health-check-not-open',
+        state: getWebSocketStateName(state),
+        ...this.getActiveLifecycleContext(),
+      });
       return Promise.resolve(false);
     }
 
@@ -619,9 +732,13 @@ export class ReconnectingWebsocket {
 
     // If we're actively processing messages during the last 5 seconds, consider the connection healthy
     if (timeSinceLastMessage < TimeUtil.TimeInMillis.SECOND * recentMessageThresholdInSeconds) {
-      this.logger.debug(
-        `[WebSocketLifecycle] event=health-check-active-messages state=${getWebSocketStateName(state)} ${this.getActiveLifecycleContext()} lastMessageAgeMs=${timeSinceLastMessage}`,
-      );
+      this.logger.debug('WebSocket health check found recent application frames', {
+        subsystem: 'websocket-lifecycle',
+        event: 'health-check-active-messages',
+        state: getWebSocketStateName(state),
+        ...this.getActiveLifecycleContext(),
+        lastMessageAgeMs: timeSinceLastMessage,
+      });
       return Promise.resolve(true);
     }
 
@@ -629,9 +746,14 @@ export class ReconnectingWebsocket {
     return new Promise<boolean>(resolve => {
       const timeoutId = this.options.wallClock.setTimeout(() => {
         this.pendingHealthChecks.delete(resolveHealthCheck);
-        this.logger.warn(
-          `[WebSocketLifecycle] event=health-check-timeout state=${getWebSocketStateName(this.getState())} ${this.getActiveLifecycleContext()} lastMessageAgeMs=${this.getLastMessageAgeInMilliseconds()} timeoutMs=${timeoutMs}`,
-        );
+        this.logger.warn('WebSocket health check timed out', {
+          subsystem: 'websocket-lifecycle',
+          event: 'health-check-timeout',
+          state: getWebSocketStateName(this.getState()),
+          ...this.getActiveLifecycleContext(),
+          lastMessageAgeMs: this.getLastMessageAgeInMilliseconds().unwrapOr(undefined),
+          timeoutMs,
+        });
         resolve(false);
       }, timeoutMs);
 
@@ -641,9 +763,14 @@ export class ReconnectingWebsocket {
       };
 
       this.pendingHealthChecks.add(resolveHealthCheck);
-      this.logger.debug(
-        `[WebSocketLifecycle] event=health-check-ping-start state=${getWebSocketStateName(state)} ${this.getActiveLifecycleContext()} lastMessageAgeMs=${timeSinceLastMessage} timeoutMs=${timeoutMs}`,
-      );
+      this.logger.debug('WebSocket health check sent a ping', {
+        subsystem: 'websocket-lifecycle',
+        event: 'health-check-ping-start',
+        state: getWebSocketStateName(state),
+        ...this.getActiveLifecycleContext(),
+        lastMessageAgeMs: timeSinceLastMessage,
+        timeoutMs,
+      });
       this.send(PingMessage.PING);
     });
   }
@@ -652,10 +779,13 @@ export class ReconnectingWebsocket {
     this.isConnectionRequested = false;
     this.resetLongRunningRetrySequence();
     if (this.socket !== undefined) {
-      const lifecycleReason = StringUtil.formatSafeLogValue(reason);
-      this.logger.info(
-        `[WebSocketLifecycle] event=disconnect-requested ${this.getActiveLifecycleContext()} reason=${lifecycleReason}`,
-      );
+      const lifecycleReason = StringUtil.sanitizeLogMessage(reason);
+      this.logger.info('WebSocket disconnect requested', {
+        subsystem: 'websocket-lifecycle',
+        event: 'disconnect-requested',
+        ...this.getActiveLifecycleContext(),
+        reason: lifecycleReason,
+      });
       this.socket.close(CloseEventCode.NORMAL_CLOSURE, reason);
     }
     // Always cleanup resources even if socket doesn't exist
@@ -758,9 +888,13 @@ export class ReconnectingWebsocket {
     }
 
     this.hasReportedLongRunningRetry = true;
-    this.logger.warn(
-      `[WebSocketLifecycle] event=long-running-reconnect ${this.getActiveLifecycleContext()} sequenceRetry=${this.reconnectSequenceRetryCount} durationMs=${retryDurationInMilliseconds}`,
-    );
+    this.logger.warn('WebSocket reconnect has been retrying for an extended period', {
+      subsystem: 'websocket-lifecycle',
+      event: 'long-running-reconnect',
+      ...this.getActiveLifecycleContext(),
+      sequenceRetry: this.reconnectSequenceRetryCount,
+      durationMs: retryDurationInMilliseconds,
+    });
     this.onLongRunningRetry?.({
       retryCount: this.reconnectSequenceRetryCount,
       retryDurationInMilliseconds,
@@ -783,30 +917,29 @@ export class ReconnectingWebsocket {
     };
   }
 
-  private getActiveLifecycleContext(): string {
+  private getActiveLifecycleContext(): Pick<WebSocketReconnectContext, 'attemptId' | 'wrapperGeneration'> {
     return this.getLifecycleContext(this.getReconnectContext());
   }
 
-  private getLifecycleContext(reconnectContext: WebSocketReconnectContext): string {
-    return `attemptId=${reconnectContext.attemptId} wrapperGeneration=${reconnectContext.wrapperGeneration}`;
+  private getLifecycleContext(
+    reconnectContext: WebSocketReconnectContext,
+  ): Pick<WebSocketReconnectContext, 'attemptId' | 'wrapperGeneration'> {
+    const {attemptId, wrapperGeneration} = reconnectContext;
+
+    return {attemptId, wrapperGeneration};
   }
 
-  private getActiveAttemptDurationInMilliseconds(): string {
-    return this.activeConnectionAttemptStartTimestamp.match({
-      Just: startTimestampInMilliseconds => {
-        return String(this.options.wallClock.currentTimestampInMilliseconds - startTimestampInMilliseconds);
-      },
-      Nothing: () => {
-        return 'unavailable';
-      },
+  private getActiveAttemptDurationInMilliseconds(): Maybe<number> {
+    return this.activeConnectionAttemptStartTimestamp.map(startTimestampInMilliseconds => {
+      return this.options.wallClock.currentTimestampInMilliseconds - startTimestampInMilliseconds;
     });
   }
 
-  private getLastMessageAgeInMilliseconds(): number | string {
+  private getLastMessageAgeInMilliseconds(): Maybe<number> {
     if (this.lastMessageTimestamp === 0) {
-      return 'unavailable';
+      return Maybe.nothing();
     }
 
-    return this.options.wallClock.currentTimestampInMilliseconds - this.lastMessageTimestamp;
+    return Maybe.just(this.options.wallClock.currentTimestampInMilliseconds - this.lastMessageTimestamp);
   }
 }

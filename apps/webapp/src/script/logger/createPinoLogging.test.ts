@@ -53,15 +53,28 @@ describe('Wire logging through Pino browser', () => {
     const {logging, output} = createTestLogging(Maybe.just('*'));
     const logger = logging.getLogger('@wireapp/api-client/tcp/WebSocketClient');
 
-    expect(logger[level]('Connection interrupted', {attempt: 3, connectionId: 'abc'})).toBeUndefined();
+    expect(
+      logger[level]('Connection interrupted', {
+        subsystem: 'websocket-lifecycle',
+        event: 'socket-close',
+        attemptId: 3,
+        wrapperGeneration: 2,
+        durationMs: 250,
+        wasClean: false,
+      }),
+    ).toBeUndefined();
     expect(output[level]).toHaveBeenCalledTimes(1);
     expect(output[level].mock.calls[0]).toHaveLength(1);
     expect(parseOutput(output[level])).toEqual({
       level: numericLevel,
       time: 1760000000000,
       component: '@wireapp/api-client/tcp/WebSocketClient',
-      attempt: 3,
-      connectionId: 'abc',
+      subsystem: 'websocket-lifecycle',
+      event: 'socket-close',
+      attemptId: 3,
+      wrapperGeneration: 2,
+      durationMs: 250,
+      wasClean: false,
       msg: 'Connection interrupted',
     });
     expect(Object.keys(logger).sort()).toEqual(['debug', 'error', 'info', 'warn']);

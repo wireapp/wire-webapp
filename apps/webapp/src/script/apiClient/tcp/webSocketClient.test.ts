@@ -276,12 +276,19 @@ describe('WebSocketClient', () => {
       expect(socketErrorListener).toHaveBeenCalledWith(socketError);
       expect(invalidTokenListener).toHaveBeenCalledWith(invalidTokenError);
       expect(lifecycleWarning).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'event=token-refresh-failure source=socket-error attemptId=0 wrapperGeneration=1 fatal=true errorName=InvalidTokenError',
-        ),
+        expect.any(String),
+        expect.objectContaining({
+          subsystem: 'websocket-lifecycle',
+          event: 'token-refresh-failure',
+          source: 'socket-error',
+          attemptId: 0,
+          wrapperGeneration: 1,
+          fatal: true,
+          errorName: 'InvalidTokenError',
+          errorMessage: 'access_token=[REDACTED]',
+        }),
       );
-      expect(lifecycleWarning).toHaveBeenCalledWith(expect.stringContaining('errorMessage="access_token=[REDACTED]"'));
-      expect(lifecycleWarning).not.toHaveBeenCalledWith(expect.stringContaining('socket-error-credential'));
+      expect(JSON.stringify(lifecycleWarning.mock.calls)).not.toContain('socket-error-credential');
     });
 
     it('logs a transient token refresh failure caused by a socket error without emitting a second error event', async () => {
@@ -309,9 +316,17 @@ describe('WebSocketClient', () => {
       expect(socketErrorListener).toHaveBeenCalledTimes(1);
       expect(socketErrorListener).toHaveBeenCalledWith(socketError);
       expect(lifecycleWarning).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'event=token-refresh-failure source=socket-error attemptId=0 wrapperGeneration=1 fatal=false errorName=NetworkError errorMessage="Failed to fetch"',
-        ),
+        expect.any(String),
+        expect.objectContaining({
+          subsystem: 'websocket-lifecycle',
+          event: 'token-refresh-failure',
+          source: 'socket-error',
+          attemptId: 0,
+          wrapperGeneration: 1,
+          fatal: false,
+          errorName: 'NetworkError',
+          errorMessage: 'Failed to fetch',
+        }),
       );
     });
 
@@ -629,12 +644,21 @@ describe('WebSocketClient', () => {
 
       expect(websocketClient.buildWebSocketUrl()).toBe('wss://websocket.example.test/await?access_token=');
       expect(lifecycleWarning).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'event=url-created-without-access-token attemptId=0 wrapperGeneration=0 endpoint=legacy-await clientPresent=false markerIncluded=false',
-        ),
+        expect.any(String),
+        expect.objectContaining({
+          subsystem: 'websocket-lifecycle',
+          event: 'url-created-without-access-token',
+          attemptId: 0,
+          wrapperGeneration: 0,
+          endpoint: 'legacy-await',
+          clientPresent: false,
+          markerIncluded: false,
+        }),
       );
-      expect(lifecycleInfo).toHaveBeenCalledWith(expect.stringContaining('event=url-created'));
-      expect(lifecycleInfo).toHaveBeenCalledWith(expect.stringContaining('accessTokenPresent=false'));
+      expect(lifecycleInfo).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({subsystem: 'websocket-lifecycle', event: 'url-created', accessTokenPresent: false}),
+      );
     });
 
     it('does not warn when building an async WebSocket URL with an access token', () => {

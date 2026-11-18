@@ -130,10 +130,6 @@ export function sanitizeLogMessage(message: string): string {
   return redactSensitiveString(message.replace(newlinePattern, ' ')).slice(0, maximumSafeLogMessageLength);
 }
 
-export function formatSafeLogValue(value: string): string {
-  return JSON.stringify(sanitizeLogMessage(value));
-}
-
 function sanitizeErrorName(errorName: string): string {
   const isSafeErrorName = errorName.length <= maximumSafeErrorNameLength && safeErrorNamePattern.test(errorName);
 
@@ -143,20 +139,20 @@ function sanitizeErrorName(errorName: string): string {
 export function getSafeErrorDetails(error: unknown): SafeErrorDetails {
   if (isError(error)) {
     return {
-      errorMessage: formatSafeLogValue(error.message),
+      errorMessage: sanitizeLogMessage(error.message),
       errorName: sanitizeErrorName(error.name),
     };
   }
 
   if (isString(error)) {
     return {
-      errorMessage: formatSafeLogValue(error),
+      errorMessage: sanitizeLogMessage(error),
       errorName: 'UnknownError',
     };
   }
 
   return {
-    errorMessage: formatSafeLogValue('Unknown error'),
+    errorMessage: 'Unknown error',
     errorName: 'UnknownError',
   };
 }

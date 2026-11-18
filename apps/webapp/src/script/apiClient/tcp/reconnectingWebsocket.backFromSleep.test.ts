@@ -266,7 +266,15 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     };
     expect(onError).toHaveBeenCalledWith(expect.anything(), expectedReconnectContext);
     expect(lifecycleWarning).toHaveBeenCalledWith(
-      '[WebSocketLifecycle] event=socket-error attemptId=1 wrapperGeneration=1 errorName=SocketError errorMessage="Bearer [REDACTED]"',
+      expect.any(String),
+      expect.objectContaining({
+        subsystem: 'websocket-lifecycle',
+        event: 'socket-error',
+        attemptId: 1,
+        wrapperGeneration: 1,
+        errorName: 'SocketError',
+        errorMessage: 'Bearer [REDACTED]',
+      }),
     );
     websocket.disconnect();
   });
