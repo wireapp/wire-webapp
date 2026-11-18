@@ -60,6 +60,7 @@ import {parseAccountDeepLink} from './utils/parseAccountDeepLink';
 import {CONVERSATION_CELLS_STATE} from '../../apiClient/conversation/conversation';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
+import {driveOffboardingFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
@@ -137,7 +138,7 @@ function ConversationContent({
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
-  const {fireAndForgetInvoker, translate, clock} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate, clock} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
@@ -173,16 +174,20 @@ function ConversationContent({
     'isCellsEnabled',
   ]);
 
-  const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(activeConversation, [
-    'is1to1',
-    'isRequest',
-    'readOnlyState',
-    'participating_user_ets',
-    'connection',
-    'isReadOnlyConversation',
-    'isSelfUserRemoved',
-    'selfUser',
-  ]);
+  const {cellsState, is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(
+    activeConversation,
+    [
+      'cellsState',
+      'is1to1',
+      'isRequest',
+      'readOnlyState',
+      'participating_user_ets',
+      'connection',
+      'isReadOnlyConversation',
+      'isSelfUserRemoved',
+      'selfUser',
+    ],
+  );
 
   const inTeam = teamState.isInTeam(selfUser);
 
@@ -691,8 +696,11 @@ function ConversationContent({
 
   const isFileTabActive = activeTabIndex === 1;
 
-  const isCellsEnabled =
-    Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isDriveOffboardingEnabled =
+    isFeatureToggleEnabled(driveOffboardingFeatureToggleName) &&
+    !isCellsEnabledForTeam &&
+    cellsState === CONVERSATION_CELLS_STATE.READY;
   const isFileUploadAllowed = isConversationFileUploadAllowed({
     conversationTeamId: activeConversation?.teamId,
     selfUserTeamId: activeConversation?.selfUser()?.teamId,
@@ -721,6 +729,7 @@ function ConversationContent({
   const selfUserDriveRole = getSelfUserDriveRole({
     conversationTeamId: activeConversation?.teamId,
     selfUserTeamId: selfUser.teamId,
+    isCellsEnabledForTeam: !isDriveOffboardingEnabled,
   });
   const showViewerPermission =
     isCellsEnabled &&
@@ -801,6 +810,7 @@ function ConversationContent({
                         }}
                         isFileUploadAllowed={isFileUploadAllowed}
                         showViewerPermission={showViewerPermission}
+                        isDriveOffboardingEnabled={isDriveOffboardingEnabled}
                       />
                     </SharedDriveUploadProvider>
                   )}

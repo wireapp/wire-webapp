@@ -33,6 +33,7 @@ import {
 } from './common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {getCellsApiPath} from './common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from './common/getCellsFilesPath/getCellsFilesPath';
+import {getConversationCellsNodesForTeamAccess} from './common/getConversationCellsNodesForTeamAccess';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
 import {openBreadcrumb} from './common/openBreadcrumb/openBreadcrumb';
 import {
@@ -83,6 +84,7 @@ interface ConversationCellsProps {
   onCloseSearchView: () => void;
   isFileUploadAllowed: boolean;
   showViewerPermission: boolean;
+  isDriveOffboardingEnabled: boolean;
 }
 
 export const ConversationCells = memo(
@@ -96,6 +98,7 @@ export const ConversationCells = memo(
     onCloseSearchView,
     isFileUploadAllowed,
     showViewerPermission,
+    isDriveOffboardingEnabled,
   }: ConversationCellsProps) => {
     const {fireAndForgetInvoker, translate} = useApplicationContext();
     const sharedDriveUploadController = useSharedDriveUploadController();
@@ -384,7 +387,9 @@ export const ConversationCells = memo(
     const selfUserDriveRole = getSelfUserDriveRole({
       conversationTeamId: activeConversation.teamId,
       selfUserTeamId: selfUser?.teamId,
+      isCellsEnabledForTeam: !isDriveOffboardingEnabled,
     });
+    const displayedNodes = getConversationCellsNodesForTeamAccess(nodes, isDriveOffboardingEnabled);
 
     return (
       <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
@@ -428,7 +433,7 @@ export const ConversationCells = memo(
             />
             {isTableVisible && (
               <CellsTable
-                nodes={isLoading ? [] : nodes}
+                nodes={isLoading ? [] : displayedNodes}
                 isNodesLoading={isLoading}
                 cellsRepository={cellsRepository}
                 conversation={activeConversation}

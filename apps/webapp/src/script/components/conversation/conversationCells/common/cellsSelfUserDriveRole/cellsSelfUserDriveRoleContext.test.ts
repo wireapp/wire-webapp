@@ -49,6 +49,18 @@ describe('getSelfUserDriveRole', () => {
       CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
     );
   });
+
+  it('removes editor actions when the owning team disables Cells', () => {
+    const selfUserDriveRole = getSelfUserDriveRole({
+      conversationTeamId: 'team-a',
+      selfUserTeamId: 'team-a',
+      isCellsEnabledForTeam: false,
+    });
+
+    expect(selfUserDriveRole).toBe(CELLS_SELF_USER_DRIVE_ROLE.VIEWER);
+    expect(canPerformCellsAction({action: CELLS_ACTION.DELETE, selfUserDriveRole})).toBe(false);
+    expect(canPerformCellsAction({action: CELLS_ACTION.RENAME, selfUserDriveRole})).toBe(false);
+  });
 });
 
 describe('shouldRestrictCellsViewerActions', () => {

@@ -27,6 +27,7 @@ import {
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
+  driveOffboardingFeatureToggleName,
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
@@ -43,6 +44,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
+  driveOffboardingFeatureToggleName,
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
@@ -51,6 +53,16 @@ const featureToggleNamesWithDedicatedExistenceTests = [
 ] as const;
 
 describe('startupFeatureToggles', function () {
+  it('keeps existing Shared Drives behind explicit opt-in when team Cells is disabled', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch(
+      `?enabled-features=${driveOffboardingFeatureToggleName}`,
+    );
+
+    expect(disabled.isFeatureToggleEnabled(driveOffboardingFeatureToggleName)).toBe(false);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(driveOffboardingFeatureToggleName);
+    expect(enabled.isFeatureToggleEnabled(driveOffboardingFeatureToggleName)).toBe(true);
+  });
   it('keeps persistent browser logs disabled for release and preview builds and preserves explicit opt-in alongside other toggles', () => {
     const disabled = createStartupFeatureTogglesFromLocationSearch('');
     const enabled = createStartupFeatureTogglesFromLocationSearch(
@@ -249,6 +261,7 @@ describe('startupFeatureToggles', function () {
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
       driveBulkRestoreFeatureToggleName,
+      driveOffboardingFeatureToggleName,
       markAsUnreadFeatureToggleName,
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,

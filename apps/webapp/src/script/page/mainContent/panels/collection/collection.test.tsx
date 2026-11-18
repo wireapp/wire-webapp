@@ -30,7 +30,7 @@ import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';
 import {MediumImage} from '../../../../repositories/entity/message/mediumImage';
 import {Text} from '../../../../repositories/entity/message/text';
 import {User} from '../../../../repositories/entity/User';
-import {withTheme} from '../../../../auth/util/test/testUtil';
+import {withTheme, withThemeAndRootContext} from '../../../../auth/util/test/testUtil';
 import {MessageCategory} from '../../../../message/messageCategory';
 import {
   createRootContextValueForTest,
@@ -42,6 +42,9 @@ import {createUuid} from '../../../../util/uuid';
 import {Collection} from './collection';
 import {FullSearch} from './fullSearch';
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
+import {CONVERSATION_CELLS_STATE} from '../../../../apiClient/conversation/conversation';
+import {Config} from '../../../../Config';
+import {driveOffboardingFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 
 jest.mock('./collectionDetails', () => {
   return {
@@ -120,6 +123,7 @@ describe('Collection', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    conversation.cellsState(CONVERSATION_CELLS_STATE.DISABLED);
     mockConversationRepository.getEventsForCategory.mockResolvedValue(messages);
     mockConversationRepository.searchInConversation.mockResolvedValue({
       messageEntities: [createLinkMessage()],
@@ -129,6 +133,61 @@ describe('Collection', () => {
 
   afterEach(() => {
     jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it.each([false, true])('shows an existing Shared Drive with offboarding flag %s', async isEnabled => {
+    const config = Config.getConfig();
+    jest.spyOn(Config, 'getConfig').mockReturnValue({...config, FEATURE: {...config.FEATURE, ENABLE_CELLS: true}});
+    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    const wrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: name => {
+          return name === driveOffboardingFeatureToggleName && isEnabled;
+        },
+      }),
+    );
+
+    const view = render(
+      withThemeAndRootContext(
+        <Collection
+          assetRepository={mockAssetRepository}
+          conversation={conversation}
+          conversationRepository={mockConversationRepository as any}
+          messageRepository={mockMessageRepository}
+          selfUser={mockSelfUser}
+        />,
+        wrapper,
+      ),
+    );
+
+    await waitFor(() => {
+      expect(view.getAllByText('CollectionItem')).toHaveLength(messages.length);
+    });
+    expect(view.getByTestId('shared-drive-id')).toBeInTheDocument();
+  });
+
+  it('omits Shared Drive when conversation Cells is disabled', async () => {
+    const config = Config.getConfig();
+    jest.spyOn(Config, 'getConfig').mockReturnValue({...config, FEATURE: {...config.FEATURE, ENABLE_CELLS: true}});
+    const view = render(
+      withTheme(
+        <Collection
+          assetRepository={mockAssetRepository}
+          conversation={conversation}
+          conversationRepository={mockConversationRepository as any}
+          messageRepository={mockMessageRepository}
+          selfUser={mockSelfUser}
+        />,
+      ),
+      {wrapper: rootProviderWrapper},
+    );
+
+    await waitFor(() => {
+      expect(view.getAllByText('CollectionItem')).toHaveLength(messages.length);
+    });
+    expect(view.queryByTestId('shared-drive-id')).not.toBeInTheDocument();
   });
 
   it('displays all image assets', async () => {
