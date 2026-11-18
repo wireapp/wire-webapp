@@ -55,7 +55,9 @@ function requireDownloadForTest(download: Maybe<BrowserLogDownload>): BrowserLog
 }
 
 describe('browser log download', () => {
-  function createDownloadDependencies(): BrowserLogDownloadTestOptions & {
+  function createDownloadDependencies(
+    initialUnixEpochMilliseconds = Date.UTC(2026, 10, 17, 9, 5),
+  ): BrowserLogDownloadTestOptions & {
     readonly clock: ReturnType<typeof createDeterministicClock>;
     readonly pickSaveFile: jest.Mock;
     readonly getDirectory: jest.Mock<Promise<BrowserLogExportDirectory>, []>;
@@ -98,7 +100,7 @@ describe('browser log download', () => {
       startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch('?enabled-features=persistent-browser-logs'),
       isElectron: false,
       clock: createDeterministicClock({
-        initialUnixEpochMicroseconds: BigInt(Date.UTC(2026, 10, 17, 9, 5)) * 1_000n,
+        initialUnixEpochMicroseconds: BigInt(initialUnixEpochMilliseconds) * 1_000n,
       }),
       showSaveFilePicker: Maybe.just(pickSaveFile),
       getDirectory: jest.fn(async () => {
@@ -157,13 +159,13 @@ describe('browser log download', () => {
   });
 
   it(
-    'opens the picker synchronously with the desktop filename and commits the selected writable',
+    'opens the picker synchronously with a UTC filename and commits the selected writable',
     withWritableStream(async () => {
       const dependencies = createDownloadDependencies();
       const download = requireDownloadForTest(createBrowserLogDownload(dependencies));
       const completion = download();
       expect(dependencies.pickSaveFile).toHaveBeenCalledWith({
-        suggestedName: 'wire-logs-2026-11-17-09-05.zip',
+        suggestedName: 'wire-logs-2026-11-17-09-05Z.zip',
         types: [{description: 'ZIP archive', accept: {'application/zip': ['.zip']}}],
       });
       expect(dependencies.getDirectory).not.toHaveBeenCalled();
@@ -184,7 +186,7 @@ describe('browser log download', () => {
       expect(await download()).toBe('saved');
       expect(dependencies.pickSaveFile).toHaveBeenNthCalledWith(
         1,
-        expect.objectContaining({suggestedName: 'wire-logs-2026-11-17-09-06.zip'}),
+        expect.objectContaining({suggestedName: 'wire-logs-2026-11-17-09-06Z.zip'}),
       );
 
       dependencies.clock.advanceByMilliseconds(60_000);
@@ -192,10 +194,26 @@ describe('browser log download', () => {
       expect(await download()).toBe('saved');
       expect(dependencies.pickSaveFile).toHaveBeenNthCalledWith(
         2,
-        expect.objectContaining({suggestedName: 'wire-logs-2026-11-17-09-07.zip'}),
+        expect.objectContaining({suggestedName: 'wire-logs-2026-11-17-09-07Z.zip'}),
       );
     }),
   );
+
+  it.each([
+    [Date.UTC(2026, 10, 17, 23, 59, 59, 999), 'wire-logs-2026-11-17-23-59Z.zip'],
+    [Date.UTC(2026, 10, 18, 0, 0), 'wire-logs-2026-11-18-00-00Z.zip'],
+    [Date.UTC(2026, 2, 29, 0, 59), 'wire-logs-2026-03-29-00-59Z.zip'],
+    [Date.UTC(2026, 2, 29, 1, 0), 'wire-logs-2026-03-29-01-00Z.zip'],
+    [Date.UTC(2026, 10, 1, 8, 59), 'wire-logs-2026-11-01-08-59Z.zip'],
+    [Date.UTC(2026, 10, 1, 9, 0), 'wire-logs-2026-11-01-09-00Z.zip'],
+  ])('suggests the UTC filename for epoch milliseconds %i', async (timestamp, suggestedName) => {
+    const dependencies = createDownloadDependencies(timestamp);
+    dependencies.pickSaveFile.mockRejectedValueOnce(new DOMException('Cancelled', 'AbortError'));
+    const download = requireDownloadForTest(createBrowserLogDownload(dependencies));
+
+    expect(await download()).toBe('cancelled');
+    expect(dependencies.pickSaveFile).toHaveBeenCalledWith(expect.objectContaining({suggestedName}));
+  });
 
   it('treats picker cancellation silently without accessing storage or creating an archive', async () => {
     const dependencies = createDownloadDependencies();

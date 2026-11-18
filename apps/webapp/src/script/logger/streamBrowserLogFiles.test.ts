@@ -88,7 +88,7 @@ describe('OPFS browser log export source', () => {
       },
       archive: {
         async addFile(options: BrowserLogArchiveEntry) {
-          expect(options.filename).toBe(filename);
+          expect(options.filename).toBe('1970-01-01/application.jsonl');
           const reader = options.readable.getReader();
           try {
             while (true) {
@@ -145,6 +145,40 @@ describe('OPFS browser log export source', () => {
 
     expect(unwrapErr(completion)).toBe('failed');
     expect(addFile).not.toHaveBeenCalled();
-    expect(events).toEqual([filename, 'enumeration-closed']);
+    expect(events).toEqual(['enumeration-closed', filename]);
+  });
+
+  it('closes directory enumeration on cancellation before opening any files', async () => {
+    const cancellation = new AbortController();
+    const enumerationClosed = jest.fn();
+    const getFileHandle = jest.fn();
+    const addFile = jest.fn();
+    const directory: BrowserLogExportDirectory = {
+      async getDirectoryHandle() {
+        return directory;
+      },
+      async *values() {
+        try {
+          yield {kind: 'file', name: filename};
+          cancellation.abort();
+          yield {kind: 'file', name: filename.replace('-1.jsonl', '-2.jsonl')};
+        } finally {
+          enumerationClosed();
+        }
+      },
+      getFileHandle,
+    };
+    const result = await streamBrowserLogFiles({
+      async getDirectory() {
+        return directory;
+      },
+      archive: {addFile},
+      signal: cancellation.signal,
+    });
+
+    expect(unwrapErr(result)).toBe('cancelled');
+    expect(enumerationClosed).toHaveBeenCalledTimes(1);
+    expect(getFileHandle).not.toHaveBeenCalled();
+    expect(addFile).not.toHaveBeenCalled();
   });
 });

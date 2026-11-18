@@ -20,6 +20,7 @@
 import {unwrap, unwrapErr} from '../util/test/resultTestSupport';
 
 import {
+  createBrowserLogArchiveManifest,
   maximumBrowserLogExportFiles,
   parseBrowserLogFileMetadata,
   selectBrowserLogFile,
@@ -27,31 +28,56 @@ import {
 } from './browserLogExportPolicy';
 
 const unattributedFilename = 'log-1000-00000000-0000-4000-8000-000000000001-1.jsonl';
+const unattributedArchivePath = '1970-01-01/application.jsonl';
 
 describe('browser log export policy', () => {
-  it.each(['', `-${'a'.repeat(64)}`, `-${'b'.repeat(64)}`])('selects owned files with account suffix %s', suffix => {
-    const filename = unattributedFilename.replace('.jsonl', `${suffix}.jsonl`);
-    const selection = selectBrowserLogFile({entry: {kind: 'file', name: filename}, exportedFiles: 0});
+  it.each([
+    [Date.UTC(2026, 10, 17, 23, 59, 59, 999), '2026-11-17', ''],
+    [Date.UTC(2026, 10, 18), '2026-11-18', 'a'.repeat(64)],
+    [Date.UTC(2026, 10, 18, 0, 30), '2026-11-18', ''],
+  ])('groups timestamp %s by UTC creation date and account', (timestamp, date, accountIdentifier) => {
+    const accountSuffix = accountIdentifier === '' ? '' : `-${accountIdentifier}`;
+    const sourceFilename = `log-${timestamp}-00000000-0000-4000-8000-000000000001-1${accountSuffix}.jsonl`;
+    const selection = selectBrowserLogFile({
+      entry: {kind: 'file', name: sourceFilename},
+      discoveredFiles: 0,
+    });
+    const archiveDirectory = accountIdentifier === '' ? date : `${date}/accounts/${accountIdentifier}`;
+    const sources = unwrap(selection)
+      .map(source => {
+        return [source];
+      })
+      .unwrapOr([]);
+    const manifest = createBrowserLogArchiveManifest(sources);
 
-    expect(unwrap(selection).unwrapOr('missing')).toBe(filename);
+    expect(manifest).toEqual([{sourceFilename, archivePath: `${archiveDirectory}/application.jsonl`}]);
   });
 
   it.each([
     {kind: 'directory' as const, name: unattributedFilename},
     {kind: 'file' as const, name: 'private.jsonl'},
     {kind: 'file' as const, name: unattributedFilename.replace('1000', '99999999999999999999')},
+    {kind: 'file' as const, name: unattributedFilename.replace('1000', '8640000000000001')},
+    {kind: 'file' as const, name: unattributedFilename.replace('1000', '253402300800000')},
   ])('ignores unrelated entry $name even at the metadata limit', entry => {
-    const selection = selectBrowserLogFile({entry, exportedFiles: maximumBrowserLogExportFiles});
+    const selection = selectBrowserLogFile({entry, discoveredFiles: maximumBrowserLogExportFiles});
 
     expect(unwrap(selection).isNothing).toBe(true);
   });
 
   it('allows the last permitted entry and rejects the next owned file', () => {
     const entry = {kind: 'file' as const, name: unattributedFilename};
-    const lastPermitted = selectBrowserLogFile({entry, exportedFiles: maximumBrowserLogExportFiles - 1});
-    const excess = selectBrowserLogFile({entry, exportedFiles: maximumBrowserLogExportFiles});
+    const lastPermitted = selectBrowserLogFile({entry, discoveredFiles: maximumBrowserLogExportFiles - 1});
+    const excess = selectBrowserLogFile({entry, discoveredFiles: maximumBrowserLogExportFiles});
+    const sources = unwrap(lastPermitted)
+      .map(source => {
+        return [source];
+      })
+      .unwrapOr([]);
 
-    expect(unwrap(lastPermitted).unwrapOr('missing')).toBe(unattributedFilename);
+    expect(createBrowserLogArchiveManifest(sources)).toEqual([
+      {sourceFilename: unattributedFilename, archivePath: unattributedArchivePath},
+    ]);
     expect(unwrapErr(excess)).toBe('limit-exceeded');
   });
 

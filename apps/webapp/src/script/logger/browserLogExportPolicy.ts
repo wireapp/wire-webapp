@@ -17,14 +17,25 @@
  *
  */
 
-import {isNull, isSafeInteger} from '@sindresorhus/is';
+import {isNull, isSafeInteger, isUndefined} from '@sindresorhus/is';
 import {Maybe, Result} from 'true-myth';
 
 import {logFilenamePattern} from './createOriginPrivateFileSystemLogStore';
 
 type SelectBrowserLogFileOptions = {
   readonly entry: Pick<FileSystemHandle, 'name' | 'kind'>;
-  readonly exportedFiles: number;
+  readonly discoveredFiles: number;
+};
+
+export type BrowserLogSource = {
+  readonly sourceFilename: string;
+  readonly archiveDirectory: string;
+  readonly createdAtMilliseconds: number;
+};
+
+type BrowserLogArchiveEntryPath = {
+  readonly sourceFilename: string;
+  readonly archivePath: string;
 };
 
 export type BrowserLogFileMetadata = {
@@ -35,36 +46,94 @@ export type BrowserLogFileMetadata = {
 // Streaming ZIP writers still retain central-directory metadata for every entry.
 export const maximumBrowserLogExportFiles = 4096;
 const maximumFilenameBytes = 1024;
+const lastFourDigitYearMilliseconds = Date.parse('9999-12-31T23:59:59.999Z');
+const utcDateLength = 10;
 
-function isOwnedLogFile(entry: SelectBrowserLogFileOptions['entry']): boolean {
+function isValidCreationTimestamp(milliseconds: number): boolean {
+  return isSafeInteger(milliseconds) && milliseconds >= 0 && milliseconds <= lastFourDigitYearMilliseconds;
+}
+
+export function selectBrowserLogFile(
+  options: SelectBrowserLogFileOptions,
+): Result<Maybe<BrowserLogSource>, 'limit-exceeded'> {
+  const {entry} = options;
   if (entry.kind !== 'file') {
-    return false;
+    return Result.ok(Maybe.nothing());
   }
   const match = logFilenamePattern.exec(entry.name);
   if (isNull(match)) {
-    return false;
+    return Result.ok(Maybe.nothing());
   }
-
-  return isSafeInteger(Number(match.at(1)));
-}
-
-function exceedsMetadataLimit(options: SelectBrowserLogFileOptions): boolean {
-  const {entry, exportedFiles} = options;
-
-  // Owned filenames contain only ASCII, so character and byte counts agree.
-  return exportedFiles >= maximumBrowserLogExportFiles || entry.name.length > maximumFilenameBytes;
-}
-
-export function selectBrowserLogFile(options: SelectBrowserLogFileOptions): Result<Maybe<string>, 'limit-exceeded'> {
-  const {entry} = options;
-  if (!isOwnedLogFile(entry)) {
+  const [, creationTimestamp, , , accountIdentifier] = match;
+  const createdAtMilliseconds = Number(creationTimestamp);
+  if (!isValidCreationTimestamp(createdAtMilliseconds)) {
     return Result.ok(Maybe.nothing());
   }
   if (exceedsMetadataLimit(options)) {
     return Result.err('limit-exceeded');
   }
 
-  return Result.ok(Maybe.just(entry.name));
+  const creationDate = new Date(createdAtMilliseconds).toISOString().slice(0, utcDateLength);
+  const archiveDirectory = isUndefined(accountIdentifier)
+    ? creationDate
+    : `${creationDate}/accounts/${accountIdentifier}`;
+  return Result.ok(Maybe.just({sourceFilename: entry.name, archiveDirectory, createdAtMilliseconds}));
+}
+
+function exceedsMetadataLimit(options: SelectBrowserLogFileOptions): boolean {
+  const {entry, discoveredFiles} = options;
+
+  // Owned filenames contain only ASCII, so character and byte counts agree.
+  return discoveredFiles >= maximumBrowserLogExportFiles || entry.name.length > maximumFilenameBytes;
+}
+
+function compareAscii(left: string, right: string): number {
+  if (left === right) {
+    return 0;
+  }
+
+  return left < right ? -1 : 1;
+}
+
+function compareBrowserLogSources(left: BrowserLogSource, right: BrowserLogSource): number {
+  const directoryOrder = compareAscii(left.archiveDirectory, right.archiveDirectory);
+  if (directoryOrder !== 0) {
+    return directoryOrder;
+  }
+  const newestFirstOrder = right.createdAtMilliseconds - left.createdAtMilliseconds;
+  if (newestFirstOrder !== 0) {
+    return newestFirstOrder;
+  }
+
+  // Comparing the full source name breaks ties by the persisted session and sequence without locale rules.
+  return compareAscii(left.sourceFilename, right.sourceFilename);
+}
+
+export function createBrowserLogArchiveManifest(
+  sources: readonly BrowserLogSource[],
+): readonly BrowserLogArchiveEntryPath[] {
+  let previousDirectory: string | undefined;
+  let previousTimestamp: number | undefined;
+  let collisionIndex = 0;
+
+  return sources.toSorted(compareBrowserLogSources).map(source => {
+    const {sourceFilename, archiveDirectory, createdAtMilliseconds} = source;
+    if (archiveDirectory !== previousDirectory) {
+      previousDirectory = archiveDirectory;
+      previousTimestamp = createdAtMilliseconds;
+      collisionIndex = 0;
+
+      return {sourceFilename, archivePath: `${archiveDirectory}/application.jsonl`};
+    }
+    if (createdAtMilliseconds !== previousTimestamp) {
+      previousTimestamp = createdAtMilliseconds;
+      collisionIndex = 0;
+    }
+    const archivePath = `${archiveDirectory}/application.old.${createdAtMilliseconds}-${collisionIndex}.jsonl`;
+    collisionIndex += 1;
+
+    return {sourceFilename, archivePath};
+  });
 }
 
 function isValidFileMetadata(file: Pick<File, 'size' | 'lastModified'>): boolean {

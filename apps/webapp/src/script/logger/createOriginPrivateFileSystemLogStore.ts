@@ -59,6 +59,11 @@ type StoredLogFile = {
   readonly sizeBytes: number;
 };
 
+type ActiveLogFile = {
+  readonly filename: string;
+  readonly utcDay: number;
+};
+
 export type LogStore = {
   readonly append: (lines: readonly string[]) => Promise<void>;
 };
@@ -73,6 +78,7 @@ type LogFileRetentionOptions = {
 
 const newlineByte = 10;
 const accountIdentifierLength = 64;
+const millisecondsPerUtcDay = 86_400_000;
 
 // Only files owned by this version participate in retention. Never recurse into directories.
 export const logFilenamePattern = /^log-(\d+)-([a-f0-9-]{36})-(\d+)(?:-([a-f0-9]{64}))?\.jsonl$/u;
@@ -186,7 +192,7 @@ export function createOriginPrivateFileSystemLogStore(
     })
     .unwrapOr('');
 
-  let activeFilename: Maybe<string> = Maybe.nothing();
+  let activeLogFile: Maybe<ActiveLogFile> = Maybe.nothing();
   let sequence = 0;
 
   async function closeAccessHandle(access: LogAccessHandle): Promise<void> {
@@ -195,7 +201,7 @@ export function createOriginPrivateFileSystemLogStore(
       await access.close();
     } catch (error: unknown) {
       // A failed close has an uncertain commit; use a new file without replaying the batch.
-      activeFilename = Maybe.nothing();
+      activeLogFile = Maybe.nothing();
 
       throw error;
     }
@@ -213,6 +219,10 @@ export function createOriginPrivateFileSystemLogStore(
     }
 
     const nowMilliseconds = clock.currentUnixEpochMilliseconds;
+    const utcDay = Math.floor(nowMilliseconds / millisecondsPerUtcDay);
+    const activeFilename = activeLogFile.andThen(file => {
+      return file.utcDay === utcDay ? Maybe.just(file.filename) : Maybe.nothing<string>();
+    });
     // The budget assumes single-instance operation; overlapping startup scans are not atomic.
     const files = await listLogFiles(directory);
     let totalBytes = files.reduce((total, file) => {
@@ -249,16 +259,17 @@ export function createOriginPrivateFileSystemLogStore(
     if (activeFile.isNothing || activeFile.value.sizeBytes + batchBytes > configuration.maximumFileBytes) {
       // Previous sessions may end with interrupted bytes; never reopen them for appending.
       sequence += 1;
-      activeFilename = Maybe.just(`log-${nowMilliseconds}-${sessionIdentifier}-${sequence}${accountSuffix}.jsonl`);
+      const filename = `log-${nowMilliseconds}-${sessionIdentifier}-${sequence}${accountSuffix}.jsonl`;
+      activeLogFile = Maybe.just({filename, utcDay});
       activeFile = Maybe.nothing();
     }
 
-    const filename = activeFilename;
-    if (filename.isNothing) {
+    if (activeLogFile.isNothing) {
       throw new Error('Missing active log filename');
     }
+    const {filename} = activeLogFile.value;
 
-    const fileHandle = await directory.getFileHandle(filename.value, {create: true});
+    const fileHandle = await directory.getFileHandle(filename, {create: true});
     const access = await fileHandle.createSyncAccessHandle();
     let removeDamagedFile = false;
     try {
@@ -293,7 +304,7 @@ export function createOriginPrivateFileSystemLogStore(
         throw error;
       }
     } catch (error: unknown) {
-      activeFilename = Maybe.nothing();
+      activeLogFile = Maybe.nothing();
 
       throw error;
     } finally {
@@ -301,7 +312,7 @@ export function createOriginPrivateFileSystemLogStore(
         await closeAccessHandle(access);
       } finally {
         if (removeDamagedFile) {
-          await directory.removeEntry(filename.value);
+          await directory.removeEntry(filename);
         }
       }
     }

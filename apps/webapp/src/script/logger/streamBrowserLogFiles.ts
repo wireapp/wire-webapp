@@ -21,9 +21,11 @@ import {Maybe, Result, task, type Task} from 'true-myth';
 
 import {
   checkBrowserLogExportCancellation,
+  createBrowserLogArchiveManifest,
   parseBrowserLogFileMetadata,
   selectBrowserLogFile,
   verifyBrowserLogFileUnchanged,
+  type BrowserLogSource,
 } from './browserLogExportPolicy';
 import type {
   BrowserLogArchive,
@@ -48,7 +50,8 @@ type OpenedBrowserLogFile = {
 
 type ExportBrowserLogFileOptions = {
   readonly directory: BrowserLogExportDirectory;
-  readonly filename: string;
+  readonly sourceFilename: string;
+  readonly archivePath: string;
   readonly archive: Pick<BrowserLogArchive, 'addFile'>;
   readonly signal: AbortSignal;
 };
@@ -99,11 +102,11 @@ function openLogDirectory(
 
 function openLogFile(
   directory: BrowserLogExportDirectory,
-  filename: string,
+  sourceFilename: string,
 ): Task<Maybe<OpenedBrowserLogFile>, 'failed'> {
   return task.tryOr('failed', async () => {
     try {
-      const fileHandle = await directory.getFileHandle(filename);
+      const fileHandle = await directory.getFileHandle(sourceFilename);
       const file = await fileHandle.getFile();
 
       return Maybe.just({fileHandle, file});
@@ -118,9 +121,9 @@ function openLogFile(
 }
 
 function exportLogFile(options: ExportBrowserLogFileOptions): Task<'exported' | 'missing', BrowserLogExportFailure> {
-  const {directory, filename, archive, signal} = options;
+  const {directory, sourceFilename, archivePath, archive, signal} = options;
 
-  return openLogFile(directory, filename).andThen(openedFile => {
+  return openLogFile(directory, sourceFilename).andThen(openedFile => {
     return openedFile.match<Task<'exported' | 'missing', BrowserLogExportFailure>>({
       Nothing() {
         return task.resolve('missing' as const);
@@ -133,7 +136,7 @@ function exportLogFile(options: ExportBrowserLogFileOptions): Task<'exported' | 
             .fromResult(checkBrowserLogExportCancellation(signal.aborted))
             .andThen(() => {
               return task.tryOr('failed' as const, () => {
-                return archive.addFile({filename, readable: createFileReadable(file)});
+                return archive.addFile({filename: archivePath, readable: createFileReadable(file)});
               });
             })
             .andThen(() => {
@@ -164,20 +167,27 @@ function streamLogDirectory(
 
   return task
     .tryOr<Result<BrowserLogExportSummary, BrowserLogExportFailure>, BrowserLogExportFailure>('failed', async () => {
-      let exportedFiles = 0;
-      let missingFiles = 0;
-      // Keep iteration sequential and stack-bounded; no manifest or recursive Task chain.
+      const sources: BrowserLogSource[] = [];
       for await (const entry of directory.values()) {
         const selection = checkBrowserLogExportCancellation(signal.aborted).andThen(() => {
-          return selectBrowserLogFile({entry, exportedFiles});
+          return selectBrowserLogFile({entry, discoveredFiles: sources.length});
         });
         if (selection.isErr) {
           return Result.err(selection.error);
         }
-        if (selection.value.isNothing) {
-          continue;
+        if (selection.value.isJust) {
+          sources.push(selection.value.value);
         }
-        const fileExport = await exportLogFile({directory, filename: selection.value.value, archive, signal});
+      }
+
+      let exportedFiles = 0;
+      let missingFiles = 0;
+      // Fix names at discovery. A missing primary is skipped without promoting another file.
+      for (const {sourceFilename, archivePath} of createBrowserLogArchiveManifest(sources)) {
+        if (signal.aborted) {
+          return Result.err('cancelled');
+        }
+        const fileExport = await exportLogFile({directory, sourceFilename, archivePath, archive, signal});
         if (fileExport.isErr) {
           return Result.err(fileExport.error);
         }
