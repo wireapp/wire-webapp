@@ -30,11 +30,16 @@ import {H2} from '../uiKit/typography/heading/heading';
 import type {Translate} from '../util/localizerUtil';
 
 type CoreCryptoUpgradeModalProps = {
+  readonly brandName: string;
   readonly isDesktopApp: boolean;
   readonly translate: Translate;
 };
 
-export function CoreCryptoUpgradeModal({isDesktopApp, translate}: CoreCryptoUpgradeModalProps): ReactElement | null {
+export function CoreCryptoUpgradeModal({
+  brandName,
+  isDesktopApp,
+  translate,
+}: CoreCryptoUpgradeModalProps): ReactElement | null {
   const support = useCoreCryptoSupport();
   const dialog = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -62,7 +67,7 @@ export function CoreCryptoUpgradeModal({isDesktopApp, translate}: CoreCryptoUpgr
         wrapperCSS={{padding: 24, maxWidth: 'calc(100vw - 32px)', overflowY: 'auto'}}
       >
         <H2 id="core-crypto-upgrade-title" css={{margin: 0}}>
-          {translate(isDesktopApp ? 'coreCryptoUpgradeDesktopTitle' : 'coreCryptoUpgradeBrowserTitle')}
+          {translate(isDesktopApp ? 'coreCryptoUpgradeDesktopTitle' : 'coreCryptoUpgradeBrowserTitle', {brandName})}
         </H2>
       </ModalComponent>
     </StyledApp>

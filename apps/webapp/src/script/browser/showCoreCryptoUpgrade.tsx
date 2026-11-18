@@ -23,6 +23,7 @@ import type {CoreCryptoSupport} from './coreCryptoSupport';
 import {CoreCryptoUpgradeModal} from './coreCryptoUpgradeModal';
 import {renderWithCoreCryptoSupport} from './renderWithCoreCryptoSupport';
 
+import {Config} from '../Config';
 import {setAppLocale} from '../localization/Localizer';
 import {translate} from '../util/localizerUtil';
 
@@ -41,6 +42,10 @@ export function showCoreCryptoUpgrade({containerId, support, isDesktopApp}: Show
   renderWithCoreCryptoSupport(
     container,
     support,
-    <CoreCryptoUpgradeModal isDesktopApp={isDesktopApp} translate={translate} />,
+    <CoreCryptoUpgradeModal
+      brandName={Config.getConfig().BRAND_NAME}
+      isDesktopApp={isDesktopApp}
+      translate={translate}
+    />,
   );
 }

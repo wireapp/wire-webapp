@@ -94,7 +94,7 @@ describe('renderWithCoreCryptoSupport', () => {
             renderWithCoreCryptoSupport(
               container,
               detected,
-              <CoreCryptoUpgradeModal isDesktopApp={false} translate={translate} />,
+              <CoreCryptoUpgradeModal brandName="Wire" isDesktopApp={false} translate={translate} />,
             ),
           );
         },
@@ -113,7 +113,7 @@ describe('renderWithCoreCryptoSupport', () => {
         renderWithCoreCryptoSupport(
           createContainer('main'),
           {missingFeatures: ['JS Promise Integration']},
-          <CoreCryptoUpgradeModal isDesktopApp translate={translate} />,
+          <CoreCryptoUpgradeModal brandName="Wire" isDesktopApp translate={translate} />,
         ),
       );
     });
