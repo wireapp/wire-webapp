@@ -24,6 +24,7 @@ import {Notification} from '../../apiClient/notification/notification';
 import {APIClient} from '../../apiClient/apiClient';
 import {BackendEvent} from '../../apiClient/event/backendEvent';
 import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
+import {USER_EVENT} from '../../apiClient/event/userEvent';
 import {MemoryEngine} from '../storage/engine/memoryEngine';
 
 import {ConversationService} from '../conversation';
@@ -58,6 +59,7 @@ describe('NotificationService', () => {
       apiClients.push(apiClient);
 
       const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
+      const logError = jest.spyOn(notificationService['logger'], 'error');
 
       jest.spyOn(notificationService as any, 'handleEvent').mockImplementation(() => {
         throw new Error('Test error');
@@ -71,14 +73,27 @@ describe('NotificationService', () => {
       });
 
       const notification = {
-        payload: [{}],
-      } as unknown as Notification;
+        id: 'private-notification-id',
+        payload: [
+          {
+            type: USER_EVENT.DELETE,
+            id: 'private-payload',
+            qualified_id: {id: 'private-payload', domain: 'example.com'},
+          },
+        ],
+      } satisfies Notification;
 
       const handledNotifications = notificationService.handleNotification(
         notification,
         NotificationSource.NOTIFICATION_STREAM,
       );
       await handledNotifications.next();
+      expect(logError).toHaveBeenCalledWith(expect.any(String), {
+        subsystem: 'websocket-lifecycle',
+        event: 'notification-event-processing-failed',
+        eventType: USER_EVENT.DELETE,
+        errorName: 'Error',
+      });
 
       return promise;
     });

@@ -1275,16 +1275,9 @@ export class Account extends TypedEventEmitter<Events> {
   ) => {
     return async (notification: Notification, source: NotificationSource): Promise<void> => {
       const connectionContext = getCurrentWebSocketConnectionContext();
-      this.logger.debug('Legacy notification queued', {
-        subsystem: 'websocket-lifecycle',
-        event: 'notification-queued',
-        ...connectionContext.unwrapOr({}),
-        source,
-      });
       void this.notificationProcessingQueue
         .add(async () => {
           try {
-            const start = Date.now();
             const firstNotificationPayload = notification.payload[0];
             const notificationTime = isUndefined(firstNotificationPayload)
               ? null
@@ -1302,14 +1295,6 @@ export class Account extends TypedEventEmitter<Events> {
             for await (const message of messages) {
               await handleEvent(message, source);
             }
-
-            this.logger.debug('Legacy notification processed', {
-              subsystem: 'websocket-lifecycle',
-              event: 'notification-processed',
-              ...connectionContext.unwrapOr({}),
-              source,
-              durationMilliseconds: Date.now() - start,
-            });
           } catch (error: unknown) {
             this.logger.error('Legacy notification processing failed', {
               subsystem: 'websocket-lifecycle',
@@ -1342,14 +1327,6 @@ export class Account extends TypedEventEmitter<Events> {
           this.reactToMissedNotification();
           return;
         }
-
-        this.logger.debug('Consumable notification queued', {
-          subsystem: 'websocket-lifecycle',
-          event: 'notification-queued',
-          ...connectionContext.unwrapOr({}),
-          source,
-          notificationType: notification.type,
-        });
 
         this.notificationProcessingQueue
           .add(() => {
@@ -1439,7 +1416,7 @@ export class Account extends TypedEventEmitter<Events> {
     const markerId = notification.data.marker_id;
     const currentMarkerId = this.apiClient.transport.http.accessTokenStore.markerToken;
     const markerMatched = markerId === currentMarkerId;
-    this.logger.info('Consumable synchronization marker received', {
+    this.logger.debug('Consumable synchronization marker received', {
       subsystem: 'websocket-lifecycle',
       event: 'async-sync-marker-received',
       ...connectionContext.unwrapOr({}),
@@ -1496,16 +1473,9 @@ export class Account extends TypedEventEmitter<Events> {
         await handleEvent(payload, source);
       }
 
-      const canAcknowledge = !isSocketCancelled(signal);
-      if (canAcknowledge) {
+      if (!isSocketCancelled(signal)) {
         this.apiClient.transport.ws.acknowledgeNotification(notification);
       }
-      this.logger.debug('Consumable notification processed', {
-        subsystem: 'websocket-lifecycle',
-        event: 'notification-processed',
-        ...connectionContext.unwrapOr({}),
-        acknowledged: canAcknowledge,
-      });
     } catch (error: unknown) {
       this.logger.error('Consumable notification processing failed', {
         subsystem: 'websocket-lifecycle',
@@ -1636,11 +1606,6 @@ export class Account extends TypedEventEmitter<Events> {
       if (isObsolete()) {
         return;
       }
-
-      this.logger.info(
-        'Finished inserting notifications for decryption from the legacy endpoint to the process queue',
-        {results},
-      );
 
       // We need to wait for the notification stream to be fully handled before releasing the message sending queue.
       // This is due to the nature of how message are encrypted, any change in mls epoch needs to happen before we start encrypting any kind of messages

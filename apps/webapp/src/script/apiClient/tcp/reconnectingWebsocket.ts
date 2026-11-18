@@ -329,11 +329,6 @@ export class ReconnectingWebsocket {
     const data = this.options.platform.bufferToString(event.data);
 
     if (data === PingMessage.PONG) {
-      this.logger.debug('WebSocket pong received', {
-        subsystem: 'websocket-lifecycle',
-        event: 'pong-received',
-        ...this.getActiveLifecycleContext(),
-      });
       this.hasUnansweredPing = false;
       if (this.pendingHealthChecks.size > 0) {
         this.logger.debug('WebSocket health check received a pong', {
@@ -342,19 +337,18 @@ export class ReconnectingWebsocket {
           state: getWebSocketStateName(this.getState()),
           ...this.getActiveLifecycleContext(),
         });
+      } else {
+        this.logger.debug('WebSocket pong received', {
+          subsystem: 'websocket-lifecycle',
+          event: 'pong-received',
+          ...this.getActiveLifecycleContext(),
+        });
       }
       this.resolvePendingHealthChecks(true);
 
       return;
     }
 
-    const {attemptId, wrapperGeneration} = this.getReconnectContext();
-    this.logger.debug('WebSocket application frame received', {
-      subsystem: 'websocket-lifecycle',
-      event: 'application-frame-received',
-      attemptId,
-      wrapperGeneration,
-    });
     this.lastMessageTimestamp = this.options.wallClock.currentTimestampInMilliseconds;
     this.onMessage?.(data);
   };

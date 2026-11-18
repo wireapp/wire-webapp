@@ -180,13 +180,15 @@ export class WebSocketClient extends EventEmitter {
       });
       throw error;
     }
-    this.logger.debug('WebSocket notification parsed and ready for dispatch', {
-      subsystem: 'websocket-lifecycle',
-      event: 'notification-dispatch',
-      implementation: this.lifecycleImplementation,
-      ...this.openConnectionContext.unwrapOr({}),
-      notificationListenerCount,
-    });
+    if (notificationListenerCount > 0) {
+      this.logger.debug('Dispatching WebSocket notification', {
+        subsystem: 'websocket-lifecycle',
+        event: 'notification-dispatch',
+        implementation: this.lifecycleImplementation,
+        ...this.openConnectionContext.unwrapOr({}),
+        notificationListenerCount,
+      });
+    }
     this.emit(TOPIC.ON_MESSAGE, notification);
   };
 

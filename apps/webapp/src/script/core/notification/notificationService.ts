@@ -32,6 +32,7 @@ import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
 import {Notification} from '../../apiClient/notification/notification';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
+import {getSafeErrorDetails} from '../../commons/util/StringUtil';
 import {getLogger} from '../../logger/getLogger';
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../coreError';
@@ -191,8 +192,11 @@ export class NotificationService extends TypedEventEmitter<Events> {
         });
         results.success++;
       } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : error;
-        this.logger.error(`Error while processing notification ${notification.id}: ${message}`, {error});
+        this.logger.error('Could not process a catch-up notification', {
+          subsystem: 'websocket-lifecycle',
+          event: 'catchup-notification-failed',
+          errorName: getSafeErrorDetails(error).errorName,
+        });
         results.error++;
       }
     }
@@ -241,7 +245,6 @@ export class NotificationService extends TypedEventEmitter<Events> {
         this.logger.warn('Debug: dropping incoming MLS event', {type: event.type});
         continue;
       }
-      this.logger.debug(`Handling event of type "${event.type}"`, {event});
       let lastEventDate: Date | undefined = undefined;
       try {
         lastEventDate = await this.database.getLastEventDate();
@@ -261,8 +264,11 @@ export class NotificationService extends TypedEventEmitter<Events> {
           yield* payloads;
         }
       } catch (error: unknown) {
-        this.logger.error(`There was an error with notification ID "${notification.id}": ${(error as Error).message}`, {
-          error,
+        this.logger.error('Could not process a notification event', {
+          subsystem: 'websocket-lifecycle',
+          event: 'notification-event-processing-failed',
+          eventType: event.type,
+          errorName: getSafeErrorDetails(error).errorName,
         });
         const notificationError: NotificationError = {
           error: error as Error,
