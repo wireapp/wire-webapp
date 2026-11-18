@@ -22,7 +22,7 @@ import type {Clock} from '@enormora/clock/clock';
 import {observeCellsBackgroundActionJobs} from './common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import type {CellsBackgroundActionOutcome} from './common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
 import {createBulkJobPollingPolicy} from './common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
-import type {SharedDriveMoveStatus, SharedDriveMoveStatusKind} from './sharedDriveUploadStatusContext';
+import type {SharedDriveMoveStatus, SharedDriveMoveStatusKind} from './sharedDriveMoveStatus';
 
 import type {CellsRepository} from '../../../repositories/cells/cellsRepository';
 

@@ -35,34 +35,16 @@ import {
   type BackgroundMoveObservation,
   type BackgroundMoveOperation,
 } from './sharedDriveBackgroundMoveController';
+import type {SharedDriveMoveStatus} from './sharedDriveMoveStatus';
 import type {DismissedUpload} from './sharedDriveUploadStatus';
 
-export interface SharedDriveMoveItem {
-  readonly id: string;
-  readonly name: string;
-  readonly isFolder: boolean;
-}
-
-export type SharedDriveBulkAction = 'move' | 'restore' | 'permanentDelete' | 'emptyBin';
-
-export interface SharedDriveMoveSummary {
-  readonly action: SharedDriveBulkAction;
-  readonly items: readonly SharedDriveMoveItem[];
-  readonly destinationPath: string;
-}
-
-export type SharedDriveMoveStatusKind =
-  'processing' | 'completed' | 'request-failed' | 'partial' | 'finished-unknown' | 'failed' | 'status-unknown';
-
-export interface SharedDriveMoveStatus extends SharedDriveMoveSummary {
-  readonly id: string;
-  readonly conversationQualifiedId: string;
-  readonly kind: SharedDriveMoveStatusKind;
-  /** Retries the check for an outcome that needs review; the popup offers it as a button when set. */
-  readonly onReview?: () => void;
-  /** True while the review is running; the popup disables its review button meanwhile. */
-  readonly isReviewing?: boolean;
-}
+export type {
+  SharedDriveBulkAction,
+  SharedDriveMoveItem,
+  SharedDriveMoveStatus,
+  SharedDriveMoveStatusKind,
+  SharedDriveMoveSummary,
+} from './sharedDriveMoveStatus';
 
 type SharedDriveUploadStatusContextValue = {
   readonly dismissedUpload: Maybe<DismissedUpload>;
