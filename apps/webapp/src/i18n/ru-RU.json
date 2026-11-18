@@ -1987,7 +1987,7 @@
   "preferencesAccountUsernamePlaceholder": "Ваше полное имя",
   "preferencesApplicationLogsDownload": "Скачать журнал приложения",
   "preferencesApplicationLogsFailed": "Не удалось скачать журнал приложения. Пожалуйста, попробуйте еще раз.",
-  "preferencesApplicationLogsTitle": "Диагностические журналы",
+  "preferencesApplicationLogsTitle": "Журналы диагностики",
   "preferencesDevice": "Устройство",
   "preferencesDeviceDetails": "Сведения об устройстве",
   "preferencesDeviceDetailsFingerprintNotMatch": "Если отпечатки не совпадают, сбросьте сессию для создания новых ключей шифрования на обеих сторонах.",
