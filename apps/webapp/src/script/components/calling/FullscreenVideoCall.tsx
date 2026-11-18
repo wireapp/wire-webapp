@@ -44,6 +44,7 @@ import {VideoControls} from './VideoControls/VideoControls';
 
 import {DefaultConversationRoleName} from '../../apiClient/conversation/conversationRole';
 import {Config} from '../../Config';
+import {minimizeSelfViewFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useActiveWindowMatchMedia} from '../../hooks/useActiveWindowMatchMedia';
 import {useToggleState} from '../../hooks/useToggleState';
 import {useApplicationContext} from '../../page/rootProvider';
@@ -141,7 +142,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: FullscreenVideoCallProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const selfParticipant = call.getSelfParticipant();
   const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesCamera']);
@@ -175,6 +176,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
   const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {BRAND_NAME: brandName, URL: configUrls} = Config.getConfig();
+  const isSelfViewMinimizationEnabled = isFeatureToggleEnabled(minimizeSelfViewFeatureToggleName);
   const callEncryptionSupportUrl = configUrls.SUPPORT.CALL_ENCRYPTION;
 
   const {selfUser, roles} = useKoSubscribableChildren(conversation, ['selfUser', 'roles']);
@@ -435,6 +437,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
                 : videoGrid
             }
             call={call}
+            allowSelfVideoMinimize={isSelfViewMinimizationEnabled}
             setMaximizedParticipant={participant => {
               return setMaximizedParticipant(call, participant);
             }}

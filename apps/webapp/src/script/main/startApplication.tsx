@@ -47,7 +47,10 @@ import {
 import {AppContainer} from '../components/appContainer/appContainer';
 import {Config} from '../Config';
 import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeStartupFeatureToggleUrl';
-import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
+import {
+  selectDefaultEnabledStartupFeatureToggleNames,
+  StartupFeatureToggleName,
+} from '../featureToggles/startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createBrowserLogDownload} from '../logger/createBrowserLogDownload';
 import {createBrowserLogZipArchive} from '../logger/createBrowserLogZipArchive';
@@ -71,9 +74,13 @@ import {exposeWrapperGlobals} from '../util/wrapper';
 export async function startApplication(
   defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[],
 ): Promise<void> {
+  const config = Config.getConfig();
   initializeStartupFeatureToggleUrl({
     url: new URL(window.location.href),
-    defaultEnabledFeatureToggleNames,
+    defaultEnabledFeatureToggleNames: selectDefaultEnabledStartupFeatureToggleNames({
+      appBaseUrl: config.APP_BASE,
+      defaultEnabledFeatureToggleNames,
+    }),
     replaceUrl(url) {
       window.history.replaceState(window.history.state, '', url);
     },
@@ -81,7 +88,6 @@ export async function startApplication(
 
   const clock = createClock();
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
-  const config = Config.getConfig();
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
   const downloadBrowserLogs = createBrowserLogDownload({
     startupFeatureToggles,

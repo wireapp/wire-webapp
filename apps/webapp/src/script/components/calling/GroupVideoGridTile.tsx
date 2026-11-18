@@ -32,6 +32,7 @@ import {
   groupVideoPauseOverlayLabel,
   groupVideoTileWrapper,
 } from './GroupVideoGridTile.styles';
+import {SelfPreviewControls} from './SelfPreviewControls';
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
@@ -52,6 +53,11 @@ interface GroupVideoGridTileProps {
   participant: Participant;
   participantCount: number;
   selfParticipant: Participant;
+  isSelfPreviewMinimized: boolean;
+  allowSelfPreviewMinimize: boolean;
+  minimizeSelfPreviewLabel: string;
+  restoreSelfPreviewLabel: string;
+  onToggleSelfPreviewMinimized: () => void;
 }
 
 const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
@@ -61,6 +67,11 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
   participantCount,
   isMaximized,
   onTileDoubleClick,
+  isSelfPreviewMinimized,
+  allowSelfPreviewMinimize,
+  minimizeSelfPreviewLabel,
+  restoreSelfPreviewLabel,
+  onToggleSelfPreviewMinimized,
 }: GroupVideoGridTileProps) => {
   const {translate} = useApplicationContext();
   const {
@@ -148,86 +159,167 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
       // minimized is passed only from CallingCell where we don't want to focus individual the tile on the tab press
       tabIndex={(!minimized || isMaximized) && !isSelfParticipant ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
       aria-label={`Focus video ${participant?.user.id}`}
+      css={
+        isSelfParticipant && isSelfPreviewMinimized
+          ? {
+              backgroundColor: 'transparent',
+              borderRadius: 0,
+              height: 40,
+              overflow: 'visible',
+              position: 'absolute',
+              right: 12,
+              top: 12,
+              width: 72,
+              zIndex: 3,
+            }
+          : undefined
+      }
     >
-      {hasActiveVideo ? (
-        <div className="tile-wrapper">
-          <Video
-            autoPlay
-            playsInline
-            /* This is needed to keep playing the video when detached to a new window,
+      <div
+        aria-hidden={isSelfParticipant && isSelfPreviewMinimized}
+        css={{
+          height: '100%',
+          visibility: isSelfParticipant && isSelfPreviewMinimized ? 'hidden' : 'visible',
+        }}
+      >
+        {hasActiveVideo ? (
+          <div className="tile-wrapper">
+            <Video
+              autoPlay
+              playsInline
+              /* This is needed to keep playing the video when detached to a new window,
                only muted video can be played automatically without user interacting with the window first,
                see https://developer.mozilla.org/en-US/docs/Web/Media/Autoplay_guide.
             */
-            muted
-            srcObject={processedVideoStream?.stream ?? videoStream}
-            className="group-video-grid__element-video"
-            css={getGroupVideoElementStyles(isMaximized || sharesScreen, isSelfParticipant && sharesCamera)}
-            onCanPlay={onVideoCanPlay}
-          />
-        </div>
-      ) : (
-        <div css={groupVideoTileWrapper}>
-          <Avatar
-            avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE}
-            participant={participant?.user}
-            hideAvailabilityStatus
-          />
-        </div>
-      )}
-
-      {showLoadingOverlay && (
-        <div
-          aria-busy={showLoadingOverlay}
-          css={groupVideoBackgroundInitializingOverlay}
-          data-uie-name="background-effect-initializing"
-        >
-          <Loading size={32} />
-        </div>
-      )}
-
-      <div css={groupVideoActiveSpeakerTile(isActivelySpeaking)} />
-
-      {!minimized && isMuted && (
-        <span className="group-video-grid__element__label__icon">
-          <Icon.MicOffIcon data-uie-name="mic-icon-off" data-uie-value={participant?.user.id} />
-        </span>
-      )}
-
-      {!minimized && handRaisedAt != null && <span className="group-video-grid__element__label__hand_icon">✋</span>}
-
-      {isMaximized && (
-        <div className="group-video-grid__element__overlay">
-          <span className="group-video-grid__element__overlay__label">
-            {translate('videoCallOverlayFitVideoLabelGoBack')}
-          </span>
-        </div>
-      )}
-
-      {!minimized && participantCount > 1 && (
-        <div className="group-video-grid__element__overlay">
-          <span className="group-video-grid__element__overlay__label">
-            {translate('videoCallOverlayFitVideoLabel')}
-          </span>
-        </div>
-      )}
-
-      {nameContainer}
-
-      {(hasPausedVideo || isSwitchingVideoResolution || doVideoReconnecting) && (
-        <div className="group-video-grid__pause-overlay">
-          <div className="background">
-            <div className="background-image"></div>
-            <div className="background-darken"></div>
+              muted
+              srcObject={processedVideoStream?.stream ?? videoStream}
+              className="group-video-grid__element-video"
+              css={getGroupVideoElementStyles(isMaximized || sharesScreen, isSelfParticipant && sharesCamera)}
+              onCanPlay={onVideoCanPlay}
+            />
           </div>
+        ) : (
+          <div css={groupVideoTileWrapper}>
+            <Avatar
+              avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE}
+              participant={participant?.user}
+              hideAvailabilityStatus
+            />
+          </div>
+        )}
 
+        {showLoadingOverlay && (
           <div
-            className="group-video-grid__pause-overlay__label"
-            css={groupVideoPauseOverlayLabel(minimized)}
-            data-uie-name="status-video-paused"
+            aria-busy={showLoadingOverlay}
+            css={groupVideoBackgroundInitializingOverlay}
+            data-uie-name="background-effect-initializing"
           >
-            {hasPausedVideo ? translate('videoCallPaused') : translate('videoCallParticipantConnecting')}
+            <Loading size={32} />
           </div>
-          {nameContainer}
+        )}
+
+        <div css={groupVideoActiveSpeakerTile(isActivelySpeaking)} />
+
+        {!minimized && isMuted && (
+          <span className="group-video-grid__element__label__icon">
+            <Icon.MicOffIcon data-uie-name="mic-icon-off" data-uie-value={participant?.user.id} />
+          </span>
+        )}
+
+        {!minimized && handRaisedAt != null && <span className="group-video-grid__element__label__hand_icon">✋</span>}
+
+        {isMaximized && (
+          <div className="group-video-grid__element__overlay">
+            <span className="group-video-grid__element__overlay__label">
+              {translate('videoCallOverlayFitVideoLabelGoBack')}
+            </span>
+          </div>
+        )}
+
+        {!minimized && participantCount > 1 && (
+          <div className="group-video-grid__element__overlay">
+            <span className="group-video-grid__element__overlay__label">
+              {translate('videoCallOverlayFitVideoLabel')}
+            </span>
+          </div>
+        )}
+
+        {nameContainer}
+
+        {(hasPausedVideo || isSwitchingVideoResolution || doVideoReconnecting) && (
+          <div className="group-video-grid__pause-overlay">
+            <div className="background">
+              <div className="background-image"></div>
+              <div className="background-darken"></div>
+            </div>
+
+            <div
+              className="group-video-grid__pause-overlay__label"
+              css={groupVideoPauseOverlayLabel(minimized)}
+              data-uie-name="status-video-paused"
+            >
+              {hasPausedVideo ? translate('videoCallPaused') : translate('videoCallParticipantConnecting')}
+            </div>
+            {nameContainer}
+          </div>
+        )}
+      </div>
+      {isSelfParticipant && allowSelfPreviewMinimize && (
+        <div
+          data-uie-name="self-video-preview-window-header"
+          css={{
+            backgroundColor: 'transparent',
+            border: 0,
+            boxShadow: 'none',
+            position: 'absolute',
+            right: 4,
+            top: 4,
+            zIndex: 2,
+          }}
+        >
+          {isSelfPreviewMinimized ? (
+            <SelfPreviewControls
+              isMuted={isMuted}
+              isHandRaised={handRaisedAt != null}
+              restoreLabel={restoreSelfPreviewLabel}
+              onRestore={onToggleSelfPreviewMinimized}
+            />
+          ) : (
+            <button
+              type="button"
+              aria-label={minimizeSelfPreviewLabel}
+              title={minimizeSelfPreviewLabel}
+              onClick={event => {
+                event.stopPropagation();
+                onToggleSelfPreviewMinimized();
+              }}
+              data-uie-name="minimize-self-video-preview"
+              css={{
+                alignItems: 'center',
+                backgroundColor: 'transparent',
+                border: 0,
+                borderRadius: 4,
+                color: 'var(--foreground)',
+                cursor: 'pointer',
+                display: 'flex',
+                height: 32,
+                justifyContent: 'center',
+                opacity: 0,
+                padding: 6,
+                width: 32,
+                transition: 'opacity 120ms ease-out',
+                '.group-video-grid__element:hover &, .group-video-grid__element:focus-within &': {opacity: 1},
+                '&:focus-visible': {
+                  outline: '2px solid var(--white)',
+                  outlineOffset: 2,
+                  opacity: 1,
+                },
+                '@media (hover: none)': {opacity: 1},
+              }}
+            >
+              <Icon.MinusIcon aria-hidden="true" />
+            </button>
+          )}
         </div>
       )}
     </div>

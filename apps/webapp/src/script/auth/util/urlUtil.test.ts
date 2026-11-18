@@ -19,7 +19,10 @@
 
 import {createAuthRedirectPath} from './urlUtil';
 
-import {forTestsOnlyFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {
+  forTestsOnlyFeatureToggleName,
+  minimizeSelfViewFeatureToggleName,
+} from '../../featureToggles/startupFeatureToggleNames';
 import {initializeStartupFeatureToggleUrl} from '../../featureToggles/initializeStartupFeatureToggleUrl';
 import {startupFeatureToggleQueryParameterName} from '../../featureToggles/startupFeatureToggles';
 import {FORWARDED_QUERY_KEYS, QUERY_KEY} from '../route';
@@ -119,7 +122,7 @@ describe('createAuthRedirectPath', () => {
   });
 
   const startupFeatureToggleQueryString = new URLSearchParams({
-    [startupFeatureToggleQueryParameterName]: forTestsOnlyFeatureToggleName,
+    [startupFeatureToggleQueryParameterName]: minimizeSelfViewFeatureToggleName,
   }).toString();
 
   it(
