@@ -273,16 +273,23 @@ describe('Desktop structured logging', () => {
         }
       });
       const {output, reportFailure} = createTestOutput(writeToDesktop);
-      for (const record of ['"first"', '"second"', '"third"', '"fourth"']) {
-        succeeding = record === '"third"';
-        output.write(record, 'info');
+      const batches = [['"first"', '"second"'], ['"third"'], ['"fourth"'], ['"fifth"']];
+      for (const [index, batch] of batches.entries()) {
+        succeeding = index === 2;
+        for (const record of batch) {
+          output.write(record, 'info');
+        }
         await output.flush();
       }
 
       const failure = response === 'busy' || response === 'rejected' ? response : 'failed';
       expect(reportFailure.mock.calls).toEqual([[failure], [failure]]);
-      expect(writeToDesktop.mock.calls).toEqual([[['"first"']], [['"second"']], [['"third"']], [['"fourth"']]]);
-      const expectedDroppedRecords = ['busy', 'rejected', 'failed'].includes(response) ? 3 : 0;
+      expect(writeToDesktop.mock.calls).toEqual(
+        batches.map(batch => {
+          return [batch];
+        }),
+      );
+      const expectedDroppedRecords = failure === 'failed' ? 0 : 4;
       expect(output.getStatistics()).toMatchObject({droppedRecords: expectedDroppedRecords, pendingBytes: 0});
     },
   );

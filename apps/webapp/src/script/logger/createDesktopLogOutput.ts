@@ -120,6 +120,11 @@ export function createDesktopLogOutput(
 
         reportFailureOnce(reply);
 
+        // Desktop can report failure after appending the batch if post-write maintenance fails.
+        if (reply === 'failed') {
+          return;
+        }
+
         return 'dropped';
       },
       Err(failure) {
