@@ -1345,7 +1345,7 @@ describe('CellsTable selection', () => {
   });
 
   it.each([THEME_ID.LIGHT, THEME_ID.DARK])(
-    'keeps unrelated Bin items selectable during a permanent-delete request in %s',
+    'blocks Bin selection and Restore during a permanent-delete request in %s',
     async themeId => {
       const originalHash = window.location.hash;
       window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
@@ -1368,10 +1368,10 @@ describe('CellsTable selection', () => {
         await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
         expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeChecked();
-        expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeEnabled();
-        await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
-        expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeChecked();
-        expect(screen.getByRole('button', {name: 'Delete permanently'})).toBeDisabled();
+        expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeDisabled();
+        expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeDisabled();
+        expect(screen.getByRole('checkbox', {name: 'Select all items on this page'})).toBeDisabled();
+        expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
         expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
 
         await act(async () => {
@@ -1380,15 +1380,15 @@ describe('CellsTable selection', () => {
         });
 
         expect(onRefresh).toHaveBeenCalledTimes(1);
-        expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeChecked();
-        expect(screen.getByRole('button', {name: 'Delete permanently'})).toBeEnabled();
+        expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeEnabled();
+        expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
       } finally {
         window.location.hash = originalHash;
       }
     },
   );
 
-  it('keeps unrelated Bin items selectable while a permanent-delete job is reconciling', async () => {
+  it('blocks Bin selection while a permanent-delete job is reconciling', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
     const user = userEvent.setup();
@@ -1412,10 +1412,9 @@ describe('CellsTable selection', () => {
         expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
       });
       expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeChecked();
-      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
       expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeDisabled();
-      await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
-      expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeChecked();
+      expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeDisabled();
+      expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
     } finally {
       window.location.hash = originalHash;
@@ -4573,7 +4572,7 @@ describe('CellsTable restoring selected Bin items', () => {
   });
 
   it.each([THEME_ID.LIGHT, THEME_ID.DARK])(
-    'lets another Bin item be selected and deleted while restore runs in %s mode',
+    'blocks Bin selection and permanent Delete while Restore runs in %s mode',
     async themeId => {
       const user = userEvent.setup();
       let resolveRestore: (response: {Status: string}) => void = noop;
@@ -4582,11 +4581,7 @@ describe('CellsTable restoring selected Bin items', () => {
           resolveRestore = resolve;
         }),
       );
-      const deleteNodes = jest.fn().mockReturnValue(
-        new Promise(() => {
-          return undefined;
-        }),
-      );
+      const deleteNodes = jest.fn();
       const repository = createRepository({restoreNodes, deleteNodes});
       renderCellsTable({
         cellsRepository: repository,
@@ -4601,18 +4596,16 @@ describe('CellsTable restoring selected Bin items', () => {
 
       expect(screen.getByRole('checkbox', {name: 'Select a.txt'})).toBeDisabled();
       expect(screen.getByRole('checkbox', {name: 'Select b.txt'})).toBeDisabled();
-      const remainingCheckbox = screen.getByRole('checkbox', {name: 'Select c.txt'});
-      expect(remainingCheckbox).toBeEnabled();
-      await user.click(remainingCheckbox);
-      expect(screen.getByText('1 selected')).toBeInTheDocument();
-      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
-      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
-      expect(deleteNodes).toHaveBeenCalledWith({uuids: ['c.txt-id'], permanently: true});
+      expect(screen.getByRole('checkbox', {name: 'Select c.txt'})).toBeDisabled();
+      expect(screen.getByRole('checkbox', {name: 'Select all items on this page'})).toBeDisabled();
+      expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
+      expect(deleteNodes).not.toHaveBeenCalled();
 
       await act(async () => {
         resolveRestore({Status: 'Performed'});
       });
-      expect(screen.getByRole('checkbox', {name: 'Select c.txt'})).toBeChecked();
+      expect(screen.getByRole('checkbox', {name: 'Select c.txt'})).toBeEnabled();
+      expect(screen.queryByText('2 selected')).not.toBeInTheDocument();
     },
   );
 
