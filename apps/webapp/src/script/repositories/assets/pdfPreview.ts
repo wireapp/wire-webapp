@@ -34,6 +34,7 @@ const maxPreviewDimension = 640;
 const maxPreviewSize = 1_048_576;
 const previewTimeout = 5000;
 const maxPdfHeaderSize = 1024;
+const standardFontDataUrl = '/min/pdfjs/standard_fonts/';
 
 type PdfJs = Pick<typeof import('react-pdf').pdfjs, 'getDocument'>;
 
@@ -94,7 +95,12 @@ export async function createPdfPreview(
       return undefined;
     }
 
-    loadingTask = getDocument({data: new Uint8Array(buffer), isEvalSupported: false});
+    loadingTask = getDocument({
+      data: new Uint8Array(buffer),
+      isEvalSupported: false,
+      standardFontDataUrl,
+      useSystemFonts: false,
+    });
     const document = await loadingTask.promise;
     if (canceled) {
       return undefined;
