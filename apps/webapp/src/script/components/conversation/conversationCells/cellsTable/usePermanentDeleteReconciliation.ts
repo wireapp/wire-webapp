@@ -65,6 +65,7 @@ export interface UsePermanentDeleteReconciliationOptions {
   readonly onRefreshAndReportSuccess: () => Promise<boolean>;
   readonly onDeleteCompleted: (nodeIds: readonly string[]) => void;
   readonly onReconciliationCompleted: (nodeIds: readonly string[]) => void;
+  readonly onReviewResolved: () => void;
   readonly reportError: (error: unknown) => void;
   readonly onContinueAfterViewLeave: (continuation: PermanentDeleteContinuation) => void;
 }
@@ -85,6 +86,7 @@ export interface PermanentDeleteReconciliationState {
     status: SharedDriveMoveStatus,
   ) => Promise<void>;
   readonly refreshReview: () => Promise<void>;
+  readonly resumeReview: (status: SharedDriveMoveStatus, scopeKey: string, path: string) => void;
   readonly cancel: () => void;
   readonly clearRejection: () => void;
   readonly reset: () => void;
@@ -442,6 +444,21 @@ export const usePermanentDeleteReconciliation = (
         return;
       }
 
+      if (
+        context.status.kind === 'request-failed' ||
+        context.status.kind === 'failed' ||
+        context.status.kind === 'partial' ||
+        context.status.kind === 'finished-unknown'
+      ) {
+        invalidateWork(generation);
+        activeContextRef.current = null;
+        isUnresolvedRef.current = false;
+        setIsUnresolved(false);
+        updateReviewReason(null);
+        optionsRef.current.onReviewResolved();
+        return;
+      }
+
       updateReviewReason(reviewReasonRef.current === 'job-failed' ? 'job-failed' : 'still-visible');
       setIsWaitingForReconciliation(true);
     } finally {
@@ -478,8 +495,27 @@ export const usePermanentDeleteReconciliation = (
     updateReviewReason(null);
   };
 
-  const actionsRef = useRef({deletePermanently, refreshReview, cancel, clearRejection, reset});
-  actionsRef.current = {deletePermanently, refreshReview, cancel, clearRejection, reset};
+  const resumeReview = (status: SharedDriveMoveStatus, scopeKey: string, path: string): void => {
+    if (activeContextRef.current !== null || isUnresolvedRef.current) {
+      return;
+    }
+    activeContextRef.current = {
+      status,
+      nodeIds: status.items.map(item => {
+        return item.id;
+      }),
+      scopeKey,
+      path,
+      jobUuids: [],
+      hasKnownJobFailure: status.kind === 'failed' || status.kind === 'partial',
+    };
+    isUnresolvedRef.current = true;
+    setIsUnresolved(true);
+    updateReviewReason(status.kind === 'failed' || status.kind === 'partial' ? 'job-failed' : 'timed-out');
+  };
+
+  const actionsRef = useRef({deletePermanently, refreshReview, resumeReview, cancel, clearRejection, reset});
+  actionsRef.current = {deletePermanently, refreshReview, resumeReview, cancel, clearRejection, reset};
   const stableDeletePermanently = useCallback(
     (nodeIds: readonly string[], scopeKey: string, path: string, status: SharedDriveMoveStatus) => {
       return actionsRef.current.deletePermanently(nodeIds, scopeKey, path, status);
@@ -488,6 +524,9 @@ export const usePermanentDeleteReconciliation = (
   );
   const stableRefreshReview = useCallback(() => {
     return actionsRef.current.refreshReview();
+  }, []);
+  const stableResumeReview = useCallback((status: SharedDriveMoveStatus, scopeKey: string, path: string): void => {
+    actionsRef.current.resumeReview(status, scopeKey, path);
   }, []);
   const stableCancel = useCallback(() => {
     actionsRef.current.cancel();
@@ -547,6 +586,7 @@ export const usePermanentDeleteReconciliation = (
     reviewReason,
     deletePermanently: stableDeletePermanently,
     refreshReview: stableRefreshReview,
+    resumeReview: stableResumeReview,
     cancel: stableCancel,
     clearRejection: stableClearRejection,
     reset: stableReset,
