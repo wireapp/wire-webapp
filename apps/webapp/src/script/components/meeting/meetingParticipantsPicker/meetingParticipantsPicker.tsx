@@ -17,7 +17,7 @@
  *
  */
 
-import {useId, type FunctionComponent} from 'react';
+import {type FunctionComponent, useId} from 'react';
 
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {Button, Popover} from 'react-aria-components';
@@ -65,7 +65,6 @@ export interface MeetingParticipantsPickerProps {
   users: User[];
   selectedUsers: User[];
   invitedEmails?: string[];
-  isFederated?: boolean;
   onInvitedEmailsChange?: (emails: string[]) => void;
   onSelectedUsersChange: (users: User[]) => void;
   filter: string;
@@ -91,7 +90,6 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
   users,
   selectedUsers,
   invitedEmails,
-  isFederated = false,
   onInvitedEmailsChange,
   onSelectedUsersChange,
   filter,
@@ -257,14 +255,14 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
               isSelectable
               onUpdateSelectedUsers={handleSelectedUsersChange}
               searchRepository={searchRepository}
+              isAllowedRemoteUser={isAllowedMeetingParticipant}
               teamRepository={teamRepository}
               conversationRepository={conversationRepository}
               conversationState={conversationState}
               teamState={teamState}
               noUnderline={noUnderline}
-              allowRemoteSearch={isUndefined(onInvitedEmailsChange) || isFederated || !isValidEmail(filter.trim())}
-              filterRemoteTeamUsers={!isFederated}
-              includeFederatedSearchResults={isFederated}
+              allowRemoteSearch={isUndefined(onInvitedEmailsChange) || !isValidEmail(filter.trim())}
+              filterRemoteTeamUsers
               showAllProvidedUsers
               hideEmptyState={matchingConversations.length > 0}
               showSelectedUsersRegardlessOfFilter
