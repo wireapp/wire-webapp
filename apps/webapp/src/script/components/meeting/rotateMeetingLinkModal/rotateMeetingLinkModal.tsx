@@ -31,7 +31,7 @@ import {handleEscDown} from '../../../util/keyboardUtil';
 import {getLogger} from '../../../util/logger';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
 import {ModalComponent} from '../../Modals/ModalComponent';
-import {showMeetingLinkConfirmation} from '../meetingLinkConfirmation/meetingLinkConfirmation';
+import {showMeetingLinkConfirmation} from '../meetingLink/meetingLink';
 import {useMeetingStore} from '../meetingStore/meetingStoreProvider';
 import {rotateMeetingLinkErrors} from '../meetingStore/rotateMeetingLinkErrors';
 import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';

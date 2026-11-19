@@ -24,16 +24,19 @@ import {ThemeProvider} from '../../../uiKit';
 
 import {translateForTest} from '../../../util/test/translateForTest';
 
-import {MeetingLinkConfirmationMessage} from './meetingLinkConfirmation';
+import {MeetingLink} from './meetingLink';
+import {meetingLinkModalFooterStyles} from './meetingLink.styles';
 
-describe('MeetingLinkConfirmationMessage', () => {
+describe('MeetingLink in the confirmation modal', () => {
   it('shows the existing copy-to-clipboard action', () => {
     render(
       <ThemeProvider>
-        <MeetingLinkConfirmationMessage
+        <MeetingLink
           link="https://wire.example/meeting-link"
           hasPassword={false}
           translate={translateForTest}
+          footerStyles={meetingLinkModalFooterStyles}
+          showCancel
         />
       </ThemeProvider>,
     );
@@ -56,20 +59,24 @@ describe('MeetingLinkConfirmationMessage', () => {
   it('shows the correct guidance for both password states', () => {
     const {rerender} = render(
       <ThemeProvider>
-        <MeetingLinkConfirmationMessage
+        <MeetingLink
           link="https://wire.example/meeting-link"
           hasPassword={false}
           translate={translateForTest}
+          footerStyles={meetingLinkModalFooterStyles}
+          showCancel
         />
       </ThemeProvider>,
     );
     expect(screen.getByRole('note')).toHaveTextContent('meetings.meetingLink.passwordUnprotected');
     rerender(
       <ThemeProvider>
-        <MeetingLinkConfirmationMessage
+        <MeetingLink
           link="https://wire.example/meeting-link"
           hasPassword
           translate={translateForTest}
+          footerStyles={meetingLinkModalFooterStyles}
+          showCancel
         />
       </ThemeProvider>,
     );
