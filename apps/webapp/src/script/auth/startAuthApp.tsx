@@ -37,6 +37,7 @@ import {Root} from './page/root';
 
 import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
 import {initializeDesktopLogOutput} from '../browser/initializeDesktopLogOutput';
+import {initializeRuntimeErrorDiagnostics} from '../browser/initializeRuntimeErrorDiagnostics';
 import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
 import {resolveStartupLoggingPolicy} from '../browser/resolveStartupLoggingPolicy';
 import {Runtime} from '../commons/util/Runtime';
@@ -126,6 +127,7 @@ export const startAuthApp = (support: CoreCryptoSupport): void => {
       });
     },
   });
+  initializeRuntimeErrorDiagnostics(window);
   logStartupRuntimeIdentity({
     clock,
     consoleOutput: console,

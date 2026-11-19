@@ -298,6 +298,54 @@ test('persists sanitized browser logs with console disabled across application r
     expect(await page.locator('html').getAttribute('data-unexpected-log-storage-access')).toBeNull();
     expect(consoleRecords).toEqual([]);
 
+    await page.evaluate(() => {
+      window.setTimeout(() => {
+        throw new TypeError('Bearer synthetic-runtime-canary');
+      }, 0);
+      void Promise.reject({privateValue: 'synthetic-rejection-canary'});
+      const script = new Blob(["console.error('synthetic-worker-console-canary'); postMessage(null);"], {
+        type: 'application/javascript',
+      });
+      const scriptUrl = URL.createObjectURL(script);
+      const worker = new Worker(scriptUrl);
+      worker.addEventListener(
+        'message',
+        () => {
+          worker.terminate();
+          URL.revokeObjectURL(scriptUrl);
+        },
+        {once: true},
+      );
+    });
+    await expect
+      .poll(async () => {
+        return (await readBrowserLogFiles(page))
+          .map(file => {
+            return file.contents;
+          })
+          .join('');
+      })
+      .toContain('Unhandled promise rejection');
+    const runtimeFiles = await readBrowserLogFiles(page);
+    const runtimeLines = runtimeFiles.flatMap(file => {
+      return file.contents.trimEnd().split('\n');
+    });
+    expect(
+      runtimeLines
+        .filter(line => {
+          return line.includes('"component":"@wireapp/webapp/RuntimeErrors"');
+        })
+        .map(line => {
+          return JSON.parse(line);
+        }),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({level: 50, msg: 'Uncaught JavaScript error', errorName: 'TypeError'}),
+        expect.objectContaining({level: 50, msg: 'Unhandled promise rejection', reasonType: 'object'}),
+      ]),
+    );
+    expect(runtimeLines.join('\n')).not.toMatch(/synthetic-(runtime|rejection)-canary/);
+
     await page.reload();
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
     expect(new URL(page.url()).searchParams.get('debugLogging')).toBe('-*');
@@ -310,7 +358,7 @@ test('persists sanitized browser logs with console disabled across application r
     secondSessionFiles.forEach(file => {
       ownedFilenames.add(file.name);
     });
-    for (const file of firstSessionFiles) {
+    for (const file of runtimeFiles) {
       expect(secondSessionFiles).toContainEqual(file);
     }
 

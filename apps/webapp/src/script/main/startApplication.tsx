@@ -42,6 +42,7 @@ import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {AppContainer} from '../components/appContainer/appContainer';
 import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
 import {initializeDesktopLogOutput} from '../browser/initializeDesktopLogOutput';
+import {initializeRuntimeErrorDiagnostics} from '../browser/initializeRuntimeErrorDiagnostics';
 import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
 import {resolveStartupLoggingPolicy} from '../browser/resolveStartupLoggingPolicy';
 import {Config} from '../Config';
@@ -148,6 +149,7 @@ export async function startApplication(
       });
     },
   });
+  initializeRuntimeErrorDiagnostics(window);
   const runtimeIdentity = {
     logger: getLogger('RuntimeIdentity'),
     deploymentStage: loggingPolicy.deploymentStage,
