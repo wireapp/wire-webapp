@@ -23,6 +23,7 @@ import {Document, Page} from 'react-pdf';
 
 import {controlsStyles, pageStyles, pageStatusStyles, viewerStyles} from './chatPdfViewer.styles';
 
+import {useElementSize} from '../../../../../../hooks/useElementSize/useElementSize';
 import {useApplicationContext} from '../../../../../../page/rootProvider';
 
 interface ChatPdfViewerProps {
@@ -37,9 +38,14 @@ export const ChatPdfViewer: FunctionComponent<ChatPdfViewerProps> = ({src}: Chat
   const {translate} = useApplicationContext();
   const [pagesCount, setPagesCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageNaturalWidth, setPageNaturalWidth] = useState<number>();
+  const {ref: viewerRef, width: viewerWidth} = useElementSize<HTMLDivElement>();
+  const availableWidth = viewerWidth - 32;
+  const pageWidth =
+    pageNaturalWidth === undefined || availableWidth <= 0 ? undefined : Math.min(pageNaturalWidth, availableWidth);
 
   return (
-    <div css={viewerStyles}>
+    <div ref={viewerRef} css={viewerStyles}>
       <Document
         file={src}
         options={pdfOptions}
@@ -68,10 +74,13 @@ export const ChatPdfViewer: FunctionComponent<ChatPdfViewerProps> = ({src}: Chat
         <div css={pageStyles}>
           <Page
             pageNumber={currentPage}
-            scale={1}
+            width={pageWidth}
             loading={null}
             renderTextLayer={false}
             renderAnnotationLayer={false}
+            onLoadSuccess={page => {
+              setPageNaturalWidth(page.getViewport({scale: 1}).width);
+            }}
           />
         </div>
         <div css={controlsStyles}>
