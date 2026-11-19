@@ -82,20 +82,20 @@ describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
     expect(startupFeatureToggleNames).toEqual(expect.arrayContaining(previewDefaultEnabledStartupFeatureToggleNames));
   });
 
-  it('enables Drive bulk restore by default in preview builds', () => {
+  it('keeps Drive bulk restore disabled by default in preview builds', () => {
     expect(startupFeatureToggleRegistry).toContainEqual({
       name: driveBulkRestoreFeatureToggleName,
-      previewDefaultEnabled: true,
-    });
-    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(driveBulkRestoreFeatureToggleName);
-  });
-
-  it('keeps Drive bulk action progress persistence disabled by default in preview builds', () => {
-    expect(startupFeatureToggleRegistry).toContainEqual({
-      name: driveBulkActionProgressFeatureToggleName,
       previewDefaultEnabled: false,
     });
-    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(driveBulkActionProgressFeatureToggleName);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(driveBulkRestoreFeatureToggleName);
+  });
+
+  it('enables Drive bulk action progress persistence by default in preview builds', () => {
+    expect(startupFeatureToggleRegistry).toContainEqual({
+      name: driveBulkActionProgressFeatureToggleName,
+      previewDefaultEnabled: true,
+    });
+    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(driveBulkActionProgressFeatureToggleName);
   });
 
   it('keeps the test-only flag explicitly opted out of preview defaults', () => {
