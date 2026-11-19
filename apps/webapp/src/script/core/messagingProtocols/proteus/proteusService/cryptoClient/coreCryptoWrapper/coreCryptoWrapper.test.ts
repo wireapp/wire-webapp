@@ -18,12 +18,50 @@
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {deleteDB, openDB} from 'idb';
+import {Maybe} from 'true-myth';
 
 import type {CoreCrypto, Database, DatabaseKey} from '@wireapp/core-crypto';
 
+import {configureLogging} from '../../../../../../logger/getLogger';
 import type {CRUDEngine} from '../../../../../storage/engine/crudEngine';
 
-import {buildClient, getCoreCryptoDbName, wipeCoreCryptoDb} from './coreCryptoWrapper';
+import {buildClient, coreCryptoLogger, getCoreCryptoDbName, wipeCoreCryptoDb} from './coreCryptoWrapper';
+
+describe('CoreCryptoWrapper logging', () => {
+  it('serializes CoreCrypto messages as strings and context as metadata at the mapped severity', () => {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 1_000_000n});
+    const serializedRecords: string[] = [];
+    configureLogging(
+      Maybe.just({
+        clock,
+        namespaces: Maybe.just('*'),
+        output() {},
+        persistenceOutput: Maybe.just(line => {
+          serializedRecords.push(line);
+        }),
+      }),
+    );
+    try {
+      coreCryptoLogger.log(3, 'Inspecting crypto state', undefined);
+      coreCryptoLogger.log(4, 'Opened crypto store', 'database');
+      coreCryptoLogger.log(5, 'Crypto warning', 'crypto');
+      coreCryptoLogger.log(6, 'Crypto operation failed', undefined);
+    } finally {
+      configureLogging(Maybe.nothing());
+    }
+
+    const actualRecords = serializedRecords.map(line => {
+      return JSON.parse(line);
+    });
+    const expectedComponent = '@wireapp/core/CoreCryptoWrapper';
+    expect(actualRecords).toEqual([
+      {level: 20, time: 1000, component: expectedComponent, msg: 'Inspecting crypto state'},
+      {level: 30, time: 1000, component: expectedComponent, msg: 'Opened crypto store', context: 'database'},
+      {level: 40, time: 1000, component: expectedComponent, msg: 'Crypto warning', context: 'crypto'},
+      {level: 50, time: 1000, component: expectedComponent, msg: 'Crypto operation failed'},
+    ]);
+  });
+});
 
 describe('CoreCryptoWrapper initialization', () => {
   const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});

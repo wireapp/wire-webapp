@@ -282,6 +282,8 @@ describe('Desktop structured logging', () => {
       const failure = response === 'busy' || response === 'rejected' ? response : 'failed';
       expect(reportFailure.mock.calls).toEqual([[failure], [failure]]);
       expect(writeToDesktop.mock.calls).toEqual([[['"first"']], [['"second"']], [['"third"']], [['"fourth"']]]);
+      const expectedDroppedRecords = ['busy', 'rejected', 'failed'].includes(response) ? 3 : 0;
+      expect(output.getStatistics()).toMatchObject({droppedRecords: expectedDroppedRecords, pendingBytes: 0});
     },
   );
 
