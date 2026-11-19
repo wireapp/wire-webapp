@@ -19,7 +19,7 @@
 
 import type {CSSObject} from '@emotion/react';
 
-export const meetingLinkConfirmationStyles: CSSObject = {
+export const meetingLinkModalFooterStyles: CSSObject = {
   display: 'flex',
   gap: '8px',
   justifyContent: 'flex-end',
@@ -27,7 +27,7 @@ export const meetingLinkConfirmationStyles: CSSObject = {
   marginBottom: '-50px',
 };
 
-export const meetingLinkConfirmationInputStyles: CSSObject = {
+export const meetingLinkInputStyles: CSSObject = {
   marginTop: '16px',
   padding: '12px 16px',
   border: '1px solid var(--border-color)',
@@ -36,7 +36,7 @@ export const meetingLinkConfirmationInputStyles: CSSObject = {
   userSelect: 'text',
 };
 
-export const meetingLinkConfirmationStatusStyles: CSSObject = {
+export const meetingLinkStatusStyles: CSSObject = {
   alignItems: 'center',
   display: 'flex',
   gap: '4px',

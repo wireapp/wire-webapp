@@ -19,15 +19,24 @@
 
 import {JSX} from 'react';
 
-import {
-  meetingLinkConfirmationInputStyles,
-  meetingLinkConfirmationStatusStyles,
-  meetingLinkConfirmationStyles,
-} from './meetingLinkConfirmation.styles';
+import type {CSSObject} from '@emotion/react';
+import {isUndefined} from '@sindresorhus/is';
+
+import {meetingLinkInputStyles, meetingLinkStatusStyles} from './meetingLink.styles';
 
 import {Button, ButtonVariant, ShieldIcon} from '../../../uiKit';
 import type {Translate} from '../../../util/localizerUtil/translationTypes';
 import {CopyToClipboardButton} from '../../copyToClipboardButton';
+
+type MeetingLinkProps = {
+  link: string;
+  hasPassword: boolean;
+  translate: Translate;
+  footerStyles: CSSObject;
+  descriptionId?: string;
+  showCancel?: boolean;
+  onClose?: () => void;
+};
 
 export type ShowMeetingLinkConfirmationParams = {
   link: string;
@@ -42,35 +51,31 @@ export type MeetingLinkConfirmationSession = {
   onClosed: () => void;
 };
 
-type MeetingLinkConfirmationMessageProps = {
-  link: string;
-  hasPassword: boolean;
-  translate: Translate;
-  onClose?: () => void;
-};
-
-export const MeetingLinkConfirmationMessage = ({
+export const MeetingLink = ({
   link,
   hasPassword,
   translate,
+  footerStyles,
+  descriptionId = 'meeting-link-description',
+  showCancel = false,
   onClose,
-}: MeetingLinkConfirmationMessageProps): JSX.Element => {
+}: MeetingLinkProps): JSX.Element => {
   return (
     <>
-      <p id="meeting-link-description" className="meeting-link-confirmation">
+      <p id={descriptionId} className="meeting-link-confirmation">
         {translate('meetings.meetingLink.description')}
       </p>
       <div
         role="textbox"
         aria-label={translate('meetings.meetingLink.title')}
-        aria-describedby="meeting-link-description"
+        aria-describedby={descriptionId}
         aria-readonly="true"
         tabIndex={0}
-        css={meetingLinkConfirmationInputStyles}
+        css={meetingLinkInputStyles}
       >
         {link}
       </div>
-      <p css={meetingLinkConfirmationStatusStyles} role="note">
+      <p css={meetingLinkStatusStyles} role="note">
         {hasPassword ? (
           <>
             <ShieldIcon aria-hidden="true" /> {translate('meetings.meetingLink.passwordProtected')}
@@ -79,22 +84,18 @@ export const MeetingLinkConfirmationMessage = ({
           translate('meetings.meetingLink.passwordUnprotected')
         )}
       </p>
-      <footer css={meetingLinkConfirmationStyles}>
+      <footer css={footerStyles}>
         <CopyToClipboardButton
           textToCopy={link}
           displayText={translate('meetings.meetingLink.copyLink')}
           copySuccessText={translate('meetings.meetingLink.copyLinkDone')}
           variant={ButtonVariant.PRIMARY}
         />
-        <Button
-          type="button"
-          variant={ButtonVariant.SECONDARY}
-          onClick={() => {
-            onClose?.();
-          }}
-        >
-          {translate('meetings.meetingLink.cancel')}
-        </Button>
+        {showCancel && (
+          <Button type="button" variant={ButtonVariant.SECONDARY} onClick={onClose}>
+            {translate('meetings.meetingLink.cancel')}
+          </Button>
+        )}
       </footer>
     </>
   );
@@ -109,7 +110,7 @@ export const registerMeetingLinkConfirmationHandler = (
 };
 
 export const showMeetingLinkConfirmation = (params: ShowMeetingLinkConfirmationParams): void => {
-  if (showMeetingLinkConfirmationHandler === undefined) {
+  if (isUndefined(showMeetingLinkConfirmationHandler)) {
     throw new Error('Meeting link confirmation has not been initialized');
   }
   showMeetingLinkConfirmationHandler(params);

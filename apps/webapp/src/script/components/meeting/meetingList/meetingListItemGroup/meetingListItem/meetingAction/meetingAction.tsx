@@ -29,7 +29,7 @@ import type {User} from '../../../../../../repositories/entity/User';
 import {showContextMenu} from '../../../../../../ui/contextMenu';
 import {MoreIcon} from '../../../../../../uiKit/dataDisplay/icon/moreIcon';
 import {IconButton} from '../../../../../../uiKit/inputs/iconButton/iconButton';
-import {showMeetingLinkConfirmation} from '../../../../meetingLinkConfirmation/meetingLinkConfirmation';
+import {showMeetingLinkConfirmation} from '../../../../meetingLink/meetingLink';
 import {openRotateMeetingLink} from '../../../../rotateMeetingLinkModal/rotateMeetingLinkController';
 import type {MeetingInstance} from '../../../../types/meetingInstance';
 import {useDeleteMeeting} from '../../../../useDeleteMeeting';
