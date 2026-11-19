@@ -132,10 +132,13 @@ describe('createSharedDriveBackgroundActionController', () => {
       observed = options;
       return jest.fn();
     });
+    const moveToBinStatus = {...status, id: 'move-to-bin'};
+    controller.register(moveToBinStatus);
+    controller.setJobUuids(moveToBinStatus.id, ['delete-job']);
 
     controller.start({
       actionName: 'delete',
-      status: {...status, id: 'move-to-bin'},
+      status: moveToBinStatus,
       jobUuids: ['delete-job'],
       cellsRepository: {getBackgroundActionInfo: jest.fn()},
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
@@ -147,6 +150,6 @@ describe('createSharedDriveBackgroundActionController', () => {
 
     expect(observed?.actionName).toBe('delete');
     observed?.onOutcome('all-finished');
-    expect(publishStatus).toHaveBeenLastCalledWith({...status, id: 'move-to-bin', kind: 'completed'});
+    expect(publishStatus).toHaveBeenLastCalledWith({...moveToBinStatus, kind: 'completed'});
   });
 });
