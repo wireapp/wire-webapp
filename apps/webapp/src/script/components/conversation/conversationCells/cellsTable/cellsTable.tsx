@@ -75,7 +75,7 @@ import {
 import {getPermanentDeleteStatusKind} from './getPermanentDeleteStatusKind';
 import {resolveRestoreTargets} from './restoreBinSelection/resolveRestoreTargets';
 import {showBulkRestoreModal} from './restoreBinSelection/showBulkRestoreModal';
-import {useBulkRestore} from './restoreBinSelection/useBulkRestore';
+import {useBulkRestore, type BulkRestoreReviewReason} from './restoreBinSelection/useBulkRestore';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
@@ -258,6 +258,7 @@ export const CellsTable = ({
   const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
   const {
     updateMoveStatus: publishMoveStatus,
+    getMoveStatus,
     startMoveStatus: publishMoveStart,
     isMoveStatusCurrent,
     getMoveOperation,
@@ -268,6 +269,19 @@ export const CellsTable = ({
     requestEmptyBinRefresh,
   } = useSharedDriveUploadStatus();
   const currentConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
+  const currentRestoreStatus = getMoveStatus(currentConversationQualifiedId);
+  const restoreReviewReasonByStatus: Readonly<Partial<Record<SharedDriveMoveStatusKind, BulkRestoreReviewReason>>> = {
+    'request-failed': 'request-failed',
+    partial: 'partial',
+    failed: 'failed',
+    'status-unknown': 'status-unknown',
+    'finished-unknown': 'refresh-failed',
+  };
+  const restoreReviewReason =
+    maybe.isJust(currentRestoreStatus) && currentRestoreStatus.value.action === 'restore'
+      ? restoreReviewReasonByStatus[currentRestoreStatus.value.kind]
+      : undefined;
+  const attachedRestoreStatusId = useRef<Maybe<string>>(Maybe.nothing());
   const updateMoveStatus = useCallback(
     (status: Omit<SharedDriveMoveStatus, 'conversationQualifiedId'>): void => {
       const operation = getMoveOperation(status.id);
@@ -429,6 +443,9 @@ export const CellsTable = ({
     },
     onStatusChange: restoreStatusReporter.report,
     onStatusCleared: restoreStatusReporter.clear,
+    observeBackgroundAction,
+    setBackgroundActionJobUuids: setMoveJobUuids,
+    publishStatus: publishMoveStatus,
     reportError: error => {
       console.error(error);
     },
@@ -439,7 +456,12 @@ export const CellsTable = ({
     setPermanentDeleteReviewing(isPermanentDeleteRefreshingReview);
   }, [isPermanentDeleteRefreshingReview, setPermanentDeleteReviewing]);
   const setRestoreReviewing = restoreStatusReporter.setReviewing;
-  const {isRefreshingReview: isRestoreRefreshingReview} = bulkRestore;
+  const {
+    isRefreshingReview: isRestoreRefreshingReview,
+    reviewReason: restoreReviewReasonFromHook,
+    resumeReview,
+  } = bulkRestore;
+  const {attachReviewStatus} = restoreStatusReporter;
   useEffect(() => {
     setRestoreReviewing(isRestoreRefreshingReview);
   }, [isRestoreRefreshingReview, setRestoreReviewing]);
@@ -515,6 +537,29 @@ export const CellsTable = ({
     resetPermanentDeleteReconciliation,
     selectionScopeKey,
     isSelectionEnabled,
+  ]);
+
+  useEffect(() => {
+    if (!isInRecycleBin() || restoreReviewReason === undefined || maybe.isNothing(currentRestoreStatus)) {
+      return;
+    }
+    if (restoreReviewReasonFromHook === null) {
+      resumeReview(restoreReviewReason);
+    }
+    if (
+      maybe.isNothing(attachedRestoreStatusId.current) ||
+      attachedRestoreStatusId.current.value !== currentRestoreStatus.value.id
+    ) {
+      attachedRestoreStatusId.current = Maybe.just(currentRestoreStatus.value.id);
+      attachReviewStatus(currentRestoreStatus.value);
+    }
+  }, [
+    attachReviewStatus,
+    currentRestoreStatus,
+    restoreReviewReason,
+    restoreReviewReasonFromHook,
+    resumeReview,
+    selectionScopeKey,
   ]);
 
   useEffect(() => {
@@ -760,12 +805,12 @@ export const CellsTable = ({
       return;
     }
 
-    restoreStatusReporter.start(
+    const status = restoreStatusReporter.start(
       currentSelectedNodes.map(node => {
         return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
       }),
     );
-    void bulkRestore.restore(currentResolution.targets, scopeKey);
+    void bulkRestore.restore(currentResolution.targets, scopeKey, status);
   };
 
   const handlePermanentDelete = async (nodeIds: string[], scopeKey: string, path: string): Promise<void> => {
@@ -821,7 +866,8 @@ export const CellsTable = ({
     !isBulkMoveToBinNeedsReview &&
     !isBulkMoveToBinPending &&
     !bulkRestore.isPending &&
-    bulkRestore.reviewReason === null;
+    bulkRestore.reviewReason === null &&
+    restoreReviewReason === undefined;
 
   const table = useReactTable({
     data: nodes,
@@ -855,7 +901,8 @@ export const CellsTable = ({
   const selectedFilesTotalSize =
     selectedNodes.length === selectedNodeIds.size ? getSelectedFilesTotalSize(selectedNodes) : Maybe.nothing();
   const restoreResolution = resolveRestoreTargets({selectedNodes});
-  const isBulkRestoreBlocking = bulkRestore.isPending || bulkRestore.reviewReason !== null;
+  const isBulkRestoreBlocking =
+    bulkRestore.isPending || bulkRestore.reviewReason !== null || restoreReviewReason !== undefined;
   const canRestoreSelection =
     isBulkRestoreEnabled &&
     selectedNodes.length > 0 &&

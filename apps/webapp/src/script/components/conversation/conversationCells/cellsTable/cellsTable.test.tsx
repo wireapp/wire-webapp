@@ -4199,6 +4199,89 @@ describe('CellsTable restoring selected Bin items', () => {
     expect(screen.getAllByText('cells.bulkRestore.status.completed').length).toBeGreaterThan(0);
   });
 
+  it('completes a restore job after leaving the Bin table', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: 'Running'})
+      .mockResolvedValueOnce({Status: 'Finished'});
+    const repository = createRepository({
+      restoreNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [{Name: 'restore', JobUuid: 'restore-job'}],
+      }),
+      getBackgroundActionInfo,
+    });
+    const onRefreshAndReportSuccess = jest.fn().mockResolvedValue(true);
+    const table = renderCellsTable({
+      cellsRepository: repository,
+      onRefreshAndReportSuccess,
+      initialNodes: [createBinNode('a.txt')],
+      clock,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+    await user.click(screen.getByRole('button', {name: 'Restore'}));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Restore'}));
+    await waitFor(() => {
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+    table.hideTable();
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+      await waitFor(() => {
+        expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    expect(screen.getByText('cells.bulkRestore.status.restored')).toBeInTheDocument();
+    expect(onRefreshAndReportSuccess).not.toHaveBeenCalled();
+  });
+
+  it('reconnects restore review after returning to the Bin', async () => {
+    const user = userEvent.setup();
+    const request = Promise.withResolvers<Awaited<ReturnType<CellsRepository['restoreNodes']>>>();
+    const repository = createRepository({restoreNodes: jest.fn().mockReturnValue(request.promise)});
+    const onRefreshAndReportSuccess = jest.fn().mockResolvedValue(true);
+    const table = renderCellsTable({
+      cellsRepository: repository,
+      onRefreshAndReportSuccess,
+      initialNodes: [createBinNode('a.txt')],
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+    await user.click(screen.getByRole('button', {name: 'Restore'}));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Restore'}));
+    await waitFor(() => {
+      expect(repository.restoreNodes).toHaveBeenCalledTimes(1);
+    });
+    table.hideTable();
+    await act(async () => {
+      request.reject(new Error('backend restore failure'));
+      await request.promise.catch(() => {
+        return undefined;
+      });
+    });
+
+    expect(await screen.findByText('cells.bulkRestore.status.needsReview')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Refresh Bin'})).not.toBeInTheDocument();
+
+    table.showTable();
+    const refreshButton = await screen.findByRole('button', {name: 'Refresh Bin'});
+    expect(screen.queryByRole('checkbox', {name: 'Select a.txt'})).not.toBeInTheDocument();
+    await user.click(refreshButton);
+
+    await waitFor(() => {
+      expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
+    });
+    await waitFor(() => {
+      expect(screen.queryByText('cells.bulkRestore.status.needsReview')).not.toBeInTheDocument();
+    });
+    expect(screen.getByRole('checkbox', {name: 'Select a.txt'})).toBeEnabled();
+    expect(repository.restoreNodes).toHaveBeenCalledTimes(1);
+  });
+
   it('shows a failed restore in the popup and clears it once the Bin refresh succeeds', async () => {
     const user = userEvent.setup();
     const repository = createRepository({restoreNodes: jest.fn().mockRejectedValue(new Error('network'))});
