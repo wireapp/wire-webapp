@@ -24,6 +24,7 @@ import {Maybe} from 'true-myth';
 import {createPinoLogging} from './createPinoLogging';
 import {enableLogging} from './enableLogging';
 import {createBrowserLogPersistence, type BrowserLogPersistence} from './createBrowserLogPersistence';
+import {createDesktopLogOutput} from './createDesktopLogOutput';
 import {createLogWorkerConnectionForTest} from './test/createLogWorkerConnectionForTest';
 
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
@@ -134,6 +135,96 @@ describe('logging startup', () => {
     logging.getLogger('component').debug('Enabled');
 
     expect(output.debug).toHaveBeenCalledTimes(1);
+  });
+
+  describe.each(['browser', 'desktop'])('debug eligibility with %s persistence', environment => {
+    it.each([
+      {query: '', debugEnabled: false, expected: []},
+      {query: '&enableLogging=*', debugEnabled: false, expected: ['Application/Selected', 'Application/Other']},
+      {query: '&enableLogging=Application/Selected', debugEnabled: false, expected: ['Application/Selected']},
+      {query: '&enableLogging=*,-Application/Other', debugEnabled: true, expected: ['Application/Selected']},
+      {
+        query: '&enableLogging=*,-Application/*,Application/Other',
+        debugEnabled: false,
+        expected: ['Application/Other'],
+      },
+      {query: '', debugEnabled: true, expected: ['Application/Selected', 'Application/Other']},
+    ])('uses $query with ENABLE_DEBUG=$debugEnabled', async options => {
+      const {query, debugEnabled, expected} = options;
+      const isElectron = environment === 'desktop';
+      const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+      const logging = createPinoLogging(Maybe.nothing());
+      const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+      const persistedLines: string[] = [];
+      const nativeOutput = createDesktopLogOutput({
+        clock,
+        async writeToDesktop(records) {
+          persistedLines.push(...records);
+
+          return 'written';
+        },
+        reportFailure: noop,
+      });
+      const locationSearch = '?enabled-features=desktop-structured-logs,persistent-browser-logs' + query;
+      const browserPersistence = enableLogging({
+        clock,
+        consoleOutput,
+        locationSearch,
+        debugEnabled,
+        storage: Maybe.nothing(),
+        configureLogging: logging.configure,
+        startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(locationSearch),
+        isElectron,
+        desktopPersistenceOutput: isElectron ? nativeOutput.write : undefined,
+        createPersistenceOutput() {
+          return createTestPersistence({
+            clock,
+            async append(lines) {
+              persistedLines.push(...lines);
+            },
+          });
+        },
+      });
+
+      const toJSON = jest.fn(() => {
+        return 'serialized';
+      });
+      logging.getLogger('Application/Selected').debug('Selected debug', {projection: {toJSON}});
+      const otherLogger = logging.getLogger('Application/Other');
+      otherLogger.debug('Other debug', {projection: {toJSON}});
+      otherLogger.info('Persistent info');
+      otherLogger.warn('Persistent warning');
+      otherLogger.error('Persistent error');
+      if (browserPersistence.isJust) {
+        await browserPersistence.value.dispose();
+      } else {
+        await nativeOutput.flush();
+      }
+
+      const persistedRecords = persistedLines.map(line => {
+        return JSON.parse(line) as Readonly<Record<string, unknown>>;
+      });
+      const persistedDebugComponents = persistedRecords
+        .filter(record => {
+          return record['level'] === 20;
+        })
+        .map(record => {
+          return record['component'];
+        });
+      const consoleDebugComponents = consoleOutput.debug.mock.calls.map(call => {
+        const record: Readonly<Record<string, unknown>> = JSON.parse(call[0]);
+
+        return record['component'];
+      });
+      expect(persistedDebugComponents).toEqual(expected);
+      expect(consoleDebugComponents).toEqual(expected);
+      expect(toJSON).toHaveBeenCalledTimes(expected.length);
+      expect(persistedRecords.slice(expected.length)).toMatchObject([
+        {level: 30, msg: 'Persistent info'},
+        {level: 40, msg: 'Persistent warning'},
+        {level: 50, msg: 'Persistent error'},
+      ]);
+    });
   });
 
   it('does not let storage failures interrupt startup or disable configured logging', () => {

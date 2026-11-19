@@ -103,21 +103,13 @@ describe('Desktop structured logging', () => {
   });
 
   it.each([
-    {consoleQuery: '', expectedConsoleInfoRecordIndexes: [], expectedConsoleDebugRecordIndexes: []},
-    {
-      consoleQuery: '&enableLogging=Selected',
-      expectedConsoleInfoRecordIndexes: [1],
-      expectedConsoleDebugRecordIndexes: [2],
-    },
-    {
-      consoleQuery: '&enableLogging=RuntimeIdentity',
-      expectedConsoleInfoRecordIndexes: [0],
-      expectedConsoleDebugRecordIndexes: [],
-    },
+    {consoleQuery: '', expectedConsoleInfoRecordIndexes: []},
+    {consoleQuery: '&enableLogging=Selected', expectedConsoleInfoRecordIndexes: [1]},
+    {consoleQuery: '&enableLogging=RuntimeIdentity', expectedConsoleInfoRecordIndexes: [0]},
   ])(
     'persists sanitized Pino diagnostics and startup identity with independent console filtering ($consoleQuery)',
     async options => {
-      const {consoleQuery, expectedConsoleInfoRecordIndexes, expectedConsoleDebugRecordIndexes} = options;
+      const {consoleQuery, expectedConsoleInfoRecordIndexes} = options;
       const writeToDesktop = jest.fn<Promise<string>, [readonly string[]]>().mockResolvedValue('written');
       const {clock, output, reportFailure} = createTestOutput(writeToDesktop);
       const logging = createPinoLogging(Maybe.nothing());
@@ -156,7 +148,6 @@ describe('Desktop structured logging', () => {
         }),
       };
       selected.info('WebSocket connected', {connectionId: 42, credential, detail: 'first\nsecond\r'});
-      selected.debug('Explicit debug');
       logging.getLogger('Other').warn('Unselected namespace');
       expect(writeToDesktop).not.toHaveBeenCalled();
 
@@ -166,7 +157,7 @@ describe('Desktop structured logging', () => {
 
       const [records] = writeToDesktop.mock.calls.at(0) ?? [];
       expect(writeToDesktop).toHaveBeenCalledTimes(1);
-      expect(records).toHaveLength(4);
+      expect(records).toHaveLength(3);
       expect(records?.join('')).not.toMatch(/[\r\n]|secret-credential/);
       expect(
         records?.map(record => {
@@ -192,7 +183,6 @@ describe('Desktop structured logging', () => {
           credential: 'Bearer [REDACTED]',
           detail: 'first\nsecond\r',
         },
-        {level: 20, time: 1000, component: 'Selected', msg: 'Explicit debug'},
         {level: 40, time: 1000, component: 'Other', msg: 'Unselected namespace'},
       ]);
       expect(credential.toJSON).toHaveBeenCalledTimes(1);
@@ -201,11 +191,7 @@ describe('Desktop structured logging', () => {
           return [records?.at(index)];
         }),
       );
-      expect(consoleOutput.debug.mock.calls).toEqual(
-        expectedConsoleDebugRecordIndexes.map(index => {
-          return [records?.at(index)];
-        }),
-      );
+      expect(consoleOutput.debug).not.toHaveBeenCalled();
       expect(consoleOutput.warn).not.toHaveBeenCalled();
       expect(browserPersistence.isNothing).toBe(true);
       expect(createPersistenceOutput).not.toHaveBeenCalled();

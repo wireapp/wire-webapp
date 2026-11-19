@@ -114,10 +114,18 @@ export function createPinoLogging(initialDependencies: Maybe<LoggingDependencies
   let namespaceRules: readonly NamespaceRule[] = [];
   let persistenceEnabled = false;
 
-  function isConsoleEnabled(component: string): boolean {
+  function isNamespaceEnabled(component: string): boolean {
     return namespaceRules.reduce((previous, rule) => {
       return rule.matches(component) ? rule.enabled : previous;
     }, false);
+  }
+
+  function getComponentLogLevel(component: string): 'debug' | 'info' | 'silent' {
+    if (isNamespaceEnabled(component)) {
+      return 'debug';
+    }
+
+    return persistenceEnabled ? 'info' : 'silent';
   }
 
   function configure(dependencies: Maybe<LoggingDependencies>): void {
@@ -164,7 +172,7 @@ export function createPinoLogging(initialDependencies: Maybe<LoggingDependencies
               // Every destination receives the same sanitized JSON line, never raw Pino objects.
               const line = encodeLogOutput(structuredRecord);
               const component = structuredRecord['component'];
-              if (isString(component) && isConsoleEnabled(component)) {
+              if (isString(component) && isNamespaceEnabled(component)) {
                 try {
                   configuration.output(line, level);
                 } catch {
@@ -195,11 +203,9 @@ export function createPinoLogging(initialDependencies: Maybe<LoggingDependencies
           }
 
           if (componentLogger.isNothing || componentLogger.value.root !== root.value) {
-            // Persistence must reach sanitization even when console namespace filtering is disabled.
-            const enabled = persistenceEnabled || isConsoleEnabled(component);
             componentLogger = Maybe.just({
               root: root.value,
-              logger: root.value.child({component}, {level: enabled ? 'debug' : 'silent'}),
+              logger: root.value.child({component}, {level: getComponentLogLevel(component)}),
             });
           }
 
