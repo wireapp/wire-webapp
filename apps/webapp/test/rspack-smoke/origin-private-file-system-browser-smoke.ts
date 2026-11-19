@@ -298,7 +298,7 @@ test('persists sanitized browser logs with console disabled across application r
     expect(await page.locator('html').getAttribute('data-unexpected-log-storage-access')).toBeNull();
     expect(consoleRecords).toEqual([]);
 
-    await page.evaluate(() => {
+    await page.evaluate(async () => {
       window.setTimeout(() => {
         throw new TypeError('Bearer synthetic-runtime-canary');
       }, 0);
@@ -308,14 +308,27 @@ test('persists sanitized browser logs with console disabled across application r
       });
       const scriptUrl = URL.createObjectURL(script);
       const worker = new Worker(scriptUrl);
-      worker.addEventListener(
-        'message',
-        () => {
-          worker.terminate();
-          URL.revokeObjectURL(scriptUrl);
-        },
-        {once: true},
-      );
+      try {
+        await new Promise<void>((resolve, reject) => {
+          worker.addEventListener(
+            'message',
+            () => {
+              resolve();
+            },
+            {once: true},
+          );
+          worker.addEventListener(
+            'error',
+            () => {
+              reject(new Error('Synthetic Worker did not run'));
+            },
+            {once: true},
+          );
+        });
+      } finally {
+        worker.terminate();
+        URL.revokeObjectURL(scriptUrl);
+      }
     });
     await expect
       .poll(async () => {
@@ -344,7 +357,7 @@ test('persists sanitized browser logs with console disabled across application r
         expect.objectContaining({level: 50, msg: 'Unhandled promise rejection', reasonType: 'object'}),
       ]),
     );
-    expect(runtimeLines.join('\n')).not.toMatch(/synthetic-(runtime|rejection)-canary/);
+    expect(runtimeLines.join('\n')).not.toMatch(/synthetic-(runtime|rejection|worker-console)-canary/);
 
     await page.reload();
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
