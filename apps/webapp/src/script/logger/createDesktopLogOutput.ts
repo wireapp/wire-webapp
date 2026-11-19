@@ -18,12 +18,13 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
+import pTimeout, {type Options as PromiseTimeoutOptions} from 'p-timeout';
 
 import {createBufferedLogOutput, type BufferedLogOutput} from './createBufferedLogOutput';
 import type {DesktopApplicationLogWrite} from './selectDesktopApplicationLogWrite';
 
-type DesktopLogFailure = 'rejected' | 'busy' | 'failed' | 'timeout';
-type DesktopLogWriteResult = 'written' | DesktopLogFailure;
+type DesktopLogWriteResult = 'written' | 'rejected' | 'busy' | 'failed';
+type DesktopLogFailure = Exclude<DesktopLogWriteResult, 'written'> | 'timeout';
 
 type DesktopLogOutputOptions = {
   readonly clock: Pick<Clock, 'setTimeout' | 'clearTimeout'>;
@@ -39,6 +40,14 @@ const responseTimeoutMilliseconds = 10_000;
 
 export function createDesktopLogOutput(options: DesktopLogOutputOptions): Pick<BufferedLogOutput, 'write' | 'flush'> {
   const {clock, writeToDesktop, reportFailure} = options;
+  const acknowledgementTimeout = {
+    milliseconds: responseTimeoutMilliseconds,
+    // p-timeout passes the opaque timer handle from setTimeout back to the same clock's clearTimeout.
+    customTimers: clock as unknown as NonNullable<PromiseTimeoutOptions<'timeout'>['customTimers']>,
+    fallback(): 'timeout' {
+      return 'timeout';
+    },
+  } satisfies PromiseTimeoutOptions<'timeout'>;
   const reportedFailures = new Set<DesktopLogFailure>();
   let writeInProgress = false;
 
@@ -88,12 +97,7 @@ export function createDesktopLogOutput(options: DesktopLogOutputOptions): Pick<B
       return;
     }
 
-    const deadline = Promise.withResolvers<'timeout'>();
-    const timeout = clock.setTimeout(() => {
-      deadline.resolve('timeout');
-    }, responseTimeoutMilliseconds);
-    const result = await Promise.race([writeBatch(lines), deadline.promise]);
-    clock.clearTimeout(timeout);
+    const result = await pTimeout(writeBatch(lines), acknowledgementTimeout);
 
     if (result === 'written') {
       reportedFailures.clear();

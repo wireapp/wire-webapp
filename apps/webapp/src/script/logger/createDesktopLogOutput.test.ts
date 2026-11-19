@@ -299,6 +299,25 @@ describe('Desktop structured logging', () => {
     },
   );
 
+  it('accepts an acknowledgement just before the timeout and stays available afterward', async () => {
+    const acknowledgement = Promise.withResolvers<string>();
+    const writeToDesktop = jest.fn().mockResolvedValue('written').mockReturnValueOnce(acknowledgement.promise);
+    const {clock, output, reportFailure} = createTestOutput(writeToDesktop);
+
+    output.write('"slow write"', 'info');
+    const firstFlush = output.flush();
+    clock.advanceByMilliseconds(9999);
+    acknowledgement.resolve('written');
+    await firstFlush;
+    clock.advanceByMilliseconds(1);
+
+    output.write('"next write"', 'info');
+    await output.flush();
+
+    expect(writeToDesktop.mock.calls).toEqual([[['"slow write"']], [['"next write"']]]);
+    expect(reportFailure).not.toHaveBeenCalled();
+  });
+
   it('reports a missing acknowledgement and keeps the IPC slot reserved until a late rejection settles', async () => {
     const acknowledgement = Promise.withResolvers<string>();
     const writeToDesktop = jest.fn().mockResolvedValue('written').mockReturnValueOnce(acknowledgement.promise);
