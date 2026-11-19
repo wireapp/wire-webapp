@@ -288,7 +288,6 @@ export const ScheduleMeetingForm: FunctionComponent<ScheduleMeetingFormProps> = 
             users={users}
             selectedUsers={formState.selectedUsers}
             invitedEmails={formState.invitedEmails}
-            isFederated={contentViewModel.isFederated}
             onInvitedEmailsChange={onInvitedEmailsChange}
             onSelectedUsersChange={onSelectedUsersChange}
             filter={formState.participantsFilter}
