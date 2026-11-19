@@ -17,9 +17,10 @@
  *
  */
 
-import {act, render, screen, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {container} from 'tsyringe';
 import ko from 'knockout';
+import {noop} from 'noop-esm';
 
 import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import {FileAsset} from '../../../../../../repositories/entity/message/fileAsset';
@@ -122,6 +123,7 @@ describe('FileAssetComponent', () => {
     render(<FileAssetComponent message={message} teamState={restrictedTeam} />, {wrapper: rootProviderWrapper});
 
     expect(load).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     load.mockRestore();
   });
 
@@ -193,7 +195,61 @@ describe('FileAssetComponent', () => {
     expect(load).not.toHaveBeenCalled();
     expect(screen.getAllByRole('button')).toHaveLength(1);
     expect(screen.getByText('report')).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     load.mockRestore();
+  });
+
+  it('opens the original PDF preview without downloading until the user chooses Download', async () => {
+    const repository = container.resolve(AssetRepository);
+    let resolveLoad: (blob: Blob | undefined) => void = noop;
+    const load = jest.spyOn(repository, 'load').mockImplementation(() => {
+      return new Promise<Blob | undefined>(resolve => {
+        resolveLoad = resolve;
+      });
+    });
+    const download = jest.spyOn(repository, 'downloadFile').mockResolvedValue(undefined);
+    const previewWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview')
+          .isFeatureToggleEnabled,
+        mainViewModel: {content: {repositories: {asset: repository}}} as MainViewModel,
+      }),
+    );
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_type = 'application/pdf';
+    asset.status(AssetTransferState.UPLOADED);
+    const originalResource = new AssetRemoteData({
+      assetKey: 'original',
+      assetDomain: 'wire.test',
+      otrKey: new Uint8Array(32),
+      sha256: new Uint8Array(32),
+    });
+    asset.original_resource(originalResource);
+
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: previewWrapper});
+    fireEvent.click(screen.getByRole('button', {name: 'cells.filePreviewButton.ariaLabel'}));
+
+    await screen.findByRole('dialog');
+    await waitFor(() => {
+      expect(load).toHaveBeenCalledTimes(1);
+    });
+    expect(load.mock.calls[0][0]).not.toBe(originalResource);
+    expect(download).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', {name: 'conversationContextMenuDownload'}));
+
+    expect(download).toHaveBeenCalledWith(asset);
+    fireEvent.click(screen.getByRole('button', {name: 'modalCloseButton'}));
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: 'cells.filePreviewButton.ariaLabel'})).toHaveFocus();
+    });
+    await act(async () => {
+      resolveLoad(undefined);
+    });
+    load.mockRestore();
+    download.mockRestore();
   });
 
   it('shows the file size in MB', () => {
