@@ -20,25 +20,34 @@
 import type {Clock} from '@enormora/clock/clock';
 
 import {observeCellsBackgroundActionJobs} from './common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
-import type {CellsBackgroundActionOutcome} from './common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
-import {createBulkJobPollingPolicy} from './common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
+import type {
+  CellsBackgroundActionOutcome,
+  CellsBackgroundActionPollingPolicy,
+} from './common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
 import type {SharedDriveMoveStatus, SharedDriveMoveStatusKind} from './sharedDriveMoveStatus';
 
 import type {CellsRepository} from '../../../repositories/cells/cellsRepository';
 
-export interface BackgroundMoveObservation {
-  readonly operationId: string;
-  readonly cellsRepository: Pick<CellsRepository, 'getBackgroundMoveInfo'>;
-  readonly clock: Clock;
-  readonly random: () => number;
-  readonly onOutcome: (outcome: CellsBackgroundActionOutcome) => void;
-}
+type BackgroundActionSource =
+  | {readonly actionName: 'move'; readonly cellsRepository: Pick<CellsRepository, 'getBackgroundMoveInfo'>}
+  | {
+      readonly actionName: 'delete' | 'restore';
+      readonly cellsRepository: Pick<CellsRepository, 'getBackgroundActionInfo'>;
+    };
 
-interface SharedDriveBackgroundMoveController {
+export type BackgroundActionObservation = BackgroundActionSource & {
+  readonly status: SharedDriveMoveStatus;
+  readonly jobUuids: readonly string[];
+  readonly clock: Clock;
+  readonly pollingPolicy: CellsBackgroundActionPollingPolicy;
+  readonly onOutcome: (outcome: CellsBackgroundActionOutcome) => void;
+};
+
+interface SharedDriveBackgroundActionController {
   readonly register: (status: SharedDriveMoveStatus) => void;
   readonly get: (id: string) => BackgroundMoveOperation | undefined;
   readonly setJobUuids: (id: string, jobUuids: readonly string[]) => void;
-  readonly start: (observation: BackgroundMoveObservation) => void;
+  readonly start: (observation: BackgroundActionObservation) => void;
   readonly stopAll: () => void;
 }
 
@@ -47,7 +56,7 @@ export interface BackgroundMoveOperation {
   readonly jobUuids: readonly string[];
 }
 
-const kindForOutcome = (outcome: CellsBackgroundActionOutcome): SharedDriveMoveStatusKind => {
+export const getBackgroundActionStatusKind = (outcome: CellsBackgroundActionOutcome): SharedDriveMoveStatusKind => {
   switch (outcome) {
     case 'all-finished':
       return 'completed';
@@ -61,11 +70,11 @@ const kindForOutcome = (outcome: CellsBackgroundActionOutcome): SharedDriveMoveS
   }
 };
 
-/** Owns move polling for as long as the app's status provider remains mounted. */
-export const createSharedDriveBackgroundMoveController = (
+/** Owns bulk job polling for as long as the app's status provider remains mounted. */
+export const createSharedDriveBackgroundActionController = (
   publishStatus: (status: SharedDriveMoveStatus) => void,
   observeJobs: typeof observeCellsBackgroundActionJobs = observeCellsBackgroundActionJobs,
-): SharedDriveBackgroundMoveController => {
+): SharedDriveBackgroundActionController => {
   const observations = new Map<string, {cancel: () => void}>();
   const operations = new Map<string, BackgroundMoveOperation>();
   const register = (status: SharedDriveMoveStatus): void => {
@@ -81,14 +90,15 @@ export const createSharedDriveBackgroundMoveController = (
     }
   };
 
-  const start = ({operationId, cellsRepository, clock, random, onOutcome}: BackgroundMoveObservation): void => {
-    const operation = operations.get(operationId);
+  const start = (request: BackgroundActionObservation): void => {
+    const {jobUuids, clock, pollingPolicy, onOutcome} = request;
+    const operation = operations.get(request.status.id);
     if (operation === undefined || operation.jobUuids.length === 0) {
       return;
     }
     // The review callback belongs to the view that started the action and stops working once that view is gone.
     // A view that is still mounted publishes its own status with the callback again.
-    const {onReview: _onReview, isReviewing: _isReviewing, ...status} = operation.status;
+    const {onReview: _onReview, isReviewing: _isReviewing, ...status} = request.status;
     if (observations.has(status.id)) {
       return;
     }
@@ -99,12 +109,15 @@ export const createSharedDriveBackgroundMoveController = (
       },
     };
     observations.set(status.id, observation);
+    const source: BackgroundActionSource =
+      request.actionName === 'move'
+        ? {actionName: 'move', cellsRepository: request.cellsRepository}
+        : {actionName: request.actionName, cellsRepository: request.cellsRepository};
     observation.cancel = observeJobs({
-      actionName: 'move',
-      cellsRepository,
-      jobUuids: operation.jobUuids,
+      ...source,
+      jobUuids,
       clock,
-      pollingPolicy: createBulkJobPollingPolicy(random),
+      pollingPolicy,
       isCurrent: () => {
         return observations.has(status.id);
       },
@@ -117,7 +130,7 @@ export const createSharedDriveBackgroundMoveController = (
         if (!observations.delete(status.id)) {
           return;
         }
-        publishStatus({...status, kind: kindForOutcome(outcome)});
+        publishStatus({...status, kind: getBackgroundActionStatusKind(outcome)});
         onOutcome(outcome);
       },
     });
