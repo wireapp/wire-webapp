@@ -26,7 +26,7 @@ import type {LogOutput} from './logOutput';
 import type {LogPersistenceConfiguration} from './logPersistenceConfiguration';
 
 type BufferedLogOutputOptions = {
-  readonly append: (lines: readonly string[]) => Promise<void>;
+  readonly append: (lines: readonly string[]) => Promise<void | 'dropped'>;
   readonly clock: Pick<Clock, 'setTimeout' | 'clearTimeout'>;
   readonly configuration: Pick<
     LogPersistenceConfiguration,
@@ -151,11 +151,14 @@ export function createBufferedLogOutput(options: BufferedLogOutputOptions): Buff
         pending = pending.slice(batch.length);
         pendingBytes -= inFlightBytes;
         try {
-          await append(
+          const outcome = await append(
             batch.map(record => {
               return record.line;
             }),
           );
+          if (outcome === 'dropped') {
+            droppedRecords += batch.length;
+          }
         } catch {
           failures += 1;
           suspended = true;

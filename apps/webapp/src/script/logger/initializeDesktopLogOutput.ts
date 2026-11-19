@@ -44,7 +44,13 @@ export function initializeDesktopLogOutput(
       clock,
       writeToDesktop,
       reportFailure(failure) {
-        console.warn(`Desktop structured log batch dropped (${failure})`);
+        if (failure === 'stalled') {
+          console.warn('Desktop structured log batch dropped while a previous write is still pending');
+
+          return;
+        }
+
+        console.warn(`Desktop structured log write did not receive a successful acknowledgement (${failure})`);
       },
     });
     const flushInvoker = createFireAndForgetInvoker({

@@ -24,7 +24,7 @@ import {createBufferedLogOutput, type BufferedLogOutput} from './createBufferedL
 import type {DesktopApplicationLogWrite} from './selectDesktopApplicationLogWrite';
 
 type DesktopLogWriteResult = 'written' | 'rejected' | 'busy' | 'failed';
-type DesktopLogFailure = Exclude<DesktopLogWriteResult, 'written'> | 'timeout';
+type DesktopLogFailure = Exclude<DesktopLogWriteResult, 'written'> | 'timeout' | 'stalled';
 
 type DesktopLogOutputOptions = {
   readonly clock: Pick<Clock, 'setTimeout' | 'clearTimeout'>;
@@ -38,7 +38,9 @@ const maximumBatchRecords = 1024;
 const batchTargetBytes = 65_536;
 const responseTimeoutMilliseconds = 10_000;
 
-export function createDesktopLogOutput(options: DesktopLogOutputOptions): Pick<BufferedLogOutput, 'write' | 'flush'> {
+export function createDesktopLogOutput(
+  options: DesktopLogOutputOptions,
+): Pick<BufferedLogOutput, 'write' | 'flush' | 'getStatistics'> {
   const {clock, writeToDesktop, reportFailure} = options;
   const acknowledgementTimeout = {
     milliseconds: responseTimeoutMilliseconds,
@@ -88,13 +90,15 @@ export function createDesktopLogOutput(options: DesktopLogOutputOptions): Pick<B
     }
   }
 
-  async function append(lines: readonly string[]): Promise<void> {
+  async function append(lines: readonly string[]): Promise<void | 'dropped'> {
     if (lines.length === 0) {
       return;
     }
     // The timed-out IPC may still be pending in Electron. It cannot be cancelled.
     if (writeInProgress) {
-      return;
+      reportFailureOnce('stalled');
+
+      return 'dropped';
     }
 
     const result = await pTimeout(writeBatch(lines), acknowledgementTimeout);
@@ -105,7 +109,7 @@ export function createDesktopLogOutput(options: DesktopLogOutputOptions): Pick<B
       return;
     }
 
-    // Drop this batch and keep admitting new records. Replaying could duplicate a late write.
+    // A timeout leaves the write outcome unknown. Replaying could duplicate a late write.
     reportFailureOnce(result);
   }
 

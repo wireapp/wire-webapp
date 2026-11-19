@@ -304,25 +304,44 @@ describe('Desktop structured logging', () => {
     expect(reportFailure).not.toHaveBeenCalled();
   });
 
-  it('reports a missing acknowledgement and keeps the IPC slot reserved until a late rejection settles', async () => {
-    const acknowledgement = Promise.withResolvers<string>();
-    const writeToDesktop = jest.fn().mockResolvedValue('written').mockReturnValueOnce(acknowledgement.promise);
-    const {clock, output, reportFailure} = createTestOutput(writeToDesktop);
+  it.each(['success', 'rejection'])(
+    'counts batches discarded during a stall and recovers after late %s',
+    async settlement => {
+      const acknowledgement = Promise.withResolvers<string>();
+      const writeToDesktop = jest.fn().mockResolvedValue('written').mockReturnValueOnce(acknowledgement.promise);
+      const {clock, output, reportFailure} = createTestOutput(writeToDesktop);
 
-    output.write('"pending"', 'info');
-    const firstFlush = output.flush();
-    clock.advanceByMilliseconds(10_000);
-    await firstFlush;
-    output.write('"dropped during stall"', 'info');
-    await output.flush();
+      output.write('"pending"', 'info');
+      const firstFlush = output.flush();
+      clock.advanceByMilliseconds(10_000);
+      await firstFlush;
+      expect(output.getStatistics()).toMatchObject({droppedRecords: 0, pendingBytes: 0});
+      output.write('"first dropped record"', 'info');
+      output.write('"second dropped record"', 'info');
+      await output.flush();
+      output.write('"third dropped record"', 'info');
+      await output.flush();
+      clock.advanceByMilliseconds(60_000);
 
-    expect(reportFailure.mock.calls).toEqual([['timeout']]);
-    expect(writeToDesktop.mock.calls).toEqual([[['"pending"']]]);
-    acknowledgement.reject(new Error('Late interruption'));
-    await Promise.resolve();
+      expect(reportFailure.mock.calls).toEqual([['timeout'], ['stalled']]);
+      expect(output.getStatistics()).toMatchObject({droppedRecords: 3, pendingBytes: 0});
+      expect(writeToDesktop.mock.calls).toEqual([[['"pending"']]]);
+      if (settlement === 'success') {
+        acknowledgement.resolve('written');
+      } else {
+        acknowledgement.reject(new Error('Late interruption'));
+      }
+      await Promise.resolve();
 
-    output.write('"after navigation interruption"', 'info');
-    await output.flush();
-    expect(writeToDesktop.mock.calls).toEqual([[['"pending"']], [['"after navigation interruption"']]]);
-  });
+      output.write('"first after recovery"', 'info');
+      output.write('"second after recovery"', 'info');
+      await output.flush();
+      expect(writeToDesktop.mock.calls).toEqual([
+        [['"pending"']],
+        [['"first after recovery"', '"second after recovery"']],
+      ]);
+      expect(reportFailure.mock.calls).toEqual([['timeout'], ['stalled']]);
+      expect(output.getStatistics()).toMatchObject({droppedRecords: 3, pendingBytes: 0});
+    },
+  );
 });
