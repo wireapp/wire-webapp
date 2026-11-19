@@ -203,14 +203,6 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.stopPropagation();
 };
 
-const withoutNodeIds = (selection: Set<string>, nodeIds: readonly string[]): Set<string> => {
-  const nextSelection = new Set(selection);
-  nodeIds.forEach(nodeId => {
-    nextSelection.delete(nodeId);
-  });
-  return nextSelection;
-};
-
 // Selecting rows only makes sense when at least one of these is available, e.g. never for viewers.
 const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE];
 
@@ -353,9 +345,6 @@ export const CellsTable = ({
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
   });
-  const [restoringNodeIds, setRestoringNodeIds] = useState<Set<string>>(() => {
-    return new Set();
-  });
   const [isBulkMoveToBinConfirmationOpen, setIsBulkMoveToBinConfirmationOpen] = useState(false);
   const [capturedBulkMoveToBin, setCapturedBulkMoveToBin] = useState<CapturedBulkMoveToBinSelection | null>(null);
   const [isBulkMoveToBinPending, setIsBulkMoveToBinPending] = useState(false);
@@ -406,11 +395,9 @@ export const CellsTable = ({
       void handleRefreshAfterPermanentDeleteReview();
     },
   );
-  const handlePermanentDeleteCompleted = (nodeIds: readonly string[]): void => {
+  const handlePermanentDeleteCompleted = (): void => {
     permanentDeleteStatusReporter.report('completed');
-    setSelectedNodeIds(currentSelection => {
-      return withoutNodeIds(currentSelection, nodeIds);
-    });
+    setSelectedNodeIds(new Set());
   };
   const permanentDelete = usePermanentDeleteReconciliation({
     cellsRepository,
@@ -474,7 +461,7 @@ export const CellsTable = ({
     },
     onRefreshAndReportSuccess,
     onRestoreSettled: () => {
-      setRestoringNodeIds(new Set());
+      setSelectedNodeIds(new Set());
     },
     onStatusChange: restoreStatusReporter.report,
     onStatusCleared: restoreStatusReporter.clear,
@@ -562,7 +549,6 @@ export const CellsTable = ({
 
     resetPermanentDeleteReconciliation();
     resetBulkRestore();
-    setRestoringNodeIds(new Set());
     setSelectedNodeIds(new Set());
     setIsBulkMovePreviewOpen(false);
     setIsBulkMoveToBinConfirmationOpen(false);
@@ -809,10 +795,17 @@ export const CellsTable = ({
     }
   };
 
-  const selectionDisabledNodeIds = new Set([...permanentDelete.activeNodeIds, ...restoringNodeIds]);
+  const isSelectionDisabled =
+    isMoveActive ||
+    isBulkMoveRequestPending ||
+    isBackgroundMovePending ||
+    isBulkMoveToBinPending ||
+    bulkRestore.isPending ||
+    isPermanentDeletePending ||
+    isPermanentDeleteUnresolved;
 
   const handleToggleSelection = (nodeId: string, isSelected: boolean): void => {
-    if (isSelected && selectionDisabledNodeIds.has(nodeId)) {
+    if (isSelectionDisabled) {
       return;
     }
     activeDriveDrag.current = null;
@@ -829,14 +822,14 @@ export const CellsTable = ({
   };
 
   const handleTogglePageSelection = (isSelected: boolean): void => {
+    if (isSelectionDisabled) {
+      return;
+    }
     activeDriveDrag.current = null;
     clearPermanentDeleteRejection();
     setSelectedNodeIds(currentSelection => {
       const nextSelection = new Set(currentSelection);
       for (const node of nodes) {
-        if (isSelected && selectionDisabledNodeIds.has(node.id)) {
-          continue;
-        }
         if (isSelected) {
           nextSelection.add(node.id);
         } else {
@@ -852,7 +845,7 @@ export const CellsTable = ({
   };
 
   const handleRestoreSelection = (nodeIds: string[], scopeKey: string): void => {
-    if (!hasSameSelection(selectedNodeIdsRef.current, nodeIds)) {
+    if (isSelectionDisabled || !hasSameSelection(selectedNodeIdsRef.current, nodeIds)) {
       return;
     }
 
@@ -874,15 +867,11 @@ export const CellsTable = ({
         return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
       }),
     );
-    setRestoringNodeIds(selectedIdSet);
-    setSelectedNodeIds(currentSelection => {
-      return withoutNodeIds(currentSelection, nodeIds);
-    });
     void bulkRestore.restore(currentResolution.targets, scopeKey, status);
   };
 
   const handlePermanentDelete = async (nodeIds: string[], scopeKey: string, path: string): Promise<void> => {
-    if (isPermanentDeletePending || isPermanentDeleteUnresolved || !isCurrentPermanentDeleteScope(scopeKey, path)) {
+    if (isSelectionDisabled || !isCurrentPermanentDeleteScope(scopeKey, path)) {
       return;
     }
     if (!hasSameSelection(selectedNodeIdsRef.current, nodeIds)) {
@@ -932,11 +921,8 @@ export const CellsTable = ({
     !isBulkMoveOutcomeUnresolved &&
     !isPermanentDeleteUnresolved &&
     !isBulkMoveToBinNeedsReview &&
-    !isBulkMoveToBinPending &&
-    !bulkRestore.isPending &&
     bulkRestore.reviewReason === null &&
     restoreReviewReason === undefined;
-  const isSelectionDisabled = isMoveActive || isBulkMoveRequestPending || isBackgroundMovePending;
 
   const table = useReactTable({
     data: nodes,
@@ -960,7 +946,6 @@ export const CellsTable = ({
         }),
       selectionEnabled: isRowSelectionEnabled,
       selectionDisabled: isSelectionDisabled,
-      selectionDisabledNodeIds,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -980,17 +965,15 @@ export const CellsTable = ({
     selectedNodes.length === selectedNodeIds.size &&
     isInRecycleBin() &&
     !isBulkRestoreBlocking &&
-    selectedNodes.every(node => {
-      return !permanentDelete.activeNodeIds.includes(node.id);
-    }) &&
+    !isSelectionDisabled &&
     canPerformCurrentDriveAction(CELLS_ACTION.RESTORE) &&
     restoreResolution.canRestore;
   const canPermanentlyDeleteSelection =
     selectedNodes.length > 0 &&
     selectedNodes.length === selectedNodeIds.size &&
     isInRecycleBin() &&
-    bulkRestore.reviewReason === null &&
-    !isPermanentDeleteUnresolved &&
+    !isBulkRestoreBlocking &&
+    !isSelectionDisabled &&
     canPerformCurrentDriveAction(CELLS_ACTION.DELETE) &&
     selectedNodes.every(node => {
       return canPerformCellsAction({action: CELLS_ACTION.DELETE, selfUserDriveRole: node.selfUserDriveRole});
@@ -1457,7 +1440,7 @@ export const CellsTable = ({
                     css={clearSelectionButtonStyles}
                     type="button"
                     aria-label={translate('cells.selection.clear')}
-                    disabled={isMoveActive || isBulkMoveToBinPending}
+                    disabled={isSelectionDisabled}
                     onClick={() => {
                       return setSelectedNodeIds(new Set());
                     }}

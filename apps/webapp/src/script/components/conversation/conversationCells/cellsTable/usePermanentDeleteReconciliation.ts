@@ -78,7 +78,6 @@ export interface PermanentDeleteReconciliationState {
   readonly isRequestInFlight: boolean;
   readonly isWaitingForReconciliation: boolean;
   readonly reviewReason: PermanentDeleteReviewReason | null;
-  readonly activeNodeIds: readonly string[];
   readonly deletePermanently: (
     nodeIds: readonly string[],
     scopeKey: string,
@@ -116,7 +115,6 @@ export const usePermanentDeleteReconciliation = (
   optionsRef.current = options;
 
   const [isPending, setIsPending] = useState(false);
-  const [activeNodeIds, setActiveNodeIds] = useState<readonly string[]>([]);
   const [isRejected, setIsRejected] = useState(false);
   const [isUnresolved, setIsUnresolved] = useState(false);
   const [isRefreshingReview, setIsRefreshingReview] = useState(false);
@@ -347,7 +345,6 @@ export const usePermanentDeleteReconciliation = (
     const requestGeneration = generationRef.current;
     isPendingRef.current = true;
     setIsPending(true);
-    setActiveNodeIds(nodeIds);
     setIsRejected(false);
     const context: PermanentDeleteReconciliationContext = {
       status,
@@ -377,7 +374,6 @@ export const usePermanentDeleteReconciliation = (
 
       setIsRejected(false);
       optionsRef.current.onDeleteCompleted(nodeIds);
-      setActiveNodeIds([]);
       if (isCurrent(context, requestGeneration)) {
         optionsRef.current.onRefresh();
       }
@@ -393,7 +389,6 @@ export const usePermanentDeleteReconciliation = (
       }
       if (isAuthoritativeRejection(error)) {
         setIsRejected(true);
-        setActiveNodeIds([]);
         return;
       }
 
@@ -462,7 +457,6 @@ export const usePermanentDeleteReconciliation = (
 
   const cancel = (): void => {
     invalidateWork();
-    setActiveNodeIds([]);
   };
 
   const clearRejection = (): void => {
@@ -474,7 +468,6 @@ export const usePermanentDeleteReconciliation = (
       continueAfterViewLeave(activeContextRef.current);
     }
     invalidateWork();
-    setActiveNodeIds([]);
     activeContextRef.current = null;
     isUnresolvedRef.current = false;
     if (isMountedRef.current) {
@@ -529,7 +522,6 @@ export const usePermanentDeleteReconciliation = (
     setIsUnresolved(false);
     setIsWaitingForReconciliation(false);
     updateReviewReason(null);
-    setActiveNodeIds([]);
     optionsRef.current.onReconciliationCompleted(context.nodeIds);
   }, [isWaitingForReconciliation, options.isNodesLoading, options.visibleNodeIds]);
 
@@ -546,7 +538,6 @@ export const usePermanentDeleteReconciliation = (
 
   return {
     isPending,
-    activeNodeIds,
     isRejected,
     isUnresolved,
     isRefreshingReview,
