@@ -43,6 +43,7 @@ import {PrekeyTracker} from './prekeysTracker';
 import {PreKey} from '../../../../../../apiClient/auth/preKey';
 import {Encoder} from '../../../../../../commons/base64/encoder';
 import {getLogger} from '../../../../../../logger/getLogger';
+import type {Logger} from '../../../../../../logger/logger';
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
 import type {CRUDEngine} from '../../../../../storage/engine/crudEngine';
 import {CoreCryptoConfig} from '../../../../common.types';
@@ -87,7 +88,7 @@ type CoreCryptoRuntime = {
 
 const logger = getLogger('@wireapp/core/CoreCryptoWrapper');
 
-const logFunctions: Record<CoreCryptoLogLevel, Function> = {
+const logFunctions: Readonly<Record<CoreCryptoLogLevel, Logger['info']>> = {
   1: logger.debug,
   2: logger.debug,
   3: logger.debug,
@@ -96,9 +97,9 @@ const logFunctions: Record<CoreCryptoLogLevel, Function> = {
   6: logger.error,
 };
 
-const coreCryptoLogger = {
-  log: (level: CoreCryptoLogLevel, message: string, context: string | undefined) => {
-    logFunctions[level].call(logger, {message, context});
+export const coreCryptoLogger: Parameters<typeof setLogger>[0] = {
+  log(level, message, context): void {
+    logFunctions[level](message, {context});
   },
 };
 

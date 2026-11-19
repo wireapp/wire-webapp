@@ -19,11 +19,14 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import pTimeout, {type Options as PromiseTimeoutOptions} from 'p-timeout';
+import {Result} from 'true-myth';
+import {match, P} from 'ts-pattern';
 
 import {createBufferedLogOutput, type BufferedLogOutput} from './createBufferedLogOutput';
 import type {DesktopApplicationLogWrite} from './selectDesktopApplicationLogWrite';
 
 type DesktopLogWriteResult = 'written' | 'rejected' | 'busy' | 'failed';
+type DesktopLogAcknowledgement = Result<DesktopLogWriteResult, 'missing-acknowledgement' | 'timeout'>;
 type DesktopLogFailure = Exclude<DesktopLogWriteResult, 'written'> | 'timeout' | 'stalled';
 
 type DesktopLogOutputOptions = {
@@ -49,11 +52,11 @@ export function createDesktopLogOutput(
   const acknowledgementTimeout = {
     milliseconds: responseTimeoutMilliseconds,
     // p-timeout passes the opaque timer handle from setTimeout back to the same clock's clearTimeout.
-    customTimers: clock as unknown as NonNullable<PromiseTimeoutOptions<'timeout'>['customTimers']>,
-    fallback(): 'timeout' {
-      return 'timeout';
+    customTimers: clock as unknown as NonNullable<PromiseTimeoutOptions<DesktopLogAcknowledgement>['customTimers']>,
+    fallback(): DesktopLogAcknowledgement {
+      return Result.err('timeout');
     },
-  } satisfies PromiseTimeoutOptions<'timeout'>;
+  } satisfies PromiseTimeoutOptions<DesktopLogAcknowledgement>;
   const reportedFailures = new Set<DesktopLogFailure>();
   let writeInProgress = false;
 
@@ -70,25 +73,25 @@ export function createDesktopLogOutput(
     }
   }
 
-  async function writeBatch(lines: readonly string[]): Promise<DesktopLogWriteResult> {
+  async function writeBatch(lines: readonly string[]): Promise<DesktopLogAcknowledgement> {
     writeInProgress = true;
     try {
-      const result = await writeToDesktop(
+      const acknowledgement = await writeToDesktop(
         lines.map(line => {
           return line.slice(0, -1);
         }),
       );
-      switch (result) {
-        case 'written':
-        case 'rejected':
-        case 'busy':
-        case 'failed':
-          return result;
-        default:
-          return 'failed';
-      }
+
+      return match(acknowledgement)
+        .returnType<DesktopLogAcknowledgement>()
+        .with(P.union('written', 'rejected', 'busy', 'failed'), reply => {
+          return Result.ok(reply);
+        })
+        .otherwise(() => {
+          return Result.err('missing-acknowledgement');
+        });
     } catch {
-      return 'failed';
+      return Result.err('missing-acknowledgement');
     } finally {
       writeInProgress = false;
     }
@@ -105,16 +108,30 @@ export function createDesktopLogOutput(
       return 'dropped';
     }
 
-    const result = await pTimeout(writeBatch(lines), acknowledgementTimeout);
+    const acknowledgement = await pTimeout(writeBatch(lines), acknowledgementTimeout);
 
-    if (result === 'written') {
-      reportedFailures.clear();
+    return acknowledgement.match<void | 'dropped'>({
+      Ok(reply) {
+        if (reply === 'written') {
+          reportedFailures.clear();
 
-      return;
-    }
+          return;
+        }
 
-    // A timeout leaves the write outcome unknown. Replaying could duplicate a late write.
-    reportFailureOnce(result);
+        reportFailureOnce(reply);
+
+        // Desktop can report failure after appending the batch if post-write maintenance fails.
+        if (reply === 'failed') {
+          return;
+        }
+
+        return 'dropped';
+      },
+      Err(failure) {
+        // Without a valid reply, the delivery outcome is unknown. Replaying could duplicate a write.
+        reportFailureOnce(failure === 'timeout' ? 'timeout' : 'failed');
+      },
+    });
   }
 
   return createBufferedLogOutput({

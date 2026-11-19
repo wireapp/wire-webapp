@@ -368,14 +368,11 @@ describe('AssetAPI', () => {
       }
     });
 
-    it('should reject tokens with invalid characters', () => {
-      const invalidToken = 'invalid token!';
+    it('rejects invalid asset tokens without including the value in the error', () => {
+      const invalidToken = 'synthetic token with spaces';
       expect(() => {
         return assetAPI.getAsset(validAssetId, validDomain, invalidToken);
-      }).toThrow(TypeError);
-      expect(() => {
-        return assetAPI.getAsset(validAssetId, validDomain, invalidToken);
-      }).toThrow(/to be base64 encoded string/);
+      }).toThrow(new TypeError('Expected asset token to be a base64-encoded string.'));
     });
   });
 

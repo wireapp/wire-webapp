@@ -50,7 +50,6 @@ import {HttpClient} from './http/';
 import {MeetingsAPI} from './meetings/meetingsApi';
 import {NotificationAPI} from './notification/';
 import {OAuthAPI} from './oauth/oAuthApi';
-import {ObfuscationUtil} from './obfuscation';
 import type {ApiClientPlatform} from './platform';
 import {SelfAPI} from './self/';
 import {ServiceProviderAPI} from './serviceProvider';
@@ -393,9 +392,7 @@ export class APIClient extends EventEmitter implements Disposable {
 
     const accessToken = await this.api.auth.postLogin(loginData);
 
-    this.logger.info(`Saved initial access token. It will expire in "${accessToken.expires_in}" seconds.`, {
-      accessToken: ObfuscationUtil.obfuscateAccessToken(accessToken),
-    });
+    this.logger.info('Saved initial access token', {expiresInSeconds: accessToken.expires_in});
 
     await this.accessTokenStore.updateToken(accessToken);
 

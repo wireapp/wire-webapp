@@ -42,7 +42,6 @@ import {
 } from '../auth/';
 import {Config} from '../config';
 import {BackendError, ConnectionState, ContentType, StatusCode, mapBackendError} from '../http/';
-import {ObfuscationUtil} from '../obfuscation';
 import type {CookiePlatform} from '../platform';
 
 const unauthorizedStatusCode = 401;
@@ -340,9 +339,7 @@ export class HttpClient extends EventEmitter {
     }
 
     const accessToken = await this.postAccess(expiredAccessToken);
-    this.logger.info(`Received updated access token. It will expire in "${accessToken.expires_in}" seconds.`, {
-      accessToken: ObfuscationUtil.obfuscateAccessToken(accessToken),
-    });
+    this.logger.info('Received updated access token', {expiresInSeconds: accessToken.expires_in});
     return this.accessTokenStore.updateToken(accessToken);
   }
 
