@@ -478,6 +478,18 @@ export const CellsTable = ({
     previousSelectionScopeKey.current = selectionScopeKey;
     activeDriveDrag.current = null;
 
+    const activeOperation = maybe.isJust(activeMoveStatusId.current)
+      ? getMoveOperation(activeMoveStatusId.current.value)
+      : undefined;
+    const isMoveStillCurrent: boolean =
+      activeOperation !== undefined &&
+      Boolean(isMoveStatusCurrent(activeOperation.status.conversationQualifiedId, activeOperation.status.id));
+    if (didSelectionScopeChange && !isMoveStillCurrent) {
+      activeMoveStatusId.current = Maybe.nothing();
+      dispatchMove({type: 'resolved'});
+      setIsBulkMovePreviewOpen(false);
+    }
+
     if (isMovePendingRef.current) {
       return cancelPermanentDeleteReconciliation;
     }
@@ -509,6 +521,8 @@ export const CellsTable = ({
   }, [
     bulkRestoreModalId,
     cancelPermanentDeleteReconciliation,
+    getMoveOperation,
+    isMoveStatusCurrent,
     permanentDeleteModalId,
     resetBulkRestore,
     resetPermanentDeleteReconciliation,
@@ -686,7 +700,7 @@ export const CellsTable = ({
       dispatchMove({type: 'background-started'});
     }
     updateMoveStatus({...summary, kind: 'processing'});
-    startBackgroundMoveObservation(moveStatusId);
+    startBackgroundMoveObservation(moveStatusId, summary, uniqueMoveJobUuids);
     return true;
   };
 
@@ -703,7 +717,7 @@ export const CellsTable = ({
         ...operation.status,
         kind: 'processing',
       });
-      startBackgroundMoveObservation(moveStatusId);
+      startBackgroundMoveObservation(moveStatusId, operation.status, operation.jobUuids);
     }
   };
 
@@ -1042,7 +1056,6 @@ export const CellsTable = ({
     setIsBulkMoveToBinPending(true);
     setIsBulkMoveToBinConfirmationOpen(false);
     const statusId = createMoveStatusId();
-    bulkMoveToBinStatusId.current = Maybe.just(statusId);
     startMoveStatus({id: statusId, kind: 'processing', ...captured.summary});
 
     try {

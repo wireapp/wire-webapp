@@ -282,6 +282,7 @@ const renderCellsTable = ({
   folderDropResetKey,
   selectionEnabled = true,
   selectionScopeKey = 'conversation:/files',
+  resetStatusOnScopeChange = false,
   isBulkRestoreEnabled = true,
   cellsRepository = {} as CellsRepository,
   initialNodes,
@@ -303,6 +304,7 @@ const renderCellsTable = ({
   readonly folderDropResetKey?: number;
   readonly selectionEnabled?: boolean;
   readonly selectionScopeKey?: string;
+  readonly resetStatusOnScopeChange?: boolean;
   readonly isBulkRestoreEnabled?: boolean;
   readonly cellsRepository?: CellsRepository;
   readonly initialNodes?: CellNode[];
@@ -355,7 +357,9 @@ const renderCellsTable = ({
   ): ReactElement => {
     return (
       <ThemeProvider theme={themes[themeId]}>
-        <SharedDriveUploadStatusProvider>
+        <SharedDriveUploadStatusProvider
+          resetOnScopeChange={resetStatusOnScopeChange ? Maybe.just(scopeKey) : Maybe.nothing()}
+        >
           <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
             {isTableVisible && (
               <CellsTable
@@ -3696,6 +3700,50 @@ describe('CellsTable selection interactions', () => {
 });
 
 describe('CellsTable selection scope', () => {
+  it('resets pending move state when the folder scope changes and ignores the old response', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    const user = userEvent.setup();
+    let resolveMove: (response: object) => void = noop;
+    const pendingMove = new Promise<object>(resolve => {
+      resolveMove = resolve;
+    });
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockReturnValue(pendingMove),
+    } as unknown as CellsRepository;
+    const {rerenderWithSelectionScope} = renderCellsTable({
+      cellsRepository: repository,
+      folderPath: 'wire-cells-web/Marketing images',
+      resetStatusOnScopeChange: true,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+    await waitFor(() => {
+      expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
+
+    rerenderWithSelectionScope('conversation:/files/subfolder');
+    expect(screen.queryByText('Moving 1 items')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    expect(screen.getByRole('button', {name: 'Move'})).toBeInTheDocument();
+
+    await act(async () => {
+      resolveMove({
+        Status: 'Performed',
+        AffectedNodes: [{Uuid: 'folder-id', Path: 'conversation-id@example.com/wire-cells-web/Marketing images'}],
+      });
+    });
+    expect(screen.getByRole('button', {name: 'Move'})).toBeInTheDocument();
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    window.location.hash = originalHash;
+  });
+
   it('clears selected nodes when the folder/view scope changes', () => {
     const {rerenderWithSelectionScope} = renderCellsTable();
     const checkbox = screen.getByRole('checkbox', {name: 'Select Marketing images'});

@@ -132,10 +132,13 @@ describe('createSharedDriveBackgroundActionController', () => {
       observed = options;
       return jest.fn();
     });
+    const deleteStatus = {...status, id: 'move-to-bin'};
+    controller.register(deleteStatus);
+    controller.setJobUuids(deleteStatus.id, ['delete-job']);
 
     controller.start({
       actionName: 'delete',
-      status: {...status, id: 'move-to-bin'},
+      status: deleteStatus,
       jobUuids: ['delete-job'],
       cellsRepository: {getBackgroundActionInfo: jest.fn()},
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
