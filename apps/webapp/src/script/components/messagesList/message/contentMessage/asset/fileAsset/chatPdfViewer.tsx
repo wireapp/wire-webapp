@@ -17,100 +17,46 @@
  *
  */
 
-import {useState, type FunctionComponent} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
-import {Document, Page} from 'react-pdf';
+import {errorStyles, viewerStyles} from './chatPdfViewer.styles';
 
-import {controlsStyles, pageStyles, pageStatusStyles, viewerStyles} from './chatPdfViewer.styles';
-
-import {useElementSize} from '../../../../../../hooks/useElementSize/useElementSize';
 import {useApplicationContext} from '../../../../../../page/rootProvider';
 
 interface ChatPdfViewerProps {
   src: string;
+  fileName: string;
 }
 
-// Keep untrusted PDFs from enabling PDF.js's JavaScript evaluator. This local
-// reader relies on system-font fallback and does not load standard-font assets.
-const pdfOptions = {isEvalSupported: false, useSystemFonts: true};
-
-export const ChatPdfViewer: FunctionComponent<ChatPdfViewerProps> = ({src}: ChatPdfViewerProps) => {
+// Requires CSP_EXTRA_FRAME_SRC=blob: in the experimental environment.
+export const ChatPdfViewer: FunctionComponent<ChatPdfViewerProps> = ({src, fileName}: ChatPdfViewerProps) => {
   const {translate} = useApplicationContext();
-  const [pagesCount, setPagesCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageNaturalWidth, setPageNaturalWidth] = useState<number>();
-  const {ref: viewerRef, width: viewerWidth} = useElementSize<HTMLDivElement>();
-  const availableWidth = viewerWidth - 32;
-  const pageWidth =
-    pageNaturalWidth === undefined || availableWidth <= 0 ? undefined : Math.min(pageNaturalWidth, availableWidth);
+  const [hasError, setHasError] = useState(false);
 
-  return (
-    <div ref={viewerRef} css={viewerStyles}>
-      <Document
-        file={src}
-        options={pdfOptions}
-        onLoadSuccess={({numPages}) => {
-          setPagesCount(numPages);
-          setCurrentPage(1);
-        }}
-        loading={
-          <div css={pageStatusStyles} role="status">
-            {translate('conversationAssetDownloading')}
-          </div>
-        }
-        error={
-          <div css={pageStatusStyles}>
-            <p>{translate('pdfViewerErrorTitle')}</p>
-            <p>{translate('pdfViewerErrorDescription')}</p>
-          </div>
-        }
-        noData={
-          <div css={pageStatusStyles}>
-            <p>{translate('pdfViewerErrorTitle')}</p>
-            <p>{translate('pdfViewerErrorDescription')}</p>
-          </div>
-        }
-      >
-        <div css={pageStyles}>
-          <Page
-            pageNumber={currentPage}
-            width={pageWidth}
-            loading={null}
-            renderTextLayer={false}
-            renderAnnotationLayer={false}
-            onLoadSuccess={page => {
-              setPageNaturalWidth(page.getViewport({scale: 1}).width);
-            }}
-          />
-        </div>
-        <div css={controlsStyles}>
-          <button
-            type="button"
-            aria-label={translate('pdfViewerPreviousPage')}
-            disabled={currentPage <= 1}
-            onClick={() => {
-              return setCurrentPage(page => {
-                return Math.max(1, page - 1);
-              });
-            }}
-          >
-            {translate('pdfViewerPreviousPage')}
-          </button>
-          <span aria-live="polite">{translate('pdfViewerPageNumber', {page: currentPage, total: pagesCount})}</span>
-          <button
-            type="button"
-            aria-label={translate('pdfViewerNextPage')}
-            disabled={currentPage >= pagesCount}
-            onClick={() => {
-              return setCurrentPage(page => {
-                return Math.min(pagesCount, page + 1);
-              });
-            }}
-          >
-            {translate('pdfViewerNextPage')}
-          </button>
-        </div>
-      </Document>
-    </div>
-  );
+  useEffect(() => {
+    const handleBlockedFrame = (event: SecurityPolicyViolationEvent): void => {
+      if (
+        event.disposition === 'enforce' &&
+        event.effectiveDirective === 'frame-src' &&
+        (event.blockedURI === src || event.blockedURI === 'blob')
+      ) {
+        setHasError(true);
+      }
+    };
+    document.addEventListener('securitypolicyviolation', handleBlockedFrame);
+    return () => {
+      document.removeEventListener('securitypolicyviolation', handleBlockedFrame);
+    };
+  }, [src]);
+
+  if (hasError) {
+    return (
+      <div css={errorStyles} role="alert">
+        <p>{translate('pdfViewerErrorTitle')}</p>
+        <p>{translate('pdfViewerErrorDescription')}</p>
+      </div>
+    );
+  }
+
+  return <iframe src={src} title={fileName} css={viewerStyles} referrerPolicy="no-referrer" />;
 };

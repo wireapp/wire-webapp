@@ -59,29 +59,19 @@ export const actionsStyles: CSSObject = {
   flexShrink: 0,
 };
 
-export const downloadButtonStyles: CSSObject = {
+export const actionButtonStyles: CSSObject = {
   display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  padding: '8px 12px',
-  border: '1px solid var(--border-color)',
-  borderRadius: 'var(--button-border-radius)',
-  color: 'var(--foreground)',
-  backgroundColor: 'transparent',
-  cursor: 'pointer',
-};
-
-export const closeButtonStyles: CSSObject = {
-  display: 'flex',
+  width: '40px',
   minWidth: '40px',
   height: '40px',
   alignItems: 'center',
   justifyContent: 'center',
-  border: '1px solid var(--border-color)',
-  borderRadius: 'var(--button-border-radius)',
-  padding: '0 8px',
+  border: 'none',
+  borderRadius: '50%',
+  padding: 0,
   color: 'var(--foreground)',
-  background: 'transparent',
+  fill: 'currentColor',
+  background: 'none',
   cursor: 'pointer',
 };
 

@@ -237,10 +237,23 @@ describe('FileAssetComponent', () => {
     });
     expect(load.mock.calls[0][0]).not.toBe(originalResource);
     expect(download).not.toHaveBeenCalled();
+    await act(async () => {
+      resolveLoad(new Blob(['%PDF-1.7 sample']));
+    });
+    const viewer = await screen.findByTitle('report.pdf');
 
     fireEvent.click(screen.getByRole('button', {name: 'conversationContextMenuDownload'}));
 
     expect(download).toHaveBeenCalledWith(asset);
+    act(() => {
+      asset.status(AssetTransferState.DOWNLOADING);
+    });
+    expect(screen.getByTitle('report.pdf')).toBe(viewer);
+    act(() => {
+      asset.status(AssetTransferState.UPLOADED);
+    });
+    expect(screen.getByTitle('report.pdf')).toBe(viewer);
+    expect(load).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByRole('button', {name: 'modalCloseButton'}));
     await waitFor(() => {
       expect(screen.getByRole('button', {name: 'cells.filePreviewButton.ariaLabel'})).toHaveFocus();
