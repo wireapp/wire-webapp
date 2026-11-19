@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, type FunctionComponent} from 'react';
+import {type FunctionComponent, useState} from 'react';
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -141,8 +141,8 @@ const ControlledPicker: FunctionComponent<{
   initialSelected?: User[];
   initialEmails?: string[];
   initialFilter?: string;
-  isFederated?: boolean;
   searchByName?: (query: string, teamId?: string) => Promise<User[]>;
+  searchRepository?: Pick<SearchRepository, 'normalizeQuery' | 'searchByName' | 'searchUserInSet'>;
   availableUsers?: User[];
   label?: string;
   conversationRepository?: Pick<ConversationRepository, 'getAllGroupConversations'>;
@@ -150,8 +150,8 @@ const ControlledPicker: FunctionComponent<{
   initialSelected = [],
   initialEmails,
   initialFilter = '',
-  isFederated = false,
   searchByName = searchRepositoryDouble.searchByName,
+  searchRepository,
   availableUsers = users,
   label = PARTICIPANTS_LABEL,
   conversationRepository,
@@ -159,8 +159,8 @@ const ControlledPicker: FunctionComponent<{
   initialSelected?: User[];
   initialEmails?: string[];
   initialFilter?: string;
-  isFederated?: boolean;
   searchByName?: (query: string, teamId?: string) => Promise<User[]>;
+  searchRepository?: Pick<SearchRepository, 'normalizeQuery' | 'searchByName' | 'searchUserInSet'>;
   availableUsers?: User[];
   label?: string;
   conversationRepository?: Pick<ConversationRepository, 'getAllGroupConversations'>;
@@ -178,14 +178,13 @@ const ControlledPicker: FunctionComponent<{
       users={availableUsers}
       selectedUsers={selectedUsers}
       invitedEmails={isUndefined(initialEmails) ? undefined : invitedEmails}
-      isFederated={isFederated}
       onInvitedEmailsChange={isUndefined(initialEmails) ? undefined : setInvitedEmails}
       onSelectedUsersChange={setSelectedUsers}
       filter={filter}
       onFilterChange={setFilter}
       placeholder={isUndefined(initialEmails) ? undefined : 'meetings.scheduleModal.participantsEmailPlaceholder'}
       selfUser={selfUser}
-      searchRepository={{...searchRepositoryDouble, searchByName}}
+      searchRepository={searchRepository ?? {...searchRepositoryDouble, searchByName}}
       teamRepository={teamRepositoryDouble}
       conversationRepository={conversationRepository as ConversationRepository | undefined}
       conversationState={conversationStateDouble}
@@ -199,6 +198,36 @@ const getSearchInput = (accessibleName = PARTICIPANTS_LABEL): HTMLElement => {
 };
 
 describe('MeetingParticipantsPicker', () => {
+  it('opens with a search repository whose methods are on its prototype', async () => {
+    class PrototypeSearchRepository {
+      normalizeQuery(query: string): ReturnType<SearchRepository['normalizeQuery']> {
+        return searchRepositoryDouble.normalizeQuery(query);
+      }
+
+      searchUserInSet(query: string, candidateUsers: User[]): User[] {
+        return searchRepositoryDouble.searchUserInSet(query, candidateUsers);
+      }
+
+      async searchByName(): Promise<User[]> {
+        return [];
+      }
+    }
+
+    const user = userEvent.setup();
+    render(
+      withThemeAndRootContext(
+        <ControlledPicker searchRepository={new PrototypeSearchRepository()} />,
+        rootProviderWrapper,
+      ),
+    );
+
+    await user.click(getSearchInput());
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+    await user.type(getSearchInput(), 'Alice');
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
+    expect(await screen.findByText('Alice Anderson')).toBeInTheDocument();
+  });
+
   it('validates typed and pasted emails separately from a selected Wire user', async () => {
     const user = userEvent.setup();
     const onSubmit = jest.fn();
@@ -282,35 +311,11 @@ describe('MeetingParticipantsPicker', () => {
     });
   });
 
-  it('searches federated name@domain and offers a separate email invitation', async () => {
-    const user = userEvent.setup();
-    const federatedUser = createUser('remote', 'Remote Person', 'remote');
-    federatedUser.teamId = 'remote-team';
-    const searchByName = jest.fn().mockResolvedValue([federatedUser]);
-    render(
-      withThemeAndRootContext(
-        <ControlledPicker initialEmails={[]} isFederated searchByName={searchByName} />,
-        rootProviderWrapper,
-      ),
-    );
-
-    const input = getSearchInput();
-    await user.type(input, 'remote@example.com');
-    await waitFor(() => {return expect(searchByName).toHaveBeenCalledWith('remote@example.com', undefined)});
-    await user.click(await screen.findByRole('button', {name: CONTACTS_LABEL}));
-    await waitFor(() => {return expect(screen.getByText('Remote Person')).toBeInTheDocument()});
-    expect(screen.getByRole('button', {name: 'meetings.scheduleModal.inviteByEmail'})).toBeInTheDocument();
-    await user.click(screen.getByText('Remote Person'));
-    expect(screen.getByRole('button', {name: SELECTED_CONTACTS_LABEL})).toBeInTheDocument();
-    await user.type(input, 'remote@example.com');
-    await user.click(screen.getByRole('button', {name: 'meetings.scheduleModal.inviteByEmail'}));
-    expect(screen.getByText('remote@example.com')).toBeInTheDocument();
-    expect(input).toHaveValue('');
-  });
-
   it('keeps @handle searches available on non-federated backends', async () => {
     const searchByName = jest.fn().mockResolvedValue([]);
-    render(withThemeAndRootContext(<ControlledPicker initialEmails={[]} searchByName={searchByName} />, rootProviderWrapper));
+    render(
+      withThemeAndRootContext(<ControlledPicker initialEmails={[]} searchByName={searchByName} />, rootProviderWrapper),
+    );
 
     fireEvent.change(getSearchInput(), {target: {value: '@jane.doe'}});
     await waitFor(() => {
@@ -877,16 +882,27 @@ describe('MeetingParticipantsPicker', () => {
     expect(screen.getByText(PARTICIPANTS_LABEL_WITH_COUNT)).toBeInTheDocument();
   });
 
-  it('includes remote team search results when filtering', async () => {
+  it('shows eligible fetched team members only', async () => {
+    const selfUser = createUser('self', 'Self User', 'self');
+    selfUser.teamId = 'self-team';
     const remoteUser = createUser('remote-1', 'Remote Member', 'remote');
-    remoteUser.teamId = users[0].teamId;
+    remoteUser.teamId = selfUser.teamId;
+    const otherTeamUser = createUser('other-team', 'Remote Other Team', 'other-team');
+    otherTeamUser.teamId = 'other-team';
+    const guest = createUser('guest', 'Remote Guest', 'guest');
+    guest.teamId = selfUser.teamId;
+    guest.isGuest(true);
+    const service = createUser('service', 'Remote Service', 'service');
+    service.teamId = selfUser.teamId;
+    service.isService = true;
     const user = userEvent.setup();
 
     render(
       withThemeAndRootContext(
         <ControlledPicker
+          availableUsers={[selfUser]}
           searchByName={async () => {
-            return [remoteUser];
+            return [remoteUser, otherTeamUser, guest, service];
           }}
         />,
         rootProviderWrapper,
@@ -903,6 +919,9 @@ describe('MeetingParticipantsPicker', () => {
     await waitFor(() => {
       expect(screen.getByText('Remote Member')).toBeInTheDocument();
     });
+    expect(screen.queryByText('Remote Other Team')).not.toBeInTheDocument();
+    expect(screen.queryByText('Remote Guest')).not.toBeInTheDocument();
+    expect(screen.queryByText('Remote Service')).not.toBeInTheDocument();
   });
 
   it('closes the menu when clicking outside', async () => {
