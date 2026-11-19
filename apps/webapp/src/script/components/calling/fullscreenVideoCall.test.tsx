@@ -18,6 +18,7 @@
  */
 
 import {act, render, waitFor} from '@testing-library/react';
+import {createStore} from 'zustand/vanilla';
 
 import {QUERY} from '../../uiKit/utils/mediaQueries';
 import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
@@ -31,12 +32,9 @@ import {User} from '../../repositories/entity/User';
 import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
 import {PropertiesService} from '../../repositories/properties/propertiesService';
 import {SelfService} from '../../repositories/self/SelfService';
-import {
-  buildCallingRepository,
-  buildMediaDevicesHandler,
-  withTheme,
-  withThemeAndRootContext,
-} from '../../auth/util/test/testUtil';
+import {buildCallingRepository, buildMediaDevicesHandler, withThemeAndRootContext} from '../../auth/util/test/testUtil';
+import type {MeetingStoreState} from '../meeting/meetingStore/createMeetingStore';
+import {MeetingStoreProvider} from '../meeting/meetingStore/meetingStoreProvider';
 import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
@@ -92,6 +90,35 @@ describe('fullscreenVideoCall', () => {
     return props as FullscreenVideoCallProps;
   };
 
+  const renderCall = (props: FullscreenVideoCallProps): ReturnType<typeof render> => {
+    const meetingStore = createStore<MeetingStoreState>(() => {
+      return {
+        meetingSeries: [],
+        isLoading: false,
+        hasLoadError: false,
+        loadMeetings: jest.fn(),
+        scheduleMeeting: jest.fn(),
+        meetNowMeeting: jest.fn(),
+        updateMeeting: jest.fn(),
+        rotateMeetingLink: jest.fn(),
+        deleteMeetingForMe: jest.fn(),
+        deleteMeetingForAll: jest.fn(),
+        removeMeetingByQualifiedId: jest.fn(),
+        syncMeetingByQualifiedId: jest.fn(),
+        loadMeetingForEdit: jest.fn(),
+      };
+    });
+
+    return render(
+      withThemeAndRootContext(
+        <MeetingStoreProvider store={meetingStore}>
+          <FullscreenVideoCall {...props} />
+        </MeetingStoreProvider>,
+        rootProviderWrapper,
+      ),
+    );
+  };
+
   beforeEach(() => {
     jest.useFakeTimers();
   });
@@ -102,16 +129,14 @@ describe('fullscreenVideoCall', () => {
   });
 
   it('always shows the security line in the timer', () => {
-    const {getByTestId} = render(
-      withThemeAndRootContext(<FullscreenVideoCall {...createProps()} />, rootProviderWrapper),
-    );
+    const {getByTestId} = renderCall(createProps());
 
     expect(getByTestId('video-timer').contains(getByTestId('call-security-line'))).toBe(true);
   });
 
   it('has no active speaker toggle for calls with more less than 3 participants', () => {
     const props = createProps();
-    const {queryByTestId} = render(withTheme(<FullscreenVideoCall {...props} />), {wrapper: rootProviderWrapper});
+    const {queryByTestId} = renderCall(props);
 
     expect(queryByTestId('do-call-controls-video-call-view')).toBeNull();
   });
@@ -129,9 +154,7 @@ describe('fullscreenVideoCall', () => {
     props.call.addParticipant(new Participant(new User('c', '', translateForTest), 'd'));
     props.call.addParticipant(new Participant(new User('e', '', translateForTest), 'f'));
 
-    const {getByTestId, getByText} = render(withTheme(<FullscreenVideoCall {...props} />), {
-      wrapper: rootProviderWrapper,
-    });
+    const {getByTestId, getByText} = renderCall(props);
     const callViewToggleButton = getByTestId('do-call-controls-video-call-view');
 
     act(() => {
@@ -156,7 +179,7 @@ describe('fullscreenVideoCall', () => {
     callState.viewMode(CallingViewMode.FULL_SCREEN);
     props.callState = callState;
 
-    render(withTheme(<FullscreenVideoCall {...props} />), {wrapper: rootProviderWrapper});
+    renderCall(props);
 
     const wrapper = document.querySelector('[data-uie-name="fullscreen-video-call"]') as HTMLElement;
 
@@ -183,7 +206,7 @@ describe('fullscreenVideoCall', () => {
     callState.viewMode(CallingViewMode.FULL_SCREEN);
     props.callState = callState;
 
-    render(withTheme(<FullscreenVideoCall {...props} />), {wrapper: rootProviderWrapper});
+    renderCall(props);
 
     const wrapper = document.querySelector('[data-uie-name="fullscreen-video-call"]') as HTMLElement;
 

@@ -22,10 +22,8 @@ import {createElement} from 'react';
 import {addNewModalToQueue, removeCurrentModal, replaceCurrentModal, showNextModalInQueue} from './PrimaryModalState';
 import {PrimaryModalType} from './PrimaryModalTypes';
 
-import {
-  MeetingLinkConfirmationMessage,
-  registerMeetingLinkConfirmationHandler,
-} from '../../meeting/meetingLinkConfirmation/meetingLinkConfirmation';
+import {MeetingLink, registerMeetingLinkConfirmationHandler} from '../../meeting/meetingLink/meetingLink';
+import {meetingLinkModalFooterStyles} from '../../meeting/meetingLink/meetingLink.styles';
 
 export {removeCurrentModal, usePrimaryModalState} from './PrimaryModalState';
 export {PrimaryModal};
@@ -48,10 +46,12 @@ registerMeetingLinkConfirmationHandler(({link, hasPassword, translate, onClosed}
       hideSecondary: true,
       text: {
         closeBtnLabel: translate('meetings.meetingLink.close'),
-        message: createElement(MeetingLinkConfirmationMessage, {
+        message: createElement(MeetingLink, {
           link,
           hasPassword,
           translate,
+          footerStyles: meetingLinkModalFooterStyles,
+          showCancel: true,
           onClose: removeCurrentModal,
         }),
         title: translate('meetings.meetingLink.title'),
