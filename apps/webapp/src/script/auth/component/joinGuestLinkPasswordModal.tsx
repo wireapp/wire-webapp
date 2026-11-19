@@ -22,6 +22,8 @@ import {FormEvent, useState, type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
+import {learnMoreLinkStyles, learnMoreLinkTextStyles} from './joinGuestLinkPasswordModal.styles';
+
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {COLOR} from '../../uiKit/identity/colors/colors';
@@ -120,8 +122,12 @@ const JoinGuestLinkPasswordModal: FunctionComponent<JoinGuestLinkPasswordModalPr
             }}
           />
         </Form>
-        <Link href={Config.getConfig().URL.SUPPORT.LEARN_MORE_ABOUT_GUEST_LINKS} target="_blank">
-          <Text block color={COLOR.BLUE} style={{textDecoration: 'underline', marginBottom: 24}}>
+        <Link
+          href={Config.getConfig().URL.SUPPORT.LEARN_MORE_ABOUT_GUEST_LINKS}
+          target="_blank"
+          css={learnMoreLinkStyles}
+        >
+          <Text color={COLOR.BLUE} css={learnMoreLinkTextStyles}>
             {translate('guestLinkPasswordModal.learnMoreLink')}
           </Text>
         </Link>
