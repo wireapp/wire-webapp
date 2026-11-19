@@ -20,10 +20,11 @@
 import {ChangeEvent, type FunctionComponent, useEffect, useRef, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {CallHeaderTitle} from './CallHeaderTitle';
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {CallSecurityLine} from './callSecurityLine/callSecurityLine';
 import {
@@ -143,6 +144,8 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
 }: FullscreenVideoCallProps) => {
   const {translate} = useApplicationContext();
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
+  const [closeMeetingLinkSignal, setCloseMeetingLinkSignal] = useState(0);
+  const [closeSecurityExplainerSignal, setCloseSecurityExplainerSignal] = useState(0);
   const selfParticipant = call.getSelfParticipant();
   const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesCamera']);
 
@@ -356,7 +359,16 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
                 return clearShowAlert();
               }}
             >
-              <h2 className="video-remote-title">{conversationName}</h2>
+              <CallHeaderTitle
+                conversationId={conversation.qualifiedId}
+                title={conversationName}
+                closeSignal={closeMeetingLinkSignal}
+                onOpen={() => {
+                  setCloseSecurityExplainerSignal(signal => {
+                    return signal + 1;
+                  });
+                }}
+              />
 
               <div data-uie-name="video-timer" className="video-timer label-xs">
                 <CallSecurityLine
@@ -365,6 +377,12 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
                   startedAt={startedAt}
                   brandName={brandName}
                   supportUrl={callEncryptionSupportUrl}
+                  closeSignal={closeSecurityExplainerSignal}
+                  onExplainerOpen={() => {
+                    setCloseMeetingLinkSignal(signal => {
+                      return signal + 1;
+                    });
+                  }}
                 />
               </div>
             </div>
@@ -439,7 +457,7 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
               return setMaximizedParticipant(call, participant);
             }}
           />
-          {classifiedDomains !== undefined && (
+          {!isUndefined(classifiedDomains) && (
             <ConversationClassifiedBar
               conversation={conversation}
               classifiedDomains={classifiedDomains}

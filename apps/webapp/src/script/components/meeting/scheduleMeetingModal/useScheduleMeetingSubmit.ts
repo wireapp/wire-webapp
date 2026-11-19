@@ -36,7 +36,7 @@ import {useApplicationContext, useMainViewModel} from '../../../page/rootProvide
 import type {User} from '../../../repositories/entity/User';
 import {mapScheduleFormToMeetingCommand} from '../mapScheduleFormToMeetingCommand';
 import {mapScheduleFormToUpdateMeetingCommand} from '../mapScheduleFormToUpdateMeetingCommand';
-import {showMeetingLinkConfirmation} from '../meetingLinkConfirmation/meetingLinkConfirmation';
+import {showMeetingLinkConfirmation} from '../meetingLink/meetingLink';
 import {useMeetingStore} from '../meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../meetingSubmitErrors';
 import type {MeetingSubmitSuccess, ScheduleMeetingSuccess} from '../shared/service/meetingService';
