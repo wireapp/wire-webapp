@@ -23,6 +23,7 @@ export const meetingSubmitErrors = {
   createFailed: 'createFailed',
   conversationSetupFailed: 'conversationSetupFailed',
   updateFailed: 'updateFailed',
+  emailRemovedButUpdateFailed: 'emailRemovedButUpdateFailed',
   editMeetingIdMissing: 'editMeetingIdMissing',
   originalMeetingTimesMissing: 'originalMeetingTimesMissing',
   addParticipantsFailed: 'addParticipantsFailed',

@@ -190,8 +190,8 @@ const hasMeetingMetadataChanged = (command: UpdateMeetingCommand): boolean => {
 };
 
 /**
- * Updates meeting metadata, syncs conversation participants, then heals the
- * dedicated meeting conversation name when it differs from the meeting title.
+ * Removes email invitees before updating metadata so they do not receive update
+ * emails, then syncs the conversation and invites new addresses with final details.
  */
 export const updateMeeting = (
   command: UpdateMeetingCommand,
@@ -216,71 +216,75 @@ export const updateMeeting = (
     return !selectedEmails.has(email.toLowerCase());
   });
 
-  const syncEmails = (success: MeetingSubmitSuccess): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
-    const add =
+  const addEmails = (success: MeetingSubmitSuccess): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+    return (
       emailsToAdd.length > 0
         ? deps.meetingsRepository.addInvitedEmails(command.meetingId, emailsToAdd)
-        : task.resolve(undefined);
-    return add
+        : task.resolve(undefined)
+    )
       .mapRejected(error => {
         logger.warn('Failed to add invited emails', {error, meetingId: command.meetingId});
         return meetingSubmitErrors.emailInvitationsFailed;
       })
-      .andThen(() => {
-        const remove =
-          emailsToRemove.length > 0
-            ? deps.meetingsRepository.removeInvitedEmails(command.meetingId, emailsToRemove)
-            : task.resolve(undefined);
-        return remove
-          .mapRejected(error => {
-            logger.warn('Failed to remove invited emails', {error, meetingId: command.meetingId});
-            return meetingSubmitErrors.emailInvitationsFailed;
-          })
-          .map(() => {
-            return success;
-          });
+      .map(() => {
+        return success;
       });
   };
 
-  if (!hasMeetingMetadataChanged(command)) {
-    return syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove)
-      .andThen(submitSuccess => {
-        if ((isEmptyArray(usersToAdd) && isEmptyArray(userIdsToRemove)) || command.qualifiedConversation.isNothing) {
-          return task.resolve(submitSuccess);
-        }
-
-        return syncMeetingConversationName(deps.conversationRepository, {
-          qualifiedConversationId: command.qualifiedConversation.value,
-          title: command.title,
-        }).map(() => {
-          return submitSuccess;
-        });
-      })
-      .andThen(syncEmails);
-  }
-
-  return deps.meetingsRepository
-    .updateMeeting(command.meetingId, mapUpdateCommandToUpdateMeeting(command))
-    .mapRejected(() => {
-      return meetingSubmitErrors.updateFailed;
-    })
-    .andThen(updatedMeeting => {
-      return saveMeetingConversationFromResponse(
-        deps.conversationRepository,
-        updatedMeeting.conversation,
-        meetingSubmitErrors.conversationSetupFailed,
-      )
-        .andThen(() => {
-          return syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove);
-        })
+  const continueAfterRemoval = (): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+    if (!hasMeetingMetadataChanged(command)) {
+      return syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove)
         .andThen(submitSuccess => {
+          if ((isEmptyArray(usersToAdd) && isEmptyArray(userIdsToRemove)) || command.qualifiedConversation.isNothing) {
+            return task.resolve(submitSuccess);
+          }
+
           return syncMeetingConversationName(deps.conversationRepository, {
-            qualifiedConversationId: updatedMeeting.qualified_conversation,
-            title: updatedMeeting.title,
+            qualifiedConversationId: command.qualifiedConversation.value,
+            title: command.title,
           }).map(() => {
             return submitSuccess;
           });
-        });
+        })
+        .andThen(addEmails);
+    }
+
+    return deps.meetingsRepository
+      .updateMeeting(command.meetingId, mapUpdateCommandToUpdateMeeting(command))
+      .mapRejected(() => {
+        return emailsToRemove.length > 0
+          ? meetingSubmitErrors.emailRemovedButUpdateFailed
+          : meetingSubmitErrors.updateFailed;
+      })
+      .andThen(updatedMeeting => {
+        return saveMeetingConversationFromResponse(
+          deps.conversationRepository,
+          updatedMeeting.conversation,
+          meetingSubmitErrors.conversationSetupFailed,
+        )
+          .andThen(() => {
+            return syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove);
+          })
+          .andThen(submitSuccess => {
+            return syncMeetingConversationName(deps.conversationRepository, {
+              qualifiedConversationId: updatedMeeting.qualified_conversation,
+              title: updatedMeeting.title,
+            }).map(() => {
+              return submitSuccess;
+            });
+          });
+      })
+      .andThen(addEmails);
+  };
+
+  return (
+    emailsToRemove.length > 0
+      ? deps.meetingsRepository.removeInvitedEmails(command.meetingId, emailsToRemove)
+      : task.resolve(undefined)
+  )
+    .mapRejected(error => {
+      logger.warn('Failed to remove invited emails', {error, meetingId: command.meetingId});
+      return meetingSubmitErrors.updateFailed;
     })
-    .andThen(syncEmails);
+    .andThen(continueAfterRemoval);
 };
