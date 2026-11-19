@@ -19,80 +19,57 @@
 
 import type {CSSObject} from '@emotion/react';
 
-import {fileHeaderHeight} from '../../../../../FileFullscreenModal/common/fileHeaderHeight';
-
-export const contentStyles: CSSObject = {
+export const overlayStyles: CSSObject = {
+  position: 'relative',
   display: 'flex',
   width: '100%',
   height: '100%',
+  minHeight: 0,
   flexDirection: 'column',
-  alignItems: 'center',
-};
-
-export const headerStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '16px',
-  height: fileHeaderHeight,
-  width: '100%',
-  boxSizing: 'border-box',
-  padding: '0 16px',
-  borderBottom: '1px solid var(--border-color)',
   backgroundColor: 'var(--app-bg)',
-};
-
-export const nameStyles: CSSObject = {
-  overflow: 'hidden',
-  margin: 0,
   color: 'var(--foreground)',
-  fontSize: 'var(--font-size-medium)',
-  fontWeight: 'var(--font-weight-semibold)',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
 };
 
-export const actionsStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  flexShrink: 0,
-};
-
-export const actionButtonStyles: CSSObject = {
+export const closeButtonStyles: CSSObject = {
+  position: 'fixed',
+  zIndex: 1,
+  top: '16px',
+  right: '16px',
   display: 'flex',
   width: '40px',
   minWidth: '40px',
   height: '40px',
   alignItems: 'center',
   justifyContent: 'center',
-  border: 'none',
+  border: '1px solid var(--border-color)',
   borderRadius: '50%',
   padding: 0,
   color: 'var(--foreground)',
-  fill: 'currentColor',
-  background: 'none',
+  backgroundColor: 'var(--app-bg)',
   cursor: 'pointer',
 };
 
-export const readerStyles: CSSObject = {
+export const previewScrollStyles: CSSObject = {
+  boxSizing: 'border-box',
   display: 'flex',
   width: '100%',
-  height: `calc(100% - ${fileHeaderHeight}px)`,
   minHeight: 0,
   flex: 1,
-  flexDirection: 'column',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   justifyContent: 'center',
-  backgroundColor: 'var(--app-bg)',
+  overflow: 'auto',
+  padding: '72px 0 16px',
 };
 
-export const loadingStyles: CSSObject = {
-  display: 'flex',
-  flex: 1,
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '8px',
+export const previewImageStyles: CSSObject = {
+  display: 'block',
+  width: '100%',
+  maxWidth: '1200px',
+  height: 'auto',
+  margin: '0 auto',
+};
+
+export const previewStatusStyles: CSSObject = {
+  margin: 'auto',
   color: 'var(--foreground)',
 };
