@@ -17,8 +17,6 @@
  *
  */
 
-import {readFileSync} from 'node:fs';
-
 import type {pdfjs} from 'react-pdf';
 import {noop} from 'noop-esm';
 import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
@@ -65,22 +63,6 @@ describe('createPdfPreview', () => {
     expect(destroy).toHaveBeenCalledTimes(1);
   });
 
-  it('configures PDF.js standard fonts when rendering the Times-Roman regression PDF', async () => {
-    const file = new Blob([readFileSync(`${__dirname}/test-data/hello-world-times-roman.pdf`)], {
-      type: 'application/pdf',
-    });
-
-    await createPdfPreview(file, new AbortController().signal, loadPdf);
-
-    expect(getDocument).toHaveBeenCalledWith(
-      expect.objectContaining({
-        standardFontDataUrl: '/min/pdfjs/standard_fonts/',
-        isEvalSupported: false,
-        useSystemFonts: false,
-      }),
-    );
-  });
-
   it.each(['application/octet-stream', ''])('renders a PDF with MIME type %p using its signature', async type => {
     const file = new Blob(['prefix\n%PDF-1.7\ncontents'], {type});
 
@@ -90,8 +72,6 @@ describe('createPdfPreview', () => {
     expect(getDocument).toHaveBeenCalledWith({
       data: new Uint8Array(Buffer.from('prefix\n%PDF-1.7\ncontents')),
       isEvalSupported: false,
-      standardFontDataUrl: '/min/pdfjs/standard_fonts/',
-      useSystemFonts: false,
     });
     expect(destroy).toHaveBeenCalledTimes(1);
   });

@@ -283,14 +283,6 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
           {from: path.resolve(srcPath, 'page/basicBrowserFeatureCheck.js'), to: 'min/'},
           {from: path.resolve(srcPath, 'page/loader.js'), to: 'min/'},
           {
-            context: path.resolve(
-              path.dirname(fileURLToPath(import.meta.resolve('pdfjs-dist/package.json'))),
-              'standard_fonts',
-            ),
-            from: '**/*',
-            to: 'min/pdfjs/standard_fonts',
-          },
-          {
             from: path.resolve(
               path.dirname(fileURLToPath(import.meta.resolve('pdfjs-dist/package.json'))),
               'build/pdf.worker.mjs',
