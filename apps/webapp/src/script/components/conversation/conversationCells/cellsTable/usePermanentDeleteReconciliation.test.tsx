@@ -188,6 +188,29 @@ describe('usePermanentDeleteReconciliation', () => {
     });
   });
 
+  it('reports an unknown outcome after a finished job remains visible and the view unmounts', async () => {
+    const {getBackgroundActionInfo, onRefreshAndReportSuccess, onContinueAfterViewLeave, options} = createOptions();
+    getBackgroundActionInfo.mockResolvedValue({Status: JobsTaskStatus.Finished});
+    const {result, unmount} = renderHook(() => {
+      return usePermanentDeleteReconciliation(options);
+    });
+
+    await act(async () => {
+      await result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin', deleteStatus);
+    });
+    await waitFor(() => {
+      expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
+    });
+
+    unmount();
+
+    expect(onContinueAfterViewLeave).toHaveBeenCalledWith({
+      kind: 'terminal',
+      status: deleteStatus,
+      statusKind: 'status-unknown',
+    });
+  });
+
   it('times out a pending status read and ignores its late result', async () => {
     const {clock, deleteNodes, getBackgroundActionInfo, onRefreshAndReportSuccess, options} = createOptions();
     let resolveStatus: ((response: {Status: JobsTaskStatus}) => void) | undefined;
