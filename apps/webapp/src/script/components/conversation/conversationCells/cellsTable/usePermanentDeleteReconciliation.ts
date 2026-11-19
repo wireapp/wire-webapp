@@ -290,6 +290,7 @@ export const usePermanentDeleteReconciliation = (
         jobUuids: jobEvidence.value.hasPendingJobs ? context.jobUuids : [],
         hasKnownJobFailure: hasJobFailure,
       };
+      activeContextRef.current = nextContext;
 
       setIsWaitingForReconciliation(false);
       let wasRefreshSuccessful = false;
