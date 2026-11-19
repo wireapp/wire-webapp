@@ -17,18 +17,35 @@
  *
  */
 
-import {useEffect, useState, type ReactElement} from 'react';
+import {useEffect, useRef, useState, type ReactElement} from 'react';
+
+import {
+  closeButtonStyles,
+  overlayStyles,
+  previewImageStyles,
+  previewScrollStyles,
+  previewStatusStyles,
+} from './pdfAssetPreview.styles';
 
 import {useInView} from '../../../../../../hooks/useInView/useInView';
 import type {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
 import {readPreviewBlob} from '../../../../../../repositories/assets/readPreviewBlob';
+import {CloseIcon} from '../../../../../../uiKit/dataDisplay/icon/closeIcon';
 import {FileCardPreview} from '../../../../../fileCard/fileCardPreview/fileCardPreview';
+import {FullscreenModal} from '../../../../../fullscreenModal/fullscreenModal';
 
 interface PdfAssetPreviewProps {
+  id: string;
   resource: AssetRemoteData;
   label: string;
+  fileName: string;
+  closeLabel: string;
+  loadingLabel: string;
+  errorLabel: string;
+  isOpen: boolean;
+  onOpenPreview: (trigger: HTMLElement) => void;
+  onClose: () => void;
   tabIndex: number;
-  onOpenPreview: () => void;
   loadAsset: (resource: AssetRemoteData) => Promise<Blob | undefined>;
 }
 
@@ -38,31 +55,63 @@ const pngSignature = '\x89PNG\r\n\x1a\n';
 const jpegSignature = '\xff\xd8\xff';
 
 export const PdfAssetPreview = ({
+  id,
   resource,
   label,
-  tabIndex,
+  fileName,
+  closeLabel,
+  loadingLabel,
+  errorLabel,
+  isOpen,
   onOpenPreview,
+  onClose,
+  tabIndex,
   loadAsset,
 }: PdfAssetPreviewProps): ReactElement => {
   const {elementRef, hasBeenInView} = useInView<HTMLDivElement>();
+  const [shouldLoadPreview, setShouldLoadPreview] = useState(false);
   const [preview, setPreview] = useState<{resource: AssetRemoteData; url: string}>();
   const [failedUrl, setFailedUrl] = useState<string>();
+  const [previewLoadFailed, setPreviewLoadFailed] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (!hasBeenInView || resource.otrKey?.length !== keyLength || resource.sha256?.length !== keyLength) {
+    if (hasBeenInView || isOpen) {
+      setShouldLoadPreview(true);
+    }
+  }, [hasBeenInView, isOpen]);
+
+  useEffect(() => {
+    if (!shouldLoadPreview) {
       return undefined;
     }
 
     let disposed = false;
     let objectUrl: string | undefined;
+    setPreviewLoadFailed(false);
+
     const load = async (): Promise<void> => {
       try {
-        const blob = await loadAsset(resource);
-        if (disposed || blob === undefined || blob.size > maxPreviewSize) {
+        if (resource.otrKey?.length !== keyLength || resource.sha256?.length !== keyLength) {
+          setPreviewLoadFailed(true);
           return;
         }
+
+        const blob = await loadAsset(resource);
+        if (disposed) {
+          return;
+        }
+        if (blob === undefined || blob.size > maxPreviewSize) {
+          setPreviewLoadFailed(true);
+          return;
+        }
+
         // Asset transport MIME describes ciphertext. Accept raster bytes only, never SVG/HTML.
         const bytes = new Uint8Array(await readPreviewBlob(blob.slice(0, pngSignature.length)));
+        if (disposed) {
+          return;
+        }
+
         const matchesSignature = (signature: string): boolean => {
           return Array.from(signature).every((character, index) => {
             return bytes[index] === character.charCodeAt(0);
@@ -70,13 +119,17 @@ export const PdfAssetPreview = ({
         };
         const isPng = matchesSignature(pngSignature);
         const isJpeg = matchesSignature(jpegSignature);
-        if (disposed || (!isPng && !isJpeg)) {
+        if (!isPng && !isJpeg) {
+          setPreviewLoadFailed(true);
           return;
         }
+
         objectUrl = URL.createObjectURL(new Blob([blob], {type: isPng ? 'image/png' : 'image/jpeg'}));
         setPreview({resource, url: objectUrl});
       } catch {
-        // Keep the ordinary file/download card when the preview is unavailable.
+        if (!disposed) {
+          setPreviewLoadFailed(true);
+        }
       }
     };
     void load();
@@ -88,9 +141,46 @@ export const PdfAssetPreview = ({
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [hasBeenInView, resource, loadAsset]);
+  }, [shouldLoadPreview, resource, loadAsset]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const attachDialogLabelAndFocus = (): boolean => {
+      const dialog = document.getElementById(id);
+      if (dialog === null) {
+        return false;
+      }
+      dialog.setAttribute('aria-label', label);
+      closeButtonRef.current?.focus();
+      return true;
+    };
+
+    if (attachDialogLabelAndFocus()) {
+      return undefined;
+    }
+
+    const observer = new MutationObserver(() => {
+      if (attachDialogLabelAndFocus()) {
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.body, {childList: true, subtree: true});
+    return () => {
+      observer.disconnect();
+    };
+  }, [id, isOpen, label]);
 
   const url = preview?.resource === resource ? preview.url : undefined;
+  const isPreviewUnavailable = previewLoadFailed || (url !== undefined && url === failedUrl);
+  const onPreviewImageError = (): void => {
+    if (url !== undefined) {
+      setFailedUrl(url);
+    }
+  };
+
   return (
     <div ref={elementRef} css={{width: '100%'}}>
       {url !== undefined && url !== failedUrl && (
@@ -98,13 +188,41 @@ export const PdfAssetPreview = ({
           <FileCardPreview
             src={url}
             aria-label={label}
+            aria-haspopup="dialog"
+            aria-expanded={isOpen}
+            aria-controls={id}
             tabIndex={tabIndex}
-            onClick={onOpenPreview}
-            onImageError={() => {
-              return setFailedUrl(url);
+            onClick={event => {
+              return onOpenPreview(event.currentTarget);
             }}
+            onImageError={onPreviewImageError}
           />
         </div>
+      )}
+      {isOpen && (
+        <FullscreenModal id={id} isOpen={isOpen} onClose={onClose}>
+          <div css={overlayStyles}>
+            <button
+              ref={closeButtonRef}
+              type="button"
+              css={closeButtonStyles}
+              aria-label={closeLabel}
+              title={closeLabel}
+              onClick={onClose}
+            >
+              <CloseIcon color="currentColor" />
+            </button>
+            <div css={previewScrollStyles}>
+              {url !== undefined && !isPreviewUnavailable ? (
+                <img src={url} alt={fileName} css={previewImageStyles} onError={onPreviewImageError} />
+              ) : (
+                <p css={previewStatusStyles} role={isPreviewUnavailable ? 'alert' : 'status'}>
+                  {isPreviewUnavailable ? errorLabel : loadingLabel}
+                </p>
+              )}
+            </div>
+          </div>
+        </FullscreenModal>
       )}
     </div>
   );

@@ -17,7 +17,7 @@
  *
  */
 
-import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import {container} from 'tsyringe';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
@@ -146,6 +146,14 @@ describe('FileAssetComponent', () => {
     const asset = message.getFirstAsset() as FileAsset;
     asset.file_type = 'application/pdf';
     asset.status(AssetTransferState.UPLOADED);
+    asset.original_resource(
+      new AssetRemoteData({
+        assetKey: 'original',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
     asset.preview_resource(
       new AssetRemoteData({
         assetKey: 'preview',
@@ -199,15 +207,9 @@ describe('FileAssetComponent', () => {
     load.mockRestore();
   });
 
-  it('opens the original PDF preview without downloading until the user chooses Download', async () => {
+  it('opens the decrypted thumbnail without downloading and preserves it during the existing download', async () => {
     const repository = container.resolve(AssetRepository);
-    let resolveLoad: (blob: Blob | undefined) => void = noop;
-    const load = jest.spyOn(repository, 'load').mockImplementation(() => {
-      return new Promise<Blob | undefined>(resolve => {
-        resolveLoad = resolve;
-      });
-    });
-    const download = jest.spyOn(repository, 'downloadFile').mockResolvedValue(undefined);
+    const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])]);
     const previewWrapper = createRootProviderWrapperForTest(
       createRootContextValueForTest({
         translate: translateForTest,
@@ -220,48 +222,112 @@ describe('FileAssetComponent', () => {
     const asset = message.getFirstAsset() as FileAsset;
     asset.file_type = 'application/pdf';
     asset.status(AssetTransferState.UPLOADED);
-    const originalResource = new AssetRemoteData({
-      assetKey: 'original',
+    asset.original_resource(
+      new AssetRemoteData({
+        assetKey: 'original',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
+    const previewResource = new AssetRemoteData({
+      assetKey: 'preview',
       assetDomain: 'wire.test',
       otrKey: new Uint8Array(32),
       sha256: new Uint8Array(32),
     });
-    asset.original_resource(originalResource);
+    asset.preview_resource(previewResource);
+    let resolveOriginal: (blob: Blob | undefined) => void = noop;
+    const download = jest.spyOn(repository, 'downloadFile');
+    const load = jest.spyOn(repository, 'load').mockImplementation(resource => {
+      if (resource === previewResource) {
+        return Promise.resolve(png);
+      }
+      return new Promise<Blob | undefined>(resolve => {
+        resolveOriginal = resolve;
+      });
+    });
+    const createObjectUrl = jest.spyOn(URL, 'createObjectURL').mockReturnValue('blob:preview');
+    const revokeObjectUrl = jest.spyOn(URL, 'revokeObjectURL').mockImplementation(noop);
+    const anchorClick = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(noop);
 
     render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: previewWrapper});
-    fireEvent.click(screen.getByRole('button', {name: 'cells.filePreviewButton.ariaLabel'}));
+    const fileCard = screen.getByRole('button', {name: 'cells.filePreviewButton.ariaLabel'});
+    fireEvent.click(fileCard);
 
-    await screen.findByRole('dialog');
+    const dialog = await screen.findByRole('dialog', {name: 'cells.filePreviewButton.ariaLabel'});
+    const enlargedImage = await within(dialog).findByRole('img', {name: 'report.pdf'});
     await waitFor(() => {
       expect(load).toHaveBeenCalledTimes(1);
     });
-    expect(load.mock.calls[0][0]).not.toBe(originalResource);
-    expect(download).not.toHaveBeenCalled();
-    await act(async () => {
-      resolveLoad(new Blob(['%PDF-1.7 sample']));
-    });
-    const viewer = await screen.findByTitle('report.pdf');
-
-    fireEvent.click(screen.getByRole('button', {name: 'conversationContextMenuDownload'}));
-
-    expect(download).toHaveBeenCalledWith(asset);
-    act(() => {
-      asset.status(AssetTransferState.DOWNLOADING);
-    });
-    expect(screen.getByTitle('report.pdf')).toBe(viewer);
-    act(() => {
-      asset.status(AssetTransferState.UPLOADED);
-    });
-    expect(screen.getByTitle('report.pdf')).toBe(viewer);
     expect(load).toHaveBeenCalledTimes(1);
+    expect(load.mock.calls[0][0]).toBe(previewResource);
+    expect(download).not.toHaveBeenCalled();
+    const thumbnailButton = requireValueForTest(
+      screen.getAllByRole('button', {name: 'cells.filePreviewButton.ariaLabel'}).find(button => {
+        return button.tagName === 'BUTTON';
+      }),
+    );
+    expect(enlargedImage.getAttribute('src')).toBe(thumbnailButton.querySelector('img')?.getAttribute('src'));
+    expect(within(dialog).getAllByRole('button')).toHaveLength(1);
+    revokeObjectUrl.mockClear();
+
+    let downloadPromise: Promise<number | void> = Promise.resolve();
+    await act(async () => {
+      downloadPromise = repository.downloadFile(asset);
+    });
+    await waitFor(() => {
+      expect(asset.status()).toBe(AssetTransferState.DOWNLOADING);
+    });
+    expect(screen.getByRole('dialog')).toBe(dialog);
+    expect(revokeObjectUrl).not.toHaveBeenCalled();
+    expect(load).toHaveBeenCalledTimes(2);
+    expect(load.mock.calls[1][0]).toBe(asset.original_resource());
+
+    await act(async () => {
+      resolveOriginal(png);
+      await downloadPromise;
+    });
+    expect(asset.status()).toBe(AssetTransferState.UPLOADED);
+    expect(download).toHaveBeenCalledWith(asset);
+    expect(screen.getByRole('dialog')).toBe(dialog);
+
+    fireEvent.keyDown(document, {key: 'Escape'});
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    expect(fileCard).toHaveFocus();
+
+    fireEvent.click(thumbnailButton);
+    await screen.findByRole('dialog', {name: 'cells.filePreviewButton.ariaLabel'});
     fireEvent.click(screen.getByRole('button', {name: 'modalCloseButton'}));
     await waitFor(() => {
-      expect(screen.getByRole('button', {name: 'cells.filePreviewButton.ariaLabel'})).toHaveFocus();
+      expect(thumbnailButton).toHaveFocus();
     });
-    await act(async () => {
-      resolveLoad(undefined);
-    });
+    expect(load).toHaveBeenCalledTimes(2);
+    expect(revokeObjectUrl).not.toHaveBeenCalled();
     load.mockRestore();
+    download.mockRestore();
+    createObjectUrl.mockRestore();
+    revokeObjectUrl.mockRestore();
+    anchorClick.mockRestore();
+  });
+
+  it('keeps file download behavior for PDFs without a preview thumbnail', async () => {
+    const repository = container.resolve(AssetRepository);
+    const download = jest.spyOn(repository, 'downloadFile').mockResolvedValue(undefined);
+    const message = mockContentMessage('older-report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_type = 'application/pdf';
+    asset.status(AssetTransferState.UPLOADED);
+
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+    fireEvent.click(screen.getByRole('button', {name: 'conversationContextMenuDownload older-report.pdf'}));
+
+    await waitFor(() => {
+      expect(download).toHaveBeenCalledWith(asset);
+    });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     download.mockRestore();
   });
 

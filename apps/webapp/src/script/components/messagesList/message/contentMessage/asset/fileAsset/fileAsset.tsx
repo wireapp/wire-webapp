@@ -23,8 +23,6 @@ import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {ChatPdfPreviewModal} from './chatPdfPreviewModal';
-import {ChatPdfViewer} from './chatPdfViewer';
 import {PdfAssetPreview} from './pdfAssetPreview';
 import {RestrictedFile} from './restrictedFile/restrictedFile';
 
@@ -68,7 +66,7 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   );
   const [isPdfPreviewOpen, setIsPdfPreviewOpen] = useState(false);
   const pdfPreviewModalId = useId();
-  const pdfTriggerRef = useRef<HTMLDivElement>(null);
+  const previewTriggerRef = useRef<HTMLElement>(null);
   const wasPdfPreviewOpen = useRef(false);
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
@@ -107,8 +105,9 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   const isFailedDownloadingHash = assetStatus === AssetTransferState.DOWNLOAD_FAILED_HASH;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
   const originalResource = asset.original_resource();
-  const canOpenPdfPreview =
-    isPdfPreviewEnabled && isFileSharingReceivingEnabled && isUploadedOrCancelled && originalResource !== undefined;
+  const canShowPdfPreview =
+    isPdfPreviewEnabled && isFileSharingReceivingEnabled && hasPdfPreview && originalResource !== undefined;
+  const canOpenPdfPreview = canShowPdfPreview && isUploadedOrCancelled;
 
   const onDownloadAsset = async (): Promise<void> => {
     if (isUploadedOrCancelled) {
@@ -116,13 +115,20 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
     }
   };
 
-  const openPdfPreview = (): void => {
+  const openPdfPreview = (trigger: HTMLElement): void => {
+    previewTriggerRef.current = trigger;
     setIsPdfPreviewOpen(true);
   };
 
   useEffect(() => {
+    if (!canShowPdfPreview && isPdfPreviewOpen) {
+      setIsPdfPreviewOpen(false);
+    }
+  }, [canShowPdfPreview, isPdfPreviewOpen]);
+
+  useEffect(() => {
     if (wasPdfPreviewOpen.current && !isPdfPreviewOpen) {
-      pdfTriggerRef.current?.focus();
+      previewTriggerRef.current?.focus();
     }
     wasPdfPreviewOpen.current = isPdfPreviewOpen;
   }, [isPdfPreviewOpen]);
@@ -150,19 +156,31 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
           role="button"
           tabIndex={messageFocusedTabIndex}
           aria-haspopup={canOpenPdfPreview ? 'dialog' : undefined}
-          aria-expanded={canOpenPdfPreview ? isPdfPreviewOpen : undefined}
-          aria-controls={canOpenPdfPreview ? pdfPreviewModalId : undefined}
+          aria-expanded={canShowPdfPreview ? isPdfPreviewOpen : undefined}
+          aria-controls={canShowPdfPreview ? pdfPreviewModalId : undefined}
           aria-label={
             canOpenPdfPreview
               ? translate('cells.filePreviewButton.ariaLabel', {name: assetFileName})
               : `${translate('conversationContextMenuDownload')} ${fileName}.${fileExtension}`
           }
-          ref={pdfTriggerRef}
-          onClick={canOpenPdfPreview ? openPdfPreview : onDownloadAsset}
+          onClick={event => {
+            if (canOpenPdfPreview) {
+              openPdfPreview(event.currentTarget);
+              return;
+            }
+            void onDownloadAsset();
+          }}
           onKeyDown={event => {
+            const trigger = event.currentTarget;
             return handleKeyDown({
               event,
-              callback: canOpenPdfPreview ? openPdfPreview : onDownloadAsset,
+              callback: () => {
+                if (canOpenPdfPreview) {
+                  openPdfPreview(trigger);
+                  return;
+                }
+                void onDownloadAsset();
+              },
               keys: [KEY.ENTER, KEY.SPACE],
             });
           }}
@@ -231,30 +249,23 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
       ) : (
         <RestrictedFile asset={asset} />
       )}
-      {isFileSharingReceivingEnabled && isUploadedOrCancelled && hasPdfPreview && (
+      {canShowPdfPreview && previewResource !== undefined && (isUploadedOrCancelled || isPdfPreviewOpen) && (
         <PdfAssetPreview
+          id={pdfPreviewModalId}
           key={previewResource.identifier}
           resource={previewResource}
-          loadAsset={loadAsset}
           label={translate('cells.filePreviewButton.ariaLabel', {name: assetFileName})}
-          tabIndex={messageFocusedTabIndex}
-          onOpenPreview={openPdfPreview}
-        />
-      )}
-      {isPdfPreviewOpen && isPdfPreviewEnabled && isFileSharingReceivingEnabled && originalResource !== undefined && (
-        <ChatPdfPreviewModal
-          id={pdfPreviewModalId}
           fileName={assetFileName}
-          resource={originalResource}
+          closeLabel={translate('modalCloseButton')}
+          loadingLabel={translate('conversationAssetDownloading')}
+          errorLabel={translate('pdfViewerErrorTitle')}
           isOpen={isPdfPreviewOpen}
-          loadAsset={loadAsset}
-          onDownload={onDownloadAsset}
+          onOpenPreview={openPdfPreview}
           onClose={() => {
             return setIsPdfPreviewOpen(false);
           }}
-          renderPdf={src => {
-            return <ChatPdfViewer key={src} src={src} fileName={assetFileName} />;
-          }}
+          tabIndex={messageFocusedTabIndex}
+          loadAsset={loadAsset}
         />
       )}
     </div>
