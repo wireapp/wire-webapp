@@ -37,7 +37,7 @@ export const startupFeatureToggleRegistry = [
   {name: conversationListCollapseFeatureToggleName, previewDefaultEnabled: false},
   {name: forTestsOnlyFeatureToggleName, previewDefaultEnabled: false},
   {name: disableMessagePreprocessingFeatureToggleName, previewDefaultEnabled: false},
-  {name: driveBulkRestoreFeatureToggleName, previewDefaultEnabled: false},
+  {name: driveBulkRestoreFeatureToggleName, previewDefaultEnabled: true},
   {name: driveBulkActionProgressFeatureToggleName, previewDefaultEnabled: false},
   {name: markAsUnreadFeatureToggleName, previewDefaultEnabled: true},
   {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},

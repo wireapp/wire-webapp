@@ -41,6 +41,7 @@ export interface BulkActionStatusReporter {
   readonly setReviewing: (isReviewing: boolean) => void;
   readonly clear: () => void;
   readonly isProcessing: () => boolean;
+  readonly attachReviewStatus: (status: SharedDriveMoveStatus) => void;
 }
 
 /**
@@ -65,6 +66,18 @@ export const useBulkActionStatusReporter = (
     onReviewRef.current?.();
   }, []);
   const hasReview = onReview !== undefined;
+  const attachReviewStatus = useCallback(
+    (status: SharedDriveMoveStatus): void => {
+      started.current = Maybe.just({
+        id: status.id,
+        items: status.items,
+        conversationQualifiedId: status.conversationQualifiedId,
+      });
+      lastKind.current = Maybe.just(status.kind);
+      updateMoveStatus({...status, onReview: review, isReviewing: false});
+    },
+    [review, updateMoveStatus],
+  );
 
   // Stable so callers can list them as effect dependencies without re-publishing on every render.
   const start = useCallback(
@@ -126,5 +139,5 @@ export const useBulkActionStatusReporter = (
     return maybe.isJust(lastKind.current) && lastKind.current.value === 'processing';
   }, []);
 
-  return {start, report, setReviewing, clear, isProcessing};
+  return {start, report, setReviewing, clear, isProcessing, attachReviewStatus};
 };

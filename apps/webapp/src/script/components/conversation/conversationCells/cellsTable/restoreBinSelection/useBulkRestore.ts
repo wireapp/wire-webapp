@@ -62,6 +62,7 @@ export interface BulkRestoreState {
     status: SharedDriveMoveStatus,
   ) => Promise<void>;
   readonly refreshReview: () => Promise<void>;
+  readonly resumeReview: (reason: BulkRestoreReviewReason) => void;
   readonly reset: () => void;
 }
 
@@ -90,6 +91,9 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
   const updateReviewReason = (reason: BulkRestoreReviewReason | null): void => {
     reviewReasonRef.current = reason;
     setReviewReason(reason);
+  };
+  const resumeReview = (reason: BulkRestoreReviewReason): void => {
+    updateReviewReason(reason);
   };
 
   const refreshAndReportSuccess = async (): Promise<boolean> => {
@@ -125,6 +129,10 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
     const generation = ++generationRef.current;
     setIsPending(true);
     optionsRef.current.onStatusChange('processing');
+    const publishDetachedStatus = (kind: SharedDriveMoveStatusKind): void => {
+      const {onReview: _onReview, isReviewing: _isReviewing, ...detachedStatus} = status;
+      optionsRef.current.publishStatus({...detachedStatus, kind});
+    };
     const observeJobs: BulkRestoreDependencies['observeJobs'] = jobUuids => {
       return new Promise(resolve => {
         const {cellsRepository, clock, random, observeBackgroundAction} = optionsRef.current;
@@ -152,12 +160,12 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
         },
       });
       if (!isMountedRef.current || generationRef.current !== generation) {
-        optionsRef.current.publishStatus({...status, kind: outcome});
+        publishDetachedStatus(outcome);
         return;
       }
       if (!optionsRef.current.isCurrentScope(scopeKey)) {
         // The view moved on: skip refreshing it, but do not leave the status popup stuck on processing.
-        optionsRef.current.publishStatus({...status, kind: outcome});
+        publishDetachedStatus(outcome);
         return;
       }
 
@@ -168,7 +176,7 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
       }
       if (!optionsRef.current.isCurrentScope(scopeKey)) {
         // Refreshing can itself move the view (e.g. to the Bin root); still report so the popup is not left processing.
-        optionsRef.current.publishStatus({...status, kind: statusKind});
+        publishDetachedStatus(statusKind);
         return;
       }
 
@@ -235,5 +243,5 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
     setReviewReason(null);
   }, []);
 
-  return {isPending, isRefreshingReview, reviewReason, restore, refreshReview, reset};
+  return {isPending, isRefreshingReview, reviewReason, restore, refreshReview, resumeReview, reset};
 };
