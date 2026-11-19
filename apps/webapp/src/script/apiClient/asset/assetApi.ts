@@ -36,8 +36,6 @@ import type {BufferPlatform} from '../platform';
 import {unsafeAlphanumeric} from '../shims/node/random';
 import {QualifiedId, RequestCancellationError} from '../user';
 
-const redactedTokenPrefixLength = 5;
-
 export interface CipherOptions {
   /** Set a custom algorithm for encryption */
   algorithm?: string;
@@ -95,9 +93,7 @@ export class AssetAPI {
     progressCallback?: ProgressCallback,
   ): RequestCancelable<AssetResponse> {
     if (token !== null && token !== undefined && token.length > 0 && !isValidToken(token)) {
-      throw new TypeError(
-        `Expected token "${token.substr(0, redactedTokenPrefixLength)}..." (redacted) to be base64 encoded string.`,
-      );
+      throw new TypeError('Expected asset token to be a base64-encoded string.');
     }
 
     const cancelSource = axios.CancelToken.source();
