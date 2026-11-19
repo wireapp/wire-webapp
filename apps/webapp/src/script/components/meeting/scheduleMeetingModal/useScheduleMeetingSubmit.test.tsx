@@ -255,47 +255,50 @@ describe('useScheduleMeetingSubmit', () => {
     expect(usePrimaryModalState.getState().currentModalContent.titleText).not.toBe('meetings.meetingLink.title');
   });
 
-  it('returns setupFailed and refreshes meetings after a partial update failure', async () => {
-    const loadMeetings = jest.fn().mockResolvedValue(undefined);
-    const updateMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.removeParticipantsFailed));
-    const store = createMeetingStore({loadMeetings, updateMeeting});
+  it.each([meetingSubmitErrors.removeParticipantsFailed, meetingSubmitErrors.emailRemovedButUpdateFailed])(
+    'returns setupFailed and refreshes meetings after %s',
+    async error => {
+      const loadMeetings = jest.fn().mockResolvedValue(undefined);
+      const updateMeeting = jest.fn().mockReturnValue(task.reject(error));
+      const store = createMeetingStore({loadMeetings, updateMeeting});
 
-    useScheduleMeetingModal.getState().openEdit(
-      {
-        title: formState.title,
-        qualified_id: {id: 'meeting-id', domain: 'example.com'},
-        qualified_creator: {id: 'creator-id', domain: 'example.com'},
-        qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
-        series_start_date: '2026-06-16T10:00:00.000Z',
-        series_end_date: '2026-06-16T11:00:00.000Z',
-        duration_ms: 3_600_000,
-        recurrence: 'doesNotRepeat',
-        conversation_id: 'conversation-id',
-        tzid: 'Europe/Berlin',
-        has_password: false,
-      },
-      formState,
-      {id: 'conversation-id', domain: 'example.com'},
-      [],
-    );
+      useScheduleMeetingModal.getState().openEdit(
+        {
+          title: formState.title,
+          qualified_id: {id: 'meeting-id', domain: 'example.com'},
+          qualified_creator: {id: 'creator-id', domain: 'example.com'},
+          qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+          series_start_date: '2026-06-16T10:00:00.000Z',
+          series_end_date: '2026-06-16T11:00:00.000Z',
+          duration_ms: 3_600_000,
+          recurrence: 'doesNotRepeat',
+          conversation_id: 'conversation-id',
+          tzid: 'Europe/Berlin',
+          has_password: false,
+        },
+        formState,
+        {id: 'conversation-id', domain: 'example.com'},
+        [],
+      );
 
-    const {result} = renderHook(
-      () => {
-        return useScheduleMeetingSubmit();
-      },
-      {wrapper: createWrapper(store)},
-    );
+      const {result} = renderHook(
+        () => {
+          return useScheduleMeetingSubmit();
+        },
+        {wrapper: createWrapper(store)},
+      );
 
-    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
-    await act(async () => {
-      submitResult = await result.current.submit(formState);
-    });
+      let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
+      await act(async () => {
+        submitResult = await result.current.submit(formState);
+      });
 
-    expect(submitResult).toBe(scheduleMeetingSubmitResults.setupFailed);
-    expect(wasScheduleMeetingPersisted(submitResult)).toBe(true);
-    expect(updateMeeting).toHaveBeenCalledWith(updateCommand);
-    expect(loadMeetings).toHaveBeenCalledTimes(1);
-  });
+      expect(submitResult).toBe(scheduleMeetingSubmitResults.setupFailed);
+      expect(wasScheduleMeetingPersisted(submitResult)).toBe(true);
+      expect(updateMeeting).toHaveBeenCalledWith(updateCommand);
+      expect(loadMeetings).toHaveBeenCalledTimes(1);
+    },
+  );
 
   it('returns submitFailed and does not refresh meetings when create fails before server state changes', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);

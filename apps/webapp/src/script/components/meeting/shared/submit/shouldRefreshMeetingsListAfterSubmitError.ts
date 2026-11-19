@@ -20,7 +20,7 @@
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../../meetingSubmitErrors';
 
 /**
- * Returns whether meeting metadata was already persisted before the submit failed.
+ * Returns whether any meeting state was already persisted before the submit failed.
  * Partial failures should refresh the meetings list and must not invite a full retry.
  */
 export const isMeetingPersistedDespiteSubmitError = (error: MeetingSubmitErrors): boolean => {
@@ -29,6 +29,7 @@ export const isMeetingPersistedDespiteSubmitError = (error: MeetingSubmitErrors)
     case meetingSubmitErrors.conversationSetupFailed:
     case meetingSubmitErrors.removeParticipantsFailed:
     case meetingSubmitErrors.emailInvitationsFailed:
+    case meetingSubmitErrors.emailRemovedButUpdateFailed:
     case meetingSubmitErrors.conversationRenameFailed:
       return true;
     default:
