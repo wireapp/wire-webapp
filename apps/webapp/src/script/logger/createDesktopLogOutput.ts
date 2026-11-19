@@ -38,6 +38,10 @@ const maximumBatchRecords = 1024;
 const batchTargetBytes = 65_536;
 const responseTimeoutMilliseconds = 10_000;
 
+/**
+ * Delivers batches best-effort with at most one IPC attempt per batch.
+ * A timeout leaves the write in flight. Later batches are dropped and counted until the write settles.
+ */
 export function createDesktopLogOutput(
   options: DesktopLogOutputOptions,
 ): Pick<BufferedLogOutput, 'write' | 'flush' | 'getStatistics'> {

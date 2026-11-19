@@ -304,6 +304,26 @@ describe('Desktop structured logging', () => {
     expect(reportFailure).not.toHaveBeenCalled();
   });
 
+  it('keeps discarding batches without replay while an IPC write never settles', async () => {
+    const writeToDesktop = jest.fn().mockReturnValue(Promise.withResolvers<never>().promise);
+    const {clock, output, reportFailure} = createTestOutput(writeToDesktop);
+
+    output.write('"pending"', 'info');
+    const firstFlush = output.flush();
+    clock.advanceByMilliseconds(10_000);
+    await firstFlush;
+
+    for (const record of ['"first discarded"', '"second discarded"', '"third discarded"']) {
+      output.write(record, 'info');
+      await output.flush();
+    }
+    clock.advanceByMilliseconds(60_000);
+
+    expect(writeToDesktop.mock.calls).toEqual([[['"pending"']]]);
+    expect(reportFailure.mock.calls).toEqual([['timeout'], ['stalled']]);
+    expect(output.getStatistics()).toMatchObject({droppedRecords: 3, pendingBytes: 0});
+  });
+
   it.each(['success', 'rejection'])(
     'counts batches discarded during a stall and recovers after late %s',
     async settlement => {
