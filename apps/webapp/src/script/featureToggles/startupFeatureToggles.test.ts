@@ -25,6 +25,7 @@ import {
 import {
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
+  desktopStructuredLogsFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
   driveBulkActionProgressFeatureToggleName,
@@ -50,11 +51,21 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
   e2ePdfPreviewFeatureToggleName,
+  desktopStructuredLogsFeatureToggleName,
   persistentBrowserLogsFeatureToggleName,
   websocketListenerLifecycleFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
+  it('defaults Desktop structured logs on in preview builds and supports release opt-in', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch('?enabled-features=desktop-structured-logs');
+
+    expect(disabled.isFeatureToggleEnabled(desktopStructuredLogsFeatureToggleName)).toBe(false);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(desktopStructuredLogsFeatureToggleName);
+    expect(enabled.enabledFeatureToggleNames).toEqual([desktopStructuredLogsFeatureToggleName]);
+  });
+
   it('accepts the WebSocket listener lifecycle alongside other explicit selections', () => {
     const toggles = createStartupFeatureTogglesFromLocationSearch(
       '?enabled-features=mark-as-unread,websocket-listener-lifecycle',
@@ -278,6 +289,7 @@ describe('startupFeatureToggles', function () {
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,
       e2ePdfPreviewFeatureToggleName,
+      desktopStructuredLogsFeatureToggleName,
       persistentBrowserLogsFeatureToggleName,
       websocketListenerLifecycleFeatureToggleName,
     ]);

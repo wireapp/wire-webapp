@@ -378,6 +378,12 @@ test('reports rejected cleanup through the invoker without an unhandled rejectio
 }) => {
   const reportedErrors: string[] = [];
   const uncaughtPageErrors: string[] = [];
+  const releaseAuthenticationNavigation = Promise.withResolvers<void>();
+  // Keep the startup document alive until Playwright receives its console record.
+  await page.route('**/auth/?**', async route => {
+    await releaseAuthenticationNavigation.promise;
+    await route.continue();
+  });
   page.on('pageerror', error => {
     uncaughtPageErrors.push(error.message);
   });
@@ -396,28 +402,32 @@ test('reports rejected cleanup through the invoker without an unhandled rejectio
     });
   });
 
-  await page.goto('/?enableLogging=*');
+  try {
+    await page.goto('/?debugLogging=*', {waitUntil: 'commit'});
+    await expect
+      .poll(() => {
+        return reportedErrors
+          .filter(message => {
+            return message.startsWith('{');
+          })
+          .map(message => {
+            return JSON.parse(message) as Record<string, unknown>;
+          });
+      })
+      .toContainEqual(
+        expect.objectContaining({
+          level: 50,
+          component: '@wireapp/webapp/FireAndForgetInvoker',
+          msg: 'failed to execute fire-and-forget action',
+          error: expect.objectContaining({message: 'simulated cleanup failure'}),
+        }),
+      );
+  } finally {
+    releaseAuthenticationNavigation.resolve();
+  }
 
   await expect(page).toHaveURL(/\/auth\//);
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
-  await expect
-    .poll(() => {
-      return reportedErrors
-        .filter(message => {
-          return message.startsWith('{');
-        })
-        .map(message => {
-          return JSON.parse(message) as Record<string, unknown>;
-        });
-    })
-    .toContainEqual(
-      expect.objectContaining({
-        level: 50,
-        component: '@wireapp/webapp/FireAndForgetInvoker',
-        msg: 'failed to execute fire-and-forget action',
-        error: expect.objectContaining({message: 'simulated cleanup failure'}),
-      }),
-    );
   expect(uncaughtPageErrors).toEqual([]);
 });
 

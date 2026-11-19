@@ -23,7 +23,7 @@ import {Maybe} from 'true-myth';
 
 import {createPinoLogging} from './createPinoLogging';
 import type {BrowserLogPersistence} from './createBrowserLogPersistence';
-import {enableLogging} from './enableLogging';
+import {initializeLogging} from './initializeLogging';
 import type {Logger} from './logger';
 import type {LogOutput} from './logOutput';
 import {getDeploymentStage, logRuntimeIdentity, logStartupRuntimeIdentity} from './logRuntimeIdentity';
@@ -51,7 +51,7 @@ function createStartupLoggingFixture(debugEnabled: boolean): StartupLoggingFixtu
   const createPersistenceOutput = jest.fn<Maybe<BrowserLogPersistence>, []>(() => {
     return Maybe.nothing();
   });
-  enableLogging({
+  initializeLogging({
     clock,
     consoleOutput,
     locationSearch: `?id=${desktopAccountIdentifier}`,
@@ -71,6 +71,7 @@ function createStartupLoggingFixture(debugEnabled: boolean): StartupLoggingFixtu
       consoleOutput,
       logger: logging.getLogger('@wireapp/webapp/RuntimeIdentity'),
       isDesktopApp: true,
+      hasDesktopLogPersistence: false,
       locationSearch: `?id=${desktopAccountIdentifier}`,
       hostname: 'wire-webapp-beta.wire.com',
       origin: 'https://wire-webapp-beta.wire.com',
@@ -127,6 +128,7 @@ describe('runtime identity', () => {
       consoleOutput: options.consoleOutput,
       logger: options.logger,
       isDesktopApp: options.isDesktopApp,
+      hasDesktopLogPersistence: false,
       locationSearch,
       hostname: options.hostname,
       origin: options.origin,
@@ -146,6 +148,7 @@ describe('runtime identity', () => {
       consoleOutput: options.consoleOutput,
       logger: {info},
       isDesktopApp: false,
+      hasDesktopLogPersistence: false,
       locationSearch: options.locationSearch,
       hostname: options.hostname,
       origin: options.origin,
@@ -177,6 +180,7 @@ describe('runtime identity', () => {
         version: options.version,
         assetVersion: options.assetVersion,
         isDesktopApp,
+        hasDesktopLogPersistence: false,
         logger: {info: failingOutput},
         consoleOutput: {info: failingOutput},
       });

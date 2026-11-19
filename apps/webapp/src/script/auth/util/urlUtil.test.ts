@@ -149,6 +149,22 @@ describe('createAuthRedirectPath', () => {
     }),
   );
 
+  it(
+    'preserves encoded debug namespaces on the way back to the application',
+    createAuthRedirectTest({
+      authPath: '/auth/?debugLogging=%40wireapp%2F*%2C-%40wireapp%2Fcore%2F*#/login',
+      expectedMainAppPath: '../?debugLogging=%40wireapp%2F*%2C-%40wireapp%2Fcore%2F*',
+    }),
+  );
+
+  it(
+    'forwards a legacy debug selection alongside an explicit empty debug override',
+    createAuthRedirectTest({
+      authPath: '/auth/?enableLogging=*&debugLogging=#/login',
+      expectedMainAppPath: '../?enableLogging=*&debugLogging=',
+    }),
+  );
+
   const forwardedQueryString = new URLSearchParams({
     [QUERY_KEY.ACCOUNT_ID]: 'account-id',
     [QUERY_KEY.ENVIRONMENT]: 'environment',

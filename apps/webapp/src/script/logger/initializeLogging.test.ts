@@ -22,8 +22,9 @@ import {noop} from 'noop-esm';
 import {Maybe} from 'true-myth';
 
 import {createPinoLogging} from './createPinoLogging';
-import {enableLogging} from './enableLogging';
+import {initializeLogging} from './initializeLogging';
 import {createBrowserLogPersistence, type BrowserLogPersistence} from './createBrowserLogPersistence';
+import {createDesktopLogOutput} from './createDesktopLogOutput';
 import {createLogWorkerConnectionForTest} from './test/createLogWorkerConnectionForTest';
 
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
@@ -75,15 +76,18 @@ describe('logging startup', () => {
     {search: '', debugEnabled: true, expected: Maybe.just('*'), calls: 1},
     {search: '?enableLogging=', debugEnabled: false, expected: Maybe.nothing<string>(), calls: 0},
     {search: '?enableLogging=', debugEnabled: true, expected: Maybe.just('*'), calls: 1},
+    {search: '?enableLogging=*&debugLogging=', debugEnabled: false, expected: Maybe.nothing<string>(), calls: 0},
+    {search: '?enableLogging=-*&debugLogging=', debugEnabled: true, expected: Maybe.just('*'), calls: 1},
+    {search: '?debugLogging=*&enableLogging=-*', debugEnabled: false, expected: Maybe.just('*'), calls: 1},
     {
-      search: '?enableLogging=@wireapp/*,-@wireapp/core/*',
+      search: '?debugLogging=@wireapp/*,-@wireapp/core/*',
       debugEnabled: true,
       expected: Maybe.just('@wireapp/*,-@wireapp/core/*'),
       calls: 1,
     },
-    {search: '?enableLogging=-*', debugEnabled: true, expected: Maybe.just('-*'), calls: 0},
-    {search: '?enableLogging=(a%2B)%2B%24', debugEnabled: true, expected: Maybe.just('(a+)+$'), calls: 0},
-    {search: '?enableLogging=*,-', debugEnabled: true, expected: Maybe.just('*,-'), calls: 0},
+    {search: '?debugLogging=-*', debugEnabled: true, expected: Maybe.just('-*'), calls: 0},
+    {search: '?debugLogging=(a%2B)%2B%24', debugEnabled: true, expected: Maybe.just('(a+)+$'), calls: 0},
+    {search: '?debugLogging=*,-', debugEnabled: true, expected: Maybe.just('*,-'), calls: 0},
   ])('restores main enablement: $search with ENABLE_DEBUG=$debugEnabled', testCase => {
     const {search, debugEnabled, expected, calls} = testCase;
     const storedValues = new Map<string, string>([['debug', 'old namespace']]);
@@ -99,7 +103,7 @@ describe('logging startup', () => {
     const logging = createPinoLogging(Maybe.nothing());
     const logger = logging.getLogger('@wireapp/webapp/Startup');
 
-    enableLogging({
+    initializeLogging({
       ...disabledPersistenceOptions,
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 1000n}),
       consoleOutput: output,
@@ -121,11 +125,11 @@ describe('logging startup', () => {
   it('applies URL enablement when debug mode is off and storage is unavailable', () => {
     const output = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
     const logging = createPinoLogging(Maybe.nothing());
-    enableLogging({
+    initializeLogging({
       ...disabledPersistenceOptions,
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 1000n}),
       consoleOutput: output,
-      locationSearch: '?enableLogging=*',
+      locationSearch: '?debugLogging=*',
       debugEnabled: false,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
@@ -134,6 +138,103 @@ describe('logging startup', () => {
     logging.getLogger('component').debug('Enabled');
 
     expect(output.debug).toHaveBeenCalledTimes(1);
+  });
+
+  describe.each(['browser', 'desktop'])('debug eligibility with %s persistence', environment => {
+    it.each([
+      {query: '', debugEnabled: false, expected: []},
+      {query: '&debugLogging=*', debugEnabled: false, expected: ['Application/Selected', 'Application/Other']},
+      {query: '&debugLogging=Application/Selected', debugEnabled: false, expected: ['Application/Selected']},
+      {query: '&debugLogging=*,-Application/Other', debugEnabled: true, expected: ['Application/Selected']},
+      {
+        query: '&debugLogging=*,-Application/*,Application/Other',
+        debugEnabled: false,
+        expected: ['Application/Other'],
+      },
+      {query: '&enableLogging=Application/Other', debugEnabled: false, expected: ['Application/Other']},
+      {
+        query: '&enableLogging=*&debugLogging=Application/Selected',
+        debugEnabled: false,
+        expected: ['Application/Selected'],
+      },
+      {query: '&enableLogging=*&debugLogging=', debugEnabled: false, expected: []},
+      {query: '', debugEnabled: true, expected: ['Application/Selected', 'Application/Other']},
+    ])('uses $query with ENABLE_DEBUG=$debugEnabled', async options => {
+      const {query, debugEnabled, expected} = options;
+      const isElectron = environment === 'desktop';
+      const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+      const logging = createPinoLogging(Maybe.nothing());
+      const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+      const persistedLines: string[] = [];
+      const nativeOutput = createDesktopLogOutput({
+        clock,
+        async writeToDesktop(records) {
+          persistedLines.push(...records);
+
+          return 'written';
+        },
+        reportFailure: noop,
+      });
+      const locationSearch = '?enabled-features=desktop-structured-logs,persistent-browser-logs' + query;
+      const browserPersistence = initializeLogging({
+        clock,
+        consoleOutput,
+        locationSearch,
+        debugEnabled,
+        storage: Maybe.nothing(),
+        configureLogging: logging.configure,
+        startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(locationSearch),
+        isElectron,
+        desktopPersistenceOutput: isElectron ? nativeOutput.write : undefined,
+        createPersistenceOutput() {
+          return createTestPersistence({
+            clock,
+            async append(lines) {
+              persistedLines.push(...lines);
+            },
+          });
+        },
+      });
+
+      const toJSON = jest.fn(() => {
+        return 'serialized';
+      });
+      logging.getLogger('Application/Selected').debug('Selected debug', {projection: {toJSON}});
+      const otherLogger = logging.getLogger('Application/Other');
+      otherLogger.debug('Other debug', {projection: {toJSON}});
+      otherLogger.info('Persistent info');
+      otherLogger.warn('Persistent warning');
+      otherLogger.error('Persistent error');
+      if (browserPersistence.isJust) {
+        await browserPersistence.value.dispose();
+      } else {
+        await nativeOutput.flush();
+      }
+
+      const persistedRecords = persistedLines.map(line => {
+        return JSON.parse(line) as Readonly<Record<string, unknown>>;
+      });
+      const persistedDebugComponents = persistedRecords
+        .filter(record => {
+          return record['level'] === 20;
+        })
+        .map(record => {
+          return record['component'];
+        });
+      const consoleDebugComponents = consoleOutput.debug.mock.calls.map(call => {
+        const record: Readonly<Record<string, unknown>> = JSON.parse(call[0]);
+
+        return record['component'];
+      });
+      expect(persistedDebugComponents).toEqual(expected);
+      expect(consoleDebugComponents).toEqual(expected);
+      expect(toJSON).toHaveBeenCalledTimes(expected.length);
+      expect(persistedRecords.slice(expected.length)).toMatchObject([
+        {level: 30, msg: 'Persistent info'},
+        {level: 40, msg: 'Persistent warning'},
+        {level: 50, msg: 'Persistent error'},
+      ]);
+    });
   });
 
   it('does not let storage failures interrupt startup or disable configured logging', () => {
@@ -149,7 +250,7 @@ describe('logging startup', () => {
     };
 
     expect(() => {
-      enableLogging({
+      initializeLogging({
         ...disabledPersistenceOptions,
         clock: createDeterministicClock({initialUnixEpochMicroseconds: 1000n}),
         consoleOutput: output,
@@ -182,9 +283,9 @@ describe('logging startup', () => {
         return createTestPersistence({clock, append});
       });
       const logging = createPinoLogging(Maybe.nothing());
-      const locationSearch = `?enabled-features=mark-as-unread${persistenceEnabled ? ',persistent-browser-logs' : ''}${consoleEnabled ? '&enableLogging=selected' : ''}`;
+      const locationSearch = `?enabled-features=mark-as-unread${persistenceEnabled ? ',persistent-browser-logs' : ''}${consoleEnabled ? '&debugLogging=selected' : ''}`;
       const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
-      const persistence = enableLogging({
+      const persistence = initializeLogging({
         clock,
         consoleOutput,
         locationSearch,
@@ -236,10 +337,10 @@ describe('logging startup', () => {
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const logging = createPinoLogging(Maybe.nothing());
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
-    const persistence = enableLogging({
+    const persistence = initializeLogging({
       clock,
       consoleOutput,
-      locationSearch: '?enableLogging=*',
+      locationSearch: '?debugLogging=*',
       debugEnabled: false,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
@@ -276,10 +377,10 @@ describe('logging startup', () => {
         outcome: request.type === 'bind-account' ? 'failed' : 'complete',
       });
     };
-    const persistence = enableLogging({
+    const persistence = initializeLogging({
       clock,
       consoleOutput,
-      locationSearch: '?enableLogging=*',
+      locationSearch: '?debugLogging=*',
       debugEnabled: false,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
@@ -325,10 +426,10 @@ describe('logging startup', () => {
   it.each(['unsupported', 'failed'] as const)('preserves console logging when persistence setup is %s', failure => {
     const logging = createPinoLogging(Maybe.nothing());
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
-    const persistence = enableLogging({
+    const persistence = initializeLogging({
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
       consoleOutput,
-      locationSearch: '?enableLogging=*',
+      locationSearch: '?debugLogging=*',
       debugEnabled: false,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,

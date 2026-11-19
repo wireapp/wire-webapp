@@ -18,6 +18,10 @@
  */
 
 import {startupFeatureToggleQueryParameterName} from '../featureToggles/startupFeatureToggles';
+import {
+  debugLoggingQueryParameterName,
+  legacyDebugLoggingQueryParameterName,
+} from '../logger/debugLoggingQueryParameterNames';
 
 export const QUERY_KEY = {
   ACCOUNT_ID: 'id', // account ID passed from the wrapper to the webview
@@ -60,6 +64,8 @@ export const FORWARDED_QUERY_KEYS = [
   QUERY_KEY.LOCALE,
   QUERY_KEY.TRACKING,
   startupFeatureToggleQueryParameterName,
+  debugLoggingQueryParameterName,
+  legacyDebugLoggingQueryParameterName,
   ...Object.values(OAUTH_QUERY_KEYS),
 ];
 
