@@ -34,10 +34,11 @@ export const inputStyles: CSSObject = {
 };
 
 export const linkStyles: CSSObject = {
+  alignSelf: 'flex-start',
   marginTop: 24,
+  marginBottom: 24,
 };
 
 export const linkTextStyles: CSSObject = {
   textDecoration: 'underline',
-  marginBottom: 24,
 };
