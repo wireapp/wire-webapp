@@ -17,12 +17,14 @@
  *
  */
 
-import {useCallback, type FunctionComponent} from 'react';
+import {useCallback, useEffect, useId, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {ChatPdfPreviewModal} from './chatPdfPreviewModal';
+import {ChatPdfViewer} from './chatPdfViewer';
 import {PdfAssetPreview} from './pdfAssetPreview';
 import {RestrictedFile} from './restrictedFile/restrictedFile';
 
@@ -58,12 +60,16 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
 }: FileAssetProps) => {
   const asset = message.getFirstAsset() as FileAssetType;
   const {translate, isFeatureToggleEnabled, mainViewModel} = useApplicationContext();
-  const loadPdfPreview = useCallback(
+  const loadAsset = useCallback(
     (resource: AssetRemoteData) => {
       return mainViewModel.content.repositories.asset.load(resource);
     },
     [mainViewModel],
   );
+  const [isPdfPreviewOpen, setIsPdfPreviewOpen] = useState(false);
+  const pdfPreviewModalId = useId();
+  const pdfTriggerRef = useRef<HTMLDivElement>(null);
+  const wasPdfPreviewOpen = useRef(false);
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
@@ -78,10 +84,9 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   const fileName = trimFileExtension(assetFileName);
   const fileExtension = getFileExtension(assetFileName);
   const formattedFileSize = formatBytes(asset.file_size);
-  const hasPdfPreview =
-    isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName) &&
-    asset.file_type === 'application/pdf' &&
-    previewResource !== undefined;
+  const isPdfPreviewEnabled =
+    isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName) && asset.file_type === 'application/pdf';
+  const hasPdfPreview = isPdfPreviewEnabled && previewResource !== undefined;
 
   // This is a hack since we don't have a FileAsset available before it's
   // uploaded completely we have to check if there is upload progress to
@@ -101,12 +106,26 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   const isFailedDownloadingDecrypt = assetStatus === AssetTransferState.DOWNLOAD_FAILED_DECRPYT;
   const isFailedDownloadingHash = assetStatus === AssetTransferState.DOWNLOAD_FAILED_HASH;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
+  const originalResource = asset.original_resource();
+  const canOpenPdfPreview =
+    isPdfPreviewEnabled && isFileSharingReceivingEnabled && isUploadedOrCancelled && originalResource !== undefined;
 
   const onDownloadAsset = async (): Promise<void> => {
     if (isUploadedOrCancelled) {
       await downloadAsset(asset);
     }
   };
+
+  const openPdfPreview = (): void => {
+    setIsPdfPreviewOpen(true);
+  };
+
+  useEffect(() => {
+    if (wasPdfPreviewOpen.current && !isPdfPreviewOpen) {
+      pdfTriggerRef.current?.focus();
+    }
+    wasPdfPreviewOpen.current = isPdfPreviewOpen;
+  }, [isPdfPreviewOpen]);
 
   if (isObfuscated) {
     return null;
@@ -130,10 +149,22 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
           data-uie-value={asset.file_name}
           role="button"
           tabIndex={messageFocusedTabIndex}
-          aria-label={`${translate('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
-          onClick={onDownloadAsset}
+          aria-haspopup={canOpenPdfPreview ? 'dialog' : undefined}
+          aria-expanded={canOpenPdfPreview ? isPdfPreviewOpen : undefined}
+          aria-controls={canOpenPdfPreview ? pdfPreviewModalId : undefined}
+          aria-label={
+            canOpenPdfPreview
+              ? translate('cells.filePreviewButton.ariaLabel', {name: assetFileName})
+              : `${translate('conversationContextMenuDownload')} ${fileName}.${fileExtension}`
+          }
+          ref={pdfTriggerRef}
+          onClick={canOpenPdfPreview ? openPdfPreview : onDownloadAsset}
           onKeyDown={event => {
-            return handleKeyDown({event, callback: onDownloadAsset, keys: [KEY.ENTER, KEY.SPACE]});
+            return handleKeyDown({
+              event,
+              callback: canOpenPdfPreview ? openPdfPreview : onDownloadAsset,
+              keys: [KEY.ENTER, KEY.SPACE],
+            });
           }}
         >
           {isPendingUpload ? (
@@ -204,10 +235,26 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
         <PdfAssetPreview
           key={previewResource.identifier}
           resource={previewResource}
-          loadAsset={loadPdfPreview}
-          label={`${translate('conversationContextMenuDownload')} ${assetFileName}`}
+          loadAsset={loadAsset}
+          label={translate('cells.filePreviewButton.ariaLabel', {name: assetFileName})}
           tabIndex={messageFocusedTabIndex}
+          onOpenPreview={openPdfPreview}
+        />
+      )}
+      {canOpenPdfPreview && originalResource !== undefined && (
+        <ChatPdfPreviewModal
+          id={pdfPreviewModalId}
+          fileName={assetFileName}
+          resource={originalResource}
+          isOpen={isPdfPreviewOpen}
+          loadAsset={loadAsset}
           onDownload={onDownloadAsset}
+          onClose={() => {
+            return setIsPdfPreviewOpen(false);
+          }}
+          renderPdf={src => {
+            return <ChatPdfViewer src={src} />;
+          }}
         />
       )}
     </div>

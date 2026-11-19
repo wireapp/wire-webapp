@@ -49,14 +49,14 @@ describe('PdfAssetPreview', () => {
     jest.spyOn(URL, 'createObjectURL').mockReturnValue('blob:preview');
   });
 
-  it('loads only the thumbnail on visibility and keeps the download action accessible', async () => {
+  it('loads only the thumbnail and opens the original PDF on click', async () => {
     const loadAsset = jest.fn().mockResolvedValue(png);
-    const download = jest.fn();
+    const openPreview = jest.fn();
     render(
       <PdfAssetPreview
         resource={makeResource()}
-        label="Download report.pdf"
-        onDownload={download}
+        label="Open PDF preview report.pdf"
+        onOpenPreview={openPreview}
         tabIndex={0}
         loadAsset={loadAsset}
       />,
@@ -65,11 +65,11 @@ describe('PdfAssetPreview', () => {
 
     enterViewport();
 
-    const button = await screen.findByRole('button', {name: 'Download report.pdf'});
+    const button = await screen.findByRole('button', {name: 'Open PDF preview report.pdf'});
     expect(loadAsset).toHaveBeenCalledTimes(1);
     expect(URL.createObjectURL).toHaveBeenCalledWith(expect.objectContaining({type: 'image/png'}));
     fireEvent.click(button);
-    expect(download).toHaveBeenCalledTimes(1);
+    expect(openPreview).toHaveBeenCalledTimes(1);
   });
 
   it('hides a thumbnail that the browser cannot display without retrying its download', async () => {
@@ -77,14 +77,14 @@ describe('PdfAssetPreview', () => {
     render(
       <PdfAssetPreview
         resource={makeResource()}
-        label="Download report.pdf"
-        onDownload={jest.fn()}
+        label="Open PDF preview report.pdf"
+        onOpenPreview={jest.fn()}
         tabIndex={0}
         loadAsset={loadAsset}
       />,
     );
     enterViewport();
-    await screen.findByRole('button', {name: 'Download report.pdf'});
+    await screen.findByRole('button', {name: 'Open PDF preview report.pdf'});
 
     fireEvent.error(screen.getByRole('presentation'));
 
@@ -99,14 +99,14 @@ describe('PdfAssetPreview', () => {
     const {unmount} = render(
       <PdfAssetPreview
         resource={resource}
-        label="Download report.pdf"
-        onDownload={jest.fn()}
+        label="Open PDF preview report.pdf"
+        onOpenPreview={jest.fn()}
         tabIndex={0}
         loadAsset={jest.fn().mockResolvedValue(png)}
       />,
     );
     enterViewport();
-    await screen.findByRole('button', {name: 'Download report.pdf'});
+    await screen.findByRole('button', {name: 'Open PDF preview report.pdf'});
 
     unmount();
 
@@ -130,7 +130,7 @@ describe('PdfAssetPreview', () => {
       <PdfAssetPreview
         resource={first}
         label="Download first.pdf"
-        onDownload={jest.fn()}
+        onOpenPreview={jest.fn()}
         tabIndex={0}
         loadAsset={loadAsset}
       />,
@@ -144,7 +144,7 @@ describe('PdfAssetPreview', () => {
       <PdfAssetPreview
         resource={second}
         label="Download second.pdf"
-        onDownload={jest.fn()}
+        onOpenPreview={jest.fn()}
         tabIndex={0}
         loadAsset={loadAsset}
       />,
@@ -168,8 +168,8 @@ describe('PdfAssetPreview', () => {
     const {unmount} = render(
       <PdfAssetPreview
         resource={makeResource()}
-        label="Download report.pdf"
-        onDownload={jest.fn()}
+        label="Open PDF preview report.pdf"
+        onOpenPreview={jest.fn()}
         tabIndex={0}
         loadAsset={loadAsset}
       />,
@@ -195,8 +195,8 @@ describe('PdfAssetPreview', () => {
     render(
       <PdfAssetPreview
         resource={resource}
-        label="Download report.pdf"
-        onDownload={jest.fn()}
+        label="Open PDF preview report.pdf"
+        onOpenPreview={jest.fn()}
         tabIndex={0}
         loadAsset={loadAsset}
       />,
@@ -217,8 +217,8 @@ describe('PdfAssetPreview', () => {
     render(
       <PdfAssetPreview
         resource={makeResource()}
-        label="Download report.pdf"
-        onDownload={jest.fn()}
+        label="Open PDF preview report.pdf"
+        onOpenPreview={jest.fn()}
         tabIndex={0}
         loadAsset={loadAsset}
       />,
@@ -238,8 +238,8 @@ describe('PdfAssetPreview', () => {
     render(
       <PdfAssetPreview
         resource={makeResource()}
-        label="Download report.pdf"
-        onDownload={jest.fn()}
+        label="Open PDF preview report.pdf"
+        onOpenPreview={jest.fn()}
         tabIndex={0}
         loadAsset={loadAsset}
       />,

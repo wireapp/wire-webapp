@@ -28,7 +28,7 @@ interface PdfAssetPreviewProps {
   resource: AssetRemoteData;
   label: string;
   tabIndex: number;
-  onDownload: () => Promise<void> | void;
+  onOpenPreview: () => void;
   loadAsset: (resource: AssetRemoteData) => Promise<Blob | undefined>;
 }
 
@@ -41,7 +41,7 @@ export const PdfAssetPreview = ({
   resource,
   label,
   tabIndex,
-  onDownload,
+  onOpenPreview,
   loadAsset,
 }: PdfAssetPreviewProps): ReactElement => {
   const {elementRef, hasBeenInView} = useInView<HTMLDivElement>();
@@ -99,7 +99,7 @@ export const PdfAssetPreview = ({
             src={url}
             aria-label={label}
             tabIndex={tabIndex}
-            onClick={onDownload}
+            onClick={onOpenPreview}
             onImageError={() => {
               return setFailedUrl(url);
             }}
