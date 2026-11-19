@@ -37,6 +37,7 @@ interface ReconciliationTestSetup {
   readonly onRefreshAndReportSuccess: jest.Mock;
   readonly onDeleteCompleted: jest.Mock;
   readonly onReconciliationCompleted: jest.Mock;
+  readonly onReviewResolved: jest.Mock;
   readonly reportError: jest.Mock;
   readonly onContinueAfterViewLeave: jest.Mock;
   readonly options: UsePermanentDeleteReconciliationOptions;
@@ -66,6 +67,7 @@ const createOptions = (): ReconciliationTestSetup => {
   const onRefreshAndReportSuccess = jest.fn().mockResolvedValue(true);
   const onDeleteCompleted = jest.fn();
   const onReconciliationCompleted = jest.fn();
+  const onReviewResolved = jest.fn();
   const reportError = jest.fn();
   const onContinueAfterViewLeave = jest.fn();
   const options = {
@@ -80,6 +82,7 @@ const createOptions = (): ReconciliationTestSetup => {
     onRefreshAndReportSuccess,
     onDeleteCompleted,
     onReconciliationCompleted,
+    onReviewResolved,
     reportError,
     onContinueAfterViewLeave,
   };
@@ -93,6 +96,7 @@ const createOptions = (): ReconciliationTestSetup => {
     onRefreshAndReportSuccess,
     onDeleteCompleted,
     onReconciliationCompleted,
+    onReviewResolved,
     reportError,
     onContinueAfterViewLeave,
     options,

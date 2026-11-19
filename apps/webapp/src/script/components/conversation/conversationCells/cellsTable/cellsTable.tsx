@@ -259,7 +259,6 @@ export const CellsTable = ({
   const {
     updateMoveStatus: publishMoveStatus,
     getMoveStatus,
-    startMoveStatus: publishMoveStart,
     tryStartMove,
     finishMove,
     isMoveActive,
@@ -285,6 +284,14 @@ export const CellsTable = ({
       ? restoreReviewReasonByStatus[currentRestoreStatus.value.kind]
       : undefined;
   const attachedRestoreStatusId = useRef<Maybe<string>>(Maybe.nothing());
+  const currentDeleteStatus = getMoveStatus(currentConversationQualifiedId);
+  const deleteNeedsReviewAttachment =
+    maybe.isJust(currentDeleteStatus) &&
+    currentDeleteStatus.value.action === 'permanentDelete' &&
+    currentDeleteStatus.value.kind !== 'processing' &&
+    currentDeleteStatus.value.kind !== 'completed' &&
+    currentDeleteStatus.value.onReview === undefined;
+  const attachedDeleteStatusId = useRef<Maybe<string>>(Maybe.nothing());
   const updateMoveStatus = useCallback(
     (status: Omit<SharedDriveMoveStatus, 'conversationQualifiedId'>): void => {
       const operation = getMoveOperation(status.id);
@@ -413,11 +420,17 @@ export const CellsTable = ({
     onRefreshAndReportSuccess,
     onDeleteCompleted: handlePermanentDeleteCompleted,
     onReconciliationCompleted: handlePermanentDeleteCompleted,
+    onReviewResolved: () => {
+      permanentDeleteStatusReporter.clear();
+      setSelectedNodeIds(new Set());
+    },
     onContinueAfterViewLeave: continuation => {
       if (continuation.kind === 'terminal') {
-        publishMoveStatus({...continuation.status, kind: continuation.statusKind});
+        const {onReview: _onReview, isReviewing: _isReviewing, ...status} = continuation.status;
+        publishMoveStatus({...status, kind: continuation.statusKind});
         return;
       }
+      setMoveJobUuids(continuation.status.id, continuation.jobUuids);
       observeBackgroundAction({
         actionName: 'delete',
         cellsRepository,
@@ -595,6 +608,27 @@ export const CellsTable = ({
     restoreReviewReason,
     restoreReviewReasonFromHook,
     resumeReview,
+    selectionScopeKey,
+  ]);
+
+  useEffect(() => {
+    if (!isInRecycleBin() || !deleteNeedsReviewAttachment || maybe.isNothing(currentDeleteStatus)) {
+      attachedDeleteStatusId.current = Maybe.nothing();
+      return;
+    }
+    if (
+      maybe.isNothing(attachedDeleteStatusId.current) ||
+      attachedDeleteStatusId.current.value !== currentDeleteStatus.value.id
+    ) {
+      attachedDeleteStatusId.current = Maybe.just(currentDeleteStatus.value.id);
+      permanentDelete.resumeReview(currentDeleteStatus.value, selectionScopeKey, getCellsFilesPath());
+      permanentDeleteStatusReporter.attachReviewStatus(currentDeleteStatus.value);
+    }
+  }, [
+    currentDeleteStatus,
+    deleteNeedsReviewAttachment,
+    permanentDelete.resumeReview,
+    permanentDeleteStatusReporter.attachReviewStatus,
     selectionScopeKey,
   ]);
 
@@ -919,7 +953,6 @@ export const CellsTable = ({
   const isRowSelectionEnabled =
     isSelectionEnabled &&
     !isBulkMoveOutcomeUnresolved &&
-    !isPermanentDeleteUnresolved &&
     !isBulkMoveToBinNeedsReview &&
     bulkRestore.reviewReason === null &&
     restoreReviewReason === undefined;
