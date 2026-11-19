@@ -203,6 +203,14 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.stopPropagation();
 };
 
+const withoutNodeIds = (selection: Set<string>, nodeIds: readonly string[]): Set<string> => {
+  const nextSelection = new Set(selection);
+  nodeIds.forEach(nodeId => {
+    nextSelection.delete(nodeId);
+  });
+  return nextSelection;
+};
+
 // Selecting rows only makes sense when at least one of these is available, e.g. never for viewers.
 const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE];
 
@@ -258,7 +266,10 @@ export const CellsTable = ({
   const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
   const {
     updateMoveStatus: publishMoveStatus,
-    startMoveStatus: publishMoveStart,
+    getMoveStatus,
+    tryStartMove,
+    finishMove,
+    isMoveActive,
     isMoveStatusCurrent,
     getMoveOperation,
     setMoveJobUuids,
@@ -275,12 +286,6 @@ export const CellsTable = ({
       }
     },
     [getMoveOperation, publishMoveStatus],
-  );
-  const startMoveStatus = useCallback(
-    (status: Omit<SharedDriveMoveStatus, 'conversationQualifiedId'>): void => {
-      publishMoveStart({...status, conversationQualifiedId: currentConversationQualifiedId});
-    },
-    [currentConversationQualifiedId, publishMoveStart],
   );
   const observeBackgroundJobs = useCallback(
     ({
@@ -333,6 +338,9 @@ export const CellsTable = ({
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
   });
+  const [restoringNodeIds, setRestoringNodeIds] = useState<Set<string>>(() => {
+    return new Set();
+  });
   const [isBulkMoveToBinConfirmationOpen, setIsBulkMoveToBinConfirmationOpen] = useState(false);
   const [capturedBulkMoveToBin, setCapturedBulkMoveToBin] = useState<CapturedBulkMoveToBinSelection | null>(null);
   const [isBulkMoveToBinPending, setIsBulkMoveToBinPending] = useState(false);
@@ -353,6 +361,18 @@ export const CellsTable = ({
   const isBackgroundMoveRetryBlocked = moveState.kind === 'needs-review' && moveState.reason !== 'status-unknown';
   const isRefreshingBulkMoveOutcome = moveState.kind === 'needs-review' && moveState.refresh === 'refreshing';
   const didBulkMoveOutcomeRefreshFail = moveState.kind === 'needs-review' && moveState.refresh === 'failed';
+  const currentMoveStatus = getMoveStatus(currentConversationQualifiedId);
+  useEffect(() => {
+    if (moveState.kind !== 'idle' || !isMoveActive || maybe.isNothing(currentMoveStatus)) {
+      return;
+    }
+    const status = currentMoveStatus.value;
+    if (status.action !== 'move' || status.kind === 'processing' || status.kind === 'completed') {
+      return;
+    }
+    activeMoveStatusId.current = Maybe.just(status.id);
+    dispatchMove({type: 'needs-review', reason: status.kind});
+  }, [currentMoveStatus, isMoveActive, moveState.kind]);
   const isMovePendingRef = useRef(false);
   isMovePendingRef.current = isBulkMoveRequestPending || isBackgroundMovePending;
   const selectedNodeIdsRef = useRef(selectedNodeIds);
@@ -371,6 +391,12 @@ export const CellsTable = ({
       void handleRefreshAfterPermanentDeleteReview();
     },
   );
+  const handlePermanentDeleteCompleted = (nodeIds: readonly string[]): void => {
+    permanentDeleteStatusReporter.report('completed');
+    setSelectedNodeIds(currentSelection => {
+      return withoutNodeIds(currentSelection, nodeIds);
+    });
+  };
   const permanentDelete = usePermanentDeleteReconciliation({
     cellsRepository,
     clock,
@@ -383,16 +409,8 @@ export const CellsTable = ({
     isNodesLoading,
     onRefresh,
     onRefreshAndReportSuccess,
-    onDeleteCompleted: nodeIds => {
-      permanentDeleteStatusReporter.report('completed');
-      setSelectedNodeIds(currentSelection => {
-        return hasSameSelection(currentSelection, nodeIds) ? new Set() : currentSelection;
-      });
-    },
-    onReconciliationCompleted: () => {
-      permanentDeleteStatusReporter.report('completed');
-      setSelectedNodeIds(new Set());
-    },
+    onDeleteCompleted: handlePermanentDeleteCompleted,
+    onReconciliationCompleted: handlePermanentDeleteCompleted,
     reportError: error => {
       console.error(error);
     },
@@ -424,7 +442,7 @@ export const CellsTable = ({
     },
     onRefreshAndReportSuccess,
     onRestoreSettled: () => {
-      setSelectedNodeIds(new Set());
+      setRestoringNodeIds(new Set());
     },
     onStatusChange: restoreStatusReporter.report,
     onStatusCleared: restoreStatusReporter.clear,
@@ -504,6 +522,7 @@ export const CellsTable = ({
 
     resetPermanentDeleteReconciliation();
     resetBulkRestore();
+    setRestoringNodeIds(new Set());
     setSelectedNodeIds(new Set());
     setIsBulkMovePreviewOpen(false);
     setIsBulkMoveToBinConfirmationOpen(false);
@@ -575,25 +594,35 @@ export const CellsTable = ({
     setIsBulkMovePreviewOpen(false);
   };
 
-  const handleBulkMoveStart = (summary: SharedDriveMoveSummary): string => {
+  const handleBulkMoveStart = (summary: SharedDriveMoveSummary): Maybe<string> => {
     const id = createMoveStatusId();
+    if (!tryStartMove({id, kind: 'processing', conversationQualifiedId: currentConversationQualifiedId, ...summary})) {
+      return Maybe.nothing();
+    }
     activeMoveStatusId.current = Maybe.just(id);
     dispatchMove({type: 'request-started'});
-    setIsBulkMovePreviewOpen(false);
-    startMoveStatus({id, kind: 'processing', ...summary});
-    return id;
+    return Maybe.just(id);
   };
 
-  const handleBackgroundMoveOutcome = (outcome: CellsBackgroundActionOutcome, moveStatusId: string): void => {
+  const completeMoveToFolder = (moveStatusId: string, closePreview: boolean): void => {
+    finishMove(moveStatusId);
+    activeMoveStatusId.current = Maybe.nothing();
     if (!isTableMounted.current) {
       return;
     }
-
-    if (outcome === 'all-finished') {
-      activeMoveStatusId.current = Maybe.nothing();
-      dispatchMove({type: 'resolved'});
+    dispatchMove({type: 'resolved'});
+    if (closePreview) {
       setIsBulkMovePreviewOpen(false);
-      onRefresh();
+    }
+    onRefresh();
+  };
+
+  const handleBackgroundMoveOutcome = (outcome: CellsBackgroundActionOutcome, moveStatusId: string): void => {
+    if (outcome === 'all-finished') {
+      completeMoveToFolder(moveStatusId, true);
+      return;
+    }
+    if (!isTableMounted.current) {
       return;
     }
 
@@ -676,11 +705,7 @@ export const CellsTable = ({
 
     if (response.Status === RestActionStatus.Performed) {
       updateMoveStatus({...summary, kind: 'completed'});
-      activeMoveStatusId.current = Maybe.nothing();
-      if (isTableMounted.current) {
-        dispatchMove({type: 'resolved'});
-        onRefresh();
-      }
+      completeMoveToFolder(moveStatusId, false);
       return true;
     }
 
@@ -701,7 +726,7 @@ export const CellsTable = ({
     }
     updateMoveStatus({...summary, kind: 'processing'});
     startBackgroundMoveObservation(moveStatusId, summary, uniqueMoveJobUuids);
-    return true;
+    return false;
   };
 
   const handleRetryBackgroundMoveStatus = (): void => {
@@ -721,7 +746,12 @@ export const CellsTable = ({
     }
   };
 
+  const selectionDisabledNodeIds = new Set([...permanentDelete.activeNodeIds, ...restoringNodeIds]);
+
   const handleToggleSelection = (nodeId: string, isSelected: boolean): void => {
+    if (isSelected && selectionDisabledNodeIds.has(nodeId)) {
+      return;
+    }
     activeDriveDrag.current = null;
     clearPermanentDeleteRejection();
     setSelectedNodeIds(currentSelection => {
@@ -741,6 +771,9 @@ export const CellsTable = ({
     setSelectedNodeIds(currentSelection => {
       const nextSelection = new Set(currentSelection);
       for (const node of nodes) {
+        if (isSelected && selectionDisabledNodeIds.has(node.id)) {
+          continue;
+        }
         if (isSelected) {
           nextSelection.add(node.id);
         } else {
@@ -778,6 +811,10 @@ export const CellsTable = ({
         return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
       }),
     );
+    setRestoringNodeIds(selectedIdSet);
+    setSelectedNodeIds(currentSelection => {
+      return withoutNodeIds(currentSelection, nodeIds);
+    });
     void bulkRestore.restore(currentResolution.targets, scopeKey);
   };
 
@@ -830,11 +867,9 @@ export const CellsTable = ({
   const isRowSelectionEnabled =
     isSelectionEnabled &&
     !isBulkMoveOutcomeUnresolved &&
-    !isPermanentDeleteUnresolved &&
     !isBulkMoveToBinNeedsReview &&
-    !isBulkMoveToBinPending &&
-    !bulkRestore.isPending &&
     bulkRestore.reviewReason === null;
+  const isSelectionDisabled = isMoveActive || isBulkMoveRequestPending || isBackgroundMovePending;
 
   const table = useReactTable({
     data: nodes,
@@ -857,6 +892,8 @@ export const CellsTable = ({
           return selectedNodeIds.has(node.id);
         }),
       selectionEnabled: isRowSelectionEnabled,
+      selectionDisabled: isSelectionDisabled,
+      selectionDisabledNodeIds,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -875,15 +912,16 @@ export const CellsTable = ({
     selectedNodes.length === selectedNodeIds.size &&
     isInRecycleBin() &&
     !isBulkRestoreBlocking &&
-    !isPermanentDeletePending &&
-    !isPermanentDeleteUnresolved &&
+    selectedNodes.every(node => {
+      return !permanentDelete.activeNodeIds.includes(node.id);
+    }) &&
     canPerformCurrentDriveAction(CELLS_ACTION.RESTORE) &&
     restoreResolution.canRestore;
   const canPermanentlyDeleteSelection =
     selectedNodes.length > 0 &&
     selectedNodes.length === selectedNodeIds.size &&
     isInRecycleBin() &&
-    !isBulkRestoreBlocking &&
+    bulkRestore.reviewReason === null &&
     !isPermanentDeleteUnresolved &&
     canPerformCurrentDriveAction(CELLS_ACTION.DELETE) &&
     selectedNodes.every(node => {
@@ -896,6 +934,7 @@ export const CellsTable = ({
     !isBulkMoveOutcomeUnresolved &&
     !isBulkMoveRequestPending &&
     !isBackgroundMovePending &&
+    !isMoveActive &&
     !isBulkMoveToBinPending &&
     !isBulkMoveToBinNeedsReview &&
     !isInRecycleBin() &&
@@ -911,6 +950,7 @@ export const CellsTable = ({
     !isBulkMoveOutcomeUnresolved &&
     !isBulkMoveRequestPending &&
     !isBackgroundMovePending &&
+    !isMoveActive &&
     !isBulkMoveToBinPending &&
     !isBulkMoveToBinNeedsReview &&
     !isInRecycleBin() &&
@@ -1028,6 +1068,7 @@ export const CellsTable = ({
         summary: captured.summary,
         jobUuids,
         onOutcome: outcome => {
+          finishMove(statusId);
           if (isTableMounted.current && !hasLeftCapturedScope(captured)) {
             void finishBulkMoveToBinOutcome(captured, statusId, getBackgroundActionStatusKind(outcome));
           }
@@ -1037,7 +1078,13 @@ export const CellsTable = ({
         resetBulkMoveToBinAfterScopeChange();
       }
     },
-    [finishBulkMoveToBinOutcome, hasLeftCapturedScope, observeBackgroundJobs, resetBulkMoveToBinAfterScopeChange],
+    [
+      finishBulkMoveToBinOutcome,
+      finishMove,
+      hasLeftCapturedScope,
+      observeBackgroundJobs,
+      resetBulkMoveToBinAfterScopeChange,
+    ],
   );
 
   const handleConfirmBulkMoveToBin = useCallback(async (): Promise<void> => {
@@ -1052,11 +1099,20 @@ export const CellsTable = ({
       return;
     }
 
+    const statusId = createMoveStatusId();
+    if (
+      !tryStartMove({
+        id: statusId,
+        kind: 'processing',
+        conversationQualifiedId: currentConversationQualifiedId,
+        ...captured.summary,
+      })
+    ) {
+      return;
+    }
     isBulkMoveToBinPendingRef.current = true;
     setIsBulkMoveToBinPending(true);
     setIsBulkMoveToBinConfirmationOpen(false);
-    const statusId = createMoveStatusId();
-    startMoveStatus({id: statusId, kind: 'processing', ...captured.summary});
 
     try {
       const response = await cellsRepository.deleteNodes({uuids: captured.nodeIds, permanently: false});
@@ -1067,6 +1123,7 @@ export const CellsTable = ({
       }
 
       const statusKind = getImmediateMoveToBinStatusKind(response);
+      finishMove(statusId);
       if (!isTableMounted.current || hasLeftCapturedScope(captured)) {
         updateMoveStatus({id: statusId, kind: statusKind, ...captured.summary});
         if (isTableMounted.current) {
@@ -1077,6 +1134,7 @@ export const CellsTable = ({
 
       await finishBulkMoveToBinOutcome(captured, statusId, statusKind);
     } catch {
+      finishMove(statusId);
       updateMoveStatus({id: statusId, kind: 'request-failed', ...captured.summary});
       if (isTableMounted.current) {
         await finishBulkMoveToBinOutcome(captured, statusId, 'request-failed');
@@ -1084,9 +1142,11 @@ export const CellsTable = ({
     }
   }, [
     capturedBulkMoveToBin,
+    currentConversationQualifiedId,
     isCapturedBulkMoveToBinSelectionCurrent,
     createMoveStatusId,
-    startMoveStatus,
+    tryStartMove,
+    finishMove,
     updateMoveStatus,
     cellsRepository,
     hasLeftCapturedScope,
@@ -1171,7 +1231,7 @@ export const CellsTable = ({
     const selected = getDriveDragNodesForEvent(destination, event);
     activeDriveDrag.current = null;
     setActiveFolderDropTarget(null, false);
-    if (selected === null || isDropMoveSubmitting.current) {
+    if (selected === null || isDropMoveSubmitting.current || isMoveActive) {
       return;
     }
 
@@ -1184,6 +1244,10 @@ export const CellsTable = ({
       destinationPath: normalizeCellsPath(destination.path, conversationQualifiedId),
     };
     const moveStatusId = handleBulkMoveStart(summary);
+    if (maybe.isNothing(moveStatusId)) {
+      isDropMoveSubmitting.current = false;
+      return;
+    }
     try {
       const response = await cellsRepository.moveNodes({
         currentPaths: selected.map(node => {
@@ -1191,9 +1255,9 @@ export const CellsTable = ({
         }),
         targetPath: getCellsApiPath({conversationQualifiedId, currentPath: summary.destinationPath}),
       });
-      handleBulkMoveResult(response, moveStatusId);
+      handleBulkMoveResult(response, moveStatusId.value);
     } catch {
-      handleBulkMoveRequestError(moveStatusId);
+      handleBulkMoveRequestError(moveStatusId.value);
     } finally {
       isDropMoveSubmitting.current = false;
     }
@@ -1316,7 +1380,7 @@ export const CellsTable = ({
                     css={clearSelectionButtonStyles}
                     type="button"
                     aria-label={translate('cells.selection.clear')}
-                    disabled={isBulkMoveToBinPending || bulkRestore.isPending}
+                    disabled={isMoveActive || isBulkMoveToBinPending}
                     onClick={() => {
                       return setSelectedNodeIds(new Set());
                     }}
@@ -1577,7 +1641,7 @@ export const CellsTable = ({
                     aria-selected={isSelectionEnabled && selectedNodeIds.has(node.id)}
                     data-uie-name="cells-table-row"
                     onClickCapture={event => {
-                      if (!isRowSelectionEnabled || (!event.metaKey && !event.ctrlKey)) {
+                      if (isSelectionDisabled || !isRowSelectionEnabled || (!event.metaKey && !event.ctrlKey)) {
                         return;
                       }
 

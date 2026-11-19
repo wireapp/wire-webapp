@@ -28,9 +28,13 @@ import {useCellsModal} from '../cellsModalContext/cellsModalContext';
 
 interface CellsModalHeaderProps {
   children: ReactNode;
+  isCloseDisabled?: boolean;
 }
 
-export const CellsModalHeader: FunctionComponent<CellsModalHeaderProps> = ({children}: CellsModalHeaderProps) => {
+export const CellsModalHeader: FunctionComponent<CellsModalHeaderProps> = ({
+  children,
+  isCloseDisabled = false,
+}: CellsModalHeaderProps) => {
   const {onClose} = useCellsModal();
   const {translate} = useApplicationContext();
 
@@ -43,6 +47,7 @@ export const CellsModalHeader: FunctionComponent<CellsModalHeaderProps> = ({chil
         type="button"
         css={closeButtonStyles}
         onClick={onClose}
+        disabled={isCloseDisabled}
         aria-label={translate('cells.modal.closeButton')}
       >
         <CloseIcon />

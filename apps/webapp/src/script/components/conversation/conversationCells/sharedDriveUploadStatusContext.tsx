@@ -51,6 +51,9 @@ type SharedDriveUploadStatusContextValue = {
   readonly dismissUpload: (upload: DismissedUpload) => void;
   readonly getMoveStatus: (conversationQualifiedId: string) => Maybe<SharedDriveMoveStatus>;
   readonly startMoveStatus: (status: SharedDriveMoveStatus) => void;
+  readonly tryStartMove: (status: SharedDriveMoveStatus) => boolean;
+  readonly finishMove: (id: string) => void;
+  readonly isMoveActive: boolean;
   readonly isMoveStatusCurrent: (conversationQualifiedId: string, id: string) => boolean;
   readonly updateMoveStatus: (status: SharedDriveMoveStatus) => void;
   readonly createMoveStatusId: () => string;
@@ -73,6 +76,13 @@ const SharedDriveUploadStatusContext = createContext<SharedDriveUploadStatusCont
   startMoveStatus: () => {
     return undefined;
   },
+  tryStartMove: () => {
+    return false;
+  },
+  finishMove: () => {
+    return undefined;
+  },
+  isMoveActive: false,
   isMoveStatusCurrent: () => {
     return false;
   },
@@ -142,6 +152,8 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
         : [],
     ),
   );
+  const moveId = useRef<Maybe<string>>(Maybe.nothing());
+  const [activeMoveId, setActiveMoveId] = useState<Maybe<string>>(Maybe.nothing());
   const getMoveStatus = (conversationQualifiedId: string): Maybe<SharedDriveMoveStatus> => {
     return Maybe.of(moveStatuses.get(conversationQualifiedId));
   };
@@ -185,6 +197,25 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
     },
     [backgroundActionController],
   );
+  const tryStartMove = useCallback(
+    (status: SharedDriveMoveStatus): boolean => {
+      if (maybe.isJust(moveId.current)) {
+        return false;
+      }
+      moveId.current = Maybe.just(status.id);
+      setActiveMoveId(Maybe.just(status.id));
+      startMoveStatus(status);
+      return true;
+    },
+    [startMoveStatus],
+  );
+  const finishMove = useCallback((id: string): void => {
+    if (maybe.isNothing(moveId.current) || moveId.current.value !== id) {
+      return;
+    }
+    moveId.current = Maybe.nothing();
+    setActiveMoveId(Maybe.nothing());
+  }, []);
   const previousScopeKey = useRef(resetOnScopeChange);
   useEffect(() => {
     const previous = previousScopeKey.current;
@@ -199,6 +230,8 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
     backgroundActionController.stopAll();
     currentMoveIds.current.clear();
     dismissedMoveStatusIds.current.clear();
+    moveId.current = Maybe.nothing();
+    setActiveMoveId(Maybe.nothing());
     setMoveStatuses(new Map());
   }, [backgroundActionController, resetOnScopeChange]);
   useEffect(() => {
@@ -216,22 +249,26 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
       return next;
     });
   }, []);
-  const clearMoveStatus = useCallback((id: string) => {
-    for (const [conversationQualifiedId, current] of currentMoveIds.current) {
-      if (current.id === id) {
-        currentMoveIds.current.delete(conversationQualifiedId);
-      }
-    }
-    setMoveStatuses(current => {
-      const next = new Map(current);
-      for (const [conversationQualifiedId, status] of next) {
-        if (status.id === id) {
-          next.delete(conversationQualifiedId);
+  const clearMoveStatus = useCallback(
+    (id: string) => {
+      finishMove(id);
+      for (const [conversationQualifiedId, current] of currentMoveIds.current) {
+        if (current.id === id) {
+          currentMoveIds.current.delete(conversationQualifiedId);
         }
       }
-      return next;
-    });
-  }, []);
+      setMoveStatuses(current => {
+        const next = new Map(current);
+        for (const [conversationQualifiedId, status] of next) {
+          if (status.id === id) {
+            next.delete(conversationQualifiedId);
+          }
+        }
+        return next;
+      });
+    },
+    [finishMove],
+  );
   const dismissUpload = useCallback((upload: DismissedUpload) => {
     return setDismissedUpload(Maybe.just(upload));
   }, []);
@@ -243,6 +280,9 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
         dismissUpload,
         getMoveStatus,
         startMoveStatus,
+        tryStartMove,
+        finishMove,
+        isMoveActive: maybe.isJust(activeMoveId),
         isMoveStatusCurrent,
         updateMoveStatus,
         createMoveStatusId,
