@@ -268,11 +268,11 @@ test('persists sanitized browser logs with console disabled across application r
     }
   });
   const ownedFilenames = new Set<string>();
-  const location = '/?enabled-features=mark-as-unread,persistent-browser-logs&enableLogging=-*';
+  const location = '/?enabled-features=mark-as-unread,persistent-browser-logs&debugLogging=-*';
   try {
     await page.goto(location);
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
-    expect(new URL(page.url()).searchParams.get('enableLogging')).toBe('-*');
+    expect(new URL(page.url()).searchParams.get('debugLogging')).toBe('-*');
     await expect
       .poll(async () => {
         const files = await readBrowserLogFiles(page);
@@ -300,7 +300,7 @@ test('persists sanitized browser logs with console disabled across application r
 
     await page.reload();
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
-    expect(new URL(page.url()).searchParams.get('enableLogging')).toBe('-*');
+    expect(new URL(page.url()).searchParams.get('debugLogging')).toBe('-*');
     await expect
       .poll(async () => {
         return (await readBrowserLogFiles(page)).length;
@@ -365,7 +365,7 @@ test('leaves Origin Private File System untouched without opt-in even when conso
     }
   });
 
-  await page.goto('/auth?enabled-features=mark-as-unread&enableLogging=*');
+  await page.goto('/auth?enabled-features=mark-as-unread&debugLogging=*');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
 
   expect(consoleRecords.length).toBeGreaterThan(0);
@@ -396,7 +396,7 @@ test('keeps startup and console logging working when logging worker construction
       consoleRecords.push(message.text());
     }
   });
-  await page.goto('/?enabled-features=persistent-browser-logs&enableLogging=*');
+  await page.goto('/?enabled-features=persistent-browser-logs&debugLogging=*');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
 
   expect(startedWorkers).toEqual([]);
@@ -476,7 +476,7 @@ test.describe('Electron logging selection', () => {
       }
     });
 
-    await page.goto('/auth?enabled-features=persistent-browser-logs&enableLogging=*');
+    await page.goto('/auth?enabled-features=persistent-browser-logs&debugLogging=*');
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
 
     expect(consoleRecords.length).toBeGreaterThan(0);
@@ -513,7 +513,7 @@ test('disables unsupported synchronous access handles without a main-thread fall
       consoleRecords.push(message.text());
     }
   });
-  await page.goto('/auth?enabled-features=persistent-browser-logs&enableLogging=*');
+  await page.goto('/auth?enabled-features=persistent-browser-logs&debugLogging=*');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
   await expect
     .poll(() => {
@@ -550,7 +550,7 @@ test('keeps console logging functional after a persistence worker crashes', asyn
   page.on('pageerror', error => {
     uncaughtErrors.push(error.message);
   });
-  await page.goto('/auth?enabled-features=persistent-browser-logs&enableLogging=*');
+  await page.goto('/auth?enabled-features=persistent-browser-logs&debugLogging=*');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
   await expect
     .poll(() => {

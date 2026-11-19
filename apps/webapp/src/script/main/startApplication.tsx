@@ -59,7 +59,7 @@ import {Core} from '../service/coreSingleton';
 import {translate} from '../util/localizerUtil';
 import {getStorage} from '../util/localStorage';
 import {getLogger} from '../util/logger';
-import {enableLogging} from '../logger/enableLogging';
+import {initializeLogging} from '../logger/initializeLogging';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {initializeDesktopLogOutput} from '../logger/initializeDesktopLogOutput';
 import {loadValue} from '../util/storageUtil';
@@ -96,7 +96,7 @@ export async function startApplication(
     },
     createArchive: createBrowserLogZipArchive,
   });
-  const persistentLogging = enableLogging({
+  const persistentLogging = initializeLogging({
     clock,
     consoleOutput: console,
     locationSearch: window.location.search,

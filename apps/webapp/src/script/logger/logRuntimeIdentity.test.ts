@@ -23,7 +23,7 @@ import {Maybe} from 'true-myth';
 
 import {createPinoLogging} from './createPinoLogging';
 import type {BrowserLogPersistence} from './createBrowserLogPersistence';
-import {enableLogging} from './enableLogging';
+import {initializeLogging} from './initializeLogging';
 import type {Logger} from './logger';
 import type {LogOutput} from './logOutput';
 import {getDeploymentStage, logRuntimeIdentity, logStartupRuntimeIdentity} from './logRuntimeIdentity';
@@ -51,7 +51,7 @@ function createStartupLoggingFixture(debugEnabled: boolean): StartupLoggingFixtu
   const createPersistenceOutput = jest.fn<Maybe<BrowserLogPersistence>, []>(() => {
     return Maybe.nothing();
   });
-  enableLogging({
+  initializeLogging({
     clock,
     consoleOutput,
     locationSearch: `?id=${desktopAccountIdentifier}`,

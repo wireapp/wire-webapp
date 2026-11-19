@@ -22,7 +22,7 @@ import {Maybe} from 'true-myth';
 
 import {createDesktopLogOutput} from './createDesktopLogOutput';
 import {createPinoLogging} from './createPinoLogging';
-import {enableLogging} from './enableLogging';
+import {initializeLogging} from './initializeLogging';
 import {logStartupRuntimeIdentity} from './logRuntimeIdentity';
 import {selectDesktopApplicationLogWrite, type DesktopApplicationLogWrite} from './selectDesktopApplicationLogWrite';
 
@@ -104,8 +104,8 @@ describe('Desktop structured logging', () => {
 
   it.each([
     {consoleQuery: '', expectedConsoleInfoRecordIndexes: []},
-    {consoleQuery: '&enableLogging=Selected', expectedConsoleInfoRecordIndexes: [1]},
-    {consoleQuery: '&enableLogging=RuntimeIdentity', expectedConsoleInfoRecordIndexes: [0]},
+    {consoleQuery: '&debugLogging=Selected', expectedConsoleInfoRecordIndexes: [1]},
+    {consoleQuery: '&debugLogging=RuntimeIdentity', expectedConsoleInfoRecordIndexes: [0]},
   ])(
     'persists sanitized Pino diagnostics and startup identity with independent console filtering ($consoleQuery)',
     async options => {
@@ -116,7 +116,7 @@ describe('Desktop structured logging', () => {
       const consoleOutput = {info: jest.fn(), debug: jest.fn(), warn: jest.fn(), error: jest.fn()};
       const createPersistenceOutput = jest.fn();
       const locationSearch = enabledSearch + consoleQuery;
-      const browserPersistence = enableLogging({
+      const browserPersistence = initializeLogging({
         clock,
         consoleOutput,
         locationSearch,

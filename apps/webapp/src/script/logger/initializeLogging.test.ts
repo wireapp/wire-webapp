@@ -22,7 +22,7 @@ import {noop} from 'noop-esm';
 import {Maybe} from 'true-myth';
 
 import {createPinoLogging} from './createPinoLogging';
-import {enableLogging} from './enableLogging';
+import {initializeLogging} from './initializeLogging';
 import {createBrowserLogPersistence, type BrowserLogPersistence} from './createBrowserLogPersistence';
 import {createDesktopLogOutput} from './createDesktopLogOutput';
 import {createLogWorkerConnectionForTest} from './test/createLogWorkerConnectionForTest';
@@ -76,15 +76,18 @@ describe('logging startup', () => {
     {search: '', debugEnabled: true, expected: Maybe.just('*'), calls: 1},
     {search: '?enableLogging=', debugEnabled: false, expected: Maybe.nothing<string>(), calls: 0},
     {search: '?enableLogging=', debugEnabled: true, expected: Maybe.just('*'), calls: 1},
+    {search: '?enableLogging=*&debugLogging=', debugEnabled: false, expected: Maybe.nothing<string>(), calls: 0},
+    {search: '?enableLogging=-*&debugLogging=', debugEnabled: true, expected: Maybe.just('*'), calls: 1},
+    {search: '?debugLogging=*&enableLogging=-*', debugEnabled: false, expected: Maybe.just('*'), calls: 1},
     {
-      search: '?enableLogging=@wireapp/*,-@wireapp/core/*',
+      search: '?debugLogging=@wireapp/*,-@wireapp/core/*',
       debugEnabled: true,
       expected: Maybe.just('@wireapp/*,-@wireapp/core/*'),
       calls: 1,
     },
-    {search: '?enableLogging=-*', debugEnabled: true, expected: Maybe.just('-*'), calls: 0},
-    {search: '?enableLogging=(a%2B)%2B%24', debugEnabled: true, expected: Maybe.just('(a+)+$'), calls: 0},
-    {search: '?enableLogging=*,-', debugEnabled: true, expected: Maybe.just('*,-'), calls: 0},
+    {search: '?debugLogging=-*', debugEnabled: true, expected: Maybe.just('-*'), calls: 0},
+    {search: '?debugLogging=(a%2B)%2B%24', debugEnabled: true, expected: Maybe.just('(a+)+$'), calls: 0},
+    {search: '?debugLogging=*,-', debugEnabled: true, expected: Maybe.just('*,-'), calls: 0},
   ])('restores main enablement: $search with ENABLE_DEBUG=$debugEnabled', testCase => {
     const {search, debugEnabled, expected, calls} = testCase;
     const storedValues = new Map<string, string>([['debug', 'old namespace']]);
@@ -100,7 +103,7 @@ describe('logging startup', () => {
     const logging = createPinoLogging(Maybe.nothing());
     const logger = logging.getLogger('@wireapp/webapp/Startup');
 
-    enableLogging({
+    initializeLogging({
       ...disabledPersistenceOptions,
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 1000n}),
       consoleOutput: output,
@@ -122,11 +125,11 @@ describe('logging startup', () => {
   it('applies URL enablement when debug mode is off and storage is unavailable', () => {
     const output = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
     const logging = createPinoLogging(Maybe.nothing());
-    enableLogging({
+    initializeLogging({
       ...disabledPersistenceOptions,
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 1000n}),
       consoleOutput: output,
-      locationSearch: '?enableLogging=*',
+      locationSearch: '?debugLogging=*',
       debugEnabled: false,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
@@ -140,14 +143,21 @@ describe('logging startup', () => {
   describe.each(['browser', 'desktop'])('debug eligibility with %s persistence', environment => {
     it.each([
       {query: '', debugEnabled: false, expected: []},
-      {query: '&enableLogging=*', debugEnabled: false, expected: ['Application/Selected', 'Application/Other']},
-      {query: '&enableLogging=Application/Selected', debugEnabled: false, expected: ['Application/Selected']},
-      {query: '&enableLogging=*,-Application/Other', debugEnabled: true, expected: ['Application/Selected']},
+      {query: '&debugLogging=*', debugEnabled: false, expected: ['Application/Selected', 'Application/Other']},
+      {query: '&debugLogging=Application/Selected', debugEnabled: false, expected: ['Application/Selected']},
+      {query: '&debugLogging=*,-Application/Other', debugEnabled: true, expected: ['Application/Selected']},
       {
-        query: '&enableLogging=*,-Application/*,Application/Other',
+        query: '&debugLogging=*,-Application/*,Application/Other',
         debugEnabled: false,
         expected: ['Application/Other'],
       },
+      {query: '&enableLogging=Application/Other', debugEnabled: false, expected: ['Application/Other']},
+      {
+        query: '&enableLogging=*&debugLogging=Application/Selected',
+        debugEnabled: false,
+        expected: ['Application/Selected'],
+      },
+      {query: '&enableLogging=*&debugLogging=', debugEnabled: false, expected: []},
       {query: '', debugEnabled: true, expected: ['Application/Selected', 'Application/Other']},
     ])('uses $query with ENABLE_DEBUG=$debugEnabled', async options => {
       const {query, debugEnabled, expected} = options;
@@ -166,7 +176,7 @@ describe('logging startup', () => {
         reportFailure: noop,
       });
       const locationSearch = '?enabled-features=desktop-structured-logs,persistent-browser-logs' + query;
-      const browserPersistence = enableLogging({
+      const browserPersistence = initializeLogging({
         clock,
         consoleOutput,
         locationSearch,
@@ -240,7 +250,7 @@ describe('logging startup', () => {
     };
 
     expect(() => {
-      enableLogging({
+      initializeLogging({
         ...disabledPersistenceOptions,
         clock: createDeterministicClock({initialUnixEpochMicroseconds: 1000n}),
         consoleOutput: output,
@@ -273,9 +283,9 @@ describe('logging startup', () => {
         return createTestPersistence({clock, append});
       });
       const logging = createPinoLogging(Maybe.nothing());
-      const locationSearch = `?enabled-features=mark-as-unread${persistenceEnabled ? ',persistent-browser-logs' : ''}${consoleEnabled ? '&enableLogging=selected' : ''}`;
+      const locationSearch = `?enabled-features=mark-as-unread${persistenceEnabled ? ',persistent-browser-logs' : ''}${consoleEnabled ? '&debugLogging=selected' : ''}`;
       const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
-      const persistence = enableLogging({
+      const persistence = initializeLogging({
         clock,
         consoleOutput,
         locationSearch,
@@ -327,10 +337,10 @@ describe('logging startup', () => {
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const logging = createPinoLogging(Maybe.nothing());
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
-    const persistence = enableLogging({
+    const persistence = initializeLogging({
       clock,
       consoleOutput,
-      locationSearch: '?enableLogging=*',
+      locationSearch: '?debugLogging=*',
       debugEnabled: false,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
@@ -367,10 +377,10 @@ describe('logging startup', () => {
         outcome: request.type === 'bind-account' ? 'failed' : 'complete',
       });
     };
-    const persistence = enableLogging({
+    const persistence = initializeLogging({
       clock,
       consoleOutput,
-      locationSearch: '?enableLogging=*',
+      locationSearch: '?debugLogging=*',
       debugEnabled: false,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
@@ -416,10 +426,10 @@ describe('logging startup', () => {
   it.each(['unsupported', 'failed'] as const)('preserves console logging when persistence setup is %s', failure => {
     const logging = createPinoLogging(Maybe.nothing());
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
-    const persistence = enableLogging({
+    const persistence = initializeLogging({
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
       consoleOutput,
-      locationSearch: '?enableLogging=*',
+      locationSearch: '?debugLogging=*',
       debugEnabled: false,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
