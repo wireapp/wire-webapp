@@ -49,6 +49,7 @@ export interface UseBulkRestoreOptions {
   readonly onStatusCleared: () => void;
   readonly reportError: (error: unknown) => void;
   readonly observeBackgroundAction: (observation: BackgroundActionObservation) => void;
+  readonly setBackgroundActionJobUuids: (id: string, jobUuids: readonly string[]) => void;
   readonly publishStatus: (status: SharedDriveMoveStatus) => void;
 }
 
@@ -135,7 +136,9 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
     };
     const observeJobs: BulkRestoreDependencies['observeJobs'] = jobUuids => {
       return new Promise(resolve => {
-        const {cellsRepository, clock, random, observeBackgroundAction} = optionsRef.current;
+        const {cellsRepository, clock, random, observeBackgroundAction, setBackgroundActionJobUuids} =
+          optionsRef.current;
+        setBackgroundActionJobUuids(status.id, jobUuids);
         observeBackgroundAction({
           actionName: 'restore',
           cellsRepository,

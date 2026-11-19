@@ -92,6 +92,7 @@ const createSetup = (): BulkRestoreTestSetup => {
   const reportError = jest.fn();
   const publishStatus = jest.fn();
   const backgroundActionController = createSharedDriveBackgroundActionController(publishStatus);
+  backgroundActionController.register(restoreStatus);
   const options: UseBulkRestoreOptions = {
     cellsRepository: {restoreNodes, lookupNodeByPath, getBackgroundActionInfo},
     clock,
@@ -108,6 +109,7 @@ const createSetup = (): BulkRestoreTestSetup => {
     onStatusCleared,
     reportError,
     observeBackgroundAction: backgroundActionController.start,
+    setBackgroundActionJobUuids: backgroundActionController.setJobUuids,
     publishStatus,
   };
   return {

@@ -444,6 +444,7 @@ export const CellsTable = ({
     onStatusChange: restoreStatusReporter.report,
     onStatusCleared: restoreStatusReporter.clear,
     observeBackgroundAction,
+    setBackgroundActionJobUuids: setMoveJobUuids,
     publishStatus: publishMoveStatus,
     reportError: error => {
       console.error(error);
@@ -455,7 +456,12 @@ export const CellsTable = ({
     setPermanentDeleteReviewing(isPermanentDeleteRefreshingReview);
   }, [isPermanentDeleteRefreshingReview, setPermanentDeleteReviewing]);
   const setRestoreReviewing = restoreStatusReporter.setReviewing;
-  const {isRefreshingReview: isRestoreRefreshingReview} = bulkRestore;
+  const {
+    isRefreshingReview: isRestoreRefreshingReview,
+    reviewReason: restoreReviewReasonFromHook,
+    resumeReview,
+  } = bulkRestore;
+  const {attachReviewStatus} = restoreStatusReporter;
   useEffect(() => {
     setRestoreReviewing(isRestoreRefreshingReview);
   }, [isRestoreRefreshingReview, setRestoreReviewing]);
@@ -537,22 +543,22 @@ export const CellsTable = ({
     if (!isInRecycleBin() || restoreReviewReason === undefined || maybe.isNothing(currentRestoreStatus)) {
       return;
     }
-    if (bulkRestore.reviewReason === null) {
-      bulkRestore.resumeReview(restoreReviewReason);
+    if (restoreReviewReasonFromHook === null) {
+      resumeReview(restoreReviewReason);
     }
     if (
       maybe.isNothing(attachedRestoreStatusId.current) ||
       attachedRestoreStatusId.current.value !== currentRestoreStatus.value.id
     ) {
       attachedRestoreStatusId.current = Maybe.just(currentRestoreStatus.value.id);
-      restoreStatusReporter.attachReviewStatus(currentRestoreStatus.value);
+      attachReviewStatus(currentRestoreStatus.value);
     }
   }, [
-    bulkRestore.reviewReason,
-    bulkRestore.resumeReview,
+    attachReviewStatus,
     currentRestoreStatus,
     restoreReviewReason,
-    restoreStatusReporter.attachReviewStatus,
+    restoreReviewReasonFromHook,
+    resumeReview,
     selectionScopeKey,
   ]);
 

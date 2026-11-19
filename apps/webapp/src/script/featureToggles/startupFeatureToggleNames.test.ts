@@ -82,12 +82,12 @@ describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
     expect(startupFeatureToggleNames).toEqual(expect.arrayContaining(previewDefaultEnabledStartupFeatureToggleNames));
   });
 
-  it('keeps Drive bulk restore disabled by default in preview builds', () => {
+  it('enables Drive bulk restore by default in preview builds', () => {
     expect(startupFeatureToggleRegistry).toContainEqual({
       name: driveBulkRestoreFeatureToggleName,
-      previewDefaultEnabled: false,
+      previewDefaultEnabled: true,
     });
-    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(driveBulkRestoreFeatureToggleName);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(driveBulkRestoreFeatureToggleName);
   });
 
   it('keeps Drive bulk action progress persistence disabled by default in preview builds', () => {
