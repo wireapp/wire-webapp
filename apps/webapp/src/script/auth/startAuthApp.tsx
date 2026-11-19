@@ -46,6 +46,7 @@ import {setAppLocale} from '../localization/Localizer';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {enableLogging} from '../logger/enableLogging';
 import {configureLogging} from '../logger/getLogger';
+import {initializeDesktopLogOutput} from '../logger/initializeDesktopLogOutput';
 import {logStartupRuntimeIdentity} from '../logger/logRuntimeIdentity';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
@@ -73,6 +74,7 @@ export const startAuthApp = (support: CoreCryptoSupport): void => {
   const config = Config.getConfig();
   const clock = createClock();
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
+  const desktopLogOutput = initializeDesktopLogOutput(clock, startupFeatureToggles);
   const persistentLogging = enableLogging({
     clock,
     consoleOutput: console,
@@ -82,6 +84,7 @@ export const startAuthApp = (support: CoreCryptoSupport): void => {
     configureLogging,
     startupFeatureToggles,
     isElectron: Runtime.isElectron(),
+    desktopPersistenceOutput: desktopLogOutput.unwrapOr(undefined),
     createPersistenceOutput() {
       return createBrowserLogPersistence({
         clock,
@@ -117,6 +120,7 @@ export const startAuthApp = (support: CoreCryptoSupport): void => {
     clock,
     consoleOutput: console,
     isDesktopApp: Runtime.isDesktopApp(),
+    hasDesktopLogPersistence: desktopLogOutput.isJust,
     locationSearch: window.location.search,
     logger: getLogger('RuntimeIdentity'),
     hostname: window.location.hostname,

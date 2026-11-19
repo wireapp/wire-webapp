@@ -22,7 +22,7 @@ import {Maybe} from 'true-myth';
 
 import type {BrowserLogPersistence} from './createBrowserLogPersistence';
 import type {LoggingDependencies} from './createPinoLogging';
-import {createConsoleOutput, type ConsoleLogOutput} from './logOutput';
+import {createConsoleOutput, type ConsoleLogOutput, type LogOutput} from './logOutput';
 
 import {persistentBrowserLogsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import type {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
@@ -36,6 +36,7 @@ type EnableLoggingOptions = {
   readonly configureLogging: (dependencies: Maybe<LoggingDependencies>) => void;
   readonly startupFeatureToggles: StartupFeatureToggles;
   readonly isElectron: boolean;
+  readonly desktopPersistenceOutput?: LogOutput | undefined;
   readonly createPersistenceOutput: () => Maybe<BrowserLogPersistence>;
 };
 
@@ -44,7 +45,7 @@ type BrowserLogPersistenceSelection = Pick<EnableLoggingOptions, 'isElectron' | 
 function isBrowserLogPersistenceEnabled(options: BrowserLogPersistenceSelection): boolean {
   const {isElectron, startupFeatureToggles} = options;
 
-  // Desktop already persists WebView console output through its native logger.
+  // Desktop owns its native log lifecycle, including legacy WebView console capture.
   return !isElectron && startupFeatureToggles.isFeatureToggleEnabled(persistentBrowserLogsFeatureToggleName);
 }
 
@@ -58,6 +59,7 @@ export function enableLogging(options: EnableLoggingOptions): Maybe<BrowserLogPe
     configureLogging,
     startupFeatureToggles,
     isElectron,
+    desktopPersistenceOutput,
     createPersistenceOutput,
   } = options;
   const namespace = new URLSearchParams(locationSearch).get('enableLogging');
@@ -75,11 +77,14 @@ export function enableLogging(options: EnableLoggingOptions): Maybe<BrowserLogPe
   configureLogging(
     Maybe.just({
       clock,
+      // Desktop still captures console messages, so enabled namespaces may appear in both native log files.
       output: createConsoleOutput(consoleOutput),
       namespaces,
-      persistenceOutput: persistence.map(output => {
-        return output.write;
-      }),
+      persistenceOutput: isElectron
+        ? Maybe.of(desktopPersistenceOutput)
+        : persistence.map(output => {
+            return output.write;
+          }),
     }),
   );
 

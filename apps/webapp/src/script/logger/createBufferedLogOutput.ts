@@ -28,7 +28,11 @@ import type {LogPersistenceConfiguration} from './logPersistenceConfiguration';
 type BufferedLogOutputOptions = {
   readonly append: (lines: readonly string[]) => Promise<void>;
   readonly clock: Pick<Clock, 'setTimeout' | 'clearTimeout'>;
-  readonly configuration: LogPersistenceConfiguration;
+  readonly configuration: Pick<
+    LogPersistenceConfiguration,
+    'maximumFileBytes' | 'maximumTotalBytes' | 'maximumPendingBytes' | 'batchTargetBytes' | 'flushIntervalMilliseconds'
+  >;
+  readonly maximumBatchRecords?: number;
 };
 
 type PendingRecord = {readonly line: string; readonly sizeBytes: number};
@@ -58,7 +62,7 @@ type BufferedLogOutputWithBarrier = BufferedLogOutput & {
 };
 
 export function createBufferedLogOutput(options: BufferedLogOutputOptions): BufferedLogOutputWithBarrier {
-  const {append, clock, configuration} = options;
+  const {append, clock, configuration, maximumBatchRecords = Infinity} = options;
   const encoder = new TextEncoder();
   const maximumRecordBytes = Math.min(
     configuration.maximumFileBytes,
@@ -100,9 +104,13 @@ export function createBufferedLogOutput(options: BufferedLogOutputOptions): Buff
     return isUndefined(timer) && isUndefined(draining);
   }
 
+  function shouldFlushImmediately(): boolean {
+    return pendingBytes >= configuration.batchTargetBytes || pending.length >= maximumBatchRecords;
+  }
+
   function scheduleFlush(): void {
     if (pending.length > 0 && shouldScheduleFlush()) {
-      if (pendingBytes >= configuration.batchTargetBytes) {
+      if (shouldFlushImmediately()) {
         fireAndForgetInvoker.fireAndForget(() => {
           return startDrain(false);
         });
@@ -130,6 +138,9 @@ export function createBufferedLogOutput(options: BufferedLogOutputOptions): Buff
         const batch: PendingRecord[] = [];
         const maximumBatchBytes = Math.min(configuration.maximumFileBytes, configuration.maximumTotalBytes);
         for (const record of pending) {
+          if (batch.length === maximumBatchRecords) {
+            break;
+          }
           if (inFlightBytes + record.sizeBytes > maximumBatchBytes) {
             break;
           }
@@ -212,7 +223,7 @@ export function createBufferedLogOutput(options: BufferedLogOutputOptions): Buff
 
     pending.push({line: terminatedLine, sizeBytes});
     pendingBytes += sizeBytes;
-    if (pendingBytes >= configuration.batchTargetBytes) {
+    if (shouldFlushImmediately()) {
       clearTimer();
     }
 

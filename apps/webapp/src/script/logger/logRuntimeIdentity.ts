@@ -40,6 +40,7 @@ type LogStartupRuntimeIdentityOptions = LogRuntimeIdentityOptions & {
   readonly clock: Pick<Clock, 'currentUnixEpochMilliseconds'>;
   readonly consoleOutput: Pick<ConsoleLogOutput, 'info'>;
   readonly isDesktopApp: boolean;
+  readonly hasDesktopLogPersistence: boolean;
   readonly locationSearch: string;
 };
 
@@ -71,17 +72,16 @@ export function logRuntimeIdentity(options: LogRuntimeIdentityOptions): void {
 }
 
 export function logStartupRuntimeIdentity(options: LogStartupRuntimeIdentityOptions): void {
-  const {clock, consoleOutput, isDesktopApp, locationSearch, hostname, origin, version, assetVersion} = options;
+  const {clock, consoleOutput, locationSearch, hostname, origin, version, assetVersion} = options;
 
   try {
-    if (!isDesktopApp) {
+    if (usesPinoForStartupIdentity(options)) {
       logRuntimeIdentity(options);
 
       return;
     }
 
-    // Desktop assigns its wrapper account ID before navigating the WebView. Native console capture
-    // reads this URL parameter, not the authenticated user's ID or the browser's OPFS binding.
+    // The legacy startup record is scoped to Desktop's wrapper account URL.
     const accountIdentifiers = new URLSearchParams(locationSearch).getAll('id');
     if (accountIdentifiers.length !== 1) {
       return;
@@ -94,8 +94,7 @@ export function logStartupRuntimeIdentity(options: LogStartupRuntimeIdentityOpti
       return;
     }
 
-    // Emit only this record directly so Desktop can persist it even when Pino namespaces are disabled.
-    // Do not also emit through Pino: enabled debug namespaces would duplicate the identity in native logs.
+    // Use the legacy console destination even when Pino namespaces are disabled.
     consoleOutput.info(
       encodeLogOutput({
         deploymentStage: getDeploymentStage(hostname),
@@ -111,4 +110,8 @@ export function logStartupRuntimeIdentity(options: LogStartupRuntimeIdentityOpti
   } catch {
     // Runtime identification is optional diagnostics and must never prevent startup.
   }
+}
+
+function usesPinoForStartupIdentity(options: LogStartupRuntimeIdentityOptions): boolean {
+  return !options.isDesktopApp || options.hasDesktopLogPersistence;
 }

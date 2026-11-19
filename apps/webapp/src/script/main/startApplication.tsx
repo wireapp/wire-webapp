@@ -61,6 +61,7 @@ import {getStorage} from '../util/localStorage';
 import {getLogger} from '../util/logger';
 import {enableLogging} from '../logger/enableLogging';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
+import {initializeDesktopLogOutput} from '../logger/initializeDesktopLogOutput';
 import {loadValue} from '../util/storageUtil';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
@@ -80,9 +81,12 @@ export async function startApplication(
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
   const config = Config.getConfig();
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
+  const isElectron = Runtime.isElectron();
+  const isDesktopApp = Runtime.isDesktopApp();
+  const desktopLogOutput = initializeDesktopLogOutput(clock, startupFeatureToggles);
   const downloadApplicationLogs = createBrowserLogDownload({
     startupFeatureToggles,
-    isElectron: Runtime.isElectron(),
+    isElectron,
     showSaveFilePicker: isFunction(window.showSaveFilePicker)
       ? Maybe.just(window.showSaveFilePicker.bind(window))
       : Maybe.nothing(),
@@ -100,7 +104,8 @@ export async function startApplication(
     storage: Maybe.of(getStorage()),
     configureLogging,
     startupFeatureToggles,
-    isElectron: Runtime.isElectron(),
+    isElectron,
+    desktopPersistenceOutput: desktopLogOutput.unwrapOr(undefined),
     createPersistenceOutput() {
       return createBrowserLogPersistence({
         clock,
@@ -147,7 +152,8 @@ export async function startApplication(
     assetVersion: runtimeIdentity.assetVersion,
     clock,
     consoleOutput: console,
-    isDesktopApp: Runtime.isDesktopApp(),
+    isDesktopApp,
+    hasDesktopLogPersistence: desktopLogOutput.isJust,
     locationSearch: window.location.search,
   });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
@@ -158,7 +164,7 @@ export async function startApplication(
   });
   const persistentLoggingLogger = getLogger('BrowserLogPersistence');
   const cleanupAccountLogs = createAccountLogCleanup({
-    isElectron: Runtime.isElectron(),
+    isElectron,
     persistence: persistentLogging,
     hashQualifiedId(qualifiedId) {
       return createAccountIdentifier({qualifiedId, encoder: new TextEncoder(), crypto: globalThis.crypto.subtle});
