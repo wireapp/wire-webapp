@@ -54,7 +54,8 @@ export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'convers
   excludeUsers?: QualifiedId[];
   /** will do an extra request to the server when user types in (otherwise will only lookup given local users) */
   allowRemoteSearch?: boolean;
-  includeFederatedSearchResults?: boolean;
+  /** Exclude users returned by the server before adding them to the list. */
+  isAllowedRemoteUser?: (user: User) => boolean;
   filterRemoteTeamUsers?: boolean;
   /** When true, show every user from `users` after local search — skip conversation/connection visibility gate. */
   showAllProvidedUsers?: boolean;
@@ -77,7 +78,7 @@ export const UserSearchableList: FunctionComponent<UserListProps> = ({
   highlightedUsers,
   selected: selectedUsers,
   allowRemoteSearch,
-  includeFederatedSearchResults = false,
+  isAllowedRemoteUser,
   selfUser,
   users,
   teamState = container.resolve(TeamState),
@@ -121,21 +122,15 @@ export const UserSearchableList: FunctionComponent<UserListProps> = ({
     }
     let resultUsers: User[];
     try {
-      resultUsers = await searchRepository.searchByName(
-        query,
-        includeFederatedSearchResults && query.includes('@') ? undefined : selfUser.teamId,
-      );
+      resultUsers = await searchRepository.searchByName(query, selfUser.teamId);
     } catch {
-      // A rejected federation lookup should leave the picker usable.
+      // A rejected lookup should leave the picker usable.
       return;
     }
     const selfTeamId = selfUser.teamId;
-    const foundMembers =
-      includeFederatedSearchResults && query.includes('@')
-        ? resultUsers
-        : resultUsers.filter(user => {
-            return user.teamId === selfTeamId;
-          });
+    const foundMembers = resultUsers.filter(user => {
+      return user.teamId === selfTeamId && (isAllowedRemoteUser?.(user) ?? true);
+    });
     const ignoreIds = ignoreMembers.map(member => {
       return member.id;
     });
@@ -205,7 +200,6 @@ export const UserSearchableList: FunctionComponent<UserListProps> = ({
     });
   }, [
     allowRemoteSearch,
-    includeFederatedSearchResults,
     conversationState,
     fetchMembersFromBackend,
     filter,
