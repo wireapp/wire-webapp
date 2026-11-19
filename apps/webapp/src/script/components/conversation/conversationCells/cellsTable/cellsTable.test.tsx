@@ -40,6 +40,7 @@ import {driveBulkRestoreFeatureToggleName} from '../../../../featureToggles/star
 import {CellNode, CellNodeType} from '../../../../types/cellNode';
 import type {Translate} from '../../../../util/localizerUtil/translationTypes';
 import {translateForTest} from '../../../../util/test/translateForTest';
+import {CellsEmptyBinAction} from '../cellsHeader/cellsEmptyBinAction/cellsEmptyBinAction';
 import type {SharedDriveUploadController} from '../sharedDriveUploadController';
 import {SharedDriveUploadStatusProvider} from '../sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from '../sharedDriveUploadStatusPopupHost';
@@ -289,6 +290,7 @@ const renderCellsTable = ({
   onRefresh = jest.fn(),
   onRefreshAndReportSuccess = jest.fn().mockResolvedValue(true),
   onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true),
+  onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(true),
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   random = () => {
     return 0.5;
@@ -309,6 +311,7 @@ const renderCellsTable = ({
   readonly onRefresh?: () => void;
   readonly onRefreshAndReportSuccess?: () => Promise<boolean>;
   readonly onRefreshAfterBulkMoveToBinOutcome?: () => Promise<boolean>;
+  readonly onRefreshAfterEmptyBinOutcome?: () => Promise<boolean>;
   readonly selfUserDriveRole?: CellsSelfUserDriveRole;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
   readonly random?: () => number;
@@ -357,6 +360,18 @@ const renderCellsTable = ({
       <ThemeProvider theme={themes[themeId]}>
         <SharedDriveUploadStatusProvider>
           <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
+            {scopeKey === 'conversation:/bin' && (
+              <CellsEmptyBinAction
+                cellsRepository={cellsRepository}
+                conversationQualifiedId={conversationQualifiedId}
+                getCurrentCellsPath={() => {
+                  return 'recycle_bin';
+                }}
+                onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
+                onEmptyBinSubmitted={jest.fn()}
+                onInProgressChange={jest.fn()}
+              />
+            )}
             {isTableVisible && (
               <CellsTable
                 nodes={nodes}
@@ -820,6 +835,47 @@ describe('CellsTable selection', () => {
     expect(onRefreshAfterBulkMoveToBinOutcome).not.toHaveBeenCalled();
     table.showTable();
     expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
+  });
+
+  it('refreshes an already open Bin when a move-to-bin job finishes', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const deleteNodes = jest.fn().mockResolvedValue({
+      Status: 'Background',
+      BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+    });
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: 'Running'})
+      .mockResolvedValueOnce({Status: 'Finished'});
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    const onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(true);
+    const table = renderCellsTable({
+      cellsRepository: {deleteNodes, getBackgroundActionInfo} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+      onRefreshAfterEmptyBinOutcome,
+      clock,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Move to Bin'}));
+    await waitFor(() => {
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+    table.rerenderWithSelectionScope('conversation:/bin');
+    expect(onRefreshAfterEmptyBinOutcome).not.toHaveBeenCalled();
+    expect(screen.getByText('Moving 1 selected items to Bin')).toBeInTheDocument();
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+    });
+    await waitFor(() => {
+      expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.queryByText('Moving 1 selected items to Bin')).not.toBeInTheDocument();
+    expect(onRefreshAfterBulkMoveToBinOutcome).not.toHaveBeenCalled();
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
   });
 
   it('starts move-to-bin observation when the request settles after leaving Files', async () => {

@@ -272,6 +272,77 @@ describe('CellsEmptyBinAction', () => {
     });
     expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
     expect(onRefreshAfterEmptyBinOutcome).not.toHaveBeenCalled();
+    rendered.rerender(
+      createEmptyBinTree({
+        cellsRepository,
+        role: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+        getCurrentCellsPath: () => {
+          return 'recycle_bin';
+        },
+        onRefreshAfterEmptyBinOutcome,
+        onEmptyBinSubmitted: jest.fn(),
+        onInProgressChange: jest.fn(),
+      }),
+    );
+    await waitFor(() => {
+      expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('refreshes a newly mounted Bin view when a background deletion finishes', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: JobsTaskStatus.Running})
+      .mockResolvedValueOnce({Status: JobsTaskStatus.Finished});
+    const cellsRepository = createRepository({
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      }),
+      getBackgroundActionInfo,
+    });
+    const onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(true);
+    const rendered = renderEmptyBinAction(cellsRepository, {clock, onRefreshAfterEmptyBinOutcome});
+
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+    await waitFor(() => {
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+    rendered.rerender(
+      createEmptyBinTree({
+        showAction: false,
+        cellsRepository,
+        role: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+        getCurrentCellsPath: () => {
+          return 'recycle_bin';
+        },
+        onRefreshAfterEmptyBinOutcome,
+        onEmptyBinSubmitted: jest.fn(),
+        onInProgressChange: jest.fn(),
+      }),
+    );
+    rendered.rerender(
+      createEmptyBinTree({
+        cellsRepository,
+        role: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+        getCurrentCellsPath: () => {
+          return 'recycle_bin';
+        },
+        onRefreshAfterEmptyBinOutcome,
+        onEmptyBinSubmitted: jest.fn(),
+        onInProgressChange: jest.fn(),
+      }),
+    );
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+    });
+    await waitFor(() => {
+      expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('signals that it is in progress from submission until the Bin is emptied', async () => {

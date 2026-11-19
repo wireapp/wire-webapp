@@ -265,6 +265,7 @@ export const CellsTable = ({
     createMoveStatusId,
     clearMoveStatus,
     observeBackgroundAction,
+    requestEmptyBinRefresh,
   } = useSharedDriveUploadStatus();
   const currentConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
   const updateMoveStatus = useCallback(
@@ -686,7 +687,7 @@ export const CellsTable = ({
       dispatchMove({type: 'background-started'});
     }
     updateMoveStatus({...summary, kind: 'processing'});
-    startBackgroundMoveObservation(moveStatusId);
+    startBackgroundMoveObservation(moveStatusId, summary, uniqueMoveJobUuids);
     return true;
   };
 
@@ -703,7 +704,7 @@ export const CellsTable = ({
         ...operation.status,
         kind: 'processing',
       });
-      startBackgroundMoveObservation(moveStatusId);
+      startBackgroundMoveObservation(moveStatusId, operation.status, operation.jobUuids);
     }
   };
 
@@ -1014,7 +1015,12 @@ export const CellsTable = ({
         summary: captured.summary,
         jobUuids,
         onOutcome: outcome => {
-          if (isTableMounted.current && !hasLeftCapturedScope(captured)) {
+          if (hasLeftCapturedScope(captured) || !isTableMounted.current) {
+            requestEmptyBinRefresh(currentConversationQualifiedId);
+            if (isTableMounted.current) {
+              resetBulkMoveToBinAfterScopeChange();
+            }
+          } else {
             void finishBulkMoveToBinOutcome(captured, statusId, getBackgroundActionStatusKind(outcome));
           }
         },
@@ -1023,7 +1029,14 @@ export const CellsTable = ({
         resetBulkMoveToBinAfterScopeChange();
       }
     },
-    [finishBulkMoveToBinOutcome, hasLeftCapturedScope, observeBackgroundJobs, resetBulkMoveToBinAfterScopeChange],
+    [
+      currentConversationQualifiedId,
+      finishBulkMoveToBinOutcome,
+      hasLeftCapturedScope,
+      observeBackgroundJobs,
+      requestEmptyBinRefresh,
+      resetBulkMoveToBinAfterScopeChange,
+    ],
   );
 
   const handleConfirmBulkMoveToBin = useCallback(async (): Promise<void> => {
@@ -1042,7 +1055,6 @@ export const CellsTable = ({
     setIsBulkMoveToBinPending(true);
     setIsBulkMoveToBinConfirmationOpen(false);
     const statusId = createMoveStatusId();
-    bulkMoveToBinStatusId.current = Maybe.just(statusId);
     startMoveStatus({id: statusId, kind: 'processing', ...captured.summary});
 
     try {
@@ -1056,6 +1068,7 @@ export const CellsTable = ({
       const statusKind = getImmediateMoveToBinStatusKind(response);
       if (!isTableMounted.current || hasLeftCapturedScope(captured)) {
         updateMoveStatus({id: statusId, kind: statusKind, ...captured.summary});
+        requestEmptyBinRefresh(currentConversationQualifiedId);
         if (isTableMounted.current) {
           resetBulkMoveToBinAfterScopeChange();
         }
@@ -1071,6 +1084,7 @@ export const CellsTable = ({
     }
   }, [
     capturedBulkMoveToBin,
+    currentConversationQualifiedId,
     isCapturedBulkMoveToBinSelectionCurrent,
     createMoveStatusId,
     startMoveStatus,
@@ -1078,6 +1092,7 @@ export const CellsTable = ({
     cellsRepository,
     hasLeftCapturedScope,
     observeMoveToBinJobs,
+    requestEmptyBinRefresh,
     resetBulkMoveToBinAfterScopeChange,
     finishBulkMoveToBinOutcome,
   ]);

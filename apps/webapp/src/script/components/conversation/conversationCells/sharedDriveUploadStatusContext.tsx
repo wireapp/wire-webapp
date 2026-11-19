@@ -59,6 +59,9 @@ type SharedDriveUploadStatusContextValue = {
   readonly dismissMoveStatus: (id: string) => void;
   readonly clearMoveStatus: (id: string) => void;
   readonly observeBackgroundAction: (observation: BackgroundActionObservation) => void;
+  readonly pendingEmptyBinRefreshes: ReadonlySet<string>;
+  readonly requestEmptyBinRefresh: (conversationQualifiedId: string) => void;
+  readonly consumeEmptyBinRefresh: (conversationQualifiedId: string) => void;
   readonly isProvided: boolean;
 };
 
@@ -97,6 +100,13 @@ const SharedDriveUploadStatusContext = createContext<SharedDriveUploadStatusCont
   observeBackgroundAction: () => {
     return undefined;
   },
+  pendingEmptyBinRefreshes: new Set(),
+  requestEmptyBinRefresh: () => {
+    return undefined;
+  },
+  consumeEmptyBinRefresh: () => {
+    return undefined;
+  },
   isProvided: false,
 });
 
@@ -123,6 +133,24 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
   resetOnScopeChange = Maybe.nothing(),
 }: SharedDriveUploadStatusProviderProps) => {
   const [dismissedUpload, setDismissedUpload] = useState<Maybe<DismissedUpload>>(initialDismissedUpload);
+  const [pendingEmptyBinRefreshes, setPendingEmptyBinRefreshes] = useState<ReadonlySet<string>>(() => {
+    return new Set();
+  });
+  const requestEmptyBinRefresh = useCallback((conversationQualifiedId: string): void => {
+    setPendingEmptyBinRefreshes(current => {
+      return new Set(current).add(conversationQualifiedId);
+    });
+  }, []);
+  const consumeEmptyBinRefresh = useCallback((conversationQualifiedId: string): void => {
+    setPendingEmptyBinRefreshes(current => {
+      if (!current.has(conversationQualifiedId)) {
+        return current;
+      }
+      const next = new Set(current);
+      next.delete(conversationQualifiedId);
+      return next;
+    });
+  }, []);
   const [moveStatuses, setMoveStatuses] = useState<ReadonlyMap<string, SharedDriveMoveStatus>>(() => {
     return maybe.isJust(initialMoveStatus)
       ? new Map([[initialMoveStatus.value.conversationQualifiedId, initialMoveStatus.value]])
@@ -200,6 +228,7 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
     currentMoveIds.current.clear();
     dismissedMoveStatusIds.current.clear();
     setMoveStatuses(new Map());
+    setPendingEmptyBinRefreshes(new Set());
   }, [backgroundActionController, resetOnScopeChange]);
   useEffect(() => {
     return backgroundActionController.stopAll;
@@ -259,6 +288,9 @@ export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploa
             backgroundActionController.start(observation);
           }
         },
+        pendingEmptyBinRefreshes,
+        requestEmptyBinRefresh,
+        consumeEmptyBinRefresh,
         isProvided: true,
       }}
     >

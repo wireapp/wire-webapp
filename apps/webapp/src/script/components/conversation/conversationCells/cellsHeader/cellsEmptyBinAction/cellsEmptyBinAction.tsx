@@ -104,10 +104,15 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   const [backgroundJobUuids, setBackgroundJobUuids] = useState<string[]>([]);
   const backgroundStatus = useRef<Maybe<SharedDriveMoveStatus>>(Maybe.nothing());
   const hasDeleteRequestStarted = useRef(false);
-  const needsRefreshOnReturn = useRef(false);
   const requestPending = useRef(false);
   const isMounted = useRef(false);
-  const {observeBackgroundAction} = useSharedDriveUploadStatus();
+  const {
+    observeBackgroundAction,
+    setMoveJobUuids,
+    pendingEmptyBinRefreshes,
+    requestEmptyBinRefresh,
+    consumeEmptyBinRefresh,
+  } = useSharedDriveUploadStatus();
   const statusReporter = useBulkActionStatusReporter(
     'emptyBin',
     `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`,
@@ -192,26 +197,26 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   }, [isSameBinView, onRefreshAfterEmptyBinOutcome]);
 
   useEffect(() => {
-    if (isAtBinRoot && needsRefreshOnReturn.current) {
-      needsRefreshOnReturn.current = false;
+    if (isAtBinRoot && pendingEmptyBinRefreshes.has(scopeKey)) {
+      consumeEmptyBinRefresh(scopeKey);
       void refreshAfterOutcome();
     }
-  }, [isAtBinRoot, refreshAfterOutcome]);
+  }, [consumeEmptyBinRefresh, isAtBinRoot, pendingEmptyBinRefreshes, refreshAfterOutcome, scopeKey]);
 
   const refreshOrDeferUntilBackInBin = (): void => {
     if (isSameBinView()) {
       void refreshAfterOutcome();
     } else {
-      needsRefreshOnReturn.current = true;
+      requestEmptyBinRefresh(initialScopeKey);
     }
   };
 
   const handleBackgroundOutcome = (outcome: CellsBackgroundActionOutcome): void => {
+    const {status: nextStatus, requiresReview: needsReview, isTerminal} = EMPTY_BIN_OUTCOME[outcome];
     if (!isMounted.current || currentScopeKey.current !== initialScopeKey) {
+      requestEmptyBinRefresh(initialScopeKey);
       return;
     }
-
-    const {status: nextStatus, requiresReview: needsReview, isTerminal} = EMPTY_BIN_OUTCOME[outcome];
     if (isTerminal) {
       setBackgroundJobUuids([]);
     }
@@ -224,6 +229,7 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
     if (maybe.isNothing(backgroundStatus.current)) {
       return;
     }
+    setMoveJobUuids(backgroundStatus.current.value.id, jobUuids);
     observeBackgroundAction({
       cellsRepository,
       actionName: 'delete',
