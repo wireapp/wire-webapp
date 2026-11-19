@@ -65,7 +65,7 @@ export const JoinGuestLinkPasswordForm: FunctionComponent<JoinGuestLinkPasswordF
       />
 
       <Link css={linkStyles} href={Config.getConfig().URL.SUPPORT.LEARN_MORE_ABOUT_GUEST_LINKS} target="_blank">
-        <Text block color={COLOR.BLUE} css={linkTextStyles}>
+        <Text color={COLOR.BLUE} css={linkTextStyles}>
           {translate('guestLinkPasswordModal.learnMoreLink')}
         </Text>
       </Link>

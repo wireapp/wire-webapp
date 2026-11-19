@@ -1431,7 +1431,7 @@
   "meetingJoin.failedHeadline": "Unable to check the meeting link",
   "meetingJoin.invalidDescription": "This meeting link has expired or is no longer valid.",
   "meetingJoin.invalidHeadline": "Meeting not found",
-  "meetingJoin.joinFailed": "Unable to join the meeting. Check your connection and try again.",
+  "meetingJoin.joinFailed": "Unable to join the meeting.",
   "meetingJoin.joinHeadline": "Join meeting",
   "meetingJoin.passwordDescription": "Enter the password shared with the meeting link.",
   "meetingJoin.passwordFailed": "Unable to join the meeting. Check the password and try again.",
