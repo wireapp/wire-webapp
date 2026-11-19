@@ -93,7 +93,7 @@ export const createSharedDriveBackgroundActionController = (
   const start = (request: BackgroundActionObservation): void => {
     const {jobUuids, clock, pollingPolicy, onOutcome} = request;
     const operation = operations.get(request.status.id);
-    if (operation === undefined || operation.jobUuids.length === 0) {
+    if (operation === undefined || jobUuids.length === 0) {
       return;
     }
     // The review callback belongs to the view that started the action and stops working once that view is gone.
