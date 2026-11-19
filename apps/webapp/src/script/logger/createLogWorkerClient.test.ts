@@ -161,6 +161,7 @@ describe('bounded log worker client', () => {
       clock,
       append: client.append,
       configuration: {...logPersistenceConfiguration, maximumPendingBytes: 12},
+      maximumBatchRecords: Infinity,
     });
     output.write('{}', 'info');
     const flushing = output.flush();

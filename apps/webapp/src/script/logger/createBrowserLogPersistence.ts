@@ -65,7 +65,12 @@ export function createBrowserLogPersistence(options: BrowserLogPersistenceOption
     clock,
     responseTimeoutMilliseconds: logPersistenceConfiguration.workerResponseTimeoutMilliseconds,
   });
-  const output = createBufferedLogOutput({clock, append: client.append, configuration: logPersistenceConfiguration});
+  const output = createBufferedLogOutput({
+    clock,
+    append: client.append,
+    configuration: logPersistenceConfiguration,
+    maximumBatchRecords: Infinity,
+  });
   let boundAccount: Maybe<string> = Maybe.nothing();
   let binding: Maybe<PendingAccountBinding> = Maybe.nothing();
   let disposed = false;

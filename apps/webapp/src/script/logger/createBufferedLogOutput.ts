@@ -32,7 +32,7 @@ type BufferedLogOutputOptions = {
     LogPersistenceConfiguration,
     'maximumFileBytes' | 'maximumTotalBytes' | 'maximumPendingBytes' | 'batchTargetBytes' | 'flushIntervalMilliseconds'
   >;
-  readonly maximumBatchRecords?: number;
+  readonly maximumBatchRecords: number;
 };
 
 type PendingRecord = {readonly line: string; readonly sizeBytes: number};
@@ -62,7 +62,7 @@ type BufferedLogOutputWithBarrier = BufferedLogOutput & {
 };
 
 export function createBufferedLogOutput(options: BufferedLogOutputOptions): BufferedLogOutputWithBarrier {
-  const {append, clock, configuration, maximumBatchRecords = Infinity} = options;
+  const {append, clock, configuration, maximumBatchRecords} = options;
   const encoder = new TextEncoder();
   const maximumRecordBytes = Math.min(
     configuration.maximumFileBytes,
