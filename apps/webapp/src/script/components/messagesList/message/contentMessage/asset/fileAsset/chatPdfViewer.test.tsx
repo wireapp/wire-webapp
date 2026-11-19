@@ -17,8 +17,7 @@
  *
  */
 
-import {act, render, screen, waitFor} from '@testing-library/react';
-import {noop} from 'noop-esm';
+import {fireEvent, render, screen} from '@testing-library/react';
 
 import {
   createRootContextValueForTest,
@@ -28,87 +27,42 @@ import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 import {ChatPdfViewer} from './chatPdfViewer';
 
-type ResizeCallback = ResizeObserverCallback;
-
-// react-pdf is globally mocked without component exports in setupTests.
-// eslint-disable-next-line jest/no-restricted-jest-methods
-jest.mock('react-pdf', () => {
-  const React = require('react');
-
-  return {
-    Document: ({children}: {children: React.ReactNode}) => {
-      return React.createElement('div', {}, children);
-    },
-    Page: ({
-      width,
-      onLoadSuccess,
-    }: {
-      width?: number;
-      onLoadSuccess: (page: {getViewport: () => {width: number}}) => void;
-    }) => {
-      const callbackRef = React.useRef(onLoadSuccess);
-      React.useEffect(() => {
-        callbackRef.current({
-          getViewport: () => {
-            return {width: 1920};
-          },
-        });
-      }, []);
-
-      return React.createElement('div', {'data-uie-name': 'pdf-page', 'data-width': width});
-    },
-  };
-});
-
 describe('ChatPdfViewer', () => {
   const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
-  let observedWidth = 400;
-  let resizeCallback: ResizeCallback;
-  let resizeTarget: Element;
-  let resizeObserverInstance: ResizeObserver;
 
-  beforeEach(() => {
-    observedWidth = 400;
-    window.ResizeObserver = class MockResizeObserver implements ResizeObserver {
-      constructor(private readonly callback: ResizeCallback) {
-        resizeCallback = callback;
-        resizeObserverInstance = this;
-      }
-      observe = (target: Element): void => {
-        resizeTarget = target;
-        this.callback([{target, contentRect: {width: observedWidth, height: 600}} as ResizeObserverEntry], this);
-      };
-      unobserve = noop;
-      disconnect = noop;
-    } as unknown as typeof window.ResizeObserver;
+  it('opens the original PDF in an accessible browser viewer', () => {
+    render(<ChatPdfViewer src="blob:original-pdf" fileName="report.pdf" />, {wrapper});
+
+    expect(screen.getByTitle('report.pdf')).toHaveAttribute('src', 'blob:original-pdf');
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('fits wide PDF pages within the available viewer width', async () => {
-    observedWidth = 400;
-    render(<ChatPdfViewer src="blob:pdf" />, {wrapper});
+  it.each([
+    {disposition: 'report', effectiveDirective: 'frame-src', blockedURI: 'blob'},
+    {disposition: 'enforce', effectiveDirective: 'img-src', blockedURI: 'blob'},
+    {disposition: 'enforce', effectiveDirective: 'frame-src', blockedURI: 'https://unrelated.test'},
+  ])('keeps the PDF visible for unrelated or report-only policy events: %p', policy => {
+    render(<ChatPdfViewer src="blob:original-pdf" fileName="report.pdf" />, {wrapper});
 
-    await waitFor(() => {
-      expect(screen.getByTestId('pdf-page')).toHaveAttribute('data-width', '368');
-    });
+    fireEvent(document, Object.assign(new Event('securitypolicyviolation'), policy));
+
+    expect(screen.getByTitle('report.pdf')).toHaveAttribute('src', 'blob:original-pdf');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('updates the page width when its container resizes', async () => {
-    observedWidth = 320;
-    render(<ChatPdfViewer src="blob:pdf" />, {wrapper});
-    await waitFor(() => {
-      expect(screen.getByTestId('pdf-page')).toHaveAttribute('data-width', '288');
-    });
+  it('shows an error when the security policy blocks the embedded PDF', () => {
+    render(<ChatPdfViewer src="blob:original-pdf" fileName="report.pdf" />, {wrapper});
 
-    observedWidth = 240;
-    act(() => {
-      resizeCallback(
-        [{target: resizeTarget, contentRect: {width: observedWidth, height: 600}} as ResizeObserverEntry],
-        resizeObserverInstance,
-      );
-    });
+    fireEvent(
+      document,
+      Object.assign(new Event('securitypolicyviolation'), {
+        disposition: 'enforce',
+        effectiveDirective: 'frame-src',
+        blockedURI: 'blob',
+      }),
+    );
 
-    await waitFor(() => {
-      expect(screen.getByTestId('pdf-page')).toHaveAttribute('data-width', '208');
-    });
+    expect(screen.getByText('pdfViewerErrorTitle')).toBeInTheDocument();
+    expect(screen.queryByTitle('report.pdf')).not.toBeInTheDocument();
   });
 });

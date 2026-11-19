@@ -20,10 +20,9 @@
 import {useEffect, useId, useRef, useState, type FunctionComponent, type ReactNode} from 'react';
 
 import {
+  actionButtonStyles,
   actionsStyles,
-  closeButtonStyles,
   contentStyles,
-  downloadButtonStyles,
   headerStyles,
   loadingStyles,
   nameStyles,
@@ -34,6 +33,8 @@ import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
 import type {AssetRemoteData as AssetRemoteDataType} from '../../../../../../repositories/assets/assetRemoteData';
 import {readPreviewBlob} from '../../../../../../repositories/assets/readPreviewBlob';
+import {CloseIcon} from '../../../../../../uiKit/dataDisplay/icon/closeIcon';
+import {DownloadIcon} from '../../../../../../uiKit/dataDisplay/icon/downloadIcon';
 import {FullscreenModal} from '../../../../../fullscreenModal/fullscreenModal';
 
 interface ChatPdfPreviewModalProps {
@@ -172,17 +173,24 @@ export const ChatPdfPreviewModal: FunctionComponent<ChatPdfPreviewModalProps> = 
               {fileName}
             </h1>
             <div css={actionsStyles}>
-              <button type="button" css={downloadButtonStyles} onClick={onDownload}>
-                {translate('conversationContextMenuDownload')}
+              <button
+                type="button"
+                css={actionButtonStyles}
+                aria-label={translate('conversationContextMenuDownload')}
+                title={translate('conversationContextMenuDownload')}
+                onClick={onDownload}
+              >
+                <DownloadIcon color="currentColor" />
               </button>
               <button
                 ref={closeButtonRef}
                 type="button"
-                css={closeButtonStyles}
+                css={actionButtonStyles}
                 aria-label={translate('modalCloseButton')}
+                title={translate('modalCloseButton')}
                 onClick={onClose}
               >
-                {translate('modalCloseButton')}
+                <CloseIcon color="currentColor" />
               </button>
             </div>
           </header>

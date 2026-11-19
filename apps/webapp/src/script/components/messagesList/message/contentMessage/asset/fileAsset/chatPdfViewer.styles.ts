@@ -20,26 +20,15 @@
 import type {CSSObject} from '@emotion/react';
 
 export const viewerStyles: CSSObject = {
-  display: 'flex',
   width: '100%',
   height: '100%',
   minHeight: 0,
   flex: 1,
-  flexDirection: 'column',
+  border: 0,
   backgroundColor: 'var(--app-bg)',
 };
 
-export const pageStyles: CSSObject = {
-  display: 'flex',
-  minHeight: 0,
-  flex: 1,
-  alignItems: 'flex-start',
-  justifyContent: 'center',
-  overflow: 'auto',
-  padding: '16px',
-};
-
-export const pageStatusStyles: CSSObject = {
+export const errorStyles: CSSObject = {
   display: 'flex',
   flex: 1,
   flexDirection: 'column',
@@ -47,30 +36,4 @@ export const pageStatusStyles: CSSObject = {
   justifyContent: 'center',
   gap: '8px',
   color: 'var(--foreground)',
-};
-
-export const controlsStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '16px',
-  minHeight: '48px',
-  borderTop: '1px solid var(--border-color)',
-  backgroundColor: 'var(--app-bg)',
-  color: 'var(--foreground)',
-
-  button: {
-    minHeight: '32px',
-    padding: '0 12px',
-    border: '1px solid var(--border-color)',
-    borderRadius: 'var(--button-border-radius)',
-    color: 'var(--foreground)',
-    backgroundColor: 'transparent',
-    cursor: 'pointer',
-
-    '&:disabled': {
-      cursor: 'default',
-      opacity: 0.5,
-    },
-  },
 };

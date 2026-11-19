@@ -241,7 +241,7 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
           onOpenPreview={openPdfPreview}
         />
       )}
-      {canOpenPdfPreview && originalResource !== undefined && (
+      {isPdfPreviewOpen && isPdfPreviewEnabled && isFileSharingReceivingEnabled && originalResource !== undefined && (
         <ChatPdfPreviewModal
           id={pdfPreviewModalId}
           fileName={assetFileName}
@@ -253,7 +253,7 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
             return setIsPdfPreviewOpen(false);
           }}
           renderPdf={src => {
-            return <ChatPdfViewer src={src} />;
+            return <ChatPdfViewer key={src} src={src} fileName={assetFileName} />;
           }}
         />
       )}
