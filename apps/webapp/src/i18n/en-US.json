@@ -1545,6 +1545,7 @@
   "meetings.scheduleModal.error.createFailedTitle": "Could not schedule meeting",
   "meetings.scheduleModal.error.editMeetingIdMissing": "Something went wrong while updating the meeting. Please close the dialog and try again.",
   "meetings.scheduleModal.error.emailInvitationsFailed": "The meeting was saved, but email invitations could not be updated. Please reopen it and try again.",
+  "meetings.scheduleModal.error.emailRemovedButUpdateFailed": "The email removal was saved, but the meeting details could not be updated. Reopen the meeting to finish your changes.",
   "meetings.scheduleModal.error.endBeforeStart": "End time must be after start time",
   "meetings.scheduleModal.error.missingTimes": "Start and end times are required.",
   "meetings.scheduleModal.error.removeParticipantsFailed": "The meeting was updated, but some participants could not be removed. Please try again.",

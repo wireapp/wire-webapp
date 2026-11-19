@@ -18,6 +18,7 @@
  */
 
 import {createDeterministicClock, type DeterministicClock} from '@enormora/clock/deterministic-clock';
+import {noop} from 'noop-esm';
 import {MeetingType} from '../../../../apiClient/meetings/createMeeting';
 import {GROUP_CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation';
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
@@ -475,6 +476,46 @@ describe('updateMeeting', () => {
     expect(removeInvitedEmails).toHaveBeenCalledWith(meetingId, ['old@example.com']);
   });
 
+  it('finishes email removal before updating details and invites new addresses afterwards', async () => {
+    let completeRemoval: () => void = noop;
+    const removal = new Promise<void>(resolve => {
+      completeRemoval = resolve;
+    });
+    const removeInvitedEmails = jest.fn().mockReturnValue(
+      task.tryOrElse(
+        () => {
+          return new Error('removal failed');
+        },
+        () => {
+          return removal;
+        },
+      ),
+    );
+    const {deps, updateMeetingMock, addInvitedEmails} = createDeps({removeInvitedEmails});
+
+    const resultPromise = updateMeeting(
+      updateCommand({
+        title: 'New title',
+        originalInvitedEmails: ['old@example.com'],
+        invitedEmails: ['new@example.com'],
+      }),
+      deps,
+    );
+
+    expect(removeInvitedEmails).toHaveBeenCalledWith(meetingId, ['old@example.com']);
+    expect(updateMeetingMock).not.toHaveBeenCalled();
+    expect(addInvitedEmails).not.toHaveBeenCalled();
+
+    completeRemoval();
+    const result = await resultPromise;
+
+    expect(result.isOk).toBe(true);
+    expect(updateMeetingMock).toHaveBeenCalledTimes(1);
+    expect(addInvitedEmails).toHaveBeenCalledWith(meetingId, ['new@example.com']);
+    expect(removeInvitedEmails.mock.invocationCallOrder[0]).toBeLessThan(updateMeetingMock.mock.invocationCallOrder[0]);
+    expect(updateMeetingMock.mock.invocationCallOrder[0]).toBeLessThan(addInvitedEmails.mock.invocationCallOrder[0]);
+  });
+
   it('does not send email requests for unchanged addresses', async () => {
     const {deps, addInvitedEmails, removeInvitedEmails} = createDeps();
     const result = await updateMeeting(
@@ -498,18 +539,41 @@ describe('updateMeeting', () => {
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.emailInvitationsFailed);
   });
 
-  it('reports a failed email removal after the add succeeds', async () => {
+  it('stops before updating details or adding invitees when email removal fails', async () => {
     const addInvitedEmails = jest.fn().mockReturnValue(task.resolve(undefined));
     const removeInvitedEmails = jest.fn().mockReturnValue(task.reject(new Error('network')));
-    const {deps} = createDeps({addInvitedEmails, removeInvitedEmails});
+    const {deps, updateMeetingMock} = createDeps({addInvitedEmails, removeInvitedEmails});
     const result = await updateMeeting(
-      updateCommand({originalInvitedEmails: ['old@example.com'], invitedEmails: ['new@example.com']}),
+      updateCommand({
+        title: 'New title',
+        originalInvitedEmails: ['old@example.com'],
+        invitedEmails: ['new@example.com'],
+      }),
       deps,
     );
 
-    expect(unwrapErr(result)).toBe(meetingSubmitErrors.emailInvitationsFailed);
-    expect(addInvitedEmails).toHaveBeenCalledWith(meetingId, ['new@example.com']);
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.updateFailed);
     expect(removeInvitedEmails).toHaveBeenCalledWith(meetingId, ['old@example.com']);
+    expect(updateMeetingMock).not.toHaveBeenCalled();
+    expect(addInvitedEmails).not.toHaveBeenCalled();
+  });
+
+  it('reports a partial save if metadata update fails after email removal', async () => {
+    const {deps, removeInvitedEmails, addInvitedEmails} = createDeps({
+      updateMeetingMock: jest.fn().mockReturnValue(task.reject(new Error('network'))),
+    });
+    const result = await updateMeeting(
+      updateCommand({
+        title: 'New title',
+        originalInvitedEmails: ['old@example.com'],
+        invitedEmails: ['new@example.com'],
+      }),
+      deps,
+    );
+
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.emailRemovedButUpdateFailed);
+    expect(removeInvitedEmails).toHaveBeenCalledWith(meetingId, ['old@example.com']);
+    expect(addInvitedEmails).not.toHaveBeenCalled();
   });
 
   it('updates metadata, applies participant diff, and returns failedToAdd', async () => {
