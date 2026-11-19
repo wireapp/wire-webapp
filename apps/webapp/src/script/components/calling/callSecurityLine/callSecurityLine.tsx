@@ -107,6 +107,8 @@ interface CallSecurityLineProps {
   readonly startedAt?: number;
   readonly brandName: string;
   readonly supportUrl?: string;
+  readonly closeSignal?: number;
+  readonly onExplainerOpen?: () => void;
 }
 
 /**
@@ -124,6 +126,8 @@ export const CallSecurityLine = ({
   startedAt,
   brandName,
   supportUrl,
+  closeSignal,
+  onExplainerOpen,
 }: CallSecurityLineProps): ReactElement => {
   const {translate, clock} = useApplicationContext();
   const [phase, setPhase] = useState<CallSecurityPhase>(() => {
@@ -138,6 +142,10 @@ export const CallSecurityLine = ({
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const explainerId = useId();
+
+  useEffect(() => {
+    setIsExplainerOpen(false);
+  }, [closeSignal]);
 
   useEffect((): void | (() => void) => {
     const currentPhase = getCallSecurityPhase(callConnectionState, startedAt, clock.currentUnixEpochMilliseconds);
@@ -310,9 +318,10 @@ export const CallSecurityLine = ({
         aria-expanded={isExplainerOpen}
         aria-controls={explainerId}
         onClick={() => {
-          setIsExplainerOpen(isOpen => {
-            return !isOpen;
-          });
+          if (!isExplainerOpen) {
+            onExplainerOpen?.();
+          }
+          setIsExplainerOpen(!isExplainerOpen);
         }}
         data-uie-name="call-security-line"
         data-uie-value={maybe.isNothing(keyUpdate) ? 'resting' : 'updating'}
