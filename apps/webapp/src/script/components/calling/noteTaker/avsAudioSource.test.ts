@@ -35,10 +35,17 @@ describe('experimental AVS audio identity hook', () => {
     receive: (source?: number) => Promise<void>;
     identities: () => Record<string, unknown>[];
     decrypt: jest.Mock;
+    advance: (milliseconds: number) => void;
   } => {
+    let now = 0;
     const messages = jest.fn();
     const decrypt = jest.fn().mockResolvedValue(new ArrayBuffer(4));
-    const context = createContext({postMessage: messages, crypto: {subtle: {decrypt}}, console});
+    const context = createContext({
+      postMessage: messages,
+      crypto: {subtle: {decrypt}},
+      console,
+      performance: {now: () => {return now}},
+    });
     runInContext(workerSource, context);
     const user = (userid: string): {userid: string; clientid: string; iva: Uint8Array; ivv: Uint8Array} => {
       return {
@@ -71,18 +78,47 @@ describe('experimental AVS audio identity hook', () => {
           return message.op === 'audioSource';
         });
     };
-    return {receive, identities, decrypt};
+    return {
+      receive,
+      identities,
+      decrypt,
+      advance: milliseconds => {
+        now += milliseconds;
+      },
+    };
   };
 
   it('maps authenticated audio frames to users and reports source switches without repeating every frame', async () => {
-    const {receive, identities} = buildWorker();
+    const {receive, identities, advance} = buildWorker();
     await receive(42);
     await receive(42);
+    advance(1000);
     await receive(99);
     expect(identities()).toEqual([
       {op: 'audioSource', self: 7, track_id: 'receiver-1', userid: 'Bob', clientid: 'client-Bob'},
       {op: 'audioSource', self: 7, track_id: 'receiver-1', userid: 'Carol', clientid: 'client-Carol'},
     ]);
+  });
+
+  it('limits notifications to one per second and reports a suppressed sender on a later frame', async () => {
+    const {receive, identities, advance} = buildWorker();
+    await receive(42);
+    advance(999);
+    await receive(99);
+    expect(identities()).toHaveLength(1);
+    advance(1);
+    await receive(99);
+    expect(identities()).toHaveLength(2);
+    expect(identities()[1]).toEqual({
+      op: 'audioSource',
+      self: 7,
+      track_id: 'receiver-1',
+      userid: 'Carol',
+      clientid: 'client-Carol',
+    });
+    advance(1000);
+    await receive(99);
+    expect(identities()).toHaveLength(2);
   });
 
   it('does not publish an identity when authentication fails', async () => {
