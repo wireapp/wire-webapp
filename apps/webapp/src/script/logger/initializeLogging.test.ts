@@ -25,13 +25,14 @@ import {createPinoLogging} from './createPinoLogging';
 import {initializeLogging} from './initializeLogging';
 import {createBrowserLogPersistence, type BrowserLogPersistence} from './createBrowserLogPersistence';
 import {createDesktopLogOutput} from './createDesktopLogOutput';
+import {selectDesktopApplicationLogWrite} from './selectDesktopApplicationLogWrite';
 import {createLogWorkerConnectionForTest} from './test/createLogWorkerConnectionForTest';
 
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
+import {resolveStartupLoggingPolicy} from '../browser/resolveStartupLoggingPolicy';
 
 const disabledPersistenceOptions = {
-  startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(''),
-  isElectron: false,
+  browserPersistenceEnabled: false,
   createPersistenceOutput() {
     return Maybe.nothing<BrowserLogPersistence>();
   },
@@ -71,6 +72,213 @@ function createTestPersistence(options: TestPersistenceOptions): Maybe<BrowserLo
 }
 
 describe('logging startup', () => {
+  it.each([
+    ['localhost', true],
+    ['wire-webapp-dev.zinfra.io', true],
+    ['wire-webapp-edge.wire.com', true],
+    ['wire-webapp-beta.wire.com', false],
+    ['app.wire.com', false],
+  ])('applies the console and DEBUG defaults for %s', (hostname, expectedConsole) => {
+    const logging = createPinoLogging(Maybe.nothing());
+    const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    initializeLogging({
+      ...disabledPersistenceOptions,
+      ...resolveStartupLoggingPolicy(hostname, !expectedConsole),
+      clock,
+      consoleOutput,
+      locationSearch: '',
+      storage: Maybe.nothing(),
+      configureLogging: logging.configure,
+    });
+    logging.getLogger('Startup').debug('debug diagnostic');
+    logging.getLogger('Startup').info('info diagnostic');
+
+    expect(consoleOutput.debug).toHaveBeenCalledTimes(expectedConsole ? 1 : 0);
+    expect(consoleOutput.info).toHaveBeenCalledTimes(expectedConsole ? 1 : 0);
+  });
+
+  it.each(['', '?enabled-features=persistent-browser-logs'])(
+    'keeps the standalone release console quiet with disabled or unavailable OPFS (%s)',
+    locationSearch => {
+      const logging = createPinoLogging(Maybe.nothing());
+      const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+      const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
+      const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+      initializeLogging({
+        ...disabledPersistenceOptions,
+        ...resolveStartupLoggingPolicy('app.wire.com', false),
+        clock,
+        consoleOutput,
+        locationSearch: locationSearch + (locationSearch === '' ? '?' : '&') + 'debugLogging=*',
+        browserPersistenceEnabled: startupFeatureToggles.isFeatureToggleEnabled('persistent-browser-logs'),
+        storage: Maybe.nothing(),
+        configureLogging: logging.configure,
+      });
+      logging.getLogger('Startup').debug('debug diagnostic');
+      logging.getLogger('Startup').error('error diagnostic');
+
+      expect(consoleOutput.debug).not.toHaveBeenCalled();
+      expect(consoleOutput.error).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    {locationSearch: '?enableLogging=@wireapp/*', debugRecords: 1},
+    {locationSearch: '?enableLogging=@wireapp/*&debugLogging=', debugRecords: 0},
+    {locationSearch: '?enableLogging=@wireapp/*&debugLogging=-*', debugRecords: 0},
+  ])('preserves the only Desktop console transport with $locationSearch', options => {
+    const {locationSearch, debugRecords} = options;
+    const logging = createPinoLogging(Maybe.nothing());
+    const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    initializeLogging({
+      ...disabledPersistenceOptions,
+      ...resolveStartupLoggingPolicy('wire-webapp-beta.wire.com', true),
+      clock,
+      consoleOutput,
+      locationSearch,
+      shouldWriteConsoleFallback() {
+        return true;
+      },
+      storage: Maybe.nothing(),
+      configureLogging: logging.configure,
+    });
+    const logger = logging.getLogger('@wireapp/webapp/Startup');
+    logger.debug('debug diagnostic');
+    logger.info('info diagnostic');
+    logger.warn('warn diagnostic');
+    logger.error('error diagnostic');
+
+    expect(consoleOutput.debug).toHaveBeenCalledTimes(debugRecords);
+    expect(consoleOutput.info).toHaveBeenCalledTimes(1);
+    expect(consoleOutput.warn).toHaveBeenCalledTimes(1);
+    expect(consoleOutput.error).toHaveBeenCalledTimes(1);
+  });
+
+  it('preserves release Desktop fallback with an exposed capability and the feature disabled', () => {
+    const logging = createPinoLogging(Maybe.nothing());
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+    const nativeWrite = jest.fn(async () => {
+      return 'written';
+    });
+    const selection = selectDesktopApplicationLogWrite({
+      isDesktopApp: true,
+      startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(''),
+      readCapability() {
+        return {version: 1, write: nativeWrite};
+      },
+    });
+    initializeLogging({
+      ...disabledPersistenceOptions,
+      ...resolveStartupLoggingPolicy('app.wire.com', false),
+      clock,
+      consoleOutput,
+      locationSearch: '?enableLogging=@wireapp/*&debugLogging=',
+      shouldWriteConsoleFallback() {
+        return selection.isNothing;
+      },
+      desktopPersistenceOutput: selection
+        .map(writeToDesktop => {
+          return createDesktopLogOutput({clock, writeToDesktop, reportFailure: noop}).write;
+        })
+        .unwrapOr(undefined),
+      storage: Maybe.nothing(),
+      configureLogging: logging.configure,
+    });
+    const logger = logging.getLogger('@wireapp/webapp/Startup');
+    logger.debug('disabled debug');
+    logger.info('sole persistence destination');
+
+    expect(nativeWrite).not.toHaveBeenCalled();
+    expect(consoleOutput.debug).not.toHaveBeenCalled();
+    expect(consoleOutput.info).toHaveBeenCalledTimes(1);
+  });
+
+  it('persists INFO, WARN, ERROR and selected DEBUG to OPFS in release with a quiet console', async () => {
+    const logging = createPinoLogging(Maybe.nothing());
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+    const persistedLines: string[] = [];
+    const persistence = initializeLogging({
+      ...resolveStartupLoggingPolicy('wire-webapp-beta.wire.com', false),
+      clock,
+      consoleOutput,
+      locationSearch: '?debugLogging=Selected',
+      browserPersistenceEnabled: true,
+      createPersistenceOutput() {
+        return createTestPersistence({
+          clock,
+          async append(lines) {
+            persistedLines.push(...lines);
+          },
+        });
+      },
+      storage: Maybe.nothing(),
+      configureLogging: logging.configure,
+    });
+    const selected = logging.getLogger('Selected');
+    const excluded = logging.getLogger('Excluded');
+    selected.debug('explicit debug');
+    excluded.debug('excluded debug');
+    excluded.info('persistent info');
+    excluded.warn('persistent warning');
+    excluded.error('persistent error');
+    if (persistence.isJust) {
+      await persistence.value.dispose();
+    }
+
+    expect(
+      persistedLines.map(line => {
+        return JSON.parse(line).level;
+      }),
+    ).toEqual([20, 30, 40, 50]);
+    expect(consoleOutput.debug).not.toHaveBeenCalled();
+    expect(consoleOutput.info).not.toHaveBeenCalled();
+    expect(consoleOutput.warn).not.toHaveBeenCalled();
+    expect(consoleOutput.error).not.toHaveBeenCalled();
+  });
+
+  it('uses the release Desktop console until acknowledgement and after transport failure', async () => {
+    const logging = createPinoLogging(Maybe.nothing());
+    const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const writeToDesktop = jest.fn().mockResolvedValueOnce('written').mockResolvedValueOnce('failed');
+    const desktop = createDesktopLogOutput({clock, writeToDesktop, reportFailure: noop});
+    initializeLogging({
+      ...disabledPersistenceOptions,
+      ...resolveStartupLoggingPolicy('app.wire.com', false),
+      clock,
+      consoleOutput,
+      locationSearch: '?debugLogging=*,-Excluded',
+      desktopPersistenceOutput: desktop.write,
+      shouldWriteConsoleFallback() {
+        return !desktop.hasConfirmedDelivery();
+      },
+      storage: Maybe.nothing(),
+      configureLogging: logging.configure,
+    });
+    logging.getLogger('Excluded').info('startup');
+    await desktop.flush();
+    logging.getLogger('Selected').debug('persist only');
+    logging.getLogger('Excluded').debug('excluded');
+    logging.getLogger('Excluded').warn('still persisted');
+    await desktop.flush();
+    logging.getLogger('Excluded').error('fallback restored');
+
+    expect(consoleOutput.info).toHaveBeenCalledTimes(1);
+    expect(consoleOutput.debug).not.toHaveBeenCalled();
+    expect(consoleOutput.warn).not.toHaveBeenCalled();
+    expect(consoleOutput.error).toHaveBeenCalledTimes(1);
+    const persistedMessages = writeToDesktop.mock.calls.flatMap(([batch]: [string[]]) => {
+      return batch.map(line => {
+        return JSON.parse(line).msg;
+      });
+    });
+    expect(persistedMessages).toEqual(['startup', 'persist only', 'still persisted']);
+  });
+
   it.each([
     {search: '', debugEnabled: false, expected: Maybe.nothing<string>(), calls: 0},
     {search: '', debugEnabled: true, expected: Maybe.just('*'), calls: 1},
@@ -183,8 +391,7 @@ describe('logging startup', () => {
         debugEnabled,
         storage: Maybe.nothing(),
         configureLogging: logging.configure,
-        startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(locationSearch),
-        isElectron,
+        browserPersistenceEnabled: !isElectron,
         desktopPersistenceOutput: isElectron ? nativeOutput.write : undefined,
         createPersistenceOutput() {
           return createTestPersistence({
@@ -292,8 +499,7 @@ describe('logging startup', () => {
         debugEnabled: false,
         storage: Maybe.nothing(),
         configureLogging: logging.configure,
-        startupFeatureToggles,
-        isElectron,
+        browserPersistenceEnabled: persistenceEnabled && !isElectron,
         createPersistenceOutput,
       });
       let serializationCount = 0;
@@ -344,8 +550,7 @@ describe('logging startup', () => {
       debugEnabled: false,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
-      startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch('?enabled-features=persistent-browser-logs'),
-      isElectron: false,
+      browserPersistenceEnabled: true,
       createPersistenceOutput() {
         return createTestPersistence({
           clock,
@@ -384,8 +589,7 @@ describe('logging startup', () => {
       debugEnabled: false,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
-      startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch('?enabled-features=persistent-browser-logs'),
-      isElectron: false,
+      browserPersistenceEnabled: true,
       createPersistenceOutput() {
         return createBrowserLogPersistence({
           clock,
@@ -433,8 +637,7 @@ describe('logging startup', () => {
       debugEnabled: false,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
-      startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch('?enabled-features=persistent-browser-logs'),
-      isElectron: false,
+      browserPersistenceEnabled: true,
       createPersistenceOutput() {
         if (failure === 'failed') {
           throw new Error('Browser capability unavailable');

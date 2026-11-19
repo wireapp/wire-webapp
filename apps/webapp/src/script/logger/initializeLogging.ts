@@ -25,30 +25,19 @@ import type {LoggingDependencies} from './createPinoLogging';
 import {debugLoggingQueryParameterName, legacyDebugLoggingQueryParameterName} from './debugLoggingQueryParameterNames';
 import {createConsoleOutput, type ConsoleLogOutput, type LogOutput} from './logOutput';
 
-import {persistentBrowserLogsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
-import type {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
-
 type InitializeLoggingOptions = {
   readonly clock: LoggingDependencies['clock'];
   readonly consoleOutput: ConsoleLogOutput;
   readonly locationSearch: string;
   readonly debugEnabled: boolean;
+  readonly developerConsoleEnabled?: boolean;
+  readonly shouldWriteConsoleFallback?: (() => boolean) | undefined;
   readonly storage: Maybe<Pick<Storage, 'setItem' | 'removeItem'>>;
   readonly configureLogging: (dependencies: Maybe<LoggingDependencies>) => void;
-  readonly startupFeatureToggles: StartupFeatureToggles;
-  readonly isElectron: boolean;
+  readonly browserPersistenceEnabled: boolean;
   readonly desktopPersistenceOutput?: LogOutput | undefined;
   readonly createPersistenceOutput: () => Maybe<BrowserLogPersistence>;
 };
-
-type BrowserLogPersistenceSelection = Pick<InitializeLoggingOptions, 'isElectron' | 'startupFeatureToggles'>;
-
-function isBrowserLogPersistenceEnabled(options: BrowserLogPersistenceSelection): boolean {
-  const {isElectron, startupFeatureToggles} = options;
-
-  // Desktop owns its native log lifecycle, including legacy WebView console capture.
-  return !isElectron && startupFeatureToggles.isFeatureToggleEnabled(persistentBrowserLogsFeatureToggleName);
-}
 
 export function initializeLogging(options: InitializeLoggingOptions): Maybe<BrowserLogPersistence> {
   const {
@@ -56,10 +45,11 @@ export function initializeLogging(options: InitializeLoggingOptions): Maybe<Brow
     consoleOutput,
     locationSearch,
     debugEnabled,
+    developerConsoleEnabled = true,
+    shouldWriteConsoleFallback,
     storage,
     configureLogging,
-    startupFeatureToggles,
-    isElectron,
+    browserPersistenceEnabled,
     desktopPersistenceOutput,
     createPersistenceOutput,
   } = options;
@@ -70,7 +60,7 @@ export function initializeLogging(options: InitializeLoggingOptions): Maybe<Brow
   const defaultNamespaces = debugEnabled ? Maybe.just('*') : Maybe.nothing<string>();
   const namespaces = isNonEmptyString(namespace) ? Maybe.just(namespace) : defaultNamespaces;
   let persistence: Maybe<BrowserLogPersistence> = Maybe.nothing();
-  if (isBrowserLogPersistenceEnabled({isElectron, startupFeatureToggles})) {
+  if (browserPersistenceEnabled) {
     try {
       persistence = createPersistenceOutput();
     } catch {
@@ -78,17 +68,29 @@ export function initializeLogging(options: InitializeLoggingOptions): Maybe<Brow
     }
   }
 
+  const writeToConsole = createConsoleOutput(consoleOutput);
+  const nativePersistence = Maybe.of(desktopPersistenceOutput);
+  const useConsoleAsOnlyPersistence = nativePersistence.isNothing && shouldWriteConsoleFallback !== undefined;
+  const persistenceOutput = useConsoleAsOnlyPersistence
+    ? Maybe.just(writeToConsole)
+    : nativePersistence.orElse(() => {
+        return persistence.map(output => {
+          return output.write;
+        });
+      });
   configureLogging(
     Maybe.just({
       clock,
-      // Desktop still captures console messages, so enabled namespaces may appear in both native log files.
-      output: createConsoleOutput(consoleOutput),
+      output: writeToConsole,
+      shouldWriteToOutput(namespaceEnabled) {
+        // A sole console persistence destination already writes every enabled record.
+        return (
+          !useConsoleAsOnlyPersistence &&
+          (shouldWriteConsoleFallback?.() === true || (developerConsoleEnabled && namespaceEnabled))
+        );
+      },
       namespaces,
-      persistenceOutput: isElectron
-        ? Maybe.of(desktopPersistenceOutput)
-        : persistence.map(output => {
-            return output.write;
-          }),
+      persistenceOutput,
     }),
   );
 

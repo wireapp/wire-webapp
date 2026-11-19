@@ -123,8 +123,7 @@ describe('Desktop structured logging', () => {
         debugEnabled: false,
         storage: Maybe.nothing(),
         configureLogging: logging.configure,
-        startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(locationSearch),
-        isElectron: true,
+        browserPersistenceEnabled: false,
         desktopPersistenceOutput: output.write,
         createPersistenceOutput,
       });
@@ -136,7 +135,7 @@ describe('Desktop structured logging', () => {
         isDesktopApp: true,
         hasDesktopLogPersistence: true,
         locationSearch,
-        hostname: 'app.wire.com',
+        deploymentStage: 'production',
         origin: 'https://app.wire.com',
         version: '1.2.3',
         assetVersion: '1.2.3-147',

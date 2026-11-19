@@ -41,10 +41,15 @@ import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {AppContainer} from '../components/appContainer/appContainer';
 import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
+import {initializeDesktopLogOutput} from '../browser/initializeDesktopLogOutput';
 import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
+import {resolveStartupLoggingPolicy} from '../browser/resolveStartupLoggingPolicy';
 import {Config} from '../Config';
 import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeStartupFeatureToggleUrl';
-import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
+import {
+  persistentBrowserLogsFeatureToggleName,
+  StartupFeatureToggleName,
+} from '../featureToggles/startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createBrowserLogDownload} from '../logger/createBrowserLogDownload';
 import {createBrowserLogZipArchive} from '../logger/createBrowserLogZipArchive';
@@ -61,7 +66,6 @@ import {getStorage} from '../util/localStorage';
 import {getLogger} from '../util/logger';
 import {initializeLogging} from '../logger/initializeLogging';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
-import {initializeDesktopLogOutput} from '../logger/initializeDesktopLogOutput';
 import {loadValue} from '../util/storageUtil';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
@@ -84,6 +88,11 @@ export async function startApplication(
   const isElectron = Runtime.isElectron();
   const isDesktopApp = Runtime.isDesktopApp();
   const desktopLogOutput = initializeDesktopLogOutput(clock, startupFeatureToggles);
+  const loggingPolicy = resolveStartupLoggingPolicy(window.location.hostname, config.FEATURE.ENABLE_DEBUG);
+  function shouldWriteConsoleFallback(): boolean {
+    return desktopLogOutput.isNothing || !desktopLogOutput.value.hasConfirmedDelivery();
+  }
+
   const downloadApplicationLogs = createBrowserLogDownload({
     startupFeatureToggles,
     isElectron,
@@ -100,12 +109,14 @@ export async function startApplication(
     clock,
     consoleOutput: console,
     locationSearch: window.location.search,
-    debugEnabled: config.FEATURE.ENABLE_DEBUG,
+    debugEnabled: loggingPolicy.debugEnabled,
+    developerConsoleEnabled: loggingPolicy.developerConsoleEnabled,
+    shouldWriteConsoleFallback: isDesktopApp ? shouldWriteConsoleFallback : undefined,
     storage: Maybe.of(getStorage()),
     configureLogging,
-    startupFeatureToggles,
-    isElectron,
-    desktopPersistenceOutput: desktopLogOutput.unwrapOr(undefined),
+    browserPersistenceEnabled:
+      !isElectron && startupFeatureToggles.isFeatureToggleEnabled(persistentBrowserLogsFeatureToggleName),
+    desktopPersistenceOutput: desktopLogOutput.isJust ? desktopLogOutput.value.write : undefined,
     createPersistenceOutput() {
       return createBrowserLogPersistence({
         clock,
@@ -139,14 +150,14 @@ export async function startApplication(
   });
   const runtimeIdentity = {
     logger: getLogger('RuntimeIdentity'),
-    hostname: window.location.hostname,
+    deploymentStage: loggingPolicy.deploymentStage,
     origin: window.location.origin,
     version: config.VERSION,
     assetVersion: config.ASSET_VERSION,
   };
   logStartupRuntimeIdentity({
     logger: runtimeIdentity.logger,
-    hostname: runtimeIdentity.hostname,
+    deploymentStage: runtimeIdentity.deploymentStage,
     origin: runtimeIdentity.origin,
     version: runtimeIdentity.version,
     assetVersion: runtimeIdentity.assetVersion,
