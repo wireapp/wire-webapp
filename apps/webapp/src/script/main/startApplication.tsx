@@ -39,6 +39,8 @@ import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {AppContainer} from '../components/appContainer/appContainer';
+import {FileFullscreenModal} from '../components/FileFullscreenModal/FileFullscreenModal';
+import {ChatPdfModalToken} from '../components/messagesList/message/contentMessage/asset/fileAsset/chatPdfModal';
 import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
 import {initializeDesktopLogOutput} from '../browser/initializeDesktopLogOutput';
 import {selectBrowserLogSaveFilePicker} from '../browser/selectBrowserLogSaveFilePicker';
@@ -74,6 +76,8 @@ type StartApplicationOptions = {
 
 export async function startApplication(options: StartApplicationOptions): Promise<void> {
   const {defaultEnabledFeatureToggleNames, support, logging} = options;
+  container.registerInstance(ChatPdfModalToken, FileFullscreenModal);
+
   initializeStartupFeatureToggleUrl({
     url: new URL(window.location.href),
     defaultEnabledFeatureToggleNames,

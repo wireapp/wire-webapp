@@ -19,15 +19,18 @@
 
 import {useEffect, useState, type ReactElement} from 'react';
 
+import {container} from 'tsyringe';
+
+import {ChatPdfModalToken, type ChatPdfModalComponent} from './chatPdfModal';
+
 import {useInView} from '../../../../../../hooks/useInView/useInView';
 import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
 import type {AssetRemoteData as AssetRemoteDataType} from '../../../../../../repositories/assets/assetRemoteData';
 import {readPreviewBlob} from '../../../../../../repositories/assets/readPreviewBlob';
 import {FileCardPreview} from '../../../../../fileCard/fileCardPreview/fileCardPreview';
-import {FileFullscreenModal} from '../../../../../FileFullscreenModal/FileFullscreenModal';
 
 interface PdfAssetPreviewProps {
-  FullscreenModalComponent?: typeof FileFullscreenModal;
+  FullscreenModalComponent?: ChatPdfModalComponent;
   id: string;
   thumbnailResource: AssetRemoteDataType;
   originalResource: AssetRemoteDataType;
@@ -77,7 +80,7 @@ const hasPdfSignature = async (blob: Blob): Promise<boolean> => {
 };
 
 export const PdfAssetPreview = ({
-  FullscreenModalComponent = FileFullscreenModal,
+  FullscreenModalComponent,
   id,
   thumbnailResource,
   originalResource,
@@ -93,6 +96,7 @@ export const PdfAssetPreview = ({
   tabIndex,
   loadAsset,
 }: PdfAssetPreviewProps): ReactElement => {
+  const ModalComponent = FullscreenModalComponent ?? container.resolve<ChatPdfModalComponent>(ChatPdfModalToken);
   const {elementRef, hasBeenInView} = useInView<HTMLDivElement>();
   const [shouldLoadThumbnail, setShouldLoadThumbnail] = useState(false);
   const [thumbnail, setThumbnail] = useState<{resource: AssetRemoteDataType; url: string}>();
@@ -257,7 +261,7 @@ export const PdfAssetPreview = ({
           />
         </div>
       )}
-      <FullscreenModalComponent
+      <ModalComponent
         id={id}
         dialogId={id}
         isOpen={isOpen}
