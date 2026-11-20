@@ -41,7 +41,10 @@ import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {AppContainer} from '../components/appContainer/appContainer';
 import {FileFullscreenModal} from '../components/FileFullscreenModal/FileFullscreenModal';
-import {ChatPdfModalToken} from '../components/messagesList/message/contentMessage/asset/fileAsset/chatPdfModal';
+import {
+  ChatPdfModalToken,
+  type ChatPdfModalComponent,
+} from '../components/messagesList/message/contentMessage/asset/fileAsset/chatPdfModal';
 import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
 import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
 import {Config} from '../Config';
@@ -71,7 +74,7 @@ export async function startApplication(
   defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[],
   support: CoreCryptoSupport,
 ): Promise<void> {
-  container.registerInstance(ChatPdfModalToken, FileFullscreenModal);
+  container.registerInstance<ChatPdfModalComponent>(ChatPdfModalToken, FileFullscreenModal);
 
   initializeStartupFeatureToggleUrl({
     url: new URL(window.location.href),
