@@ -131,9 +131,11 @@ export function ConfigToolbar(): JSX.Element | null {
       });
     };
 
+    // eslint-disable-next-line import/no-named-as-default-member -- Named wrappers are ESM-only; CommonJS methods need the singleton receiver.
     keyboardjs.bind(['command+shift+2', 'ctrl+shift+2'], handleKeyDown);
 
     return () => {
+      // eslint-disable-next-line import/no-named-as-default-member -- Named wrappers are ESM-only; CommonJS methods need the singleton receiver.
       keyboardjs.unbind(['command+shift+2', 'ctrl+shift+2'], handleKeyDown);
     };
   }, []);

@@ -170,6 +170,7 @@ export class DebugUtil {
       this.ignoredMLSConversation(undefined);
     });
 
+    // eslint-disable-next-line import/no-named-as-default-member -- Named wrappers are ESM-only; CommonJS methods need the singleton receiver.
     keyboardjs.bind(['command+shift+1', 'ctrl+shift+1'], this.toggleDebugUi);
 
     // If the debugger marked as active in the LocalStorage, install the Web Component
