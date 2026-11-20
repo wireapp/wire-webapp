@@ -23,13 +23,15 @@ import {create} from 'zustand';
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
 
-export enum MeetingNotificationKind {
-  INVITE = 'invite',
-  UPDATE = 'update',
-  CANCELLED = 'cancelled',
-  ONGOING = 'ongoing',
-  REMINDER = 'reminder',
-}
+export const MeetingNotificationKind = {
+  INVITE: 'invite',
+  UPDATE: 'update',
+  CANCELLED: 'cancelled',
+  ONGOING: 'ongoing',
+  REMINDER: 'reminder',
+} as const;
+
+export type MeetingNotificationKind = (typeof MeetingNotificationKind)[keyof typeof MeetingNotificationKind];
 
 type MeetingNotificationBase = {
   qualifiedId: QualifiedId;
@@ -41,23 +43,23 @@ type MeetingNotificationBase = {
 export type AddNotificationInput = MeetingNotificationBase &
   (
     | {
-        kind: MeetingNotificationKind.INVITE;
+        kind: typeof MeetingNotificationKind.INVITE;
         qualifiedCreator: QualifiedId;
       }
     | {
-        kind: MeetingNotificationKind.UPDATE;
+        kind: typeof MeetingNotificationKind.UPDATE;
         qualifiedCreator: QualifiedId;
       }
     | {
-        kind: MeetingNotificationKind.CANCELLED;
+        kind: typeof MeetingNotificationKind.CANCELLED;
         qualifiedCreator: QualifiedId;
       }
     | {
-        kind: MeetingNotificationKind.ONGOING;
+        kind: typeof MeetingNotificationKind.ONGOING;
         qualifiedCreator: QualifiedId;
       }
     | {
-        kind: MeetingNotificationKind.REMINDER;
+        kind: typeof MeetingNotificationKind.REMINDER;
         qualifiedCreator: QualifiedId;
       }
   );

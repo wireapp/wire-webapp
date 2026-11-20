@@ -45,6 +45,7 @@ type GetMeetingActionEntriesParams = {
   translate: Translate;
   onJoin: () => void;
   isJoinDisabled?: boolean;
+  joinOnly?: boolean;
   onEdit: () => void;
   onShowMeetingLink: () => void;
   onRotateMeetingLink: () => void;
@@ -60,6 +61,7 @@ export const getMeetingActionEntries = ({
   translate,
   onJoin,
   isJoinDisabled = false,
+  joinOnly = false,
   onEdit,
   onShowMeetingLink,
   onRotateMeetingLink,
@@ -75,6 +77,10 @@ export const getMeetingActionEntries = ({
     isDisabled: isJoinDisabled,
     click: onJoin,
   };
+
+  if (joinOnly) {
+    return [joinEntry];
+  }
 
   const editEntry: ContextMenuEntry = {
     icon: () => {

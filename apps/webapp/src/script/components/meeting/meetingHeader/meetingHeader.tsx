@@ -24,15 +24,17 @@ import {actionsStyles, headingStyles, wrapperStyles} from './meetingHeader.style
 import {useApplicationContext} from '../../../page/rootProvider';
 import {MeetingMultiActionButton} from '../meetingMultiActionButton/meetingMultiActionButton';
 
-export const MeetingHeader: FunctionComponent = () => {
+export const MeetingHeader: FunctionComponent<{showActions?: boolean}> = ({showActions = true}) => {
   const {translate} = useApplicationContext();
 
   return (
     <header css={wrapperStyles}>
       <h2 css={headingStyles}>{translate('meetings.navigation.title')}</h2>
-      <div css={actionsStyles}>
-        <MeetingMultiActionButton />
-      </div>
+      {showActions && (
+        <div css={actionsStyles}>
+          <MeetingMultiActionButton />
+        </div>
+      )}
     </header>
   );
 };

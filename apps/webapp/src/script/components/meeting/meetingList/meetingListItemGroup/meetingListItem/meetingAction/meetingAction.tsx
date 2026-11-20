@@ -42,6 +42,7 @@ interface MeetingActionProps {
   selfUser: User | undefined;
   joinMeeting: () => void;
   isJoinDisabled: boolean;
+  joinOnly?: boolean;
 }
 
 export const MeetingAction: FunctionComponent<MeetingActionProps> = ({
@@ -49,6 +50,7 @@ export const MeetingAction: FunctionComponent<MeetingActionProps> = ({
   selfUser,
   joinMeeting,
   isJoinDisabled,
+  joinOnly = false,
 }: MeetingActionProps) => {
   const {translate, clock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
@@ -70,6 +72,7 @@ export const MeetingAction: FunctionComponent<MeetingActionProps> = ({
         translate,
         onJoin: joinMeeting,
         isJoinDisabled,
+        joinOnly,
         onEdit: () => {
           if (canEditMeeting(meetingInstance, selfUser, clock.currentUnixEpochMilliseconds)) {
             fireAndForgetInvoker.fireAndForget(() => {
