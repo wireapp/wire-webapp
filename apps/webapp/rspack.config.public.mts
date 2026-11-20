@@ -46,6 +46,7 @@ export default {
   entry: {
     ...rspackEntrypoints,
     app: path.resolve(configDirectoryPath, 'src/script/main/releaseEntrypoint.tsx'),
+    auth: path.resolve(configDirectoryPath, 'src/script/auth/releaseEntrypoint.tsx'),
   },
   cache: {
     ...rspackCache,

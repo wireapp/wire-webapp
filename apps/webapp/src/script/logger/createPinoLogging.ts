@@ -30,6 +30,7 @@ import {encodeLogOutput, type LogOutput} from './logOutput';
 export type LoggingDependencies = {
   readonly clock: Pick<Clock, 'currentUnixEpochMilliseconds'>;
   readonly output: LogOutput;
+  readonly shouldWriteToOutput?: (namespaceEnabled: boolean) => boolean;
   readonly namespaces: Maybe<string>;
   readonly persistenceOutput: Maybe<LogOutput>;
 };
@@ -172,12 +173,14 @@ export function createPinoLogging(initialDependencies: Maybe<LoggingDependencies
               // Every destination receives the same sanitized JSON line, never raw Pino objects.
               const line = encodeLogOutput(structuredRecord);
               const component = structuredRecord['component'];
-              if (isString(component) && isNamespaceEnabled(component)) {
-                try {
+              try {
+                const namespaceEnabled = isString(component) && isNamespaceEnabled(component);
+                const shouldWriteToOutput = configuration.shouldWriteToOutput?.(namespaceEnabled) ?? namespaceEnabled;
+                if (shouldWriteToOutput) {
                   configuration.output(line, level);
-                } catch {
-                  // Console failure must not prevent persistence of the same sanitized record.
                 }
+              } catch {
+                // Console failure must not prevent persistence of the same sanitized record.
               }
 
               if (configuration.persistenceOutput.isJust) {

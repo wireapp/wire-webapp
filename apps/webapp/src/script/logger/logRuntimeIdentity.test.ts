@@ -26,9 +26,7 @@ import type {BrowserLogPersistence} from './createBrowserLogPersistence';
 import {initializeLogging} from './initializeLogging';
 import type {Logger} from './logger';
 import type {LogOutput} from './logOutput';
-import {getDeploymentStage, logRuntimeIdentity, logStartupRuntimeIdentity} from './logRuntimeIdentity';
-
-import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
+import {logRuntimeIdentity, logStartupRuntimeIdentity} from './logRuntimeIdentity';
 
 const desktopAccountIdentifier = '11111111-1111-4111-8111-111111111111';
 
@@ -56,10 +54,10 @@ function createStartupLoggingFixture(debugEnabled: boolean): StartupLoggingFixtu
     consoleOutput,
     locationSearch: `?id=${desktopAccountIdentifier}`,
     debugEnabled,
+    developerConsoleEnabled: true,
     storage: Maybe.nothing(),
     configureLogging: logging.configure,
-    startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch('?enabled-features=persistent-browser-logs'),
-    isElectron: true,
+    browserPersistenceEnabled: false,
     createPersistenceOutput,
   });
 
@@ -73,7 +71,6 @@ function createStartupLoggingFixture(debugEnabled: boolean): StartupLoggingFixtu
       isDesktopApp: true,
       hasDesktopLogPersistence: false,
       locationSearch: `?id=${desktopAccountIdentifier}`,
-      hostname: 'wire-webapp-beta.wire.com',
       origin: 'https://wire-webapp-beta.wire.com',
       version: '1.2.3',
       assetVersion: '1.2.3-0123456789abcdef',
@@ -97,7 +94,6 @@ describe('runtime identity', () => {
         time: 1000,
         component: '@wireapp/webapp/RuntimeIdentity',
         msg: 'WebApp runtime identity',
-        deploymentStage: 'beta',
         version: '1.2.3',
         assetVersion: '1.2.3-0123456789abcdef',
         origin: 'https://wire-webapp-beta.wire.com',
@@ -130,7 +126,6 @@ describe('runtime identity', () => {
       isDesktopApp: options.isDesktopApp,
       hasDesktopLogPersistence: false,
       locationSearch,
-      hostname: options.hostname,
       origin: options.origin,
       version: options.version,
       assetVersion: options.assetVersion,
@@ -150,14 +145,12 @@ describe('runtime identity', () => {
       isDesktopApp: false,
       hasDesktopLogPersistence: false,
       locationSearch: options.locationSearch,
-      hostname: options.hostname,
       origin: options.origin,
       version: options.version,
       assetVersion: options.assetVersion,
     });
 
     expect(info).toHaveBeenCalledWith('WebApp runtime identity', {
-      deploymentStage: 'beta',
       version: options.version,
       assetVersion: options.assetVersion,
       origin: options.origin,
@@ -175,7 +168,6 @@ describe('runtime identity', () => {
       logStartupRuntimeIdentity({
         clock: options.clock,
         locationSearch: options.locationSearch,
-        hostname: options.hostname,
         origin: options.origin,
         version: options.version,
         assetVersion: options.assetVersion,
@@ -188,27 +180,8 @@ describe('runtime identity', () => {
     expect(failingOutput).toHaveBeenCalledTimes(1);
   });
 
-  it.each([
-    ['wire-webapp-edge.wire.com', 'edge'],
-    ['wire-webapp-beta.wire.com', 'beta'],
-    ['app.wire.com', 'production'],
-    ['localhost', 'unknown'],
-    ['custom.example.com', 'unknown'],
-    ['wire-webapp-dev.zinfra.io', 'unknown'],
-    ['wire-webapp-staging.wire.com', 'unknown'],
-    ['wire-webapp-edge.wire.com.example.com', 'unknown'],
-    ['custom.app.wire.com', 'unknown'],
-    ['', 'unknown'],
-  ])('classifies the exact hostname %s as %s', (hostname, expectedStage) => {
-    expect(getDeploymentStage(hostname)).toBe(expectedStage);
-  });
-
-  it.each([
-    ['wire-webapp-edge.wire.com', 'edge'],
-    ['wire-webapp-beta.wire.com', 'beta'],
-    ['app.wire.com', 'production'],
-    ['custom.example.com', 'unknown'],
-  ])('emits INFO attributes through Pino for %s with unchanged build values', (hostname, deploymentStage) => {
+  it('emits the origin and unchanged build values through Pino', () => {
+    const origin = 'https://custom.example.com';
     const persistenceOutput = jest.fn<ReturnType<LogOutput>, Parameters<LogOutput>>();
     const logging = createPinoLogging(Maybe.nothing());
     const logger = logging.getLogger('RuntimeIdentity');
@@ -223,8 +196,7 @@ describe('runtime identity', () => {
 
     logRuntimeIdentity({
       logger,
-      hostname,
-      origin: `https://${hostname}`,
+      origin,
       version: '1.2.3',
       assetVersion: '1.2.3-0123456789abcdef',
     });
@@ -236,10 +208,9 @@ describe('runtime identity', () => {
       level: 30,
       time: 1000,
       component: 'RuntimeIdentity',
-      deploymentStage,
       version: '1.2.3',
       assetVersion: '1.2.3-0123456789abcdef',
-      origin: `https://${hostname}`,
+      origin,
       msg: 'WebApp runtime identity',
     };
     expect(actualRecord).toEqual(expectedRecord);

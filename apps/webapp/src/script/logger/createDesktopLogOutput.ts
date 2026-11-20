@@ -47,7 +47,7 @@ const responseTimeoutMilliseconds = 10_000;
  */
 export function createDesktopLogOutput(
   options: DesktopLogOutputOptions,
-): Pick<BufferedLogOutput, 'write' | 'flush' | 'getStatistics'> {
+): Pick<BufferedLogOutput, 'write' | 'flush' | 'getStatistics'> & {readonly hasConfirmedDelivery: () => boolean} {
   const {clock, writeToDesktop, reportFailure} = options;
   const acknowledgementTimeout = {
     milliseconds: responseTimeoutMilliseconds,
@@ -59,8 +59,10 @@ export function createDesktopLogOutput(
   } satisfies PromiseTimeoutOptions<DesktopLogAcknowledgement>;
   const reportedFailures = new Set<DesktopLogFailure>();
   let writeInProgress = false;
+  let deliveryConfirmed = false;
 
   function reportFailureOnce(failure: DesktopLogFailure): void {
+    deliveryConfirmed = false;
     if (reportedFailures.has(failure)) {
       return;
     }
@@ -113,6 +115,7 @@ export function createDesktopLogOutput(
     return acknowledgement.match<void | 'dropped'>({
       Ok(reply) {
         if (reply === 'written') {
+          deliveryConfirmed = true;
           reportedFailures.clear();
 
           return;
@@ -134,7 +137,7 @@ export function createDesktopLogOutput(
     });
   }
 
-  return createBufferedLogOutput({
+  const output = createBufferedLogOutput({
     append,
     clock,
     maximumBatchRecords,
@@ -146,4 +149,11 @@ export function createDesktopLogOutput(
       flushIntervalMilliseconds: 1000,
     },
   });
+
+  return {
+    ...output,
+    hasConfirmedDelivery() {
+      return deliveryConfirmed;
+    },
+  };
 }

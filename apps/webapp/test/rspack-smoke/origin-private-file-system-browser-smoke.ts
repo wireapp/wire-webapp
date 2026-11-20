@@ -298,6 +298,76 @@ test('persists sanitized browser logs with console disabled across application r
     expect(await page.locator('html').getAttribute('data-unexpected-log-storage-access')).toBeNull();
     expect(consoleRecords).toEqual([]);
 
+    await page.evaluate(async () => {
+      window.setTimeout(() => {
+        throw new TypeError(
+          'Bearer synthetic-runtime-canary\n    at https://example.com/synthetic-runtime-frame-canary.js:38:49',
+        );
+      }, 0);
+      void Promise.reject({privateValue: 'synthetic-rejection-canary'});
+      void Promise.reject(new DOMException('synthetic-quota-canary', 'QuotaExceededError'));
+      void Promise.reject({type: 'LEGAL_HOLD_CONVERSATION_CANCELLATION'});
+      window.dispatchEvent(new Event('error'));
+      const script = new Blob(["console.error('synthetic-worker-console-canary'); postMessage(null);"], {
+        type: 'application/javascript',
+      });
+      const scriptUrl = URL.createObjectURL(script);
+      const worker = new Worker(scriptUrl);
+      try {
+        await new Promise<void>((resolve, reject) => {
+          worker.addEventListener(
+            'message',
+            () => {
+              resolve();
+            },
+            {once: true},
+          );
+          worker.addEventListener(
+            'error',
+            () => {
+              reject(new Error('Synthetic Worker did not run'));
+            },
+            {once: true},
+          );
+        });
+      } finally {
+        worker.terminate();
+        URL.revokeObjectURL(scriptUrl);
+      }
+    });
+    const runtimeErrorComponent = '"component":"@wireapp/webapp/RuntimeErrors"';
+    await expect
+      .poll(async () => {
+        const files = await readBrowserLogFiles(page);
+
+        return files.flatMap(file => {
+          return file.contents.split('\n').filter(line => {
+            return line.includes(runtimeErrorComponent);
+          });
+        });
+      })
+      .toHaveLength(3);
+    const runtimeFiles = await readBrowserLogFiles(page);
+    const runtimeLines = runtimeFiles.flatMap(file => {
+      return file.contents.trimEnd().split('\n');
+    });
+    const runtimeRecords = runtimeLines
+      .filter(line => {
+        return line.includes(runtimeErrorComponent);
+      })
+      .map(line => {
+        return JSON.parse(line);
+      });
+    expect(runtimeRecords).toHaveLength(3);
+    expect(runtimeRecords).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({level: 50, msg: 'Uncaught JavaScript error', errorName: 'TypeError'}),
+        expect.objectContaining({level: 50, msg: 'Unhandled promise rejection', reasonType: 'object'}),
+        expect.objectContaining({level: 50, msg: 'Unhandled promise rejection', errorName: 'QuotaExceededError'}),
+      ]),
+    );
+    expect(runtimeLines.join('\n')).not.toMatch(/synthetic-(runtime(-frame)?|rejection|quota|worker-console)-canary/);
+
     await page.reload();
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
     expect(new URL(page.url()).searchParams.get('debugLogging')).toBe('-*');
@@ -310,7 +380,7 @@ test('persists sanitized browser logs with console disabled across application r
     secondSessionFiles.forEach(file => {
       ownedFilenames.add(file.name);
     });
-    for (const file of firstSessionFiles) {
+    for (const file of runtimeFiles) {
       expect(secondSessionFiles).toContainEqual(file);
     }
 
@@ -342,9 +412,7 @@ test('persists sanitized browser logs with console disabled across application r
   }
 });
 
-test('leaves Origin Private File System untouched without opt-in even when console logging is enabled', async ({
-  page,
-}) => {
+test('leaves Origin Private File System untouched without opt-in', async ({page}, testInfo) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator.storage, 'getDirectory', {
       value(): never {
@@ -368,12 +436,12 @@ test('leaves Origin Private File System untouched without opt-in even when conso
   await page.goto('/auth?enabled-features=mark-as-unread&debugLogging=*');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
 
-  expect(consoleRecords.length).toBeGreaterThan(0);
+  expect(consoleRecords.length > 0).toBe(testInfo.project.name === 'rspack-internal');
   expect(startedWorkers).toEqual([]);
   expect(await page.locator('html').getAttribute('data-unexpected-log-storage-access')).toBeNull();
 });
 
-test('keeps startup and console logging working when logging worker construction fails', async ({page}) => {
+test('preserves the console policy when logging worker construction fails', async ({page}, testInfo) => {
   await page.addInitScript(() => {
     const NativeWorker = window.Worker;
     Object.defineProperty(window, 'Worker', {
@@ -400,7 +468,7 @@ test('keeps startup and console logging working when logging worker construction
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
 
   expect(startedWorkers).toEqual([]);
-  expect(consoleRecords.length).toBeGreaterThan(0);
+  expect(consoleRecords.length > 0).toBe(testInfo.project.name === 'rspack-internal');
 });
 
 test('starts without main-thread filesystem access while worker initialization never settles', async ({
@@ -452,7 +520,7 @@ test('starts without main-thread filesystem access while worker initialization n
 test.describe('Electron logging selection', () => {
   test.use({
     userAgent:
-      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Electron/38.0.0 Safari/537.36',
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Wire/3.46.0 Electron/38.0.0 Safari/537.36',
   });
 
   test('never initializes Origin Private File System despite opt-in and preserves console capture', async ({page}) => {
@@ -485,7 +553,10 @@ test.describe('Electron logging selection', () => {
   });
 });
 
-test('disables unsupported synchronous access handles without a main-thread fallback', async ({page, context}) => {
+test('disables unsupported synchronous access handles without a main-thread fallback', async ({
+  page,
+  context,
+}, testInfo) => {
   await context.route('**/wire-browser-log-persistence.js', async route => {
     const response = await route.fetch();
     const prefix =
@@ -521,12 +592,12 @@ test('disables unsupported synchronous access handles without a main-thread fall
     })
     .toBe(true);
 
-  expect(consoleRecords.length).toBeGreaterThan(0);
+  expect(consoleRecords.length > 0).toBe(testInfo.project.name === 'rspack-internal');
   expect(await page.locator('html').getAttribute('data-unexpected-log-storage-access')).toBeNull();
   expect(await readBrowserLogFiles(page)).toEqual([]);
 });
 
-test('keeps console logging functional after a persistence worker crashes', async ({page, context}) => {
+test('preserves the console policy after a persistence worker crashes', async ({page, context}, testInfo) => {
   await context.route('**/wire-browser-log-persistence.js', async route => {
     const response = await route.fetch();
     await route.fulfill({
@@ -558,6 +629,6 @@ test('keeps console logging functional after a persistence worker crashes', asyn
     })
     .toBe(true);
 
-  expect(consoleRecords.length).toBeGreaterThan(0);
+  expect(consoleRecords.length > 0).toBe(testInfo.project.name === 'rspack-internal');
   expect(uncaughtErrors).toEqual([]);
 });

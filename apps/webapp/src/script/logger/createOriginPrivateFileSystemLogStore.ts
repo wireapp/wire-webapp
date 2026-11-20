@@ -18,8 +18,9 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import {isNull, isObject, isSafeInteger, isString} from '@sindresorhus/is';
+import {isError, isNull, isObject, isSafeInteger, isString} from '@sindresorhus/is';
 import {Maybe, Result} from 'true-myth';
+import {objectHasOwn} from 'ts-extras';
 
 import {logDirectoryName, type LogPersistenceConfiguration} from './logPersistenceConfiguration';
 
@@ -142,7 +143,11 @@ function isValidWriteCount(writtenBytes: number, remainingBytes: number): boolea
 }
 
 export function isMissingEntry(error: unknown): boolean {
-  return isObject(error) && 'name' in error && error.name === 'NotFoundError';
+  if (error instanceof DOMException || isError(error)) {
+    return error.name === 'NotFoundError';
+  }
+
+  return isObject(error) && objectHasOwn(error, 'name') && error.name === 'NotFoundError';
 }
 
 async function listLogFiles(directory: LogDirectory): Promise<readonly StoredLogFile[]> {

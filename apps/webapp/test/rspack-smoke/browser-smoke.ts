@@ -373,7 +373,7 @@ test('redirects to authentication with an empty selection while cache cleanup ne
   expect(uncaughtPageErrors).toEqual([]);
 });
 
-test('reports rejected cleanup through the invoker without an unhandled rejection or blocked authentication', async ({
+test('reports rejected cleanup through Desktop fallback without an unhandled rejection or blocked authentication', async ({
   page,
 }) => {
   const reportedErrors: string[] = [];
@@ -393,6 +393,9 @@ test('reports rejected cleanup through the invoker without an unhandled rejectio
     }
   });
   await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'userAgent', {
+      value: `${navigator.userAgent} Wire/3.46.0 Electron/38.0.0`,
+    });
     Object.defineProperty(navigator, 'serviceWorker', {
       value: {
         getRegistrations() {
@@ -461,20 +464,76 @@ test('warns about rejected authentication cleanup when structured logging is dis
   expect(uncaughtPageErrors).toEqual([]);
 });
 
-test('bundles the application entrypoint selected for the artifact', async ({request}, testInfo) => {
-  const sourceMapResponse = await request.get('/min/app.js.map');
-  const sourceMapText = await sourceMapResponse.text();
+test('bundles the application and authentication entrypoints selected for the artifact', async ({
+  request,
+}, testInfo) => {
   const expectedEntrypoint = testInfo.project.name === 'rspack-internal' ? 'preview' : 'release';
   const excludedEntrypoint = testInfo.project.name === 'rspack-internal' ? 'release' : 'preview';
 
-  expect(sourceMapResponse.ok()).toBe(true);
-  expect(sourceMapText).toContain(`/main/${expectedEntrypoint}Entrypoint.tsx`);
-  expect(sourceMapText).not.toContain(`/main/${excludedEntrypoint}Entrypoint.tsx`);
-  expect(sourceMapText).not.toContain('/browser/coreCryptoUpgradeModal.tsx');
-  expect(sourceMapText).not.toContain('/browser/showCoreCryptoUpgrade.tsx');
-  expect(sourceMapText).not.toContain('/localization/Localizer.ts');
-  expect(sourceMapText).not.toContain('/util/util.ts');
+  for (const {bundle, directory} of [
+    {bundle: 'app', directory: 'main'},
+    {bundle: 'auth', directory: 'auth'},
+  ]) {
+    const sourceMapResponse = await request.get(`/min/${bundle}.js.map`);
+    const sourceMapText = await sourceMapResponse.text();
+    expect(sourceMapResponse.ok()).toBe(true);
+    expect(sourceMapText).toContain(`/${directory}/${expectedEntrypoint}Entrypoint.tsx`);
+    expect(sourceMapText).not.toContain(`/${directory}/${excludedEntrypoint}Entrypoint.tsx`);
+    expect(sourceMapText).not.toContain('/browser/coreCryptoUpgradeModal.tsx');
+    expect(sourceMapText).not.toContain('/browser/showCoreCryptoUpgrade.tsx');
+    expect(sourceMapText).not.toContain('/localization/Localizer.ts');
+    expect(sourceMapText).not.toContain('/util/util.ts');
+  }
 });
+
+for (const scenario of [
+  {label: 'default', configuredDebug: false, selection: ''},
+  {label: 'configured DEBUG', configuredDebug: true, selection: ''},
+  {label: 'explicit namespaces', configuredDebug: false, selection: '*,-Excluded'},
+]) {
+  test(`applies ${scenario.label} logging to both startup pages`, async ({page}, testInfo) => {
+    const {configuredDebug, selection} = scenario;
+    const developerConsoleEnabled = testInfo.project.name === 'rspack-internal';
+    await page.route('**/config.js', async route => {
+      const response = await route.fetch();
+      await route.fulfill({
+        response,
+        body: `${await response.text()} window.wire.env.FEATURE.ENABLE_DEBUG = ${configuredDebug};`,
+      });
+    });
+    await page.addInitScript(() => {
+      if (location.pathname === '/') {
+        window.addEventListener(
+          'pagehide',
+          () => {
+            sessionStorage.setItem('mainDebugSelection', localStorage.getItem('debug') ?? '');
+          },
+          {once: true},
+        );
+      }
+    });
+    const startupRecords: string[] = [];
+    page.on('console', message => {
+      const line = message.text();
+      if (line.startsWith('{') && line.includes('"component":"@wireapp/webapp/RuntimeIdentity"')) {
+        startupRecords.push(line);
+      }
+    });
+    const search = new URLSearchParams({'enabled-features': ''});
+    if (selection !== '') {
+      search.set('debugLogging', selection);
+    }
+    await page.goto(`/?${search}`);
+    await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+
+    const expectedDebug = selection !== '' ? selection : developerConsoleEnabled || configuredDebug ? '*' : '';
+    const startupSelections = await page.evaluate(() => {
+      return {main: sessionStorage.getItem('mainDebugSelection'), auth: localStorage.getItem('debug') ?? ''};
+    });
+    expect(startupSelections).toEqual({main: expectedDebug, auth: expectedDebug});
+    expect(startupRecords).toHaveLength(developerConsoleEnabled ? 2 : 0);
+  });
+}
 
 async function expectStartupSelectionSurvivesAuthentication(page: Page, selection: string): Promise<void> {
   await page.goto(`/?enabled-features=${selection}&hl=en`);
