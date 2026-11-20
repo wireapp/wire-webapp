@@ -22,6 +22,9 @@ import ko from 'knockout';
 
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {FileAsset as MessageFileAsset} from '../../../../repositories/entity/message/fileAsset';
+import {AssetRemoteData} from '../../../../repositories/assets/assetRemoteData';
+import {AssetTransferState} from '../../../../repositories/assets/assetTransferState';
 import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';
 import {Text} from '../../../../repositories/entity/message/text';
 import {User} from '../../../../repositories/entity/User';
@@ -35,6 +38,7 @@ import {createUuid} from '../../../../util/uuid';
 
 import {ContentMessageComponent, ContentMessageProps} from './contentMessage';
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
+import {createStartupFeatureTogglesFromLocationSearch} from '../../../../featureToggles/startupFeatureToggles';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
@@ -89,6 +93,47 @@ describe('message', () => {
 
     const {getByText} = render(<ContentMessageComponent {...defaultParams} />, {wrapper: rootProviderWrapper});
     expect(getByText(linkPreview.title)).not.toBe(null);
+  });
+
+  it('renders a quoted PDF as a compact file row when a preview is available', async () => {
+    const quotedMessage = new ContentMessage(createUuid(), translateForTest);
+    quotedMessage.user(new User(createUuid(), '', translateForTest));
+    const pdf = new MessageFileAsset();
+    pdf.file_name = 'report.pdf';
+    pdf.file_size = 1024;
+    pdf.file_type = 'application/pdf';
+    pdf.status(AssetTransferState.UPLOADED);
+    pdf.preview_resource(
+      new AssetRemoteData({
+        assetKey: 'preview',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
+    quotedMessage.assets.push(pdf);
+    const message = new ContentMessage(undefined, translateForTest);
+    message.user(new User(createUuid(), '', translateForTest));
+    message.quote(new QuoteEntity({messageId: quotedMessage.id, userId: ''}));
+    const findMessage = (): Promise<ContentMessage> => {
+      return Promise.resolve(quotedMessage);
+    };
+    const wrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview')
+          .isFeatureToggleEnabled,
+      }),
+    );
+
+    const {findByText, container} = render(
+      <ContentMessageComponent {...defaultParams} message={message} findMessage={findMessage} />,
+      {wrapper},
+    );
+
+    expect(await findByText('report')).toBeInTheDocument();
+    expect(container.querySelector('.message-quote .file-asset')).toBeInTheDocument();
+    expect(container.querySelector('.message-quote .pdf-asset-preview')).not.toBeInTheDocument();
   });
 
   it('displays a quoted message', async () => {
