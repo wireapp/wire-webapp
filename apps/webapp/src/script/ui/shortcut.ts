@@ -17,8 +17,9 @@
  *
  */
 
+import {isFunction, isNumber, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
-import keyboardJS from 'keyboardjs';
+import {bind, releaseKey} from 'keyboardjs';
 
 import {ShortcutType} from './shortcutType';
 
@@ -163,18 +164,27 @@ const _registerEvent = (platformSpecificShortcut: string, event: string): void =
     _registerEvent(replacedShortcut, event);
   }
 
-  return keyboardJS.bind(platformSpecificShortcut, inputEvent => {
-    if (inputEvent === undefined) {
+  bind(platformSpecificShortcut, inputEvent => {
+    if (isUndefined(inputEvent)) {
       return;
     }
-    keyboardJS.releaseKey(inputEvent.keyCode);
+
+    if (isNumber(inputEvent.keyCode)) {
+      releaseKey(inputEvent.keyCode);
+    }
 
     // Hotfix WEBAPP-1916
-    const ignoreEvent = includesString(platformSpecificShortcut, 'command') && !inputEvent.metaKey;
-    if (!ignoreEvent) {
-      inputEvent.preventDefault();
-      amplify.publish(event);
+    const ignoreEvent = includesString(platformSpecificShortcut, 'command') && inputEvent.metaKey !== true;
+    if (ignoreEvent) {
+      return;
     }
+
+    if (!isFunction(inputEvent.preventDefault)) {
+      return;
+    }
+
+    inputEvent.preventDefault();
+    amplify.publish(event);
   });
 };
 
