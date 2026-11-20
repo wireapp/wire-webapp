@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen, type RenderResult} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor, type RenderResult} from '@testing-library/react';
 import {container} from 'tsyringe';
 
 import {
@@ -31,7 +31,9 @@ import {
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
 
+import * as util from '../../../util/util';
 import {FileHeader, getConversationIconType} from './FileHeader';
+import type {CellsSelfUserDriveRole} from '../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import type {ReactNode} from 'react';
 
 const translate = (key: string): string => {
@@ -76,10 +78,16 @@ describe('FileHeader', () => {
     container.reset();
   });
 
-  const renderHeader = ({props = {}}: {props?: Partial<Parameters<typeof FileHeader>[0]>} = {}): RenderResult => {
+  const renderHeader = ({
+    props = {},
+    selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+  }: {
+    props?: Partial<Parameters<typeof FileHeader>[0]>;
+    selfUserDriveRole?: CellsSelfUserDriveRole;
+  } = {}): RenderResult => {
     return render(
       withThemeAndRootContext(
-        <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>
+        <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
           <FileHeader {...defaultProps} {...props} />
         </CellsSelfUserDriveRoleProvider>,
         createWrapper(),
@@ -91,6 +99,45 @@ describe('FileHeader', () => {
     renderHeader();
 
     expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
+  });
+
+  it('preserves the default Cells download path and resolves the latest pre-signed URL', async () => {
+    container.reset();
+    const signedUrl = 'https://cells.example.com/signed-document.pdf';
+    const getNode = jest.fn().mockResolvedValue({PreSignedGET: {Url: signedUrl}});
+    container.registerInstance(CellsRepository, {getNode} as unknown as CellsRepository);
+    const forceDownload = jest.spyOn(util, 'forcedDownloadFile').mockResolvedValue(undefined);
+    renderHeader({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR});
+
+    fireEvent.click(screen.getByRole('button', {name: 'Download'}));
+
+    await waitFor(() => {
+      expect(forceDownload).toHaveBeenCalledWith({url: signedUrl, name: 'document.pdf'});
+    });
+    expect(getNode).toHaveBeenCalledWith({uuid: 'file-id'});
+  });
+
+  it('uses the chat download callback without resolving Cells services or permissions', async () => {
+    container.reset();
+    const onDownload = jest.fn().mockResolvedValue(undefined);
+    renderHeader({props: {context: 'chat', onDownload, fileUrl: undefined, isEditable: true}});
+
+    const downloadButton = screen.getByRole('button', {name: 'Download'});
+    expect(downloadButton).toBeEnabled();
+    expect(screen.queryByRole('button', {name: 'Editing'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'More options'})).not.toBeInTheDocument();
+    expect(screen.queryByText('Viewer access')).not.toBeInTheDocument();
+
+    fireEvent.click(downloadButton);
+    await waitFor(() => {
+      expect(onDownload).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('focuses the close action when a chat preview opens', () => {
+    renderHeader({props: {context: 'chat', autoFocusCloseButton: true}});
+
+    expect(screen.getByRole('button', {name: 'Close'})).toHaveFocus();
   });
 
   it('hides edit and version history actions for restricted viewers on editable files', () => {
