@@ -211,7 +211,7 @@
     "cross-env": "10.1.0",
     "css-loader": "7.1.5",
     "cssnano": "9.9.0",
-    "dependency-cruiser": "18.7.2",
+    "dependency-cruiser": "18.8.0",
     "dotenv-defaults": "5.0.2",
     "eslint": "9.39.5",
     "eslint-config-prettier": "10.1.8",
