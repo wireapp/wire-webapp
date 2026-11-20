@@ -19,6 +19,7 @@
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import platform from 'platform';
+import {objectHasOwn} from 'ts-extras';
 
 import {BROWSER, WEBAPP_SUPPORTED_BROWSERS} from '../config/CommonConfig';
 
@@ -156,8 +157,8 @@ export class Runtime {
      * 'createEncodedVideoStreams' API will be completely removed in
      * Chrome 88+.
      */
-    const isSupportingEncodedVideoStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedVideoStreams');
-    const isSupportingEncodedStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedStreams');
+    const isSupportingEncodedVideoStreams = objectHasOwn(RTCRtpSender.prototype, 'createEncodedVideoStreams');
+    const isSupportingEncodedStreams = objectHasOwn(RTCRtpSender.prototype, 'createEncodedStreams');
     return isSupportingEncodedStreams || isSupportingEncodedVideoStreams;
   };
 

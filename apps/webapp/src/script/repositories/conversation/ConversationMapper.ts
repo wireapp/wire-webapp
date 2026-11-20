@@ -19,7 +19,7 @@
 
 import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isNumber, isUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
-import {isDefined} from 'ts-extras';
+import {isDefined, objectHasOwn} from 'ts-extras';
 import {isObject} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -292,7 +292,7 @@ export class ConversationMapper {
   ): Conversation {
     Object.entries(conversationData).forEach(([key, value]: [keyof Conversation, string]) => {
       if (key !== 'id') {
-        if (value !== undefined && conversationEntity.hasOwnProperty(key)) {
+        if (value !== undefined && objectHasOwn(conversationEntity, key)) {
           if (ko.isObservable(conversationEntity[key])) {
             (conversationEntity[key] as ko.Observable)(value);
           } else {

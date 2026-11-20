@@ -19,7 +19,7 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import ko from 'knockout';
-import {arrayIncludes, objectKeys} from 'ts-extras';
+import {arrayIncludes, objectHasOwn, objectKeys} from 'ts-extras';
 
 import {ClientMapper} from './ClientMapper';
 
@@ -150,7 +150,7 @@ export class ClientEntity {
   }
 
   private removeDefaultValues(jsonObject: Record<string, any>, memberName: string): void {
-    if (jsonObject.hasOwnProperty(memberName)) {
+    if (objectHasOwn(jsonObject, memberName)) {
       const isDefaultValue = jsonObject[memberName] === ClientEntity.CONFIG.DEFAULT_VALUE;
       if (isDefaultValue) {
         jsonObject[memberName] = '';

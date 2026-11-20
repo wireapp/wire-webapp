@@ -19,6 +19,7 @@
 
 import {isFunction, isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
+import {objectHasOwn} from 'ts-extras';
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
@@ -230,7 +231,7 @@ export class Message {
 
   hasMultipartAsset(): this is ContentMessage {
     const contentMessageCandidate = this as unknown as {assets?: () => {type: AssetType}[]};
-    const hasAssetsFunction = Object.hasOwn(this, 'assets') && typeof contentMessageCandidate.assets === 'function';
+    const hasAssetsFunction = objectHasOwn(this, 'assets') && typeof contentMessageCandidate.assets === 'function';
     return this.isContent() && hasAssetsFunction
       ? this.assets().some(assetEntity => {
           return assetEntity.type === AssetType.MULTIPART;
@@ -266,7 +267,7 @@ export class Message {
   }
 
   isComposite(): this is CompositeMessage {
-    return this.isContent() && this.hasOwnProperty('selectedButtonId');
+    return this.isContent() && objectHasOwn(this, 'selectedButtonId');
   }
 
   /**

@@ -18,6 +18,7 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
+import {objectHasOwn} from 'ts-extras';
 
 import cs from '../../i18n/cs-CZ.json';
 import da from '../../i18n/da-DK.json';
@@ -93,7 +94,7 @@ export type ApplicationLocaleSettings = {
 };
 
 function isApplicationTranslationLanguage(value: string): value is ApplicationTranslationLanguage {
-  return Object.hasOwn(strings, value);
+  return objectHasOwn(strings, value);
 }
 
 export function resolveApplicationLocale(input: ApplicationLocaleResolutionInput): ApplicationLocaleSettings {

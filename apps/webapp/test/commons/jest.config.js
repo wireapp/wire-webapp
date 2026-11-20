@@ -29,7 +29,7 @@ module.exports = {
     '^.+\\.(ts|tsx)$': '@swc/jest',
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is|ts-extras)/)'],
   cacheDirectory: '../../target/jest/cache',
   coverageDirectory: '../../target/coverage/apps/webapp/commons',
   coverageReporters: rootJestConfiguration.coverageReporters,

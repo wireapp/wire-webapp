@@ -18,6 +18,7 @@
  */
 
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {objectHasOwn} from 'ts-extras';
 
 import {CRUDEngine} from './crudEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
@@ -128,7 +129,7 @@ export class MemoryEngine implements CRUDEngine {
   ): Promise<EntityType> {
     this.prepareTable(tableName);
     const table = this.getTable(tableName);
-    if (Object.prototype.hasOwnProperty.call(table, primaryKey as PropertyKey)) {
+    if (objectHasOwn(table, primaryKey as PropertyKey)) {
       return Promise.resolve(table[primaryKey as PropertyKey]);
     }
     const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
