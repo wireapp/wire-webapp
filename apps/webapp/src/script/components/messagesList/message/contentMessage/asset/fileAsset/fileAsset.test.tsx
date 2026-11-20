@@ -125,6 +125,29 @@ describe('FileAssetComponent', () => {
     load.mockRestore();
   });
 
+  it('does not render or fetch a PDF preview for quoted files', () => {
+    const load = jest.spyOn(container.resolve(AssetRepository), 'load');
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_type = 'application/pdf';
+    asset.status(AssetTransferState.UPLOADED);
+    asset.preview_resource(
+      new AssetRemoteData({
+        assetKey: 'preview',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
+
+    render(<FileAssetComponent message={message} teamState={teamState} isQuote />, {wrapper: rootProviderWrapper});
+
+    expect(load).not.toHaveBeenCalled();
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.getByText('report')).toBeInTheDocument();
+    load.mockRestore();
+  });
+
   it('removes the PDF preview and revokes its URL when the message expires', async () => {
     const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])]);
     const repository = container.resolve(AssetRepository);

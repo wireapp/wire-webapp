@@ -46,6 +46,7 @@ interface FileAssetProps {
   message: ContentMessage;
   teamState?: TeamState;
   isFocusable?: boolean;
+  isQuote?: boolean;
 }
 
 const uploadProgressCompletePercentage = 100;
@@ -55,6 +56,7 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   hasHeader = false,
   teamState = container.resolve(TeamState),
   isFocusable = true,
+  isQuote = false,
 }: FileAssetProps) => {
   const asset = message.getFirstAsset() as FileAssetType;
   const {translate, isFeatureToggleEnabled, mainViewModel} = useApplicationContext();
@@ -79,6 +81,7 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   const fileExtension = getFileExtension(assetFileName);
   const formattedFileSize = formatBytes(asset.file_size);
   const hasPdfPreview =
+    !isQuote &&
     isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName) &&
     asset.file_type === 'application/pdf' &&
     previewResource !== undefined;
