@@ -143,6 +143,7 @@ describe('MeetingsAPI', () => {
       title: validMeeting.title,
       start_time: validMeeting.start_time,
       end_time: validMeeting.end_time,
+      type: 'scheduled',
       tzid: validMeeting.tzid,
     });
 
@@ -153,6 +154,7 @@ describe('MeetingsAPI', () => {
           title: validMeeting.title,
           start_time: validMeeting.start_time,
           end_time: validMeeting.end_time,
+          type: 'scheduled',
           tzid: validMeeting.tzid,
         },
         method: 'post',
@@ -216,6 +218,7 @@ describe('MeetingsAPI', () => {
           title: validMeeting.title,
           start_time: validMeeting.start_time,
           end_time: validMeeting.end_time,
+          type: 'scheduled',
           tzid: validMeeting.tzid,
         });
       },

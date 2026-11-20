@@ -208,6 +208,7 @@ describe('scheduleMeeting', () => {
       title: 'Weekly sync',
       start_time: futureStartIso,
       end_time: futureEndIso,
+      type: 'scheduled',
       tzid: 'Europe/Berlin',
     });
     expect(saveMeetingConversationFromBackend).toHaveBeenCalledWith(meetingConversationResponse);
@@ -387,6 +388,7 @@ describe('meetNowMeeting', () => {
       title: 'Standup',
       start_time: fixedNow.toISOString(),
       end_time: new Date(fixedNow.getTime() + 60 * 60 * 1000).toISOString(),
+      type: 'immediate',
       tzid: 'Europe/Berlin',
     });
   });

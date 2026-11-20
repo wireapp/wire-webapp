@@ -44,6 +44,7 @@ describe('mapScheduleCommandToCreateMeeting', () => {
       start_time: futureStartIso,
       end_time: futureEndIso,
       recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
+      type: 'scheduled',
       tzid: 'Pacific/Auckland',
     });
   });

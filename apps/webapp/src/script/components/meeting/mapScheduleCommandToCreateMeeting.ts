@@ -33,6 +33,7 @@ export const mapScheduleCommandToCreateMeeting = (
     title: command.title,
     start_time: command.start.toISOString(),
     end_time: command.end.toISOString(),
+    type: 'scheduled',
     tzid: deviceTimeZone.ianaTimeZoneId,
     ...(recurrence !== undefined && {recurrence}),
   };
