@@ -25,23 +25,20 @@ import {logDirectoryName} from '../../../../src/script/logger/logPersistenceConf
 
 test('downloads browser logs through a real Chromium writable file stream', async ({createPage, createUser}) => {
   const user = await createUser();
-  const page = await createPage(
-    async page => {
-      await page.addInitScript(() => {
-        // Replace only the OS dialog. Keep native createWritable, write, and close.
-        window.showSaveFilePicker = async function selectLogDestination(options: {
-          readonly suggestedName?: string;
-        }): Promise<FileSystemFileHandle> {
-          document.documentElement.dataset.logPickerActivation = String(navigator.userActivation.isActive);
-          document.documentElement.dataset.logPickerFilename = options.suggestedName;
-          const root = await navigator.storage.getDirectory();
+  const page = await createPage(async page => {
+    await page.addInitScript(() => {
+      // Replace only the OS dialog. Keep native createWritable, write, and close.
+      window.showSaveFilePicker = async function selectLogDestination(options: {
+        readonly suggestedName?: string;
+      }): Promise<FileSystemFileHandle> {
+        document.documentElement.dataset.logPickerActivation = String(navigator.userActivation.isActive);
+        document.documentElement.dataset.logPickerFilename = options.suggestedName;
+        const root = await navigator.storage.getDirectory();
 
-          return root.getFileHandle('browser-log-download-test.zip', {create: true});
-        };
-      });
-    },
-    withLogin(user, {startupFeatureToggles: {'persistent-browser-logs': true}}),
-  );
+        return root.getFileHandle('browser-log-download-test.zip', {create: true});
+      };
+    });
+  }, withLogin(user));
   const accountIdentifier = 'a'.repeat(64);
   const sessionIdentifier = '00000000-0000-4000-8000-000000000001';
   const midnightMilliseconds = Date.UTC(2025, 10, 18);

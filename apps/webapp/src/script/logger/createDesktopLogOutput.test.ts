@@ -28,7 +28,7 @@ import {selectDesktopApplicationLogWrite, type DesktopApplicationLogWrite} from 
 
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 
-const enabledSearch = '?enabled-features=desktop-structured-logs,persistent-browser-logs';
+const enabledSearch = '?enabled-features=desktop-structured-logs';
 
 function createTestOutput(writeToDesktop: DesktopApplicationLogWrite): {
   readonly clock: ReturnType<typeof createDeterministicClock>;
@@ -121,6 +121,7 @@ describe('Desktop structured logging', () => {
       const createPersistenceOutput = jest.fn();
       const locationSearch = enabledSearch + consoleQuery;
       const browserPersistence = initializeLogging({
+        loggingEnabled: true,
         clock,
         consoleOutput,
         locationSearch,

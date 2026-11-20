@@ -24,10 +24,14 @@ import {match} from 'ts-pattern';
 import type {ApplicationLogDownload} from './applicationLogDownload';
 import {createBrowserLogDownload} from './createBrowserLogDownload';
 import type {BrowserLogArchive, BrowserLogArchiveOptions, BrowserLogExportDirectory} from './exportBrowserLogs';
+import type {BrowserLogSaveFilePicker} from '../browser/selectBrowserLogSaveFilePicker';
 
-import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
-
-type BrowserLogDownloadTestOptions = Parameters<typeof createBrowserLogDownload>[0];
+type BrowserLogDownloadTestOptions = {
+  readonly showSaveFilePicker: Maybe<BrowserLogSaveFilePicker>;
+  readonly clock: ReturnType<typeof createDeterministicClock>;
+  readonly getDirectory: jest.Mock<Promise<BrowserLogExportDirectory>, []>;
+  readonly createArchive: jest.Mock<BrowserLogArchive, [BrowserLogArchiveOptions]>;
+};
 
 function withWritableStream(test: () => Promise<void>): () => Promise<void> {
   return async function runWithWritableStream(): Promise<void> {
@@ -59,10 +63,7 @@ describe('browser log download', () => {
   function createDownloadDependencies(
     initialUnixEpochMilliseconds = Date.UTC(2026, 10, 17, 9, 5),
   ): BrowserLogDownloadTestOptions & {
-    readonly clock: ReturnType<typeof createDeterministicClock>;
     readonly pickSaveFile: jest.Mock;
-    readonly getDirectory: jest.Mock<Promise<BrowserLogExportDirectory>, []>;
-    readonly createArchive: jest.Mock<BrowserLogArchive, [BrowserLogArchiveOptions]>;
     readonly write: jest.Mock;
     readonly close: jest.Mock;
     readonly abort: jest.Mock;
@@ -98,8 +99,6 @@ describe('browser log download', () => {
       write,
       close,
       abort,
-      startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch('?enabled-features=persistent-browser-logs'),
-      isElectron: false,
       clock: createDeterministicClock({
         initialUnixEpochMicroseconds: BigInt(initialUnixEpochMilliseconds) * 1_000n,
       }),
@@ -123,40 +122,13 @@ describe('browser log download', () => {
     };
   }
 
-  it.each(['electron', 'missing-picker', 'disabled-feature'] as const)(
-    'hides downloads for %s',
-    unavailableCapability => {
-      const dependencies = createDownloadDependencies();
-      const download = createBrowserLogDownload({
-        startupFeatureToggles:
-          unavailableCapability === 'disabled-feature'
-            ? createStartupFeatureTogglesFromLocationSearch('')
-            : dependencies.startupFeatureToggles,
-        isElectron: unavailableCapability === 'electron',
-        showSaveFilePicker:
-          unavailableCapability === 'missing-picker' ? Maybe.nothing() : dependencies.showSaveFilePicker,
-        clock: dependencies.clock,
-        getDirectory: dependencies.getDirectory,
-        createArchive: dependencies.createArchive,
-      });
-      expect(download.isNothing).toBe(true);
-      expect(dependencies.pickSaveFile).not.toHaveBeenCalled();
-      expect(dependencies.getDirectory).not.toHaveBeenCalled();
-    },
-  );
-
-  it.each([null, false, {}, 'unsupported'])('requires a callable picker capability: %p', picker => {
+  it('hides downloads when the save picker is unavailable', () => {
     const dependencies = createDownloadDependencies();
-    const download = createBrowserLogDownload({
-      startupFeatureToggles: dependencies.startupFeatureToggles,
-      isElectron: dependencies.isElectron,
-      // Model a browser exposing a non-callable picker despite its ambient type.
-      showSaveFilePicker: Maybe.of(picker) as BrowserLogDownloadTestOptions['showSaveFilePicker'],
-      clock: dependencies.clock,
-      getDirectory: dependencies.getDirectory,
-      createArchive: dependencies.createArchive,
-    });
+    const download = createBrowserLogDownload({...dependencies, showSaveFilePicker: Maybe.nothing()});
+
     expect(download.isNothing).toBe(true);
+    expect(dependencies.pickSaveFile).not.toHaveBeenCalled();
+    expect(dependencies.getDirectory).not.toHaveBeenCalled();
   });
 
   it(

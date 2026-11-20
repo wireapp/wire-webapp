@@ -17,11 +17,15 @@
  *
  */
 
-import {expect, test} from '@playwright/test';
+import {chromium, expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
+import {mkdtemp, rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 
 import {logDirectoryName, logPersistenceConfiguration} from '../../src/script/logger/logPersistenceConfiguration';
 import type {LogWorkerCommand} from '../../src/script/logger/logWorkerProtocol';
+import {QUERY_KEY} from '../../src/script/auth/route';
 
 type BrowserLogFile = {
   readonly name: string;
@@ -115,6 +119,12 @@ async function readBrowserLogFiles(page: Page): Promise<readonly BrowserLogFile[
     directoryName: logDirectoryName,
     filenames: [],
     operation: 'read',
+  });
+}
+
+async function disableSavePickerCapability(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, 'showSaveFilePicker', {configurable: true, value: undefined});
   });
 }
 
@@ -240,6 +250,108 @@ test('loads the native persistence worker and binds an account after unattribute
   await verifyNativePersistenceAccountBinding(page, 'after unattributed writes');
 });
 
+test('preserves committed logs across reload and a full Chromium restart without feature selection', async ({
+  baseURL,
+}) => {
+  const profileDirectory = await mkdtemp(join(tmpdir(), 'wire-browser-log-profile-'));
+
+  try {
+    const initialContext = await chromium.launchPersistentContext(profileDirectory, {baseURL});
+    let committedFiles: readonly BrowserLogFile[];
+    try {
+      const page = await initialContext.newPage();
+      await page.goto('/');
+      await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+      await expect
+        .poll(async () => {
+          const files = await readBrowserLogFiles(page);
+
+          return files.some(file => {
+            return file.contents.includes('WebApp runtime identity');
+          });
+        })
+        .toBe(true);
+
+      const firstSessionFiles = await readBrowserLogFiles(page);
+      expect(firstSessionFiles.length).toBeGreaterThan(0);
+      await page.reload();
+      await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+      await expect
+        .poll(async () => {
+          return (await readBrowserLogFiles(page)).length;
+        })
+        .toBeGreaterThan(firstSessionFiles.length);
+      await page.goto('/config.js');
+      committedFiles = await readBrowserLogFiles(page);
+      expect(committedFiles.length).toBeGreaterThan(firstSessionFiles.length);
+    } finally {
+      await initialContext.close();
+    }
+
+    const restartedContext = await chromium.launchPersistentContext(profileDirectory, {baseURL});
+    try {
+      const page = await restartedContext.newPage();
+      await page.goto('/config.js');
+      expect(await readBrowserLogFiles(page)).toEqual(expect.arrayContaining([...committedFiles]));
+    } finally {
+      await restartedContext.close();
+    }
+  } finally {
+    await rm(profileDirectory, {recursive: true, force: true});
+  }
+});
+
+test('persists release INFO, WARN and ERROR without feature query parameters', async ({page}, testInfo) => {
+  await page.route('**/conversations/code-check', async route => {
+    await route.fulfill({status: 503, body: 'Synthetic conversation check failure'});
+  });
+  await page.route('**/conversations/join', async route => {
+    await route.fulfill({status: 503, body: 'Synthetic conversation lookup failure'});
+  });
+  await page.goto(`/auth?${QUERY_KEY.CONVERSATION_CODE}=synthetic-code&${QUERY_KEY.CONVERSATION_KEY}=synthetic-key`);
+  await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+  await page.getByRole('button', {name: 'Log in'}).click();
+  await expect(page.getByPlaceholder('Email or username')).toBeVisible();
+  expect(new URL(page.url()).searchParams.has('enabled-features')).toBe(false);
+
+  await page.evaluate(() => {
+    window.dispatchEvent(new ErrorEvent('error', {error: new TypeError('synthetic release error')}));
+  });
+  await expect
+    .poll(async () => {
+      const files = await readBrowserLogFiles(page);
+      const levels = files.flatMap(file => {
+        return file.contents
+          .trimEnd()
+          .split('\n')
+          .filter(line => {
+            return line.length > 0;
+          })
+          .map(line => {
+            return JSON.parse(line).level;
+          });
+      });
+
+      return [...new Set(levels)];
+    })
+    .toEqual(expect.arrayContaining([30, 40, 50]));
+  if (testInfo.project.name === 'rspack-public') {
+    const logFiles = await readBrowserLogFiles(page);
+    const levels = logFiles.flatMap(file => {
+      return file.contents
+        .trimEnd()
+        .split('\n')
+        .filter(line => {
+          return line.length > 0;
+        })
+        .map(line => {
+          return JSON.parse(line).level;
+        });
+    });
+    expect(levels).not.toContain(20);
+  }
+});
+
 test('persists sanitized browser logs with console disabled across application reload', async ({page, context}) => {
   // Enforce the application's current script and worker directives without widening either policy.
   await context.route('**/auth?**', async route => {
@@ -268,7 +380,7 @@ test('persists sanitized browser logs with console disabled across application r
     }
   });
   const ownedFilenames = new Set<string>();
-  const location = '/?enabled-features=mark-as-unread,persistent-browser-logs&debugLogging=-*';
+  const location = '/?enabled-features=&debugLogging=-*';
   try {
     await page.goto(location);
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
@@ -396,11 +508,11 @@ test('persists sanitized browser logs with console disabled across application r
       }
     }
     expect(totalBytes).toBeLessThanOrEqual(logPersistenceConfiguration.maximumTotalBytes);
-    expect(new URL(page.url()).searchParams.get('enabled-features')).toBe('mark-as-unread,persistent-browser-logs');
+    expect(new URL(page.url()).searchParams.get('enabled-features')).toBe('');
     expect(consoleRecords).toEqual([]);
   } finally {
     // Stop the test's writer before removing only the files this isolated browser context created.
-    await page.goto('/auth?enabled-features=');
+    await page.goto('/config.js');
     (await readBrowserLogFiles(page)).forEach(file => {
       ownedFilenames.add(file.name);
     });
@@ -412,7 +524,8 @@ test('persists sanitized browser logs with console disabled across application r
   }
 });
 
-test('leaves Origin Private File System untouched without opt-in', async ({page}, testInfo) => {
+test('disables standalone logging without the save picker despite explicit logging selections', async ({page}) => {
+  await disableSavePickerCapability(page);
   await page.addInitScript(() => {
     Object.defineProperty(navigator.storage, 'getDirectory', {
       value(): never {
@@ -433,10 +546,16 @@ test('leaves Origin Private File System untouched without opt-in', async ({page}
     }
   });
 
-  await page.goto('/auth?enabled-features=mark-as-unread&debugLogging=*');
-  await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+  for (const location of [
+    '/auth?debugLogging=*&enableLogging=*',
+    '/?enabled-features=&debugLogging=*',
+    '/?enabled-features=persistent-browser-logs&enableLogging=*',
+  ]) {
+    await page.goto(location);
+    await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+  }
 
-  expect(consoleRecords.length > 0).toBe(testInfo.project.name === 'rspack-internal');
+  expect(consoleRecords).toEqual([]);
   expect(startedWorkers).toEqual([]);
   expect(await page.locator('html').getAttribute('data-unexpected-log-storage-access')).toBeNull();
 });
@@ -464,7 +583,7 @@ test('preserves the console policy when logging worker construction fails', asyn
       consoleRecords.push(message.text());
     }
   });
-  await page.goto('/?enabled-features=persistent-browser-logs&debugLogging=*');
+  await page.goto('/?debugLogging=*');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
 
   expect(startedWorkers).toEqual([]);
@@ -497,7 +616,7 @@ test('starts without main-thread filesystem access while worker initialization n
       },
     });
   });
-  await page.goto('/auth?enabled-features=persistent-browser-logs');
+  await page.goto('/auth');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
   await expect
     .poll(async () => {
@@ -514,7 +633,7 @@ test('starts without main-thread filesystem access while worker initialization n
     })
     .toBe(true);
   expect(await page.locator('html').getAttribute('data-unexpected-log-storage-access')).toBeNull();
-  await page.goto('/auth?enabled-features=');
+  await page.goto('/config.js');
 });
 
 test.describe('Electron logging selection', () => {
@@ -523,7 +642,7 @@ test.describe('Electron logging selection', () => {
       'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Wire/3.46.0 Electron/38.0.0 Safari/537.36',
   });
 
-  test('never initializes Origin Private File System despite opt-in and preserves console capture', async ({page}) => {
+  test('never initializes Origin Private File System and preserves Desktop console capture', async ({page}) => {
     await page.addInitScript(() => {
       Object.defineProperty(navigator.storage, 'getDirectory', {
         value(): never {
@@ -544,7 +663,7 @@ test.describe('Electron logging selection', () => {
       }
     });
 
-    await page.goto('/auth?enabled-features=persistent-browser-logs&debugLogging=*');
+    await page.goto('/auth?enabled-features=desktop-structured-logs&debugLogging=*');
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
 
     expect(consoleRecords.length).toBeGreaterThan(0);
@@ -584,7 +703,7 @@ test('disables unsupported synchronous access handles without a main-thread fall
       consoleRecords.push(message.text());
     }
   });
-  await page.goto('/auth?enabled-features=persistent-browser-logs&debugLogging=*');
+  await page.goto('/auth?debugLogging=*');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
   await expect
     .poll(() => {
@@ -621,7 +740,7 @@ test('preserves the console policy after a persistence worker crashes', async ({
   page.on('pageerror', error => {
     uncaughtErrors.push(error.message);
   });
-  await page.goto('/auth?enabled-features=persistent-browser-logs&debugLogging=*');
+  await page.goto('/auth?debugLogging=*');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
   await expect
     .poll(() => {

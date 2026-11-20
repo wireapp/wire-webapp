@@ -31,6 +31,7 @@ import {createLogWorkerConnectionForTest} from './test/createLogWorkerConnection
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 
 const disabledPersistenceOptions = {
+  loggingEnabled: true,
   browserPersistenceEnabled: false,
   createPersistenceOutput() {
     return Maybe.nothing<BrowserLogPersistence>();
@@ -71,27 +72,31 @@ function createTestPersistence(options: TestPersistenceOptions): Maybe<BrowserLo
 }
 
 describe('logging startup', () => {
-  it.each(['', '?enabled-features=persistent-browser-logs'])(
-    'keeps the standalone release console quiet with disabled or unavailable OPFS (%s)',
+  it.each(['?debugLogging=*', '?enableLogging=*'])(
+    'keeps standalone logging disabled when the save picker is unavailable despite %s',
     locationSearch => {
       const logging = createPinoLogging(Maybe.nothing());
       const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
-      const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
+      const configureLogging = jest.fn(logging.configure);
+      const createPersistenceOutput = jest.fn();
       const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
       initializeLogging({
-        ...disabledPersistenceOptions,
+        loggingEnabled: false,
+        browserPersistenceEnabled: false,
+        createPersistenceOutput,
         debugEnabled: false,
         developerConsoleEnabled: false,
         clock,
         consoleOutput,
-        locationSearch: locationSearch + (locationSearch === '' ? '?' : '&') + 'debugLogging=*',
-        browserPersistenceEnabled: startupFeatureToggles.isFeatureToggleEnabled('persistent-browser-logs'),
+        locationSearch,
         storage: Maybe.nothing(),
-        configureLogging: logging.configure,
+        configureLogging,
       });
       logging.getLogger('Startup').debug('debug diagnostic');
       logging.getLogger('Startup').error('error diagnostic');
 
+      expect(configureLogging).toHaveBeenCalledWith(Maybe.nothing());
+      expect(createPersistenceOutput).not.toHaveBeenCalled();
       expect(consoleOutput.debug).not.toHaveBeenCalled();
       expect(consoleOutput.error).not.toHaveBeenCalled();
     },
@@ -197,6 +202,7 @@ describe('logging startup', () => {
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
     const persistedLines: string[] = [];
     const persistence = initializeLogging({
+      loggingEnabled: true,
       debugEnabled: configuredDebug,
       developerConsoleEnabled: false,
       clock,
@@ -382,11 +388,12 @@ describe('logging startup', () => {
         },
         reportFailure: noop,
       });
-      const locationSearch = '?enabled-features=desktop-structured-logs,persistent-browser-logs' + query;
+      const locationSearch = '?enabled-features=desktop-structured-logs' + query;
       const browserPersistence = initializeLogging({
         clock,
         consoleOutput,
         locationSearch,
+        loggingEnabled: true,
         debugEnabled,
         developerConsoleEnabled: true,
         storage: Maybe.nothing(),
@@ -491,9 +498,12 @@ describe('logging startup', () => {
         return createTestPersistence({clock, append});
       });
       const logging = createPinoLogging(Maybe.nothing());
-      const locationSearch = `?enabled-features=mark-as-unread${persistenceEnabled ? ',persistent-browser-logs' : ''}${consoleEnabled ? '&debugLogging=selected' : ''}`;
+      const loggingEnabled = isElectron || persistenceEnabled;
+      const shouldWriteConsole = loggingEnabled && consoleEnabled;
+      const locationSearch = `?enabled-features=mark-as-unread${consoleEnabled ? '&debugLogging=selected' : ''}`;
       const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
       const persistence = initializeLogging({
+        loggingEnabled,
         clock,
         consoleOutput,
         locationSearch,
@@ -522,16 +532,16 @@ describe('logging startup', () => {
       const shouldPersist = persistenceEnabled && !isElectron;
       expect(persistence.isJust).toBe(shouldPersist);
       expect(createPersistenceOutput).toHaveBeenCalledTimes(shouldPersist ? 1 : 0);
-      expect(consoleOutput.info).toHaveBeenCalledTimes(consoleEnabled ? 1 : 0);
+      expect(consoleOutput.info).toHaveBeenCalledTimes(shouldWriteConsole ? 1 : 0);
       expect(consoleOutput.warn).not.toHaveBeenCalled();
       expect(startupFeatureToggles.isFeatureToggleEnabled('mark-as-unread')).toBe(true);
-      expect(serializationCount).toBe(consoleEnabled || shouldPersist ? 1 : 0);
+      expect(serializationCount).toBe(shouldWriteConsole || shouldPersist ? 1 : 0);
       const lines = append.mock.calls.flatMap(call => {
         return call[0];
       });
       expect(lines).toHaveLength(shouldPersist ? 2 : 0);
       expect(lines.join('')).not.toContain('secret-');
-      if (shouldPersist && consoleEnabled) {
+      if (shouldPersist && shouldWriteConsole) {
         expect(lines.at(0)).toBe(`${String(consoleOutput.info.mock.calls.at(0)?.at(0))}\n`);
       }
 
@@ -546,6 +556,7 @@ describe('logging startup', () => {
     const logging = createPinoLogging(Maybe.nothing());
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
     const persistence = initializeLogging({
+      loggingEnabled: true,
       clock,
       consoleOutput,
       locationSearch: '?debugLogging=*',
@@ -586,6 +597,7 @@ describe('logging startup', () => {
       });
     };
     const persistence = initializeLogging({
+      loggingEnabled: true,
       clock,
       consoleOutput,
       locationSearch: '?debugLogging=*',
@@ -635,6 +647,7 @@ describe('logging startup', () => {
     const logging = createPinoLogging(Maybe.nothing());
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
     const persistence = initializeLogging({
+      loggingEnabled: true,
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
       consoleOutput,
       locationSearch: '?debugLogging=*',
