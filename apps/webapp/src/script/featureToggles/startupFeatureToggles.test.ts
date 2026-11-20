@@ -37,7 +37,6 @@ import {
   forTestsOnlyFeatureToggleName,
   persistentBrowserLogsFeatureToggleName,
   previewDefaultEnabledStartupFeatureToggleNames,
-  websocketListenerLifecycleFeatureToggleName,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
@@ -53,7 +52,6 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   e2ePdfPreviewFeatureToggleName,
   desktopStructuredLogsFeatureToggleName,
   persistentBrowserLogsFeatureToggleName,
-  websocketListenerLifecycleFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -66,16 +64,6 @@ describe('startupFeatureToggles', function () {
     expect(enabled.enabledFeatureToggleNames).toEqual([desktopStructuredLogsFeatureToggleName]);
   });
 
-  it('accepts the WebSocket listener lifecycle alongside other explicit selections', () => {
-    const toggles = createStartupFeatureTogglesFromLocationSearch(
-      '?enabled-features=mark-as-unread,websocket-listener-lifecycle',
-    );
-
-    expect(toggles.enabledFeatureToggleNames).toEqual([
-      markAsUnreadFeatureToggleName,
-      websocketListenerLifecycleFeatureToggleName,
-    ]);
-  });
   it('defaults persistent browser logs on in preview builds and supports release opt-in alongside other toggles', () => {
     const disabled = createStartupFeatureTogglesFromLocationSearch('');
     const enabled = createStartupFeatureTogglesFromLocationSearch(
@@ -291,7 +279,6 @@ describe('startupFeatureToggles', function () {
       e2ePdfPreviewFeatureToggleName,
       desktopStructuredLogsFeatureToggleName,
       persistentBrowserLogsFeatureToggleName,
-      websocketListenerLifecycleFeatureToggleName,
     ]);
   });
 

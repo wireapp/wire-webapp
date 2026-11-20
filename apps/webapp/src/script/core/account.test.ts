@@ -37,11 +37,7 @@ import {ConsumableEvent} from '../apiClient/notification/consumableNotification'
 import {Self} from '../apiClient/self/self';
 import {SelfAPI} from '../apiClient/self/selfApi';
 import {UserType} from '../apiClient/user/user';
-import {
-  ReconnectingWebsocket,
-  type WebSocketLifecycleImplementation,
-  WEBSOCKET_STATE,
-} from '../apiClient/tcp/reconnectingWebsocket';
+import {ReconnectingWebsocket, WEBSOCKET_STATE} from '../apiClient/tcp/reconnectingWebsocket';
 import {WebSocketClient} from '../apiClient/tcp/webSocketClient';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {WS} from 'jest-websocket-mock';
@@ -94,10 +90,8 @@ const MOCK_BACKEND = {
 
 const apiClients: APIClient[] = [];
 
-async function createAccount(
-  webSocketLifecycleImplementation: WebSocketLifecycleImplementation = 'corrected',
-): Promise<{account: Account; apiClient: APIClient}> {
-  const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND, webSocketLifecycleImplementation});
+async function createAccount(): Promise<{account: Account; apiClient: APIClient}> {
+  const apiClient = new APIClient({platform: nodePlatform, urls: MOCK_BACKEND});
   apiClients.push(apiClient);
   const account = new Account(apiClient);
   await account['initServices']({
@@ -128,17 +122,8 @@ const waitFor = (assertion: () => void): Promise<void> => {
 };
 
 describe('Account', () => {
-  it('preserves non-Error queue rejection propagation in the legacy lifecycle', () => {
-    using apiClient = new APIClient({platform: nodePlatform, webSocketLifecycleImplementation: 'legacy'});
-    const account = new Account(apiClient);
-
-    expect(() => {
-      account['handleNotificationQueueError']('unexpected rejection');
-    }).toThrow();
-  });
-
-  it('does not rethrow non-Error queue rejections in the corrected lifecycle', () => {
-    using apiClient = new APIClient({platform: nodePlatform, webSocketLifecycleImplementation: 'corrected'});
+  it('handles non-Error notification queue rejections', () => {
+    using apiClient = new APIClient({platform: nodePlatform});
     const account = new Account(apiClient);
 
     expect(() => {
@@ -432,8 +417,8 @@ describe('Account', () => {
       server = new WS(websocketServerAddress); // isolate per test
     });
 
-    async function initializeAccount(implementation: WebSocketLifecycleImplementation): Promise<void> {
-      dependencies = await createAccount(implementation);
+    async function initializeAccount(): Promise<void> {
+      dependencies = await createAccount();
       const {account} = dependencies;
       await account.login({
         clientType: ClientType.TEMPORARY,
@@ -464,9 +449,9 @@ describe('Account', () => {
       WS.clean();
     });
 
-    describe('corrected lifecycle', () => {
+    describe('WebSocket lifecycle', () => {
       beforeEach(async () => {
-        await initializeAccount('corrected');
+        await initializeAccount();
       });
       it('delivers notifications when the previous disconnect callback is called again during setup', async () => {
         const {account, apiClient} = dependencies;
@@ -520,6 +505,8 @@ describe('Account', () => {
       it('reports each socket state once after repeated initialization failures', async () => {
         const {account, apiClient} = dependencies;
         const websocket = apiClient.transport.ws;
+        const messageListenerCountBeforeFailures = websocket.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE);
+        const stateListenerCountBeforeFailures = websocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE);
         jest.spyOn(apiClient, 'connect').mockReturnValue(websocket);
         const updateCapabilities = jest.spyOn(getAccountServiceForTest(account).client, 'putClientCapabilities');
         const failedAttemptStates = jest.fn();
@@ -532,6 +519,9 @@ describe('Account', () => {
             account.listen({useLegacy: true, onConnectionStateChanged: failedAttemptStates}),
           ).rejects.toThrow(networkError);
         }
+
+        expect(websocket.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE)).toBe(messageListenerCountBeforeFailures);
+        expect(websocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE)).toBe(stateListenerCountBeforeFailures);
 
         updateCapabilities.mockResolvedValue(undefined);
         const disconnect = await account.listen({useLegacy: true, onConnectionStateChanged: successfulAttemptStates});
@@ -557,7 +547,7 @@ describe('Account', () => {
         const pendingConnection = account.listen({
           useLegacy: true,
           onConnectionStateChanged: offlineStates,
-          connectionCycle: {signal: Maybe.just(offlineCycle.signal), connectCycleId: 1},
+          connectionCycle: {signal: offlineCycle.signal, connectCycleId: 1},
         });
         offlineCycle.abort('offline');
         const activeStates = jest.fn();
@@ -1065,9 +1055,9 @@ describe('Account', () => {
         disconnect();
       });
     });
-    describe('legacy lifecycle', () => {
+    describe('notification protocol compatibility', () => {
       beforeEach(async () => {
-        await initializeAccount('legacy');
+        await initializeAccount();
       });
 
       it.each([true, false])('delivers a WebSocket notification with useLegacy=%s', async useLegacy => {
