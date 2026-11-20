@@ -123,6 +123,26 @@ const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>): (s
 };
 
 describe('getMeetingActionEntries', () => {
+  it('offers only Join now for a linked meeting', () => {
+    const onJoin = jest.fn();
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance({link: 'https://example.com/meeting'}),
+      selfUser: createSelfUser(),
+      nowMilliseconds: futureNowMilliseconds,
+      translate,
+      onJoin,
+      joinOnly: true,
+      onEdit: noop,
+      onShowMeetingLink: noop,
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
+    });
+
+    expect(getEntryLabels(entries)).toEqual([MEETING_ACTION_TRANSLATION_KEYS.joinNow]);
+    entries[0].click?.();
+    expect(onJoin).toHaveBeenCalledTimes(1);
+  });
+
   it('returns the expected action labels without Start meeting', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),

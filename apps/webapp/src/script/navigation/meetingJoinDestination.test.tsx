@@ -17,12 +17,13 @@
  *
  */
 
-import {act, fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ThemeProvider} from '../uiKit';
 import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {MeetingStoreRoot} from '../components/meeting/meetingStore/meetingStoreRoot';
+import {Meetings} from '../components/meeting/meetings';
 import {MeetingPrepModal} from '../components/meeting/meetingPrep/meetingPrepModal';
 import {
   meetingPrepPreviewErrors,
@@ -40,7 +41,13 @@ import {
 import type {MainViewModel} from '../view_model/MainViewModel';
 import {translateForTest} from '../util/test/translateForTest';
 
-import {joinedMeetingDestinationSchema, loginJoinDestination, openLoginMeetingPrep} from './meetingJoinDestination';
+import {
+  isLoginMeetingDestination,
+  joinedMeetingDestinationSchema,
+  loginJoinDestination,
+  meetingJoinLandingPath,
+  openLoginMeetingPrep,
+} from './meetingJoinDestination';
 
 const response = {
   qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
@@ -58,7 +65,7 @@ describe('meeting link post-login landing', () => {
     window.history.replaceState({}, '', '/');
   });
 
-  it('shows guest preparation without an outer theme provider or the meetings view', () => {
+  it('shows guest preparation over only the joined meeting and leaves it visible after dismissal', async () => {
     const participant = new User('guest-id', 'example.com', translateForTest);
     participant.name('Guest');
     jest.spyOn(container.resolve(UserState), 'self').mockReturnValue(participant);
@@ -73,38 +80,71 @@ describe('meeting link post-login landing', () => {
     } as unknown as MediaStreamHandler);
     jest.spyOn(container, 'resolve').mockImplementation(testContainer.resolve.bind(testContainer));
     const loadMeetings = jest.fn();
+    const getMeeting = jest.fn(() => {
+      return task.resolve({
+        ...response,
+        created_at: '2098-12-01T12:00:00Z',
+        updated_at: '2098-12-01T12:00:00Z',
+        end_time: '2099-01-01T13:00:00Z',
+        qualified_creator: {id: 'creator-id', domain: 'example.com'},
+        tzid: 'Europe/Berlin',
+        has_password: false,
+      });
+    });
     const mainViewModel = {
       content: {
-        repositories: {meetings: {getMeetingsList: loadMeetings}, conversation: {}, calling: {}, properties: {}},
+        repositories: {
+          meetings: {getMeetingsList: loadMeetings, getMeeting},
+          conversation: {},
+          calling: {},
+          properties: {},
+        },
       },
       calling: {callingRepository: {}, callActions: {}},
     } as unknown as MainViewModel;
     const joined = joinedMeetingDestinationSchema.parse(response);
+    expect(meetingJoinLandingPath(joined.meetingPrep, true, false)).toBe('/meetings/meeting-id/example.com');
     openLoginMeetingPrep(loginJoinDestination(joined), useMeetingPrepModal.getState().open);
-    window.history.replaceState({}, '', '/#/conversation/conversation-id/example.com');
+    window.history.replaceState({}, '', '/#/meetings/meeting-id/example.com');
 
-    const page = render(
-      <MeetingStoreRoot>
-        <div>Conversation</div>
-      </MeetingStoreRoot>,
-      {
-        wrapper: createRootProviderWrapperForTest(
-          createRootContextValueForTest({
-            translate: translateForTest,
-            mainViewModel,
-            fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
-          }),
-        ),
-      },
-    );
+    const renderPage = (): ReturnType<typeof render> => {
+      return render(
+        <MeetingStoreRoot>
+          <Meetings linkedMeetingId={response.qualified_id} />
+        </MeetingStoreRoot>,
+        {
+          wrapper: createRootProviderWrapperForTest(
+            createRootContextValueForTest({
+              translate: translateForTest,
+              mainViewModel,
+              fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
+            }),
+          ),
+        },
+      );
+    };
+    const page = renderPage();
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: 'Link meeting'})).toBeInTheDocument();
+    await waitFor(() => {
+      expect(page.container.querySelector('[data-uie-name="meetings-list"]')).toBeInTheDocument();
+    });
+    expect(getMeeting).toHaveBeenCalledWith(response.qualified_id);
     expect(loadMeetings).not.toHaveBeenCalled();
-    expect(screen.queryByRole('heading', {name: 'meetings.navigation.title'})).not.toBeInTheDocument();
+    expect(page.container.querySelector('header button')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', {name: 'modalConfirmSecondary'}));
-    expect(window.location.hash).toBe('#/conversation/conversation-id/example.com');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(page.container.querySelector('[data-uie-name="meetings-list"]')).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/meetings/meeting-id/example.com');
     page.unmount();
+
+    const reloaded = renderPage();
+    await waitFor(() => {
+      expect(getMeeting).toHaveBeenCalledTimes(2);
+      expect(reloaded.container.querySelector('[data-uie-name="meetings-list"]')).toBeInTheDocument();
+    });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('opens prep for the joined meeting without joining the call automatically', () => {
@@ -155,6 +195,12 @@ describe('meeting link post-login landing', () => {
     expect(openLoginMeetingPrep(destination, open)).toBe(false);
     expect(destination).toEqual({conversation: 'conversation-id', domain: 'example.com'});
     expect(open).not.toHaveBeenCalled();
+    expect(isLoginMeetingDestination(destination)).toBe(false);
+  });
+
+  it('keeps the normal Meetings tab for members who have it', () => {
+    const joined = joinedMeetingDestinationSchema.parse(response);
+    expect(meetingJoinLandingPath(joined.meetingPrep, false, true)).toBe('/meetings');
   });
 
   it('rejects incomplete joined meeting data instead of silently navigating to its conversation', () => {
