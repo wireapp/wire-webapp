@@ -258,7 +258,16 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
             )}
           </div>
           {canOpenPdfPreview && (
-            <PdfAssetOptions canDownload={isUploadedOrCancelled} onOpen={openPdfPreview} onDownload={onDownloadAsset} />
+            <PdfAssetOptions
+              labels={{
+                menu: translate('cells.options.label'),
+                open: translate('cells.options.open'),
+                download: translate('cells.options.download'),
+              }}
+              canDownload={isUploadedOrCancelled}
+              onOpen={openPdfPreview}
+              onDownload={onDownloadAsset}
+            />
           )}
         </div>
       ) : (

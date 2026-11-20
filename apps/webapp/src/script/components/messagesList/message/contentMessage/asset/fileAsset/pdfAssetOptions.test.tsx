@@ -19,30 +19,23 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import {withThemeAndRootContext} from '../../../../../../auth/util/test/testUtil';
-import {
-  createRootContextValueForTest,
-  createRootProviderWrapperForTest,
-} from '../../../../../../page/testSupport/rootContextTestSupport';
+import {ThemeProvider} from '../../../../../../uiKit/identity/theme/theme';
 
 import {PdfAssetOptions} from './pdfAssetOptions';
 
 const renderPdfAssetOptions = (canDownload = true): {onOpen: jest.Mock; onDownload: jest.Mock} => {
-  const wrapper = createRootProviderWrapperForTest(
-    createRootContextValueForTest({
-      translate: key => {
-        return key;
-      },
-    }),
-  );
   const onOpen = jest.fn();
   const onDownload = jest.fn();
 
   render(
-    withThemeAndRootContext(
-      <PdfAssetOptions canDownload={canDownload} onOpen={onOpen} onDownload={onDownload} />,
-      wrapper,
-    ),
+    <ThemeProvider>
+      <PdfAssetOptions
+        labels={{menu: 'cells.options.label', open: 'cells.options.open', download: 'cells.options.download'}}
+        canDownload={canDownload}
+        onOpen={onOpen}
+        onDownload={onDownload}
+      />
+    </ThemeProvider>,
   );
 
   return {onOpen, onDownload};

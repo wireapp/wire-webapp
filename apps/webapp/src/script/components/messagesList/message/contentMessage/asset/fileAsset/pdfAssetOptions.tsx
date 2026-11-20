@@ -21,22 +21,22 @@ import {useRef, type FunctionComponent} from 'react';
 
 import {wrapperStyles, triggerStyles} from './pdfAssetOptions.styles';
 
-import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {MoreIcon} from '../../../../../../uiKit/dataDisplay/icon/moreIcon';
 import {DropdownMenu} from '../../../../../../uiKit/surface/dropdownMenu/dropdownMenu';
 
 interface PdfAssetOptionsProps {
+  labels: {menu: string; open: string; download: string};
   canDownload: boolean;
   onOpen: (trigger: HTMLElement) => void;
   onDownload: () => Promise<void> | void;
 }
 
 export const PdfAssetOptions: FunctionComponent<PdfAssetOptionsProps> = ({
+  labels,
   canDownload,
   onOpen,
   onDownload,
 }: PdfAssetOptionsProps) => {
-  const {translate} = useApplicationContext();
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const openPreview = (): void => {
@@ -63,7 +63,7 @@ export const PdfAssetOptions: FunctionComponent<PdfAssetOptionsProps> = ({
           <button
             ref={triggerRef}
             type="button"
-            aria-label={translate('cells.options.label')}
+            aria-label={labels.menu}
             css={triggerStyles}
             onClick={event => {
               return event.stopPropagation();
@@ -76,9 +76,9 @@ export const PdfAssetOptions: FunctionComponent<PdfAssetOptionsProps> = ({
           </button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          <DropdownMenu.Item onClick={openPreview}>{translate('cells.options.open')}</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={openPreview}>{labels.open}</DropdownMenu.Item>
           <DropdownMenu.Item disabled={!canDownload} onClick={download}>
-            {translate('cells.options.download')}
+            {labels.download}
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu>
