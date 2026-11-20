@@ -257,7 +257,7 @@
     "postcss-import": "17.0.1",
     "postcss-less": "7.1.1",
     "postcss-loader": "8.2.1",
-    "postcss-preset-env": "11.6.2",
+    "postcss-preset-env": "11.6.3",
     "postcss-scss": "4.0.9",
     "prettier": "3.10.1",
     "qrcode-reader": "1.0.4",
