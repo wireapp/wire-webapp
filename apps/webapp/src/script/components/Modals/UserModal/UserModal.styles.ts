@@ -45,8 +45,23 @@ export const userModalStyle = css`
     padding: 0;
   }
 
+  .modal__header {
+    min-height: 16px;
+    padding: 24px 24px 0;
+    margin-bottom: 8px;
+  }
+
+  .modal__header__button {
+    top: 24px;
+    right: 24px;
+  }
+
+  .modal__buttons {
+    margin: 24px 0;
+  }
+
   .modal__body {
-    padding: 0 16px;
+    padding: 0 24px;
 
     .classified-bar {
       margin-top: 12px;
