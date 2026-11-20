@@ -20,6 +20,9 @@
 import {act, render, screen, waitFor} from '@testing-library/react';
 import {container} from 'tsyringe';
 import ko from 'knockout';
+import Long from 'long';
+
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import {FileAsset} from '../../../../../../repositories/entity/message/fileAsset';
@@ -201,5 +204,51 @@ describe('FileAssetComponent', () => {
       wrapper: rootProviderWrapper,
     });
     expect(queryByText('10 MB')).not.toBeNull();
+  });
+
+  const protocolSize = ProtobufAsset.Original.decode(
+    ProtobufAsset.Original.encode({mimeType: 'application/pdf', size: 1_048_576}).finish(),
+  ).size;
+
+  it.each([
+    ['protocol Long', protocolSize],
+    ['structured-cloned Long', structuredClone(protocolSize)],
+  ] as const)('shows a size from a %s', (_description, fileSize) => {
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_size = fileSize as unknown as number;
+
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+
+    expect(screen.getByTestId('file-size')).toHaveTextContent('1 MB');
+  });
+
+  it('shows large valid unsigned Long sizes', () => {
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_size = Long.MAX_UNSIGNED_VALUE as unknown as number;
+
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+
+    expect(screen.getByTestId('file-size')).toHaveTextContent('16 EB');
+  });
+
+  it.each([
+    ['missing', undefined],
+    ['NaN', Number.NaN],
+    ['infinite', Number.POSITIVE_INFINITY],
+    ['negative', -1],
+    ['fractional', 0.5],
+    ['invalid text', 'not-a-size'],
+    ['outside the protocol range', '1e30'],
+    ['malformed Long', {low: 'invalid', high: 0, unsigned: true}],
+  ] as const)('does not render a malformed file size (%s)', (_description, fileSize) => {
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_size = fileSize as any;
+
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+
+    expect(screen.queryByTestId('file-size')).not.toBeInTheDocument();
   });
 });
