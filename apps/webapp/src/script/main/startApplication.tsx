@@ -41,14 +41,12 @@ import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {AppContainer} from '../components/appContainer/appContainer';
 import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
 import {initializeDesktopLogOutput} from '../browser/initializeDesktopLogOutput';
+import {selectBrowserLogSaveFilePicker} from '../browser/selectBrowserLogSaveFilePicker';
 import {initializeRuntimeErrorDiagnostics} from '../browser/initializeRuntimeErrorDiagnostics';
 import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
 import {Config} from '../Config';
 import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeStartupFeatureToggleUrl';
-import {
-  persistentBrowserLogsFeatureToggleName,
-  StartupFeatureToggleName,
-} from '../featureToggles/startupFeatureToggleNames';
+import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createBrowserLogDownload} from '../logger/createBrowserLogDownload';
 import {createBrowserLogZipArchive} from '../logger/createBrowserLogZipArchive';
@@ -90,17 +88,15 @@ export async function startApplication(options: StartApplicationOptions): Promis
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
   const isElectron = Runtime.isElectron();
   const isDesktopApp = Runtime.isDesktopApp();
+  const browserLogSaveFilePicker = selectBrowserLogSaveFilePicker({isElectron, browserWindow: window});
+  const browserLoggingAvailable = browserLogSaveFilePicker.isJust;
   const desktopLogOutput = initializeDesktopLogOutput(clock, startupFeatureToggles);
   function shouldWriteConsoleFallback(): boolean {
     return desktopLogOutput.isNothing || !desktopLogOutput.value.hasConfirmedDelivery();
   }
 
   const downloadApplicationLogs = createBrowserLogDownload({
-    startupFeatureToggles,
-    isElectron,
-    showSaveFilePicker: isFunction(window.showSaveFilePicker)
-      ? Maybe.just(window.showSaveFilePicker.bind(window))
-      : Maybe.nothing(),
+    showSaveFilePicker: browserLogSaveFilePicker,
     clock,
     getDirectory() {
       return navigator.storage.getDirectory();
@@ -115,8 +111,8 @@ export async function startApplication(options: StartApplicationOptions): Promis
     shouldWriteConsoleFallback: isDesktopApp ? shouldWriteConsoleFallback : undefined,
     storage: Maybe.of(getStorage()),
     configureLogging,
-    browserPersistenceEnabled:
-      !isElectron && startupFeatureToggles.isFeatureToggleEnabled(persistentBrowserLogsFeatureToggleName),
+    loggingEnabled: isElectron || browserLoggingAvailable,
+    browserPersistenceEnabled: !isElectron && browserLoggingAvailable,
     desktopPersistenceOutput: desktopLogOutput.isJust ? desktopLogOutput.value.write : undefined,
     createPersistenceOutput() {
       return createBrowserLogPersistence({

@@ -37,6 +37,7 @@ type InitializeLoggingOptions = StartupLoggingOptions & {
   readonly shouldWriteConsoleFallback?: (() => boolean) | undefined;
   readonly storage: Maybe<Pick<Storage, 'setItem' | 'removeItem'>>;
   readonly configureLogging: (dependencies: Maybe<LoggingDependencies>) => void;
+  readonly loggingEnabled: boolean;
   readonly browserPersistenceEnabled: boolean;
   readonly desktopPersistenceOutput?: LogOutput | undefined;
   readonly createPersistenceOutput: () => Maybe<BrowserLogPersistence>;
@@ -52,6 +53,7 @@ export function initializeLogging(options: InitializeLoggingOptions): Maybe<Brow
     shouldWriteConsoleFallback,
     storage,
     configureLogging,
+    loggingEnabled,
     browserPersistenceEnabled,
     desktopPersistenceOutput,
     createPersistenceOutput,
@@ -63,7 +65,8 @@ export function initializeLogging(options: InitializeLoggingOptions): Maybe<Brow
   const defaultNamespaces = debugEnabled ? Maybe.just('*') : Maybe.nothing<string>();
   const namespaces = isNonEmptyString(namespace) ? Maybe.just(namespace) : defaultNamespaces;
   let persistence: Maybe<BrowserLogPersistence> = Maybe.nothing();
-  if (browserPersistenceEnabled) {
+  const canCreateBrowserLogPersistence = loggingEnabled && browserPersistenceEnabled;
+  if (canCreateBrowserLogPersistence) {
     try {
       persistence = createPersistenceOutput();
     } catch {
@@ -81,33 +84,34 @@ export function initializeLogging(options: InitializeLoggingOptions): Maybe<Brow
           return output.write;
         });
       });
-  configureLogging(
-    Maybe.just({
-      clock,
-      output: writeToConsole,
-      shouldWriteToOutput(namespaceEnabled) {
-        // A sole console persistence destination already writes every enabled record.
-        return (
-          !useConsoleAsOnlyPersistence &&
-          (shouldWriteConsoleFallback?.() === true || (developerConsoleEnabled && namespaceEnabled))
-        );
-      },
-      namespaces,
-      persistenceOutput,
-    }),
-  );
+  const loggingDependencies = Maybe.just<LoggingDependencies>({
+    clock,
+    output: writeToConsole,
+    shouldWriteToOutput(namespaceEnabled) {
+      // A sole console persistence destination already writes every enabled record.
+      return (
+        !useConsoleAsOnlyPersistence &&
+        (shouldWriteConsoleFallback?.() === true || (developerConsoleEnabled && namespaceEnabled))
+      );
+    },
+    namespaces,
+    persistenceOutput,
+  });
+  configureLogging(loggingEnabled ? loggingDependencies : Maybe.nothing());
 
-  // Preserve main's debug storage setting for reloads and the separate redux-logdown consumer.
-  try {
-    if (storage.isJust) {
-      if (namespaces.isJust) {
-        storage.value.setItem('debug', namespaces.value);
-      } else {
-        storage.value.removeItem('debug');
+  // Preserve existing debug storage when this application logging pipeline is unavailable.
+  if (loggingEnabled) {
+    try {
+      if (storage.isJust) {
+        if (namespaces.isJust) {
+          storage.value.setItem('debug', namespaces.value);
+        } else {
+          storage.value.removeItem('debug');
+        }
       }
+    } catch {
+      // Logging configuration must also work when storage is unavailable.
     }
-  } catch {
-    // Logging configuration must also work when storage is unavailable.
   }
 
   return persistence;

@@ -27,10 +27,7 @@ import {readFileSync, readdirSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {z} from 'zod';
 
-import {
-  persistentBrowserLogsFeatureToggleName,
-  previewDefaultEnabledStartupFeatureToggleNames,
-} from '../../src/script/featureToggles/startupFeatureToggleNames';
+import {previewDefaultEnabledStartupFeatureToggleNames} from '../../src/script/featureToggles/startupFeatureToggleNames';
 
 type RuntimeDiagnostics = {
   readonly uncaughtPageErrors: string[];
@@ -174,30 +171,28 @@ test('loads the application entry points and redirects an unauthenticated visito
     ],
   });
 
-  if (expectedDefaultNames.includes(persistentBrowserLogsFeatureToggleName)) {
-    const persistenceWorkerPath = '/min/wire-browser-log-persistence.js';
-    await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
-    await expect
-      .poll(() => {
-        return page.workers().map(worker => {
-          return new URL(worker.url()).pathname;
-        });
-      })
-      .toContain(persistenceWorkerPath);
+  const persistenceWorkerPath = '/min/wire-browser-log-persistence.js';
+  await expect
+    .poll(() => {
+      return page.workers().map(worker => {
+        return new URL(worker.url()).pathname;
+      });
+    })
+    .toContain(persistenceWorkerPath);
 
-    // Navigating away from the application can cancel its worker request. The login page starts its own worker.
-    const failedLocalRequests = diagnostics.failedLocalRequests.filter(failure => {
-      return failure !== `script ${persistenceWorkerPath}: net::ERR_ABORTED`;
-    });
-    expectNoRuntimeFailures({
-      diagnostics: {...diagnostics, failedLocalRequests},
-      buildProjectName: testInfo.project.name,
-    });
-
-    return;
-  }
-
-  expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
+  // Redirecting from the main app can cancel its worker request before auth starts its own worker.
+  const failedLocalRequests = diagnostics.failedLocalRequests.filter(failure => {
+    return failure !== `script ${persistenceWorkerPath}: net::ERR_ABORTED`;
+  });
+  expectNoRuntimeFailures({
+    diagnostics: {
+      uncaughtPageErrors: diagnostics.uncaughtPageErrors,
+      failedLocalRequests,
+      failedLocalResponses: diagnostics.failedLocalResponses,
+      localScriptResponses: diagnostics.localScriptResponses,
+    },
+    buildProjectName: testInfo.project.name,
+  });
 });
 
 for (const entryPath of ['/', '/auth']) {
@@ -494,6 +489,14 @@ for (const scenario of [
   test(`applies ${scenario.label} logging to both startup pages`, async ({page}, testInfo) => {
     const {configuredDebug, selection} = scenario;
     const developerConsoleEnabled = testInfo.project.name === 'rspack-internal';
+    await page.addInitScript(() => {
+      Object.defineProperty(window, 'showSaveFilePicker', {
+        configurable: true,
+        value: async function showSaveFilePicker(): Promise<FileSystemFileHandle> {
+          throw new DOMException('Synthetic save dialog cancellation', 'AbortError');
+        },
+      });
+    });
     await page.route('**/config.js', async route => {
       const response = await route.fetch();
       await route.fulfill({

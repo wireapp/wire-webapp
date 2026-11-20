@@ -39,9 +39,9 @@ import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
 import {initializeDesktopLogOutput} from '../browser/initializeDesktopLogOutput';
 import {initializeRuntimeErrorDiagnostics} from '../browser/initializeRuntimeErrorDiagnostics';
 import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
+import {selectBrowserLogSaveFilePicker} from '../browser/selectBrowserLogSaveFilePicker';
 import {Runtime} from '../commons/util/Runtime';
 import {Config} from '../Config';
-import {persistentBrowserLogsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
@@ -76,6 +76,10 @@ export function startAuthApp(support: CoreCryptoSupport, logging: StartupLogging
   const config = Config.getConfig();
   const clock = createClock();
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
+  const isElectron = Runtime.isElectron();
+  const browserLogSaveFilePicker = selectBrowserLogSaveFilePicker({isElectron, browserWindow: window});
+  const browserLoggingAvailable = browserLogSaveFilePicker.isJust;
+  const loggingEnabled = isElectron || browserLoggingAvailable;
   const desktopLogOutput = initializeDesktopLogOutput(clock, startupFeatureToggles);
   const isDesktopApp = Runtime.isDesktopApp();
   function shouldWriteConsoleFallback(): boolean {
@@ -90,8 +94,8 @@ export function startAuthApp(support: CoreCryptoSupport, logging: StartupLogging
     shouldWriteConsoleFallback: isDesktopApp ? shouldWriteConsoleFallback : undefined,
     storage: Maybe.of(getStorage()),
     configureLogging,
-    browserPersistenceEnabled:
-      !Runtime.isElectron() && startupFeatureToggles.isFeatureToggleEnabled(persistentBrowserLogsFeatureToggleName),
+    loggingEnabled,
+    browserPersistenceEnabled: !isElectron && browserLoggingAvailable,
     desktopPersistenceOutput: desktopLogOutput.isJust ? desktopLogOutput.value.write : undefined,
     createPersistenceOutput() {
       return createBrowserLogPersistence({
@@ -168,12 +172,15 @@ export function startAuthApp(support: CoreCryptoSupport, logging: StartupLogging
   }
 
   const store = configureStore({
-    clock,
-    actions: actionRoot,
-    apiClient,
-    core,
-    getConfig: Config.getConfig,
-    localStorage,
+    thunkDependencies: {
+      clock,
+      actions: actionRoot,
+      apiClient,
+      core,
+      getConfig: Config.getConfig,
+      localStorage,
+    },
+    reduxLoggingEnabled: loggingEnabled,
   });
 
   const render = (Component: FunctionComponent<AuthAppProps>): void => {

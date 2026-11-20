@@ -20,7 +20,6 @@
 /// <reference types="wicg-file-system-access" />
 
 import type {Clock} from '@enormora/clock/clock';
-import {isFunction} from '@sindresorhus/is';
 import {Maybe, Result, task, type Task} from 'true-myth';
 
 import type {ApplicationLogDownload, ApplicationLogDownloadOutcome} from './applicationLogDownload';
@@ -31,15 +30,10 @@ import {
   type BrowserLogExportDirectory,
 } from './exportBrowserLogs';
 
-import {persistentBrowserLogsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
-import type {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
+import type {BrowserLogSaveFilePicker} from '../browser/selectBrowserLogSaveFilePicker';
 
 type BrowserLogDownloadOptions = {
-  readonly startupFeatureToggles: StartupFeatureToggles;
-  readonly isElectron: boolean;
-  readonly showSaveFilePicker: Maybe<
-    (options: Parameters<typeof window.showSaveFilePicker>[0]) => Promise<Pick<FileSystemFileHandle, 'createWritable'>>
-  >;
+  readonly showSaveFilePicker: Maybe<BrowserLogSaveFilePicker>;
   readonly clock: Pick<Clock, 'currentUnixEpochMilliseconds'>;
   readonly getDirectory: () => Promise<BrowserLogExportDirectory>;
   readonly createArchive: (options: BrowserLogArchiveOptions) => BrowserLogArchive;
@@ -52,20 +46,11 @@ function isSavePickerCancellation(error: unknown): boolean {
 }
 
 export function createBrowserLogDownload(options: BrowserLogDownloadOptions): Maybe<ApplicationLogDownload> {
-  const {startupFeatureToggles, isElectron, showSaveFilePicker, clock, getDirectory, createArchive} = options;
-  if (isElectron) {
-    return Maybe.nothing();
-  }
-  if (!startupFeatureToggles.isFeatureToggleEnabled(persistentBrowserLogsFeatureToggleName)) {
-    return Maybe.nothing();
-  }
+  const {showSaveFilePicker, clock, getDirectory, createArchive} = options;
   if (showSaveFilePicker.isNothing) {
     return Maybe.nothing();
   }
   const pickSaveFile = showSaveFilePicker.value;
-  if (!isFunction(pickSaveFile)) {
-    return Maybe.nothing();
-  }
 
   async function saveBrowserLogs(): Promise<Result<ApplicationLogDownloadOutcome, 'failed'>> {
     let fileHandle: Pick<FileSystemFileHandle, 'createWritable'>;

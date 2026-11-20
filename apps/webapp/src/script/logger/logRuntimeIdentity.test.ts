@@ -50,6 +50,7 @@ function createStartupLoggingFixture(debugEnabled: boolean): StartupLoggingFixtu
     return Maybe.nothing();
   });
   initializeLogging({
+    loggingEnabled: true,
     clock,
     consoleOutput,
     locationSearch: `?id=${desktopAccountIdentifier}`,

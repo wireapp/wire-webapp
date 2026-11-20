@@ -35,7 +35,6 @@ import {
   e2ePdfPreviewFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
-  persistentBrowserLogsFeatureToggleName,
   previewDefaultEnabledStartupFeatureToggleNames,
 } from './startupFeatureToggleNames';
 
@@ -51,7 +50,6 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   sendCallLogsFeatureToggleName,
   e2ePdfPreviewFeatureToggleName,
   desktopStructuredLogsFeatureToggleName,
-  persistentBrowserLogsFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -64,18 +62,13 @@ describe('startupFeatureToggles', function () {
     expect(enabled.enabledFeatureToggleNames).toEqual([desktopStructuredLogsFeatureToggleName]);
   });
 
-  it('defaults persistent browser logs on in preview builds and supports release opt-in alongside other toggles', () => {
-    const disabled = createStartupFeatureTogglesFromLocationSearch('');
-    const enabled = createStartupFeatureTogglesFromLocationSearch(
+  it('ignores stale persistent browser log selections and preserves other feature toggles', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       '?enabled-features=mark-as-unread,persistent-browser-logs',
     );
 
-    expect(disabled.isFeatureToggleEnabled(persistentBrowserLogsFeatureToggleName)).toBe(false);
-    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(persistentBrowserLogsFeatureToggleName);
-    expect(enabled.enabledFeatureToggleNames).toEqual([
-      markAsUnreadFeatureToggleName,
-      persistentBrowserLogsFeatureToggleName,
-    ]);
+    expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([markAsUnreadFeatureToggleName]);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain('persistent-browser-logs');
   });
   it('keeps encrypted PDF previews disabled for release builds and allows explicit opt-in', () => {
     const disabled = createStartupFeatureTogglesFromLocationSearch('');
@@ -278,7 +271,6 @@ describe('startupFeatureToggles', function () {
       sendCallLogsFeatureToggleName,
       e2ePdfPreviewFeatureToggleName,
       desktopStructuredLogsFeatureToggleName,
-      persistentBrowserLogsFeatureToggleName,
     ]);
   });
 
