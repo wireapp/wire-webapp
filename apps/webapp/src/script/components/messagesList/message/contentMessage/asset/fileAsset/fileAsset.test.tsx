@@ -125,6 +125,40 @@ describe('FileAssetComponent', () => {
     load.mockRestore();
   });
 
+  it('does not render or fetch a PDF preview for quoted files', () => {
+    const repository = container.resolve(AssetRepository);
+    const load = jest.spyOn(repository, 'load').mockResolvedValue(new Blob());
+    const previewWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview')
+          .isFeatureToggleEnabled,
+        mainViewModel: {content: {repositories: {asset: repository}}} as MainViewModel,
+      }),
+    );
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_type = 'application/pdf';
+    asset.status(AssetTransferState.UPLOADED);
+    asset.preview_resource(
+      new AssetRemoteData({
+        assetKey: 'preview',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
+
+    (IntersectionObserver as jest.Mock).mockClear();
+    render(<FileAssetComponent message={message} teamState={teamState} isQuote />, {wrapper: previewWrapper});
+
+    expect((IntersectionObserver as jest.Mock).mock.calls).toHaveLength(0);
+    expect(load).not.toHaveBeenCalled();
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.getByText('report')).toBeInTheDocument();
+    load.mockRestore();
+  });
+
   it('removes the PDF preview and revokes its URL when the message expires', async () => {
     const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])]);
     const repository = container.resolve(AssetRepository);
