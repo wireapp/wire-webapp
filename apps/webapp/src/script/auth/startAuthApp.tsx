@@ -172,7 +172,7 @@ export function startAuthApp(support: CoreCryptoSupport, logging: StartupLogging
   }
 
   const store = configureStore({
-    thunkArguments: {
+    thunkDependencies: {
       clock,
       actions: actionRoot,
       apiClient,
