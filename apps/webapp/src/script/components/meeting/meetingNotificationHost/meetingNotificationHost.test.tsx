@@ -17,11 +17,12 @@
  *
  */
 
-import {fireEvent, render, screen, type RenderResult} from '@testing-library/react';
+import {fireEvent, render, type RenderResult, screen} from '@testing-library/react';
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 
 import {MeetingNotificationHost} from './meetingNotificationHost';
+import * as joinMeetingCallModule from '../useJoinMeetingCall';
 import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
@@ -33,17 +34,13 @@ import {
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
 
-jest.mock('../useJoinMeetingCall', () => {
+const mockUseJoinMeetingCall = jest.spyOn(joinMeetingCallModule, 'useJoinMeetingCall').mockImplementation(() => {
   return {
-    useJoinMeetingCall: jest.fn(() => {
-      return {
-        joinMeeting: jest.fn(),
-        isJoinDisabled: false,
-        isCallActive: false,
-        isCallConnecting: false,
-        isJoining: false,
-      };
-    }),
+    joinMeeting: jest.fn(),
+    isJoinDisabled: false,
+    isCallActive: false,
+    isCallConnecting: false,
+    isJoining: false,
   };
 });
 
@@ -77,6 +74,10 @@ const renderHost = (isStandalone = true, translate: Translate = translateForTest
 };
 
 describe('MeetingNotificationHost', () => {
+  afterAll(() => {
+    mockUseJoinMeetingCall.mockRestore();
+  });
+
   beforeEach(() => {
     useMeetingNotificationStore.getState().clearNotifications();
   });

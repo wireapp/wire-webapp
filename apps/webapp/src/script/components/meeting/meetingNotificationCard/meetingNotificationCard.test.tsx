@@ -25,7 +25,7 @@ import en from '../../../../i18n/en-US.json';
 import {User} from '../../../repositories/entity/User';
 import {UserState} from '../../../repositories/user/userState';
 import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
-import {useJoinMeetingCall} from '../useJoinMeetingCall';
+import * as joinMeetingCallModule from '../useJoinMeetingCall';
 import {MeetingNotificationCard} from './meetingNotificationCard';
 import {type MeetingNotification, MeetingNotificationKind} from '../meetingNotificationStore/meetingNotificationStore';
 import {formatLocale} from '../../../util/timeUtil';
@@ -38,17 +38,12 @@ import {
 } from '../../../page/testSupport/rootContextTestSupport';
 import type {MainViewModel} from '../../../view_model/MainViewModel';
 
-jest.mock('../useJoinMeetingCall', () => {
-  return {
-    useJoinMeetingCall: jest.fn(),
-  };
-});
-
 const qualifiedId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
 const qualifiedCreator: QualifiedId = {id: 'creator-id', domain: 'example.com'};
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 const ongoingMeetingStartTime = '2026-06-01T09:50:00.000Z';
+const mockUseJoinMeetingCall = jest.spyOn(joinMeetingCallModule, 'useJoinMeetingCall');
 const specialCharacterName = `Eldon Bauch ±§!@#{}[]:"|;'\\<>?,./$%^&*()`;
 const renderedTranslations: Partial<Record<TranslationKey, (substitutions?: Substitutions) => string>> = {
   'meetings.notifications.title': substitutions => {
@@ -81,9 +76,14 @@ const renderCard = (card: ReactElement): RenderResult => {
 };
 
 describe('MeetingNotificationCard', () => {
+  afterAll(() => {
+    mockUseJoinMeetingCall.mockRestore();
+  });
+
   beforeEach(() => {
     window.history.replaceState(null, '', '#/');
-    jest.mocked(useJoinMeetingCall).mockReturnValue({
+    mockUseJoinMeetingCall.mockClear();
+    mockUseJoinMeetingCall.mockReturnValue({
       joinMeeting: jest.fn(),
       isJoinDisabled: false,
       isCallActive: false,
@@ -225,7 +225,7 @@ describe('MeetingNotificationCard', () => {
   it('opens the prep modal when Join is clicked', () => {
     const joinMeeting = jest.fn();
     const onDismiss = jest.fn();
-    jest.mocked(useJoinMeetingCall).mockReturnValue({
+    mockUseJoinMeetingCall.mockReturnValue({
       joinMeeting,
       isJoinDisabled: false,
       isCallActive: false,
@@ -248,7 +248,7 @@ describe('MeetingNotificationCard', () => {
 
     fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
 
-    expect(useJoinMeetingCall).toHaveBeenCalledWith(qualifiedConversationId);
+    expect(mockUseJoinMeetingCall).toHaveBeenCalledWith(qualifiedConversationId);
     expect(joinMeeting).not.toHaveBeenCalled();
     expect(useMeetingPrepModal.getState().session.unwrapOr({meetingTitle: ''}).meetingTitle).toBe('Meeting Title');
     expect(onDismiss).not.toHaveBeenCalled();
@@ -256,7 +256,7 @@ describe('MeetingNotificationCard', () => {
 
   it('uses the panel-closing callback once the call is active', () => {
     const onCallJoined = jest.fn();
-    jest.mocked(useJoinMeetingCall).mockReturnValue({
+    mockUseJoinMeetingCall.mockReturnValue({
       joinMeeting: jest.fn(),
       isJoinDisabled: true,
       isCallActive: true,

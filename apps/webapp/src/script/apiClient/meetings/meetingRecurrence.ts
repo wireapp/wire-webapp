@@ -17,12 +17,14 @@
  *
  */
 
-export enum MeetingRecurrenceFrequency {
-  DAILY = 'daily',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly',
-  YEARLY = 'yearly',
-}
+export const MeetingRecurrenceFrequency = {
+  DAILY: 'daily',
+  WEEKLY: 'weekly',
+  MONTHLY: 'monthly',
+  YEARLY: 'yearly',
+} as const;
+
+export type MeetingRecurrenceFrequency = (typeof MeetingRecurrenceFrequency)[keyof typeof MeetingRecurrenceFrequency];
 
 export interface MeetingRecurrence {
   frequency: MeetingRecurrenceFrequency;
