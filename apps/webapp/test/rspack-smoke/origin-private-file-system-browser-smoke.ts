@@ -300,10 +300,14 @@ test('persists sanitized browser logs with console disabled across application r
 
     await page.evaluate(async () => {
       window.setTimeout(() => {
-        throw new TypeError('Bearer synthetic-runtime-canary');
+        throw new TypeError(
+          'Bearer synthetic-runtime-canary\n    at https://example.com/synthetic-runtime-frame-canary.js:38:49',
+        );
       }, 0);
       void Promise.reject({privateValue: 'synthetic-rejection-canary'});
       void Promise.reject(new DOMException('synthetic-quota-canary', 'QuotaExceededError'));
+      void Promise.reject({type: 'LEGAL_HOLD_CONVERSATION_CANCELLATION'});
+      window.dispatchEvent(new Event('error'));
       const script = new Blob(["console.error('synthetic-worker-console-canary'); postMessage(null);"], {
         type: 'application/javascript',
       });
@@ -331,35 +335,38 @@ test('persists sanitized browser logs with console disabled across application r
         URL.revokeObjectURL(scriptUrl);
       }
     });
+    const runtimeErrorComponent = '"component":"@wireapp/webapp/RuntimeErrors"';
     await expect
       .poll(async () => {
-        return (await readBrowserLogFiles(page))
-          .map(file => {
-            return file.contents;
-          })
-          .join('');
+        const files = await readBrowserLogFiles(page);
+
+        return files.flatMap(file => {
+          return file.contents.split('\n').filter(line => {
+            return line.includes(runtimeErrorComponent);
+          });
+        });
       })
-      .toContain('"errorName":"QuotaExceededError"');
+      .toHaveLength(3);
     const runtimeFiles = await readBrowserLogFiles(page);
     const runtimeLines = runtimeFiles.flatMap(file => {
       return file.contents.trimEnd().split('\n');
     });
-    expect(
-      runtimeLines
-        .filter(line => {
-          return line.includes('"component":"@wireapp/webapp/RuntimeErrors"');
-        })
-        .map(line => {
-          return JSON.parse(line);
-        }),
-    ).toEqual(
+    const runtimeRecords = runtimeLines
+      .filter(line => {
+        return line.includes(runtimeErrorComponent);
+      })
+      .map(line => {
+        return JSON.parse(line);
+      });
+    expect(runtimeRecords).toHaveLength(3);
+    expect(runtimeRecords).toEqual(
       expect.arrayContaining([
         expect.objectContaining({level: 50, msg: 'Uncaught JavaScript error', errorName: 'TypeError'}),
         expect.objectContaining({level: 50, msg: 'Unhandled promise rejection', reasonType: 'object'}),
         expect.objectContaining({level: 50, msg: 'Unhandled promise rejection', errorName: 'QuotaExceededError'}),
       ]),
     );
-    expect(runtimeLines.join('\n')).not.toMatch(/synthetic-(runtime|rejection|quota|worker-console)-canary/);
+    expect(runtimeLines.join('\n')).not.toMatch(/synthetic-(runtime(-frame)?|rejection|quota|worker-console)-canary/);
 
     await page.reload();
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();

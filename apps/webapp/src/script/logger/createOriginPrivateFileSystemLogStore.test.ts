@@ -25,6 +25,7 @@ import {unwrap, unwrapErr} from '../util/test/resultTestSupport';
 import {createLogWorkerProcessor} from './createLogWorkerProcessor';
 import {
   createOriginPrivateFileSystemLogStore,
+  isMissingEntry,
   type LogDirectory,
   type LogStore,
 } from './createOriginPrivateFileSystemLogStore';
@@ -254,6 +255,14 @@ function createStoreForTest(options: TestStoreOptions): LogStore {
 }
 
 describe('worker synchronous Origin Private File System log store', () => {
+  it('recognizes native missing-entry errors and requires an own name on plain objects', () => {
+    const errorWithInheritedName: unknown = Object.create({name: 'NotFoundError'});
+
+    expect(isMissingEntry(new DOMException('Missing file', 'NotFoundError'))).toBe(true);
+    expect(isMissingEntry({name: 'NotFoundError'})).toBe(true);
+    expect(isMissingEntry(errorWithInheritedName)).toBe(false);
+  });
+
   it('preserves unattributed log files when the worker binds an account after writing', async () => {
     const storage = createTestDirectory();
     const accountIdentifier = 'a'.repeat(64);

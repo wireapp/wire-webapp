@@ -17,14 +17,17 @@
  *
  */
 
-import {isError, isInteger, isString} from '@sindresorhus/is';
+import {isError, isInteger} from '@sindresorhus/is';
 
 import type {LogAttributes, Logger} from './logger';
 
 type RuntimeErrorEventType = 'error' | 'unhandledrejection';
 
 type RuntimeErrorDiagnosticsOptions = {
-  readonly subscribe: (type: RuntimeErrorEventType, listener: (event: Event) => void) => () => void;
+  readonly subscribe: <Type extends RuntimeErrorEventType>(
+    type: Type,
+    listener: (event: WindowEventMap[Type]) => void,
+  ) => () => void;
   readonly logger: Pick<Logger, 'error'>;
   readonly isExpectedRejection: (reason: unknown) => boolean;
 };
@@ -42,8 +45,6 @@ const standardErrorNames: ReadonlySet<string> = new Set([
   'DOMException',
   'RuntimeError',
 ]);
-const maximumInspectedStackLength = 8192;
-const maximumStackFrames = 8;
 const diagnosticDomExceptionNames: ReadonlySet<string> = new Set([
   'AbortError',
   'DataCloneError',
@@ -69,33 +70,28 @@ function getErrorAttributes(reason: unknown): LogAttributes {
     return {reasonType: reason === null ? 'null' : typeof reason};
   }
 
-  // Runtime errors can contain arbitrary user data in their message or custom properties.
-  // Retain only a standard error name and coordinates from stack frames.
-  const stack = isString(reason.stack) ? reason.stack.slice(0, maximumInspectedStackLength) : '';
-  const stackLocations = stack
-    .split('\n')
-    .slice(1, maximumStackFrames + 1)
-    .flatMap(frame => {
-      const location = /\/([a-zA-Z0-9_-]{1,100}\.m?js):([0-9]+):([0-9]+)\)?$/.exec(frame)?.slice(1);
+  // Runtime errors can contain arbitrary user data in their message, stack, or custom properties.
+  const errorName = reason.name;
 
-      return location === undefined ? [] : [location.join(':')];
-    });
-
-  return {errorName: standardErrorNames.has(reason.name) ? reason.name : 'Error', stackLocations};
+  return {errorName: standardErrorNames.has(errorName) ? errorName : 'Error'};
 }
 
 export function registerRuntimeErrorDiagnostics(options: RuntimeErrorDiagnosticsOptions): () => void {
   const {subscribe, logger, isExpectedRejection} = options;
   let reporting = false;
 
-  function report(message: string, attributes: () => LogAttributes): void {
+  function report(message: string, attributes: () => LogAttributes | undefined): void {
     if (reporting) {
       return;
     }
 
     reporting = true;
     try {
-      logger.error(message, attributes());
+      const logAttributes = attributes();
+
+      if (logAttributes !== undefined) {
+        logger.error(message, logAttributes);
+      }
     } catch {
       // Reporting must never trigger another uncaught error.
     } finally {
@@ -105,27 +101,30 @@ export function registerRuntimeErrorDiagnostics(options: RuntimeErrorDiagnostics
 
   const unsubscribeError = subscribe('error', event => {
     // Element resource failures also use an error event. Report only JavaScript error events.
-    if ('error' in event) {
+    if (event instanceof ErrorEvent) {
       report('Uncaught JavaScript error', () => {
+        const error = event.error;
+        const line = event.lineno;
+        const column = event.colno;
+
         return {
-          ...getErrorAttributes(event.error),
-          line: 'lineno' in event && isInteger(event.lineno) ? event.lineno : undefined,
-          column: 'colno' in event && isInteger(event.colno) ? event.colno : undefined,
+          ...getErrorAttributes(error),
+          line: isInteger(line) ? line : undefined,
+          column: isInteger(column) ? column : undefined,
         };
       });
     }
   });
   const unsubscribeRejection = subscribe('unhandledrejection', event => {
-    try {
-      const shouldReport = 'reason' in event && !isExpectedRejection(event.reason);
-      if (shouldReport) {
-        report('Unhandled promise rejection', () => {
-          return getErrorAttributes(event.reason);
-        });
+    report('Unhandled promise rejection', () => {
+      const reason = event.reason;
+
+      if (isExpectedRejection(reason)) {
+        return undefined;
       }
-    } catch {
-      // An inaccessible reason must not turn into another uncaught error.
-    }
+
+      return getErrorAttributes(reason);
+    });
   });
 
   return function unsubscribe(): void {

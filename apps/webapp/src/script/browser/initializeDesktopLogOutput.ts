@@ -20,6 +20,7 @@
 import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {Maybe} from 'true-myth';
+import {objectHasOwn} from 'ts-extras';
 
 import {Runtime} from '../commons/util/Runtime';
 import type {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
@@ -35,7 +36,7 @@ export function initializeDesktopLogOutput(
     isDesktopApp: Runtime.isDesktopApp(),
     startupFeatureToggles,
     readCapability() {
-      return 'desktopApplicationLogs' in window ? window.desktopApplicationLogs : undefined;
+      return objectHasOwn(window, 'desktopApplicationLogs') ? window.desktopApplicationLogs : undefined;
     },
   }).map(writeToDesktop => {
     const output = createDesktopLogOutput({

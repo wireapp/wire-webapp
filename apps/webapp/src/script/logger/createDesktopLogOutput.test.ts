@@ -75,20 +75,24 @@ describe('Desktop structured logging', () => {
       .unwrapOr(undefined);
   });
 
-  it.each([undefined, null, {version: 2, write: jest.fn()}, {version: 1, write: 'write'}, {version: 1}])(
-    'ignores an unavailable capability (%s)',
-    capability => {
-      expect(
-        selectDesktopApplicationLogWrite({
-          isDesktopApp: true,
-          startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(enabledSearch),
-          readCapability() {
-            return capability;
-          },
-        }).isNothing,
-      ).toBe(true);
-    },
-  );
+  it.each([
+    undefined,
+    null,
+    {version: 2, write: jest.fn()},
+    {version: 1, write: 'write'},
+    {version: 1},
+    Object.create({version: 1, write: jest.fn()}),
+  ])('ignores an unavailable capability (%s)', capability => {
+    expect(
+      selectDesktopApplicationLogWrite({
+        isDesktopApp: true,
+        startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(enabledSearch),
+        readCapability() {
+          return capability;
+        },
+      }).isNothing,
+    ).toBe(true);
+  });
 
   it('contains errors while reading the capability', () => {
     expect(

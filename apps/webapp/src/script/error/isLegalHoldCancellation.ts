@@ -18,11 +18,14 @@
  */
 
 import {isObject} from '@sindresorhus/is';
+import {objectHasOwn} from 'ts-extras';
 
 import {ConversationError} from './conversationError';
 
 export function isLegalHoldCancellation(reason: unknown): boolean {
   return (
-    isObject(reason) && 'type' in reason && reason.type === ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION
+    isObject(reason) &&
+    objectHasOwn(reason, 'type') &&
+    reason.type === ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION
   );
 }
