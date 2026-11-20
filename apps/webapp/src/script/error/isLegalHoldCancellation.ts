@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,4 +17,15 @@
  *
  */
 
-export * from './obfuscationUtil';
+import {isObject} from '@sindresorhus/is';
+import {objectHasOwn} from 'ts-extras';
+
+import {ConversationError} from './conversationError';
+
+export function isLegalHoldCancellation(reason: unknown): boolean {
+  return (
+    isObject(reason) &&
+    objectHasOwn(reason, 'type') &&
+    reason.type === ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION
+  );
+}

@@ -23,6 +23,14 @@ const commonJsExportConditions = ['node', 'node-addons', 'require', 'default'];
 const importExportConditions = ['node', 'node-addons', 'import', 'default'];
 
 module.exports = (modulePath, resolverOptions) => {
+  if (modulePath === 'keyboardjs') {
+    // KeyboardJS exposes the receiver-independent named method wrappers in its ESM entry.
+    return resolverOptions.defaultResolver(modulePath, {
+      ...resolverOptions,
+      conditions: importExportConditions,
+    });
+  }
+
   try {
     // Prefer CommonJS exports so Jest internals and dual-published packages stay compatible.
     return resolverOptions.defaultResolver(modulePath, {

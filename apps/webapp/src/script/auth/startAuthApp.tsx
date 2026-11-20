@@ -36,7 +36,10 @@ import {actionRoot} from './module/action';
 import {Root} from './page/root';
 
 import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
+import {initializeDesktopLogOutput} from '../browser/initializeDesktopLogOutput';
+import {initializeRuntimeErrorDiagnostics} from '../browser/initializeRuntimeErrorDiagnostics';
 import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
+import {selectBrowserLogSaveFilePicker} from '../browser/selectBrowserLogSaveFilePicker';
 import {Runtime} from '../commons/util/Runtime';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
@@ -45,8 +48,7 @@ import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {configureLogging} from '../logger/getLogger';
-import {initializeDesktopLogOutput} from '../logger/initializeDesktopLogOutput';
-import {initializeLogging} from '../logger/initializeLogging';
+import {initializeLogging, type StartupLoggingOptions} from '../logger/initializeLogging';
 import {logStartupRuntimeIdentity} from '../logger/logRuntimeIdentity';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
@@ -69,22 +71,32 @@ retireLegacyServiceWorker({
 
 const mainId = 'main';
 
-export const startAuthApp = (support: CoreCryptoSupport): void => {
+export function startAuthApp(support: CoreCryptoSupport, logging: StartupLoggingOptions): void {
   exposeWrapperGlobals();
   const config = Config.getConfig();
   const clock = createClock();
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
+  const isElectron = Runtime.isElectron();
+  const browserLogSaveFilePicker = selectBrowserLogSaveFilePicker({isElectron, browserWindow: window});
+  const browserLoggingAvailable = browserLogSaveFilePicker.isJust;
+  const loggingEnabled = isElectron || browserLoggingAvailable;
   const desktopLogOutput = initializeDesktopLogOutput(clock, startupFeatureToggles);
+  const isDesktopApp = Runtime.isDesktopApp();
+  function shouldWriteConsoleFallback(): boolean {
+    return desktopLogOutput.isNothing || !desktopLogOutput.value.hasConfirmedDelivery();
+  }
+
   const persistentLogging = initializeLogging({
     clock,
     consoleOutput: console,
     locationSearch: window.location.search,
-    debugEnabled: config.FEATURE.ENABLE_DEBUG,
+    ...logging,
+    shouldWriteConsoleFallback: isDesktopApp ? shouldWriteConsoleFallback : undefined,
     storage: Maybe.of(getStorage()),
     configureLogging,
-    startupFeatureToggles,
-    isElectron: Runtime.isElectron(),
-    desktopPersistenceOutput: desktopLogOutput.unwrapOr(undefined),
+    loggingEnabled,
+    browserPersistenceEnabled: !isElectron && browserLoggingAvailable,
+    desktopPersistenceOutput: desktopLogOutput.isJust ? desktopLogOutput.value.write : undefined,
     createPersistenceOutput() {
       return createBrowserLogPersistence({
         clock,
@@ -116,14 +128,14 @@ export const startAuthApp = (support: CoreCryptoSupport): void => {
       });
     },
   });
+  initializeRuntimeErrorDiagnostics(window);
   logStartupRuntimeIdentity({
     clock,
     consoleOutput: console,
-    isDesktopApp: Runtime.isDesktopApp(),
+    isDesktopApp,
     hasDesktopLogPersistence: desktopLogOutput.isJust,
     locationSearch: window.location.search,
     logger: getLogger('RuntimeIdentity'),
-    hostname: window.location.hostname,
     origin: window.location.origin,
     version: config.VERSION,
     assetVersion: config.ASSET_VERSION,
@@ -160,12 +172,15 @@ export const startAuthApp = (support: CoreCryptoSupport): void => {
   }
 
   const store = configureStore({
-    clock,
-    actions: actionRoot,
-    apiClient,
-    core,
-    getConfig: Config.getConfig,
-    localStorage,
+    thunkDependencies: {
+      clock,
+      actions: actionRoot,
+      apiClient,
+      core,
+      getConfig: Config.getConfig,
+      localStorage,
+    },
+    reduxLoggingEnabled: loggingEnabled,
   });
 
   const render = (Component: FunctionComponent<AuthAppProps>): void => {
@@ -191,4 +206,4 @@ export const startAuthApp = (support: CoreCryptoSupport): void => {
   };
 
   fireAndForgetInvoker.fireAndForget(runApp);
-};
+}

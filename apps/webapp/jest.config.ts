@@ -41,6 +41,7 @@ const esmPackagesToTransform = [
   '@sindresorhus/is',
   '@stablelib/utf8',
   '@faker-js/faker',
+  'keyboardjs',
 ];
 
 const config: Config = {
@@ -97,6 +98,7 @@ const config: Config = {
   transformIgnorePatterns: [`/node_modules/(?!(${esmPackagesToTransform.join('|')})/)`],
   // Override transform to use babel-jest for webapp (uses React automatic runtime with Emotion)
   transform: {
+    '^.+\\.mjs$': 'babel-jest',
     '^.+\\.[tj]sx?$': 'babel-jest',
   },
 };

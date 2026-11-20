@@ -28,16 +28,9 @@ import {
   sendCallLogsFeatureToggleName,
   startupFeatureToggleNames,
   startupFeatureToggleRegistry,
-  websocketListenerLifecycleFeatureToggleName,
 } from './startupFeatureToggleNames';
 
 describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
-  it('registers the corrected WebSocket listener lifecycle as enabled by default in preview builds', () => {
-    expect(startupFeatureToggleRegistry).toContainEqual({
-      name: websocketListenerLifecycleFeatureToggleName,
-      previewDefaultEnabled: true,
-    });
-  });
   it('enables Mark as unread by default in preview builds', () => {
     expect(startupFeatureToggleRegistry).toContainEqual({
       name: markAsUnreadFeatureToggleName,
@@ -90,12 +83,12 @@ describe('selectPreviewDefaultEnabledStartupFeatureToggleNames', () => {
     expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(driveBulkRestoreFeatureToggleName);
   });
 
-  it('keeps Drive bulk action progress persistence disabled by default in preview builds', () => {
+  it('enables Drive bulk action progress persistence by default in preview builds', () => {
     expect(startupFeatureToggleRegistry).toContainEqual({
       name: driveBulkActionProgressFeatureToggleName,
-      previewDefaultEnabled: false,
+      previewDefaultEnabled: true,
     });
-    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain(driveBulkActionProgressFeatureToggleName);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(driveBulkActionProgressFeatureToggleName);
   });
 
   it('keeps the test-only flag explicitly opted out of preview defaults', () => {

@@ -857,6 +857,31 @@ const repositoryLinterOptions = {
   reportUnusedDisableDirectives: 'error',
 };
 
+const noEnumDeclarationsRule = {
+  meta: {
+    type: 'suggestion',
+    docs: {
+      description: 'Disallow TypeScript enum declarations',
+    },
+    messages: {
+      forbidden: 'Avoid TypeScript enums. Use a union type or an `as const` object instead.',
+    },
+    schema: [],
+  },
+  /**
+   * @param {import('eslint').Rule.RuleContext} ruleContext
+   * @returns {import('eslint').Rule.RuleListener}
+   */
+  create(ruleContext) {
+    return {
+      /** @returns {void} */
+      TSEnumDeclaration: function reportEnumDeclaration(enumDeclaration) {
+        ruleContext.report({node: enumDeclaration, messageId: 'forbidden'});
+      },
+    };
+  },
+};
+
 const testLinterOptions = {
   reportUnusedInlineConfigs: 'error',
 };
@@ -1124,6 +1149,22 @@ const config = [
     },
     rules: {
       'jest/no-restricted-jest-methods': jestMockRestrictionRule,
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    languageOptions: {
+      parser: tsParser,
+    },
+    plugins: {
+      wire: {
+        rules: {
+          'no-enum-declarations': noEnumDeclarationsRule,
+        },
+      },
+    },
+    rules: {
+      'wire/no-enum-declarations': 'warn',
     },
   },
 ];

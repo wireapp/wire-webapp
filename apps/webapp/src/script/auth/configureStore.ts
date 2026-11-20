@@ -28,11 +28,20 @@ import {
 } from 'redux';
 import {withExtraArgument} from 'redux-thunk';
 
-import {reducers, type RootState} from './module/reducer';
+import {reducers, type Api, type RootState} from './module/reducer';
 
 import {LOGGER_NAMESPACE} from '../util/logger';
 
 type AuthStore = Store<RootState, AnyAction>;
+
+type AuthThunkDependencies = Readonly<Omit<Api, 'localStorage'>> & {
+  readonly localStorage: Api['localStorage'] | undefined;
+};
+
+type ConfigureStoreOptions = {
+  readonly thunkDependencies: AuthThunkDependencies;
+  readonly reduxLoggingEnabled: boolean;
+};
 
 type HotReloadCapableModule = NodeJS.Module & {
   readonly hot?: {
@@ -42,8 +51,12 @@ type HotReloadCapableModule = NodeJS.Module & {
 
 const reduxLogdown = require('redux-logdown');
 
-const configureStore = (thunkArguments: object = {}): AuthStore => {
-  const store = createStore(combineReducers(reducers), undefined, createMiddleware(thunkArguments));
+const configureStore = (options?: ConfigureStoreOptions): AuthStore => {
+  const store = createStore(
+    combineReducers(reducers),
+    undefined,
+    createMiddleware(options?.thunkDependencies, options?.reduxLoggingEnabled ?? true),
+  );
   const hotReloadCapableModule = module as HotReloadCapableModule;
 
   if (process.env.NODE_ENV !== 'production') {
@@ -61,8 +74,15 @@ const createLoggerMiddleware = (): Middleware => {
   return reduxLogdown(LOGGER_NAMESPACE, {diff: true});
 };
 
-const createMiddleware = (thunkArguments: object): StoreEnhancer => {
-  const middlewares = [withExtraArgument(thunkArguments), createLoggerMiddleware()];
+const createMiddleware = (
+  thunkDependencies: AuthThunkDependencies | undefined,
+  reduxLoggingEnabled: boolean,
+): StoreEnhancer => {
+  const middlewares = [withExtraArgument(thunkDependencies ?? {})];
+  if (reduxLoggingEnabled) {
+    middlewares.push(createLoggerMiddleware());
+  }
+
   return applyMiddleware(...middlewares);
 };
 

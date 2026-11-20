@@ -19,7 +19,12 @@
 
 import {nodePlatform} from './shims/node/platform';
 
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {Maybe} from 'true-myth';
+
 import {AccentColor} from '../commons/util';
+import {configureLogging} from '../logger/getLogger';
+import type {LogOutput} from '../logger/logOutput';
 import nock from 'nock';
 
 import {APIClient} from './apiClient';
@@ -533,6 +538,47 @@ describe('APIClient', () => {
       const context = await client.login(loginData);
       expect(context.userId).toBe(accessTokenData.user);
       expect(client['accessTokenStore'].accessTokenData?.access_token).toBe(accessTokenData.access_token);
+    });
+
+    it('serializes login and refresh expiration diagnostics without access-token material', async () => {
+      const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+      const persistedLines: string[] = [];
+      nock(baseUrl).post(AuthAPI.URL.ACCESS).reply(StatusCode.OK, accessTokenData);
+      const client = new APIClient({...testConfig, platform: nodePlatform});
+      apiClients.push(client);
+
+      configureLogging(
+        Maybe.just({
+          clock,
+          namespaces: Maybe.nothing<string>(),
+          output() {},
+          persistenceOutput: Maybe.just<LogOutput>(line => {
+            persistedLines.push(line);
+          }),
+        }),
+      );
+      try {
+        await client.login(loginData);
+        await client.transport.http.refreshAccessToken();
+      } finally {
+        configureLogging(Maybe.nothing());
+      }
+
+      const serialized = persistedLines.join('\n');
+      expect(serialized).toContain('Saved initial access token');
+      expect(serialized).toContain('Received updated access token');
+      const records = persistedLines.map(line => {
+        return JSON.parse(line);
+      });
+      expect(records).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({msg: 'Saved initial access token', expiresInSeconds: accessTokenData.expires_in}),
+          expect.objectContaining({msg: 'Received updated access token', expiresInSeconds: accessTokenData.expires_in}),
+        ]),
+      );
+      expect(serialized.includes(accessTokenData.access_token)).toBe(false);
+      expect(serialized.includes(accessTokenData.access_token.slice(0, 20))).toBe(false);
+      expect(serialized).not.toContain('"access_token"');
     });
 
     it('can login after a logout', async () => {

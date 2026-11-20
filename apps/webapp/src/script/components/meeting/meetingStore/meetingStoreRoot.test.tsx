@@ -300,6 +300,12 @@ const getRenderedMeetingTitles = (): string => {
   return screen.getByTestId(meetingTitlesTestId).textContent;
 };
 
+const setAvailability = (availability: Availability.Type): void => {
+  act(() => {
+    container.resolve(UserState).self().availability(availability);
+  });
+};
+
 describe('MeetingStoreRoot', () => {
   afterEach(() => {
     jest.restoreAllMocks();
@@ -447,6 +453,51 @@ describe('MeetingStoreRoot', () => {
     expect(getMeeting).toHaveBeenCalledWith(meetingId);
   });
 
+  it.each([
+    {event: WebAppEvents.MEETING.MEMBER_ADDED, expectedTitle: 'Weekly sync (updated)'},
+    {event: WebAppEvents.MEETING.UPDATED, expectedTitle: 'Weekly sync (updated)'},
+  ])('syncs $event without an in-app card while Away', async ({event, expectedTitle}) => {
+    renderMeetingStoreRoot({initialAvailability: Availability.Type.AWAY});
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+
+    act(() => {
+      amplify.publish(event, meetingId, otherUserId);
+    });
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe(expectedTitle);
+    });
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+
+    setAvailability(Availability.Type.AVAILABLE);
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+  });
+
+  it('syncs an ongoing meeting invite without an in-app card while Away', async () => {
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-16T10:30:00.000Z')) * 1_000n,
+    });
+    renderMeetingStoreRoot({
+      clock,
+      initialAvailability: Availability.Type.AWAY,
+      getMeetingsList: jest.fn(() => {
+        return task.resolve([]);
+      }),
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId, otherUserId);
+    });
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync (updated)');
+    });
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+  });
+
   it('removes a meeting from the store when a meeting deleted event is published', async () => {
     renderMeetingStoreRoot();
 
@@ -482,6 +533,58 @@ describe('MeetingStoreRoot', () => {
 
     await waitFor(() => {
       expect(getRenderedMeetingTitles()).toBe('');
+    });
+  });
+
+  it('removes a cancelled meeting without an in-app card while Away', async () => {
+    renderMeetingStoreRoot({initialAvailability: Availability.Type.AWAY});
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.DELETED, meetingId, otherUserId);
+    });
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('');
+    });
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+
+    setAvailability(Availability.Type.AVAILABLE);
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+  });
+
+  it('dismisses visible cards on Away and resumes new notifications afterward', async () => {
+    renderMeetingStoreRoot();
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, otherUserId);
+    });
+    await waitFor(() => {
+      expect(useMeetingNotificationStore.getState().notifications).toHaveLength(1);
+    });
+    useMeetingNotificationStore.getState().setIsExpanded(true);
+
+    setAvailability(Availability.Type.AWAY);
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(false);
+
+    setAvailability(Availability.Type.AVAILABLE);
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, otherUserId);
+    });
+    await waitFor(() => {
+      expect(useMeetingNotificationStore.getState().notifications).toEqual([
+        expect.objectContaining({kind: MeetingNotificationKind.UPDATE, qualifiedId: meetingId}),
+      ]);
     });
   });
 
@@ -707,7 +810,7 @@ describe('MeetingStoreRoot', () => {
     {availability: Availability.Type.AWAY, expectedToasts: 0},
     {availability: Availability.Type.AVAILABLE, expectedToasts: 1},
   ])(
-    'shows the in-app reminder and $expectedToasts OS toasts when availability is $availability',
+    'shows a reminder only while available and $expectedToasts OS toasts when availability is $availability',
     async ({availability, expectedToasts}) => {
       const requests: SystemNotificationRequest[] = [];
       jest.spyOn(browserNotificationApi, 'createBrowserSystemNotificationApi').mockReturnValue({
@@ -742,9 +845,11 @@ describe('MeetingStoreRoot', () => {
         clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
       });
 
-      expect(useMeetingNotificationStore.getState().notifications).toEqual([
-        expect.objectContaining({kind: MeetingNotificationKind.REMINDER, meetingTitle: 'Weekly sync'}),
-      ]);
+      expect(useMeetingNotificationStore.getState().notifications).toEqual(
+        availability === Availability.Type.AWAY
+          ? []
+          : [expect.objectContaining({kind: MeetingNotificationKind.REMINDER, meetingTitle: 'Weekly sync'})],
+      );
       expect(requests).toHaveLength(expectedToasts);
 
       if (availability === Availability.Type.AWAY) {
@@ -753,6 +858,7 @@ describe('MeetingStoreRoot', () => {
           clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
         });
         expect(requests).toHaveLength(0);
+        expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
       }
     },
   );

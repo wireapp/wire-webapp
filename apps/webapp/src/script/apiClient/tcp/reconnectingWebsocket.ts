@@ -69,8 +69,6 @@ export type WebSocketReconnectContext = {
   readonly reconnectSequenceRetryCount: number;
 };
 
-export type WebSocketLifecycleImplementation = 'legacy' | 'corrected';
-
 export type WebSocketErrorHandler = (error: ErrorEvent, reconnectContext: WebSocketReconnectContext) => void;
 
 type IntervalIdentifier = ReturnType<typeof globalThis.setInterval>;
@@ -101,7 +99,6 @@ export type ReconnectingWebsocketWallClock = {
 };
 
 type ReconnectingWebsocketOptions = {
-  readonly lifecycleImplementation?: WebSocketLifecycleImplementation;
   readonly platform: WebSocketPlatform;
   readonly backFromSleepHandler: Maybe<BackFromSleepHandler>;
   readonly pingInterval: Maybe<number>;
@@ -194,7 +191,6 @@ export class ReconnectingWebsocket {
   };
 
   private readonly logger: Logger;
-  private readonly usesCorrectedLifecycle: boolean;
   private socket?: ReconnectingWebsocketWrapper;
   private isConnectionRequested = false;
   private pingerId?: IntervalIdentifier;
@@ -233,7 +229,6 @@ export class ReconnectingWebsocket {
     private readonly options: ReconnectingWebsocketOptions,
   ) {
     this.logger = getLogger('@wireapp/api-client/tcp/ReconnectingWebsocket');
-    this.usesCorrectedLifecycle = options.lifecycleImplementation === 'corrected';
 
     if (options.pingInterval.isJust) {
       this.PING_INTERVAL = options.pingInterval.value;
@@ -378,11 +373,10 @@ export class ReconnectingWebsocket {
   };
 
   private shouldIgnoreDisconnectedEvent(): boolean {
-    return this.usesCorrectedLifecycle && !this.isConnectionRequested;
+    return !this.isConnectionRequested;
   }
 
-  private readonly internalOnReconnect = async (generation: Maybe<number> = Maybe.nothing()): Promise<string> => {
-    const wrapperGeneration = generation.unwrapOr(this.wrapperGeneration);
+  private readonly internalOnReconnect = async (wrapperGeneration = this.wrapperGeneration): Promise<string> => {
     if (wrapperGeneration !== this.wrapperGeneration) {
       throw new DOMException('WebSocket wrapper was replaced', 'AbortError');
     }
@@ -655,9 +649,7 @@ export class ReconnectingWebsocket {
     const existingSocket = this.socket;
 
     const canReconnectInPlace =
-      (!this.usesCorrectedLifecycle || wasConnectionRequested) &&
-      !isUndefined(existingSocket) &&
-      !this.isExistingSocketClosed(existingSocket);
+      wasConnectionRequested && !isUndefined(existingSocket) && !this.isExistingSocketClosed(existingSocket);
     if (canReconnectInPlace) {
       this.logger.warn(
         `Existing WebSocket instance detected in state ${WEBSOCKET_STATE[existingSocket.readyState]} (${existingSocket.readyState}); reconnecting in place`,
@@ -682,14 +674,9 @@ export class ReconnectingWebsocket {
   }
 
   private createAndBindSocketWrapper(reason: string): void {
-    const legacySocket = this.usesCorrectedLifecycle
-      ? Maybe.nothing<ReconnectingWebsocketWrapper>()
-      : Maybe.just(this.getReconnectingWebsocket());
     this.wrapperGeneration += 1;
     this.activeWrapperGeneration = Maybe.just(this.wrapperGeneration);
-    const nextSocket = legacySocket.unwrapOrElse(() => {
-      return this.getReconnectingWebsocket();
-    });
+    const nextSocket = this.getReconnectingWebsocket();
     this.socket = nextSocket;
     this.bindSocketHandlers(nextSocket);
     this.logger.info('WebSocket wrapper created', {
@@ -836,11 +823,6 @@ export class ReconnectingWebsocket {
         websocket.socket.close(CloseEventCode.NORMAL_CLOSURE, reason);
       }
     }
-    if (!this.usesCorrectedLifecycle) {
-      closeSocket();
-      this.cleanup();
-      return;
-    }
     try {
       closeSocket();
     } finally {
@@ -867,9 +849,7 @@ export class ReconnectingWebsocket {
   }
 
   private getReconnectingWebsocket(): ReconnectingWebsocketWrapper {
-    const wrapperGeneration = this.usesCorrectedLifecycle
-      ? Maybe.just(this.wrapperGeneration)
-      : Maybe.nothing<number>();
+    const wrapperGeneration = this.wrapperGeneration;
     return this.options.websocketFactory.match({
       Just: websocketFactory => {
         return websocketFactory();

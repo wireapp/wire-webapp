@@ -28,7 +28,7 @@ import {selectDesktopApplicationLogWrite, type DesktopApplicationLogWrite} from 
 
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 
-const enabledSearch = '?enabled-features=desktop-structured-logs,persistent-browser-logs';
+const enabledSearch = '?enabled-features=desktop-structured-logs';
 
 function createTestOutput(writeToDesktop: DesktopApplicationLogWrite): {
   readonly clock: ReturnType<typeof createDeterministicClock>;
@@ -75,20 +75,24 @@ describe('Desktop structured logging', () => {
       .unwrapOr(undefined);
   });
 
-  it.each([undefined, null, {version: 2, write: jest.fn()}, {version: 1, write: 'write'}, {version: 1}])(
-    'ignores an unavailable capability (%s)',
-    capability => {
-      expect(
-        selectDesktopApplicationLogWrite({
-          isDesktopApp: true,
-          startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(enabledSearch),
-          readCapability() {
-            return capability;
-          },
-        }).isNothing,
-      ).toBe(true);
-    },
-  );
+  it.each([
+    undefined,
+    null,
+    {version: 2, write: jest.fn()},
+    {version: 1, write: 'write'},
+    {version: 1},
+    Object.create({version: 1, write: jest.fn()}),
+  ])('ignores an unavailable capability (%s)', capability => {
+    expect(
+      selectDesktopApplicationLogWrite({
+        isDesktopApp: true,
+        startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(enabledSearch),
+        readCapability() {
+          return capability;
+        },
+      }).isNothing,
+    ).toBe(true);
+  });
 
   it('contains errors while reading the capability', () => {
     expect(
@@ -117,14 +121,15 @@ describe('Desktop structured logging', () => {
       const createPersistenceOutput = jest.fn();
       const locationSearch = enabledSearch + consoleQuery;
       const browserPersistence = initializeLogging({
+        loggingEnabled: true,
         clock,
         consoleOutput,
         locationSearch,
         debugEnabled: false,
+        developerConsoleEnabled: true,
         storage: Maybe.nothing(),
         configureLogging: logging.configure,
-        startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(locationSearch),
-        isElectron: true,
+        browserPersistenceEnabled: false,
         desktopPersistenceOutput: output.write,
         createPersistenceOutput,
       });
@@ -136,7 +141,6 @@ describe('Desktop structured logging', () => {
         isDesktopApp: true,
         hasDesktopLogPersistence: true,
         locationSearch,
-        hostname: 'app.wire.com',
         origin: 'https://app.wire.com',
         version: '1.2.3',
         assetVersion: '1.2.3-147',
@@ -169,7 +173,6 @@ describe('Desktop structured logging', () => {
           time: 1000,
           component: 'RuntimeIdentity',
           msg: 'WebApp runtime identity',
-          deploymentStage: 'production',
           version: '1.2.3',
           assetVersion: '1.2.3-147',
           origin: 'https://app.wire.com',
@@ -273,15 +276,24 @@ describe('Desktop structured logging', () => {
         }
       });
       const {output, reportFailure} = createTestOutput(writeToDesktop);
-      for (const record of ['"first"', '"second"', '"third"', '"fourth"']) {
-        succeeding = record === '"third"';
-        output.write(record, 'info');
+      const batches = [['"first"', '"second"'], ['"third"'], ['"fourth"'], ['"fifth"']];
+      for (const [index, batch] of batches.entries()) {
+        succeeding = index === 2;
+        for (const record of batch) {
+          output.write(record, 'info');
+        }
         await output.flush();
       }
 
       const failure = response === 'busy' || response === 'rejected' ? response : 'failed';
       expect(reportFailure.mock.calls).toEqual([[failure], [failure]]);
-      expect(writeToDesktop.mock.calls).toEqual([[['"first"']], [['"second"']], [['"third"']], [['"fourth"']]]);
+      expect(writeToDesktop.mock.calls).toEqual(
+        batches.map(batch => {
+          return [batch];
+        }),
+      );
+      const expectedDroppedRecords = failure === 'failed' ? 0 : 4;
+      expect(output.getStatistics()).toMatchObject({droppedRecords: expectedDroppedRecords, pendingBytes: 0});
     },
   );
 

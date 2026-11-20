@@ -18,8 +18,11 @@
  */
 
 import {startBrowserApplication} from '../browser/startBrowserApplication';
+import type {StartupLoggingOptions} from '../logger/initializeLogging';
 
-await startBrowserApplication('main', async support => {
-  const {startAuthApp} = await import('./startAuthApp');
-  startAuthApp(support);
-});
+export async function startAuthentication(logging: StartupLoggingOptions): Promise<void> {
+  await startBrowserApplication('main', async support => {
+    const {startAuthApp} = await import('./startAuthApp');
+    startAuthApp(support, logging);
+  });
+}

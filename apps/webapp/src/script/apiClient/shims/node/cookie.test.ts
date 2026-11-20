@@ -19,11 +19,15 @@
 
 import {nodePlatform} from './platform';
 
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {AxiosHeaders, AxiosResponse} from 'axios';
 import nock from 'nock';
+import {Maybe} from 'true-myth';
 
 import {getCookieExpiration, retrieveCookie, sendRequestWithCookie} from './cookie';
 
+import {configureLogging} from '../../../logger/getLogger';
+import type {LogOutput} from '../../../logger/logOutput';
 import {AccessTokenStore} from '../../auth/accessTokenStore';
 import {Cookie} from '../../auth/cookie';
 import {CookieStore} from '../../auth/cookieStore';
@@ -139,6 +143,33 @@ describe('retrieveCookie', () => {
 
     expect(CookieStore.getCookie()?.expiration).toBe(new Date('2038-01-19T03:14:07.000Z').toString());
     expect(CookieStore.getCookie()?.zuid).toBe('persistent-value');
+  });
+
+  it('serializes cookie expiration without the session value or its prefix', async () => {
+    const sessionValue = 'synthetic-session-cookie-value';
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const persistedLines: string[] = [];
+    configureLogging(
+      Maybe.just({
+        clock,
+        namespaces: Maybe.nothing<string>(),
+        output() {},
+        persistenceOutput: Maybe.just<LogOutput>(line => {
+          persistedLines.push(line);
+        }),
+      }),
+    );
+    try {
+      await retrieveCookie(createResponse([`zuid=${sessionValue}; Path=/access`]));
+    } finally {
+      configureLogging(Maybe.nothing());
+    }
+
+    const serialized = persistedLines.join('\n');
+    expect(serialized).toContain('Saved internal cookie');
+    expect(serialized).toContain('Infinity');
+    expect(serialized.includes(sessionValue.slice(0, 20))).toBe(false);
+    expect(CookieStore.getCookie()?.zuid).toBe(sessionValue);
   });
 
   it('ignores malformed cookie headers', async () => {

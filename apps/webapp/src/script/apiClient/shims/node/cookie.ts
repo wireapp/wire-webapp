@@ -21,8 +21,6 @@ import {isNull, isNullOrUndefined} from '@sindresorhus/is';
 import {AxiosHeaders, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {Cookie as ToughCookie} from 'tough-cookie';
 
-import {obfuscateCookie} from './obfuscateCookie';
-
 import {getLogger} from '../../../logger/getLogger';
 import {Cookie} from '../../auth/';
 import {CookieStore} from '../../auth/cookieStore';
@@ -43,7 +41,7 @@ export const retrieveCookie = async <T>(response: AxiosResponse<T>): Promise<T> 
     for (const cookie of cookies) {
       const cookieString = getCookieExpiration(cookie.expires);
       CookieStore.setCookie(new Cookie(cookie.value, cookieString));
-      logger.info(`Saved internal cookie. It will expire on "${cookieString}".`, {cookie: obfuscateCookie(cookie)});
+      logger.info(`Saved internal cookie. It will expire on "${cookieString}".`);
     }
   }
 

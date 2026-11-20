@@ -19,6 +19,7 @@
 
 import {isFunction, isObject} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
+import {objectHasOwn} from 'ts-extras';
 
 import {desktopStructuredLogsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import type {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
@@ -61,9 +62,9 @@ function isVersionOneCapability(
 ): capability is {readonly version: 1; readonly write: DesktopApplicationLogWrite} {
   return (
     isObject(capability) &&
-    'version' in capability &&
+    objectHasOwn(capability, 'version') &&
     capability.version === 1 &&
-    'write' in capability &&
+    objectHasOwn(capability, 'write') &&
     isFunction(capability.write)
   );
 }

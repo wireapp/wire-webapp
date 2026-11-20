@@ -101,11 +101,7 @@ import {
   ConsumableNotificationSynchronization,
 } from '../apiClient/notification/consumableNotification';
 import {Notification} from '../apiClient/notification/notification';
-import {
-  type WebSocketLifecycleImplementation,
-  type WebSocketReconnectContext,
-  WEBSOCKET_STATE,
-} from '../apiClient/tcp/reconnectingWebsocket';
+import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '../apiClient/tcp/reconnectingWebsocket';
 import {WebSocketClient} from '../apiClient/tcp/webSocketClient';
 import {FEATURE_KEY, FEATURE_STATUS} from '../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../apiClient/user/qualifiedId';
@@ -123,7 +119,7 @@ export type ProcessedEventPayload = HandledEventPayload;
 export type WebSocketConnectionContext = Pick<WebSocketReconnectContext, 'attemptId' | 'wrapperGeneration'>;
 
 type WebSocketConnectionCycle = {
-  readonly signal: Maybe<AbortSignal>;
+  readonly signal: AbortSignal;
   readonly connectCycleId: number;
 };
 
@@ -849,11 +845,7 @@ export class Account extends TypedEventEmitter<Events> {
       throw new Error('use of legacy notifications must be explicitly set to true or false');
     }
 
-    const implementation = this.webSocketLifecycleImplementation;
-    const usesCorrectedLifecycle = implementation === 'corrected';
-    const cycleSignal: Maybe<AbortSignal> = usesCorrectedLifecycle
-      ? (connectionCycle?.signal ?? Maybe.nothing())
-      : Maybe.nothing();
+    const cycleSignal = Maybe.of(connectionCycle?.signal);
     if (isSocketCancelled(cycleSignal)) {
       return noop;
     }
@@ -861,14 +853,10 @@ export class Account extends TypedEventEmitter<Events> {
     this.cancelWebSocketConnection('superseded');
     const account = this;
     const websocket = this.apiClient.transport.ws;
-    const ownerCancellation: Maybe<AbortController> = usesCorrectedLifecycle
-      ? Maybe.just(new AbortController())
-      : Maybe.nothing();
-    const ownerSignal = ownerCancellation.map(controller => {
-      return controller.signal;
-    });
+    const ownerCancellation = new AbortController();
+    const ownerSignal = Maybe.just(ownerCancellation.signal);
     const listenerOwnerId = ++this.webSocketListenerOwnerId;
-    const lifecycle = {listenerOwnerId, connectCycleId: connectionCycle?.connectCycleId, useLegacy, implementation};
+    const lifecycle = {listenerOwnerId, connectCycleId: connectionCycle?.connectCycleId, useLegacy};
     let currentWebSocketConnectionContext: Maybe<WebSocketConnectionContext> = Maybe.nothing();
     let socketCancellation: Maybe<AbortController> = Maybe.nothing();
     let transportInUse = false;
@@ -922,10 +910,8 @@ export class Account extends TypedEventEmitter<Events> {
           ...lifecycle,
           ...currentWebSocketConnectionContext.unwrapOr({}),
         });
-        if (usesCorrectedLifecycle) {
-          cleanup('consumer-missing');
-          return;
-        }
+        cleanup('consumer-missing');
+        return;
       }
       if (state === ConnectionState.LIVE) {
         legacyMigration = 'none';
@@ -938,23 +924,17 @@ export class Account extends TypedEventEmitter<Events> {
       cleanup(reason === 'offline' || reason === 'superseded' ? reason : 'disconnect');
     }
 
-    function logListenerRemoval(
-      reason: WebSocketCleanupReason | 'legacy-listener-replacement',
-      removalScope: 'owned' | 'all-listeners' | 'all-notification-listeners',
-    ): void {
+    function logListenerRemoval(reason: WebSocketCleanupReason): void {
       const connectionContext = currentWebSocketConnectionContext.unwrapOr<Partial<WebSocketConnectionContext>>({});
       account.logger.info('Notification listener removal completed', {
         subsystem: 'websocket-lifecycle',
         event: 'notification-listener-removed',
-        listenerOwnerId: removalScope === 'owned' ? listenerOwnerId : undefined,
-        initiatingListenerOwnerId: removalScope === 'owned' ? undefined : listenerOwnerId,
+        listenerOwnerId,
         connectCycleId: lifecycle.connectCycleId,
         attemptId: connectionContext.attemptId,
         wrapperGeneration: connectionContext.wrapperGeneration,
         useLegacy,
-        implementation,
         reason,
-        removalScope,
         notificationListenerCount: websocket.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE),
         stateListenerCount: websocket.listenerCount(WebSocketClient.TOPIC.ON_STATE_CHANGE),
       });
@@ -973,25 +953,17 @@ export class Account extends TypedEventEmitter<Events> {
         locked: websocket.isLocked(),
         notificationListenerRegistered: subscription.hasNotificationListener(),
       });
-      if (usesCorrectedLifecycle) {
-        abortSocketController(ownerCancellation);
-        if (cycleSignal.isJust) {
-          cycleSignal.value.removeEventListener('abort', cancelConnectionCycle);
-        }
-        account.cleanupWebSocketConnection = Maybe.nothing();
-        subscription.remove();
-        logListenerRemoval(reason, 'owned');
+      ownerCancellation.abort();
+      if (cycleSignal.isJust) {
+        cycleSignal.value.removeEventListener('abort', cancelConnectionCycle);
       }
+      account.cleanupWebSocketConnection = Maybe.nothing();
+      subscription.remove();
+      logListenerRemoval(reason);
       abortSocketController(socketCancellation);
       flushProposalsQueue();
       account.pauseAndFlushNotificationQueue();
-      if (!usesCorrectedLifecycle) {
-        // Preserve the rollback cleanup order and listener scope.
-        account.apiClient.disconnect();
-        publishConnectionState(ConnectionState.CLOSED);
-        websocket.removeAllListeners();
-        logListenerRemoval(reason, 'all-listeners');
-      } else if (transportInUse) {
+      if (transportInUse) {
         try {
           account.apiClient.disconnect();
         } catch (error: unknown) {
@@ -1042,7 +1014,6 @@ export class Account extends TypedEventEmitter<Events> {
       getCurrentWebSocketConnectionContext,
       ownsConnection,
       lifecycle,
-      checkSocketCancellation: usesCorrectedLifecycle,
       getSocketSignal,
     });
 
@@ -1051,13 +1022,6 @@ export class Account extends TypedEventEmitter<Events> {
       event: 'notification-listener-register-start',
       ...lifecycle,
     });
-    if (!usesCorrectedLifecycle) {
-      const listenersToReplace = websocket.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE);
-      websocket.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
-      if (listenersToReplace > 0) {
-        logListenerRemoval('legacy-listener-replacement', 'all-notification-listeners');
-      }
-    }
     const subscription = this.setupWebSocketListeners({
       onConnectionStateChanged,
       handleNotification,
@@ -1071,11 +1035,9 @@ export class Account extends TypedEventEmitter<Events> {
         }
       },
     });
-    if (usesCorrectedLifecycle) {
-      this.cleanupWebSocketConnection = Maybe.just(cleanup);
-      if (cycleSignal.isJust) {
-        cycleSignal.value.addEventListener('abort', cancelConnectionCycle, {once: true});
-      }
+    this.cleanupWebSocketConnection = Maybe.just(cleanup);
+    if (cycleSignal.isJust) {
+      cycleSignal.value.addEventListener('abort', cancelConnectionCycle, {once: true});
     }
     this.logger.info('Notification listener registered', {
       subsystem: 'websocket-lifecycle',
@@ -1103,14 +1065,12 @@ export class Account extends TypedEventEmitter<Events> {
       abortController: AbortController,
       reconnectContext: WebSocketReconnectContext,
     ): Promise<void> {
-      const obsolete = usesCorrectedLifecycle && (!ownsConnection() || abortController.signal.aborted);
+      const obsolete = !ownsConnection() || abortController.signal.aborted;
       if (obsolete) {
         return;
       }
-      if (usesCorrectedLifecycle) {
-        abortSocketController(socketCancellation);
-        socketCancellation = Maybe.just(abortController);
-      }
+      abortSocketController(socketCancellation);
+      socketCancellation = Maybe.just(abortController);
       currentWebSocketConnectionContext = Maybe.just(reconnectContext);
       account.logger.info('WebSocket opened for notification processing', {
         subsystem: 'websocket-lifecycle',
@@ -1144,12 +1104,7 @@ export class Account extends TypedEventEmitter<Events> {
           if (abortController.signal.aborted) {
             return;
           }
-          if (usesCorrectedLifecycle) {
-            cleanup('catchup-failed');
-          } else {
-            account.pauseAndFlushNotificationQueue();
-            publishConnectionState(ConnectionState.CLOSED);
-          }
+          cleanup('catchup-failed');
         }
       }
     }
@@ -1163,9 +1118,6 @@ export class Account extends TypedEventEmitter<Events> {
     if (!useLegacy) {
       // let the backend now client is capable of consumable notifications
       capabilities.push(ClientCapability.CONSUMABLE_NOTIFICATIONS);
-      if (!usesCorrectedLifecycle) {
-        websocket.useAsyncNotificationsSocket();
-      }
     }
 
     this.logger.info(`Client is using the ${useLegacy ? 'legacy' : 'async'} notification stream`);
@@ -1175,8 +1127,7 @@ export class Account extends TypedEventEmitter<Events> {
       if (isObsoleteInitialization()) {
         return noop;
       }
-      const shouldSwitchSocket = usesCorrectedLifecycle && !useLegacy;
-      if (shouldSwitchSocket) {
+      if (!useLegacy) {
         websocket.useAsyncNotificationsSocket();
       }
 
@@ -1197,10 +1148,8 @@ export class Account extends TypedEventEmitter<Events> {
       if (!isClientCapableOfConsumableNotifications && !useLegacy) {
         // do the last legacy sync without connecting to any websockets
         transportInUse = true;
-        if (usesCorrectedLifecycle) {
-          legacyMigration = 'queued';
-        }
-        await legacyProcessNotificationStream(ownerCancellation);
+        legacyMigration = 'queued';
+        await legacyProcessNotificationStream(Maybe.just(ownerCancellation));
         if (isObsoleteInitialization()) {
           return noop;
         }
@@ -1236,9 +1185,7 @@ export class Account extends TypedEventEmitter<Events> {
         errorName,
         errorMessage,
       });
-      if (usesCorrectedLifecycle) {
-        cleanup('setup-failed');
-      }
+      cleanup('setup-failed');
       throw error;
     }
 
@@ -1383,11 +1330,6 @@ export class Account extends TypedEventEmitter<Events> {
   }
 
   private readonly handleNotificationQueueError = (error: unknown): void => {
-    const preserveLegacyRejection = this.webSocketLifecycleImplementation === 'legacy' && !(error instanceof Error);
-    if (preserveLegacyRejection) {
-      throw error;
-    }
-
     if (error instanceof TimeoutError) {
       this.logger.warn('Notification decryption task timed out', {
         subsystem: 'websocket-lifecycle',
@@ -1578,7 +1520,6 @@ export class Account extends TypedEventEmitter<Events> {
       return Maybe.nothing();
     },
     lifecycle,
-    checkSocketCancellation = false,
   }: {
     handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>;
     handleMissedNotifications: (notificationId: string) => Promise<void>;
@@ -1587,14 +1528,13 @@ export class Account extends TypedEventEmitter<Events> {
     ownsConnection?: () => boolean;
     getSocketSignal?: () => Maybe<AbortSignal>;
     lifecycle?: LogAttributes;
-    checkSocketCancellation?: boolean;
   }) => {
     return async (abortController: Maybe<AbortController> = Maybe.nothing()) => {
       const abortSignal = abortController.map(controller => {
         return controller.signal;
       });
       function isObsolete(): boolean {
-        return !ownsConnection() || (checkSocketCancellation && isSocketCancelled(abortSignal));
+        return !ownsConnection() || isSocketCancelled(abortSignal);
       }
 
       if (isObsolete()) {
@@ -1900,14 +1840,9 @@ export class Account extends TypedEventEmitter<Events> {
    *   // handle unhealthy websocket
    * }
    */
-  public get webSocketLifecycleImplementation(): WebSocketLifecycleImplementation {
-    return this.apiClient.transport.ws.lifecycleImplementation;
-  }
-
   public isWebsocketHealthy = async (): Promise<boolean> => {
-    const usesCorrectedLifecycle = this.webSocketLifecycleImplementation === 'corrected';
     const missingConsumer = this.apiClient.transport.ws.listenerCount(WebSocketClient.TOPIC.ON_MESSAGE) === 0;
-    if (usesCorrectedLifecycle && missingConsumer) {
+    if (missingConsumer) {
       return false;
     }
 

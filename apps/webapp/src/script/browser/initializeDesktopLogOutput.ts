@@ -20,24 +20,23 @@
 import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {Maybe} from 'true-myth';
-
-import {createDesktopLogOutput} from './createDesktopLogOutput';
-import type {LogOutput} from './logOutput';
-import {selectDesktopApplicationLogWrite} from './selectDesktopApplicationLogWrite';
+import {objectHasOwn} from 'ts-extras';
 
 import {Runtime} from '../commons/util/Runtime';
 import type {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
+import {createDesktopLogOutput} from '../logger/createDesktopLogOutput';
+import {selectDesktopApplicationLogWrite} from '../logger/selectDesktopApplicationLogWrite';
 
 /** Composes the Desktop logging transport for the main and authentication entry points. */
 export function initializeDesktopLogOutput(
   clock: Pick<Clock, 'setTimeout' | 'clearTimeout'>,
   startupFeatureToggles: StartupFeatureToggles,
-): Maybe<LogOutput> {
+): Maybe<ReturnType<typeof createDesktopLogOutput>> {
   return selectDesktopApplicationLogWrite({
     isDesktopApp: Runtime.isDesktopApp(),
     startupFeatureToggles,
     readCapability() {
-      return 'desktopApplicationLogs' in window ? window.desktopApplicationLogs : undefined;
+      return objectHasOwn(window, 'desktopApplicationLogs') ? window.desktopApplicationLogs : undefined;
     },
   }).map(writeToDesktop => {
     const output = createDesktopLogOutput({
@@ -63,6 +62,6 @@ export function initializeDesktopLogOutput(
       flushInvoker.fireAndForget(output.flush);
     });
 
-    return output.write;
+    return output;
   });
 }

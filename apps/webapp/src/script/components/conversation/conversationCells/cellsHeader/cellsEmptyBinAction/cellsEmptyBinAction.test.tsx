@@ -72,6 +72,7 @@ const createRepository = (overrides: Partial<CellsRepository> = {}): CellsReposi
 };
 
 interface EmptyBinTreeProps {
+  readonly showAction?: boolean;
   readonly cellsRepository: CellsRepository;
   readonly role: typeof CELLS_SELF_USER_DRIVE_ROLE.EDITOR | typeof CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
   readonly getCurrentCellsPath: () => string;
@@ -81,6 +82,7 @@ interface EmptyBinTreeProps {
 }
 
 const createEmptyBinTree = ({
+  showAction = true,
   cellsRepository,
   role,
   getCurrentCellsPath,
@@ -92,14 +94,16 @@ const createEmptyBinTree = ({
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <SharedDriveUploadStatusProvider>
         <CellsSelfUserDriveRoleProvider selfUserDriveRole={role}>
-          <CellsEmptyBinAction
-            cellsRepository={cellsRepository}
-            conversationQualifiedId={conversationQualifiedId}
-            getCurrentCellsPath={getCurrentCellsPath}
-            onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
-            onEmptyBinSubmitted={onEmptyBinSubmitted}
-            onInProgressChange={onInProgressChange}
-          />
+          {showAction && (
+            <CellsEmptyBinAction
+              cellsRepository={cellsRepository}
+              conversationQualifiedId={conversationQualifiedId}
+              getCurrentCellsPath={getCurrentCellsPath}
+              onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
+              onEmptyBinSubmitted={onEmptyBinSubmitted}
+              onInProgressChange={onInProgressChange}
+            />
+          )}
         </CellsSelfUserDriveRoleProvider>
         <SharedDriveUploadStatusPopupHost
           controller={uploadStatusController}
@@ -221,6 +225,124 @@ describe('CellsEmptyBinAction', () => {
       resolveDelete({Status: 'Performed'});
     });
     expect(await screen.findByText('cells.emptyBin.status.completed')).toBeInTheDocument();
+  });
+
+  it('completes background deletion after leaving the Bin view', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: JobsTaskStatus.Running})
+      .mockResolvedValueOnce({Status: JobsTaskStatus.Finished});
+    const cellsRepository = createRepository({
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      }),
+      getBackgroundActionInfo,
+    });
+    const onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(true);
+    const rendered = renderEmptyBinAction(cellsRepository, {clock, onRefreshAfterEmptyBinOutcome});
+
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+    await waitFor(() => {
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+    rendered.rerender(
+      createEmptyBinTree({
+        showAction: false,
+        cellsRepository,
+        role: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+        getCurrentCellsPath: () => {
+          return 'recycle_bin';
+        },
+        onRefreshAfterEmptyBinOutcome,
+        onEmptyBinSubmitted: jest.fn(),
+        onInProgressChange: jest.fn(),
+      }),
+    );
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+      await Promise.resolve();
+    });
+    await waitFor(() => {
+      expect(screen.getByRole('progressbar', {name: 'cells.emptyBin.status.completed'})).toBeInTheDocument();
+    });
+    expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
+    expect(onRefreshAfterEmptyBinOutcome).not.toHaveBeenCalled();
+    rendered.rerender(
+      createEmptyBinTree({
+        cellsRepository,
+        role: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+        getCurrentCellsPath: () => {
+          return 'recycle_bin';
+        },
+        onRefreshAfterEmptyBinOutcome,
+        onEmptyBinSubmitted: jest.fn(),
+        onInProgressChange: jest.fn(),
+      }),
+    );
+    await waitFor(() => {
+      expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('refreshes a newly mounted Bin view when a background deletion finishes', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: JobsTaskStatus.Running})
+      .mockResolvedValueOnce({Status: JobsTaskStatus.Finished});
+    const cellsRepository = createRepository({
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      }),
+      getBackgroundActionInfo,
+    });
+    const onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(true);
+    const rendered = renderEmptyBinAction(cellsRepository, {clock, onRefreshAfterEmptyBinOutcome});
+
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+    await waitFor(() => {
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+    rendered.rerender(
+      createEmptyBinTree({
+        showAction: false,
+        cellsRepository,
+        role: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+        getCurrentCellsPath: () => {
+          return 'recycle_bin';
+        },
+        onRefreshAfterEmptyBinOutcome,
+        onEmptyBinSubmitted: jest.fn(),
+        onInProgressChange: jest.fn(),
+      }),
+    );
+    rendered.rerender(
+      createEmptyBinTree({
+        cellsRepository,
+        role: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+        getCurrentCellsPath: () => {
+          return 'recycle_bin';
+        },
+        onRefreshAfterEmptyBinOutcome,
+        onEmptyBinSubmitted: jest.fn(),
+        onInProgressChange: jest.fn(),
+      }),
+    );
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+    });
+    await waitFor(() => {
+      expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('signals that it is in progress from submission until the Bin is emptied', async () => {
@@ -398,7 +520,7 @@ describe('CellsEmptyBinAction', () => {
     await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
     await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('cells.emptyBin.status.unknown');
+    expect(await screen.findByText('cells.emptyBin.status.unknown', {selector: 'span'})).toBeInTheDocument();
     expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
     expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', {name: 'cells.emptyBin.button'})).toBeDisabled();
@@ -463,7 +585,7 @@ describe('CellsEmptyBinAction', () => {
       clock.advanceByMilliseconds(1000);
       await Promise.resolve();
     });
-    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
 
     currentPath = 'recycle_bin';
     rerender();
@@ -541,7 +663,7 @@ describe('CellsEmptyBinAction', () => {
     await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
     await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('cells.emptyBin.status.partial');
+    expect(await screen.findByText('cells.emptyBin.status.partial', {selector: 'span'})).toBeInTheDocument();
     expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
     expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(2);
     expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);

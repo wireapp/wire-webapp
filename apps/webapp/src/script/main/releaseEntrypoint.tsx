@@ -21,5 +21,9 @@ import {startBrowserApplication} from '../browser/startBrowserApplication';
 
 await startBrowserApplication('wire-app', async support => {
   const {startApplication} = await import('./startApplication');
-  await startApplication([], support);
+  await startApplication({
+    defaultEnabledFeatureToggleNames: [],
+    support,
+    logging: {debugEnabled: window.wire.env.FEATURE.ENABLE_DEBUG, developerConsoleEnabled: false},
+  });
 });

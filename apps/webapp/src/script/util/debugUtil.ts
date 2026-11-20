@@ -19,7 +19,7 @@
 
 import {isNonEmptyString, isNullOrUndefined, isObject, isUndefined} from '@sindresorhus/is';
 import {Dexie} from 'dexie';
-import keyboardjs from 'keyboardjs';
+import {bind} from 'keyboardjs';
 import ko from 'knockout';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {noop} from 'noop-esm';
@@ -170,7 +170,7 @@ export class DebugUtil {
       this.ignoredMLSConversation(undefined);
     });
 
-    keyboardjs.bind(['command+shift+1', 'ctrl+shift+1'], this.toggleDebugUi);
+    bind(['command+shift+1', 'ctrl+shift+1'], this.toggleDebugUi);
 
     // If the debugger marked as active in the LocalStorage, install the Web Component
     this.setupAvsDebugger();

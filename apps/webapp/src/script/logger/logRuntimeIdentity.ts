@@ -19,18 +19,14 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
-import {match} from 'ts-pattern';
 
 import type {Logger} from './logger';
 import {encodeLogOutput, type ConsoleLogOutput} from './logOutput';
 
 import {isUUIDv4} from '../commons/util/ValidationUtil';
 
-type DeploymentStage = 'edge' | 'beta' | 'production' | 'unknown';
-
 type LogRuntimeIdentityOptions = {
   readonly logger: Pick<Logger, 'info'>;
-  readonly hostname: string;
   readonly origin: string;
   readonly version: string;
   readonly assetVersion: string;
@@ -44,27 +40,9 @@ type LogStartupRuntimeIdentityOptions = LogRuntimeIdentityOptions & {
   readonly locationSearch: string;
 };
 
-export function getDeploymentStage(hostname: string): DeploymentStage {
-  return match(hostname)
-    .returnType<DeploymentStage>()
-    .with('wire-webapp-edge.wire.com', () => {
-      return 'edge';
-    })
-    .with('wire-webapp-beta.wire.com', () => {
-      return 'beta';
-    })
-    .with('app.wire.com', () => {
-      return 'production';
-    })
-    .otherwise(() => {
-      return 'unknown';
-    });
-}
-
 export function logRuntimeIdentity(options: LogRuntimeIdentityOptions): void {
-  const {logger, hostname, origin, version, assetVersion} = options;
+  const {logger, origin, version, assetVersion} = options;
   logger.info('WebApp runtime identity', {
-    deploymentStage: getDeploymentStage(hostname),
     version,
     assetVersion,
     origin,
@@ -72,7 +50,7 @@ export function logRuntimeIdentity(options: LogRuntimeIdentityOptions): void {
 }
 
 export function logStartupRuntimeIdentity(options: LogStartupRuntimeIdentityOptions): void {
-  const {clock, consoleOutput, locationSearch, hostname, origin, version, assetVersion} = options;
+  const {clock, consoleOutput, locationSearch, origin, version, assetVersion} = options;
 
   try {
     if (usesPinoForStartupIdentity(options)) {
@@ -97,7 +75,6 @@ export function logStartupRuntimeIdentity(options: LogStartupRuntimeIdentityOpti
     // Use the legacy console destination even when Pino namespaces are disabled.
     consoleOutput.info(
       encodeLogOutput({
-        deploymentStage: getDeploymentStage(hostname),
         version,
         assetVersion,
         origin,

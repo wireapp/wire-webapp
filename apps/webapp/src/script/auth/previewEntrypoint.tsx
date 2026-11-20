@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,6 @@
  *
  */
 
-import {AccessTokenData} from '../auth';
+import {startAuthentication} from './main';
 
-const obfuscationLengthLimit = 20;
-
-const obfuscateAccessToken = (accessToken: AccessTokenData, enabled = true): AccessTokenData => {
-  if (enabled) {
-    return {
-      ...accessToken,
-      access_token: `${accessToken.access_token.substr(0, obfuscationLengthLimit)}...`,
-    };
-  }
-  return accessToken;
-};
-
-export const ObfuscationUtil = {
-  obfuscateAccessToken,
-};
+await startAuthentication({debugEnabled: true, developerConsoleEnabled: true});
