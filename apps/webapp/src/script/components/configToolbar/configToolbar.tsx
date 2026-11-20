@@ -21,7 +21,7 @@ import {useEffect, useRef, useState} from 'react';
 
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import keyboardjs from 'keyboardjs';
+import {bind, unbind} from 'keyboardjs';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
@@ -131,12 +131,10 @@ export function ConfigToolbar(): JSX.Element | null {
       });
     };
 
-    // eslint-disable-next-line import/no-named-as-default-member -- Named wrappers are ESM-only; CommonJS methods need the singleton receiver.
-    keyboardjs.bind(['command+shift+2', 'ctrl+shift+2'], handleKeyDown);
+    bind(['command+shift+2', 'ctrl+shift+2'], handleKeyDown);
 
     return () => {
-      // eslint-disable-next-line import/no-named-as-default-member -- Named wrappers are ESM-only; CommonJS methods need the singleton receiver.
-      keyboardjs.unbind(['command+shift+2', 'ctrl+shift+2'], handleKeyDown);
+      unbind(['command+shift+2', 'ctrl+shift+2'], handleKeyDown);
     };
   }, []);
 

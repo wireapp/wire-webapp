@@ -18,22 +18,21 @@
  */
 
 import {amplify} from 'amplify';
-import keyboardJS from 'keyboardjs';
+import keyboardJS, {pressKey, releaseAllKeys} from 'keyboardjs';
 
 import {WebAppEvents} from '../webAppEvents';
 
 import './shortcut';
 
-/* eslint-disable import/no-named-as-default-member -- Named wrappers are ESM-only; CommonJS methods need the singleton receiver. */
 function withShortcutBindings(testFunction: () => void): () => void {
   function runShortcutBindingTest(): void {
     try {
-      keyboardJS.releaseAllKeys();
+      releaseAllKeys();
       jest.spyOn(amplify, 'publish').mockReturnValue(true);
       testFunction();
     } finally {
       try {
-        keyboardJS.releaseAllKeys();
+        releaseAllKeys();
       } finally {
         jest.restoreAllMocks();
       }
@@ -49,9 +48,9 @@ describe('Shortcut bindings', () => {
     withShortcutBindings(() => {
       const preventDefault = jest.fn();
 
-      keyboardJS.pressKey('ctrl', {keyCode: 17});
-      keyboardJS.pressKey('shift', {keyCode: 16});
-      keyboardJS.pressKey('k', {keyCode: 75, preventDefault});
+      pressKey('ctrl', {keyCode: 17});
+      pressKey('shift', {keyCode: 16});
+      pressKey('k', {keyCode: 75, preventDefault});
 
       expect(preventDefault).toHaveBeenCalledTimes(1);
       expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.SHORTCUT.ADD_PEOPLE);
@@ -61,9 +60,9 @@ describe('Shortcut bindings', () => {
   it(
     'ignores a partial event without preventing the browser default',
     withShortcutBindings(() => {
-      keyboardJS.pressKey('ctrl', {keyCode: 17});
-      keyboardJS.pressKey('shift', {keyCode: 16});
-      keyboardJS.pressKey('k', {keyCode: 75});
+      pressKey('ctrl', {keyCode: 17});
+      pressKey('shift', {keyCode: 16});
+      pressKey('k', {keyCode: 75});
 
       expect(amplify.publish).not.toHaveBeenCalled();
     }),
@@ -75,12 +74,11 @@ describe('Shortcut bindings', () => {
       const releaseKeySpy = jest.spyOn(keyboardJS, 'releaseKey');
       const preventDefault = jest.fn();
 
-      keyboardJS.pressKey('ctrl', {});
-      keyboardJS.pressKey('shift', {});
-      keyboardJS.pressKey('k', {preventDefault});
+      pressKey('ctrl', {});
+      pressKey('shift', {});
+      pressKey('k', {preventDefault});
 
       expect(releaseKeySpy).not.toHaveBeenCalledWith(undefined);
     }),
   );
 });
-/* eslint-enable import/no-named-as-default-member */

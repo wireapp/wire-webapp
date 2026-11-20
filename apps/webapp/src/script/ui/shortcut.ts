@@ -19,7 +19,7 @@
 
 import {isFunction, isNumber, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
-import keyboardJS from 'keyboardjs';
+import {bind, releaseKey} from 'keyboardjs';
 
 import {ShortcutType} from './shortcutType';
 
@@ -164,15 +164,13 @@ const _registerEvent = (platformSpecificShortcut: string, event: string): void =
     _registerEvent(replacedShortcut, event);
   }
 
-  // eslint-disable-next-line import/no-named-as-default-member -- Named wrappers are ESM-only; CommonJS methods need the singleton receiver.
-  keyboardJS.bind(platformSpecificShortcut, inputEvent => {
+  bind(platformSpecificShortcut, inputEvent => {
     if (isUndefined(inputEvent)) {
       return;
     }
 
     if (isNumber(inputEvent.keyCode)) {
-      // eslint-disable-next-line import/no-named-as-default-member -- Named wrappers are ESM-only; CommonJS methods need the singleton receiver.
-      keyboardJS.releaseKey(inputEvent.keyCode);
+      releaseKey(inputEvent.keyCode);
     }
 
     // Hotfix WEBAPP-1916
