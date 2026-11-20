@@ -456,6 +456,7 @@ export const CellsTable = ({
     reviewReason: permanentDeleteReviewReason,
     deletePermanently,
     refreshReview: handleRefreshAfterPermanentDeleteReview,
+    resumeReview: resumePermanentDeleteReview,
     cancel: cancelPermanentDeleteReconciliation,
     clearRejection: clearPermanentDeleteRejection,
     reset: resetPermanentDeleteReconciliation,
@@ -611,6 +612,7 @@ export const CellsTable = ({
     selectionScopeKey,
   ]);
 
+  const {attachReviewStatus: attachPermanentDeleteReviewStatus} = permanentDeleteStatusReporter;
   useEffect(() => {
     if (!isInRecycleBin() || !deleteNeedsReviewAttachment || maybe.isNothing(currentDeleteStatus)) {
       attachedDeleteStatusId.current = Maybe.nothing();
@@ -621,14 +623,14 @@ export const CellsTable = ({
       attachedDeleteStatusId.current.value !== currentDeleteStatus.value.id
     ) {
       attachedDeleteStatusId.current = Maybe.just(currentDeleteStatus.value.id);
-      permanentDelete.resumeReview(currentDeleteStatus.value, selectionScopeKey, getCellsFilesPath());
-      permanentDeleteStatusReporter.attachReviewStatus(currentDeleteStatus.value);
+      resumePermanentDeleteReview(currentDeleteStatus.value, selectionScopeKey, getCellsFilesPath());
+      attachPermanentDeleteReviewStatus(currentDeleteStatus.value);
     }
   }, [
+    attachPermanentDeleteReviewStatus,
     currentDeleteStatus,
     deleteNeedsReviewAttachment,
-    permanentDelete.resumeReview,
-    permanentDeleteStatusReporter.attachReviewStatus,
+    resumePermanentDeleteReview,
     selectionScopeKey,
   ]);
 
