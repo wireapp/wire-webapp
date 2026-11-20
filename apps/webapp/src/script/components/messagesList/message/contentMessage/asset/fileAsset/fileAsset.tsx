@@ -82,8 +82,6 @@ function normalizeFileSize(fileSize: unknown): number | undefined {
     size = fileSize;
   } else if (typeof fileSize === 'string' && fileSize.trim() !== '') {
     size = Number(fileSize);
-  } else if (Long.isLong(fileSize)) {
-    size = fileSize.toNumber();
   } else if (isSerializedLong(fileSize)) {
     size = Long.fromBits(fileSize.low, fileSize.high, fileSize.unsigned ?? false).toNumber();
   } else {

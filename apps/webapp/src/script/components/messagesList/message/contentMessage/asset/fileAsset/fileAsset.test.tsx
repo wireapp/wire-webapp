@@ -223,6 +223,21 @@ describe('FileAssetComponent', () => {
     expect(screen.getByTestId('file-size')).toHaveTextContent('1 MB');
   });
 
+  it.each([
+    [0, '0 B'],
+    [1_048_576, '1 MB'],
+    ['0', '0 B'],
+    ['1048576', '1 MB'],
+  ] as const)('shows valid file size %p', (fileSize, expectedSize) => {
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_size = fileSize as unknown as number;
+
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+
+    expect(screen.getByTestId('file-size')).toHaveTextContent(expectedSize);
+  });
+
   it('shows large valid unsigned Long sizes', () => {
     const message = mockContentMessage('report.pdf');
     const asset = message.getFirstAsset() as FileAsset;
@@ -235,6 +250,11 @@ describe('FileAssetComponent', () => {
 
   it.each([
     ['missing', undefined],
+    ['null', null],
+    ['blank', ''],
+    ['whitespace', ' '],
+    ['unrecognized object', {}],
+    ['spoofed Long marker', {__isLong__: true}],
     ['NaN', Number.NaN],
     ['infinite', Number.POSITIVE_INFINITY],
     ['negative', -1],
@@ -245,10 +265,11 @@ describe('FileAssetComponent', () => {
   ] as const)('does not render a malformed file size (%s)', (_description, fileSize) => {
     const message = mockContentMessage('report.pdf');
     const asset = message.getFirstAsset() as FileAsset;
-    asset.file_size = fileSize as any;
+    asset.file_size = fileSize as unknown as number;
 
     render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
 
     expect(screen.queryByTestId('file-size')).not.toBeInTheDocument();
+    expect(screen.getByTestId('file-type')).toHaveTextContent('pdf');
   });
 });
