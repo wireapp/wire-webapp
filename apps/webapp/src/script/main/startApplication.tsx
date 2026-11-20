@@ -260,11 +260,7 @@ export async function startApplication(options: StartApplicationOptions): Promis
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
   const {applicationObservability} = applicationServices;
-  const apiClient = createApplicationApiClient({
-    clock: applicationServices.clock,
-    startupFeatureToggles,
-    logger: getLogger('WebSocketLifecycle'),
-  });
+  const apiClient = createApplicationApiClient(applicationServices.clock);
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
     apiClient,

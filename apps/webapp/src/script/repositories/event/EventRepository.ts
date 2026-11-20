@@ -169,11 +169,10 @@ export class EventRepository {
   // WebSocket handling
   //##############################################################################
 
-  private readonly updateConnectivityStatus = (state: ConnectionState, usesCorrectedLifecycle = false): void => {
+  private readonly updateConnectivityStatus = (state: ConnectionState): void => {
     switch (state) {
       case ConnectionState.CONNECTING: {
-        const leavingLive =
-          usesCorrectedLifecycle && this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+        const leavingLive = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
         if (leavingLive) {
           this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
         }
@@ -258,15 +257,9 @@ export class EventRepository {
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     dryRun = false,
   ): Promise<void> {
-    const implementation = account.webSocketLifecycleImplementation;
-    const usesCorrectedLifecycle = implementation === 'corrected';
-    if (usesCorrectedLifecycle) {
-      this.disconnectWebSocket();
-    }
+    this.disconnectWebSocket();
     const cleanupHandlers: (() => void)[] = [];
-    let connection: Maybe<{readonly cancellation: Maybe<AbortController>; initializing: boolean}> = Maybe.nothing();
-    // The rollback path keeps this callback until the replacement finishes initialization.
-    let legacyDisconnect = noop;
+    let connection: Maybe<{readonly cancellation: AbortController; initializing: boolean}> = Maybe.nothing();
     let disposed = false;
     let healthCheckInProgress = false;
     let currentConnectionState: Maybe<ConnectionState> = Maybe.nothing();
@@ -289,15 +282,11 @@ export class EventRepository {
     function applyConnectionState(state: ConnectionState): void {
       connectionStateRevision += 1;
       currentConnectionState = Maybe.just(state);
-      repository.updateConnectivityStatus(state, usesCorrectedLifecycle);
+      repository.updateConnectivityStatus(state);
     }
 
     function cancelConnection(reason: 'superseded' | 'offline' | 'disconnect'): void {
-      if (!usesCorrectedLifecycle) {
-        legacyDisconnect();
-        return;
-      }
-      const previousCancellation = connection.andThen(attempt => {
+      const previousCancellation = connection.map(attempt => {
         return attempt.cancellation;
       });
       connection = Maybe.nothing();
@@ -326,36 +315,28 @@ export class EventRepository {
         return;
       }
 
-      if (usesCorrectedLifecycle) {
-        cancelConnection('superseded');
-      }
+      cancelConnection('superseded');
       const currentConnectCycleId = ++connectCycleId;
       const attempt = {
-        cancellation: usesCorrectedLifecycle ? Maybe.just(new AbortController()) : Maybe.nothing<AbortController>(),
+        cancellation: new AbortController(),
         initializing: true,
       };
       const currentAttempt = Maybe.just(attempt);
       connection = currentAttempt;
-      if (!usesCorrectedLifecycle) {
-        cancelConnection('superseded');
-      }
-      const leavingLive =
-        usesCorrectedLifecycle && currentConnectionState.unwrapOr(ConnectionState.CLOSED) === ConnectionState.LIVE;
+      const leavingLive = currentConnectionState.unwrapOr(ConnectionState.CLOSED) === ConnectionState.LIVE;
       if (leavingLive) {
         applyConnectionState(ConnectionState.CONNECTING);
       }
-      const lifecycle = {trigger, connectCycleId: currentConnectCycleId, implementation};
+      const lifecycle = {trigger, connectCycleId: currentConnectCycleId};
       repository.logger.info('Connection attempt started', {
         subsystem: 'websocket-lifecycle',
         event: 'connect-start',
         ...lifecycle,
       });
       try {
-        const disconnect = await account.listen({
+        await account.listen({
           connectionCycle: {
-            signal: attempt.cancellation.map(controller => {
-              return controller.signal;
-            }),
+            signal: attempt.cancellation.signal,
             connectCycleId: currentConnectCycleId,
           },
           useLegacy,
@@ -363,7 +344,7 @@ export class EventRepository {
             connectionState: ConnectionState,
             connectionContext: WebSocketConnectionContext | undefined,
           ) => {
-            const isObsolete = usesCorrectedLifecycle && connection !== currentAttempt;
+            const isObsolete = connection !== currentAttempt;
             if (isObsolete) {
               return;
             }
@@ -381,17 +362,10 @@ export class EventRepository {
           onNotificationStreamProgress,
           dryRun,
         });
-        if (!usesCorrectedLifecycle) {
-          legacyDisconnect = disconnect;
-        }
       } catch (error: unknown) {
         if (connection === currentAttempt) {
           connection = Maybe.nothing();
-          if (usesCorrectedLifecycle) {
-            applyConnectionState(ConnectionState.CLOSED);
-          } else {
-            legacyDisconnect = noop;
-          }
+          applyConnectionState(ConnectionState.CLOSED);
           const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
           repository.logger.warn('Connection setup failed', {
             subsystem: 'websocket-lifecycle',
@@ -492,8 +466,7 @@ export class EventRepository {
           isHealthy = false;
         }
         const isObsolete =
-          usesCorrectedLifecycle &&
-          (disposed || connection !== checkedConnection || connectionStateRevision !== checkedStateRevision);
+          disposed || connection !== checkedConnection || connectionStateRevision !== checkedStateRevision;
         if (isObsolete) {
           return;
         }
@@ -532,30 +505,20 @@ export class EventRepository {
     const handleOffline = (): void => {
       this.logger.warn('Internet connection lost');
       cancelConnection('offline');
-      if (usesCorrectedLifecycle) {
-        applyConnectionState(ConnectionState.CLOSED);
-      } else {
-        Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
-      }
+      applyConnectionState(ConnectionState.CLOSED);
     };
 
     function disconnect(): void {
-      if (usesCorrectedLifecycle) {
-        disposed = true;
-        repository.disconnectWebSocket = noop;
-      }
+      disposed = true;
+      repository.disconnectWebSocket = noop;
       cleanupHandlers.forEach(cleanup => {
         cleanup();
       });
       cancelConnection('disconnect');
-      if (usesCorrectedLifecycle) {
-        repository.notificationHandlingState(NOTIFICATION_HANDLING_STATE.CLOSED);
-      }
+      repository.notificationHandlingState(NOTIFICATION_HANDLING_STATE.CLOSED);
     }
 
-    if (usesCorrectedLifecycle) {
-      this.disconnectWebSocket = disconnect;
-    }
+    this.disconnectWebSocket = disconnect;
 
     await this.handleTimeDrift();
     if (disposed) {
@@ -608,9 +571,6 @@ export class EventRepository {
     });
 
     await connect('initial');
-    if (!usesCorrectedLifecycle) {
-      this.disconnectWebSocket = disconnect;
-    }
   }
 
   /**

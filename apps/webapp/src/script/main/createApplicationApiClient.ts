@@ -19,28 +19,8 @@
 
 import type {Clock} from '@enormora/clock/clock';
 
-import {websocketListenerLifecycleFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
-import type {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
-import type {Logger} from '../logger/getLogger';
 import {APIClient} from '../service/apiClientSingleton';
 
-type CreateApplicationApiClientOptions = {
-  readonly clock: Clock;
-  readonly startupFeatureToggles: StartupFeatureToggles;
-  readonly logger: Pick<Logger, 'info'>;
-};
-
-export function createApplicationApiClient(options: CreateApplicationApiClientOptions): APIClient {
-  const {clock, startupFeatureToggles, logger} = options;
-  const implementation = startupFeatureToggles.isFeatureToggleEnabled(websocketListenerLifecycleFeatureToggleName)
-    ? 'corrected'
-    : 'legacy';
-  const apiClient = new APIClient({clock, webSocketLifecycleImplementation: implementation});
-  logger.info('WebSocket lifecycle initialized', {
-    subsystem: 'websocket-lifecycle',
-    event: 'websocket-lifecycle-initialized',
-    implementation,
-  });
-
-  return apiClient;
+export function createApplicationApiClient(clock: Clock): APIClient {
+  return new APIClient({clock});
 }

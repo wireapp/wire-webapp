@@ -18,99 +18,19 @@
  */
 
 import {createClock} from '@enormora/clock/clock';
-import {noop} from 'noop-esm';
 
 import {createApplicationApiClient} from './createApplicationApiClient';
 
-import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeStartupFeatureToggleUrl';
-import {
-  markAsUnreadFeatureToggleName,
-  previewDefaultEnabledStartupFeatureToggleNames,
-  websocketListenerLifecycleFeatureToggleName,
-} from '../featureToggles/startupFeatureToggleNames';
-import {updateLocationSearchForStartupFeatureToggle} from '../featureToggles/startupFeatureToggleQueryParameters';
-import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
-
-function initializeUrl(url: URL, preview: boolean): URL {
-  let initializedUrl = url;
-  initializeStartupFeatureToggleUrl({
-    url,
-    defaultEnabledFeatureToggleNames: preview ? previewDefaultEnabledStartupFeatureToggleNames : [],
-    replaceUrl(replacement) {
-      initializedUrl = new URL(replacement);
-    },
-  });
-
-  return initializedUrl;
-}
+import {Account} from '../core/account';
 
 describe('createApplicationApiClient', () => {
-  const optIn = '?enabled-features=websocket-listener-lifecycle';
+  it('treats an application WebSocket with no notification consumer as unhealthy', async () => {
+    using apiClient = createApplicationApiClient(createClock());
+    const account = new Account(apiClient);
+    const checkTransportHealth = jest.spyOn(apiClient.transport.ws, 'checkHealth').mockResolvedValue(true);
 
-  it.each([
-    {scenario: 'preview defaults', preview: true, query: '', implementation: 'corrected', markAsUnread: true},
-    {scenario: 'release defaults', preview: false, query: '', implementation: 'legacy', markAsUnread: false},
-    {scenario: 'preview opt-in', preview: true, query: optIn, implementation: 'corrected', markAsUnread: false},
-    {scenario: 'release opt-in', preview: false, query: optIn, implementation: 'corrected', markAsUnread: false},
-    {
-      scenario: 'preview opt-out',
-      preview: true,
-      query: '?enabled-features=',
-      implementation: 'legacy',
-      markAsUnread: false,
-    },
-    {
-      scenario: 'release opt-out',
-      preview: false,
-      query: '?enabled-features=',
-      implementation: 'legacy',
-      markAsUnread: false,
-    },
-    {
-      scenario: 'preview selection of another feature',
-      preview: true,
-      query: '?enabled-features=mark-as-unread',
-      implementation: 'legacy',
-      markAsUnread: true,
-    },
-  ])('selects the lifecycle for $scenario', options => {
-    const {preview, query, implementation, markAsUnread} = options;
-    const url = initializeUrl(new URL(`https://example.com/${query}`), preview);
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(url.search);
-    using apiClient = createApplicationApiClient({
-      clock: createClock(),
-      startupFeatureToggles,
-      logger: {info: noop},
-    });
+    await expect(account.isWebsocketHealthy()).resolves.toBe(false);
 
-    expect(apiClient.transport.ws.lifecycleImplementation).toBe(implementation);
-    expect(startupFeatureToggles.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(markAsUnread);
-  });
-
-  it('keeps the session selection stable and honors the opt-out at the next preview startup', () => {
-    const url = initializeUrl(new URL(`https://example.com/${optIn}`), true);
-    const clock = createClock();
-    const logger = {info: noop};
-    using apiClient = createApplicationApiClient({
-      clock,
-      startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(url.search),
-      logger,
-    });
-
-    url.search = updateLocationSearchForStartupFeatureToggle({
-      locationSearch: url.search,
-      featureToggleName: websocketListenerLifecycleFeatureToggleName,
-      shouldEnableFeatureToggle: false,
-    });
-    expect(url.search).toBe('?enabled-features=');
-    expect(apiClient.transport.ws.lifecycleImplementation).toBe('corrected');
-
-    const reloadedUrl = initializeUrl(new URL(url.href), true);
-    using reloadedClient = createApplicationApiClient({
-      clock,
-      startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(reloadedUrl.search),
-      logger,
-    });
-    expect(reloadedClient.transport.ws.lifecycleImplementation).toBe('legacy');
+    expect(checkTransportHealth).not.toHaveBeenCalled();
   });
 });

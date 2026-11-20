@@ -32,7 +32,6 @@ import {NotificationSource} from '../../core/notification';
 import {WebAppEvents} from '../../webAppEvents';
 import {amplify} from 'amplify';
 import {asyncNoop} from 'noop-esm';
-import {Maybe} from 'true-myth';
 import {Runtime} from '../../commons/util/Runtime';
 
 import {ClientConversationEvent} from '../conversation/EventBuilder';
@@ -250,7 +249,7 @@ describe('EventRepository', () => {
 
     it('returns to stream handling while reconnecting from LIVE', () => {
       eventRepository['updateConnectivityStatus'](ConnectionState.LIVE);
-      eventRepository['updateConnectivityStatus'](ConnectionState.CONNECTING, true);
+      eventRepository['updateConnectivityStatus'](ConnectionState.CONNECTING);
 
       expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.STREAM);
     });
@@ -393,7 +392,6 @@ describe('EventRepository', () => {
       );
 
       mockAccount = {
-        webSocketLifecycleImplementation: 'corrected',
         listen: jest.fn().mockResolvedValue(jest.fn()),
         isWebsocketHealthy: jest.fn().mockResolvedValue(true),
       };
@@ -498,7 +496,7 @@ describe('EventRepository', () => {
       await eventRepository.connectWebSocket(mockAccount, true, progressCallback, false);
 
       expect(mockAccount.listen).toHaveBeenCalledWith({
-        connectionCycle: {signal: expect.objectContaining({isJust: true}), connectCycleId: 1},
+        connectionCycle: {signal: expect.any(AbortSignal), connectCycleId: 1},
         useLegacy: true,
         onConnectionStateChanged: expect.any(Function),
         onEvent: expect.any(Function),
@@ -517,11 +515,12 @@ describe('EventRepository', () => {
     it('cancels an initializing reconnect on offline and ignores its late state changes', async () => {
       type ListenOptions = NonNullable<Parameters<Account['listen']>[0]>;
       function getCycleSignal(options: ListenOptions): AbortSignal {
-        const signal = options.connectionCycle?.signal ?? Maybe.nothing();
+        const connectionCycle = options.connectionCycle;
+        if (connectionCycle === undefined) {
+          throw new Error('Expected the WebSocket connection to have a cancellation signal');
+        }
 
-        return signal.unwrapOrElse(() => {
-          throw new Error('Expected the corrected lifecycle to have a cancellation signal');
-        });
+        return connectionCycle.signal;
       }
 
       const pendingReconnect = Promise.withResolvers<() => void>();
@@ -561,23 +560,9 @@ describe('EventRepository', () => {
       expect(getCycleSignal(activeCycle).reason).toBe('disconnect');
     });
 
-    it('uses the returned disconnect callback for the legacy lifecycle', async () => {
-      const disconnect = jest.fn();
-      mockAccount.webSocketLifecycleImplementation = 'legacy';
-      mockAccount.listen.mockResolvedValue(disconnect);
-      await eventRepository.connectWebSocket(mockAccount, true, jest.fn());
-
-      window.dispatchEvent(new Event('offline'));
-
-      expect(mockAccount.listen).toHaveBeenCalledWith(
-        expect.objectContaining({connectionCycle: {signal: Maybe.nothing(), connectCycleId: 1}}),
-      );
-      expect(disconnect).toHaveBeenCalledTimes(1);
-    });
-
     it('recovers notifications after a healthy transport loses its application consumer', async () => {
       jest.spyOn(Runtime, 'isElectron').mockReturnValue(true);
-      using apiClient = new APIClient({platform: browserPlatform, webSocketLifecycleImplementation: 'corrected'});
+      using apiClient = new APIClient({platform: browserPlatform});
       const account = new Account(apiClient);
       account['currentClient'] = {
         id: 'test-client',

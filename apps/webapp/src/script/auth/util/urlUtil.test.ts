@@ -21,7 +21,7 @@ import {createAuthRedirectPath} from './urlUtil';
 
 import {
   forTestsOnlyFeatureToggleName,
-  websocketListenerLifecycleFeatureToggleName,
+  markAsUnreadFeatureToggleName,
 } from '../../featureToggles/startupFeatureToggleNames';
 import {initializeStartupFeatureToggleUrl} from '../../featureToggles/initializeStartupFeatureToggleUrl';
 import {startupFeatureToggleQueryParameterName} from '../../featureToggles/startupFeatureToggles';
@@ -98,7 +98,7 @@ describe('createAuthRedirectPath', () => {
 
     initializeStartupFeatureToggleUrl({
       url: applicationUrl,
-      defaultEnabledFeatureToggleNames: [forTestsOnlyFeatureToggleName, websocketListenerLifecycleFeatureToggleName],
+      defaultEnabledFeatureToggleNames: [forTestsOnlyFeatureToggleName, markAsUnreadFeatureToggleName],
       replaceUrl(url) {
         applicationUrl = new URL(url);
       },
@@ -117,8 +117,8 @@ describe('createAuthRedirectPath', () => {
       allowedQueryParameterNames: FORWARDED_QUERY_KEYS,
     });
 
-    expect(authPath).toBe('/auth/?hl=en&enabled-features=for-tests-only%2Cwebsocket-listener-lifecycle');
-    expect(mainAppPath).toBe('../?hl=en&enabled-features=for-tests-only%2Cwebsocket-listener-lifecycle');
+    expect(authPath).toBe('/auth/?hl=en&enabled-features=for-tests-only%2Cmark-as-unread');
+    expect(mainAppPath).toBe('../?hl=en&enabled-features=for-tests-only%2Cmark-as-unread');
   });
 
   const startupFeatureToggleQueryString = new URLSearchParams({

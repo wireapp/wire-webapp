@@ -133,7 +133,6 @@ function createWebSocketClient(
   return new WebSocketClient(baseUrl, client, {
     platform: nodePlatform.websocket,
     wallClock,
-    lifecycleImplementation: 'corrected',
   });
 }
 
@@ -722,11 +721,10 @@ describe('WebSocketClient', () => {
       });
     });
 
-    it.each(['legacy', 'corrected'] as const)('propagates a malformed frame in %s mode', implementation => {
+    it('propagates a malformed frame', () => {
       const websocketClient = new WebSocketClient(testWebSocketBaseUrl, fakeHttpClient, {
         platform: nodePlatform.websocket,
         wallClock: testWallClock,
-        lifecycleImplementation: implementation,
       });
       webSocketClients.push(websocketClient);
       const listener = jest.fn();

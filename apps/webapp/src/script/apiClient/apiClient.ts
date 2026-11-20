@@ -54,12 +54,7 @@ import type {ApiClientPlatform} from './platform';
 import {SelfAPI} from './self/';
 import {ServiceProviderAPI} from './serviceProvider';
 import {ServicesAPI} from './services';
-import {
-  OnConnect,
-  ReconnectingWebsocketWallClock,
-  WebSocketClient,
-  type WebSocketLifecycleImplementation,
-} from './tcp/';
+import {OnConnect, ReconnectingWebsocketWallClock, WebSocketClient} from './tcp/';
 import {
   FeatureAPI,
   IdentityProviderAPI,
@@ -107,8 +102,7 @@ const defaultConfig = {
     setTimeout: globalThis.setTimeout.bind(globalThis),
   },
   urls: Backend.PRODUCTION,
-  webSocketLifecycleImplementation: 'legacy',
-} satisfies Config & Pick<APIClientConfiguration, 'wallClock' | 'webSocketLifecycleImplementation'>;
+} satisfies Config & Pick<APIClientConfiguration, 'wallClock'>;
 
 export interface APIClient {
   on(event: TOPIC.ON_LOGOUT, listener: (error: InvalidTokenError) => void): this;
@@ -121,11 +115,10 @@ export interface APIClient {
 export type APIClientConfiguration = {
   readonly platform: ApiClientPlatform;
   readonly wallClock: ReconnectingWebsocketWallClock;
-  readonly webSocketLifecycleImplementation: WebSocketLifecycleImplementation;
 };
 
 export type APIClientConstructorConfiguration = Partial<Config> &
-  Partial<Pick<APIClientConfiguration, 'wallClock' | 'webSocketLifecycleImplementation'>> & {
+  Partial<Pick<APIClientConfiguration, 'wallClock'>> & {
     readonly platform: ApiClientPlatform;
   };
 
@@ -212,8 +205,7 @@ export class APIClient extends EventEmitter implements Disposable {
 
   constructor(config: APIClientConstructorConfiguration) {
     super();
-    const {webSocketLifecycleImplementation = defaultConfig.webSocketLifecycleImplementation} = config;
-    this.config = {...defaultConfig, ...config, webSocketLifecycleImplementation};
+    this.config = {...defaultConfig, ...config};
     this.accessTokenStore = new AccessTokenStore();
     this.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, (accessToken: AccessTokenData) => {
       return this.emit(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, accessToken);
@@ -222,7 +214,6 @@ export class APIClient extends EventEmitter implements Disposable {
 
     const httpClient = new HttpClient(this.config, this.accessTokenStore, {cookie: this.config.platform.cookie});
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient, {
-      lifecycleImplementation: this.config.webSocketLifecycleImplementation,
       wallClock: this.config.wallClock,
       platform: this.config.platform.websocket,
     });

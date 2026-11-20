@@ -17,5 +17,5 @@
  *
  */
 
-export type {ReconnectingWebsocketWallClock, WebSocketLifecycleImplementation} from './reconnectingWebsocket';
+export type {ReconnectingWebsocketWallClock} from './reconnectingWebsocket';
 export * from './webSocketClient';
