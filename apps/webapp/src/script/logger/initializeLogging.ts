@@ -30,7 +30,7 @@ type InitializeLoggingOptions = {
   readonly consoleOutput: ConsoleLogOutput;
   readonly locationSearch: string;
   readonly debugEnabled: boolean;
-  readonly developerConsoleEnabled?: boolean;
+  readonly developerConsoleEnabled: boolean;
   readonly shouldWriteConsoleFallback?: (() => boolean) | undefined;
   readonly storage: Maybe<Pick<Storage, 'setItem' | 'removeItem'>>;
   readonly configureLogging: (dependencies: Maybe<LoggingDependencies>) => void;
@@ -45,7 +45,7 @@ export function initializeLogging(options: InitializeLoggingOptions): Maybe<Brow
     consoleOutput,
     locationSearch,
     debugEnabled,
-    developerConsoleEnabled = true,
+    developerConsoleEnabled,
     shouldWriteConsoleFallback,
     storage,
     configureLogging,

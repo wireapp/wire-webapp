@@ -121,6 +121,7 @@ describe('Desktop structured logging', () => {
         consoleOutput,
         locationSearch,
         debugEnabled: false,
+        developerConsoleEnabled: true,
         storage: Maybe.nothing(),
         configureLogging: logging.configure,
         browserPersistenceEnabled: false,

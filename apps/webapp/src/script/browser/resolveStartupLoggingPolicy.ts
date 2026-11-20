@@ -29,7 +29,7 @@ type StartupLoggingPolicy = {
 export function resolveStartupLoggingPolicy(hostname: string, configuredDebug: boolean): StartupLoggingPolicy {
   const deploymentStage = match(hostname.toLowerCase())
     .returnType<DeploymentStage>()
-    .with('localhost', '127.0.0.1', '[::1]', 'local.zinfra.io', () => {
+    .with('localhost', '127.0.0.1', '[::1]', 'local.wire.com', 'local.zinfra.io', 'local.imai.wire.link', () => {
       return 'local';
     })
     .with('wire-webapp-dev.zinfra.io', () => {
@@ -48,17 +48,11 @@ export function resolveStartupLoggingPolicy(hostname: string, configuredDebug: b
       return 'unknown';
     });
 
-  const debugEnabled = match(deploymentStage)
-    .with('local', 'dev', 'edge', () => {
-      return true;
-    })
-    .with('beta', 'production', () => {
-      return false;
-    })
-    .with('unknown', () => {
-      return configuredDebug;
-    })
-    .exhaustive();
+  const developmentDeployment = deploymentStage === 'local' || deploymentStage === 'dev' || deploymentStage === 'edge';
 
-  return {deploymentStage, debugEnabled, developerConsoleEnabled: debugEnabled};
+  return {
+    deploymentStage,
+    debugEnabled: deploymentStage === 'unknown' ? configuredDebug : developmentDeployment,
+    developerConsoleEnabled: developmentDeployment,
+  };
 }

@@ -73,18 +73,24 @@ function createTestPersistence(options: TestPersistenceOptions): Maybe<BrowserLo
 
 describe('logging startup', () => {
   it.each([
-    ['localhost', true],
-    ['wire-webapp-dev.zinfra.io', true],
-    ['wire-webapp-edge.wire.com', true],
-    ['wire-webapp-beta.wire.com', false],
-    ['app.wire.com', false],
-  ])('applies the console and DEBUG defaults for %s', (hostname, expectedConsole) => {
+    ['localhost', false, true, true],
+    ['local.wire.com', false, true, true],
+    ['local.zinfra.io', false, true, true],
+    ['LOCAL.IMAI.WIRE.LINK', false, true, true],
+    ['wire-webapp-dev.zinfra.io', false, true, true],
+    ['wire-webapp-edge.wire.com', false, true, true],
+    ['wire-webapp-beta.wire.com', true, false, false],
+    ['app.wire.com', true, false, false],
+    ['app.customer.example', true, true, false],
+    ['local.wire.com.customer.example', false, false, false],
+  ])('applies the console and DEBUG defaults for %s', (hostname, configuredDebug, expectedDebug, expectedConsole) => {
     const logging = createPinoLogging(Maybe.nothing());
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const loggingPolicy = resolveStartupLoggingPolicy(hostname, configuredDebug);
     initializeLogging({
       ...disabledPersistenceOptions,
-      ...resolveStartupLoggingPolicy(hostname, !expectedConsole),
+      ...loggingPolicy,
       clock,
       consoleOutput,
       locationSearch: '',
@@ -94,7 +100,8 @@ describe('logging startup', () => {
     logging.getLogger('Startup').debug('debug diagnostic');
     logging.getLogger('Startup').info('info diagnostic');
 
-    expect(consoleOutput.debug).toHaveBeenCalledTimes(expectedConsole ? 1 : 0);
+    expect(loggingPolicy.debugEnabled).toBe(expectedDebug);
+    expect(consoleOutput.debug).toHaveBeenCalledTimes(expectedDebug && expectedConsole ? 1 : 0);
     expect(consoleOutput.info).toHaveBeenCalledTimes(expectedConsole ? 1 : 0);
   });
 
@@ -124,17 +131,26 @@ describe('logging startup', () => {
   );
 
   it.each([
-    {locationSearch: '?enableLogging=@wireapp/*', debugRecords: 1},
-    {locationSearch: '?enableLogging=@wireapp/*&debugLogging=', debugRecords: 0},
-    {locationSearch: '?enableLogging=@wireapp/*&debugLogging=-*', debugRecords: 0},
-  ])('preserves the only Desktop console transport with $locationSearch', options => {
-    const {locationSearch, debugRecords} = options;
+    {hostname: 'wire-webapp-beta.wire.com', locationSearch: '?enableLogging=@wireapp/*', debugRecords: 1},
+    {hostname: 'wire-webapp-beta.wire.com', locationSearch: '?enableLogging=@wireapp/*&debugLogging=', debugRecords: 0},
+    {
+      hostname: 'wire-webapp-beta.wire.com',
+      locationSearch: '?enableLogging=@wireapp/*&debugLogging=-*',
+      debugRecords: 0,
+    },
+    {
+      hostname: 'app.customer.example',
+      locationSearch: '?debugLogging=@wireapp/webapp/Startup&enableLogging=-*',
+      debugRecords: 1,
+    },
+  ])('preserves the only Desktop console transport on $hostname with $locationSearch', options => {
+    const {hostname, locationSearch, debugRecords} = options;
     const logging = createPinoLogging(Maybe.nothing());
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     initializeLogging({
       ...disabledPersistenceOptions,
-      ...resolveStartupLoggingPolicy('wire-webapp-beta.wire.com', true),
+      ...resolveStartupLoggingPolicy(hostname, false),
       clock,
       consoleOutput,
       locationSearch,
@@ -196,16 +212,30 @@ describe('logging startup', () => {
     expect(consoleOutput.info).toHaveBeenCalledTimes(1);
   });
 
-  it('persists INFO, WARN, ERROR and selected DEBUG to OPFS in release with a quiet console', async () => {
+  it.each([
+    {
+      hostname: 'wire-webapp-beta.wire.com',
+      configuredDebug: false,
+      locationSearch: '?debugLogging=Selected',
+      expectedLevels: [20, 30, 40, 50],
+    },
+    {
+      hostname: 'app.customer.example',
+      configuredDebug: true,
+      locationSearch: '',
+      expectedLevels: [20, 20, 30, 40, 50],
+    },
+  ])('persists INFO, WARN, ERROR and enabled DEBUG to OPFS with a quiet console on $hostname', async options => {
+    const {hostname, configuredDebug, locationSearch, expectedLevels} = options;
     const logging = createPinoLogging(Maybe.nothing());
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
     const persistedLines: string[] = [];
     const persistence = initializeLogging({
-      ...resolveStartupLoggingPolicy('wire-webapp-beta.wire.com', false),
+      ...resolveStartupLoggingPolicy(hostname, configuredDebug),
       clock,
       consoleOutput,
-      locationSearch: '?debugLogging=Selected',
+      locationSearch,
       browserPersistenceEnabled: true,
       createPersistenceOutput() {
         return createTestPersistence({
@@ -233,7 +263,7 @@ describe('logging startup', () => {
       persistedLines.map(line => {
         return JSON.parse(line).level;
       }),
-    ).toEqual([20, 30, 40, 50]);
+    ).toEqual(expectedLevels);
     expect(consoleOutput.debug).not.toHaveBeenCalled();
     expect(consoleOutput.info).not.toHaveBeenCalled();
     expect(consoleOutput.warn).not.toHaveBeenCalled();
@@ -317,6 +347,7 @@ describe('logging startup', () => {
       consoleOutput: output,
       locationSearch: search,
       debugEnabled,
+      developerConsoleEnabled: true,
       storage: Maybe.just(storage),
       configureLogging: logging.configure,
     });
@@ -339,6 +370,7 @@ describe('logging startup', () => {
       consoleOutput: output,
       locationSearch: '?debugLogging=*',
       debugEnabled: false,
+      developerConsoleEnabled: true,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
     });
@@ -389,6 +421,7 @@ describe('logging startup', () => {
         consoleOutput,
         locationSearch,
         debugEnabled,
+        developerConsoleEnabled: true,
         storage: Maybe.nothing(),
         configureLogging: logging.configure,
         browserPersistenceEnabled: !isElectron,
@@ -463,6 +496,7 @@ describe('logging startup', () => {
         consoleOutput: output,
         locationSearch: '',
         debugEnabled: true,
+        developerConsoleEnabled: true,
         storage: Maybe.just(storage),
         configureLogging: logging.configure,
       });
@@ -497,6 +531,7 @@ describe('logging startup', () => {
         consoleOutput,
         locationSearch,
         debugEnabled: false,
+        developerConsoleEnabled: true,
         storage: Maybe.nothing(),
         configureLogging: logging.configure,
         browserPersistenceEnabled: persistenceEnabled && !isElectron,
@@ -548,6 +583,7 @@ describe('logging startup', () => {
       consoleOutput,
       locationSearch: '?debugLogging=*',
       debugEnabled: false,
+      developerConsoleEnabled: true,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
       browserPersistenceEnabled: true,
@@ -587,6 +623,7 @@ describe('logging startup', () => {
       consoleOutput,
       locationSearch: '?debugLogging=*',
       debugEnabled: false,
+      developerConsoleEnabled: true,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
       browserPersistenceEnabled: true,
@@ -635,6 +672,7 @@ describe('logging startup', () => {
       consoleOutput,
       locationSearch: '?debugLogging=*',
       debugEnabled: false,
+      developerConsoleEnabled: true,
       storage: Maybe.nothing(),
       configureLogging: logging.configure,
       browserPersistenceEnabled: true,
