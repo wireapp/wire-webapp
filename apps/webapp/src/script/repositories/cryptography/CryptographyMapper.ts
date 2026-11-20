@@ -488,7 +488,7 @@ export class CryptographyMapper {
 
     if (!isNullOrUndefined(original)) {
       data = {
-        content_length: original.size as number,
+        content_length: Number(original.size),
         content_type: original.mimeType ?? '',
         info: {
           name: original.name ?? undefined,

@@ -272,6 +272,29 @@ describe('CryptographyMapper', () => {
       });
     });
 
+    it('normalizes decoded asset sizes before they are stored', async () => {
+      const original = Asset.Original.decode(
+        Asset.Original.encode({mimeType: 'application/pdf', name: 'report.pdf', size: 1_048_576}).finish(),
+      );
+      expect(Long.isLong(original.size)).toBe(true);
+
+      const uploaded = new Asset.RemoteData({
+        assetId: createUuid(),
+        assetToken: createUuid(),
+        otrKey: new Uint8Array([1]),
+        sha256: new Uint8Array([2]),
+      });
+      const generic_message = new GenericMessage({
+        [GenericMessageType.ASSET]: new Asset({original, uploaded}),
+        messageId: createUuid(),
+      });
+
+      const mapped_event = requireMappedMessageData(await mapper.mapGenericMessage(generic_message, event));
+
+      expect(mapped_event.data.content_length).toBe(1_048_576);
+      expect(structuredClone(mapped_event).data.content_length).toBe(1_048_576);
+    });
+
     it('resolves with a mapped original asset message with audio meta data', () => {
       const duration = 3;
       const audio_meta_data = new Asset.AudioMetaData({
