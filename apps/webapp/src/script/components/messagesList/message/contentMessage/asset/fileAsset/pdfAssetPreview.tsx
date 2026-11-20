@@ -17,92 +17,116 @@
  *
  */
 
-import {useEffect, useRef, useState, type ReactElement} from 'react';
-
-import {
-  closeButtonStyles,
-  overlayStyles,
-  previewImageStyles,
-  previewScrollStyles,
-  previewStatusStyles,
-} from './pdfAssetPreview.styles';
+import {useEffect, useState, type ReactElement} from 'react';
 
 import {useInView} from '../../../../../../hooks/useInView/useInView';
-import type {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
+import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
+import type {AssetRemoteData as AssetRemoteDataType} from '../../../../../../repositories/assets/assetRemoteData';
 import {readPreviewBlob} from '../../../../../../repositories/assets/readPreviewBlob';
-import {CloseIcon} from '../../../../../../uiKit/dataDisplay/icon/closeIcon';
 import {FileCardPreview} from '../../../../../fileCard/fileCardPreview/fileCardPreview';
-import {FullscreenModal} from '../../../../../fullscreenModal/fullscreenModal';
+import {FileFullscreenModal} from '../../../../../FileFullscreenModal/FileFullscreenModal';
 
 interface PdfAssetPreviewProps {
   id: string;
-  resource: AssetRemoteData;
+  thumbnailResource: AssetRemoteDataType;
+  originalResource: AssetRemoteDataType;
   label: string;
   fileName: string;
-  closeLabel: string;
-  loadingLabel: string;
-  errorLabel: string;
+  fileExtension: string;
+  senderName: string;
+  timestamp: number;
   isOpen: boolean;
   onOpenPreview: (trigger: HTMLElement) => void;
   onClose: () => void;
+  onDownload: () => Promise<void> | void;
   tabIndex: number;
-  loadAsset: (resource: AssetRemoteData) => Promise<Blob | undefined>;
+  loadAsset: (resource: AssetRemoteDataType) => Promise<Blob | undefined>;
 }
 
 const keyLength = 32;
 const maxPreviewSize = 1_048_576;
+const pdfHeaderLength = 1024;
 const pngSignature = '\x89PNG\r\n\x1a\n';
 const jpegSignature = '\xff\xd8\xff';
+const pdfSignature = '%PDF-';
+
+type PreviewStatus = 'loading' | 'unavailable' | 'success';
+
+const createPreviewResource = (resource: AssetRemoteDataType): AssetRemoteData => {
+  return new AssetRemoteData({
+    ...resource.urlData,
+    otrKey: resource.otrKey,
+    sha256: resource.sha256,
+  });
+};
+
+const matchesSignature = (bytes: Uint8Array, signature: string): boolean => {
+  return Array.from(signature).every((character, index) => {
+    return bytes[index] === character.charCodeAt(0);
+  });
+};
+
+const hasPdfSignature = async (blob: Blob): Promise<boolean> => {
+  if (blob.size === 0) {
+    return false;
+  }
+
+  const header = new Uint8Array(await readPreviewBlob(blob.slice(0, pdfHeaderLength)));
+  return new TextDecoder().decode(header).includes(pdfSignature);
+};
 
 export const PdfAssetPreview = ({
   id,
-  resource,
+  thumbnailResource,
+  originalResource,
   label,
   fileName,
-  closeLabel,
-  loadingLabel,
-  errorLabel,
+  fileExtension,
+  senderName,
+  timestamp,
   isOpen,
   onOpenPreview,
   onClose,
+  onDownload,
   tabIndex,
   loadAsset,
 }: PdfAssetPreviewProps): ReactElement => {
   const {elementRef, hasBeenInView} = useInView<HTMLDivElement>();
-  const [shouldLoadPreview, setShouldLoadPreview] = useState(false);
-  const [preview, setPreview] = useState<{resource: AssetRemoteData; url: string}>();
-  const [failedUrl, setFailedUrl] = useState<string>();
-  const [previewLoadFailed, setPreviewLoadFailed] = useState(false);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const [shouldLoadThumbnail, setShouldLoadThumbnail] = useState(false);
+  const [thumbnail, setThumbnail] = useState<{resource: AssetRemoteDataType; url: string}>();
+  const [failedThumbnailUrl, setFailedThumbnailUrl] = useState<string>();
+  const [thumbnailLoadFailed, setThumbnailLoadFailed] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string>();
+  const [pdfStatus, setPdfStatus] = useState<PreviewStatus>('loading');
 
   useEffect(() => {
     if (hasBeenInView || isOpen) {
-      setShouldLoadPreview(true);
+      setShouldLoadThumbnail(true);
     }
   }, [hasBeenInView, isOpen]);
 
   useEffect(() => {
-    if (!shouldLoadPreview) {
+    if (!shouldLoadThumbnail) {
       return undefined;
     }
 
     let disposed = false;
     let objectUrl: string | undefined;
-    setPreviewLoadFailed(false);
+    setThumbnailLoadFailed(false);
 
     const load = async (): Promise<void> => {
       try {
-        if (resource.otrKey?.length !== keyLength || resource.sha256?.length !== keyLength) {
-          setPreviewLoadFailed(true);
+        if (thumbnailResource.otrKey?.length !== keyLength || thumbnailResource.sha256?.length !== keyLength) {
+          setThumbnailLoadFailed(true);
           return;
         }
 
-        const blob = await loadAsset(resource);
+        const blob = await loadAsset(thumbnailResource);
         if (disposed) {
           return;
         }
         if (blob === undefined || blob.size > maxPreviewSize) {
-          setPreviewLoadFailed(true);
+          setThumbnailLoadFailed(true);
           return;
         }
 
@@ -112,23 +136,18 @@ export const PdfAssetPreview = ({
           return;
         }
 
-        const matchesSignature = (signature: string): boolean => {
-          return Array.from(signature).every((character, index) => {
-            return bytes[index] === character.charCodeAt(0);
-          });
-        };
-        const isPng = matchesSignature(pngSignature);
-        const isJpeg = matchesSignature(jpegSignature);
+        const isPng = matchesSignature(bytes, pngSignature);
+        const isJpeg = matchesSignature(bytes, jpegSignature);
         if (!isPng && !isJpeg) {
-          setPreviewLoadFailed(true);
+          setThumbnailLoadFailed(true);
           return;
         }
 
         objectUrl = URL.createObjectURL(new Blob([blob], {type: isPng ? 'image/png' : 'image/jpeg'}));
-        setPreview({resource, url: objectUrl});
+        setThumbnail({resource: thumbnailResource, url: objectUrl});
       } catch {
         if (!disposed) {
-          setPreviewLoadFailed(true);
+          setThumbnailLoadFailed(true);
         }
       }
     };
@@ -136,57 +155,94 @@ export const PdfAssetPreview = ({
 
     return () => {
       disposed = true;
-      resource.cancelDownload();
+      thumbnailResource.cancelDownload();
       if (objectUrl !== undefined) {
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [shouldLoadPreview, resource, loadAsset]);
+  }, [shouldLoadThumbnail, thumbnailResource, loadAsset]);
 
   useEffect(() => {
     if (!isOpen) {
       return undefined;
     }
 
-    const attachDialogLabelAndFocus = (): boolean => {
-      const dialog = document.getElementById(id);
-      if (dialog === null) {
-        return false;
+    let disposed = false;
+    let isLoading = true;
+    let objectUrl: string | undefined;
+    const pdfResource = createPreviewResource(originalResource);
+    setPdfUrl(undefined);
+    setPdfStatus('loading');
+
+    const loadPdf = async (): Promise<void> => {
+      try {
+        if (pdfResource.otrKey?.length !== keyLength || pdfResource.sha256?.length !== keyLength) {
+          setPdfStatus('unavailable');
+          return;
+        }
+
+        const blob = await loadAsset(pdfResource);
+        if (disposed) {
+          return;
+        }
+        if (blob === undefined) {
+          setPdfStatus('unavailable');
+          return;
+        }
+
+        const isPdf = await hasPdfSignature(blob);
+        if (disposed) {
+          return;
+        }
+        if (!isPdf) {
+          setPdfStatus('unavailable');
+          return;
+        }
+
+        objectUrl = URL.createObjectURL(new Blob([blob], {type: 'application/pdf'}));
+        setPdfUrl(objectUrl);
+        setPdfStatus('success');
+      } catch {
+        if (!disposed) {
+          setPdfStatus('unavailable');
+        }
+      } finally {
+        isLoading = false;
       }
-      dialog.setAttribute('aria-label', label);
-      closeButtonRef.current?.focus();
-      return true;
     };
+    void loadPdf();
 
-    if (attachDialogLabelAndFocus()) {
-      return undefined;
-    }
-
-    const observer = new MutationObserver(() => {
-      if (attachDialogLabelAndFocus()) {
-        observer.disconnect();
-      }
-    });
-    observer.observe(document.body, {childList: true, subtree: true});
     return () => {
-      observer.disconnect();
+      disposed = true;
+      if (isLoading) {
+        pdfResource.cancelDownload();
+      }
+      if (objectUrl !== undefined) {
+        URL.revokeObjectURL(objectUrl);
+      }
     };
-  }, [id, isOpen, label]);
+  }, [isOpen, originalResource, loadAsset]);
 
-  const url = preview?.resource === resource ? preview.url : undefined;
-  const isPreviewUnavailable = previewLoadFailed || (url !== undefined && url === failedUrl);
-  const onPreviewImageError = (): void => {
-    if (url !== undefined) {
-      setFailedUrl(url);
+  const thumbnailUrl = thumbnail?.resource === thumbnailResource ? thumbnail.url : undefined;
+  const isThumbnailUnavailable =
+    thumbnailLoadFailed || (thumbnailUrl !== undefined && thumbnailUrl === failedThumbnailUrl);
+  const onThumbnailError = (): void => {
+    if (thumbnailUrl !== undefined) {
+      setFailedThumbnailUrl(thumbnailUrl);
     }
+  };
+  const closePreview = (): void => {
+    setPdfUrl(undefined);
+    setPdfStatus('loading');
+    onClose();
   };
 
   return (
     <div ref={elementRef} css={{width: '100%'}}>
-      {url !== undefined && url !== failedUrl && (
+      {thumbnailUrl !== undefined && thumbnailUrl !== failedThumbnailUrl && !isThumbnailUnavailable && (
         <div css={{marginTop: '12px'}}>
           <FileCardPreview
-            src={url}
+            src={thumbnailUrl}
             aria-label={label}
             aria-haspopup="dialog"
             aria-expanded={isOpen}
@@ -195,35 +251,25 @@ export const PdfAssetPreview = ({
             onClick={event => {
               return onOpenPreview(event.currentTarget);
             }}
-            onImageError={onPreviewImageError}
+            onImageError={onThumbnailError}
           />
         </div>
       )}
-      {isOpen && (
-        <FullscreenModal id={id} isOpen={isOpen} onClose={onClose}>
-          <div css={overlayStyles}>
-            <button
-              ref={closeButtonRef}
-              type="button"
-              css={closeButtonStyles}
-              aria-label={closeLabel}
-              title={closeLabel}
-              onClick={onClose}
-            >
-              <CloseIcon color="currentColor" />
-            </button>
-            <div css={previewScrollStyles}>
-              {url !== undefined && !isPreviewUnavailable ? (
-                <img src={url} alt={fileName} css={previewImageStyles} onError={onPreviewImageError} />
-              ) : (
-                <p css={previewStatusStyles} role={isPreviewUnavailable ? 'alert' : 'status'}>
-                  {isPreviewUnavailable ? errorLabel : loadingLabel}
-                </p>
-              )}
-            </div>
-          </div>
-        </FullscreenModal>
-      )}
+      <FileFullscreenModal
+        id={id}
+        dialogId={id}
+        isOpen={isOpen}
+        onClose={closePreview}
+        filePreviewUrl={pdfUrl}
+        fileName={fileName}
+        fileExtension={fileExtension}
+        senderName={senderName}
+        timestamp={timestamp}
+        status={pdfStatus}
+        previewType="pdf"
+        context="chat"
+        onDownload={onDownload}
+      />
     </div>
   );
 };

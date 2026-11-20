@@ -249,25 +249,30 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
       ) : (
         <RestrictedFile asset={asset} />
       )}
-      {canShowPdfPreview && previewResource !== undefined && (isUploadedOrCancelled || isPdfPreviewOpen) && (
-        <PdfAssetPreview
-          id={pdfPreviewModalId}
-          key={previewResource.identifier}
-          resource={previewResource}
-          label={translate('cells.filePreviewButton.ariaLabel', {name: assetFileName})}
-          fileName={assetFileName}
-          closeLabel={translate('modalCloseButton')}
-          loadingLabel={translate('conversationAssetDownloading')}
-          errorLabel={translate('pdfViewerErrorTitle')}
-          isOpen={isPdfPreviewOpen}
-          onOpenPreview={openPdfPreview}
-          onClose={() => {
-            return setIsPdfPreviewOpen(false);
-          }}
-          tabIndex={messageFocusedTabIndex}
-          loadAsset={loadAsset}
-        />
-      )}
+      {canShowPdfPreview &&
+        previewResource !== undefined &&
+        originalResource !== undefined &&
+        (isUploadedOrCancelled || isPdfPreviewOpen) && (
+          <PdfAssetPreview
+            id={pdfPreviewModalId}
+            key={previewResource.identifier}
+            thumbnailResource={previewResource}
+            originalResource={originalResource}
+            label={translate('cells.filePreviewButton.ariaLabel', {name: assetFileName})}
+            fileName={fileName}
+            fileExtension={fileExtension}
+            senderName={message.user().name()}
+            timestamp={message.timestamp()}
+            isOpen={isPdfPreviewOpen}
+            onOpenPreview={openPdfPreview}
+            onClose={() => {
+              return setIsPdfPreviewOpen(false);
+            }}
+            onDownload={onDownloadAsset}
+            tabIndex={messageFocusedTabIndex}
+            loadAsset={loadAsset}
+          />
+        )}
     </div>
   );
 };

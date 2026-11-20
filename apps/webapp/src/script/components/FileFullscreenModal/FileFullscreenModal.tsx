@@ -31,9 +31,10 @@ import {PDFViewer} from './PdfViewer/PdfViewer';
 
 import type {Conversation} from '../../repositories/entity/Conversation';
 import {isFileEditable} from '../../util/fileTypeUtil';
+import type {FileType} from '../../util/getFileTypeFromExtension/fileType';
 import {getFileTypeFromExtension} from '../../util/getFileTypeFromExtension/getFileTypeFromExtension';
 import {getBestPreviewSource} from '../../util/imageUtil';
-import {getFileExtensionFromUrl} from '../../util/util';
+import {getFileExtensionFromUrl, getFileNameWithExtension} from '../../util/util';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,
@@ -59,6 +60,10 @@ interface FileFullscreenModalProps {
   badges?: string[];
   isEditMode?: boolean;
   checkIsInRecycleBin?: () => boolean;
+  context?: 'cells' | 'chat';
+  onDownload?: () => Promise<void> | void;
+  previewType?: FileType;
+  dialogId?: string;
 }
 
 export const FileFullscreenModal: FunctionComponent<FileFullscreenModalProps> = ({
@@ -77,13 +82,19 @@ export const FileFullscreenModal: FunctionComponent<FileFullscreenModalProps> = 
   badges,
   isEditMode = false,
   checkIsInRecycleBin = isInRecycleBin,
+  context = 'cells',
+  onDownload,
+  previewType,
+  dialogId,
 }: FileFullscreenModalProps) => {
-  const modalDomId = useId();
+  const generatedDialogId = useId();
+  const modalDomId = dialogId ?? generatedDialogId;
   const sourceConversationFromContext = useFileFullscreenModalSourceConversation();
   const sourceConversationForMetadata = sourceConversation ?? sourceConversationFromContext;
-  const notInRecycleBin = !checkIsInRecycleBin();
+  const isInCellsRecycleBin = context === 'cells' && checkIsInRecycleBin();
+  const notInRecycleBin = !isInCellsRecycleBin;
   const canPerformCellsAction = useCellsActionPermissions();
-  const canEdit = canPerformCellsAction(CELLS_ACTION.EDIT);
+  const canEdit = context === 'cells' && canPerformCellsAction(CELLS_ACTION.EDIT);
   const [isInEditMode, setIsInEditMode] = useState(isEditMode && notInRecycleBin && canEdit);
   const [refreshKey, setRefreshKey] = useState(0);
   const isEditable = isFileEditable(fileExtension);
@@ -104,7 +115,12 @@ export const FileFullscreenModal: FunctionComponent<FileFullscreenModalProps> = 
   }, [canEdit, isEditMode, notInRecycleBin]);
 
   return (
-    <FullscreenModal id={modalDomId} isOpen={isOpen} onClose={onCloseModal}>
+    <FullscreenModal
+      id={modalDomId}
+      ariaLabel={getFileNameWithExtension(fileName, fileExtension)}
+      isOpen={isOpen}
+      onClose={onCloseModal}
+    >
       <FileHeader
         onClose={onCloseModal}
         fileName={fileName}
@@ -120,7 +136,10 @@ export const FileFullscreenModal: FunctionComponent<FileFullscreenModalProps> = 
         isEditable={isEditable}
         id={id}
         onFileContentRefresh={refreshModalContent}
-        showViewOnlyLabel={!canEdit}
+        showViewOnlyLabel={context === 'cells' && !canEdit}
+        context={context}
+        onDownload={onDownload}
+        autoFocusCloseButton={context === 'chat'}
       />
       {isInEditMode && isEditable ? (
         <FileEditor key={refreshKey} id={id} />
@@ -134,6 +153,7 @@ export const FileFullscreenModal: FunctionComponent<FileFullscreenModalProps> = 
           senderName={senderName}
           timestamp={timestamp}
           status={status}
+          previewType={previewType}
         />
       )}
     </FullscreenModal>
@@ -148,6 +168,7 @@ interface ModalContentProps {
   timestamp: number;
   filePreviewUrl?: string;
   fileUrl?: string;
+  previewType?: FileType;
 }
 
 const ModalContent: FunctionComponent<ModalContentProps> = ({
@@ -158,6 +179,7 @@ const ModalContent: FunctionComponent<ModalContentProps> = ({
   senderName,
   timestamp,
   status,
+  previewType,
 }: ModalContentProps) => {
   if (status === 'loading' && (filePreviewUrl === undefined || filePreviewUrl.length === 0)) {
     return <FileLoader />;
@@ -168,7 +190,7 @@ const ModalContent: FunctionComponent<ModalContentProps> = ({
   }
 
   const extension = getFileExtensionFromUrl(filePreviewUrl);
-  const type = getFileTypeFromExtension(extension);
+  const type = previewType ?? getFileTypeFromExtension(extension);
 
   if (type === 'pdf') {
     return <PDFViewer src={filePreviewUrl} />;

@@ -35,17 +35,44 @@ import {FileFullscreenModal} from './FileFullscreenModal';
 
 jest.mock('../fullscreenModal/fullscreenModal', () => {
   return {
-    FullscreenModal: ({children, isOpen}: any) => {
-      return isOpen ? <div>{children}</div> : null;
+    FullscreenModal: ({
+      children,
+      isOpen,
+      id,
+      ariaLabel,
+    }: {
+      children: ReactNode;
+      isOpen: boolean;
+      id: string;
+      ariaLabel?: string;
+    }) => {
+      return isOpen ? (
+        <div id={id} role="dialog" aria-label={ariaLabel}>
+          {children}
+        </div>
+      ) : null;
     },
   };
 });
 
 jest.mock('./FileHeader/FileHeader', () => {
   return {
-    FileHeader: ({showViewOnlyLabel}: {showViewOnlyLabel?: boolean}) => {
+    FileHeader: ({
+      showViewOnlyLabel,
+      context,
+      onDownload,
+    }: {
+      showViewOnlyLabel?: boolean;
+      context?: string;
+      onDownload?: () => void;
+    }) => {
       return (
-        <div data-uie-name="file-header" data-show-view-only-label={String(showViewOnlyLabel === true)}>
+        <div
+          data-uie-name="file-header"
+          data-show-view-only-label={String(showViewOnlyLabel === true)}
+          data-context={context}
+          data-has-download={String(onDownload !== undefined)}
+        >
           Header
         </div>
       );
@@ -208,6 +235,47 @@ describe('FileFullscreenModal - File Version Restore', () => {
       render(<FileFullscreenModal {...defaultProps} filePreviewUrl="file.pdf" fileExtension="pdf" />, {wrapper});
 
       expect(screen.getByTestId('pdf-viewer')).toBeInTheDocument();
+    });
+
+    it('uses an explicit preview type when the decrypted URL has no file extension', () => {
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          fileExtension="pdf"
+          filePreviewUrl="blob:decrypted-pdf"
+          previewType="pdf"
+        />,
+        {wrapper},
+      );
+
+      expect(screen.getByTestId('pdf-viewer')).toBeInTheDocument();
+    });
+
+    it('keeps chat previews read-only without Cells viewer assumptions', () => {
+      render(<FileFullscreenModal {...defaultProps} context="chat" isEditMode fileExtension="docx" />, {wrapper});
+
+      expect(screen.getByTestId('file-header')).toHaveAttribute('data-context', 'chat');
+      expect(screen.getByTestId('file-header')).toHaveAttribute('data-show-view-only-label', 'false');
+      expect(screen.getByTestId('file-header')).toHaveAttribute('data-has-download', 'false');
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+    });
+
+    it('uses the supplied dialog id and file name as the accessible dialog label', () => {
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          context="chat"
+          dialogId="chat-pdf-preview"
+          fileName="report"
+          fileExtension="pdf"
+        />,
+        {
+          wrapper,
+        },
+      );
+
+      const dialog = screen.getByRole('dialog', {name: 'report.pdf'});
+      expect(dialog).toHaveAttribute('id', 'chat-pdf-preview');
     });
 
     it('should render image viewer for image files', () => {

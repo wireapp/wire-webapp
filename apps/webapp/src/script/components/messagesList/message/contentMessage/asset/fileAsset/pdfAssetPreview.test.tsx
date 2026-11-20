@@ -19,7 +19,7 @@
 
 import {useState, type FunctionComponent} from 'react';
 
-import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
 import {PdfAssetPreview} from './pdfAssetPreview';
@@ -27,52 +27,112 @@ import {PdfAssetPreview} from './pdfAssetPreview';
 import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
 import {requireValueForTest} from '../../../../../../page/testSupport/rootContextTestSupport';
 
+jest.mock('../../../../../FileFullscreenModal/FileFullscreenModal', () => {
+  return {
+    FileFullscreenModal: ({
+      isOpen,
+      dialogId,
+      onClose,
+      onDownload,
+      filePreviewUrl,
+      fileName,
+      fileExtension,
+      senderName,
+      timestamp,
+      status,
+      context,
+      previewType,
+    }: {
+      isOpen: boolean;
+      dialogId: string;
+      onClose: () => void;
+      onDownload: () => void;
+      filePreviewUrl?: string;
+      fileName: string;
+      fileExtension: string;
+      senderName: string;
+      timestamp: number;
+      status: string;
+      context: string;
+      previewType: string;
+    }) => {
+      if (!isOpen) {
+        return null;
+      }
+
+      return (
+        <div
+          role="dialog"
+          id={dialogId}
+          aria-label={`${fileName}.${fileExtension}`}
+          data-testid="file-modal"
+          data-preview-url={filePreviewUrl}
+          data-status={status}
+          data-context={context}
+          data-preview-type={previewType}
+          data-sender={senderName}
+          data-timestamp={timestamp}
+        >
+          <button type="button" onClick={onDownload}>
+            Download
+          </button>
+          <button type="button" onClick={onClose}>
+            Close test preview
+          </button>
+        </div>
+      );
+    },
+  };
+});
+
 const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])], {type: 'application/octet-stream'});
+const pdf = new Blob(['%PDF-1.7\nvalid test PDF'], {type: 'application/octet-stream'});
 
 interface PreviewHarnessProps {
-  resource: AssetRemoteData;
+  thumbnailResource: AssetRemoteData;
+  originalResource: AssetRemoteData;
   label: string;
-  tabIndex?: number;
-  onOpenPreview?: (trigger: HTMLElement) => void;
   loadAsset: (resource: AssetRemoteData) => Promise<Blob | undefined>;
+  onDownload?: () => Promise<void> | void;
 }
 
 const PreviewHarness: FunctionComponent<PreviewHarnessProps> = ({
-  resource,
+  thumbnailResource,
+  originalResource,
   label,
-  tabIndex = 0,
-  onOpenPreview = noop,
   loadAsset,
+  onDownload = noop,
 }: PreviewHarnessProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <PdfAssetPreview
       id="pdf-preview"
-      resource={resource}
+      thumbnailResource={thumbnailResource}
+      originalResource={originalResource}
       label={label}
-      fileName="report.pdf"
-      closeLabel="Close preview"
-      loadingLabel="Loading preview"
-      errorLabel="Preview unavailable"
+      fileName="report"
+      fileExtension="pdf"
+      senderName="Kim Dawson"
+      timestamp={1700000000000}
       isOpen={isOpen}
-      onOpenPreview={trigger => {
-        onOpenPreview(trigger);
-        setIsOpen(true);
+      onOpenPreview={() => {
+        return setIsOpen(true);
       }}
       onClose={() => {
         return setIsOpen(false);
       }}
-      tabIndex={tabIndex}
+      tabIndex={0}
       loadAsset={loadAsset}
+      onDownload={onDownload}
     />
   );
 };
 
 describe('PdfAssetPreview', () => {
-  const makeResource = (): AssetRemoteData => {
+  const makeResource = (assetKey: string): AssetRemoteData => {
     return new AssetRemoteData({
-      assetKey: 'preview',
+      assetKey,
       assetDomain: 'wire.test',
       otrKey: new Uint8Array(32),
       sha256: new Uint8Array(32),
@@ -89,169 +149,206 @@ describe('PdfAssetPreview', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     URL.revokeObjectURL = jest.fn();
-    jest.spyOn(URL, 'createObjectURL').mockReturnValue('blob:preview');
+    jest.spyOn(URL, 'createObjectURL').mockReturnValueOnce('blob:thumbnail').mockReturnValueOnce('blob:pdf');
   });
 
-  it('opens the loaded thumbnail at full size using the same raster URL', async () => {
-    const loadAsset = jest.fn().mockResolvedValue(png);
-    const onOpenPreview = jest.fn();
+  it('loads the encrypted thumbnail lazily and opens the decrypted original in the shared PDF viewer', async () => {
+    const thumbnailResource = makeResource('thumbnail');
+    const originalResource = makeResource('original');
+    const onDownload = jest.fn().mockResolvedValue(undefined);
+    const loadAsset = jest.fn().mockResolvedValueOnce(png).mockResolvedValueOnce(pdf);
     render(
       <PreviewHarness
-        resource={makeResource()}
+        thumbnailResource={thumbnailResource}
+        originalResource={originalResource}
         label="Open PDF preview report.pdf"
-        onOpenPreview={onOpenPreview}
         loadAsset={loadAsset}
+        onDownload={onDownload}
       />,
     );
-    expect(loadAsset).not.toHaveBeenCalled();
 
+    expect(loadAsset).not.toHaveBeenCalled();
     enterViewport();
 
-    const thumbnailButton = await screen.findByRole('button', {name: 'Open PDF preview report.pdf'});
+    const trigger = await screen.findByRole('button', {name: 'Open PDF preview report.pdf'});
     expect(loadAsset).toHaveBeenCalledTimes(1);
+    expect(loadAsset).toHaveBeenCalledWith(thumbnailResource);
     expect(URL.createObjectURL).toHaveBeenCalledWith(expect.objectContaining({type: 'image/png'}));
 
-    fireEvent.click(thumbnailButton);
+    fireEvent.click(trigger);
 
-    const dialog = await screen.findByRole('dialog', {name: 'Open PDF preview report.pdf'});
-    const enlargedImage = within(dialog).getByRole('img', {name: 'report.pdf'});
-    expect(enlargedImage.getAttribute('src')).toBe(thumbnailButton.querySelector('img')?.getAttribute('src'));
-    expect(within(dialog).getAllByRole('button')).toHaveLength(1);
-    expect(screen.getByRole('button', {name: 'Close preview'})).toHaveFocus();
-    expect(onOpenPreview).toHaveBeenCalledWith(thumbnailButton);
-    expect(loadAsset).toHaveBeenCalledTimes(1);
-
-    fireEvent.click(screen.getByRole('button', {name: 'Close preview'}));
+    const dialog = await screen.findByRole('dialog', {name: 'report.pdf'});
     await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(dialog).toHaveAttribute('data-status', 'success');
     });
-    expect(URL.revokeObjectURL).not.toHaveBeenCalled();
+    expect(dialog).toHaveAttribute('data-preview-url', 'blob:pdf');
+    expect(trigger).toHaveAttribute('aria-controls', dialog.id);
+    expect(dialog).toHaveAttribute('data-preview-type', 'pdf');
+    expect(dialog).toHaveAttribute('data-context', 'chat');
+    expect(dialog).toHaveAttribute('data-sender', 'Kim Dawson');
+    expect(dialog).toHaveAttribute('data-timestamp', '1700000000000');
+    expect(loadAsset).toHaveBeenCalledTimes(2);
+
+    const [pdfResource] = loadAsset.mock.calls[1];
+    expect(pdfResource).not.toBe(originalResource);
+    expect(pdfResource.urlData).toEqual(originalResource.urlData);
+    expect(pdfResource.otrKey).toEqual(originalResource.otrKey);
+    expect(pdfResource.sha256).toEqual(originalResource.sha256);
+
+    fireEvent.click(screen.getByRole('button', {name: 'Download'}));
+    expect(onDownload).toHaveBeenCalledTimes(1);
   });
 
-  it('hides a thumbnail that the browser cannot display without retrying its download', async () => {
-    const loadAsset = jest.fn().mockResolvedValue(png);
-    render(<PreviewHarness resource={makeResource()} label="Open PDF preview report.pdf" loadAsset={loadAsset} />);
-    enterViewport();
-    await screen.findByRole('button', {name: 'Open PDF preview report.pdf'});
+  it('cancels a scoped PDF load and ignores its result after the modal closes', async () => {
+    let resolvePdf: (blob: Blob) => void = noop;
+    let pdfResource: AssetRemoteData | undefined;
+    const loadAsset = jest.fn((resource: AssetRemoteData) => {
+      if (resource.urlData.assetKey === 'thumbnail') {
+        return Promise.resolve(png);
+      }
 
-    fireEvent.error(screen.getByRole('presentation'));
-
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
-    expect(loadAsset).toHaveBeenCalledTimes(1);
-  });
-
-  it('keeps the shared URL valid while the overlay is open and revokes it on unmount', async () => {
-    const resource = makeResource();
-    const cancel = jest.fn();
-    resource.cancelDownload = cancel;
-    const {unmount} = render(
+      pdfResource = resource;
+      resource.cancelDownload = jest.fn();
+      return new Promise<Blob>(resolve => {
+        resolvePdf = resolve;
+      });
+    });
+    render(
       <PreviewHarness
-        resource={resource}
+        thumbnailResource={makeResource('thumbnail')}
+        originalResource={makeResource('original')}
         label="Open PDF preview report.pdf"
-        loadAsset={jest.fn().mockResolvedValue(png)}
+        loadAsset={loadAsset}
       />,
     );
     enterViewport();
     fireEvent.click(await screen.findByRole('button', {name: 'Open PDF preview report.pdf'}));
-    await screen.findByRole('dialog', {name: 'Open PDF preview report.pdf'});
-
-    unmount();
-
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview');
-    expect(cancel).toHaveBeenCalled();
-  });
-
-  it('keeps the current thumbnail when a replaced request finishes last', async () => {
-    let resolveOld: (blob: Blob) => void = noop;
-    const first = makeResource();
-    const second = makeResource();
-    const loadAsset = jest
-      .fn()
-      .mockReturnValueOnce(
-        new Promise<Blob>(resolve => {
-          resolveOld = resolve;
-        }),
-      )
-      .mockResolvedValueOnce(png);
-    const {rerender} = render(<PreviewHarness resource={first} label="Download first.pdf" loadAsset={loadAsset} />);
-    enterViewport();
     await waitFor(() => {
-      return expect(loadAsset).toHaveBeenCalledTimes(1);
+      return expect(loadAsset).toHaveBeenCalledTimes(2);
     });
 
-    rerender(<PreviewHarness resource={second} label="Download second.pdf" loadAsset={loadAsset} />);
-    await screen.findByRole('button', {name: 'Download second.pdf'});
+    fireEvent.click(screen.getByRole('button', {name: 'Close test preview'}));
+    expect(pdfResource?.cancelDownload).toHaveBeenCalledTimes(1);
+
     await act(async () => {
-      return resolveOld(png);
+      return resolvePdf(pdf);
     });
 
     expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
-    expect(screen.getByRole('button', {name: 'Download second.pdf'})).toBeInTheDocument();
+    expect(screen.queryByTestId('file-modal')).not.toBeInTheDocument();
   });
 
-  it('ignores a completed request after unmount', async () => {
-    let resolve: (blob: Blob) => void = noop;
-    const loadAsset = jest.fn().mockReturnValue(
-      new Promise<Blob>(done => {
-        resolve = done;
-      }),
-    );
-    const {unmount} = render(
-      <PreviewHarness resource={makeResource()} label="Open PDF preview report.pdf" loadAsset={loadAsset} />,
+  it('shows the shared unavailable state when downloaded bytes are not a PDF', async () => {
+    const invalidPdf = new Blob(['not a PDF'], {type: 'application/pdf'});
+    const loadAsset = jest.fn().mockResolvedValueOnce(png).mockResolvedValueOnce(invalidPdf);
+    render(
+      <PreviewHarness
+        thumbnailResource={makeResource('thumbnail')}
+        originalResource={makeResource('original')}
+        label="Open PDF preview report.pdf"
+        loadAsset={loadAsset}
+      />,
     );
     enterViewport();
+    fireEvent.click(await screen.findByRole('button', {name: 'Open PDF preview report.pdf'}));
+
+    const dialog = await screen.findByRole('dialog', {name: 'report.pdf'});
     await waitFor(() => {
-      return expect(loadAsset).toHaveBeenCalledTimes(1);
+      expect(dialog).toHaveAttribute('data-status', 'unavailable');
     });
-    unmount();
-
-    await act(async () => {
-      return resolve(png);
-    });
-
-    expect(URL.createObjectURL).not.toHaveBeenCalled();
+    expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
   });
 
   it.each([
     new AssetRemoteData({assetKey: 'missing-key', assetDomain: 'wire.test', sha256: new Uint8Array(32)}),
     new AssetRemoteData({assetKey: 'missing-hash', assetDomain: 'wire.test', otrKey: new Uint8Array(32)}),
-  ])('does not fetch a preview with incomplete encryption metadata', resource => {
-    const loadAsset = jest.fn();
-    render(<PreviewHarness resource={resource} label="Open PDF preview report.pdf" loadAsset={loadAsset} />);
-
+  ])('does not request an original PDF without complete encryption metadata', async originalResource => {
+    const loadAsset = jest.fn().mockResolvedValue(png);
+    render(
+      <PreviewHarness
+        thumbnailResource={makeResource('thumbnail')}
+        originalResource={originalResource}
+        label="Open PDF preview report.pdf"
+        loadAsset={loadAsset}
+      />,
+    );
     enterViewport();
+    fireEvent.click(await screen.findByRole('button', {name: 'Open PDF preview report.pdf'}));
 
-    expect(loadAsset).not.toHaveBeenCalled();
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    const dialog = await screen.findByRole('dialog', {name: 'report.pdf'});
+    await waitFor(() => {
+      expect(dialog).toHaveAttribute('data-status', 'unavailable');
+    });
+    expect(loadAsset).toHaveBeenCalledTimes(1);
+    expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the shared unavailable state when the encrypted asset load rejects', async () => {
+    const loadAsset = jest
+      .fn()
+      .mockResolvedValueOnce(png)
+      .mockRejectedValueOnce(new Error('Encrypted asset does not match its SHA-256 hash'));
+    render(
+      <PreviewHarness
+        thumbnailResource={makeResource('thumbnail')}
+        originalResource={makeResource('original')}
+        label="Open PDF preview report.pdf"
+        loadAsset={loadAsset}
+      />,
+    );
+    enterViewport();
+    fireEvent.click(await screen.findByRole('button', {name: 'Open PDF preview report.pdf'}));
+
+    const dialog = await screen.findByRole('dialog', {name: 'report.pdf'});
+    await waitFor(() => {
+      expect(dialog).toHaveAttribute('data-status', 'unavailable');
+    });
+    expect(loadAsset).toHaveBeenCalledTimes(2);
+    expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
   });
 
   it.each([
     new Blob(['<svg onload="alert(1)"/>'], {type: 'image/svg+xml'}),
-    new Blob([new Uint8Array(1024 * 1024 + 1)], {type: 'image/png'}),
+    new Blob([new Uint8Array(1_048_577)], {type: 'image/png'}),
     undefined,
-  ])('leaves the ordinary file card when thumbnail bytes are unsupported', async blob => {
+  ])('does not expose unsupported thumbnail bytes', async blob => {
     const loadAsset = jest.fn().mockResolvedValue(blob);
-    render(<PreviewHarness resource={makeResource()} label="Open PDF preview report.pdf" loadAsset={loadAsset} />);
-
+    render(
+      <PreviewHarness
+        thumbnailResource={makeResource('thumbnail')}
+        originalResource={makeResource('original')}
+        label="Open PDF preview report.pdf"
+        loadAsset={loadAsset}
+      />,
+    );
     enterViewport();
-    await waitFor(() => {
-      return expect(loadAsset).toHaveBeenCalledTimes(1);
-    });
 
+    await waitFor(() => {
+      expect(loadAsset).toHaveBeenCalledTimes(1);
+    });
     expect(URL.createObjectURL).not.toHaveBeenCalled();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('does not display bytes when integrity checking or decryption fails', async () => {
-    const loadAsset = jest.fn().mockRejectedValue(new Error('Encrypted asset does not match its SHA-256 hash'));
-    render(<PreviewHarness resource={makeResource()} label="Open PDF preview report.pdf" loadAsset={loadAsset} />);
-
+  it('revokes the thumbnail and PDF URLs when their owning scopes are disposed', async () => {
+    const {unmount} = render(
+      <PreviewHarness
+        thumbnailResource={makeResource('thumbnail')}
+        originalResource={makeResource('original')}
+        label="Open PDF preview report.pdf"
+        loadAsset={jest.fn().mockResolvedValueOnce(png).mockResolvedValueOnce(pdf)}
+      />,
+    );
     enterViewport();
+    fireEvent.click(await screen.findByRole('button', {name: 'Open PDF preview report.pdf'}));
+    await screen.findByRole('dialog', {name: 'report.pdf'});
     await waitFor(() => {
-      return expect(loadAsset).toHaveBeenCalledTimes(1);
+      expect(URL.createObjectURL).toHaveBeenCalledTimes(2);
     });
 
-    expect(URL.createObjectURL).not.toHaveBeenCalled();
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    unmount();
+
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:thumbnail');
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:pdf');
   });
 });
