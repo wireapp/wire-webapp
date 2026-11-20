@@ -405,9 +405,7 @@ test('persists sanitized browser logs with console disabled across application r
   }
 });
 
-test('leaves Origin Private File System untouched without opt-in even when console logging is enabled', async ({
-  page,
-}) => {
+test('leaves Origin Private File System untouched without opt-in', async ({page}, testInfo) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator.storage, 'getDirectory', {
       value(): never {
@@ -431,12 +429,12 @@ test('leaves Origin Private File System untouched without opt-in even when conso
   await page.goto('/auth?enabled-features=mark-as-unread&debugLogging=*');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
 
-  expect(consoleRecords.length).toBeGreaterThan(0);
+  expect(consoleRecords.length > 0).toBe(testInfo.project.name === 'rspack-internal');
   expect(startedWorkers).toEqual([]);
   expect(await page.locator('html').getAttribute('data-unexpected-log-storage-access')).toBeNull();
 });
 
-test('keeps startup and console logging working when logging worker construction fails', async ({page}) => {
+test('preserves the console policy when logging worker construction fails', async ({page}, testInfo) => {
   await page.addInitScript(() => {
     const NativeWorker = window.Worker;
     Object.defineProperty(window, 'Worker', {
@@ -463,7 +461,7 @@ test('keeps startup and console logging working when logging worker construction
   await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
 
   expect(startedWorkers).toEqual([]);
-  expect(consoleRecords.length).toBeGreaterThan(0);
+  expect(consoleRecords.length > 0).toBe(testInfo.project.name === 'rspack-internal');
 });
 
 test('starts without main-thread filesystem access while worker initialization never settles', async ({
@@ -515,7 +513,7 @@ test('starts without main-thread filesystem access while worker initialization n
 test.describe('Electron logging selection', () => {
   test.use({
     userAgent:
-      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Electron/38.0.0 Safari/537.36',
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Wire/3.46.0 Electron/38.0.0 Safari/537.36',
   });
 
   test('never initializes Origin Private File System despite opt-in and preserves console capture', async ({page}) => {
@@ -548,7 +546,10 @@ test.describe('Electron logging selection', () => {
   });
 });
 
-test('disables unsupported synchronous access handles without a main-thread fallback', async ({page, context}) => {
+test('disables unsupported synchronous access handles without a main-thread fallback', async ({
+  page,
+  context,
+}, testInfo) => {
   await context.route('**/wire-browser-log-persistence.js', async route => {
     const response = await route.fetch();
     const prefix =
@@ -584,12 +585,12 @@ test('disables unsupported synchronous access handles without a main-thread fall
     })
     .toBe(true);
 
-  expect(consoleRecords.length).toBeGreaterThan(0);
+  expect(consoleRecords.length > 0).toBe(testInfo.project.name === 'rspack-internal');
   expect(await page.locator('html').getAttribute('data-unexpected-log-storage-access')).toBeNull();
   expect(await readBrowserLogFiles(page)).toEqual([]);
 });
 
-test('keeps console logging functional after a persistence worker crashes', async ({page, context}) => {
+test('preserves the console policy after a persistence worker crashes', async ({page, context}, testInfo) => {
   await context.route('**/wire-browser-log-persistence.js', async route => {
     const response = await route.fetch();
     await route.fulfill({
@@ -621,6 +622,6 @@ test('keeps console logging functional after a persistence worker crashes', asyn
     })
     .toBe(true);
 
-  expect(consoleRecords.length).toBeGreaterThan(0);
+  expect(consoleRecords.length > 0).toBe(testInfo.project.name === 'rspack-internal');
   expect(uncaughtErrors).toEqual([]);
 });

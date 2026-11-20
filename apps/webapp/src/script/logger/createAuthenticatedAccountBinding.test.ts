@@ -78,7 +78,6 @@ describe('authenticated account log binding', () => {
     );
     const runtimeIdentity = {
       logger: logging.getLogger('RuntimeIdentity'),
-      deploymentStage: 'beta',
       origin: 'https://wire-webapp-beta.wire.com',
       version: '1.2.3',
       assetVersion: '1.2.3-abcdef',

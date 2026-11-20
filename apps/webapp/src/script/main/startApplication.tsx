@@ -44,7 +44,6 @@ import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
 import {initializeDesktopLogOutput} from '../browser/initializeDesktopLogOutput';
 import {initializeRuntimeErrorDiagnostics} from '../browser/initializeRuntimeErrorDiagnostics';
 import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
-import {resolveStartupLoggingPolicy} from '../browser/resolveStartupLoggingPolicy';
 import {Config} from '../Config';
 import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeStartupFeatureToggleUrl';
 import {
@@ -65,15 +64,19 @@ import {Core} from '../service/coreSingleton';
 import {translate} from '../util/localizerUtil';
 import {getStorage} from '../util/localStorage';
 import {getLogger} from '../util/logger';
-import {initializeLogging} from '../logger/initializeLogging';
+import {initializeLogging, type StartupLoggingOptions} from '../logger/initializeLogging';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {loadValue} from '../util/storageUtil';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
-export async function startApplication(
-  defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[],
-  support: CoreCryptoSupport,
-): Promise<void> {
+type StartApplicationOptions = {
+  readonly defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[];
+  readonly support: CoreCryptoSupport;
+  readonly logging: StartupLoggingOptions;
+};
+
+export async function startApplication(options: StartApplicationOptions): Promise<void> {
+  const {defaultEnabledFeatureToggleNames, support, logging} = options;
   initializeStartupFeatureToggleUrl({
     url: new URL(window.location.href),
     defaultEnabledFeatureToggleNames,
@@ -89,7 +92,6 @@ export async function startApplication(
   const isElectron = Runtime.isElectron();
   const isDesktopApp = Runtime.isDesktopApp();
   const desktopLogOutput = initializeDesktopLogOutput(clock, startupFeatureToggles);
-  const loggingPolicy = resolveStartupLoggingPolicy(window.location.hostname, config.FEATURE.ENABLE_DEBUG);
   function shouldWriteConsoleFallback(): boolean {
     return desktopLogOutput.isNothing || !desktopLogOutput.value.hasConfirmedDelivery();
   }
@@ -110,8 +112,7 @@ export async function startApplication(
     clock,
     consoleOutput: console,
     locationSearch: window.location.search,
-    debugEnabled: loggingPolicy.debugEnabled,
-    developerConsoleEnabled: loggingPolicy.developerConsoleEnabled,
+    ...logging,
     shouldWriteConsoleFallback: isDesktopApp ? shouldWriteConsoleFallback : undefined,
     storage: Maybe.of(getStorage()),
     configureLogging,
@@ -152,14 +153,12 @@ export async function startApplication(
   initializeRuntimeErrorDiagnostics(window);
   const runtimeIdentity = {
     logger: getLogger('RuntimeIdentity'),
-    deploymentStage: loggingPolicy.deploymentStage,
     origin: window.location.origin,
     version: config.VERSION,
     assetVersion: config.ASSET_VERSION,
   };
   logStartupRuntimeIdentity({
     logger: runtimeIdentity.logger,
-    deploymentStage: runtimeIdentity.deploymentStage,
     origin: runtimeIdentity.origin,
     version: runtimeIdentity.version,
     assetVersion: runtimeIdentity.assetVersion,

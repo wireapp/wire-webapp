@@ -29,7 +29,6 @@ import {selectDesktopApplicationLogWrite} from './selectDesktopApplicationLogWri
 import {createLogWorkerConnectionForTest} from './test/createLogWorkerConnectionForTest';
 
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
-import {resolveStartupLoggingPolicy} from '../browser/resolveStartupLoggingPolicy';
 
 const disabledPersistenceOptions = {
   browserPersistenceEnabled: false,
@@ -72,39 +71,6 @@ function createTestPersistence(options: TestPersistenceOptions): Maybe<BrowserLo
 }
 
 describe('logging startup', () => {
-  it.each([
-    ['localhost', false, true, true],
-    ['local.wire.com', false, true, true],
-    ['local.zinfra.io', false, true, true],
-    ['LOCAL.IMAI.WIRE.LINK', false, true, true],
-    ['wire-webapp-dev.zinfra.io', false, true, true],
-    ['wire-webapp-edge.wire.com', false, true, true],
-    ['wire-webapp-beta.wire.com', true, false, false],
-    ['app.wire.com', true, false, false],
-    ['app.customer.example', true, true, false],
-    ['local.wire.com.customer.example', false, false, false],
-  ])('applies the console and DEBUG defaults for %s', (hostname, configuredDebug, expectedDebug, expectedConsole) => {
-    const logging = createPinoLogging(Maybe.nothing());
-    const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
-    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
-    const loggingPolicy = resolveStartupLoggingPolicy(hostname, configuredDebug);
-    initializeLogging({
-      ...disabledPersistenceOptions,
-      ...loggingPolicy,
-      clock,
-      consoleOutput,
-      locationSearch: '',
-      storage: Maybe.nothing(),
-      configureLogging: logging.configure,
-    });
-    logging.getLogger('Startup').debug('debug diagnostic');
-    logging.getLogger('Startup').info('info diagnostic');
-
-    expect(loggingPolicy.debugEnabled).toBe(expectedDebug);
-    expect(consoleOutput.debug).toHaveBeenCalledTimes(expectedDebug && expectedConsole ? 1 : 0);
-    expect(consoleOutput.info).toHaveBeenCalledTimes(expectedConsole ? 1 : 0);
-  });
-
   it.each(['', '?enabled-features=persistent-browser-logs'])(
     'keeps the standalone release console quiet with disabled or unavailable OPFS (%s)',
     locationSearch => {
@@ -114,7 +80,8 @@ describe('logging startup', () => {
       const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
       initializeLogging({
         ...disabledPersistenceOptions,
-        ...resolveStartupLoggingPolicy('app.wire.com', false),
+        debugEnabled: false,
+        developerConsoleEnabled: false,
         clock,
         consoleOutput,
         locationSearch: locationSearch + (locationSearch === '' ? '?' : '&') + 'debugLogging=*',
@@ -131,26 +98,25 @@ describe('logging startup', () => {
   );
 
   it.each([
-    {hostname: 'wire-webapp-beta.wire.com', locationSearch: '?enableLogging=@wireapp/*', debugRecords: 1},
-    {hostname: 'wire-webapp-beta.wire.com', locationSearch: '?enableLogging=@wireapp/*&debugLogging=', debugRecords: 0},
+    {locationSearch: '?enableLogging=@wireapp/*', debugRecords: 1},
+    {locationSearch: '?enableLogging=@wireapp/*&debugLogging=', debugRecords: 0},
     {
-      hostname: 'wire-webapp-beta.wire.com',
       locationSearch: '?enableLogging=@wireapp/*&debugLogging=-*',
       debugRecords: 0,
     },
     {
-      hostname: 'app.customer.example',
       locationSearch: '?debugLogging=@wireapp/webapp/Startup&enableLogging=-*',
       debugRecords: 1,
     },
-  ])('preserves the only Desktop console transport on $hostname with $locationSearch', options => {
-    const {hostname, locationSearch, debugRecords} = options;
+  ])('preserves the only Desktop console transport with $locationSearch', options => {
+    const {locationSearch, debugRecords} = options;
     const logging = createPinoLogging(Maybe.nothing());
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     initializeLogging({
       ...disabledPersistenceOptions,
-      ...resolveStartupLoggingPolicy(hostname, false),
+      debugEnabled: false,
+      developerConsoleEnabled: false,
       clock,
       consoleOutput,
       locationSearch,
@@ -188,7 +154,8 @@ describe('logging startup', () => {
     });
     initializeLogging({
       ...disabledPersistenceOptions,
-      ...resolveStartupLoggingPolicy('app.wire.com', false),
+      debugEnabled: false,
+      developerConsoleEnabled: false,
       clock,
       consoleOutput,
       locationSearch: '?enableLogging=@wireapp/*&debugLogging=',
@@ -214,25 +181,24 @@ describe('logging startup', () => {
 
   it.each([
     {
-      hostname: 'wire-webapp-beta.wire.com',
       configuredDebug: false,
       locationSearch: '?debugLogging=Selected',
       expectedLevels: [20, 30, 40, 50],
     },
     {
-      hostname: 'app.customer.example',
       configuredDebug: true,
       locationSearch: '',
       expectedLevels: [20, 20, 30, 40, 50],
     },
-  ])('persists INFO, WARN, ERROR and enabled DEBUG to OPFS with a quiet console on $hostname', async options => {
-    const {hostname, configuredDebug, locationSearch, expectedLevels} = options;
+  ])('persists INFO, WARN, ERROR and enabled DEBUG to OPFS with a quiet console ($locationSearch)', async options => {
+    const {configuredDebug, locationSearch, expectedLevels} = options;
     const logging = createPinoLogging(Maybe.nothing());
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
     const persistedLines: string[] = [];
     const persistence = initializeLogging({
-      ...resolveStartupLoggingPolicy(hostname, configuredDebug),
+      debugEnabled: configuredDebug,
+      developerConsoleEnabled: false,
       clock,
       consoleOutput,
       locationSearch,
@@ -278,7 +244,8 @@ describe('logging startup', () => {
     const desktop = createDesktopLogOutput({clock, writeToDesktop, reportFailure: noop});
     initializeLogging({
       ...disabledPersistenceOptions,
-      ...resolveStartupLoggingPolicy('app.wire.com', false),
+      debugEnabled: false,
+      developerConsoleEnabled: false,
       clock,
       consoleOutput,
       locationSearch: '?debugLogging=*,-Excluded',

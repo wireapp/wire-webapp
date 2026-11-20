@@ -27,7 +27,6 @@ import {isUUIDv4} from '../commons/util/ValidationUtil';
 
 type LogRuntimeIdentityOptions = {
   readonly logger: Pick<Logger, 'info'>;
-  readonly deploymentStage: string;
   readonly origin: string;
   readonly version: string;
   readonly assetVersion: string;
@@ -42,9 +41,8 @@ type LogStartupRuntimeIdentityOptions = LogRuntimeIdentityOptions & {
 };
 
 export function logRuntimeIdentity(options: LogRuntimeIdentityOptions): void {
-  const {logger, deploymentStage, origin, version, assetVersion} = options;
+  const {logger, origin, version, assetVersion} = options;
   logger.info('WebApp runtime identity', {
-    deploymentStage,
     version,
     assetVersion,
     origin,
@@ -52,7 +50,7 @@ export function logRuntimeIdentity(options: LogRuntimeIdentityOptions): void {
 }
 
 export function logStartupRuntimeIdentity(options: LogStartupRuntimeIdentityOptions): void {
-  const {clock, consoleOutput, locationSearch, deploymentStage, origin, version, assetVersion} = options;
+  const {clock, consoleOutput, locationSearch, origin, version, assetVersion} = options;
 
   try {
     if (usesPinoForStartupIdentity(options)) {
@@ -77,7 +75,6 @@ export function logStartupRuntimeIdentity(options: LogStartupRuntimeIdentityOpti
     // Use the legacy console destination even when Pino namespaces are disabled.
     consoleOutput.info(
       encodeLogOutput({
-        deploymentStage,
         version,
         assetVersion,
         origin,

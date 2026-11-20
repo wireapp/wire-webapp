@@ -39,7 +39,6 @@ import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
 import {initializeDesktopLogOutput} from '../browser/initializeDesktopLogOutput';
 import {initializeRuntimeErrorDiagnostics} from '../browser/initializeRuntimeErrorDiagnostics';
 import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
-import {resolveStartupLoggingPolicy} from '../browser/resolveStartupLoggingPolicy';
 import {Runtime} from '../commons/util/Runtime';
 import {Config} from '../Config';
 import {persistentBrowserLogsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
@@ -49,7 +48,7 @@ import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {configureLogging} from '../logger/getLogger';
-import {initializeLogging} from '../logger/initializeLogging';
+import {initializeLogging, type StartupLoggingOptions} from '../logger/initializeLogging';
 import {logStartupRuntimeIdentity} from '../logger/logRuntimeIdentity';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
@@ -72,14 +71,13 @@ retireLegacyServiceWorker({
 
 const mainId = 'main';
 
-export const startAuthApp = (support: CoreCryptoSupport): void => {
+export function startAuthApp(support: CoreCryptoSupport, logging: StartupLoggingOptions): void {
   exposeWrapperGlobals();
   const config = Config.getConfig();
   const clock = createClock();
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
   const desktopLogOutput = initializeDesktopLogOutput(clock, startupFeatureToggles);
   const isDesktopApp = Runtime.isDesktopApp();
-  const loggingPolicy = resolveStartupLoggingPolicy(window.location.hostname, config.FEATURE.ENABLE_DEBUG);
   function shouldWriteConsoleFallback(): boolean {
     return desktopLogOutput.isNothing || !desktopLogOutput.value.hasConfirmedDelivery();
   }
@@ -88,8 +86,7 @@ export const startAuthApp = (support: CoreCryptoSupport): void => {
     clock,
     consoleOutput: console,
     locationSearch: window.location.search,
-    debugEnabled: loggingPolicy.debugEnabled,
-    developerConsoleEnabled: loggingPolicy.developerConsoleEnabled,
+    ...logging,
     shouldWriteConsoleFallback: isDesktopApp ? shouldWriteConsoleFallback : undefined,
     storage: Maybe.of(getStorage()),
     configureLogging,
@@ -135,7 +132,6 @@ export const startAuthApp = (support: CoreCryptoSupport): void => {
     hasDesktopLogPersistence: desktopLogOutput.isJust,
     locationSearch: window.location.search,
     logger: getLogger('RuntimeIdentity'),
-    deploymentStage: loggingPolicy.deploymentStage,
     origin: window.location.origin,
     version: config.VERSION,
     assetVersion: config.ASSET_VERSION,
@@ -203,4 +199,4 @@ export const startAuthApp = (support: CoreCryptoSupport): void => {
   };
 
   fireAndForgetInvoker.fireAndForget(runApp);
-};
+}

@@ -25,12 +25,15 @@ import type {LoggingDependencies} from './createPinoLogging';
 import {debugLoggingQueryParameterName, legacyDebugLoggingQueryParameterName} from './debugLoggingQueryParameterNames';
 import {createConsoleOutput, type ConsoleLogOutput, type LogOutput} from './logOutput';
 
-type InitializeLoggingOptions = {
+export type StartupLoggingOptions = {
+  readonly debugEnabled: boolean;
+  readonly developerConsoleEnabled: boolean;
+};
+
+type InitializeLoggingOptions = StartupLoggingOptions & {
   readonly clock: LoggingDependencies['clock'];
   readonly consoleOutput: ConsoleLogOutput;
   readonly locationSearch: string;
-  readonly debugEnabled: boolean;
-  readonly developerConsoleEnabled: boolean;
   readonly shouldWriteConsoleFallback?: (() => boolean) | undefined;
   readonly storage: Maybe<Pick<Storage, 'setItem' | 'removeItem'>>;
   readonly configureLogging: (dependencies: Maybe<LoggingDependencies>) => void;
