@@ -126,7 +126,16 @@ describe('FileAssetComponent', () => {
   });
 
   it('does not render or fetch a PDF preview for quoted files', () => {
-    const load = jest.spyOn(container.resolve(AssetRepository), 'load');
+    const repository = container.resolve(AssetRepository);
+    const load = jest.spyOn(repository, 'load').mockResolvedValue(new Blob());
+    const previewWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview')
+          .isFeatureToggleEnabled,
+        mainViewModel: {content: {repositories: {asset: repository}}} as MainViewModel,
+      }),
+    );
     const message = mockContentMessage('report.pdf');
     const asset = message.getFirstAsset() as FileAsset;
     asset.file_type = 'application/pdf';
@@ -140,8 +149,10 @@ describe('FileAssetComponent', () => {
       }),
     );
 
-    render(<FileAssetComponent message={message} teamState={teamState} isQuote />, {wrapper: rootProviderWrapper});
+    (IntersectionObserver as jest.Mock).mockClear();
+    render(<FileAssetComponent message={message} teamState={teamState} isQuote />, {wrapper: previewWrapper});
 
+    expect((IntersectionObserver as jest.Mock).mock.calls).toHaveLength(0);
     expect(load).not.toHaveBeenCalled();
     expect(screen.getAllByRole('button')).toHaveLength(1);
     expect(screen.getByText('report')).toBeInTheDocument();
