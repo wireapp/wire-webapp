@@ -36,6 +36,7 @@ export const mapMeetNowCommandToCreateMeeting = (
     title: command.title,
     start_time: start.toISOString(),
     end_time: end.toISOString(),
+    type: 'immediate',
     tzid: deviceTimeZone.ianaTimeZoneId,
   };
 };
