@@ -284,6 +284,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
             {asset.isFile() && (
               <FileAsset
                 message={quotedMessage}
+                isQuote
                 // className="message-quote__file"
                 data-uie-name="media-file-quote"
                 isFocusable={isMessageFocused}
