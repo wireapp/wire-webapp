@@ -202,7 +202,7 @@
     "babel-jest": "30.5.2",
     "babel-plugin-polyfill-corejs3": "1.0.0",
     "babel-plugin-transform-import-meta": "3.1.0",
-    "baseline-browser-mapping": "2.11.37",
+    "baseline-browser-mapping": "2.11.38",
     "browserslist": "4.29.5",
     "concurrently": "10.0.7",
     "copy": "0.3.2",
