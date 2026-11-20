@@ -21,6 +21,7 @@ import {Fragment, ReactElement, type FunctionComponent} from 'react';
 
 import {isBoolean, isDate, isNonEmptyString, isNumber, isObject, isString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
+import {objectHasOwn} from 'ts-extras';
 
 import {Config} from '../../Config';
 import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
@@ -67,7 +68,7 @@ const Exception: FunctionComponent<ExceptionProps> = ({errors = []}: ExceptionPr
         const errorLabel = isString(error.label) ? error.label : 'unexpected-error';
         return (
           <ErrorMessage data-uie-name="error-message" data-uie-value={errorLabel} key={errorLabel}>
-            {Object.hasOwn(translatedErrors, errorLabel) ? (
+            {objectHasOwn(translatedErrors, errorLabel) ? (
               <FormattedMessage
                 id={translatedErrors[errorLabel]}
                 values={{

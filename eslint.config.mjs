@@ -898,6 +898,18 @@ const config = [
     rules: {
       'import/no-named-as-default-member': 'error',
       'import/no-named-as-default': 'error',
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'Object',
+          property: 'hasOwn',
+          message: 'Use objectHasOwn() from ts-extras instead.',
+        },
+        {
+          property: 'hasOwnProperty',
+          message: 'Use objectHasOwn() from ts-extras instead.',
+        },
+      ],
     },
   },
   ...productionConfigs,

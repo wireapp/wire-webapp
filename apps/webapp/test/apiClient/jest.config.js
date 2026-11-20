@@ -34,7 +34,7 @@ module.exports = {
     '^@enormora/clock/deterministic-clock$': '<rootDir>/../../node_modules/@enormora/clock/deterministic-clock.js',
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(nock|@mswjs/interceptors|@open-draft/until|rettime|true-myth|@enormora/clock|p-timeout|p-cancelable|uuid|noop-esm|@sindresorhus/is)/)',
+    '/node_modules/(?!(nock|@mswjs/interceptors|@open-draft/until|rettime|true-myth|ts-extras|@enormora/clock|p-timeout|p-cancelable|uuid|noop-esm|@sindresorhus/is)/)',
   ],
   coverageDirectory: '../../target/coverage/apps/webapp/apiClient',
   coverageReporters: rootJestConfiguration.coverageReporters,

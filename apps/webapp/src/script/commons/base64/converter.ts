@@ -18,6 +18,7 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
+import {objectHasOwn} from 'ts-extras';
 
 import {UnsupportedInputError} from './unsupportedInputError';
 
@@ -71,7 +72,7 @@ export class Converter {
     const arrayBufferView = new Uint8Array(length);
 
     for (const key in objectSource) {
-      if (objectSource.hasOwnProperty(key)) {
+      if (objectHasOwn(objectSource, key)) {
         const value = objectSource[key];
         if (isUndefined(value)) {
           throw new Error(`Missing value for byte index ${key}`);

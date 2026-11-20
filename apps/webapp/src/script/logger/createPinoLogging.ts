@@ -23,6 +23,7 @@ import type {Logger as PinoLogger} from 'pino';
 import {levels, pino} from 'pino/browser';
 import {errWithCause} from 'pino-std-serializers';
 import {Maybe} from 'true-myth';
+import {objectHasOwn} from 'ts-extras';
 
 import type {LogAttributes, Logger} from './logger';
 import {encodeLogOutput, type LogOutput} from './logOutput';
@@ -219,7 +220,7 @@ export function createPinoLogging(initialDependencies: Maybe<LoggingDependencies
           // On a metadata collision, retain the complete attribute object under "attributes".
           const fields = attributes ?? {};
           const conflicts = ['level', 'time', 'component', 'msg', 'toJSON'].some(key => {
-            return Object.hasOwn(fields, key);
+            return objectHasOwn(fields, key);
           });
           componentLogger.value.logger[level](conflicts ? {attributes: fields} : {...fields}, message);
         } catch {

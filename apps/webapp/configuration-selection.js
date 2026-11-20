@@ -16,6 +16,8 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
+const {objectHasOwn} = require('ts-extras');
+
 const configurationDependencyKeyBySemanticProfile = {
   development: 'wire-web-config-default-staging',
   production: 'wire-web-config-default-master',
@@ -26,7 +28,7 @@ const configurationDependencyKeyBySemanticProfile = {
  * @returns {string}
  */
 function configurationDependencyKeyForSemanticProfile(semanticProfile) {
-  if (!Object.hasOwn(configurationDependencyKeyBySemanticProfile, semanticProfile)) {
+  if (!objectHasOwn(configurationDependencyKeyBySemanticProfile, semanticProfile)) {
     const unsupportedProfileMessage = `Unsupported WIRE_WEBAPP_CONFIGURATION "${semanticProfile}". Set it to "development" or "production".`;
     throw new Error(unsupportedProfileMessage);
   }

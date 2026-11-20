@@ -17,6 +17,8 @@
  *
  */
 
+import {objectHasOwn} from 'ts-extras';
+
 import {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
 import type {APIClient} from '../../service/apiClientSingleton';
@@ -77,7 +79,7 @@ describe('PropertiesRepository persisted webapp settings', function () {
 
       expect(({} as Record<string, unknown>).prototypePollutionTestValue).toBeUndefined();
       expect(propertiesRepository.properties).toEqual(expectedProperties);
-      expect(Object.hasOwn(propertiesRepository.properties, forbiddenKey)).toBe(false);
+      expect(objectHasOwn(propertiesRepository.properties, forbiddenKey)).toBe(false);
       expect(Object.getPrototypeOf(propertiesRepository.properties)).toBe(Object.prototype);
     }),
   );
@@ -97,7 +99,7 @@ describe('PropertiesRepository persisted webapp settings', function () {
 
       expect(({} as Record<string, unknown>).prototypePollutionTestValue).toBeUndefined();
       expect(propertiesRepository.properties).toEqual(expectedProperties);
-      expect(Object.hasOwn(propertiesRepository.properties.settings.privacy, forbiddenKey)).toBe(false);
+      expect(objectHasOwn(propertiesRepository.properties.settings.privacy, forbiddenKey)).toBe(false);
     }),
   );
 
