@@ -18,6 +18,7 @@
  */
 
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {container} from 'tsyringe';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
@@ -37,6 +38,7 @@ import {createStartupFeatureTogglesFromLocationSearch} from '../../../../../../f
 import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
 import {AssetRepository} from '../../../../../../repositories/assets/assetRepository';
 import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
+import {FEATURE_STATUS} from '../../../../../../apiClient/team/feature/featureList.types';
 import {requireValueForTest} from '../../../../../../page/testSupport/rootContextTestSupport';
 import type {MainViewModel} from '../../../../../../view_model/MainViewModel';
 
@@ -155,15 +157,26 @@ describe('FileAssetComponent', () => {
         sha256: new Uint8Array(32),
       }),
     );
+    asset.original_resource(
+      new AssetRemoteData({
+        assetKey: 'original',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
     message.ephemeral_expires(expired);
     message.status(StatusType.SENT);
     const restrictedTeam = new TeamState();
-    jest.spyOn(restrictedTeam, 'isFileSharingReceivingEnabled').mockReturnValue(receiving);
+    if (!receiving) {
+      restrictedTeam.teamFeatures({fileSharing: {status: FEATURE_STATUS.DISABLED}});
+    }
 
     render(<FileAssetComponent message={message} teamState={restrictedTeam} />, {wrapper: rootProviderWrapper});
 
     expect(load).not.toHaveBeenCalled();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'cells.options.label'})).not.toBeInTheDocument();
     load.mockRestore();
   });
 
@@ -208,7 +221,12 @@ describe('FileAssetComponent', () => {
       return callback([{isIntersecting: true} as IntersectionObserverEntry], {} as IntersectionObserver);
     });
     await waitFor(() => {
-      return expect(screen.getAllByRole('button')).toHaveLength(2);
+      const thumbnailButtons = screen
+        .getAllByRole('button', {name: 'cells.filePreviewButton.ariaLabel'})
+        .filter(button => {
+          return button.tagName === 'BUTTON';
+        });
+      expect(thumbnailButtons).toHaveLength(1);
     });
 
     act(() => {
@@ -234,6 +252,14 @@ describe('FileAssetComponent', () => {
         sha256: new Uint8Array(32),
       }),
     );
+    asset.original_resource(
+      new AssetRemoteData({
+        assetKey: 'original',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
     const disabledWrapper = createRootProviderWrapperForTest(
       createRootContextValueForTest({translate: translateForTest}),
     );
@@ -244,6 +270,7 @@ describe('FileAssetComponent', () => {
     expect(screen.getAllByRole('button')).toHaveLength(1);
     expect(screen.getByText('report')).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'cells.options.label'})).not.toBeInTheDocument();
     load.mockRestore();
   });
 
@@ -364,6 +391,121 @@ describe('FileAssetComponent', () => {
     createObjectUrl.mockRestore();
     revokeObjectUrl.mockRestore();
     anchorClick.mockRestore();
+  });
+
+  it('opens the shared PDF viewer from the action menu without triggering a download', async () => {
+    const user = userEvent.setup();
+    const repository = container.resolve(AssetRepository);
+    const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])]);
+    const pdf = new Blob(['%PDF-1.7\\nvalid test PDF']);
+    const previewWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview')
+          .isFeatureToggleEnabled,
+        mainViewModel: {content: {repositories: {asset: repository}}} as MainViewModel,
+      }),
+    );
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_type = 'application/pdf';
+    asset.status(AssetTransferState.UPLOADED);
+    asset.original_resource(
+      new AssetRemoteData({
+        assetKey: 'original',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
+    asset.preview_resource(
+      new AssetRemoteData({
+        assetKey: 'preview',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
+    const load = jest.spyOn(repository, 'load').mockImplementation(resource => {
+      return Promise.resolve(resource.urlData.assetKey === 'preview' ? png : pdf);
+    });
+    const download = jest.spyOn(repository, 'downloadFile');
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: previewWrapper});
+
+    const trigger = screen.getByRole('button', {name: 'cells.options.label'});
+    expect(trigger.closest('[role="button"]')).toBeNull();
+    await user.click(trigger);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(load).not.toHaveBeenCalled();
+    expect(download).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('menuitem', {name: 'cells.options.open'}));
+
+    const dialog = await screen.findByRole('dialog', {name: 'report.pdf'});
+    await waitFor(() => {
+      expect(dialog).toHaveAttribute('data-status', 'success');
+    });
+    expect(dialog).toHaveAttribute('data-context', 'chat');
+    expect(dialog).toHaveAttribute('data-preview-type', 'pdf');
+    expect(download).not.toHaveBeenCalled();
+    expect(load).toHaveBeenCalledTimes(2);
+
+    await user.click(screen.getByRole('button', {name: 'Close PDF preview'}));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(trigger).toHaveFocus();
+    });
+
+    load.mockRestore();
+    download.mockRestore();
+  });
+
+  it('downloads through the existing encrypted asset path from the action menu', async () => {
+    const user = userEvent.setup();
+    const repository = container.resolve(AssetRepository);
+    const previewWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview')
+          .isFeatureToggleEnabled,
+        mainViewModel: {content: {repositories: {asset: repository}}} as MainViewModel,
+      }),
+    );
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_type = 'application/pdf';
+    asset.status(AssetTransferState.UPLOADED);
+    asset.original_resource(
+      new AssetRemoteData({
+        assetKey: 'original',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
+    asset.preview_resource(
+      new AssetRemoteData({
+        assetKey: 'preview',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
+    const load = jest.spyOn(repository, 'load');
+    const download = jest.spyOn(repository, 'downloadFile').mockResolvedValue(undefined);
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: previewWrapper});
+
+    await user.click(screen.getByRole('button', {name: 'cells.options.label'}));
+    await user.click(screen.getByRole('menuitem', {name: 'cells.options.download'}));
+
+    await waitFor(() => {
+      expect(download).toHaveBeenCalledTimes(1);
+    });
+    expect(download).toHaveBeenCalledWith(asset);
+    expect(load).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    load.mockRestore();
+    download.mockRestore();
   });
 
   it('keeps file download behavior for PDFs without a preview thumbnail', async () => {
