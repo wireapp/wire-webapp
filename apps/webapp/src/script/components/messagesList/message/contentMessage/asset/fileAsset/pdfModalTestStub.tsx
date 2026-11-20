@@ -17,9 +17,9 @@
  *
  */
 
-import type {ComponentProps, ReactElement} from 'react';
+import type {ReactElement} from 'react';
 
-import type {FileFullscreenModal} from '../../../../../FileFullscreenModal/FileFullscreenModal';
+import type {ChatPdfModalProps} from './chatPdfModal';
 
 export const PdfModalTestStub = ({
   isOpen,
@@ -34,7 +34,7 @@ export const PdfModalTestStub = ({
   status,
   context,
   previewType,
-}: ComponentProps<typeof FileFullscreenModal>): ReactElement | null => {
+}: ChatPdfModalProps): ReactElement | null => {
   if (!isOpen) {
     return null;
   }

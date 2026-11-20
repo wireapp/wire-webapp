@@ -21,9 +21,13 @@ import {useState, type FunctionComponent} from 'react';
 
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import {noop} from 'noop-esm';
+import {container} from 'tsyringe';
 
 import {PdfAssetPreview} from './pdfAssetPreview';
 import {PdfModalTestStub} from './pdfModalTestStub';
+import {ChatPdfModalToken, type ChatPdfModalComponent} from './chatPdfModal';
+
+import {FileFullscreenModal} from '../../../../../FileFullscreenModal/FileFullscreenModal';
 
 import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
 import {translateForTest} from '../../../../../../util/test/translateForTest';
@@ -38,7 +42,8 @@ const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])], {type:
 const pdf = new Blob(['%PDF-1.7\nvalid test PDF'], {type: 'application/octet-stream'});
 
 interface PreviewHarnessProps {
-  useSharedViewer?: boolean;
+  FullscreenModalComponent?: ChatPdfModalComponent;
+  useRegisteredModal?: boolean;
   thumbnailResource: AssetRemoteData;
   originalResource: AssetRemoteData;
   label: string;
@@ -47,7 +52,8 @@ interface PreviewHarnessProps {
 }
 
 const PreviewHarness: FunctionComponent<PreviewHarnessProps> = ({
-  useSharedViewer = false,
+  FullscreenModalComponent,
+  useRegisteredModal = false,
   thumbnailResource,
   originalResource,
   label,
@@ -58,7 +64,7 @@ const PreviewHarness: FunctionComponent<PreviewHarnessProps> = ({
 
   return (
     <PdfAssetPreview
-      FullscreenModalComponent={useSharedViewer ? undefined : PdfModalTestStub}
+      FullscreenModalComponent={useRegisteredModal ? undefined : (FullscreenModalComponent ?? PdfModalTestStub)}
       id="pdf-preview"
       thumbnailResource={thumbnailResource}
       originalResource={originalResource}
@@ -108,7 +114,36 @@ describe('PdfAssetPreview', () => {
       .mockReturnValueOnce('blob:pdf');
   });
 
-  it('uses the shared dialog and close action when no viewer adapter is injected', async () => {
+  afterEach(() => {
+    container.reset();
+  });
+
+  it('resolves the registered dialog renderer when no viewer adapter is injected', async () => {
+    container.registerInstance(ChatPdfModalToken, PdfModalTestStub);
+    const loadAsset = jest.fn().mockResolvedValueOnce(png).mockResolvedValueOnce(pdf);
+    const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+    render(
+      <ThemeProvider>
+        <PreviewHarness
+          useRegisteredModal
+          thumbnailResource={makeResource('thumbnail')}
+          originalResource={makeResource('original')}
+          label="Open report.pdf"
+          loadAsset={loadAsset}
+        />
+      </ThemeProvider>,
+      {wrapper},
+    );
+    enterViewport();
+
+    fireEvent.click(await screen.findByRole('button', {name: 'Open report.pdf'}));
+
+    const dialog = await screen.findByRole('dialog', {name: 'report.pdf'});
+    expect(dialog).toHaveAttribute('data-context', 'chat');
+    expect(dialog).toHaveAttribute('data-preview-type', 'pdf');
+  });
+
+  it('uses the shared dialog and close action when the real viewer is injected', async () => {
     let resolvePdf: (value: Blob | undefined) => void = noop;
     const pendingPdf = new Promise<Blob | undefined>(resolve => {
       resolvePdf = resolve;
@@ -118,7 +153,7 @@ describe('PdfAssetPreview', () => {
     render(
       <ThemeProvider>
         <PreviewHarness
-          useSharedViewer
+          FullscreenModalComponent={FileFullscreenModal}
           thumbnailResource={makeResource('thumbnail')}
           originalResource={makeResource('original')}
           label="Open report.pdf"
