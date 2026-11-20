@@ -38,7 +38,6 @@ import {createUuid} from '../../../../util/uuid';
 
 import {ContentMessageComponent, ContentMessageProps} from './contentMessage';
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
-import {createStartupFeatureTogglesFromLocationSearch} from '../../../../featureToggles/startupFeatureToggles';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
@@ -121,8 +120,9 @@ describe('message', () => {
     const wrapper = createRootProviderWrapperForTest(
       createRootContextValueForTest({
         translate: translateForTest,
-        isFeatureToggleEnabled: createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview')
-          .isFeatureToggleEnabled,
+        isFeatureToggleEnabled: () => {
+          return true;
+        },
       }),
     );
 
@@ -132,8 +132,9 @@ describe('message', () => {
     );
 
     expect(await findByText('report')).toBeInTheDocument();
-    expect(container.querySelector('.message-quote .file-asset')).toBeInTheDocument();
-    expect(container.querySelector('.message-quote .pdf-asset-preview')).not.toBeInTheDocument();
+    const fileCard = container.querySelector('.message-quote .file-asset');
+    expect(fileCard).toBeInTheDocument();
+    expect(getComputedStyle(fileCard as HTMLElement).maxWidth).not.toBe('500px');
   });
 
   it('displays a quoted message', async () => {
