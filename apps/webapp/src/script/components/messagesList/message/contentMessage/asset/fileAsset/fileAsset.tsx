@@ -17,12 +17,13 @@
  *
  */
 
-import {useCallback, type FunctionComponent} from 'react';
+import {useCallback, useEffect, useId, useRef, useState, type ComponentProps, type FunctionComponent} from 'react';
 
 import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {PdfAssetOptions} from './pdfAssetOptions';
 import {PdfAssetPreview} from './pdfAssetPreview';
 import {RestrictedFile} from './restrictedFile/restrictedFile';
 
@@ -42,6 +43,7 @@ import {AssetLoader} from '../common/assetLoader/assetLoader';
 import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 
 interface FileAssetProps {
+  FullscreenModalComponent?: ComponentProps<typeof PdfAssetPreview>['FullscreenModalComponent'];
   hasHeader?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
@@ -51,6 +53,7 @@ interface FileAssetProps {
 const uploadProgressCompletePercentage = 100;
 
 const FileAsset: FunctionComponent<FileAssetProps> = ({
+  FullscreenModalComponent,
   message,
   hasHeader = false,
   teamState = container.resolve(TeamState),
@@ -58,12 +61,16 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
 }: FileAssetProps) => {
   const asset = message.getFirstAsset() as FileAssetType;
   const {translate, isFeatureToggleEnabled, mainViewModel} = useApplicationContext();
-  const loadPdfPreview = useCallback(
+  const loadAsset = useCallback(
     (resource: AssetRemoteData) => {
       return mainViewModel.content.repositories.asset.load(resource);
     },
     [mainViewModel],
   );
+  const [isPdfPreviewOpen, setIsPdfPreviewOpen] = useState(false);
+  const pdfPreviewModalId = useId();
+  const previewTriggerRef = useRef<HTMLElement>(null);
+  const wasPdfPreviewOpen = useRef(false);
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
@@ -78,10 +85,9 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   const fileName = trimFileExtension(assetFileName);
   const fileExtension = getFileExtension(assetFileName);
   const formattedFileSize = formatBytes(asset.file_size);
-  const hasPdfPreview =
-    isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName) &&
-    asset.file_type === 'application/pdf' &&
-    previewResource !== undefined;
+  const isPdfPreviewEnabled =
+    isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName) && asset.file_type === 'application/pdf';
+  const hasPdfPreview = isPdfPreviewEnabled && previewResource !== undefined;
 
   // This is a hack since we don't have a FileAsset available before it's
   // uploaded completely we have to check if there is upload progress to
@@ -101,12 +107,34 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   const isFailedDownloadingDecrypt = assetStatus === AssetTransferState.DOWNLOAD_FAILED_DECRPYT;
   const isFailedDownloadingHash = assetStatus === AssetTransferState.DOWNLOAD_FAILED_HASH;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
+  const originalResource = asset.original_resource();
+  const canShowPdfPreview =
+    isPdfPreviewEnabled && isFileSharingReceivingEnabled && hasPdfPreview && originalResource !== undefined;
+  const canOpenPdfPreview = canShowPdfPreview && isUploadedOrCancelled;
 
   const onDownloadAsset = async (): Promise<void> => {
     if (isUploadedOrCancelled) {
       await downloadAsset(asset);
     }
   };
+
+  const openPdfPreview = (trigger: HTMLElement): void => {
+    previewTriggerRef.current = trigger;
+    setIsPdfPreviewOpen(true);
+  };
+
+  useEffect(() => {
+    if (!canShowPdfPreview && isPdfPreviewOpen) {
+      setIsPdfPreviewOpen(false);
+    }
+  }, [canShowPdfPreview, isPdfPreviewOpen]);
+
+  useEffect(() => {
+    if (wasPdfPreviewOpen.current && !isPdfPreviewOpen) {
+      previewTriggerRef.current?.focus();
+    }
+    wasPdfPreviewOpen.current = isPdfPreviewOpen;
+  }, [isPdfPreviewOpen]);
 
   if (isObfuscated) {
     return null;
@@ -122,94 +150,154 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
       {hasHeader && <AssetHeader message={message} />}
 
       {isFileSharingReceivingEnabled ? (
-        <div
-          className={cx('file', {
-            'cursor-pointer': isUploadedOrCancelled,
-          })}
-          data-uie-name="file"
-          data-uie-value={asset.file_name}
-          role="button"
-          tabIndex={messageFocusedTabIndex}
-          aria-label={`${translate('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
-          onClick={onDownloadAsset}
-          onKeyDown={event => {
-            return handleKeyDown({event, callback: onDownloadAsset, keys: [KEY.ENTER, KEY.SPACE]});
-          }}
-        >
-          {isPendingUpload ? (
-            <div className="asset-placeholder loading-dots" />
-          ) : (
-            <>
-              {isUploadedOrCancelled && (
-                <div className="file__icon icon-file" data-uie-name="file-icon">
-                  <span className="file__icon__ext icon-view" />
+        <div css={{position: 'relative', width: '100%'}}>
+          <div
+            className={cx('file', {
+              'cursor-pointer': isUploadedOrCancelled,
+            })}
+            css={canOpenPdfPreview ? {paddingRight: '40px'} : undefined}
+            data-uie-name="file"
+            data-uie-value={asset.file_name}
+            role="button"
+            tabIndex={messageFocusedTabIndex}
+            aria-haspopup={canOpenPdfPreview ? 'dialog' : undefined}
+            aria-expanded={canShowPdfPreview ? isPdfPreviewOpen : undefined}
+            aria-controls={canShowPdfPreview ? pdfPreviewModalId : undefined}
+            aria-label={
+              canOpenPdfPreview
+                ? translate('cells.filePreviewButton.ariaLabel', {name: assetFileName})
+                : `${translate('conversationContextMenuDownload')} ${fileName}.${fileExtension}`
+            }
+            onClick={event => {
+              if (canOpenPdfPreview) {
+                openPdfPreview(event.currentTarget);
+                return;
+              }
+              void onDownloadAsset();
+            }}
+            onKeyDown={event => {
+              const trigger = event.currentTarget;
+              return handleKeyDown({
+                event,
+                callback: () => {
+                  if (canOpenPdfPreview) {
+                    openPdfPreview(trigger);
+                    return;
+                  }
+                  void onDownloadAsset();
+                },
+                keys: [KEY.ENTER, KEY.SPACE],
+              });
+            }}
+          >
+            {isPendingUpload ? (
+              <div className="asset-placeholder loading-dots" />
+            ) : (
+              <>
+                {isUploadedOrCancelled && (
+                  <div className="file__icon icon-file" data-uie-name="file-icon">
+                    <span className="file__icon__ext icon-view" />
+                  </div>
+                )}
+
+                {isDownloading && (
+                  <AssetLoader
+                    loadProgress={downloadProgress ?? 0}
+                    onCancel={() => {
+                      return asset.cancelDownload();
+                    }}
+                  />
+                )}
+
+                {isUploading && (
+                  <AssetLoader
+                    loadProgress={uploadProgress === 0 || isNan(uploadProgress) ? 0 : uploadProgress}
+                    onCancel={() => {
+                      return cancelUpload();
+                    }}
+                  />
+                )}
+
+                {(isFailedUpload || isFailedDownloadingDecrypt || isFailedDownloadingHash) && (
+                  <div className="media-button media-button-error" />
+                )}
+
+                <div className="file__desc">
+                  <p className="label-bold-xs ellipsis" data-uie-name="file-name">
+                    {fileName}
+                  </p>
+                  <ul className="file__desc__meta label-xs text-foreground">
+                    <li className="label-nocase-xs" data-uie-name="file-size">
+                      {formattedFileSize}
+                    </li>
+
+                    {isNonEmptyString(fileExtension) ? (
+                      <li data-uie-name="file-type">{fileExtension}</li>
+                    ) : (
+                      fileExtension
+                    )}
+
+                    {isUploading && <li data-uie-name="file-status">{translate('conversationAssetUploading')}</li>}
+
+                    {isFailedUpload && (
+                      <li data-uie-name="file-status">{translate('conversationAssetUploadFailed')}</li>
+                    )}
+
+                    {isDownloading && <li data-uie-name="file-status">{translate('conversationAssetDownloading')}</li>}
+
+                    {isFailedDownloadingDecrypt && (
+                      <li data-uie-name="file-status">{translate('conversationAssetFailedDecryptDownloading')}</li>
+                    )}
+
+                    {isFailedDownloadingHash && (
+                      <li data-uie-name="file-status">{translate('conversationAssetFailedHashDownloading')}</li>
+                    )}
+                  </ul>
                 </div>
-              )}
-
-              {isDownloading && (
-                <AssetLoader
-                  loadProgress={downloadProgress ?? 0}
-                  onCancel={() => {
-                    return asset.cancelDownload();
-                  }}
-                />
-              )}
-
-              {isUploading && (
-                <AssetLoader
-                  loadProgress={uploadProgress === 0 || isNan(uploadProgress) ? 0 : uploadProgress}
-                  onCancel={() => {
-                    return cancelUpload();
-                  }}
-                />
-              )}
-
-              {(isFailedUpload || isFailedDownloadingDecrypt || isFailedDownloadingHash) && (
-                <div className="media-button media-button-error" />
-              )}
-
-              <div className="file__desc">
-                <p className="label-bold-xs ellipsis" data-uie-name="file-name">
-                  {fileName}
-                </p>
-                <ul className="file__desc__meta label-xs text-foreground">
-                  <li className="label-nocase-xs" data-uie-name="file-size">
-                    {formattedFileSize}
-                  </li>
-
-                  {isNonEmptyString(fileExtension) ? <li data-uie-name="file-type">{fileExtension}</li> : fileExtension}
-
-                  {isUploading && <li data-uie-name="file-status">{translate('conversationAssetUploading')}</li>}
-
-                  {isFailedUpload && <li data-uie-name="file-status">{translate('conversationAssetUploadFailed')}</li>}
-
-                  {isDownloading && <li data-uie-name="file-status">{translate('conversationAssetDownloading')}</li>}
-
-                  {isFailedDownloadingDecrypt && (
-                    <li data-uie-name="file-status">{translate('conversationAssetFailedDecryptDownloading')}</li>
-                  )}
-
-                  {isFailedDownloadingHash && (
-                    <li data-uie-name="file-status">{translate('conversationAssetFailedHashDownloading')}</li>
-                  )}
-                </ul>
-              </div>
-            </>
+              </>
+            )}
+          </div>
+          {canOpenPdfPreview && (
+            <PdfAssetOptions
+              labels={{
+                menu: translate('cells.options.label'),
+                open: translate('cells.options.open'),
+                download: translate('cells.options.download'),
+              }}
+              canDownload={isUploadedOrCancelled}
+              onOpen={openPdfPreview}
+              onDownload={onDownloadAsset}
+            />
           )}
         </div>
       ) : (
         <RestrictedFile asset={asset} />
       )}
-      {isFileSharingReceivingEnabled && isUploadedOrCancelled && hasPdfPreview && (
-        <PdfAssetPreview
-          key={previewResource.identifier}
-          resource={previewResource}
-          loadAsset={loadPdfPreview}
-          label={`${translate('conversationContextMenuDownload')} ${assetFileName}`}
-          tabIndex={messageFocusedTabIndex}
-          onDownload={onDownloadAsset}
-        />
-      )}
+      {canShowPdfPreview &&
+        previewResource !== undefined &&
+        originalResource !== undefined &&
+        (isUploadedOrCancelled || isPdfPreviewOpen) && (
+          <PdfAssetPreview
+            FullscreenModalComponent={FullscreenModalComponent}
+            id={pdfPreviewModalId}
+            key={previewResource.identifier}
+            thumbnailResource={previewResource}
+            originalResource={originalResource}
+            label={translate('cells.filePreviewButton.ariaLabel', {name: assetFileName})}
+            fileName={fileName}
+            fileExtension={fileExtension}
+            senderName={message.user().name()}
+            timestamp={message.timestamp()}
+            isOpen={isPdfPreviewOpen}
+            onOpenPreview={openPdfPreview}
+            onClose={() => {
+              return setIsPdfPreviewOpen(false);
+            }}
+            onDownload={onDownloadAsset}
+            tabIndex={messageFocusedTabIndex}
+            loadAsset={loadAsset}
+          />
+        )}
     </div>
   );
 };

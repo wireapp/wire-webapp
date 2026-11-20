@@ -34,6 +34,7 @@ interface FullscreenModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
+  ariaLabel?: string;
 }
 
 /**
@@ -61,6 +62,7 @@ export const FullscreenModal: FunctionComponent<FullscreenModalProps> = ({
   isOpen,
   children,
   onClose,
+  ariaLabel,
 }: FullscreenModalProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -116,7 +118,7 @@ export const FullscreenModal: FunctionComponent<FullscreenModalProps> = ({
   return (
     <>
       {createPortal(
-        <div role="dialog" aria-modal="true" id={id} css={modalStyles(isAnimating)}>
+        <div role="dialog" aria-modal="true" aria-label={ariaLabel} id={id} css={modalStyles(isAnimating)}>
           <div css={contentStyles(isAnimating)}>{children}</div>
         </div>,
         document.body,
