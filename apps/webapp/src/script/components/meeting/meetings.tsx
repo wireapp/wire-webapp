@@ -29,15 +29,27 @@ import {MeetingList} from './meetingList/meetingList';
 import {useMeetingStore} from './meetingStore/meetingStoreProvider';
 import {MeetNowModal} from './meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from './scheduleMeetingModal';
+import type {MeetingSeries} from './types/meetingSeries';
 
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../page/rootProvider';
 import {UserState} from '../../repositories/user/userState';
-import {matchQualifiedIds} from '../../util/qualifiedId';
 
 export const Meetings: FunctionComponent<{linkedMeetingId?: QualifiedId}> = ({linkedMeetingId}) => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const linkedRequestVersion = useRef(0);
+  const [linkedMeetingLoad, setLinkedMeetingLoad] = useState<{
+    key: string;
+    status: 'loading' | 'ready' | 'error';
+    meeting?: MeetingSeries;
+  }>();
+  const linkedMeetingIdValue = linkedMeetingId?.id;
+  const linkedMeetingDomain = linkedMeetingId?.domain;
+  const linkedMeetingKey =
+    linkedMeetingIdValue === undefined || linkedMeetingDomain === undefined
+      ? undefined
+      : JSON.stringify([linkedMeetingIdValue, linkedMeetingDomain]);
   const meetingSeries = useMeetingStore(state => {
     return state.meetingSeries;
   });
@@ -50,44 +62,68 @@ export const Meetings: FunctionComponent<{linkedMeetingId?: QualifiedId}> = ({li
   const loadMeetings = useMeetingStore(state => {
     return state.loadMeetings;
   });
-  const syncMeeting = useMeetingStore(state => {
+  const syncMeetingByQualifiedId = useMeetingStore(state => {
     return state.syncMeetingByQualifiedId;
   });
-  const [linkedMeetingIsLoading, setLinkedMeetingIsLoading] = useState(false);
-  const [linkedMeetingHasLoadError, setLinkedMeetingHasLoadError] = useState(false);
   const selfUser = container.resolve(UserState).self();
+  const currentLinkedLoad = linkedMeetingKey === linkedMeetingLoad?.key ? linkedMeetingLoad : undefined;
+  const linkedMeetingSeries = currentLinkedLoad?.meeting === undefined ? [] : [currentLinkedLoad.meeting];
+  const visibleMeetingSeries = linkedMeetingId === undefined ? meetingSeries : linkedMeetingSeries;
 
   const refreshMeetings = useCallback(() => {
-    if (linkedMeetingId !== undefined) {
-      setLinkedMeetingIsLoading(true);
-      setLinkedMeetingHasLoadError(false);
-      void syncMeeting(linkedMeetingId).then(result => {
-        setLinkedMeetingIsLoading(false);
-        setLinkedMeetingHasLoadError(result.isErr);
-      });
+    if (linkedMeetingKey === undefined || linkedMeetingIdValue === undefined || linkedMeetingDomain === undefined) {
+      fireAndForgetInvoker.fireAndForget(loadMeetings);
       return;
     }
-    return fireAndForgetInvoker.fireAndForget(loadMeetings);
-  }, [fireAndForgetInvoker, loadMeetings, linkedMeetingId, syncMeeting]);
+
+    const requestVersion = ++linkedRequestVersion.current;
+    setLinkedMeetingLoad({key: linkedMeetingKey, status: 'loading'});
+    void (async () => {
+      try {
+        const result = await syncMeetingByQualifiedId({id: linkedMeetingIdValue, domain: linkedMeetingDomain});
+        if (linkedRequestVersion.current !== requestVersion) {
+          return;
+        }
+        setLinkedMeetingLoad(
+          result.isOk
+            ? {key: linkedMeetingKey, status: 'ready', meeting: result.value.meeting}
+            : {key: linkedMeetingKey, status: 'error'},
+        );
+      } catch {
+        if (linkedRequestVersion.current === requestVersion) {
+          setLinkedMeetingLoad({key: linkedMeetingKey, status: 'error'});
+        }
+      }
+    })();
+  }, [
+    fireAndForgetInvoker,
+    loadMeetings,
+    linkedMeetingIdValue,
+    linkedMeetingDomain,
+    linkedMeetingKey,
+    syncMeetingByQualifiedId,
+  ]);
 
   useEffect(() => {
     refreshMeetings();
+    return () => {
+      linkedRequestVersion.current += 1;
+    };
   }, [refreshMeetings]);
 
   return (
     <div css={meetingsContentWrapperStyles}>
-      <MeetingHeader showActions={linkedMeetingId === undefined} />
+      <MeetingHeader showActions={linkedMeetingId === undefined} isLinkedMeeting={linkedMeetingId !== undefined} />
       <div css={contentStyles} ref={scrollContainerRef}>
         <MeetingList
-          meetingSeries={
+          meetingSeries={visibleMeetingSeries}
+          isLoading={
             linkedMeetingId === undefined
-              ? meetingSeries
-              : meetingSeries.filter(series => {
-                  return matchQualifiedIds(series.qualified_id, linkedMeetingId);
-                })
+              ? isLoading
+              : currentLinkedLoad?.status !== 'ready' && currentLinkedLoad?.status !== 'error'
           }
-          isLoading={linkedMeetingId === undefined ? isLoading : linkedMeetingIsLoading}
-          hasLoadError={linkedMeetingId === undefined ? hasLoadError : linkedMeetingHasLoadError}
+          hasLoadError={linkedMeetingId === undefined && hasLoadError}
+          linkedMeetingUnavailable={linkedMeetingId !== undefined && currentLinkedLoad?.status === 'error'}
           onRefresh={refreshMeetings}
           scrollElementRef={scrollContainerRef}
           selfUser={selfUser}

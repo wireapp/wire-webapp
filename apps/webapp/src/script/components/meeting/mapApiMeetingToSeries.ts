@@ -24,12 +24,12 @@ import {result, Result} from 'true-myth';
 import {mapMeetingRecurrenceToOption} from './scheduleMeetingModal/scheduleMeetingRecurrence';
 import type {MeetingSeries} from './types/meetingSeries';
 
-import type {Meeting as ApiMeeting} from '../../apiClient/meetings/meeting';
+import type {Meeting} from '../../apiClient/meetings/meeting';
 
 export type MapApiMeetingToSeriesError =
   'invalidStartTime' | 'invalidEndTime' | 'endNotAfterStart' | 'invalidRecurrenceUntil';
 
-export const mapApiMeetingToSeries = (apiMeeting: ApiMeeting): Result<MeetingSeries, MapApiMeetingToSeriesError> => {
+export const mapApiMeetingToSeries = (apiMeeting: Meeting): Result<MeetingSeries, MapApiMeetingToSeriesError> => {
   const start = parseISO(apiMeeting.start_time);
   const end = parseISO(apiMeeting.end_time);
 

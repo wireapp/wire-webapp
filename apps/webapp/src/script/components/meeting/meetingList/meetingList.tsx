@@ -63,6 +63,7 @@ export interface MeetingListProps {
   meetingSeries: MeetingSeries[];
   isLoading: boolean;
   hasLoadError: boolean;
+  linkedMeetingUnavailable?: boolean;
   onRefresh: () => void;
   selfUser: User | undefined;
   isLinkedMeeting?: boolean;
@@ -140,6 +141,7 @@ export const MeetingList: FunctionComponent<MeetingListProps> = ({
   meetingSeries,
   isLoading,
   hasLoadError,
+  linkedMeetingUnavailable = false,
   onRefresh,
   selfUser,
   isLinkedMeeting = false,
@@ -287,6 +289,17 @@ export const MeetingList: FunctionComponent<MeetingListProps> = ({
     return (
       <div css={meetingListContainerStyles} data-uie-name="meetings-list-error">
         <p>{translate('meetings.list.loadError')}</p>
+        <Button variant={ButtonVariant.TERTIARY} onClick={onRefresh} data-uie-name="do-refresh-meetings">
+          {translate('meetings.list.refresh')}
+        </Button>
+      </div>
+    );
+  }
+
+  if (linkedMeetingUnavailable) {
+    return (
+      <div css={meetingListContainerStyles} data-uie-name="linked-meeting-unavailable">
+        <p>{translate('meetings.list.reopenInviteLink')}</p>
         <Button variant={ButtonVariant.TERTIARY} onClick={onRefresh} data-uie-name="do-refresh-meetings">
           {translate('meetings.list.refresh')}
         </Button>

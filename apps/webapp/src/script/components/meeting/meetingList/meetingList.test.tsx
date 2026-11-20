@@ -185,6 +185,24 @@ describe('MeetingList', () => {
     expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 
+  it('shows retry when a linked meeting cannot be fetched', () => {
+    const onRefresh = jest.fn();
+    renderMeetingList({
+      meetingSeries: [],
+      isLoading: false,
+      hasLoadError: false,
+      linkedMeetingUnavailable: true,
+      isLinkedMeeting: true,
+      onRefresh,
+    });
+
+    expect(screen.getByText('meetings.list.reopenInviteLink')).toBeInTheDocument();
+    act(() => {
+      screen.getByRole('button', {name: 'meetings.list.refresh'}).click();
+    });
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+  });
+
   it('shows no creation actions when a linked meeting has no visible occurrences', () => {
     const clock = createDeterministicClock({
       initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-15T12:00:00.000Z')) * 1_000n,

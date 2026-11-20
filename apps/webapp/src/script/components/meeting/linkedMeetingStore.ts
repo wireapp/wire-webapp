@@ -24,3 +24,10 @@ import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 export const useLinkedMeetingStore = create<{meetingId: QualifiedId | undefined}>(() => {
   return {meetingId: undefined};
 });
+
+export const clearLinkedMeetingOnNavigation = (hash: string): void => {
+  if (/^#\/(?:meetings\/[^/]+\/[^/]+|preferences\/[^/]+)$/.test(hash)) {
+    return;
+  }
+  useLinkedMeetingStore.setState({meetingId: undefined});
+};

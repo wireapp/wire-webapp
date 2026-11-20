@@ -41,6 +41,10 @@ const metadata = {
   qualified_id: {id: 'meeting-id', domain: 'example.com'},
   title: 'Private meeting title',
   start_time: '2099-01-01T12:00:00Z',
+  end_time: '2099-01-01T13:00:00Z',
+  qualified_creator: {id: 'creator-id', domain: 'example.com'},
+  tzid: 'Europe/Berlin',
+  has_password: false,
 };
 const prep = {
   meetingTitle: metadata.title,
@@ -115,7 +119,11 @@ describe('meeting links in the existing auth flow', () => {
     expect(register).toHaveBeenCalledTimes(mode === 'guest' ? 1 : 0);
     expect(date).not.toHaveBeenCalled();
     expect(JSON.parse(window.localStorage.getItem('LOGIN_CONVERSATION_KEY') ?? '{}')).toEqual({
-      data: {conversation: conversation.id, domain: conversation.domain, meetingPrep: prep},
+      data: {
+        conversation: conversation.id,
+        domain: conversation.domain,
+        meetingPrep: prep,
+      },
     });
   });
 
@@ -274,7 +282,11 @@ describe('meeting links in the existing auth flow', () => {
     await submitCorrectPassword(page);
     expect(joins).toBe(2);
     expect(JSON.parse(window.localStorage.getItem('LOGIN_CONVERSATION_KEY') ?? '{}')).toEqual({
-      data: {conversation: conversation.id, domain: conversation.domain, meetingPrep: prep},
+      data: {
+        conversation: conversation.id,
+        domain: conversation.domain,
+        meetingPrep: prep,
+      },
     });
   });
 

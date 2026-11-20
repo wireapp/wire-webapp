@@ -24,10 +24,13 @@ import * as Icon from '../../../components/icon';
 import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
 import {Config} from '../../../Config';
 import {User} from '../../../repositories/entity/User';
+import {useMatchMedia} from '../../../uiKit/layout/matchMedia/matchMedia';
+import {QUERY} from '../../../uiKit/utils/mediaQueries';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {ListViewModel} from '../../../view_model/ListViewModel';
 import {useApplicationContext} from '../../rootProvider';
+import {useAppMainState, ViewType} from '../../state';
 import {ContentState, useAppState} from '../../useAppState';
 
 type TemporaryGuestConversations = {
@@ -50,6 +53,10 @@ const TemporaryGuestConversations: FunctionComponent<TemporaryGuestConversations
   const {activeCalls} = useKoSubscribableChildren(callingViewModel, ['activeCalls']);
   const isMeetingView = useAppState(state => {
     return state.contentState === ContentState.MEETINGS;
+  });
+  const isMobileView = useMatchMedia(QUERY.tabletSMDown);
+  const setCurrentView = useAppMainState(state => {
+    return state.responsiveView.setCurrentView;
   });
   const isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
   const openPreferences = (): void => {
@@ -99,6 +106,18 @@ const TemporaryGuestConversations: FunctionComponent<TemporaryGuestConversations
           );
         })}
       <div className="temporary-guest__content">
+        {isMeetingView && isMobileView && (
+          <button
+            type="button"
+            className="temporary-guest__return-to-meeting"
+            onClick={() => {
+              setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
+            }}
+            data-uie-name="go-to-linked-meeting"
+          >
+            {translate('meetings.list.returnToMeeting')}
+          </button>
+        )}
         <Icon.LogoFullIcon />
         <div className="temporary-guest__description">{translate('temporaryGuestDescription')}</div>
         {isAccountCreationEnabled && (

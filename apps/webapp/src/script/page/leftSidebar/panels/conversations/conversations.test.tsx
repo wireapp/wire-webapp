@@ -29,6 +29,7 @@ import {CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '../../../../webAppEvents';
+import {useLinkedMeetingStore} from '../../../../components/meeting/linkedMeetingStore';
 
 import {CallState} from '../../../../repositories/calling/CallState';
 import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
@@ -74,6 +75,7 @@ const defaultParams: Omit<ConversationsProps, 'conversationRepository' | 'search
   } as unknown as ConversationsProps['listViewModel'],
   preferenceNotificationRepository: {
     notifications: observable([]),
+    getNotifications: jest.fn().mockReturnValue([]),
   } as unknown as ConversationsProps['preferenceNotificationRepository'],
   propertiesRepository: {
     getPreference: jest.fn(),
@@ -608,6 +610,39 @@ describe('Conversations', () => {
     expect(setHistoryParam).toHaveBeenCalledWith('/');
   });
 
+  it.each([false, true])('returns from Settings to a linked meeting for temporary guest %s', isTemporaryGuest => {
+    const meetingId = {id: 'meeting-id', domain: 'example.com'};
+    defaultParams.selfUser.isTemporaryGuest(isTemporaryGuest);
+    useLinkedMeetingStore.setState({meetingId});
+    useAppState.setState({listState: ListState.PREFERENCES, contentState: ContentState.PREFERENCES_ACCOUNT});
+    useSidebarStore.setState({currentTab: SidebarTabs.PREFERENCES});
+    const navigate = jest.spyOn(Router, 'navigate').mockImplementation();
+
+    try {
+      const {getByTitle} = render(
+        withTheme(
+          <Conversations
+            {...defaultParams}
+            searchRepository={searchRepository}
+            conversationRepository={conversationRepository}
+          />,
+        ),
+      );
+
+      act(() => {
+        getByTitle('tooltipSearchClose').click();
+      });
+
+      expect(navigate).toHaveBeenCalledWith('/meetings/meeting-id/example.com');
+    } finally {
+      navigate.mockRestore();
+      useLinkedMeetingStore.setState({meetingId: undefined});
+      defaultParams.selfUser.isTemporaryGuest(false);
+      useAppState.setState({listState: ListState.CONVERSATIONS, contentState: ContentState.CONVERSATION});
+      useSidebarStore.setState({currentTab: SidebarTabs.RECENT});
+    }
+  });
+
   it('preserves the conversation deep link when switching between conversation list tabs', () => {
     useAppState.setState({listState: ListState.CONVERSATIONS});
     useSidebarStore.setState({currentTab: SidebarTabs.RECENT});
@@ -628,6 +663,44 @@ describe('Conversations', () => {
     });
 
     expect(setHistoryParam).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [SidebarTabs.RECENT, 'go-recent-view'],
+    [SidebarTabs.FAVORITES, 'go-favorites-view'],
+    [SidebarTabs.GROUPS, 'go-groups-view'],
+    [SidebarTabs.DIRECTS, 'go-directs-view'],
+    [SidebarTabs.ARCHIVES, 'go-archive'],
+  ])('leaves a linked meeting for conversation tab %s, including an empty list', (tab, buttonName) => {
+    useLinkedMeetingStore.setState({meetingId: {id: 'meeting-id', domain: 'example.com'}});
+    useAppState.setState({listState: ListState.CONVERSATIONS, contentState: ContentState.MEETINGS});
+    useSidebarStore.setState({currentTab: tab});
+    const setHistoryParam = jest.spyOn(Router, 'setHistoryParam').mockImplementation(() => false);
+    try {
+      const {container} = render(
+        withTheme(
+          <Conversations
+            {...defaultParams}
+            searchRepository={searchRepository}
+            conversationRepository={conversationRepository}
+          />,
+        ),
+      );
+      const button = container.querySelector<HTMLElement>(`[data-uie-name="${buttonName}"]`);
+      expect(button).toBeInTheDocument();
+      act(() => {
+        button?.click();
+      });
+      expect(setHistoryParam).toHaveBeenCalledWith('/');
+      expect(defaultParams.listViewModel.switchList).toHaveBeenCalledWith(ListState.CONVERSATIONS, true);
+      expect(defaultParams.listViewModel.contentViewModel.switchContent).toHaveBeenCalledWith(ContentState.CONVERSATION);
+      expect(useSidebarStore.getState().currentTab).toBe(tab);
+    } finally {
+      setHistoryParam.mockRestore();
+      useLinkedMeetingStore.setState({meetingId: undefined});
+      useAppState.setState({listState: ListState.CONVERSATIONS, contentState: ContentState.CONVERSATION});
+      useSidebarStore.setState({currentTab: SidebarTabs.RECENT});
+    }
   });
 
   it('keeps Connect selected on the first click when a conversation is shown', () => {

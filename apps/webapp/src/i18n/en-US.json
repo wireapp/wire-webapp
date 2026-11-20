@@ -1473,6 +1473,8 @@
   "meetings.error.conversationSetupFailed": "The meeting was saved, but something went wrong while setting up the conversation. Please try again.",
   "meetings.error.setupFailedTitle": "Could not finish meeting setup",
   "meetings.list.loadError": "Could not load meetings. Please try again.",
+  "meetings.list.reopenInviteLink": "Meeting details are unavailable. Please reopen the invitation link.",
+  "meetings.list.returnToMeeting": "Return to meeting",
   "meetings.list.refresh": "Refresh",
   "meetings.list.today": "Today",
   "meetings.list.tomorrow": "Tomorrow",

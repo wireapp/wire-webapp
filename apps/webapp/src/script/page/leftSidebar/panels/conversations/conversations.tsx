@@ -54,6 +54,7 @@ import {
   useSidebarStore,
 } from './useSidebarStore';
 
+import {useLinkedMeetingStore} from '../../../../components/meeting/linkedMeetingStore';
 import {MeetingNotificationHost} from '../../../../components/meeting/meetingNotificationHost/meetingNotificationHost';
 import {Config} from '../../../../Config';
 import {useConversationFocus} from '../../../../hooks/useConversationFocus';
@@ -73,7 +74,7 @@ import {EventName} from '../../../../repositories/tracking/eventName';
 import {UserRepository} from '../../../../repositories/user/userRepository';
 import {UserState} from '../../../../repositories/user/userState';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
-import {setHistoryParam} from '../../../../router/Router';
+import {navigate, setHistoryParam} from '../../../../router/Router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {useMatchMedia} from '../../../../uiKit/layout/matchMedia/matchMedia';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
@@ -157,6 +158,9 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
   const [searchResetToken, setSearchResetToken] = useState(0);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
+  const linkedMeetingId = useLinkedMeetingStore(state => {
+    return state.meetingId;
+  });
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
@@ -501,6 +505,15 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
     [setCurrentView, switchList, switchContent],
   );
 
+  const onClosePreferences = useCallback(() => {
+    if (linkedMeetingId !== undefined) {
+      navigate(`/meetings/${encodeURIComponent(linkedMeetingId.id)}/${encodeURIComponent(linkedMeetingId.domain)}`);
+      setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
+      return;
+    }
+    onExitPreferences();
+  }, [linkedMeetingId, onExitPreferences, setCurrentView]);
+
   const changeTab = useCallback(
     (nextTab: SidebarTabs, folderId?: string) => {
       if (!isNonEmptyString(folderId)) {
@@ -522,10 +535,11 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
       const {listState} = useAppState.getState();
       const isSwitchingConversationListTab = listState === ListState.CONVERSATIONS && isConversationListTab(nextTab);
 
-      if (shouldClearDeepLinkForTab(nextTab) && !isSwitchingConversationListTab) {
+      const isLeavingLinkedMeeting = linkedMeetingId !== undefined && isConversationListTab(nextTab);
+      if (isLeavingLinkedMeeting || (shouldClearDeepLinkForTab(nextTab) && !isSwitchingConversationListTab)) {
         setHistoryParam('/');
 
-        if (nextTab !== SidebarTabs.CELLS && nextTab !== SidebarTabs.MEETINGS) {
+        if (isLeavingLinkedMeeting || (nextTab !== SidebarTabs.CELLS && nextTab !== SidebarTabs.MEETINGS)) {
           onExitPreferences(isConversationListTab(nextTab));
         }
       }
@@ -549,6 +563,7 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
       clearConversationFilter,
       setCurrentTab,
       listViewModel,
+      linkedMeetingId,
     ],
   );
 
@@ -571,7 +586,11 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
   }, [isAdvancedFiltersEnabled, resetDisabledFeatureTabs]);
 
   useEffect(() => {
-    if (!isMeetingsEnabled && currentTab === SidebarTabs.MEETINGS) {
+    if (
+      !isMeetingsEnabled &&
+      currentTab === SidebarTabs.MEETINGS &&
+      !/^#\/meetings\/[^/]+\/[^/]+$/.test(window.location.hash)
+    ) {
       setCurrentTab(SidebarTabs.RECENT);
       switchList(ListState.CONVERSATIONS);
       switchContent(ContentState.CONVERSATION);
@@ -607,9 +626,7 @@ export const Conversations: FunctionComponent<ConversationsProps> = ({
         onPreferenceItemClick={onClickPreferences}
         teamRepository={teamRepository}
         preferenceNotificationRepository={preferenceNotificationRepository}
-        {...(isTemporaryGuest && {
-          onClose: onExitPreferences,
-        })}
+        onClose={linkedMeetingId !== undefined || isTemporaryGuest ? onClosePreferences : undefined}
       />
     );
   } else {

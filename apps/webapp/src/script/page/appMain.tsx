@@ -36,6 +36,7 @@ import {WindowTitleUpdater} from './components/windowTitleUpdater';
 import {LeftSidebar} from './leftSidebar';
 import {TeamCreationModalContainer} from './leftSidebar/panels/conversations/conversationTabs/teamCreation/teamCreationModalContainer';
 import {SidebarTabs, useSidebarStore} from './leftSidebar/panels/conversations/useSidebarStore';
+import {getAppColumns} from './linkedMeetingLayout';
 import {MainContent} from './mainContent';
 import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
@@ -48,7 +49,7 @@ import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
 import {ConfigToolbar} from '../components/configToolbar/configToolbar';
 import {SharedDriveUploadStatusScope} from '../components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {ErrorFallback} from '../components/errorFallback';
-import {useLinkedMeetingStore} from '../components/meeting/linkedMeetingStore';
+import {clearLinkedMeetingOnNavigation, useLinkedMeetingStore} from '../components/meeting/linkedMeetingStore';
 import {useMeetingPrepModal} from '../components/meeting/meetingPrep/useMeetingPrepModal';
 import {CreateConversationModal} from '../components/Modals/CreateConversation/CreateConversaionModal';
 import {FileHistoryModal} from '../components/Modals/FileHistoryModal/FileHistoryModal';
@@ -71,11 +72,7 @@ import {
   initialiseMigrationOfProteusConversations,
   joinUnestablishedMixedConversations,
 } from '../mls/MLSMigration/migrationInitialiser';
-import {
-  isLoginMeetingDestination,
-  meetingJoinLandingPath,
-  openLoginMeetingPrep,
-} from '../navigation/meetingJoinDestination';
+import {getLoginMeetingPrep, replaceLoginMeetingRoute} from '../navigation/meetingJoinDestination';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
 import {ConversationState} from '../repositories/conversation/ConversationState';
 import {User} from '../repositories/entity/User';
@@ -94,6 +91,7 @@ import {canUseMeetings} from '../util/canUseMeetings';
 import {canUseTroubleshooter} from '../util/canUseTroubleshooter';
 import {useKoSubscribableChildren} from '../util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from '../util/isDetachedCallingFeatureEnabled';
+import {useMeetingsFeatureFlag} from '../util/useMeetingsFeatureFlag';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
@@ -176,6 +174,28 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
   const currentState = history[history.length - 1];
 
   const {currentTab} = useSidebarStore();
+  const linkedMeetingId = useLinkedMeetingStore(state => {
+    return state.meetingId;
+  });
+  const contentState = useAppState(state => {
+    return state.contentState;
+  });
+  const {isMeetingsEnabled} = useMeetingsFeatureFlag();
+  const isLinkedMeetingOnlyView =
+    linkedMeetingId !== undefined &&
+    contentState === ContentState.MEETINGS &&
+    !isMeetingsEnabled &&
+    !selfUser.isTemporaryGuest();
+
+  useEffect(() => {
+    const clearOnNavigation = (): void => {
+      clearLinkedMeetingOnNavigation(window.location.hash);
+    };
+    window.addEventListener('hashchange', clearOnNavigation);
+    return () => {
+      window.removeEventListener('hashchange', clearOnNavigation);
+    };
+  }, []);
 
   const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams, compareEntityId = false): void => {
     const isDifferentState = currentState !== panelState;
@@ -205,11 +225,22 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
     const pendingJoinDestination = isNonEmptyString(conversationRedirect)
       ? JSON.parse(conversationRedirect)?.data
       : undefined;
-    const hasPendingMeetingJoin = isLoginMeetingDestination(pendingJoinDestination);
+    const pendingMeetingPrep = getLoginMeetingPrep(pendingJoinDestination);
+    const hasPendingMeetingJoin = pendingMeetingPrep !== undefined;
+    if (pendingMeetingPrep !== undefined) {
+      replaceLoginMeetingRoute(
+        pendingMeetingPrep,
+        selfUser.isTemporaryGuest(),
+        canUseMeetings({
+          isTeamMeetingsFeatureEnabled: teamState.isMeetingsEnabled(),
+          apiVersion: core.backendFeatures.version,
+        }),
+      );
+    }
 
     const showMostRecentConversation = (): void => {
       const isShowingConversation = useAppState.getState().isShowingConversation();
-      if (!isShowingConversation) {
+      if (!isShowingConversation && useAppState.getState().contentState !== ContentState.MEETINGS) {
         return;
       }
 
@@ -219,7 +250,9 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
         return mainView.list.showTemporaryGuest(!hasPendingMeetingJoin);
       }
       if (!isNullOrUndefined(activeConversation)) {
-        // There is already an active conversation, keeping state as is
+        if (useAppState.getState().contentState === ContentState.MEETINGS) {
+          navigate(generateConversationUrl(activeConversation.qualifiedId));
+        }
         return;
       }
       const mostRecentConversation = conversationState.getMostRecentConversation();
@@ -235,7 +268,11 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
     const historyState = window.history.state;
     if (isTruthy(historyState) && isTruthy(historyState.eventKey)) {
       historyState.eventKey = '';
-      window.history.replaceState(historyState, '', window.location.hash);
+      window.history.replaceState(
+        historyState,
+        '',
+        `${window.location.pathname}${window.location.search}${window.location.hash}`,
+      );
     }
 
     const showConversationMessages = (conversationId: string, domain = apiContext.domain ?? ''): void => {
@@ -342,6 +379,7 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
           mainView.list.switchList(ListState.TEMPORARY_GUEST, false);
         }
         mainView.list.contentViewModel.switchContent(ContentState.MEETINGS);
+        useAppMainState.getState().responsiveView.setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
       },
       '/user/:userId/:domain': showUserProfile,
       '/user/:domain/:userId': showUserProfile,
@@ -350,7 +388,7 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
 
-    if (isNonEmptyString(redirect)) {
+    if (isNonEmptyString(redirect) && !hasPendingMeetingJoin) {
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
       window.location.replace(redirect);
     }
@@ -358,21 +396,9 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
     if (isNonEmptyString(conversationRedirect)) {
       const destination = pendingJoinDestination;
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-      const openedMeetingPrep = openLoginMeetingPrep(destination, useMeetingPrepModal.getState().open);
-      if (openedMeetingPrep) {
-        const session = useMeetingPrepModal.getState().session;
-        if (session.isJust) {
-          navigate(
-            meetingJoinLandingPath(
-              session.value,
-              selfUser.isTemporaryGuest(),
-              canUseMeetings({
-                isTeamMeetingsFeatureEnabled: teamState.isMeetingsEnabled(),
-                apiVersion: core.backendFeatures.version,
-              }),
-            ),
-          );
-        }
+      if (pendingMeetingPrep !== undefined) {
+        localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
+        useMeetingPrepModal.getState().open(pendingMeetingPrep);
       } else {
         const {conversation, domain} = destination;
         window.location.replace(`#/conversation/${conversation}${isTruthy(domain) ? `/${domain}` : ''}`);
@@ -427,12 +453,14 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
 
   useE2EIFeatureConfigUpdate(repositories.team, clock);
 
-  const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
-  const showMainContent =
-    currentTab === SidebarTabs.CELLS ||
-    currentTab === SidebarTabs.MEETINGS ||
-    !isMobileView ||
-    isMobileCentralColumnView;
+  const {showLeftSidebar, showMainContent} = getAppColumns({
+    isLinkedMeetingOnlyView,
+    isMobileView,
+    isMobileLeftSidebarView,
+    isMobileCentralColumnView,
+    isLeftSidebarHidden,
+    isCellsOrMeetingsTab: currentTab === SidebarTabs.CELLS || currentTab === SidebarTabs.MEETINGS,
+  });
   const {hasLargeOffset, hasSmallOffset} = useWarningOffset();
   return (
     <StyledApp
@@ -451,7 +479,8 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
             id="app"
             className={cx('app', {
               'app--hide-main-content-on-mobile':
-                currentTab !== SidebarTabs.CELLS && currentTab !== SidebarTabs.MEETINGS,
+                !isLinkedMeetingOnlyView && currentTab !== SidebarTabs.CELLS && currentTab !== SidebarTabs.MEETINGS,
+              'app--linked-meeting-only': isLinkedMeetingOnlyView,
               'app--small-offset': hasSmallOffset,
               'app--large-offset': hasLargeOffset,
             })}

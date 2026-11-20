@@ -54,6 +54,10 @@ describe.each(['password', 'SSO'] as const)('Meeting link login with %s', mode =
     qualified_conversation: conversation,
     title: 'Meeting',
     start_time: '2026-01-01T12:00:00Z',
+    end_time: '2026-01-01T13:00:00Z',
+    has_password: false,
+    qualified_creator: {id: 'creator-id', domain: 'example.com'},
+    tzid: 'Europe/Berlin',
   };
 
   beforeEach(() => {

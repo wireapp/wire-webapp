@@ -26,6 +26,10 @@
   background-color: var(--app-bg);
   transition: filter 0.3s;
 
+  &--linked-meeting-only {
+    min-width: 0;
+  }
+
   .left-column {
     position: relative;
     display: flex;
@@ -56,6 +60,26 @@
       &.left-column--conversation-list-collapsed {
         width: auto;
       }
+    }
+  }
+
+  &--linked-meeting-only {
+    .left-column {
+      min-width: 0;
+      width: auto;
+
+      .team-mode & {
+        width: auto;
+      }
+    }
+
+    .left-list-conversations {
+      display: none;
+    }
+
+    .center-column {
+      min-width: 0;
+      width: 100%;
     }
   }
 

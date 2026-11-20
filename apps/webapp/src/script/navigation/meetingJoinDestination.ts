@@ -23,7 +23,11 @@ import {z} from 'zod';
 import type {QualifiedId} from '../apiClient/user';
 import type {MeetingPrepSession} from '../components/meeting/meetingPrep/useMeetingPrepModal';
 
-export type JoinLinkResult = {conversation: QualifiedId; eventTime?: string; meetingPrep?: MeetingPrepSession};
+export type JoinLinkResult = {
+  conversation: QualifiedId;
+  eventTime?: string;
+  meetingPrep?: MeetingPrepSession;
+};
 
 const qualifiedIdSchema = z.object({id: z.string().min(1), domain: z.string().min(1)});
 export const joinedMeetingDestinationSchema = z
@@ -57,6 +61,11 @@ export const isLoginMeetingDestination = (data: unknown): boolean => {
   return pendingMeetingPrepSchema.safeParse(data).success;
 };
 
+export const getLoginMeetingPrep = (data: unknown): MeetingPrepSession | undefined => {
+  const destination = pendingMeetingPrepSchema.safeParse(data);
+  return destination.success ? destination.data.meetingPrep : undefined;
+};
+
 export const meetingJoinLandingPath = (
   session: MeetingPrepSession,
   isTemporaryGuest: boolean,
@@ -67,6 +76,19 @@ export const meetingJoinLandingPath = (
   }
   const {id, domain} = session.qualifiedMeetingId;
   return `/meetings/${encodeURIComponent(id)}/${encodeURIComponent(domain)}`;
+};
+
+export const replaceLoginMeetingRoute = (
+  session: MeetingPrepSession,
+  isTemporaryGuest: boolean,
+  canOpenMeetingsTab: boolean,
+): void => {
+  const meetingPath = meetingJoinLandingPath(session, isTemporaryGuest, canOpenMeetingsTab);
+  window.history.replaceState(
+    window.history.state,
+    '',
+    `${window.location.pathname}${window.location.search}#${meetingPath}`,
+  );
 };
 
 export function loginJoinDestination(result: JoinLinkResult): {
@@ -82,10 +104,10 @@ export function loginJoinDestination(result: JoinLinkResult): {
 }
 
 export function openLoginMeetingPrep(data: unknown, open: (session: MeetingPrepSession) => void): boolean {
-  const destination = pendingMeetingPrepSchema.safeParse(data);
-  if (!destination.success) {
+  const session = getLoginMeetingPrep(data);
+  if (session === undefined) {
     return false;
   }
-  open(destination.data.meetingPrep);
+  open(session);
   return true;
 }

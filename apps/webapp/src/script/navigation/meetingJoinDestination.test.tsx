@@ -18,6 +18,8 @@
  */
 
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {noop} from 'noop-esm';
 import {ThemeProvider} from '../uiKit';
 import {Maybe, task} from 'true-myth';
 import {container} from 'tsyringe';
@@ -47,6 +49,7 @@ import {
   loginJoinDestination,
   meetingJoinLandingPath,
   openLoginMeetingPrep,
+  replaceLoginMeetingRoute,
 } from './meetingJoinDestination';
 
 const response = {
@@ -54,6 +57,10 @@ const response = {
   qualified_id: {id: 'meeting-id', domain: 'example.com'},
   title: 'Link meeting',
   start_time: '2099-01-01T12:00:00Z',
+  end_time: '2099-01-01T13:00:00Z',
+  qualified_creator: {id: 'creator-id', domain: 'example.com'},
+  tzid: 'Europe/Berlin',
+  has_password: false,
 };
 
 describe('meeting link post-login landing', () => {
@@ -63,6 +70,27 @@ describe('meeting link post-login landing', () => {
     });
     jest.restoreAllMocks();
     window.history.replaceState({}, '', '/');
+  });
+
+  it.each([
+    {isTemporaryGuest: true, canOpenMeetingsTab: false, expectedHash: '#/meetings/meeting-id/example.com'},
+    {isTemporaryGuest: false, canOpenMeetingsTab: false, expectedHash: '#/meetings/meeting-id/example.com'},
+    {isTemporaryGuest: false, canOpenMeetingsTab: true, expectedHash: '#/meetings'},
+  ])('replaces an old conversation route before meeting preparation for $expectedHash', scenario => {
+    window.history.replaceState(
+      {eventKey: 'previous'},
+      '',
+      '/?enabled-features=mark-as-unread#/conversation/old-id/example.com',
+    );
+    const historyLength = window.history.length;
+    const session = joinedMeetingDestinationSchema.parse(response).meetingPrep;
+
+    replaceLoginMeetingRoute(session, scenario.isTemporaryGuest, scenario.canOpenMeetingsTab);
+
+    expect(window.location.hash).toBe(scenario.expectedHash);
+    expect(window.location.search).toBe('?enabled-features=mark-as-unread');
+    expect(window.history.state).toEqual({eventKey: 'previous'});
+    expect(window.history.length).toBe(historyLength);
   });
 
   it('shows guest preparation over only the joined meeting and leaves it visible after dismissal', async () => {
@@ -80,17 +108,7 @@ describe('meeting link post-login landing', () => {
     } as unknown as MediaStreamHandler);
     jest.spyOn(container, 'resolve').mockImplementation(testContainer.resolve.bind(testContainer));
     const loadMeetings = jest.fn();
-    const getMeeting = jest.fn(() => {
-      return task.resolve({
-        ...response,
-        created_at: '2098-12-01T12:00:00Z',
-        updated_at: '2098-12-01T12:00:00Z',
-        end_time: '2099-01-01T13:00:00Z',
-        qualified_creator: {id: 'creator-id', domain: 'example.com'},
-        tzid: 'Europe/Berlin',
-        has_password: false,
-      });
-    });
+    const getMeeting = jest.fn().mockReturnValue(task.resolve(response));
     const mainViewModel = {
       content: {
         repositories: {
@@ -145,6 +163,110 @@ describe('meeting link post-login landing', () => {
       expect(reloaded.container.querySelector('[data-uie-name="meetings-list"]')).toBeInTheDocument();
     });
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('shows the unavailable state after a failed read and allows retry', async () => {
+    const participant = new User('guest-id', 'example.com', translateForTest);
+    jest.spyOn(container.resolve(UserState), 'self').mockReturnValue(participant);
+    const getMeeting = jest
+      .fn()
+      .mockReturnValueOnce(task.reject(new Error('Not found')))
+      .mockReturnValueOnce(task.resolve(response));
+    const mainViewModel = {
+      content: {repositories: {meetings: {getMeeting}, conversation: {}, calling: {}, properties: {}}},
+      calling: {callingRepository: {}, callActions: {}},
+    } as unknown as MainViewModel;
+    const page = render(
+      <ThemeProvider>
+        <MeetingStoreRoot>
+          <Meetings linkedMeetingId={response.qualified_id} />
+        </MeetingStoreRoot>
+      </ThemeProvider>,
+      {
+        wrapper: createRootProviderWrapperForTest(
+          createRootContextValueForTest({translate: translateForTest, mainViewModel}),
+        ),
+      },
+    );
+    await waitFor(() => {
+      expect(page.container.querySelector('[data-uie-name="linked-meeting-unavailable"]')).toBeInTheDocument();
+    });
+    expect(screen.getByText('meetings.list.reopenInviteLink')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.list.refresh'}));
+    await waitFor(() => {
+      expect(page.container.querySelector('[data-uie-name="meetings-list"]')).toBeInTheDocument();
+    });
+    expect(getMeeting).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not show a late response from a previously opened linked meeting', async () => {
+    const participant = new User('guest-id', 'example.com', translateForTest);
+    jest.spyOn(container.resolve(UserState), 'self').mockReturnValue(participant);
+    let finishFirstRead: () => void = noop;
+    const firstRead = new Promise<void>(resolve => {
+      finishFirstRead = resolve;
+    });
+    const secondMeeting = {
+      ...response,
+      qualified_id: {id: 'second-id', domain: 'example.com'},
+      title: 'Second meeting',
+      start_time: '2020-01-01T12:00:00Z',
+      end_time: '2020-01-01T13:00:00Z',
+    };
+    const getMeeting = jest.fn((meetingId: {id: string}) => {
+      return meetingId.id === response.qualified_id.id
+        ? task.tryOrElse(
+            () => {
+              return new Error('Meeting read failed');
+            },
+            async () => {
+              await firstRead;
+              return response;
+            },
+          )
+        : task.resolve(secondMeeting);
+    });
+    const mainViewModel = {
+      content: {repositories: {meetings: {getMeeting}, conversation: {}, calling: {}, properties: {}}},
+      calling: {callingRepository: {}, callActions: {}},
+    } as unknown as MainViewModel;
+    const wrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        mainViewModel,
+        clock: createDeterministicClock({
+          initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-15T12:00:00Z')) * 1_000n,
+        }),
+      }),
+    );
+    const page = render(
+      <ThemeProvider>
+        <MeetingStoreRoot>
+          <Meetings linkedMeetingId={response.qualified_id} />
+        </MeetingStoreRoot>
+      </ThemeProvider>,
+      {wrapper},
+    );
+
+    page.rerender(
+      <ThemeProvider>
+        <MeetingStoreRoot>
+          <Meetings linkedMeetingId={secondMeeting.qualified_id} />
+        </MeetingStoreRoot>
+      </ThemeProvider>,
+    );
+    await waitFor(() => {
+      expect(getMeeting).toHaveBeenCalledTimes(2);
+      expect(page.container.querySelector('[data-uie-name="meetings-list-loading"]')).not.toBeInTheDocument();
+      expect(page.container.querySelector('[data-uie-name="meetings-list"]')).not.toBeInTheDocument();
+    });
+
+    await act(async () => {
+      finishFirstRead();
+      await firstRead;
+    });
+    expect(page.container.querySelector('[data-uie-name="meetings-list"]')).not.toBeInTheDocument();
+    expect(getMeeting).toHaveBeenCalledTimes(2);
   });
 
   it('opens prep for the joined meeting without joining the call automatically', () => {

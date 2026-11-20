@@ -19,16 +19,42 @@
 
 import type {FunctionComponent} from 'react';
 
+import {container} from 'tsyringe';
+
 import {actionsStyles, headingStyles, wrapperStyles} from './meetingHeader.styles';
 
 import {useApplicationContext} from '../../../page/rootProvider';
+import {useAppMainState, ViewType} from '../../../page/state';
+import {UserState} from '../../../repositories/user/userState';
+import {IconButton, IconButtonVariant} from '../../../uiKit/inputs/iconButton/iconButton';
+import {useMatchMedia} from '../../../uiKit/layout/matchMedia/matchMedia';
+import {QUERY} from '../../../uiKit/utils/mediaQueries';
 import {MeetingMultiActionButton} from '../meetingMultiActionButton/meetingMultiActionButton';
 
-export const MeetingHeader: FunctionComponent<{showActions?: boolean}> = ({showActions = true}) => {
+export const MeetingHeader: FunctionComponent<{showActions?: boolean; isLinkedMeeting?: boolean}> = ({
+  showActions = true,
+  isLinkedMeeting = false,
+}) => {
   const {translate} = useApplicationContext();
+  const isMobileView = useMatchMedia(QUERY.tabletSMDown);
+  const isTemporaryGuest = container.resolve(UserState).self()?.isTemporaryGuest();
+  const setCurrentView = useAppMainState(state => {
+    return state.responsiveView.setCurrentView;
+  });
 
   return (
     <header css={wrapperStyles}>
+      {isLinkedMeeting && isTemporaryGuest && isMobileView && (
+        <IconButton
+          variant={IconButtonVariant.SECONDARY}
+          className="icon-back"
+          aria-label={translate('index.goBack')}
+          onClick={() => {
+            setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
+          }}
+          data-uie-name="go-to-guest-panel"
+        />
+      )}
       <h2 css={headingStyles}>{translate('meetings.navigation.title')}</h2>
       {showActions && (
         <div css={actionsStyles}>

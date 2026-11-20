@@ -35,6 +35,10 @@ const metadata = {
   title: 'Private title',
   start_time: '2099-01-01T12:00:00Z',
   recurrence: {frequency: 'daily'},
+  end_time: '2099-01-01T13:00:00Z',
+  qualified_creator: {id: 'creator-id', domain: 'example.com'},
+  tzid: 'Europe/Berlin',
+  has_password: false,
 };
 const prep = {
   meetingTitle: metadata.title,
