@@ -185,7 +185,12 @@ test('loads the application entry points and redirects an unauthenticated visito
     return failure !== `script ${persistenceWorkerPath}: net::ERR_ABORTED`;
   });
   expectNoRuntimeFailures({
-    diagnostics: {...diagnostics, failedLocalRequests},
+    diagnostics: {
+      uncaughtPageErrors: diagnostics.uncaughtPageErrors,
+      failedLocalRequests,
+      failedLocalResponses: diagnostics.failedLocalResponses,
+      localScriptResponses: diagnostics.localScriptResponses,
+    },
     buildProjectName: testInfo.project.name,
   });
 });

@@ -123,12 +123,17 @@ describe('browser log download', () => {
   }
 
   it('hides downloads when the save picker is unavailable', () => {
-    const dependencies = createDownloadDependencies();
-    const download = createBrowserLogDownload({...dependencies, showSaveFilePicker: Maybe.nothing()});
+    const {clock, createArchive, getDirectory, pickSaveFile} = createDownloadDependencies();
+    const download = createBrowserLogDownload({
+      showSaveFilePicker: Maybe.nothing(),
+      clock,
+      getDirectory,
+      createArchive,
+    });
 
     expect(download.isNothing).toBe(true);
-    expect(dependencies.pickSaveFile).not.toHaveBeenCalled();
-    expect(dependencies.getDirectory).not.toHaveBeenCalled();
+    expect(pickSaveFile).not.toHaveBeenCalled();
+    expect(getDirectory).not.toHaveBeenCalled();
   });
 
   it(
