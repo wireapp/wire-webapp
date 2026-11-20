@@ -19,76 +19,26 @@
 
 import {useState, type FunctionComponent} from 'react';
 
-import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
 import {PdfAssetPreview} from './pdfAssetPreview';
+import {PdfModalTestStub} from './pdfModalTestStub';
 
 import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
-import {requireValueForTest} from '../../../../../../page/testSupport/rootContextTestSupport';
-
-jest.mock('../../../../../FileFullscreenModal/FileFullscreenModal', () => {
-  return {
-    FileFullscreenModal: ({
-      isOpen,
-      dialogId,
-      onClose,
-      onDownload,
-      filePreviewUrl,
-      fileName,
-      fileExtension,
-      senderName,
-      timestamp,
-      status,
-      context,
-      previewType,
-    }: {
-      isOpen: boolean;
-      dialogId: string;
-      onClose: () => void;
-      onDownload: () => void;
-      filePreviewUrl?: string;
-      fileName: string;
-      fileExtension: string;
-      senderName: string;
-      timestamp: number;
-      status: string;
-      context: string;
-      previewType: string;
-    }) => {
-      if (!isOpen) {
-        return null;
-      }
-
-      return (
-        <div
-          role="dialog"
-          id={dialogId}
-          aria-label={`${fileName}.${fileExtension}`}
-          data-testid="file-modal"
-          data-preview-url={filePreviewUrl}
-          data-status={status}
-          data-context={context}
-          data-preview-type={previewType}
-          data-sender={senderName}
-          data-timestamp={timestamp}
-        >
-          <button type="button" onClick={onDownload}>
-            Download
-          </button>
-          <button type="button" onClick={onClose}>
-            Close test preview
-          </button>
-        </div>
-      );
-    },
-  };
-});
+import {translateForTest} from '../../../../../../util/test/translateForTest';
+import {ThemeProvider} from '../../../../../../uiKit/identity/theme/theme';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+  requireValueForTest,
+} from '../../../../../../page/testSupport/rootContextTestSupport';
 
 const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])], {type: 'application/octet-stream'});
 const pdf = new Blob(['%PDF-1.7\nvalid test PDF'], {type: 'application/octet-stream'});
 
 interface PreviewHarnessProps {
+  useSharedViewer?: boolean;
   thumbnailResource: AssetRemoteData;
   originalResource: AssetRemoteData;
   label: string;
@@ -97,6 +47,7 @@ interface PreviewHarnessProps {
 }
 
 const PreviewHarness: FunctionComponent<PreviewHarnessProps> = ({
+  useSharedViewer = false,
   thumbnailResource,
   originalResource,
   label,
@@ -107,6 +58,7 @@ const PreviewHarness: FunctionComponent<PreviewHarnessProps> = ({
 
   return (
     <PdfAssetPreview
+      FullscreenModalComponent={useSharedViewer ? undefined : PdfModalTestStub}
       id="pdf-preview"
       thumbnailResource={thumbnailResource}
       originalResource={originalResource}
@@ -149,10 +101,50 @@ describe('PdfAssetPreview', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     URL.revokeObjectURL = jest.fn();
-    jest.spyOn(URL, 'createObjectURL').mockReturnValueOnce('blob:thumbnail').mockReturnValueOnce('blob:pdf');
+    jest
+      .spyOn(URL, 'createObjectURL')
+      .mockReset()
+      .mockReturnValueOnce('blob:thumbnail')
+      .mockReturnValueOnce('blob:pdf');
   });
 
-  it('loads the encrypted thumbnail lazily and opens the decrypted original in the shared PDF viewer', async () => {
+  it('uses the shared dialog and close action when no viewer adapter is injected', async () => {
+    let resolvePdf: (value: Blob | undefined) => void = noop;
+    const pendingPdf = new Promise<Blob | undefined>(resolve => {
+      resolvePdf = resolve;
+    });
+    const loadAsset = jest.fn().mockResolvedValueOnce(png).mockReturnValue(pendingPdf);
+    const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+    render(
+      <ThemeProvider>
+        <PreviewHarness
+          useSharedViewer
+          thumbnailResource={makeResource('thumbnail')}
+          originalResource={makeResource('original')}
+          label="Open report.pdf"
+          loadAsset={loadAsset}
+        />
+      </ThemeProvider>,
+      {wrapper},
+    );
+    enterViewport();
+
+    fireEvent.click(await screen.findByRole('button', {name: 'Open report.pdf'}));
+
+    const dialog = await screen.findByRole('dialog', {name: 'report.pdf'});
+    const close = within(dialog).getByRole('button', {name: 'cells.imageFullScreenModal.closeButton'});
+    expect(within(dialog).getByRole('button', {name: 'cells.imageFullScreenModal.downloadButton'})).toBeEnabled();
+    fireEvent.click(close);
+    await act(async () => {
+      resolvePdf(pdf);
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', {name: 'report.pdf'})).not.toBeInTheDocument();
+    });
+  });
+
+  it('loads the encrypted thumbnail lazily and passes the decrypted original to the viewer adapter', async () => {
     const thumbnailResource = makeResource('thumbnail');
     const originalResource = makeResource('original');
     const onDownload = jest.fn().mockResolvedValue(undefined);
@@ -227,7 +219,7 @@ describe('PdfAssetPreview', () => {
       return expect(loadAsset).toHaveBeenCalledTimes(2);
     });
 
-    fireEvent.click(screen.getByRole('button', {name: 'Close test preview'}));
+    fireEvent.click(screen.getByRole('button', {name: 'Close PDF preview'}));
     expect(pdfResource?.cancelDownload).toHaveBeenCalledTimes(1);
 
     await act(async () => {
@@ -235,7 +227,7 @@ describe('PdfAssetPreview', () => {
     });
 
     expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
-    expect(screen.queryByTestId('file-modal')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('shows the shared unavailable state when downloaded bytes are not a PDF', async () => {

@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useId, useRef, useState, type FunctionComponent} from 'react';
+import {useCallback, useEffect, useId, useRef, useState, type ComponentProps, type FunctionComponent} from 'react';
 
 import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -43,6 +43,7 @@ import {AssetLoader} from '../common/assetLoader/assetLoader';
 import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 
 interface FileAssetProps {
+  FullscreenModalComponent?: ComponentProps<typeof PdfAssetPreview>['FullscreenModalComponent'];
   hasHeader?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
@@ -52,6 +53,7 @@ interface FileAssetProps {
 const uploadProgressCompletePercentage = 100;
 
 const FileAsset: FunctionComponent<FileAssetProps> = ({
+  FullscreenModalComponent,
   message,
   hasHeader = false,
   teamState = container.resolve(TeamState),
@@ -267,6 +269,7 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
         originalResource !== undefined &&
         (isUploadedOrCancelled || isPdfPreviewOpen) && (
           <PdfAssetPreview
+            FullscreenModalComponent={FullscreenModalComponent}
             id={pdfPreviewModalId}
             key={previewResource.identifier}
             thumbnailResource={previewResource}

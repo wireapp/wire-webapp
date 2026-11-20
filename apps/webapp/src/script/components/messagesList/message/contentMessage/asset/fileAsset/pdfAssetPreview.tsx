@@ -27,6 +27,7 @@ import {FileCardPreview} from '../../../../../fileCard/fileCardPreview/fileCardP
 import {FileFullscreenModal} from '../../../../../FileFullscreenModal/FileFullscreenModal';
 
 interface PdfAssetPreviewProps {
+  FullscreenModalComponent?: typeof FileFullscreenModal;
   id: string;
   thumbnailResource: AssetRemoteDataType;
   originalResource: AssetRemoteDataType;
@@ -76,6 +77,7 @@ const hasPdfSignature = async (blob: Blob): Promise<boolean> => {
 };
 
 export const PdfAssetPreview = ({
+  FullscreenModalComponent = FileFullscreenModal,
   id,
   thumbnailResource,
   originalResource,
@@ -255,7 +257,7 @@ export const PdfAssetPreview = ({
           />
         </div>
       )}
-      <FileFullscreenModal
+      <FullscreenModalComponent
         id={id}
         dialogId={id}
         isOpen={isOpen}

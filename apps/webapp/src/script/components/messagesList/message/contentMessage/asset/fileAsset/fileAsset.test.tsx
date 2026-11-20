@@ -17,6 +17,8 @@
  *
  */
 
+import type {ComponentProps, ReactElement} from 'react';
+
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {container} from 'tsyringe';
@@ -33,7 +35,8 @@ import {
 } from '../../../../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../../../util/test/translateForTest';
 
-import {FileAsset as FileAssetComponent} from './fileAsset';
+import {FileAsset as RealFileAssetComponent} from './fileAsset';
+import {PdfModalTestStub} from './pdfModalTestStub';
 import {createStartupFeatureTogglesFromLocationSearch} from '../../../../../../featureToggles/startupFeatureToggles';
 import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
 import {AssetRepository} from '../../../../../../repositories/assets/assetRepository';
@@ -42,46 +45,9 @@ import {FEATURE_STATUS} from '../../../../../../apiClient/team/feature/featureLi
 import {requireValueForTest} from '../../../../../../page/testSupport/rootContextTestSupport';
 import type {MainViewModel} from '../../../../../../view_model/MainViewModel';
 
-jest.mock('../../../../../FileFullscreenModal/FileFullscreenModal', () => {
-  return {
-    FileFullscreenModal: ({
-      id,
-      isOpen,
-      onClose,
-      onDownload,
-      fileName,
-      fileExtension,
-      filePreviewUrl,
-      status,
-      context,
-      previewType,
-    }: any) => {
-      if (!isOpen) {
-        return null;
-      }
-
-      return (
-        <div
-          role="dialog"
-          aria-label={`${fileName}.${fileExtension}`}
-          id={id}
-          data-preview-url={filePreviewUrl}
-          data-status={status}
-          data-context={context}
-          data-preview-type={previewType}
-        >
-          <button type="button" onClick={onDownload}>
-            Download
-          </button>
-          <button type="button" aria-label="Close PDF preview" onClick={onClose}>
-            Close
-          </button>
-        </div>
-      );
-    },
-  };
-});
-
+const FileAssetComponent = (props: ComponentProps<typeof RealFileAssetComponent>): ReactElement => {
+  return <RealFileAssetComponent {...props} FullscreenModalComponent={PdfModalTestStub} />;
+};
 describe('FileAssetComponent', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
@@ -274,7 +240,7 @@ describe('FileAssetComponent', () => {
     load.mockRestore();
   });
 
-  it('opens the shared PDF viewer and keeps it available during the existing file download', async () => {
+  it('opens the injected PDF modal and keeps it available during the existing file download', async () => {
     const repository = container.resolve(AssetRepository);
     const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])]);
     const pdf = new Blob(['%PDF-1.7\nvalid test PDF']);
@@ -393,7 +359,7 @@ describe('FileAssetComponent', () => {
     anchorClick.mockRestore();
   });
 
-  it('opens the shared PDF viewer from the action menu without triggering a download', async () => {
+  it('opens the injected PDF modal from the action menu without triggering a download', async () => {
     const user = userEvent.setup();
     const repository = container.resolve(AssetRepository);
     const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])]);
