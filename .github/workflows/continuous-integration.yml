@@ -333,12 +333,6 @@ jobs:
   public-production-package:
     runs-on: ubuntu-26.04
     name: Public production package verification
-    needs:
-      - generated-artifacts
-      - type-check
-      - lint-file-names
-      - lint
-      - unit-tests
     permissions:
       contents: read
 

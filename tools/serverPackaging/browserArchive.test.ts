@@ -110,6 +110,7 @@ describe('browser deployment ZIP verification', () => {
       throw new Error('CI workflow must define production build and package jobs');
     }
     expect(JSON.stringify(rspackJob)).not.toMatch(/apt-get|unzip|verifyBrowserArchive/);
+    expect(packageJob.needs).toBeUndefined();
     expect(packageJob.if).toBeUndefined();
     const packageCommands = packageJob.steps
       .flatMap(step => {
