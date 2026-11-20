@@ -44,8 +44,27 @@ const standardErrorNames: ReadonlySet<string> = new Set([
 ]);
 const maximumInspectedStackLength = 8192;
 const maximumStackFrames = 8;
+const diagnosticDomExceptionNames: ReadonlySet<string> = new Set([
+  'AbortError',
+  'DataCloneError',
+  'InvalidStateError',
+  'NetworkError',
+  'NotAllowedError',
+  'NotFoundError',
+  'NotSupportedError',
+  'OperationError',
+  'QuotaExceededError',
+  'SecurityError',
+  'TimeoutError',
+]);
 
 function getErrorAttributes(reason: unknown): LogAttributes {
+  if (reason instanceof DOMException) {
+    const name = reason.name;
+
+    return {errorName: diagnosticDomExceptionNames.has(name) ? name : 'DOMException'};
+  }
+
   if (!isError(reason)) {
     return {reasonType: reason === null ? 'null' : typeof reason};
   }

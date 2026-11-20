@@ -59,6 +59,12 @@ describe('runtime error diagnostics', () => {
     const rejection = Object.assign(new Event('unhandledrejection', {cancelable: true}), {
       reason: {privateValue: 'synthetic-secret-rejection'},
     });
+    const quotaRejection = Object.assign(new Event('unhandledrejection', {cancelable: true}), {
+      reason: new DOMException('synthetic-secret-quota-message', 'QuotaExceededError'),
+    });
+    const customRejection = Object.assign(new Event('unhandledrejection', {cancelable: true}), {
+      reason: new DOMException('synthetic-secret-message', 'synthetic-secret-name'),
+    });
     const expectedCancellation = Object.assign(new Event('unhandledrejection'), {
       reason: {type: ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION},
     });
@@ -66,6 +72,8 @@ describe('runtime error diagnostics', () => {
     target.dispatchEvent(new Event('error'));
     expect(target.dispatchEvent(errorEvent)).toBe(true);
     expect(target.dispatchEvent(rejection)).toBe(true);
+    expect(target.dispatchEvent(quotaRejection)).toBe(true);
+    expect(target.dispatchEvent(customRejection)).toBe(true);
     target.dispatchEvent(expectedCancellation);
     unsubscribe();
     target.dispatchEvent(errorEvent);
@@ -86,6 +94,8 @@ describe('runtime error diagnostics', () => {
         column: 17,
       },
       {level: 50, msg: 'Unhandled promise rejection', reasonType: 'object'},
+      {level: 50, msg: 'Unhandled promise rejection', errorName: 'QuotaExceededError'},
+      {level: 50, msg: 'Unhandled promise rejection', errorName: 'DOMException'},
     ]);
   });
 

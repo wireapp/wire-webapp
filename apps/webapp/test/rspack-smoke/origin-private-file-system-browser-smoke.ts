@@ -303,6 +303,7 @@ test('persists sanitized browser logs with console disabled across application r
         throw new TypeError('Bearer synthetic-runtime-canary');
       }, 0);
       void Promise.reject({privateValue: 'synthetic-rejection-canary'});
+      void Promise.reject(new DOMException('synthetic-quota-canary', 'QuotaExceededError'));
       const script = new Blob(["console.error('synthetic-worker-console-canary'); postMessage(null);"], {
         type: 'application/javascript',
       });
@@ -338,7 +339,7 @@ test('persists sanitized browser logs with console disabled across application r
           })
           .join('');
       })
-      .toContain('Unhandled promise rejection');
+      .toContain('"errorName":"QuotaExceededError"');
     const runtimeFiles = await readBrowserLogFiles(page);
     const runtimeLines = runtimeFiles.flatMap(file => {
       return file.contents.trimEnd().split('\n');
@@ -355,9 +356,10 @@ test('persists sanitized browser logs with console disabled across application r
       expect.arrayContaining([
         expect.objectContaining({level: 50, msg: 'Uncaught JavaScript error', errorName: 'TypeError'}),
         expect.objectContaining({level: 50, msg: 'Unhandled promise rejection', reasonType: 'object'}),
+        expect.objectContaining({level: 50, msg: 'Unhandled promise rejection', errorName: 'QuotaExceededError'}),
       ]),
     );
-    expect(runtimeLines.join('\n')).not.toMatch(/synthetic-(runtime|rejection|worker-console)-canary/);
+    expect(runtimeLines.join('\n')).not.toMatch(/synthetic-(runtime|rejection|quota|worker-console)-canary/);
 
     await page.reload();
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
