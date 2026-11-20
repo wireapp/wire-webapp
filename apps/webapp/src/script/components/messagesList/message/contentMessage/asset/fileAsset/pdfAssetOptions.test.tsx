@@ -27,7 +27,7 @@ import {
 
 import {PdfAssetOptions} from './pdfAssetOptions';
 
-const renderPdfAssetOptions = (canDownload = true) => {
+const renderPdfAssetOptions = (canDownload = true): {onOpen: jest.Mock; onDownload: jest.Mock} => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: key => {

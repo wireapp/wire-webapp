@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo, type FunctionComponent} from 'react';
+import {useEffect, useMemo, useRef, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -134,6 +134,13 @@ export const FileHeader: FunctionComponent<FileHeaderProps> = ({
   const shouldShowViewOnlyLabel = isCellsContext && showViewOnlyLabel;
   const canShowDownload = isCellsContext ? canPerformCellsAction(CELLS_ACTION.DOWNLOAD) : onDownload !== undefined;
   const {showModal} = useFileHistoryModal();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (autoFocusCloseButton) {
+      closeButtonRef.current?.focus();
+    }
+  }, [autoFocusCloseButton]);
 
   const handleFileDownload = async (): Promise<void> => {
     if (onDownload !== undefined) {
@@ -156,7 +163,7 @@ export const FileHeader: FunctionComponent<FileHeaderProps> = ({
       <div css={leftColumnStyles}>
         <button
           type="button"
-          autoFocus={autoFocusCloseButton}
+          ref={closeButtonRef}
           css={closeButtonStyles}
           aria-label={translate('cells.imageFullScreenModal.closeButton')}
           onClick={onClose}
