@@ -172,7 +172,6 @@
     "@types/js-cookie": "3.0.6",
     "@types/js-yaml": "4.0.9",
     "@types/jsdom": "30.0.0",
-    "@types/keyboardjs": "2.5.3",
     "@types/linkify-it": "5.0.0",
     "@types/lodash": "4.17.27",
     "@types/markdown-it": "14.2.0",
