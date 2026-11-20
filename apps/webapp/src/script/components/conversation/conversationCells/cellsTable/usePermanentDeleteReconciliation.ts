@@ -29,6 +29,7 @@ import {
   checkCellsBackgroundActionJobs,
   getCellsBackgroundActionEvidence,
 } from '../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
+import type {SharedDriveMoveStatus, SharedDriveMoveStatusKind} from '../sharedDriveUploadStatusContext';
 
 const PERMANENT_DELETE_RECONCILIATION_INTERVAL_MS = 1000;
 const PERMANENT_DELETE_RECONCILIATION_TIMEOUT_MS = 20_000;
@@ -36,12 +37,17 @@ const PERMANENT_DELETE_RECONCILIATION_TIMEOUT_MS = 20_000;
 export type PermanentDeleteReviewReason = 'job-failed' | 'refresh-failed' | 'still-visible' | 'timed-out';
 
 interface PermanentDeleteReconciliationContext {
+  readonly status: SharedDriveMoveStatus;
   readonly nodeIds: readonly string[];
   readonly scopeKey: string;
   readonly path: string;
   readonly jobUuids: readonly string[];
   readonly hasKnownJobFailure: boolean;
 }
+
+export type PermanentDeleteContinuation =
+  | {readonly kind: 'background'; readonly status: SharedDriveMoveStatus; readonly jobUuids: readonly string[]}
+  | {readonly kind: 'terminal'; readonly status: SharedDriveMoveStatus; readonly statusKind: SharedDriveMoveStatusKind};
 
 interface ScheduledTimeout {
   readonly generation: number;
@@ -58,8 +64,10 @@ export interface UsePermanentDeleteReconciliationOptions {
   readonly onRefresh: () => void;
   readonly onRefreshAndReportSuccess: () => Promise<boolean>;
   readonly onDeleteCompleted: (nodeIds: readonly string[]) => void;
-  readonly onReconciliationCompleted: () => void;
+  readonly onReconciliationCompleted: (nodeIds: readonly string[]) => void;
+  readonly onReviewResolved: () => void;
   readonly reportError: (error: unknown) => void;
+  readonly onContinueAfterViewLeave: (continuation: PermanentDeleteContinuation) => void;
 }
 
 export interface PermanentDeleteReconciliationState {
@@ -71,8 +79,14 @@ export interface PermanentDeleteReconciliationState {
   readonly isRequestInFlight: boolean;
   readonly isWaitingForReconciliation: boolean;
   readonly reviewReason: PermanentDeleteReviewReason | null;
-  readonly deletePermanently: (nodeIds: readonly string[], scopeKey: string, path: string) => Promise<void>;
+  readonly deletePermanently: (
+    nodeIds: readonly string[],
+    scopeKey: string,
+    path: string,
+    status: SharedDriveMoveStatus,
+  ) => Promise<void>;
   readonly refreshReview: () => Promise<void>;
+  readonly resumeReview: (status: SharedDriveMoveStatus, scopeKey: string, path: string) => void;
   readonly cancel: () => void;
   readonly clearRejection: () => void;
   readonly reset: () => void;
@@ -86,6 +100,10 @@ const isAuthoritativeRejection = (error: unknown): boolean => {
     error.code < StatusCode.INTERNAL_SERVER_ERROR &&
     error.code !== StatusCode.REQUEST_TIMEOUT
   );
+};
+
+const getFailedRequestStatusKind = (error: unknown): SharedDriveMoveStatusKind => {
+  return isAuthoritativeRejection(error) ? 'request-failed' : 'status-unknown';
 };
 
 const isFailureReason = (reason: PermanentDeleteReviewReason | null): reason is 'job-failed' | 'refresh-failed' => {
@@ -147,6 +165,26 @@ export const usePermanentDeleteReconciliation = (
       generationRef.current === generation &&
       optionsRef.current.isCurrentScope(context.scopeKey, context.path)
     );
+  };
+
+  const continueAsTerminal = (status: SharedDriveMoveStatus, statusKind: SharedDriveMoveStatusKind): void => {
+    optionsRef.current.onContinueAfterViewLeave({kind: 'terminal', status, statusKind});
+  };
+
+  const continueAfterViewLeave = (context: PermanentDeleteReconciliationContext): void => {
+    if (context.jobUuids.length > 0) {
+      optionsRef.current.onContinueAfterViewLeave({
+        kind: 'background',
+        status: context.status,
+        jobUuids: context.jobUuids,
+      });
+      return;
+    }
+    optionsRef.current.onContinueAfterViewLeave({
+      kind: 'terminal',
+      status: context.status,
+      statusKind: 'status-unknown',
+    });
   };
 
   const invalidateWork = (expectedGeneration?: number): number | undefined => {
@@ -252,6 +290,7 @@ export const usePermanentDeleteReconciliation = (
         jobUuids: jobEvidence.value.hasPendingJobs ? context.jobUuids : [],
         hasKnownJobFailure: hasJobFailure,
       };
+      activeContextRef.current = nextContext;
 
       setIsWaitingForReconciliation(false);
       let wasRefreshSuccessful = false;
@@ -291,7 +330,12 @@ export const usePermanentDeleteReconciliation = (
     }
   };
 
-  const deletePermanently = async (nodeIds: readonly string[], scopeKey: string, path: string): Promise<void> => {
+  const deletePermanently = async (
+    nodeIds: readonly string[],
+    scopeKey: string,
+    path: string,
+    status: SharedDriveMoveStatus,
+  ): Promise<void> => {
     if (
       !isMountedRef.current ||
       isPendingRef.current ||
@@ -306,6 +350,7 @@ export const usePermanentDeleteReconciliation = (
     setIsPending(true);
     setIsRejected(false);
     const context: PermanentDeleteReconciliationContext = {
+      status,
       nodeIds,
       scopeKey,
       path,
@@ -315,11 +360,16 @@ export const usePermanentDeleteReconciliation = (
 
     try {
       const response = await optionsRef.current.cellsRepository.deleteNodes({uuids: [...nodeIds], permanently: true});
+      const evidence = getCellsBackgroundActionEvidence(response, 'delete');
       if (!isCurrent(context, requestGeneration)) {
+        if (evidence.hasCompleted) {
+          continueAsTerminal(status, 'completed');
+        } else {
+          continueAfterViewLeave({...context, jobUuids: evidence.jobUuids});
+        }
         return;
       }
 
-      const evidence = getCellsBackgroundActionEvidence(response, 'delete');
       if (!evidence.hasCompleted) {
         startReconciliation({...context, jobUuids: evidence.jobUuids, hasKnownJobFailure: evidence.hasFailedJobs});
         return;
@@ -332,10 +382,12 @@ export const usePermanentDeleteReconciliation = (
       }
     } catch (error) {
       if (!isMountedRef.current || generationRef.current !== requestGeneration) {
+        continueAsTerminal(status, getFailedRequestStatusKind(error));
         return;
       }
       optionsRef.current.reportError(error);
       if (!isCurrent(context, requestGeneration)) {
+        continueAsTerminal(status, getFailedRequestStatusKind(error));
         return;
       }
       if (isAuthoritativeRejection(error)) {
@@ -393,6 +445,21 @@ export const usePermanentDeleteReconciliation = (
         return;
       }
 
+      if (
+        context.status.kind === 'request-failed' ||
+        context.status.kind === 'failed' ||
+        context.status.kind === 'partial' ||
+        context.status.kind === 'finished-unknown'
+      ) {
+        invalidateWork(generation);
+        activeContextRef.current = null;
+        isUnresolvedRef.current = false;
+        setIsUnresolved(false);
+        updateReviewReason(null);
+        optionsRef.current.onReviewResolved();
+        return;
+      }
+
       updateReviewReason(reviewReasonRef.current === 'job-failed' ? 'job-failed' : 'still-visible');
       setIsWaitingForReconciliation(true);
     } finally {
@@ -415,6 +482,9 @@ export const usePermanentDeleteReconciliation = (
   };
 
   const reset = (): void => {
+    if (activeContextRef.current !== null && isUnresolvedRef.current) {
+      continueAfterViewLeave(activeContextRef.current);
+    }
     invalidateWork();
     activeContextRef.current = null;
     isUnresolvedRef.current = false;
@@ -426,13 +496,38 @@ export const usePermanentDeleteReconciliation = (
     updateReviewReason(null);
   };
 
-  const actionsRef = useRef({deletePermanently, refreshReview, cancel, clearRejection, reset});
-  actionsRef.current = {deletePermanently, refreshReview, cancel, clearRejection, reset};
-  const stableDeletePermanently = useCallback((nodeIds: readonly string[], scopeKey: string, path: string) => {
-    return actionsRef.current.deletePermanently(nodeIds, scopeKey, path);
-  }, []);
+  const resumeReview = (status: SharedDriveMoveStatus, scopeKey: string, path: string): void => {
+    if (activeContextRef.current !== null || isUnresolvedRef.current) {
+      return;
+    }
+    activeContextRef.current = {
+      status,
+      nodeIds: status.items.map(item => {
+        return item.id;
+      }),
+      scopeKey,
+      path,
+      jobUuids: [],
+      hasKnownJobFailure: status.kind === 'failed' || status.kind === 'partial',
+    };
+    isUnresolvedRef.current = true;
+    setIsUnresolved(true);
+    updateReviewReason(status.kind === 'failed' || status.kind === 'partial' ? 'job-failed' : 'timed-out');
+  };
+
+  const actionsRef = useRef({deletePermanently, refreshReview, resumeReview, cancel, clearRejection, reset});
+  actionsRef.current = {deletePermanently, refreshReview, resumeReview, cancel, clearRejection, reset};
+  const stableDeletePermanently = useCallback(
+    (nodeIds: readonly string[], scopeKey: string, path: string, status: SharedDriveMoveStatus) => {
+      return actionsRef.current.deletePermanently(nodeIds, scopeKey, path, status);
+    },
+    [],
+  );
   const stableRefreshReview = useCallback(() => {
     return actionsRef.current.refreshReview();
+  }, []);
+  const stableResumeReview = useCallback((status: SharedDriveMoveStatus, scopeKey: string, path: string): void => {
+    actionsRef.current.resumeReview(status, scopeKey, path);
   }, []);
   const stableCancel = useCallback(() => {
     actionsRef.current.cancel();
@@ -467,12 +562,15 @@ export const usePermanentDeleteReconciliation = (
     setIsUnresolved(false);
     setIsWaitingForReconciliation(false);
     updateReviewReason(null);
-    optionsRef.current.onReconciliationCompleted();
+    optionsRef.current.onReconciliationCompleted(context.nodeIds);
   }, [isWaitingForReconciliation, options.isNodesLoading, options.visibleNodeIds]);
 
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
+      if (activeContextRef.current !== null && isUnresolvedRef.current) {
+        continueAfterViewLeave(activeContextRef.current);
+      }
       isMountedRef.current = false;
       invalidateWorkRef.current();
     };
@@ -489,6 +587,7 @@ export const usePermanentDeleteReconciliation = (
     reviewReason,
     deletePermanently: stableDeletePermanently,
     refreshReview: stableRefreshReview,
+    resumeReview: stableResumeReview,
     cancel: stableCancel,
     clearRejection: stableClearRejection,
     reset: stableReset,

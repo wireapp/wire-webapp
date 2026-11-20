@@ -283,6 +283,7 @@ const renderCellsTable = ({
   folderDropResetKey,
   selectionEnabled = true,
   selectionScopeKey = 'conversation:/files',
+  resetStatusOnScopeChange = false,
   isBulkRestoreEnabled = true,
   cellsRepository = {} as CellsRepository,
   initialNodes,
@@ -305,6 +306,7 @@ const renderCellsTable = ({
   readonly folderDropResetKey?: number;
   readonly selectionEnabled?: boolean;
   readonly selectionScopeKey?: string;
+  readonly resetStatusOnScopeChange?: boolean;
   readonly isBulkRestoreEnabled?: boolean;
   readonly cellsRepository?: CellsRepository;
   readonly initialNodes?: CellNode[];
@@ -358,7 +360,9 @@ const renderCellsTable = ({
   ): ReactElement => {
     return (
       <ThemeProvider theme={themes[themeId]}>
-        <SharedDriveUploadStatusProvider>
+        <SharedDriveUploadStatusProvider
+          resetOnScopeChange={resetStatusOnScopeChange ? Maybe.just(scopeKey) : Maybe.nothing()}
+        >
           <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
             {scopeKey === 'conversation:/bin' && (
               <CellsEmptyBinAction
@@ -724,6 +728,32 @@ describe('CellsTable selection', () => {
     });
     expect(deleteNodes).toHaveBeenCalledTimes(1);
     expect(onRefreshAfterBulkMoveToBinOutcome).not.toHaveBeenCalled();
+  });
+
+  it('keeps other moves locked after changing folders until Move to Bin finishes', async () => {
+    const user = userEvent.setup();
+    let resolveDelete: (response: {Status: string}) => void = () => {
+      return undefined;
+    };
+    const pendingDelete = new Promise<{Status: string}>(resolve => {
+      resolveDelete = resolve;
+    });
+    const deleteNodes = jest.fn().mockReturnValue(pendingDelete);
+    const view = renderCellsTable({cellsRepository: {deleteNodes} as unknown as CellsRepository});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Move to Bin'}));
+    view.rerenderWithSelectionScope('conversation:/files/another-folder');
+
+    expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeDisabled();
+    expect(screen.getByRole('row', {name: /Wire logs\.pdf/})).toHaveAttribute('draggable', 'false');
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+
+    resolveDelete({Status: 'Performed'});
+    await waitFor(() => {
+      expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeEnabled();
+    });
   });
 
   it('does not retry the batch mutation after a request error', async () => {
@@ -1314,37 +1344,217 @@ describe('CellsTable selection', () => {
     }
   });
 
-  it('disables the action while the permanent-delete request is pending', async () => {
+  it.each([THEME_ID.LIGHT, THEME_ID.DARK])(
+    'blocks Bin selection and Restore during a permanent-delete request in %s',
+    async themeId => {
+      const originalHash = window.location.hash;
+      window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+      const user = userEvent.setup();
+      let resolveDelete: (response: {Status: string}) => void = () => {
+        return undefined;
+      };
+      const deleteRequest = new Promise<{Status: string}>(resolve => {
+        resolveDelete = resolve;
+      });
+      const onRefresh = jest.fn();
+      const repository = {
+        deleteNodes: jest.fn().mockReturnValue(deleteRequest),
+      } as unknown as CellsRepository;
+
+      try {
+        renderCellsTable({cellsRepository: repository, onRefresh, themeId});
+        await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+        await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+        await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+
+        expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeChecked();
+        expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeDisabled();
+        expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeDisabled();
+        expect(screen.getByRole('checkbox', {name: 'Select all items on this page'})).toBeDisabled();
+        expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
+        expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+
+        await act(async () => {
+          resolveDelete({Status: 'Performed'});
+          await deleteRequest;
+        });
+
+        expect(onRefresh).toHaveBeenCalledTimes(1);
+        expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeEnabled();
+        expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
+      } finally {
+        window.location.hash = originalHash;
+      }
+    },
+  );
+
+  it('blocks Bin selection while a permanent-delete job is reconciling', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
     const user = userEvent.setup();
-    let resolveDelete: (response: {Status: string}) => void = () => {
-      return undefined;
-    };
-    const deleteRequest = new Promise<{Status: string}>(resolve => {
-      resolveDelete = resolve;
-    });
-    const onRefresh = jest.fn();
+    const pendingStatus = Promise.withResolvers<unknown>();
+    const getBackgroundActionInfo = jest.fn().mockReturnValue(pendingStatus.promise);
     const repository = {
-      deleteNodes: jest.fn().mockReturnValue(deleteRequest),
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      }),
+      getBackgroundActionInfo,
     } as unknown as CellsRepository;
 
     try {
-      renderCellsTable({cellsRepository: repository, onRefresh});
+      renderCellsTable({cellsRepository: repository});
       await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(screen.getByRole('button', {name: 'Delete permanently'})).toBeDisabled();
+      await waitFor(() => {
+        expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+      });
+      expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeChecked();
+      expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeDisabled();
+      expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeDisabled();
+      expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('reports a permanent delete completed after leaving the Bin table', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const request = Promise.withResolvers<Awaited<ReturnType<CellsRepository['deleteNodes']>>>();
+    const repository = {deleteNodes: jest.fn().mockReturnValue(request.promise)} as unknown as CellsRepository;
+
+    try {
+      const table = renderCellsTable({cellsRepository: repository});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+      table.hideTable();
 
       await act(async () => {
-        resolveDelete({Status: 'Performed'});
-        await deleteRequest;
+        request.resolve({Status: RestActionStatus.Performed});
+        await request.promise;
       });
 
-      expect(onRefresh).toHaveBeenCalledTimes(1);
-      expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
+      expect(screen.getByText('cells.bulkDelete.status.deleted')).toBeInTheDocument();
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('continues a permanent delete job after leaving the Bin table', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: 'Running'})
+      .mockResolvedValueOnce({Status: 'Finished'});
+    const repository = {
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: RestActionStatus.Background,
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      }),
+      getBackgroundActionInfo,
+    } as unknown as CellsRepository;
+
+    try {
+      const table = renderCellsTable({cellsRepository: repository});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+      await waitFor(() => {
+        expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+      });
+      table.hideTable();
+
+      await waitFor(() => {
+        expect(screen.getByText('cells.bulkDelete.status.deleted')).toBeInTheDocument();
+      });
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('reconnects permanent delete review after returning to the Bin', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const request = Promise.withResolvers<Awaited<ReturnType<CellsRepository['deleteNodes']>>>();
+    const repository = {deleteNodes: jest.fn().mockReturnValue(request.promise)} as unknown as CellsRepository;
+    const onRefreshAndReportSuccess = jest.fn().mockResolvedValue(true);
+
+    try {
+      const table = renderCellsTable({cellsRepository: repository, onRefreshAndReportSuccess});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+      table.hideTable();
+
+      await act(async () => {
+        request.reject(new Error('delete outcome unknown'));
+        await request.promise.catch(() => {
+          return undefined;
+        });
+      });
+      expect(screen.queryByRole('button', {name: 'Refresh Bin'})).not.toBeInTheDocument();
+
+      table.showTable();
+      const refreshButton = await screen.findByRole('button', {name: 'Refresh Bin'});
+      expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeDisabled();
+      await user.click(refreshButton);
+      await waitFor(() => {
+        expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
+      });
+      table.rerenderWithNodes([]);
+      await waitFor(() => {
+        expect(screen.getByRole('checkbox', {name: 'Select all items on this page'})).toBeInTheDocument();
+      });
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('unlocks Bin selection after refreshing a confirmed failed delete on return', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const request = Promise.withResolvers<Awaited<ReturnType<CellsRepository['deleteNodes']>>>();
+    const repository = {deleteNodes: jest.fn().mockReturnValue(request.promise)} as unknown as CellsRepository;
+    const onRefreshAndReportSuccess = jest.fn().mockResolvedValue(true);
+
+    try {
+      const table = renderCellsTable({cellsRepository: repository, onRefreshAndReportSuccess});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+      table.hideTable();
+
+      await act(async () => {
+        request.reject(new BackendError('Delete rejected', undefined, StatusCode.FORBIDDEN));
+        await request.promise.catch(() => {
+          return undefined;
+        });
+      });
+      table.showTable();
+
+      await user.click(await screen.findByRole('button', {name: 'Refresh Bin'}));
+      await waitFor(() => {
+        expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
+      });
+      await waitFor(() => {
+        expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeEnabled();
+      });
+      expect(screen.queryByRole('button', {name: 'Refresh Bin'})).not.toBeInTheDocument();
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
     } finally {
       window.location.hash = originalHash;
     }
@@ -2694,7 +2904,7 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
     });
-    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Move to folder')).toBeInTheDocument();
     expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     expect(onRefresh).not.toHaveBeenCalled();
@@ -2703,7 +2913,7 @@ describe('CellsTable selection', () => {
     rerenderWithSelectionScope('conversation:/files');
     rerenderWithSelectionScope('conversation:/files', false);
     rerenderWithSelectionScope('conversation:/files', true);
-    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Move to folder')).toBeInTheDocument();
     expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     expect(onRefresh).not.toHaveBeenCalled();
@@ -2846,7 +3056,7 @@ describe('CellsTable selection', () => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
     });
     expect(onRefresh).not.toHaveBeenCalled();
-    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Move to folder')).toBeInTheDocument();
     expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
 
@@ -3252,7 +3462,7 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
-  it('closes the destination dialog while tracking a background move', async () => {
+  it('keeps the destination dialog open while tracking a background move', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
     const user = userEvent.setup();
@@ -3277,14 +3487,18 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
     });
-    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Move to folder')).toBeInTheDocument();
     expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', {name: 'Processing'})).toBeDisabled();
+    expect(within(dialog).getByRole('button', {name: 'Processing'})).toHaveTextContent('Processing');
+    expect(within(dialog).getByRole('button', {name: 'cells.modal.closeButton'})).toBeDisabled();
+    expect(within(dialog).queryByRole('button', {name: 'cells.moveNodeModal.cancelButton'})).not.toBeInTheDocument();
 
     rerenderWithSelectionScope('conversation:/files/subfolder');
     rerenderWithSelectionScope('conversation:/files');
     rerenderWithSelectionScope('conversation:/files', false);
     rerenderWithSelectionScope('conversation:/files', true);
-    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Move to folder')).toBeInTheDocument();
     expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
 
@@ -3506,8 +3720,17 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     });
-    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Move to folder')).toBeInTheDocument();
     expect(screen.getByText('Moving 2 items')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeDisabled();
+    expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeDisabled();
+    expect(screen.getByRole('checkbox', {name: 'Select all items on this page'})).toBeDisabled();
+    fireEvent.click(screen.getByRole('row', {name: /Wire logs\.pdf/}), {metaKey: true});
+    expect(screen.getByText('2 selected')).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', {name: 'Processing'})).toBeDisabled();
+    expect(within(dialog).getByRole('button', {name: 'Processing'})).toHaveTextContent('Processing');
+    expect(within(dialog).getByRole('button', {name: 'cells.modal.closeButton'})).toBeDisabled();
+    expect(within(dialog).queryByRole('button', {name: 'cells.moveNodeModal.cancelButton'})).not.toBeInTheDocument();
     expect(screen.getByRole('progressbar', {name: 'Processing'})).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
@@ -3551,7 +3774,7 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     });
-    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Move to folder')).toBeInTheDocument();
     expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', {name: 'fileCardDefaultCloseButtonLabel'}));
@@ -3669,8 +3892,13 @@ describe('CellsTable selection', () => {
       await waitFor(() => {
         expect(repository.moveNodes).toHaveBeenCalledTimes(1);
       });
-      expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+      expect(screen.getByText('Move to folder')).toBeInTheDocument();
       expect(screen.getByText('Moving 2 items')).toBeInTheDocument();
+      expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeDisabled();
+      expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeDisabled();
+      expect(within(dialog).getByRole('button', {name: 'Processing'})).toBeDisabled();
+      expect(within(dialog).getByRole('button', {name: 'Processing'})).toHaveTextContent('Processing');
+      expect(within(dialog).getByRole('button', {name: 'cells.modal.closeButton'})).toBeDisabled();
       await act(async () => {
         rejectMove(new Error('Move failed'));
       });
@@ -3752,6 +3980,50 @@ describe('CellsTable selection interactions', () => {
 });
 
 describe('CellsTable selection scope', () => {
+  it('resets pending move state when the folder scope changes and ignores the old response', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    const user = userEvent.setup();
+    let resolveMove: (response: object) => void = noop;
+    const pendingMove = new Promise<object>(resolve => {
+      resolveMove = resolve;
+    });
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockReturnValue(pendingMove),
+    } as unknown as CellsRepository;
+    const {rerenderWithSelectionScope} = renderCellsTable({
+      cellsRepository: repository,
+      folderPath: 'wire-cells-web/Marketing images',
+      resetStatusOnScopeChange: true,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+    await waitFor(() => {
+      expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
+
+    rerenderWithSelectionScope('conversation:/files/subfolder');
+    expect(screen.queryByText('Moving 1 items')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    expect(screen.getByRole('button', {name: 'Move'})).toBeInTheDocument();
+
+    await act(async () => {
+      resolveMove({
+        Status: 'Performed',
+        AffectedNodes: [{Uuid: 'folder-id', Path: 'conversation-id@example.com/wire-cells-web/Marketing images'}],
+      });
+    });
+    expect(screen.getByRole('button', {name: 'Move'})).toBeInTheDocument();
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    window.location.hash = originalHash;
+  });
+
   it('clears selected nodes when the folder/view scope changes', () => {
     const {rerenderWithSelectionScope} = renderCellsTable();
     const checkbox = screen.getByRole('checkbox', {name: 'Select Marketing images'});
@@ -3857,6 +4129,100 @@ describe('CellsTable row modifier selection', () => {
   });
 });
 describe('CellsTable internal drag and drop', () => {
+  it('offers refresh after a background drop fails in an unmounted Files table', async () => {
+    let resolveStatus: (status: object) => void = noop;
+    const pendingStatus = new Promise<object>(resolve => {
+      resolveStatus = resolve;
+    });
+    const moveNodes = jest
+      .fn()
+      .mockResolvedValue({Status: 'Background', BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]});
+    const getBackgroundMoveInfo = jest.fn().mockReturnValue(pendingStatus);
+    const onRefreshAndReportSuccess = jest.fn().mockResolvedValue(true);
+    const {hideTable, showTable} = renderCellsTable({
+      cellsRepository: {moveNodes, getBackgroundMoveInfo} as unknown as CellsRepository,
+      onRefreshAndReportSuccess,
+    });
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    const transfer = createInternalDragTransfer();
+    fireEvent.dragStart(screen.getByRole('row', {name: /Wire logs\.pdf/}), {dataTransfer: transfer});
+    fireEvent.drop(screen.getByRole('row', {name: /Marketing images/}), {dataTransfer: transfer});
+    await waitFor(() => {
+      expect(getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
+    });
+
+    hideTable();
+    showTable();
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    const source = screen.getByRole('row', {name: /Wire logs\.pdf/});
+    expect(source).toHaveAttribute('draggable', 'false');
+    await act(async () => {
+      resolveStatus({Status: JobsTaskStatus.Error});
+    });
+    expect(await screen.findByRole('button', {name: 'cells.bulkMove.refreshDrive'})).toBeInTheDocument();
+    expect(moveNodes).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
+    await waitFor(() => {
+      expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
+      expect(screen.queryByRole('button', {name: 'cells.bulkMove.refreshDrive'})).not.toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    expect(source).toHaveAttribute('draggable', 'true');
+  });
+
+  it('blocks another drop after the Files table remounts until the background move finishes', async () => {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const moveNodes = jest
+      .fn()
+      .mockResolvedValueOnce({Status: 'Background', BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]})
+      .mockResolvedValueOnce({Status: 'Performed', AffectedNodes: [{Uuid: 'file-id'}]});
+    const getBackgroundMoveInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: 'Running'})
+      .mockResolvedValueOnce({Status: 'Finished'});
+    const {hideTable, showTable} = renderCellsTable({
+      cellsRepository: {moveNodes, getBackgroundMoveInfo} as unknown as CellsRepository,
+      clock,
+    });
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    const source = screen.getByRole('row', {name: /Wire logs\.pdf/});
+    const transfer = createInternalDragTransfer();
+    fireEvent.dragStart(source, {dataTransfer: transfer});
+    fireEvent.drop(screen.getByRole('row', {name: /Marketing images/}), {dataTransfer: transfer});
+    await waitFor(() => {
+      expect(getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
+    });
+
+    hideTable();
+    showTable();
+    const remountedSource = screen.getByRole('row', {name: /Wire logs\.pdf/});
+    const remountedTarget = screen.getByRole('row', {name: /Marketing images/});
+    expect(remountedSource).toHaveAttribute('draggable', 'false');
+    expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeDisabled();
+    expect(screen.getByRole('checkbox', {name: 'Select all items on this page'})).toBeDisabled();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+    const secondTransfer = createInternalDragTransfer();
+    fireEvent.dragStart(remountedSource, {dataTransfer: secondTransfer});
+    fireEvent.drop(remountedTarget, {dataTransfer: secondTransfer});
+    expect(moveNodes).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+      await waitFor(() => {
+        expect(getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
+      });
+    });
+    expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeEnabled();
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    expect(remountedSource).toHaveAttribute('draggable', 'true');
+    const thirdTransfer = createInternalDragTransfer();
+    fireEvent.dragStart(remountedSource, {dataTransfer: thirdTransfer});
+    fireEvent.drop(remountedTarget, {dataTransfer: thirdTransfer});
+    await waitFor(() => {
+      expect(moveNodes).toHaveBeenCalledTimes(2);
+    });
+  });
+
   it('moves every selected item into a folder without opening the Move dialog or uploading files', async () => {
     const moveNodes = jest
       .fn()
@@ -4281,6 +4647,44 @@ describe('CellsTable restoring selected Bin items', () => {
     expect(screen.getByRole('checkbox', {name: 'Select a.txt'})).toBeEnabled();
     expect(repository.restoreNodes).toHaveBeenCalledTimes(1);
   });
+
+  it.each([THEME_ID.LIGHT, THEME_ID.DARK])(
+    'blocks Bin selection and permanent Delete while Restore runs in %s mode',
+    async themeId => {
+      const user = userEvent.setup();
+      let resolveRestore: (response: {Status: string}) => void = noop;
+      const restoreNodes = jest.fn().mockReturnValue(
+        new Promise<{Status: string}>(resolve => {
+          resolveRestore = resolve;
+        }),
+      );
+      const deleteNodes = jest.fn();
+      const repository = createRepository({restoreNodes, deleteNodes});
+      renderCellsTable({
+        cellsRepository: repository,
+        initialNodes: [createBinNode('a.txt'), createBinNode('b.txt'), createBinNode('c.txt')],
+        themeId,
+      });
+
+      await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+      await user.click(screen.getByRole('checkbox', {name: 'Select b.txt'}));
+      await user.click(screen.getByRole('button', {name: 'Restore'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Restore selected items'}));
+
+      expect(screen.getByRole('checkbox', {name: 'Select a.txt'})).toBeDisabled();
+      expect(screen.getByRole('checkbox', {name: 'Select b.txt'})).toBeDisabled();
+      expect(screen.getByRole('checkbox', {name: 'Select c.txt'})).toBeDisabled();
+      expect(screen.getByRole('checkbox', {name: 'Select all items on this page'})).toBeDisabled();
+      expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
+      expect(deleteNodes).not.toHaveBeenCalled();
+
+      await act(async () => {
+        resolveRestore({Status: 'Performed'});
+      });
+      expect(screen.getByRole('checkbox', {name: 'Select c.txt'})).toBeEnabled();
+      expect(screen.queryByText('2 selected')).not.toBeInTheDocument();
+    },
+  );
 
   it('shows a failed restore in the popup and clears it once the Bin refresh succeeds', async () => {
     const user = userEvent.setup();
