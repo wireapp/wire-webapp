@@ -99,17 +99,19 @@ export function initializeLogging(options: InitializeLoggingOptions): Maybe<Brow
   });
   configureLogging(loggingEnabled ? loggingDependencies : Maybe.nothing());
 
-  // Preserve main's debug storage setting for reloads and the separate redux-logdown consumer.
-  try {
-    if (storage.isJust) {
-      if (namespaces.isJust) {
-        storage.value.setItem('debug', namespaces.value);
-      } else {
-        storage.value.removeItem('debug');
+  // Preserve existing debug storage when this application logging pipeline is unavailable.
+  if (loggingEnabled) {
+    try {
+      if (storage.isJust) {
+        if (namespaces.isJust) {
+          storage.value.setItem('debug', namespaces.value);
+        } else {
+          storage.value.removeItem('debug');
+        }
       }
+    } catch {
+      // Logging configuration must also work when storage is unavailable.
     }
-  } catch {
-    // Logging configuration must also work when storage is unavailable.
   }
 
   return persistence;

@@ -79,6 +79,7 @@ describe('logging startup', () => {
       const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
       const configureLogging = jest.fn(logging.configure);
       const createPersistenceOutput = jest.fn();
+      const storage = {setItem: jest.fn(), removeItem: jest.fn()};
       const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
       initializeLogging({
         loggingEnabled: false,
@@ -89,7 +90,7 @@ describe('logging startup', () => {
         clock,
         consoleOutput,
         locationSearch,
-        storage: Maybe.nothing(),
+        storage: Maybe.just(storage),
         configureLogging,
       });
       logging.getLogger('Startup').debug('debug diagnostic');
@@ -99,6 +100,8 @@ describe('logging startup', () => {
       expect(createPersistenceOutput).not.toHaveBeenCalled();
       expect(consoleOutput.debug).not.toHaveBeenCalled();
       expect(consoleOutput.error).not.toHaveBeenCalled();
+      expect(storage.setItem).not.toHaveBeenCalled();
+      expect(storage.removeItem).not.toHaveBeenCalled();
     },
   );
 

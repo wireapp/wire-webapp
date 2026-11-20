@@ -79,6 +79,7 @@ export function startAuthApp(support: CoreCryptoSupport, logging: StartupLogging
   const isElectron = Runtime.isElectron();
   const browserLogSaveFilePicker = selectBrowserLogSaveFilePicker({isElectron, browserWindow: window});
   const browserLoggingAvailable = browserLogSaveFilePicker.isJust;
+  const loggingEnabled = isElectron || browserLoggingAvailable;
   const desktopLogOutput = initializeDesktopLogOutput(clock, startupFeatureToggles);
   const isDesktopApp = Runtime.isDesktopApp();
   function shouldWriteConsoleFallback(): boolean {
@@ -93,7 +94,7 @@ export function startAuthApp(support: CoreCryptoSupport, logging: StartupLogging
     shouldWriteConsoleFallback: isDesktopApp ? shouldWriteConsoleFallback : undefined,
     storage: Maybe.of(getStorage()),
     configureLogging,
-    loggingEnabled: isElectron || browserLoggingAvailable,
+    loggingEnabled,
     browserPersistenceEnabled: !isElectron && browserLoggingAvailable,
     desktopPersistenceOutput: desktopLogOutput.isJust ? desktopLogOutput.value.write : undefined,
     createPersistenceOutput() {
@@ -171,12 +172,15 @@ export function startAuthApp(support: CoreCryptoSupport, logging: StartupLogging
   }
 
   const store = configureStore({
-    clock,
-    actions: actionRoot,
-    apiClient,
-    core,
-    getConfig: Config.getConfig,
-    localStorage,
+    thunkArguments: {
+      clock,
+      actions: actionRoot,
+      apiClient,
+      core,
+      getConfig: Config.getConfig,
+      localStorage,
+    },
+    reduxLoggingEnabled: loggingEnabled,
   });
 
   const render = (Component: FunctionComponent<AuthAppProps>): void => {

@@ -352,6 +352,75 @@ test('persists release INFO, WARN and ERROR without feature query parameters', a
   }
 });
 
+test('does not emit Redux debug logs after reload without the picker when DEBUG storage exists', async ({page}) => {
+  await page.route('**/conversations/code-check', async route => {
+    await route.fulfill({status: 503, body: 'Synthetic conversation check failure'});
+  });
+  await page.route('**/conversations/join', async route => {
+    await route.fulfill({status: 503, body: 'Synthetic conversation lookup failure'});
+  });
+
+  await page.goto('/config.js');
+  await page.evaluate(() => {
+    window.localStorage.setItem('debug', '*');
+  });
+  await page.addInitScript(() => {
+    if (window.sessionStorage.getItem('disableBrowserLogSavePicker') === 'true') {
+      Object.defineProperty(window, 'showSaveFilePicker', {configurable: true, value: undefined});
+    }
+  });
+
+  const reduxActionMessages: string[] = [];
+  page.on('console', consoleMessage => {
+    const messageText = consoleMessage.text();
+    if (messageText.includes('CONVERSATION_CODE_CHECK_START')) {
+      reduxActionMessages.push(messageText);
+    }
+  });
+
+  const conversationCheckResponse = page.waitForResponse('**/conversations/code-check');
+  const loginSearch = new URLSearchParams({
+    [QUERY_KEY.CONVERSATION_CODE]: 'synthetic-code',
+    [QUERY_KEY.CONVERSATION_KEY]: 'synthetic-key',
+    debugLogging: '*',
+    enableLogging: '*',
+  });
+  await page.goto(`/auth?${loginSearch.toString()}#/login`);
+  await conversationCheckResponse;
+  await expect(page.getByPlaceholder('Email or username')).toBeVisible();
+  expect(
+    await page.evaluate(() => {
+      return typeof window.showSaveFilePicker;
+    }),
+  ).toBe('function');
+  await expect
+    .poll(() => {
+      return reduxActionMessages.length;
+    })
+    .toBeGreaterThan(0);
+
+  await page.evaluate(() => {
+    window.sessionStorage.setItem('disableBrowserLogSavePicker', 'true');
+  });
+  reduxActionMessages.length = 0;
+
+  const reloadedConversationCheckResponse = page.waitForResponse('**/conversations/code-check');
+  await page.reload();
+  await reloadedConversationCheckResponse;
+  await expect(page.getByPlaceholder('Email or username')).toBeVisible();
+  expect(
+    await page.evaluate(() => {
+      return typeof window.showSaveFilePicker;
+    }),
+  ).toBe('undefined');
+  expect(
+    await page.evaluate(() => {
+      return window.localStorage.getItem('debug');
+    }),
+  ).toBe('*');
+  expect(reduxActionMessages).toEqual([]);
+});
+
 test('persists sanitized browser logs with console disabled across application reload', async ({page, context}) => {
   // Enforce the application's current script and worker directives without widening either policy.
   await context.route('**/auth?**', async route => {
