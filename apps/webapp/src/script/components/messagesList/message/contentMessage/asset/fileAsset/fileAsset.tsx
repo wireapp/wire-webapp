@@ -21,6 +21,7 @@ import {useCallback, type FunctionComponent} from 'react';
 
 import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
+import Long from 'long';
 import {container} from 'tsyringe';
 
 import {PdfAssetPreview} from './pdfAssetPreview';
@@ -49,6 +50,48 @@ interface FileAssetProps {
 }
 
 const uploadProgressCompletePercentage = 100;
+const maxProtocolFileSize = Long.MAX_UNSIGNED_VALUE.toNumber();
+
+type SerializedLong = {
+  high: number;
+  low: number;
+  unsigned?: boolean;
+};
+
+function isInt32(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && (value | 0) === value;
+}
+
+function isSerializedLong(value: unknown): value is SerializedLong {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const serializedLong = value as Record<string, unknown>;
+  return (
+    isInt32(serializedLong.low) &&
+    isInt32(serializedLong.high) &&
+    (serializedLong.unsigned === undefined || typeof serializedLong.unsigned === 'boolean')
+  );
+}
+
+function normalizeFileSize(fileSize: unknown): number | undefined {
+  let size: number;
+
+  if (typeof fileSize === 'number') {
+    size = fileSize;
+  } else if (typeof fileSize === 'string' && fileSize.trim() !== '') {
+    size = Number(fileSize);
+  } else if (Long.isLong(fileSize)) {
+    size = fileSize.toNumber();
+  } else if (isSerializedLong(fileSize)) {
+    size = Long.fromBits(fileSize.low, fileSize.high, fileSize.unsigned ?? false).toNumber();
+  } else {
+    return undefined;
+  }
+
+  return Number.isFinite(size) && Number.isInteger(size) && size >= 0 && size <= maxProtocolFileSize ? size : undefined;
+}
 
 const FileAsset: FunctionComponent<FileAssetProps> = ({
   message,
@@ -77,7 +120,8 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
   const assetFileName = asset.file_name ?? '';
   const fileName = trimFileExtension(assetFileName);
   const fileExtension = getFileExtension(assetFileName);
-  const formattedFileSize = formatBytes(asset.file_size);
+  const fileSize = normalizeFileSize(asset.file_size);
+  const formattedFileSize = fileSize === undefined ? undefined : formatBytes(fileSize);
   const hasPdfPreview =
     isFeatureToggleEnabled(e2ePdfPreviewFeatureToggleName) &&
     asset.file_type === 'application/pdf' &&
@@ -173,9 +217,11 @@ const FileAsset: FunctionComponent<FileAssetProps> = ({
                   {fileName}
                 </p>
                 <ul className="file__desc__meta label-xs text-foreground">
-                  <li className="label-nocase-xs" data-uie-name="file-size">
-                    {formattedFileSize}
-                  </li>
+                  {formattedFileSize !== undefined && (
+                    <li className="label-nocase-xs" data-uie-name="file-size">
+                      {formattedFileSize}
+                    </li>
+                  )}
 
                   {isNonEmptyString(fileExtension) ? <li data-uie-name="file-type">{fileExtension}</li> : fileExtension}
 
