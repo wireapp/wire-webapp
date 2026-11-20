@@ -18,6 +18,8 @@
 
 import {ListViewModel} from './ListViewModel';
 
+import {amplify} from 'amplify';
+
 import {SidebarTabs, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
 import {createExecutingFireAndForgetInvokerForTest} from '../page/testSupport/rootContextTestSupport';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
@@ -102,6 +104,18 @@ describe('ListViewModel', () => {
 
     expect(useAppState.getState().listState).toBe(ListState.CONVERSATIONS);
     expect(useSidebarStore.getState().currentTab).toBe(SidebarTabs.CONNECT);
+  });
+
+  it('keeps the temporary guest sidebar without opening a conversation for a meeting landing', () => {
+    const {listViewModel} = createListViewModel();
+    const publish = jest.spyOn(amplify, 'publish');
+
+    listViewModel.showTemporaryGuest(false);
+
+    expect(useAppState.getState().listState).toBe(ListState.TEMPORARY_GUEST);
+    expect(listViewModel.contentViewModel.loadPreviousContent).not.toHaveBeenCalled();
+    expect(publish).not.toHaveBeenCalled();
+    publish.mockRestore();
   });
 
   it('keeps the archive list when opening an archived conversation', () => {

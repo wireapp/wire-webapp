@@ -38,6 +38,7 @@ import {Conversation} from '../../components/conversation';
 import {HistoryExport} from '../../components/historyExport';
 import {HistoryImport} from '../../components/historyImport';
 import * as Icon from '../../components/icon';
+import {useLinkedMeetingStore} from '../../components/meeting/linkedMeetingStore';
 import {Meetings} from '../../components/meeting/meetings';
 import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ClientState} from '../../repositories/client/ClientState';
@@ -101,6 +102,9 @@ const MainContent: FunctionComponent<MainContentProps> = ({
   const teamState = container.resolve(TeamState);
   const {showRequestModal} = useLegalHoldModalState();
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
+  const linkedMeetingId = useLinkedMeetingStore(state => {
+    return state.meetingId;
+  });
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
@@ -338,7 +342,9 @@ const MainContent: FunctionComponent<MainContentProps> = ({
               />
             )}
 
-            {contentState === ContentState.MEETINGS && isMeetingsEnabled && <Meetings />}
+            {contentState === ContentState.MEETINGS && (isMeetingsEnabled || linkedMeetingId !== undefined) && (
+              <Meetings linkedMeetingId={linkedMeetingId} />
+            )}
           </>
         </Animated>
       </SwitchTransition>

@@ -185,6 +185,26 @@ describe('MeetingList', () => {
     expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 
+  it('shows no creation actions when a linked meeting has no visible occurrences', () => {
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-15T12:00:00.000Z')) * 1_000n,
+    });
+    const meetingSeries = [createMeetingSeries('2026-06-14T14:00:00.000Z', '2026-06-14T15:00:00.000Z', 'Past meeting')];
+
+    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false, isLinkedMeeting: true}, clock);
+
+    expect(screen.getByText('meetings.noUpcomingMeetingsText')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'meetings.action.meetNow'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'meetings.action.scheduleMeeting'})).not.toBeInTheDocument();
+  });
+
+  it('keeps creation actions in the regular empty Meetings list', () => {
+    renderMeetingList({meetingSeries: [], isLoading: false, hasLoadError: false});
+
+    expect(screen.getByRole('button', {name: 'meetings.action.meetNow'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'meetings.action.scheduleMeeting'})).toBeInTheDocument();
+  });
+
   it('renders ongoing meetings within the today section', () => {
     const clock = createDeterministicClock({
       initialUnixEpochMicroseconds: BigInt(new Date('2026-06-15T14:30:00.000Z').getTime()) * 1_000n,

@@ -56,6 +56,7 @@ interface MeetingListItemProps {
   nowMilliseconds?: number;
   isFirstInDay?: boolean;
   isLastInDay?: boolean;
+  joinOnly?: boolean;
 }
 
 const MeetingListItemComponent: FunctionComponent<MeetingListItemProps> = ({
@@ -64,6 +65,7 @@ const MeetingListItemComponent: FunctionComponent<MeetingListItemProps> = ({
   nowMilliseconds: providedNowMilliseconds,
   isFirstInDay = false,
   isLastInDay = false,
+  joinOnly = false,
 }: MeetingListItemProps) => {
   const {meetingSeries, start, end} = meetingInstance;
   const {title, recurrence} = meetingSeries;
@@ -142,6 +144,7 @@ const MeetingListItemComponent: FunctionComponent<MeetingListItemProps> = ({
           selfUser={selfUser}
           joinMeeting={openPrep}
           isJoinDisabled={isJoinDisabled}
+          joinOnly={joinOnly}
         />
       </div>
     </div>

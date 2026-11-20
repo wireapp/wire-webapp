@@ -53,6 +53,22 @@ const pendingMeetingPrepSchema = z.object({
     qualifiedConversationId: qualifiedIdSchema,
   }),
 });
+export const isLoginMeetingDestination = (data: unknown): boolean => {
+  return pendingMeetingPrepSchema.safeParse(data).success;
+};
+
+export const meetingJoinLandingPath = (
+  session: MeetingPrepSession,
+  isTemporaryGuest: boolean,
+  canOpenMeetingsTab: boolean,
+): string => {
+  if (!isTemporaryGuest && canOpenMeetingsTab) {
+    return '/meetings';
+  }
+  const {id, domain} = session.qualifiedMeetingId;
+  return `/meetings/${encodeURIComponent(id)}/${encodeURIComponent(domain)}`;
+};
+
 export function loginJoinDestination(result: JoinLinkResult): {
   conversation: string;
   domain: string;

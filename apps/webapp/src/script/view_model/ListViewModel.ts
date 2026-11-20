@@ -381,10 +381,12 @@ export class ListViewModel {
     }
   };
 
-  readonly showTemporaryGuest = (): void => {
-    this.switchList(ListState.TEMPORARY_GUEST);
-    const conversationEntity = this.conversationState.getMostRecentConversation();
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+  readonly showTemporaryGuest = (showConversation = true): void => {
+    this.switchList(ListState.TEMPORARY_GUEST, showConversation);
+    if (showConversation) {
+      const conversationEntity = this.conversationState.getMostRecentConversation();
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+    }
   };
 
   readonly onContextMenu = (

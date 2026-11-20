@@ -65,6 +65,7 @@ export interface MeetingListProps {
   hasLoadError: boolean;
   onRefresh: () => void;
   selfUser: User | undefined;
+  isLinkedMeeting?: boolean;
   scrollElementRef?: RefObject<HTMLElement | null>;
   useMeetingListVirtualizer?: UseMeetingListVirtualizer;
 }
@@ -141,6 +142,7 @@ export const MeetingList: FunctionComponent<MeetingListProps> = ({
   hasLoadError,
   onRefresh,
   selfUser,
+  isLinkedMeeting = false,
   scrollElementRef,
   useMeetingListVirtualizer: useMeetingListVirtualizerDependency = useMeetingListVirtualizer,
 }: MeetingListProps) => {
@@ -295,7 +297,7 @@ export const MeetingList: FunctionComponent<MeetingListProps> = ({
   if (!hasVisibleMeetingInstances) {
     return (
       <div css={emptyListContainerStyles}>
-        <EmptyMeetingList />
+        <EmptyMeetingList showCreationActions={!isLinkedMeeting} />
       </div>
     );
   }
@@ -349,6 +351,7 @@ export const MeetingList: FunctionComponent<MeetingListProps> = ({
                       meetingInstance={item.meetingInstance}
                       nowMilliseconds={nowMilliseconds}
                       selfUser={selfUser}
+                      joinOnly={isLinkedMeeting}
                       isFirstInDay={previousItem?.type === 'dayHeader'}
                       isLastInDay={isMeetingListItemLastInDay({
                         nextItem,

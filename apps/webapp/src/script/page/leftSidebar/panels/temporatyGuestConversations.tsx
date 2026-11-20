@@ -28,6 +28,7 @@ import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {ListViewModel} from '../../../view_model/ListViewModel';
 import {useApplicationContext} from '../../rootProvider';
+import {ContentState, useAppState} from '../../useAppState';
 
 type TemporaryGuestConversations = {
   callingViewModel: CallingViewModel;
@@ -47,6 +48,9 @@ const TemporaryGuestConversations: FunctionComponent<TemporaryGuestConversations
   ]);
 
   const {activeCalls} = useKoSubscribableChildren(callingViewModel, ['activeCalls']);
+  const isMeetingView = useAppState(state => {
+    return state.contentState === ContentState.MEETINGS;
+  });
   const isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
   const openPreferences = (): void => {
     void listViewModel.openPreferencesAccount();
@@ -75,24 +79,25 @@ const TemporaryGuestConversations: FunctionComponent<TemporaryGuestConversations
 
   return (
     <div id="temporary-guest" className={`temporary-guest`}>
-      {activeCalls.map(call => {
-        const {conversation} = call;
-        return (
-          <CallingCell
-            key={conversation.id}
-            data-uie-name="item-call"
-            data-uie-uid={conversation.id}
-            data-uie-value={conversation.display_name()}
-            call={call}
-            isTemporaryUser
-            isFullUi
-            callActions={callingViewModel.callActions}
-            callingRepository={callingViewModel.callingRepository}
-            propertiesRepository={callingViewModel.propertiesRepository}
-            hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-          />
-        );
-      })}
+      {!isMeetingView &&
+        activeCalls.map(call => {
+          const {conversation} = call;
+          return (
+            <CallingCell
+              key={conversation.id}
+              data-uie-name="item-call"
+              data-uie-uid={conversation.id}
+              data-uie-value={conversation.display_name()}
+              call={call}
+              isTemporaryUser
+              isFullUi
+              callActions={callingViewModel.callActions}
+              callingRepository={callingViewModel.callingRepository}
+              propertiesRepository={callingViewModel.propertiesRepository}
+              hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+            />
+          );
+        })}
       <div className="temporary-guest__content">
         <Icon.LogoFullIcon />
         <div className="temporary-guest__description">{translate('temporaryGuestDescription')}</div>
