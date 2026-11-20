@@ -31,7 +31,6 @@ import {configureLogging} from '../logger/getLogger';
 import {Runtime} from '../commons/util/Runtime';
 
 import {createApplicationServices} from './createApplicationServices';
-import {createApplicationApiClient} from './createApplicationApiClient';
 import {createAccountIdentifier} from '../logger/createAccountIdentifier';
 import {createAuthenticatedAccountBinding} from '../logger/createAuthenticatedAccountBinding';
 import {logRuntimeIdentity, logStartupRuntimeIdentity} from '../logger/logRuntimeIdentity';
@@ -260,7 +259,9 @@ export async function startApplication(options: StartApplicationOptions): Promis
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
   const {applicationObservability} = applicationServices;
-  const apiClient = createApplicationApiClient(applicationServices.clock);
+  const apiClient = new APIClient({
+    clock: applicationServices.clock,
+  });
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
     apiClient,
