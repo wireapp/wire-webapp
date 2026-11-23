@@ -247,7 +247,7 @@
     "jsdom": "31.0.1",
     "jsdom-worker": "0.3.0",
     "less": "4.9.1",
-    "less-loader": "13.1.0",
+    "less-loader": "13.1.1",
     "nock": "15.0.6",
     "node-fetch": "2.7.0",
     "os-browserify": "0.3.0",
