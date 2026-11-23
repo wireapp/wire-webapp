@@ -2501,6 +2501,8 @@
   "userNotFoundMessage": "Gali būti, kad neturite leidimo šiai paskyrai arba žmogus nesinaudoja {brandName}.",
   "userNotFoundTitle": "{brandName} nepavyksta rasti šio žmogaus.",
   "userNotVerified": "Get certainty about {user}’s identity before connecting.",
+  "userOnboardingPending": "Onboarding pending",
+  "userOnboardingPendingStartConversationInfo": "You can start a conversation with this team member once they are fully onboarded.",
   "userProfileButtonConnect": "Užmegzti kontaktą",
   "userProfileButtonIgnore": "Nepaisyti",
   "userProfileButtonUnblock": "Atblokuoti",

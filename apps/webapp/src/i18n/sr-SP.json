@@ -2501,6 +2501,8 @@
   "userNotFoundMessage": "Можда немате дозволу за овај налог или особа можда није укључена{brandName}.",
   "userNotFoundTitle": "{brandName} не могу да нађемо ову особу",
   "userNotVerified": "Get certainty about {user}’s identity before connecting.",
+  "userOnboardingPending": "Onboarding pending",
+  "userOnboardingPendingStartConversationInfo": "You can start a conversation with this team member once they are fully onboarded.",
   "userProfileButtonConnect": "Повежи се",
   "userProfileButtonIgnore": "Игнориши",
   "userProfileButtonUnblock": "Одблокирај",
