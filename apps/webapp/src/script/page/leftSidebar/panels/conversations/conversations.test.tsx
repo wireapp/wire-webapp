@@ -102,7 +102,11 @@ describe('Conversations', () => {
   beforeEach(async () => {
     testFactory = new TestFactory();
     conversationRepository = await testFactory.exposeConversationActors();
-    searchRepository = new SearchRepository({} as UserRepository);
+    searchRepository = new SearchRepository({} as UserRepository, {
+      getTeamSupportedProtocols: () => {
+        return [];
+      },
+    });
     window.Element.prototype.getBoundingClientRect = jest.fn().mockReturnValue({height: 1000, width: 1000});
     Object.defineProperty(window.HTMLElement.prototype, 'clientHeight', {configurable: true, value: 1000});
     Object.defineProperty(window.HTMLElement.prototype, 'clientWidth', {configurable: true, value: 1000});

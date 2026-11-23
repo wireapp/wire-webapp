@@ -17,9 +17,10 @@
  *
  */
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import type {SearchResult} from '../../apiClient/user/searchResult';
 import {APIClient} from '../../service/apiClientSingleton';
@@ -33,6 +34,7 @@ import {
   transliterationIndex,
 } from '../../util/stringUtil';
 import type {User} from '../entity/User';
+import type {TeamRepository} from '../team/TeamRepository';
 import {validateHandle} from '../user/userHandleGenerator';
 import type {UserRepository} from '../user/userRepository';
 
@@ -52,11 +54,12 @@ const CONFIG = {
 
 export class SearchRepository {
   /**
-   * @param searchService SearchService
    * @param userRepository Repository for all user interactions
+   * @param teamRepository Repository providing the team's supported protocols
    */
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly teamRepository: Pick<TeamRepository, 'getTeamSupportedProtocols'>,
     private readonly core = container.resolve(Core),
     private readonly apiClient = container.resolve(APIClient),
   ) {}
@@ -189,12 +192,28 @@ export class SearchRepository {
     const {query, isHandleQuery} = this.normalizeQuery(term);
     const [rawName, rawDomain] = this.core.backendFeatures.isFederated ? query.split('@') : [query];
     const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
+    const restrictToLocalDomain =
+      teamId !== '' && !this.teamRepository.getTeamSupportedProtocols().includes(CONVERSATION_PROTOCOL.MLS);
+    const localDomain = this.apiClient.domain ?? this.core.backendFeatures.domain;
+
+    if (restrictToLocalDomain && domain !== undefined && domain !== localDomain) {
+      return [];
+    }
 
     const userIds: QualifiedId[] = await this.getContacts(name, CONFIG.MAX_DIRECTORY_RESULTS, domain).then(
       ({documents}) => {
-        return documents.map(match => {
-          return {domain: match.qualified_id?.domain ?? '', id: match.id};
-        });
+        return documents
+          .filter(match => {
+            // Older backends may return local contacts without a qualified ID.
+            return (
+              !restrictToLocalDomain ||
+              isNullOrUndefined(match.qualified_id) ||
+              match.qualified_id.domain === localDomain
+            );
+          })
+          .map(match => {
+            return {domain: match.qualified_id?.domain ?? '', id: match.id};
+          });
       },
     );
 

@@ -256,8 +256,8 @@ export class TestFactory {
    * @returns {Promise<SearchRepository>} The search repository.
    */
   async exposeSearchActors() {
-    const userRepository = await this.exposeUserActors();
-    this.search_repository = new SearchRepository(userRepository);
+    const teamRepository = await this.exposeTeamActors();
+    this.search_repository = new SearchRepository(this.user_repository, teamRepository);
 
     return this.search_repository;
   }
