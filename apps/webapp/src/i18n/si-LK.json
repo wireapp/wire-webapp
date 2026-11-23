@@ -2501,6 +2501,8 @@
   "userNotFoundMessage": "ඔබට මෙම ගිණුම සඳහා අවසර නැත හෝ පුද්ගලයා {brandName} හි නැත.",
   "userNotFoundTitle": "මෙම පුද්ගලයා {brandName} හි හමු නොවිණි",
   "userNotVerified": "සම්බන්ධ වීමට පෙර {user}ගේ අනන්‍යතාවය නිශ්චිත කරගන්න.",
+  "userOnboardingPending": "Onboarding pending",
+  "userOnboardingPendingStartConversationInfo": "You can start a conversation with this team member once they are fully onboarded.",
   "userProfileButtonConnect": "සබඳින්න",
   "userProfileButtonIgnore": "නොසලකන්න",
   "userProfileButtonUnblock": "අනවහිර",

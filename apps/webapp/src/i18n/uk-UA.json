@@ -2501,6 +2501,8 @@
   "userNotFoundMessage": "У вас відсутні необхідні права доступу для цього акаунту або особа не зареєстрована в {brandName}.",
   "userNotFoundTitle": "{brandName} не може знайти дану особу.",
   "userNotVerified": "Get certainty about {user}’s identity before connecting.",
+  "userOnboardingPending": "Onboarding pending",
+  "userOnboardingPendingStartConversationInfo": "You can start a conversation with this team member once they are fully onboarded.",
   "userProfileButtonConnect": "Додати до контактів",
   "userProfileButtonIgnore": "Ігнорувати",
   "userProfileButtonUnblock": "Розблокувати",

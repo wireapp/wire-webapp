@@ -2501,6 +2501,8 @@
   "userNotFoundMessage": "Você pode não ter permissão com esta conta ou a pessoa pode não estar no {brandName}.",
   "userNotFoundTitle": "O {brandName} não consegue encontrar esta pessoa.",
   "userNotVerified": "Tenha certeza sobre a identidade de {user} antes de se conectar.",
+  "userOnboardingPending": "Onboarding pending",
+  "userOnboardingPendingStartConversationInfo": "You can start a conversation with this team member once they are fully onboarded.",
   "userProfileButtonConnect": "Conectar",
   "userProfileButtonIgnore": "Ignorar",
   "userProfileButtonUnblock": "Desbloquear",
