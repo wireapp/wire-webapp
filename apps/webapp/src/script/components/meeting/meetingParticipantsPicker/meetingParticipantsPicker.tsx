@@ -246,6 +246,18 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
             role="listbox"
             aria-multiselectable="true"
           >
+            {!isUndefined(onInvitedEmailsChange) && isValidEmail(filter.trim()) && (
+              <button
+                type="button"
+                css={inviteByEmailActionStyles}
+                data-uie-name="invite-by-email"
+                onClick={() => {
+                  return selectEmail(filter);
+                }}
+              >
+                {translate('meetings.scheduleModal.inviteByEmail')}
+              </button>
+            )}
             <UserSearchableList
               selfUser={selfUser}
               users={allowedUsers}
@@ -270,18 +282,6 @@ export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPic
               onContactsOpenChange={setIsContactsOpen}
               dataUieName={isNonEmptyString(dataUieName) ? `${dataUieName}-list` : undefined}
             />
-            {!isUndefined(onInvitedEmailsChange) && isValidEmail(filter.trim()) && (
-              <button
-                type="button"
-                css={inviteByEmailActionStyles}
-                data-uie-name="invite-by-email"
-                onClick={() => {
-                  return selectEmail(filter);
-                }}
-              >
-                {translate('meetings.scheduleModal.inviteByEmail')}
-              </button>
-            )}
             <MeetingConversationsSearchableList
               id={id}
               conversations={matchingConversations}
