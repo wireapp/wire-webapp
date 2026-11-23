@@ -28,7 +28,7 @@
     "@tanstack/react-virtual": "3.14.26",
     "@wireapp/avs": "10.5.44",
     "@wireapp/avs-debugger": "0.0.7",
-    "@wireapp/core-crypto": "11.0.1",
+    "@wireapp/core-crypto": "11.0.2",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/kalium-backup": "0.0.4",
     "@wireapp/protocol-messaging": "1.66.0",
