@@ -23,18 +23,15 @@ import type {Maybe} from 'true-myth';
 import {objectHasOwn} from 'ts-extras';
 
 import {Runtime} from '../commons/util/Runtime';
-import type {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
 import {createDesktopLogOutput} from '../logger/createDesktopLogOutput';
 import {selectDesktopApplicationLogWrite} from '../logger/selectDesktopApplicationLogWrite';
 
 /** Composes the Desktop logging transport for the main and authentication entry points. */
 export function initializeDesktopLogOutput(
   clock: Pick<Clock, 'setTimeout' | 'clearTimeout'>,
-  startupFeatureToggles: StartupFeatureToggles,
 ): Maybe<ReturnType<typeof createDesktopLogOutput>> {
   return selectDesktopApplicationLogWrite({
     isDesktopApp: Runtime.isDesktopApp(),
-    startupFeatureToggles,
     readCapability() {
       return objectHasOwn(window, 'desktopApplicationLogs') ? window.desktopApplicationLogs : undefined;
     },

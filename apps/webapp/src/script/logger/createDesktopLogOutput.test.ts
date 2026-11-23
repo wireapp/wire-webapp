@@ -26,10 +26,6 @@ import {initializeLogging} from './initializeLogging';
 import {logStartupRuntimeIdentity} from './logRuntimeIdentity';
 import {selectDesktopApplicationLogWrite, type DesktopApplicationLogWrite} from './selectDesktopApplicationLogWrite';
 
-import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
-
-const enabledSearch = '?enabled-features=desktop-structured-logs';
-
 function createTestOutput(writeToDesktop: DesktopApplicationLogWrite): {
   readonly clock: ReturnType<typeof createDeterministicClock>;
   readonly output: ReturnType<typeof createDesktopLogOutput>;
@@ -44,12 +40,10 @@ function createTestOutput(writeToDesktop: DesktopApplicationLogWrite): {
 
 describe('Desktop structured logging', () => {
   it.each([
-    {isDesktopApp: false, locationSearch: enabledSearch, reads: 0},
-    {isDesktopApp: true, locationSearch: '', reads: 0},
-    {isDesktopApp: true, locationSearch: '?enabled-features=', reads: 0},
-    {isDesktopApp: true, locationSearch: enabledSearch, reads: 1},
-  ])('reads the capability only on opted-in Wire Desktop ($isDesktopApp, $locationSearch)', options => {
-    const {isDesktopApp, locationSearch, reads} = options;
+    {isDesktopApp: false, reads: 0},
+    {isDesktopApp: true, reads: 1},
+  ])('reads the capability only in Wire Desktop ($isDesktopApp)', options => {
+    const {isDesktopApp, reads} = options;
     const capability = {
       version: 1,
       async write(): Promise<string> {
@@ -61,7 +55,6 @@ describe('Desktop structured logging', () => {
     });
     const write = selectDesktopApplicationLogWrite({
       isDesktopApp,
-      startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(locationSearch),
       readCapability,
     });
 
@@ -86,7 +79,6 @@ describe('Desktop structured logging', () => {
     expect(
       selectDesktopApplicationLogWrite({
         isDesktopApp: true,
-        startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(enabledSearch),
         readCapability() {
           return capability;
         },
@@ -98,7 +90,6 @@ describe('Desktop structured logging', () => {
     expect(
       selectDesktopApplicationLogWrite({
         isDesktopApp: true,
-        startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(enabledSearch),
         readCapability() {
           throw new Error('Preload unavailable');
         },
@@ -106,20 +97,36 @@ describe('Desktop structured logging', () => {
     ).toBe(true);
   });
 
+  it('contains errors while validating a capability', () => {
+    const capability = Object.defineProperty({}, 'version', {
+      get(): never {
+        throw new Error('Preload capability is inaccessible');
+      },
+    });
+
+    expect(
+      selectDesktopApplicationLogWrite({
+        isDesktopApp: true,
+        readCapability() {
+          return capability;
+        },
+      }).isNothing,
+    ).toBe(true);
+  });
+
   it.each([
-    {consoleQuery: '', expectedConsoleInfoRecordIndexes: []},
-    {consoleQuery: '&debugLogging=Selected', expectedConsoleInfoRecordIndexes: [1]},
-    {consoleQuery: '&debugLogging=RuntimeIdentity', expectedConsoleInfoRecordIndexes: [0]},
+    {locationSearch: '', expectedConsoleInfoRecordIndexes: []},
+    {locationSearch: '?debugLogging=Selected', expectedConsoleInfoRecordIndexes: [1]},
+    {locationSearch: '?debugLogging=RuntimeIdentity', expectedConsoleInfoRecordIndexes: [0]},
   ])(
-    'persists sanitized Pino diagnostics and startup identity with independent console filtering ($consoleQuery)',
+    'persists sanitized Pino diagnostics and startup identity with independent console filtering ($locationSearch)',
     async options => {
-      const {consoleQuery, expectedConsoleInfoRecordIndexes} = options;
+      const {locationSearch, expectedConsoleInfoRecordIndexes} = options;
       const writeToDesktop = jest.fn<Promise<string>, [readonly string[]]>().mockResolvedValue('written');
       const {clock, output, reportFailure} = createTestOutput(writeToDesktop);
       const logging = createPinoLogging(Maybe.nothing());
       const consoleOutput = {info: jest.fn(), debug: jest.fn(), warn: jest.fn(), error: jest.fn()};
       const createPersistenceOutput = jest.fn();
-      const locationSearch = enabledSearch + consoleQuery;
       const browserPersistence = initializeLogging({
         loggingEnabled: true,
         clock,

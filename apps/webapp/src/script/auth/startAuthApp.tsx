@@ -42,7 +42,6 @@ import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSuppor
 import {selectBrowserLogSaveFilePicker} from '../browser/selectBrowserLogSaveFilePicker';
 import {Runtime} from '../commons/util/Runtime';
 import {Config} from '../Config';
-import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
@@ -75,12 +74,11 @@ export function startAuthApp(support: CoreCryptoSupport, logging: StartupLogging
   exposeWrapperGlobals();
   const config = Config.getConfig();
   const clock = createClock();
-  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
   const isElectron = Runtime.isElectron();
   const browserLogSaveFilePicker = selectBrowserLogSaveFilePicker({isElectron, browserWindow: window});
   const browserLoggingAvailable = browserLogSaveFilePicker.isJust;
   const loggingEnabled = isElectron || browserLoggingAvailable;
-  const desktopLogOutput = initializeDesktopLogOutput(clock, startupFeatureToggles);
+  const desktopLogOutput = initializeDesktopLogOutput(clock);
   const isDesktopApp = Runtime.isDesktopApp();
   function shouldWriteConsoleFallback(): boolean {
     return desktopLogOutput.isNothing || !desktopLogOutput.value.hasConfirmedDelivery();

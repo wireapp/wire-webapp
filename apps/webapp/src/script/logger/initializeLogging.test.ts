@@ -27,9 +27,6 @@ import {createBrowserLogPersistence, type BrowserLogPersistence} from './createB
 import {createDesktopLogOutput} from './createDesktopLogOutput';
 import {selectDesktopApplicationLogWrite} from './selectDesktopApplicationLogWrite';
 import {createLogWorkerConnectionForTest} from './test/createLogWorkerConnectionForTest';
-
-import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
-
 const disabledPersistenceOptions = {
   loggingEnabled: true,
   browserPersistenceEnabled: false,
@@ -146,7 +143,7 @@ describe('logging startup', () => {
     expect(consoleOutput.error).toHaveBeenCalledTimes(1);
   });
 
-  it('preserves release Desktop fallback with an exposed capability and the feature disabled', () => {
+  it('selects the Desktop capability without a feature toggle and preserves console fallback until acknowledgement', () => {
     const logging = createPinoLogging(Maybe.nothing());
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const consoleOutput = {debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn()};
@@ -155,11 +152,14 @@ describe('logging startup', () => {
     });
     const selection = selectDesktopApplicationLogWrite({
       isDesktopApp: true,
-      startupFeatureToggles: createStartupFeatureTogglesFromLocationSearch(''),
       readCapability() {
         return {version: 1, write: nativeWrite};
       },
     });
+    const desktop = selection.map(writeToDesktop => {
+      return createDesktopLogOutput({clock, writeToDesktop, reportFailure: noop});
+    });
+    expect(selection.isJust).toBe(true);
     initializeLogging({
       ...disabledPersistenceOptions,
       debugEnabled: false,
@@ -168,11 +168,15 @@ describe('logging startup', () => {
       consoleOutput,
       locationSearch: '?enableLogging=@wireapp/*&debugLogging=',
       shouldWriteConsoleFallback() {
-        return selection.isNothing;
+        return desktop
+          .map(output => {
+            return !output.hasConfirmedDelivery();
+          })
+          .unwrapOr(true);
       },
-      desktopPersistenceOutput: selection
-        .map(writeToDesktop => {
-          return createDesktopLogOutput({clock, writeToDesktop, reportFailure: noop}).write;
+      desktopPersistenceOutput: desktop
+        .map(output => {
+          return output.write;
         })
         .unwrapOr(undefined),
       storage: Maybe.nothing(),
@@ -391,7 +395,7 @@ describe('logging startup', () => {
         },
         reportFailure: noop,
       });
-      const locationSearch = '?enabled-features=desktop-structured-logs' + query;
+      const locationSearch = query === '' ? '' : '?' + query.slice(1);
       const browserPersistence = initializeLogging({
         clock,
         consoleOutput,
@@ -504,7 +508,6 @@ describe('logging startup', () => {
       const loggingEnabled = isElectron || persistenceEnabled;
       const shouldWriteConsole = loggingEnabled && consoleEnabled;
       const locationSearch = `?enabled-features=mark-as-unread${consoleEnabled ? '&debugLogging=selected' : ''}`;
-      const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
       const persistence = initializeLogging({
         loggingEnabled,
         clock,
@@ -537,7 +540,6 @@ describe('logging startup', () => {
       expect(createPersistenceOutput).toHaveBeenCalledTimes(shouldPersist ? 1 : 0);
       expect(consoleOutput.info).toHaveBeenCalledTimes(shouldWriteConsole ? 1 : 0);
       expect(consoleOutput.warn).not.toHaveBeenCalled();
-      expect(startupFeatureToggles.isFeatureToggleEnabled('mark-as-unread')).toBe(true);
       expect(serializationCount).toBe(shouldWriteConsole || shouldPersist ? 1 : 0);
       const lines = append.mock.calls.flatMap(call => {
         return call[0];

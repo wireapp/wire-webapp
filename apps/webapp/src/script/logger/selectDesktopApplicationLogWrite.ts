@@ -21,25 +21,18 @@ import {isFunction, isObject} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 import {objectHasOwn} from 'ts-extras';
 
-import {desktopStructuredLogsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
-import type {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
-
 export type DesktopApplicationLogWrite = (records: readonly string[]) => Promise<unknown>;
 
 type DesktopApplicationLogSelectionOptions = {
   readonly isDesktopApp: boolean;
-  readonly startupFeatureToggles: StartupFeatureToggles;
   readonly readCapability: () => unknown;
 };
 
 export function selectDesktopApplicationLogWrite(
   options: DesktopApplicationLogSelectionOptions,
 ): Maybe<DesktopApplicationLogWrite> {
-  const {isDesktopApp, startupFeatureToggles, readCapability} = options;
+  const {isDesktopApp, readCapability} = options;
   if (!isDesktopApp) {
-    return Maybe.nothing();
-  }
-  if (!startupFeatureToggles.isFeatureToggleEnabled(desktopStructuredLogsFeatureToggleName)) {
     return Maybe.nothing();
   }
 

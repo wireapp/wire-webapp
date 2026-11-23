@@ -732,12 +732,65 @@ test.describe('Electron logging selection', () => {
       }
     });
 
-    await page.goto('/auth?enabled-features=desktop-structured-logs&debugLogging=*');
+    await page.goto('/auth?debugLogging=*');
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
 
     expect(consoleRecords.length).toBeGreaterThan(0);
     expect(startedWorkers).toEqual([]);
     expect(await page.locator('html').getAttribute('data-unexpected-log-storage-access')).toBeNull();
+  });
+
+  test('uses the version 1 logging capability from both application entry points', async ({page}) => {
+    await page.addInitScript(() => {
+      const entryPath = window.location.pathname;
+      Object.defineProperty(navigator.storage, 'getDirectory', {
+        value(): never {
+          const previousAccessPaths = sessionStorage.getItem('unexpectedDesktopLogStorageAccessPaths') ?? '';
+          sessionStorage.setItem('unexpectedDesktopLogStorageAccessPaths', `${previousAccessPaths}|${entryPath}`);
+
+          throw new Error('Origin Private File System should be disabled in Electron');
+        },
+      });
+      Object.defineProperty(window, 'desktopApplicationLogs', {
+        configurable: true,
+        value: {
+          version: 1,
+          async write(records: readonly string[]): Promise<string> {
+            if (records.length > 0) {
+              const previousWrites = sessionStorage.getItem('desktopLogWritePaths') ?? '';
+              sessionStorage.setItem('desktopLogWritePaths', `${previousWrites}|${entryPath}`);
+              document.documentElement.dataset.desktopLogWritePath = entryPath;
+            }
+
+            return 'written';
+          },
+        },
+      });
+    });
+    const startedWorkers: string[] = [];
+    page.on('worker', worker => {
+      startedWorkers.push(worker.url());
+    });
+
+    await page.goto('/?debugLogging=*');
+    await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+    const mainApplicationWritePaths = await page.evaluate(() => sessionStorage.getItem('desktopLogWritePaths') ?? '');
+    expect(mainApplicationWritePaths.split('|')).toContain('/');
+    expect(await page.evaluate(() => sessionStorage.getItem('unexpectedDesktopLogStorageAccessPaths'))).toBeNull();
+
+    await page.goto('/auth?debugLogging=*');
+    await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+    await expect
+      .poll(() => {
+        return page.locator('html').getAttribute('data-desktop-log-write-path');
+      })
+      .toBe('/auth');
+    const writePaths = await page.evaluate(() => sessionStorage.getItem('desktopLogWritePaths'));
+    const desktopWriteEntryPaths = (writePaths ?? '').split('|');
+    expect(desktopWriteEntryPaths).toContain('/');
+    expect(desktopWriteEntryPaths).toContain('/auth');
+    expect(startedWorkers).toEqual([]);
+    expect(await page.evaluate(() => sessionStorage.getItem('unexpectedDesktopLogStorageAccessPaths'))).toBeNull();
   });
 });
 
