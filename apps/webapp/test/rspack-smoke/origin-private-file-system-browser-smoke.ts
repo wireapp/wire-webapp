@@ -732,7 +732,7 @@ test.describe('Electron logging selection', () => {
       }
     });
 
-    await page.goto('/auth?enabled-features=desktop-structured-logs&debugLogging=*');
+    await page.goto('/auth?debugLogging=*');
     await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
 
     expect(consoleRecords.length).toBeGreaterThan(0);

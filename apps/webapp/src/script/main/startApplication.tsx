@@ -90,7 +90,7 @@ export async function startApplication(options: StartApplicationOptions): Promis
   const isDesktopApp = Runtime.isDesktopApp();
   const browserLogSaveFilePicker = selectBrowserLogSaveFilePicker({isElectron, browserWindow: window});
   const browserLoggingAvailable = browserLogSaveFilePicker.isJust;
-  const desktopLogOutput = initializeDesktopLogOutput(clock, startupFeatureToggles);
+  const desktopLogOutput = initializeDesktopLogOutput(clock);
   function shouldWriteConsoleFallback(): boolean {
     return desktopLogOutput.isNothing || !desktopLogOutput.value.hasConfirmedDelivery();
   }

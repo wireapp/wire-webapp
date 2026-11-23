@@ -28,7 +28,6 @@ export const troubleshooterFeatureToggleName = 'troubleshooter';
 
 export const sendCallLogsFeatureToggleName = 'send-call-logs';
 export const e2ePdfPreviewFeatureToggleName = 'e2e-pdf-preview';
-export const desktopStructuredLogsFeatureToggleName = 'desktop-structured-logs';
 
 export const startupFeatureToggleRegistry = [
   {name: applockRefactoredFeatureToggleName, previewDefaultEnabled: false},
@@ -41,7 +40,6 @@ export const startupFeatureToggleRegistry = [
   {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},
   {name: sendCallLogsFeatureToggleName, previewDefaultEnabled: false},
   {name: e2ePdfPreviewFeatureToggleName, previewDefaultEnabled: true},
-  {name: desktopStructuredLogsFeatureToggleName, previewDefaultEnabled: true},
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleRegistry)[number]['name'];
