@@ -32,10 +32,17 @@ export enum UserType {
   BOT = 'bot',
 }
 
+export type ContactStatusState = 'contactable' | 'non-contactable';
+
+export interface ContactStatus {
+  state: ContactStatusState;
+}
+
 export interface User {
   accent_id?: AccentColor.AccentColorID;
   app?: App;
   assets?: UserAsset[];
+  contact_status?: ContactStatus;
   deleted?: boolean;
   email?: string;
   expires_at?: string;

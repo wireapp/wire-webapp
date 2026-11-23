@@ -114,6 +114,7 @@ export class UserMapper {
       availability,
       app,
       assets,
+      contact_status: contactStatus,
       deleted,
       email,
       expires_at: expirationDate,
@@ -150,6 +151,10 @@ export class UserMapper {
 
     if (!isNullOrUndefined(supportedProtocols)) {
       userEntity.supportedProtocols(supportedProtocols);
+    }
+
+    if (!isNullOrUndefined(contactStatus)) {
+      userEntity.isPendingOnboarding(contactStatus.state === 'non-contactable');
     }
 
     if (isNonEmptyString(expirationDate)) {
