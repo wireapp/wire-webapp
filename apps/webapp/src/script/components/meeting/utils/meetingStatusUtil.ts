@@ -19,11 +19,13 @@
 
 import {isAfter, isBefore} from 'date-fns';
 
-export enum MeetingTemporalStatuses {
-  ON_GOING = 'on_going',
-  UPCOMING = 'upcoming',
-  PAST = 'past',
-}
+export const MeetingTemporalStatuses = {
+  ON_GOING: 'on_going',
+  UPCOMING: 'upcoming',
+  PAST: 'past',
+} as const;
+
+export type MeetingTemporalStatuses = (typeof MeetingTemporalStatuses)[keyof typeof MeetingTemporalStatuses];
 
 /**
  * Determines the scheduled time window of a meeting at a specific instant.
