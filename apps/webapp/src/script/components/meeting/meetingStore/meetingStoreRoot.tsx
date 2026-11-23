@@ -132,14 +132,6 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
         notificationStore.addNotification(notification);
       }
     };
-    const availabilitySubscription = selfUser.availability.subscribe(availability => {
-      if (availability === Availability.Type.AWAY) {
-        notificationStore.clearNotifications();
-      }
-    });
-    if (getAvailability() === Availability.Type.AWAY) {
-      notificationStore.clearNotifications();
-    }
     const notificationHandlers = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => {
         return store.getState().meetingSeries;
@@ -212,7 +204,6 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
     dispatcher.enqueueInitialLoad();
 
     return () => {
-      availabilitySubscription.dispose();
       unsubscribeFromMeetingLifecycleEvents();
       unsubscribeFromMeetingConversationEvents();
       unsubscribeFromMeetingStore();

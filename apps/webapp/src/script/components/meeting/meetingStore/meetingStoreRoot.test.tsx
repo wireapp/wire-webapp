@@ -556,27 +556,45 @@ describe('MeetingStoreRoot', () => {
     expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
   });
 
-  it('dismisses visible cards on Away and resumes new notifications afterward', async () => {
-    renderMeetingStoreRoot();
+  it('keeps visible cards expanded on Away, suppresses new events and reminders, and resumes new notifications afterward', async () => {
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-16T09:49:00.000Z')) * 1_000n,
+    });
+    renderMeetingStoreRoot({clock});
 
     await waitFor(() => {
       expect(getRenderedMeetingTitles()).toBe('Weekly sync');
     });
 
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      meetingTitle: 'Existing invitation',
+      meetingStartTime: '2026-06-16T10:00:00.000Z',
+      qualifiedId: otherUserId,
+      qualifiedConversationId: conversationId,
+      qualifiedCreator: otherUserId,
+    });
+    useMeetingNotificationStore.getState().setIsExpanded(true);
+    const existingNotifications = useMeetingNotificationStore.getState().notifications;
+
+    setAvailability(Availability.Type.AWAY);
+    expect(useMeetingNotificationStore.getState().notifications).toEqual(existingNotifications);
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(true);
+
     act(() => {
       amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, otherUserId);
     });
     await waitFor(() => {
-      expect(useMeetingNotificationStore.getState().notifications).toHaveLength(1);
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync (updated)');
     });
-    useMeetingNotificationStore.getState().setIsExpanded(true);
-
-    setAvailability(Availability.Type.AWAY);
-    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
-    expect(useMeetingNotificationStore.getState().isExpanded).toBe(false);
+    act(() => {
+      clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+    });
+    expect(useMeetingNotificationStore.getState().notifications).toEqual(existingNotifications);
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(true);
 
     setAvailability(Availability.Type.AVAILABLE);
-    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+    expect(useMeetingNotificationStore.getState().notifications).toEqual(existingNotifications);
 
     act(() => {
       amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, otherUserId);
@@ -584,8 +602,30 @@ describe('MeetingStoreRoot', () => {
     await waitFor(() => {
       expect(useMeetingNotificationStore.getState().notifications).toEqual([
         expect.objectContaining({kind: MeetingNotificationKind.UPDATE, qualifiedId: meetingId}),
+        ...existingNotifications,
       ]);
     });
+  });
+
+  it('keeps existing expanded cards when mounted while Away', async () => {
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      meetingTitle: 'Existing invitation',
+      meetingStartTime: '2026-06-16T10:00:00.000Z',
+      qualifiedId: otherUserId,
+      qualifiedConversationId: conversationId,
+      qualifiedCreator: otherUserId,
+    });
+    useMeetingNotificationStore.getState().setIsExpanded(true);
+    const existingNotifications = useMeetingNotificationStore.getState().notifications;
+
+    renderMeetingStoreRoot({initialAvailability: Availability.Type.AWAY});
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+    expect(useMeetingNotificationStore.getState().notifications).toEqual(existingNotifications);
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(true);
   });
 
   it('does not notify the user who deleted the meeting', async () => {
