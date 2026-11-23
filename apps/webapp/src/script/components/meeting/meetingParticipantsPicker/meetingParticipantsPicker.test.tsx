@@ -293,6 +293,36 @@ describe('MeetingParticipantsPicker', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
+  it('shows Invite by email before No matches and adds the trimmed address when clicked', async () => {
+    const user = userEvent.setup();
+    render(withThemeAndRootContext(<ControlledPicker initialEmails={[]} />, rootProviderWrapper));
+
+    await user.click(getSearchInput());
+    fireEvent.change(getSearchInput(), {target: {value: '  guest@example.com  '}});
+
+    const inviteButton = screen.getByRole('button', {name: 'meetings.scheduleModal.inviteByEmail'});
+    const noMatches = await screen.findByText(NO_MATCHES_LABEL);
+    expect(inviteButton.compareDocumentPosition(noMatches) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    await user.click(inviteButton);
+    expect(screen.getByText('guest@example.com')).toBeInTheDocument();
+    expect(getSearchInput(PARTICIPANTS_LABEL_WITH_COUNT)).toHaveValue('');
+  });
+
+  it('does not show Invite by email for invalid text or a name-only picker', async () => {
+    const user = userEvent.setup();
+    const {unmount} = render(withThemeAndRootContext(<ControlledPicker initialEmails={[]} />, rootProviderWrapper));
+
+    await user.click(getSearchInput());
+    fireEvent.change(getSearchInput(), {target: {value: 'invalid@'}});
+    expect(screen.queryByRole('button', {name: 'meetings.scheduleModal.inviteByEmail'})).not.toBeInTheDocument();
+
+    unmount();
+    render(withThemeAndRootContext(<ControlledPicker initialFilter="guest@example.com" />, rootProviderWrapper));
+    await user.click(getSearchInput());
+    expect(screen.queryByRole('button', {name: 'meetings.scheduleModal.inviteByEmail'})).not.toBeInTheDocument();
+  });
+
   it('does not send email queries to remote people search', async () => {
     const searchByName = jest.fn().mockResolvedValue([]);
     render(
