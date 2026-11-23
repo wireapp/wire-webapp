@@ -97,6 +97,19 @@ const createOptions = (
 };
 
 describe('createBulkRestoreController', () => {
+  it('removes the departed view review callback when publishing a detached failure', async () => {
+    const request = Promise.withResolvers<Awaited<ReturnType<BulkRestoreOptions['cellsRepository']['restoreNodes']>>>();
+    const {options, publishStatus} = createOptions(jest.fn().mockReturnValue(request.promise));
+    const controller = createBulkRestoreController(options);
+    const restoring = controller.restore([target], 'bin-scope', {...status, onReview: jest.fn(), isReviewing: true});
+
+    controller.dispose();
+    request.reject(new Error('backend restore failure'));
+    await restoring;
+
+    expect(publishStatus).toHaveBeenCalledWith({...status, kind: 'request-failed'});
+  });
+
   it('keeps B processing when A finishes refreshing after a scope reset', async () => {
     let scope = 'scope-a';
     const wrapper = ({children}: {children: ReactNode}): ReactElement => {

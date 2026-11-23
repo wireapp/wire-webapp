@@ -164,18 +164,21 @@ export const createBulkRestoreController = (initialOptions: BulkRestoreOptions):
         },
       });
       if (!mounted || generation !== requestGeneration || !options.isCurrentScope(scopeKey)) {
-        options.publishStatus({...status, kind: outcome});
+        const {onReview: _onReview, isReviewing: _isReviewing, ...detachedStatus} = status;
+        options.publishStatus({...detachedStatus, kind: outcome});
         return;
       }
 
       const didRefresh = await refreshAndReportSuccess();
       const statusKind = outcome === 'completed' && !didRefresh ? 'finished-unknown' : outcome;
       if (!mounted || generation !== requestGeneration) {
-        options.publishStatus({...status, kind: statusKind});
+        const {onReview: _onReview, isReviewing: _isReviewing, ...detachedStatus} = status;
+        options.publishStatus({...detachedStatus, kind: statusKind});
         return;
       }
       if (!options.isCurrentScope(scopeKey)) {
-        options.publishStatus({...status, kind: statusKind});
+        const {onReview: _onReview, isReviewing: _isReviewing, ...detachedStatus} = status;
+        options.publishStatus({...detachedStatus, kind: statusKind});
         return;
       }
 
