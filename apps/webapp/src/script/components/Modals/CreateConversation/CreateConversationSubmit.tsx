@@ -32,17 +32,17 @@ export const CreateConversationSubmit: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {error, conversationName} = useCreateConversationModal();
   const nonFederatingParticipantsModalCopy = getNonFederatingParticipantsModalCopy(translate);
-  const {onSubmit, isLoading} = useCreateConversation(nonFederatingParticipantsModalCopy);
+  const {onSubmit, isSubmitting} = useCreateConversation(nonFederatingParticipantsModalCopy);
 
   return (
     <Button
       id="group-go-next"
       css={{marginBottom: 0}}
-      disabled={isNonEmptyString(error) || !isNonEmptyString(conversationName)}
+      disabled={isSubmitting || isNonEmptyString(error) || !isNonEmptyString(conversationName)}
       type="button"
       onClick={onSubmit}
       data-uie-name="do-create-group"
-      showLoading={isLoading}
+      showLoading={isSubmitting}
       variant={ButtonVariant.TERTIARY}
     >
       {translate('createConversationModalHeaderDone')}
