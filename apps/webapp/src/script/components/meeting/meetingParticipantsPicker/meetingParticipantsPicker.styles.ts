@@ -196,6 +196,10 @@ export const listContainerStyles: CSSObject = {
   flex: 1,
   overflowY: 'auto',
 
+  '.user-list__no-results': {
+    margin: '16px 18px',
+  },
+
   '[data-uie-name="do-toggle-selected-search-list"]': sectionHeaderBorderStyles,
 
   '[data-uie-name="do-toggle-search-list"]': {
@@ -213,12 +217,12 @@ export const listContainerStyles: CSSObject = {
 export const inviteByEmailActionStyles: CSSObject = {
   background: 'none',
   border: 'none',
-  borderTop: '1px solid var(--border-color)',
+  borderBottom: '1px solid var(--border-color)',
   color: 'var(--accent-color)',
   cursor: 'pointer',
   display: 'block',
   padding: '12px 16px',
-  textAlign: 'left',
+  textAlign: 'center',
   width: '100%',
   '&:hover, &:focus-visible': {
     backgroundColor: 'var(--background-fadeout)',
