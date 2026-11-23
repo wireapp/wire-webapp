@@ -34,7 +34,6 @@ import {
   transliterationIndex,
 } from '../../util/stringUtil';
 import type {User} from '../entity/User';
-import type {TeamRepository} from '../team/TeamRepository';
 import {validateHandle} from '../user/userHandleGenerator';
 import type {UserRepository} from '../user/userRepository';
 
@@ -59,7 +58,7 @@ export class SearchRepository {
    */
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly teamRepository: Pick<TeamRepository, 'getTeamSupportedProtocols'>,
+    private readonly teamRepository: {getTeamSupportedProtocols: () => CONVERSATION_PROTOCOL[]},
     private readonly core = container.resolve(Core),
     private readonly apiClient = container.resolve(APIClient),
   ) {}
