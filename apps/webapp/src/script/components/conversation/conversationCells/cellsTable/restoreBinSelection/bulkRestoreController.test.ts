@@ -93,6 +93,21 @@ const createOptions = (
 };
 
 describe('createBulkRestoreController', () => {
+  it('resumes a detached review and clears it after a successful refresh', async () => {
+    const {options, onRefreshAndReportSuccess} = createOptions(jest.fn());
+    const controller = createBulkRestoreController(options);
+
+    controller.resumeReview('refresh-failed');
+    expect(controller.getSnapshot().reviewReason).toBe('refresh-failed');
+
+    await controller.refreshReview();
+
+    expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
+    expect(options.onStatusCleared).toHaveBeenCalledTimes(1);
+    expect(options.onRestoreSettled).toHaveBeenCalledTimes(1);
+    expect(controller.getSnapshot().reviewReason).toBeNull();
+  });
+
   it('publishes state changes to subscribers while a restore completes', async () => {
     const request = Promise.withResolvers<Awaited<ReturnType<BulkRestoreOptions['cellsRepository']['restoreNodes']>>>();
     const {options, onStatusChange} = createOptions(jest.fn().mockReturnValue(request.promise));

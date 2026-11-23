@@ -69,6 +69,7 @@ export interface BulkRestoreController {
     status: SharedDriveMoveStatus,
   ) => Promise<void>;
   readonly refreshReview: () => Promise<void>;
+  readonly resumeReview: (reason: BulkRestoreReviewReason) => void;
   readonly reset: () => void;
 }
 
@@ -248,6 +249,9 @@ export const createBulkRestoreController = (initialOptions: BulkRestoreOptions):
     },
     restore,
     refreshReview,
+    resumeReview: reason => {
+      updateSnapshot({reviewReason: reason});
+    },
     reset,
   };
 };
