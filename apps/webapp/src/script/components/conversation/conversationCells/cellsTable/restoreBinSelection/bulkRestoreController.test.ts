@@ -17,6 +17,9 @@
  *
  */
 
+import {createElement, type ReactElement, type ReactNode} from 'react';
+
+import {act, renderHook} from '@testing-library/react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {RestActionStatus} from 'cells-sdk-ts';
 import {Maybe} from 'true-myth';
@@ -25,6 +28,7 @@ import {createBulkRestoreController, type BulkRestoreOptions} from './bulkRestor
 import type {RestoreTarget} from './resolveRestoreTargets';
 
 import type {SharedDriveMoveStatus} from '../../sharedDriveUploadStatusContext';
+import {SharedDriveUploadStatusProvider, useSharedDriveUploadStatus} from '../../sharedDriveUploadStatusContext';
 import {CellNodeType} from '../../../../../types/cellNode';
 
 const status: SharedDriveMoveStatus = {
@@ -93,6 +97,63 @@ const createOptions = (
 };
 
 describe('createBulkRestoreController', () => {
+  it('keeps B processing when A finishes refreshing after a scope reset', async () => {
+    let scope = 'scope-a';
+    const wrapper = ({children}: {children: ReactNode}): ReactElement => {
+      return createElement(SharedDriveUploadStatusProvider, {resetOnScopeChange: Maybe.just(scope), children});
+    };
+    const provider = renderHook(useSharedDriveUploadStatus, {wrapper});
+    const refresh = Promise.withResolvers<boolean>();
+    const refreshStarted = Promise.withResolvers<void>();
+    const requestB =
+      Promise.withResolvers<Awaited<ReturnType<BulkRestoreOptions['cellsRepository']['restoreNodes']>>>();
+    const restoreNodes = jest
+      .fn()
+      .mockResolvedValueOnce({Status: RestActionStatus.Performed})
+      .mockReturnValueOnce(requestB.promise);
+    const {options, onRefreshAndReportSuccess} = createOptions(restoreNodes);
+    onRefreshAndReportSuccess.mockImplementation(() => {
+      refreshStarted.resolve();
+      return refresh.promise;
+    });
+    const controller = createBulkRestoreController({
+      ...options,
+      publishStatus: value => {
+        return provider.result.current.updateMoveStatus(value);
+      },
+    });
+    const statusA = {...status, id: provider.result.current.createMoveStatusId()};
+    act(() => {
+      return provider.result.current.startMoveStatus(statusA);
+    });
+    const restoringA = controller.restore([target], scope, statusA);
+    await refreshStarted.promise;
+
+    act(() => {
+      scope = 'scope-b';
+      provider.rerender();
+      controller.reset();
+    });
+    const statusB = {...status, id: provider.result.current.createMoveStatusId()};
+    act(() => {
+      return provider.result.current.startMoveStatus(statusB);
+    });
+    const restoringB = controller.restore([target], scope, statusB);
+
+    await act(async () => {
+      refresh.resolve(true);
+      await restoringA;
+    });
+    expect(provider.result.current.getMoveStatus(status.conversationQualifiedId)).toEqual(Maybe.just(statusB));
+    expect(controller.getSnapshot().isPending).toBe(true);
+
+    controller.dispose();
+    await act(async () => {
+      requestB.resolve({Status: RestActionStatus.Performed});
+      await restoringB;
+    });
+  });
+
   it('resumes a detached review and clears it after a successful refresh', async () => {
     const {options, onRefreshAndReportSuccess} = createOptions(jest.fn());
     const controller = createBulkRestoreController(options);
