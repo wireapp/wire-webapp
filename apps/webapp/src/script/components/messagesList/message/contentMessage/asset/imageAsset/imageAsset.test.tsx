@@ -166,6 +166,12 @@ describe('image-asset', () => {
     const imageElement = screen.getByTestId('image-loader');
     expect(imageElement).toBeDefined();
     expect(getAssetUrlMock).not.toHaveBeenCalled();
+    const imageContainer = requireValueForTest(imageElement.parentElement);
+
+    expect(imageContainer).toHaveAttribute('data-uie-status', 'waiting');
+    expect(imageContainer).toHaveClass('image-asset--no-image');
+    expect(imageContainer).toHaveClass('loading-dots-static');
+    expect(imageContainer).not.toHaveClass('loading-dots');
 
     act(() => {
       image.resource(
@@ -205,6 +211,7 @@ describe('image-asset', () => {
 
       const imageContainer = requireValueForTest(imageElement.parentElement);
       expect(imageContainer).toHaveAttribute('data-uie-status', 'loaded');
+      expect(imageContainer).not.toHaveClass('loading-dots-static');
       expect(imageContainer).not.toHaveClass('loading-dots');
     });
   });
@@ -232,6 +239,7 @@ describe('image-asset', () => {
     });
 
     expect(imageContainer).not.toHaveClass('loading-dots');
+    expect(imageContainer).not.toHaveClass('loading-dots-static');
     expect(imageLoggerMock.error).toHaveBeenCalledWith('Failed to load image asset', {error: expect.any(Error)});
     expect(screen.getByRole('button', {name: retryLabel})).toBeDefined();
     expect(imageContainer).not.toHaveAttribute('role', 'button');
@@ -351,12 +359,16 @@ describe('image-asset', () => {
     const imageElement = screen.getByTestId('image-loader');
     const imageContainer = requireValueForTest(imageElement.parentElement);
     expect(imageContainer).toHaveAttribute('data-uie-status', 'waiting');
+    expect(imageContainer).toHaveClass('loading-dots-static');
+    expect(imageContainer).not.toHaveClass('loading-dots');
 
     await waitFor(() => {
       expect(getAssetUrlMock).toHaveBeenCalled();
     });
 
     expect(imageContainer).toHaveAttribute('data-uie-status', 'loading');
+    expect(imageContainer).toHaveClass('loading-dots');
+    expect(imageContainer).not.toHaveClass('loading-dots-static');
     fireEvent.click(imageContainer);
     fireEvent.keyDown(imageContainer, {key: 'Enter', code: 'Enter'});
     fireEvent.keyDown(imageContainer, {key: ' ', code: 'Space'});

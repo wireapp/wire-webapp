@@ -231,7 +231,6 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
 
   const dummyImageUrl = `data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${imageSizes?.width}' height='${imageSizes?.height}'></svg>`;
   const assetUrl = imageUrl?.url ?? dummyImageUrl;
-  const isLoading = imageLoadState === 'waiting' || imageLoadState === 'loading';
   const isLoaded = imageLoadState === 'loaded';
   const isFailed = imageLoadState === 'failed';
   const isImageDetailInteractive = isLoaded && !isUndefined(onClick);
@@ -328,8 +327,9 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
     <InViewport
       onVisible={handleImageVisible}
       className={cx(className, {
-        'loading-dots': isLoading,
-        'image-asset--no-image': isLoading || isFailed,
+        'loading-dots': imageLoadState === 'loading',
+        'loading-dots-static': imageLoadState === 'waiting',
+        'image-asset--no-image': !isLoaded,
       })}
       onClick={handleImageClick}
       onKeyDown={handleImageKeyDown}
