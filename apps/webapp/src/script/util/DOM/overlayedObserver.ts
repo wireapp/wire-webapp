@@ -17,7 +17,7 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNan, isNull, isUndefined} from '@sindresorhus/is';
 
 const midpointDivisor = 2;
 const overlayCheckIntervalInMilliseconds = 300;
@@ -54,36 +54,39 @@ function checkOverlayedElements(): void {
  */
 const isOverlayed = (domElement: HTMLElement): boolean => {
   const box = domElement.getBoundingClientRect();
-  if (isNaN(box.right + box.left + box.bottom + box.top)) {
+  if (isNan(box.right + box.left + box.bottom + box.top)) {
     return true;
   }
   const middlePointX = (box.right + box.left) / midpointDivisor;
   const middlePointY = (box.bottom + box.top) / midpointDivisor;
   const elementAtPoint = document.elementFromPoint(middlePointX, middlePointY);
-  return elementAtPoint !== null && domElement !== elementAtPoint && !domElement.contains(elementAtPoint);
+  return !isNull(elementAtPoint) && domElement !== elementAtPoint && !domElement.contains(elementAtPoint);
 };
 
 const onElementVisible = (element: HTMLElement, onVisible: () => void): void => {
   if (!isOverlayed(element)) {
     return onVisible();
   }
-  if (overlayCheckerInterval === undefined) {
+  if (isUndefined(overlayCheckerInterval)) {
     overlayCheckerInterval = window.setInterval(checkOverlayedElements, overlayCheckIntervalInMilliseconds);
   }
   overlayedElements.set(element, {onVisible});
 };
 
 const trackElement = (element: HTMLElement, onChange: (isChanged: boolean) => void): void => {
-  onChange(!isOverlayed(element));
-  if (overlayCheckerInterval === undefined) {
+  const isVisible = !isOverlayed(element);
+  overlayedElements.set(element, {onChange});
+
+  if (isUndefined(overlayCheckerInterval)) {
     overlayCheckerInterval = window.setInterval(checkOverlayedElements, overlayCheckIntervalInMilliseconds);
   }
-  overlayedElements.set(element, {onChange});
+
+  onChange(isVisible);
 };
 
 const removeElement = (element: HTMLElement): void => {
   overlayedElements.delete(element);
-  if (overlayedElements.size < 1 && overlayCheckerInterval !== undefined) {
+  if (overlayedElements.size < 1 && !isUndefined(overlayCheckerInterval)) {
     clearInterval(overlayCheckerInterval);
     overlayCheckerInterval = undefined;
   }

@@ -118,6 +118,33 @@ describe('overlayedObserver', () => {
   });
 
   describe('trackElement', () => {
+    it('registers the element before reporting its initial visibility', () => {
+      const element = document.createElement('div');
+      const originalElementFromPoint = document.elementFromPoint;
+      const elementFromPoint = jest.fn(() => {
+        return element;
+      });
+      const onChange = jest.fn(() => {
+        return overlayedObserver.removeElement(element);
+      });
+
+      document.elementFromPoint = elementFromPoint;
+
+      try {
+        overlayedObserver.trackElement(element, onChange);
+
+        expect(onChange).toHaveBeenCalledWith(true);
+        expect(jest.getTimerCount()).toBe(0);
+
+        jest.advanceTimersByTime(301);
+
+        expect(elementFromPoint).toHaveBeenCalledTimes(1);
+      } finally {
+        overlayedObserver.removeElement(element);
+        document.elementFromPoint = originalElementFromPoint;
+      }
+    });
+
     it('continues reporting visibility changes while tracking the element', () => {
       const callbackSpy = {
         onChange: noop,
