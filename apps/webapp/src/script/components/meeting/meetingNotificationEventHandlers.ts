@@ -162,7 +162,7 @@ export const createMeetingNotificationEventHandlers = ({
         return;
       }
 
-      let kind = MeetingNotificationKind.INVITE;
+      let kind: MeetingNotificationKind = MeetingNotificationKind.INVITE;
       if (!isUndefined(getMeetingInstanceAt(meeting, new Date(now)))) {
         kind = MeetingNotificationKind.ONGOING;
       } else if (notifiedMeetings.has(meetingKey)) {
