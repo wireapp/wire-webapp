@@ -78,11 +78,6 @@ export enum CallViewTab {
   SPEAKERS = 'speakers',
 }
 
-declare global {
-  interface HTMLAudioElement {
-    setSinkId?: (sinkId: string) => Promise<void>;
-  }
-}
 const MAX_USERS_TO_CALL_WITHOUT_CONFIRM = Config.getConfig().FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT;
 
 export class CallingViewModel {

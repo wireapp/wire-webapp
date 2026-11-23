@@ -196,6 +196,7 @@
     "@typescript-eslint/eslint-plugin": "8.73.0",
     "@typescript-eslint/parser": "8.73.0",
     "@typescript-eslint/utils": "8.73.0",
+    "@typescript/native-compiler": "npm:typescript@7.0.2",
     "archiver": "7.0.1",
     "autoprefixer": "10.7.0",
     "babel-jest": "30.5.2",
@@ -276,9 +277,8 @@
     "svg-inline-loader": "0.8.2",
     "tough-cookie": "4.1.4",
     "ts-node": "10.9.2",
-    "tsc-watch": "7.2.1",
     "type-fest": "5.10.0",
-    "typescript": "6.0.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "worker-timers": "8.0.34",
     "ws": "8.23.0"
   },
@@ -326,7 +326,10 @@
     "libsodium-wrappers-sumo@0.7.9": {
       "libsodium-sumo": "0.7.15"
     },
-    "typescript": "6.0.3",
+    "@wireapp/protocol-messaging": {
+      "typescript": "npm:@typescript/typescript6@6.0.2"
+    },
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "xml2js": "0.6.2",
     "@stablelib/utf8": "2.1.0",
     "jest-config": "30.5.2",
