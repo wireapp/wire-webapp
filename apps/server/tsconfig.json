@@ -6,7 +6,7 @@
     "noUncheckedIndexedAccess": true,
     "outDir": "dist",
     "paths": {
-      "@enormora/objectory": ["node_modules/@enormora/objectory/main.d.ts"]
+      "@enormora/objectory": ["../../node_modules/@enormora/objectory/main.d.ts"]
     },
     "removeComments": true,
     "lib": ["esnext"],

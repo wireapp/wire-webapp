@@ -147,7 +147,6 @@ export type FeatureList = {
   [FEATURE_KEY.CELLS]?: FeatureCells;
   [FEATURE_KEY.CHANNELS]?: FeatureChannels;
   [FEATURE_KEY.CHAT_BUBBLES]?: FeatureChatBubbles;
-  [FEATURE_KEY.ASSET_AUDIT_LOG]?: FeatureAssetAuditLog;
   [FEATURE_KEY.CLASSIFIED_DOMAINS]?: FeatureClassifiedDomains;
   [FEATURE_KEY.CONFERENCE_CALLING]?: FeatureConferenceCalling;
   [FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?: FeatureConsumableNotifications;

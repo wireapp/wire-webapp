@@ -27,6 +27,11 @@ import type {TelemetryAssetFunctions} from './telemetryAssets.ts';
 const {copyTelemetryAsset}: TelemetryAssetFunctions = require('./telemetryAssets.ts');
 
 const workspaceDirectory = path.resolve(__dirname, '../..');
+const nativeCompilerPath = path.join(
+  path.dirname(require.resolve('@typescript/native-compiler/package.json')),
+  'bin',
+  'tsc',
+);
 const upstreamSdkPath = require.resolve('countly-sdk-web/lib/countly.min.js');
 
 describe('standalone telemetry SDK', () => {
@@ -112,7 +117,7 @@ describe('standalone telemetry SDK', () => {
           include: ['consumer.ts'],
         }),
       );
-      execFileSync(process.execPath, [require.resolve('typescript/lib/tsc.js'), '--project', consumerDirectory], {
+      execFileSync(process.execPath, [nativeCompilerPath, '--project', consumerDirectory], {
         cwd: workspaceDirectory,
         timeout: 30_000,
       });
