@@ -19,12 +19,14 @@
 
 import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 
-import type {RestoreTarget} from './resolveRestoreTargets';
-
 import {getCellsBackgroundActionEvidence} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import type {CellsBackgroundActionOutcome} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
 
 export type BulkRestoreOutcome = 'completed' | 'request-failed' | 'partial' | 'failed' | 'status-unknown';
+
+export type BulkRestoreTarget =
+  | {readonly kind: 'selected'; readonly node: {readonly id: string}}
+  | {readonly kind: 'parent'; readonly rootParentName: string};
 
 export interface BulkRestoreDependencies {
   lookupRootParentId: (rootParentName: string) => Promise<string>;
@@ -34,7 +36,7 @@ export interface BulkRestoreDependencies {
 }
 
 interface RunBulkRestoreParams extends BulkRestoreDependencies {
-  targets: readonly RestoreTarget[];
+  targets: readonly BulkRestoreTarget[];
 }
 
 const outcomeByJobOutcome: Readonly<Record<CellsBackgroundActionOutcome, BulkRestoreOutcome>> = {
@@ -46,7 +48,7 @@ const outcomeByJobOutcome: Readonly<Record<CellsBackgroundActionOutcome, BulkRes
 };
 
 const resolveTargetIds = async (
-  targets: readonly RestoreTarget[],
+  targets: readonly BulkRestoreTarget[],
   lookupRootParentId: BulkRestoreDependencies['lookupRootParentId'],
 ): Promise<string[]> => {
   const ids = await Promise.all(
