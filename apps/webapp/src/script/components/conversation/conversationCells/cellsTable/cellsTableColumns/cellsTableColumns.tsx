@@ -88,6 +88,7 @@ export const getCellsTableColumns = ({
   onTogglePageSelection,
   isPageSelected,
   selectionEnabled,
+  selectionDisabled,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
@@ -103,6 +104,7 @@ export const getCellsTableColumns = ({
   onTogglePageSelection: (isSelected: boolean) => void;
   isPageSelected: boolean;
   selectionEnabled: boolean;
+  selectionDisabled: boolean;
 }): GetCellsTableColumnsResult => {
   return [
     ...(selectionEnabled
@@ -116,6 +118,7 @@ export const getCellsTableColumns = ({
                   id="all-on-page"
                   name={labels.selectAllOnPage}
                   isChecked={isPageSelected}
+                  isDisabled={selectionDisabled}
                   onChange={onTogglePageSelection}
                 />
               );
@@ -127,6 +130,7 @@ export const getCellsTableColumns = ({
                   id={node.id}
                   name={node.name}
                   isChecked={selectedNodeIds.has(node.id)}
+                  isDisabled={selectionDisabled}
                   onChange={isSelected => {
                     onToggleSelection(node.id, isSelected);
                   }}

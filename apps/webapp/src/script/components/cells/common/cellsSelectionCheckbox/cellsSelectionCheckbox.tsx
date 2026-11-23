@@ -26,6 +26,7 @@ interface CellsSelectionCheckboxProps {
   id: string;
   name: string;
   isChecked: boolean;
+  isDisabled: boolean;
   onChange: (isChecked: boolean) => void;
 }
 
@@ -33,6 +34,7 @@ export const CellsSelectionCheckbox: FunctionComponent<CellsSelectionCheckboxPro
   id,
   name,
   isChecked,
+  isDisabled,
   onChange,
 }: CellsSelectionCheckboxProps) => {
   const {translate} = useApplicationContext();
@@ -42,6 +44,7 @@ export const CellsSelectionCheckbox: FunctionComponent<CellsSelectionCheckboxPro
       checkboxSize="small"
       id={`cells-selection-${id}`}
       checked={isChecked}
+      disabled={isDisabled}
       aria-label={translate('cells.selection.selectItem', {name})}
       onChange={event => {
         onChange(event.currentTarget.checked);

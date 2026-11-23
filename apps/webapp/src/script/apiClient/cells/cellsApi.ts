@@ -429,7 +429,7 @@ export class CellsAPI {
       }),
       CopyMoveOptions: {TargetIsParent: true, TargetPath: targetPath},
       AwaitStatus: 'Finished',
-      AwaitTimeout: '5000ms',
+      AwaitTimeout: '60000ms',
     });
 
     return result.data;

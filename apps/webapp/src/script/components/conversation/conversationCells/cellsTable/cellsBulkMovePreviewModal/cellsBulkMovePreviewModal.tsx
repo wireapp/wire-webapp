@@ -20,6 +20,7 @@
 import {useEffect, useState, type FunctionComponent} from 'react';
 
 import type {RestPerformActionResponse} from 'cells-sdk-ts';
+import type {Maybe} from 'true-myth';
 
 import {CellsBulkMovePreviewPresentation} from './cellsBulkMovePreviewPresentation';
 import {useBulkMoveDestinationSelection} from './useBulkMoveDestinationSelection';
@@ -45,7 +46,7 @@ interface CellsBulkMovePreviewModalProps {
   conversationName: string;
   isMoveOutcomeUnresolved: boolean;
   isMoveRequestPending: boolean;
-  onMoveStart: (summary: SharedDriveMoveSummary) => string;
+  onMoveStart: (summary: SharedDriveMoveSummary) => Maybe<string>;
   onMoveResult: (response: RestPerformActionResponse, operationId: string) => boolean;
   onMoveError: (operationId: string) => void;
   isBackgroundMovePending: boolean;
