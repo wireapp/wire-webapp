@@ -19,6 +19,8 @@
 
 import React, {useEffect, useRef, type FunctionComponent} from 'react';
 
+import {isNull, isUndefined} from '@sindresorhus/is';
+
 import {overlayedObserver} from '../../util/DOM/overlayedObserver';
 import {viewportObserver} from '../../util/DOM/viewportObserver';
 
@@ -46,21 +48,29 @@ export const InViewport: FunctionComponent<InViewportParams & React.HTMLProps<HT
 
   useEffect(() => {
     const element = domNode.current;
-    if (element === null) {
+    if (isNull(element)) {
       return undefined;
     }
 
+    const observedElement = element;
+
     let inViewport = false;
     let visible = !checkOverlay;
+    let overlayTracked = false;
 
     let onVisibleTriggered = false;
     let onVisibilityLostTriggered = false;
 
-    const releaseTrackers = (): void => {
-      if (checkOverlay) {
-        overlayedObserver.removeElement(element);
+    function releaseOverlayTracker(): void {
+      if (overlayTracked) {
+        overlayTracked = false;
+        overlayedObserver.removeElement(observedElement);
       }
-      viewportObserver.removeElement(element);
+    }
+
+    const releaseTrackers = (): void => {
+      releaseOverlayTracker();
+      viewportObserver.removeElement(observedElement);
     };
 
     const triggerCallbackIfVisible = (): void => {
@@ -71,36 +81,48 @@ export const InViewport: FunctionComponent<InViewportParams & React.HTMLProps<HT
           onVisibilityLostTriggered = false;
         }
 
-        if (onVisibilityLost === undefined) {
+        if (isUndefined(onVisibilityLost)) {
           releaseTrackers();
         }
       }
     };
 
+    function shouldStartOverlayTracking(): boolean {
+      return checkOverlay && !overlayTracked;
+    }
+
     viewportObserver.trackElement(
-      element,
+      observedElement,
       (isInViewport: boolean, isPartiallyVisible: boolean) => {
         inViewport = isInViewport;
-        triggerCallbackIfVisible();
 
-        // If the element is not intersecting at all, we can trigger the onVisibilityLost callback
         if (!isPartiallyVisible) {
+          releaseOverlayTracker();
+          visible = !checkOverlay;
           if (!onVisibilityLostTriggered) {
             onVisibilityLost?.();
             onVisibleTriggered = false;
             onVisibilityLostTriggered = true;
           }
+
+          return;
         }
+
+        if (shouldStartOverlayTracking()) {
+          overlayTracked = true;
+          overlayedObserver.trackElement(observedElement, isVisible => {
+            visible = isVisible;
+            triggerCallbackIfVisible();
+          });
+
+          return;
+        }
+
+        triggerCallbackIfVisible();
       },
       requireFullyInView,
       allowBiggerThanViewport,
     );
-    if (checkOverlay) {
-      overlayedObserver.trackElement(element, isVisible => {
-        visible = isVisible;
-        triggerCallbackIfVisible();
-      });
-    }
     return () => {
       // If the element is unmounted, we can trigger the onVisibilityLost callback and release the trackers
       if (callVisibilityLostOnUnmount) {
