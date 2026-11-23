@@ -19,6 +19,8 @@
 
 import React, {ChangeEvent, useId, type FunctionComponent} from 'react';
 
+import {isEmptyString} from '@sindresorhus/is';
+
 import {UserlistMode} from '../..';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {User} from '../../../../repositories/entity/User';
@@ -100,7 +102,7 @@ export const UserListItem: FunctionComponent<UserListItemProps> = ({
     if (isTemporaryGuest) {
       return expirationText;
     }
-    if (isPendingOnboardingShown && user.handle === '') {
+    if (isPendingOnboardingShown && isEmptyString(user.handle)) {
       return translate('userOnboardingPending');
     }
     if (!isAvailable) {

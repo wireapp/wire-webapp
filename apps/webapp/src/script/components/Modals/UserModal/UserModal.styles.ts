@@ -22,6 +22,11 @@ import {CSSObject, css} from '@emotion/react';
 export const userModalStyle = css`
   .enriched-fields {
     margin: 0 0 16px 0;
+
+    &__entry {
+      padding-left: 0;
+      padding-right: 0;
+    }
   }
 
   .loading-wrapper {
@@ -95,7 +100,7 @@ export const unverifiedUserWarningRowStyle: CSSObject = {
 
 export const unverifiedUserWarningIconStyle: CSSObject = {
   height: '1rem',
-  margin: '0.15em 1em',
+  margin: '0.15em 1em 0.15em 0',
   minWidth: '1rem',
 };
 

@@ -503,7 +503,7 @@ describe('UserActions', () => {
       return {user, selfUser};
     };
 
-    it('disables start conversation in the user modal and explains why', () => {
+    it('disables start conversation in the single action layout and explains why', () => {
       const {user, selfUser} = createPendingTeamMember();
       const props = {actionsViewModel, isSelfActivated: true, onAction: noop, selfUser, user, isModal: true};
 
@@ -518,14 +518,17 @@ describe('UserActions', () => {
       expect(getByTestId('do-close')).not.toBeDisabled();
     });
 
-    it('keeps start conversation enabled outside of the user modal', () => {
+    it('disables start conversation in the actions list and explains why', () => {
       const {user, selfUser} = createPendingTeamMember();
       const props = {actionsViewModel, isSelfActivated: true, onAction: noop, selfUser, user};
 
-      const {getByTestId, queryByTestId} = renderWithRootProvider(<UserActions {...props} />);
+      const {getByTestId} = renderWithRootProvider(<UserActions {...props} />);
 
-      expect(getByTestId(ActionIdentifier[Actions.START_CONVERSATION])).not.toBeDisabled();
-      expect(queryByTestId('status-pending-onboarding-info')).toBeNull();
+      const startConversationButton = getByTestId(ActionIdentifier[Actions.START_CONVERSATION]);
+      const pendingOnboardingInfo = getByTestId('status-pending-onboarding-info');
+
+      expect(startConversationButton).toBeDisabled();
+      expect(startConversationButton.getAttribute('aria-describedby')).toBe(pendingOnboardingInfo.id);
     });
   });
 

@@ -21,7 +21,7 @@ import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined
 
 import {isSelfAPIUser} from './userGuards';
 
-import {ContactStatusState, UserType} from '../../apiClient/user/user';
+import {UserType} from '../../apiClient/user/user';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {type Translate} from '../../util/localizerUtil';
 import {getLogger, Logger} from '../../util/logger';
@@ -154,7 +154,7 @@ export class UserMapper {
     }
 
     if (!isNullOrUndefined(contactStatus)) {
-      userEntity.isPendingOnboarding(contactStatus.state === ContactStatusState.NON_CONTACTABLE);
+      userEntity.isPendingOnboarding(contactStatus.state === 'non-contactable');
     }
 
     if (isNonEmptyString(expirationDate)) {

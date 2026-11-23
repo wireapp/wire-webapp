@@ -17,7 +17,6 @@
  *
  */
 
-import {ContactStatusState} from '../../apiClient/user/user';
 import {UserAsset, UserAssetType} from '../../apiClient/user/userAsset';
 
 import {Availability} from '@wireapp/protocol-messaging';
@@ -178,7 +177,7 @@ describe('User Mapper', () => {
     it('marks the user as pending onboarding when they are not contactable', () => {
       const userEntity = new User('', '', translateForTest);
       userEntity.id = entities.user.john_doe.id;
-      const data = {contact_status: {state: ContactStatusState.NON_CONTACTABLE}, id: userEntity.id};
+      const data: Partial<UserRecord> = {contact_status: {state: 'non-contactable'}, id: userEntity.id};
       mapper.updateUserFromObject(userEntity, data, '');
 
       expect(userEntity.isPendingOnboarding()).toBe(true);
@@ -188,7 +187,7 @@ describe('User Mapper', () => {
       const userEntity = new User('', '', translateForTest);
       userEntity.id = entities.user.john_doe.id;
       userEntity.isPendingOnboarding(true);
-      const data = {contact_status: {state: ContactStatusState.CONTACTABLE}, id: userEntity.id};
+      const data: Partial<UserRecord> = {contact_status: {state: 'contactable'}, id: userEntity.id};
       mapper.updateUserFromObject(userEntity, data, '');
 
       expect(userEntity.isPendingOnboarding()).toBe(false);

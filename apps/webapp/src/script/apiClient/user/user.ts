@@ -32,10 +32,7 @@ export enum UserType {
   BOT = 'bot',
 }
 
-export enum ContactStatusState {
-  CONTACTABLE = 'contactable',
-  NON_CONTACTABLE = 'non-contactable',
-}
+export type ContactStatusState = 'contactable' | 'non-contactable';
 
 export interface ContactStatus {
   state: ContactStatusState;

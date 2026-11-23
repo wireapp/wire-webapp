@@ -254,11 +254,10 @@ const UserActions: FunctionComponent<UserActionsProps> = ({
           Icon: Icon.MessageIcon,
           identifier: ActionIdentifier[Actions.START_CONVERSATION],
           label: translate('groupParticipantActionStartConversation'),
-          ...(isModal &&
-            isPendingOnboarding && {
-              disabled: true,
-              descriptionId: pendingOnboardingInfoId,
-            }),
+          ...(isPendingOnboarding && {
+            disabled: true,
+            descriptionId: pendingOnboardingInfoId,
+          }),
         }
       : undefined;
 
