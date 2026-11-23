@@ -20,8 +20,12 @@
 import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 
-import type {RestoreTarget} from './resolveRestoreTargets';
-import {runBulkRestore, type BulkRestoreDependencies, type BulkRestoreOutcome} from './runBulkRestore';
+import {
+  runBulkRestore,
+  type BulkRestoreDependencies,
+  type BulkRestoreOutcome,
+  type BulkRestoreTarget,
+} from './runBulkRestore';
 
 import type {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
@@ -64,7 +68,7 @@ export interface BulkRestoreController {
   readonly mount: () => void;
   readonly dispose: () => void;
   readonly restore: (
-    targets: readonly RestoreTarget[],
+    targets: readonly BulkRestoreTarget[],
     scopeKey: string,
     status: SharedDriveMoveStatus,
   ) => Promise<void>;
@@ -120,7 +124,7 @@ export const createBulkRestoreController = (initialOptions: BulkRestoreOptions):
   };
 
   const restore = async (
-    targets: readonly RestoreTarget[],
+    targets: readonly BulkRestoreTarget[],
     scopeKey: string,
     status: SharedDriveMoveStatus,
   ): Promise<void> => {
