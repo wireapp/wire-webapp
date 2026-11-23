@@ -13,6 +13,9 @@
   "prConcurrentLimit": 5,
   "configMigration": true,
   "minimumReleaseAge": "3 days",
+  "npm": {
+    "minimumReleaseAgePackageManagerSync": true
+  },
   "lockFileMaintenance": {
     "enabled": true
   },
