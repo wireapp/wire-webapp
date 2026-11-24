@@ -17,33 +17,18 @@
  *
  */
 
-import {isNonEmptyString} from '@sindresorhus/is';
-
 import {SystemMessage} from './systemMessage';
 
 import {CONVERSATION_EVENT} from '../../../apiClient/event/conversationEvent';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate} from '../../../util/localizerUtil';
-import {User} from '../User';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
-  constructor(
-    isReceiptEnabled: boolean,
-    userId: string,
-    userDomain: string | undefined,
-    isSelfUser: boolean,
-    translate: Translate,
-  ) {
+  constructor(isReceiptEnabled: boolean, isSelfUser: boolean, translate: Translate) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.RECEIPT_MODE_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
-
-    if (isNonEmptyString(userId)) {
-      this.from = userId;
-      this.fromDomain = userDomain;
-      this.user(new User(userId, userDomain ?? '', this.translate));
-    }
 
     this.caption = getCaption(isReceiptEnabled, isSelfUser, this.translate);
   }

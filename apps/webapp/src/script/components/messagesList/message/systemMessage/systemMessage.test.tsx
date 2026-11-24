@@ -62,7 +62,7 @@ describe('SystemMessage', () => {
   });
 
   it('shows timer icon for MessageTimerUpdateMessage', async () => {
-    const message = new MessageTimerUpdateMessage(0, 'sender-id', undefined, false, translateForTest);
+    const message = new MessageTimerUpdateMessage(0, false, translateForTest);
 
     render(<SystemMessage message={message} />);
 
@@ -127,7 +127,7 @@ describe('SystemMessage', () => {
   });
 
   it('shows read icon for ReceiptModeUpdateMessage', async () => {
-    const message = new ReceiptModeUpdateMessage(true, 'sender-id', undefined, false, translateForTest);
+    const message = new ReceiptModeUpdateMessage(true, false, translateForTest);
 
     render(<SystemMessage message={message} />);
 
