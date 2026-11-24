@@ -121,7 +121,9 @@ export const useCreateConversationModal = create<CreateConversationModalState>(s
       });
     },
     hideModal: () => {
-      return set({...initialState});
+      return set(state => {
+        return {...initialState, isSubmitting: state.isSubmitting};
+      });
     },
     setIsSubmitting: (isSubmitting: boolean) => {
       return set({isSubmitting});

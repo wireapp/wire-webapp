@@ -129,7 +129,7 @@ export const useCreateConversation = (
     );
   };
 
-  const handleException = (error: Error, conversationName: string): void => {
+  const handleException = (error: unknown, conversationName: string): void => {
     if (isNonFederatingBackendsError(error)) {
       hideModal();
 
@@ -171,7 +171,7 @@ export const useCreateConversation = (
         createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
       }
     } catch (error: unknown) {
-      handleException(error as Error, conversationName);
+      handleException(error, conversationName);
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
     } finally {
       hideModal();

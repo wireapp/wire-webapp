@@ -45,7 +45,7 @@ export const ConfirmDiscardModal: FunctionComponent<ConfirmDiscardModalProps> = 
   onSubmit,
 }: ConfirmDiscardModalProps) => {
   const {translate} = useApplicationContext();
-  const {isConfirmDiscardModalOpen} = useCreateConversationModal();
+  const {isConfirmDiscardModalOpen, isSubmitting} = useCreateConversationModal();
 
   return (
     <ModalComponent
@@ -67,6 +67,7 @@ export const ConfirmDiscardModal: FunctionComponent<ConfirmDiscardModalProps> = 
           variant={ButtonVariant.SECONDARY}
           type="button"
           onClick={onCancel}
+          disabled={isSubmitting}
           data-uie-name="do-cancel"
           onKeyDown={event => {
             return handleEscDown(event, onCancel);
@@ -78,6 +79,7 @@ export const ConfirmDiscardModal: FunctionComponent<ConfirmDiscardModalProps> = 
           css={confirmConversationButtonCss}
           type="button"
           onClick={onSubmit}
+          disabled={isSubmitting}
           data-uie-name="do-submit"
           onKeyDown={event => {
             return handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]});

@@ -40,6 +40,7 @@ export const CreateTeamModal: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {
     isCreateTeamModalOpen,
+    isSubmitting,
     setIsCreateTeamModalOpen,
     hideModal: hideConversationCreationModal,
   } = useCreateConversationModal();
@@ -50,6 +51,10 @@ export const CreateTeamModal: FunctionComponent = () => {
   };
 
   const onSubmit = (): void => {
+    if (useCreateConversationModal.getState().isSubmitting) {
+      return;
+    }
+
     setIsCreateTeamModalOpen(false);
     hideConversationCreationModal();
     showTeamCreationModal();
@@ -79,6 +84,7 @@ export const CreateTeamModal: FunctionComponent = () => {
           css={salesModalBodyButtonCss}
           type="button"
           onClick={onSubmit}
+          disabled={isSubmitting}
           data-uie-name="do-create-team"
           onKeyDown={event => {
             return handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]});
