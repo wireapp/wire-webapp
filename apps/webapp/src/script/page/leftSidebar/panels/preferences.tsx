@@ -26,8 +26,8 @@ import {ListWrapper} from './listWrapper';
 import {Runtime} from '../../../commons/util/Runtime';
 import * as Icon from '../../../components/icon';
 import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
+import type {ClientNotificationData} from '../../../repositories/notification/ClientNotificationData';
 import {
-  ClientNotificationData,
   Notification,
   PreferenceNotificationRepository,
 } from '../../../repositories/notification/PreferenceNotificationRepository';

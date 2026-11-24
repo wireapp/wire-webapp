@@ -22,7 +22,7 @@ import {Maybe} from 'true-myth';
 
 import {WebAppEvents} from '../../webAppEvents';
 
-import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
+import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator/useTypingIndicatorState/useTypingIndicatorState';
 import {CacheRepository} from '../cache/cacheRepository';
 import {ClientRepository} from '../client/ClientRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';

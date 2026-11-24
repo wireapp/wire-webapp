@@ -31,7 +31,7 @@ import {DefaultConversationRoleName} from '../../../apiClient/conversation/conve
 import {RECEIPT_MODE} from '../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import {CONVERSATION_READONLY_STATE} from '../../conversation/ConversationRepository';
+import {CONVERSATION_READONLY_STATE} from '../../conversation/conversationConstants';
 import {ConversationStatus} from '../../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 

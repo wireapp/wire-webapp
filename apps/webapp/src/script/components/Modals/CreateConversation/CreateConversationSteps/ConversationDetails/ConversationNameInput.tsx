@@ -22,7 +22,7 @@ import type {FunctionComponent} from 'react';
 import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
 
 import {useApplicationContext} from '../../../../../page/rootProvider';
-import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {CONVERSATION_MAX_NAME_LENGTH} from '../../../../../repositories/conversation/conversationConstants';
 import {handleEnterDown} from '../../../../../util/keyboardUtil';
 import {TextInput} from '../../../../TextInput';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
@@ -33,7 +33,7 @@ export const ConversationNameInput: FunctionComponent = () => {
   const {conversationName, setConversationName, setError, error, gotoNextStep, conversationType} =
     useCreateConversationModal();
 
-  const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+  const maxNameLength = CONVERSATION_MAX_NAME_LENGTH;
 
   const onGroupNameChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const {value} = event.target;

@@ -23,7 +23,7 @@ import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 import {ConversationVerificationBadges} from '../../../../../components/badge';
 import * as Icon from '../../../../../components/icon';
-import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {CONVERSATION_MAX_NAME_LENGTH} from '../../../../../repositories/conversation/conversationConstants';
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {User} from '../../../../../repositories/entity/User';
 import {ServiceEntity} from '../../../../../repositories/integration/ServiceEntity';
@@ -156,7 +156,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
               className="conversation-details__name conversation-details__name--input"
               dir="auto"
               spellCheck="false"
-              maxLength={ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH}
+              maxLength={CONVERSATION_MAX_NAME_LENGTH}
               onChange={renameConversation}
               onKeyDown={handleRenameConversation}
               value={groupName}

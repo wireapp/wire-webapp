@@ -20,6 +20,7 @@
 import {isUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
 
+import type {MemberMessageShape} from './message';
 import {SystemMessage} from './systemMessage';
 
 import {MemberLeaveReason} from '../../../apiClient/conversation/data/conversationMemberLeaveData';
@@ -62,7 +63,7 @@ function translateGroupCreationHeader(options: GroupCreationHeaderTranslationOpt
   return capitalizeFirstChar(groupCreationString);
 }
 
-export class MemberMessage extends SystemMessage {
+export class MemberMessage extends SystemMessage implements MemberMessageShape {
   public allTeamMembers: User[] | undefined;
   public readonly hasUsers: ko.PureComputed<boolean>;
   public readonly userIds: ko.ObservableArray<QualifiedId>;

@@ -24,7 +24,7 @@ import {CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 
 import {ConnectionEntity} from '../../../repositories/connection/connectionEntity';
-import {CONVERSATION_READONLY_STATE} from '../../../repositories/conversation/ConversationRepository';
+import {CONVERSATION_READONLY_STATE} from '../../../repositories/conversation/conversationConstants';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {User} from '../../../repositories/entity/User';
 import {withTheme} from '../../../auth/util/test/testUtil';
