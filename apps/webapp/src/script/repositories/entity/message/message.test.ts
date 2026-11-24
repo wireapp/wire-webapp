@@ -28,9 +28,42 @@ import {Multipart} from './multipart';
 import {PingMessage} from './pingMessage';
 import {Text} from './text';
 
+import {StatusType} from '../../../message/statusType';
 import {SuperType} from '../../../message/superType';
 
 describe('Message', () => {
+  describe.each(['isReactable', 'isReplyable'] as const)('%s', method => {
+    function createContentMessage(status: StatusType): ContentMessage {
+      const message = new ContentMessage('message-id', translateForTest);
+      message.status(status);
+      message.assets.push(new Text('', 'hello'));
+      return message;
+    }
+
+    it('allows a sent message', () => {
+      expect(createContentMessage(StatusType.SENT)[method]()).toBe(true);
+    });
+
+    it('refuses a message that is sending', () => {
+      expect(createContentMessage(StatusType.SENDING)[method]()).toBe(false);
+    });
+
+    it('refuses a message that is sending when the outbox has it in flight', () => {
+      expect(createContentMessage(StatusType.SENDING)[method](false)).toBe(false);
+    });
+
+    it('allows a message that is sending when it waits in the outbox', () => {
+      expect(createContentMessage(StatusType.SENDING)[method](true)).toBe(true);
+    });
+
+    it('still refuses a pending ephemeral message', () => {
+      const message = createContentMessage(StatusType.SENDING);
+      message.ephemeral_expires(1000);
+
+      expect(message[method](true)).toBe(false);
+    });
+  });
+
   describe('translation injection', () => {
     it('uses the injected translate function for ephemeral captions', () => {
       const translate = jest.fn((translationKey: string) => {

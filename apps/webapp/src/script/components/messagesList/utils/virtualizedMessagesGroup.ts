@@ -19,6 +19,8 @@
 
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
+import {startsSendingStateGroup} from './sendingState';
+
 import {Message} from '../../../repositories/entity/message/message';
 import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from '../../../util/timeUtil';
 
@@ -126,10 +128,12 @@ type GroupMessagesOptions = {
   readonly messages: Message[];
   readonly lastReadTimestamp: number;
   readonly includeInitialUnreadSeparator?: boolean;
+  /** Starts a new group where the sending state (sent, pending, failed) changes */
+  readonly splitBySendingState?: boolean;
 };
 
 export function groupMessagesBySenderAndTime(options: GroupMessagesOptions): (Marker | GroupedMessage)[] {
-  const {messages, lastReadTimestamp, includeInitialUnreadSeparator = false} = options;
+  const {messages, lastReadTimestamp, includeInitialUnreadSeparator = false, splitBySendingState = false} = options;
 
   return messages.reduce<(Marker | GroupedMessage)[]>((acc, message, index) => {
     const previousMessage = messages[index - 1];
@@ -158,6 +162,7 @@ export function groupMessagesBySenderAndTime(options: GroupMessagesOptions): (Ma
       areContentMessages &&
       !isNullOrUndefined(lastMessageInfo) &&
       lastMessageInfo.sender === message.from &&
+      !(splitBySendingState && startsSendingStateGroup(message, previousMessage)) &&
       shouldGroupMessagesByTimestamp(
         lastMessageInfo.firstMessageTimestamp,
         lastMessageInfo.lastMessageTimestamp,

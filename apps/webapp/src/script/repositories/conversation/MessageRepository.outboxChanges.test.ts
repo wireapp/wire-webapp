@@ -577,6 +577,25 @@ describe('MessageRepository routes changes through the outbox', () => {
     });
   });
 
+  describe('telling what a delete may offer', () => {
+    it('knows a pending message nobody can have', async () => {
+      seedMessage(parts, {messageId: 'message-1'});
+      await startOutbox(parts);
+
+      expect(parts.repository.isPendingAndNeverAttempted('message-1')).toBe(true);
+    });
+
+    it('does not count an unconfirmed message, or one the outbox does not have', async () => {
+      seedMessage(parts, {messageId: 'message-1', attempts: 1});
+      seedMessage(parts, {messageId: 'message-2', queuedSeq: 2, mayBeDelivered: true});
+      await startOutbox(parts);
+
+      expect(parts.repository.isPendingAndNeverAttempted('message-1')).toBe(false);
+      expect(parts.repository.isPendingAndNeverAttempted('message-2')).toBe(false);
+      expect(parts.repository.isPendingAndNeverAttempted('unknown')).toBe(false);
+    });
+  });
+
   describe('deleting', () => {
     function deleteForEveryone(message: ContentMessage): Promise<void> {
       return parts.repository.deleteMessageForEveryone(parts.conversation, message);

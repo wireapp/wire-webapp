@@ -30,10 +30,13 @@ import {useMessageActionsState} from './messageActions/messageActions.state';
 import {MessageReactionsList} from './messageActions/messageReactions/messageReactionsList';
 import {MessageHeader} from './messageHeader';
 import {Quote} from './messageQuote';
+import {PendingClock} from './pendingClock';
 import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './warnings';
+import {WRITTEN_TIME_SHOWN_AFTER_MILLISECONDS, WrittenTime} from './writtenTime';
 
 import {MessageActions} from '..';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
+import {pendingOfflineMessagesFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useClickOutside} from '../../../../hooks/useClickOutside';
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../../hooks/useRelativeTimestamp';
 import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';
@@ -74,6 +77,8 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   is1to1?: boolean;
   isFileShareRestricted: boolean;
   loadUsersByIdsFromDb: (userIds: QualifiedId[]) => Promise<User[]>;
+  /** Where the message is in the outbox; leaving it out treats every message as not being in it */
+  getOutboxState?: (messageId: string) => 'pending' | 'sending' | undefined;
 }
 
 export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = ({
@@ -98,9 +103,11 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
   is1to1,
   isFileShareRestricted,
   loadUsersByIdsFromDb,
+  getOutboxState,
 }: ContentMessageProps) => {
   const messageRef = useRef<HTMLDivElement | null>(null);
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  const isOutboxEnabled = isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName);
 
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(() => {
@@ -115,10 +122,12 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
     assets,
     was_edited,
     failedToSend,
+    failed_reason: failedReason,
     reactions,
     status,
     quote,
     isObfuscated,
+    written_time: writtenTime,
   } = useKoSubscribableChildren(message, [
     'senderName',
     'timestamp',
@@ -127,10 +136,12 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
     'assets',
     'was_edited',
     'failedToSend',
+    'failed_reason',
     'reactions',
     'status',
     'quote',
     'isObfuscated',
+    'written_time',
   ]);
 
   const relativeTimestampFormatter = useMemo(() => {
@@ -141,6 +152,20 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
     });
   }, [translate]);
   const timeAgo = useRelativeTimestamp(message.timestamp(), false, relativeTimestampFormatter);
+
+  const isFailed = [StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status);
+  const outboxState = isOutboxEnabled ? getOutboxState?.(message.id) : undefined;
+  // A message restored after a reload has no outbox state until the outbox started, but it already waits
+  const isWaitingForConnection = isOutboxEnabled && status === StatusType.SENDING && outboxState !== 'sending';
+  const isPendingInOutbox = outboxState === 'pending' && status === StatusType.SENDING;
+  const isDimmed = isOutboxEnabled && (status === StatusType.SENDING || isFailed);
+  const writtenTimestamp = Date.parse(writtenTime ?? '');
+  const showWrittenTime =
+    isOutboxEnabled &&
+    status !== StatusType.SENDING &&
+    !isFailed &&
+    Number.isFinite(writtenTimestamp) &&
+    timestamp - writtenTimestamp >= WRITTEN_TIME_SHOWN_AFTER_MILLISECONDS;
 
   const [messageAriaLabel] = getMessageAriaLabel({
     assets,
@@ -216,6 +241,10 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
               {timeAgo}
             </MessageTime>
           </span>
+
+          {showWrittenTime && <WrittenTime timestamp={writtenTimestamp} />}
+
+          {isWaitingForConnection && <PendingClock />}
         </MessageHeader>
       )}
 
@@ -235,6 +264,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
             className={cx('message-body', {
               'message-asset': isAssetMessage,
               'message-quoted': !isNullOrUndefined(quote),
+              'message-body-dimmed': isDimmed,
               'ephemeral-asset-expired': isObfuscated && isAssetMessage,
               'icon-file': isObfuscated && isFileMessage,
               'icon-movie': isObfuscated && isVideoMessage,
@@ -290,6 +320,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
                 handleReactionClick={onClickReaction}
                 reactionsTotalCount={reactions.length}
                 isRemovedFromConversation={conversation.isSelfUserRemoved()}
+                isPendingInOutbox={isPendingInOutbox}
               />
             )}
           </div>
@@ -297,7 +328,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
 
         {message.expectsReadConfirmation && (
           <div css={deliveredMessageIndicator}>
-            {is1to1 === true && isLastDeliveredMessage && (
+            {is1to1 === true && isLastDeliveredMessage && !isWaitingForConnection && (
               <div
                 data-uie-name="status-message-read-receipt-delivered"
                 title={translate('conversationMessageDelivered')}
@@ -313,6 +344,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
       {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
         <CompleteFailureToSendWarning
           {...(status === StatusType.FEDERATION_ERROR && {unreachableDomain: conversation.domain})}
+          failedReason={failedReason}
           isMessageFocused={msgFocusState}
           onRetry={() => {
             return onRetry(message);

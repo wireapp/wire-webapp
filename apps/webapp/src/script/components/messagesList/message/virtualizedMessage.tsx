@@ -40,6 +40,7 @@ import type {UserRepository} from '../../../repositories/user/userRepository';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from '../../../util/focusUtil';
 import {isTabKey} from '../../../util/keyboardUtil';
+import {OfflineNotice} from '../offlineNotice';
 
 interface MessageActions {
   onClickAvatar: (user: User | ServiceEntity) => void;
@@ -82,6 +83,8 @@ interface MessageParams extends MessageActions {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
   measureElement?: (element: HTMLElement | null) => void;
   index?: number;
+  /** Puts the offline notice right above the message, inside the measured element so that the row keeps its height */
+  showOfflineNotice?: boolean;
 }
 
 export const Message: FunctionComponent<MessageParams> = (props: MessageParams) => {
@@ -96,6 +99,7 @@ export const Message: FunctionComponent<MessageParams> = (props: MessageParams) 
     setMsgElementsFocusable,
     measureElement,
     index,
+    showOfflineNotice = false,
   } = props;
   const messageElementRef = useRef<HTMLDivElement | null>(null);
   const {status, ephemeral_expires} = useKoSubscribableChildren(message, ['status', 'ephemeral_expires']);
@@ -169,6 +173,7 @@ export const Message: FunctionComponent<MessageParams> = (props: MessageParams) 
         return handleFocus(message.id);
       }}
     >
+      {showOfflineNotice && <OfflineNotice />}
       <MessageWrapper
         {...props}
         hideHeader={hideHeader}

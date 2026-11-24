@@ -387,6 +387,19 @@
   }
 }
 
+// Pending and failed content takes the timestamp colour, which keeps its contrast in the light and the dark theme
+.message-body.message-body-dimmed {
+  color: var(--content-message-timestamp);
+
+  .text,
+  .message-quote,
+  .message-quote *,
+  .message-asset,
+  .message-asset * {
+    color: var(--content-message-timestamp) !important;
+  }
+}
+
 .message-body-like {
   .flex-center;
 
