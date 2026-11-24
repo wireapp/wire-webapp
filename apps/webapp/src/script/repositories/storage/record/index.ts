@@ -22,5 +22,6 @@ export * from './clientRecord';
 export * from './conversationRecord';
 export * from './cryptoboxRecord';
 export * from './eventRecord';
+export * from './eventRecordReactions';
 export * from './eventRecordGuards';
 export * from './userRecord';

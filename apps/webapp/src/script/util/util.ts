@@ -29,7 +29,6 @@ import {Decoder} from '../commons/base64/decoder';
 import {Encoder} from '../commons/base64/encoder';
 import {Runtime} from '../commons/util/Runtime';
 import {AuthError} from '../error/authError';
-import type {Conversation} from '../repositories/entity/Conversation';
 
 const decimalRadix = 10;
 const environmentPollingIntervalInMilliseconds = 100;
@@ -328,7 +327,9 @@ export const zeroPadding = (value: string | number, length = 2): string => {
   return `${'0'.repeat(zerosNeeded)}${value}`;
 };
 
-export const sortGroupsByLastEvent = (groupA: Conversation, groupB: Conversation): number => {
+type ConversationWithLastEvent = {last_event_timestamp: () => number};
+
+export const sortGroupsByLastEvent = (groupA: ConversationWithLastEvent, groupB: ConversationWithLastEvent): number => {
   return groupB.last_event_timestamp() - groupA.last_event_timestamp();
 };
 

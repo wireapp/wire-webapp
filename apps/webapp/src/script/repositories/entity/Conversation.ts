@@ -65,10 +65,10 @@ import {getLogger, Logger} from '../../util/logger';
 import {matchQualifiedIds} from '../../util/qualifiedId';
 import {truncate} from '../../util/stringUtil';
 import {WebAppEvents} from '../../webAppEvents';
-import {ClientRepository} from '../client';
+import {CLIENT_REPOSITORY_CONFIG} from '../client/clientConfig';
 import {ConnectionEntity} from '../connection/connectionEntity';
 import {ACCESS_STATE} from '../conversation/AccessState';
-import {ConversationRepository, CONVERSATION_READONLY_STATE} from '../conversation/ConversationRepository';
+import {CONVERSATION_MAX_NAME_LENGTH, CONVERSATION_READONLY_STATE} from '../conversation/conversationConstants';
 import {isProteusTeam1to1Conversation, isSelfConversation} from '../conversation/ConversationSelectors';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
@@ -719,7 +719,7 @@ export class Conversation {
             })
             .join(', ');
 
-          const maxLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+          const maxLength = CONVERSATION_MAX_NAME_LENGTH;
           return truncate(joinedNames, maxLength, false);
         }
 
@@ -748,7 +748,7 @@ export class Conversation {
             })
             .join(', ');
 
-          const maxLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+          const maxLength = CONVERSATION_MAX_NAME_LENGTH;
           return truncate(joinedNames, maxLength, false);
         }
 
@@ -1065,11 +1065,11 @@ export class Conversation {
       return this.participating_user_ets().reduce((accumulator, userEntity) => {
         return userEntity.devices().length > 0
           ? accumulator + userEntity.devices().length
-          : accumulator + ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+          : accumulator + CLIENT_REPOSITORY_CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
       }, this.selfUser()?.devices().length ?? 0);
     }
 
-    return this.getNumberOfParticipants() * ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+    return this.getNumberOfParticipants() * CLIENT_REPOSITORY_CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
   }
 
   /**

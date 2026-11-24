@@ -58,17 +58,10 @@ const loginHashSeed = 42;
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};
-type ClientRepositoryConfig = {AVERAGE_NUMBER_OF_CLIENTS: number};
 
 export class ClientRepository {
   private readonly logger: Logger;
   public selfUser: ko.Observable<User>;
-
-  static get CONFIG(): ClientRepositoryConfig {
-    return {
-      AVERAGE_NUMBER_OF_CLIENTS: 4,
-    };
-  }
 
   static get PRIMARY_KEY_CURRENT_CLIENT(): string {
     return 'local_identity';

@@ -22,8 +22,6 @@ import getSlug from 'speakingurl';
 
 import {randomElement} from './arrayUtil';
 
-import type {User} from '../repositories/entity/User';
-
 const obfuscationExtraCharacterRange = 10;
 const wordBoundarySearchLength = 25;
 const bitsPerByte = 8;
@@ -158,7 +156,9 @@ export const sortByPriority = (stringA: string = '', stringB: string = '', query
   return stringA.localeCompare(stringB);
 };
 
-export const sortUsersByPriority = (userA: User, userB: User): number => {
+type NamedUser = {name: () => string};
+
+export const sortUsersByPriority = (userA: NamedUser, userB: NamedUser): number => {
   return sortByPriority(userA.name(), userB.name());
 };
 

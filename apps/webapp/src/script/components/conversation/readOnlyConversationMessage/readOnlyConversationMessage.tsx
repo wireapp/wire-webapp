@@ -23,7 +23,7 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
 
 import {useApplicationContext} from '../../../page/rootProvider';
-import {CONVERSATION_READONLY_STATE} from '../../../repositories/conversation/ConversationRepository';
+import {CONVERSATION_READONLY_STATE} from '../../../repositories/conversation/conversationConstants';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {Link, LinkVariant} from '../../../uiKit/typography/link/link';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';

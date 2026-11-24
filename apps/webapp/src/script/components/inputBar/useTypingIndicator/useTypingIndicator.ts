@@ -21,7 +21,7 @@ import {useCallback, useEffect, useRef} from 'react';
 
 import {noop} from 'noop-esm';
 
-import {TYPING_TIMEOUT} from '../typingIndicator';
+import {TYPING_TIMEOUT} from '../typingIndicator/typingTimeout';
 
 type TypingIndicatorProps = {
   text: string;

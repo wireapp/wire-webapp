@@ -19,7 +19,7 @@
 
 import {isEmptyString} from '@sindresorhus/is';
 
-/** Matches ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH — meeting titles become conversation names. */
+/** Matches CONVERSATION_MAX_NAME_LENGTH — meeting titles become conversation names. */
 export const MEETING_TITLE_MAX_LENGTH = 64;
 
 export const meetingTitleErrorKeys = {

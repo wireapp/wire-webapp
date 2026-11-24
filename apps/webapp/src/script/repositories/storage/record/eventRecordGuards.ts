@@ -21,7 +21,7 @@ import {isTruthy} from '@sindresorhus/is';
 
 import {EventRecord} from './eventRecord';
 
-import {MessageAddEvent, MultipartMessageAddEvent} from '../../conversation/EventBuilder';
+import {MessageAddEvent, MultipartMessageAddEvent} from '../../conversation/EventBuilder/EventBuilder.events';
 import {ClientEvent} from '../../event/Client';
 
 /**

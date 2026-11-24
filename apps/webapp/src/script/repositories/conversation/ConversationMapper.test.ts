@@ -45,7 +45,7 @@ import {createUuid} from '../../util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationDatabaseData, ConversationMapper, SelfStatusUpdateDatabaseData} from './ConversationMapper';
-import {CONVERSATION_READONLY_STATE} from './ConversationRepository';
+import {CONVERSATION_READONLY_STATE} from './conversationConstants';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';

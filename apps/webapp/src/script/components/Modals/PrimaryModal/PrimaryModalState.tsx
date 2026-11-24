@@ -34,7 +34,7 @@ import {
 } from './PrimaryModalTypes';
 
 import {Config} from '../../../Config';
-import {ClientNotificationData} from '../../../repositories/notification/PreferenceNotificationRepository';
+import type {ClientNotificationData} from '../../../repositories/notification/ClientNotificationData';
 import {getLogger} from '../../../util/logger';
 import {formatLocale} from '../../../util/timeUtil';
 import {noop} from '../../../util/util';
