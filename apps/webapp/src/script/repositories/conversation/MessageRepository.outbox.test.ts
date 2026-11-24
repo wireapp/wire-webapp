@@ -496,3 +496,33 @@ describe('MessageRepository outbox lifecycle', () => {
     }).not.toThrow();
   });
 });
+
+describe('MessageRepository.getOutboxState', () => {
+  afterEach(() => {
+    amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
+  });
+
+  function buildWithFoundOperation(state: string | undefined): MessageRepository {
+    const outbox = createOutboxSpy();
+    const find = jest.fn(() => {
+      return state === undefined ? {type: 'operation-not-found'} : {type: 'operation-found', operation: {state}};
+    });
+    outbox.register.mockReturnValue({type: 'kind-registered', handle: {find}} as never);
+    return buildMessageRepository(outbox);
+  }
+
+  it.each([
+    ['queued', 'pending'],
+    ['on-hold', 'pending'],
+    ['in-progress', 'sending'],
+    ['dead-lettered', undefined],
+    ['succeeded', undefined],
+    [undefined, undefined],
+  ])('maps the outbox state %s to %s', (outboxState, expected) => {
+    expect(buildWithFoundOperation(outboxState).getOutboxState('message-id')).toBe(expected);
+  });
+
+  it('answers undefined without an outbox', () => {
+    expect(buildMessageRepository().getOutboxState('message-id')).toBeUndefined();
+  });
+});

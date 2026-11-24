@@ -61,6 +61,8 @@ export interface MessageActionsMenuProps {
   handleReactionClick: (emoji: string) => void;
   reactionsTotalCount: number;
   isRemovedFromConversation: boolean;
+  /** The message waits in the outbox with no send in flight, so reactions and replies can queue behind it */
+  isPendingInOutbox?: boolean;
 }
 
 const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
@@ -72,6 +74,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   handleReactionClick,
   reactionsTotalCount,
   isRemovedFromConversation,
+  isPendingInOutbox = false,
 }) => {
   const {translate} = useApplicationContext();
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
@@ -159,7 +162,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
     [message, toggleActiveMenu],
   );
 
-  const isMsgReactable = message.isReactable() && !isRemovedFromConversation;
+  const isMsgReactable = message.isReactable(isPendingInOutbox) && !isRemovedFromConversation;
   // clicking anywhere else other than the message action menu removes action menu active state
   useClickOutside(wrapperRef, () => {
     if (!isMenuOpen) {
@@ -187,7 +190,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
               wrapperRef={wrapperRef}
               handleReactionClick={handleReactionClick}
             />
-            {message.isReplyable() && (
+            {message.isReplyable(isPendingInOutbox) && (
               <ReplyButton
                 translate={translate}
                 actionId={MessageActionsId.REPLY}

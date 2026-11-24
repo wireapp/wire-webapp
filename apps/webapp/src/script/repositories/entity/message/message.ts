@@ -452,28 +452,30 @@ export class Message {
 
   /**
    * Check if message can be reacted to.
+   * @param isPendingInOutbox the message waits in the outbox and no send is in flight, so what follows can queue behind it
    * @returns `true`, if message type supports reactions, `false` otherwise.
    */
-  isReactable(): this is ContentMessage {
+  isReactable(isPendingInOutbox = false): this is ContentMessage {
     return (
       this.isContent() &&
       !this.isComposite() &&
       !this.isEphemeral() &&
-      this.status() !== StatusType.SENDING &&
+      (this.status() !== StatusType.SENDING || isPendingInOutbox) &&
       !this.hasUnavailableAsset()
     );
   }
 
   /**
    * Check if message can be replied to.
+   * @param isPendingInOutbox the message waits in the outbox and no send is in flight, so what follows can queue behind it
    * @returns `true`, if message type supports replies, `false` otherwise.
    */
-  isReplyable(): boolean {
+  isReplyable(isPendingInOutbox = false): boolean {
     return (
       this.isContent() &&
       !this.isComposite() &&
       !this.isEphemeral() &&
-      this.status() !== StatusType.SENDING &&
+      (this.status() !== StatusType.SENDING || isPendingInOutbox) &&
       !this.hasUnavailableAsset()
     );
   }

@@ -181,6 +181,47 @@ describe('CompleteFailureToSendWarning', () => {
     ),
   );
 
+  describe.each([
+    ['expired', 'Message could not be sent in time.'],
+    ['declined', 'Message was not sent because it was declined.'],
+    ['removed', 'Message could not be sent as you are no longer in this conversation.'],
+    ['rejected', 'Message was rejected and could not be sent.'],
+  ] as const)('with the failed reason %s', (failedReason, expectedText) => {
+    it(
+      'replaces the connectivity text',
+      withTranslationStrings(en, () => {
+        const {container} = render(
+          withThemeAndRootContext(
+            <CompleteFailureToSendWarning failedReason={failedReason} isMessageFocused={false} onRetry={jest.fn()} />,
+            translationRootProviderWrapper,
+          ),
+        );
+
+        expect(container).toHaveTextContent(expectedText);
+        expect(container).not.toHaveTextContent('connectivity issues');
+      }),
+    );
+  });
+
+  it(
+    'keeps the unreachable backend text of a federation error with a failed reason',
+    withTranslationStrings(en, () => {
+      const {container} = render(
+        withThemeAndRootContext(
+          <CompleteFailureToSendWarning
+            failedReason="rejected"
+            isMessageFocused={false}
+            onRetry={jest.fn()}
+            unreachableDomain="example.test"
+          />,
+          translationRootProviderWrapper,
+        ),
+      );
+
+      expect(container).toHaveTextContent('back-end of example.test could not be reached');
+    }),
+  );
+
   it(
     'renders the connectivity warning without an offline backend link',
     withTranslationStrings(en, () => {
