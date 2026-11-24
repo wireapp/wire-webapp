@@ -279,6 +279,13 @@ export class EventMapper {
 
     if (originalEntity.isContent() || (originalEntity as Message).isPing()) {
       originalEntity.status(event.status ?? StatusType.SENT);
+      // An update may carry only what changed
+      if (!isUndefined(event.failed_reason)) {
+        originalEntity.failed_reason(event.failed_reason);
+      }
+      if (!isUndefined(event.written_time)) {
+        originalEntity.written_time(event.written_time);
+      }
     }
 
     originalEntity.replacing_message_id = eventData.replacing_message_id;
@@ -521,6 +528,8 @@ export class EventMapper {
 
     if (messageEntity.isContent() || messageEntity.isPing()) {
       messageEntity.status((event as EventRecord).status ?? StatusType.SENT);
+      messageEntity.failed_reason((event as EventRecord).failed_reason);
+      messageEntity.written_time((event as EventRecord).written_time);
     }
 
     if (messageEntity.isComposite()) {
