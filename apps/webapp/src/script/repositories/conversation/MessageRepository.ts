@@ -158,6 +158,7 @@ import {UserState} from '../user/userState';
 type OptimisticMessageEvent = Parameters<EventRepository['injectEvent']>[0];
 
 const conversationStatisticsRoundingFactor = 6;
+const assetPerformTimeoutMinutes = 10;
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
@@ -812,6 +813,10 @@ export class MessageRepository {
     asImage: boolean = false,
     originalId?: string,
   ): Promise<EventRecord | void> {
+    if (this.outbox !== undefined) {
+      return this.enqueueAsset(conversation, file, asImage, originalId);
+    }
+
     const uploadStarted = Date.now();
     const beforeUnload = (event: Event): void => {
       event.preventDefault();
@@ -2046,6 +2051,114 @@ export class MessageRepository {
         return this.markRefused(conversation, payload.messageId);
       },
     });
+  }
+
+  private enqueueAssetOperation(payload: AssetMessagePayload): ReturnType<MessageOutboxHandles['message']['enqueue']> {
+    return this.outboxKinds.message.enqueue({
+      payload,
+      correlationKey: messageCorrelationKey(payload),
+      orderingKey: messageOrderingKey(payload.conversationId),
+      performTimeoutMilliseconds: assetPerformTimeoutMinutes * TIME_IN_MILLIS.MINUTE,
+    });
+  }
+
+  /**
+   * Shows the asset as pending and keeps its bytes on the record: the operation holds nothing but ids,
+   * so the upload and the send read the file from the record whenever they run.
+   */
+  private async enqueueAsset(
+    conversation: Conversation,
+    file: Blob,
+    asImage: boolean,
+    originalId?: string,
+  ): Promise<void> {
+    if (originalId !== undefined) {
+      return this.enqueueAssetAgain(conversation, file, asImage, originalId);
+    }
+
+    let metaData: FileMetaDataContent;
+    try {
+      metaData = await this.buildFileMetaData(file, asImage);
+    } catch (error: unknown) {
+      this.logger.error('Error while building metadata for asset', {error});
+      return;
+    }
+    const message = MessageBuilder.buildFileMetaDataMessage({metaData});
+    const payload: AssetMessagePayload = {
+      type: 'asset',
+      conversationId: conversation.qualifiedId,
+      messageId: message.messageId,
+      asImage,
+    };
+
+    const showAsset = async (): Promise<void> => {
+      await this.injectOptimisticMessage(message, conversation);
+    };
+    await this.enqueueWhileShowing(payload.messageId, async () => {
+      const outcome = await this.enqueueAssetOperation(payload);
+      await this.followEnqueue('message', outcome, {
+        accepted: async () => {
+          await showAsset();
+          if (!(await this.keepFileOnMessage(conversation, payload.messageId, file))) {
+            await this.markRefused(conversation, payload.messageId);
+          }
+        },
+        refused: async () => {
+          await showAsset();
+          await this.keepFileOnMessage(conversation, payload.messageId, file);
+          await this.markRefused(conversation, payload.messageId);
+        },
+      });
+    });
+  }
+
+  /** Retry: the same asset, sent again from where it was in the conversation */
+  private async enqueueAssetAgain(
+    conversation: Conversation,
+    file: Blob,
+    asImage: boolean,
+    messageId: string,
+  ): Promise<void> {
+    // The decline of the earlier attempt would otherwise dead-letter this one as well
+    await this.setOutboxMessageStatus(conversation, messageId, StatusType.SENDING);
+
+    const record = await this.eventService.loadEvent(conversation.id, messageId);
+    if (record?.fileData === undefined && !(await this.keepFileOnMessage(conversation, messageId, file))) {
+      await this.markRefused(conversation, messageId);
+      return;
+    }
+
+    const payload: AssetMessagePayload = {
+      type: 'asset',
+      conversationId: conversation.qualifiedId,
+      messageId,
+      asImage,
+    };
+    const operationPayload = match(this.outboxKinds.message.find(messageId))
+      .with({type: 'operation-found', operation: {state: 'dead-lettered', payload: {type: 'asset'}}}, ({operation}) => {
+        const mayBeDelivered = operation.attempts > 0 || operation.payload.mayBeDelivered === true;
+        return mayBeDelivered ? {...operation.payload, mayBeDelivered: true as const} : operation.payload;
+      })
+      .otherwise(() => {
+        return payload;
+      });
+    const outcome = await this.enqueueAssetOperation(operationPayload);
+    await this.followEnqueue('message', outcome, {
+      refused: () => {
+        return this.markRefused(conversation, messageId);
+      },
+    });
+  }
+
+  /** `false` when the record could not take the bytes, e.g. the storage quota is exceeded; the shown message keeps them */
+  private async keepFileOnMessage(conversation: Conversation, messageId: string, file: Blob): Promise<boolean> {
+    try {
+      await this.storeFileInDb(conversation, messageId, file);
+      return true;
+    } catch (error: unknown) {
+      this.logger.warn('Could not keep the bytes of an asset on its message', {error});
+      return false;
+    }
   }
 
   private async enqueuePing(conversation: Conversation): Promise<SendAndInjectResult> {
