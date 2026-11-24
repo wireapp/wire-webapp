@@ -41,6 +41,11 @@ export function messageCorrelationKey(payload: MessagePayload | MessageChangePay
   }
 }
 
+/** The changes a message can have waiting in the outbox, which go away with it */
+export function changeCorrelationKeysOf(messageId: string): string[] {
+  return [`${messageId}:reaction`, `${messageId}:edit`, `${messageId}:delete`];
+}
+
 /** Messages, their pending changes and pings go out one at a time, in the order the user acted */
 export function messageOrderingKey(conversationId: QualifiedId): string {
   return conversationId.id;

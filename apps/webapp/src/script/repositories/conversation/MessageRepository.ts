@@ -36,7 +36,7 @@ import {match, P} from 'ts-pattern';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
-import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
+import {Asset, Availability, Confirmation, GenericMessage, Mention} from '@wireapp/protocol-messaging';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
@@ -47,12 +47,21 @@ import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 import type {FailedReason} from './outbox/FailedReason';
-import {messageCorrelationKey, messageOrderingKey, receiptCorrelationKey, receiptOrderingKey} from './outbox/keys';
+import {
+  changeCorrelationKeysOf,
+  messageChangeOrderingKey,
+  messageCorrelationKey,
+  messageOrderingKey,
+  receiptCorrelationKey,
+  receiptOrderingKey,
+} from './outbox/keys';
 import {registerMessageOutboxKinds, type MessageOutboxHandles} from './outbox/messageOutboxKinds';
 import type {MessageOutboxPort, MessageRecord} from './outbox/MessageOutboxPort';
 import type {
   AssetMessagePayload,
   EditMessagePayload as OutboxEditPayload,
+  MessageChangePayload,
+  MessagePayload,
   ReceiptPayload as OutboxReceiptPayload,
   StoredMention,
   TextMessagePayload as OutboxTextPayload,
@@ -96,7 +105,7 @@ import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
 import {MentionEntity} from '../../message/mentionEntity';
 import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
-import type {EnqueueOutcome, Outbox} from '../../outbox';
+import type {EnqueueOutcome, OperationView, Outbox} from '../../outbox';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {
@@ -113,7 +122,7 @@ import {matchQualifiedIds} from '../../util/qualifiedId';
 import {capitalizeFirstChar} from '../../util/stringUtil';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {isBackendError, isErrorWithCode} from '../../util/typePredicateUtil';
-import {loadUrlBlob, supportsMLS} from '../../util/util';
+import {arrayToBase64, loadUrlBlob, supportsMLS} from '../../util/util';
 import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from '../assets/assetMetaDataBuilder';
@@ -240,6 +249,8 @@ export class MessageRepository {
   private readonly outboxHandles?: MessageOutboxHandles<Conversation>;
   /** Messages whose optimistic injection hasn't settled, by message id */
   private readonly pendingInjections = new Map<string, Promise<void>>();
+  /** The message the user is editing, which the outbox keeps on hold so that the edit can replace its text */
+  private heldForEditing?: string;
 
   private get coreServices(): NonNullable<Core['service']> {
     const coreServices = this.core.service;
@@ -294,6 +305,9 @@ export class MessageRepository {
    */
   async reviewRestoredHolds(conversation: Conversation): Promise<void> {
     await this.outboxHandles?.reviewRestoredHolds(conversation);
+    if (this.outbox !== undefined) {
+      await this.adoptRestoredEditHold(conversation);
+    }
   }
 
   private get conversationService(): ConversationService {
@@ -303,6 +317,9 @@ export class MessageRepository {
   private initSubscriptions(): void {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
     amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.sendAvailabilityStatus);
+    if (this.outbox !== undefined) {
+      amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, this.startEditingMessage);
+    }
   }
 
   /**
@@ -641,6 +658,10 @@ export class MessageRepository {
         ConversationError.TYPE.NO_MESSAGE_CHANGES,
         ConversationError.MESSAGE.NO_MESSAGE_CHANGES,
       );
+    }
+
+    if (this.outbox !== undefined) {
+      return this.enqueueEdit(conversation, textMessage, originalMessage, mentions);
     }
 
     const originalMessageId = originalMessage.id;
@@ -1509,6 +1530,9 @@ export class MessageRepository {
     messageEntity: Message,
     reactions: ReactionType,
   ): Promise<SendAndInjectResult> {
+    if (this.outbox !== undefined) {
+      return this.enqueueReaction(conversation, messageEntity, reactions);
+    }
     const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: reactions});
 
     return this.sendAndInjectMessage(reaction, conversation);
@@ -1563,6 +1587,9 @@ export class MessageRepository {
       optimisticRemoval?: boolean;
     } = {},
   ): Promise<void> {
+    if (this.outbox !== undefined) {
+      return this.enqueueDelete(conversation, message, options.targetedUsers);
+    }
     const conversationId = conversation.id;
     const messageId = message.id;
 
@@ -1618,6 +1645,9 @@ export class MessageRepository {
    * @returns Resolves when message was deleted
    */
   public async deleteMessage(conversation: Conversation, message: Message): Promise<void> {
+    if (this.outbox !== undefined) {
+      return this.enqueueHide(conversation, message);
+    }
     try {
       const payload = MessageBuilder.buildHideMessage({
         conversationId: conversation.id,
@@ -2051,6 +2081,364 @@ export class MessageRepository {
       orderingKey: receiptOrderingKey(payload),
     });
     await this.followEnqueue('receipt', outcome, {});
+  }
+
+  private get activeOutbox(): Outbox {
+    if (this.outbox === undefined) {
+      throw new Error('The outbox is not enabled');
+    }
+    return this.outbox;
+  }
+
+  /** The message as the outbox still has it; `undefined` once it went through, or when it never was in it */
+  private findPendingMessage(messageId: string): OperationView<MessagePayload> | undefined {
+    const found = this.outboxKinds.message.find(messageId);
+    return found.type === 'operation-found' ? found.operation : undefined;
+  }
+
+  /** A send was started and got no answer, so the message may have been delivered */
+  private isUnconfirmed({attempts, payload}: OperationView<MessagePayload>): boolean {
+    return attempts > 0 || ((payload.type === 'text' || payload.type === 'asset') && payload.mayBeDelivered === true);
+  }
+
+  /**
+   * A change follows its target in the message's lane while the outbox still has the target, or an earlier change
+   * to it; any other change goes to the lane of changes, which pending messages never block.
+   */
+  private async enqueueChange(
+    payload: Exclude<MessageChangePayload, {type: 'hide'}>,
+    steps: {accepted?: () => Promise<void>; refused?: () => Promise<void>},
+  ): Promise<void> {
+    const correlationKey = messageCorrelationKey(payload);
+    const targetMessageId = payload.type === 'edit' ? payload.originalMessageId : payload.targetMessageId;
+    const followsTarget =
+      this.findPendingMessage(targetMessageId) !== undefined || this.findPendingMessage(correlationKey) !== undefined;
+    if (followsTarget) {
+      const outcome = await this.outboxKinds.message.enqueue({
+        payload,
+        correlationKey,
+        orderingKey: messageOrderingKey(payload.conversationId),
+      });
+      // The earlier version went out meanwhile, so this one is a change to a message that was sent
+      if (outcome.type !== 'operation-succeeded') {
+        return this.followEnqueue('message', outcome, steps);
+      }
+    }
+    const request = {payload, correlationKey, orderingKey: messageChangeOrderingKey(payload.conversationId)};
+    let outcome = await this.outboxKinds.messageChange.enqueue(request);
+    // An enqueue with the key of a running attempt answers that attempt's ending, which doesn't hold this payload
+    if (outcome.type === 'operation-succeeded') {
+      outcome = await this.outboxKinds.messageChange.enqueue(request);
+    }
+    await this.followEnqueue('message-change', outcome, steps);
+  }
+
+  private async enqueueReaction(
+    conversation: Conversation,
+    message: Message,
+    reactions: ReactionType,
+  ): Promise<SendAndInjectResult> {
+    const reaction = MessageBuilder.buildReactionMessage({originalMessageId: message.id, type: reactions});
+    let state = SendAndInjectSendingState.QUEUED;
+    await this.enqueueChange(
+      {type: 'reaction', conversationId: conversation.qualifiedId, targetMessageId: message.id, reactions},
+      {
+        accepted: async () => {
+          await this.injectOptimisticMessage(reaction, conversation);
+        },
+        refused: async () => {
+          state = SendAndInjectSendingState.FAILED;
+        },
+      },
+    );
+    return {id: reaction.messageId, sentAt: new Date().toISOString(), state};
+  }
+
+  private readonly startEditingMessage = (message?: ContentMessage): void => {
+    this.holdForEditing(message).catch((error: unknown) => {
+      this.logger.warn('Failed to hold a message for editing', {error});
+    });
+  };
+
+  /** Starting to edit a message releases the one edited before and holds this one, if it is still in the outbox */
+  private async holdForEditing(message?: ContentMessage): Promise<void> {
+    await this.releaseEditing();
+    const pending = message === undefined ? undefined : this.findPendingMessage(message.id);
+    if (message === undefined || pending === undefined) {
+      return;
+    }
+    const correlationKey = message.id;
+    if (pending.state === 'on-hold') {
+      // Held already, either by a prompt of this session or, untracked, restored with the draft that edits it
+      if (!this.outboxKinds.holds.has(correlationKey)) {
+        this.heldForEditing = correlationKey;
+      }
+      return;
+    }
+    // The outbox reports a hold right away, and one that isn't registered by then counts as restored
+    this.outboxKinds.holds.add(correlationKey);
+    const outcome = await this.activeOutbox.hold(correlationKey);
+    this.logger.info('The outbox answered holding a message for editing', {outcome: outcome.type});
+    if (outcome.type === 'operation-held') {
+      this.heldForEditing = correlationKey;
+    } else {
+      this.outboxKinds.holds.remove(correlationKey);
+    }
+  }
+
+  private async releaseEditing(): Promise<void> {
+    const correlationKey = this.heldForEditing;
+    if (correlationKey === undefined) {
+      return;
+    }
+    this.heldForEditing = undefined;
+    const outcome = await this.activeOutbox.release(correlationKey);
+    this.logger.info('The outbox answered releasing a message that was held for editing', {outcome: outcome.type});
+  }
+
+  /**
+   * A hold restored from an earlier session, on a message the draft is still editing, is the user's hold again,
+   * so that it is released like a live one: when another message is edited, or when the edit is sent.
+   */
+  private async adoptRestoredEditHold(conversation: Conversation): Promise<void> {
+    const listed = this.activeOutbox.lanes();
+    if (listed.type !== 'lanes-listed' || this.heldForEditing !== undefined) {
+      return;
+    }
+    for (const {first} of listed.lanes) {
+      const {correlationKey, state, kind} = first;
+      if (
+        kind !== 'message' ||
+        state !== 'on-hold' ||
+        correlationKey === undefined ||
+        this.outboxKinds.holds.has(correlationKey) ||
+        this.findPendingMessage(correlationKey)?.payload.type !== 'text'
+      ) {
+        continue;
+      }
+      if ((await this.isBeingEdited?.(conversation, correlationKey)) === true) {
+        this.heldForEditing = correlationKey;
+        return;
+      }
+    }
+  }
+
+  /**
+   * Save an edit. A message the outbox never attempted is edited where it is: the edit replaces its text, and
+   * no one else ever sees the original. Otherwise the edit is a message of its own, behind the message if the
+   * outbox still has it. A message that failed only changes locally, so that Retry sends the new text.
+   */
+  private async enqueueEdit(
+    conversation: Conversation,
+    textMessage: string,
+    originalMessage: ContentMessage,
+    mentions: MentionEntity[],
+  ): Promise<void> {
+    const originalMessageId = originalMessage.id;
+    if (this.heldForEditing === originalMessageId) {
+      // The hold ends with this edit, as a version or by the release below
+      this.heldForEditing = undefined;
+    }
+    // We cancel the sending of the link preview if the user has edited the message
+    cancelSendingLinkPreview(originalMessageId);
+    try {
+      const pending = this.findPendingMessage(originalMessageId);
+      const hasFailed =
+        pending?.state === 'dead-lettered' ||
+        arrayIncludes([StatusType.FAILED, StatusType.FEDERATION_ERROR], originalMessage.status());
+      if (hasFailed) {
+        await this.updateMessageTextLocally(conversation, originalMessage, textMessage, mentions);
+      } else if (
+        pending?.payload.type === 'text' &&
+        (pending.state === 'queued' || pending.state === 'on-hold') &&
+        !this.isUnconfirmed(pending) &&
+        !originalMessage.hasMultipartAsset()
+      ) {
+        const replaced = await this.editPendingMessage(
+          conversation,
+          textMessage,
+          originalMessage,
+          mentions,
+          pending.payload,
+        );
+        if (!replaced) {
+          // An attempt started meanwhile and went through: the message was sent
+          await this.enqueueEditAfterMessage(conversation, textMessage, originalMessage, mentions);
+        }
+      } else {
+        await this.enqueueEditAfterMessage(conversation, textMessage, originalMessage, mentions);
+        // The message was held while its text could still be replaced; now it goes, and the edit behind it
+        if (pending?.state === 'on-hold') {
+          const outcome = await this.activeOutbox.release(originalMessageId);
+          this.logger.info('The outbox answered releasing an edited message', {outcome: outcome.type});
+        }
+      }
+    } finally {
+      clearLinkPreviewSendingState(originalMessageId);
+    }
+  }
+
+  /**
+   * A version of the message: with the new text it keeps its id, its place and its lack of an edited mark.
+   * Resolves to `false` when the message went out before the version could take its place.
+   */
+  private async editPendingMessage(
+    conversation: Conversation,
+    textMessage: string,
+    originalMessage: ContentMessage,
+    mentions: MentionEntity[],
+    payload: OutboxTextPayload,
+  ): Promise<boolean> {
+    let replaced = true;
+    await this.enqueueWhileShowing(originalMessage.id, async () => {
+      const outcome = await this.outboxKinds.message.enqueue({
+        payload: {...payload, text: textMessage, mentions: this.toStoredMentions(mentions)},
+        correlationKey: originalMessage.id,
+        orderingKey: messageOrderingKey(payload.conversationId),
+      });
+      replaced = outcome.type !== 'operation-succeeded';
+      await this.followEnqueue('message', outcome, {
+        accepted: () => {
+          return this.updateMessageTextLocally(conversation, originalMessage, textMessage, mentions);
+        },
+        refused: async () => {
+          // The message is still held for the edit that can't be queued
+          await this.activeOutbox.release(originalMessage.id);
+        },
+      });
+    });
+    return replaced;
+  }
+
+  private async enqueueEditAfterMessage(
+    conversation: Conversation,
+    textMessage: string,
+    originalMessage: ContentMessage,
+    mentions: MentionEntity[],
+  ): Promise<void> {
+    const attachments = originalMessage
+      .getMultipartAssets()
+      .map(multipart => {
+        return multipart.attachments?.() ?? [];
+      })
+      .flat()
+      .filter(Boolean);
+    const payload: OutboxEditPayload = {
+      type: 'edit',
+      conversationId: conversation.qualifiedId,
+      originalMessageId: originalMessage.id,
+      messageId: createUuid(),
+      text: textMessage,
+      mentions: this.toStoredMentions(mentions),
+      attachments: isNonEmptyArray(attachments) ? attachments : undefined,
+    };
+    await this.enqueueWhileShowing(originalMessage.id, () => {
+      return this.enqueueChange(payload, {
+        accepted: async () => {
+          await this.injectOptimisticMessage(this.buildOutboxEdit(conversation, payload), conversation);
+        },
+      });
+    });
+  }
+
+  /** Changes the text of a message that is shown and stored, as it is, without an edit */
+  private async updateMessageTextLocally(
+    conversation: Conversation,
+    message: ContentMessage,
+    text: string,
+    mentions: MentionEntity[],
+  ): Promise<void> {
+    const textMessage = MessageBuilder.buildTextMessage(
+      this.decorateTextMessage({text}, conversation, {mentions}),
+      message.id,
+    );
+    const record = await this.eventService.loadEvent(conversation.id, message.id);
+    if (record === undefined) {
+      return;
+    }
+    const data = {
+      ...(record as {data?: object}).data,
+      content: text,
+      mentions: (textMessage.text?.mentions ?? []).map(mention => {
+        return arrayToBase64(Mention.encode(mention).finish());
+      }),
+    };
+    await this.eventService.updateEvent(record.primary_key, {data} as Partial<EventRecord>);
+    // The shown text is made from the stored one, as it is when the message is loaded
+    const updated = this.event_mapper.mapJsonEvent({...record, data} as EventRecord, conversation);
+    if (updated instanceof ContentMessage) {
+      message.assets(updated.assets());
+    }
+  }
+
+  /**
+   * Delete for everyone. A message that never went out is dropped with its changes and nothing is sent;
+   * one that may have been delivered is dropped unless it is in flight, and the deletion follows it.
+   */
+  private async enqueueDelete(
+    conversation: Conversation,
+    message: Message,
+    targetedUsers?: QualifiedId[],
+  ): Promise<void> {
+    if (!message.user().isMe && !isTruthy(message.ephemeral_expires())) {
+      throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
+    }
+    await this.removeThroughOutbox(conversation, message, () => {
+      return this.enqueueChange(
+        {
+          type: 'delete',
+          conversationId: conversation.qualifiedId,
+          targetMessageId: message.id,
+          recipients: targetedUsers,
+        },
+        {},
+      );
+    });
+  }
+
+  /** Delete for me: the same as for everyone, with a hide of the message on the user's own clients */
+  private async enqueueHide(conversation: Conversation, message: Message): Promise<void> {
+    await this.removeThroughOutbox(conversation, message, async () => {
+      const payload: MessageChangePayload = {
+        type: 'hide',
+        conversationId: conversation.qualifiedId,
+        targetMessageId: message.id,
+      };
+      const request = {
+        payload,
+        correlationKey: messageCorrelationKey(payload),
+        orderingKey: messageChangeOrderingKey(conversation.qualifiedId),
+      };
+      let outcome = await this.outboxKinds.messageChange.enqueue(request);
+      // An enqueue with the key of a running attempt answers that attempt's ending, which doesn't hold this payload
+      if (outcome.type === 'operation-succeeded') {
+        outcome = await this.outboxKinds.messageChange.enqueue(request);
+      }
+      await this.followEnqueue('message-change', outcome, {});
+    });
+  }
+
+  /** Whatever is sent to remove the message, the message goes at once */
+  private async removeThroughOutbox(
+    conversation: Conversation,
+    message: Message,
+    enqueueRemoval: () => Promise<void>,
+  ): Promise<void> {
+    const pending = this.findPendingMessage(message.id);
+    // An attempt in flight isn't dropped: the removal waits for it and follows the message
+    if (pending === undefined || pending.state === 'in-progress') {
+      await enqueueRemoval();
+    } else {
+      // The changes go first, so that none is sent for a message that no longer exists
+      for (const correlationKey of [...changeCorrelationKeysOf(message.id), message.id]) {
+        const outcome = await this.activeOutbox.drop(correlationKey);
+        this.logger.info('The outbox answered dropping an operation of a deleted message', {outcome: outcome.type});
+      }
+      if (this.isUnconfirmed(pending)) {
+        await enqueueRemoval();
+      }
+    }
+    await this.deleteMessageById(conversation, message.id);
   }
 
   private async resolveOutgoingQuote(

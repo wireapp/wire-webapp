@@ -47,7 +47,8 @@ export const useMessageEditing = (): UseMessageEditingResult => {
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, editMessage);
 
     return () => {
-      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
+      // Only this subscription: the message repository listens to the same event
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, editMessage);
     };
   }, [editMessage]);
 
