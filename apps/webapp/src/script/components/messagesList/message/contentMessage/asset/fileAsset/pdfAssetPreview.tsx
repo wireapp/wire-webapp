@@ -71,12 +71,20 @@ const matchesSignature = (bytes: Uint8Array, signature: string): boolean => {
 };
 
 const hasPdfSignature = async (blob: Blob): Promise<boolean> => {
-  if (blob.size === 0) {
+  if (blob.size < pdfSignature.length) {
     return false;
   }
 
   const header = new Uint8Array(await readPreviewBlob(blob.slice(0, pdfHeaderLength)));
-  return new TextDecoder().decode(header).includes(pdfSignature);
+  const lastHeaderOffset = Math.min(header.length, pdfHeaderLength) - pdfSignature.length;
+
+  for (let offset = 0; offset <= lastHeaderOffset; offset += 1) {
+    if (matchesSignature(header.slice(offset), pdfSignature)) {
+      return true;
+    }
+  }
+
+  return false;
 };
 
 export const PdfAssetPreview = ({
@@ -102,8 +110,12 @@ export const PdfAssetPreview = ({
   const [thumbnail, setThumbnail] = useState<{resource: AssetRemoteDataType; url: string}>();
   const [failedThumbnailUrl, setFailedThumbnailUrl] = useState<string>();
   const [thumbnailLoadFailed, setThumbnailLoadFailed] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState<string>();
-  const [pdfStatus, setPdfStatus] = useState<PreviewStatus>('loading');
+  const [shouldLoadPdf, setShouldLoadPdf] = useState(false);
+  const [pdfPreview, setPdfPreview] = useState<{
+    resource: AssetRemoteDataType;
+    url?: string;
+    status: PreviewStatus;
+  }>();
 
   useEffect(() => {
     if (hasBeenInView || isOpen) {
@@ -169,7 +181,13 @@ export const PdfAssetPreview = ({
   }, [shouldLoadThumbnail, thumbnailResource, loadAsset]);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      setShouldLoadPdf(true);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!shouldLoadPdf) {
       return undefined;
     }
 
@@ -177,13 +195,12 @@ export const PdfAssetPreview = ({
     let isLoading = true;
     let objectUrl: string | undefined;
     const pdfResource = createPreviewResource(originalResource);
-    setPdfUrl(undefined);
-    setPdfStatus('loading');
+    setPdfPreview({resource: originalResource, status: 'loading'});
 
     const loadPdf = async (): Promise<void> => {
       try {
         if (pdfResource.otrKey?.length !== keyLength || pdfResource.sha256?.length !== keyLength) {
-          setPdfStatus('unavailable');
+          setPdfPreview({resource: originalResource, status: 'unavailable'});
           return;
         }
 
@@ -192,7 +209,7 @@ export const PdfAssetPreview = ({
           return;
         }
         if (blob === undefined) {
-          setPdfStatus('unavailable');
+          setPdfPreview({resource: originalResource, status: 'unavailable'});
           return;
         }
 
@@ -201,16 +218,15 @@ export const PdfAssetPreview = ({
           return;
         }
         if (!isPdf) {
-          setPdfStatus('unavailable');
+          setPdfPreview({resource: originalResource, status: 'unavailable'});
           return;
         }
 
         objectUrl = URL.createObjectURL(new Blob([blob], {type: 'application/pdf'}));
-        setPdfUrl(objectUrl);
-        setPdfStatus('success');
+        setPdfPreview({resource: originalResource, url: objectUrl, status: 'success'});
       } catch {
         if (!disposed) {
-          setPdfStatus('unavailable');
+          setPdfPreview({resource: originalResource, status: 'unavailable'});
         }
       } finally {
         isLoading = false;
@@ -227,7 +243,7 @@ export const PdfAssetPreview = ({
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [isOpen, originalResource, loadAsset]);
+  }, [shouldLoadPdf, originalResource, loadAsset]);
 
   const thumbnailUrl = thumbnail?.resource === thumbnailResource ? thumbnail.url : undefined;
   const isThumbnailUnavailable =
@@ -237,9 +253,8 @@ export const PdfAssetPreview = ({
       setFailedThumbnailUrl(thumbnailUrl);
     }
   };
+  const activePdfPreview = pdfPreview?.resource === originalResource ? pdfPreview : undefined;
   const closePreview = (): void => {
-    setPdfUrl(undefined);
-    setPdfStatus('loading');
     onClose();
   };
 
@@ -266,12 +281,12 @@ export const PdfAssetPreview = ({
         dialogId={id}
         isOpen={isOpen}
         onClose={closePreview}
-        filePreviewUrl={pdfUrl}
+        filePreviewUrl={activePdfPreview?.url}
         fileName={fileName}
         fileExtension={fileExtension}
         senderName={senderName}
         timestamp={timestamp}
-        status={pdfStatus}
+        status={activePdfPreview?.status ?? 'loading'}
         previewType="pdf"
         context="chat"
         onDownload={onDownload}
