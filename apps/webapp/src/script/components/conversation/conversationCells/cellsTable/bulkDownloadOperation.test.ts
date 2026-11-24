@@ -31,8 +31,16 @@ Object.assign(globalThis, {ReadableStream});
 const createStream = (
   source?: ConstructorParameters<typeof ReadableStream<Uint8Array>>[0],
 ): globalThis.ReadableStream<Uint8Array> => {
-  return new ReadableStream<Uint8Array>(source) as unknown as globalThis.ReadableStream<Uint8Array>;
+  return new ReadableStream<Uint8Array>(
+    source ?? {
+      start(controller) {
+        controller.close();
+      },
+    },
+  ) as unknown as globalThis.ReadableStream<Uint8Array>;
 };
+
+const eligibleSelection = (paths: readonly string[]) => ({kind: 'eligible', paths}) as const;
 
 const createNode = (path: string, role: CellsSelfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR): CellNode =>
   ({
@@ -55,8 +63,12 @@ describe('resolveBulkDownloadSelection', () => {
     });
   });
 
-  it('rejects an empty selection and a selection containing a node missing from the current view', () => {
+  it('rejects empty, whitespace-only, and incomplete selections', () => {
     expect(resolveBulkDownloadSelection({nodes: [], canDownload: true})).toEqual({kind: 'rejected', reason: 'empty'});
+    expect(resolveBulkDownloadSelection({nodes: [createNode('  ')], canDownload: true})).toEqual({
+      kind: 'rejected',
+      reason: 'selection-unavailable',
+    });
     expect(resolveBulkDownloadSelection({nodes: [createNode('file')], canDownload: true, selectedCount: 2})).toEqual({
       kind: 'rejected',
       reason: 'selection-unavailable',
@@ -90,10 +102,13 @@ describe('createBulkDownloadOperation', () => {
     const states: string[] = [];
     operation.subscribe(state => states.push(state.kind));
 
-    const first = operation.start({paths: ['workspace/file.txt'], archiveParentPath: 'workspace'});
-    await expect(operation.start({paths: ['workspace/other.txt'], archiveParentPath: 'workspace'})).rejects.toThrow(
-      'A bulk download is already in progress',
-    );
+    const first = operation.start({
+      selection: eligibleSelection(['workspace/file.txt']),
+      archiveParentPath: 'workspace',
+    });
+    await expect(
+      operation.start({selection: eligibleSelection(['workspace/other.txt']), archiveParentPath: 'workspace'}),
+    ).rejects.toThrow('A bulk download is already in progress');
     finishDownload?.(
       createStream({
         start(controller) {
@@ -123,22 +138,82 @@ describe('createBulkDownloadOperation', () => {
       }),
     );
     const operation = createBulkDownloadOperation(download);
-    const {stream} = await operation.start({paths: ['workspace/file.txt'], archiveParentPath: 'workspace'});
+    const {stream} = await operation.start({
+      selection: eligibleSelection(['workspace/file.txt']),
+      archiveParentPath: 'workspace',
+    });
 
     await expect(stream.getReader().read()).rejects.toBe(failure);
     expect(operation.getState()).toEqual({kind: 'failed', error: failure});
     expect(download).toHaveBeenCalledTimes(1);
   });
 
-  it('exposes failures and allows an explicit later attempt without retrying automatically', async () => {
+  it('exposes failures and allows a deliberate later attempt without retrying automatically', async () => {
     const failure = new Error('connection lost');
-    const download = jest.fn().mockRejectedValueOnce(failure);
+    const download = jest.fn().mockRejectedValueOnce(failure).mockResolvedValue(createStream());
     const operation = createBulkDownloadOperation(download);
+    const request = {selection: eligibleSelection(['workspace/file.txt']), archiveParentPath: 'workspace'};
 
-    await expect(operation.start({paths: ['workspace/file.txt'], archiveParentPath: 'workspace'})).rejects.toBe(
-      failure,
-    );
+    await expect(operation.start(request)).rejects.toBe(failure);
     expect(operation.getState()).toEqual({kind: 'failed', error: failure});
     expect(download).toHaveBeenCalledTimes(1);
+
+    const retry = await operation.start(request);
+    await retry.stream.getReader().read();
+    expect(download).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps the operation locked until cancellation settles, then exposes cancellation', async () => {
+    let finishCancel: (() => void) | undefined;
+    const source = createStream({
+      cancel() {
+        return new Promise<void>(resolve => {
+          finishCancel = resolve;
+        });
+      },
+    });
+    const download = jest.fn().mockResolvedValueOnce(source).mockResolvedValue(createStream());
+    const operation = createBulkDownloadOperation(download);
+    const request = {selection: eligibleSelection(['workspace/file.txt']), archiveParentPath: 'workspace'};
+    const {stream} = await operation.start(request);
+    const cancellation = stream.cancel();
+
+    await expect(operation.start(request)).rejects.toThrow('A bulk download is already in progress');
+    finishCancel?.();
+    await cancellation;
+    expect(operation.getState()).toEqual({kind: 'cancelled'});
+
+    const retry = await operation.start(request);
+    await retry.stream.getReader().read();
+    expect(download).toHaveBeenCalledTimes(2);
+  });
+
+  it('exposes cancellation failures and releases the operation lock', async () => {
+    const failure = new Error('cancel failed');
+    const source = createStream({cancel: () => Promise.reject(failure)});
+    const download = jest.fn().mockResolvedValueOnce(source).mockResolvedValue(createStream());
+    const operation = createBulkDownloadOperation(download);
+    const request = {selection: eligibleSelection(['workspace/file.txt']), archiveParentPath: 'workspace'};
+    const {stream} = await operation.start(request);
+
+    await expect(stream.cancel()).rejects.toBe(failure);
+    expect(operation.getState()).toEqual({kind: 'failed', error: failure});
+    await operation.start(request);
+    expect(download).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not let a throwing observer corrupt operation state', async () => {
+    const operation = createBulkDownloadOperation(async () => createStream());
+    operation.subscribe(() => {
+      throw new Error('observer failed');
+    });
+
+    const result = await operation.start({
+      selection: eligibleSelection(['workspace/file.txt']),
+      archiveParentPath: 'workspace',
+    });
+    await result.stream.getReader().read();
+
+    expect(operation.getState()).toEqual({kind: 'stream-consumed', bytesReceived: 0});
   });
 });

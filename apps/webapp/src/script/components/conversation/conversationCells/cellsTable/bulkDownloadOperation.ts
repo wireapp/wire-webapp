@@ -63,9 +63,16 @@ export type BulkDownloadOperationState =
   | {readonly kind: 'starting'}
   | {readonly kind: 'downloading'; readonly bytesReceived: number}
   | {readonly kind: 'stream-consumed'; readonly bytesReceived: number}
+  | {readonly kind: 'cancelled'}
   | {readonly kind: 'failed'; readonly error: unknown};
 
 interface BulkDownloadRequest {
+  readonly selection: BulkDownloadSelection;
+  readonly archiveParentPath: string;
+  readonly abortController?: AbortController;
+}
+
+interface DownloadArchiveRequest {
   readonly paths: readonly string[];
   readonly archiveParentPath: string;
   readonly abortController?: AbortController;
@@ -83,15 +90,22 @@ export interface BulkDownloadOperation {
 }
 
 export const createBulkDownloadOperation = (
-  download: (request: BulkDownloadRequest) => Promise<ReadableStream<Uint8Array>>,
+  download: (request: DownloadArchiveRequest) => Promise<ReadableStream<Uint8Array>>,
 ): BulkDownloadOperation => {
   let state: BulkDownloadOperationState = {kind: 'idle'};
   let isActive = false;
+  let operationId = 0;
   const listeners = new Set<(state: BulkDownloadOperationState) => void>();
 
   const setState = (nextState: BulkDownloadOperationState): void => {
     state = nextState;
-    listeners.forEach(listener => listener(state));
+    listeners.forEach(listener => {
+      try {
+        listener(state);
+      } catch {
+        // A status observer must not interrupt the transfer lifecycle.
+      }
+    });
   };
 
   return {
@@ -104,16 +118,22 @@ export const createBulkDownloadOperation = (
       if (isActive) {
         throw new Error('A bulk download is already in progress');
       }
-      if (request.paths.length === 0 || request.paths.some(path => path.trim().length === 0)) {
-        throw new Error('A bulk download requires at least one non-empty path');
+      if (request.selection.kind !== 'eligible') {
+        throw new Error(`Cannot start bulk download: ${request.selection.reason}`);
       }
 
       isActive = true;
-      setState({kind: 'starting'});
+      const currentOperationId = ++operationId;
 
       try {
-        const source = await download(request);
+        setState({kind: 'starting'});
+        const source = await download({
+          paths: request.selection.paths,
+          archiveParentPath: request.archiveParentPath,
+          abortController: request.abortController,
+        });
         let bytesReceived = 0;
+        let isCancelling = false;
         const reader = source.getReader();
         const stream = new ReadableStream<Uint8Array>({
           async pull(controller) {
@@ -121,23 +141,40 @@ export const createBulkDownloadOperation = (
               const {done, value} = await reader.read();
               if (done) {
                 controller.close();
-                isActive = false;
-                setState({kind: 'stream-consumed', bytesReceived});
+                if (!isCancelling && operationId === currentOperationId) {
+                  isActive = false;
+                  setState({kind: 'stream-consumed', bytesReceived});
+                }
                 return;
               }
               bytesReceived += value.byteLength;
-              setState({kind: 'downloading', bytesReceived});
+              if (operationId === currentOperationId) {
+                setState({kind: 'downloading', bytesReceived});
+              }
               controller.enqueue(value);
             } catch (error) {
-              isActive = false;
-              setState({kind: 'failed', error});
+              if (operationId === currentOperationId) {
+                isActive = false;
+                setState({kind: 'failed', error});
+              }
               controller.error(error);
             }
           },
           async cancel(reason) {
-            isActive = false;
-            await reader.cancel(reason);
-            setState({kind: 'failed', error: new Error('Archive stream was cancelled')});
+            isCancelling = true;
+            try {
+              await reader.cancel(reason);
+              if (operationId === currentOperationId) {
+                isActive = false;
+                setState({kind: 'cancelled'});
+              }
+            } catch (error) {
+              if (operationId === currentOperationId) {
+                isActive = false;
+                setState({kind: 'failed', error});
+              }
+              throw error;
+            }
           },
         });
         return {
@@ -147,8 +184,10 @@ export const createBulkDownloadOperation = (
           },
         };
       } catch (error) {
-        isActive = false;
-        setState({kind: 'failed', error});
+        if (operationId === currentOperationId) {
+          isActive = false;
+          setState({kind: 'failed', error});
+        }
         throw error;
       }
     },
