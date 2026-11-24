@@ -41,6 +41,7 @@ import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';
 import * as browserLocationModule from '../../navigation/browserLocation';
+import type {Outbox} from '../../outbox';
 import {translateForTest} from '../../util/test/translateForTest';
 
 const createMockDependencies = (): LifeCycleDependencies => {
@@ -341,6 +342,28 @@ describe('LifeCycleRepository', () => {
       await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, false);
 
       expect(mockDependencies.conversationRepository.sendTypingStop).toHaveBeenCalledWith(mockConversation);
+    });
+
+    it('should stop the outbox after the websocket disconnects', async () => {
+      const calls: string[] = [];
+      (mockDependencies.eventRepository.disconnectWebSocket as jest.Mock).mockImplementation(() => {
+        calls.push('disconnectWebSocket');
+      });
+      const stop = jest.fn().mockImplementation(async () => {
+        calls.push('stop');
+      });
+      mockDependencies.outbox = {stop} as unknown as Outbox;
+      lifeCycleRepository = new LifeCycleRepository(mockDependencies);
+
+      await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, false);
+
+      expect(calls).toEqual(['disconnectWebSocket', 'stop']);
+    });
+
+    it('should log out without an outbox', async () => {
+      await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, false);
+
+      expect(mockDependencies.eventRepository.disconnectWebSocket).toHaveBeenCalled();
     });
 
     it('should handle typing stop failure gracefully', async () => {
