@@ -30,6 +30,7 @@ import {
   type BackgroundFrameSizes,
   type BackgroundFpsDiagnostics,
 } from './longpipeBackgroundEffects';
+import {preloadLongpipeModels} from './longpipeModelResources';
 import {BackgroundEffectsQuality, backgroundEffectsStore} from './useBackgroundEffectsStore';
 import {
   BackgroundEffectSelection,
@@ -355,6 +356,13 @@ export class BackgroundEffectsHandler {
   };
 
   public async preloadResources(): Promise<void> {
+    if (!isBackgroundEffectsSupported()) {
+      return;
+    }
+    await Promise.all([preloadLongpipeModels(), this.preloadBackgroundImages()]);
+  }
+
+  private async preloadBackgroundImages(): Promise<void> {
     // preload default bg image
     await loadBackgroundSource(DEFAULT_BUILTIN_BACKGROUND_ID);
 

@@ -287,6 +287,11 @@ export class App {
     const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
     const mediaDevicesHandler = new MediaDevicesHandler();
     const backgroundEffectsHandler = new BackgroundEffectsHandler();
+    this.fireAndForgetInvoker.fireAndForget(() => {
+      return backgroundEffectsHandler.preloadResources().catch((error: unknown) => {
+        this.logger.warn('[virtual-background] preload failed, starting without resources', {error});
+      });
+    });
 
     container.registerInstance(MediaDevicesHandler, mediaDevicesHandler);
     container.registerInstance(MediaConstraintsHandler, mediaConstraintsHandler);
@@ -541,7 +546,6 @@ export class App {
         self: selfRepository,
         cells: cellsRepository,
       } = this.repository;
-      const bgEffectsHandler = callingRepository.getBackgroundEffectsHandler();
       await checkIndexedDb();
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
@@ -691,12 +695,6 @@ export class App {
       eventLogger.log(AppInitializationStep.ConversationsLoaded);
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
-
-      fireAndForgetInvoker.fireAndForget(() => {
-        return bgEffectsHandler.preloadResources().catch((error: unknown) => {
-          this.logger.warn('[virtual-background] preload failed, starting without resources', {error});
-        });
-      });
 
       if (this.core.hasMLSDevice) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)

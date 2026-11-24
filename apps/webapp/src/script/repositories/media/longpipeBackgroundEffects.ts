@@ -27,11 +27,11 @@ import {
 import {noop} from 'noop-esm';
 
 import {BACKGROUND_RESOLUTIONS, type QualityMode} from './backgroundEffectsResolution';
+import {MODEL_WEIGHTS_BASE_URL} from './longpipeModelResources';
 
 import {getLogger} from '../../util/logger';
 
 const POLL_INTERVAL_MS = 1000;
-const MODEL_WEIGHTS_BASE_URL = '/assets/longpipe/models/v0.0.5';
 const DOWNGRADE_SAMPLES = 5;
 const UPGRADE_SAMPLES = 15;
 const CHANGE_COOLDOWN_MS = 10000;
