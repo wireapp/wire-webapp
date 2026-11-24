@@ -602,7 +602,7 @@ describe('CellsTable selection', () => {
     }
   });
 
-  it('aborts an in-flight archive request when the table unmounts', async () => {
+  it('ignores duplicate starts and aborts the active request when the table unmounts', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/team/Shared%20Drive';
     const user = userEvent.setup();
@@ -617,10 +617,18 @@ describe('CellsTable selection', () => {
 
     try {
       await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
-      await user.click(screen.getByRole('button', {name: 'Download'}));
+      const downloadButton = screen.getByRole('button', {name: 'Download'});
+      await act(async () => {
+        fireEvent.click(downloadButton);
+        fireEvent.click(downloadButton);
+        await Promise.resolve();
+      });
       await waitFor(() => {
         expect(downloadSelectionArchive).toHaveBeenCalledTimes(1);
       });
+      expect(
+        screen.queryByText('Could not download the selected items. Select Download to try again.'),
+      ).not.toBeInTheDocument();
       const {abortController} = downloadSelectionArchive.mock.calls[0][0];
 
       table.unmount();

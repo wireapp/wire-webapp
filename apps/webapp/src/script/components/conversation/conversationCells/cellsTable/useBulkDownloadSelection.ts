@@ -125,6 +125,7 @@ export const useBulkDownloadSelection = ({
     });
   }, [cellsRepository]);
   const [state, setState] = useState<BulkDownloadViewState>({kind: 'idle'});
+  const isStartingRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const isMountedRef = useRef(true);
 
@@ -146,10 +147,11 @@ export const useBulkDownloadSelection = ({
   const statusMessage = getStatusMessage(state, translate);
 
   const start = async (): Promise<void> => {
-    if (isDisabled || selection.kind !== 'eligible') {
+    if (isStartingRef.current || isDisabled || selection.kind !== 'eligible') {
       return;
     }
 
+    isStartingRef.current = true;
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
     try {
@@ -179,6 +181,7 @@ export const useBulkDownloadSelection = ({
       if (abortControllerRef.current === abortController) {
         abortControllerRef.current = null;
       }
+      isStartingRef.current = false;
     }
   };
 
