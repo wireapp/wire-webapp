@@ -19,7 +19,6 @@
 
 import {isNull} from '@sindresorhus/is';
 import {cleanup} from '@testing-library/react';
-import {container as serviceContainer} from 'tsyringe';
 
 import {useCreateConversationModal} from './useCreateConversationModal';
 
@@ -28,31 +27,32 @@ import {useAppMainState} from '../../../../page/state';
 import {usePrimaryModalState} from '../../PrimaryModal';
 
 type CreateConversationTest = () => void | Promise<void>;
-
 export function withIsolatedCreateConversationTest(testFunction: CreateConversationTest): () => Promise<void> {
   return async function runIsolatedCreateConversationTest(): Promise<void> {
-    const conversationModalInitialState = useCreateConversationModal.getInitialState();
-    const primaryModalInitialState = usePrimaryModalState.getInitialState();
-    const sidebarInitialState = useSidebarStore.getInitialState();
-    const appMainInitialState = useAppMainState.getInitialState();
+    const previousConversationModalState = useCreateConversationModal.getState();
+    const previousPrimaryModalState = usePrimaryModalState.getState();
+    const previousSidebarTab = useSidebarStore.getState().currentTab;
+    const previousResponsiveView = useAppMainState.getState().responsiveView.currentView;
     const originalSidebarStorage = localStorage.getItem('sidebar-store');
     const originalWindowLocationHash = window.location.hash;
 
-    useCreateConversationModal.setState(conversationModalInitialState, true);
-    usePrimaryModalState.setState(primaryModalInitialState, true);
-    useSidebarStore.setState(sidebarInitialState, true);
-    useAppMainState.setState(appMainInitialState, true);
-    serviceContainer.clearInstances();
+    useCreateConversationModal.setState(useCreateConversationModal.getInitialState(), true);
+    usePrimaryModalState.setState(usePrimaryModalState.getInitialState(), true);
 
     try {
       await testFunction();
     } finally {
       cleanup();
-      useCreateConversationModal.setState(conversationModalInitialState, true);
-      usePrimaryModalState.setState(primaryModalInitialState, true);
-      useSidebarStore.setState(sidebarInitialState, true);
-      useAppMainState.setState(appMainInitialState, true);
-      serviceContainer.clearInstances();
+      useCreateConversationModal.setState(previousConversationModalState, true);
+      usePrimaryModalState.setState(previousPrimaryModalState, true);
+
+      if (useSidebarStore.getState().currentTab !== previousSidebarTab) {
+        useSidebarStore.getState().setCurrentTab(previousSidebarTab);
+      }
+
+      if (useAppMainState.getState().responsiveView.currentView !== previousResponsiveView) {
+        useAppMainState.getState().responsiveView.setCurrentView(previousResponsiveView);
+      }
       window.history.replaceState(
         window.history.state,
         '',

@@ -19,7 +19,7 @@
 import {act, fireEvent, render} from '@testing-library/react';
 import {isNull} from '@sindresorhus/is';
 import ko from 'knockout';
-import {container as serviceContainer} from 'tsyringe';
+import {container as serviceContainer, type InjectionToken} from 'tsyringe';
 
 import {CreateConversationModal} from './CreateConversaionModal';
 import {withIsolatedCreateConversationTest} from './hooks/createConversationTestSupport';
@@ -45,8 +45,7 @@ type RenderCreateConversationModalOptions = {
   readonly conversationCreationStep: ConversationCreationStep;
 };
 
-function renderCreateConversationModal(options: RenderCreateConversationModalOptions): ReturnType<typeof render> {
-  const {createGroupConversation, conversationCreationStep} = options;
+function stubCreateConversationModalDependencies(): jest.SpyInstance {
   const selfUser = new User('self-user-id', 'example.com', translateForTest);
   const userState = {
     connectedUsers: ko.pureComputed(() => {
@@ -83,6 +82,40 @@ function renderCreateConversationModal(options: RenderCreateConversationModalOpt
       return false;
     },
   };
+  const originalContainerResolve: (token: InjectionToken<unknown>, ...resolutionContext: unknown[]) => unknown =
+    serviceContainer.resolve.bind(serviceContainer);
+
+  return jest.spyOn(serviceContainer, 'resolve').mockImplementation((token, ...resolutionContext: unknown[]) => {
+    if (token === TeamState) {
+      return teamState as unknown as TeamState;
+    }
+
+    if (token === UserState) {
+      return userState as unknown as UserState;
+    }
+
+    if (token === ConversationState) {
+      return conversationState as unknown as ConversationState;
+    }
+
+    return originalContainerResolve(token, ...resolutionContext);
+  });
+}
+
+function withIsolatedCreateConversationModalTest(testFunction: () => void | Promise<void>): () => Promise<void> {
+  return async function runIsolatedCreateConversationModalTest(): Promise<void> {
+    const containerResolutionSpy = stubCreateConversationModalDependencies();
+
+    try {
+      await withIsolatedCreateConversationTest(testFunction)();
+    } finally {
+      containerResolutionSpy.mockRestore();
+    }
+  };
+}
+
+function renderCreateConversationModal(options: RenderCreateConversationModalOptions): ReturnType<typeof render> {
+  const {createGroupConversation, conversationCreationStep} = options;
   const mainViewModel = {
     content: {
       repositories: {
@@ -113,10 +146,6 @@ function renderCreateConversationModal(options: RenderCreateConversationModalOpt
     },
   } as unknown as MainViewModel;
 
-  serviceContainer.registerInstance(TeamState, teamState as unknown as TeamState);
-  serviceContainer.registerInstance(UserState, userState as unknown as UserState);
-  serviceContainer.registerInstance(ConversationState, conversationState as unknown as ConversationState);
-
   const modal = useCreateConversationModal.getState();
   modal.showModal();
   modal.setConversationName('Test group');
@@ -131,7 +160,7 @@ function renderCreateConversationModal(options: RenderCreateConversationModalOpt
 describe('CreateConversationModal submission lifecycle', () => {
   it(
     'keeps the Done button loading, rejects rapid duplicate submissions, and closes after success',
-    withIsolatedCreateConversationTest(async () => {
+    withIsolatedCreateConversationModalTest(async () => {
       const createdConversation = {
         qualifiedId: {id: 'conversation-id', domain: 'example.com'},
       } as unknown as Conversation;
@@ -139,16 +168,14 @@ describe('CreateConversationModal submission lifecycle', () => {
       const createGroupConversation = jest.fn(() => {
         return pendingCreation.promise;
       });
-      const {baseElement, getByRole} = renderCreateConversationModal({
+      const {getByRole} = renderCreateConversationModal({
         createGroupConversation,
         conversationCreationStep: ConversationCreationStep.ParticipantsSelection,
       });
-      const doneButton = baseElement.querySelector<HTMLButtonElement>('[data-uie-name="do-create-group"]');
+      const doneButton = getByRole('button', {name: 'createConversationModalHeaderDone'});
       const searchInput = getByRole('textbox');
 
-      if (isNull(doneButton)) {
-        throw new Error('Expected the Done button to be rendered');
-      }
+      expect(doneButton).toHaveAttribute('aria-busy', 'false');
 
       act(() => {
         fireEvent.click(doneButton);
@@ -159,7 +186,8 @@ describe('CreateConversationModal submission lifecycle', () => {
 
       expect(useCreateConversationModal.getState().isSubmitting).toBe(true);
       expect(doneButton).toBeDisabled();
-      expect(doneButton.querySelector('svg')).not.toBeNull();
+      expect(doneButton).toHaveAttribute('aria-busy', 'true');
+      expect(getByRole('button', {name: 'createConversationModalHeaderDone'})).toBe(doneButton);
       expect(createGroupConversation).toHaveBeenCalledTimes(1);
 
       await act(async () => {
@@ -174,7 +202,7 @@ describe('CreateConversationModal submission lifecycle', () => {
 
   it(
     'blocks close, Escape, backdrop dismissal, and backwards navigation before React rerenders',
-    withIsolatedCreateConversationTest(() => {
+    withIsolatedCreateConversationModalTest(() => {
       const createGroupConversation = jest.fn(async () => {
         return {qualifiedId: {id: 'conversation-id', domain: 'example.com'}} as unknown as Conversation;
       });
@@ -221,7 +249,7 @@ describe('CreateConversationModal submission lifecycle', () => {
 
   it(
     'keeps discard confirmation actions and Escape from changing the modal during submission',
-    withIsolatedCreateConversationTest(() => {
+    withIsolatedCreateConversationModalTest(() => {
       const createGroupConversation = jest.fn(async () => {
         return {qualifiedId: {id: 'conversation-id', domain: 'example.com'}} as unknown as Conversation;
       });

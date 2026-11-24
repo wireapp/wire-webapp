@@ -88,6 +88,7 @@ describe('useCreateConversation', () => {
         submissions.push(result.current.done.onSubmit(click));
       });
 
+      expect(useCreateConversationModal.getState().isOpen).toBe(false);
       expect(useCreateConversationModal.getState().isSubmitting).toBe(true);
       expect(createGroupConversation).toHaveBeenCalledTimes(1);
 
@@ -106,6 +107,7 @@ describe('useCreateConversation', () => {
         modal.setConversationName('Test group');
       });
 
+      expect(useCreateConversationModal.getState().isOpen).toBe(true);
       expect(result.current.done.isSubmitting).toBe(false);
 
       await act(async () => {
@@ -117,6 +119,12 @@ describe('useCreateConversation', () => {
       expect(useCreateConversationModal.getState().isOpen).toBe(false);
       expect(result.current.done.isSubmitting).toBe(false);
       expect(result.current.search.isSubmitting).toBe(false);
+
+      act(() => {
+        modal.showModal();
+      });
+
+      expect(useCreateConversationModal.getState().isOpen).toBe(true);
     }),
   );
 

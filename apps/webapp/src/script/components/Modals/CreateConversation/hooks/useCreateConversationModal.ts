@@ -117,6 +117,10 @@ export const useCreateConversationModal = create<CreateConversationModalState>(s
     isSubmitting: false,
     showModal: () => {
       return set(state => {
+        if (state.isSubmitting) {
+          return state;
+        }
+
         return {...state, isOpen: true};
       });
     },

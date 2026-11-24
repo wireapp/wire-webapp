@@ -42,6 +42,8 @@ export const CreateConversationSubmit: FunctionComponent = () => {
       type="button"
       onClick={onSubmit}
       data-uie-name="do-create-group"
+      aria-label={translate('createConversationModalHeaderDone')}
+      aria-busy={isSubmitting}
       showLoading={isSubmitting}
       variant={ButtonVariant.TERTIARY}
     >
