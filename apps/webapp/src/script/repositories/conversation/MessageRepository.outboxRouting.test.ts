@@ -410,6 +410,230 @@ describe('MessageRepository routing sends through the outbox', () => {
     });
   });
 
+  describe('an asset', () => {
+    const file = new File(['bytes'], 'notes.txt', {type: 'text/plain'});
+    const metaData = {audio: null, video: null, image: null, length: file.size, name: file.name, type: file.type};
+
+    beforeEach(() => {
+      jest.spyOn(parts.repository as any, 'buildFileMetaData').mockResolvedValue(metaData);
+      Object.assign(parts.storedMessage, {fileData: jest.fn()});
+    });
+
+    function sendAsset(): Promise<unknown> {
+      return (parts.repository as any).uploadFile(parts.conversation, file, false);
+    }
+
+    it('stores the operation with ids only, shows the pending asset, then keeps the bytes on the record', async () => {
+      await startOutbox(parts);
+
+      await sendAsset();
+
+      const snapshot = onlySnapshot(parts.store);
+      expect(snapshot).toEqual(
+        expect.objectContaining({
+          kind: 'message',
+          state: 'queued',
+          orderingKey: CONVERSATION_ID.id,
+          performTimeoutMilliseconds: 10 * 60 * 1000,
+          payload: {type: 'asset', conversationId: CONVERSATION_ID, messageId: expect.any(String), asImage: false},
+        }),
+      );
+      expect(snapshot.correlationKey).toBe((snapshot.payload as {messageId: string}).messageId);
+      expect(parts.order).toEqual(['append:operation-queued', 'inject', 'updateEvent']);
+      expect(parts.updateEvent).toHaveBeenCalledWith('primary-key', {fileData: file});
+      expect((parts.storedMessage as any).fileData).toHaveBeenCalledWith(file);
+      expect(parts.send).not.toHaveBeenCalled();
+    });
+
+    it('shows the asset as failed with its bytes kept when the outbox refuses it', async () => {
+      await sendAsset();
+
+      expect(parts.inject).toHaveBeenCalledTimes(1);
+      expect(parts.updateEvent).toHaveBeenCalledWith('primary-key', {fileData: file});
+      expect(parts.updateEvent).toHaveBeenLastCalledWith('primary-key', {
+        status: StatusType.FAILED,
+        failed_reason: 'rejected',
+      });
+      expect(parts.send).not.toHaveBeenCalled();
+    });
+
+    it('shows the asset as failed, with the bytes on the shown message, when the record cannot take them', async () => {
+      await startOutbox(parts);
+      parts.updateEvent.mockImplementation(async (_key, changes: any) => {
+        if (changes.fileData !== undefined) {
+          throw new Error('QuotaExceededError');
+        }
+        return {} as any;
+      });
+
+      await expect(sendAsset()).resolves.toBeUndefined();
+
+      expect(parts.inject).toHaveBeenCalledTimes(1);
+      expect((parts.storedMessage as any).fileData).toHaveBeenCalledWith(file);
+      expect(parts.updateEvent).toHaveBeenLastCalledWith('primary-key', {
+        status: StatusType.FAILED,
+        failed_reason: 'rejected',
+      });
+    });
+
+    it('shows nothing when the metadata of the file cannot be built', async () => {
+      await startOutbox(parts);
+      jest.spyOn(parts.repository as any, 'buildFileMetaData').mockRejectedValue(new Error('corrupt'));
+
+      await sendAsset();
+
+      expect(parts.store.operationIds()).toEqual([]);
+      expect(parts.inject).not.toHaveBeenCalled();
+    });
+
+    describe('Retry', () => {
+      const failedPayload = {
+        type: 'asset' as const,
+        conversationId: CONVERSATION_ID,
+        messageId: 'asset-1',
+        asImage: false,
+      };
+
+      function seedDeadLetter(attempts: number): void {
+        parts.store.seed(
+          createStoredSnapshot({
+            kind: 'message',
+            id: 'operation-1',
+            seq: 3,
+            trigger: 'operation-dead-lettered',
+            correlationKey: 'asset-1',
+            orderingKey: CONVERSATION_ID.id,
+            payload: failedPayload,
+            state: 'dead-lettered',
+            attempts,
+            queuedSeq: 7,
+            queuedAt: 1_000_000 - 5000,
+            validUntil: 1_000_000 - 1,
+          }),
+        );
+      }
+
+      function retry(): Promise<void> {
+        return parts.repository.retryUploadFile(parts.conversation, file, false, 'asset-1') as Promise<void>;
+      }
+
+      it('queues the dead-lettered operation again as a version of itself, from the bytes on the record', async () => {
+        seedDeadLetter(2);
+        jest.spyOn(parts.eventService, 'loadEvent').mockResolvedValue({
+          primary_key: 'primary-key',
+          status: StatusType.FAILED,
+          fileData: file,
+        } as any);
+        await startOutbox(parts);
+        parts.updateEvent.mockClear();
+        parts.order.length = 0;
+
+        await retry();
+
+        expect(onlySnapshot(parts.store)).toEqual(
+          expect.objectContaining({
+            id: 'operation-1',
+            trigger: 'operation-versioned',
+            state: 'queued',
+            attempts: 0,
+            queuedSeq: 7,
+            payload: {...failedPayload, mayBeDelivered: true},
+          }),
+        );
+        // The queued attempt that follows has no upload to run against, and marks the asset itself
+        expect(parts.order.slice(0, 2)).toEqual(['updateEvent', 'append:operation-versioned']);
+        expect(parts.updateEvent).not.toHaveBeenCalledWith('primary-key', {fileData: file});
+        expect(parts.inject).not.toHaveBeenCalled();
+      });
+
+      it('puts the bytes back on a record that lost them, and queues a new operation', async () => {
+        await startOutbox(parts);
+
+        await retry();
+
+        expect(parts.updateEvent).toHaveBeenCalledWith('primary-key', {fileData: file});
+        expect(onlySnapshot(parts.store)).toEqual(
+          expect.objectContaining({trigger: 'operation-queued', payload: failedPayload}),
+        );
+        expect(parts.inject).not.toHaveBeenCalled();
+      });
+
+      it('shows the asset as failed again when the outbox refuses it', async () => {
+        await startOutbox(parts);
+        parts.store.fail('append', true);
+
+        await retry();
+
+        expect(parts.updateEvent).toHaveBeenLastCalledWith('primary-key', {
+          status: StatusType.FAILED,
+          failed_reason: 'rejected',
+        });
+      });
+    });
+
+    describe('the upload', () => {
+      const uploaded = {domain: 'wire.test', key: 'asset-key', keyBytes: new Uint8Array([1]), sha256: new Uint8Array([2]), token: 'token'};
+
+      it('warns about leaving only while it runs, and keeps the result on the record', async () => {
+        const events: string[] = [];
+        const add = jest.spyOn(window, 'addEventListener').mockImplementation(type => {
+          events.push(`add:${type}`);
+        });
+        const remove = jest.spyOn(window, 'removeEventListener').mockImplementation(type => {
+          events.push(`remove:${type}`);
+        });
+        jest.spyOn(parts.repository as any, 'uploadToAssetService').mockImplementation(async () => {
+          events.push('upload');
+          return uploaded;
+        });
+        jest.spyOn(parts.eventService, 'loadEvent').mockResolvedValue({primary_key: 'primary-key', data: {name: 'n'}} as any);
+
+        await (parts.repository as any).uploadOutboxAsset(
+          parts.conversation,
+          {type: 'asset', conversationId: CONVERSATION_ID, messageId: 'asset-1', asImage: false},
+          file,
+          new AbortController().signal,
+        );
+
+        add.mockRestore();
+        remove.mockRestore();
+        expect(events).toEqual(['add:beforeunload', 'upload', 'remove:beforeunload']);
+        expect(parts.updateEvent).toHaveBeenCalledWith('primary-key', {
+          data: {
+            name: 'n',
+            domain: 'wire.test',
+            key: 'asset-key',
+            otr_key: uploaded.keyBytes,
+            sha256: uploaded.sha256,
+            token: 'token',
+          },
+        });
+      });
+
+      it('lets go of the warning when the upload fails', async () => {
+        const add = jest.spyOn(window, 'addEventListener');
+        const remove = jest.spyOn(window, 'removeEventListener');
+        jest.spyOn(parts.repository as any, 'uploadToAssetService').mockRejectedValue(new Error('offline'));
+
+        await expect(
+          (parts.repository as any).uploadOutboxAsset(
+            parts.conversation,
+            {type: 'asset', conversationId: CONVERSATION_ID, messageId: 'asset-1', asImage: false},
+            file,
+            new AbortController().signal,
+          ),
+        ).rejects.toThrow('offline');
+
+        const added = add.mock.calls.filter(([type]) => {return type === 'beforeunload'}).map(([, listener]) => {return listener});
+        const removed = remove.mock.calls.filter(([type]) => {return type === 'beforeunload'}).map(([, listener]) => {return listener});
+        add.mockRestore();
+        remove.mockRestore();
+        expect(added).toHaveLength(1);
+        expect(removed).toEqual(added);
+      });
+    });
+  });
+
   describe('a ping', () => {
     it('stores the operation, plays the sound, shows the ping, and answers that it is queued', async () => {
       await startOutbox(parts);
@@ -865,6 +1089,46 @@ describe('MessageRepository without an outbox keeps sending directly', () => {
     await (repository as any).updateMessageAsSent(parts.conversation, 'message-1', '2026-01-01T00:00:05.000Z');
 
     expect(parts.updateEvent.mock.calls[0][1]).not.toHaveProperty('written_time');
+    parts.clock.dispose();
+  });
+
+  it('uploads a file as before, holding the page open for the whole send and showing the process queue', async () => {
+    const parts = buildParts();
+    const assetRepository = {addToProcessQueue: jest.fn()} as unknown as AssetRepository;
+    const repository = new MessageRepository(
+      () => {
+        return {checkMessageTimer: jest.fn()} as unknown as ConversationRepository;
+      },
+      new CryptographyRepository({} as any),
+      new EventRepository(parts.eventService, {} as any, {} as any, {} as any),
+      new PropertiesRepository({} as any, {} as any, translateForTest),
+      serverTimeHandler,
+      {} as UserRepository,
+      assetRepository,
+      new AudioRepository(),
+      translateForTest,
+      new UserState(),
+      new ClientState(),
+      new ConversationState(new UserState()),
+      new TeamState(),
+      createCoreTestFixture({service: {conversation: {send: jest.fn(), messageTimer: new MessageTimer()}}}),
+    );
+    const file = new File(['bytes'], 'notes.txt', {type: 'text/plain'});
+    jest
+      .spyOn(repository as any, 'buildFileMetaData')
+      .mockResolvedValue({audio: null, video: null, image: null, length: file.size, name: file.name, type: file.type});
+    const sendRemote = jest
+      .spyOn(repository as any, 'sendAssetRemotedata')
+      .mockResolvedValue({state: 'SENDING'} as never);
+    const add = jest.spyOn(window, 'addEventListener');
+
+    await (repository as any).uploadFile(parts.conversation, file, false);
+
+    const listeners = add.mock.calls.filter(([type]) => {return type === 'beforeunload'});
+    add.mockRestore();
+    expect(listeners).toHaveLength(1);
+    expect(assetRepository.addToProcessQueue).toHaveBeenCalledTimes(1);
+    expect(sendRemote).toHaveBeenCalledTimes(1);
     parts.clock.dispose();
   });
 });
