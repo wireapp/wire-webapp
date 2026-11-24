@@ -37,10 +37,18 @@ export const CreateConversationModal: FunctionComponent = () => {
     useCreateConversationModal();
 
   const onCancel = (): void => {
+    if (useCreateConversationModal.getState().isSubmitting) {
+      return;
+    }
+
     setIsConfirmDiscardModalOpen(false);
   };
 
   const onSubmit = (): void => {
+    if (useCreateConversationModal.getState().isSubmitting) {
+      return;
+    }
+
     if (discardTrigger === 'modalClose') {
       hideModal();
       return;
@@ -56,10 +64,15 @@ export const CreateConversationModal: FunctionComponent = () => {
         id="create-conversation-modal"
         wrapperCSS={createConversationModalWrapperCss}
         isShown={isOpen}
-        onClosed={hideModal}
         data-uie-name="group-creation-label"
         onKeyDown={event => {
-          return handleEscDown(event, hideModal);
+          return handleEscDown(event, () => {
+            if (useCreateConversationModal.getState().isSubmitting) {
+              return;
+            }
+
+            hideModal();
+          });
         }}
       >
         <CreateConversationHeader />

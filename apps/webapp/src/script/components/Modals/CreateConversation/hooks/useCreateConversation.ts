@@ -17,8 +17,6 @@
  *
  */
 
-import {useState} from 'react';
-
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -48,7 +46,7 @@ import {ConversationAccess, ConversationCreationStep, ConversationType} from '..
 import {NonFederatingParticipantsModalCopy} from '../utils';
 
 type UseCreateConversationResult = {
-  isLoading: boolean;
+  isSubmitting: boolean;
   onSubmit: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>,
   ) => Promise<void>;
@@ -56,12 +54,13 @@ type UseCreateConversationResult = {
 export const useCreateConversation = (
   nonFederatingParticipantsModalCopy: NonFederatingParticipantsModalCopy,
 ): UseCreateConversationResult => {
-  const [isLoading, setIsLoading] = useState(false);
   const {mainViewModel, translate} = useApplicationContext();
   const {
     conversationName,
     hideModal,
     showModal,
+    isSubmitting,
+    setIsSubmitting,
     selectedContacts,
     setConversationName,
     setConversationCreationStep,
@@ -114,15 +113,11 @@ export const useCreateConversation = (
           action: () => {
             setConversationName(conversationName);
             showModal();
-            setIsLoading(false);
             setConversationCreationStep(ConversationCreationStep.ParticipantsSelection);
           },
         },
         secondaryAction: {
           text: nonFederatingParticipantsModalCopy.leaveButtonText,
-          action: () => {
-            setIsLoading(false);
-          },
         },
         text: {
           translatedMessage: nonFederatingParticipantsModalCopy.getTranslatedMessage(backendString),
@@ -134,7 +129,7 @@ export const useCreateConversation = (
     );
   };
 
-  const handleException = (error: Error, conversationName: string): void => {
+  const handleException = (error: unknown, conversationName: string): void => {
     if (isNonFederatingBackendsError(error)) {
       hideModal();
 
@@ -146,7 +141,10 @@ export const useCreateConversation = (
   const onSubmit = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>,
   ): Promise<void> => {
-    setIsLoading(true);
+    if (useCreateConversationModal.getState().isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
 
     try {
       const conversation = await conversationRepository.createGroupConversation(
@@ -173,16 +171,16 @@ export const useCreateConversation = (
         createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
       }
     } catch (error: unknown) {
-      handleException(error as Error, conversationName);
+      handleException(error, conversationName);
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
-      setIsLoading(false);
+    } finally {
+      hideModal();
+      setIsSubmitting(false);
     }
-
-    hideModal();
   };
 
   return {
-    isLoading,
+    isSubmitting,
     onSubmit,
   };
 };

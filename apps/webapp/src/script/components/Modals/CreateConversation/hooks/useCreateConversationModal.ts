@@ -34,6 +34,7 @@ import {
  */
 type CreateConversationModalState = {
   isOpen: boolean;
+  isSubmitting: boolean;
   conversationName: string;
   access: ConversationAccess;
   moderator: ADD_PERMISSION;
@@ -56,6 +57,7 @@ type CreateConversationModalState = {
 
   showModal: () => void;
   hideModal: () => void;
+  setIsSubmitting: (isSubmitting: boolean) => void;
   setConversationName: (name: string) => void;
   setAccess: (access: ConversationAccess) => void;
   setModerator: (access: ADD_PERMISSION) => void;
@@ -112,13 +114,23 @@ const initialState = {
 export const useCreateConversationModal = create<CreateConversationModalState>(set => {
   return {
     ...initialState,
+    isSubmitting: false,
     showModal: () => {
       return set(state => {
+        if (state.isSubmitting) {
+          return state;
+        }
+
         return {...state, isOpen: true};
       });
     },
     hideModal: () => {
-      return set({...initialState});
+      return set(state => {
+        return {...initialState, isSubmitting: state.isSubmitting};
+      });
+    },
+    setIsSubmitting: (isSubmitting: boolean) => {
+      return set({isSubmitting});
     },
     setConversationName: (name: string) => {
       return set({conversationName: name});

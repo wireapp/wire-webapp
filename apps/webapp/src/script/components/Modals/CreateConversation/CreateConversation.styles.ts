@@ -32,3 +32,11 @@ export const createConversationHeaderContainerCss: CSSObject = {
   borderBottom: '1px solid var(--border-color)',
   marginBottom: '0px',
 };
+
+export const createConversationCloseButtonCss: CSSObject = {
+  '&:disabled': {
+    cursor: 'not-allowed',
+    opacity: 0.32,
+    pointerEvents: 'none',
+  },
+};

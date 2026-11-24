@@ -22,7 +22,7 @@ import type {FunctionComponent} from 'react';
 import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {createConversationHeaderContainerCss} from './CreateConversation.styles';
+import {createConversationCloseButtonCss, createConversationHeaderContainerCss} from './CreateConversation.styles';
 import {CreateConversationSubmit} from './CreateConversationSubmit';
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
 import {ConversationType, ConversationCreationStep} from './types';
@@ -46,6 +46,7 @@ export const CreateConversationHeader: FunctionComponent = () => {
     setDiscardTrigger,
     setIsConfirmDiscardModalOpen,
     hideModal,
+    isSubmitting,
   } = useCreateConversationModal();
   const userState = container.resolve(UserState);
   const selfUser = userState.self();
@@ -60,6 +61,10 @@ export const CreateConversationHeader: FunctionComponent = () => {
   };
 
   const onBackClick = (): void => {
+    if (useCreateConversationModal.getState().isSubmitting) {
+      return;
+    }
+
     if (conversationType === ConversationType.Group) {
       gotoFirstStep();
       return;
@@ -69,6 +74,10 @@ export const CreateConversationHeader: FunctionComponent = () => {
   };
 
   const onModalClose = (): void => {
+    if (useCreateConversationModal.getState().isSubmitting) {
+      return;
+    }
+
     if (conversationCreationStep !== ConversationCreationStep.ConversationDetails) {
       setDiscardTrigger('modalClose');
       setIsConfirmDiscardModalOpen(true);
@@ -88,6 +97,8 @@ export const CreateConversationHeader: FunctionComponent = () => {
         className="button-reset-default"
         type="button"
         onClick={onModalClose}
+        disabled={isSubmitting}
+        css={createConversationCloseButtonCss}
         aria-label={translate('accessibility.groupCreationActionCloseModal')}
         data-uie-name="do-close"
       >
@@ -105,6 +116,7 @@ export const CreateConversationHeader: FunctionComponent = () => {
             css={{marginBottom: 0}}
             type="button"
             onClick={onBackClick}
+            disabled={isSubmitting}
             aria-label={'Back'}
             data-uie-name="go-to-previous-step"
             variant={ButtonVariant.TERTIARY}
