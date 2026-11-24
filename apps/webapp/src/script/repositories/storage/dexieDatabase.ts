@@ -25,6 +25,7 @@ import {ClientRecord} from './record/clientRecord';
 import {GroupIdRecord} from './record/groupIdRecord';
 import {StorageSchemata} from './storageSchemata';
 
+import type {OperationSnapshot} from '../../outbox';
 import {getLogger, Logger} from '../../util/logger';
 
 /**
@@ -39,6 +40,7 @@ export class DexieDatabase extends Dexie {
   conversations: Table<ConversationRecord, string>;
   events: Table<EventRecord, number>;
   keys: Table<CryptoboxRecord, string>;
+  outbox: Table<OperationSnapshot, number>;
   prekeys: Table<CryptoboxRecord, string>;
   sessions: Table<CryptoboxRecord, string>;
   users: Table<UserRecord, string>;
@@ -58,6 +60,7 @@ export class DexieDatabase extends Dexie {
     this.conversations = this.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS);
     this.events = this.table(StorageSchemata.OBJECT_STORE.EVENTS);
     this.keys = this.table(StorageSchemata.OBJECT_STORE.KEYS);
+    this.outbox = this.table(StorageSchemata.OBJECT_STORE.OUTBOX);
     this.prekeys = this.table(StorageSchemata.OBJECT_STORE.PRE_KEYS);
     this.sessions = this.table(StorageSchemata.OBJECT_STORE.SESSIONS);
     this.users = this.table(StorageSchemata.OBJECT_STORE.USERS);

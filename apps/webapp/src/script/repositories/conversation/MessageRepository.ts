@@ -80,6 +80,7 @@ import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
 import {MentionEntity} from '../../message/mentionEntity';
 import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
+import type {Outbox} from '../../outbox';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {
@@ -221,6 +222,7 @@ export class MessageRepository {
     private readonly conversationState = container.resolve(ConversationState),
     private readonly teamState = container.resolve(TeamState),
     private readonly core = container.resolve(Core),
+    private readonly outbox?: Outbox,
   ) {
     this.logger = getLogger('MessageRepository');
 
@@ -276,6 +278,12 @@ export class MessageRepository {
 
     if (this.isBlockingNotificationHandling !== updatedHandlingState) {
       this.isBlockingNotificationHandling = updatedHandlingState;
+    }
+
+    if (handlingState === NOTIFICATION_HANDLING_STATE.WEB_SOCKET) {
+      this.outbox?.resume();
+    } else {
+      this.outbox?.pause();
     }
   };
 
