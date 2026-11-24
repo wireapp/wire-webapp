@@ -36,7 +36,7 @@ import {
   SidebarTabs,
   useSidebarStore,
 } from '../page/leftSidebar/panels/conversations/useSidebarStore';
-import {PanelState} from '../page/rightSidebar';
+import {PanelState} from '../page/rightSidebar/panelState';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
 import type {CallingRepository} from '../repositories/calling/CallingRepository';

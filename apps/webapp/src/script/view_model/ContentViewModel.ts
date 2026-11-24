@@ -36,8 +36,7 @@ import {
   isConversationListTab,
   useSidebarStore,
 } from '../page/leftSidebar/panels/conversations/useSidebarStore';
-import '../page/mainContent';
-import {PanelState} from '../page/rightSidebar';
+import {PanelState} from '../page/rightSidebar/panelState';
 import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
 import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';

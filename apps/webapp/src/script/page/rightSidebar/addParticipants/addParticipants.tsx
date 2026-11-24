@@ -49,7 +49,7 @@ import {safeWindowOpen} from '../../../util/sanitizationUtil';
 import {compareTransliteration, sortByPriority, sortUsersByPriority} from '../../../util/stringUtil';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
-import {PanelEntity, PanelState} from '../rightSidebar';
+import {PanelEntity, PanelState} from '../panelState';
 
 const ENABLE_ADD_ACTIONS_LENGTH = 0;
 const ENABLE_IS_SEARCHING_LENGTH = 0;

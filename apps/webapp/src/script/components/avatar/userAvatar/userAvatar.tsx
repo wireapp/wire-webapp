@@ -29,7 +29,7 @@ import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {COLOR} from '../../../uiKit/identity/colors/colors';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
-import {AvailabilityIcon} from '../../availabilityIcon';
+import {AvailabilityIcon} from '../../availabilityIcon/availability';
 import {useUserName} from '../../UserName';
 import {AVATAR_SIZE, STATE} from '../avatar';
 import {AvatarBackground} from '../avatarBackground';

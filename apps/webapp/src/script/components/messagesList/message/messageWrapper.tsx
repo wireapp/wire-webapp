@@ -26,7 +26,7 @@ import {container} from 'tsyringe';
 
 import {CallMessage} from './callMessage';
 import {CallTimeoutMessage} from './callTimeoutMessage';
-import {ContentMessageComponent} from './contentMessage';
+import {ContentMessageComponent} from './contentMessage/contentMessage';
 import {DecryptErrorMessage} from './decryptErrorMessage';
 import {DeleteMessage} from './deleteMessage';
 import {E2EIVerificationMessage} from './e2eiVerificationMessage';
@@ -35,10 +35,10 @@ import {FederationStopMessage} from './federationStopMessage';
 import {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';
 import {LegalHoldMessage} from './legalHoldMessage';
 import {MemberMessage} from './memberMessage';
-import {MessageParams} from './message';
 import {MissedMessage} from './missedMessage';
 import {PingMessage} from './pingMessage';
 import {SystemMessage} from './systemMessage';
+import {MessageParams} from './types';
 import {VerificationMessage} from './verificationMessage';
 
 import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';

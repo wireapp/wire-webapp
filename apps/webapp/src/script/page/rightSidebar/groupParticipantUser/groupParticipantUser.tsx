@@ -43,7 +43,7 @@ import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {WebAppEvents} from '../../../webAppEvents';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
-import {PanelEntity} from '../rightSidebar';
+import {PanelEntity} from '../panelState';
 
 interface GroupParticipantUserProps {
   onBack: (entity: PanelEntity) => void;

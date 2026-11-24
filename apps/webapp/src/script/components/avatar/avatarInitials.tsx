@@ -19,10 +19,10 @@
 
 import {FC} from 'react';
 
+import {AVATAR_SIZE, INITIALS_SIZE, DIAMETER} from './avatar';
+
 import {CSS_FILL_PARENT} from '../../util/cssMixin';
 import {getFirstChar} from '../../util/stringUtil';
-
-import {AVATAR_SIZE, INITIALS_SIZE, DIAMETER} from '.';
 
 const pixelsPerRem = 16;
 
