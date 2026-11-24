@@ -24,7 +24,11 @@ import {
   CELLS_SELF_USER_DRIVE_ROLE,
   type CellsSelfUserDriveRole,
 } from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {createBulkDownloadOperation, resolveBulkDownloadSelection} from './bulkDownloadOperation';
+import {
+  type BulkDownloadSelection,
+  createBulkDownloadOperation,
+  resolveBulkDownloadSelection,
+} from './bulkDownloadOperation';
 
 Object.assign(globalThis, {ReadableStream});
 
@@ -40,26 +44,31 @@ const createStream = (
   ) as unknown as globalThis.ReadableStream<Uint8Array>;
 };
 
-const eligibleSelection = (paths: readonly string[]) => ({kind: 'eligible', paths}) as const;
+const eligibleSelection = (paths: readonly string[]): BulkDownloadSelection => {
+  return {kind: 'eligible', paths} as const;
+};
 
-const createNode = (path: string, role: CellsSelfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR): CellNode =>
-  ({
+const createNode = (path: string, role: CellsSelfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR): CellNode => {
+  return {
     id: path,
     name: path.split('/').at(-1) ?? path,
     path,
     type: path.endsWith('/') ? CellNodeType.FOLDER : CellNodeType.FILE,
     selfUserDriveRole: role,
-  }) as CellNode;
+  } as CellNode;
+};
 
 describe('resolveBulkDownloadSelection', () => {
   it('accepts every permitted file and folder in a mixed selection without imposing a cap', () => {
-    const nodes = Array.from({length: 501}, (_, index) =>
-      createNode(index === 0 ? 'workspace/folder/' : `workspace/file-${index}.txt`),
-    );
+    const nodes = Array.from({length: 501}, (_, index) => {
+      return createNode(index === 0 ? 'workspace/folder/' : `workspace/file-${index}.txt`);
+    });
 
     expect(resolveBulkDownloadSelection({nodes, canDownload: true})).toEqual({
       kind: 'eligible',
-      paths: nodes.map(({path}) => path),
+      paths: nodes.map(({path}) => {
+        return path;
+      }),
     });
   });
 
@@ -92,15 +101,16 @@ describe('resolveBulkDownloadSelection', () => {
 describe('createBulkDownloadOperation', () => {
   it('rejects concurrent starts and reports transferred bytes without claiming a save', async () => {
     let finishDownload: ((stream: globalThis.ReadableStream<Uint8Array>) => void) | undefined;
-    const download = jest.fn(
-      () =>
-        new Promise<globalThis.ReadableStream<Uint8Array>>(resolve => {
-          finishDownload = resolve;
-        }),
-    );
+    const download = jest.fn(() => {
+      return new Promise<globalThis.ReadableStream<Uint8Array>>(resolve => {
+        finishDownload = resolve;
+      });
+    });
     const operation = createBulkDownloadOperation(download);
     const states: string[] = [];
-    operation.subscribe(state => states.push(state.kind));
+    operation.subscribe(state => {
+      states.push(state.kind);
+    });
 
     const first = operation.start({
       selection: eligibleSelection(['workspace/file.txt']),
@@ -216,14 +226,18 @@ describe('createBulkDownloadOperation', () => {
     const download = jest.fn().mockResolvedValueOnce(source).mockResolvedValue(createStream());
     const operation = createBulkDownloadOperation(download);
     const states: string[] = [];
-    operation.subscribe(({kind}) => states.push(kind));
+    operation.subscribe(({kind}) => {
+      states.push(kind);
+    });
     const request = {selection: eligibleSelection(['workspace/file.txt']), archiveParentPath: 'workspace'};
     const {stream} = await operation.start(request);
     await pullStarted;
 
     const cancellation = stream.cancel();
     await cancelStarted;
-    await new Promise<void>(resolve => setImmediate(resolve));
+    await new Promise<void>(resolve => {
+      setImmediate(resolve);
+    });
 
     try {
       expect(operation.getState()).toEqual({kind: 'starting'});
@@ -242,7 +256,11 @@ describe('createBulkDownloadOperation', () => {
 
   it('exposes cancellation failures and releases the operation lock', async () => {
     const failure = new Error('cancel failed');
-    const source = createStream({cancel: () => Promise.reject(failure)});
+    const source = createStream({
+      cancel: () => {
+        return Promise.reject(failure);
+      },
+    });
     const download = jest.fn().mockResolvedValueOnce(source).mockResolvedValue(createStream());
     const operation = createBulkDownloadOperation(download);
     const request = {selection: eligibleSelection(['workspace/file.txt']), archiveParentPath: 'workspace'};
@@ -255,7 +273,9 @@ describe('createBulkDownloadOperation', () => {
   });
 
   it('does not let a throwing observer corrupt operation state', async () => {
-    const operation = createBulkDownloadOperation(async () => createStream());
+    const operation = createBulkDownloadOperation(async () => {
+      return createStream();
+    });
     operation.subscribe(() => {
       throw new Error('observer failed');
     });

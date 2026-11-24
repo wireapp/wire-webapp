@@ -50,8 +50,14 @@ export const resolveBulkDownloadSelection = ({
     return {kind: 'rejected', reason: 'forbidden'};
   }
 
-  const paths = nodes.map(({path}) => path);
-  if (paths.some(path => path.trim().length === 0)) {
+  const paths = nodes.map(({path}) => {
+    return path;
+  });
+  if (
+    paths.some(path => {
+      return path.trim().length === 0;
+    })
+  ) {
     return {kind: 'rejected', reason: 'selection-unavailable'};
   }
 
@@ -109,10 +115,14 @@ export const createBulkDownloadOperation = (
   };
 
   return {
-    getState: () => state,
+    getState: () => {
+      return state;
+    },
     subscribe: listener => {
       listeners.add(listener);
-      return () => listeners.delete(listener);
+      return () => {
+        return listeners.delete(listener);
+      };
     },
     start: async request => {
       if (isActive) {
