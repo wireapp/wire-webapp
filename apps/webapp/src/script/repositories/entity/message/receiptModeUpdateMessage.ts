@@ -18,21 +18,22 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {container} from 'tsyringe';
 
 import {SystemMessage} from './systemMessage';
 
 import {CONVERSATION_EVENT} from '../../../apiClient/event/conversationEvent';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate} from '../../../util/localizerUtil';
-import {matchQualifiedIds} from '../../../util/qualifiedId';
-import {UserState} from '../../user/userState';
 import {User} from '../User';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
-  private readonly userState = container.resolve(UserState);
-
-  constructor(isReceiptEnabled: boolean, userId: string, userDomain: string | undefined, translate: Translate) {
+  constructor(
+    isReceiptEnabled: boolean,
+    userId: string,
+    userDomain: string | undefined,
+    isSelfUser: boolean,
+    translate: Translate,
+  ) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.RECEIPT_MODE_UPDATE;
@@ -44,8 +45,6 @@ export class ReceiptModeUpdateMessage extends SystemMessage {
       this.user(new User(userId, userDomain ?? '', this.translate));
     }
 
-    const isSelfUser =
-      isNonEmptyString(userId) && matchQualifiedIds(this.user().qualifiedId, this.userState.self()?.qualifiedId);
     this.caption = getCaption(isReceiptEnabled, isSelfUser, this.translate);
   }
 }

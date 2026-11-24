@@ -39,8 +39,9 @@ import {MessageTimerUpdateMessage} from '../entity/message/messageTimerUpdateMes
 import {ReceiptModeUpdateMessage} from '../entity/message/receiptModeUpdateMessage';
 import {SystemMessage} from '../entity/message/systemMessage';
 import {eventShouldBeStored} from '../event/EventTypeHandling';
-import {UserState} from '../user/userState';
 import {SystemMessageType} from '../../message/systemMessageType';
+import {APIClient} from '../../service/apiClientSingleton';
+import {ClientType} from '../../apiClient/client/clientType';
 
 import {EventMapper} from './EventMapper';
 import {translateForTest} from '../../util/test/translateForTest';
@@ -298,8 +299,8 @@ describe('Event Mapper', () => {
     });
 
     describe('message timer update', () => {
-      const userState = container.resolve(UserState);
-      const selfUser = new User('self-user-id', 'wire.com', translateForTest);
+      const apiClient = container.resolve(APIClient);
+      const selfUser = {id: 'self-user-id', domain: 'wire.com'};
       const mapper = new EventMapper(undefined, translateForTest);
 
       const createTimerUpdateEvent = (
@@ -319,12 +320,11 @@ describe('Event Mapper', () => {
       };
 
       beforeEach(() => {
-        selfUser.isMe = true;
-        userState.self(selfUser);
+        apiClient.context = {clientType: ClientType.PERMANENT, userId: selfUser.id, domain: selfUser.domain};
       });
 
       afterEach(() => {
-        userState.self(undefined as any);
+        apiClient.context = undefined;
       });
 
       it('uses the self caption when the self user updated the timer', () => {
@@ -363,8 +363,8 @@ describe('Event Mapper', () => {
     });
 
     describe('receipt mode update', () => {
-      const userState = container.resolve(UserState);
-      const selfUser = new User('self-user-id', 'wire.com', translateForTest);
+      const apiClient = container.resolve(APIClient);
+      const selfUser = {id: 'self-user-id', domain: 'wire.com'};
       const mapper = new EventMapper(undefined, translateForTest);
 
       const createReceiptModeUpdateEvent = (
@@ -384,12 +384,11 @@ describe('Event Mapper', () => {
       };
 
       beforeEach(() => {
-        selfUser.isMe = true;
-        userState.self(selfUser);
+        apiClient.context = {clientType: ClientType.PERMANENT, userId: selfUser.id, domain: selfUser.domain};
       });
 
       afterEach(() => {
-        userState.self(undefined as any);
+        apiClient.context = undefined;
       });
 
       it('uses the self caption when the self user enabled read receipts', () => {
