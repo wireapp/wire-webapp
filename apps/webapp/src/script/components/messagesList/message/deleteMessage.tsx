@@ -21,6 +21,8 @@ import type {FunctionComponent} from 'react';
 
 import {noop} from 'noop-esm';
 
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+
 import {MessageHeader} from './contentMessage/messageHeader';
 import {MessageTime} from './messageTime';
 
@@ -28,6 +30,7 @@ import {useApplicationContext} from '../../../page/rootProvider';
 import {DeleteMessage as DeleteMessageEntity} from '../../../repositories/entity/message/deleteMessage';
 import {User} from '../../../repositories/entity/User';
 import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {getUserName} from '../../../util/localizerUtil/userName';
 import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 interface DeleteMessageProps {
@@ -37,9 +40,11 @@ interface DeleteMessageProps {
 
 const DeleteMessage: FunctionComponent<DeleteMessageProps> = ({message, onClickAvatar = noop}: DeleteMessageProps) => {
   const {translate} = useApplicationContext();
+  const {deletedBy} = useKoSubscribableChildren(message, ['deletedBy']);
   const deletedTimeStamp = message.deleted_timestamp ?? 0;
 
-  const formattedDeletionTime = translate('conversationDeleteTimestamp', {
+  const formattedDeletionTime = translate('conversationDeleteTimestampBy', {
+    name: getUserName(deletedBy, translate),
     date: formatTimeShort(fromUnixTime(deletedTimeStamp / TIME_IN_MILLIS.SECOND)),
   });
 
