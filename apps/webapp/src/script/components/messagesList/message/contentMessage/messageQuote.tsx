@@ -46,7 +46,7 @@ import {isErrorWithType} from '../../../../util/typePredicateUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
 import * as Icon from '../../../icon';
 import {AssetImage} from '../../../image';
-import {MessageActions} from '../message';
+import {MessageActions} from '../types';
 import {useMessageFocusedTabIndex} from '../util';
 
 function createPlaceholderMessage(translate: Translate): ContentMessage {

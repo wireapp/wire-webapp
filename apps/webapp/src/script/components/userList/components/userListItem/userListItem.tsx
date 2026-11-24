@@ -30,7 +30,7 @@ import {UserStatusBadges} from '../../../badge';
 import {ParticipantItemContent} from '../../../participantItemContent';
 import {listItem, listWrapper} from '../../../participantItemContent/participantItem.styles';
 import {useUserName} from '../../../UserName';
-import {UserlistMode} from '../../userList';
+import {UserlistMode} from '../../userListMode';
 
 export interface UserListItemProps {
   groupId?: string;

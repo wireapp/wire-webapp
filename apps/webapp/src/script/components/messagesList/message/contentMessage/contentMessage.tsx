@@ -49,9 +49,9 @@ import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {getMessageAriaLabel} from '../../../../util/conversationMessages';
 import {FileFullscreenModalSourceConversationProvider} from '../../../FileFullscreenModal/FileFullscreenModalSourceConversationContext';
 import {EphemeralTimer} from '../ephemeralTimer';
-import {MessageActions} from '../message';
 import {MessageTime} from '../messageTime';
 import {ReadIndicator} from '../readIndicator';
+import {MessageActions} from '../types';
 import {useMessageFocusedTabIndex} from '../util';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {

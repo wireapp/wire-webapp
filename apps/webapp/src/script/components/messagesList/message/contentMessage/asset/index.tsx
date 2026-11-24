@@ -45,8 +45,8 @@ import {Multipart} from '../../../../../repositories/entity/message/multipart';
 import {Text} from '../../../../../repositories/entity/message/text';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {includesOnlyEmojis} from '../../../../../util/emojiUtil';
-import {MessageActions} from '../../message';
 import {ReadIndicator} from '../../readIndicator';
+import {MessageActions} from '../../types';
 
 interface ContentAssetProps {
   asset: Asset;

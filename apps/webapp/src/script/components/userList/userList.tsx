@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 
 import {UserListItem} from './components/userListItem/userListItem';
 import {collapseButton, collapseIcon} from './userList.styles';
+import {UserlistMode} from './userListMode';
 
 import {useApplicationContext} from '../../page/rootProvider';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
@@ -37,11 +38,7 @@ import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isEnterKey, isSpaceKey} from '../../util/keyboardUtil';
 import {InViewport} from '../inViewport';
 
-export enum UserlistMode {
-  COMPACT = 'UserlistMode.COMPACT',
-  DEFAULT = 'UserlistMode.DEFAULT',
-  OTHERS = 'UserlistMode.OTHERS',
-}
+export {UserlistMode};
 
 const USER_CHUNK_SIZE = 64;
 
