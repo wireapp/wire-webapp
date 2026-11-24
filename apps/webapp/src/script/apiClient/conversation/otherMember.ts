@@ -18,10 +18,9 @@
  */
 
 import {ConversationOtherMemberUpdateData} from './data';
+import {ServiceRef} from './serviceRef';
 
 import {QualifiedId} from '../user/qualifiedId';
-
-import {ServiceRef} from './';
 
 export interface OtherMember extends Partial<ConversationOtherMemberUpdateData> {
   /** The user ID. */

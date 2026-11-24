@@ -17,7 +17,11 @@
  *
  */
 
-import {ClientCapability, ClientType, Location, MLSPublicKeyRecord, PublicClient} from './';
+import {MLSPublicKeyRecord} from './clientApi';
+import {ClientCapability} from './clientCapability';
+import {ClientType} from './clientType';
+import {Location} from './location';
+import {PublicClient} from './publicClient';
 
 export interface AddedClient extends PublicClient {
   /** The IP address from which the client was registered */

@@ -17,7 +17,7 @@
  *
  */
 
-import {OTRRecipients} from './';
+import {OTRRecipients} from './otrRecipients';
 
 export interface NewOTRMessage<T extends string | Uint8Array> {
   /** Extra (symmetric) data (i.e. ciphertext) that is replicated for each recipient. */

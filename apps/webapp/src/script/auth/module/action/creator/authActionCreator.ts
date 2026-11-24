@@ -17,13 +17,13 @@
  *
  */
 
+import type {AppAction} from './appAction';
+
 import type {SSOSettings} from '../../../../apiClient/account/ssoSettings';
 import type {RegisterData} from '../../../../apiClient/auth/registerData';
 import {OAuthClient} from '../../../../apiClient/oauth/oAuthClient';
 import {TeamData} from '../../../../apiClient/team/team/teamData';
 import type {LoginDataState, RegistrationDataState} from '../../reducer/authReducer';
-
-import type {AppAction} from '.';
 
 export enum AUTH_ACTION {
   AUTH_RESET_ERROR = 'AUTH_RESET_ERROR',

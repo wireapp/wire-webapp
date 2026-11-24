@@ -30,6 +30,7 @@ import {
   ProteusCreateConversationResponse,
   SendMlsMessageParams,
   SendResult,
+  RemoveUsersParams,
 } from './conversationService.types';
 
 import {APIClient} from '../../../apiClient/apiClient';
@@ -61,7 +62,6 @@ import {Decoder} from '../../../commons/base64/decoder';
 import {TypedEventEmitter} from '../../../commons/TypedEventEmitter/TypedEventEmitter';
 import {XOR} from '../../../commons/util/TypeUtil';
 import {getLogger} from '../../../logger/getLogger';
-import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {isMlsConversationNotFoundError} from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';
 import {
@@ -83,7 +83,9 @@ import {HandledEventPayload, HandledEventResult} from '../../notification';
 import {CoreDatabase} from '../../storage/coreDb';
 import {isMLSConversation} from '../../util';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
+import {MessageSendingState} from '../message/message.types';
 import {isSendingMessage, sendMessage} from '../message/messageSender';
+import {MessageTimer} from '../messageTimer/messageTimer';
 import {SubconversationService} from '../subconversationService/subconversationService';
 
 type DeferredEpochRecoveryEntry = {

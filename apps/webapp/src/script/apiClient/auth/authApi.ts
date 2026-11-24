@@ -19,10 +19,11 @@
 
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
+import {AccessTokenData} from './accessTokenData';
 import {CookieList} from './cookieList';
+import {LoginData} from './loginData';
 import {RegisterData} from './registerData';
 
-import {AccessTokenData, LoginData} from '../auth/';
 import {ClientType} from '../client/';
 import {HttpClient} from '../http/';
 import type {CookiePlatform} from '../platform';

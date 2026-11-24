@@ -23,6 +23,10 @@ import axios from 'axios';
 import {StatusCodes} from 'http-status-codes';
 import {Maybe, task, type Task} from 'true-myth';
 
+import {ClientBackendRepository} from './clientBackendRepository';
+import {ClientDatabaseRepository} from './clientDatabaseRepository';
+import {ClientInfo} from './clientInfo';
+
 import {APIClient} from '../../apiClient/apiClient';
 import {LoginData} from '../../apiClient/auth/loginData';
 import {ClientCapability} from '../../apiClient/client/clientCapability';
@@ -38,8 +42,6 @@ import {InitialPrekeys} from '../messagingProtocols/proteus/proteusService/crypt
 import {wipeCoreCryptoDb} from '../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
 import type {CRUDEngine} from '../storage/engine/crudEngine';
 import {RecordNotFoundError} from '../storage/engine/error';
-
-import {ClientInfo, ClientBackendRepository, ClientDatabaseRepository} from './';
 
 /** `HttpClient` turns error responses with a body into a `BackendError`, other failures stay an `AxiosError`. */
 function isNotFoundError(error: unknown): boolean {

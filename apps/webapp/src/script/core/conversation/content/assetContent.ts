@@ -17,12 +17,14 @@
  *
  */
 
-import {Asset} from '@wireapp/protocol-messaging';
+import {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {AbortReason, AssetTransferState} from '..';
+import {FileContent, FileMetaDataContent} from './fileContent';
+import {ImageContent} from './imageContent';
+
 import {EncryptedAssetUploaded} from '../../cryptography';
-
-import {FileContent, FileMetaDataContent, ImageContent, LegalHoldStatus} from '.';
+import {AbortReason} from '../abortReason';
+import {AssetTransferState} from '../assetTransferState';
 
 export type ImageMetaData = Asset.IImageMetaData;
 export type VideoMetaData = Asset.IVideoMetaData;

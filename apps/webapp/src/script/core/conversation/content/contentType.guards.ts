@@ -17,28 +17,28 @@
  *
  */
 
-import {ClientActionType} from '..';
-import {Connection} from '../../../apiClient/connection/connection';
-
 import {
   AssetContent,
-  ClearedContent,
-  ClientActionContent,
-  ConfirmationContent,
-  ConversationContent,
-  DeletedContent,
-  EditedTextContent,
   FileAssetAbortContent,
   FileAssetContent,
   FileAssetMetaDataContent,
-  HiddenContent,
   ImageAssetContent,
-  ImageContent,
-  LocationContent,
-  MultiPartContent,
-  ReactionContent,
-  TextContent,
-} from '.';
+} from './assetContent';
+import {ClearedContent} from './clearedContent';
+import {ClientActionContent} from './clientActionContent';
+import {ConfirmationContent} from './confirmationContent';
+import {ConversationContent} from './conversationContent';
+import {DeletedContent} from './deletedContent';
+import {EditedTextContent} from './editedTextContent';
+import {HiddenContent} from './hiddenContent';
+import {ImageContent} from './imageContent';
+import {LocationContent} from './locationContent';
+import {MultiPartContent} from './multipartContent';
+import {ReactionContent} from './reactionContent';
+import {TextContent} from './textContent';
+
+import {Connection} from '../../../apiClient/connection/connection';
+import {ClientActionType} from '../clientActionType';
 
 export function isAbortedAssetContent(content: ConversationContent): content is AssetContent {
   return (content as AssetContent).abortReason !== undefined;

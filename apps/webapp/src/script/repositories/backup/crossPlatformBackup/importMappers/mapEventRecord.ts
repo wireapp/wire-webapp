@@ -19,10 +19,10 @@
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {CPBLogger} from '..';
 import {MessageCategory} from '../../../../message/messageCategory';
 import {ClientEvent} from '../../../event/Client';
 import {EventRecord} from '../../../storage';
+import {CPBLogger} from '../CPB.helper';
 import {BackupMessageContent, BackupMessage} from '../CPB.library';
 
 // Type definition for common message fields

@@ -23,7 +23,7 @@ import type {JSX} from '@emotion/react/jsx-runtime';
 
 import {DefaultAvatarImageSmall, DefaultAvatarImageLarge} from './defaultAvatarImage';
 
-import {AVATAR_SIZE, DIAMETER} from '..';
+import {AVATAR_SIZE, DIAMETER} from '../avatar';
 import {AvatarWrapper} from '../avatarWrapper';
 
 interface PlaceholderAvatarProps extends React.HTMLProps<HTMLDivElement> {

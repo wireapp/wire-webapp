@@ -19,12 +19,12 @@
 
 import {App} from './app';
 import {QualifiedId} from './qualifiedId';
+import {UserAsset} from './userAsset';
 
 import {AccentColor} from '../../commons/util';
 import {ServiceRef} from '../conversation/';
 import {Picture} from '../self/';
 import {CONVERSATION_PROTOCOL} from '../team';
-import {UserAsset} from '../user/';
 
 export enum UserType {
   REGULAR = 'regular',

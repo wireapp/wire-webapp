@@ -17,7 +17,8 @@
  *
  */
 
-import {ConnectionStatus} from '../connection/';
+import {ConnectionStatus} from './connectionStatus';
+
 import {QualifiedId} from '../user';
 
 export interface Connection {

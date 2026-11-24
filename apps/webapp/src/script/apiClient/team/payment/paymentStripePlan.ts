@@ -18,7 +18,8 @@
  */
 
 // https://stripe.com/docs/api#plans
-import {PaymentInterval, SupportedCurrency} from '../payment/';
+import {PaymentInterval} from './paymentInterval';
+import {SupportedCurrency} from './supportedCurrency';
 
 export interface PaymentStripePlan {
   amount: number;

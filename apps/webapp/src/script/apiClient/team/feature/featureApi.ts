@@ -19,7 +19,7 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {InvalidAppLockTimeoutError} from './featureError';
+import {InvalidAppLockTimeoutError, FeatureLockedError} from './featureError';
 import {
   allFeaturesResponseSchema,
   FeatureAllowedGlobalOperations,
@@ -42,13 +42,12 @@ import {
   FeatureSndFactorPassword,
   FeatureSSO,
   FeatureVideoCalling,
+  FeatureConversationGuestLink,
 } from './featureList.schema';
 import {FeatureList} from './featureList.types';
 
 import {getLogger, type Logger} from '../../../logger/getLogger';
 import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
-
-import {FeatureConversationGuestLink, FeatureLockedError} from '.';
 
 export const isBackendError = (error: unknown): error is BackendError => {
   return error instanceof Error && 'label' in error && typeof (error as any).label === 'string';

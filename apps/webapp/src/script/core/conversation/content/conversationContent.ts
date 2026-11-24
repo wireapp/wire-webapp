@@ -17,36 +17,36 @@
  *
  */
 
-import {ClientActionType} from '..';
-
 import {
   AssetContent,
-  ButtonActionContent,
-  ButtonActionConfirmationContent,
-  CallingContent,
-  ClearedContent,
-  ClientActionContent,
-  ClientAddContent,
-  ClientRemoveContent,
-  CompositeContent,
-  ConfirmationContent,
-  ConnectionContent,
-  DeletedContent,
-  EditedTextContent,
   FileAssetAbortContent,
   FileAssetContent,
   FileAssetMetaDataContent,
-  HiddenContent,
   ImageAssetContent,
-  ImageContent,
-  KnockContent,
-  LocationContent,
-  ReactionContent,
-  TextContent,
-  InCallEmojiContent,
-  InCallHandRaiseContent,
-  MultiPartContent,
-} from '.';
+} from './assetContent';
+import {ButtonActionConfirmationContent} from './buttonActionConfirmationContent';
+import {ButtonActionContent} from './buttonActionContent';
+import {CallingContent} from './callingContent';
+import {ClearedContent} from './clearedContent';
+import {ClientActionContent} from './clientActionContent';
+import {ClientAddContent} from './clientAddContent';
+import {ClientRemoveContent} from './clientRemoveContent';
+import {CompositeContent} from './compositeContent';
+import {ConfirmationContent} from './confirmationContent';
+import {DeletedContent} from './deletedContent';
+import {EditedTextContent} from './editedTextContent';
+import {HiddenContent} from './hiddenContent';
+import {ImageContent} from './imageContent';
+import {InCallEmojiContent} from './inCallEmojiContent';
+import {InCallHandRaiseContent} from './inCallHandRaiseContent';
+import {KnockContent} from './knockContent';
+import {LocationContent} from './locationContent';
+import {MultiPartContent} from './multipartContent';
+import {ReactionContent} from './reactionContent';
+import {TextContent} from './textContent';
+
+import {Connection as ConnectionContent} from '../../../apiClient/connection/connection';
+import {ClientActionType} from '../clientActionType';
 
 export type ConversationContent =
   | AssetContent

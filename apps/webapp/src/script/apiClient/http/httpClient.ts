@@ -19,12 +19,17 @@
 
 import axios, {AxiosError, AxiosHeaders, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import axiosRetry, {isNetworkOrIdempotentRequestError, exponentialDelay} from 'axios-retry';
+import {StatusCodes as StatusCode} from 'http-status-codes';
 import {gzip} from 'pako';
 import {Maybe} from 'true-myth';
 
 import {EventEmitter} from 'events';
 
 import {createAbortableWait} from './abortableWait';
+import {BackendError} from './backendError';
+import {mapBackendError} from './backendErrorMapper';
+import {ConnectionState} from './connectionState';
+import {ContentType} from './contentType';
 import {createIncrementalRetryBackoffPolicy, IncrementalRetryBackoffState} from './incrementalRetryBackoff';
 import {createIncrementalRetryBackoffRunner} from './incrementalRetryBackoffRunner';
 import {PriorityQueue} from './priorityQueue/priorityQueue';
@@ -41,7 +46,6 @@ import {
   TokenExpiredError,
 } from '../auth/';
 import {Config} from '../config';
-import {BackendError, ConnectionState, ContentType, StatusCode, mapBackendError} from '../http/';
 import {ObfuscationUtil} from '../obfuscation';
 import type {CookiePlatform} from '../platform';
 

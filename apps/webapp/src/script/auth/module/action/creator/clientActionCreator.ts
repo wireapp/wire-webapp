@@ -17,9 +17,9 @@
  *
  */
 
-import type {RegisteredClient} from '../../../../apiClient/client/registeredClient';
+import type {AppAction} from './appAction';
 
-import type {AppAction} from './';
+import type {RegisteredClient} from '../../../../apiClient/client/registeredClient';
 
 export enum CLIENT_ACTION {
   CLIENT_INIT_SUCCESS = 'CLIENT_INIT_SUCCESS',

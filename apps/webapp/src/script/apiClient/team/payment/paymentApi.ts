@@ -19,17 +19,15 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../../http/';
+import {PaymentBillingData} from './paymentBillingData';
+import {PaymentData} from './paymentData';
+import {PaymentDataUpdate} from './paymentDataUpdate';
+import {PaymentPlan} from './paymentPlan';
+import {PaymentStripeCharge} from './paymentStripeCharge';
+import {PaymentStripeInvoices} from './paymentStripeInvoices';
+import {PaymentStripePlan} from './paymentStripePlan';
 
-import {
-  PaymentBillingData,
-  PaymentData,
-  PaymentDataUpdate,
-  PaymentPlan,
-  PaymentStripeCharge,
-  PaymentStripeInvoices,
-  PaymentStripePlan,
-} from './';
+import {HttpClient} from '../../http/';
 
 const defaultInvoicesChunkSize = 10;
 

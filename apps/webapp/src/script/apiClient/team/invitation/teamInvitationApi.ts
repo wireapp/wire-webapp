@@ -26,10 +26,12 @@ import {
   InvitationNotFoundError,
   InvitationMultipleError,
 } from './invitationError';
+import {NewTeamInvitation} from './newTeamInvitation';
+import {TeamInvitation} from './teamInvitation';
+import {TeamInvitationChunk} from './teamInvitationChunk';
 import {TeamMigrationPayload} from './teamMigrationPayload';
 
 import {HttpClient, BackendErrorLabel, BackendError} from '../../http/';
-import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation/';
 import {TeamAPI} from '../team/';
 
 const maximumInvitationsChunkSize = 100;

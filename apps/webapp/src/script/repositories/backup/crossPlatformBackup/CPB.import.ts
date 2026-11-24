@@ -19,6 +19,7 @@
 
 import {isUndefined} from '@sindresorhus/is';
 
+import {CPBLogger, peekCrossPlatformData} from './CPB.helper';
 import {CPBackupImporter, BackupImportResult, BackupQualifiedId} from './CPB.library';
 import {ImportHistoryToDatabaseParams} from './CPB.types';
 import {mapConversationRecord, mapUserRecord} from './importMappers';
@@ -27,8 +28,6 @@ import {mapEventRecord} from './importMappers/mapEventRecord';
 import {ConversationRecord, EventRecord, UserRecord} from '../../storage';
 import {FileDescriptor, Filename} from '../backup.types';
 import {DifferentAccountError, IncompatibleBackupError, IncompatibleBackupFormatError, InvalidPassword} from '../error';
-
-import {CPBLogger, peekCrossPlatformData} from '.';
 
 /**
  * Imports the history from a Multi-Platform backup to the Database

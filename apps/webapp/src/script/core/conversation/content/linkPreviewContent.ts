@@ -17,9 +17,10 @@
  *
  */
 
-import {ILinkPreview} from '@wireapp/protocol-messaging';
+import {ILinkPreview, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {ImageAssetContent, ImageContent, LegalHoldStatus} from '.';
+import {ImageAssetContent} from './assetContent';
+import {ImageContent} from './imageContent';
 
 export interface LinkPreviewContent extends Omit<ILinkPreview, 'image'> {
   expectsReadConfirmation?: boolean;

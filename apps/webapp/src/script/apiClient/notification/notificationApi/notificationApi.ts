@@ -19,8 +19,9 @@
 
 import axios, {AxiosRequestConfig} from 'axios';
 
-import {Notification, NotificationList} from '..';
 import {BackendError, BackendErrorLabel, HttpClient, StatusCode} from '../../http';
+import {Notification} from '../notification';
+import {NotificationList} from '../notificationList';
 
 export const NOTIFICATION_SIZE_MAXIMUM = 10000;
 

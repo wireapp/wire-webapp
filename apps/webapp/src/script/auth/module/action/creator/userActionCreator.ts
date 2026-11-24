@@ -17,7 +17,7 @@
  *
  */
 
-import type {AppAction} from '.';
+import type {AppAction} from './appAction';
 
 export enum USER_ACTION {
   USER_SEND_ACTIVATION_CODE_FAILED = 'USER_SEND_ACTIVATION_CODE_FAILED',

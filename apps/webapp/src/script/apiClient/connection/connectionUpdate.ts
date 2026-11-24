@@ -17,7 +17,7 @@
  *
  */
 
-import {ConnectionStatus} from '../connection/';
+import {ConnectionStatus} from './connectionStatus';
 
 export interface ConnectionUpdate {
   status: ConnectionStatus;

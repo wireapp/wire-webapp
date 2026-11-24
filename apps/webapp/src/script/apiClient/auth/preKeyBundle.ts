@@ -17,7 +17,8 @@
  *
  */
 
-import {ClientPreKey} from '../auth/';
+import {ClientPreKey} from './clientPreKey';
+
 import {QualifiedId} from '../user';
 
 export interface PreKeyBundleBase {

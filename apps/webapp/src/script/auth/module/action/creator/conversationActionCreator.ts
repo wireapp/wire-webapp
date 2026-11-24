@@ -17,11 +17,11 @@
  *
  */
 
+import type {AppAction} from './appAction';
+
 import type {ConversationJoinData} from '../../../../apiClient/conversation/data/conversationJoinData';
 import type {ConversationEvent} from '../../../../apiClient/event/conversationEvent';
 import type {BackendError} from '../../../../apiClient/http/backendError';
-
-import type {AppAction} from '.';
 
 export enum CONVERSATION_ACTION {
   CONVERSATION_CODE_CHECK_FAILED = 'CONVERSATION_CODE_CHECK_FAILED',

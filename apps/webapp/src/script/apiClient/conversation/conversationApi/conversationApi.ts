@@ -20,22 +20,6 @@
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosRequestConfig, AxiosResponse, isAxiosError} from 'axios';
 
-import {
-  ADD_PERMISSION,
-  Conversation,
-  ConversationCode,
-  ConversationRolesList,
-  DefaultConversationRoleName,
-  Invite,
-  JoinConversationByCodePayload,
-  Member,
-  MessageSendingStatus,
-  MLS1to1Conversation,
-  MLSConversation,
-  NewConversation,
-  QualifiedConversationIds,
-  RemoteConversations,
-} from '..';
 import {chunk} from '../../../commons/util/ArrayUtil';
 import {BackendFeatures} from '../../apiClient';
 import {
@@ -54,11 +38,14 @@ import {
 import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
 import {CONVERSATION_PROTOCOL} from '../../team';
 import {QualifiedId} from '../../user';
+import {ADD_PERMISSION, Conversation, MLS1to1Conversation, MLSConversation} from '../conversation';
+import {ConversationCode, JoinConversationByCodePayload} from '../conversationCode';
 import {
   ConversationFullError,
   ConversationCodeNotFoundError,
   ConversationLegalholdMissingConsentError,
 } from '../conversationError';
+import {ConversationRolesList, DefaultConversationRoleName} from '../conversationRole';
 import {
   ConversationAccessUpdateData,
   ConversationJoinData,
@@ -70,6 +57,12 @@ import {
   ConversationTypingData,
 } from '../data';
 import {handleFederationErrors} from '../federatedBackendsError';
+import {Invite} from '../invite';
+import {Member} from '../member';
+import {MessageSendingStatus} from '../messageSendingStatus';
+import {NewConversation} from '../newConversation';
+import {QualifiedConversationIds} from '../qualifiedConversationIds';
+import {RemoteConversations} from '../remoteConversations';
 import {Subconversation, SUBCONVERSATION_ID} from '../subconversation';
 
 const maximumConversationChunkSize = 500;

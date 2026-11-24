@@ -17,7 +17,7 @@
  *
  */
 
-import {LegalHoldStatus} from '.';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 export interface LocationContent {
   expectsReadConfirmation?: boolean;

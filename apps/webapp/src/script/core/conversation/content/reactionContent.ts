@@ -17,9 +17,9 @@
  *
  */
 
-import {ReactionType} from '..';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {LegalHoldStatus} from '.';
+import {ReactionType} from '../reactionType';
 
 export interface ReactionContent {
   legalHoldStatus?: LegalHoldStatus;

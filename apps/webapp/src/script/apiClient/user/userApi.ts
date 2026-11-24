@@ -19,10 +19,23 @@
 
 import Axios, {AxiosRequestConfig} from 'axios';
 
+import {Activate} from './activate';
+import {ActivationResponse} from './activationResponse';
+import {CheckHandles} from './checkHandles';
+import {CompletePasswordReset} from './completePasswordReset';
+import {HandleInfo} from './handleInfo';
+import {LimitedQualifiedUserIdList} from './limitedQualifiedUserIdList';
+import {NewPasswordReset} from './newPasswordReset';
+import {QualifiedHandle} from './qualifiedHandle';
+import {QualifiedId} from './qualifiedId';
 import {RichInfo} from './richInfo';
 import {RTCConfiguration} from './rtcConfiguration';
+import {SearchResult} from './searchResult';
+import {SendActivationCode} from './sendActivationCode';
+import {User} from './user';
 import {RequestCancellationError} from './userError';
 import {QualifiedUserPreKeyBundleMap} from './userPreKeyBundleMap';
+import {VerifyDelete} from './verifyDelete';
 
 import {ArrayUtil} from '../../commons/util';
 import {BackendFeatures} from '../apiClient';
@@ -32,21 +45,6 @@ import {PublicClient, QualifiedPublicClients} from '../client/';
 import {QualifiedUserClients} from '../conversation/';
 import {BackendError, BackendErrorLabel, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
 import {CONVERSATION_PROTOCOL} from '../team';
-import {
-  Activate,
-  ActivationResponse,
-  CheckHandles,
-  CompletePasswordReset,
-  HandleInfo,
-  LimitedQualifiedUserIdList,
-  NewPasswordReset,
-  QualifiedHandle,
-  QualifiedId,
-  SearchResult,
-  SendActivationCode,
-  User,
-  VerifyDelete,
-} from '../user/';
 
 const defaultUsersChunkSize = 50;
 const defaultUsersPrekeyBundleChunkSize = 128;

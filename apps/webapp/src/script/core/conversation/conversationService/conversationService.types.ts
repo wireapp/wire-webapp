@@ -19,13 +19,13 @@
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {MessageSendingState} from '..';
 import {Conversation} from '../../../apiClient/conversation/conversation';
 import {MessageSendingStatus} from '../../../apiClient/conversation/messageSendingStatus';
 import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
 import {ConversationEvent, ConversationMemberJoinEvent} from '../../../apiClient/event/conversationEvent';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import {MessageSendingState} from '../message/message.types';
 
 export enum MessageTargetMode {
   NONE,

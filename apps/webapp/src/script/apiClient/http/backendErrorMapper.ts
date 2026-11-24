@@ -20,6 +20,9 @@
 import {StatusCodes as StatusCode} from 'http-status-codes';
 import {z} from 'zod';
 
+import {BackendError} from './backendError';
+import {BackendErrorLabel} from './backendErrorLabel';
+
 import {getLogger} from '../../logger/getLogger';
 import {
   IdentifierExistsError,
@@ -41,8 +44,6 @@ import {
 } from '../conversation/';
 import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/teamError';
 import {QualifiedId, QualifiedIdSchema, UnconnectedUserError, UserIsUnknownError} from '../user/';
-
-import {BackendError, BackendErrorLabel} from './';
 
 type BackendErrorWithLabel = BackendError & {label: BackendErrorLabel};
 type ErrorBuilder = (e: BackendErrorWithLabel) => BackendError;

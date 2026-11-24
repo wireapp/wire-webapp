@@ -17,8 +17,7 @@
  *
  */
 
-import type {Action} from 'redux';
-
+import type {AppAction} from './appAction';
 import type {AuthActions} from './authActionCreator';
 import type {ClientActions} from './clientActionCreator';
 import type {ConversationActions} from './conversationActionCreator';
@@ -28,9 +27,7 @@ import type {LocalStorageActions} from './localStorageActionCreator';
 import type {SelfActions} from './selfActionCreator';
 import type {UserActions} from './userActionCreator';
 
-export interface AppAction extends Action {
-  type: string;
-}
+export type {AppAction};
 
 export type AppActions =
   | AuthActions

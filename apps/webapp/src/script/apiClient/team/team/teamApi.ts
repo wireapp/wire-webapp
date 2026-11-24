@@ -23,10 +23,12 @@ import {NewAppRequest} from './app/newAppRequest';
 import {NewAppResponse} from './app/newAppResponse';
 import {TeamCollaborator} from './collaborator/teamCollaborator';
 import {LeadData} from './leadData';
+import {NewTeamData} from './newTeamData';
+import {TeamChunkData} from './teamChunkData';
+import {TeamData} from './teamData';
 import {TeamSizeData} from './teamSizeData';
 import {UpdateTeamData} from './updateTeamData';
 
-import {NewTeamData, TeamChunkData, TeamData} from '../';
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http/';
 import {RequestCancellationError, User} from '../../user';
 

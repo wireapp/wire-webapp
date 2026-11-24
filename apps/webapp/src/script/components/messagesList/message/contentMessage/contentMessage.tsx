@@ -32,7 +32,6 @@ import {MessageHeader} from './messageHeader';
 import {Quote} from './messageQuote';
 import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './warnings';
 
-import {MessageActions} from '..';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {useClickOutside} from '../../../../hooks/useClickOutside';
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../../hooks/useRelativeTimestamp';
@@ -50,6 +49,7 @@ import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {getMessageAriaLabel} from '../../../../util/conversationMessages';
 import {FileFullscreenModalSourceConversationProvider} from '../../../FileFullscreenModal/FileFullscreenModalSourceConversationContext';
 import {EphemeralTimer} from '../ephemeralTimer';
+import {MessageActions} from '../message';
 import {MessageTime} from '../messageTime';
 import {ReadIndicator} from '../readIndicator';
 import {useMessageFocusedTabIndex} from '../util';

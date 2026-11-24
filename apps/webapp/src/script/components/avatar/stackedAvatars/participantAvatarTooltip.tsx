@@ -23,10 +23,10 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {avatarItemStyles} from './stackedAvatars.styles';
 
-import {Avatar, AVATAR_SIZE} from '..';
 import type {User} from '../../../repositories/entity/User';
 import {Tooltip} from '../../../uiKit/dataDisplay/tooltip/tooltip';
 import {useUserName} from '../../UserName';
+import {Avatar, AVATAR_SIZE} from '../avatar';
 
 interface ParticipantAvatarTooltipProps {
   participant: User;

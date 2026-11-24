@@ -19,9 +19,12 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../../http/';
+import {Provider} from './provider';
+import {Service} from './service';
+import {Services} from './services';
+import {ServiceWhitelistData} from './serviceWhitelistData';
 
-import {Provider, Service, ServiceWhitelistData, Services} from './';
+import {HttpClient} from '../../http/';
 
 export class ServiceAPI {
   constructor(private readonly client: HttpClient) {}

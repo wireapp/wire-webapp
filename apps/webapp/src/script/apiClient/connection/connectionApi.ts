@@ -19,9 +19,11 @@
 
 import {AxiosRequestConfig} from 'axios';
 
+import {Connection} from './connection';
 import {ConnectionLegalholdMissingConsentError} from './connectionError';
+import {ConnectionUpdate} from './connectionUpdate';
+import {UserConnectionList} from './userConnectionList';
 
-import {Connection, ConnectionUpdate, UserConnectionList} from '../connection/';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 import {QualifiedId} from '../user';
 

@@ -19,11 +19,16 @@
 
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
+import {ChangePassword} from './changePassword';
+import {Consent} from './consent';
+import {ConsentResults} from './consentResults';
+import {Delete} from './delete';
+import {Name} from './name';
+import {Self} from './self';
+
 import {HttpClient, TraceState} from '../http/';
 import {CONVERSATION_PROTOCOL} from '../team';
 import {UserUpdate} from '../user/';
-
-import {ChangePassword, Consent, ConsentResults, Delete, Name, Self} from './';
 
 export class SelfAPI {
   constructor(private readonly client: HttpClient) {}

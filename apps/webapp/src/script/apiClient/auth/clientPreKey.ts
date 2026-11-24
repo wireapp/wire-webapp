@@ -17,7 +17,7 @@
  *
  */
 
-import {PreKey} from '../auth/';
+import {PreKey} from './preKey';
 
 export interface ClientPreKey {
   /** The client ID */

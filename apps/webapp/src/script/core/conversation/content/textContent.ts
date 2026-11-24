@@ -17,7 +17,11 @@
  *
  */
 
-import {LegalHoldStatus, LinkPreviewUploadedContent, MentionContent, QuoteContent} from '.';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+
+import {LinkPreviewUploadedContent} from './linkPreviewContent';
+import {MentionContent} from './mentionContent';
+import {QuoteContent} from './quoteContent';
 
 export interface TextContent {
   expectsReadConfirmation?: boolean;

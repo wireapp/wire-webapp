@@ -17,7 +17,7 @@
  *
  */
 
-import {TeamInvitation} from '../invitation/';
+import {TeamInvitation} from './teamInvitation';
 
 export interface TeamInvitationChunk {
   has_more: boolean;

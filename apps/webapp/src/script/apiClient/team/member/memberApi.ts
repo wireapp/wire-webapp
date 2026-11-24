@@ -20,6 +20,8 @@
 import axios, {AxiosHeaderValue, AxiosRequestConfig} from 'axios';
 
 import {MemberCSVResponse} from './memberCsvResponse';
+import {MemberData} from './memberData';
+import {Members} from './members';
 import {UpdatedMemberData} from './updatedMemberData';
 
 import {ArrayUtil} from '../../../commons/util';
@@ -32,7 +34,6 @@ import {
   SyntheticErrorLabel,
 } from '../../http/';
 import {RequestCancellationError} from '../../user';
-import {MemberData, Members} from '../member/';
 import {TeamAPI} from '../team/teamApi';
 
 const defaultMembersChunkSize = 1600;

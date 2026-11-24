@@ -17,7 +17,7 @@
  *
  */
 
-import type {AppAction} from '.';
+import type {AppAction} from './appAction';
 
 export enum LOCAL_STORAGE_ACTION {
   LOCAL_STORAGE_DELETE_FAILED = 'LOCAL_STORAGE_DELETE_FAILED',

@@ -19,7 +19,6 @@
 
 import React, {ChangeEvent, useId, type FunctionComponent} from 'react';
 
-import {UserlistMode} from '../..';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {User} from '../../../../repositories/entity/User';
 import {Checkbox, CheckboxLabel} from '../../../../uiKit/inputs/checkbox/checkbox';
@@ -31,6 +30,7 @@ import {UserStatusBadges} from '../../../badge';
 import {ParticipantItemContent} from '../../../participantItemContent';
 import {listItem, listWrapper} from '../../../participantItemContent/participantItem.styles';
 import {useUserName} from '../../../UserName';
+import {UserlistMode} from '../../userList';
 
 export interface UserListItemProps {
   groupId?: string;

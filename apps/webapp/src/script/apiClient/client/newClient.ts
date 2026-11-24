@@ -17,11 +17,14 @@
  *
  */
 
+import {MLSPublicKeyRecord} from './clientApi';
+import {ClientCapability} from './clientCapability';
 import {ClientCapabilityData} from './clientCapabilityData';
+import {ClientClassification} from './clientClassification';
+import {ClientType} from './clientType';
+import {Location} from './location';
 
 import {PreKey} from '../auth/';
-
-import {ClientCapability, ClientClassification, ClientType, Location, MLSPublicKeyRecord} from './';
 
 type BaseUpdatePayload = ClientCapabilityData & {label?: string};
 type MLSUpdatePayload = {

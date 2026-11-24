@@ -17,7 +17,7 @@
  *
  */
 
-import {OTRClientMap} from './';
+import {OTRClientMap} from './otrClientMap';
 
 export interface OTRRecipients<T extends string | Uint8Array> {
   [userId: string]: OTRClientMap<T>;

@@ -17,13 +17,12 @@
  *
  */
 
+import {ConversationMembers} from './conversationMembers';
 import {RECEIPT_MODE} from './data';
 
 import {MLSPublicKeyRecord} from '../client';
 import {CONVERSATION_PROTOCOL} from '../team';
 import {QualifiedId} from '../user';
-
-import {ConversationMembers} from './';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Conversation types define backend wire values inline. */
 export enum CONVERSATION_TYPE {

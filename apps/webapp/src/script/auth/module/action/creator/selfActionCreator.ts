@@ -17,10 +17,10 @@
  *
  */
 
+import type {AppAction} from './appAction';
+
 import type {Consent} from '../../../../apiClient/self/consent';
 import type {Self} from '../../../../apiClient/self/self';
-
-import type {AppAction} from '.';
 
 export enum SELF_ACTION {
   CONSENT_GET_FAILED = 'CONSENT_GET_FAILED',

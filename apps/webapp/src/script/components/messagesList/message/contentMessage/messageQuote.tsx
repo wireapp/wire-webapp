@@ -29,7 +29,6 @@ import {MultipartAssetPreview} from './asset/multipartAssetPreview';
 import {TextMessageRenderer} from './asset/textMessageRenderer';
 import {VideoAsset} from './asset/videoAsset/videoAsset';
 
-import {MessageActions} from '..';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {ConversationError} from '../../../../error/conversationError';
 import {QuoteEntity} from '../../../../message/quoteEntity';
@@ -47,6 +46,7 @@ import {isErrorWithType} from '../../../../util/typePredicateUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
 import * as Icon from '../../../icon';
 import {AssetImage} from '../../../image';
+import {MessageActions} from '../message';
 import {useMessageFocusedTabIndex} from '../util';
 
 function createPlaceholderMessage(translate: Translate): ContentMessage {

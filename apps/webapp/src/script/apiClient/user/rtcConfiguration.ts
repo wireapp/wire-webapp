@@ -17,7 +17,7 @@
  *
  */
 
-import {RTCIceServer} from '../user/';
+import {RTCIceServer} from './rtcIceServer';
 
 export interface RTCConfiguration {
   ice_servers: RTCIceServer[];

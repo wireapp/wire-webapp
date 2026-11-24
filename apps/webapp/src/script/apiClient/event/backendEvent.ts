@@ -17,14 +17,12 @@
  *
  */
 
-import {CONVERSATION_EVENT} from './conversationEvent';
-import {FEDERATION_EVENT} from './federationEvent';
-import {MEETING_EVENT} from './meetingEvent';
-import {TEAM_EVENT} from './teamEvent';
-import {USER_EVENT} from './userEvent';
+import {CONVERSATION_EVENT, ConversationEvent} from './conversationEvent';
+import {FEDERATION_EVENT, FederationEvent} from './federationEvent';
+import {MEETING_EVENT, MeetingEvent} from './meetingEvent';
+import {TEAM_EVENT, TeamEvent} from './teamEvent';
+import {USER_EVENT, UserEvent} from './userEvent';
 import {USER_GROUP_EVENT, UserGroupEvent} from './userGroupEvent';
-
-import {ConversationEvent, MeetingEvent, TeamEvent, UserEvent, FederationEvent} from '.';
 
 export type BackendEvent = ConversationEvent | MeetingEvent | UserEvent | TeamEvent | FederationEvent | UserGroupEvent;
 export type BackendEventType =

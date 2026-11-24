@@ -21,6 +21,14 @@ import {isNonEmptyString, isTruthy} from '@sindresorhus/is';
 
 import {buildMetaData} from './assetMetadata';
 import {
+  CPBLogger,
+  exportTable,
+  isAssetAddEvent,
+  isLocationAddEvent,
+  isMessageAddEvent,
+  isSupportedEventType,
+} from './CPB.helper';
+import {
   CPBackupExporter,
   BackupQualifiedId,
   BackupUser,
@@ -42,8 +50,6 @@ import {
 import {ConversationRecord, UserRecord, EventRecord} from '../../storage';
 import {CancelError, ExportError} from '../error';
 import {preprocessConversations, preprocessUsers, preprocessEvents} from '../recordPreprocessors';
-
-import {CPBLogger, exportTable, isAssetAddEvent, isLocationAddEvent, isMessageAddEvent, isSupportedEventType} from '.';
 
 const PROGRESSION_STEP = 10;
 const PROGRESSION_COMPLETE = 100;
