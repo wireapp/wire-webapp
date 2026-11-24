@@ -28,8 +28,8 @@ import {AudioAsset} from '../../../../components/messagesList/message/contentMes
 import {FileAsset} from '../../../../components/messagesList/message/contentMessage/asset/fileAsset/fileAsset';
 import {LinkPreviewAsset} from '../../../../components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent';
 import {MessageCategory} from '../../../../message/messageCategory';
+import type {MediumImageAssetShape} from '../../../../repositories/entity/message/asset';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
-import {MediumImage} from '../../../../repositories/entity/message/mediumImage';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 
 interface CollectionItemProps {
@@ -41,7 +41,7 @@ interface CollectionItemProps {
 const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
   const {assets} = useKoSubscribableChildren(message, ['assets']);
   const firstAsset = assets[0];
-  const {resource} = useKoSubscribableChildren(firstAsset as MediumImage, ['resource']);
+  const {resource} = useKoSubscribableChildren(firstAsset as MediumImageAssetShape, ['resource']);
 
   if (isOfCategory('images', message) === true && firstAsset.isImage() && !isNullOrUndefined(resource)) {
     return (

@@ -31,7 +31,7 @@ import {RestrictedImage} from './restrictedImage';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {AssetRemoteData} from '../../repositories/assets/assetRemoteData';
-import {MediumImage} from '../../repositories/entity/message/mediumImage';
+import type {MediumImageAssetShape} from '../../repositories/entity/message/asset';
 import {TeamState} from '../../repositories/team/TeamState';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
@@ -70,7 +70,7 @@ interface RemoteDataImageProps extends BaseImageProps {
   imageSizes?: {width: string; height: string; ratio: number};
 }
 interface AssetImageProps extends BaseImageProps {
-  image: MediumImage;
+  image: MediumImageAssetShape;
 }
 
 type ImageLoadState = 'waiting' | 'loading' | 'loaded' | 'failed';

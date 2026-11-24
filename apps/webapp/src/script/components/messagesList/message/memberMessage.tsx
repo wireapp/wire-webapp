@@ -31,8 +31,8 @@ import {useApplicationContext} from '../../../page/rootProvider';
 import {
   groupCreationHeaderSenderNameMarkerEnd,
   groupCreationHeaderSenderNameMarkerStart,
-  MemberMessage as MemberMessageEntity,
 } from '../../../repositories/entity/message/memberMessage';
+import type {Message, MemberMessageShape} from '../../../repositories/entity/message/message';
 import {User} from '../../../repositories/entity/User';
 import {CollectionIcon} from '../../../uiKit/dataDisplay/icon/collectionIcon';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
@@ -97,6 +97,8 @@ interface MemberMessageProps {
   isCellsConversation: boolean;
   isSelfGuest: boolean;
 }
+
+type MemberMessageEntity = Message & MemberMessageShape;
 
 export const MemberMessage: FunctionComponent<MemberMessageProps> = ({
   message,

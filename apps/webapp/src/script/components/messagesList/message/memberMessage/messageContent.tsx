@@ -27,13 +27,15 @@ import {CONVERSATION_EVENT} from '../../../../apiClient/event/conversationEvent'
 import {Config} from '../../../../Config';
 import {SystemMessageType} from '../../../../message/systemMessageType';
 import {useApplicationContext, type RootContextValue} from '../../../../page/rootProvider';
-import {MemberMessage as MemberMessageEntity} from '../../../../repositories/entity/message/memberMessage';
+import type {Message, MemberMessageShape} from '../../../../repositories/entity/message/message';
 import {User} from '../../../../repositories/entity/User';
 import {ClientEvent} from '../../../../repositories/event/Client';
 import {Declension} from '../../../../util/localizerUtil';
 import {createReactTranslationMarker, replaceReactComponents} from '../../../../util/localizerUtil/reactLocalizerUtil';
 import {joinNames} from '../../../../util/localizerUtil/userName';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';
+
+type MemberMessageEntity = Message & MemberMessageShape;
 
 export const CONFIG = {
   MAX_USERS_VISIBLE: 17,

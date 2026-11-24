@@ -23,8 +23,8 @@ import type {FunctionComponent} from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {useApplicationContext} from '../../../../../../page/rootProvider';
+import type {MediumImageAssetShape} from '../../../../../../repositories/entity/message/asset';
 import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
-import {MediumImage} from '../../../../../../repositories/entity/message/mediumImage';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';
 import * as Icon from '../../../../../icon';
@@ -33,7 +33,7 @@ import {AssetLoader} from '../common/assetLoader/assetLoader';
 import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 
 export interface ImageAssetProps {
-  asset: MediumImage;
+  asset: MediumImageAssetShape;
   getAssetUrl?: GetAssetUrl;
   logger?: ImageLogger;
   message: ContentMessage;

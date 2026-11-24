@@ -23,15 +23,10 @@ import ko from 'knockout';
 import {REASON as AVS_REASON} from '@wireapp/avs';
 import type {LegalHoldStatus, QualifiedUserId} from '@wireapp/protocol-messaging';
 
-import type {Asset} from './asset';
-import type {CompositeMessage} from './compositeMessage';
-import type {FileAsset} from './fileAsset';
+import type {Asset, FileAssetShape, MediumImageAssetShape, MultipartAssetShape} from './asset';
 import type {LinkPreview} from './linkPreview';
-import type {MediumImage} from './mediumImage';
-import type {MemberMessage} from './memberMessage';
-import type {Multipart} from './multipart';
-import type {Text as TextAsset} from './text';
 
+import type {MemberLeaveReason} from '../../../apiClient/conversation/data/conversationMemberLeaveData';
 import type {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import type {AddUsersFailure} from '../../../core/conversation/conversationService/conversationService.types';
@@ -81,7 +76,7 @@ interface CallingTimeoutMessageShape {
 }
 
 interface ContentMessageShape {
-  readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage>;
+  readonly assets: ko.ObservableArray<Asset>;
   readonly failedToSend: ko.Observable<
     {queued?: QualifiedUserClients | QualifiedId[]; failed?: QualifiedId[]} | undefined
   >;
@@ -95,13 +90,13 @@ interface ContentMessageShape {
   readonly displayEditedTimestamp: () => string;
   addAsset(asset: Asset): void;
   copy(): void;
-  getFirstAsset(): Asset | FileAsset | TextAsset | MediumImage | undefined;
+  getFirstAsset(): Asset | undefined;
   isUserMentioned(userId: QualifiedId): boolean;
   isUserQuoted(userId: string): boolean;
   isUserTargeted(userId: QualifiedId): boolean;
   download(assetRepository: {
-    download(asset: ReturnType<MediumImage['resource']>, fileName: string): unknown;
-    downloadFile(asset: FileAsset): unknown;
+    download(asset: ReturnType<MediumImageAssetShape['resource']>, fileName: string): unknown;
+    downloadFile(asset: Asset & FileAssetShape): unknown;
   }): void;
   getContentName(): string;
 }
@@ -164,6 +159,45 @@ interface VerificationMessageShape {
   userIds: ko.ObservableArray<QualifiedUserId>;
   VerificationMessageType: ko.Observable<VerificationMessageType | undefined>;
   readonly isSelfClient: ko.PureComputed<boolean>;
+}
+
+interface CompositeMessageShape {
+  readonly errorButtonId: ko.Observable<string | undefined>;
+  readonly errorMessage: ko.Observable<string>;
+  readonly selectedButtonId: ko.Observable<string | undefined>;
+  readonly waitingButtonId: ko.Observable<string | undefined>;
+  getSelectionChange(buttonId: string): false | {selected_button_id: string; version: number};
+  setButtonError(buttonId: string, errorMessage: string): void;
+  clearButtonError(): void;
+}
+
+export interface MemberMessageShape {
+  allTeamMembers: User[] | undefined;
+  readonly hasUsers: ko.PureComputed<boolean>;
+  readonly userIds: ko.ObservableArray<QualifiedId>;
+  readonly userEntities: ko.ObservableArray<User>;
+  readonly targetedUsers: ko.PureComputed<User[]>;
+  readonly name: ko.Observable<string>;
+  readonly otherUser: ko.PureComputed<User>;
+  readonly showNamedCreation: ko.PureComputed<boolean>;
+  readonly groupCreationHeader: ko.PureComputed<string>;
+  readonly remoteUserEntities: ko.PureComputed<User[]>;
+  showServicesWarning: boolean;
+  memberMessageType: SystemMessageType;
+  reason?: MemberLeaveReason;
+  readonly hash: ko.PureComputed<string>;
+  isConnection(): boolean;
+  isConnectionRequest(): boolean;
+  isCreation(): boolean;
+  isConversationCreate(): boolean;
+  isConversationResume(): boolean;
+  isGroupCreation(): boolean;
+  isMemberChange(): boolean;
+  isMemberJoin(): boolean;
+  isMemberLeave(): boolean;
+  isTeamMemberLeave(): boolean;
+  isMemberRemoval(): boolean;
+  isUserAffected(userId: QualifiedId): boolean;
 }
 
 export class Message {
@@ -344,7 +378,7 @@ export class Message {
       : false;
   }
 
-  getMultipartAssets(): Multipart[] {
+  getMultipartAssets(): (Asset & MultipartAssetShape)[] {
     const hasMultipartAsset = this.hasMultipartAsset();
     if (!hasMultipartAsset) {
       return [];
@@ -371,7 +405,7 @@ export class Message {
     return this.super_type === SuperType.CONTENT;
   }
 
-  isComposite(): this is CompositeMessage {
+  isComposite(): this is Message & CompositeMessageShape {
     return this.isContent() && this.hasOwnProperty('selectedButtonId');
   }
 
@@ -400,7 +434,7 @@ export class Message {
     if (this.isContent()) {
       const assetEntity = this.getFirstAsset();
 
-      if (!isUndefined(assetEntity) && isFunction((assetEntity as FileAsset).original_resource)) {
+      if (!isUndefined(assetEntity) && isFunction((assetEntity as Asset & FileAssetShape).original_resource)) {
         return true;
       }
     }
@@ -425,7 +459,7 @@ export class Message {
    * Check if message is a member message.
    * @returns Is message of type member
    */
-  isMember(): this is MemberMessage {
+  isMember(): this is Message & MemberMessageShape {
     return this.super_type === SuperType.MEMBER;
   }
 
@@ -541,7 +575,7 @@ export class Message {
         if (includeFailedState) {
           unavailableStatus.push(AssetTransferState.UPLOAD_FAILED);
         }
-        const assetStatus = (asset as FileAsset).status();
+        const assetStatus = (asset as Asset & FileAssetShape).status();
         return unavailableStatus.includes(assetStatus);
       });
     }

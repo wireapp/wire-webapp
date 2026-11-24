@@ -23,7 +23,6 @@ import ko from 'knockout';
 import type {Asset as ProtobufAsset, IAttachment, ICellAsset} from '@wireapp/protocol-messaging';
 
 import type {LinkPreview} from './linkPreview';
-import type {MediumImage as MediumImageAsset} from './mediumImage';
 
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import type {MentionEntity} from '../../../message/mentionEntity';
@@ -42,7 +41,7 @@ export type AssetMetaData = (
  * Structural types for the asset subclasses. They are declared here instead of importing the subclasses, so the type
  * guards below do not make this base class depend on its own subclasses.
  */
-interface FileAssetShape {
+export interface FileAssetShape {
   readonly original_resource: ko.Observable<AssetRemoteData>;
   readonly preview_resource: ko.Observable<AssetRemoteData>;
   readonly downloadProgress: ko.PureComputed<number | undefined>;
@@ -71,9 +70,16 @@ interface TextAssetShape {
   isUserMentioned(userId: QualifiedId): boolean;
 }
 
-interface MultipartAssetShape extends TextAssetShape {
+export interface MultipartAssetShape extends TextAssetShape {
   readonly attachments?: ko.ObservableArray<IAttachment>;
   getCellAssets(): ICellAsset[];
+}
+
+export interface MediumImageAssetShape {
+  readonly resource: ko.Observable<AssetRemoteData>;
+  height: string;
+  width: string;
+  readonly ratio: number;
 }
 
 export class Asset {
@@ -97,7 +103,7 @@ export class Asset {
     return this.isAudio() || this.isFile() || this.isVideo() || this.isImage();
   }
 
-  isImage(): this is MediumImageAsset {
+  isImage(): this is Asset & FileAssetShape & MediumImageAssetShape {
     return this.type === AssetType.IMAGE;
   }
 
