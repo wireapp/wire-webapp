@@ -142,7 +142,7 @@ export class EventMapper {
       isNonEmptyString(userId) &&
       matchQualifiedIds(
         {id: userId, domain: userDomain ?? ''},
-        context && {id: context.userId, domain: context.domain ?? ''},
+        context === undefined ? undefined : {id: context.userId, domain: context.domain ?? ''},
       )
     );
   }
