@@ -343,7 +343,8 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
           case BackendErrorLabel.INVALID_CREDENTIALS:
           case BackendErrorLabel.ACCOUNT_SUSPENDED:
           case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
-          case LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS: {
+          case LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS:
+          case LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN: {
             break;
           }
           default: {

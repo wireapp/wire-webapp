@@ -70,6 +70,16 @@ type RenderStatusMessageResult = ReturnType<typeof parseError> | ReturnType<type
 
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
+function consumeSSOAutoLoginParameter(): void {
+  const currentUrl = new URL(window.location.href);
+  if (!currentUrl.searchParams.has(QUERY_KEY.SSO_AUTO_LOGIN)) {
+    return;
+  }
+
+  currentUrl.searchParams.delete(QUERY_KEY.SSO_AUTO_LOGIN);
+  window.history.replaceState(window.history.state, '', `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
+}
+
 const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & ConnectedProps & DispatchProps> = ({
   initialCode,
   isFetching,
@@ -109,6 +119,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   const [isValidLink, setIsValidLink] = useState(true);
 
   const [shouldAutoLogin, setShouldAutoLogin] = useState(false);
+  const hasConsumedAutoLogin = useRef(false);
 
   const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(
     conversationInfo?.has_password === true ||
@@ -233,6 +244,12 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
         return;
       }
 
+      if (shouldAutoLogin || UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN)) {
+        hasConsumedAutoLogin.current = true;
+        setShouldAutoLogin(false);
+        consumeSSOAutoLoginParameter();
+      }
+
       if (requiresPasswordModal(isLinkPasswordModalOpen, conversationInfo?.has_password ?? false, conversationError)) {
         setIsLinkPasswordModalOpen(true);
         return;
@@ -298,14 +315,21 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
       navigate,
       pushAccountRegistrationData,
       resetAuthError,
+      shouldAutoLogin,
     ],
   );
 
   useEffect(() => {
-    if (shouldAutoLogin && isNonEmptyString(initialCode) && initialCode === codeOrMail) {
+    if (
+      shouldAutoLogin &&
+      !hasConsumedAutoLogin.current &&
+      !isFetching &&
+      isNonEmptyString(initialCode) &&
+      initialCode === codeOrMail
+    ) {
       void handleSubmit();
     }
-  }, [codeOrMail, handleSubmit, initialCode, shouldAutoLogin]);
+  }, [codeOrMail, handleSubmit, initialCode, isFetching, shouldAutoLogin]);
 
   const stripPrefix = (prefixedCode: string): string => {
     return prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');

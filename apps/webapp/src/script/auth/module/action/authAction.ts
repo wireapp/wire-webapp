@@ -35,6 +35,7 @@ import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/ba
 import {OAuthBody} from '../../../apiClient/oauth/oAuthBody';
 import {OAuthClient} from '../../../apiClient/oauth/oAuthClient';
 import type {TeamData} from '../../../apiClient/team/team/teamData';
+import {isCoreCryptoDatabaseOpenError} from '../../../core/messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper/coreCryptoDatabaseOpenError';
 import {LowDiskSpaceError} from '../../../core/storage/engine/error';
 import {toError} from '../../../util/toError';
 import {isAxiosError, isBackendError} from '../../../util/typePredicateUtil';
@@ -47,6 +48,13 @@ type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootStat
 const isSystemKeychainAccessError = (errorCandidate: unknown): errorCandidate is Error => {
   return errorCandidate instanceof Error && errorCandidate.message.includes('cryption is not available');
 };
+
+function labelCoreCryptoDatabaseOpenError(error: unknown): unknown {
+  if (isCoreCryptoDatabaseOpenError(error)) {
+    return new LabeledError(LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN, error);
+  }
+  return error;
+}
 
 export class AuthAction {
   doLogin = (loginData: LoginData, getEntropy?: () => Promise<Uint8Array>): ThunkAction => {
@@ -127,6 +135,7 @@ export class AuthAction {
         if (isBackendError(error) && error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
           dispatch(AuthActionCreator.successfulLogin());
         } else {
+          error = labelCoreCryptoDatabaseOpenError(error);
           if (error instanceof LowDiskSpaceError) {
             error = new LabeledError(LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE, error);
           }
@@ -194,6 +203,7 @@ export class AuthAction {
         if (isBackendError(error) && error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
           dispatch(AuthActionCreator.successfulLogin());
         } else {
+          error = labelCoreCryptoDatabaseOpenError(error);
           dispatch(AuthActionCreator.failedLogin(toError(error)));
         }
         throw error;

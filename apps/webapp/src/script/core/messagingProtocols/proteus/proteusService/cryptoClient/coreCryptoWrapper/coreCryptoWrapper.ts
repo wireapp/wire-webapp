@@ -36,6 +36,7 @@ import {
   type PkiEnvironmentHooks,
 } from '@wireapp/core-crypto';
 
+import {createCoreCryptoDatabaseOpenError} from './coreCryptoDatabaseOpenError';
 import {releaseCoreCryptoHandles} from './coreCryptoHandleLifecycle';
 import {removeCoreCryptoOpfsDatabase} from './coreCryptoOpfsStorage';
 import {PrekeyTracker} from './prekeysTracker';
@@ -329,7 +330,11 @@ export async function buildClient(
 
       runtime.configureLogging();
 
-      coreCryptoDatabase = await runtime.openDatabase(coreCryptoDbName, keyResult.value.key);
+      try {
+        coreCryptoDatabase = await runtime.openDatabase(coreCryptoDbName, keyResult.value.key);
+      } catch (cause: unknown) {
+        throw createCoreCryptoDatabaseOpenError(cause);
+      }
       coreCryptoInstance = runtime.createCoreCrypto(coreCryptoDatabase);
 
       return new CoreCryptoWrapper(

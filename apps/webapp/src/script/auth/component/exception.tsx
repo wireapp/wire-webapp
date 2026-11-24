@@ -26,7 +26,7 @@ import {objectHasOwn} from 'ts-extras';
 import {Config} from '../../Config';
 import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
 import {Link} from '../../uiKit/typography/link/link';
-import {errorHandlerStrings} from '../../util/errorUtil';
+import {errorHandlerDefaultMessages, errorHandlerStrings} from '../../util/errorUtil';
 import {validationErrorStrings} from '../../util/validationUtil';
 
 interface ExceptionProps {
@@ -71,6 +71,7 @@ const Exception: FunctionComponent<ExceptionProps> = ({errors = []}: ExceptionPr
             {objectHasOwn(translatedErrors, errorLabel) ? (
               <FormattedMessage
                 id={translatedErrors[errorLabel]}
+                defaultMessage={errorHandlerDefaultMessages[errorLabel]}
                 values={{
                   minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH,
                   supportEmailExistsLink: (
