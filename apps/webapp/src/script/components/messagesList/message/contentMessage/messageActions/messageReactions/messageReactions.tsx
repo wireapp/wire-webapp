@@ -27,9 +27,9 @@ import {reactionImgSize} from './emojiChar.styles';
 import {isSpaceOrEnterKey} from '../../../../../../util/keyboardUtil';
 import type {Translate} from '../../../../../../util/localizerUtil';
 import {EmojiPicker} from '../../../../../emojiPicker/emojiPicker';
-import {MessageActionsId} from '../messageActions';
 import {useMessageActionsState} from '../messageActions.state';
 import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from '../messageActions.styles';
+import {MessageActionsId} from '../messageActionsId';
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';

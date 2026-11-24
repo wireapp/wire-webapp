@@ -26,7 +26,7 @@ import {closeButtonStyles, headingContainerStyles} from './selectMenuList.styles
 
 import {CloseIcon} from '../../../dataDisplay/icon';
 import {Theme} from '../../../identity/theme';
-import {Option} from '../select';
+import type {Option} from '../select.types';
 
 type SelectMenuListComponentType<IsMulti extends boolean, Group extends GroupBase<Option>> = ((
   props: MenuListProps<Option, IsMulti, Group>,

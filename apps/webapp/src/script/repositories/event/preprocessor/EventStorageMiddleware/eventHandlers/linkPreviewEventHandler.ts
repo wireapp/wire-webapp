@@ -19,8 +19,8 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import type {EditableEvent} from './editedEventHandler';
 import {EventValidationError} from './EventValidationError';
+import type {EditableEvent} from './getCommonMessageUpdates';
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 
 import {categoryFromEvent} from '../../../../../message/messageCategorization';

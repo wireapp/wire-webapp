@@ -19,14 +19,9 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import {getCommonMessageUpdates} from './getCommonMessageUpdates';
+import {EditableEvent, getCommonMessageUpdates} from './getCommonMessageUpdates';
 
 import {EventError} from '../../../../../error/eventError';
-import {
-  CompositeMessageAddEvent,
-  MessageAddEvent,
-  MultipartMessageAddEvent,
-} from '../../../../conversation/EventBuilder';
 import {StoredEvent} from '../../../../storage';
 import {ClientEvent, CONVERSATION} from '../../../Client';
 import type {IdentifiedUpdatePayload} from '../../../EventService';
@@ -36,7 +31,6 @@ function throwValidationError(message: string): never {
   throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${message}`);
 }
 
-export type EditableEvent = MessageAddEvent | MultipartMessageAddEvent | CompositeMessageAddEvent;
 type UpdatedEditableEvent = EditableEvent & Pick<IdentifiedUpdatePayload, 'primary_key'>;
 
 function validateEditEvent(

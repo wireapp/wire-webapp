@@ -22,7 +22,7 @@ import type {JSX} from 'react';
 import {components, ContainerProps, GroupBase} from 'react-select';
 
 import {TabIndex} from '../../../utils/enums';
-import {Option} from '../select';
+import type {Option} from '../select.types';
 
 const selectContainerInnerStyles = {
   minWidth: 0,

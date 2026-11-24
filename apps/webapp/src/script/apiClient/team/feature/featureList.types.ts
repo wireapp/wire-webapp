@@ -18,6 +18,13 @@
  */
 
 import {
+  ACCESS_TYPE,
+  CONVERSATION_PROTOCOL,
+  FEATURE_KEY,
+  FEATURE_LOCK_STATUS,
+  FEATURE_STATUS,
+} from './featureList.enums';
+import {
   FeatureAllowedGlobalOperations,
   FeatureAppLock,
   FeatureApps,
@@ -53,61 +60,7 @@ import {
   FeatureVideoCalling,
 } from './featureList.schema';
 
-/**
- * FEATURE_KEY enum defines the canonical keys for all Wire feature flags.
- * These keys match the camelCase property names returned by the Wire backend API.
- */
-export enum FEATURE_KEY {
-  APPLOCK = 'appLock',
-  ALLOWED_GLOBAL_OPERATIONS = 'allowedGlobalOperations',
-  APPS = 'apps',
-  ASSET_AUDIT_LOG = 'assetAuditLog',
-  CELLS = 'cells',
-  CHANNELS = 'channels',
-  CHAT_BUBBLES = 'chatBubbles',
-  CLASSIFIED_DOMAINS = 'classifiedDomains',
-  CONFERENCE_CALLING = 'conferenceCalling',
-  CONSUMABLE_NOTIFICATIONS = 'consumableNotifications',
-  CONVERSATION_GUEST_LINKS = 'conversationGuestLinks',
-  DIGITAL_SIGNATURES = 'digitalSignatures',
-  DOMAIN_REGISTRATION = 'domainRegistration',
-  ENFORCE_DOWNLOAD_PATH = 'enforceFileDownloadLocation',
-  EXPOSE_INVITATION_URLS_TO_TEAM_ADMIN = 'exposeInvitationURLsToTeamAdmin',
-  FILE_SHARING = 'fileSharing',
-  LEGALHOLD = 'legalhold',
-  LIMITED_EVENT_FANOUT = 'limitedEventFanout',
-  MLS = 'mls',
-  MLSE2EID = 'mlsE2EId',
-  MLS_MIGRATION = 'mlsMigration',
-  OUTLOOK_CAL_INTEGRATION = 'outlookCalIntegration',
-  SEARCH_VISIBILITY = 'searchVisibility',
-  SEARCH_VISIBILITY_INBOUND = 'searchVisibilityInbound',
-  SELF_DELETING_MESSAGES = 'selfDeletingMessages',
-  SIMPLIFIED_USER_CONNECTION_REQUEST_QR_CODE = 'simplifiedUserConnectionRequestQRCode',
-  SND_FACTOR_PASSWORD = 'sndFactorPasswordChallenge',
-  SSO = 'sso',
-  STEALTH_USERS = 'stealthUsers',
-  VALIDATE_SAML_EMAILS = 'validateSAMLemails',
-  VIDEO_CALLING = 'videoCalling',
-  PREVENT_ADMIN_LESS_GROUPS = 'preventAdminlessGroups',
-  MEETINGS = 'meetings',
-}
-
-export enum FEATURE_LOCK_STATUS {
-  LOCKED = 'locked',
-  UNLOCKED = 'unlocked',
-}
-
-export enum FEATURE_STATUS {
-  ENABLED = 'enabled',
-  DISABLED = 'disabled',
-}
-
-export enum ACCESS_TYPE {
-  TEAM_MEMBERS = 'team-members',
-  EVERYONE = 'everyone',
-  ADMINS = 'admins',
-}
+export {ACCESS_TYPE, CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_LOCK_STATUS, FEATURE_STATUS};
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Expiration options define their serialized durations in seconds inline. */
 export enum SELF_DELETING_TIMEOUT {
@@ -120,12 +73,6 @@ export enum SELF_DELETING_TIMEOUT {
   WEEKS_4 = 2_419_200,
 }
 /* eslint-enable @typescript-eslint/no-magic-numbers */
-
-export enum CONVERSATION_PROTOCOL {
-  MLS = 'mls',
-  PROTEUS = 'proteus',
-  MIXED = 'mixed',
-}
 
 /**
  * FeatureList represents the response from the Wire backend feature flags API.

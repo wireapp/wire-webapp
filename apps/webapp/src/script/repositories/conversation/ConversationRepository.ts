@@ -41,6 +41,7 @@ import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/pr
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {updateAccessRights} from './ConversationAccessPermission';
+import {CONFIRMATION_THRESHOLD} from './conversationConfirmationThreshold';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
@@ -273,7 +274,7 @@ export class ConversationRepository {
 
   static get CONFIG(): ConversationRepositoryConfig {
     return {
-      CONFIRMATION_THRESHOLD: TIME_IN_MILLIS.WEEK,
+      CONFIRMATION_THRESHOLD,
       EXTERNAL_MESSAGE_THRESHOLD: externalMessageThresholdInKibibytes * bytesPerKibibyte,
       ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY: 3000,
       GROUP: {

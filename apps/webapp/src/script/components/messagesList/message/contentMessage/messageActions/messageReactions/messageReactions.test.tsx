@@ -29,7 +29,7 @@ import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 import {MessageReactions, MessageReactionsProps} from './messageReactions';
 
-import {MessageActionsId} from '../messageActions';
+import {MessageActionsId} from '../messageActionsId';
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';

@@ -36,9 +36,9 @@ import {
   meetingConversationSyncErrors,
   syncMeetingConversationParticipants,
 } from '../../meetingConversationSync';
-import type {MeetingServiceDeps} from '../../meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../../meetingSubmitErrors';
 import type {MeetNowMeetingCommand, ScheduleMeetingCommand, UpdateMeetingCommand} from '../types/meetingCommandTypes';
+import type {MeetingServiceDeps} from '../types/meetingServiceDeps';
 
 export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
 

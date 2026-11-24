@@ -26,6 +26,7 @@ import type {StateManagerProps} from 'react-select/dist/declarations/src/stateMa
 
 import {BaseSelectDropdownIndicator} from './baseSelect/baseSelectDropdownIndicator';
 import {customStyles} from './select.styles';
+import type {Option} from './select.types';
 import {SelectContainer} from './selectContainer/selectContainer';
 import {SelectIndicatorsContainer} from './selectIndicatorsContainer/selectIndicatorsContainer';
 import {SelectMenu} from './selectMenu/selectMenu';
@@ -37,12 +38,7 @@ import {Theme} from '../../identity/theme';
 import {TabIndex} from '../../utils/enums';
 import {InputLabel} from '../inputLabel';
 
-export type Option = {
-  value: string | number;
-  label: string;
-  description?: string;
-  isDisabled?: boolean;
-};
+export type {Option};
 
 export interface SelectProps<IsMulti extends boolean, Group extends GroupBase<Option>> extends StateManagerProps<
   Option,

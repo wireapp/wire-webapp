@@ -19,7 +19,12 @@
 
 import type {FunctionComponent} from 'react';
 
-import {channelAvatarContainerCss, channelAvatarIconCss, channelAvatarLockIconCss} from './channelAvatar.styles';
+import {
+  ChannelAvatarSize,
+  channelAvatarContainerCss,
+  channelAvatarIconCss,
+  channelAvatarLockIconCss,
+} from './channelAvatar.styles';
 
 import {ChannelIcon} from '../../uiKit/dataDisplay/icon/channelIcon';
 import {LockClosedIcon} from '../../uiKit/dataDisplay/icon/lockClosedIcon';
@@ -27,8 +32,6 @@ import {getChannelAvatarColors} from '../../util/avatarUtil';
 
 const channelIconWidthInPixels = 16;
 const smallChannelIconWidthInPixels = 10;
-
-export type ChannelAvatarSize = 'small' | 'large';
 
 interface ChannelAvatarProps {
   className?: string;

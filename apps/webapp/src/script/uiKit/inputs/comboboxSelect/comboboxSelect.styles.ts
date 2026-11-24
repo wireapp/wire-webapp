@@ -20,7 +20,7 @@
 import {CSSObject} from '@emotion/react';
 import {StylesConfig} from 'react-select';
 
-import type {ComboboxSelectOption} from './comboboxSelect';
+import type {ComboboxSelectOption} from './comboboxSelect.types';
 
 import {Theme} from '../../identity/theme';
 import {visuallyHidden} from '../../utils';

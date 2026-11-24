@@ -17,17 +17,9 @@
  *
  */
 
-import type {AxiosRequestConfig, AxiosResponse} from 'axios';
+import type {CookiePlatform} from './http/httpClient';
 
-import type {HttpClient} from './http/httpClient';
-
-export type CookiePlatform = {
-  readonly retrieveCookie: <ResponseBody>(response: AxiosResponse<ResponseBody>) => Promise<ResponseBody>;
-  readonly sendRequestWithCookie: <ResponseBody>(
-    client: HttpClient,
-    config: AxiosRequestConfig,
-  ) => Promise<AxiosResponse<ResponseBody>>;
-};
+export type {CookiePlatform};
 
 export type BufferPlatform = {
   readonly bufferToString: (buffer: ArrayBuffer) => string;

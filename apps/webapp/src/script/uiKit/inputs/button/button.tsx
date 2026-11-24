@@ -20,30 +20,15 @@
 import {forwardRef} from 'react';
 
 import {buttonStyle} from './button.styles';
+import {ButtonProps, ButtonVariant} from './button.types';
 
 import {Loading} from '../../dataDisplay';
 import {COLOR, Theme} from '../../identity';
-import {TextProps, filterTextProps} from '../../typography';
+import {filterTextProps} from '../../typography';
 import {filterProps} from '../../utils';
 
-export enum ButtonVariant {
-  PRIMARY = 'primary',
-  SECONDARY = 'secondary',
-  TERTIARY = 'tertiary',
-  QUATERNARY = 'quaternary',
-  SEND = 'send',
-  CANCEL = 'cancel',
-}
-
-export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
-  variant?: ButtonVariant;
-  group?: boolean;
-  backgroundColor?: string;
-  loadingColor?: string;
-  noCapital?: boolean;
-  showLoading?: boolean;
-  isActive?: boolean;
-}
+export {ButtonVariant};
+export type {ButtonProps};
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({showLoading, children, loadingColor = COLOR.WHITE, ...props}, ref) => {

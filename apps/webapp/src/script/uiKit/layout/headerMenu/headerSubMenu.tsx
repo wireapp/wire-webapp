@@ -22,6 +22,7 @@ import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
+import {DESKTOP_HEADER_SUB_MENU_CLASSNAME} from './headerSubMenuClassName';
 import {MENU_LINK_CLASSNAME} from './menuLink';
 import {MenuSubLink} from './menuSubLink';
 
@@ -62,8 +63,6 @@ const desktopStyledHeaderSubMenuStyle: (theme: Theme, props: DesktopStyledHeader
     },
   };
 };
-
-export const DESKTOP_HEADER_SUB_MENU_CLASSNAME = 'desktopStyledHeaderSubMenu';
 
 export const DesktopStyledHeaderSubMenu: FunctionComponent<DesktopStyledHeaderSubMenuProps> = props => {
   return (

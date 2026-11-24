@@ -21,7 +21,7 @@ import type {JSX} from 'react';
 
 import {components, GroupBase, IndicatorsContainerProps} from 'react-select';
 
-import {Option} from '../select';
+import type {Option} from '../select.types';
 
 export const SelectIndicatorsContainer = <
   IsMulti extends boolean = false,
