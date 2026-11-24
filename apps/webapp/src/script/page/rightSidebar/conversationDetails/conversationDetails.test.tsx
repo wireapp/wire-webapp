@@ -260,6 +260,7 @@ describe('ConversationDetails', () => {
     conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     conversation.teamId = 'conversation-team';
     const props = getDefaultParams();
+    props.teamState.teamFeatures({cells: {status: FEATURE_STATUS.DISABLED}} as FeatureList);
     props.selfUser.teamId = 'conversation-team';
     const togglePanel = jest.fn();
 
