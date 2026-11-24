@@ -31,11 +31,14 @@ import {SelfState, initialSelfState, selfReducer} from './selfReducer';
 import type {APIClient} from '../../../apiClient/apiClient';
 import type {Configuration} from '../../../Config';
 import type {Account} from '../../../core';
-import type {ActionRoot} from '../action';
+
+/** Filled in by the action module (see `declare module` in `../action`), so the reducer doesn't import actions. */
+
+export interface ApiActions {}
 
 export type Api = {
   clock: Clock;
-  actions: ActionRoot;
+  actions: ApiActions;
   apiClient: APIClient;
   core: Account;
   getConfig: () => Configuration;

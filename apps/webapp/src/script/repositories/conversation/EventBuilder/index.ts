@@ -18,4 +18,5 @@
  */
 
 export * from './EventBuilder';
+export * from './EventBuilder.events';
 export * from './EventBuilder.types';

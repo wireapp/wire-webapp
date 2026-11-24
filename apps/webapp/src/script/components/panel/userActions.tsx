@@ -92,6 +92,7 @@ function createPlaceholder1to1Conversation(
   user: User,
   selfUser: User,
   translate: ReturnType<typeof useApplicationContext>['translate'],
+  teamState: TeamState,
 ): Conversation {
   const userConnection = user.connection();
 
@@ -100,7 +101,7 @@ function createPlaceholder1to1Conversation(
   }
 
   const {id, domain} = userConnection.conversationId;
-  const conversation = new Conversation(id, domain, CONVERSATION_PROTOCOL.PROTEUS, translate);
+  const conversation = new Conversation(id, domain, CONVERSATION_PROTOCOL.PROTEUS, translate, teamState);
   conversation.name(user.name());
   conversation.selfUser(selfUser);
   conversation.type(CONVERSATION_TYPE.CONNECT);
@@ -310,7 +311,7 @@ const UserActions: FunctionComponent<UserActionsProps> = ({
             // before the other user has accepted the request.
             const connectionConversation =
               connectionStatus === ConnectionStatus.SENT
-                ? createPlaceholder1to1Conversation(user, selfUser, translate)
+                ? createPlaceholder1to1Conversation(user, selfUser, translate, teamState)
                 : await actionsViewModel.getConversationById(conversationId);
 
             const savedConversation = await actionsViewModel.saveConversation(connectionConversation);

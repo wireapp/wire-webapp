@@ -17,8 +17,9 @@
  *
  */
 
+import {Scope} from './oauthScope';
+
 import {OAuthBody} from '../../apiClient/oauth/oAuthBody';
-import {Scope} from '../page/oAuthPermissions';
 import {QUERY_KEY} from '../route';
 
 /**

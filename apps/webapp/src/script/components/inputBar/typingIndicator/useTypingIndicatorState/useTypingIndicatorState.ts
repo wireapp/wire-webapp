@@ -21,6 +21,11 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {create} from 'zustand';
 
 import {User} from '../../../../repositories/entity/User';
+import {TIME_IN_MILLIS} from '../../../../util/timeUtil';
+
+const typingTimeoutInSeconds = 10;
+
+export const TYPING_TIMEOUT = TIME_IN_MILLIS.SECOND * typingTimeoutInSeconds;
 
 type TypingUser = {
   conversationId: string;

@@ -28,7 +28,6 @@ import {
 } from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {container} from 'tsyringe';
 import {Cancelable, debounce} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -53,7 +52,6 @@ import {RECEIPT_MODE} from '../../apiClient/conversation/data/conversationReceip
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {UserType} from '../../apiClient/user/user';
-import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/Message';
@@ -64,16 +62,15 @@ import {getLogger, Logger} from '../../util/logger';
 import {matchQualifiedIds} from '../../util/qualifiedId';
 import {truncate} from '../../util/stringUtil';
 import {WebAppEvents} from '../../webAppEvents';
-import {ClientRepository} from '../client';
+import {AVERAGE_NUMBER_OF_CLIENTS} from '../client/ClientConstants';
 import {ConnectionEntity} from '../connection/connectionEntity';
 import {ACCESS_STATE} from '../conversation/AccessState';
-import {ConversationRepository, CONVERSATION_READONLY_STATE} from '../conversation/ConversationRepository';
-import {isProteusTeam1to1Conversation, isSelfConversation} from '../conversation/ConversationSelectors';
+import {CONVERSATION_READONLY_STATE, MAX_GROUP_NAME_LENGTH} from '../conversation/ConversationConstants';
+import {isProteusTeam1to1Conversation} from '../conversation/ConversationPredicates';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationRecord} from '../storage/record/conversationRecord';
-import {TeamState} from '../team/TeamState';
 
 const userSearchDebounceInMilliseconds = 100;
 const decimalRadix = 10;
@@ -98,8 +95,16 @@ enum TIMESTAMP_TYPE {
   MUTED = 'mutedTimestamp',
 }
 
+export interface ConversationTeamState {
+  isSelfDeletingMessagesEnabled: () => boolean;
+  getEnforcedSelfDeletingMessagesTimeout: () => number;
+}
+
 export class Conversation {
-  private readonly teamState: TeamState;
+  /** Set once at app start, so the entity doesn't depend on the legal hold UI. */
+  static closeLegalHoldRequestModal?: (conversationId: string) => void;
+
+  private readonly teamState?: ConversationTeamState;
   public readonly archivedState: ko.Observable<boolean>;
   public readonly readOnlyState: ko.Observable<CONVERSATION_READONLY_STATE | null>;
   private readonly incomingMessages: ko.ObservableArray<Message>;
@@ -226,7 +231,7 @@ export class Conversation {
     domain: string,
     protocol: CONVERSATION_PROTOCOL,
     private readonly translate: Translate,
-    teamState = container.resolve(TeamState),
+    teamState?: ConversationTeamState,
   ) {
     this.teamState = teamState;
     this.id = conversation_id;
@@ -463,8 +468,7 @@ export class Conversation {
       }
 
       if (!hasLegalHold) {
-        const {closeRequestModal} = useLegalHoldModalState.getState();
-        closeRequestModal(this.id);
+        Conversation.closeLegalHoldRequestModal?.(this.id);
       }
 
       return hasLegalHold;
@@ -473,7 +477,7 @@ export class Conversation {
     this.blockLegalHoldMessage = false;
 
     this.legalHoldStatus.subscribe(legalHoldStatus => {
-      if (!this.blockLegalHoldMessage && !isSelfConversation(this) && this.hasInitializedUsers()) {
+      if (!this.blockLegalHoldMessage && !this.isSelf() && this.hasInitializedUsers()) {
         const selfUser = this.selfUser();
         if (selfUser === undefined) {
           return;
@@ -540,11 +544,11 @@ export class Conversation {
         return 0;
       }
       // If team does not allow self-deleting messages, return 0
-      if (!this.teamState.isSelfDeletingMessagesEnabled()) {
+      if (this.teamState?.isSelfDeletingMessagesEnabled() !== true) {
         return 0;
       }
       // If team enforces a timeout, use it
-      const enforcedTimeout = this.teamState.getEnforcedSelfDeletingMessagesTimeout();
+      const enforcedTimeout = this.teamState?.getEnforcedSelfDeletingMessagesTimeout();
       if (isNumber(enforcedTimeout) && enforcedTimeout !== 0) {
         return enforcedTimeout;
       }
@@ -718,7 +722,7 @@ export class Conversation {
             })
             .join(', ');
 
-          const maxLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+          const maxLength = MAX_GROUP_NAME_LENGTH;
           return truncate(joinedNames, maxLength, false);
         }
 
@@ -747,7 +751,7 @@ export class Conversation {
             })
             .join(', ');
 
-          const maxLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+          const maxLength = MAX_GROUP_NAME_LENGTH;
           return truncate(joinedNames, maxLength, false);
         }
 
@@ -1064,11 +1068,11 @@ export class Conversation {
       return this.participating_user_ets().reduce((accumulator, userEntity) => {
         return userEntity.devices().length > 0
           ? accumulator + userEntity.devices().length
-          : accumulator + ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+          : accumulator + AVERAGE_NUMBER_OF_CLIENTS;
       }, this.selfUser()?.devices().length ?? 0);
     }
 
-    return this.getNumberOfParticipants() * ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+    return this.getNumberOfParticipants() * AVERAGE_NUMBER_OF_CLIENTS;
   }
 
   /**

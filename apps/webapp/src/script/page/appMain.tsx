@@ -36,7 +36,7 @@ import {LeftSidebar} from './leftSidebar';
 import {TeamCreationModalContainer} from './leftSidebar/panels/conversations/conversationTabs/teamCreation/teamCreationModalContainer';
 import {SidebarTabs, useSidebarStore} from './leftSidebar/panels/conversations/useSidebarStore';
 import {MainContent} from './mainContent';
-import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
+import {PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
@@ -54,6 +54,7 @@ import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from '../components/Modals/UserModal';
 import {Config} from '../Config';
 import type {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
+import {RightSidebarParams} from '../guards/Panel';
 import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
@@ -87,11 +88,7 @@ import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 import {WebAppEvents} from '../webAppEvents';
 
-export type RightSidebarParams = {
-  entity: PanelEntity | null;
-  showReactions?: boolean;
-  highlighted?: User[];
-};
+export type {RightSidebarParams};
 
 type AppMainProps = {
   readonly app: App;

@@ -64,19 +64,11 @@ import {loadDataUrl} from '../../util/util';
 import {actionRoot} from '../module/action';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as SelfSelector from '../module/selector/selfSelector';
+import {Scope} from '../util/oauthScope';
 import {oAuthParams, oAuthScope, oAuthScopesToString} from '../util/oauthUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   assetRepository?: AssetRepository;
-}
-
-export enum Scope {
-  WRITE_CONVERSATIONS = 'write:conversations',
-  WRITE_CONVERSATIONS_CODE = 'write:conversations_code',
-  ADMIN_MEETINGS = 'admin:meetings',
-  WRITE_MEETINGS = 'write:meetings',
-  READ_SELF = 'read:self',
-  READ_FEATURE_CONFIGS = 'read:feature_configs',
 }
 
 const OAuthPermissionsComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({

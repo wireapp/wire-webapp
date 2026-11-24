@@ -25,6 +25,7 @@ import murmurhash from 'murmurhash';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
+import {AVERAGE_NUMBER_OF_CLIENTS} from './ClientConstants';
 import {ClientEntity} from './ClientEntity';
 import {constructClientId, parseClientId} from './ClientIdUtil';
 import {ClientMapper} from './ClientMapper';
@@ -66,7 +67,7 @@ export class ClientRepository {
 
   static get CONFIG(): ClientRepositoryConfig {
     return {
-      AVERAGE_NUMBER_OF_CLIENTS: 4,
+      AVERAGE_NUMBER_OF_CLIENTS,
     };
   }
 

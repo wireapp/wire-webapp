@@ -22,6 +22,8 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
 
+import type {ClientNotificationData} from './ClientNotificationData';
+
 import {ClientType} from '../../apiClient/client/clientType';
 import {UserEvent, USER_EVENT} from '../../apiClient/event/userEvent';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
@@ -32,13 +34,7 @@ import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import {PropertiesRepository} from '../properties/propertiesRepository';
 
-export type ClientNotificationData = {
-  domain?: string;
-  id: string;
-  model: string;
-  time: string;
-  type: ClientType;
-};
+export type {ClientNotificationData};
 export interface Notification {
   data: ClientNotificationData | boolean;
   type: string;

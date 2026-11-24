@@ -20,10 +20,13 @@
 import {isUndefined} from '@sindresorhus/is';
 import {create} from 'zustand';
 
-import {LegalHoldModalType} from './LegalHoldModal';
-
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {User} from '../../../repositories/entity/User';
+
+export enum LegalHoldModalType {
+  REQUEST = 'request',
+  USERS = 'users',
+}
 
 type LegalHoldModalState = {
   type: LegalHoldModalType | null;

@@ -17,6 +17,7 @@
  *
  */
 
+import {CLIENT_PAYLOAD, SELF_CLIENT_PAYLOAD} from './ClientConstants';
 import {ClientEntity} from './ClientEntity';
 import {parseClientId} from './ClientIdUtil';
 
@@ -31,8 +32,8 @@ type ClientMappingResult<T> = {client: T; wasUpdated: boolean};
 export class ClientMapper {
   static get CONFIG(): ClientMapperConfig {
     return {
-      CLIENT_PAYLOAD: ['class', 'id', 'domain'],
-      SELF_CLIENT_PAYLOAD: ['address', 'cookie', 'label', 'model', 'time', 'type'],
+      CLIENT_PAYLOAD,
+      SELF_CLIENT_PAYLOAD,
     };
   }
 

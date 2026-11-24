@@ -23,7 +23,7 @@ import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is
 import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {useLegalHoldModalState} from './LegalHoldModal.state';
+import {LegalHoldModalType, useLegalHoldModalState} from './LegalHoldModal.state';
 
 import {LegalHoldMemberStatus} from '../../../apiClient/team/legalhold/legalHoldMemberStatus';
 import {useUserDevicesHistory} from '../../../hooks/useUserDevicesHistory';
@@ -115,10 +115,7 @@ function renderLegalHoldDescription(options: RenderLegalHoldDescriptionOptions):
   return replaceReactComponents(translatedText, legalHoldDescriptionReactReplacements);
 }
 
-export enum LegalHoldModalType {
-  REQUEST = 'request',
-  USERS = 'users',
-}
+export {LegalHoldModalType};
 
 export interface LegalHoldModalProps {
   clientRepository: ClientRepository;

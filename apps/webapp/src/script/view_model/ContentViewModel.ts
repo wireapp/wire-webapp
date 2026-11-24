@@ -30,7 +30,6 @@ import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationError} from '../error/conversationError';
-import '../page/leftSidebar';
 import {
   getConversationListTab,
   isConversationListTab,

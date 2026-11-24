@@ -23,7 +23,7 @@ import type {CSSObject} from '@emotion/react';
 
 import type {PrimaryModalTranslatedMessage} from './PrimaryModalTranslatedMessage';
 
-import {ClientNotificationData} from '../../../repositories/notification/PreferenceNotificationRepository';
+import {ClientNotificationData} from '../../../repositories/notification/ClientNotificationData';
 import type {Translate as TranslationFunction} from '../../../util/localizerUtil';
 
 export type {

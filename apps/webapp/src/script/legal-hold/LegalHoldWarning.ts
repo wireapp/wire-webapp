@@ -23,7 +23,7 @@ import {useLegalHoldModalState} from '../components/Modals/LegalHoldModal/LegalH
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {PrimaryModalTranslatedMessage} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {ConversationError} from '../error/conversationError';
-import {OPEN_CONVERSATION_DETAILS} from '../page/rightSidebar/rightSidebar';
+import {OPEN_CONVERSATION_DETAILS} from '../page/rightSidebar/rightSidebarEvents';
 import {ConversationVerificationState} from '../repositories/conversation/ConversationVerificationState';
 import type {Conversation} from '../repositories/entity/Conversation';
 import type {Translate} from '../util/localizerUtil';

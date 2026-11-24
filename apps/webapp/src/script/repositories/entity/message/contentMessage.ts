@@ -33,8 +33,12 @@ import {SuperType} from '../../../message/superType';
 import {copyText} from '../../../util/clipboardUtil';
 import {type Translate} from '../../../util/localizerUtil';
 import {formatLocale, formatTimeShort} from '../../../util/timeUtil';
-import {AssetRepository} from '../../assets/assetRepository';
 import {ReactionMap, ReadReceipt} from '../../storage';
+
+interface AssetDownloader {
+  download(asset: ReturnType<MediumImage['resource']>, fileName: string): Promise<number | void>;
+  downloadFile(asset: FileAsset): Promise<number | void>;
+}
 
 export class ContentMessage extends Message {
   public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage> = ko.observableArray();
@@ -114,7 +118,7 @@ export class ContentMessage extends Message {
   /**
    * Download message content.
    */
-  download(assetRepository: AssetRepository): void {
+  download(assetRepository: AssetDownloader): void {
     const asset_et = this.getFirstAsset() as FileAsset | MediumImage;
 
     if (typeof (asset_et as MediumImage).resource === 'function') {

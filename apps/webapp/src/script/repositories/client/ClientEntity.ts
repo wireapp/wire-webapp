@@ -20,7 +20,7 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import ko from 'knockout';
 
-import {ClientMapper} from './ClientMapper';
+import {CLIENT_PAYLOAD, SELF_CLIENT_PAYLOAD} from './ClientConstants';
 
 import {ClientClassification} from '../../apiClient/client/clientClassification';
 import {ClientType} from '../../apiClient/client/clientType';
@@ -124,12 +124,12 @@ export class ClientEntity {
     const jsonObject = JSON.parse(ko.toJSON(this));
     delete jsonObject.isSelfClient;
 
-    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => {
+    CLIENT_PAYLOAD.forEach(name => {
       this.removeDefaultValues(jsonObject, name);
     });
 
     if (this.isSelfClient) {
-      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => {
+      SELF_CLIENT_PAYLOAD.forEach(name => {
         this.removeDefaultValues(jsonObject, name);
       });
     }

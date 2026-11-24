@@ -60,9 +60,9 @@ import {CONVERSATION_CELLS_STATE} from '../../apiClient/conversation/conversatio
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
+import {RightSidebarParams} from '../../guards/Panel';
 import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
 import {useApplicationContext, useMainViewModel} from '../../page/rootProvider';
 import {CallState} from '../../repositories/calling/CallState';
