@@ -921,8 +921,6 @@ export class EventMapper {
   }: LegacyEventRecord): ReceiptModeUpdateMessage {
     return new ReceiptModeUpdateMessage(
       isTruthy(eventData.receipt_mode),
-      from,
-      qualified_from?.domain,
       this.isSelfUser(from, qualified_from?.domain),
       this.translate,
     );
@@ -941,8 +939,6 @@ export class EventMapper {
   }: LegacyEventRecord): MessageTimerUpdateMessage {
     return new MessageTimerUpdateMessage(
       eventData.message_timer,
-      from,
-      qualified_from?.domain,
       this.isSelfUser(from, qualified_from?.domain),
       this.translate,
     );
