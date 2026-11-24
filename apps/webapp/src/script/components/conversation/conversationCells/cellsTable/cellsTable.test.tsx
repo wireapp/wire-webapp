@@ -172,7 +172,7 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
     return `to ${substitutions?.destination}`;
   }
   if (key === 'cells.bulkMove.outcomeUnresolved') {
-    return 'Move status is unresolved. Verify the Drive before trying again.';
+    return 'Unable to verify the move status. Refresh Shared Drive';
   }
   if (key === 'cells.bulkMove.requestFailed') {
     return 'The move request failed. Some items may have moved. Refresh Drive to check item locations before trying again.';
