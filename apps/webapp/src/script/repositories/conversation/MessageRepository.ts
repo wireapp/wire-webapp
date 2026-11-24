@@ -3258,6 +3258,23 @@ export class MessageRepository {
     return pending !== undefined && !this.isUnconfirmed(pending);
   }
 
+  /**
+   * Counts the operations in the lanes that start with a message, for the warning at logout. What a message has
+   * queued behind it counts too, and nothing that failed does.
+   */
+  public countPendingMessages(): number {
+    if (this.outbox === undefined) {
+      return 0;
+    }
+    const lanesResult = this.outbox.lanes();
+    if (lanesResult.outcome !== 'lanes-listed') {
+      return 0;
+    }
+    return lanesResult.lanes.reduce((count, {operations}) => {
+      return operations[0]?.kind === 'message' ? count + operations.length : count;
+    }, 0);
+  }
+
   // Shared by the kinds
 
   /** For what the user doesn't see as a message: whatever isn't a success or a reason to retry is forgotten */

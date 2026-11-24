@@ -62,6 +62,10 @@ type ClientRepositoryConfig = {AVERAGE_NUMBER_OF_CLIENTS: number};
 
 export class ClientRepository {
   private readonly logger: Logger;
+  /** Without the outbox nothing is pending */
+  private countPendingMessages: () => number = () => {
+    return 0;
+  };
   public selfUser: ko.Observable<User>;
 
   static get CONFIG(): ClientRepositoryConfig {
@@ -91,6 +95,11 @@ export class ClientRepository {
 
   init(selfUser: User): void {
     this.selfUser(selfUser);
+  }
+
+  /** The client repository is created before the message repository, so the count is handed over afterwards */
+  setPendingMessageCounter(countPendingMessages: () => number): void {
+    this.countPendingMessages = countPendingMessages;
   }
 
   //##############################################################################
@@ -329,6 +338,7 @@ export class ClientRepository {
         await this.deleteLocalTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       } else {
+        const pendingMessages = this.countPendingMessages();
         PrimaryModal.show(
           PrimaryModal.type.OPTION,
           {
@@ -340,6 +350,12 @@ export class ClientRepository {
               text: this.translate('modalAccountLogoutAction'),
             },
             text: {
+              ...(pendingMessages > 0 && {
+                message:
+                  pendingMessages === 1
+                    ? this.translate('outboxLogoutPendingMessage')
+                    : this.translate('outboxLogoutPendingMessagesPlural', {count: pendingMessages}),
+              }),
               option: this.translate('modalAccountLogoutOption'),
               title: this.translate('modalAccountLogoutHeadline'),
             },

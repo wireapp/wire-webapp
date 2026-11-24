@@ -467,6 +467,14 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(parts.repository.isPendingAndNeverAttempted('message-2')).toBe(false);
       expect(parts.repository.isPendingAndNeverAttempted('unknown')).toBe(false);
     });
+
+    it('counts the operations waiting in lanes that start with a message', async () => {
+      seedMessage(parts, {messageId: 'message-1'});
+      seedMessage(parts, {messageId: 'message-2', queuedSeq: 2});
+      await startOutbox(parts);
+
+      expect(parts.repository.countPendingMessages()).toBe(2);
+    });
   });
 
   describe('deleting', () => {

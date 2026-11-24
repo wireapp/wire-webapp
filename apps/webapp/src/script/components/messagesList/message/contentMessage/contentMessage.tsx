@@ -57,6 +57,7 @@ import {OutlineCheck} from '../../../../uiKit/dataDisplay/icon/outlineCheck';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {getMessageAriaLabel} from '../../../../util/conversationMessages';
 import {TIME_IN_MILLIS, fromUnixTime, isYoungerThan1Hour} from '../../../../util/timeUtil';
+import {useNoInternetState} from '../../../../view_model/WarningsContainer/noInternetState';
 import {FileFullscreenModalSourceConversationProvider} from '../../../FileFullscreenModal/FileFullscreenModalSourceConversationContext';
 import {EphemeralTimer} from '../ephemeralTimer';
 import {MessageTime} from '../messageTime';
@@ -134,6 +135,13 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
   const messageRef = useRef<HTMLDivElement | null>(null);
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const isOutboxEnabled = isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName);
+  const hasNoInternet = useNoInternetState(state => {
+    return state.hasNoInternet;
+  });
+  const isOffline = isOutboxEnabled && hasNoInternet;
+  const getOfflineButtonLabel = (feature: string): string => {
+    return translate('outboxNotAvailableOffline', {feature});
+  };
 
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(() => {
@@ -322,6 +330,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
                   isMessageFocused={msgFocusState}
                   is1to1Conversation={conversation.is1to1()}
                   isFileShareRestricted={isFileShareRestricted}
+                  getOfflineButtonLabel={isOffline ? getOfflineButtonLabel : undefined}
                   onClickDetails={() => {
                     return onClickDetails(message);
                   }}

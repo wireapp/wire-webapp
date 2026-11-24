@@ -101,6 +101,11 @@ body.theme-dark {
     display: flex;
   }
 
+  &[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
   &--borderless {
     border: 1px solid transparent;
     background-color: transparent;

@@ -19,7 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
+import {noop} from 'noop-esm';
+
+import {pendingOfflineMessagesFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../page/rootProvider';
+import {useNoInternetState} from '../../../../view_model/WarningsContainer/noInternetState';
 import * as Icon from '../../../icon';
 
 interface GiphyButtonProps {
@@ -27,7 +31,14 @@ interface GiphyButtonProps {
 }
 
 export const GiphyButton: FunctionComponent<GiphyButtonProps> = ({onGifClick}: GiphyButtonProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const hasNoInternet = useNoInternetState(state => {
+    return state.hasNoInternet;
+  });
+  const isOffline = isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName) && hasNoInternet;
+  const label = isOffline
+    ? translate('outboxNotAvailableOffline', {feature: translate('extensionsBubbleButtonGif')})
+    : translate('extensionsBubbleButtonGif');
 
   return (
     <>
@@ -36,9 +47,10 @@ export const GiphyButton: FunctionComponent<GiphyButtonProps> = ({onGifClick}: G
           className="input-bar-control"
           type="button"
           css={{marginBottom: '0'}}
-          title={translate('extensionsBubbleButtonGif')}
-          aria-label={translate('extensionsBubbleButtonGif')}
-          onClick={onGifClick}
+          title={label}
+          aria-label={label}
+          aria-disabled={isOffline || undefined}
+          onClick={isOffline ? noop : onGifClick}
           data-uie-name="do-giphy-popover"
         >
           <Icon.GifIcon width={14} height={14} />

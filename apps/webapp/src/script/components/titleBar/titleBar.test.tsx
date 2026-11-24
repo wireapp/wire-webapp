@@ -17,13 +17,16 @@
  *
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {isNull} from '@sindresorhus/is';
 
 import {Runtime} from '../../commons/util/Runtime';
+import {pendingOfflineMessagesFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
+import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {WebAppEvents} from '../../webAppEvents';
 
@@ -336,6 +339,67 @@ describe('TitleBar', () => {
     expect(audioCallButton).toBeDefined();
     fireEvent.click(audioCallButton);
     expect(callActions.startAudio).toHaveBeenCalledWith(conversation);
+  });
+
+  describe('the call button offline', () => {
+    const renderOffline = (isOutboxEnabled: boolean): ReturnType<typeof render> => {
+      const firstUser = new User('', '', translateForTest);
+      const conversation = createConversationEntity({
+        firstUserEntity: ko.pureComputed(() => {
+          return firstUser;
+        }),
+        is1to1: ko.pureComputed(() => {
+          return true;
+        }),
+        participating_user_ids: ko.observableArray([
+          {domain: '', id: ''},
+          {domain: '', id: ''},
+        ] as QualifiedId[]),
+      });
+      act(() => {
+        useWarningsState.setState({warnings: [TYPE.NO_INTERNET]});
+      });
+      const wrapper = createRootProviderWrapperForTest(
+        createRootContextValueForTest({
+          translate: translateForTest,
+          isFeatureToggleEnabled: featureName => {
+            return isOutboxEnabled && featureName === pendingOfflineMessagesFeatureToggleName;
+          },
+        }),
+      );
+      return render(
+        withThemeAndRootContext(<TitleBar {...getDefaultProps(callingRepository, conversation)} />, wrapper),
+      );
+    };
+
+    beforeEach(() => {
+      callActions.startAudio.mockClear();
+    });
+
+    afterEach(() => {
+      act(() => {
+        useWarningsState.setState({warnings: []});
+      });
+    });
+
+    it('stays focusable, explains why and starts nothing with the outbox on', () => {
+      const {getByRole} = renderOffline(true);
+
+      const callButton = getByRole('button', {name: 'outboxNotAvailableOffline'});
+      callButton.focus();
+      fireEvent.click(callButton);
+
+      expect(callButton).toHaveAttribute('aria-disabled', 'true');
+      expect(callButton).not.toBeDisabled();
+      expect(callButton).toHaveFocus();
+      expect(callActions.startAudio).not.toHaveBeenCalled();
+    });
+
+    it('is unchanged with the outbox off', () => {
+      const {getByRole} = renderOffline(false);
+
+      expect(getByRole('button', {name: 'tooltipConversationCall'})).not.toHaveAttribute('aria-disabled');
+    });
   });
 
   it("doesn't show video call button when video calling is not enabled", async () => {

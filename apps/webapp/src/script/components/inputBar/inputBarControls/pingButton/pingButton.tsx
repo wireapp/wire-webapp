@@ -19,7 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
+import {noop} from 'noop-esm';
+
+import {pendingOfflineMessagesFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../page/rootProvider';
+import {useNoInternetState} from '../../../../view_model/WarningsContainer/noInternetState';
 import * as Icon from '../../../icon';
 
 interface PingButtonProps {
@@ -28,16 +32,24 @@ interface PingButtonProps {
 }
 
 export const PingButton: FunctionComponent<PingButtonProps> = ({isDisabled, onClick}: PingButtonProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const hasNoInternet = useNoInternetState(state => {
+    return state.hasNoInternet;
+  });
+  const isOffline = isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName) && hasNoInternet;
+  const label = isOffline
+    ? translate('outboxNotAvailableOffline', {feature: translate('tooltipConversationPing')})
+    : translate('tooltipConversationPing');
 
   return (
     <button
       className="input-bar-control"
       type="button"
-      onClick={onClick}
+      onClick={isOffline ? noop : onClick}
       disabled={isDisabled}
-      title={translate('tooltipConversationPing')}
-      aria-label={translate('tooltipConversationPing')}
+      aria-disabled={isOffline || undefined}
+      title={label}
+      aria-label={label}
       data-uie-name="do-ping"
     >
       <Icon.PingIcon width={14} height={14} />
