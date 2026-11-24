@@ -29,6 +29,7 @@ import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';
 import {replaceBrowserLocation} from '../../navigation/browserLocation';
+import type {Outbox} from '../../outbox';
 import type {Core} from '../../service/coreSingleton';
 import {getLogger, Logger} from '../../util/logger';
 import {includesString} from '../../util/stringUtil';
@@ -85,6 +86,8 @@ export interface LifeCycleDependencies {
   storageRepository: StorageRepository;
   userRepository: UserRepository;
   core: Core;
+  /** Present only when the outbox is enabled; its attempts must end before the session does */
+  outbox?: Outbox;
 }
 
 /**
@@ -239,6 +242,8 @@ export class LifeCycleRepository {
     // Disconnect from real-time events
     this.dependencies.eventRepository.disconnectWebSocket();
     this.logger.debug('Disconnected from real-time event WebSocket.');
+
+    await this.dependencies.outbox?.stop();
   };
 
   /**
