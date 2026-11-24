@@ -58,7 +58,7 @@ import {formatDuration} from '../../../util/timeUtil';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
-import {PanelEntity, PanelState} from '../rightSidebar';
+import {PanelEntity, PanelState} from '../panelState';
 
 const CONFIG = {
   MAX_USERS_VISIBLE: 7,

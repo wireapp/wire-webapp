@@ -50,7 +50,7 @@ import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag
 import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
 import {WebAppEvents} from '../../../../../webAppEvents';
 import {useApplicationContext} from '../../../../rootProvider';
-import {PanelEntity, PanelState} from '../../../rightSidebar';
+import {PanelEntity, PanelState} from '../../../panelState';
 import {getConversationActions} from '../../utils/getConversationActions';
 import {ConversationDetailsBottomActions} from '../conversationDetailsBottomActions';
 

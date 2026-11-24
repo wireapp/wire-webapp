@@ -23,7 +23,7 @@ import {isEmptyArray, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {UserListItem} from './components/userListItem';
+import {UserListItem} from './components/userListItem/userListItem';
 import {collapseButton, collapseIcon} from './userList.styles';
 
 import {useApplicationContext} from '../../page/rootProvider';
