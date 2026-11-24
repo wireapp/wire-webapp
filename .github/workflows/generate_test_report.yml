@@ -19,6 +19,9 @@ jobs:
           persist-credentials: false
           ref: ${{ github.ref }}
 
+      - name: Verify Git LFS binary pointers
+        uses: $/.github/actions/verify-git-lfs-files
+
       - name: Capture checked out commit SHA
         run: echo "TESTED_COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
 

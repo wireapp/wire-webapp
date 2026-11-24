@@ -39,6 +39,7 @@ Prerequisites:
 1. Use Node.js 26.12.1, as pinned by `.nvmrc`.
 1. Use npm 11.20.0, bundled with Node.js 26.12.1 and declared by the root `package.json` `packageManager` field.
 1. The `devEngines` checks require Node.js `>=26.12.1 <27` and npm `>=11.20.0 <12` for `npm install` and `npm clean-install`.
+1. Install Git 2.40 or newer, Git LFS 3.2 or newer, and `jq`. Run `git lfs install` to configure Git LFS for your account.
 
 ## 1. Install Dependencies & Fetch Configuration
 

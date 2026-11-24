@@ -96,6 +96,9 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
 
+      - name: Verify Git LFS binary pointers
+        uses: $/.github/actions/verify-git-lfs-files
+
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:

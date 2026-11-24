@@ -1,0 +1,60 @@
+name: Verify Git LFS files
+description: Confirm committed Git attributes match the files tracked by Git LFS
+
+inputs:
+  repository-directory:
+    description: Path to the checked-out repository to validate
+    required: false
+    default: .
+
+runs:
+  using: composite
+  steps:
+    - name: Compare committed Git LFS attributes and pointers
+      shell: bash
+      working-directory: ${{ inputs.repository-directory }}
+      run: |
+        set -euo pipefail
+
+        temporaryDirectory="$(mktemp -d)"
+        trap 'rm -rf -- "${temporaryDirectory}"' EXIT
+
+        expectedFilePaths="${temporaryDirectory}/expected-file-paths"
+        lfsFilesJsonPath="${temporaryDirectory}/lfs-files.json"
+        actualFilePaths="${temporaryDirectory}/actual-file-paths"
+
+        git ls-tree -r -z --name-only HEAD |
+          git check-attr --source=HEAD --stdin -z filter |
+          while IFS= read -r -d '' filePath &&
+          IFS= read -r -d '' attributeName &&
+          IFS= read -r -d '' attributeValue; do
+          if [[ "${filePath}" == *.bin ]]; then
+            if [[ "${attributeName}" != 'filter' || "${attributeValue}" != 'lfs' ]]; then
+              printf 'Committed .bin file must have the filter=lfs attribute: %q\n' "${filePath}" >&2
+              exit 1
+            fi
+
+          fi
+
+          if [[ "${attributeName}" == 'filter' && "${attributeValue}" == 'lfs' ]]; then
+            printf '%q\n' "${filePath}"
+          fi
+          done |
+          LC_ALL=C sort -u > "${expectedFilePaths}"
+
+        git lfs ls-files --json --include='' --exclude='' HEAD > "${lfsFilesJsonPath}"
+        jq -e 'has("files") and (.files | if . == null then true else type == "array" and all(.[]; (.name | type) == "string") end)' \
+          "${lfsFilesJsonPath}" > /dev/null
+        jq -j '(.files // [])[] | .name + "\u0000"' "${lfsFilesJsonPath}" |
+          while IFS= read -r -d '' filePath; do
+            printf '%q\n' "${filePath}"
+          done |
+          LC_ALL=C sort -u > "${actualFilePaths}"
+
+        if ! diff -u "${expectedFilePaths}" "${actualFilePaths}"; then
+          printf '\nCommitted Git LFS attributes do not match the files tracked by Git LFS.\n' >&2
+          printf 'Lines prefixed with - require a Git LFS pointer. Lines prefixed with + require the filter=lfs attribute.\n' >&2
+          exit 1
+        fi
+
+        printf 'Committed Git LFS attributes and pointers match.\n'

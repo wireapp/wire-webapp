@@ -398,6 +398,11 @@ jobs:
 
           echo "Building application source from maintenance commit ${maintenance_commit_sha}."
 
+      - name: Verify Git LFS binary pointers
+        uses: $/.github/actions/verify-git-lfs-files
+        with:
+          repository-directory: maintenance-source
+
       - name: Setup workflow tooling Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:

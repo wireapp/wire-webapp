@@ -165,6 +165,9 @@ jobs:
           fetch-depth: 0
           ref: ${{ needs.prepare_release.outputs.release_commit_sha }}
 
+      - name: Verify Git LFS binary pointers
+        uses: $/.github/actions/verify-git-lfs-files
+
       - name: Verify prepared release commit
         id: release_metadata
         env:
