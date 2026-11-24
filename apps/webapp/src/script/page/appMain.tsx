@@ -37,7 +37,8 @@ import {LeftSidebar} from './leftSidebar';
 import {TeamCreationModalContainer} from './leftSidebar/panels/conversations/conversationTabs/teamCreation/teamCreationModalContainer';
 import {SidebarTabs, useSidebarStore} from './leftSidebar/panels/conversations/useSidebarStore';
 import {MainContent} from './mainContent';
-import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
+import {RightSidebar} from './rightSidebar';
+import {PanelState, RightSidebarParams} from './rightSidebar/panelState';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
@@ -91,12 +92,6 @@ import {MainViewModel} from '../view_model/MainViewModel';
 import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 import {WebAppEvents} from '../webAppEvents';
-
-export type RightSidebarParams = {
-  entity: PanelEntity | null;
-  showReactions?: boolean;
-  highlighted?: User[];
-};
 
 type AppMainProps = {
   readonly app: App;

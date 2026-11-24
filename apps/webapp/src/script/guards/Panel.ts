@@ -17,7 +17,7 @@
  *
  */
 
-import {PanelEntity} from '../page/rightSidebar/rightSidebar';
+import {PanelEntity} from '../page/rightSidebar/panelState';
 import {User} from '../repositories/entity/User';
 import {ServiceEntity} from '../repositories/integration/ServiceEntity';
 

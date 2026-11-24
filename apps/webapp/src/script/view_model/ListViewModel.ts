@@ -25,7 +25,6 @@ import {container} from 'tsyringe';
 
 import type {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
-import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import {Runtime} from '../commons/util/Runtime';
@@ -36,7 +35,7 @@ import {
   SidebarTabs,
   useSidebarStore,
 } from '../page/leftSidebar/panels/conversations/useSidebarStore';
-import {PanelState} from '../page/rightSidebar';
+import {PanelState} from '../page/rightSidebar/panelState';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
 import type {CallingRepository} from '../repositories/calling/CallingRepository';
@@ -59,6 +58,12 @@ import {isEscapeKey} from '../util/keyboardUtil';
 import {type Translate} from '../util/localizerUtil';
 import {WebAppEvents} from '../webAppEvents';
 
+interface ListContentViewModel {
+  repositories: ViewModelRepositories;
+  switchContent: (newContentState: ContentState) => void;
+  loadPreviousContent: () => void;
+}
+
 export class ListViewModel {
   private readonly userState: UserState;
   private readonly teamState: TeamState;
@@ -75,7 +80,7 @@ export class ListViewModel {
   public readonly teamRepository: TeamRepository;
   public readonly searchRepository: SearchRepository;
   private readonly actionsViewModel: ActionsViewModel;
-  public readonly contentViewModel: ContentViewModel;
+  public readonly contentViewModel: ListContentViewModel;
   public readonly callingViewModel: CallingViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
   public readonly selfUser: ko.Subscribable<User>;
