@@ -70,6 +70,30 @@ type RenderStatusMessageResult = ReturnType<typeof parseError> | ReturnType<type
 
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
+type AutomaticLoginSubmissionState = {
+  readonly shouldAutoLogin: boolean;
+  readonly hasConsumedAutoLogin: boolean;
+  readonly isFetching: boolean;
+  readonly initialCode: string | undefined;
+  readonly codeOrMail: string;
+};
+
+function shouldSubmitAutomaticLoginRequest({
+  shouldAutoLogin,
+  hasConsumedAutoLogin,
+  isFetching,
+  initialCode,
+  codeOrMail,
+}: AutomaticLoginSubmissionState): boolean {
+  return (
+    shouldAutoLogin &&
+    !hasConsumedAutoLogin &&
+    !isFetching &&
+    isNonEmptyString(initialCode) &&
+    initialCode === codeOrMail
+  );
+}
+
 type AutomaticLoginRequestControls = {
   readonly shouldAutoLogin: boolean;
   readonly hasConsumedAutoLogin: React.MutableRefObject<boolean>;
@@ -328,13 +352,14 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   );
 
   useEffect(() => {
-    if (
-      shouldAutoLogin &&
-      !hasConsumedAutoLogin.current &&
-      !isFetching &&
-      isNonEmptyString(initialCode) &&
-      initialCode === codeOrMail
-    ) {
+    const isReadyToSubmit = shouldSubmitAutomaticLoginRequest({
+      shouldAutoLogin,
+      hasConsumedAutoLogin: hasConsumedAutoLogin.current,
+      isFetching,
+      initialCode,
+      codeOrMail,
+    });
+    if (isReadyToSubmit) {
       void handleSubmit();
     }
   }, [codeOrMail, handleSubmit, initialCode, isFetching, shouldAutoLogin]);
