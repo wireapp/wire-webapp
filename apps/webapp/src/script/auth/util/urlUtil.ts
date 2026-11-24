@@ -91,6 +91,23 @@ export function hasURLParameter(parameterName: string): boolean {
     .includes(parameterName);
 }
 
+export function removeURLParameterFromCurrentUrl(parameterName: string): void {
+  const currentUrl = new URL(window.location.href);
+  if (!currentUrl.searchParams.has(parameterName)) {
+    return;
+  }
+
+  const remainingQueryParameters = currentUrl.search
+    .slice(1)
+    .split('&')
+    .filter(queryParameter => {
+      return !new URLSearchParams(`?${queryParameter}`).has(parameterName);
+    });
+  currentUrl.search = remainingQueryParameters.length === 0 ? '' : `?${remainingQueryParameters.join('&')}`;
+
+  window.history.replaceState(window.history.state, '', currentUrl.href);
+}
+
 export function openTab(url: string): Window | null {
   const newWindow = window.open(url);
   if (!isNull(newWindow)) {

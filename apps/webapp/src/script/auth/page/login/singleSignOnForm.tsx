@@ -59,7 +59,7 @@ import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
 import {logoutReasonStrings} from '../../util/logoutUtil';
 import {withOAuthQuery} from '../../util/oauthUtil';
-import {getSearchParams, SSO_CODE_PREFIX} from '../../util/urlUtil';
+import {getSearchParams, removeURLParameterFromCurrentUrl, SSO_CODE_PREFIX} from '../../util/urlUtil';
 
 interface SingleSignOnFormProps {
   doLogin: (code: string) => Promise<void>;
@@ -70,14 +70,22 @@ type RenderStatusMessageResult = ReturnType<typeof parseError> | ReturnType<type
 
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
-function consumeSSOAutoLoginParameter(): void {
-  const currentUrl = new URL(window.location.href);
-  if (!currentUrl.searchParams.has(QUERY_KEY.SSO_AUTO_LOGIN)) {
+type AutomaticLoginRequestControls = {
+  readonly shouldAutoLogin: boolean;
+  readonly hasConsumedAutoLogin: React.MutableRefObject<boolean>;
+  readonly setShouldAutoLogin: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+function consumeAutomaticLoginRequest(automaticLoginRequestControls: AutomaticLoginRequestControls): void {
+  const hasAutomaticLoginRequest =
+    automaticLoginRequestControls.shouldAutoLogin || UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
+  if (!hasAutomaticLoginRequest) {
     return;
   }
 
-  currentUrl.searchParams.delete(QUERY_KEY.SSO_AUTO_LOGIN);
-  window.history.replaceState(window.history.state, '', `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
+  automaticLoginRequestControls.hasConsumedAutoLogin.current = true;
+  automaticLoginRequestControls.setShouldAutoLogin(false);
+  removeURLParameterFromCurrentUrl(QUERY_KEY.SSO_AUTO_LOGIN);
 }
 
 const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & ConnectedProps & DispatchProps> = ({
@@ -244,11 +252,11 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
         return;
       }
 
-      if (shouldAutoLogin || UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN)) {
-        hasConsumedAutoLogin.current = true;
-        setShouldAutoLogin(false);
-        consumeSSOAutoLoginParameter();
-      }
+      consumeAutomaticLoginRequest({
+        shouldAutoLogin,
+        hasConsumedAutoLogin,
+        setShouldAutoLogin,
+      });
 
       if (requiresPasswordModal(isLinkPasswordModalOpen, conversationInfo?.has_password ?? false, conversationError)) {
         setIsLinkPasswordModalOpen(true);

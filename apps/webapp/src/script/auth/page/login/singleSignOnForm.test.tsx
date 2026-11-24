@@ -143,7 +143,13 @@ describe('SingleSignOnForm', () => {
       new Error('Failed to open the CoreCrypto database'),
     );
     const warning = jest.spyOn(console, 'warn').mockReturnValue(undefined);
-    window.history.replaceState({}, '', `?${QUERY_KEY.SSO_AUTO_LOGIN}=true#/sso`);
+    const originalHistoryState = {entry: 'sso-login'};
+    window.history.replaceState(
+      originalHistoryState,
+      '',
+      `/auth/login?tracking=a%20b&${QUERY_KEY.SSO_AUTO_LOGIN}=true&theme=dark#/sso`,
+    );
+    const historyReplaceSpy = spyOn(window.history, 'replaceState').and.callThrough();
 
     spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => {
       return Promise.resolve();
@@ -192,6 +198,15 @@ describe('SingleSignOnForm', () => {
     expect(doLogin).toHaveBeenCalledTimes(1);
     expect(finalizeSSOLogin).toHaveBeenCalledTimes(1);
     expect(new URLSearchParams(window.location.search).has(QUERY_KEY.SSO_AUTO_LOGIN)).toBe(false);
+    expect(window.location.pathname).toBe('/auth/login');
+    expect(window.location.search).toBe('?tracking=a%20b&theme=dark');
+    expect(window.location.hash).toBe('#/sso');
+    expect(window.history.state).toMatchObject(originalHistoryState);
+    expect(historyReplaceSpy).toHaveBeenCalledWith(
+      expect.objectContaining(originalHistoryState),
+      '',
+      `${window.location.origin}/auth/login?tracking=a%20b&theme=dark#/sso`,
+    );
 
     form.unmount();
     form = renderForm();
