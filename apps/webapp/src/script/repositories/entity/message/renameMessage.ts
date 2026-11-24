@@ -29,6 +29,7 @@ import {matchQualifiedIds} from '../../../util/qualifiedId';
 import {UserState} from '../../user/userState';
 import {User} from '../User';
 
+// Draft only: no-op comment to run CI on a message entity that imports User.
 export class RenameMessage extends SystemMessage {
   public readonly name: string;
   private readonly userState = container.resolve(UserState);
