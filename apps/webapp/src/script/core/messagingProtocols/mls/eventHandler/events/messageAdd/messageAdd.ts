@@ -17,7 +17,7 @@
  *
  */
 
-import {result} from 'true-myth';
+import {result, type Task} from 'true-myth';
 
 import {BufferedDecryptedMessage, ClientId, ConversationId, DecryptedMessage} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -31,14 +31,25 @@ import {TimeUtil} from '../../../../../../commons/util';
 import {getLogger} from '../../../../../../logger/getLogger';
 import {HandledEventPayload} from '../../../../../notification';
 import {parseFullQualifiedClientId} from '../../../../../util/fullyQualifiedClientIdUtils';
-import {MLSService} from '../../../mlsService/mlsService';
 
 const logger = getLogger('@wireapp/core/mls/messageAdd');
+
+/** The parts of `MLSService` used by the message add handler. */
+interface MessageAddMLSService {
+  decryptMessage(
+    conversationId: ConversationId,
+    payload: Uint8Array,
+    qualifiedConversationId: QualifiedId,
+    eventTime?: string,
+  ): Promise<DecryptedMessage | undefined>;
+  getSafeEpoch(groupId: string): Task<bigint, unknown>;
+  handlePendingProposals(params: {delayInMs: number; eventTime: string; groupId: string}): Promise<void>;
+}
 
 interface HandleMLSMessageAddParams {
   event: ConversationMLSMessageAddEvent;
   groupId: string;
-  mlsService: MLSService;
+  mlsService: MessageAddMLSService;
   qualifiedConversationId: QualifiedId;
 }
 
@@ -74,7 +85,7 @@ const scheduleProposal = ({
   delay?: bigint;
   event: ConversationMLSMessageAddEvent;
   groupId: string;
-  mlsService: MLSService;
+  mlsService: MessageAddMLSService;
 }): void => {
   if (delay === undefined) {
     return;

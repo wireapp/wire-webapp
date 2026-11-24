@@ -24,7 +24,7 @@ import {StatusCodes} from 'http-status-codes';
 import {Maybe, task, type Task} from 'true-myth';
 
 import {ClientBackendRepository} from './clientBackendRepository';
-import {ClientDatabaseRepository} from './clientDatabaseRepository';
+import {ClientDatabaseRepository, MetaClient} from './clientDatabaseRepository';
 import {ClientInfo} from './clientInfo';
 
 import {APIClient} from '../../apiClient/apiClient';
@@ -52,14 +52,7 @@ function isNotFoundError(error: unknown): boolean {
   return axios.isAxiosError(error) && error.response?.status === StatusCodes.NOT_FOUND;
 }
 
-export interface MetaClient extends RegisteredClient {
-  domain?: string;
-  meta: {
-    is_verified?: boolean;
-    is_mls_verified?: boolean;
-    primary_key: string;
-  };
-}
+export type {MetaClient};
 
 export class ClientService {
   private readonly database: ClientDatabaseRepository;

@@ -44,6 +44,7 @@ export * from './linkPreviewContent';
 export * from './locationContent';
 export * from './mentionContent';
 export * from './quoteContent';
+export * from './quoteMessageContent';
 export * from './reactionContent';
 export * from './textContent';
 export * from './tweetContent';

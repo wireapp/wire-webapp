@@ -19,7 +19,7 @@
 
 import {ClientPreKey} from './clientPreKey';
 
-import {QualifiedId} from '../user';
+import {QualifiedId} from '../user/qualifiedId';
 
 export interface PreKeyBundleBase {
   /** PreKeys of all clients */

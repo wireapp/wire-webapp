@@ -26,6 +26,12 @@ import {Maybe} from 'true-myth';
 import {EventEmitter} from 'events';
 
 import {createAbortableWait} from './abortableWait';
+import {
+  InvalidTokenError,
+  MissingCookieAndTokenError,
+  MissingCookieError,
+  TokenExpiredError,
+} from './authenticationError';
 import {BackendError} from './backendError';
 import {mapBackendError} from './backendErrorMapper';
 import {ConnectionState} from './connectionState';
@@ -38,12 +44,6 @@ import {TimeUtil} from '../../commons/util';
 import {getLogger, type Logger} from '../../logger/getLogger';
 import {AccessTokenData} from '../auth/accessTokenData';
 import {AccessTokenStore} from '../auth/accessTokenStore';
-import {
-  InvalidTokenError,
-  MissingCookieAndTokenError,
-  MissingCookieError,
-  TokenExpiredError,
-} from '../auth/authenticationError';
 import {AUTH_URL} from '../auth/authUrl';
 import {Config} from '../config';
 import {ObfuscationUtil} from '../obfuscation';
