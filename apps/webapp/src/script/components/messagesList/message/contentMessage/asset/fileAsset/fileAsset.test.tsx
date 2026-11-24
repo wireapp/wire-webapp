@@ -393,10 +393,11 @@ describe('FileAssetComponent', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       expect(thumbnailButton).toHaveFocus();
     });
-    expect(revokeObjectUrl).toHaveBeenCalledWith('blob:pdf');
+    expect(revokeObjectUrl).not.toHaveBeenCalledWith('blob:pdf');
     expect(revokeObjectUrl).not.toHaveBeenCalledWith('blob:thumbnail');
 
     unmount();
+    expect(revokeObjectUrl).toHaveBeenCalledWith('blob:pdf');
     expect(revokeObjectUrl).toHaveBeenCalledWith('blob:thumbnail');
     load.mockRestore();
     download.mockRestore();

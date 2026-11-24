@@ -275,6 +275,8 @@ describe('PdfAssetPreview', () => {
     });
 
     expect(URL.createObjectURL).toHaveBeenCalledTimes(2);
+    expect(screen.getByRole('dialog', {name: 'report.pdf'})).toHaveAttribute('data-status', 'success');
+    expect(screen.getByRole('dialog', {name: 'report.pdf'})).toHaveAttribute('data-preview-url', 'blob:pdf');
   });
 
   it('reuses the loaded PDF and thumbnail after closing and reopening the modal', async () => {
@@ -337,6 +339,7 @@ describe('PdfAssetPreview', () => {
     rerender(preview(secondOriginalResource));
     await waitFor(() => {
       expect(screen.getByRole('dialog', {name: 'report.pdf'})).toHaveAttribute('data-status', 'success');
+      expect(screen.getByRole('dialog', {name: 'report.pdf'})).toHaveAttribute('data-preview-url', 'blob:pdf-new');
     });
 
     expect(loadAsset).toHaveBeenCalledTimes(3);
@@ -372,6 +375,37 @@ describe('PdfAssetPreview', () => {
       expect(dialog).toHaveAttribute('data-status', expected ? 'success' : 'unavailable');
     });
     expect(URL.createObjectURL).toHaveBeenCalledTimes(expected ? 2 : 1);
+  });
+
+  it('retries a failed PDF load after the modal closes and reopens', async () => {
+    const loadAsset = jest
+      .fn()
+      .mockResolvedValueOnce(png)
+      .mockRejectedValueOnce(new Error('Encrypted asset does not match its SHA-256 hash'))
+      .mockResolvedValueOnce(pdf);
+    render(
+      <PreviewHarness
+        thumbnailResource={makeResource('thumbnail')}
+        originalResource={makeResource('original')}
+        label="Open PDF preview report.pdf"
+        loadAsset={loadAsset}
+      />,
+    );
+    enterViewport();
+    fireEvent.click(await screen.findByRole('button', {name: 'Open PDF preview report.pdf'}));
+    await waitFor(() => {
+      expect(screen.getByRole('dialog', {name: 'report.pdf'})).toHaveAttribute('data-status', 'unavailable');
+    });
+
+    fireEvent.click(screen.getByRole('button', {name: 'Close PDF preview'}));
+    fireEvent.click(await screen.findByRole('button', {name: 'Open PDF preview report.pdf'}));
+    await waitFor(() => {
+      expect(screen.getByRole('dialog', {name: 'report.pdf'})).toHaveAttribute('data-status', 'success');
+      expect(screen.getByRole('dialog', {name: 'report.pdf'})).toHaveAttribute('data-preview-url', 'blob:pdf');
+    });
+
+    expect(loadAsset).toHaveBeenCalledTimes(3);
+    expect(URL.createObjectURL).toHaveBeenCalledTimes(2);
   });
 
   it.each(['%PDF-X.7', '%PDF-1.x', '%PDF-10.7'])('rejects malformed PDF header %s', async header => {
