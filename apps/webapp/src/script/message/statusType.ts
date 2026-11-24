@@ -17,8 +17,6 @@
  *
  */
 
-import {EventRecord} from '../repositories/storage/record/eventRecord';
-
 /** Enum for different confirmation types */
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Status members define persisted message values inline. */
 export enum StatusType {
@@ -31,17 +29,3 @@ export enum StatusType {
   UNSPECIFIED = -1,
 }
 /* eslint-enable @typescript-eslint/no-magic-numbers */
-
-type FailedEventRecord = Omit<EventRecord, 'status'> & {
-  status: StatusType.FAILED;
-};
-type EventRecordWithFederationError = Omit<EventRecord, 'status'> & {
-  status: StatusType.FEDERATION_ERROR;
-};
-
-export const isEventRecordFailed = (event: any): event is FailedEventRecord => {
-  return 'status' in event && event.status === StatusType.FAILED;
-};
-export const isEventRecordWithFederationError = (event: any): event is EventRecordWithFederationError => {
-  return 'status' in event && event.status === StatusType.FEDERATION_ERROR;
-};
