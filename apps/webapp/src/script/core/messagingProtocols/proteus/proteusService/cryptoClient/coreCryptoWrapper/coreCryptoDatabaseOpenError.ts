@@ -17,6 +17,9 @@
  *
  */
 
+import {isError} from '@sindresorhus/is';
+import {objectHasIn} from 'ts-extras';
+
 const coreCryptoDatabaseOpenErrorBrand = Symbol('CoreCryptoDatabaseOpenError');
 
 type CoreCryptoDatabaseOpenError = Error & {
@@ -30,5 +33,5 @@ export function createCoreCryptoDatabaseOpenError(cause: unknown): Error {
 }
 
 export function isCoreCryptoDatabaseOpenError(errorCandidate: unknown): errorCandidate is CoreCryptoDatabaseOpenError {
-  return errorCandidate instanceof Error && coreCryptoDatabaseOpenErrorBrand in errorCandidate;
+  return isError(errorCandidate) && objectHasIn(errorCandidate, coreCryptoDatabaseOpenErrorBrand);
 }

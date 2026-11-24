@@ -17,19 +17,22 @@
  *
  */
 
+import {isString} from '@sindresorhus/is';
+
 export class LabeledError extends Error {
   public label: string;
 
   constructor(label: string, error: Error);
   constructor(label: string, message: string);
   constructor(label: string, messageOrError: string | Error) {
+    const hasPlainMessage = isString(messageOrError);
     super(
-      typeof messageOrError === 'string' ? messageOrError : messageOrError.message,
-      typeof messageOrError === 'string' ? undefined : {cause: messageOrError},
+      hasPlainMessage ? messageOrError : messageOrError.message,
+      hasPlainMessage ? undefined : {cause: messageOrError},
     );
     this.label = label;
 
-    if (typeof messageOrError === 'string') {
+    if (hasPlainMessage) {
       this.name = this.constructor.name;
     } else {
       this.name = messageOrError.name;

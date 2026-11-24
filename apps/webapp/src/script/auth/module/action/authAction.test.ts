@@ -26,6 +26,7 @@ import {BackendError} from '../../../apiClient/http/backendError';
 import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {RecursivePartial} from '../../../commons/util/TypeUtil';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {arrayLast} from 'ts-extras';
 
 import type {APIClient} from '../../../apiClient/apiClient';
 import type {TypeUtil} from '../../../commons/util';
@@ -375,8 +376,7 @@ describe('AuthAction', () => {
     expect(logout).toHaveBeenCalledTimes(2);
     expect(login).toHaveBeenCalledTimes(2);
     expect(doInitializeClient).toHaveBeenCalledTimes(2);
-    const loginActions = store.getActions();
-    expect(loginActions[loginActions.length - 1]).toEqual(AuthActionCreator.successfulLogin());
+    expect(arrayLast(store.getActions())).toEqual(AuthActionCreator.successfulLogin());
   });
 
   it('labels a CoreCrypto database open error after SSO and stops the login loading state', async () => {

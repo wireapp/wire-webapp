@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isNull} from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyString, isNull} from '@sindresorhus/is';
 
 import {FORWARDED_QUERY_KEYS} from '../route';
 
@@ -103,7 +103,7 @@ export function removeURLParameterFromCurrentUrl(parameterName: string): void {
     .filter(queryParameter => {
       return !new URLSearchParams(`?${queryParameter}`).has(parameterName);
     });
-  currentUrl.search = remainingQueryParameters.length === 0 ? '' : `?${remainingQueryParameters.join('&')}`;
+  currentUrl.search = isEmptyArray(remainingQueryParameters) ? '' : `?${remainingQueryParameters.join('&')}`;
 
   window.history.replaceState(window.history.state, '', currentUrl.href);
 }
