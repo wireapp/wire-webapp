@@ -17,8 +17,9 @@
  *
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, waitFor} from '@testing-library/react';
 import {ClientType} from '../../../apiClient/client/clientType';
+import {IntlProvider} from 'react-intl';
 
 import {TypeUtil} from '../../../commons/util';
 import {noop} from 'noop-esm';
@@ -36,9 +37,13 @@ import {translateForTest} from '../../../util/test/translateForTest';
 import {SingleSignOnForm} from './singleSignOnForm';
 
 import {Config, Configuration} from '../../../Config';
+import germanMessages from '../../../../i18n/de-DE.json';
+import {configureStore} from '../../configureStore';
 import {actionRoot} from '../../module/action';
+import {AuthActionCreator} from '../../module/action/creator';
+import {LabeledError} from '../../module/action/labeledError';
 import {ValidationError} from '../../module/action/validationError';
-import {initialRootState} from '../../module/reducer';
+import {initialRootState, ThunkDispatch} from '../../module/reducer';
 import {ROUTE, QUERY_KEY} from '../../route';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {mountComponent, withIntl, withThemeAndRootContext} from '../../util/test/testUtil';
@@ -47,8 +52,17 @@ const codeOrEmailInputId = 'enter-code';
 const submitButtonId = 'do-sso-sign-in';
 const temporaryCheckboxId = 'enter-public-computer-sso-sign-in';
 const errorId = 'error-message';
+const storageErrorMessageId = 'LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN';
+const germanMessagesWithoutStorageError: Record<string, string> = {...germanMessages};
+delete germanMessagesWithoutStorageError[storageErrorMessageId];
 
 describe('SingleSignOnForm', () => {
+  const originalUrl = window.location.href;
+
+  afterEach(() => {
+    window.history.replaceState({}, '', originalUrl);
+  });
+
   it('prefills code and disables input with initial SSO code', async () => {
     spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
       FEATURE: {
@@ -120,6 +134,106 @@ describe('SingleSignOnForm', () => {
     expect(actionRoot.authAction.doFinalizeSSOLogin).toHaveBeenCalledTimes(1);
 
     expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.HISTORY_INFO}`);
+  });
+
+  it('consumes automatic SSO login after a storage failure and allows a manual retry', async () => {
+    const ssoCode = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';
+    const storageError = new LabeledError(
+      LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN,
+      new Error('Failed to open the CoreCrypto database'),
+    );
+    const warning = jest.spyOn(console, 'warn').mockReturnValue(undefined);
+    const originalHistoryState = {entry: 'sso-login'};
+    window.history.replaceState(
+      originalHistoryState,
+      '',
+      `/auth/login?tracking=a%20b&${QUERY_KEY.SSO_AUTO_LOGIN}=true&theme=dark#/sso`,
+    );
+    const historyReplaceSpy = spyOn(window.history, 'replaceState').and.callThrough();
+
+    spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => {
+      return Promise.resolve();
+    });
+    let finalizationAttempts = 0;
+    const finalizeSSOLogin = spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(
+      async (dispatch: ThunkDispatch): Promise<void> => {
+        finalizationAttempts += 1;
+        if (finalizationAttempts === 1) {
+          dispatch(AuthActionCreator.startLogin());
+          dispatch(AuthActionCreator.failedLogin(storageError));
+        }
+        throw storageError;
+      },
+    );
+
+    const store = configureStore();
+    const doLogin = jest.fn().mockResolvedValue(undefined);
+    const rootProviderWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
+        translate: translateForTest,
+      }),
+    );
+    function renderForm(): ReturnType<typeof render> {
+      return render(
+        <Router>
+          {withThemeAndRootContext(
+            <Provider store={store}>
+              <IntlProvider locale="de-DE" messages={germanMessagesWithoutStorageError} onError={jest.fn()}>
+                <SingleSignOnForm doLogin={doLogin} initialCode={ssoCode} />
+              </IntlProvider>
+            </Provider>,
+            rootProviderWrapper,
+          )}
+        </Router>,
+      );
+    }
+    let form = renderForm();
+
+    await waitFor(() => {
+      expect(form.getByTestId(errorId)).toHaveTextContent(
+        'Wire couldn’t open your local message storage. Please try signing in again.',
+      );
+    });
+    expect(doLogin).toHaveBeenCalledTimes(1);
+    expect(finalizeSSOLogin).toHaveBeenCalledTimes(1);
+    expect(new URLSearchParams(window.location.search).has(QUERY_KEY.SSO_AUTO_LOGIN)).toBe(false);
+    expect(window.location.pathname).toBe('/auth/login');
+    expect(window.location.search).toBe('?tracking=a%20b&theme=dark');
+    expect(window.location.hash).toBe('#/sso');
+    expect(window.history.state).toMatchObject(originalHistoryState);
+    expect(historyReplaceSpy).toHaveBeenCalledWith(
+      expect.objectContaining(originalHistoryState),
+      '',
+      `${window.location.origin}/auth/login?tracking=a%20b&theme=dark#/sso`,
+    );
+
+    form.unmount();
+    form = renderForm();
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(form.getByTestId(errorId)).toHaveTextContent(
+      'Wire couldn’t open your local message storage. Please try signing in again.',
+    );
+    expect(doLogin).toHaveBeenCalledTimes(1);
+    expect(finalizeSSOLogin).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(form.getByTestId(submitButtonId));
+
+    await waitFor(() => {
+      expect(doLogin).toHaveBeenCalledTimes(2);
+      expect(finalizeSSOLogin).toHaveBeenCalledTimes(2);
+    });
+    expect(form.getByTestId(errorId)).toHaveTextContent(
+      'Wire couldn’t open your local message storage. Please try signing in again.',
+    );
+    expect(warning).toHaveBeenCalledTimes(2);
+    warning.mock.calls.forEach(warningCall => {
+      expect(warningCall[1]).not.toContain('cause');
+      expect(warningCall[2]).toBe(storageError);
+    });
+    warning.mockRestore();
   });
 
   it('shows invalid code or email error', async () => {

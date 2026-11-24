@@ -19,8 +19,14 @@
 
 import {TranslationKey} from './localizerUtil';
 
+import englishMessages from '../../i18n/en-US.json';
 import {BackendErrorLabel, SyntheticErrorLabel} from '../apiClient/http/backendErrorLabel';
 import {LabeledError} from '../auth/module/action/labeledError';
+
+export const errorHandlerDefaultMessages: Partial<Record<string, string>> = {
+  [LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN]:
+    englishMessages['LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN'],
+};
 
 export const errorHandlerStrings: Record<string, TranslationKey> = {
   [BackendErrorLabel.NO_CONVERSATION_CODE]: 'BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND',
@@ -69,6 +75,7 @@ export const errorHandlerStrings: Record<string, TranslationKey> = {
   [SyntheticErrorLabel.SSO_GENERIC_ERROR]: 'BackendError.LABEL.SSO_GENERIC_ERROR',
   [LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE]: 'LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE',
   [LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS]: 'LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS',
+  [LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN]: 'LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN',
   [BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND]: 'BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND',
   [BackendErrorLabel.INVALID_CONVERSATION_PASSWORD]: 'BackendErrorLabel.INVALID_CONVERSATION_PASSWORD',
   [BackendErrorLabel.MLS_MIGRATION_CRITERIA_NOT_SATISFIED]: 'BackendError.LABEL.MLS_MIGRATION_CRITERIA_NOT_SATISFIED',

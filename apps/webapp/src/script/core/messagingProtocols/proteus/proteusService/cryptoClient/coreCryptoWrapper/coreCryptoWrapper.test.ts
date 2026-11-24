@@ -25,6 +25,7 @@ import type {CoreCrypto, Database, DatabaseKey} from '@wireapp/core-crypto';
 import {configureLogging} from '../../../../../../logger/getLogger';
 import type {CRUDEngine} from '../../../../../storage/engine/crudEngine';
 
+import {isCoreCryptoDatabaseOpenError} from './coreCryptoDatabaseOpenError';
 import {buildClient, coreCryptoLogger, getCoreCryptoDbName, wipeCoreCryptoDb} from './coreCryptoWrapper';
 
 describe('CoreCryptoWrapper logging', () => {
@@ -79,11 +80,11 @@ describe('CoreCryptoWrapper initialization', () => {
   });
 
   it('preserves the database after a failed open so migration can be retried', async () => {
-    const migrationError = new Error('migration interrupted');
+    const databaseOpenCause = new Error('Opaque database open failure');
     const database = {uniffiDestroy: jest.fn()} as unknown as Database;
     const coreCrypto = {uniffiDestroy: jest.fn()} as unknown as CoreCrypto;
     const databaseKey = {} as DatabaseKey;
-    const openDatabase = jest.fn().mockRejectedValueOnce(migrationError).mockResolvedValueOnce(database);
+    const openDatabase = jest.fn().mockRejectedValueOnce(databaseOpenCause).mockResolvedValueOnce(database);
     const runtime = {
       configureLogging: jest.fn(),
       createCoreCrypto: jest.fn().mockReturnValue(coreCrypto),
@@ -109,7 +110,14 @@ describe('CoreCryptoWrapper initialization', () => {
       );
     };
 
-    await expect(build()).rejects.toBe(migrationError);
+    const openError = await build().catch((error: unknown) => {
+      return error;
+    });
+    expect(isCoreCryptoDatabaseOpenError(openError)).toBe(true);
+    if (!isCoreCryptoDatabaseOpenError(openError)) {
+      throw new Error('Expected a semantic CoreCrypto database open error');
+    }
+    expect(openError.cause).toBe(databaseOpenCause);
     await expect(indexedDB.databases()).resolves.toEqual(
       expect.arrayContaining([expect.objectContaining({name: databaseName})]),
     );

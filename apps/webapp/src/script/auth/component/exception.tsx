@@ -21,12 +21,12 @@ import {Fragment, ReactElement, type FunctionComponent} from 'react';
 
 import {isBoolean, isDate, isNonEmptyString, isNumber, isObject, isString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
-import {objectHasOwn} from 'ts-extras';
+import {objectHasIn, objectHasOwn} from 'ts-extras';
 
 import {Config} from '../../Config';
 import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
 import {Link} from '../../uiKit/typography/link/link';
-import {errorHandlerStrings} from '../../util/errorUtil';
+import {errorHandlerDefaultMessages, errorHandlerStrings} from '../../util/errorUtil';
 import {validationErrorStrings} from '../../util/validationUtil';
 
 interface ExceptionProps {
@@ -62,7 +62,7 @@ const Exception: FunctionComponent<ExceptionProps> = ({errors = []}: ExceptionPr
     <Fragment>
       {errors.map(error => {
         const translatedErrors = {...validationErrorStrings, ...errorHandlerStrings};
-        if (!isObject(error) || !('label' in error)) {
+        if (!isObject(error) || !objectHasIn(error, 'label')) {
           return null;
         }
         const errorLabel = isString(error.label) ? error.label : 'unexpected-error';
@@ -71,6 +71,7 @@ const Exception: FunctionComponent<ExceptionProps> = ({errors = []}: ExceptionPr
             {objectHasOwn(translatedErrors, errorLabel) ? (
               <FormattedMessage
                 id={translatedErrors[errorLabel]}
+                defaultMessage={errorHandlerDefaultMessages[errorLabel]}
                 values={{
                   minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH,
                   supportEmailExistsLink: (

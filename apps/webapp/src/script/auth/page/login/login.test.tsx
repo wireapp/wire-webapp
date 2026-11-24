@@ -34,6 +34,7 @@ import {Config, Configuration} from '../../../Config';
 import {configureStore} from '../../configureStore';
 import {actionRoot} from '../../module/action';
 import {AuthActionCreator} from '../../module/action/creator';
+import {LabeledError} from '../../module/action/labeledError';
 import {initialRootState, ThunkDispatch} from '../../module/reducer';
 import {ROUTE} from '../../route';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
@@ -186,6 +187,54 @@ describe('Login', () => {
     expect(getByTestId('do-sign-in')).toBeVisible();
     expect(store.getState().authState.error).toBe(invalidCredentialsError);
     expect(finalAuthErrorTransition).toBe(invalidCredentialsError);
+  });
+
+  it('shows the local storage error and allows the user to retry login', async () => {
+    const databaseOpenError = new LabeledError(
+      LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN,
+      new Error('Failed to open the CoreCrypto database'),
+    );
+    let loginAttempts = 0;
+    const historyPushSpy = spyOn(history, 'pushState');
+
+    spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
+    const doLogin = spyOn(actionRoot.authAction, 'doLogin').and.returnValue(
+      async (dispatch: ThunkDispatch): Promise<void> => {
+        dispatch(AuthActionCreator.startLogin());
+        loginAttempts += 1;
+        if (loginAttempts === 1) {
+          dispatch(AuthActionCreator.failedLogin(databaseOpenError));
+          throw databaseOpenError;
+        }
+        dispatch(AuthActionCreator.successfulLogin());
+      },
+    );
+
+    const {getByTestId} = render(
+      <Router>{withTheme(<Provider store={configureStore()}>{withIntl(<Login />)}</Provider>)}</Router>,
+    );
+
+    fireEvent.change(getByTestId('enter-email'), {target: {value: 'email@mail.com'}});
+    fireEvent.change(getByTestId('enter-password'), {target: {value: 'password'}});
+    fireEvent.click(getByTestId('do-sign-in'));
+
+    const errorMessage = await waitFor(() => {
+      const currentErrorMessage = getByTestId('error-message');
+      expect(currentErrorMessage).toBeVisible();
+      return currentErrorMessage;
+    });
+    expect(errorMessage).toHaveAttribute('data-uie-value', LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN);
+    expect(errorMessage).toHaveTextContent(
+      'Wire couldn’t open your local message storage. Please try signing in again.',
+    );
+    expect(getByTestId('do-sign-in')).toBeEnabled();
+
+    fireEvent.click(getByTestId('do-sign-in'));
+
+    await waitFor(() => {
+      expect(doLogin).toHaveBeenCalledTimes(2);
+      expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.HISTORY_INFO}`);
+    });
   });
 
   it('has disabled submit button as long as one input is empty', () => {

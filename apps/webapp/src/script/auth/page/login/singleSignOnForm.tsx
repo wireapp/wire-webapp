@@ -59,7 +59,7 @@ import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
 import {logoutReasonStrings} from '../../util/logoutUtil';
 import {withOAuthQuery} from '../../util/oauthUtil';
-import {getSearchParams, SSO_CODE_PREFIX} from '../../util/urlUtil';
+import {getSearchParams, removeURLParameterFromCurrentUrl, SSO_CODE_PREFIX} from '../../util/urlUtil';
 
 interface SingleSignOnFormProps {
   doLogin: (code: string) => Promise<void>;
@@ -69,6 +69,48 @@ interface SingleSignOnFormProps {
 type RenderStatusMessageResult = ReturnType<typeof parseError> | ReturnType<typeof parseValidationErrors>;
 
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
+
+type AutomaticLoginSubmissionState = {
+  readonly shouldAutoLogin: boolean;
+  readonly hasConsumedAutoLogin: boolean;
+  readonly isFetching: boolean;
+  readonly initialCode: string | undefined;
+  readonly codeOrMail: string;
+};
+
+function shouldSubmitAutomaticLoginRequest({
+  shouldAutoLogin,
+  hasConsumedAutoLogin,
+  isFetching,
+  initialCode,
+  codeOrMail,
+}: AutomaticLoginSubmissionState): boolean {
+  return (
+    shouldAutoLogin &&
+    !hasConsumedAutoLogin &&
+    !isFetching &&
+    isNonEmptyString(initialCode) &&
+    initialCode === codeOrMail
+  );
+}
+
+type AutomaticLoginRequestControls = {
+  readonly shouldAutoLogin: boolean;
+  readonly hasConsumedAutoLogin: React.MutableRefObject<boolean>;
+  readonly setShouldAutoLogin: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+function consumeAutomaticLoginRequest(automaticLoginRequestControls: AutomaticLoginRequestControls): void {
+  const hasAutomaticLoginRequest =
+    automaticLoginRequestControls.shouldAutoLogin || UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
+  if (!hasAutomaticLoginRequest) {
+    return;
+  }
+
+  automaticLoginRequestControls.hasConsumedAutoLogin.current = true;
+  automaticLoginRequestControls.setShouldAutoLogin(false);
+  removeURLParameterFromCurrentUrl(QUERY_KEY.SSO_AUTO_LOGIN);
+}
 
 const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & ConnectedProps & DispatchProps> = ({
   initialCode,
@@ -109,6 +151,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   const [isValidLink, setIsValidLink] = useState(true);
 
   const [shouldAutoLogin, setShouldAutoLogin] = useState(false);
+  const hasConsumedAutoLogin = useRef(false);
 
   const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(
     conversationInfo?.has_password === true ||
@@ -233,6 +276,12 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
         return;
       }
 
+      consumeAutomaticLoginRequest({
+        shouldAutoLogin,
+        hasConsumedAutoLogin,
+        setShouldAutoLogin,
+      });
+
       if (requiresPasswordModal(isLinkPasswordModalOpen, conversationInfo?.has_password ?? false, conversationError)) {
         setIsLinkPasswordModalOpen(true);
         return;
@@ -298,14 +347,22 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
       navigate,
       pushAccountRegistrationData,
       resetAuthError,
+      shouldAutoLogin,
     ],
   );
 
   useEffect(() => {
-    if (shouldAutoLogin && isNonEmptyString(initialCode) && initialCode === codeOrMail) {
+    const isReadyToSubmit = shouldSubmitAutomaticLoginRequest({
+      shouldAutoLogin,
+      hasConsumedAutoLogin: hasConsumedAutoLogin.current,
+      isFetching,
+      initialCode,
+      codeOrMail,
+    });
+    if (isReadyToSubmit) {
       void handleSubmit();
     }
-  }, [codeOrMail, handleSubmit, initialCode, shouldAutoLogin]);
+  }, [codeOrMail, handleSubmit, initialCode, isFetching, shouldAutoLogin]);
 
   const stripPrefix = (prefixedCode: string): string => {
     return prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');
