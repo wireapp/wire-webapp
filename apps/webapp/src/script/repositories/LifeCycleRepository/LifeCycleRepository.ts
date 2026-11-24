@@ -23,7 +23,7 @@ import {Maybe} from 'true-myth';
 
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {URLParameter} from '../../auth/urlParameter';
-import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
+import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator/useTypingIndicatorState/useTypingIndicatorState';
 import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';

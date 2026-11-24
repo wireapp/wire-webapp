@@ -25,22 +25,17 @@ import {singleton} from 'tsyringe';
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 
 import {Call} from './Call';
+import {CallViewTab, MuteState} from './CallEnums';
 
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {Config} from '../../Config';
 import {matchQualifiedIds} from '../../util/qualifiedId';
-import {CallViewTab} from '../../view_model/CallingViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
 import {EventName} from '../tracking/eventName';
 import {Segmentation} from '../tracking/segmentation';
 
-export enum MuteState {
-  NOT_MUTED,
-  SELF_MUTED,
-  REMOTE_MUTED,
-  REMOTE_FORCE_MUTED,
-}
+export {MuteState};
 
 export enum CallingViewMode {
   FULL_SCREEN = 'fullscreen',

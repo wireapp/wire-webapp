@@ -35,17 +35,16 @@ import {GuestServicesOptions} from './guestServicesOptions';
 import {MessageDetails} from './messageDetails';
 import {Notifications} from './notifications';
 import {ParticipantDevices} from './participantDevices';
+import {OPEN_CONVERSATION_DETAILS} from './rightSidebarEvents';
 import {SharedDrive} from './sharedDrive';
 import {TimedMessages} from './timedMessages';
 
 import {isReadableMessage} from '../../guards/Message';
-import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/Panel';
+import {isUserAppOrServiceEntity, isUserEntity, PanelEntity} from '../../guards/Panel';
 import {isAppOrServiceEntity} from '../../guards/Service';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
-import {Conversation} from '../../repositories/entity/Conversation';
 import {Message} from '../../repositories/entity/message/message';
 import {User} from '../../repositories/entity/User';
-import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {TeamState} from '../../repositories/team/TeamState';
 import {UserState} from '../../repositories/user/userState';
 import {Core} from '../../service/coreSingleton';
@@ -57,7 +56,7 @@ import {RightSidebarParams} from '../appMain';
 import {useAppMainState} from '../state';
 import {ContentState} from '../useAppState';
 
-export const OPEN_CONVERSATION_DETAILS = 'OPEN_CONVERSATION_DETAILS';
+export {OPEN_CONVERSATION_DETAILS};
 export const rightPanelAnimationTimeout = 350; // ms
 
 interface AnimatedProps {
@@ -95,7 +94,7 @@ export enum PanelState {
   CONVERSATION_HISTORY = 'CONVERSATION_HISTORY',
 }
 
-export type PanelEntity = Conversation | User | Message | ServiceEntity;
+export type {PanelEntity};
 
 interface RightSidebarProps {
   currentEntity?: RightSidebarParams['entity'];

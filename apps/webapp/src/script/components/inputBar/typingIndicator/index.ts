@@ -17,12 +17,6 @@
  *
  */
 
-import {TIME_IN_MILLIS} from '../../../util/timeUtil';
-
-const typingTimeoutInSeconds = 10;
-
 export * from './typingIndicator';
 
-export {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
-
-export const TYPING_TIMEOUT = TIME_IN_MILLIS.SECOND * typingTimeoutInSeconds;
+export {TYPING_TIMEOUT, useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';

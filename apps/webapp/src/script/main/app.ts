@@ -43,6 +43,7 @@ import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {createBrowserSystemNotificationApi} from '../browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {Runtime} from '../commons/util/Runtime';
+import {useLegalHoldModalState} from '../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config, Configuration} from '../Config';
 import {EVENTS as CoreEvents} from '../core/account';
@@ -89,6 +90,7 @@ import {OnConversationE2EIVerificationStateChange} from '../repositories/convers
 import {EventBuilder} from '../repositories/conversation/EventBuilder';
 import {MessageRepository} from '../repositories/conversation/MessageRepository';
 import {CryptographyRepository} from '../repositories/cryptography/CryptographyRepository';
+import {Conversation} from '../repositories/entity/Conversation';
 import {User} from '../repositories/entity/User';
 import {EventRepository} from '../repositories/event/EventRepository';
 import {EventService} from '../repositories/event/EventService';
@@ -245,6 +247,9 @@ export class App {
     private readonly conversationRepositoryOptions: ConversationRepositoryOptions,
   ) {
     this.config = config;
+    Conversation.closeLegalHoldRequestModal = conversationId => {
+      useLegalHoldModalState.getState().closeRequestModal(conversationId);
+    };
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => {
       return this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
     });

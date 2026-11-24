@@ -41,6 +41,10 @@ export interface ActionRoot {
   wrapperEventAction: WrapperEventAction;
 }
 
+declare module '../reducer' {
+  interface ApiActions extends ActionRoot {}
+}
+
 export const actionRoot: ActionRoot = {
   authAction,
   clientAction,

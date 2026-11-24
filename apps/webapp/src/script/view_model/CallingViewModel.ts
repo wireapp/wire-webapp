@@ -27,13 +27,13 @@ import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {QualifiedId} from '../apiClient/user/qualifiedId';
-import '../components/calling/ChooseScreen';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {PrimaryModalTranslatedMessage} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from '../Config';
 import type {AudioRepository} from '../repositories/audio/audioRepository';
 import {AudioType} from '../repositories/audio/audioType';
 import type {Call} from '../repositories/calling/Call';
+import {CallViewTab} from '../repositories/calling/CallEnums';
 import {CallingRepository} from '../repositories/calling/CallingRepository';
 import type {CallMediaChoice} from '../repositories/calling/callMediaChoice';
 import {CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
@@ -73,10 +73,7 @@ export interface CallActions {
   toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
 }
 
-export enum CallViewTab {
-  ALL = 'all',
-  SPEAKERS = 'speakers',
-}
+export {CallViewTab};
 
 declare global {
   interface HTMLAudioElement {

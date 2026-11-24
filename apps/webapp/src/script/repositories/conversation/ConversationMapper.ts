@@ -46,7 +46,7 @@ import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 import {type Translate} from '../../util/localizerUtil';
-import {Conversation} from '../entity/Conversation';
+import {Conversation, ConversationTeamState} from '../entity/Conversation';
 import {ConversationRecord} from '../storage/record/conversationRecord';
 
 const guestLinkAccessModeCount = 2;
@@ -119,6 +119,7 @@ export class ConversationMapper {
     conversationsData: ConversationDatabaseData[],
     timestamp: number = 1,
     translate: Translate,
+    teamState?: ConversationTeamState,
   ): Conversation[] {
     if (conversationsData === undefined) {
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
@@ -127,7 +128,7 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
     return conversationsData.map((conversationData: ConversationDatabaseData, index: number) => {
-      return ConversationMapper.createConversationEntity(conversationData, translate, timestamp + index);
+      return ConversationMapper.createConversationEntity(conversationData, translate, timestamp + index, teamState);
     });
   }
 
@@ -430,6 +431,7 @@ export class ConversationMapper {
     conversationData: ConversationDatabaseData,
     translate: Translate,
     initialTimestamp?: number,
+    teamState?: ConversationTeamState,
   ): Conversation {
     if (conversationData === undefined) {
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
@@ -465,7 +467,7 @@ export class ConversationMapper {
     const conversationDomain = conversationData.domain ?? conversationData.qualified_id?.domain ?? '';
     const conversationProtocol = protocol ?? CONVERSATION_PROTOCOL.PROTEUS;
 
-    let conversationEntity = new Conversation(id, conversationDomain, conversationProtocol, translate);
+    let conversationEntity = new Conversation(id, conversationDomain, conversationProtocol, translate, teamState);
     conversationEntity.roles(this.computeRoles(conversationData));
 
     conversationEntity.creator = creator;

@@ -47,7 +47,8 @@ import {EphemeralStatusType} from '../../../message/ephemeralStatusType';
 import type {MessageCategory} from '../../../message/messageCategory';
 import {StatusType} from '../../../message/statusType';
 import {SuperType} from '../../../message/superType';
-import {type Translate, getUserName} from '../../../util/localizerUtil';
+import {type Translate} from '../../../util/localizerUtil';
+import {getUserName} from '../../../util/localizerUtil/userName';
 import {
   formatDateNumeral,
   formatDurationCaption,

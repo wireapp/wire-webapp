@@ -25,9 +25,9 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {RightSidebarParams} from '../../guards/Panel';
 import {useConversationCall} from '../../hooks/useConversationCall';
 import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
 import {useApplicationContext} from '../../page/rootProvider';
 import {useAppMainState, ViewType} from '../../page/state';

@@ -17,9 +17,18 @@
  *
  */
 
-import {PanelEntity} from '../page/rightSidebar/rightSidebar';
+import {Conversation} from '../repositories/entity/Conversation';
+import {Message} from '../repositories/entity/message/message';
 import {User} from '../repositories/entity/User';
 import {ServiceEntity} from '../repositories/integration/ServiceEntity';
+
+export type PanelEntity = Conversation | User | Message | ServiceEntity;
+
+export type RightSidebarParams = {
+  entity: PanelEntity | null;
+  showReactions?: boolean;
+  highlighted?: User[];
+};
 
 const isServiceEntity = (entity: PanelEntity): entity is ServiceEntity => {
   return 'isService' in entity && entity.isService;

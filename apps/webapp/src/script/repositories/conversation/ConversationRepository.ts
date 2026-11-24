@@ -41,6 +41,7 @@ import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/pr
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {updateAccessRights} from './ConversationAccessPermission';
+import {CONVERSATION_READONLY_STATE, MAX_GROUP_NAME_LENGTH} from './ConversationConstants';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
@@ -127,7 +128,10 @@ import type {BackendError} from '../../apiClient/http/backendError';
 import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
-import {TYPING_TIMEOUT, useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
+import {
+  TYPING_TIMEOUT,
+  useTypingIndicatorState,
+} from '../../components/inputBar/typingIndicator/useTypingIndicatorState/useTypingIndicatorState';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {Account} from '../../core';
@@ -232,11 +236,7 @@ type ConversationRepositoryConfig = {
 };
 type DeleteBotsResponse = {event?: MemberLeaveEvent};
 
-export enum CONVERSATION_READONLY_STATE {
-  READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS = 'READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS',
-  READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS = 'READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS',
-  READONLY_ONE_TO_ONE_NO_KEY_PACKAGES = 'READONLY_ONE_TO_ONE_NO_KEY_PACKAGES',
-}
+export {CONVERSATION_READONLY_STATE};
 
 interface Resolve1To1ConversationOptions {
   isLiveUpdate?: boolean;
@@ -277,7 +277,7 @@ export class ConversationRepository {
       EXTERNAL_MESSAGE_THRESHOLD: externalMessageThresholdInKibibytes * bytesPerKibibyte,
       ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY: 3000,
       GROUP: {
-        MAX_NAME_LENGTH: 64,
+        MAX_NAME_LENGTH: MAX_GROUP_NAME_LENGTH,
         MAX_SIZE: Config.getConfig().MAX_GROUP_PARTICIPANTS,
       },
       CHANNEL: {
@@ -2740,7 +2740,12 @@ export class ConversationRepository {
     const conversationsForMapping = this.options.isMarkAsUnreadFeatureEnabled
       ? conversationData
       : conversationData.map(withoutManualUnreadTimestamp);
-    const entities = ConversationMapper.mapConversations(conversationsForMapping, initialTimestamp, this.translate);
+    const entities = ConversationMapper.mapConversations(
+      conversationsForMapping,
+      initialTimestamp,
+      this.translate,
+      this.teamState,
+    );
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.userState.self());

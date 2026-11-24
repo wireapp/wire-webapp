@@ -23,8 +23,8 @@ import ko from 'knockout';
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
 import {AudioSpeakerFactory} from './AudioSpeakerFactory';
+import {MuteState} from './CallEnums';
 import {CallingEpochCache} from './CallingEpochCache';
-import {MuteState} from './CallState';
 import type {ClientId, Participant} from './Participant';
 
 import {QualifiedId} from '../../apiClient/user/qualifiedId';

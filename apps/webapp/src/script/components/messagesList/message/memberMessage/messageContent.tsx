@@ -30,8 +30,9 @@ import {useApplicationContext, type RootContextValue} from '../../../../page/roo
 import {MemberMessage as MemberMessageEntity} from '../../../../repositories/entity/message/memberMessage';
 import {User} from '../../../../repositories/entity/User';
 import {ClientEvent} from '../../../../repositories/event/Client';
-import {Declension, joinNames} from '../../../../util/localizerUtil';
+import {Declension} from '../../../../util/localizerUtil';
 import {createReactTranslationMarker, replaceReactComponents} from '../../../../util/localizerUtil/reactLocalizerUtil';
+import {joinNames} from '../../../../util/localizerUtil/userName';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';
 
 export const CONFIG = {

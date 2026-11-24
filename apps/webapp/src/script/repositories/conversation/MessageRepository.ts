@@ -86,7 +86,8 @@ import {
   clearLinkPreviewSendingState,
   shouldSendLinkPreviewForMessage,
 } from '../../util/linkPreviewSender';
-import {type Translate, Declension, joinNames} from '../../util/localizerUtil';
+import {type Translate, Declension} from '../../util/localizerUtil';
+import {joinNames} from '../../util/localizerUtil/userName';
 import {getLogger, Logger} from '../../util/logger';
 import {isMarkdownText} from '../../util/markdownUtil';
 import {areMentionsDifferent, isTextDifferent} from '../../util/messageComparator';

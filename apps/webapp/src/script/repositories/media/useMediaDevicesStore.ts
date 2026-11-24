@@ -22,8 +22,6 @@ import {useStore} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
 
-import type {ElectronDesktopCapturerSource} from './MediaDevicesHandler';
-
 export const defaultAudioInputId = 'default';
 export const defaultAudioOutputId = 'default';
 export const defaultVideoInputId = 'default';
@@ -43,7 +41,12 @@ type MediaChannelPatch<Device> = Readonly<
   Partial<Pick<MediaChannel<Device>, 'devices' | 'activeId' | 'preferredId' | 'supported'>>
 >;
 // omit thumbnail (which is a native image) to avoid serialization issues in Zustand immer
-type ScreenDevice = Omit<ElectronDesktopCapturerSource, 'thumbnail'> & {readonly thumbnail: unknown};
+type ScreenDevice = {
+  readonly display_id: string;
+  readonly id: string;
+  readonly name: string;
+  readonly thumbnail: unknown;
+};
 
 type MediaChannel<Device> = {
   devices: Device[];

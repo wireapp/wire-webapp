@@ -19,7 +19,8 @@
 
 import {User} from '../repositories/entity/User';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
-import {Declension, translate, getSelfName, getUserName} from './localizerUtil';
+import {Declension, translate} from './localizerUtil';
+import {getSelfName, getUserName} from './localizerUtil/userName';
 
 import {escapeRegex, safeWindowOpen} from './sanitizationUtil';
 import {translateForTest} from './test/translateForTest';

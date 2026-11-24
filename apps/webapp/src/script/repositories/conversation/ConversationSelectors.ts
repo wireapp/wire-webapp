@@ -19,6 +19,8 @@
 
 import {isNonEmptyString, isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
+import {isProteusTeam1to1Conversation} from './ConversationPredicates';
+
 import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
 import {
   Conversation as BackendConversation,
@@ -29,6 +31,8 @@ import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.ty
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {matchQualifiedIds} from '../../util/qualifiedId';
 import {Conversation} from '../entity/Conversation';
+
+export {isProteusTeam1to1Conversation};
 
 export type ProteusConversation = Conversation & {protocol: CONVERSATION_PROTOCOL.PROTEUS};
 export type MixedConversation = Conversation & {groupId: string; protocol: CONVERSATION_PROTOCOL.MIXED};
@@ -69,22 +73,6 @@ export function isSelfConversation(conversation: Conversation): boolean {
 
 export function isTeamConversation(conversation: Conversation): boolean {
   return conversation.type() === CONVERSATION_TYPE.GLOBAL_TEAM;
-}
-
-export function isProteusTeam1to1Conversation({
-  name,
-  type,
-  inTeam,
-  otherMembersLength,
-}: {
-  name: string | undefined;
-  type: CONVERSATION_TYPE;
-  inTeam: boolean;
-  otherMembersLength: number;
-}): boolean {
-  const isGroupConversation = type === CONVERSATION_TYPE.REGULAR;
-  const hasOneParticipant = otherMembersLength === 1;
-  return isGroupConversation && hasOneParticipant && inTeam && !isNonEmptyString(name);
 }
 
 export function isBackendProteus1to1Conversation(conversation: BackendConversation): boolean {
