@@ -23,6 +23,7 @@ import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import type {ReactionType} from '../../../core/conversation';
 import {StatusType} from '../../../message/statusType';
 import {ClientConversationEvent} from '../../conversation/EventBuilder';
+import type {FailedReason} from '../../conversation/outbox/FailedReason';
 
 export interface ReadReceipt {
   domain?: string;
@@ -48,6 +49,10 @@ export type ReactionMap = [reaction: string, userIds: QualifiedId[]][];
 type SentEvent = {
   /** sending status of the event*/
   status: StatusType;
+  /** Set together with a failed status; a `declined` message is never sent again until it is queued anew */
+  failed_reason?: FailedReason;
+  /** The time the message was written at, kept when the send replaces `time` with the server's; never sent over the wire */
+  written_time?: string;
   /** raw content of a file that was supposed to be sent but failed. Is undefined if the message has been successfully sent  */
   fileData?: Blob;
   failedToSend?: {

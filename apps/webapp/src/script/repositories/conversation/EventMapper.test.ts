@@ -30,6 +30,7 @@ import {Conversation} from '../entity/Conversation';
 import {ContentMessage} from '../entity/message/contentMessage';
 import {User} from '../entity/User';
 import {MentionEntity} from '../../message/mentionEntity';
+import {StatusType} from '../../message/statusType';
 import {translate} from '../../util/localizerUtil';
 import {arrayToBase64} from '../../util/util';
 import {createUuid} from '../../util/uuid';
@@ -188,6 +189,27 @@ describe('Event Mapper', () => {
       expect(messageEntity.getFirstAsset().resource().otrKey).toBe(otrKey);
       expect(messageEntity.getFirstAsset().resource().sha256).toBe(sha256);
       expect(messageEntity).toBeDefined();
+    });
+
+    it('copies the failed reason and the written time onto the entity', () => {
+      const event = {
+        ...createMessageAddEvent(),
+        status: StatusType.FAILED,
+        failed_reason: 'declined',
+        written_time: '2017-05-18T10:32:20.000Z',
+      } as any;
+
+      const messageEntity = eventMapper.mapJsonEvent(event, conversation) as any;
+
+      expect(messageEntity.failed_reason()).toBe('declined');
+      expect(messageEntity.written_time()).toBe('2017-05-18T10:32:20.000Z');
+    });
+
+    it('leaves the failed reason and the written time empty when the record has none', () => {
+      const messageEntity = eventMapper.mapJsonEvent(createMessageAddEvent() as any, conversation) as any;
+
+      expect(messageEntity.failed_reason()).toBeUndefined();
+      expect(messageEntity.written_time()).toBeUndefined();
     });
 
     it('skips messages which cannot be mapped', () => {

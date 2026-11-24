@@ -19,9 +19,14 @@
 
 import {amplify} from 'amplify';
 
+import {BackendError} from '../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {NetworkError} from '../../apiClient/http/networkError';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {MessageSendingState} from '../../core/conversation';
 import {MessageTimer} from '../../core/conversation/messageTimer/messageTimer';
-import type {Outbox} from '../../outbox';
+import {StatusType} from '../../message/statusType';
+import type {Kind, Outbox, PerformOutcome} from '../../outbox';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
 import {translateForTest} from '../../util/test/translateForTest';
@@ -44,8 +49,19 @@ import {UserState} from '../user/userState';
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
 import {MessageRepository} from './MessageRepository';
+import type {MessagePayload} from './outbox/payloads';
 
-function buildMessageRepository(outbox?: Outbox): MessageRepository {
+const CONVERSATION_ID = {id: 'conversation-1', domain: 'wire.test'};
+
+type MessageRepositoryParts = {
+  repository: MessageRepository;
+  conversation: Conversation;
+  conversationState: ConversationState;
+  eventService: EventService;
+  send: jest.Mock;
+};
+
+function buildMessageRepositoryParts(outbox?: Outbox): MessageRepositoryParts {
   const selfUser = new User('selfid', '', translateForTest);
   selfUser.isMe = true;
   const userState = new UserState();
@@ -54,14 +70,22 @@ function buildMessageRepository(outbox?: Outbox): MessageRepository {
   clientState.currentClient = new ClientEntity(true, '');
   const conversationState = new ConversationState(userState);
   const selfConversation = new Conversation(selfUser.id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-  conversationState.conversations([selfConversation]);
+  const conversation = new Conversation(
+    CONVERSATION_ID.id,
+    CONVERSATION_ID.domain,
+    CONVERSATION_PROTOCOL.PROTEUS,
+    translateForTest,
+  );
+  conversationState.conversations([selfConversation, conversation]);
+  const eventService = new EventService({} as any);
+  const send = jest.fn();
 
-  return new MessageRepository(
+  const repository = new MessageRepository(
     () => {
-      return {} as ConversationRepository;
+      return {checkMessageTimer: jest.fn()} as unknown as ConversationRepository;
     },
     new CryptographyRepository({} as any),
-    new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
+    new EventRepository(eventService, {} as any, {} as any, {} as any),
     new PropertiesRepository({} as any, {} as any, translateForTest),
     serverTimeHandler,
     {} as UserRepository,
@@ -73,13 +97,237 @@ function buildMessageRepository(outbox?: Outbox): MessageRepository {
     clientState,
     conversationState,
     new TeamState(),
-    createCoreTestFixture({service: {conversation: {send: jest.fn(), messageTimer: new MessageTimer()}}}),
+    createCoreTestFixture({service: {conversation: {send, messageTimer: new MessageTimer()}}}),
   );
+  return {repository, conversation, conversationState, eventService, send};
 }
 
-function createOutboxSpy(): Pick<Outbox, 'pause' | 'resume'> & Outbox {
-  return {pause: jest.fn(), resume: jest.fn()} as unknown as Pick<Outbox, 'pause' | 'resume'> & Outbox;
+function buildMessageRepository(outbox?: Outbox): MessageRepository {
+  return buildMessageRepositoryParts(outbox).repository;
 }
+
+type OutboxSpy = Outbox & {
+  pause: jest.Mock;
+  resume: jest.Mock;
+  register: jest.Mock<ReturnType<Outbox['register']>, Parameters<Outbox['register']>>;
+};
+
+function createOutboxSpy(): OutboxSpy {
+  return {
+    pause: jest.fn(),
+    resume: jest.fn(),
+    register: jest.fn(() => {
+      return {type: 'kind-registered', handle: {}};
+    }),
+  } as unknown as OutboxSpy;
+}
+
+describe('MessageRepository reviewing restored holds', () => {
+  afterEach(() => {
+    amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
+  });
+
+  function createLanesOutbox(): {outbox: OutboxSpy; lanes: jest.Mock} {
+    const outbox = createOutboxSpy();
+    const lanes = jest.fn(() => {
+      return {type: 'lanes-listed', lanes: []};
+    });
+    Object.assign(outbox, {lanes});
+    return {outbox, lanes};
+  }
+
+  it('looks for restored holds when a conversation becomes the active one', () => {
+    const {outbox, lanes} = createLanesOutbox();
+    const {conversation, conversationState} = buildMessageRepositoryParts(outbox);
+    expect(lanes).not.toHaveBeenCalled();
+
+    conversationState.activeConversation(conversation);
+
+    expect(lanes).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not look when no conversation is active', () => {
+    const {outbox, lanes} = createLanesOutbox();
+    const {conversation, conversationState} = buildMessageRepositoryParts(outbox);
+    conversationState.activeConversation(conversation);
+    lanes.mockClear();
+
+    conversationState.activeConversation(undefined);
+
+    expect(lanes).not.toHaveBeenCalled();
+  });
+
+  it('does nothing without an outbox', async () => {
+    const {repository, conversation, conversationState} = buildMessageRepositoryParts();
+
+    conversationState.activeConversation(conversation);
+
+    await expect(repository.reviewRestoredHolds(conversation)).resolves.toBeUndefined();
+  });
+});
+
+describe('MessageRepository outbox registration', () => {
+  afterEach(() => {
+    amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
+  });
+
+  it('registers the four message kinds', () => {
+    const outbox = createOutboxSpy();
+
+    buildMessageRepository(outbox);
+
+    const registeredNames = outbox.register.mock.calls.map(([kind]) => {
+      return kind.name;
+    });
+
+    expect(registeredNames).toEqual(['message', 'message-change', 'receipt', 'ping']);
+  });
+
+  it.each([{type: 'kind-name-taken', kind: 'message'} as const, {type: 'outbox-already-started'} as const])(
+    'throws when the outbox answers %p, because the wiring is wrong',
+    answer => {
+      const outbox = createOutboxSpy();
+      outbox.register.mockReturnValue(answer);
+
+      expect(() => {
+        buildMessageRepository(outbox);
+      }).toThrow(/outbox kind/);
+    },
+  );
+
+  it('registers nothing without an outbox', () => {
+    expect(() => {
+      buildMessageRepository();
+    }).not.toThrow();
+  });
+});
+
+describe('MessageRepository as the port of the message kinds', () => {
+  const textPayload = {
+    type: 'text' as const,
+    conversationId: CONVERSATION_ID,
+    messageId: 'message-1',
+    text: 'hello',
+    mentions: [],
+  };
+
+  afterEach(() => {
+    amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
+  });
+
+  type PortContext = MessageRepositoryParts & {
+    messageKind: Kind<MessagePayload>;
+    storedMessage: {status: jest.Mock};
+    updateEvent: jest.SpyInstance;
+  };
+
+  function setup(): PortContext {
+    const outbox = createOutboxSpy();
+    const parts = buildMessageRepositoryParts(outbox);
+    const messageKind = outbox.register.mock.calls[0][0] as Kind<MessagePayload>;
+    const storedMessage = {
+      status: jest.fn(),
+      failed_reason: jest.fn(),
+      written_time: jest.fn(),
+      primary_key: 'primary-key',
+      readReceipts: () => {return []},
+      type: 'conversation.message-add',
+      hasAssetImage: () => {return false},
+      timestamp: jest.fn(),
+    };
+    jest.spyOn(parts.conversation, 'getMessage').mockReturnValue(storedMessage as any);
+    jest.spyOn(parts.conversation, 'updateTimestamps').mockImplementation();
+    jest.spyOn(parts.conversation, 'updateTimestampServer').mockImplementation();
+    jest.spyOn(parts.eventService, 'loadEvent').mockResolvedValue({
+      primary_key: 'primary-key',
+      status: StatusType.SENDING,
+    } as any);
+    const updateEvent = jest.spyOn(parts.eventService, 'updateEvent').mockResolvedValue({} as any);
+    return {...parts, messageKind, storedMessage, updateEvent};
+  }
+
+  function perform(messageKind: Kind<MessagePayload>, payload: MessagePayload): Promise<PerformOutcome> {
+    return messageKind.perform(
+      {id: 'operation', kind: 'message', payload, queuedAt: 0, state: 'in-progress', attempts: 1},
+      new AbortController().signal,
+    );
+  }
+
+  it('sends a text through the core without showing it again, and answers succeeded', async () => {
+    const {messageKind, send} = setup();
+    send.mockResolvedValue({id: 'message-1', sentAt: new Date().toISOString(), state: MessageSendingState.OUTGOING_SENT});
+
+    await expect(perform(messageKind, textPayload)).resolves.toEqual({type: 'attempt-succeeded'});
+
+    expect(send).toHaveBeenCalledTimes(1);
+    expect(send.mock.calls[0][0].payload.messageId).toBe('message-1');
+  });
+
+  it('writes the failure and its reason on the record when the backend refuses a text', async () => {
+    const {messageKind, send, storedMessage, updateEvent} = setup();
+    send.mockRejectedValue(new BackendError('removed', BackendErrorLabel.CLIENT_ERROR, 403));
+
+    await expect(perform(messageKind, textPayload)).resolves.toEqual({type: 'operation-dead-lettered'});
+
+    expect(storedMessage.status).toHaveBeenCalledWith(StatusType.FAILED);
+    expect(updateEvent).toHaveBeenCalledWith('primary-key', {status: StatusType.FAILED, failed_reason: 'removed'});
+  });
+
+  it('marks a federation error with its status', async () => {
+    const {messageKind, send, storedMessage, updateEvent} = setup();
+    send.mockRejectedValue(new BackendError('remote', BackendErrorLabel.FEDERATION_REMOTE_ERROR, 533 as never));
+
+    await expect(perform(messageKind, textPayload)).resolves.toEqual({type: 'operation-dead-lettered'});
+
+    expect(storedMessage.status).toHaveBeenCalledWith(StatusType.FEDERATION_ERROR);
+    expect(updateEvent).toHaveBeenCalledWith('primary-key', {
+      status: StatusType.FEDERATION_ERROR,
+      failed_reason: 'rejected',
+    });
+  });
+
+  it('asks for a retry when the core cannot reach the backend, and marks nothing', async () => {
+    const {messageKind, send, updateEvent} = setup();
+    send.mockRejectedValue(new NetworkError('offline'));
+
+    await expect(perform(messageKind, textPayload)).resolves.toEqual({type: 'attempt-failed'});
+
+    expect(updateEvent).not.toHaveBeenCalled();
+  });
+
+  it('removes a message the outbox dropped from the record and from the screen', async () => {
+    const {messageKind, eventService} = setup();
+    const deleteEvent = jest.spyOn(eventService, 'deleteEvent').mockResolvedValue(1);
+    const removed = jest.fn();
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, removed);
+
+    messageKind.onChanged?.({
+      id: 'operation',
+      kind: 'message',
+      payload: textPayload,
+      queuedAt: 0,
+      state: 'dropped',
+      attempts: 1,
+    });
+    await new Promise(resolve => {
+      setTimeout(resolve, 0);
+    });
+
+    expect(deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
+    expect(removed).toHaveBeenCalledWith('message-1', CONVERSATION_ID.id);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, removed);
+  });
+
+  it('answers dropped for a conversation it does not know', async () => {
+    const {messageKind, send} = setup();
+
+    await expect(
+      perform(messageKind, {...textPayload, conversationId: {id: 'unknown', domain: 'wire.test'}}),
+    ).resolves.toEqual({type: 'operation-dropped'});
+
+    expect(send).not.toHaveBeenCalled();
+  });
+});
 
 describe('MessageRepository outbox lifecycle', () => {
   const notificationHandlingStates = [
