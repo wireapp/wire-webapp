@@ -38,13 +38,14 @@ import {QualifiedUserPreKeyBundleMap} from './userPreKeyBundleMap';
 import {VerifyDelete} from './verifyDelete';
 
 import {ArrayUtil} from '../../commons/util';
-import {BackendFeatures} from '../apiClient';
-import {ClientPreKey, PreKeyBundle} from '../auth/';
+import {ClientPreKey} from '../auth/clientPreKey';
+import {PreKeyBundle} from '../auth/preKeyBundle';
 import {VerificationActionType} from '../auth/verificationActionType';
+import {BackendFeatures} from '../backendFeatures';
 import {PublicClient, QualifiedPublicClients} from '../client/';
-import {QualifiedUserClients} from '../conversation/';
+import {QualifiedUserClients} from '../conversation/qualifiedUserClients';
 import {BackendError, BackendErrorLabel, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
-import {CONVERSATION_PROTOCOL} from '../team';
+import {CONVERSATION_PROTOCOL} from '../team/feature/featureList.types';
 
 const defaultUsersChunkSize = 50;
 const defaultUsersPrekeyBundleChunkSize = 128;

@@ -26,7 +26,7 @@ import {
   createRootProviderWrapperForTest,
 } from '../../page/testSupport/rootContextTestSupport';
 
-import {Avatar} from './avatar';
+import {Avatar} from './participantAvatar';
 import {translateForTest} from '../../util/test/translateForTest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(

@@ -33,17 +33,25 @@ import {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUse
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {QualifiedUserPreKeyBundleMap} from '../../../apiClient/user/userPreKeyBundleMap';
 import {uuidToBytes} from '../../../commons/util/StringUtil';
-import type {EncryptionResult, ProteusService} from '../../messagingProtocols/proteus';
+import type {EncryptionResult} from '../../messagingProtocols/proteus/proteusService/proteusService.types';
 import {isQualifiedIdArray} from '../../util';
 
 const clientIdentifierRadix = 16;
+
+/** The part of the proteus service that the message service relies on. */
+interface MessageProteusService {
+  encrypt(
+    plainText: Uint8Array,
+    recipients: QualifiedUserPreKeyBundleMap | QualifiedUserClients,
+  ): Promise<EncryptionResult>;
+}
 
 type ClientMismatchError = AxiosError<MessageSendingStatus>;
 
 export class MessageService {
   constructor(
     private readonly apiClient: APIClient,
-    private readonly proteusService: ProteusService,
+    private readonly proteusService: MessageProteusService,
   ) {}
 
   /**

@@ -25,7 +25,7 @@ import {ClientCapabilityRemovedError} from './clientError';
 import {CreateClientPayload, UpdateClientPayload} from './newClient';
 import {RegisteredClient} from './registeredClient';
 
-import {PreKeyBundle} from '../auth/';
+import {PreKeyBundle} from '../auth/preKeyBundle';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 
 const clientCacheDurationInMilliseconds = 86_400_000;

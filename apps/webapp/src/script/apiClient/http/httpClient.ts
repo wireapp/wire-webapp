@@ -36,15 +36,15 @@ import {PriorityQueue} from './priorityQueue/priorityQueue';
 
 import {TimeUtil} from '../../commons/util';
 import {getLogger, type Logger} from '../../logger/getLogger';
+import {AccessTokenData} from '../auth/accessTokenData';
+import {AccessTokenStore} from '../auth/accessTokenStore';
 import {
-  AccessTokenData,
-  AccessTokenStore,
-  AuthAPI,
   InvalidTokenError,
   MissingCookieAndTokenError,
   MissingCookieError,
   TokenExpiredError,
-} from '../auth/';
+} from '../auth/authenticationError';
+import {AUTH_URL} from '../auth/authUrl';
 import {Config} from '../config';
 import {ObfuscationUtil} from '../obfuscation';
 import type {CookiePlatform} from '../platform';
@@ -246,7 +246,7 @@ export class HttpClient extends EventEmitter {
         signal: abortController?.signal,
         // We want to prefix all urls, except for the "access" endpoint
         url:
-          config.url !== undefined && config.url.startsWith(AuthAPI.URL.ACCESS)
+          config.url !== undefined && config.url.startsWith(AUTH_URL.ACCESS)
             ? config.url
             : `${this.versionPrefix}${config.url}`,
         maxBodyLength: FILE_SIZE_100_MB,
@@ -354,7 +354,7 @@ export class HttpClient extends EventEmitter {
     const config: AxiosRequestConfig = {
       headers: {},
       method: 'post',
-      url: `${AuthAPI.URL.ACCESS}`,
+      url: `${AUTH_URL.ACCESS}`,
       withCredentials: true,
       params: clientId !== undefined && clientId.length > 0 ? {client_id: clientId} : undefined,
     };

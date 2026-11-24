@@ -18,12 +18,11 @@
  */
 
 import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {Maybe, task} from 'true-myth';
+import {Maybe, task, type Task} from 'true-myth';
 import {match, P} from 'ts-pattern';
 
 import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {Account, MLSService} from '../core';
-import {ConversationRepository} from '../repositories/conversation/ConversationRepository';
 import {
   isMLSCapableConversation,
   isMLSConversation,
@@ -51,6 +50,18 @@ const DEFAULT_RECOVERY_BATCH_SIZE = 10;
 // this client has to create the MLS group instead of joining it.
 const ZERO_EPOCH = 0n;
 
+type EnsureConversationExistsParams = {
+  conversationId: QualifiedId;
+  groupId: string;
+  core?: Account;
+};
+
+/** The part of the conversation repository that is needed to establish or join MLS groups. */
+type MLSConversationRepository = {
+  ensureConversationExists: (params: EnsureConversationExistsParams) => Promise<void>;
+  safeEnsureConversationExists: (params: EnsureConversationExistsParams) => Task<void, unknown>;
+};
+
 export type MLSConversationRecoveryResult = {
   completed: boolean;
   failedConversationCount: number;
@@ -71,7 +82,7 @@ export async function recoverMLSConversationsInBatches({
   batchSize = DEFAULT_RECOVERY_BATCH_SIZE,
 }: {
   conversations: Conversation[];
-  conversationRepository: ConversationRepository;
+  conversationRepository: MLSConversationRepository;
   core: Account;
   isActive: () => boolean;
   mlsService?: MLSService;
@@ -184,7 +195,7 @@ export async function recoverMLSConversationsInBatches({
  */
 export async function initMLSGroupConversations(
   conversations: Conversation[],
-  conversationRepository: ConversationRepository,
+  conversationRepository: MLSConversationRepository,
   {
     core,
     onSuccessfulJoin,
@@ -225,7 +236,7 @@ export async function initMLSGroupConversations(
  */
 export async function initMLSGroupConversation(
   mlsConversation: MLSCapableConversation,
-  conversationRepository: ConversationRepository,
+  conversationRepository: MLSConversationRepository,
   {
     core,
     onSuccessfulJoin,
@@ -281,7 +292,7 @@ export async function initMLSGroupConversation(
  */
 export async function initialiseSelfAndTeamConversations(
   conversations: Conversation[],
-  conversationRepository: ConversationRepository,
+  conversationRepository: MLSConversationRepository,
   selfUser: User,
   selfClientId: string,
   core: Account,

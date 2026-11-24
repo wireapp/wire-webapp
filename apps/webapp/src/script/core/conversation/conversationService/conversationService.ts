@@ -24,14 +24,17 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {
   AddUsersParams,
+  AddUsersToProteusConversationParams,
   BaseCreateConversationResponse,
   KeyPackageClaimUser,
   ProteusAddUsersResponse,
   ProteusCreateConversationResponse,
   SendMlsMessageParams,
+  SendProteusMessageParams,
   SendResult,
   RemoveUsersParams,
 } from './conversationService.types';
+import {getConversationQualifiedMembers} from './utility/getConversationQualifiedMembers';
 
 import {APIClient} from '../../../apiClient/apiClient';
 import {
@@ -74,11 +77,6 @@ import {
   createDefaultMlsErrorMapper,
   minimalDefaultPolicies,
 } from '../../messagingProtocols/mls/recovery';
-import {getConversationQualifiedMembers, ProteusService} from '../../messagingProtocols/proteus';
-import {
-  AddUsersToProteusConversationParams,
-  SendProteusMessageParams,
-} from '../../messagingProtocols/proteus/proteusService/proteusService.types';
 import {HandledEventPayload, HandledEventResult} from '../../notification';
 import {CoreDatabase} from '../../storage/coreDb';
 import {isMLSConversation} from '../../util';
@@ -87,6 +85,14 @@ import {MessageSendingState} from '../message/message.types';
 import {isSendingMessage, sendMessage} from '../message/messageSender';
 import {MessageTimer} from '../messageTimer/messageTimer';
 import {SubconversationService} from '../subconversationService/subconversationService';
+
+/** The part of the proteus service that the conversation service relies on. */
+interface ConversationProteusService {
+  createConversation(conversationData: NewConversation): Promise<ProteusCreateConversationResponse>;
+  addUsersToConversation(params: AddUsersToProteusConversationParams): Promise<ProteusAddUsersResponse>;
+  sendMessage(params: SendProteusMessageParams): Promise<SendResult>;
+  handleOtrMessageAddEvent(event: ConversationOtrMessageAddEvent): Promise<HandledEventPayload>;
+}
 
 type DeferredEpochRecoveryEntry = {
   conversationId: QualifiedId;
@@ -117,7 +123,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
   constructor(
     private readonly apiClient: APIClient,
-    private readonly proteusService: ProteusService,
+    private readonly proteusService: ConversationProteusService,
     private readonly coreDatabase: CoreDatabase,
     private readonly groupIdFromConversationId: (
       conversationId: QualifiedId,

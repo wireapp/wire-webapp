@@ -17,7 +17,6 @@
  *
  */
 
-import {Message} from './message';
 import {MessageSendingState} from './message.types';
 
 import {ConversationEventData} from '../../../apiClient/event/conversationEvent';
@@ -43,8 +42,6 @@ export interface BasePayloadBundle {
   timestamp: number;
   type: PayloadBundleType;
 }
-
-export type PayloadBundle = Message | BasePayloadBundle;
 
 export enum PayloadBundleType {
   ASSET = 'PayloadBundleType.ASSET',

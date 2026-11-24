@@ -22,6 +22,7 @@ import {z} from 'zod';
 
 import {BackendError} from './backendError';
 import {BackendErrorLabel} from './backendErrorLabel';
+import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from './teamError';
 
 import {getLogger} from '../../logger/getLogger';
 import {
@@ -33,7 +34,7 @@ import {
   MissingCookieAndTokenError,
   MissingCookieError,
   TokenExpiredError,
-} from '../auth/';
+} from '../auth/authenticationError';
 import {
   ConversationIsUnknownError,
   ConversationOperationError,
@@ -41,9 +42,9 @@ import {
   MLSInvalidLeafNodeIndexError,
   MLSInvalidLeafNodeSignatureError,
   MLSStaleMessageError,
-} from '../conversation/';
-import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/teamError';
-import {QualifiedId, QualifiedIdSchema, UnconnectedUserError, UserIsUnknownError} from '../user/';
+} from '../conversation/conversationError';
+import {QualifiedId, QualifiedIdSchema} from '../user/qualifiedId';
+import {UnconnectedUserError, UserIsUnknownError} from '../user/userError';
 
 type BackendErrorWithLabel = BackendError & {label: BackendErrorLabel};
 type ErrorBuilder = (e: BackendErrorWithLabel) => BackendError;

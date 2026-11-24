@@ -22,9 +22,9 @@ import {QualifiedId} from './qualifiedId';
 import {UserAsset} from './userAsset';
 
 import {AccentColor} from '../../commons/util';
-import {ServiceRef} from '../conversation/';
-import {Picture} from '../self/';
-import {CONVERSATION_PROTOCOL} from '../team';
+import {ServiceRef} from '../conversation/serviceRef';
+import {Picture} from '../self/picture';
+import {CONVERSATION_PROTOCOL} from '../team/feature/featureList.types';
 
 export enum UserType {
   REGULAR = 'regular',

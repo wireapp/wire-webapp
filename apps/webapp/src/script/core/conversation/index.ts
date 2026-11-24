@@ -25,6 +25,7 @@ export * from './conversationService';
 export * from './genericMessageType';
 export * from './messageTimer';
 export * from './message/payloadBundle';
+export type {PayloadBundle} from './message/message';
 export * from './message/message.types';
 export * from './reactionType';
 export * from './inCallEmojiType';

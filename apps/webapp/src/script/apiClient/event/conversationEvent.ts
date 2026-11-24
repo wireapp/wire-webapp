@@ -17,7 +17,6 @@
  *
  */
 
-import {SUBCONVERSATION_ID} from '../conversation';
 import {
   ConversationAccessUpdateData,
   ConversationCodeUpdateData,
@@ -38,6 +37,7 @@ import {ConversationAddPermissionUpdateData} from '../conversation/data/conversa
 import {ConversationAdminlessDeleteReminderData} from '../conversation/data/conversationAdminlessDeleteReminderData';
 import {ConversationMLSResetData} from '../conversation/data/conversationMlsResetData';
 import {ConversationProtocolUpdateData} from '../conversation/data/conversationProtocolUpdateData';
+import {SUBCONVERSATION_ID} from '../conversation/subconversation';
 import {QualifiedId} from '../user';
 
 export enum CONVERSATION_EVENT {

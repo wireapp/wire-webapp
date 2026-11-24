@@ -21,7 +21,7 @@ import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosRequestConfig, AxiosResponse, isAxiosError} from 'axios';
 
 import {chunk} from '../../../commons/util/ArrayUtil';
-import {BackendFeatures} from '../../apiClient';
+import {BackendFeatures} from '../../backendFeatures';
 import {
   ConversationAccessUpdateEvent,
   ConversationAddPermissionUpdateEvent,

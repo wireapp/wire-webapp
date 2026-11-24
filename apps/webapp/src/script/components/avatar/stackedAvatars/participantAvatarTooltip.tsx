@@ -26,7 +26,8 @@ import {avatarItemStyles} from './stackedAvatars.styles';
 import type {User} from '../../../repositories/entity/User';
 import {Tooltip} from '../../../uiKit/dataDisplay/tooltip/tooltip';
 import {useUserName} from '../../UserName';
-import {Avatar, AVATAR_SIZE} from '../avatar';
+import {AVATAR_SIZE} from '../avatar';
+import {Avatar} from '../participantAvatar';
 
 interface ParticipantAvatarTooltipProps {
   participant: User;

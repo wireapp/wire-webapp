@@ -18,7 +18,10 @@
  */
 
 import {OtrMessage} from './otrMessage';
+import type {BasePayloadBundle} from './payloadBundle';
 import {TeamMessage} from './teamMessage';
 import {UserMessage} from './userMessage';
 
 export type Message = OtrMessage | TeamMessage | UserMessage;
+
+export type PayloadBundle = Message | BasePayloadBundle;

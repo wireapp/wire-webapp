@@ -18,6 +18,7 @@
  */
 
 export * from './avatar';
+export * from './participantAvatar';
 export * from './channelAvatar';
 export * from './groupAvatar';
 export * from './stackedAvatars';

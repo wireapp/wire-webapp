@@ -17,7 +17,7 @@
  *
  */
 
-import {AccessTokenData} from '../auth';
+import {AccessTokenData} from '../auth/accessTokenData';
 
 const obfuscationLengthLimit = 20;
 

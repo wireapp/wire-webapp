@@ -17,109 +17,12 @@
  *
  */
 
-import {ConversationMembers} from './conversationMembers';
-import {RECEIPT_MODE} from './data';
+import {Conversation} from './conversationBase';
 
 import {MLSPublicKeyRecord} from '../client';
-import {CONVERSATION_PROTOCOL} from '../team';
-import {QualifiedId} from '../user';
+import {CONVERSATION_PROTOCOL} from '../team/feature/featureList.types';
 
-/* eslint-disable @typescript-eslint/no-magic-numbers -- Conversation types define backend wire values inline. */
-export enum CONVERSATION_TYPE {
-  REGULAR = 0,
-  SELF = 1,
-  ONE_TO_ONE = 2,
-  CONNECT = 3,
-  GLOBAL_TEAM = 4,
-}
-/* eslint-enable @typescript-eslint/no-magic-numbers */
-
-export enum CONVERSATION_LEGACY_ACCESS_ROLE {
-  ACTIVATED = 'activated',
-  NON_ACTIVATED = 'non_activated',
-  PRIVATE = 'private',
-  TEAM = 'team',
-}
-
-export enum CONVERSATION_ACCESS_ROLE {
-  TEAM_MEMBER = 'team_member',
-  SERVICE = 'service',
-  NON_TEAM_MEMBER = 'non_team_member',
-  GUEST = 'guest',
-}
-
-export enum CONVERSATION_ACCESS {
-  CODE = 'code',
-  INVITE = 'invite',
-  LINK = 'link',
-  PRIVATE = 'private',
-}
-
-export enum GROUP_CONVERSATION_TYPE {
-  CHANNEL = 'channel',
-  GROUP_CONVERSATION = 'group_conversation',
-  MEETING = 'meeting',
-}
-
-export enum ADD_PERMISSION {
-  EVERYONE = 'everyone',
-  ADMINS = 'admins',
-}
-
-export enum CONVERSATION_CELLS_STATE {
-  DISABLED = 'disabled',
-  PENDING = 'pending',
-  READY = 'ready',
-}
-
-type UUID = string;
-/**
- * A conversation object as returned from the server
- */
-export interface Conversation {
-  qualified_id: QualifiedId;
-  type: CONVERSATION_TYPE;
-  creator: UUID;
-  cells_state: CONVERSATION_CELLS_STATE;
-  access: CONVERSATION_ACCESS[];
-  group_conv_type?: GROUP_CONVERSATION_TYPE;
-  add_permission?: ADD_PERMISSION;
-  /** How users can join conversations */
-  //CONVERSATION_ACCESS_ROLE for api <= v2, ACCESS_ROLE_V2[] since api v3
-  access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
-  /** @deprecated Use access_role instead */
-  access_role_v2?: CONVERSATION_ACCESS_ROLE[];
-  name?: string;
-  last_event?: string;
-  last_event_time?: string;
-  team?: UUID;
-
-  /**
-   * Per-conversation message timer (can be null)
-   * @format int64
-   * @min -9223372036854776000
-   * @max 9223372036854776000
-   */
-  message_timer?: number;
-
-  /**
-   * Conversation receipt mode
-   * @format int32
-   * @min -2147483648
-   * @max 2147483647
-   */
-  receipt_mode?: RECEIPT_MODE;
-
-  /** Users of a conversation */
-  members: ConversationMembers;
-
-  /** MLS conversations only */
-  group_id?: string;
-  epoch?: number;
-  cipher_suite?: number;
-
-  protocol: CONVERSATION_PROTOCOL;
-}
+export * from './conversationBase';
 
 export interface MLSConversation extends Conversation {
   group_id: string;

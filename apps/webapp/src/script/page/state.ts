@@ -19,7 +19,7 @@
 
 import {create} from 'zustand';
 
-import {PanelEntity, PanelState} from './rightSidebar';
+import {PanelEntity, PanelState} from './rightSidebar/panelState';
 
 import {Message} from '../repositories/entity/message/message';
 import {User} from '../repositories/entity/User';
@@ -29,7 +29,7 @@ export enum ViewType {
   MOBILE_LEFT_SIDEBAR = 1,
 }
 
-type RightSidebarParams = {
+export type RightSidebarParams = {
   entity: PanelEntity | null;
   showReactions?: boolean;
   highlighted?: User[];

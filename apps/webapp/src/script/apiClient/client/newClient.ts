@@ -24,7 +24,7 @@ import {ClientClassification} from './clientClassification';
 import {ClientType} from './clientType';
 import {Location} from './location';
 
-import {PreKey} from '../auth/';
+import {PreKey} from '../auth/preKey';
 
 type BaseUpdatePayload = ClientCapabilityData & {label?: string};
 type MLSUpdatePayload = {
