@@ -30,7 +30,9 @@ import {
 } from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {noop} from 'noop-esm';
 import {arrayIncludes} from 'ts-extras';
+import {match, P} from 'ts-pattern';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
@@ -44,6 +46,18 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
+import type {FailedReason} from './outbox/FailedReason';
+import {messageCorrelationKey, messageOrderingKey, receiptCorrelationKey, receiptOrderingKey} from './outbox/keys';
+import {registerMessageOutboxKinds, type MessageOutboxHandles} from './outbox/messageOutboxKinds';
+import type {MessageOutboxPort, MessageRecord} from './outbox/MessageOutboxPort';
+import type {
+  AssetMessagePayload,
+  EditMessagePayload as OutboxEditPayload,
+  ReceiptPayload as OutboxReceiptPayload,
+  StoredMention,
+  TextMessagePayload as OutboxTextPayload,
+} from './outbox/payloads';
+import {QUOTE_EVENT_HASHER, type QuoteEventHasher} from './outbox/QuoteEventHasher';
 
 import {AssetAuditData} from '../../apiClient/asset/assetApi';
 import {MessageSendingStatus} from '../../apiClient/conversation/messageSendingStatus';
@@ -74,13 +88,14 @@ import {
 import * as MessageBuilder from '../../core/conversation/message/messageBuilder';
 import {OtrMessage} from '../../core/conversation/message/otrMessage';
 import {TextContentBuilder} from '../../core/conversation/message/textContentBuilder';
+import type {EncryptedAssetUploaded} from '../../core/cryptography/assetCryptography/encryptedAsset';
 import {isQualifiedUserClients} from '../../core/util';
 import {ConversationError} from '../../error/conversationError';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
 import {MentionEntity} from '../../message/mentionEntity';
 import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
-import type {Outbox} from '../../outbox';
+import type {EnqueueOutcome, Outbox} from '../../outbox';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {
@@ -120,7 +135,7 @@ import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {PropertiesRepository} from '../properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/propertiesType';
-import type {EventRecord, ReactionMap} from '../storage';
+import type {AssetRecord, EventRecord, ReactionMap} from '../storage';
 import {TeamState} from '../team/TeamState';
 import {UserType} from '../tracking/attribute';
 import {EventName} from '../tracking/eventName';
@@ -181,6 +196,8 @@ type EditMultiPartMessagePayload = MultipartMessagePayload & {originalMessageId:
 
 const enum SendAndInjectSendingState {
   FAILED = 'FAILED',
+  /** Taken by the outbox, which sends it when it can */
+  QUEUED = 'QUEUED',
 }
 
 type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingState | SendAndInjectSendingState};
@@ -200,6 +217,16 @@ type StoredMessage = Message & {primary_key: string};
 type StoredContentMessage = ContentMessage & {primary_key: string};
 
 type AssetMetadataMessage = {message: GenericMessage; metaData: FileMetaDataContent};
+type RecordedUpload = Pick<AssetRecord, 'otr_key' | 'sha256' | 'domain' | 'token'> & {key: string};
+
+/** What an upload attempt kept on the record of an asset message, when it got that far */
+function readRecordedUpload(record: EventRecord): RecordedUpload | undefined {
+  const data = (record as {data?: Partial<AssetRecord>}).data;
+  if (!isNonEmptyString(data?.key) || isUndefined(data.otr_key) || isUndefined(data.sha256)) {
+    return undefined;
+  }
+  return {domain: data.domain, key: data.key, otr_key: data.otr_key, sha256: data.sha256, token: data.token};
+}
 
 export class MessageRepository {
   private readonly logger: Logger;
@@ -207,6 +234,9 @@ export class MessageRepository {
   private readonly event_mapper: EventMapper;
   private isBlockingNotificationHandling: boolean;
   private onClientMismatch?: ClientMismatchHandlerFn;
+  private readonly outboxHandles?: MessageOutboxHandles<Conversation>;
+  /** Messages whose optimistic injection hasn't settled, by message id */
+  private readonly pendingInjections = new Map<string, Promise<void>>();
 
   private get coreServices(): NonNullable<Core['service']> {
     const coreServices = this.core.service;
@@ -233,6 +263,8 @@ export class MessageRepository {
     private readonly teamState = container.resolve(TeamState),
     private readonly core = container.resolve(Core),
     private readonly outbox?: Outbox,
+    /** Reads the conversation's draft, which lives with the input bar; only needed with an outbox */
+    private readonly isBeingEdited?: (conversation: Conversation, messageId: string) => Promise<boolean>,
   ) {
     this.logger = getLogger('MessageRepository');
 
@@ -242,6 +274,23 @@ export class MessageRepository {
     this.isBlockingNotificationHandling = true;
 
     this.initSubscriptions();
+
+    if (this.outbox !== undefined) {
+      this.outboxHandles = registerMessageOutboxKinds(this.outbox, this.createMessageOutboxPort());
+      this.conversationState.activeConversation.subscribe(conversation => {
+        if (conversation !== undefined) {
+          void this.reviewRestoredHolds(conversation);
+        }
+      });
+    }
+  }
+
+  /**
+   * Holds restored from an earlier session have no prompt left: asks again, or releases them, when the user opens
+   * their conversation. Nothing happens while the outbox isn't started.
+   */
+  async reviewRestoredHolds(conversation: Conversation): Promise<void> {
+    await this.outboxHandles?.reviewRestoredHolds(conversation);
   }
 
   private get conversationService(): ConversationService {
@@ -303,6 +352,9 @@ export class MessageRepository {
    * @returns Resolves after sending the knock
    */
   public async sendPing(conversation: Conversation): Promise<SendAndInjectResult> {
+    if (this.outbox !== undefined) {
+      return this.enqueuePing(conversation);
+    }
     const ping = MessageBuilder.buildPingMessage({
       expectsReadConfirmation: this.expectReadReceipt(conversation),
       hotKnock: false,
@@ -537,6 +589,9 @@ export class MessageRepository {
     messageId?: string;
     attachments?: MultiPartContent['attachments'];
   }): Promise<void> {
+    if (this.outbox !== undefined) {
+      return this.enqueueText({conversation, textMessage, mentions, QuoteEntity, messageId, attachments});
+    }
     const textPayload = {
       conversation,
       mentions,
@@ -885,19 +940,11 @@ export class MessageRepository {
     originalId?: string,
   ): Promise<AssetMetadataMessage | null> {
     try {
-      const metadata = await buildMetadata(file);
-      const meta = {
-        audio: isAudio(file) && !isUndefined(metadata) ? metadata : null,
-        video: isVideo(file) && !isUndefined(metadata) ? metadata : null,
-        image: allowImageDetection === true && isImage(file) && !isUndefined(metadata) ? metadata : null,
-        length: file.size,
-        name: (file as File).name,
-        type: file.type,
-      } as FileMetaDataContent;
+      const meta = await this.buildFileMetaData(file, allowImageDetection);
 
-      const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
+      const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta}, originalId);
       this.assetRepository.addToProcessQueue(message, conversation.id);
-      return {message, metaData: meta as FileMetaDataContent};
+      return {message, metaData: meta};
     } catch (error: unknown) {
       this.logger.error('Error while building metadata for asset', {error});
       const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${
@@ -908,13 +955,24 @@ export class MessageRepository {
     }
   }
 
-  private async sendAssetRemotedata(
+  private async buildFileMetaData(file: Blob, allowImageDetection?: boolean): Promise<FileMetaDataContent> {
+    const metadata = await buildMetadata(file);
+    return {
+      audio: isAudio(file) && !isUndefined(metadata) ? metadata : null,
+      video: isVideo(file) && !isUndefined(metadata) ? metadata : null,
+      image: allowImageDetection === true && isImage(file) && !isUndefined(metadata) ? metadata : null,
+      length: file.size,
+      name: (file as File).name,
+      type: file.type,
+    } as FileMetaDataContent;
+  }
+
+  private async uploadToAssetService(
     conversation: Conversation,
     file: Blob,
     messageId: string,
-    asImage: boolean,
-    meta: FileMetaDataContent,
-  ): Promise<SendAndInjectResult> {
+    meta: Pick<FileMetaDataContent, 'name' | 'type'>,
+  ): Promise<EncryptedAssetUploaded & {preview?: Asset.IPreview}> {
     const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
 
     const auditData: AssetAuditData | undefined = isAuditLogEnabled
@@ -938,15 +996,24 @@ export class MessageRepository {
       ...(isAuditLogEnabled && {auditData}),
     };
 
-    const asset = await this.assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled);
+    return this.assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled);
+  }
 
+  private async buildUploadedAssetMessage(
+    conversation: Conversation,
+    file: Blob,
+    messageId: string,
+    asImage: boolean,
+    meta: FileMetaDataContent,
+    asset: EncryptedAssetUploaded & {preview?: Asset.IPreview},
+  ): Promise<GenericMessage> {
     const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
     const commonMessageData = {
       asset: asset,
       expectsReadConfirmation: this.expectReadReceipt(conversation),
     };
 
-    const assetMessage = !isUndefined(metadata)
+    return !isUndefined(metadata)
       ? MessageBuilder.buildImageMessage(
           {
             ...commonMessageData,
@@ -963,6 +1030,17 @@ export class MessageRepository {
           },
           messageId,
         );
+  }
+
+  private async sendAssetRemotedata(
+    conversation: Conversation,
+    file: Blob,
+    messageId: string,
+    asImage: boolean,
+    meta: FileMetaDataContent,
+  ): Promise<SendAndInjectResult> {
+    const asset = await this.uploadToAssetService(conversation, file, messageId, meta);
+    const assetMessage = await this.buildUploadedAssetMessage(conversation, file, messageId, asImage, meta, asset);
 
     return this.sendAndInjectMessage(assetMessage, conversation, {enableEphemeral: true});
   }
@@ -1096,11 +1174,7 @@ export class MessageRepository {
       syncTimestamp: true,
     },
   ): Promise<SendAndInjectResult> {
-    const messageTimer = conversation.messageTimer();
-    const payload =
-      enableEphemeral && isNumber(messageTimer) && messageTimer !== 0
-        ? MessageBuilder.wrapInEphemeral(message, messageTimer)
-        : message;
+    const payload = enableEphemeral ? this.wrapInEphemeralWhenTimed(message, conversation) : message;
 
     const backendOptions: BackendSendOptions = {
       syncTimestamp,
@@ -1130,6 +1204,14 @@ export class MessageRepository {
       await this.updateMessageAsFailed(conversation, payload.messageId, error);
       return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
     }
+  }
+
+  /** Wraps the message for the self-deleting timer the conversation has right now, if any */
+  private wrapInEphemeralWhenTimed(message: GenericMessage, conversation: Conversation): GenericMessage {
+    const messageTimer = conversation.messageTimer();
+    return isNumber(messageTimer) && messageTimer !== 0
+      ? MessageBuilder.wrapInEphemeral(message, messageTimer)
+      : message;
   }
 
   /**
@@ -1367,6 +1449,20 @@ export class MessageRepository {
         return;
       }
     }
+    if (this.outbox !== undefined) {
+      return this.enqueueReceipt({
+        type: 'confirmation',
+        conversationId: conversationEntity.qualifiedId,
+        confirmationType: type,
+        messageIds: [
+          messageEntity.id,
+          ...moreMessageEntities.map(entity => {
+            return entity.id;
+          }),
+        ],
+        recipient: messageEntity.qualifiedFrom,
+      });
+    }
     const moreMessageIds = isNonEmptyArray(moreMessageEntities)
       ? moreMessageEntities.map(entity => {
           return entity.id;
@@ -1557,6 +1653,13 @@ export class MessageRepository {
     const clearedTimestampMilliseconds = conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
 
     if (isNumber(clearedTimestampMilliseconds) && clearedTimestampMilliseconds !== 0) {
+      if (this.outbox !== undefined) {
+        return this.enqueueReceipt({
+          type: 'cleared',
+          conversationId: conversation.qualifiedId,
+          timestamp: clearedTimestampMilliseconds,
+        });
+      }
       const payload = MessageBuilder.buildClearedMessage(conversation.qualifiedId);
       await this.sendToSelfConversations(payload);
     }
@@ -1688,7 +1791,7 @@ export class MessageRepository {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = isNonEmptyArray(messageEntity.readReceipts()) ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
-      const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend' | 'fileData'> = {
+      const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend' | 'fileData' | 'written_time'> = {
         status: updatedStatus,
         failedToSend,
         fileData: undefined,
@@ -1696,6 +1799,10 @@ export class MessageRepository {
       if (isNonEmptyString(isoDate)) {
         const timestamp = new Date(isoDate).getTime();
         if (!isNaN(timestamp)) {
+          const writtenTime = this.keepWrittenTime(messageEntity);
+          if (writtenTime !== undefined) {
+            changes.written_time = writtenTime;
+          }
           changes.time = isoDate;
           messageEntity.timestamp(timestamp);
           conversationEntity.updateTimestampServer(timestamp, true);
@@ -1712,6 +1819,24 @@ export class MessageRepository {
       }
     }
     return undefined;
+  }
+
+  /** The time the message was written at survives the send, which replaces its time with the server's */
+  private keepWrittenTime(messageEntity: Message): string | undefined {
+    if (this.outbox === undefined) {
+      return undefined;
+    }
+    const writtenTime = messageEntity.written_time();
+    if (writtenTime !== undefined) {
+      return writtenTime;
+    }
+    const writtenTimestamp = messageEntity.timestamp();
+    if (!Number.isFinite(writtenTimestamp)) {
+      return undefined;
+    }
+    const fromTimestamp = new Date(writtenTimestamp).toISOString();
+    messageEntity.written_time(fromTimestamp);
+    return fromTimestamp;
   }
 
   private async updateMessageAsFailed(
@@ -1733,6 +1858,449 @@ export class MessageRepository {
       }
     }
     return undefined;
+  }
+
+  private get outboxKinds(): MessageOutboxHandles<Conversation> {
+    if (this.outboxHandles === undefined) {
+      throw new Error('The outbox is not enabled');
+    }
+    return this.outboxHandles;
+  }
+
+  /** Logs what the outbox answered, without content, and runs the step that fits it */
+  private async followEnqueue(
+    kind: string,
+    outcome: EnqueueOutcome<unknown>,
+    steps: {accepted?: () => Promise<void>; refused?: () => Promise<void>},
+  ): Promise<void> {
+    await match(outcome)
+      .with({type: P.union('operation-queued', 'operation-versioned')}, async ({type}) => {
+        this.logger.info('The outbox took an operation', {kind, outcome: type});
+        await steps.accepted?.();
+      })
+      .with({type: P.union('operation-succeeded', 'operation-dropped')}, async ({type}) => {
+        // The operation ended while the call waited for its running attempt
+        this.logger.info('The outbox had finished the operation already', {kind, outcome: type});
+      })
+      .with(
+        {
+          type: P.union(
+            'correlation-key-empty',
+            'ordering-key-empty',
+            'payload-invalid',
+            'key-taken-by-other-kind',
+            'outbox-full',
+            'outbox-not-started',
+            'storage-full',
+            'storage-failed',
+          ),
+        },
+        async ({type}) => {
+          this.logger.warn('The outbox refused an operation', {kind, outcome: type});
+          await steps.refused?.();
+        },
+      )
+      .exhaustive();
+  }
+
+  /** A message the outbox refused is shown as failed, so that it can be sent again; it is never sent around the outbox */
+  private async markRefused(conversation: Conversation, messageId: string): Promise<void> {
+    await this.setOutboxMessageStatus(conversation, messageId, StatusType.FAILED, 'rejected');
+  }
+
+  private toStoredMentions(mentions: MentionEntity[]): StoredMention[] {
+    return mentions.map(({startIndex, length, userId, userQualifiedId}) => {
+      return {startIndex, length, userId, userQualifiedId};
+    });
+  }
+
+  private enqueueMessage(payload: OutboxTextPayload): ReturnType<MessageOutboxHandles['message']['enqueue']> {
+    return this.outboxKinds.message.enqueue({
+      payload,
+      correlationKey: messageCorrelationKey(payload),
+      orderingKey: messageOrderingKey(payload.conversationId),
+    });
+  }
+
+  private async enqueueText({
+    conversation,
+    textMessage,
+    mentions,
+    QuoteEntity,
+    messageId,
+    attachments,
+  }: {
+    conversation: Conversation;
+    textMessage: string;
+    mentions: MentionEntity[];
+    QuoteEntity?: OutgoingQuote;
+    messageId?: string;
+    attachments?: MultiPartContent['attachments'];
+  }): Promise<void> {
+    const payload: OutboxTextPayload = {
+      type: 'text',
+      conversationId: conversation.qualifiedId,
+      messageId: messageId ?? createUuid(),
+      text: textMessage,
+      mentions: this.toStoredMentions(mentions),
+      quote: QuoteEntity === undefined ? undefined : {messageId: QuoteEntity.messageId, userId: QuoteEntity.userId},
+      attachments: isNonEmptyArray(attachments) ? attachments : undefined,
+    };
+    if (messageId !== undefined) {
+      return this.enqueueTextAgain(conversation, payload);
+    }
+
+    const showText = async (): Promise<void> => {
+      const message = await this.buildOutboxText(conversation, payload, QuoteEntity);
+      await this.injectOptimisticMessage(message, conversation);
+    };
+    await this.enqueueWhileShowing(payload.messageId, async () => {
+      const outcome = await this.enqueueMessage(payload);
+      await this.followEnqueue('message', outcome, {
+        accepted: showText,
+        refused: async () => {
+          await showText();
+          await this.markRefused(conversation, payload.messageId);
+        },
+      });
+    });
+  }
+
+  /**
+   * Runs an enqueue whose steps show the message. The outbox may send as soon as the operation is stored, so
+   * `whenShown` holds the send back until this has settled, whether the message was shown or not.
+   * Operations restored after a reload are not registered: their messages are shown already.
+   */
+  private async enqueueWhileShowing(messageId: string, enqueueAndShow: () => Promise<void>): Promise<void> {
+    let settle: () => void = noop;
+    this.pendingInjections.set(
+      messageId,
+      new Promise<void>(resolve => {
+        settle = resolve;
+      }),
+    );
+    try {
+      await enqueueAndShow();
+    } finally {
+      this.pendingInjections.delete(messageId);
+      settle();
+    }
+  }
+
+  private async whenShown(messageId: string): Promise<void> {
+    await this.pendingInjections.get(messageId);
+  }
+
+  /** Retry: the same message, sent again from where it was in the conversation */
+  private async enqueueTextAgain(conversation: Conversation, payload: OutboxTextPayload): Promise<void> {
+    // The decline of the earlier attempt would otherwise dead-letter this one as well
+    await this.setOutboxMessageStatus(conversation, payload.messageId, StatusType.SENDING);
+
+    const operationPayload = match(this.outboxKinds.message.find(payload.messageId))
+      .with({type: 'operation-found', operation: {state: 'dead-lettered', payload: {type: 'text'}}}, ({operation}) => {
+        const mayBeDelivered = operation.attempts > 0 || operation.payload.mayBeDelivered === true;
+        return mayBeDelivered ? {...operation.payload, mayBeDelivered: true as const} : operation.payload;
+      })
+      .otherwise(() => {
+        return payload;
+      });
+    const outcome = await this.enqueueMessage(operationPayload);
+    await this.followEnqueue('message', outcome, {
+      refused: () => {
+        return this.markRefused(conversation, payload.messageId);
+      },
+    });
+  }
+
+  private async enqueuePing(conversation: Conversation): Promise<SendAndInjectResult> {
+    const messageId = createUuid();
+    let state = SendAndInjectSendingState.QUEUED;
+    const showPing = async (): Promise<void> => {
+      await this.injectOptimisticMessage(this.buildOutboxPing(conversation, messageId), conversation);
+    };
+    await this.enqueueWhileShowing(messageId, async () => {
+      const enqueued = this.outboxKinds.ping.enqueue({
+        payload: {conversationId: conversation.qualifiedId, messageId},
+        correlationKey: messageId,
+        orderingKey: messageOrderingKey(conversation.qualifiedId),
+      });
+      void this.audioRepository.play(AudioType.OUTGOING_PING);
+      await this.followEnqueue('ping', await enqueued, {
+        accepted: showPing,
+        refused: async () => {
+          state = SendAndInjectSendingState.FAILED;
+          await showPing();
+          await this.markRefused(conversation, messageId);
+        },
+      });
+    });
+    return {id: messageId, sentAt: new Date().toISOString(), state};
+  }
+
+  /** Receipts are never shown, and what the outbox refuses is lost */
+  private async enqueueReceipt(payload: OutboxReceiptPayload): Promise<void> {
+    const outcome = await this.outboxKinds.receipt.enqueue({
+      payload,
+      correlationKey: receiptCorrelationKey(payload),
+      orderingKey: receiptOrderingKey(payload),
+    });
+    await this.followEnqueue('receipt', outcome, {});
+  }
+
+  private async resolveOutgoingQuote(
+    conversation: Conversation,
+    quote: OutboxTextPayload['quote'],
+  ): Promise<OutgoingQuote | undefined> {
+    if (quote === undefined) {
+      return undefined;
+    }
+    // The hash includes the time of the quoted message, so it is made when sending. A quote of a message that
+    // is gone keeps its ids and has no hash: the receiver shows it as not found
+    const quotedEvent = await this.eventService.loadEvent(conversation.id, quote.messageId);
+    const hash =
+      quotedEvent === undefined
+        ? new Uint8Array().buffer
+        : await container.resolve<QuoteEventHasher>(QUOTE_EVENT_HASHER)(quotedEvent);
+    return new QuoteEntity({hash, messageId: quote.messageId, userId: quote.userId}) as OutgoingQuote;
+  }
+
+  private toMentionEntities(mentions: StoredMention[]): MentionEntity[] {
+    return mentions.map(({startIndex, length, userId, userQualifiedId}) => {
+      return new MentionEntity(startIndex, length, userId, userQualifiedId.domain);
+    });
+  }
+
+  /** `quote` is the one the sender already has, with its hash; without it the hash is made from the quoted message */
+  private async buildOutboxText(
+    conversation: Conversation,
+    payload: OutboxTextPayload,
+    quote?: OutgoingQuote,
+  ): Promise<GenericMessage> {
+    const text = this.decorateTextMessage({text: payload.text}, conversation, {
+      mentions: this.toMentionEntities(payload.mentions),
+      quote: quote ?? (await this.resolveOutgoingQuote(conversation, payload.quote)),
+    });
+    const message = isNonEmptyArray(payload.attachments)
+      ? MessageBuilder.buildMultipartMessage(payload.attachments, text, payload.messageId)
+      : MessageBuilder.buildTextMessage(text, payload.messageId);
+    return this.wrapInEphemeralWhenTimed(message, conversation);
+  }
+
+  private buildOutboxEdit(conversation: Conversation, payload: OutboxEditPayload): GenericMessage {
+    const text = this.decorateTextMessage(
+      {originalMessageId: payload.originalMessageId, text: payload.text},
+      conversation,
+      {
+        mentions: this.toMentionEntities(payload.mentions),
+      },
+    );
+    return isNonEmptyArray(payload.attachments)
+      ? MessageBuilder.buildEditedMultipartMessage(
+          payload.attachments,
+          text,
+          payload.originalMessageId,
+          payload.messageId,
+        )
+      : MessageBuilder.buildEditedTextMessage(text, payload.messageId);
+  }
+
+  private buildOutboxPing(conversation: Conversation, messageId: string): GenericMessage {
+    const ping = MessageBuilder.buildPingMessage({
+      expectsReadConfirmation: this.expectReadReceipt(conversation),
+      hotKnock: false,
+      legalHoldStatus: conversation.legalHoldStatus(),
+    });
+    ping.messageId = messageId;
+    return this.wrapInEphemeralWhenTimed(ping, conversation);
+  }
+
+  private async findOutboxMessageRecord(
+    conversation: Conversation,
+    messageId: string,
+  ): Promise<MessageRecord | undefined> {
+    const record = await this.eventService.loadEvent(conversation.id, messageId);
+    if (record === undefined) {
+      return undefined;
+    }
+    return {
+      isFailed: record.status === StatusType.FAILED || record.status === StatusType.FEDERATION_ERROR,
+      failedReason: record.failed_reason,
+      file: record.fileData,
+      hasUploadResult: readRecordedUpload(record) !== undefined,
+    };
+  }
+
+  private async uploadOutboxAsset(
+    conversation: Conversation,
+    payload: AssetMessagePayload,
+    file: Blob,
+    signal: AbortSignal,
+  ): Promise<void> {
+    const cancelUpload = (): void => {
+      this.assetRepository.cancelUpload(payload.messageId);
+    };
+    const keepPageOpen = (event: Event): void => {
+      event.preventDefault();
+    };
+    signal.addEventListener('abort', cancelUpload, {once: true});
+    // Only an upload in progress is worth a warning on leaving: a queued message is kept and sent later
+    window.addEventListener('beforeunload', keepPageOpen);
+    try {
+      const asset = await this.uploadToAssetService(conversation, file, payload.messageId, {
+        name: (file as File).name,
+        type: file.type,
+      });
+      const record = await this.eventService.loadEvent(conversation.id, payload.messageId);
+      if (record !== undefined) {
+        await this.eventService.updateEvent(record.primary_key, {
+          data: {
+            ...(record as {data?: object}).data,
+            domain: asset.domain,
+            key: asset.key,
+            otr_key: asset.keyBytes,
+            sha256: asset.sha256,
+            token: asset.token,
+          },
+        } as Partial<EventRecord>);
+      }
+    } finally {
+      window.removeEventListener('beforeunload', keepPageOpen);
+      signal.removeEventListener('abort', cancelUpload);
+    }
+  }
+
+  private async buildOutboxAsset(
+    conversation: Conversation,
+    payload: AssetMessagePayload,
+  ): Promise<GenericMessage | undefined> {
+    const record = await this.eventService.loadEvent(conversation.id, payload.messageId);
+    const upload = record === undefined ? undefined : readRecordedUpload(record);
+    const file = record?.fileData;
+    if (upload === undefined || file === undefined) {
+      return undefined;
+    }
+    const meta = await this.buildFileMetaData(file, payload.asImage);
+    // Describing an uploaded asset needs no cipher text
+    const asset: EncryptedAssetUploaded = {
+      cipherText: new Uint8Array(),
+      domain: upload.domain ?? '',
+      key: upload.key,
+      keyBytes: upload.otr_key,
+      sha256: upload.sha256,
+      token: upload.token,
+    };
+    const message = await this.buildUploadedAssetMessage(
+      conversation,
+      file,
+      payload.messageId,
+      payload.asImage,
+      meta,
+      asset,
+    );
+    return this.wrapInEphemeralWhenTimed(message, conversation);
+  }
+
+  private async setOutboxMessageStatus(
+    conversation: Conversation,
+    messageId: string,
+    status: StatusType,
+    failedReason?: FailedReason,
+  ): Promise<void> {
+    try {
+      const messageEntity = await this.getMessageInConversationById(conversation, messageId);
+      messageEntity.status(status);
+      messageEntity.failed_reason(failedReason);
+      await this.eventService.updateEvent(messageEntity.primary_key, {status, failed_reason: failedReason});
+    } catch (error: unknown) {
+      if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+        throw error;
+      }
+    }
+  }
+
+  /** What the message kinds need, as arrow functions over this repository so that they never import it */
+  private createMessageOutboxPort(): MessageOutboxPort<Conversation> {
+    return {
+      findConversation: conversationId => {
+        return this.conversationState.findConversation(conversationId);
+      },
+      selfConversations: () => {
+        return this.conversationState.getSelfConversations(supportsMLS() && this.teamState.isMLSEnabled());
+      },
+      recipientsOf: conversation => {
+        return conversation.allUserEntities().map(user => {
+          if (isUndefined(user)) {
+            throw new Error('Conversation member list contains an empty user');
+          }
+          return user.qualifiedId;
+        });
+      },
+      supportsReadReceipts: conversation => {
+        return supportsReadReceipts(conversation);
+      },
+      isDegraded: conversation => {
+        return conversation.verification_state() === ConversationVerificationState.DEGRADED;
+      },
+      isBeingEdited: async (conversation, messageId) => {
+        return (await this.isBeingEdited?.(conversation, messageId)) === true;
+      },
+      requestSendingPermission: conversation => {
+        return this.requestUserSendingPermission(conversation, false, CONSENT_TYPE.MESSAGE);
+      },
+      buildText: (conversation, payload) => {
+        return this.buildOutboxText(conversation, payload);
+      },
+      buildEdit: (conversation, payload) => {
+        return this.buildOutboxEdit(conversation, payload);
+      },
+      buildPing: (conversation, messageId) => {
+        return this.buildOutboxPing(conversation, messageId);
+      },
+      buildAsset: (conversation, payload) => {
+        return this.buildOutboxAsset(conversation, payload);
+      },
+      sendToBackend: (message, conversation, options) => {
+        return this.sendMessageToBackend(message, conversation, options);
+      },
+      whenShown: messageId => {
+        return this.whenShown(messageId);
+      },
+      injectOptimistic: (message, conversation) => {
+        return this.injectOptimisticMessage(message, conversation);
+      },
+      uploadAsset: (conversation, payload, file, signal) => {
+        return this.uploadOutboxAsset(conversation, payload, file, signal);
+      },
+      sendLinkPreview: async (conversation, {messageId, text, mentions, quote}) => {
+        await this.handleLinkPreview(
+          {
+            conversation,
+            message: text,
+            messageId,
+            mentions: this.toMentionEntities(mentions),
+            quote: await this.resolveOutgoingQuote(conversation, quote),
+          },
+          conversation.qualifiedId,
+        );
+      },
+      findMessage: (conversation, messageId) => {
+        return this.findOutboxMessageRecord(conversation, messageId);
+      },
+      markSending: (conversation, messageId) => {
+        return this.setOutboxMessageStatus(conversation, messageId, StatusType.SENDING);
+      },
+      markFailed: (conversation, messageId, {reason, federation}) => {
+        return this.setOutboxMessageStatus(
+          conversation,
+          messageId,
+          federation ? StatusType.FEDERATION_ERROR : StatusType.FAILED,
+          reason,
+        );
+      },
+      deleteMessage: async (conversation, messageId) => {
+        await this.deleteMessageById(conversation, messageId);
+      },
+    };
   }
 
   private createRecipients(users: User[]): QualifiedUserClients {
@@ -1867,8 +2435,12 @@ export class MessageRepository {
    */
   public async markAsRead(conversation: Conversation): Promise<void> {
     const timestamp = conversation.last_read_timestamp();
-    const payload = MessageBuilder.buildLastReadMessage(conversation.qualifiedId, timestamp);
-    await this.sendToSelfConversations(payload);
+    if (this.outbox !== undefined) {
+      await this.enqueueReceipt({type: 'last-read', conversationId: conversation.qualifiedId, timestamp});
+    } else {
+      const payload = MessageBuilder.buildLastReadMessage(conversation.qualifiedId, timestamp);
+      await this.sendToSelfConversations(payload);
+    }
     /*
      * FIXME notification removal can be improved.
      * We can add the conversation ID in the payload of the event and only check unread messages for this particular conversation
@@ -1883,8 +2455,12 @@ export class MessageRepository {
    * @param countlyId Countly new ID
    */
   public async sendCountlySync(countlyId: string): Promise<void> {
-    const payload = MessageBuilder.buildDataTransferMessage(countlyId);
-    await this.sendToSelfConversations(payload);
+    if (this.outbox !== undefined) {
+      await this.enqueueReceipt({type: 'data-transfer', countlyId});
+    } else {
+      const payload = MessageBuilder.buildDataTransferMessage(countlyId);
+      await this.sendToSelfConversations(payload);
+    }
     this.logger.info(`Sent countly sync message with ID ${countlyId}`);
   }
 
