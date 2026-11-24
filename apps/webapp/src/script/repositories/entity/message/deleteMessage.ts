@@ -35,6 +35,8 @@ export class DeleteMessage extends Message {
 
     this.super_type = SuperType.DELETE;
     this.deleted_timestamp = null;
-    this.deletedBy = ko.pureComputed(() => this.user());
+    this.deletedBy = ko.pureComputed(() => {
+      return this.user();
+    });
   }
 }

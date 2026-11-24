@@ -21,8 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {noop} from 'noop-esm';
 
-import {useKoSubscribableChildren} from '../../../util/componentUtil';
-
 import {MessageHeader} from './contentMessage/messageHeader';
 import {MessageTime} from './messageTime';
 
@@ -30,6 +28,7 @@ import {useApplicationContext} from '../../../page/rootProvider';
 import {DeleteMessage as DeleteMessageEntity} from '../../../repositories/entity/message/deleteMessage';
 import {User} from '../../../repositories/entity/User';
 import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {getUserName} from '../../../util/localizerUtil/userName';
 import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from '../../../util/timeUtil';
 
