@@ -48,9 +48,6 @@ import * as Icon from '../../../components/icon';
 import {ParticipantItemContent} from '../../../components/participantItemContent';
 import {BaseToggle} from '../../../components/toggle/BaseToggle';
 import {driveOffboardingFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {User} from '../../../repositories/entity/User';
-import {TeamState} from '../../../repositories/team/TeamState';
 import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {capitalizeFirstChar, sortUsersByPriority} from '../../../util/stringUtil';
@@ -58,10 +55,25 @@ import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 
 interface SharedDriveProps {
-  activeConversation: Conversation;
-  teamState: TeamState;
+  activeConversation: {
+    cellsState: CONVERSATION_CELLS_STATE;
+    groupId: string;
+    isSelfUserRemoved: boolean;
+    participating_user_ets: User[];
+    selfUser?: User | null;
+    teamId?: string;
+  };
+  teamState: {isCellsEnabled: boolean};
   onBack: () => void;
   onClose: () => void;
+}
+
+interface User {
+  handle?: string;
+  id: string;
+  isMe: boolean;
+  teamId?: string;
+  type: UserType;
 }
 
 const SharedDrive: FunctionComponent<SharedDriveProps> = ({
@@ -85,7 +97,7 @@ const SharedDrive: FunctionComponent<SharedDriveProps> = ({
   ]);
   const isDriveOffboardingEnabled =
     isFeatureToggleEnabled(driveOffboardingFeatureToggleName) &&
-    !isCellsEnabledForTeam &&
+    !Boolean(isCellsEnabledForTeam) &&
     cellsState === CONVERSATION_CELLS_STATE.READY;
 
   const participants = useMemo(() => {
@@ -93,7 +105,7 @@ const SharedDrive: FunctionComponent<SharedDriveProps> = ({
       return participant.type === UserType.REGULAR;
     });
 
-    if (!isSelfUserRemoved && !isNullOrUndefined(selfUser)) {
+    if (!Boolean(isSelfUserRemoved) && !isNullOrUndefined(selfUser)) {
       return [...users, selfUser].toSorted(sortUsersByPriority);
     }
 
@@ -140,7 +152,7 @@ const SharedDrive: FunctionComponent<SharedDriveProps> = ({
               role === CELLS_SELF_USER_DRIVE_ROLE.EDITOR
                 ? 'cells.sharedDriveAccess.role.editor'
                 : 'cells.sharedDriveAccess.role.viewer';
-            const selfString = participant.isMe
+            const selfString = Boolean(participant.isMe)
               ? `(${capitalizeFirstChar(translate('conversationYouNominative'))})`
               : '';
 

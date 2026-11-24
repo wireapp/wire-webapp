@@ -19,12 +19,10 @@
 
 import {CELLS_SELF_USER_DRIVE_ROLE} from './cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
-import {CellNode} from '../../../../types/cellNode';
-
-export const getConversationCellsNodesForTeamAccess = (
-  nodes: CellNode[],
+export const getConversationCellsNodesForTeamAccess = <T extends {selfUserDriveRole: string}>(
+  nodes: T[],
   isDriveOffboardingEnabled: boolean,
-): CellNode[] => {
+): T[] | (T & {selfUserDriveRole: string})[] => {
   if (!isDriveOffboardingEnabled) {
     return nodes;
   }
