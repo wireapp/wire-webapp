@@ -20,6 +20,7 @@
 import {useMemo, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
+import ko from 'knockout';
 import {noop} from 'noop-esm';
 
 import {
@@ -48,6 +49,8 @@ import * as Icon from '../../../components/icon';
 import {ParticipantItemContent} from '../../../components/participantItemContent';
 import {BaseToggle} from '../../../components/toggle/BaseToggle';
 import {driveOffboardingFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import type {Conversation} from '../../../repositories/entity/Conversation';
+import type {User} from '../../../repositories/entity/User';
 import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {capitalizeFirstChar, sortUsersByPriority} from '../../../util/stringUtil';
@@ -55,25 +58,10 @@ import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 
 interface SharedDriveProps {
-  activeConversation: {
-    cellsState: CONVERSATION_CELLS_STATE;
-    groupId: string;
-    isSelfUserRemoved: boolean;
-    participating_user_ets: User[];
-    selfUser?: User | null;
-    teamId?: string;
-  };
-  teamState: {isCellsEnabled: boolean};
+  activeConversation: Conversation;
+  teamState: {isCellsEnabled: ko.Subscribable<boolean>};
   onBack: () => void;
   onClose: () => void;
-}
-
-interface User {
-  handle?: string;
-  id: string;
-  isMe: boolean;
-  teamId?: string;
-  type: UserType;
 }
 
 const SharedDrive: FunctionComponent<SharedDriveProps> = ({

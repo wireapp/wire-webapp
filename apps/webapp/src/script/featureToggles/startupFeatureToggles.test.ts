@@ -79,7 +79,7 @@ describe('startupFeatureToggles', function () {
       '?enabled-features=mark-as-unread,persistent-browser-logs',
     );
 
-    expect(disabled.isFeatureToggleEnabled('persistent-browser-logs')).toBe(false);
+    expect(disabled.enabledFeatureToggleNames).toEqual([]);
     expect(enabled.enabledFeatureToggleNames).toEqual([markAsUnreadFeatureToggleName]);
     expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain('persistent-browser-logs');
   });
