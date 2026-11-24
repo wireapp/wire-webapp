@@ -188,6 +188,58 @@ describe('createBulkDownloadOperation', () => {
     expect(download).toHaveBeenCalledTimes(2);
   });
 
+  it('keeps the operation active while cancelling an already-pending source read', async () => {
+    let signalPullStarted: (() => void) | undefined;
+    let finishSourcePull: (() => void) | undefined;
+    let signalCancelStarted: (() => void) | undefined;
+    let finishSourceCancel: (() => void) | undefined;
+    const pullStarted = new Promise<void>(resolve => {
+      signalPullStarted = resolve;
+    });
+    const cancelStarted = new Promise<void>(resolve => {
+      signalCancelStarted = resolve;
+    });
+    const source = createStream({
+      pull() {
+        signalPullStarted?.();
+        return new Promise<void>(resolve => {
+          finishSourcePull = resolve;
+        });
+      },
+      cancel() {
+        signalCancelStarted?.();
+        return new Promise<void>(resolve => {
+          finishSourceCancel = resolve;
+        });
+      },
+    });
+    const download = jest.fn().mockResolvedValueOnce(source).mockResolvedValue(createStream());
+    const operation = createBulkDownloadOperation(download);
+    const states: string[] = [];
+    operation.subscribe(({kind}) => states.push(kind));
+    const request = {selection: eligibleSelection(['workspace/file.txt']), archiveParentPath: 'workspace'};
+    const {stream} = await operation.start(request);
+    await pullStarted;
+
+    const cancellation = stream.cancel();
+    await cancelStarted;
+    await new Promise<void>(resolve => setImmediate(resolve));
+
+    try {
+      expect(operation.getState()).toEqual({kind: 'starting'});
+      expect(states).toEqual(['starting']);
+      await expect(operation.start(request)).rejects.toThrow('A bulk download is already in progress');
+    } finally {
+      finishSourcePull?.();
+      finishSourceCancel?.();
+      await cancellation;
+    }
+
+    expect(operation.getState()).toEqual({kind: 'cancelled'});
+    expect(states).toEqual(['starting', 'cancelled']);
+    expect(download).toHaveBeenCalledTimes(1);
+  });
+
   it('exposes cancellation failures and releases the operation lock', async () => {
     const failure = new Error('cancel failed');
     const source = createStream({cancel: () => Promise.reject(failure)});

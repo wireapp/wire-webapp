@@ -139,6 +139,9 @@ export const createBulkDownloadOperation = (
           async pull(controller) {
             try {
               const {done, value} = await reader.read();
+              if (isCancelling) {
+                return;
+              }
               if (done) {
                 controller.close();
                 if (!isCancelling && operationId === currentOperationId) {
@@ -153,6 +156,9 @@ export const createBulkDownloadOperation = (
               }
               controller.enqueue(value);
             } catch (error) {
+              if (isCancelling) {
+                return;
+              }
               if (operationId === currentOperationId) {
                 isActive = false;
                 setState({kind: 'failed', error});
