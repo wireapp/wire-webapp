@@ -21,9 +21,9 @@ import React from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {CSS_FILL_PARENT, CSS_FLEX_CENTER, CSS_ICON} from '../../util/cssMixin';
+import {STATE} from './avatarConstants';
 
-import {STATE} from '.';
+import {CSS_FILL_PARENT, CSS_FLEX_CENTER, CSS_ICON} from '../../util/cssMixin';
 
 interface AvatarBadgeProps {
   state: STATE;

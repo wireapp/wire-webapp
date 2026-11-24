@@ -30,7 +30,7 @@ import {
 
 import {UserAvatar} from './userAvatar';
 
-import {AVATAR_SIZE, STATE} from '../avatar';
+import {AVATAR_SIZE, STATE} from '../avatarConstants';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(

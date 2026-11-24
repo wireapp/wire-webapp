@@ -31,7 +31,6 @@ import {MultipartAssets} from './multipartAssets/multipartAssets';
 import {TextMessageRenderer} from './textMessageRenderer';
 import {VideoAsset} from './videoAsset/videoAsset';
 
-import {MessageActions} from '../..';
 import {QualifiedId} from '../../../../../apiClient/user/qualifiedId';
 import {StatusType} from '../../../../../message/statusType';
 import {AssetType} from '../../../../../repositories/assets/assetType';
@@ -46,6 +45,7 @@ import {Multipart} from '../../../../../repositories/entity/message/multipart';
 import {Text} from '../../../../../repositories/entity/message/text';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {includesOnlyEmojis} from '../../../../../util/emojiUtil';
+import {MessageActions} from '../../messageActions';
 import {ReadIndicator} from '../../readIndicator';
 
 interface ContentAssetProps {

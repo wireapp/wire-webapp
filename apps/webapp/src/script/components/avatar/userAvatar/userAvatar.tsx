@@ -31,13 +31,14 @@ import {COLOR} from '../../../uiKit/identity/colors/colors';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {AvailabilityIcon} from '../../availabilityIcon';
 import {useUserName} from '../../UserName';
-import {AVATAR_SIZE, STATE} from '../avatar';
 import {AvatarBackground} from '../avatarBackground';
 import {AvatarBadge} from '../avatarBadge';
 import {AvatarBorder} from '../avatarBorder';
+import {AVATAR_SIZE, STATE} from '../avatarConstants';
 import {AvatarImage} from '../avatarImage';
 import {AvatarInitials} from '../avatarInitials';
 import {AvatarWrapper} from '../avatarWrapper';
+import {shouldShowBadge} from '../shouldShowBadge';
 
 interface UserAvatarProps {
   avatarSize: AVATAR_SIZE;
@@ -54,12 +55,6 @@ interface UserAvatarProps {
   hideProfilePicture?: boolean;
   teamState?: TeamState;
 }
-
-export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
-  const isTooSmall = [AVATAR_SIZE.XX_SMALL, AVATAR_SIZE.XXX_SMALL].includes(size);
-  const isBadgeState = [STATE.PENDING, STATE.BLOCKED].includes(state);
-  return !isTooSmall && isBadgeState;
-};
 
 const getIconSize = (size: AVATAR_SIZE): string => {
   if (size === AVATAR_SIZE.X_LARGE) {
