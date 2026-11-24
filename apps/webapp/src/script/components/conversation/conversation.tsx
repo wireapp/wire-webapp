@@ -114,6 +114,11 @@ interface ConversationProps {
 
 interface ConversationContentProps extends ConversationProps {
   readonly activeConversation: ConversationEntity;
+  readonly components?: {
+    readonly ConversationCells?: typeof ConversationCells;
+    readonly MessageListWrapper?: typeof MessageListWrapper;
+    readonly TitleBar?: typeof TitleBar;
+  };
 }
 
 const CONFIG = Config.getConfig();
@@ -129,14 +134,18 @@ export function Conversation(props: ConversationProps): ReactElement | null {
   return <ConversationContent {...props} activeConversation={activeConversation} />;
 }
 
-function ConversationContent({
+export function ConversationContent({
   teamState,
   selfUser,
   openRightSidebar,
   isRightSidebarOpen = false,
   reloadApp,
   activeConversation,
+  components = {},
 }: ConversationContentProps): ReactElement {
+  const ConversationCellsComponent = components.ConversationCells ?? ConversationCells;
+  const MessageListWrapperComponent = components.MessageListWrapper ?? MessageListWrapper;
+  const TitleBarComponent = components.TitleBar ?? TitleBar;
   const messageListLogger = getLogger('ConversationList');
 
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
@@ -761,7 +770,7 @@ function ConversationContent({
               `${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}:${isFileTabActive ? getCellsFilesPath() : 'outside-files'}`,
             )}
           >
-            <TitleBar
+            <TitleBarComponent
               repositories={repositories}
               conversation={activeConversation}
               selfUser={selfUser}
@@ -805,7 +814,7 @@ function ConversationContent({
                 <ConversationTabPanel id="files" isActive={isFileTabActive}>
                   {isFileTabActive && (
                     <SharedDriveUploadProvider controller={sharedDriveUploadController}>
-                      <ConversationCells
+                      <ConversationCellsComponent
                         key={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
                         activeConversation={activeConversation}
                         userRepository={repositories.user}
@@ -850,7 +859,7 @@ function ConversationContent({
                 );
               })}
 
-              <MessageListWrapper
+              <MessageListWrapperComponent
                 conversation={activeConversation}
                 selfUser={selfUser}
                 conversationRepository={conversationRepository}

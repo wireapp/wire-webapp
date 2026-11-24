@@ -299,6 +299,7 @@ describe('ConversationDetails', () => {
     conversation.teamId = 'conversation-team';
     const props = getDefaultParams();
     props.selfUser.teamId = 'conversation-team';
+    props.teamState.teamFeatures({cells: {status: FEATURE_STATUS.DISABLED}} as FeatureList);
 
     const view = render(
       withThemeAndRootContext(
