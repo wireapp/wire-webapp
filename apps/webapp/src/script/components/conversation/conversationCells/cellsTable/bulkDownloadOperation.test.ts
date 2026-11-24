@@ -84,19 +84,6 @@ describe('resolveBulkDownloadSelection', () => {
     });
   });
 
-  it('rejects downloads from unsupported locations', () => {
-    expect(
-      resolveBulkDownloadSelection({
-        nodes: [createNode('workspace/file')],
-        canDownload: true,
-        isSupportedLocation: false,
-      }),
-    ).toEqual({
-      kind: 'rejected',
-      reason: 'unsupported-location',
-    });
-  });
-
   it('rejects the whole selection when the current drive permission or any item denies download', () => {
     expect(resolveBulkDownloadSelection({nodes: [createNode('file')], canDownload: false})).toEqual({
       kind: 'rejected',

@@ -20,7 +20,7 @@
 import type {CellNode} from '../../../../types/cellNode';
 import {canPerformCellsAction, CELLS_ACTION} from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
-export type BulkDownloadRejectionReason = 'empty' | 'selection-unavailable' | 'forbidden' | 'unsupported-location';
+export type BulkDownloadRejectionReason = 'empty' | 'selection-unavailable' | 'forbidden';
 
 export type BulkDownloadSelection =
   | {readonly kind: 'eligible'; readonly paths: readonly string[]}
@@ -30,21 +30,16 @@ export const resolveBulkDownloadSelection = ({
   nodes,
   canDownload,
   selectedCount = nodes.length,
-  isSupportedLocation = true,
 }: {
   nodes: readonly CellNode[];
   canDownload: boolean;
   selectedCount?: number;
-  isSupportedLocation?: boolean;
 }): BulkDownloadSelection => {
   if (selectedCount === 0) {
     return {kind: 'rejected', reason: 'empty'};
   }
   if (nodes.length !== selectedCount) {
     return {kind: 'rejected', reason: 'selection-unavailable'};
-  }
-  if (!isSupportedLocation) {
-    return {kind: 'rejected', reason: 'unsupported-location'};
   }
   if (
     !canDownload ||

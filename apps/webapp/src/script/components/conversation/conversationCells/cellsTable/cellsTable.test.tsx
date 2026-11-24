@@ -104,9 +104,6 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkDownload.unavailable.selection-unavailable') {
     return 'Some selected items are not available here. Refresh Shared Drive and select them again.';
   }
-  if (key === 'cells.bulkDownload.unavailable.unsupported-location') {
-    return 'Bulk download is not available in this location.';
-  }
   if (key === 'cells.options.deletePermanently') {
     return 'Delete permanently';
   }
@@ -621,6 +618,28 @@ describe('CellsTable selection', () => {
       ).toBeInTheDocument();
       expect(screen.getByRole('button', {name: 'Download'})).toBeEnabled();
       expect(downloadSelectionArchive).toHaveBeenCalledTimes(1);
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('does not offer bulk download in the Bin or search selection contexts', async () => {
+    const originalHash = window.location.hash;
+    const user = userEvent.setup();
+
+    try {
+      window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+      const binTable = renderCellsTable({
+        selectionScopeKey: 'conversation:/bin',
+        initialNodes: [createNode({id: 'bin-file'})],
+      });
+      await user.click(screen.getByRole('checkbox', {name: 'Select Node name'}));
+      expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
+
+      binTable.unmount();
+      window.location.hash = '#/conversation/conversation-id@example.com/files/team/Shared%20Drive/search';
+      renderCellsTable({selectionEnabled: false});
+      expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
     } finally {
       window.location.hash = originalHash;
     }
