@@ -890,12 +890,22 @@ describe('MeetingStoreRoot', () => {
   ])('keeps the $title reminder in the sidebar when its system notification fires', async record => {
     const requests: SystemNotificationRequest[] = [];
     jest.spyOn(browserNotificationApi, 'createBrowserSystemNotificationApi').mockReturnValue({
-      isSupported: () => {return true},
-      getPermission: () => {return 'granted'},
-      requestPermission: async () => {return 'granted'},
+      isSupported: () => {
+        return true;
+      },
+      getPermission: () => {
+        return 'granted';
+      },
+      requestPermission: async () => {
+        return 'granted';
+      },
       show: request => {
         requests.push(request);
-        return result.ok({close: () => {return result.ok(undefined)}});
+        return result.ok({
+          close: () => {
+            return result.ok(undefined);
+          },
+        });
       },
     });
     const clock = createDeterministicClock({
@@ -904,13 +914,19 @@ describe('MeetingStoreRoot', () => {
     renderMeetingStoreRoot({
       clock,
       showMeetingNotificationHost: true,
-      getMeetingsList: jest.fn(() => {return task.resolve([{...record.meeting, title: record.title, tzid: 'Europe/Berlin'}])}),
+      getMeetingsList: jest.fn(() => {
+        return task.resolve([{...record.meeting, title: record.title, tzid: 'Europe/Berlin'}]);
+      }),
     });
 
-    await waitFor(() => {return expect(getRenderedMeetingTitles()).toBe(record.title)});
+    await waitFor(() => {
+      return expect(getRenderedMeetingTitles()).toBe(record.title);
+    });
     expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
 
-    act(() => {return clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE)});
+    act(() => {
+      return clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+    });
 
     expect(requests).toHaveLength(1);
     expect(useMeetingNotificationStore.getState().notifications).toEqual([
@@ -923,7 +939,9 @@ describe('MeetingStoreRoot', () => {
     ]);
     expect(screen.getByTestId('meeting-notification-host')).toHaveTextContent('meetings.notifications.total');
 
-    act(() => {return clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE)});
+    act(() => {
+      return clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+    });
     expect(useMeetingNotificationStore.getState().notifications).toHaveLength(1);
     expect(screen.getByTestId('meeting-notification-host')).toHaveTextContent('meetings.notifications.total');
   });

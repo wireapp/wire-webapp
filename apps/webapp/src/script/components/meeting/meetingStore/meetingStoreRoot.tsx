@@ -185,8 +185,9 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
         logger.debug('meeting notification store changed', {
           notificationCountBefore: previousState.notifications.length,
           notificationCountAfter: state.notifications.length,
-          reminderCount: state.notifications.filter(notification => notification.kind === MeetingNotificationKind.REMINDER)
-            .length,
+          reminderCount: state.notifications.filter(notification => {
+            return notification.kind === MeetingNotificationKind.REMINDER;
+          }).length,
         });
       }
     });
