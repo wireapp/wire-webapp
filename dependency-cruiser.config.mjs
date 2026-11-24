@@ -7,6 +7,13 @@ export default {
       from: {},
       to: {circular: true},
     },
+    {
+      name: 'outbox-imports-nothing-from-app',
+      comment: 'The outbox is a standalone kernel: it may import from itself and from packages only',
+      severity: 'error',
+      from: {path: '^apps/webapp/src/script/outbox/'},
+      to: {path: '^apps/webapp/src/script/', pathNot: '^apps/webapp/src/script/outbox/'},
+    },
   ],
   options: {
     doNotFollow: {path: '(^|/)node_modules/'},
