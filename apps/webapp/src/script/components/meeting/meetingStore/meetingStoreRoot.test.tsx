@@ -41,12 +41,14 @@ import {MeetingRecurrenceFrequency} from '../../../apiClient/meetings/meetingRec
 import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 
 import {useMeetingStore} from './meetingStoreProvider';
+import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
 import {MeetingNotificationHost} from '../meetingNotificationHost/meetingNotificationHost';
 import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
 } from '../meetingNotificationStore/meetingNotificationStore';
 import {User} from '../../../repositories/entity/User';
+import {MediaStreamHandler} from '../../../repositories/media/MediaStreamHandler';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {UserState} from '../../../repositories/user/userState';
 import {Config} from '../../../Config';
@@ -272,6 +274,7 @@ const renderMeetingStoreRoot = ({
   const selfUser = new User(selfUserId.id, selfUserId.domain, translateForTest);
   selfUser.availability(initialAvailability);
   container.resolve(UserState).self(selfUser);
+  container.registerInstance(MediaStreamHandler, {} as MediaStreamHandler);
 
   const mainViewModel = {
     content: {
@@ -320,6 +323,7 @@ describe('MeetingStoreRoot', () => {
   afterEach(() => {
     jest.restoreAllMocks();
     useMeetingNotificationStore.getState().clearNotifications();
+    useMeetingPrepModal.getState().close();
     act(() => {
       container.resolve(TeamState).teamFeatures(undefined);
     });
@@ -813,6 +817,53 @@ describe('MeetingStoreRoot', () => {
     });
 
     expect(getMeetingsList).not.toHaveBeenCalled();
+  });
+
+  it('mounts one Prep modal for an active session even when Meetings is disabled, then removes it on close', () => {
+    renderMeetingStoreRoot({isMeetingsFeatureEnabled: false});
+
+    expect(screen.queryByTestId('meeting-prep-modal')).toBeNull();
+
+    act(() => {
+      useMeetingPrepModal.getState().open({
+        meetingTitle: 'Weekly sync',
+        meetingStartTime: '2026-06-16T10:00:00.000Z',
+        qualifiedMeetingId: meetingId,
+        qualifiedConversationId: conversationId,
+      });
+    });
+
+    expect(screen.getAllByTestId('meeting-prep-modal')).toHaveLength(1);
+
+    act(() => {
+      useMeetingPrepModal.getState().close();
+    });
+
+    expect(screen.queryByTestId('meeting-prep-modal')).toBeNull();
+  });
+
+  it('keeps the Prep modal mounted when the view changes', () => {
+    const {rerender} = renderMeetingStoreRoot();
+
+    act(() => {
+      useMeetingPrepModal.getState().open({
+        meetingTitle: 'Weekly sync',
+        meetingStartTime: '2026-06-16T10:00:00.000Z',
+        qualifiedMeetingId: meetingId,
+        qualifiedConversationId: conversationId,
+      });
+    });
+
+    const modal = screen.getByTestId('meeting-prep-modal');
+
+    rerender(
+      <MeetingStoreRoot>
+        <div>Another view</div>
+      </MeetingStoreRoot>,
+    );
+
+    expect(screen.getByText('Another view')).toBeInTheDocument();
+    expect(screen.getByTestId('meeting-prep-modal')).toBe(modal);
   });
 
   it('does not load meeting data when the negotiated API version is below 17', async () => {

@@ -32,6 +32,7 @@ import {subscribeToMeetingLifecycleEvents} from './subscribeToMeetingLifecycleEv
 import {createBrowserSystemNotificationApi} from '../../../browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {UserState} from '../../../repositories/user/userState';
+import {ThemeProvider} from '../../../uiKit';
 import {getLogger} from '../../../util/logger';
 import {formatTimeShort} from '../../../util/timeUtil';
 import {useMeetingsFeatureFlag} from '../../../util/useMeetingsFeatureFlag';
@@ -44,6 +45,7 @@ import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
 } from '../meetingNotificationStore/meetingNotificationStore';
+import {MeetingPrepModalHost} from '../meetingPrep/meetingPrepModalHost';
 import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
 import {resolveCurrentMeetingReminderPayload} from '../resolveCurrentMeetingReminderPayload';
 import {deleteMeetingForAll, deleteMeetingForMe} from '../shared/service/deleteMeeting';
@@ -62,6 +64,9 @@ type MeetingStoreRootProps = {
 export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({children}: MeetingStoreRootProps) => {
   const {mainViewModel, clock, translate} = useApplicationContext();
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
+  const meetingPrepSession = useMeetingPrepModal(state => {
+    return state.session;
+  });
   const {
     meetings: meetingsRepository,
     conversation: conversationRepository,
@@ -231,5 +236,14 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
     };
   }, [isMeetingsEnabled, store, clock, mainViewModel, translate]);
 
-  return <MeetingStoreProvider store={store}>{children}</MeetingStoreProvider>;
+  return (
+    <MeetingStoreProvider store={store}>
+      {children}
+      {meetingPrepSession.isJust && (
+        <ThemeProvider>
+          <MeetingPrepModalHost />
+        </ThemeProvider>
+      )}
+    </MeetingStoreProvider>
+  );
 };
