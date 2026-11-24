@@ -139,6 +139,11 @@ jobs:
           fetch-depth: 0
           path: selected-release
 
+      - name: Verify Git LFS binary pointers
+        uses: $/.github/actions/verify-git-lfs-files
+        with:
+          repository-directory: selected-release
+
       - name: Collect rollback git metadata
         id: git_metadata
         working-directory: selected-release

@@ -48,6 +48,22 @@ jobs:
           echo "zizmor findings: $findingsCount"
           test "$findingsCount" -eq 0
 
+  git-lfs-binary-files:
+    runs-on: ubuntu-26.04
+    name: Verify Git LFS binary pointers
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Verify Git LFS binary pointers
+        uses: ./.github/actions/verify-git-lfs-files
+
   generated-artifacts:
     runs-on: ubuntu-26.04-arm
     name: Generated artifacts check
