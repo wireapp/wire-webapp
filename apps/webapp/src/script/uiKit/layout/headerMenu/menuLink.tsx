@@ -21,7 +21,7 @@ import type {FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
-import {DESKTOP_HEADER_SUB_MENU_CLASSNAME} from './headerSubMenu';
+import {DESKTOP_HEADER_SUB_MENU_CLASSNAME} from './headerSubMenuClassName';
 
 import {Theme} from '../../identity';
 import {LinkProps, filterLinkProps, linkStyle} from '../../typography';

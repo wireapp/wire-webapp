@@ -22,10 +22,9 @@ import {forwardRef, ForwardRefRenderFunction} from 'react';
 import cx from 'classnames';
 
 import {itemStyle, symbolStyle, nameStyle} from './emojiItem.styles';
-import {EmojiOption} from './emojiPickerPlugin';
 
 interface EmojiItemProps {
-  emoji: EmojiOption;
+  emoji: {emoji: string; title: string};
   onClick: () => void;
   onMouseEnter: () => void;
   selectedEmoji?: boolean;

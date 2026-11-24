@@ -31,17 +31,14 @@ import {
   loadingMessageStyles,
   labelCSS,
 } from './comboboxSelect.styles';
+import type {ComboboxSelectOption} from './comboboxSelect.types';
 
 import {CloseIcon} from '../../dataDisplay/icon';
 import {Theme} from '../../identity/theme';
 import {InputLabel} from '../inputLabel';
 import {BaseSelectDropdownIndicator} from '../select/baseSelect/baseSelectDropdownIndicator';
 
-export type ComboboxSelectOption = {
-  value: string | number;
-  label: string;
-  description?: string;
-};
+export type {ComboboxSelectOption};
 
 export interface ComboboxSelectProps {
   id: string;

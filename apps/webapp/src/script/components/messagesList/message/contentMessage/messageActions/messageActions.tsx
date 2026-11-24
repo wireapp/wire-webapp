@@ -31,6 +31,7 @@ import {
   getIconCSS,
   messageWithHeaderTop,
 } from './messageActions.styles';
+import {MessageActionsId} from './messageActionsId';
 import {MessageReactions} from './messageReactions/messageReactions';
 import {ReplyButton} from './replyButton';
 
@@ -43,14 +44,6 @@ import {isSpaceOrEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
 import {setContextMenuPosition} from '../../../../../util/util';
 import {WebAppEvents} from '../../../../../webAppEvents';
 import {useMessageFocusedTabIndex} from '../../util';
-
-export const MessageActionsId = {
-  THUMBSUP: 'reactwith-thumbsup-messag',
-  HEART: 'reactwith-love-message',
-  EMOJI: 'reactwith-emoji-message',
-  REPLY: 'do-reply-message',
-  OPTIONS: 'go-options',
-} as const;
 
 export interface MessageActionsMenuProps {
   isMsgWithHeader: boolean;

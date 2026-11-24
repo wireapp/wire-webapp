@@ -43,7 +43,7 @@ import {TeamState} from '../../../../repositories/team/TeamState';
 import {generatePermissionHelpers} from '../../../../repositories/user/userPermission';
 import {UserRepository} from '../../../../repositories/user/userRepository';
 import {UserState} from '../../../../repositories/user/userState';
-import {MainViewModel} from '../../../../view_model/MainViewModel';
+import type {ActionsViewModel} from '../../../../view_model/ActionsViewModel';
 import {useApplicationContext} from '../../../rootProvider';
 import {SidebarTabs, useSidebarStore} from '../conversations/useSidebarStore';
 import {ListWrapper} from '../listWrapper';
@@ -53,7 +53,7 @@ type StartUIProps = {
   conversationState?: ConversationState;
   integrationRepository: IntegrationRepository;
   isFederated: boolean;
-  mainViewModel: MainViewModel;
+  mainViewModel: {readonly actions: ActionsViewModel};
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   selfUser: User;

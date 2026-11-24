@@ -21,7 +21,7 @@ import {Children, ReactNode, type JSX} from 'react';
 
 import {components, GroupBase, ValueContainerProps} from 'react-select';
 
-import {Option} from '../select';
+import type {Option} from '../select.types';
 
 export const SelectValueContainer = <
   IsMulti extends boolean = false,

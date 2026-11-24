@@ -47,7 +47,6 @@ import {
 import {AUTH_URL} from '../auth/authUrl';
 import {Config} from '../config';
 import {ObfuscationUtil} from '../obfuscation';
-import type {CookiePlatform} from '../platform';
 
 const unauthorizedStatusCode = 401;
 const forbiddenStatusCode = 403;
@@ -57,6 +56,14 @@ enum TOPIC {
   ON_INVALID_TOKEN = 'HttpClient.TOPIC.ON_INVALID_TOKEN',
   ON_LONG_RUNNING_RETRY = 'HttpClient.TOPIC.ON_LONG_RUNNING_RETRY',
 }
+
+export type CookiePlatform = {
+  readonly retrieveCookie: <ResponseBody>(response: AxiosResponse<ResponseBody>) => Promise<ResponseBody>;
+  readonly sendRequestWithCookie: <ResponseBody>(
+    client: HttpClient,
+    config: AxiosRequestConfig,
+  ) => Promise<AxiosResponse<ResponseBody>>;
+};
 
 export type LongRunningRetryDetails = {
   readonly retryCount: number;

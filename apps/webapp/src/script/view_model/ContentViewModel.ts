@@ -23,7 +23,8 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {isError} from 'underscore';
 
-import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
+import type {ActionsViewModel} from './ActionsViewModel';
+import type {ViewModelRepositories} from './ViewModelRepositories';
 
 import {ConnectionStatus} from '../apiClient/connection/connectionStatus';
 import {QualifiedId} from '../apiClient/user/qualifiedId';
@@ -65,6 +66,13 @@ interface ShowConversationOverload {
   (conversationId: QualifiedId, options?: ShowConversationOptions): Promise<void>;
 }
 
+/** The part of the `MainViewModel` that the content view model uses. */
+interface ContentViewModelParent {
+  readonly isFederated: boolean;
+  readonly actions: ActionsViewModel;
+  readonly list: {readonly openConversations: (archive?: boolean) => void};
+}
+
 export class ContentViewModel {
   private readonly userState: UserState;
   private readonly conversationState: ConversationState;
@@ -73,7 +81,7 @@ export class ContentViewModel {
   messageRepository: MessageRepository;
   sidebarId: string;
   logger: Logger;
-  mainViewModel: MainViewModel;
+  mainViewModel: ContentViewModelParent;
   previousConversation?: Conversation;
   userRepository: UserRepository;
 
@@ -82,7 +90,7 @@ export class ContentViewModel {
   }
 
   constructor(
-    mainViewModel: MainViewModel,
+    mainViewModel: ContentViewModelParent,
     public repositories: ViewModelRepositories,
     private readonly translate: Translate,
   ) {

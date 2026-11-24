@@ -44,8 +44,6 @@ import {
   BaseSelection,
 } from 'lexical';
 
-import {$isMentionNode} from './mentionNode';
-
 import {KEY} from '../../../../../util/keyboardUtil';
 import {getNextSibling, getPreviousSibling} from '../utils/getSelectionInfo';
 
@@ -110,7 +108,7 @@ export const Mention: FunctionComponent<MentionComponentProps> = (props: Mention
         event.preventDefault();
         const node = $getNodeByKey(nodeKey);
 
-        if ($isMentionNode(node)) {
+        if (!isNullOrUndefined(node)) {
           const previousNode = node.getPreviousSibling();
           if ($isTextNode(previousNode)) {
             const newSelection = $createRangeSelection();

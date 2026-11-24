@@ -30,7 +30,7 @@ import {
   baseOptionStyles,
   baseSingleValueStyles,
 } from './baseSelect/baseSelect.styles';
-import {Option} from './select';
+import type {Option} from './select.types';
 import {isGroup} from './selectOption/selectOption';
 
 import {Theme} from '../../identity/theme';

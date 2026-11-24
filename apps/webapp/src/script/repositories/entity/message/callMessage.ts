@@ -27,8 +27,8 @@ import {type Translate} from '../../../util/localizerUtil';
 import type {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 
 export class CallMessage extends Message {
-  private readonly call_message_type: CALL_MESSAGE_TYPE;
-  private readonly duration: number;
+  public readonly call_message_type: CALL_MESSAGE_TYPE;
+  public readonly duration: number;
   public readonly caption?: ko.PureComputed<string>;
   public readonly finished_reason?: TERMINATION_REASON;
 

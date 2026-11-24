@@ -28,8 +28,8 @@ import {
   safeLeaveMeetingConversation,
   type LeaveMeetingConversationError,
 } from '../../meetingConversationTeardown';
-import type {MeetingServiceDeps} from '../../meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../../meetingSubmitErrors';
+import type {MeetingServiceDeps} from '../types/meetingServiceDeps';
 
 export type DeleteMeetingCommand = {
   meetingId: QualifiedId;

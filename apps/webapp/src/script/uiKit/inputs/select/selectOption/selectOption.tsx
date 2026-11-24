@@ -24,7 +24,7 @@ import {components, GroupBase, OptionProps, OptionsOrGroups} from 'react-select'
 
 import {CheckIcon} from '../../../dataDisplay/icon';
 import {Theme} from '../../../identity/theme';
-import {Option} from '../select';
+import type {Option} from '../select.types';
 
 type SelectOptionComponentType<IsMulti extends boolean, Group extends GroupBase<Option>> = ((
   props: OptionProps<Option, IsMulti, Group>,

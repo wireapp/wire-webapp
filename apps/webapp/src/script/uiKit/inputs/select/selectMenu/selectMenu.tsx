@@ -23,7 +23,7 @@ import {CSSObject} from '@emotion/react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {components, GroupBase, MenuProps} from 'react-select';
 
-import {Option} from '../select';
+import type {Option} from '../select.types';
 
 type SelectMenuComponentType<IsMulti extends boolean, Group extends GroupBase<Option>> = ((
   props: MenuProps<Option, IsMulti, Group>,

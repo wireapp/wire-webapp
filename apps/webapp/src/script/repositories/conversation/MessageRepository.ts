@@ -36,7 +36,7 @@ import {partition} from 'underscore';
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {findDeletedClients} from './ClientMismatchUtil';
-import {ConversationRepository} from './ConversationRepository';
+import {CONFIRMATION_THRESHOLD} from './conversationConfirmationThreshold';
 import {isMLSConversation, supportsReadReceipts} from './ConversationSelectors';
 import {ConversationState} from './ConversationState';
 import {ConversationVerificationState} from './ConversationVerificationState';
@@ -190,6 +190,12 @@ type StoredContentMessage = ContentMessage & {primary_key: string};
 
 type AssetMetadataMessage = {message: GenericMessage; metaData: FileMetaDataContent};
 
+/** The part of the `ConversationRepository` that this repository uses. */
+type MessageRepositoryConversationRepository = {
+  checkMessageTimer: (messageEntity: ContentMessage) => void;
+  ensureConversationExists: (params: {conversationId: QualifiedId; groupId: string}) => Promise<void>;
+};
+
 export class MessageRepository {
   private readonly logger: Logger;
   private readonly eventService: EventService;
@@ -207,7 +213,7 @@ export class MessageRepository {
   }
 
   constructor(
-    private readonly conversationRepositoryProvider: () => ConversationRepository,
+    private readonly conversationRepositoryProvider: () => MessageRepositoryConversationRepository,
     private readonly cryptography_repository: CryptographyRepository,
     private readonly eventRepository: EventRepository,
     private readonly propertyRepository: PropertiesRepository,
@@ -1302,7 +1308,6 @@ export class MessageRepository {
 
     if (type === Confirmation.Type.DELIVERED) {
       const otherUserIn1To1 = conversationEntity.is1to1();
-      const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
       const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
 
       if (!otherUserIn1To1 || !withinThreshold) {

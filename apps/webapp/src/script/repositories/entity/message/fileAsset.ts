@@ -22,17 +22,12 @@ import ko from 'knockout';
 
 import type {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
-import {Asset} from './asset';
+import {Asset, type AssetMetaData} from './asset';
 
 import {Logger, getLogger} from '../../../util/logger';
 import type {AssetRemoteData} from '../../assets/assetRemoteData';
 import {AssetTransferState} from '../../assets/assetTransferState';
 import {AssetType} from '../../assets/assetType';
-
-type AssetMetaData = (ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaData | ProtobufAsset.IVideoMetaData) & {
-  duration?: number;
-  loudness?: number[];
-};
 
 export class FileAsset extends Asset {
   public readonly original_resource: ko.Observable<AssetRemoteData>;

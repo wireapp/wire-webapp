@@ -19,15 +19,18 @@
 
 import {useId, type FunctionComponent} from 'react';
 
-import {type DeviceProps} from './detailedDevice';
 import {FormattedId} from './formattedId';
 
 import {VerificationBadges} from '../../../../../../components/badge';
+import type {ClientEntity} from '../../../../../../repositories/client/ClientEntity';
 import {splitFingerprint} from '../../../../../../util/stringUtil';
 import {formatTimestamp} from '../../../../../../util/timeUtil';
 import {useApplicationContext} from '../../../../../rootProvider';
 
-interface ProteusDeviceDetailsProps extends Omit<DeviceProps, 'getDeviceIdentity'> {
+interface ProteusDeviceDetailsProps {
+  device: ClientEntity;
+  fingerprint: string;
+  isCurrentDevice?: boolean;
   isProteusVerified?: boolean;
   showVerificationStatus?: boolean;
 }
