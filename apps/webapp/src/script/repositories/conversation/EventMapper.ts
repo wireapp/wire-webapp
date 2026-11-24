@@ -17,7 +17,7 @@
  *
  */
 
-import {isValidDate} from '@sindresorhus/is';
+import {isNonEmptyString, isValidDate} from '@sindresorhus/is';
 import {
   CONVERSATION_EVENT,
   ConversationAdminlessDeleteReminderEvent,
@@ -72,6 +72,7 @@ import {ClientEvent} from 'Repositories/event/Client';
 import type {EventRecord, LegacyEventRecord, WithSender} from 'Repositories/storage';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {userReactionMapToReactionMap} from 'Util/reactionUtil';
 import {toError} from 'Util/toError';
 import {isErrorWithType} from 'Util/typePredicateUtil';
@@ -117,6 +118,17 @@ export class EventMapper {
 
   private get fallbackDomain() {
     return this.apiClient.context?.domain;
+  }
+
+  private isSelfUser(userId: string, userDomain: string | undefined): boolean {
+    const context = this.apiClient.context;
+    return (
+      isNonEmptyString(userId) &&
+      matchQualifiedIds(
+        {id: userId, domain: userDomain ?? ''},
+        context === undefined ? undefined : {id: context.userId, domain: context.domain ?? ''},
+      )
+    );
   }
 
   /**
@@ -870,7 +882,13 @@ export class EventMapper {
    * @returns receipt mode update message entity
    */
   private _mapEventReceiptModeUpdate({data: eventData, from, qualified_from}: LegacyEventRecord) {
-    return new ReceiptModeUpdateMessage(!!eventData.receipt_mode, from, qualified_from?.domain, this.translate);
+    return new ReceiptModeUpdateMessage(
+      !!eventData.receipt_mode,
+      from,
+      qualified_from?.domain,
+      this.isSelfUser(from, qualified_from?.domain),
+      this.translate,
+    );
   }
 
   /**
@@ -880,7 +898,13 @@ export class EventMapper {
    * @returns message timer update message entity
    */
   private _mapEventMessageTimerUpdate({data: eventData, from, qualified_from}: LegacyEventRecord) {
-    return new MessageTimerUpdateMessage(eventData.message_timer, from, qualified_from?.domain, this.translate);
+    return new MessageTimerUpdateMessage(
+      eventData.message_timer,
+      from,
+      qualified_from?.domain,
+      this.isSelfUser(from, qualified_from?.domain),
+      this.translate,
+    );
   }
 
   /**

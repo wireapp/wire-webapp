@@ -18,6 +18,7 @@
  */
 
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {ClientType} from '@wireapp/api-client/lib/client/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
@@ -39,8 +40,8 @@ import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTime
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
 import {SystemMessage} from 'Repositories/entity/message/systemMessage';
 import {eventShouldBeStored} from 'Repositories/event/EventTypeHandling';
-import {UserState} from 'Repositories/user/userState';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {APIClient} from 'src/script/service/apiClientSingleton';
 
 import {EventMapper} from './EventMapper';
 import {translateForTest} from 'Util/test/translateForTest';
@@ -275,8 +276,8 @@ describe('Event Mapper', () => {
     });
 
     describe('message timer update', () => {
-      const userState = container.resolve(UserState);
-      const selfUser = new User('self-user-id', 'wire.com', translateForTest);
+      const apiClient = container.resolve(APIClient);
+      const selfUser = {id: 'self-user-id', domain: 'wire.com'};
       const mapper = new EventMapper(undefined, translateForTest);
 
       const createTimerUpdateEvent = (messageTimer: number | null, from: string, domain?: string) => ({
@@ -290,12 +291,11 @@ describe('Event Mapper', () => {
       });
 
       beforeEach(() => {
-        selfUser.isMe = true;
-        userState.self(selfUser);
+        apiClient.context = {clientType: ClientType.PERMANENT, userId: selfUser.id, domain: selfUser.domain};
       });
 
       afterEach(() => {
-        userState.self(undefined as any);
+        apiClient.context = undefined;
       });
 
       it('uses the self caption when the self user updated the timer', () => {
@@ -334,8 +334,8 @@ describe('Event Mapper', () => {
     });
 
     describe('receipt mode update', () => {
-      const userState = container.resolve(UserState);
-      const selfUser = new User('self-user-id', 'wire.com', translateForTest);
+      const apiClient = container.resolve(APIClient);
+      const selfUser = {id: 'self-user-id', domain: 'wire.com'};
       const mapper = new EventMapper(undefined, translateForTest);
 
       const createReceiptModeUpdateEvent = (receiptMode: number, from: string, domain?: string) => ({
@@ -349,12 +349,11 @@ describe('Event Mapper', () => {
       });
 
       beforeEach(() => {
-        selfUser.isMe = true;
-        userState.self(selfUser);
+        apiClient.context = {clientType: ClientType.PERMANENT, userId: selfUser.id, domain: selfUser.domain};
       });
 
       afterEach(() => {
-        userState.self(undefined as any);
+        apiClient.context = undefined;
       });
 
       it('uses the self caption when the self user enabled read receipts', () => {
