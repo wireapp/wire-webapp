@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo, type FunctionComponent} from 'react';
+import {useEffect, useMemo, useRef, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -81,6 +81,9 @@ interface FileHeaderProps {
   showViewOnlyLabel?: boolean;
   onEditModeChange: (isEditable: boolean) => void;
   onFileContentRefresh: () => void;
+  context?: 'cells' | 'chat';
+  onDownload?: () => Promise<void> | void;
+  autoFocusCloseButton?: boolean;
 }
 
 type ConversationIconType = 'channel' | 'group';
@@ -111,6 +114,9 @@ export const FileHeader: FunctionComponent<FileHeaderProps> = ({
   showViewOnlyLabel = false,
   onEditModeChange,
   onFileContentRefresh,
+  context = 'cells',
+  onDownload,
+  autoFocusCloseButton = false,
 }: FileHeaderProps) => {
   const {translate} = useApplicationContext();
   const canPerformCellsAction = useCellsActionPermissions();
@@ -123,16 +129,33 @@ export const FileHeader: FunctionComponent<FileHeaderProps> = ({
   }, [translate]);
   const timeAgo = useRelativeTimestamp(timestamp, false, relativeTimestampFormatter);
   const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);
-  const isRecycleBin = isInRecycleBin();
-  const cellsRepository = container.resolve(CellsRepository);
+  const isCellsContext = context === 'cells';
+  const isRecycleBin = isCellsContext && isInRecycleBin();
+  const shouldShowViewOnlyLabel = isCellsContext && showViewOnlyLabel;
+  const canShowDownload = isCellsContext ? canPerformCellsAction(CELLS_ACTION.DOWNLOAD) : onDownload !== undefined;
   const {showModal} = useFileHistoryModal();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (autoFocusCloseButton) {
+      closeButtonRef.current?.focus();
+    }
+  }, [autoFocusCloseButton]);
 
   const handleFileDownload = async (): Promise<void> => {
-    if (fileUrl !== undefined && fileUrl.length > 0) {
-      const node = await cellsRepository.getNode({uuid: id});
-      const resolvedDownloadUrl = node.PreSignedGET?.Url ?? fileUrl;
-      await forcedDownloadFile({url: resolvedDownloadUrl, name: fileNameWithExtension});
+    if (onDownload !== undefined) {
+      await onDownload();
+      return;
     }
+
+    if (fileUrl === undefined || fileUrl.length === 0) {
+      return;
+    }
+
+    const cellsRepository = container.resolve(CellsRepository);
+    const node = await cellsRepository.getNode({uuid: id});
+    const resolvedDownloadUrl = node.PreSignedGET?.Url ?? fileUrl;
+    await forcedDownloadFile({url: resolvedDownloadUrl, name: fileNameWithExtension});
   };
 
   return (
@@ -140,6 +163,7 @@ export const FileHeader: FunctionComponent<FileHeaderProps> = ({
       <div css={leftColumnStyles}>
         <button
           type="button"
+          ref={closeButtonRef}
           css={closeButtonStyles}
           aria-label={translate('cells.imageFullScreenModal.closeButton')}
           onClick={onClose}
@@ -162,7 +186,7 @@ export const FileHeader: FunctionComponent<FileHeaderProps> = ({
           {!isNullOrUndefined(badges) && badges.length > 0 && <BadgesWithTooltip items={badges} />}
         </div>
       </div>
-      {isEditable === true && !showViewOnlyLabel && (
+      {isCellsContext && isEditable === true && !shouldShowViewOnlyLabel && (
         <div css={editModeButtonStyles}>
           <button
             title="Viewing"
@@ -191,24 +215,25 @@ export const FileHeader: FunctionComponent<FileHeaderProps> = ({
         </div>
       )}
       <div css={actionButtonsStyles}>
-        {showViewOnlyLabel && (
+        {shouldShowViewOnlyLabel && (
           <CellsViewerAccessLabel
             label={translate('cells.imageFullScreenModal.viewerAccessLabel')}
             iconUieName="file-header-view-only-icon"
           />
         )}
-        {!showViewOnlyLabel && !isRecycleBin && canPerformCellsAction(CELLS_ACTION.DOWNLOAD) && (
+        {!shouldShowViewOnlyLabel && !isRecycleBin && canShowDownload && (
           <Button
             variant={ButtonVariant.TERTIARY}
             css={downloadButtonStyles}
             onClick={handleFileDownload}
-            disabled={fileUrl === undefined || fileUrl.length === 0}
+            disabled={onDownload === undefined && (fileUrl === undefined || fileUrl.length === 0)}
             aria-label={translate('cells.imageFullScreenModal.downloadButton')}
           >
             <DownloadIcon />
           </Button>
         )}
-        {!showViewOnlyLabel &&
+        {!shouldShowViewOnlyLabel &&
+          isCellsContext &&
           !isRecycleBin &&
           isEditable === true &&
           canPerformCellsAction(CELLS_ACTION.VIEW_VERSION_HISTORY) && (
