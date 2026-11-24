@@ -26,30 +26,17 @@ import {formatDuration} from 'Util/timeUtil';
 import {SystemMessage} from './systemMessage';
 
 import {SystemMessageType} from '../../../message/systemMessageType';
-import {User} from '../User';
 
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number | null;
 
-  constructor(
-    messageTimer: number | null,
-    userId: string,
-    userDomain: string | undefined,
-    isSelfUser: boolean,
-    translate: Translate,
-  ) {
+  constructor(messageTimer: number | null, isSelfUser: boolean, translate: Translate) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE;
 
     this.message_timer = ConversationEphemeralHandler.validateTimer(messageTimer);
-
-    if (userId) {
-      this.from = userId;
-      this.fromDomain = userDomain;
-      this.user(new User(userId, userDomain ?? '', this.translate));
-    }
 
     this.caption = getCaption(this.message_timer, isSelfUser, this.translate);
   }

@@ -884,8 +884,6 @@ export class EventMapper {
   private _mapEventReceiptModeUpdate({data: eventData, from, qualified_from}: LegacyEventRecord) {
     return new ReceiptModeUpdateMessage(
       !!eventData.receipt_mode,
-      from,
-      qualified_from?.domain,
       this.isSelfUser(from, qualified_from?.domain),
       this.translate,
     );
@@ -900,8 +898,6 @@ export class EventMapper {
   private _mapEventMessageTimerUpdate({data: eventData, from, qualified_from}: LegacyEventRecord) {
     return new MessageTimerUpdateMessage(
       eventData.message_timer,
-      from,
-      qualified_from?.domain,
       this.isSelfUser(from, qualified_from?.domain),
       this.translate,
     );
