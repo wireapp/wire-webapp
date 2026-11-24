@@ -33,7 +33,6 @@ import {Notification} from '../../apiClient/notification/notification';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
 import {getLogger} from '../../logger/getLogger';
-import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../coreError';
 import {DecryptionError} from '../errors/decryptionError';
 import type {CRUDEngine} from '../storage/engine/crudEngine';
@@ -58,6 +57,11 @@ export type HandledEventPayloads = HandledEventPayload | readonly HandledEventPa
  */
 export type HandledEventResult =
   {status: 'unhandled'} | {status: 'ignored'} | {status: 'handled'; payload: HandledEventPayloads | null};
+
+/** The part of the conversation service that the notification service relies on. */
+type NotificationConversationService = {
+  handleEvent(event: BackendEvent): Promise<HandledEventResult>;
+};
 
 enum TOPIC {
   NOTIFICATION_ERROR = 'NotificationService.TOPIC.NOTIFICATION_ERROR',
@@ -89,7 +93,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
   constructor(
     apiClient: APIClient,
     storeEngine: CRUDEngine,
-    private readonly conversationService: ConversationService,
+    private readonly conversationService: NotificationConversationService,
   ) {
     super();
     this.apiClient = apiClient;

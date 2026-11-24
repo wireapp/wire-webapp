@@ -98,6 +98,18 @@ export type SendMlsMessageParams = SendCommonParams & {
   protocol: CONVERSATION_PROTOCOL.MLS;
 };
 
+export type SendProteusMessageParams = SendCommonParams &
+  MessageSendingOptions & {
+    /**
+     * Can be either a QualifiedId[] or QualfiedUserClients. The type has some effect on the behavior of the method. (Needed only for Proteus)
+     *    When given a QualifiedId[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
+     *    When given a QualifiedUserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
+     */
+    userIds?: QualifiedId[] | QualifiedUserClients;
+    onClientMismatch?: (status: MessageSendingStatus, wasSent: boolean) => void | boolean | Promise<boolean>;
+    protocol: CONVERSATION_PROTOCOL.PROTEUS;
+  };
+
 export type KeyPackageClaimUser = QualifiedId & {skipOwnClientId?: string};
 
 export type AddUsersParams = {
@@ -107,6 +119,8 @@ export type AddUsersParams = {
   commitPendingFirst?: boolean;
   updateKeyingMaterialIfEmpty?: boolean;
 };
+
+export type AddUsersToProteusConversationParams = Omit<AddUsersParams, 'groupId'>;
 
 export type RemoveUsersParams = {
   conversationId: QualifiedId;

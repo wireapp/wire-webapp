@@ -20,8 +20,9 @@
 import {CONVERSATION_EVENT, ConversationEvent} from '../../../apiClient/event/conversationEvent';
 import {NotificationSource} from '../../notification';
 import {MessageSendingState} from '../message';
+import type {PayloadBundle} from '../message/message';
 import {createId} from '../message/messageBuilder';
-import {PayloadBundle, PayloadBundleType} from '../message/payloadBundle';
+import {PayloadBundleType} from '../message/payloadBundle';
 
 export class ConversationMapper {
   public static mapConversationEvent(event: ConversationEvent, source: NotificationSource): PayloadBundle {

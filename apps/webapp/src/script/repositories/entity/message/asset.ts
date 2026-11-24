@@ -18,14 +18,26 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
+import type ko from 'knockout';
 
 import type {FileAsset} from './fileAsset';
 import type {Location as LocationAsset} from './location';
-import type {MediumImage as MediumImageAsset} from './mediumImage';
 import type {Multipart as MultipartAsset} from './multipart';
 import type {Text as TextAsset} from './text';
 
+import type {AssetRemoteData} from '../../assets/assetRemoteData';
 import {AssetType} from '../../assets/assetType';
+
+/*
+ * Structural type for the image asset. It is declared here instead of importing the subclass, so the type guard below
+ * does not make this base class depend on its own subclass.
+ */
+interface MediumImageAssetShape {
+  readonly resource: ko.Observable<AssetRemoteData>;
+  height: string;
+  width: string;
+  readonly ratio: number;
+}
 
 export class Asset {
   public file_type?: string;
@@ -48,7 +60,7 @@ export class Asset {
     return this.isAudio() || this.isFile() || this.isVideo() || this.isImage();
   }
 
-  isImage(): this is MediumImageAsset {
+  isImage(): this is FileAsset & MediumImageAssetShape {
     return this.type === AssetType.IMAGE;
   }
 

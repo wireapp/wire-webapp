@@ -50,8 +50,8 @@ import {CoreDatabase} from '../../../storage/coreDb';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
-import {MLSService} from '../mlsService';
 import {isCoreCryptoMLSInvalidCredentialsError} from '../mlsService/coreCryptoMlsError';
+import type {ClientId} from '../types';
 import {createMLSClientId} from '../utils/mlsId';
 
 /**
@@ -107,6 +107,14 @@ const decodeClientId = (clientId: WireIdentity['clientId']): string => {
 };
 
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
+/** The part of the MLS service that the external E2EI service relies on. */
+type E2EIMLSService = {
+  hasCredential(credentialType: CredentialType): Promise<boolean>;
+  conversationExists(groupId: string): Promise<boolean>;
+  getClientIds(groupId: string): Promise<{userId: string; clientId: ClientId; domain: string}[]>;
+  isInitializedMLSClient(client: RegisteredClient): boolean;
+};
+
 export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   private readonly logger = getLogger('@wireapp/core/E2EIdentityServiceExternal');
   private _acmeService?: AcmeService;
@@ -119,7 +127,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     coreDatabase: CoreDatabase,
     private readonly recurringTaskScheduler: RecurringTaskScheduler,
     private readonly localClientLoader: LocalClientLoader,
-    private readonly mlsService: MLSService,
+    private readonly mlsService: E2EIMLSService,
     private readonly pkiEnvironmentFactory: PkiEnvironmentFactory,
   ) {
     super();

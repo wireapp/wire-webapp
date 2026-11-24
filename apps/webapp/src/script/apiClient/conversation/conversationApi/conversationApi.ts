@@ -37,7 +37,7 @@ import {
   RemoteConversations,
 } from '..';
 import {chunk} from '../../../commons/util/ArrayUtil';
-import {BackendFeatures} from '../../apiClient';
+import {BackendFeatures} from '../../backendFeatures';
 import {
   ConversationAccessUpdateEvent,
   ConversationAddPermissionUpdateEvent,

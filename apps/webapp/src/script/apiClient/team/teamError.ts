@@ -17,48 +17,4 @@
  *
  */
 
-import {BackendError, BackendErrorLabel, StatusCode, SyntheticErrorLabel} from '../http/';
-
-export class TeamError extends BackendError {
-  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: StatusCode) {
-    super(message, label, code);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = 'ConversationError';
-  }
-}
-
-export class InviteEmailInUseError extends TeamError {
-  constructor(
-    message: string,
-    label: BackendErrorLabel = BackendErrorLabel.INVITE_EMAIL_EXISTS,
-    code: StatusCode = StatusCode.CONFLICT,
-  ) {
-    super(message, label, code);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = 'InviteEmailInUseError';
-  }
-}
-
-export class InvalidInvitationCodeError extends TeamError {
-  constructor(
-    message: string,
-    label: BackendErrorLabel = BackendErrorLabel.INVALID_INVITATION_CODE,
-    code: StatusCode = StatusCode.BAD_REQUEST,
-  ) {
-    super(message, label, code);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = 'InvalidInvitationCodeError';
-  }
-}
-
-export class ServiceNotFoundError extends TeamError {
-  constructor(
-    message: string,
-    label: BackendErrorLabel | SyntheticErrorLabel = SyntheticErrorLabel.SERVICE_NOT_FOUND,
-    code: StatusCode = StatusCode.NOT_FOUND,
-  ) {
-    super(message, label, code);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = 'ServiceNotFoundError';
-  }
-}
+export * from '../http/teamError';

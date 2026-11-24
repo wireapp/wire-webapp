@@ -20,6 +20,8 @@
 import {StatusCodes as StatusCode} from 'http-status-codes';
 import {z} from 'zod';
 
+import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from './teamError';
+
 import {getLogger} from '../../logger/getLogger';
 import {
   IdentifierExistsError,
@@ -30,7 +32,7 @@ import {
   MissingCookieAndTokenError,
   MissingCookieError,
   TokenExpiredError,
-} from '../auth/';
+} from '../auth/authenticationError';
 import {
   ConversationIsUnknownError,
   ConversationOperationError,
@@ -38,9 +40,9 @@ import {
   MLSInvalidLeafNodeIndexError,
   MLSInvalidLeafNodeSignatureError,
   MLSStaleMessageError,
-} from '../conversation/';
-import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/teamError';
-import {QualifiedId, QualifiedIdSchema, UnconnectedUserError, UserIsUnknownError} from '../user/';
+} from '../conversation/conversationError';
+import {QualifiedId, QualifiedIdSchema} from '../user/qualifiedId';
+import {UnconnectedUserError, UserIsUnknownError} from '../user/userError';
 
 import {BackendError, BackendErrorLabel} from './';
 

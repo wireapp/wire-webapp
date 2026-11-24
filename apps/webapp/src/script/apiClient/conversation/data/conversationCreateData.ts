@@ -17,7 +17,7 @@
  *
  */
 
-import {Conversation} from '../conversation';
+import {Conversation} from '../conversationBase';
 
 export interface ConversationCreateData extends Conversation {
   /** @deprecated */

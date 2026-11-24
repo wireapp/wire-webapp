@@ -17,34 +17,17 @@
  *
  */
 
+import type {LoginDataState, RegistrationDataState} from './authState.types';
+
 import type {SSOSettings} from '../../../apiClient/account/ssoSettings';
-import {LoginData} from '../../../apiClient/auth/loginData';
 import {ClientType} from '../../../apiClient/client/clientType';
 import {OAuthClient} from '../../../apiClient/oauth/oAuthClient';
-import type {TeamData} from '../../../apiClient/team/team/teamData';
-import type {UserAsset} from '../../../apiClient/user/userAsset';
 import {Config} from '../../../Config';
-import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator/';
+import {AppActions} from '../action/creator/appActions';
+import {AUTH_ACTION} from '../action/creator/authActionCreator';
+import {USER_ACTION} from '../action/creator/userActionCreator';
 
-export interface RegistrationDataState {
-  accent_id?: number;
-  assets: UserAsset[] | [];
-  email?: string;
-  email_code: string | null;
-  invitation_code?: string;
-  label?: string;
-  locale?: string;
-  name: string;
-  password?: string;
-  team?: TeamData;
-  termsAccepted: boolean;
-  privacyPolicyAccepted: boolean;
-  customBackendURL: string;
-  accountCreationEnabled: boolean;
-  shouldDisplayWarning: boolean;
-}
-
-export type LoginDataState = Pick<LoginData, 'clientType'>;
+export type {LoginDataState, RegistrationDataState};
 
 export type AuthState = {
   readonly account: RegistrationDataState;

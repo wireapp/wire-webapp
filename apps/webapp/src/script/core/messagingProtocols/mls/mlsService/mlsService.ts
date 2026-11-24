@@ -77,7 +77,11 @@ import {Encoder} from '../../../../commons/base64/encoder';
 import {TypedEventEmitter} from '../../../../commons/TypedEventEmitter/TypedEventEmitter';
 import {TimeUtil} from '../../../../commons/util';
 import {getLogger} from '../../../../logger/getLogger';
-import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';
+import {
+  AddUsersFailure,
+  AddUsersFailureReasons,
+  KeyPackageClaimUser,
+} from '../../../conversation/conversationService/conversationService.types';
 import type {HandledEventPayload} from '../../../notification';
 import {CoreDatabase} from '../../../storage/coreDb';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
@@ -87,7 +91,8 @@ import {TaskScheduler} from '../../../util/taskScheduler';
 import {User} from '../e2eIdentityService';
 import {E2EIServiceInternal, getAllConversationsCallback} from '../e2eIdentityService/e2eiServiceInternal';
 import {getSignatureAlgorithmForCiphersuite} from '../e2eIdentityService/helper';
-import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../eventHandler/events';
+import {handleMLSMessageAdd} from '../eventHandler/events/messageAdd/messageAdd';
+import {handleMLSWelcomeMessage} from '../eventHandler/events/welcomeMessage/welcomeMessage';
 import {BufferedMlsMessageRecoveryTracker} from '../recovery/bufferedMlsMessageRecoveryTracker';
 import {MlsBufferedMessageRecoveryRequiredError} from '../recovery/mlsBufferedMessageRecoveryRequiredError';
 import {ClientId, HandlePendingProposalsParams} from '../types';

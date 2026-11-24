@@ -20,7 +20,11 @@
 import * as hash from 'hash.js';
 import Long from 'long';
 
-import {AssetContent, ContentType, ConversationContent, LocationContent, TextContent} from '../conversation/content';
+import {AssetContent} from '../conversation/content/assetContent';
+import * as ContentType from '../conversation/content/contentType.guards';
+import {ConversationContent} from '../conversation/content/conversationContent';
+import {LocationContent} from '../conversation/content/locationContent';
+import {TextContent} from '../conversation/content/textContent';
 
 const millisecondsPerSecond = 1000;
 const bytesPerUtf16CodeUnit = 2;

@@ -53,9 +53,9 @@ import {UserState} from '../../repositories/user/userState';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {useMeetingsFeatureFlag} from '../../util/useMeetingsFeatureFlag';
 import {incomingCssClass, removeAnimationsClass} from '../../util/util';
-import {RightSidebarParams} from '../appMain';
 import {PanelState} from '../rightSidebar';
 import {useApplicationContext} from '../rootProvider';
+import {RightSidebarParams} from '../state';
 import {ContentState, useAppState} from '../useAppState';
 
 export const ANIMATED_PAGE_TRANSITION_DURATION = 500;

@@ -17,12 +17,14 @@
  *
  */
 
-import {MessageSendingStatus} from '../../../../apiClient/conversation/messageSendingStatus';
 import {NewConversation} from '../../../../apiClient/conversation/newConversation';
+import {QualifiedOTRRecipients} from '../../../../apiClient/conversation/otrRecipients';
 import {QualifiedUserClients} from '../../../../apiClient/conversation/qualifiedUserClients';
-import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
-import {AddUsersParams, MessageSendingOptions, SendCommonParams} from '../../../conversation';
+import type {
+  AddUsersToProteusConversationParams,
+  SendProteusMessageParams,
+} from '../../../conversation/conversationService/conversationService.types';
 
 export interface NewClient {
   clientId: string;
@@ -33,21 +35,18 @@ export type ProteusServiceConfig = {
   nbPrekeys: number;
 };
 
-export type SendProteusMessageParams = SendCommonParams &
-  MessageSendingOptions & {
-    /**
-     * Can be either a QualifiedId[] or QualfiedUserClients. The type has some effect on the behavior of the method. (Needed only for Proteus)
-     *    When given a QualifiedId[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
-     *    When given a QualifiedUserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
-     */
-    userIds?: QualifiedId[] | QualifiedUserClients;
-    onClientMismatch?: (status: MessageSendingStatus, wasSent: boolean) => void | boolean | Promise<boolean>;
-    protocol: CONVERSATION_PROTOCOL.PROTEUS;
-  };
+export type EncryptionResult = {
+  /** the encrypted payloads for the clients that have a valid sessions */
+  payloads: QualifiedOTRRecipients;
+  /** user-client that do not have prekeys on backend (deleted clients) */
+  unknowns?: QualifiedUserClients;
+  /** users for whom we could retrieve a prekey and, thus, for which we could not encrypt the message */
+  failed?: QualifiedId[];
+};
 
 export type CreateProteusConversationParams = {
   conversationData: NewConversation | string;
   otherUserIds?: string | string[];
 };
 
-export type AddUsersToProteusConversationParams = Omit<AddUsersParams, 'groupId'>;
+export type {AddUsersToProteusConversationParams, SendProteusMessageParams};

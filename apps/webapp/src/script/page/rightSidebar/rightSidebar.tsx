@@ -25,15 +25,16 @@ import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
 
 import {Access} from './access/access';
-import {AddParticipants} from './addParticipants';
-import {ConversationDetails} from './conversationDetails';
+import {AddParticipants} from './addParticipants/addParticipants';
+import {ConversationDetails} from './conversationDetails/conversationDetails';
 import {ConversationHistory} from './conversationHistory/conversationHistory';
-import {ConversationParticipants} from './conversationParticipants';
+import {ConversationParticipants} from './conversationParticipants/conversationParticipants';
 import {GroupParticipantService} from './groupParticipantService';
-import {GroupParticipantUser} from './groupParticipantUser';
+import {GroupParticipantUser} from './groupParticipantUser/groupParticipantUser';
 import {GuestServicesOptions} from './guestServicesOptions';
-import {MessageDetails} from './messageDetails';
+import {MessageDetails} from './messageDetails/messageDetails';
 import {Notifications} from './notifications';
+import {PanelEntity, PanelState} from './panelState';
 import {ParticipantDevices} from './participantDevices';
 import {SharedDrive} from './sharedDrive';
 import {TimedMessages} from './timedMessages';
@@ -42,10 +43,8 @@ import {isReadableMessage} from '../../guards/Message';
 import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/Panel';
 import {isAppOrServiceEntity} from '../../guards/Service';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
-import {Conversation} from '../../repositories/entity/Conversation';
 import {Message} from '../../repositories/entity/message/message';
 import {User} from '../../repositories/entity/User';
-import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {TeamState} from '../../repositories/team/TeamState';
 import {UserState} from '../../repositories/user/userState';
 import {Core} from '../../service/coreSingleton';
@@ -53,8 +52,7 @@ import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {WebAppEvents} from '../../webAppEvents';
-import {RightSidebarParams} from '../appMain';
-import {useAppMainState} from '../state';
+import {RightSidebarParams, useAppMainState} from '../state';
 import {ContentState} from '../useAppState';
 
 export const OPEN_CONVERSATION_DETAILS = 'OPEN_CONVERSATION_DETAILS';
@@ -78,24 +76,8 @@ const Animated: FC<AnimatedProps> = ({children, ...rest}) => {
   );
 };
 
-export enum PanelState {
-  ADD_PARTICIPANTS = 'ADD_PARTICIPANTS',
-  CONVERSATION_DETAILS = 'CONVERSATION_DETAILS',
-  CONVERSATION_PARTICIPANTS = 'CONVERSATION_PARTICIPANTS',
-  GROUP_PARTICIPANT_SERVICE = 'GROUP_PARTICIPANT_SERVICE',
-  GROUP_PARTICIPANT_USER = 'GROUP_PARTICIPANT_USER',
-  GUEST_OPTIONS = 'GUEST_OPTIONS',
-  MESSAGE_DETAILS = 'MESSAGE_DETAILS',
-  NOTIFICATIONS = 'NOTIFICATIONS',
-  PARTICIPANT_DEVICES = 'DEVICES',
-  SERVICES_OPTIONS = 'SERVICES_OPTIONS',
-  SHARED_DRIVE = 'SHARED_DRIVE',
-  TIMED_MESSAGES = 'TIMED_MESSAGES',
-  ACCESS = 'ACCESS',
-  CONVERSATION_HISTORY = 'CONVERSATION_HISTORY',
-}
-
-export type PanelEntity = Conversation | User | Message | ServiceEntity;
+export {PanelState} from './panelState';
+export type {PanelEntity} from './panelState';
 
 interface RightSidebarProps {
   currentEntity?: RightSidebarParams['entity'];

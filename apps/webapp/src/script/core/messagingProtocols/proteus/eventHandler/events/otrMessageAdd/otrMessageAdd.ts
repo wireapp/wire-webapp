@@ -20,16 +20,22 @@
 import {ClientAction, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {ConversationOtrMessageAddEvent} from '../../../../../../apiClient/event/conversationEvent';
+import {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
 import {Decoder} from '../../../../../../commons/base64/decoder';
 import {getLogger} from '../../../../../../logger/getLogger';
 import {GenericMessageType} from '../../../../../conversation';
 import {DecryptionError} from '../../../../../errors/decryptionError';
 import {HandledEventPayload} from '../../../../../notification';
-import {ProteusService} from '../../../proteusService';
+
+/** The part of the proteus service that is needed to decrypt incoming messages. */
+type OtrMessageDecryptingService = {
+  decrypt(encryptedText: Uint8Array, userId: QualifiedId, clientId: string): Promise<Uint8Array>;
+  consumePrekey(): Promise<void>;
+};
 
 interface HandleOtrMessageAddParams {
   event: ConversationOtrMessageAddEvent;
-  proteusService: ProteusService;
+  proteusService: OtrMessageDecryptingService;
 }
 
 const logger = getLogger('@wireapp/core/otrMessageAdd');

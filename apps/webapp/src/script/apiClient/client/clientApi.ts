@@ -23,7 +23,7 @@ import {z} from 'zod';
 import {ClientCapabilityData} from './clientCapabilityData';
 import {ClientCapabilityRemovedError} from './clientError';
 
-import {PreKeyBundle} from '../auth/';
+import {PreKeyBundle} from '../auth/preKeyBundle';
 import {CreateClientPayload, RegisteredClient, UpdateClientPayload} from '../client/';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 

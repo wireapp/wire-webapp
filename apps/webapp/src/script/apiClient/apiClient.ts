@@ -37,6 +37,7 @@ import {
 } from './auth/';
 import {CookieStore} from './auth/cookieStore';
 import {parseAccessToken} from './auth/parseAccessToken';
+import {BackendFeatures} from './backendFeatures';
 import {BroadcastAPI} from './broadcast/broadcastApi';
 import {CellsAPI} from './cells/cellsApi';
 import {ClientAPI, ClientType} from './client/';
@@ -159,20 +160,7 @@ type Apis = {
   generic: GenericAPI;
 };
 
-/** map of all the features that the backend supports (depending on the backend api version number) */
-export type BackendFeatures = {
-  /** The actual version used to communicate with backend */
-  version: number;
-  /** Does the backend API support federated endpoints */
-  federationEndpoints: boolean;
-  /** Is the backend actually talking to other federated domains */
-  isFederated: boolean;
-  /** Does the backend API support MLS features */
-  supportsMLS: boolean;
-  /** Does the backend API support creating guest links with password */
-  supportsGuestLinksWithPassword: boolean;
-  domain: string;
-};
+export type {BackendFeatures};
 
 export type BackendVersionResponse = {
   supported: number[];

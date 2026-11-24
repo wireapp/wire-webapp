@@ -19,7 +19,7 @@
 
 import {ClientCapabilityData} from './clientCapabilityData';
 
-import {PreKey} from '../auth/';
+import {PreKey} from '../auth/preKey';
 
 import {ClientCapability, ClientClassification, ClientType, Location, MLSPublicKeyRecord} from './';
 

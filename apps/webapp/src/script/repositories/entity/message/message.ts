@@ -24,7 +24,6 @@ import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {CallingTimeoutMessage} from './callingTimeoutMessage';
 import type {CallMessage} from './callMessage';
-import type {CompositeMessage} from './compositeMessage';
 import type {ContentMessage} from './contentMessage';
 import type {DecryptErrorMessage} from './decryptErrorMessage';
 import type {DeleteMessage} from './deleteMessage';
@@ -35,18 +34,19 @@ import type {FileAsset} from './fileAsset';
 import type {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';
 import type {LegalHoldMessage} from './legalHoldMessage';
 import type {LinkPreview} from './linkPreview';
-import type {MemberMessage} from './memberMessage';
 import type {MissedMessage} from './missedMessage';
 import type {Multipart} from './multipart';
 import type {PingMessage} from './pingMessage';
 import type {SystemMessage} from './systemMessage';
 import type {VerificationMessage} from './verificationMessage';
 
+import type {MemberLeaveReason} from '../../../apiClient/conversation/data/conversationMemberLeaveData';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {EphemeralStatusType} from '../../../message/ephemeralStatusType';
 import type {MessageCategory} from '../../../message/messageCategory';
 import {StatusType} from '../../../message/statusType';
 import {SuperType} from '../../../message/superType';
+import type {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate, getUserName} from '../../../util/localizerUtil';
 import {
   formatDateNumeral,
@@ -59,6 +59,50 @@ import {AssetTransferState} from '../../assets/assetTransferState';
 import {AssetType} from '../../assets/assetType';
 import type {ReadReceipt} from '../../storage/record/eventRecord';
 import {User} from '../User';
+
+/*
+ * Structural types for message subclasses. They are declared here instead of importing the subclasses, so the type
+ * guards below do not make this base class depend on its own subclasses. They list the members callers use after
+ * narrowing; the subclasses are assignable to them.
+ */
+interface CompositeMessageShape {
+  readonly errorButtonId: ko.Observable<string | undefined>;
+  readonly errorMessage: ko.Observable<string>;
+  readonly selectedButtonId: ko.Observable<string | undefined>;
+  readonly waitingButtonId: ko.Observable<string | undefined>;
+  getSelectionChange(buttonId: string): false | {selected_button_id: string; version: number};
+  setButtonError(buttonId: string, errorMessage: string): void;
+  clearButtonError(): void;
+}
+
+interface MemberMessageShape {
+  allTeamMembers: User[] | undefined;
+  readonly hasUsers: ko.PureComputed<boolean>;
+  readonly userIds: ko.ObservableArray<QualifiedId>;
+  readonly userEntities: ko.ObservableArray<User>;
+  readonly targetedUsers: ko.PureComputed<User[]>;
+  readonly name: ko.Observable<string>;
+  readonly otherUser: ko.PureComputed<User>;
+  readonly showNamedCreation: ko.PureComputed<boolean>;
+  readonly groupCreationHeader: ko.PureComputed<string>;
+  readonly remoteUserEntities: ko.PureComputed<User[]>;
+  showServicesWarning: boolean;
+  memberMessageType: SystemMessageType;
+  reason?: MemberLeaveReason;
+  readonly hash: ko.PureComputed<string>;
+  isConnection(): boolean;
+  isConnectionRequest(): boolean;
+  isCreation(): boolean;
+  isConversationCreate(): boolean;
+  isConversationResume(): boolean;
+  isGroupCreation(): boolean;
+  isMemberChange(): boolean;
+  isMemberJoin(): boolean;
+  isMemberLeave(): boolean;
+  isTeamMemberLeave(): boolean;
+  isMemberRemoval(): boolean;
+  isUserAffected(userId: QualifiedId): boolean;
+}
 
 export class Message {
   protected readonly translate: Translate;
@@ -265,7 +309,7 @@ export class Message {
     return this.super_type === SuperType.CONTENT;
   }
 
-  isComposite(): this is CompositeMessage {
+  isComposite(): this is ContentMessage & CompositeMessageShape {
     return this.isContent() && this.hasOwnProperty('selectedButtonId');
   }
 
@@ -319,7 +363,7 @@ export class Message {
    * Check if message is a member message.
    * @returns Is message of type member
    */
-  isMember(): this is MemberMessage {
+  isMember(): this is SystemMessage & MemberMessageShape {
     return this.super_type === SuperType.MEMBER;
   }
 

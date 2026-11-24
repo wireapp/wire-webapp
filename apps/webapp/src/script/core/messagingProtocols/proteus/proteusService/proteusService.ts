@@ -23,6 +23,7 @@ import {generateDecryptionError} from './decryptionErrorGenerator';
 import {deleteIdentity} from './identityClearer';
 import type {
   AddUsersToProteusConversationParams,
+  EncryptionResult,
   ProteusServiceConfig,
   SendProteusMessageParams,
 } from './proteusService.types';
@@ -37,7 +38,6 @@ import {
   FederatedBackendsErrorLabel,
 } from '../../../../apiClient/conversation/federatedBackendsError';
 import {NewConversation} from '../../../../apiClient/conversation/newConversation';
-import {QualifiedOTRRecipients} from '../../../../apiClient/conversation/otrRecipients';
 import {QualifiedUserClients} from '../../../../apiClient/conversation/qualifiedUserClients';
 import type {ConversationOtrMessageAddEvent} from '../../../../apiClient/event/conversationEvent';
 import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
@@ -64,15 +64,6 @@ import {
   initSession,
   initSessions,
 } from '../utility/sessionHandler';
-
-export type EncryptionResult = {
-  /** the encrypted payloads for the clients that have a valid sessions */
-  payloads: QualifiedOTRRecipients;
-  /** user-client that do not have prekeys on backend (deleted clients) */
-  unknowns?: QualifiedUserClients;
-  /** users for whom we could retrieve a prekey and, thus, for which we could not encrypt the message */
-  failed?: QualifiedId[];
-};
 
 export class ProteusService {
   private readonly messageService: MessageService;

@@ -19,6 +19,7 @@
 
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
+import {AUTH_URL} from './authUrl';
 import {CookieList} from './cookieList';
 import {RegisterData} from './registerData';
 
@@ -34,19 +35,7 @@ export class AuthAPI {
     private readonly cookie: CookiePlatform,
   ) {}
 
-  public static readonly URL = {
-    ACCESS: '/access',
-    COOKIES: '/cookies',
-    EMAIL: 'email',
-    INITIATE_LOGIN: 'initiate-login',
-    LOGIN: '/login',
-    LOGOUT: 'logout',
-    REGISTER: '/register',
-    REMOVE: 'remove',
-    SELF: 'self',
-    SEND: 'send',
-    SSO: '/sso',
-  };
+  public static readonly URL = AUTH_URL;
 
   public getCookies(labels?: string[]): Promise<AxiosResponse<CookieList>> {
     const config: AxiosRequestConfig = {

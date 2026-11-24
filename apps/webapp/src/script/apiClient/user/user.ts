@@ -21,9 +21,9 @@ import {App} from './app';
 import {QualifiedId} from './qualifiedId';
 
 import {AccentColor} from '../../commons/util';
-import {ServiceRef} from '../conversation/';
-import {Picture} from '../self/';
-import {CONVERSATION_PROTOCOL} from '../team';
+import {ServiceRef} from '../conversation/serviceRef';
+import {Picture} from '../self/picture';
+import {CONVERSATION_PROTOCOL} from '../team/feature/featureList.types';
 import {UserAsset} from '../user/';
 
 export enum UserType {
