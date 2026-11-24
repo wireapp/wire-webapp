@@ -31,7 +31,6 @@ import {Maybe, maybe} from 'true-myth';
 
 import {
   meetingPrepCalloutStatusStyles,
-  meetingPrepCalloutSuccessStyles,
   meetingPrepCalloutWarningStyles,
   meetingPrepDeviceRowsStyles,
   meetingPrepRowActionStyles,
@@ -51,12 +50,10 @@ import {useCloseOnEscapeOrOutsidePress} from '../../../hooks/useCloseOnEscapeOrO
 import {InputLevel} from '../../../page/mainContent/panels/preferences/avPreferences/inputLevel';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {AlertIcon} from '../../../uiKit/dataDisplay/icon/alertIcon';
-import {CameraIcon} from '../../../uiKit/dataDisplay/icon/cameraIcon';
-import {CheckRoundIcon} from '../../../uiKit/dataDisplay/icon/checkRoundIcon';
 import {ChevronDownIcon} from '../../../uiKit/dataDisplay/icon/chevronDownIcon';
 import {SpeakerIcon} from '../../../uiKit/dataDisplay/icon/speakerIcon';
 import {VideoControlsSelect} from '../../calling/VideoControls/VideoControlsSelect/VideoControlsSelect';
-import {MicOnIcon} from '../../icon';
+import {CameraIcon, MicOnIcon} from '../../icon';
 
 type DeviceKind = 'microphone' | 'speaker' | 'camera';
 
@@ -258,15 +255,11 @@ export const MeetingPrepDevices = ({
       <div role="status">
         {maybe.isJust(callout) && (
           <div
-            css={callout.value.tone === 'success' ? meetingPrepCalloutSuccessStyles : meetingPrepCalloutWarningStyles}
+            css={meetingPrepCalloutWarningStyles}
             data-uie-name="meeting-prep-setup-callout"
-            data-uie-value={callout.value.tone}
+            data-uie-value={callout.value.status}
           >
-            {callout.value.tone === 'success' ? (
-              <CheckRoundIcon width={16} height={16} color="currentColor" aria-hidden="true" />
-            ) : (
-              <AlertIcon width={16} height={16} color="currentColor" aria-hidden="true" />
-            )}
+            <AlertIcon width={16} height={16} color="currentColor" aria-hidden="true" />
             <span>
               <span css={meetingPrepCalloutStatusStyles}>{translate(callout.value.status)}</span>
               {callout.value.hint.mapOr(null, hint => {
@@ -280,7 +273,7 @@ export const MeetingPrepDevices = ({
       <div css={meetingPrepDeviceRowsStyles}>
         <DeviceRow
           kind="microphone"
-          icon={<MicOnIcon />}
+          icon={<MicOnIcon fill="currentColor" />}
           label={translate('meetings.prep.deviceMicrophone')}
           value={microphoneValue}
           fallbackName={microphoneFallback}
@@ -325,7 +318,7 @@ export const MeetingPrepDevices = ({
         />
         <DeviceRow
           kind="camera"
-          icon={<CameraIcon width={16} height={16} color="currentColor" aria-hidden="true" />}
+          icon={<CameraIcon width={16} height={16} fill="currentColor" aria-hidden="true" />}
           label={translate('meetings.prep.deviceCamera')}
           value={cameraValue}
           fallbackName={cameraFallback}
