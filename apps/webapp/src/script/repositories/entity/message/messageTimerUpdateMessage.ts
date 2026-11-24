@@ -30,7 +30,7 @@ import {SystemMessageType} from '../../../message/systemMessageType';
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number | null;
 
-  constructor(messageTimer: number | null, translate: Translate) {
+  constructor(messageTimer: number | null, isSelfUser: boolean, translate: Translate) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE;
@@ -38,7 +38,7 @@ export class MessageTimerUpdateMessage extends SystemMessage {
 
     this.message_timer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
-    this.caption = getCaption(this.message_timer, this.user().isMe, this.translate);
+    this.caption = getCaption(this.message_timer, isSelfUser, this.translate);
   }
 }
 
