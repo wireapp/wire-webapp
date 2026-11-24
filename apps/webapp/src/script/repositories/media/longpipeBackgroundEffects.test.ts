@@ -18,6 +18,7 @@
  */
 
 import type {PipelineOptions, PipelineStats, ReadyInfo} from 'longpipe';
+import {noop} from 'noop-esm';
 
 import {LongpipeBackgroundSession, type LongpipePipeline, type PipelineFactory} from './longpipeBackgroundEffects';
 
@@ -271,5 +272,57 @@ describe('LongpipeBackgroundSession', () => {
     finishReady?.({backend: 'webgpu', preset: 'medium', dtype: 'f16'});
     expect(pending.destroy).toHaveBeenCalled();
     expect(session.stream.getTracks()).toHaveLength(0);
+  });
+
+  it('bounds initial startup and releases owned resources even when ready never settles', async () => {
+    const camera = tracks[0];
+    const factory = createPipeline.getMockImplementation();
+    if (factory === undefined) {
+      throw new Error('Missing test pipeline factory');
+    }
+    const pending = {
+      ...factory(new MediaStream(), {} as PipelineOptions),
+      ready: new Promise<ReadyInfo>(noop),
+    };
+    createPipeline.mockReturnValueOnce(pending);
+    const rejection = expect(session.start()).rejects.toThrow('initialization timed out');
+    await jest.advanceTimersByTimeAsync(30000);
+    await rejection;
+    expect(pending.destroy).toHaveBeenCalledTimes(1);
+    expect(tracks[1].stop).toHaveBeenCalled();
+    expect(createPipeline.mock.calls[0][0].getVideoTracks()[0].stop).toHaveBeenCalled();
+    expect(camera.stop).not.toHaveBeenCalled();
+    expect(session.stream.getTracks()).toHaveLength(0);
+    expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it('unblocks queued operations after a replacement timeout and ignores late readiness', async () => {
+    await session.start();
+    const previousTrack = session.stream.getVideoTracks()[0];
+    const factory = createPipeline.getMockImplementation();
+    if (factory === undefined) {
+      throw new Error('Missing test pipeline factory');
+    }
+    let finishReady: ((info: ReadyInfo) => void) | undefined;
+    const pending = {
+      ...factory(new MediaStream(), {} as PipelineOptions),
+      ready: new Promise<ReadyInfo>(resolve => {
+        finishReady = resolve;
+      }),
+    };
+    createPipeline.mockReturnValueOnce(pending);
+    const rejection = expect(session.setQuality('nhd')).rejects.toThrow('initialization timed out');
+    const nextOperation = session.setBackground({blur: {strength: 'high'}});
+    await jest.advanceTimersByTimeAsync(30000);
+    await rejection;
+    await nextOperation;
+    expect(pending.destroy).toHaveBeenCalledTimes(1);
+    expect(pipelines[0].setBackground).toHaveBeenCalledWith({blur: {strength: 'high'}});
+    expect(pipelines[0].destroy).not.toHaveBeenCalled();
+    finishReady?.({backend: 'webgpu', preset: 'medium', dtype: 'f16'});
+    await jest.advanceTimersByTimeAsync(0);
+    expect(session.stream.getVideoTracks()).toEqual([previousTrack]);
+    await session.setQuality('hd');
+    expect(session.stream.getVideoTracks()).toEqual(pipelines[2].stream.getVideoTracks());
   });
 });

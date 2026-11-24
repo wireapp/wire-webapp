@@ -32,6 +32,7 @@ import {MODEL_WEIGHTS_BASE_URL} from './longpipeModelResources';
 import {getLogger} from '../../util/logger';
 
 const POLL_INTERVAL_MS = 1000;
+const INITIALIZATION_TIMEOUT_MS = 30000;
 const DOWNGRADE_SAMPLES = 5;
 const UPGRADE_SAMPLES = 15;
 const CHANGE_COOLDOWN_MS = 10000;
@@ -238,12 +239,21 @@ export class LongpipeBackgroundSession {
         },
       });
       this.pendingPipeline = pipeline;
-      const ready = await new Promise<ReadyInfo>((resolve, reject) => {
-        this.cancelInitialization = () => {
-          reject(new Error('Background session released during initialization'));
-        };
-        void pipeline.ready.then(resolve, reject);
-      });
+      let initializationTimer: ReturnType<typeof setTimeout> | undefined;
+      let ready: ReadyInfo;
+      try {
+        ready = await new Promise<ReadyInfo>((resolve, reject) => {
+          initializationTimer = setTimeout(() => {
+            reject(new Error('Longpipe initialization timed out after 30000 ms'));
+          }, INITIALIZATION_TIMEOUT_MS);
+          this.cancelInitialization = () => {
+            reject(new Error('Background session released during initialization'));
+          };
+          void pipeline.ready.then(resolve, reject);
+        });
+      } finally {
+        clearTimeout(initializationTimer);
+      }
       if (this.released) {
         pipeline.destroy();
         return;
