@@ -22,6 +22,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useMemo,
   useReducer,
   useRef,
   useState,
@@ -34,6 +35,12 @@ import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
 import {Maybe, maybe} from 'true-myth';
 
+import {
+  createBulkDownloadOperation,
+  resolveBulkDownloadSelection,
+  type BulkDownloadRejectionReason,
+  type BulkDownloadOperationState,
+} from './bulkDownloadOperation';
 import {bulkMoveReducer} from './bulkMoveState';
 import {CellsBulkMovePreviewModal} from './cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
 import {normalizeCellsPath} from './cellsBulkMovePreviewModal/normalizeCellsPath';
@@ -89,7 +96,7 @@ import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';
 import {TrashIcon} from '../../../../uiKit/dataDisplay/icon/trashIcon';
 import {UploadIcon} from '../../../../uiKit/dataDisplay/icon/uploadIcon';
 import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
-import {formatBytes} from '../../../../util/util';
+import {downloadBlob, formatBytes} from '../../../../util/util';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '../../../Modals/PrimaryModal';
 import {getCellsBackgroundActionEvidence} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import type {CellsBackgroundActionOutcome} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
@@ -114,6 +121,8 @@ import {
   type SharedDriveMoveSummary,
 } from '../sharedDriveUploadStatusContext';
 import {useBulkActionStatusReporter} from '../useBulkActionStatusReporter';
+
+type BulkDownloadViewState = BulkDownloadOperationState | {readonly kind: 'ready'};
 
 interface CellsTableProps {
   nodes: CellNode[];
@@ -204,7 +213,33 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
 };
 
 // Selecting rows only makes sense when at least one of these is available, e.g. never for viewers.
-const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE];
+const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE, CELLS_ACTION.DOWNLOAD];
+
+const getBulkArchiveParentPath = (): string => {
+  const currentPath = getCellsFilesPath();
+  return currentPath.trim().length > 0 ? currentPath : 'wire-cells-web';
+};
+
+const readArchiveBlob = async (stream: ReadableStream<Uint8Array>): Promise<Blob> => {
+  const reader = stream.getReader();
+  const chunks: ArrayBuffer[] = [];
+
+  try {
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) {
+        break;
+      }
+      const chunk = new ArrayBuffer(value.byteLength);
+      new Uint8Array(chunk).set(value);
+      chunks.push(chunk);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  return new Blob(chunks, {type: 'application/zip'});
+};
 
 interface CapturedBulkMoveToBinSelection {
   nodeIds: string[];
@@ -342,6 +377,20 @@ export const CellsTable = ({
     };
   }, []);
   const canPerformCurrentDriveAction = useCellsActionPermissions();
+  const bulkDownloadOperation = useMemo(() => {
+    return createBulkDownloadOperation(request => {
+      return cellsRepository.downloadSelectionArchive(request);
+    });
+  }, [cellsRepository]);
+  const [bulkDownloadState, setBulkDownloadState] = useState<BulkDownloadViewState>({kind: 'idle'});
+  const downloadAbortController = useRef<AbortController | null>(null);
+  useEffect(() => {
+    const unsubscribe = bulkDownloadOperation.subscribe(setBulkDownloadState);
+    return () => {
+      unsubscribe();
+      downloadAbortController.current?.abort();
+    };
+  }, [bulkDownloadOperation]);
   const canPerformAnyBulkAction = BULK_ACTIONS.some(action => {
     return canPerformCurrentDriveAction(action);
   });
@@ -395,6 +444,7 @@ export const CellsTable = ({
   const canPerformCurrentDriveActionRef = useRef(canPerformCurrentDriveAction);
   canPerformCurrentDriveActionRef.current = canPerformCurrentDriveAction;
   const permanentDeleteModalId = useId();
+  const bulkDownloadDescriptionId = useId();
   const permanentDeleteStatusReporter = useBulkActionStatusReporter(
     'permanentDelete',
     currentConversationQualifiedId,
@@ -989,6 +1039,40 @@ export const CellsTable = ({
   const selectedNodes = nodes.filter(node => {
     return selectedNodeIds.has(node.id);
   });
+  const bulkDownloadArchiveParentPath = getBulkArchiveParentPath();
+  const bulkDownloadSelection = resolveBulkDownloadSelection({
+    nodes: selectedNodes,
+    canDownload: canPerformCurrentDriveAction(CELLS_ACTION.DOWNLOAD),
+    selectedCount: selectedNodeIds.size,
+    isSupportedLocation: !isInRecycleBin(),
+  });
+  const isBulkDownloadActive =
+    bulkDownloadState.kind === 'starting' ||
+    bulkDownloadState.kind === 'downloading' ||
+    bulkDownloadState.kind === 'stream-consumed';
+  let bulkDownloadUnavailableReason: BulkDownloadRejectionReason | null = null;
+  if (selectedNodeIds.size > 0 && bulkDownloadSelection.kind === 'rejected') {
+    bulkDownloadUnavailableReason = bulkDownloadSelection.reason;
+  } else if (selectedNodeIds.size > 0 && bulkDownloadArchiveParentPath.trim().length === 0) {
+    bulkDownloadUnavailableReason = 'selection-unavailable';
+  }
+  const bulkDownloadStatusMessage = (() => {
+    switch (bulkDownloadState.kind) {
+      case 'starting':
+        return translate('cells.bulkDownload.starting');
+      case 'downloading':
+        return translate('cells.bulkDownload.progress', {bytes: formatBytes(bulkDownloadState.bytesReceived)});
+      case 'stream-consumed':
+        return translate('cells.bulkDownload.preparingBrowserDownload');
+      case 'ready':
+        return translate('cells.bulkDownload.ready');
+      case 'failed':
+        return translate('cells.bulkDownload.failed');
+      case 'cancelled':
+      case 'idle':
+        return null;
+    }
+  })();
   const selectedFilesTotalSize =
     selectedNodes.length === selectedNodeIds.size ? getSelectedFilesTotalSize(selectedNodes) : Maybe.nothing();
   const restoreResolution = resolveRestoreTargets({selectedNodes});
@@ -1045,6 +1129,53 @@ export const CellsTable = ({
       return canPerformCellsAction({action: CELLS_ACTION.DELETE, selfUserDriveRole: node.selfUserDriveRole});
     });
   const tableWrapperStyles = rows.length > 0 ? [wrapperStyles, wrapperWithRowsStyles] : wrapperStyles;
+
+  const handleBulkDownloadSelection = async (): Promise<void> => {
+    const nodeIds = Array.from(selectedNodeIdsRef.current);
+    if (
+      nodeIds.length === 0 ||
+      isSelectionDisabled ||
+      !selectionEnabled ||
+      !hasSameSelection(selectedNodeIdsRef.current, nodeIds) ||
+      !canPerformCurrentDriveActionRef.current(CELLS_ACTION.DOWNLOAD)
+    ) {
+      return;
+    }
+
+    const selectedIdSet = new Set(nodeIds);
+    const currentNodes = nodesRef.current.filter(node => {
+      return selectedIdSet.has(node.id);
+    });
+    const selection = resolveBulkDownloadSelection({
+      nodes: currentNodes,
+      canDownload: canPerformCurrentDriveActionRef.current(CELLS_ACTION.DOWNLOAD),
+      selectedCount: nodeIds.length,
+      isSupportedLocation: !isInRecycleBin(),
+    });
+    const archiveParentPath = getBulkArchiveParentPath();
+    if (selection.kind !== 'eligible' || archiveParentPath.trim().length === 0) {
+      return;
+    }
+
+    const abortController = new AbortController();
+    downloadAbortController.current = abortController;
+    try {
+      const {stream} = await bulkDownloadOperation.start({selection, archiveParentPath, abortController});
+      const archive = await readArchiveBlob(stream);
+      downloadBlob(archive, 'bulk-download.zip', 'application/zip');
+      if (isTableMounted.current) {
+        setBulkDownloadState({kind: 'ready'});
+      }
+    } catch (error) {
+      if (isTableMounted.current) {
+        setBulkDownloadState({kind: 'failed', error});
+      }
+    } finally {
+      if (downloadAbortController.current === abortController) {
+        downloadAbortController.current = null;
+      }
+    }
+  };
 
   const hasLeftCapturedScope = useCallback((captured: CapturedBulkMoveToBinSelection): boolean => {
     return captured.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin();
@@ -1489,6 +1620,19 @@ export const CellsTable = ({
                     <span css={selectionSizeStyles}>{formatBytes(selectedFilesTotalSize.value)}</span>
                   )}
                   <div css={selectionActionsStyles}>
+                    <button
+                      css={bulkActionButtonStyles}
+                      type="button"
+                      disabled={
+                        isSelectionDisabled || isBulkDownloadActive || bulkDownloadSelection.kind !== 'eligible'
+                      }
+                      aria-describedby={bulkDownloadUnavailableReason === null ? undefined : bulkDownloadDescriptionId}
+                      onClick={() => {
+                        void handleBulkDownloadSelection();
+                      }}
+                    >
+                      {translate('cells.bulkDownload.button')}
+                    </button>
                     {canPermanentlyDeleteSelection && (
                       <button
                         css={bulkActionButtonStyles}
@@ -1596,6 +1740,18 @@ export const CellsTable = ({
             </div>,
             selectionBarAnchor,
           )}
+        {bulkDownloadStatusMessage !== null && selectedNodeIds.size > 0 && (
+          <div css={moveOutcomeMessageStyles} role={bulkDownloadState.kind === 'failed' ? 'alert' : 'status'}>
+            {bulkDownloadStatusMessage}
+          </div>
+        )}
+        {bulkDownloadUnavailableReason !== null && bulkDownloadUnavailableReason !== 'empty' && (
+          <div css={moveOutcomeMessageStyles} role="status">
+            <span id={bulkDownloadDescriptionId}>
+              {translate(`cells.bulkDownload.unavailable.${bulkDownloadUnavailableReason}`)}
+            </span>
+          </div>
+        )}
         {(isBulkMovePreviewOpen || isBulkMoveRequestPending || isBackgroundMovePending) &&
           (canMoveSelection ||
             isBulkMoveOutcomeUnresolved ||

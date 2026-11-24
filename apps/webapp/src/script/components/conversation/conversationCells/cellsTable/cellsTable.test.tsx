@@ -17,6 +17,8 @@
  *
  */
 
+import {ReadableStream as NodeReadableStream} from 'node:stream/web';
+
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import type {ReactElement} from 'react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
@@ -30,6 +32,7 @@ import {PrimaryModalComponent} from '../../../Modals/PrimaryModal/PrimaryModal';
 import {JobsTaskStatus, RestActionStatus} from 'cells-sdk-ts';
 import {Maybe} from 'true-myth';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import * as utilities from '../../../../util/util';
 import type {Conversation} from '../../../../repositories/entity/Conversation';
 import {
   createExecutingFireAndForgetInvokerForTest,
@@ -53,6 +56,17 @@ import {
   CellsSelfUserDriveRole,
 } from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
+const originalReadableStreamDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'ReadableStream');
+
+const createArchiveStream = (): ReadableStream<Uint8Array> => {
+  return new NodeReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(new Uint8Array([0x50, 0x4b, 0x03, 0x04]));
+      controller.close();
+    },
+  }) as unknown as ReadableStream<Uint8Array>;
+};
+
 const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.selection.selectedCount') {
     return `${substitutions?.count} selected`;
@@ -68,6 +82,30 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   }
   if (key === 'cells.selection.move') {
     return 'Move';
+  }
+  if (key === 'cells.bulkDownload.button') {
+    return 'Download';
+  }
+  if (key === 'cells.bulkDownload.starting') {
+    return 'Preparing archive…';
+  }
+  if (key === 'cells.bulkDownload.progress') {
+    return `Downloading archive · ${substitutions?.bytes} received`;
+  }
+  if (key === 'cells.bulkDownload.ready') {
+    return 'Archive prepared. Check browser downloads.';
+  }
+  if (key === 'cells.bulkDownload.failed') {
+    return 'Could not download the selected items. Select Download to try again.';
+  }
+  if (key === 'cells.bulkDownload.unavailable.forbidden') {
+    return 'You do not have permission to download every selected item.';
+  }
+  if (key === 'cells.bulkDownload.unavailable.selection-unavailable') {
+    return 'Some selected items are not available here. Refresh Shared Drive and select them again.';
+  }
+  if (key === 'cells.bulkDownload.unavailable.unsupported-location') {
+    return 'Bulk download is not available in this location.';
   }
   if (key === 'cells.options.deletePermanently') {
     return 'Delete permanently';
@@ -445,6 +483,149 @@ const renderCellsTable = ({
 };
 
 describe('CellsTable selection', () => {
+  beforeAll(() => {
+    Object.defineProperty(globalThis, 'ReadableStream', {
+      configurable: true,
+      writable: true,
+      value: NodeReadableStream,
+    });
+  });
+
+  afterAll(() => {
+    if (originalReadableStreamDescriptor === undefined) {
+      Reflect.deleteProperty(globalThis, 'ReadableStream');
+      return;
+    }
+    Object.defineProperty(globalThis, 'ReadableStream', originalReadableStreamDescriptor);
+  });
+
+  it('downloads selected files and folders through the Cells repository', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/team/Shared%20Drive/Reports';
+    const user = userEvent.setup();
+    const downloadSelectionArchive = jest.fn().mockImplementation(async () => {
+      return createArchiveStream();
+    });
+    const downloadBlob = jest.spyOn(utilities, 'downloadBlob').mockReturnValue(0);
+    const cellsRepository = {downloadSelectionArchive} as unknown as CellsRepository;
+    const nodes = [
+      createNode({
+        id: 'folder-id',
+        name: 'Folder',
+        path: 'team/Shared Drive/Reports/Folder',
+        type: CellNodeType.FOLDER,
+      }),
+      createNode({
+        id: 'file-id',
+        name: 'Report.pdf',
+        path: 'team/Shared Drive/Reports/Report.pdf',
+        type: CellNodeType.FILE,
+      }),
+    ];
+
+    try {
+      renderCellsTable({cellsRepository, initialNodes: nodes});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Folder'}));
+      await user.click(screen.getByRole('checkbox', {name: 'Select Report.pdf'}));
+      await user.click(screen.getByRole('button', {name: 'Download'}));
+
+      await waitFor(() => {
+        expect(downloadSelectionArchive).toHaveBeenCalledWith({
+          paths: ['team/Shared Drive/Reports/Folder', 'team/Shared Drive/Reports/Report.pdf'],
+          archiveParentPath: 'team/Shared Drive/Reports',
+          abortController: expect.any(AbortController),
+        });
+      });
+      expect(await screen.findByText('Archive prepared. Check browser downloads.')).toBeInTheDocument();
+      expect(downloadBlob).toHaveBeenCalledWith(expect.any(Blob), 'bulk-download.zip', 'application/zip');
+    } finally {
+      downloadBlob.mockRestore();
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('explains and blocks download when one selected item is not permitted', async () => {
+    const user = userEvent.setup();
+    const downloadSelectionArchive = jest.fn().mockResolvedValue(createArchiveStream());
+    const nodes = [
+      createNode({id: 'allowed-file', name: 'Allowed.txt', type: CellNodeType.FILE}),
+      createNode({
+        id: 'denied-folder',
+        name: 'Restricted folder',
+        type: CellNodeType.FOLDER,
+        selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+      }),
+    ];
+    renderCellsTable({
+      cellsRepository: {downloadSelectionArchive} as unknown as CellsRepository,
+      initialNodes: nodes,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Allowed.txt'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Restricted folder'}));
+
+    expect(screen.getByText('You do not have permission to download every selected item.')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Download'})).toBeDisabled();
+    expect(downloadSelectionArchive).not.toHaveBeenCalled();
+  });
+
+  it('reports byte progress and blocks another start until the archive is prepared', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/team/Shared%20Drive';
+    const user = userEvent.setup();
+    let closeSource: (() => void) | undefined;
+    const stream = new NodeReadableStream<Uint8Array>(
+      {
+        start(controller) {
+          controller.enqueue(new Uint8Array([1, 2]));
+          closeSource = () => {
+            return controller.close();
+          };
+        },
+      },
+      {highWaterMark: 0},
+    ) as unknown as ReadableStream<Uint8Array>;
+    const downloadSelectionArchive = jest.fn().mockResolvedValue(stream);
+    const downloadBlob = jest.spyOn(utilities, 'downloadBlob').mockReturnValue(0);
+
+    try {
+      renderCellsTable({cellsRepository: {downloadSelectionArchive} as unknown as CellsRepository});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Download'}));
+
+      expect(await screen.findByText('Downloading archive · 2 B received')).toBeInTheDocument();
+      expect(screen.getByRole('button', {name: 'Download'})).toBeDisabled();
+      closeSource?.();
+      expect(await screen.findByText('Archive prepared. Check browser downloads.')).toBeInTheDocument();
+      expect(downloadBlob).toHaveBeenCalledTimes(1);
+      expect(downloadSelectionArchive).toHaveBeenCalledTimes(1);
+    } finally {
+      downloadBlob.mockRestore();
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('shows a failure and keeps the selection available for an explicit retry', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/team/Shared%20Drive';
+    const user = userEvent.setup();
+    const downloadSelectionArchive = jest.fn().mockRejectedValue(new Error('connection failed'));
+    renderCellsTable({cellsRepository: {downloadSelectionArchive} as unknown as CellsRepository});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    try {
+      await user.click(screen.getByRole('button', {name: 'Download'}));
+
+      expect(
+        await screen.findByText('Could not download the selected items. Select Download to try again.'),
+      ).toBeInTheDocument();
+      expect(screen.getByRole('button', {name: 'Download'})).toBeEnabled();
+      expect(downloadSelectionArchive).toHaveBeenCalledTimes(1);
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
   it('hides page and row selection for a viewer', () => {
     renderCellsTable({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER});
 

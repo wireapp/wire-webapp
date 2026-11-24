@@ -106,6 +106,28 @@ describe('CellsRepository upload cancellation', () => {
   });
 });
 
+describe('CellsRepository bulk download', () => {
+  it('forwards selected paths, archive location, and cancellation to the Cells API', async () => {
+    const stream = {} as ReadableStream<Uint8Array>;
+    const downloadSelectionArchive = jest.fn().mockResolvedValue(stream);
+    const repository = new CellsRepository({api: {cells: {downloadSelectionArchive}}} as never);
+    const abortController = new AbortController();
+
+    await expect(
+      repository.downloadSelectionArchive({
+        paths: ['workspace/Reports/', 'workspace/summary.pdf'],
+        archiveParentPath: 'workspace',
+        abortController,
+      }),
+    ).resolves.toBe(stream);
+    expect(downloadSelectionArchive).toHaveBeenCalledWith({
+      paths: ['workspace/Reports/', 'workspace/summary.pdf'],
+      archiveParentPath: 'workspace',
+      abortController,
+    });
+  });
+});
+
 describe('CellsRepository bulk Bin actions', () => {
   it('waits for the batch delete response and returns every background job', async () => {
     const completions: Array<(response: RestPerformActionResponse) => void> = [];
