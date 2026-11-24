@@ -92,17 +92,11 @@ const renderDevices = (props: DevicesProps, onModalKeyDown: jest.Mock = jest.fn(
 };
 
 describe('MeetingPrepDevices', () => {
-  it('shows a success callout and a warning callout in the same format', () => {
-    renderDevices(createProps({callout: getMeetingPrepSetupCallout({microphone: 'working', camera: 'working'})}));
-    expect(screen.getByTestId('meeting-prep-setup-callout')).toHaveAttribute('data-uie-value', 'success');
-    expect(screen.getByRole('status')).toHaveTextContent('meetings.prep.setupMicrophoneAndCameraWorking');
-  });
-
   it('adds the fix to a warning', () => {
     renderDevices(createProps({callout: getMeetingPrepSetupCallout({microphone: 'blocked', camera: 'off'})}));
     const callout = screen.getByTestId('meeting-prep-setup-callout');
 
-    expect(callout).toHaveAttribute('data-uie-value', 'warning');
+    expect(callout).toHaveAttribute('data-uie-value', 'meetings.prep.setupMicrophoneBlocked');
     expect(callout).toHaveTextContent('meetings.prep.setupMicrophoneBlocked meetings.prep.setupMicrophoneBlockedHint');
   });
 

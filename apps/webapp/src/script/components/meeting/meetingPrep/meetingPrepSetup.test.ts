@@ -27,16 +27,15 @@ import {
 
 const statusOf = (microphone: MicrophoneHealth, camera: CameraHealth): string => {
   return getMeetingPrepSetupCallout({microphone, camera}).mapOr('none', callout => {
-    return `${callout.tone}:${callout.status}`;
+    return callout.status;
   });
 };
 
 describe('getMeetingPrepSetupCallout', () => {
-  it('names only the devices that work', () => {
-    expect(statusOf('working', 'working')).toBe('success:meetings.prep.setupMicrophoneAndCameraWorking');
-    expect(statusOf('working', 'off')).toBe('success:meetings.prep.setupMicrophoneWorking');
-    expect(statusOf('working', 'starting')).toBe('success:meetings.prep.setupMicrophoneWorking');
-    expect(statusOf('off', 'working')).toBe('success:meetings.prep.setupCameraWorking');
+  it('does not repeat the join sentence for working devices', () => {
+    expect(statusOf('working', 'working')).toBe('none');
+    expect(statusOf('working', 'off')).toBe('none');
+    expect(statusOf('off', 'working')).toBe('none');
   });
 
   it('shows nothing when both devices are off or still starting', () => {
@@ -53,7 +52,7 @@ describe('getMeetingPrepSetupCallout', () => {
   });
 
   it('warns about an unavailable camera even when the microphone works', () => {
-    expect(statusOf('working', 'unavailable')).toBe('warning:meetings.prep.setupCameraUnavailable');
+    expect(statusOf('working', 'unavailable')).toBe('meetings.prep.setupCameraUnavailable');
   });
 });
 

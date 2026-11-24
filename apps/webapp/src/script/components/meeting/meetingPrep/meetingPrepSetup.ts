@@ -61,7 +61,6 @@ export const getCameraHealth = ({
 };
 
 export interface MeetingPrepSetupCallout {
-  readonly tone: 'success' | 'warning';
   readonly status: TranslationKey;
   readonly hint: Maybe<TranslationKey>;
 }
@@ -71,18 +70,12 @@ interface MeetingPrepSetupInput {
   readonly camera: CameraHealth;
 }
 
-const success = (status: TranslationKey): Maybe<MeetingPrepSetupCallout> => {
-  return Maybe.just<MeetingPrepSetupCallout>({tone: 'success', status, hint: Maybe.nothing()});
-};
-
 const warning = (status: TranslationKey, hint: TranslationKey): Maybe<MeetingPrepSetupCallout> => {
-  return Maybe.just<MeetingPrepSetupCallout>({tone: 'warning', status, hint: Maybe.just(hint)});
+  return Maybe.just<MeetingPrepSetupCallout>({status, hint: Maybe.just(hint)});
 };
 
 /**
- * The setup callout above the device rows. It only claims what the browser reports: access granted
- * and a live stream. A blocked microphone comes first, because the user cannot be heard. Nothing
- * when both devices are off by choice or still starting.
+ * Show a warning when a device fails to start. A blocked microphone takes priority.
  */
 export const getMeetingPrepSetupCallout = ({
   microphone,
@@ -95,15 +88,6 @@ export const getMeetingPrepSetupCallout = ({
     })
     .with({camera: 'unavailable'}, () => {
       return warning('meetings.prep.setupCameraUnavailable', 'meetings.prep.setupCameraUnavailableHint');
-    })
-    .with({microphone: 'working', camera: 'working'}, () => {
-      return success('meetings.prep.setupMicrophoneAndCameraWorking');
-    })
-    .with({microphone: 'working'}, () => {
-      return success('meetings.prep.setupMicrophoneWorking');
-    })
-    .with({camera: 'working'}, () => {
-      return success('meetings.prep.setupCameraWorking');
     })
     .otherwise(() => {
       return Maybe.nothing();

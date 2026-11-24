@@ -46,11 +46,6 @@ export const meetingPrepCalloutStyles: CSSObject = {
   },
 };
 
-export const meetingPrepCalloutSuccessStyles: CSSObject = {
-  ...meetingPrepCalloutStyles,
-  '--tone': 'var(--success-color)',
-};
-
 export const meetingPrepCalloutWarningStyles: CSSObject = {
   ...meetingPrepCalloutStyles,
   '--tone': 'var(--amber-500)',
