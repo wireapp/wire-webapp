@@ -17,15 +17,27 @@
  *
  */
 
+import type {ConversationId} from '@wireapp/core-crypto';
+
 import {ConversationMLSWelcomeEvent} from '../../../../../../apiClient/event/conversationEvent';
 import {Decoder} from '../../../../../../commons/base64/decoder';
 import {Encoder} from '../../../../../../commons/base64/encoder';
+import type {Logger} from '../../../../../../logger/getLogger';
 import {HandledEventPayload} from '../../../../../notification';
-import {MLSService, MLSServiceEvents} from '../../../mlsService';
+import {MLSServiceEvents} from '../../../mlsService/mlsServiceEvents';
+
+/** The parts of `MLSService` used by the welcome message handler. */
+interface WelcomeMessageMLSService {
+  emit(eventName: MLSServiceEvents.NEW_EPOCH, payload: {epoch: bigint; groupId: string}): boolean;
+  getEpoch(groupId: string): Promise<bigint>;
+  logger: Pick<Logger, 'info'>;
+  processWelcomeMessage(welcomeMessage: Uint8Array): Promise<ConversationId>;
+  scheduleKeyMaterialRenewal(groupId: string): Promise<void>;
+}
 
 interface HandleWelcomeMessageParams {
   event: ConversationMLSWelcomeEvent;
-  mlsService: MLSService;
+  mlsService: WelcomeMessageMLSService;
 }
 
 export const handleMLSWelcomeMessage = async ({

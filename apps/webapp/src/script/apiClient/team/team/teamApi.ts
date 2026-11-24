@@ -23,7 +23,6 @@ import {NewAppRequest} from './app/newAppRequest';
 import {NewAppResponse} from './app/newAppResponse';
 import {TeamCollaborator} from './collaborator/teamCollaborator';
 import {LeadData} from './leadData';
-import {NewTeamData} from './newTeamData';
 import {TeamChunkData} from './teamChunkData';
 import {TeamData} from './teamData';
 import {TeamSizeData} from './teamSizeData';
@@ -31,6 +30,16 @@ import {UpdateTeamData} from './updateTeamData';
 
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http/';
 import {RequestCancellationError, User} from '../../user';
+
+/** Subset of the team creation payload the API needs (see `NewTeamData`). */
+interface NewTeamPayload {
+  binding?: boolean;
+  icon: string;
+  icon_key?: string;
+  members?: {permissions: {copy: number; self: number}; user: string}[];
+  name: string;
+  splash_screen?: string;
+}
 
 export class TeamAPI {
   constructor(private readonly client: HttpClient) {}
@@ -45,7 +54,7 @@ export class TeamAPI {
     LEAD: 'lead',
   };
 
-  public async postTeam(team: NewTeamData): Promise<void> {
+  public async postTeam(team: NewTeamPayload): Promise<void> {
     const config: AxiosRequestConfig = {
       data: team,
       method: 'post',

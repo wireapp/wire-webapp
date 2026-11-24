@@ -17,10 +17,10 @@
  *
  */
 
-import {MLSPublicKeyRecord} from './clientApi';
 import {ClientCapability} from './clientCapability';
 import {ClientType} from './clientType';
 import {Location} from './location';
+import {MLSPublicKeyRecord} from './mlsPublicKeyRecord';
 import {PublicClient} from './publicClient';
 
 export interface AddedClient extends PublicClient {

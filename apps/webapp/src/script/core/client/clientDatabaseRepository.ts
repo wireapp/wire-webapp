@@ -17,8 +17,6 @@
  *
  */
 
-import {MetaClient} from './clientService';
-
 import {RegisteredClient} from '../../apiClient/client/registeredClient';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {constructSessionId} from '../messagingProtocols/proteus/utility/sessionHandler';
@@ -26,6 +24,15 @@ import type {CRUDEngine} from '../storage/engine/crudEngine';
 
 export enum DatabaseStores {
   CLIENTS = 'clients',
+}
+
+export interface MetaClient extends RegisteredClient {
+  domain?: string;
+  meta: {
+    is_verified?: boolean;
+    is_mls_verified?: boolean;
+    primary_key: string;
+  };
 }
 
 export class ClientDatabaseRepository {

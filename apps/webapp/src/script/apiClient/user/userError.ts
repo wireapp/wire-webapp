@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,44 +17,4 @@
  *
  */
 
-import {BackendError, BackendErrorLabel, StatusCode, SyntheticErrorLabel} from '../http/';
-
-export class UserError extends BackendError {
-  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code?: StatusCode) {
-    super(message, label, code);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = 'UserError';
-  }
-}
-
-export class UserIsUnknownError extends UserError {
-  constructor(
-    message: string,
-    label: BackendErrorLabel = BackendErrorLabel.CLIENT_ERROR,
-    code: StatusCode = StatusCode.BAD_REQUEST,
-  ) {
-    super(message, label, code);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = 'UserIsUnknownError';
-  }
-}
-
-export class UnconnectedUserError extends UserError {
-  constructor(
-    message: string,
-    label: BackendErrorLabel = BackendErrorLabel.NOT_CONNECTED,
-    code: StatusCode = StatusCode.FORBIDDEN,
-  ) {
-    super(message, label, code);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = 'UnconnectedUserError';
-  }
-}
-
-export class RequestCancellationError extends UserError {
-  constructor(message: string, label = SyntheticErrorLabel.REQUEST_CANCELLED, code?: StatusCode) {
-    super(message, label, code);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = 'RequestCancellationError';
-  }
-}
+export * from '../http/userError';

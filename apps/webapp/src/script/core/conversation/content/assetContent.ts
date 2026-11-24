@@ -19,15 +19,15 @@
 
 import {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import {AudioMetaData, ImageMetaData, VideoMetaData} from './assetMetaData';
 import {FileContent, FileMetaDataContent} from './fileContent';
 import {ImageContent} from './imageContent';
 
-import {EncryptedAssetUploaded} from '../../cryptography';
+import {EncryptedAssetUploaded} from '../../cryptography/assetCryptography/encryptedAsset';
 import {AbortReason} from '../abortReason';
 import {AssetTransferState} from '../assetTransferState';
 
-export type ImageMetaData = Asset.IImageMetaData;
-export type VideoMetaData = Asset.IVideoMetaData;
+export type {AudioMetaData, ImageMetaData, VideoMetaData};
 export type Preview = Asset.IPreview;
 export type Original = Asset.IOriginal;
 
@@ -49,10 +49,6 @@ export interface RemoteData extends Asset.IRemoteData {
   assetId: string;
   otrKey: Uint8Array | Buffer;
   sha256: Uint8Array | Buffer;
-}
-
-export interface AudioMetaData extends Omit<Asset.IAudioMetaData, 'normalizedLoudness'> {
-  normalizedLoudness?: Uint8Array | Buffer | null;
 }
 
 export interface ImageAssetContent extends AssetBase {

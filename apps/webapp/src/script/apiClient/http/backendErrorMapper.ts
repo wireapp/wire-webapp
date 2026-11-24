@@ -20,11 +20,6 @@
 import {StatusCodes as StatusCode} from 'http-status-codes';
 import {z} from 'zod';
 
-import {BackendError} from './backendError';
-import {BackendErrorLabel} from './backendErrorLabel';
-import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from './teamError';
-
-import {getLogger} from '../../logger/getLogger';
 import {
   IdentifierExistsError,
   InvalidCredentialsError,
@@ -34,7 +29,9 @@ import {
   MissingCookieAndTokenError,
   MissingCookieError,
   TokenExpiredError,
-} from '../auth/authenticationError';
+} from './authenticationError';
+import {BackendError} from './backendError';
+import {BackendErrorLabel} from './backendErrorLabel';
 import {
   ConversationIsUnknownError,
   ConversationOperationError,
@@ -42,9 +39,12 @@ import {
   MLSInvalidLeafNodeIndexError,
   MLSInvalidLeafNodeSignatureError,
   MLSStaleMessageError,
-} from '../conversation/conversationError';
+} from './conversationError';
+import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from './teamError';
+import {UnconnectedUserError, UserIsUnknownError} from './userError';
+
+import {getLogger} from '../../logger/getLogger';
 import {QualifiedId, QualifiedIdSchema} from '../user/qualifiedId';
-import {UnconnectedUserError, UserIsUnknownError} from '../user/userError';
 
 type BackendErrorWithLabel = BackendError & {label: BackendErrorLabel};
 type ErrorBuilder = (e: BackendErrorWithLabel) => BackendError;

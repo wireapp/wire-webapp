@@ -22,6 +22,7 @@ import {z} from 'zod';
 
 import {ClientCapabilityData} from './clientCapabilityData';
 import {ClientCapabilityRemovedError} from './clientError';
+import {MLSPublicKeyAlgorithmKeys, MLSPublicKeyRecord} from './mlsPublicKeyRecord';
 import {CreateClientPayload, UpdateClientPayload} from './newClient';
 import {RegisteredClient} from './registeredClient';
 
@@ -40,14 +41,7 @@ export type ClaimedKeyPackages = {
   }[];
 };
 
-export enum MLSPublicKeyAlgorithmKeys {
-  ECDSA_SECP256R1_SHA256 = 'ecdsa_secp256r1_sha256',
-  ECDSA_SECP384R1_SHA384 = 'ecdsa_secp384r1_sha384',
-  ECDSA_SECP521R1_SHA512 = 'ecdsa_secp521r1_sha512',
-  ED448 = 'ed448',
-  ED25519 = 'ed25519',
-}
-export type MLSPublicKeyRecord = Partial<Record<MLSPublicKeyAlgorithmKeys, string>>;
+export {MLSPublicKeyAlgorithmKeys, type MLSPublicKeyRecord};
 
 export type GetMLSPublicKeysResponseData = {
   removal: MLSPublicKeyRecord;

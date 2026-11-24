@@ -51,6 +51,7 @@ import {
   UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
 } from './coreCryptoMlsError';
 import {getMLSDeviceStatus, isMLSDevice, MLSDeviceStatus} from './mlsDeviceStatus';
+import {MLSServiceEventPayloads, MLSServiceEvents} from './mlsServiceEvents';
 
 import {APIClient} from '../../../../apiClient/apiClient';
 import type {
@@ -129,27 +130,10 @@ const defaultConfig = {
   nbKeyPackages: 100,
 };
 
-export enum MLSServiceEvents {
-  NEW_EPOCH = 'newEpoch',
-  MLS_CLIENT_MISMATCH = 'mlsClientMismatch',
-  MLS_EVENT_DISTRIBUTED = 'mlsEventDistributed',
-  KEY_MATERIAL_UPDATE_FAILURE = 'keyMaterialUpdateFailure',
-  MLS_CONVERSATION_RECOVERY_REQUIRED = 'mlsConversationRecoveryRequired',
-}
-
-type Events = {
-  [MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE]: {error: unknown; groupId: string};
-  [MLSServiceEvents.NEW_EPOCH]: {epoch: bigint; groupId: string};
-  [MLSServiceEvents.MLS_CLIENT_MISMATCH]: void;
-  [MLSServiceEvents.MLS_EVENT_DISTRIBUTED]: {
-    events: any;
-    time: string;
-  };
-  [MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED]: void;
-};
+export {MLSServiceEvents};
 
 const MLS_CONVERSATION_RECOVERY_KEY = 'required';
-export class MLSService extends TypedEventEmitter<Events> {
+export class MLSService extends TypedEventEmitter<MLSServiceEventPayloads> {
   logger = getLogger('@wireapp/core/MLSService');
   private _config?: ConfiguredMLSConfig;
   private clientInitialized = false;

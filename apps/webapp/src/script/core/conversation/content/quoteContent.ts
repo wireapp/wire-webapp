@@ -19,14 +19,4 @@
 
 import {IQuote} from '@wireapp/protocol-messaging';
 
-import {AssetContent} from './assetContent';
-import {LocationContent} from './locationContent';
-import {MultiPartContent} from './multipartContent';
-import {TextContent} from './textContent';
-
 export {IQuote as QuoteContent};
-
-export interface QuoteMessageContent {
-  content: AssetContent | LocationContent | TextContent | MultiPartContent;
-  quotedMessageId: string;
-}
