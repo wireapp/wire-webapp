@@ -21,6 +21,8 @@ import {type ReactNode, useEffect, useMemo, type FunctionComponent} from 'react'
 
 import {container} from 'tsyringe';
 
+import {Availability} from '@wireapp/protocol-messaging';
+
 import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
 import {createMeetingStore} from './createMeetingStore';
 import {MeetingStoreProvider} from './meetingStoreProvider';
@@ -38,6 +40,7 @@ import {createMeetingReminderScheduler} from '../createMeetingReminderScheduler'
 import {createBrowserDeviceTimeZone} from '../deviceTimeZone';
 import {createMeetingNotificationEventHandlers} from '../meetingNotificationEventHandlers';
 import {
+  type AddNotificationInput,
   MeetingNotificationKind,
   useMeetingNotificationStore,
 } from '../meetingNotificationStore/meetingNotificationStore';
@@ -120,20 +123,27 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
     });
 
     const notificationStore = useMeetingNotificationStore.getState();
+    const selfUser = container.resolve(UserState).self();
+    const getAvailability = (): Availability.Type => {
+      return selfUser.availability();
+    };
+    const addNotificationUnlessAway = (notification: AddNotificationInput): void => {
+      if (getAvailability() !== Availability.Type.AWAY) {
+        notificationStore.addNotification(notification);
+      }
+    };
     const notificationHandlers = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => {
         return store.getState().meetingSeries;
       },
       clock,
-      addNotification: notificationStore.addNotification,
+      addNotification: addNotificationUnlessAway,
       dismissNotificationsForMeeting: notificationStore.dismissNotificationsForMeeting,
       logger,
     });
     const reminderOsNotifier = createMeetingReminderOsNotifier({
       notificationApi: createBrowserSystemNotificationApi(),
-      getAvailability: () => {
-        return container.resolve(UserState).self().availability();
-      },
+      getAvailability,
       openMeetingsList: () => {
         return mainViewModel.list.openMeetingsList();
       },
@@ -152,11 +162,11 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
       translate,
       logger,
     });
-    // One scheduler, two sinks: the in-app card always fires, the OS toast is additive.
+    // One scheduler, two sinks. Each checks availability when the reminder fires.
     const reminderScheduler = createMeetingReminderScheduler({
       clock,
       onReminder: payload => {
-        notificationStore.addNotification({
+        addNotificationUnlessAway({
           ...payload,
           kind: MeetingNotificationKind.REMINDER,
         });

@@ -41,6 +41,7 @@ describe('buffered log output', () => {
       clock,
       append,
       configuration: {...logPersistenceConfiguration, batchTargetBytes: 6},
+      maximumBatchRecords: Infinity,
     });
     output.write('{}', 'info');
     expect(batches).toEqual([]);
@@ -60,7 +61,12 @@ describe('buffered log output', () => {
   it('batches ordered, unchanged sanitized records and flushes on the clock', async () => {
     const clock = createTestClock();
     const append = jest.fn<Promise<void>, [readonly string[]]>();
-    const output = createBufferedLogOutput({clock, append, configuration: logPersistenceConfiguration});
+    const output = createBufferedLogOutput({
+      clock,
+      append,
+      configuration: logPersistenceConfiguration,
+      maximumBatchRecords: Infinity,
+    });
     const firstLine = '{"msg":"Bearer [REDACTED]","escaped":"\\u0025","unicode":"€"}';
     const secondLine = '{"msg":"second\\nline"}';
     output.write(firstLine, 'info');
@@ -81,6 +87,7 @@ describe('buffered log output', () => {
       clock: createTestClock(),
       append,
       configuration: {...logPersistenceConfiguration, maximumFileBytes: 6},
+      maximumBatchRecords: Infinity,
     });
     output.write('{}', 'debug');
     output.write('{}', 'info');
@@ -97,6 +104,7 @@ describe('buffered log output', () => {
       clock: createTestClock(),
       append,
       configuration: {...logPersistenceConfiguration, maximumPendingBytes: 10},
+      maximumBatchRecords: Infinity,
     });
     output.write('"€"', 'info');
     output.write('"a"', 'info');
@@ -120,6 +128,7 @@ describe('buffered log output', () => {
       clock: createTestClock(),
       append,
       configuration: {...logPersistenceConfiguration, maximumPendingBytes: 6},
+      maximumBatchRecords: Infinity,
     });
     output.write('{}', 'info');
     output.write('{}', 'info');
@@ -141,6 +150,7 @@ describe('buffered log output', () => {
       clock: createTestClock(),
       append,
       configuration: {...logPersistenceConfiguration, maximumFileBytes: 6},
+      maximumBatchRecords: Infinity,
     });
     output.write('"long"', 'info');
     output.write('"€€"', 'info');
@@ -165,7 +175,12 @@ describe('buffered log output', () => {
 
       batches.push(lines);
     }
-    const output = createBufferedLogOutput({clock, append, configuration: logPersistenceConfiguration});
+    const output = createBufferedLogOutput({
+      clock,
+      append,
+      configuration: logPersistenceConfiguration,
+      maximumBatchRecords: Infinity,
+    });
     output.write('{}', 'info');
     await expect(output.flush()).resolves.toBeUndefined();
     output.write('[]', 'info');
@@ -183,7 +198,12 @@ describe('buffered log output', () => {
   it('initializes without logs, disposes with a final flush and cancels its timer', async () => {
     const clock = createTestClock();
     const append = jest.fn<Promise<void>, [readonly string[]]>();
-    const output = createBufferedLogOutput({clock, append, configuration: logPersistenceConfiguration});
+    const output = createBufferedLogOutput({
+      clock,
+      append,
+      configuration: logPersistenceConfiguration,
+      maximumBatchRecords: Infinity,
+    });
     await output.flush();
     expect(append).toHaveBeenCalledWith([]);
     output.write('{}', 'info');

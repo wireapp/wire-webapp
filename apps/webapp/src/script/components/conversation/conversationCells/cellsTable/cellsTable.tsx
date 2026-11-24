@@ -75,7 +75,7 @@ import {
 import {getPermanentDeleteStatusKind} from './getPermanentDeleteStatusKind';
 import {resolveRestoreTargets} from './restoreBinSelection/resolveRestoreTargets';
 import {showBulkRestoreModal} from './restoreBinSelection/showBulkRestoreModal';
-import {useBulkRestore} from './restoreBinSelection/useBulkRestore';
+import {useBulkRestore, type BulkRestoreReviewReason} from './restoreBinSelection/useBulkRestore';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
@@ -91,10 +91,7 @@ import {UploadIcon} from '../../../../uiKit/dataDisplay/icon/uploadIcon';
 import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
 import {formatBytes} from '../../../../util/util';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '../../../Modals/PrimaryModal';
-import {
-  getCellsBackgroundActionEvidence,
-  observeCellsBackgroundActionJobs,
-} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
+import {getCellsBackgroundActionEvidence} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import type {CellsBackgroundActionOutcome} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
 import {createBulkJobPollingPolicy} from '../common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
 import {
@@ -108,6 +105,7 @@ import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {isInRecycleBin} from '../common/recycleBin/recycleBin';
 import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
 import {getSharedDriveDroppedFiles} from '../getSharedDriveDroppedFiles';
+import {getBackgroundActionStatusKind} from '../sharedDriveBackgroundActionController';
 import {moveStatusMessageKey} from '../sharedDriveMoveStatusMessages';
 import {
   useSharedDriveUploadStatus,
@@ -224,6 +222,16 @@ const bulkMoveToBinReviewReasonByStatus: Readonly<
   failed: 'job-failed',
 };
 
+const getMoveToBinJobUuids = (response: RestPerformActionResponse): readonly string[] => {
+  return response.Status === RestActionStatus.Background
+    ? getCellsBackgroundActionEvidence(response, 'delete').jobUuids
+    : [];
+};
+
+const getImmediateMoveToBinStatusKind = (response: RestPerformActionResponse): SharedDriveMoveStatusKind => {
+  return response.Status === RestActionStatus.Performed ? 'completed' : 'status-unknown';
+};
+
 export const CellsTable = ({
   nodes,
   isNodesLoading,
@@ -250,15 +258,40 @@ export const CellsTable = ({
   const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
   const {
     updateMoveStatus: publishMoveStatus,
-    startMoveStatus: publishMoveStart,
+    getMoveStatus,
+    tryStartMove,
+    finishMove,
+    isMoveActive,
     isMoveStatusCurrent,
     getMoveOperation,
     setMoveJobUuids,
     createMoveStatusId,
     clearMoveStatus,
-    observeBackgroundMove,
+    observeBackgroundAction,
+    requestEmptyBinRefresh,
   } = useSharedDriveUploadStatus();
   const currentConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
+  const currentRestoreStatus = getMoveStatus(currentConversationQualifiedId);
+  const restoreReviewReasonByStatus: Readonly<Partial<Record<SharedDriveMoveStatusKind, BulkRestoreReviewReason>>> = {
+    'request-failed': 'request-failed',
+    partial: 'partial',
+    failed: 'failed',
+    'status-unknown': 'status-unknown',
+    'finished-unknown': 'refresh-failed',
+  };
+  const restoreReviewReason =
+    maybe.isJust(currentRestoreStatus) && currentRestoreStatus.value.action === 'restore'
+      ? restoreReviewReasonByStatus[currentRestoreStatus.value.kind]
+      : undefined;
+  const attachedRestoreStatusId = useRef<Maybe<string>>(Maybe.nothing());
+  const currentDeleteStatus = getMoveStatus(currentConversationQualifiedId);
+  const deleteNeedsReviewAttachment =
+    maybe.isJust(currentDeleteStatus) &&
+    currentDeleteStatus.value.action === 'permanentDelete' &&
+    currentDeleteStatus.value.kind !== 'processing' &&
+    currentDeleteStatus.value.kind !== 'completed' &&
+    currentDeleteStatus.value.onReview === undefined;
+  const attachedDeleteStatusId = useRef<Maybe<string>>(Maybe.nothing());
   const updateMoveStatus = useCallback(
     (status: Omit<SharedDriveMoveStatus, 'conversationQualifiedId'>): void => {
       const operation = getMoveOperation(status.id);
@@ -268,11 +301,37 @@ export const CellsTable = ({
     },
     [getMoveOperation, publishMoveStatus],
   );
-  const startMoveStatus = useCallback(
-    (status: Omit<SharedDriveMoveStatus, 'conversationQualifiedId'>): void => {
-      publishMoveStart({...status, conversationQualifiedId: currentConversationQualifiedId});
+  const observeBackgroundJobs = useCallback(
+    ({
+      actionName,
+      statusId,
+      summary,
+      jobUuids,
+      onOutcome,
+    }: {
+      readonly actionName: 'move' | 'delete';
+      readonly statusId: string;
+      readonly summary: SharedDriveMoveSummary;
+      readonly jobUuids: readonly string[];
+      readonly onOutcome: (outcome: CellsBackgroundActionOutcome) => void;
+    }): void => {
+      setMoveJobUuids(statusId, jobUuids);
+      observeBackgroundAction({
+        actionName,
+        status: {
+          id: statusId,
+          conversationQualifiedId: currentConversationQualifiedId,
+          kind: 'processing',
+          ...summary,
+        },
+        jobUuids,
+        cellsRepository,
+        clock,
+        pollingPolicy: createBulkJobPollingPolicy(random),
+        onOutcome,
+      });
     },
-    [currentConversationQualifiedId, publishMoveStart],
+    [cellsRepository, clock, currentConversationQualifiedId, observeBackgroundAction, random, setMoveJobUuids],
   );
   const activeMoveStatusId = useRef<Maybe<string>>(Maybe.nothing());
   const isTableMounted = useRef(true);
@@ -299,12 +358,10 @@ export const CellsTable = ({
   const [isBulkMoveToBinNeedsReview, setIsBulkMoveToBinNeedsReview] = useState(false);
   const [isRefreshingBulkMoveToBin, setIsRefreshingBulkMoveToBin] = useState(false);
   const [bulkMoveToBinReviewReason, setBulkMoveToBinReviewReason] = useState<BulkMoveToBinReviewReason | null>(null);
-  const [backgroundMoveToBinJobUuids, setBackgroundMoveToBinJobUuids] = useState<string[]>([]);
   const isBulkMoveToBinPendingRef = useRef(false);
   const latestSelectionScopeKey = useRef(selectionScopeKey);
   latestSelectionScopeKey.current = selectionScopeKey;
   const previousSelectionScopeKey = useRef(selectionScopeKey);
-  const bulkMoveToBinStatusId = useRef<Maybe<string>>(Maybe.nothing());
   const [isBulkMovePreviewOpen, setIsBulkMovePreviewOpen] = useState(false);
   const [moveState, dispatchMove] = useReducer(bulkMoveReducer, {kind: 'idle'});
   const isBulkMoveRequestPending = moveState.kind === 'request-pending';
@@ -315,6 +372,18 @@ export const CellsTable = ({
   const isBackgroundMoveRetryBlocked = moveState.kind === 'needs-review' && moveState.reason !== 'status-unknown';
   const isRefreshingBulkMoveOutcome = moveState.kind === 'needs-review' && moveState.refresh === 'refreshing';
   const didBulkMoveOutcomeRefreshFail = moveState.kind === 'needs-review' && moveState.refresh === 'failed';
+  const currentMoveStatus = getMoveStatus(currentConversationQualifiedId);
+  useEffect(() => {
+    if (moveState.kind !== 'idle' || !isMoveActive || maybe.isNothing(currentMoveStatus)) {
+      return;
+    }
+    const status = currentMoveStatus.value;
+    if (status.action !== 'move' || status.kind === 'processing' || status.kind === 'completed') {
+      return;
+    }
+    activeMoveStatusId.current = Maybe.just(status.id);
+    dispatchMove({type: 'needs-review', reason: status.kind});
+  }, [currentMoveStatus, isMoveActive, moveState.kind]);
   const isMovePendingRef = useRef(false);
   isMovePendingRef.current = isBulkMoveRequestPending || isBackgroundMovePending;
   const selectedNodeIdsRef = useRef(selectedNodeIds);
@@ -333,6 +402,10 @@ export const CellsTable = ({
       void handleRefreshAfterPermanentDeleteReview();
     },
   );
+  const handlePermanentDeleteCompleted = (): void => {
+    permanentDeleteStatusReporter.report('completed');
+    setSelectedNodeIds(new Set());
+  };
   const permanentDelete = usePermanentDeleteReconciliation({
     cellsRepository,
     clock,
@@ -345,15 +418,30 @@ export const CellsTable = ({
     isNodesLoading,
     onRefresh,
     onRefreshAndReportSuccess,
-    onDeleteCompleted: nodeIds => {
-      permanentDeleteStatusReporter.report('completed');
-      setSelectedNodeIds(currentSelection => {
-        return hasSameSelection(currentSelection, nodeIds) ? new Set() : currentSelection;
-      });
-    },
-    onReconciliationCompleted: () => {
-      permanentDeleteStatusReporter.report('completed');
+    onDeleteCompleted: handlePermanentDeleteCompleted,
+    onReconciliationCompleted: handlePermanentDeleteCompleted,
+    onReviewResolved: () => {
+      permanentDeleteStatusReporter.clear();
       setSelectedNodeIds(new Set());
+    },
+    onContinueAfterViewLeave: continuation => {
+      if (continuation.kind === 'terminal') {
+        const {onReview: _onReview, isReviewing: _isReviewing, ...status} = continuation.status;
+        publishMoveStatus({...status, kind: continuation.statusKind});
+        return;
+      }
+      setMoveJobUuids(continuation.status.id, continuation.jobUuids);
+      observeBackgroundAction({
+        actionName: 'delete',
+        cellsRepository,
+        status: continuation.status,
+        jobUuids: continuation.jobUuids,
+        clock,
+        pollingPolicy: createBulkJobPollingPolicy(random),
+        onOutcome: () => {
+          return undefined;
+        },
+      });
     },
     reportError: error => {
       console.error(error);
@@ -368,6 +456,7 @@ export const CellsTable = ({
     reviewReason: permanentDeleteReviewReason,
     deletePermanently,
     refreshReview: handleRefreshAfterPermanentDeleteReview,
+    resumeReview: resumePermanentDeleteReview,
     cancel: cancelPermanentDeleteReconciliation,
     clearRejection: clearPermanentDeleteRejection,
     reset: resetPermanentDeleteReconciliation,
@@ -390,6 +479,9 @@ export const CellsTable = ({
     },
     onStatusChange: restoreStatusReporter.report,
     onStatusCleared: restoreStatusReporter.clear,
+    observeBackgroundAction,
+    setBackgroundActionJobUuids: setMoveJobUuids,
+    publishStatus: publishMoveStatus,
     reportError: error => {
       console.error(error);
     },
@@ -400,7 +492,12 @@ export const CellsTable = ({
     setPermanentDeleteReviewing(isPermanentDeleteRefreshingReview);
   }, [isPermanentDeleteRefreshingReview, setPermanentDeleteReviewing]);
   const setRestoreReviewing = restoreStatusReporter.setReviewing;
-  const {isRefreshingReview: isRestoreRefreshingReview} = bulkRestore;
+  const {
+    isRefreshingReview: isRestoreRefreshingReview,
+    reviewReason: restoreReviewReasonFromHook,
+    resumeReview,
+  } = bulkRestore;
+  const {attachReviewStatus} = restoreStatusReporter;
   useEffect(() => {
     setRestoreReviewing(isRestoreRefreshingReview);
   }, [isRestoreRefreshingReview, setRestoreReviewing]);
@@ -440,6 +537,18 @@ export const CellsTable = ({
     previousSelectionScopeKey.current = selectionScopeKey;
     activeDriveDrag.current = null;
 
+    const activeOperation = maybe.isJust(activeMoveStatusId.current)
+      ? getMoveOperation(activeMoveStatusId.current.value)
+      : undefined;
+    const isMoveStillCurrent: boolean =
+      activeOperation !== undefined &&
+      Boolean(isMoveStatusCurrent(activeOperation.status.conversationQualifiedId, activeOperation.status.id));
+    if (didSelectionScopeChange && !isMoveStillCurrent) {
+      activeMoveStatusId.current = Maybe.nothing();
+      dispatchMove({type: 'resolved'});
+      setIsBulkMovePreviewOpen(false);
+    }
+
     if (isMovePendingRef.current) {
       return cancelPermanentDeleteReconciliation;
     }
@@ -461,7 +570,6 @@ export const CellsTable = ({
     setIsBulkMoveToBinNeedsReview(false);
     setIsRefreshingBulkMoveToBin(false);
     setBulkMoveToBinReviewReason(null);
-    setBackgroundMoveToBinJobUuids([]);
     if (usePrimaryModalState.getState().currentModalId === permanentDeleteModalId) {
       removeCurrentModal();
     }
@@ -472,11 +580,58 @@ export const CellsTable = ({
   }, [
     bulkRestoreModalId,
     cancelPermanentDeleteReconciliation,
+    getMoveOperation,
+    isMoveStatusCurrent,
     permanentDeleteModalId,
     resetBulkRestore,
     resetPermanentDeleteReconciliation,
     selectionScopeKey,
     isSelectionEnabled,
+  ]);
+
+  useEffect(() => {
+    if (!isInRecycleBin() || restoreReviewReason === undefined || maybe.isNothing(currentRestoreStatus)) {
+      return;
+    }
+    if (restoreReviewReasonFromHook === null) {
+      resumeReview(restoreReviewReason);
+    }
+    if (
+      maybe.isNothing(attachedRestoreStatusId.current) ||
+      attachedRestoreStatusId.current.value !== currentRestoreStatus.value.id
+    ) {
+      attachedRestoreStatusId.current = Maybe.just(currentRestoreStatus.value.id);
+      attachReviewStatus(currentRestoreStatus.value);
+    }
+  }, [
+    attachReviewStatus,
+    currentRestoreStatus,
+    restoreReviewReason,
+    restoreReviewReasonFromHook,
+    resumeReview,
+    selectionScopeKey,
+  ]);
+
+  const {attachReviewStatus: attachPermanentDeleteReviewStatus} = permanentDeleteStatusReporter;
+  useEffect(() => {
+    if (!isInRecycleBin() || !deleteNeedsReviewAttachment || maybe.isNothing(currentDeleteStatus)) {
+      attachedDeleteStatusId.current = Maybe.nothing();
+      return;
+    }
+    if (
+      maybe.isNothing(attachedDeleteStatusId.current) ||
+      attachedDeleteStatusId.current.value !== currentDeleteStatus.value.id
+    ) {
+      attachedDeleteStatusId.current = Maybe.just(currentDeleteStatus.value.id);
+      resumePermanentDeleteReview(currentDeleteStatus.value, selectionScopeKey, getCellsFilesPath());
+      attachPermanentDeleteReviewStatus(currentDeleteStatus.value);
+    }
+  }, [
+    attachPermanentDeleteReviewStatus,
+    currentDeleteStatus,
+    deleteNeedsReviewAttachment,
+    resumePermanentDeleteReview,
+    selectionScopeKey,
   ]);
 
   useEffect(() => {
@@ -524,25 +679,35 @@ export const CellsTable = ({
     setIsBulkMovePreviewOpen(false);
   };
 
-  const handleBulkMoveStart = (summary: SharedDriveMoveSummary): string => {
+  const handleBulkMoveStart = (summary: SharedDriveMoveSummary): Maybe<string> => {
     const id = createMoveStatusId();
+    if (!tryStartMove({id, kind: 'processing', conversationQualifiedId: currentConversationQualifiedId, ...summary})) {
+      return Maybe.nothing();
+    }
     activeMoveStatusId.current = Maybe.just(id);
     dispatchMove({type: 'request-started'});
-    setIsBulkMovePreviewOpen(false);
-    startMoveStatus({id, kind: 'processing', ...summary});
-    return id;
+    return Maybe.just(id);
   };
 
-  const handleBackgroundMoveOutcome = (outcome: CellsBackgroundActionOutcome, moveStatusId: string): void => {
+  const completeMoveToFolder = (moveStatusId: string, closePreview: boolean): void => {
+    finishMove(moveStatusId);
+    activeMoveStatusId.current = Maybe.nothing();
     if (!isTableMounted.current) {
       return;
     }
-
-    if (outcome === 'all-finished') {
-      activeMoveStatusId.current = Maybe.nothing();
-      dispatchMove({type: 'resolved'});
+    dispatchMove({type: 'resolved'});
+    if (closePreview) {
       setIsBulkMovePreviewOpen(false);
-      onRefresh();
+    }
+    onRefresh();
+  };
+
+  const handleBackgroundMoveOutcome = (outcome: CellsBackgroundActionOutcome, moveStatusId: string): void => {
+    if (outcome === 'all-finished') {
+      completeMoveToFolder(moveStatusId, true);
+      return;
+    }
+    if (!isTableMounted.current) {
       return;
     }
 
@@ -558,12 +723,16 @@ export const CellsTable = ({
     setIsBulkMovePreviewOpen(false);
   };
 
-  const startBackgroundMoveObservation = (moveStatusId: string): void => {
-    observeBackgroundMove({
-      operationId: moveStatusId,
-      cellsRepository,
-      clock,
-      random,
+  const startBackgroundMoveObservation = (
+    moveStatusId: string,
+    summary: SharedDriveMoveSummary,
+    jobUuids: readonly string[],
+  ): void => {
+    observeBackgroundJobs({
+      actionName: 'move',
+      statusId: moveStatusId,
+      summary,
+      jobUuids,
       onOutcome: outcome => {
         const conversation = getMoveOperation(moveStatusId)?.status.conversationQualifiedId;
         if (conversation !== undefined && isMoveStatusCurrent(conversation, moveStatusId)) {
@@ -621,11 +790,7 @@ export const CellsTable = ({
 
     if (response.Status === RestActionStatus.Performed) {
       updateMoveStatus({...summary, kind: 'completed'});
-      activeMoveStatusId.current = Maybe.nothing();
-      if (isTableMounted.current) {
-        dispatchMove({type: 'resolved'});
-        onRefresh();
-      }
+      completeMoveToFolder(moveStatusId, false);
       return true;
     }
 
@@ -645,8 +810,8 @@ export const CellsTable = ({
       dispatchMove({type: 'background-started'});
     }
     updateMoveStatus({...summary, kind: 'processing'});
-    startBackgroundMoveObservation(moveStatusId);
-    return true;
+    startBackgroundMoveObservation(moveStatusId, summary, uniqueMoveJobUuids);
+    return false;
   };
 
   const handleRetryBackgroundMoveStatus = (): void => {
@@ -662,11 +827,23 @@ export const CellsTable = ({
         ...operation.status,
         kind: 'processing',
       });
-      startBackgroundMoveObservation(moveStatusId);
+      startBackgroundMoveObservation(moveStatusId, operation.status, operation.jobUuids);
     }
   };
 
+  const isSelectionDisabled =
+    isMoveActive ||
+    isBulkMoveRequestPending ||
+    isBackgroundMovePending ||
+    isBulkMoveToBinPending ||
+    bulkRestore.isPending ||
+    isPermanentDeletePending ||
+    isPermanentDeleteUnresolved;
+
   const handleToggleSelection = (nodeId: string, isSelected: boolean): void => {
+    if (isSelectionDisabled) {
+      return;
+    }
     activeDriveDrag.current = null;
     clearPermanentDeleteRejection();
     setSelectedNodeIds(currentSelection => {
@@ -681,6 +858,9 @@ export const CellsTable = ({
   };
 
   const handleTogglePageSelection = (isSelected: boolean): void => {
+    if (isSelectionDisabled) {
+      return;
+    }
     activeDriveDrag.current = null;
     clearPermanentDeleteRejection();
     setSelectedNodeIds(currentSelection => {
@@ -701,7 +881,7 @@ export const CellsTable = ({
   };
 
   const handleRestoreSelection = (nodeIds: string[], scopeKey: string): void => {
-    if (!hasSameSelection(selectedNodeIdsRef.current, nodeIds)) {
+    if (isSelectionDisabled || !hasSameSelection(selectedNodeIdsRef.current, nodeIds)) {
       return;
     }
 
@@ -718,16 +898,16 @@ export const CellsTable = ({
       return;
     }
 
-    restoreStatusReporter.start(
+    const status = restoreStatusReporter.start(
       currentSelectedNodes.map(node => {
         return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
       }),
     );
-    void bulkRestore.restore(currentResolution.targets, scopeKey);
+    void bulkRestore.restore(currentResolution.targets, scopeKey, status);
   };
 
   const handlePermanentDelete = async (nodeIds: string[], scopeKey: string, path: string): Promise<void> => {
-    if (isPermanentDeletePending || isPermanentDeleteUnresolved || !isCurrentPermanentDeleteScope(scopeKey, path)) {
+    if (isSelectionDisabled || !isCurrentPermanentDeleteScope(scopeKey, path)) {
       return;
     }
     if (!hasSameSelection(selectedNodeIdsRef.current, nodeIds)) {
@@ -752,12 +932,12 @@ export const CellsTable = ({
       return;
     }
 
-    permanentDeleteStatusReporter.start(
+    const status = permanentDeleteStatusReporter.start(
       currentSelectedNodes.map(node => {
         return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
       }),
     );
-    await deletePermanently(nodeIds, scopeKey, path);
+    await deletePermanently(nodeIds, scopeKey, path, status);
   };
   const [activeFolderDropTargetId, setActiveFolderDropTargetId] = useState<string | null>(null);
   const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
@@ -775,11 +955,9 @@ export const CellsTable = ({
   const isRowSelectionEnabled =
     isSelectionEnabled &&
     !isBulkMoveOutcomeUnresolved &&
-    !isPermanentDeleteUnresolved &&
     !isBulkMoveToBinNeedsReview &&
-    !isBulkMoveToBinPending &&
-    !bulkRestore.isPending &&
-    bulkRestore.reviewReason === null;
+    bulkRestore.reviewReason === null &&
+    restoreReviewReason === undefined;
 
   const table = useReactTable({
     data: nodes,
@@ -802,6 +980,7 @@ export const CellsTable = ({
           return selectedNodeIds.has(node.id);
         }),
       selectionEnabled: isRowSelectionEnabled,
+      selectionDisabled: isSelectionDisabled,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -813,15 +992,15 @@ export const CellsTable = ({
   const selectedFilesTotalSize =
     selectedNodes.length === selectedNodeIds.size ? getSelectedFilesTotalSize(selectedNodes) : Maybe.nothing();
   const restoreResolution = resolveRestoreTargets({selectedNodes});
-  const isBulkRestoreBlocking = bulkRestore.isPending || bulkRestore.reviewReason !== null;
+  const isBulkRestoreBlocking =
+    bulkRestore.isPending || bulkRestore.reviewReason !== null || restoreReviewReason !== undefined;
   const canRestoreSelection =
     isBulkRestoreEnabled &&
     selectedNodes.length > 0 &&
     selectedNodes.length === selectedNodeIds.size &&
     isInRecycleBin() &&
     !isBulkRestoreBlocking &&
-    !isPermanentDeletePending &&
-    !isPermanentDeleteUnresolved &&
+    !isSelectionDisabled &&
     canPerformCurrentDriveAction(CELLS_ACTION.RESTORE) &&
     restoreResolution.canRestore;
   const canPermanentlyDeleteSelection =
@@ -829,7 +1008,7 @@ export const CellsTable = ({
     selectedNodes.length === selectedNodeIds.size &&
     isInRecycleBin() &&
     !isBulkRestoreBlocking &&
-    !isPermanentDeleteUnresolved &&
+    !isSelectionDisabled &&
     canPerformCurrentDriveAction(CELLS_ACTION.DELETE) &&
     selectedNodes.every(node => {
       return canPerformCellsAction({action: CELLS_ACTION.DELETE, selfUserDriveRole: node.selfUserDriveRole});
@@ -841,6 +1020,7 @@ export const CellsTable = ({
     !isBulkMoveOutcomeUnresolved &&
     !isBulkMoveRequestPending &&
     !isBackgroundMovePending &&
+    !isMoveActive &&
     !isBulkMoveToBinPending &&
     !isBulkMoveToBinNeedsReview &&
     !isInRecycleBin() &&
@@ -856,6 +1036,7 @@ export const CellsTable = ({
     !isBulkMoveOutcomeUnresolved &&
     !isBulkMoveRequestPending &&
     !isBackgroundMovePending &&
+    !isMoveActive &&
     !isBulkMoveToBinPending &&
     !isBulkMoveToBinNeedsReview &&
     !isInRecycleBin() &&
@@ -864,6 +1045,10 @@ export const CellsTable = ({
       return canPerformCellsAction({action: CELLS_ACTION.DELETE, selfUserDriveRole: node.selfUserDriveRole});
     });
   const tableWrapperStyles = rows.length > 0 ? [wrapperStyles, wrapperWithRowsStyles] : wrapperStyles;
+
+  const hasLeftCapturedScope = useCallback((captured: CapturedBulkMoveToBinSelection): boolean => {
+    return captured.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin();
+  }, []);
 
   const isCapturedBulkMoveToBinSelectionCurrent = useCallback(
     (captured: CapturedBulkMoveToBinSelection): boolean => {
@@ -902,17 +1087,19 @@ export const CellsTable = ({
     setIsBulkMoveToBinConfirmationOpen(false);
     setCapturedBulkMoveToBin(null);
     setSelectedNodeIds(new Set());
-    setBackgroundMoveToBinJobUuids([]);
     setBulkMoveToBinReviewReason(null);
   }, []);
 
   const finishBulkMoveToBinOutcome = useCallback(
     async (captured: CapturedBulkMoveToBinSelection, statusId: string, statusKind: SharedDriveMoveStatusKind) => {
+      if (!isTableMounted.current) {
+        updateMoveStatus({id: statusId, kind: statusKind, ...captured.summary});
+        return;
+      }
       setIsBulkMoveToBinConfirmationOpen(false);
       setIsRefreshingBulkMoveToBin(true);
-      setBackgroundMoveToBinJobUuids([]);
 
-      if (captured.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin()) {
+      if (hasLeftCapturedScope(captured)) {
         updateMoveStatus({id: statusId, kind: 'status-unknown', ...captured.summary});
         resetBulkMoveToBinAfterScopeChange();
         return;
@@ -925,7 +1112,12 @@ export const CellsTable = ({
         didRefresh = false;
       }
 
-      if (captured.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin()) {
+      if (!isTableMounted.current) {
+        updateMoveStatus({id: statusId, kind: statusKind, ...captured.summary});
+        return;
+      }
+
+      if (hasLeftCapturedScope(captured)) {
         updateMoveStatus({id: statusId, kind: 'status-unknown', ...captured.summary});
         resetBulkMoveToBinAfterScopeChange();
         return;
@@ -951,7 +1143,41 @@ export const CellsTable = ({
       setIsBulkMoveToBinPending(false);
       setIsRefreshingBulkMoveToBin(false);
     },
-    [onRefreshAfterBulkMoveToBinOutcome, resetBulkMoveToBinAfterScopeChange, updateMoveStatus],
+    [hasLeftCapturedScope, onRefreshAfterBulkMoveToBinOutcome, resetBulkMoveToBinAfterScopeChange, updateMoveStatus],
+  );
+
+  const observeMoveToBinJobs = useCallback(
+    (captured: CapturedBulkMoveToBinSelection, statusId: string, jobUuids: readonly string[]): void => {
+      observeBackgroundJobs({
+        actionName: 'delete',
+        statusId,
+        summary: captured.summary,
+        jobUuids,
+        onOutcome: outcome => {
+          finishMove(statusId);
+          if (hasLeftCapturedScope(captured) || !isTableMounted.current) {
+            requestEmptyBinRefresh(currentConversationQualifiedId);
+            if (isTableMounted.current) {
+              resetBulkMoveToBinAfterScopeChange();
+            }
+          } else {
+            void finishBulkMoveToBinOutcome(captured, statusId, getBackgroundActionStatusKind(outcome));
+          }
+        },
+      });
+      if (isTableMounted.current && captured.scopeKey !== latestSelectionScopeKey.current) {
+        resetBulkMoveToBinAfterScopeChange();
+      }
+    },
+    [
+      currentConversationQualifiedId,
+      finishBulkMoveToBinOutcome,
+      finishMove,
+      hasLeftCapturedScope,
+      observeBackgroundJobs,
+      requestEmptyBinRefresh,
+      resetBulkMoveToBinAfterScopeChange,
+    ],
   );
 
   const handleConfirmBulkMoveToBin = useCallback(async (): Promise<void> => {
@@ -966,47 +1192,60 @@ export const CellsTable = ({
       return;
     }
 
+    const statusId = createMoveStatusId();
+    if (
+      !tryStartMove({
+        id: statusId,
+        kind: 'processing',
+        conversationQualifiedId: currentConversationQualifiedId,
+        ...captured.summary,
+      })
+    ) {
+      return;
+    }
     isBulkMoveToBinPendingRef.current = true;
     setIsBulkMoveToBinPending(true);
     setIsBulkMoveToBinConfirmationOpen(false);
-    const statusId = createMoveStatusId();
-    bulkMoveToBinStatusId.current = Maybe.just(statusId);
-    startMoveStatus({id: statusId, kind: 'processing', ...captured.summary});
 
     try {
       const response = await cellsRepository.deleteNodes({uuids: captured.nodeIds, permanently: false});
-      if (captured.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin()) {
-        updateMoveStatus({id: statusId, kind: 'status-unknown', ...captured.summary});
-        resetBulkMoveToBinAfterScopeChange();
+      const jobUuids = getMoveToBinJobUuids(response);
+      if (jobUuids.length > 0) {
+        observeMoveToBinJobs(captured, statusId, jobUuids);
         return;
       }
 
-      if (response.Status === RestActionStatus.Performed) {
-        await finishBulkMoveToBinOutcome(captured, statusId, 'completed');
-        return;
-      }
-
-      if (response.Status === RestActionStatus.Background) {
-        const {jobUuids} = getCellsBackgroundActionEvidence(response, 'delete');
-        if (jobUuids.length > 0) {
-          setBackgroundMoveToBinJobUuids([...jobUuids]);
-          setIsBulkMoveToBinConfirmationOpen(false);
-          return;
+      const statusKind = getImmediateMoveToBinStatusKind(response);
+      finishMove(statusId);
+      if (!isTableMounted.current || hasLeftCapturedScope(captured)) {
+        updateMoveStatus({id: statusId, kind: statusKind, ...captured.summary});
+        requestEmptyBinRefresh(currentConversationQualifiedId);
+        if (isTableMounted.current) {
+          resetBulkMoveToBinAfterScopeChange();
         }
+        return;
       }
 
-      await finishBulkMoveToBinOutcome(captured, statusId, 'status-unknown');
+      await finishBulkMoveToBinOutcome(captured, statusId, statusKind);
     } catch {
+      finishMove(statusId);
       updateMoveStatus({id: statusId, kind: 'request-failed', ...captured.summary});
-      await finishBulkMoveToBinOutcome(captured, statusId, 'request-failed');
+      if (isTableMounted.current) {
+        await finishBulkMoveToBinOutcome(captured, statusId, 'request-failed');
+      }
     }
   }, [
     capturedBulkMoveToBin,
+    currentConversationQualifiedId,
     isCapturedBulkMoveToBinSelectionCurrent,
     createMoveStatusId,
-    startMoveStatus,
+    tryStartMove,
+    finishMove,
     updateMoveStatus,
     cellsRepository,
+    hasLeftCapturedScope,
+    observeMoveToBinJobs,
+    requestEmptyBinRefresh,
     resetBulkMoveToBinAfterScopeChange,
     finishBulkMoveToBinOutcome,
   ]);
@@ -1024,7 +1263,7 @@ export const CellsTable = ({
       didRefresh = false;
     }
 
-    if (capturedBulkMoveToBin.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin()) {
+    if (hasLeftCapturedScope(capturedBulkMoveToBin)) {
       resetBulkMoveToBinAfterScopeChange();
       return;
     }
@@ -1045,54 +1284,11 @@ export const CellsTable = ({
     setIsRefreshingBulkMoveToBin(false);
   }, [
     capturedBulkMoveToBin,
+    hasLeftCapturedScope,
     isRefreshingBulkMoveToBin,
     onRefreshAfterBulkMoveToBinOutcome,
     resetBulkMoveToBinAfterScopeChange,
   ]);
-
-  useEffect(() => {
-    if (backgroundMoveToBinJobUuids.length === 0 || capturedBulkMoveToBin === null) {
-      return undefined;
-    }
-
-    if (!maybe.isJust(bulkMoveToBinStatusId.current)) {
-      setBulkMoveToBinReviewReason('status-unknown');
-      setIsBulkMoveToBinNeedsReview(true);
-      isBulkMoveToBinPendingRef.current = false;
-      setIsBulkMoveToBinPending(false);
-      return undefined;
-    }
-
-    const statusId = bulkMoveToBinStatusId.current.value;
-    const captured = capturedBulkMoveToBin;
-
-    return observeCellsBackgroundActionJobs({
-      cellsRepository,
-      actionName: 'delete',
-      jobUuids: backgroundMoveToBinJobUuids,
-      clock,
-      pollingPolicy: createBulkJobPollingPolicy(random),
-      isCurrent: () => {
-        return true;
-      },
-      onOutcome: outcome => {
-        switch (outcome) {
-          case 'all-finished':
-            void finishBulkMoveToBinOutcome(captured, statusId, 'completed');
-            return;
-          case 'mixed-terminal':
-            void finishBulkMoveToBinOutcome(captured, statusId, 'partial');
-            return;
-          case 'all-failed':
-            void finishBulkMoveToBinOutcome(captured, statusId, 'failed');
-            return;
-          case 'check-limit':
-          case 'status-unknown':
-            void finishBulkMoveToBinOutcome(captured, statusId, 'status-unknown');
-        }
-      },
-    });
-  }, [backgroundMoveToBinJobUuids, capturedBulkMoveToBin, cellsRepository, clock, finishBulkMoveToBinOutcome, random]);
 
   useEffect(() => {
     return () => {
@@ -1130,7 +1326,7 @@ export const CellsTable = ({
     const selected = getDriveDragNodesForEvent(destination, event);
     activeDriveDrag.current = null;
     setActiveFolderDropTarget(null, false);
-    if (selected === null || isDropMoveSubmitting.current) {
+    if (selected === null || isDropMoveSubmitting.current || isMoveActive) {
       return;
     }
 
@@ -1143,6 +1339,10 @@ export const CellsTable = ({
       destinationPath: normalizeCellsPath(destination.path, conversationQualifiedId),
     };
     const moveStatusId = handleBulkMoveStart(summary);
+    if (maybe.isNothing(moveStatusId)) {
+      isDropMoveSubmitting.current = false;
+      return;
+    }
     try {
       const response = await cellsRepository.moveNodes({
         currentPaths: selected.map(node => {
@@ -1150,9 +1350,9 @@ export const CellsTable = ({
         }),
         targetPath: getCellsApiPath({conversationQualifiedId, currentPath: summary.destinationPath}),
       });
-      handleBulkMoveResult(response, moveStatusId);
+      handleBulkMoveResult(response, moveStatusId.value);
     } catch {
-      handleBulkMoveRequestError(moveStatusId);
+      handleBulkMoveRequestError(moveStatusId.value);
     } finally {
       isDropMoveSubmitting.current = false;
     }
@@ -1275,7 +1475,7 @@ export const CellsTable = ({
                     css={clearSelectionButtonStyles}
                     type="button"
                     aria-label={translate('cells.selection.clear')}
-                    disabled={isBulkMoveToBinPending || bulkRestore.isPending}
+                    disabled={isSelectionDisabled}
                     onClick={() => {
                       return setSelectedNodeIds(new Set());
                     }}
@@ -1536,7 +1736,7 @@ export const CellsTable = ({
                     aria-selected={isSelectionEnabled && selectedNodeIds.has(node.id)}
                     data-uie-name="cells-table-row"
                     onClickCapture={event => {
-                      if (!isRowSelectionEnabled || (!event.metaKey && !event.ctrlKey)) {
+                      if (isSelectionDisabled || !isRowSelectionEnabled || (!event.metaKey && !event.ctrlKey)) {
                         return;
                       }
 

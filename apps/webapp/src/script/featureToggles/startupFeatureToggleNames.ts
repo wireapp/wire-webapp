@@ -28,8 +28,6 @@ export const troubleshooterFeatureToggleName = 'troubleshooter';
 
 export const sendCallLogsFeatureToggleName = 'send-call-logs';
 export const e2ePdfPreviewFeatureToggleName = 'e2e-pdf-preview';
-export const persistentBrowserLogsFeatureToggleName = 'persistent-browser-logs';
-export const websocketListenerLifecycleFeatureToggleName = 'websocket-listener-lifecycle';
 
 export const startupFeatureToggleRegistry = [
   {name: applockRefactoredFeatureToggleName, previewDefaultEnabled: false},
@@ -37,13 +35,11 @@ export const startupFeatureToggleRegistry = [
   {name: forTestsOnlyFeatureToggleName, previewDefaultEnabled: false},
   {name: disableMessagePreprocessingFeatureToggleName, previewDefaultEnabled: false},
   {name: driveBulkRestoreFeatureToggleName, previewDefaultEnabled: false},
-  {name: driveBulkActionProgressFeatureToggleName, previewDefaultEnabled: false},
+  {name: driveBulkActionProgressFeatureToggleName, previewDefaultEnabled: true},
   {name: markAsUnreadFeatureToggleName, previewDefaultEnabled: true},
   {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},
   {name: sendCallLogsFeatureToggleName, previewDefaultEnabled: false},
   {name: e2ePdfPreviewFeatureToggleName, previewDefaultEnabled: true},
-  {name: persistentBrowserLogsFeatureToggleName, previewDefaultEnabled: true},
-  {name: websocketListenerLifecycleFeatureToggleName, previewDefaultEnabled: true},
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleRegistry)[number]['name'];

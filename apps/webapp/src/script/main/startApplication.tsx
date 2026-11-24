@@ -31,7 +31,6 @@ import {configureLogging} from '../logger/getLogger';
 import {Runtime} from '../commons/util/Runtime';
 
 import {createApplicationServices} from './createApplicationServices';
-import {createApplicationApiClient} from './createApplicationApiClient';
 import {createAccountIdentifier} from '../logger/createAccountIdentifier';
 import {createAuthenticatedAccountBinding} from '../logger/createAuthenticatedAccountBinding';
 import {logRuntimeIdentity, logStartupRuntimeIdentity} from '../logger/logRuntimeIdentity';
@@ -41,6 +40,9 @@ import {waitForDocumentContentLoaded} from './waitForDocumentContentLoaded';
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {AppContainer} from '../components/appContainer/appContainer';
 import type {CoreCryptoSupport} from '../browser/coreCryptoSupport';
+import {initializeDesktopLogOutput} from '../browser/initializeDesktopLogOutput';
+import {selectBrowserLogSaveFilePicker} from '../browser/selectBrowserLogSaveFilePicker';
+import {initializeRuntimeErrorDiagnostics} from '../browser/initializeRuntimeErrorDiagnostics';
 import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
 import {Config} from '../Config';
 import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeStartupFeatureToggleUrl';
@@ -59,15 +61,19 @@ import {Core} from '../service/coreSingleton';
 import {translate} from '../util/localizerUtil';
 import {getStorage} from '../util/localStorage';
 import {getLogger} from '../util/logger';
-import {enableLogging} from '../logger/enableLogging';
+import {initializeLogging, type StartupLoggingOptions} from '../logger/initializeLogging';
 import {createBrowserLogPersistence, createLogWorkerConnection} from '../logger/createBrowserLogPersistence';
 import {loadValue} from '../util/storageUtil';
 import {exposeWrapperGlobals} from '../util/wrapper';
 
-export async function startApplication(
-  defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[],
-  support: CoreCryptoSupport,
-): Promise<void> {
+type StartApplicationOptions = {
+  readonly defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[];
+  readonly support: CoreCryptoSupport;
+  readonly logging: StartupLoggingOptions;
+};
+
+export async function startApplication(options: StartApplicationOptions): Promise<void> {
+  const {defaultEnabledFeatureToggleNames, support, logging} = options;
   initializeStartupFeatureToggleUrl({
     url: new URL(window.location.href),
     defaultEnabledFeatureToggleNames,
@@ -80,27 +86,34 @@ export async function startApplication(
   const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
   const config = Config.getConfig();
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
+  const isElectron = Runtime.isElectron();
+  const isDesktopApp = Runtime.isDesktopApp();
+  const browserLogSaveFilePicker = selectBrowserLogSaveFilePicker({isElectron, browserWindow: window});
+  const browserLoggingAvailable = browserLogSaveFilePicker.isJust;
+  const desktopLogOutput = initializeDesktopLogOutput(clock);
+  function shouldWriteConsoleFallback(): boolean {
+    return desktopLogOutput.isNothing || !desktopLogOutput.value.hasConfirmedDelivery();
+  }
+
   const downloadApplicationLogs = createBrowserLogDownload({
-    startupFeatureToggles,
-    isElectron: Runtime.isElectron(),
-    showSaveFilePicker: isFunction(window.showSaveFilePicker)
-      ? Maybe.just(window.showSaveFilePicker.bind(window))
-      : Maybe.nothing(),
+    showSaveFilePicker: browserLogSaveFilePicker,
     clock,
     getDirectory() {
       return navigator.storage.getDirectory();
     },
     createArchive: createBrowserLogZipArchive,
   });
-  const persistentLogging = enableLogging({
+  const persistentLogging = initializeLogging({
     clock,
     consoleOutput: console,
     locationSearch: window.location.search,
-    debugEnabled: config.FEATURE.ENABLE_DEBUG,
+    ...logging,
+    shouldWriteConsoleFallback: isDesktopApp ? shouldWriteConsoleFallback : undefined,
     storage: Maybe.of(getStorage()),
     configureLogging,
-    startupFeatureToggles,
-    isElectron: Runtime.isElectron(),
+    loggingEnabled: isElectron || browserLoggingAvailable,
+    browserPersistenceEnabled: !isElectron && browserLoggingAvailable,
+    desktopPersistenceOutput: desktopLogOutput.isJust ? desktopLogOutput.value.write : undefined,
     createPersistenceOutput() {
       return createBrowserLogPersistence({
         clock,
@@ -132,22 +145,22 @@ export async function startApplication(
       });
     },
   });
+  initializeRuntimeErrorDiagnostics(window);
   const runtimeIdentity = {
     logger: getLogger('RuntimeIdentity'),
-    hostname: window.location.hostname,
     origin: window.location.origin,
     version: config.VERSION,
     assetVersion: config.ASSET_VERSION,
   };
   logStartupRuntimeIdentity({
     logger: runtimeIdentity.logger,
-    hostname: runtimeIdentity.hostname,
     origin: runtimeIdentity.origin,
     version: runtimeIdentity.version,
     assetVersion: runtimeIdentity.assetVersion,
     clock,
     consoleOutput: console,
-    isDesktopApp: Runtime.isDesktopApp(),
+    isDesktopApp,
+    hasDesktopLogPersistence: desktopLogOutput.isJust,
     locationSearch: window.location.search,
   });
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
@@ -158,7 +171,7 @@ export async function startApplication(
   });
   const persistentLoggingLogger = getLogger('BrowserLogPersistence');
   const cleanupAccountLogs = createAccountLogCleanup({
-    isElectron: Runtime.isElectron(),
+    isElectron,
     persistence: persistentLogging,
     hashQualifiedId(qualifiedId) {
       return createAccountIdentifier({qualifiedId, encoder: new TextEncoder(), crypto: globalThis.crypto.subtle});
@@ -242,10 +255,8 @@ export async function startApplication(
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
   const {applicationObservability} = applicationServices;
-  const apiClient = createApplicationApiClient({
+  const apiClient = new APIClient({
     clock: applicationServices.clock,
-    startupFeatureToggles,
-    logger: getLogger('WebSocketLifecycle'),
   });
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({

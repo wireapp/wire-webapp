@@ -24,6 +24,7 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import userEvent from '@testing-library/user-event';
 import {Maybe, maybe} from 'true-myth';
 
+import {createBulkJobPollingPolicy} from './common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
 import {
   SharedDriveUploadStatusProvider,
   SharedDriveUploadStatusScope,
@@ -115,13 +116,15 @@ describe('SharedDriveUploadStatusScope', () => {
     });
     const getBackgroundMoveInfo = jest.fn();
     act(() => {
-      return result.current.observeBackgroundMove({
-        operationId: status.id,
+      return result.current.observeBackgroundAction({
+        actionName: 'move',
+        status,
+        jobUuids: ['job-1'],
         cellsRepository: {getBackgroundMoveInfo},
         clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
-        random: () => {
+        pollingPolicy: createBulkJobPollingPolicy(() => {
           return 0.5;
-        },
+        }),
         onOutcome: jest.fn(),
       });
     });
@@ -140,11 +143,11 @@ describe('SharedDriveUploadStatusScope', () => {
       const view = render(<StatusTree enabled={enabled} conversationId="conversation-1" viewId="folder-a" />);
 
       await user.click(screen.getByRole('button', {name: 'Start'}));
-      expect(screen.getByTestId('bulk-status')).toHaveTextContent('processing');
+      expect(screen.getByText('processing')).toBeInTheDocument();
       view.rerender(<StatusTree enabled={enabled} conversationId="conversation-2" viewId="folder-a" />);
-      expect(screen.getByTestId('bulk-status')).toHaveTextContent('empty');
+      expect(screen.getByText('empty')).toBeInTheDocument();
       view.rerender(<StatusTree enabled={enabled} conversationId="conversation-1" viewId="folder-a" />);
-      expect(screen.getByTestId('bulk-status')).toHaveTextContent(expectedOnReturn);
+      expect(screen.getByText(expectedOnReturn)).toBeInTheDocument();
     },
   );
 
@@ -159,7 +162,7 @@ describe('SharedDriveUploadStatusScope', () => {
     await user.click(screen.getByRole('button', {name: 'Dismiss upload'}));
     view.rerender(<StatusTree enabled={enabled} conversationId="conversation-1" viewId="folder-b" />);
 
-    expect(screen.getByTestId('bulk-status')).toHaveTextContent(expectedAfterNavigation);
-    expect(screen.getByTestId('dismissed-upload')).toHaveTextContent('upload-1');
+    expect(screen.getByText(expectedAfterNavigation)).toBeInTheDocument();
+    expect(screen.getByText('upload-1')).toBeInTheDocument();
   });
 });

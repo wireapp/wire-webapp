@@ -176,6 +176,16 @@ describe('jsonToArrayBufferView', () => {
     expect(arrayBufferView[0]).toBe(163);
     expect(arrayBufferView[expectedLength - 1]).toBe(37);
   });
+
+  it('maps numeric keys from an object without a prototype to an array buffer', () => {
+    const json: Record<string, number> = {0: 163, 1: 37};
+    Object.setPrototypeOf(json, null);
+
+    const actualArrayBufferView = Converter.jsonToArrayBufferView(json);
+    const expectedArrayBufferView = new Uint8Array([163, 37]);
+
+    expect(actualArrayBufferView).toEqual(expectedArrayBufferView);
+  });
 });
 
 describe('numberArrayToArrayBufferView', () => {

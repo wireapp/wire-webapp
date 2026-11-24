@@ -33,7 +33,7 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {asyncNoop, noop} from 'noop-esm';
 import {Task, task} from 'true-myth';
-import {isDefined} from 'ts-extras';
+import {isDefined, objectHasOwn} from 'ts-extras';
 import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
 
@@ -728,7 +728,7 @@ export class ConversationRepository {
   private async fetchConversationById({id: conversationId, domain}: QualifiedId): Promise<Conversation> {
     const qualifiedId = {domain, id: conversationId};
     const fetching_conversations: Record<string, FetchPromise[]> = {};
-    if (fetching_conversations.hasOwnProperty(conversationId)) {
+    if (objectHasOwn(fetching_conversations, conversationId)) {
       return new Promise((resolve, reject) => {
         fetching_conversations[conversationId].push({rejectFn: reject, resolveFn: resolve});
       });
@@ -5347,7 +5347,7 @@ export class ConversationRepository {
       options,
     );
     messageEntity.user(userEntity);
-    if (isMemberMessage(messageEntity) || messageEntity.hasOwnProperty('userEntities')) {
+    if (isMemberMessage(messageEntity) || objectHasOwn(messageEntity, 'userEntities')) {
       return this.userRepository
         .getUsersById((messageEntity as MemberMessage).userIds(), options)
         .then(userEntities => {

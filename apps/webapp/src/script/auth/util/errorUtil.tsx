@@ -21,6 +21,7 @@ import {ReactElement} from 'react';
 
 import {isBoolean, isDate, isNonEmptyString, isNumber, isObject, isString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
+import {objectHasOwn} from 'ts-extras';
 
 import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
 import {errorHandlerStrings} from '../../util/errorUtil';
@@ -60,7 +61,7 @@ const toMessageInterpolationValues = (value: unknown): MessageInterpolationValue
 
 export function parseError(error: unknown): ReactElement | null {
   if (error !== null && error !== undefined) {
-    if (hasLabel(error) && Object.hasOwn(errorHandlerStrings, error.label)) {
+    if (hasLabel(error) && objectHasOwn(errorHandlerStrings, error.label)) {
       return (
         <ErrorMessage data-uie-name="error-message" data-uie-value={error.label}>
           <FormattedMessage id={errorHandlerStrings[error.label]} />
@@ -85,7 +86,7 @@ export function parseValidationErrors(errors: unknown | unknown[]): ReactElement
         data-uie-value={hasLabel(error) ? error.label : 'unexpected-error'}
         key={hasLabel(error) ? error.label : 'unexpected-error'}
       >
-        {hasLabel(error) && Object.hasOwn(validationErrorStrings, error.label) ? (
+        {hasLabel(error) && objectHasOwn(validationErrorStrings, error.label) ? (
           <FormattedMessage id={validationErrorStrings[error.label]} />
         ) : (
           <FormattedMessage id="BackendError.unexpected" values={toMessageInterpolationValues(error)} />

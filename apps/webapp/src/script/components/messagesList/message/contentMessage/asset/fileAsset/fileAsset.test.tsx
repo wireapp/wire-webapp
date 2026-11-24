@@ -20,6 +20,9 @@
 import {act, render, screen, waitFor} from '@testing-library/react';
 import {container} from 'tsyringe';
 import ko from 'knockout';
+import Long from 'long';
+
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import {FileAsset} from '../../../../../../repositories/entity/message/fileAsset';
@@ -125,6 +128,40 @@ describe('FileAssetComponent', () => {
     load.mockRestore();
   });
 
+  it('does not render or fetch a PDF preview for quoted files', () => {
+    const repository = container.resolve(AssetRepository);
+    const load = jest.spyOn(repository, 'load').mockResolvedValue(new Blob());
+    const previewWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: createStartupFeatureTogglesFromLocationSearch('?enabled-features=e2e-pdf-preview')
+          .isFeatureToggleEnabled,
+        mainViewModel: {content: {repositories: {asset: repository}}} as MainViewModel,
+      }),
+    );
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_type = 'application/pdf';
+    asset.status(AssetTransferState.UPLOADED);
+    asset.preview_resource(
+      new AssetRemoteData({
+        assetKey: 'preview',
+        assetDomain: 'wire.test',
+        otrKey: new Uint8Array(32),
+        sha256: new Uint8Array(32),
+      }),
+    );
+
+    (IntersectionObserver as jest.Mock).mockClear();
+    render(<FileAssetComponent message={message} teamState={teamState} isQuote />, {wrapper: previewWrapper});
+
+    expect((IntersectionObserver as jest.Mock).mock.calls).toHaveLength(0);
+    expect(load).not.toHaveBeenCalled();
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.getByText('report')).toBeInTheDocument();
+    load.mockRestore();
+  });
+
   it('removes the PDF preview and revokes its URL when the message expires', async () => {
     const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])]);
     const repository = container.resolve(AssetRepository);
@@ -201,5 +238,72 @@ describe('FileAssetComponent', () => {
       wrapper: rootProviderWrapper,
     });
     expect(queryByText('10 MB')).not.toBeNull();
+  });
+
+  const protocolSize = ProtobufAsset.Original.decode(
+    ProtobufAsset.Original.encode({mimeType: 'application/pdf', size: 1_048_576}).finish(),
+  ).size;
+
+  it.each([
+    ['protocol Long', protocolSize],
+    ['structured-cloned Long', structuredClone(protocolSize)],
+  ] as const)('shows a size from a %s', (_description, fileSize) => {
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_size = fileSize as unknown as number;
+
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+
+    expect(screen.getByTestId('file-size')).toHaveTextContent('1 MB');
+  });
+
+  it.each([
+    [0, '0 B'],
+    [1_048_576, '1 MB'],
+    ['0', '0 B'],
+    ['1048576', '1 MB'],
+  ] as const)('shows valid file size %p', (fileSize, expectedSize) => {
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_size = fileSize as unknown as number;
+
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+
+    expect(screen.getByTestId('file-size')).toHaveTextContent(expectedSize);
+  });
+
+  it('shows large valid unsigned Long sizes', () => {
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_size = Long.MAX_UNSIGNED_VALUE as unknown as number;
+
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+
+    expect(screen.getByTestId('file-size')).toHaveTextContent('16 EB');
+  });
+
+  it.each([
+    ['missing', undefined],
+    ['null', null],
+    ['blank', ''],
+    ['whitespace', ' '],
+    ['unrecognized object', {}],
+    ['spoofed Long marker', {__isLong__: true}],
+    ['NaN', Number.NaN],
+    ['infinite', Number.POSITIVE_INFINITY],
+    ['negative', -1],
+    ['fractional', 0.5],
+    ['invalid text', 'not-a-size'],
+    ['outside the protocol range', '1e30'],
+    ['malformed Long', {low: 'invalid', high: 0, unsigned: true}],
+  ] as const)('does not render a malformed file size (%s)', (_description, fileSize) => {
+    const message = mockContentMessage('report.pdf');
+    const asset = message.getFirstAsset() as FileAsset;
+    asset.file_size = fileSize as unknown as number;
+
+    render(<FileAssetComponent message={message} teamState={teamState} />, {wrapper: rootProviderWrapper});
+
+    expect(screen.queryByTestId('file-size')).not.toBeInTheDocument();
+    expect(screen.getByTestId('file-type')).toHaveTextContent('pdf');
   });
 });

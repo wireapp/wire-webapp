@@ -349,6 +349,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               isSelectable
               allowRemoteSearch
               filterRemoteTeamUsers
+              showPendingOnboarding
             />
           )}
 

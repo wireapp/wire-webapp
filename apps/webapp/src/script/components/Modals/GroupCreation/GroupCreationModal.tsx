@@ -519,6 +519,7 @@ const GroupCreationModal: FunctionComponent<GroupCreationModalProps> = ({
               noUnderline
               allowRemoteSearch
               filterRemoteTeamUsers
+              showPendingOnboarding
             />
           </FadingScrollbar>
         )}

@@ -19,10 +19,13 @@
 
 import {MeetingRecurrence} from './meetingRecurrence';
 
+export type MeetingType = 'immediate' | 'scheduled';
+
 export interface CreateMeeting {
   end_time: string;
   recurrence?: MeetingRecurrence;
   start_time: string;
   title: string;
+  type: MeetingType;
   tzid: string;
 }

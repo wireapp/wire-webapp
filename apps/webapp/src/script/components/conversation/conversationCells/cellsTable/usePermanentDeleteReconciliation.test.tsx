@@ -21,6 +21,7 @@ import {act, renderHook, waitFor} from '@testing-library/react';
 import {JobsTaskStatus} from 'cells-sdk-ts';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import type {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import type {SharedDriveMoveStatus} from '../sharedDriveUploadStatusContext';
 
 import {
   usePermanentDeleteReconciliation,
@@ -36,9 +37,20 @@ interface ReconciliationTestSetup {
   readonly onRefreshAndReportSuccess: jest.Mock;
   readonly onDeleteCompleted: jest.Mock;
   readonly onReconciliationCompleted: jest.Mock;
+  readonly onReviewResolved: jest.Mock;
   readonly reportError: jest.Mock;
+  readonly onContinueAfterViewLeave: jest.Mock;
   readonly options: UsePermanentDeleteReconciliationOptions;
 }
+
+const deleteStatus: SharedDriveMoveStatus = {
+  id: 'delete-1',
+  conversationQualifiedId: 'conversation-id@wire.test',
+  action: 'permanentDelete',
+  items: [],
+  destinationPath: '',
+  kind: 'processing',
+};
 
 const createOptions = (): ReconciliationTestSetup => {
   const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
@@ -55,7 +67,9 @@ const createOptions = (): ReconciliationTestSetup => {
   const onRefreshAndReportSuccess = jest.fn().mockResolvedValue(true);
   const onDeleteCompleted = jest.fn();
   const onReconciliationCompleted = jest.fn();
+  const onReviewResolved = jest.fn();
   const reportError = jest.fn();
+  const onContinueAfterViewLeave = jest.fn();
   const options = {
     cellsRepository,
     clock,
@@ -68,7 +82,9 @@ const createOptions = (): ReconciliationTestSetup => {
     onRefreshAndReportSuccess,
     onDeleteCompleted,
     onReconciliationCompleted,
+    onReviewResolved,
     reportError,
+    onContinueAfterViewLeave,
   };
 
   return {
@@ -80,7 +96,9 @@ const createOptions = (): ReconciliationTestSetup => {
     onRefreshAndReportSuccess,
     onDeleteCompleted,
     onReconciliationCompleted,
+    onReviewResolved,
     reportError,
+    onContinueAfterViewLeave,
     options,
   };
 };
@@ -97,7 +115,7 @@ describe('usePermanentDeleteReconciliation', () => {
     });
 
     await act(async () => {
-      await result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin');
+      await result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin', deleteStatus);
     });
 
     expect(deleteNodes).toHaveBeenCalledWith({uuids: ['selected-node'], permanently: true});
@@ -107,7 +125,8 @@ describe('usePermanentDeleteReconciliation', () => {
   });
 
   it('ignores a delete response that resolves after the hook unmounts', async () => {
-    const {deleteNodes, onRefresh, onDeleteCompleted, onRefreshAndReportSuccess, options} = createOptions();
+    const {deleteNodes, onRefresh, onDeleteCompleted, onRefreshAndReportSuccess, onContinueAfterViewLeave, options} =
+      createOptions();
     let resolveDelete: ((response: {Status: 'Performed'; BackgroundActions: []}) => void) | undefined;
     deleteNodes.mockImplementation(() => {
       return new Promise(resolve => {
@@ -120,7 +139,7 @@ describe('usePermanentDeleteReconciliation', () => {
 
     let deleteRequest: Promise<void> | undefined;
     act(() => {
-      deleteRequest = result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin');
+      deleteRequest = result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin', deleteStatus);
     });
     unmount();
 
@@ -132,6 +151,64 @@ describe('usePermanentDeleteReconciliation', () => {
     expect(onDeleteCompleted).not.toHaveBeenCalled();
     expect(onRefresh).not.toHaveBeenCalled();
     expect(onRefreshAndReportSuccess).not.toHaveBeenCalled();
+    expect(onContinueAfterViewLeave).toHaveBeenCalledWith({
+      kind: 'terminal',
+      status: deleteStatus,
+      statusKind: 'completed',
+    });
+  });
+
+  it('hands a background delete job to the app after unmount', async () => {
+    const {deleteNodes, onContinueAfterViewLeave, options} = createOptions();
+    let resolveDelete:
+      ((response: {Status: 'Background'; BackgroundActions: {Name: string; JobUuid: string}[]}) => void) | undefined;
+    deleteNodes.mockImplementation(() => {
+      return new Promise(resolve => {
+        resolveDelete = resolve;
+      });
+    });
+    const {result, unmount} = renderHook(() => {
+      return usePermanentDeleteReconciliation(options);
+    });
+
+    let deleteRequest: Promise<void> | undefined;
+    act(() => {
+      deleteRequest = result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin', deleteStatus);
+    });
+    unmount();
+    await act(async () => {
+      resolveDelete?.({Status: 'Background', BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}]});
+      await deleteRequest;
+    });
+
+    expect(onContinueAfterViewLeave).toHaveBeenCalledWith({
+      kind: 'background',
+      status: deleteStatus,
+      jobUuids: ['delete-job'],
+    });
+  });
+
+  it('reports an unknown outcome after a finished job remains visible and the view unmounts', async () => {
+    const {getBackgroundActionInfo, onRefreshAndReportSuccess, onContinueAfterViewLeave, options} = createOptions();
+    getBackgroundActionInfo.mockResolvedValue({Status: JobsTaskStatus.Finished});
+    const {result, unmount} = renderHook(() => {
+      return usePermanentDeleteReconciliation(options);
+    });
+
+    await act(async () => {
+      await result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin', deleteStatus);
+    });
+    await waitFor(() => {
+      expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
+    });
+
+    unmount();
+
+    expect(onContinueAfterViewLeave).toHaveBeenCalledWith({
+      kind: 'terminal',
+      status: deleteStatus,
+      statusKind: 'status-unknown',
+    });
   });
 
   it('times out a pending status read and ignores its late result', async () => {
@@ -147,7 +224,7 @@ describe('usePermanentDeleteReconciliation', () => {
     });
 
     await act(async () => {
-      await result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin');
+      await result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin', deleteStatus);
     });
     await waitFor(() => {
       expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
@@ -184,7 +261,7 @@ describe('usePermanentDeleteReconciliation', () => {
     });
 
     await act(async () => {
-      await result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin');
+      await result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin', deleteStatus);
     });
     await waitFor(() => {
       expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
@@ -233,7 +310,7 @@ describe('usePermanentDeleteReconciliation', () => {
     });
 
     await act(async () => {
-      await result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin');
+      await result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin', deleteStatus);
       await waitFor(() => {
         expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
       });
@@ -279,7 +356,7 @@ describe('usePermanentDeleteReconciliation', () => {
     });
 
     await act(async () => {
-      await result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin');
+      await result.current.deletePermanently(['selected-node'], 'bin-scope', '/recycle_bin', deleteStatus);
     });
     await waitFor(() => {
       expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);

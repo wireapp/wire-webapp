@@ -2501,6 +2501,8 @@
   "userNotFoundMessage": "Возможно, у вас нет разрешения на использование этой учетной записи, либо этот человек отсутствует в {brandName}.",
   "userNotFoundTitle": "{brandName} не может найти этого человека.",
   "userNotVerified": "Перед добавлением убедитесь в личности {user}.",
+  "userOnboardingPending": "Ожидание ознакомления",
+  "userOnboardingPendingStartConversationInfo": "Вы сможете начать общение с этим пользователем, как только он полностью пройдет вводный курс.",
   "userProfileButtonConnect": "Связаться",
   "userProfileButtonIgnore": "Игнорировать",
   "userProfileButtonUnblock": "Разблокировать",

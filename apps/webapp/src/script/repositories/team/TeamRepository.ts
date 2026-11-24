@@ -20,7 +20,7 @@
 import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {task} from 'true-myth';
-import {isDefined, objectEntries} from 'ts-extras';
+import {isDefined, objectEntries, objectHasOwn} from 'ts-extras';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
@@ -737,7 +737,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     const supportsLegalHold =
       this.teamState.supportsLegalHold() ||
       members.some(member => {
-        return member.hasOwnProperty('legalholdStatus');
+        return objectHasOwn(member, 'legalholdStatus');
       });
     this.teamState.supportsLegalHold(supportsLegalHold);
     this.teamState.memberRoles(memberRoles);

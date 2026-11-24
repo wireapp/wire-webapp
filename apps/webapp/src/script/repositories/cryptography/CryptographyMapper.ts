@@ -19,6 +19,7 @@
 
 import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
+import {objectHasOwn} from 'ts-extras';
 import {container} from 'tsyringe';
 
 import {
@@ -488,7 +489,7 @@ export class CryptographyMapper {
 
     if (!isNullOrUndefined(original)) {
       data = {
-        content_length: original.size as number,
+        content_length: Number(original.size),
         content_type: original.mimeType ?? '',
         info: {
           name: original.name ?? undefined,
@@ -522,7 +523,7 @@ export class CryptographyMapper {
       data.info.tag = 'medium';
     }
 
-    if (asset.hasOwnProperty('uploaded') && !isNullOrUndefined(uploaded)) {
+    if (objectHasOwn(asset, 'uploaded') && !isNullOrUndefined(uploaded)) {
       data = {
         ...data,
         domain: uploaded.assetDomain ?? undefined,
@@ -532,7 +533,7 @@ export class CryptographyMapper {
         status: AssetTransferState.UPLOADED,
         token: uploaded.assetToken ?? undefined,
       };
-    } else if (asset.hasOwnProperty('notUploaded') && !isNullOrUndefined(notUploaded)) {
+    } else if (objectHasOwn(asset, 'notUploaded') && !isNullOrUndefined(notUploaded)) {
       data = {...data, reason: notUploaded, status: AssetTransferState.UPLOAD_FAILED};
     }
 

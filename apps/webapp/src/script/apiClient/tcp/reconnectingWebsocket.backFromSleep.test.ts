@@ -369,7 +369,6 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
       websocketFactory: Maybe.just(createMockWebsocketFactory(previousSocket, nextSocket)),
-      lifecycleImplementation: 'corrected',
     });
     const onClose = jest.fn();
     const onMessage = jest.fn();

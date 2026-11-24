@@ -482,6 +482,56 @@ describe('UserActions', () => {
     expect(queryByTestId('do-close')).not.toBeNull();
   });
 
+  describe('when the user is pending onboarding', () => {
+    const createPendingTeamMember = (): {user: User; selfUser: User} => {
+      const team = new TeamEntity('teamId');
+      teamState.team(team);
+
+      const user = new User('', '', translateForTest);
+      user.teamId = team.id;
+      user.isPendingOnboarding(true);
+      jest.spyOn(user, 'isAvailable').mockImplementation(
+        ko.pureComputed(() => {
+          return true;
+        }),
+      );
+
+      const selfUser = new User('', '', translateForTest);
+      selfUser.teamId = team.id;
+      userState.self(selfUser);
+
+      return {user, selfUser};
+    };
+
+    it('disables start conversation in the single action layout and explains why', () => {
+      const {user, selfUser} = createPendingTeamMember();
+      const props = {actionsViewModel, isSelfActivated: true, onAction: noop, selfUser, user, isModal: true};
+
+      const {getByTestId} = renderWithRootProvider(withTheme(<UserActions {...props} />));
+
+      const startConversationButton = getByTestId(ActionIdentifier[Actions.START_CONVERSATION]);
+      const pendingOnboardingInfo = getByTestId('status-pending-onboarding-info');
+
+      expect(startConversationButton).toBeDisabled();
+      expect(startConversationButton.getAttribute('aria-describedby')).toBe(pendingOnboardingInfo.id);
+      expect(pendingOnboardingInfo.textContent).toContain('userOnboardingPendingStartConversationInfo');
+      expect(getByTestId('do-close')).not.toBeDisabled();
+    });
+
+    it('disables start conversation in the actions list and explains why', () => {
+      const {user, selfUser} = createPendingTeamMember();
+      const props = {actionsViewModel, isSelfActivated: true, onAction: noop, selfUser, user};
+
+      const {getByTestId} = renderWithRootProvider(<UserActions {...props} />);
+
+      const startConversationButton = getByTestId(ActionIdentifier[Actions.START_CONVERSATION]);
+      const pendingOnboardingInfo = getByTestId('status-pending-onboarding-info');
+
+      expect(startConversationButton).toBeDisabled();
+      expect(startConversationButton.getAttribute('aria-describedby')).toBe(pendingOnboardingInfo.id);
+    });
+  });
+
   it('displays a list when a single action is available in sidebar', () => {
     const user = new User('', '', translateForTest);
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);

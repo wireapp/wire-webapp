@@ -21,7 +21,7 @@ import {createAuthRedirectPath} from './urlUtil';
 
 import {
   forTestsOnlyFeatureToggleName,
-  websocketListenerLifecycleFeatureToggleName,
+  markAsUnreadFeatureToggleName,
 } from '../../featureToggles/startupFeatureToggleNames';
 import {initializeStartupFeatureToggleUrl} from '../../featureToggles/initializeStartupFeatureToggleUrl';
 import {startupFeatureToggleQueryParameterName} from '../../featureToggles/startupFeatureToggles';
@@ -98,7 +98,7 @@ describe('createAuthRedirectPath', () => {
 
     initializeStartupFeatureToggleUrl({
       url: applicationUrl,
-      defaultEnabledFeatureToggleNames: [forTestsOnlyFeatureToggleName, websocketListenerLifecycleFeatureToggleName],
+      defaultEnabledFeatureToggleNames: [forTestsOnlyFeatureToggleName, markAsUnreadFeatureToggleName],
       replaceUrl(url) {
         applicationUrl = new URL(url);
       },
@@ -117,8 +117,8 @@ describe('createAuthRedirectPath', () => {
       allowedQueryParameterNames: FORWARDED_QUERY_KEYS,
     });
 
-    expect(authPath).toBe('/auth/?hl=en&enabled-features=for-tests-only%2Cwebsocket-listener-lifecycle');
-    expect(mainAppPath).toBe('../?hl=en&enabled-features=for-tests-only%2Cwebsocket-listener-lifecycle');
+    expect(authPath).toBe('/auth/?hl=en&enabled-features=for-tests-only%2Cmark-as-unread');
+    expect(mainAppPath).toBe('../?hl=en&enabled-features=for-tests-only%2Cmark-as-unread');
   });
 
   const startupFeatureToggleQueryString = new URLSearchParams({
@@ -146,6 +146,22 @@ describe('createAuthRedirectPath', () => {
     createAuthRedirectTest({
       authPath: '/auth/?enabled-features=unknown-feature#/login',
       expectedMainAppPath: '../?enabled-features=unknown-feature',
+    }),
+  );
+
+  it(
+    'preserves encoded debug namespaces on the way back to the application',
+    createAuthRedirectTest({
+      authPath: '/auth/?debugLogging=%40wireapp%2F*%2C-%40wireapp%2Fcore%2F*#/login',
+      expectedMainAppPath: '../?debugLogging=%40wireapp%2F*%2C-%40wireapp%2Fcore%2F*',
+    }),
+  );
+
+  it(
+    'forwards a legacy debug selection alongside an explicit empty debug override',
+    createAuthRedirectTest({
+      authPath: '/auth/?enableLogging=*&debugLogging=#/login',
+      expectedMainAppPath: '../?enableLogging=*&debugLogging=',
     }),
   );
 

@@ -22,6 +22,11 @@ import {CSSObject, css} from '@emotion/react';
 export const userModalStyle = css`
   .enriched-fields {
     margin: 0 0 16px 0;
+
+    &__entry {
+      padding-left: 0;
+      padding-right: 0;
+    }
   }
 
   .loading-wrapper {
@@ -45,8 +50,23 @@ export const userModalStyle = css`
     padding: 0;
   }
 
+  .modal__header {
+    min-height: 16px;
+    padding: 24px 24px 0;
+    margin-bottom: 8px;
+  }
+
+  .modal__header__button {
+    top: 24px;
+    right: 24px;
+  }
+
+  .modal__buttons {
+    margin: 24px 0;
+  }
+
   .modal__body {
-    padding: 0 16px;
+    padding: 0 24px;
 
     .classified-bar {
       margin-top: 12px;
@@ -80,7 +100,7 @@ export const unverifiedUserWarningRowStyle: CSSObject = {
 
 export const unverifiedUserWarningIconStyle: CSSObject = {
   height: '1rem',
-  margin: '0.15em 1em',
+  margin: '0.15em 1em 0.15em 0',
   minWidth: '1rem',
 };
 

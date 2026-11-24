@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,5 @@
  *
  */
 
-import {Cookie as ToughCookie} from 'tough-cookie';
-
-const obfuscationLengthLimit = 20;
-
-export function obfuscateCookie(cookie: ToughCookie, enabled = true): ToughCookie {
-  if (enabled) {
-    const obfuscatedCookie = cookie.clone() ?? new ToughCookie({key: cookie.key});
-    obfuscatedCookie.value = `${cookie.value.substr(0, obfuscationLengthLimit)}...`;
-
-    return obfuscatedCookie;
-  }
-
-  return cookie;
-}
+export const debugLoggingQueryParameterName = 'debugLogging';
+export const legacyDebugLoggingQueryParameterName = 'enableLogging';

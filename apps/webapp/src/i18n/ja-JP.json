@@ -2501,6 +2501,8 @@
   "userNotFoundMessage": "このアカウントに対する権限がないか、またはこのユーザーが {brandName} 上にいない可能性があります。",
   "userNotFoundTitle": "{brandName} このユーザーを見つけられませんでした。",
   "userNotVerified": "Get certainty about {user}’s identity before connecting.",
+  "userOnboardingPending": "Onboarding pending",
+  "userOnboardingPendingStartConversationInfo": "You can start a conversation with this team member once they are fully onboarded.",
   "userProfileButtonConnect": "つながる",
   "userProfileButtonIgnore": "無視",
   "userProfileButtonUnblock": "ブロック解除",

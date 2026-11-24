@@ -439,8 +439,7 @@ export class TestFactory {
  */
 
 /**
- * @template T
- * @type {Map<Constructor<T>, T>}
+ * @type {Map<Constructor<unknown>, unknown>}
  */
 const actorsCache = new Map();
 
@@ -452,8 +451,9 @@ const actorsCache = new Map();
  * @returns {T} the instantiated service
  */
 function singleton(Service, ...dependencies) {
-  // @ts-ignore
-  actorsCache.set(Service, actorsCache.get(Service) || new Service(...dependencies));
-  // @ts-ignore
-  return actorsCache.get(Service);
+  const cachedInstance = /** @type {T | undefined} */ (actorsCache.get(Service));
+  const serviceInstance = cachedInstance || new Service(...dependencies);
+  actorsCache.set(Service, serviceInstance);
+
+  return serviceInstance;
 }

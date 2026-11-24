@@ -18,6 +18,7 @@
  */
 
 import {isEmptyArray} from '@sindresorhus/is';
+import {objectHasOwn} from 'ts-extras';
 
 import type {TranslationStringMap} from './translationFileSchema.ts';
 
@@ -75,7 +76,7 @@ export function validateTranslationPlaceholders(
   return Object.keys(options.canonicalTranslations)
     .toSorted()
     .flatMap((translationKey): TranslationPlaceholderMismatch[] => {
-      if (!Object.hasOwn(options.translatedTranslations, translationKey)) {
+      if (!objectHasOwn(options.translatedTranslations, translationKey)) {
         return [];
       }
 

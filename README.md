@@ -49,6 +49,10 @@ Prerequisites:
      - `.env.defaults` into repository root
    - Runtime priority is: process environment (for example AWS) > `.env` > `.env.defaults` > code fallback.
 
+### TypeScript compilers
+
+A clean npm install exposes TypeScript 7 as the `tsc` command. Just recipes invoke `@typescript/native-compiler/bin/tsc` directly so rebuilding the TypeScript 6 compatibility package cannot redirect repository builds or watches. `tsc6` and the `typescript` package provide TypeScript 6 for tooling that still uses its compiler API, including typescript-eslint. The native compiler uses the `@typescript/native-compiler` alias because `@typescript/native` is reserved for a TypeScript 7.1 prerelease peer.
+
 ## 2. Build & Run
 
 ### Development
@@ -58,7 +62,7 @@ Prerequisites:
    - `127.0.0.1 local.zinfra.io` (to connect with the staging backend)
    - `127.0.0.1 local.imai.wire.link` (to connect with the imai backend)
 1. Run `npx just develop`; Just builds the server output, then starts the Express server and its TypeScript watcher. Rspack compiles the WebApp in memory and serves it at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
-1. Server TypeScript changes are recompiled with `tsc --watch`; `node --watch` restarts the compiled Express server when its output changes. `concurrently` stops sibling processes if any watcher exits.
+1. Just recompiles server TypeScript changes with the native compiler watcher; `node --watch` restarts the compiled Express server when its output changes. `concurrently` stops sibling processes if any watcher exits.
 1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
    `FEATURE_CHECK_CONSENT="false"` to the env file
 

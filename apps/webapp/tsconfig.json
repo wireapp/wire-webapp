@@ -7,17 +7,22 @@
   },
   "compilerOptions": {
     "allowJs": true,
-    "baseUrl": ".",
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
     "module": "esnext",
+    "moduleResolution": "bundler",
     "lib": ["esnext", "dom", "dom.iterable"],
     "noEmitOnError": true,
     "outDir": "../../dist/apps/webapp",
     "paths": {
+      "@enormora/clock/clock": ["../../node_modules/@enormora/clock/clock.entry-point.d.ts"],
+      "@enormora/objectory": ["../../node_modules/@enormora/objectory/main.d.ts"],
       "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
       "ts-extras": ["../../node_modules/ts-extras/distribution/index.d.ts"],
     },
+    // Preserve the existing declaration lookup for package-private type imports.
+    "resolvePackageJsonExports": false,
+    "resolvePackageJsonImports": false,
     "target": "ESNext",
     "strict": true,
     "strictPropertyInitialization": false,

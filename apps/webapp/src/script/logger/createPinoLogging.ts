@@ -23,6 +23,7 @@ import type {Logger as PinoLogger} from 'pino';
 import {levels, pino} from 'pino/browser';
 import {errWithCause} from 'pino-std-serializers';
 import {Maybe} from 'true-myth';
+import {objectHasOwn} from 'ts-extras';
 
 import type {LogAttributes, Logger} from './logger';
 import {encodeLogOutput, type LogOutput} from './logOutput';
@@ -30,6 +31,7 @@ import {encodeLogOutput, type LogOutput} from './logOutput';
 export type LoggingDependencies = {
   readonly clock: Pick<Clock, 'currentUnixEpochMilliseconds'>;
   readonly output: LogOutput;
+  readonly shouldWriteToOutput?: (namespaceEnabled: boolean) => boolean;
   readonly namespaces: Maybe<string>;
   readonly persistenceOutput: Maybe<LogOutput>;
 };
@@ -114,10 +116,18 @@ export function createPinoLogging(initialDependencies: Maybe<LoggingDependencies
   let namespaceRules: readonly NamespaceRule[] = [];
   let persistenceEnabled = false;
 
-  function isConsoleEnabled(component: string): boolean {
+  function isNamespaceEnabled(component: string): boolean {
     return namespaceRules.reduce((previous, rule) => {
       return rule.matches(component) ? rule.enabled : previous;
     }, false);
+  }
+
+  function getComponentLogLevel(component: string): 'debug' | 'info' | 'silent' {
+    if (isNamespaceEnabled(component)) {
+      return 'debug';
+    }
+
+    return persistenceEnabled ? 'info' : 'silent';
   }
 
   function configure(dependencies: Maybe<LoggingDependencies>): void {
@@ -164,12 +174,14 @@ export function createPinoLogging(initialDependencies: Maybe<LoggingDependencies
               // Every destination receives the same sanitized JSON line, never raw Pino objects.
               const line = encodeLogOutput(structuredRecord);
               const component = structuredRecord['component'];
-              if (isString(component) && isConsoleEnabled(component)) {
-                try {
+              try {
+                const namespaceEnabled = isString(component) && isNamespaceEnabled(component);
+                const shouldWriteToOutput = configuration.shouldWriteToOutput?.(namespaceEnabled) ?? namespaceEnabled;
+                if (shouldWriteToOutput) {
                   configuration.output(line, level);
-                } catch {
-                  // Console failure must not prevent persistence of the same sanitized record.
                 }
+              } catch {
+                // Console failure must not prevent persistence of the same sanitized record.
               }
 
               if (configuration.persistenceOutput.isJust) {
@@ -195,11 +207,9 @@ export function createPinoLogging(initialDependencies: Maybe<LoggingDependencies
           }
 
           if (componentLogger.isNothing || componentLogger.value.root !== root.value) {
-            // Persistence must reach sanitization even when console namespace filtering is disabled.
-            const enabled = persistenceEnabled || isConsoleEnabled(component);
             componentLogger = Maybe.just({
               root: root.value,
-              logger: root.value.child({component}, {level: enabled ? 'debug' : 'silent'}),
+              logger: root.value.child({component}, {level: getComponentLogLevel(component)}),
             });
           }
 
@@ -210,7 +220,7 @@ export function createPinoLogging(initialDependencies: Maybe<LoggingDependencies
           // On a metadata collision, retain the complete attribute object under "attributes".
           const fields = attributes ?? {};
           const conflicts = ['level', 'time', 'component', 'msg', 'toJSON'].some(key => {
-            return Object.hasOwn(fields, key);
+            return objectHasOwn(fields, key);
           });
           componentLogger.value.logger[level](conflicts ? {attributes: fields} : {...fields}, message);
         } catch {

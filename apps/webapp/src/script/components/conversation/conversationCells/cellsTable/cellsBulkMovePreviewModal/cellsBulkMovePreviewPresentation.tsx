@@ -20,7 +20,7 @@
 import {useEffect, useRef, type ChangeEvent, type FormEvent, type FunctionComponent, type MouseEvent} from 'react';
 
 import type {RestPerformActionResponse} from 'cells-sdk-ts';
-import type {Result} from 'true-myth';
+import {maybe, type Maybe, type Result} from 'true-myth';
 
 import {BulkMoveDestinationSelection} from './useBulkMoveDestinationSelection';
 
@@ -47,7 +47,7 @@ interface CellsBulkMovePreviewPresentationProps {
   selectedItems: readonly SharedDriveMoveItem[];
   destinationPath: string;
   onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
-  onMoveStart: (summary: SharedDriveMoveSummary) => string;
+  onMoveStart: (summary: SharedDriveMoveSummary) => Maybe<string>;
   onMoveResult: (response: RestPerformActionResponse, operationId: string) => boolean;
   onMoveError: (operationId: string) => void;
   isMoveDisabled: boolean;
@@ -95,15 +95,18 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
       destinationPath: destinationPath.length > 0 ? destinationPath : translate('cells.sharedDrive.title'),
     };
     const operationId = onMoveStart(moveSummary);
+    if (maybe.isNothing(operationId)) {
+      return;
+    }
 
     const moveResult = await onMove();
     if (moveResult.isErr) {
-      onMoveError(operationId);
+      onMoveError(operationId.value);
       return;
     }
 
     if (moveResult.isOk) {
-      const canCloseAfterMove = onMoveResult(moveResult.value, operationId);
+      const canCloseAfterMove = onMoveResult(moveResult.value, operationId.value);
       if (canCloseAfterMove && isCurrentDialog.current) {
         onClose();
       }
@@ -112,7 +115,7 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
-      <CellsModal.Header>
+      <CellsModal.Header isCloseDisabled={isMoveLoading || isBackgroundMovePending}>
         {translate(
           activeModalContent === 'create' ? 'cells.moveNodeModal.createTitle' : 'cells.moveNodeModal.moveTitle',
         )}
@@ -130,7 +133,7 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
             }}
           />
           <CellsModal.Actions>
-            {!isBackgroundMovePending && (
+            {!isMoveLoading && !isBackgroundMovePending && (
               <CellsModal.SecondaryButton onClick={onClose}>
                 {translate('cells.moveNodeModal.cancelButton')}
               </CellsModal.SecondaryButton>

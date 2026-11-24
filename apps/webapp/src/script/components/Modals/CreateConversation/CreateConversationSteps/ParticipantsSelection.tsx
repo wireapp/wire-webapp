@@ -100,6 +100,7 @@ export const ParticipantsSelection: FunctionComponent = () => {
             noUnderline
             allowRemoteSearch
             filterRemoteTeamUsers
+            showPendingOnboarding
           />
         </FadingScrollbar>
       </div>

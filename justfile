@@ -3,6 +3,8 @@ set positional-arguments
 export PATH := justfile_directory() + "/node_modules/.bin:" + env_var("PATH")
 export NODE_OPTIONS := "--max-old-space-size=6144"
 
+native_typescript_compiler_path := justfile_directory() + "/node_modules/@typescript/native-compiler/bin/tsc"
+
 # Apply committed dependency patches without running repository setup automatically.
 [group('setup')]
 apply-patches:
@@ -38,11 +40,11 @@ report-dependencies:
 stylesheet-lint:
     cd apps/webapp && prettier --ignore-path ../../.prettierignore --check "**/*.less" && stylelint --ignore-path .gitignore "**/*.less"
 
-# Lint the repository with ESLint's flat config and the temporary 279-warning budget.
+# The 552-warning baseline covers 273 enum declarations and 279 other warnings.
 [arg("fix", long, value="true")]
 [group('lint')]
 eslint fix="false":
-    eslint . --config eslint.config.mjs --max-warnings=279 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
+    eslint . --config eslint.config.mjs --max-warnings=552 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
 
 # Run all repository lint checks, including circular dependencies.
 [group('lint')]
@@ -66,30 +68,30 @@ format:
 # Type-check all application and tooling configurations in sequence.
 [group('type-check')]
 type-check:
-    tsc --project ./tsconfig.tools.type-check.json
-    tsc --project ./tools/releaseAppearance/tsconfig.json
-    tsc --project ./tsconfig.release-cli.json
-    tsc --project ./apps/webapp/tsconfig.type-check.json
-    tsc --project ./apps/webapp/tsconfig.rspack.json
-    tsc --project ./apps/server/tsconfig.build.json --noEmit
-    tsc --project ./apps/server/tsconfig.type-check.json
-    tsc --project ./apps/server/tsconfig.rspack.json
-    tsc --project ./apps/server/bin/tsconfig.json
-    tsc --project ./apps/webapp/tsconfig.api-client.json
-    tsc --project ./apps/webapp/tsconfig.commons.json
-    tsc --project ./apps/webapp/tsconfig.commons-tests.json
+    node "{{native_typescript_compiler_path}}" --project ./tsconfig.tools.type-check.json
+    node "{{native_typescript_compiler_path}}" --project ./tools/releaseAppearance/tsconfig.json
+    node "{{native_typescript_compiler_path}}" --project ./tsconfig.release-cli.json
+    node "{{native_typescript_compiler_path}}" --project ./apps/webapp/tsconfig.type-check.json
+    node "{{native_typescript_compiler_path}}" --project ./apps/webapp/tsconfig.rspack.json
+    node "{{native_typescript_compiler_path}}" --project ./apps/server/tsconfig.build.json --noEmit
+    node "{{native_typescript_compiler_path}}" --project ./apps/server/tsconfig.type-check.json
+    node "{{native_typescript_compiler_path}}" --project ./apps/server/tsconfig.rspack.json
+    node "{{native_typescript_compiler_path}}" --project ./apps/server/bin/tsconfig.json
+    node "{{native_typescript_compiler_path}}" --project ./apps/webapp/tsconfig.api-client.json
+    node "{{native_typescript_compiler_path}}" --project ./apps/webapp/tsconfig.commons.json
+    node "{{native_typescript_compiler_path}}" --project ./apps/webapp/tsconfig.commons-tests.json
 
 # Compile the production server and copy its runtime assets.
 [group('build')]
 build-server:
     rimraf apps/server/build/server
-    tsc --project apps/server/tsconfig.build.json --outDir apps/server/build/server
+    node "{{native_typescript_compiler_path}}" --project apps/server/tsconfig.build.json --outDir apps/server/build/server
     WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/server node apps/server/bin/copy_server_assets.js
 
 # Type-check and bundle the production server with its runtime assets.
 [group('build')]
 build-server-bundle:
-    tsc --project apps/server/tsconfig.build.json --noEmit
+    node "{{native_typescript_compiler_path}}" --project apps/server/tsconfig.build.json --noEmit
     rspack build --config apps/server/rspack.config.mts --json=apps/server/build/server-bundle-stats.json
     WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/bundle node apps/server/bin/copy_server_assets.js --bundle
 
@@ -139,7 +141,7 @@ build-webapp-public:
 prepare-development-server:
     rimraf apps/server/dist apps/server/build/metadata
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    tsc --project apps/server/tsconfig.build.json --incremental
+    node "{{native_typescript_compiler_path}}" --project apps/server/tsconfig.build.json --incremental
     WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/dist node apps/server/bin/copy_server_assets.js
     cp apps/server/build/metadata/version.json apps/server/dist/version.json
 
@@ -153,7 +155,7 @@ develop: prepare-development-server
 # Recompile server sources while Node watches the compiled output and restarts the server.
 [group('development')]
 watch-server-typescript:
-    tsc --project apps/server/tsconfig.build.json --incremental --watch --preserveWatchOutput
+    node "{{native_typescript_compiler_path}}" --project apps/server/tsconfig.build.json --incremental --watch --preserveWatchOutput
 
 [group('development')]
 run-development-server:
@@ -169,7 +171,7 @@ run-development-server:
 configure-webapp:
     cd apps/webapp && node ../../tools/configuration/cli.mts ./.copyconfigrc.js
     cd apps/webapp && ts-node ./bin/generate_react_icons.ts
-    cd apps/webapp && tsc --project ./tsconfig.generated-icons.json --noEmit
+    cd apps/webapp && node "{{native_typescript_compiler_path}}" --project ./tsconfig.generated-icons.json --noEmit
 
 # Build and publish a Docker image after packaging the application.
 [group('release')]

@@ -39,6 +39,7 @@ describe('mapMeetNowCommandToCreateMeeting', () => {
       title: 'Standup',
       start_time: fixedNow.toISOString(),
       end_time: new Date(fixedNow.getTime() + 60 * 60 * 1000).toISOString(),
+      type: 'immediate',
       tzid: 'Pacific/Auckland',
     });
   });

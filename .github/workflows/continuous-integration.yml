@@ -50,7 +50,7 @@ jobs:
 
   generated-artifacts:
     runs-on: ubuntu-26.04-arm
-    name: generated artifacts check
+    name: Generated artifacts check
     permissions:
       contents: read
 
@@ -175,7 +175,7 @@ jobs:
 
   type-check:
     runs-on: ubuntu-26.04-arm
-    name: type check
+    name: Type check
     permissions:
       contents: read
 
@@ -200,7 +200,7 @@ jobs:
 
   lint-file-names:
     runs-on: ubuntu-26.04-arm
-    name: lint file names
+    name: Lint file names
     permissions:
       contents: read
 
@@ -225,7 +225,7 @@ jobs:
 
   lint:
     runs-on: ubuntu-26.04-arm
-    name: lint
+    name: Lint
     permissions:
       contents: read
     env:
@@ -293,7 +293,7 @@ jobs:
 
   unit-tests:
     runs-on: ubuntu-26.04-arm
-    name: unit tests
+    name: Unit tests
     permissions:
       contents: read
 
@@ -333,12 +333,6 @@ jobs:
   public-production-package:
     runs-on: ubuntu-26.04
     name: Public production package verification
-    needs:
-      - generated-artifacts
-      - type-check
-      - lint-file-names
-      - lint
-      - unit-tests
     permissions:
       contents: read
 

@@ -35,6 +35,7 @@ describe('MeetingsApiDataSource', () => {
       title: 'Weekly sync',
       start_time: '2026-06-16T10:00:00.000Z',
       end_time: '2026-06-16T11:00:00.000Z',
+      type: 'scheduled',
       tzid: 'Europe/Berlin',
     });
     await dataSource.getMeetingsList();

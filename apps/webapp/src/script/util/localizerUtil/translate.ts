@@ -18,6 +18,7 @@
  */
 
 import {isNumber, isString} from '@sindresorhus/is';
+import {objectHasOwn} from 'ts-extras';
 import {escape} from 'underscore';
 
 import {dangerousTranslationSubstitutionPattern, translationSubstitutionPattern} from './translationMarkers';
@@ -44,7 +45,7 @@ function replaceSubstituteEscaped(
   }
 
   return string.replace(regex, (found: string, content: string): string => {
-    if (substitutes !== undefined && Object.hasOwn(substitutes, content)) {
+    if (substitutes !== undefined && objectHasOwn(substitutes, content)) {
       return escape(substitutes[content] as string);
     }
 
@@ -62,7 +63,7 @@ function replaceSubstitute(
   }
 
   return string.replace(regex, (found: string, content: string) => {
-    if (substitutes !== undefined && Object.hasOwn(substitutes, content)) {
+    if (substitutes !== undefined && objectHasOwn(substitutes, content)) {
       return substitutes[content] as string;
     }
 
@@ -78,7 +79,7 @@ export function translate<Id extends TranslationKey>(
 ): string {
   const localeValue = strings[locale]?.[identifier];
   const defaultValue =
-    strings[DEFAULT_LOCALE] !== undefined && Object.hasOwn(strings[DEFAULT_LOCALE], identifier)
+    strings[DEFAULT_LOCALE] !== undefined && objectHasOwn(strings[DEFAULT_LOCALE], identifier)
       ? strings[DEFAULT_LOCALE][identifier]
       : identifier;
   const value = isString(localeValue) ? localeValue : defaultValue;

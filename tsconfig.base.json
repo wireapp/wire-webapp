@@ -1,16 +1,13 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "rootDir": ".",
     "sourceMap": true,
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "downlevelIteration": true,
     "alwaysStrict": true,
     "strict": true,
     "strictNullChecks": true,
@@ -18,12 +15,10 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    // Temporary compatibility mapping: legacy CommonJS projects cannot resolve
-    // ESM-only packages' declarations through package exports. Remove this
-    // when those projects are migrated deliberately to modern resolution.
+    // Compatibility mappings for projects whose package declarations need explicit entrypoints.
     "paths": {
-      "@sindresorhus/is": ["node_modules/@sindresorhus/is/distribution/index.d.ts"],
-      "ts-extras": ["node_modules/ts-extras/distribution/index.d.ts"]
+      "@sindresorhus/is": ["./node_modules/@sindresorhus/is/distribution/index.d.ts"],
+      "ts-extras": ["./node_modules/ts-extras/distribution/index.d.ts"]
     },
     "noUnusedLocals": true,
     "resolveJsonModule": true,
@@ -31,9 +26,7 @@
     "target": "es2024",
     "module": "esnext",
     "lib": ["ES2024", "dom"],
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "baseUrl": "."
+    "skipLibCheck": true
   },
   "exclude": ["node_modules", "tmp"]
 }
