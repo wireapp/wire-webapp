@@ -217,7 +217,7 @@ test.describe('Mention', () => {
     'I want mention to be shown as a full name even if I searched by username',
     {tag: ['@TC-3493', '@regression']},
     async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA));
+      const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
@@ -276,7 +276,7 @@ test.describe('Mention', () => {
     'I should not loose drafted text or mentions in input field',
     {tag: ['@TC-3498', '@regression']},
     async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA));
+      const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
@@ -446,7 +446,7 @@ test.describe('Mention', () => {
     'I should not see mentions suggestion if I type @ with characters in front',
     {tag: ['@TC-3532', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(page, userB);
 
       const {pages} = PageManager.from(page).webapp;

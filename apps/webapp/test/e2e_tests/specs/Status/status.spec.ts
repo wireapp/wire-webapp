@@ -228,7 +228,11 @@ test.describe('Status', () => {
 
   for (const config of notificationConfigs) {
     test(config.title, {tag: config.tag}, async ({createPage, api}) => {
-      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB)),
+        createPage(withLogin(userC)),
+      ]);
       await connectWithUser(userAPage, userB);
       await connectWithUser(userBPage, userC);
 

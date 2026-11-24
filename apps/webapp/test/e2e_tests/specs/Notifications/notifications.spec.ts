@@ -87,7 +87,7 @@ test.describe('Notifications', () => {
     'I want to mute 1on1 conversations via recent view',
     {tag: ['@TC-1437', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(page, userB);
       const pages = PageManager.from(page).webapp.pages;
 
@@ -104,7 +104,7 @@ test.describe('Notifications', () => {
     'I want to unmute 1on1 conversations via recent view',
     {tag: ['@TC-1438', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(page, userB);
       const pages = PageManager.from(page).webapp.pages;
 

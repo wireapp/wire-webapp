@@ -66,7 +66,7 @@ test.describe('Sending Assets', () => {
   });
 
   test('Verify you can delete an audio message', {tag: ['@TC-111', '@regression']}, async ({createPage}) => {
-    const userAPage = await createPage(withLogin(userA));
+    const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(userAPage, userB);
     const {pages} = PageManager.from(userAPage).webapp;
 
@@ -80,7 +80,7 @@ test.describe('Sending Assets', () => {
   });
 
   test('I want to drag & drop a file into a conversation', {tag: ['@TC-497', '@regression']}, async ({createPage}) => {
-    const userAPage = await createPage(withLogin(userA));
+    const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(userAPage, userB);
     const {pages, modals} = PageManager.from(userAPage).webapp;
 
@@ -115,7 +115,7 @@ test.describe('Sending Assets', () => {
     'I want to copy & paste an image into a conversation',
     {tag: ['@TC-498', '@regression']},
     async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA));
+      const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
       const {pages} = PageManager.from(userAPage).webapp;
 
@@ -162,7 +162,7 @@ test.describe('Sending Assets', () => {
   );
 
   test('I want to copy message via message option menu', {tag: ['@TC-500', '@regression']}, async ({createPage}) => {
-    const userAPage = await createPage(withLogin(userA));
+    const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(userAPage, userB);
     const userAPages = PageManager.from(userAPage).webapp.pages;
 
@@ -197,7 +197,7 @@ test.describe('Sending Assets', () => {
       `Verify file can be uploaded and re-downloaded by sender himself in ${conversationType}`,
       {tag: [`${tag}`, '@regression']},
       async ({createPage}, testInfo) => {
-        const userAPage = await createPage(withLogin(userA));
+        const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
         await connectWithUser(userAPage, userB);
         const {pages} = PageManager.from(userAPage).webapp;
 
@@ -239,7 +239,7 @@ test.describe('Sending Assets', () => {
   });
 
   test('Verify warning is shown if file size is too big', {tag: ['@TC-767', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA));
+    const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(page, userB);
     const {pages, modals} = PageManager.from(page).webapp;
     await createGroup(pages, 'Test Group', [userB]);
@@ -334,7 +334,7 @@ test.describe('Sending Assets', () => {
     async ({createPage}, testInfo) => {
       test.setTimeout(testInfo.timeout + 11_000);
 
-      const userAPage = await createPage(withLogin(userA));
+      const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
       const {pages} = PageManager.from(userAPage).webapp;
 
@@ -358,7 +358,7 @@ test.describe('Sending Assets', () => {
     'Verify you can see conversation images in fullscreen',
     {tag: ['@TC-1193', '@regression']},
     async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA));
+      const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
       const {pages, modals} = PageManager.from(userAPage).webapp;
 

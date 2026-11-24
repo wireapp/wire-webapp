@@ -145,7 +145,7 @@ test.describe('Authentication', () => {
         const userB = await createUser();
         const {owner: userA} = await createTeam('Test Team', {users: [userB]});
 
-        const pageManager = PageManager.from(await createPage());
+        const [pageManager] = await Promise.all([PageManager.from(createPage()), createPage(withLogin(userB))]);
         const {pages, components} = pageManager.webapp;
 
         await test.step('Log in and connect with user B', async () => {
@@ -206,7 +206,7 @@ test.describe('Authentication', () => {
       const userB = await createUser();
       const {owner: userA} = await createTeam('Test Team', {users: [userB]});
 
-      const pageManager = await PageManager.from(createPage());
+      const [pageManager] = await Promise.all([PageManager.from(createPage()), createPage(withLogin(userB))]);
       const {pages, components} = pageManager.webapp;
 
       await test.step('Log in with public computer checked', async () => {

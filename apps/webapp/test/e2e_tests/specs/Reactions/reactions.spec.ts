@@ -105,7 +105,7 @@ test.describe('Reactions', () => {
   }
 
   test("Verify liking someone's location", {tag: ['@TC-1533', '@regression']}, async ({createPage, api}) => {
-    const userAPage = await createPage(withLogin(userA));
+    const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(userAPage, userB);
 
     const userAPages = PageManager.from(userAPage).webapp.pages;
@@ -137,7 +137,7 @@ test.describe('Reactions', () => {
   });
 
   test('Verify liking an own text message', {tag: ['@TC-1534', '@regression']}, async ({createPage}) => {
-    const userAPage = await createPage(withLogin(userA));
+    const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(userAPage, userB);
 
     const userAPages = PageManager.from(userAPage).webapp.pages;
@@ -150,7 +150,7 @@ test.describe('Reactions', () => {
   });
 
   test('Verify you cannot like a system message', {tag: ['@TC-1535', '@regression']}, async ({createPage}) => {
-    const userAPage = await createPage(withLogin(userA));
+    const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(userAPage, userB);
 
     const userAPages = PageManager.from(userAPage).webapp.pages;

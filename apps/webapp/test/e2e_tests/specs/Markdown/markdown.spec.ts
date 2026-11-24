@@ -37,7 +37,7 @@ test.describe('Markdown', () => {
     'I want to paste text with CRLF (carriage return/ line feed) characters in the message',
     {tag: ['@regression', '@TC-11735']},
     async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA));
+      const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
@@ -66,7 +66,7 @@ test.describe('Markdown', () => {
     'I want to paste text with HTML code in the message',
     {tag: ['@regression', '@TC-11736']},
     async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA));
+      const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
@@ -160,7 +160,10 @@ test.describe('Markdown', () => {
     {tag: ['@TC-9482', '@regression']},
     async ({createPage}) => {
       const targetUrl = 'https://example.com/test_path_with_underscores';
-      const userAPageManager = PageManager.from(await createPage(withLogin(userA)));
+      const [userAPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))),
+        createPage(withLogin(userB)),
+      ]);
       await connectWithUser(userAPageManager, userB);
 
       const {pages, modals} = userAPageManager.webapp;

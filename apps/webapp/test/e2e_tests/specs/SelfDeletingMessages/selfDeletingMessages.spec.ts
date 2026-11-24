@@ -87,7 +87,7 @@ test.describe('Self Deleting Messages', () => {
     async ({createPage}, testInfo) => {
       test.setTimeout(testInfo.timeout + 10_000);
 
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(page, userB);
       const pages = PageManager.from(page).webapp.pages;
 
@@ -116,7 +116,7 @@ test.describe('Self Deleting Messages', () => {
     'Verify that message with previous timer are deleted on start-up when the timeout passed in 1:1',
     {tag: ['@TC-664', '@regression']},
     async ({context, createPage}) => {
-      let page = await createPage(context, withLogin(userA));
+      let [page] = await Promise.all([createPage(context, withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(page, userB);
       let pages = PageManager.from(page).webapp.pages;
 

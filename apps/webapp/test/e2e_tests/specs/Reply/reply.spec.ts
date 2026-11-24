@@ -35,7 +35,7 @@ test.describe('Reply', () => {
   });
 
   test('I should not be able to reply to a ping', {tag: ['@TC-8038', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA));
+    const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
 
@@ -48,7 +48,7 @@ test.describe('Reply', () => {
   });
 
   test('I should not be able to reply to timed messages', {tag: ['@TC-8039', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA));
+    const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
 
@@ -92,7 +92,7 @@ test.describe('Reply', () => {
     'I should not see the quoted message when searching for original message in collections',
     {tag: ['@TC-2996', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(page, userB);
       const pages = PageManager.from(page).webapp.pages;
 
@@ -118,7 +118,7 @@ test.describe('Reply', () => {
       const longMessage =
         'This is a very long message which should be truncated within the UI since it is as already stated very long.';
 
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(page, userB);
       const pages = PageManager.from(page).webapp.pages;
 
@@ -135,7 +135,7 @@ test.describe('Reply', () => {
   );
 
   test('I want to reply to a picture', {tag: ['@TC-3002', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA));
+    const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
 
@@ -150,7 +150,7 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to an audio message', {tag: ['@TC-3003', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA));
+    const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
 
@@ -165,7 +165,7 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a video message', {tag: ['@TC-3004', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA));
+    const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
 
@@ -180,7 +180,7 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a link', {tag: ['@TC-3005', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA));
+    const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
 
@@ -195,7 +195,7 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a file', {tag: ['@TC-3006', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA));
+    const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
 
@@ -210,7 +210,7 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a reply', {tag: ['@TC-3007', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA));
+    const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
 
@@ -229,7 +229,7 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a link mixed with text', {tag: ['@TC-3008', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA));
+    const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
 
@@ -245,7 +245,7 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a location share', {tag: ['@TC-3009', '@regression']}, async ({createPage, api}) => {
-    const page = await createPage(withLogin(userA));
+    const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
 
@@ -279,7 +279,7 @@ test.describe('Reply', () => {
     'I want to send a timed message as a reply to any type of a message',
     {tag: ['@TC-3011', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(page, userB);
       const pages = PageManager.from(page).webapp.pages;
 
@@ -299,7 +299,7 @@ test.describe('Reply', () => {
     'I want to click the quoted message to jump to the original message',
     {tag: ['@TC-3013', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(page, userB);
       const pages = PageManager.from(page).webapp.pages;
 
@@ -361,7 +361,7 @@ test.describe('Reply', () => {
     'I want to reply with mention and tap on the mention in the reply opens the user profile',
     {tag: ['@TC-3016', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(page, userB);
       const pages = PageManager.from(page).webapp.pages;
 

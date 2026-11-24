@@ -247,7 +247,10 @@ test.describe('User Blocking', () => {
       'Verify you cannot add a person who blocked you to a group chat',
       {tag: ['@TC-10912', '@regression']},
       async ({createPage}) => {
-        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA)));
+        const [userAPageManagerInstance] = await Promise.all([
+          PageManager.from(createPage(withLogin(userA))),
+          createPage(withLogin(userC)),
+        ]);
         await sendConnectionRequest(userAPageManagerInstance, userB);
         await connectWithUser(userAPageManagerInstance, userC);
         const {pages: userAPages, modals: userAModals} = userAPageManagerInstance.webapp;
@@ -303,7 +306,10 @@ test.describe('User Blocking', () => {
       'Verify you can unblock someone from conversation list options',
       {tag: ['@TC-10914', '@regression']},
       async ({createPage}) => {
-        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA)));
+        const [userAPageManagerInstance] = await Promise.all([
+          PageManager.from(createPage(withLogin(userA))),
+          createPage(withLogin(userC)),
+        ]);
         await sendConnectionRequest(userAPageManagerInstance, userB);
         await connectWithUser(userAPageManagerInstance, userC);
         const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManagerInstance.webapp;
@@ -357,7 +363,10 @@ test.describe('User Blocking', () => {
       'Verify you can not block a user from your team',
       {tag: ['@TC-10915', '@regression']},
       async ({createPage}) => {
-        const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+        const [userAPageManager] = await Promise.all([
+          PageManager.from(createPage(withLogin(userA))),
+          createPage(withLogin(userB)),
+        ]);
         await connectWithUser(userAPageManager, userB);
         const userAPages = userAPageManager.webapp.pages;
 
