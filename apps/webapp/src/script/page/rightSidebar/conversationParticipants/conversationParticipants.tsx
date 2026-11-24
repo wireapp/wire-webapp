@@ -34,7 +34,7 @@ import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {sortUsersByPriority} from '../../../util/stringUtil';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
-import {PanelEntity, PanelState} from '../rightSidebar';
+import {PanelEntity, PanelState} from '../panelState';
 
 interface ConversationParticipantsProps {
   activeConversation: Conversation;

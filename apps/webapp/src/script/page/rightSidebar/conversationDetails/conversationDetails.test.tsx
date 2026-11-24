@@ -62,7 +62,8 @@ import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
 import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
-import {PanelState} from '../rightSidebar';
+
+import {PanelState} from '../panelState';
 
 jest.mock('../../../components/panel/enrichedFields', () => {
   return {

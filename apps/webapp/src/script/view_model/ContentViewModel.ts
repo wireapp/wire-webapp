@@ -30,14 +30,12 @@ import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationError} from '../error/conversationError';
-import '../page/leftSidebar';
 import {
   getConversationListTab,
   isConversationListTab,
   useSidebarStore,
 } from '../page/leftSidebar/panels/conversations/useSidebarStore';
-import '../page/mainContent';
-import {PanelState} from '../page/rightSidebar';
+import {PanelState} from '../page/rightSidebar/panelState';
 import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
 import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';

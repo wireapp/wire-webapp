@@ -19,7 +19,7 @@
 
 import {create} from 'zustand';
 
-import {PanelEntity, PanelState} from './rightSidebar';
+import {PanelEntity, PanelState} from './rightSidebar/panelState';
 
 import {Message} from '../repositories/entity/message/message';
 import {User} from '../repositories/entity/User';
