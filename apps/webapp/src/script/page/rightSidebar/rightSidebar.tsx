@@ -318,7 +318,12 @@ const RightSidebar: FC<RightSidebarProps> = ({
           )}
 
           {currentState === PanelState.SHARED_DRIVE && (
-            <SharedDrive activeConversation={activeConversation} onClose={closePanel} onBack={onBackClick} />
+            <SharedDrive
+              activeConversation={activeConversation}
+              teamState={teamState}
+              onClose={closePanel}
+              onBack={onBackClick}
+            />
           )}
 
           {(currentState === PanelState.GUEST_OPTIONS || currentState === PanelState.SERVICES_OPTIONS) && (

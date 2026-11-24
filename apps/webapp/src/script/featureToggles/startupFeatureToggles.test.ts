@@ -28,6 +28,7 @@ import {
   disableMessagePreprocessingFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
   driveBulkActionProgressFeatureToggleName,
+  driveOffboardingFeatureToggleName,
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
@@ -44,6 +45,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   disableMessagePreprocessingFeatureToggleName,
   driveBulkRestoreFeatureToggleName,
   driveBulkActionProgressFeatureToggleName,
+  driveOffboardingFeatureToggleName,
   markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
@@ -57,6 +59,28 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([markAsUnreadFeatureToggleName]);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain('persistent-browser-logs');
+  });
+
+  it('keeps existing Shared Drives behind explicit opt-in when team Cells is disabled', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch(
+      `?enabled-features=${driveOffboardingFeatureToggleName}`,
+    );
+
+    expect(disabled.isFeatureToggleEnabled(driveOffboardingFeatureToggleName)).toBe(false);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(driveOffboardingFeatureToggleName);
+    expect(enabled.isFeatureToggleEnabled(driveOffboardingFeatureToggleName)).toBe(true);
+  });
+
+  it('keeps persistent browser logs disabled for release and preview builds and preserves explicit opt-in alongside other toggles', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch(
+      '?enabled-features=mark-as-unread,persistent-browser-logs',
+    );
+
+    expect(disabled.enabledFeatureToggleNames).toEqual([]);
+    expect(enabled.enabledFeatureToggleNames).toEqual([markAsUnreadFeatureToggleName]);
     expect(previewDefaultEnabledStartupFeatureToggleNames).not.toContain('persistent-browser-logs');
   });
   it('keeps encrypted PDF previews disabled for release builds and allows explicit opt-in', () => {
@@ -255,6 +279,7 @@ describe('startupFeatureToggles', function () {
       disableMessagePreprocessingFeatureToggleName,
       driveBulkRestoreFeatureToggleName,
       driveBulkActionProgressFeatureToggleName,
+      driveOffboardingFeatureToggleName,
       markAsUnreadFeatureToggleName,
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,

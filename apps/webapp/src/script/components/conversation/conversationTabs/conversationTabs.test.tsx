@@ -17,8 +17,10 @@
  *
  */
 
+import {useState, type ReactElement} from 'react';
+
 import {act, render, type RenderResult} from '@testing-library/react';
-import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
+import {THEME_ID, ThemeProvider, themes} from '../../../uiKit/identity/theme/theme';
 import {Maybe} from 'true-myth';
 
 import type {UploadState} from '../../../repositories/cells/upload';
@@ -101,24 +103,80 @@ const renderTabs = (
   controller: SharedDriveUploadController,
   isUploadStatusIndicatorEnabled = true,
   dismissedUpload: Maybe<DismissedUpload> = Maybe.nothing<DismissedUpload>(),
+  onIndexChange: (index: number) => void = jest.fn(),
+  activeTabIndex = 0,
+  themeId = THEME_ID.DEFAULT,
 ): RenderResult => {
   return render(
-    <ThemeProvider>
+    <ThemeProvider theme={themes[themeId]}>
       <SharedDriveUploadStatusProvider initialDismissedUpload={dismissedUpload}>
         <ConversationTabs
-          activeTabIndex={0}
-          onIndexChange={jest.fn()}
+          activeTabIndex={activeTabIndex}
+          onIndexChange={onIndexChange}
           conversationQualifiedId={conversationQualifiedId}
           sharedDriveUploadController={controller}
           isUploadStatusIndicatorEnabled={isUploadStatusIndicatorEnabled}
         />
       </SharedDriveUploadStatusProvider>
     </ThemeProvider>,
-    {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}))},
+    {
+      wrapper: createRootProviderWrapperForTest(
+        createRootContextValueForTest({
+          translate: translateForTest,
+        }),
+      ),
+    },
   );
 };
 
 describe('ConversationTabs', () => {
+  it.each([THEME_ID.LIGHT, THEME_ID.DARK])('restores a direct Files link in %s theme', themeId => {
+    const previousHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation/example.com/files';
+    const {controller} = createController();
+    const StatefulTabs = (): ReactElement => {
+      const [activeTabIndex, setActiveTabIndex] = useState(0);
+
+      return (
+        <ConversationTabs
+          activeTabIndex={activeTabIndex}
+          onIndexChange={setActiveTabIndex}
+          conversationQualifiedId={conversationQualifiedId}
+          sharedDriveUploadController={controller}
+          isUploadStatusIndicatorEnabled
+        />
+      );
+    };
+    const view = render(
+      <ThemeProvider theme={themes[themeId]}>
+        <SharedDriveUploadStatusProvider>
+          <StatefulTabs />
+        </SharedDriveUploadStatusProvider>
+      </ThemeProvider>,
+      {
+        wrapper: createRootProviderWrapperForTest(
+          createRootContextValueForTest({
+            translate: translateForTest,
+          }),
+        ),
+      },
+    );
+
+    const filesTab = view.getByRole('tab', {name: 'conversationDetailsActionCellsTitle'});
+    expect(filesTab).toHaveAttribute('aria-selected', 'true');
+    expect(filesTab).toHaveAttribute('aria-controls', 'conversation-tabpanel-files');
+    filesTab.focus();
+    expect(filesTab).toHaveFocus();
+    expect(view.getByRole('tab', {name: 'cells.tableRow.conversationName'})).toHaveAttribute('aria-selected', 'false');
+
+    act(() => {
+      window.location.hash = '#/conversation/conversation/example.com';
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    });
+    expect(view.getByRole('tab', {name: 'cells.tableRow.conversationName'})).toHaveAttribute('aria-selected', 'true');
+    window.location.hash = previousHash;
+  });
+
   it('does not render a shared drive upload icon when there is no file upload', () => {
     const {controller} = createController();
     const view = renderTabs(controller);
