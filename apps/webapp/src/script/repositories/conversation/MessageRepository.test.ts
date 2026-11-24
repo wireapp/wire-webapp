@@ -279,6 +279,197 @@ describe('MessageRepository', () => {
     });
   });
 
+  describe('sending and injecting a message', () => {
+    type SendAndInjectOptions = {silentDegradationWarning?: boolean; skipInjection?: boolean};
+    type SendAndInjectPrivateMethodsForTest = {
+      sendAndInjectMessage: (
+        message: GenericMessage,
+        conversation: Conversation,
+        options?: SendAndInjectOptions,
+      ) => Promise<{state: unknown}>;
+      injectOptimisticMessage: (payload: GenericMessage, conversation: Conversation) => Promise<boolean>;
+      sendMessageToBackend: (payload: GenericMessage, conversation: Conversation) => Promise<unknown>;
+      generateRecipients: () => Promise<unknown>;
+      updateMessageAsFailed: (conversation: Conversation, messageId: string, error: unknown) => Promise<void>;
+    };
+
+    type SendAndInjectSetup = {
+      privateMethods: SendAndInjectPrivateMethodsForTest;
+      clientState: ClientState;
+      generateRecipients: jest.SpyInstance;
+      calls: string[];
+      send: jest.SpyInstance;
+      injectEvent: jest.SpyInstance;
+      requestPermission: jest.SpyInstance;
+      updateMessageAsFailed: jest.SpyInstance;
+      conversation: Conversation;
+    };
+
+    const buildKnock = (): GenericMessage => {
+      return new GenericMessage({messageId: createUuid(), knock: {hotKnock: false}});
+    };
+
+    const setup = async (): Promise<SendAndInjectSetup> => {
+      const [messageRepository, {core, eventRepository, clientState}] = await buildMessageRepository(translateForTest);
+      clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
+      const privateMethods = messageRepository as unknown as SendAndInjectPrivateMethodsForTest;
+      const calls: string[] = [];
+      const conversationService = getConversationServiceForTest(core);
+      jest.spyOn(conversationService.messageTimer, 'setConversationLevelTimer').mockImplementation(() => {
+        calls.push('timer');
+      });
+      const generateRecipients = jest.spyOn(privateMethods, 'generateRecipients').mockImplementation(async () => {
+        calls.push('recipients');
+        return {};
+      });
+      const send = jest.spyOn(conversationService, 'send').mockImplementation(async () => {
+        calls.push('send');
+        return successPayload;
+      });
+      const injectEvent = jest.spyOn(eventRepository, 'injectEvent').mockImplementation(async () => {
+        calls.push('inject');
+      });
+      const requestPermission = jest
+        .spyOn(messageRepository, 'requestUserSendingPermission')
+        .mockImplementation(async () => {
+          calls.push('prompt');
+          return true;
+        });
+      const updateMessageAsFailed = jest.spyOn(privateMethods, 'updateMessageAsFailed').mockResolvedValue(undefined);
+      return {
+        privateMethods,
+        clientState,
+        generateRecipients,
+        calls,
+        send,
+        injectEvent,
+        requestPermission,
+        updateMessageAsFailed,
+        conversation: generateConversation(),
+      };
+    };
+
+    it('prepares the send, injects, asks the prompt, then sends', async () => {
+      const {privateMethods, calls, conversation} = await setup();
+
+      const result = await privateMethods.sendAndInjectMessage(buildKnock(), conversation);
+
+      expect(calls).toEqual(['timer', 'recipients', 'inject', 'prompt', 'send']);
+      expect(result.state).toBe(MessageSendingState.OUTGOING_SENT);
+    });
+
+    it('skips the injection when skipInjection is set', async () => {
+      const {privateMethods, calls, conversation} = await setup();
+
+      await privateMethods.sendAndInjectMessage(buildKnock(), conversation, {skipInjection: true});
+
+      expect(calls).toEqual(['timer', 'recipients', 'prompt', 'send']);
+    });
+
+    it('skips the prompt when silentDegradationWarning is set', async () => {
+      const {privateMethods, calls, conversation} = await setup();
+
+      await privateMethods.sendAndInjectMessage(buildKnock(), conversation, {silentDegradationWarning: true});
+
+      expect(calls).toEqual(['timer', 'recipients', 'inject', 'send']);
+    });
+
+    it('does not send when the user declines the prompt', async () => {
+      const {privateMethods, calls, requestPermission, conversation} = await setup();
+      requestPermission.mockResolvedValue(false);
+
+      const result = await privateMethods.sendAndInjectMessage(buildKnock(), conversation);
+
+      expect(calls).toEqual(['timer', 'recipients', 'inject']);
+      expect(result.state).toBe(MessageSendingState.CANCELED);
+    });
+
+    it('skips the prompt but still sends when there is no client id to inject with', async () => {
+      const {privateMethods, calls, clientState, conversation} = await setup();
+      clientState.currentClient = new ClientEntity(true, '');
+
+      const result = await privateMethods.sendAndInjectMessage(buildKnock(), conversation);
+
+      expect(calls).toEqual(['timer', 'recipients', 'send']);
+      expect(result.state).toBe(MessageSendingState.OUTGOING_SENT);
+    });
+
+    it('lets a recipients failure propagate before injecting or marking the message failed', async () => {
+      const {privateMethods, calls, generateRecipients, updateMessageAsFailed, conversation} = await setup();
+      const error = new Error('no recipients');
+      generateRecipients.mockRejectedValue(error);
+
+      await expect(privateMethods.sendAndInjectMessage(buildKnock(), conversation)).rejects.toBe(error);
+
+      expect(calls).toEqual(['timer']);
+      expect(updateMessageAsFailed).not.toHaveBeenCalled();
+    });
+
+    it('marks the message as failed when the send throws', async () => {
+      const {privateMethods, send, updateMessageAsFailed, conversation} = await setup();
+      const error = new Error('offline');
+      send.mockRejectedValue(error);
+      const message = buildKnock();
+
+      const result = await privateMethods.sendAndInjectMessage(message, conversation);
+
+      expect(updateMessageAsFailed).toHaveBeenCalledWith(conversation, message.messageId, error);
+      expect(result.state).toBe('FAILED');
+    });
+
+    describe('sendMessageToBackend', () => {
+      it('rethrows what the send throws without marking the message as failed', async () => {
+        const {privateMethods, send, updateMessageAsFailed, injectEvent, requestPermission, conversation} =
+          await setup();
+        const error = new Error('offline');
+        send.mockRejectedValue(error);
+
+        await expect(privateMethods.sendMessageToBackend(buildKnock(), conversation)).rejects.toBe(error);
+
+        expect(updateMessageAsFailed).not.toHaveBeenCalled();
+        expect(injectEvent).not.toHaveBeenCalled();
+        expect(requestPermission).not.toHaveBeenCalled();
+      });
+
+      it('marks the message as sent once the backend accepted it', async () => {
+        const {privateMethods, conversation} = await setup();
+        const updateMessageAsSent = jest.spyOn(privateMethods as any, 'updateMessageAsSent');
+        const message = buildKnock();
+
+        await privateMethods.sendMessageToBackend(message, conversation);
+
+        expect(updateMessageAsSent).toHaveBeenCalledWith(
+          conversation,
+          message.messageId,
+          successPayload.sentAt,
+          undefined,
+        );
+      });
+    });
+
+    describe('injectOptimisticMessage', () => {
+      it('injects the message without sending it', async () => {
+        const {privateMethods, calls, send, conversation} = await setup();
+
+        const injected = await privateMethods.injectOptimisticMessage(buildKnock(), conversation);
+
+        expect(injected).toBe(true);
+        expect(calls).toEqual(['inject']);
+        expect(send).not.toHaveBeenCalled();
+      });
+
+      it('reports that nothing was injected when there is no client id', async () => {
+        const {privateMethods, calls, clientState, conversation} = await setup();
+        clientState.currentClient = new ClientEntity(true, '');
+
+        const injected = await privateMethods.injectOptimisticMessage(buildKnock(), conversation);
+
+        expect(injected).toBe(false);
+        expect(calls).toEqual([]);
+      });
+    });
+  });
+
   describe('requestUserSendingPermission', () => {
     it('uses injected translate for degraded conversation modal copy', async () => {
       const translate = ((translationKey: string) => {
