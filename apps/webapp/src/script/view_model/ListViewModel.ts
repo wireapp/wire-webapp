@@ -26,7 +26,7 @@ import {container} from 'tsyringe';
 import type {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
-import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
+import type {ViewModelRepositories} from './ViewModelRepositories';
 
 import {Runtime} from '../commons/util/Runtime';
 import {PrimaryModal, usePrimaryModalState} from '../components/Modals/PrimaryModal';
@@ -59,6 +59,14 @@ import {isEscapeKey} from '../util/keyboardUtil';
 import {type Translate} from '../util/localizerUtil';
 import {WebAppEvents} from '../webAppEvents';
 
+/** The part of the `MainViewModel` that the list view model uses. */
+interface ListViewModelParent {
+  readonly isFederated: boolean;
+  readonly actions: ActionsViewModel;
+  readonly content: ContentViewModel;
+  readonly calling: CallingViewModel;
+}
+
 export class ListViewModel {
   private readonly userState: UserState;
   private readonly teamState: TeamState;
@@ -68,7 +76,7 @@ export class ListViewModel {
   readonly lastUpdate: ko.Observable<number>;
   readonly repositories: ViewModelRepositories;
 
-  public readonly mainViewModel: MainViewModel;
+  public readonly mainViewModel: ListViewModelParent;
   public readonly conversationRepository: ConversationRepository;
   public readonly propertiesRepository: PropertiesRepository;
   private readonly callingRepository: CallingRepository;
@@ -86,7 +94,7 @@ export class ListViewModel {
   }
 
   constructor(
-    mainViewModel: MainViewModel,
+    mainViewModel: ListViewModelParent,
     repositories: ViewModelRepositories,
     private readonly translate: Translate,
     private readonly fireAndForgetInvoker: FireAndForgetInvoker,

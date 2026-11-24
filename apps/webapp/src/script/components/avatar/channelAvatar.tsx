@@ -19,16 +19,71 @@
 
 import type {FunctionComponent} from 'react';
 
-import {
-  ChannelAvatarSize,
-  channelAvatarContainerCss,
-  channelAvatarIconCss,
-  channelAvatarLockIconCss,
-} from './channelAvatar.styles';
+import {CSSObject} from '@emotion/react';
 
 import {ChannelIcon} from '../../uiKit/dataDisplay/icon/channelIcon';
 import {LockClosedIcon} from '../../uiKit/dataDisplay/icon/lockClosedIcon';
 import {getChannelAvatarColors} from '../../util/avatarUtil';
+import {CSS_SQUARE} from '../../util/cssMixin';
+
+type ChannelAvatarSize = 'small' | 'large';
+
+const channelAvatarSizeInPixels = 28;
+const smallChannelAvatarSizeInPixels = 16;
+const smallChannelAvatarBorderWidthInPixels = 0.5;
+const channelAvatarBorderRadiusInPixels = 8;
+const smallChannelAvatarBorderRadiusInPixels = 4;
+const channelAvatarContentSizeInPixels = 26;
+const channelAvatarContentBorderRadiusInPixels = 7;
+
+const channelAvatarContainerCss = ({border, size}: {border: string; size: ChannelAvatarSize}): CSSObject => {
+  return {
+    ...CSS_SQUARE(size === 'small' ? smallChannelAvatarSizeInPixels : channelAvatarSizeInPixels),
+    border: `${size === 'small' ? smallChannelAvatarBorderWidthInPixels : 1}px solid var(--${border})`,
+    borderRadius: size === 'small' ? smallChannelAvatarBorderRadiusInPixels : channelAvatarBorderRadiusInPixels,
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: size === 'small' ? 'hidden' : 'visible',
+  };
+};
+
+const channelAvatarIconCss = ({
+  color,
+  background,
+  size,
+}: {
+  color: string;
+  background: string;
+  size: ChannelAvatarSize;
+}): CSSObject => {
+  return {
+    ...CSS_SQUARE(size === 'small' ? '100%' : channelAvatarContentSizeInPixels),
+    backgroundColor: `var(--${background})`,
+    color: `var(--${color})`,
+    display: 'flex',
+    flexWrap: 'wrap',
+    overflow: 'hidden',
+    borderRadius: size === 'small' ? 0 : channelAvatarContentBorderRadiusInPixels,
+    justifyContent: 'center',
+    alignContent: 'center',
+  };
+};
+
+const channelAvatarLockIconCss: CSSObject = {
+  color: 'var(--app-bg-secondary)',
+  backgroundColor: 'var(--main-color)',
+  position: 'absolute',
+  width: '14px',
+  height: '14px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: '3px',
+  top: '18px',
+  left: '18px',
+};
 
 const channelIconWidthInPixels = 16;
 const smallChannelIconWidthInPixels = 10;
