@@ -184,6 +184,16 @@ const enum SendAndInjectSendingState {
 
 type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingState | SendAndInjectSendingState};
 
+type BackendSendOptions = MessageSendingOptions & {
+  silentDegradationWarning?: boolean;
+  skipInjection?: boolean;
+  skipSelf?: boolean;
+  syncTimestamp?: boolean;
+  targetMode?: MessageTargetMode;
+};
+
+type CoreSendOptions = Parameters<ConversationService['send']>[0];
+
 /** A message that has already been stored in DB and has a primary key */
 type StoredMessage = Message & {primary_key: string};
 type StoredContentMessage = ContentMessage & {primary_key: string};
@@ -1084,59 +1094,79 @@ export class MessageRepository {
         ? MessageBuilder.wrapInEphemeral(message, messageTimer)
         : message;
 
-    const injectOptimisticEvent = async (): Promise<boolean> => {
-      if (skipInjection !== true) {
-        const clientId = this.clientState.currentClient?.id;
+    const backendOptions: BackendSendOptions = {
+      syncTimestamp,
+      nativePush,
+      targetMode,
+      recipients,
+      skipSelf,
+      skipInjection,
+      silentDegradationWarning,
+    };
+    const sendOptions = await this.prepareSend(payload, conversation, backendOptions);
 
-        if (!isNonEmptyString(clientId)) {
-          this.logger.error('No current client id found, cannot send message optimistically');
-          return true;
-        }
-
-        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const selfUser = this.userState.self();
-        if (isUndefined(selfUser)) {
-          throw new Error('No self user found, cannot send message optimistically');
-        }
-        const optimisticEvent = EventBuilder.buildMessageAdd({
-          conversationEntity: conversation,
-          currentTimestamp,
-          senderId: selfUser.id,
-          clientId,
-        });
-        this.trackContributed(conversation, payload);
-        const mappedEvent = (await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
-          payload,
-          optimisticEvent,
-        )) as OptimisticMessageEvent;
-        await this.eventRepository.injectEvent(mappedEvent);
-      }
-      return silentDegradationWarning === true
+    // Without a client id nothing is injected, and the prompt is skipped as well
+    const injected = skipInjection === true ? true : await this.injectOptimisticMessage(payload, conversation);
+    const shouldProceedSending =
+      !injected || silentDegradationWarning === true
         ? true
-        : this.requestUserSendingPermission(conversation, false, consentType);
-    };
+        : await this.requestUserSendingPermission(conversation, false, consentType);
+    if (!shouldProceedSending) {
+      this.logger.info('User has canceled sending a message to a degraded conversation.');
+      return {id: payload.messageId, sentAt: new Date().toISOString(), state: MessageSendingState.CANCELED};
+    }
 
-    const handleSuccess = async ({sentAt, failedToSend}: SendResult): Promise<void> => {
-      const injectDelta = 10; // we want to make sure the message is injected slightly before it was received by the backend
-      const sentTimestamp = new Date(sentAt).getTime() - injectDelta;
-      const preMessageTimestamp = new Date(sentTimestamp).toISOString();
-      // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
-      await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
-      if (skipInjection !== true) {
-        await this.updateMessageAsSent(
-          conversation,
-          payload.messageId,
-          syncTimestamp ? sentAt : undefined,
-          failedToSend,
-        );
-      }
-    };
+    try {
+      return await this.sendMessageToBackend(payload, conversation, backendOptions, sendOptions);
+    } catch (error: unknown) {
+      await this.updateMessageAsFailed(conversation, payload.messageId, error);
+      return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
+    }
+  }
 
-    const conversationService = this.conversationService;
+  /**
+   * Injects the optimistic `message-add` event (status `SENDING`) for a message that is about to be sent.
+   * Injecting the same message id twice throws in the event storage, so this must run once per message.
+   * Resolves to `false` when nothing was injected because there is no current client id.
+   */
+  private async injectOptimisticMessage(payload: GenericMessage, conversation: Conversation): Promise<boolean> {
+    const clientId = this.clientState.currentClient?.id;
+
+    if (!isNonEmptyString(clientId)) {
+      this.logger.error('No current client id found, cannot send message optimistically');
+      return false;
+    }
+
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const selfUser = this.userState.self();
+    if (isUndefined(selfUser)) {
+      throw new Error('No self user found, cannot send message optimistically');
+    }
+    const optimisticEvent = EventBuilder.buildMessageAdd({
+      conversationEntity: conversation,
+      currentTimestamp,
+      senderId: selfUser.id,
+      clientId,
+    });
+    this.trackContributed(conversation, payload);
+    const mappedEvent = (await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
+      payload,
+      optimisticEvent,
+    )) as OptimisticMessageEvent;
+    await this.eventRepository.injectEvent(mappedEvent);
+    return true;
+  }
+
+  /** Configures the conversation timer and resolves the core send options, including the recipients. */
+  private async prepareSend(
+    payload: GenericMessage,
+    conversation: Conversation,
+    {nativePush = true, targetMode, recipients, skipSelf, silentDegradationWarning}: BackendSendOptions = {},
+  ): Promise<CoreSendOptions> {
     // Configure ephemeral messages
-    conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
+    this.conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    const sendOptions: Parameters<typeof conversationService.send>[0] = isMLSConversation(conversation)
+    return isMLSConversation(conversation)
       ? {
           groupId: conversation.groupId,
           payload,
@@ -1154,31 +1184,51 @@ export class MessageRepository {
           targetMode,
           userIds: await this.generateRecipients(conversation, recipients, skipSelf),
         };
+  }
 
-    const shouldProceedSending = await injectOptimisticEvent();
-    if (!shouldProceedSending) {
-      this.logger.info('User has canceled sending a message to a degraded conversation.');
-      return {id: payload.messageId, sentAt: new Date().toISOString(), state: MessageSendingState.CANCELED};
-    }
-
-    try {
-      if (isMLSConversation(conversation)) {
-        this.logger.info('Sending message to a MLS conversation, ensuring conversation exists');
-        await this.conversationRepositoryProvider().ensureConversationExists({
-          conversationId: conversation.qualifiedId,
-          groupId: conversation.groupId,
-        });
+  /**
+   * Sends the message through the core and, when the backend accepted it, marks the message as sent.
+   * Throws whatever the send throws; it neither injects the message nor asks the degradation prompt, nor marks it as failed.
+   * Pass `preparedSendOptions` (from `prepareSend`) when they were resolved earlier; otherwise they are resolved here.
+   */
+  private async sendMessageToBackend(
+    payload: GenericMessage,
+    conversation: Conversation,
+    options: BackendSendOptions = {},
+    preparedSendOptions?: CoreSendOptions,
+  ): Promise<SendResult> {
+    const {syncTimestamp = true, skipInjection, silentDegradationWarning} = options;
+    const handleSuccess = async ({sentAt, failedToSend}: SendResult): Promise<void> => {
+      const injectDelta = 10; // we want to make sure the message is injected slightly before it was received by the backend
+      const sentTimestamp = new Date(sentAt).getTime() - injectDelta;
+      const preMessageTimestamp = new Date(sentTimestamp).toISOString();
+      // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
+      await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
+      if (skipInjection !== true) {
+        await this.updateMessageAsSent(
+          conversation,
+          payload.messageId,
+          syncTimestamp ? sentAt : undefined,
+          failedToSend,
+        );
       }
-      const result = await this.conversationService.send(sendOptions);
+    };
 
-      if (result.state === MessageSendingState.OUTGOING_SENT) {
-        await handleSuccess(result);
-      }
-      return result;
-    } catch (error: unknown) {
-      await this.updateMessageAsFailed(conversation, payload.messageId, error);
-      return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
+    const sendOptions = preparedSendOptions ?? (await this.prepareSend(payload, conversation, options));
+
+    if (isMLSConversation(conversation)) {
+      this.logger.info('Sending message to a MLS conversation, ensuring conversation exists');
+      await this.conversationRepositoryProvider().ensureConversationExists({
+        conversationId: conversation.qualifiedId,
+        groupId: conversation.groupId,
+      });
     }
+    const result = await this.conversationService.send(sendOptions);
+
+    if (result.state === MessageSendingState.OUTGOING_SENT) {
+      await handleSuccess(result);
+    }
+    return result;
   }
 
   public updateUserReactions(reactions: ReactionMap, userId: QualifiedId, reaction: ReactionType): string {
