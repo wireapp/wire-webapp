@@ -137,29 +137,41 @@ describe('LongpipeBackgroundSession', () => {
       }),
     );
     await jest.advanceTimersByTimeAsync(1000);
-    expect(onStats).toHaveBeenCalledWith(stats, {
-      input: {width: 1920, height: 1080},
-      output: {width: 1920, height: 1080},
-      requestedOutput: {width: 1920, height: 1080},
-    }, {requestedInputFps: null, inputTrackFps: 30, countedInputFps: null, inputFpsSource: 'track-settings'});
+    expect(onStats).toHaveBeenCalledWith(
+      stats,
+      {
+        input: {width: 1920, height: 1080},
+        output: {width: 1920, height: 1080},
+        requestedOutput: {width: 1920, height: 1080},
+      },
+      {requestedInputFps: null, inputTrackFps: 30, countedInputFps: null, inputFpsSource: 'track-settings'},
+    );
   });
 
   it('keeps unreported output dimensions separate from the requested output size', async () => {
     await session.start();
     jest.spyOn(session.stream.getVideoTracks()[0], 'getSettings').mockReturnValue({});
     await jest.advanceTimersByTimeAsync(1000);
-    expect(onStats).toHaveBeenCalledWith(stats, {
-      input: {width: 1920, height: 1080},
-      output: null,
-      requestedOutput: {width: 1920, height: 1080},
-    }, expect.objectContaining({inputFpsSource: 'track-settings'}));
+    expect(onStats).toHaveBeenCalledWith(
+      stats,
+      {
+        input: {width: 1920, height: 1080},
+        output: null,
+        requestedOutput: {width: 1920, height: 1080},
+      },
+      expect.objectContaining({inputFpsSource: 'track-settings'}),
+    );
   });
 
   it('distinguishes a 15 FPS capture request from a 30 FPS track setting and counts delivered frames', async () => {
     await session.start();
     const input = createPipeline.mock.calls[0][0].getVideoTracks()[0];
     let frames = 0;
-    Object.defineProperty(input, 'stats', {get: () => {return {totalFrames: frames};}});
+    Object.defineProperty(input, 'stats', {
+      get: () => {
+        return {totalFrames: frames};
+      },
+    });
     jest.spyOn(input, 'getConstraints').mockReturnValue({frameRate: {ideal: 15}});
     await jest.advanceTimersByTimeAsync(1000);
     frames = 15;

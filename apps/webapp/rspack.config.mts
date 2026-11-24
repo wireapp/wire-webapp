@@ -115,7 +115,9 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
     for (const suffix of ['.f16.bin', '.bin']) {
       const modelPath = path.join(modelDirectory, `model_${model}${suffix}`);
       if (!existsSync(modelPath)) {
-        throw new Error(`Missing Longpipe weights: ${modelPath}. Run sh tools/longpipe/downloadModels.sh to import the models before building.`);
+        throw new Error(
+          `Missing Longpipe weights: ${modelPath}. Run sh tools/longpipe/downloadModels.sh to import the models before building.`,
+        );
       }
     }
   }

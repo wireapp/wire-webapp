@@ -3948,9 +3948,13 @@ describe('set background effect', () => {
       const processedStream = createMediaStream('processedStream');
       const processedMedia = new ReleasableMediaStream(processedStream);
       jest.spyOn(callState, 'joinedCall').mockImplementation(
-        ko.pureComputed<Call | undefined>(() => {return activeCall;}),
+        ko.pureComputed<Call | undefined>(() => {
+          return activeCall;
+        }),
       );
-      jest.spyOn(backgroundEffectsHandler, 'applyBackgroundEffect').mockResolvedValue({applied: true, media: processedMedia});
+      jest
+        .spyOn(backgroundEffectsHandler, 'applyBackgroundEffect')
+        .mockResolvedValue({applied: true, media: processedMedia});
 
       await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, true);
       jest.spyOn(selfParticipant, 'processedVideoStream').mockReturnValue(processedMedia);
