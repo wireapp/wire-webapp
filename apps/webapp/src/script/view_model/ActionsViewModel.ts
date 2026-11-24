@@ -21,8 +21,6 @@ import {isEmptyArray, isNonEmptyString, isNull, isUndefined} from '@sindresorhus
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import type {MainViewModel} from './MainViewModel';
-
 import {ConnectionStatus} from '../apiClient/connection/connectionStatus';
 import {DefaultConversationRoleName} from '../apiClient/conversation/conversationRole';
 import {BackendErrorLabel} from '../apiClient/http/backendErrorLabel';
@@ -49,6 +47,12 @@ import {type Translate} from '../util/localizerUtil';
 import {isBackendError} from '../util/typePredicateUtil';
 import {WebAppEvents} from '../webAppEvents';
 
+interface ActionsViewModelMain {
+  readonly list: {
+    readonly clickToUnarchive: (conversationEntity: Conversation) => void;
+  };
+}
+
 type ConnectionRequestResult = {connectionStatus: ConnectionStatus; conversationId: QualifiedId};
 
 export class ActionsViewModel {
@@ -61,7 +65,7 @@ export class ActionsViewModel {
     private readonly messageRepository: MessageRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
-    private readonly mainViewModel: MainViewModel,
+    private readonly mainViewModel: ActionsViewModelMain,
     private readonly translate: Translate,
   ) {}
 

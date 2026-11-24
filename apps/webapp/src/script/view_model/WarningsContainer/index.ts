@@ -17,7 +17,6 @@
  *
  */
 
-import './WarningsContainer';
 import {hideWarning, showWarning} from './WarningsState';
 import {CONFIG, TYPE} from './WarningsTypes';
 

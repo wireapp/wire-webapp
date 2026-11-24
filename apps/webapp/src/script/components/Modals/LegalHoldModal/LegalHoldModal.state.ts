@@ -20,7 +20,7 @@
 import {isUndefined} from '@sindresorhus/is';
 import {create} from 'zustand';
 
-import {LegalHoldModalType} from './LegalHoldModal';
+import {LegalHoldModalType} from './LegalHoldModal.types';
 
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {User} from '../../../repositories/entity/User';

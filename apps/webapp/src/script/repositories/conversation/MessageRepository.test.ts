@@ -137,6 +137,7 @@ async function buildMessageRepository(
     assetRepository: {} as AssetRepository,
     audioRepository: new AudioRepository(),
     translate,
+    showLegalHoldWarningModal: jest.fn().mockResolvedValue(undefined),
     userState,
     clientState,
     conversationState,

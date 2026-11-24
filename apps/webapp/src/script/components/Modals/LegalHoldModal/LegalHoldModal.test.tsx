@@ -42,7 +42,8 @@ import {
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
 
-import {LegalHoldModal, LegalHoldModalProps, LegalHoldModalType} from './LegalHoldModal';
+import {LegalHoldModal, LegalHoldModalProps} from './LegalHoldModal';
+import {LegalHoldModalType} from './LegalHoldModal.types';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';

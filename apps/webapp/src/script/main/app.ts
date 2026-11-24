@@ -55,6 +55,7 @@ import {AuthError} from '../error/authError';
 import {BaseError} from '../error/baseError';
 import {CLIENT_ERROR_TYPE} from '../error/clientError';
 import {TeamError} from '../error/teamError';
+import {showLegalHoldWarningModal} from '../legal-hold/LegalHoldWarning';
 import {
   createNewVersionPollingCallback,
   type FetchLatestBuildMetadata,
@@ -350,6 +351,7 @@ export class App {
       repositories.asset,
       repositories.audio,
       this.translate,
+      showLegalHoldWarningModal,
     );
 
     repositories.calling = new CallingRepository(

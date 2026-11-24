@@ -19,7 +19,7 @@
 
 import {arrayIncludes, objectValues} from 'ts-extras';
 
-import {CallViewTab} from '../view_model/CallingViewModel';
+import {CallViewTab} from '../repositories/calling/enum/CallViewTab';
 
 interface CallViewOption {
   label: string;
