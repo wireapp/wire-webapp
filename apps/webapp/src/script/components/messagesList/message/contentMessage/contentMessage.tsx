@@ -38,6 +38,7 @@ import {MessageActions} from '..';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {pendingOfflineMessagesFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useClickOutside} from '../../../../hooks/useClickOutside';
+import {useOutboxOffline} from '../../../../hooks/useOutboxOffline';
 import {
   createRelativeTimestampFormatter,
   useRelativeTimestamp,
@@ -136,6 +137,10 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
   const messageRef = useRef<HTMLDivElement | null>(null);
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const isOutboxEnabled = isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName);
+  const isOffline = useOutboxOffline(isOutboxEnabled);
+  const getOfflineButtonLabel = (feature: string): string => {
+    return translate('outboxNotAvailableOffline', {feature});
+  };
 
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(() => {
@@ -329,6 +334,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
                   isMessageFocused={msgFocusState}
                   is1to1Conversation={conversation.is1to1()}
                   isFileShareRestricted={isFileShareRestricted}
+                  getOfflineButtonLabel={isOffline ? getOfflineButtonLabel : undefined}
                   onClickDetails={() => {
                     return onClickDetails(message);
                   }}

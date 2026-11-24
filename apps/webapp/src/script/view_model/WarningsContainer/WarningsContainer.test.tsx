@@ -20,6 +20,7 @@
 import {act, cleanup, fireEvent, render} from '@testing-library/react';
 
 import en from '../../../i18n/en-US.json';
+import {pendingOfflineMessagesFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {setStrings, translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {
@@ -66,6 +67,37 @@ describe('WarningsContainer', () => {
       useWarningsState.setState({name: '', warnings: []});
     });
     jest.restoreAllMocks();
+  });
+
+  describe('the no-internet banner', () => {
+    const renderBanner = (isOutboxEnabled: boolean): ReturnType<typeof render> => {
+      const wrapper = createRootProviderWrapperForTest(
+        createRootContextValueForTest({
+          translate: translateForTest,
+          isFeatureToggleEnabled: featureName => {
+            return isOutboxEnabled && featureName === pendingOfflineMessagesFeatureToggleName;
+          },
+        }),
+      );
+      const result = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper});
+      act(() => {
+        Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
+      });
+      return result;
+    };
+
+    it('is announced as a status with the outbox on', () => {
+      const {getByRole} = renderBanner(true);
+
+      expect(getByRole('status')).toHaveTextContent('warningConnectivityNoInternet');
+    });
+
+    it('has no role with the outbox off', () => {
+      const {getByTestId, queryByRole} = renderBanner(false);
+
+      expect(getByTestId('no-internet')).not.toHaveAttribute('role');
+      expect(queryByRole('status')).toBeNull();
+    });
   });
 
   it('does not render when no warning is in the queue', async () => {

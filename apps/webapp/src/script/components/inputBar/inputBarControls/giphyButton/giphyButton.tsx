@@ -19,6 +19,10 @@
 
 import type {FunctionComponent} from 'react';
 
+import {noop} from 'noop-esm';
+
+import {pendingOfflineMessagesFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
+import {useOutboxOffline} from '../../../../hooks/useOutboxOffline';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import * as Icon from '../../../icon';
 
@@ -27,7 +31,11 @@ interface GiphyButtonProps {
 }
 
 export const GiphyButton: FunctionComponent<GiphyButtonProps> = ({onGifClick}: GiphyButtonProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const isOffline = useOutboxOffline(isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName));
+  const label = isOffline
+    ? translate('outboxNotAvailableOffline', {feature: translate('extensionsBubbleButtonGif')})
+    : translate('extensionsBubbleButtonGif');
 
   return (
     <>
@@ -36,9 +44,10 @@ export const GiphyButton: FunctionComponent<GiphyButtonProps> = ({onGifClick}: G
           className="input-bar-control"
           type="button"
           css={{marginBottom: '0'}}
-          title={translate('extensionsBubbleButtonGif')}
-          aria-label={translate('extensionsBubbleButtonGif')}
-          onClick={onGifClick}
+          title={label}
+          aria-label={label}
+          aria-disabled={isOffline || undefined}
+          onClick={isOffline ? noop : onGifClick}
           data-uie-name="do-giphy-popover"
         >
           <Icon.GifIcon width={14} height={14} />

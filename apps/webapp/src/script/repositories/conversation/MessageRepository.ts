@@ -3147,6 +3147,23 @@ export class MessageRepository {
     return pending !== undefined && this.pendingStateOf(pending) === 'pending' && !this.isUnconfirmed(pending);
   }
 
+  /**
+   * Counts the operations in the lanes that start with a message, for the warning at logout. What a message has
+   * queued behind it counts too, and nothing that failed does.
+   */
+  public countPendingMessages(): number {
+    if (this.outbox === undefined) {
+      return 0;
+    }
+    const listed = this.outbox.lanes();
+    if (listed.type !== 'lanes-listed') {
+      return 0;
+    }
+    return listed.lanes.reduce((count, {first, size}) => {
+      return first.kind === 'message' ? count + 1 + size : count;
+    }, 0);
+  }
+
   private pendingStateOf(pending: OperationView<MessagePayload> | undefined): 'pending' | 'sending' | undefined {
     return match(pending?.state)
       .with('queued', 'on-hold', () => {

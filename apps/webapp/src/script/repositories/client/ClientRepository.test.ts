@@ -356,6 +356,72 @@ describe('ClientRepository', () => {
     });
   });
 
+  describe('logoutClient with pending messages', () => {
+    const createRepository = (translate: Translate): ClientRepository => {
+      return new ClientRepository(
+        {} as any,
+        {} as any,
+        translate,
+        {
+          currentClient: {
+            isTemporary: () => {
+              return false;
+            },
+          },
+        } as any,
+        {} as any,
+      );
+    };
+    const translate = ((translationKey: Parameters<Translate>[0], substitutions?: Record<string, string | number>) => {
+      return `translated:${translationKey}:${substitutions?.count ?? ''}`;
+    }) as Translate;
+
+    it.each([
+      [1, 'translated:outboxLogoutPendingMessage:'],
+      [3, 'translated:outboxLogoutPendingMessagesPlural:3'],
+    ])('warns with the count of %s pending messages', async (count, expectedMessage) => {
+      const primaryModalShow = jest.fn();
+      PrimaryModal.show = primaryModalShow;
+      const clientRepository = createRepository(translate);
+      clientRepository.setPendingMessageCounter(() => {
+        return count;
+      });
+
+      await clientRepository.logoutClient();
+
+      expect(primaryModalShow).toHaveBeenCalledWith(
+        PrimaryModal.type.OPTION,
+        expect.objectContaining({text: expect.objectContaining({message: expectedMessage})}),
+        undefined,
+        translate,
+      );
+    });
+
+    it('shows no warning without pending messages', async () => {
+      const primaryModalShow = jest.fn();
+      PrimaryModal.show = primaryModalShow;
+      const clientRepository = createRepository(translate);
+      clientRepository.setPendingMessageCounter(() => {
+        return 0;
+      });
+
+      await clientRepository.logoutClient();
+
+      const [, options] = primaryModalShow.mock.calls[0];
+      expect(options.text).not.toHaveProperty('message');
+    });
+
+    it('shows no warning when no counter was set', async () => {
+      const primaryModalShow = jest.fn();
+      PrimaryModal.show = primaryModalShow;
+
+      await createRepository(translate).logoutClient();
+
+      const [, options] = primaryModalShow.mock.calls[0];
+      expect(options.text).not.toHaveProperty('message');
+    });
+  });
+
   describe('logoutClient', () => {
     it('uses the injected translate function for the logout modal copy', async () => {
       const translate = jest.fn((translationKey: Parameters<Translate>[0]) => {

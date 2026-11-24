@@ -17,7 +17,8 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {fireEvent, render} from '@testing-library/react';
+import type {ComponentProps} from 'react';
 import ko from 'knockout';
 
 import {CompositeMessage} from '../../../../../../repositories/entity/message/compositeMessage';
@@ -71,5 +72,45 @@ describe('MessageButton', () => {
     expect(selectedButton).not.toBeNull();
 
     expect(requireValueForTest(selectedButton).getAttribute('data-uie-selected')).toBe('true');
+  });
+
+  describe('offline', () => {
+    const createProps = (onClick: () => void): ComponentProps<typeof MessageButton> => {
+      const message: Partial<CompositeMessage> = {
+        errorButtonId: ko.observable<string | undefined>(''),
+        errorMessage: ko.observable(''),
+        selectedButtonId: ko.observable<string | undefined>(''),
+        waitingButtonId: ko.observable<string | undefined>(''),
+      };
+      return {id: 'id', label: 'Option', message: message as CompositeMessage, onClick};
+    };
+    const getOfflineLabel = (label: string): string => {
+      return `${label}, not available offline`;
+    };
+
+    it('stays focusable, explains why and ignores clicks', () => {
+      const onClick = jest.fn();
+      const {getByRole} = render(withTheme(<MessageButton {...createProps(onClick)} getOfflineLabel={getOfflineLabel} />));
+
+      const button = getByRole('button', {name: 'Option, not available offline'});
+      button.focus();
+      fireEvent.click(button);
+
+      expect(button).toHaveAttribute('aria-disabled', 'true');
+      expect(button).not.toBeDisabled();
+      expect(button).toHaveFocus();
+      expect(onClick).not.toHaveBeenCalled();
+    });
+
+    it('does not change without an offline label', () => {
+      const onClick = jest.fn();
+      const {getByRole} = render(withTheme(<MessageButton {...createProps(onClick)} />));
+
+      const button = getByRole('button', {name: 'Option'});
+      fireEvent.click(button);
+
+      expect(button).not.toHaveAttribute('aria-disabled');
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
   });
 });
