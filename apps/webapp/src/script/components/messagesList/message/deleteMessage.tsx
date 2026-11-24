@@ -29,7 +29,6 @@ import {DeleteMessage as DeleteMessageEntity} from '../../../repositories/entity
 import {User} from '../../../repositories/entity/User';
 import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
-import {getUserName} from '../../../util/localizerUtil/userName';
 import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 interface DeleteMessageProps {
@@ -39,11 +38,12 @@ interface DeleteMessageProps {
 
 const DeleteMessage: FunctionComponent<DeleteMessageProps> = ({message, onClickAvatar = noop}: DeleteMessageProps) => {
   const {translate} = useApplicationContext();
-  const {deletedBy} = useKoSubscribableChildren(message, ['deletedBy']);
+  // Only the sender can delete a message for everyone, so the sender is who deleted it.
+  const {unsafeSenderName} = useKoSubscribableChildren(message, ['unsafeSenderName']);
   const deletedTimeStamp = message.deleted_timestamp ?? 0;
 
   const formattedDeletionTime = translate('conversationDeleteTimestampBy', {
-    name: getUserName(deletedBy, translate),
+    name: unsafeSenderName,
     date: formatTimeShort(fromUnixTime(deletedTimeStamp / TIME_IN_MILLIS.SECOND)),
   });
 
