@@ -19,9 +19,9 @@
 
 import type {ReactNode, MouseEvent, KeyboardEvent, FunctionComponent} from 'react';
 
-import {CSS_SQUARE} from '../../util/cssMixin';
+import {DIAMETER, AVATAR_SIZE} from './avatarConstants';
 
-import {DIAMETER, AVATAR_SIZE} from '.';
+import {CSS_SQUARE} from '../../util/cssMixin';
 
 const pixelsPerRem = 16;
 

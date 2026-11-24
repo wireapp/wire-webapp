@@ -22,14 +22,13 @@ import React from 'react';
 import {AvatarBackground} from './avatarBackground';
 import {AvatarBadge} from './avatarBadge';
 import {AvatarBorder} from './avatarBorder';
+import {AVATAR_SIZE, STATE, DIAMETER} from './avatarConstants';
 import {AvatarInitials} from './avatarInitials';
 import {AvatarWrapper} from './avatarWrapper';
-import {shouldShowBadge} from './userAvatar';
+import {shouldShowBadge} from './shouldShowBadge';
 
 import {User} from '../../repositories/entity/User';
 import {CSS_FILL_PARENT} from '../../util/cssMixin';
-
-import {AVATAR_SIZE, STATE, DIAMETER} from '.';
 
 const extraLargeAvatarBorderWidthInPixels = 4;
 const timerViewBoxSize = 32;

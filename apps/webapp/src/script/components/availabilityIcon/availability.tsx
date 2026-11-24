@@ -23,7 +23,7 @@ import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 
 import * as styles from './availability.styles';
 
-import {AVATAR_SIZE} from '../avatar';
+import {AVATAR_SIZE} from '../avatar/avatarConstants';
 import * as Icon from '../icon';
 
 const availabilityIconBaseProps = {

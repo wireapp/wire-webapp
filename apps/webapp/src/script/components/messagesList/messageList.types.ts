@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {MessageActions} from './message';
+import {MessageActions} from './message/messageActions';
 
 import {AssetRepository} from '../../repositories/assets/assetRepository';
 import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';

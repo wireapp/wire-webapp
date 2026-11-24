@@ -24,7 +24,7 @@ import {ParticipantAvatarTooltip} from './participantAvatarTooltip';
 import {overflowCountStyles, wrapperStyles} from './stackedAvatars.styles';
 
 import type {User} from '../../../repositories/entity/User';
-import {AVATAR_SIZE} from '../avatar';
+import {AVATAR_SIZE} from '../avatarConstants';
 
 interface StackedAvatarsProps {
   participants: User[];

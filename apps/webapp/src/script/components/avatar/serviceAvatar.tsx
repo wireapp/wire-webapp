@@ -23,14 +23,13 @@ import ko from 'knockout';
 
 import {AvatarBackground} from './avatarBackground';
 import {AvatarBorder} from './avatarBorder';
+import {AVATAR_SIZE} from './avatarConstants';
 import {AvatarImage} from './avatarImage';
 import {AvatarWrapper} from './avatarWrapper';
 
 import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {CSS_FILL_PARENT} from '../../util/cssMixin';
 import * as Icon from '../icon';
-
-import {AVATAR_SIZE} from '.';
 
 interface ServiceAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
