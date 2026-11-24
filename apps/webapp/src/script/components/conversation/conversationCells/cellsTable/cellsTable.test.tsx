@@ -602,6 +602,40 @@ describe('CellsTable selection', () => {
     }
   });
 
+  it('aborts an in-flight archive request when the table unmounts', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/team/Shared%20Drive';
+    const user = userEvent.setup();
+    let resolveArchive: ((stream: ReadableStream<Uint8Array>) => void) | undefined;
+    const downloadSelectionArchive = jest.fn((_: Parameters<CellsRepository['downloadSelectionArchive']>[0]) => {
+      return new Promise<ReadableStream<Uint8Array>>(resolve => {
+        resolveArchive = resolve;
+      });
+    });
+    const downloadBlob = jest.spyOn(utilities, 'downloadBlob').mockReturnValue(0);
+    const table = renderCellsTable({cellsRepository: {downloadSelectionArchive} as unknown as CellsRepository});
+
+    try {
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Download'}));
+      await waitFor(() => {
+        expect(downloadSelectionArchive).toHaveBeenCalledTimes(1);
+      });
+      const {abortController} = downloadSelectionArchive.mock.calls[0][0];
+
+      table.unmount();
+      expect(abortController?.signal.aborted).toBe(true);
+      await act(async () => {
+        resolveArchive?.(createArchiveStream());
+        await Promise.resolve();
+      });
+      expect(downloadBlob).not.toHaveBeenCalled();
+    } finally {
+      downloadBlob.mockRestore();
+      window.location.hash = originalHash;
+    }
+  });
+
   it('shows a failure and keeps the selection available for an explicit retry', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/team/Shared%20Drive';

@@ -24,6 +24,7 @@ import {
   resolveBulkDownloadSelection,
   type BulkDownloadOperationState,
   type BulkDownloadRejectionReason,
+  type BulkDownloadSelection,
 } from './bulkDownloadOperation';
 
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
@@ -59,6 +60,34 @@ const readArchiveBlob = async (stream: ReadableStream<Uint8Array>): Promise<Blob
 };
 
 type BulkDownloadViewState = BulkDownloadOperationState | {readonly kind: 'ready'};
+
+const getUnavailableReason = (
+  selection: BulkDownloadSelection,
+  selectedCount: number,
+): Exclude<BulkDownloadRejectionReason, 'empty'> | null => {
+  if (selectedCount === 0 || selection.kind === 'eligible' || selection.reason === 'empty') {
+    return null;
+  }
+  return selection.reason;
+};
+
+const getStatusMessage = (state: BulkDownloadViewState, translate: Translate): string | null => {
+  switch (state.kind) {
+    case 'starting':
+      return translate('cells.bulkDownload.starting');
+    case 'downloading':
+      return translate('cells.bulkDownload.progress', {bytes: formatBytes(state.bytesReceived)});
+    case 'stream-consumed':
+      return translate('cells.bulkDownload.preparingBrowserDownload');
+    case 'ready':
+      return translate('cells.bulkDownload.ready');
+    case 'failed':
+      return translate('cells.bulkDownload.failed');
+    case 'cancelled':
+    case 'idle':
+      return null;
+  }
+};
 
 interface UseBulkDownloadSelectionOptions {
   readonly cellsRepository: CellsRepository;
@@ -110,33 +139,11 @@ export const useBulkDownloadSelection = ({
   }, [operation]);
 
   const selection = resolveBulkDownloadSelection({nodes: selectedNodes, canDownload, selectedCount});
-  const unavailableReason: Exclude<BulkDownloadRejectionReason, 'empty'> | null =
-    selectedCount > 0 && selection.kind === 'rejected' && selection.reason !== 'empty' ? selection.reason : null;
+  const unavailableReason = getUnavailableReason(selection, selectedCount);
   const isActive = state.kind === 'starting' || state.kind === 'downloading' || state.kind === 'stream-consumed';
   const isDisabled = !isSelectionEnabled || isSelectionDisabled || isActive || selection.kind !== 'eligible';
   const isFailure = state.kind === 'failed';
-
-  let statusMessage: string | null = null;
-  switch (state.kind) {
-    case 'starting':
-      statusMessage = translate('cells.bulkDownload.starting');
-      break;
-    case 'downloading':
-      statusMessage = translate('cells.bulkDownload.progress', {bytes: formatBytes(state.bytesReceived)});
-      break;
-    case 'stream-consumed':
-      statusMessage = translate('cells.bulkDownload.preparingBrowserDownload');
-      break;
-    case 'ready':
-      statusMessage = translate('cells.bulkDownload.ready');
-      break;
-    case 'failed':
-      statusMessage = translate('cells.bulkDownload.failed');
-      break;
-    case 'cancelled':
-    case 'idle':
-      break;
-  }
+  const statusMessage = getStatusMessage(state, translate);
 
   const start = async (): Promise<void> => {
     if (isDisabled || selection.kind !== 'eligible') {
@@ -151,7 +158,15 @@ export const useBulkDownloadSelection = ({
         archiveParentPath: getArchiveParentPath(),
         abortController,
       });
+      if (abortController.signal.aborted) {
+        await stream.cancel();
+        return;
+      }
+
       const archive = await readArchiveBlob(stream);
+      if (abortController.signal.aborted) {
+        return;
+      }
       downloadBlob(archive, 'bulk-download.zip', 'application/zip');
       if (isMountedRef.current) {
         setState({kind: 'ready'});
