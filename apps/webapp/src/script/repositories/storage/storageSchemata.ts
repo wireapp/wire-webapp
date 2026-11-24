@@ -40,6 +40,7 @@ type StorageObjectStore = {
   readonly GROUP_IDS: 'group_ids';
   readonly KEYS: 'keys';
   readonly LAST_KEY_MATERIAL_UPDATE_DATES: 'last_key_material_update_dates';
+  readonly OUTBOX: 'outbox';
   readonly PENDING_PROPOSALS: 'pending_proposals';
   readonly PRE_KEYS: 'prekeys';
   readonly SESSIONS: 'sessions';
@@ -57,6 +58,7 @@ export class StorageSchemata {
       GROUP_IDS: 'group_ids',
       KEYS: 'keys',
       LAST_KEY_MATERIAL_UPDATE_DATES: 'last_key_material_update_dates',
+      OUTBOX: 'outbox',
       PENDING_PROPOSALS: 'pending_proposals',
       PRE_KEYS: 'prekeys',
       SESSIONS: 'sessions',
@@ -449,6 +451,12 @@ export class StorageSchemata {
         // This version enables DB encryption at rest
         schema: {},
         version: 21,
+      },
+      {
+        schema: {
+          [StorageSchemata.OBJECT_STORE.OUTBOX]: '++primary_key, id, [id+seq]',
+        },
+        version: 22,
       },
     ];
   }
