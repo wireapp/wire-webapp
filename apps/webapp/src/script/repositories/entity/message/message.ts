@@ -20,33 +20,30 @@
 import {isFunction, isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
 
-import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {REASON as AVS_REASON} from '@wireapp/avs';
+import type {LegalHoldStatus, QualifiedUserId} from '@wireapp/protocol-messaging';
 
-import {CallingTimeoutMessage} from './callingTimeoutMessage';
-import type {CallMessage} from './callMessage';
+import type {Asset} from './asset';
 import type {CompositeMessage} from './compositeMessage';
-import type {ContentMessage} from './contentMessage';
-import type {DecryptErrorMessage} from './decryptErrorMessage';
-import type {DeleteMessage} from './deleteMessage';
-import {E2EIVerificationMessage} from './e2eiVerificationMessage';
-import type {FailedToAddUsersMessage} from './failedToAddUsersMessage';
-import type {FederationStopMessage} from './federationStopMessage';
 import type {FileAsset} from './fileAsset';
-import type {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';
-import type {LegalHoldMessage} from './legalHoldMessage';
 import type {LinkPreview} from './linkPreview';
+import type {MediumImage} from './mediumImage';
 import type {MemberMessage} from './memberMessage';
-import type {MissedMessage} from './missedMessage';
 import type {Multipart} from './multipart';
-import type {PingMessage} from './pingMessage';
-import type {SystemMessage} from './systemMessage';
-import type {VerificationMessage} from './verificationMessage';
+import type {Text as TextAsset} from './text';
 
+import type {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import type {AddUsersFailure} from '../../../core/conversation/conversationService/conversationService.types';
+import type {CALL_MESSAGE_TYPE} from '../../../message/callMessageType';
+import type {E2EIVerificationMessageType} from '../../../message/e2eiVerificationMessageType';
 import {EphemeralStatusType} from '../../../message/ephemeralStatusType';
 import type {MessageCategory} from '../../../message/messageCategory';
+import type {QuoteEntity} from '../../../message/quoteEntity';
 import {StatusType} from '../../../message/statusType';
 import {SuperType} from '../../../message/superType';
+import type {SystemMessageType} from '../../../message/systemMessageType';
+import type {VerificationMessageType} from '../../../message/verificationMessageType';
 import {type Translate, getUserName} from '../../../util/localizerUtil';
 import {
   formatDateNumeral,
@@ -57,8 +54,116 @@ import {
 } from '../../../util/timeUtil';
 import {AssetTransferState} from '../../assets/assetTransferState';
 import {AssetType} from '../../assets/assetType';
-import type {ReadReceipt} from '../../storage/record/eventRecord';
+import type {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
+import type {ReactionMap, ReadReceipt} from '../../storage/record/eventRecord';
 import {User} from '../User';
+
+/*
+ * Structural types for the message subclasses. They are declared here instead of importing the subclasses, so the
+ * type guards below do not make this base class depend on its own subclasses. They list the members callers use after
+ * narrowing; the subclasses are assignable to them.
+ */
+interface CallMessageShape {
+  readonly call_message_type: CALL_MESSAGE_TYPE;
+  readonly duration: number;
+  readonly caption?: ko.PureComputed<string>;
+  readonly finished_reason?: TERMINATION_REASON;
+  isActivation(): boolean;
+  isDeactivation(): boolean;
+  wasCompleted(): boolean;
+}
+
+interface CallingTimeoutMessageShape {
+  reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT;
+  readonly isNoOneJoined: boolean;
+  readonly isEveryOneLeft: boolean;
+}
+
+interface ContentMessageShape {
+  readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage>;
+  readonly failedToSend: ko.Observable<
+    {queued?: QualifiedUserClients | QualifiedId[]; failed?: QualifiedId[]} | undefined
+  >;
+  readonly fileData: ko.Observable<Blob | undefined>;
+  readonly quote: ko.Observable<QuoteEntity | undefined>;
+  readonly was_edited: ko.PureComputed<boolean>;
+  replacing_message_id?: string;
+  readonly edited_timestamp: ko.Observable<number | null>;
+  readonly reactions: ko.Observable<ReactionMap>;
+  readonly readReceipts: ko.ObservableArray<ReadReceipt>;
+  readonly displayEditedTimestamp: () => string;
+  addAsset(asset: Asset): void;
+  copy(): void;
+  getFirstAsset(): Asset | FileAsset | TextAsset | MediumImage | undefined;
+  isUserMentioned(userId: QualifiedId): boolean;
+  isUserQuoted(userId: string): boolean;
+  isUserTargeted(userId: QualifiedId): boolean;
+  download(assetRepository: {
+    download(asset: ReturnType<MediumImage['resource']>, fileName: string): unknown;
+    downloadFile(asset: FileAsset): unknown;
+  }): void;
+  getContentName(): string;
+}
+
+interface DecryptErrorMessageShape {
+  readonly clientId: string;
+  readonly code: number;
+  readonly isRecoverable: boolean;
+  readonly isIdentityChanged: boolean;
+}
+
+interface DeleteMessageShape {
+  deleted_timestamp: null | number;
+}
+
+interface E2EIVerificationMessageShape {
+  messageType: E2EIVerificationMessageType;
+  userIds?: QualifiedId[];
+}
+
+interface FailedToAddUsersMessageShape {
+  readonly failures: AddUsersFailure[];
+}
+
+interface FederationStopMessageShape {
+  readonly domains: string[];
+}
+
+interface FileTypeRestrictedMessageShape {
+  readonly isIncoming: boolean;
+  readonly name: string;
+  readonly fileExt: string;
+}
+
+interface LegalHoldMessageShape {
+  legalHoldStatus: LegalHoldStatus;
+  readonly isActivationMessage: boolean;
+}
+
+type MissedMessageShape = unknown;
+
+interface PingMessageShape {
+  readonly caption: ko.PureComputed<string>;
+  readonly iconClasses: ko.PureComputed<string>;
+  readonly reactions: ko.Observable<ReactionMap>;
+}
+
+export interface RenameMessageShape {
+  readonly name: string;
+}
+
+interface SystemMessageShape {
+  caption?: string;
+  system_message_type: SystemMessageType;
+  isConversationRename(): this is RenameMessageShape;
+}
+
+interface VerificationMessageShape {
+  readonly userEntities: ko.ObservableArray<User>;
+  userIds: ko.ObservableArray<QualifiedUserId>;
+  VerificationMessageType: ko.Observable<VerificationMessageType | undefined>;
+  readonly isSelfClient: ko.PureComputed<boolean>;
+}
 
 export class Message {
   protected readonly translate: Translate;
@@ -228,7 +333,7 @@ export class Message {
       : false;
   }
 
-  hasMultipartAsset(): this is ContentMessage {
+  hasMultipartAsset(): this is Message & ContentMessageShape {
     const contentMessageCandidate = this as unknown as {assets?: () => {type: AssetType}[]};
     const hasAssetsFunction = Object.hasOwn(this, 'assets') && typeof contentMessageCandidate.assets === 'function';
     return this.isContent() && hasAssetsFunction
@@ -253,7 +358,7 @@ export class Message {
    * Check if message is a call message.
    * @returns Is message of type call
    */
-  isCall(): this is CallMessage {
+  isCall(): this is Message & CallMessageShape {
     return this.super_type === SuperType.CALL;
   }
 
@@ -261,7 +366,7 @@ export class Message {
    * Check if message is a content message.
    * @returns Is message of type content
    */
-  isContent(): this is ContentMessage {
+  isContent(): this is Message & ContentMessageShape {
     return this.super_type === SuperType.CONTENT;
   }
 
@@ -281,7 +386,7 @@ export class Message {
    * Check if the message content can be downloaded.
    * @returns `true`, if the message has downloadable content, `false` otherwise.
    */
-  isDownloadable(): this is ContentMessage {
+  isDownloadable(): this is Message & ContentMessageShape {
     const isExpiredEphemeral = this.ephemeral_status() === EphemeralStatusType.TIMED_OUT;
     if (isExpiredEphemeral) {
       return false;
@@ -309,7 +414,7 @@ export class Message {
   isLinkPreview(): this is LinkPreview {
     return (
       this.hasAssetText() &&
-      (this as unknown as ContentMessage).assets().some(assetEntity => {
+      (this as unknown as ContentMessageShape).assets().some(assetEntity => {
         return assetEntity.isText() && isNonEmptyArray(assetEntity.previews());
       })
     );
@@ -327,7 +432,7 @@ export class Message {
    * Check if message is a ping message.
    * @returns Is message of type ping
    */
-  isPing(): this is PingMessage {
+  isPing(): this is Message & PingMessageShape {
     return this.super_type === SuperType.PING;
   }
 
@@ -335,27 +440,27 @@ export class Message {
    * Check if message is a system message.
    * @returns Is message of type system
    */
-  isSystem(): this is SystemMessage {
+  isSystem(): this is Message & SystemMessageShape {
     return this.super_type === SuperType.SYSTEM;
   }
 
-  isFileTypeRestricted(): this is FileTypeRestrictedMessage {
+  isFileTypeRestricted(): this is Message & FileTypeRestrictedMessageShape {
     return this.super_type === SuperType.FILE_TYPE_RESTRICTED;
   }
 
-  isDelete(): this is DeleteMessage {
+  isDelete(): this is Message & DeleteMessageShape {
     return this.super_type === SuperType.DELETE;
   }
 
-  isMissed(): this is MissedMessage {
+  isMissed(): this is Message & MissedMessageShape {
     return this.super_type === SuperType.MISSED;
   }
 
-  isCallTimeout(): this is CallingTimeoutMessage {
+  isCallTimeout(): this is Message & CallingTimeoutMessageShape {
     return this.super_type === SuperType.CALL_TIME_OUT;
   }
 
-  isFailedToAddUsersMessage(): this is FailedToAddUsersMessage {
+  isFailedToAddUsersMessage(): this is Message & FailedToAddUsersMessageShape {
     return this.super_type === SuperType.FAILED_TO_ADD_USERS;
   }
 
@@ -363,7 +468,7 @@ export class Message {
    * Check if message is an undecryptable message.
    * @returns Is message unable to decrypt
    */
-  isUnableToDecrypt(): this is DecryptErrorMessage {
+  isUnableToDecrypt(): this is Message & DecryptErrorMessageShape {
     return this.super_type === SuperType.UNABLE_TO_DECRYPT;
   }
 
@@ -371,7 +476,7 @@ export class Message {
    * Check if message is a verification message.
    * @returns Is message of type verification
    */
-  isVerification(): this is VerificationMessage {
+  isVerification(): this is Message & VerificationMessageShape {
     return this.super_type === SuperType.VERIFICATION;
   }
 
@@ -379,15 +484,15 @@ export class Message {
    * Check if message is a E2E Identity Verification message.
    * @returns Is message of type E2E Identity Verification
    */
-  isE2EIVerification(): this is E2EIVerificationMessage {
+  isE2EIVerification(): this is Message & E2EIVerificationMessageShape {
     return this.super_type === SuperType.E2EI_VERIFICATION;
   }
 
-  isFederationStop(): this is FederationStopMessage {
+  isFederationStop(): this is Message & FederationStopMessageShape {
     return this.super_type === SuperType.FEDERATION_STOP;
   }
 
-  isLegalHold(): this is LegalHoldMessage {
+  isLegalHold(): this is Message & LegalHoldMessageShape {
     return this.super_type === SuperType.LEGALHOLD;
   }
 
@@ -396,7 +501,7 @@ export class Message {
    * @returns `true`, if message can be copied, `false` otherwise.
    */
 
-  isCopyable(): this is ContentMessage {
+  isCopyable(): this is Message & ContentMessageShape {
     return this.hasAssetText() && !this.isComposite() && (!this.isEphemeral() || this.user().isMe);
   }
 
@@ -404,7 +509,7 @@ export class Message {
    * Check if message can be edited.
    * @returns `true`, if message can be edited, `false` otherwise.
    */
-  isEditable(): this is ContentMessage {
+  isEditable(): this is Message & ContentMessageShape {
     return this.hasAssetText() && this.user().isMe && !this.isEphemeral();
   }
 
@@ -430,7 +535,7 @@ export class Message {
    */
   hasUnavailableAsset(includeFailedState = true): boolean {
     if (this.hasAsset()) {
-      return (this as unknown as ContentMessage).assets().some(asset => {
+      return (this as unknown as ContentMessageShape).assets().some(asset => {
         const unavailableStatus = [AssetTransferState.UPLOAD_PENDING, AssetTransferState.UPLOADING];
         if (includeFailedState) {
           unavailableStatus.push(AssetTransferState.UPLOAD_FAILED);
@@ -446,7 +551,7 @@ export class Message {
    * Check if message can be reacted to.
    * @returns `true`, if message type supports reactions, `false` otherwise.
    */
-  isReactable(): this is ContentMessage {
+  isReactable(): this is Message & ContentMessageShape {
     return (
       this.isContent() &&
       !this.isComposite() &&

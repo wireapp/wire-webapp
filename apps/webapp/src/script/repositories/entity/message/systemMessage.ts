@@ -17,8 +17,7 @@
  *
  */
 
-import {Message} from './message';
-import {RenameMessage} from './renameMessage';
+import {Message, type RenameMessageShape} from './message';
 
 import {SuperType} from '../../../message/superType';
 import {SystemMessageType} from '../../../message/systemMessageType';
@@ -34,7 +33,7 @@ export class SystemMessage extends Message {
     this.system_message_type = SystemMessageType.NORMAL;
   }
 
-  isConversationRename(): this is RenameMessage {
+  isConversationRename(): this is RenameMessageShape {
     return this.system_message_type === SystemMessageType.CONVERSATION_RENAME;
   }
 }

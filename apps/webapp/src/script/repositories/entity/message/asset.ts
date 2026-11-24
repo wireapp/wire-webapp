@@ -18,14 +18,63 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
+import ko from 'knockout';
 
-import type {FileAsset} from './fileAsset';
-import type {Location as LocationAsset} from './location';
+import type {Asset as ProtobufAsset, IAttachment, ICellAsset} from '@wireapp/protocol-messaging';
+
+import type {LinkPreview} from './linkPreview';
 import type {MediumImage as MediumImageAsset} from './mediumImage';
-import type {Multipart as MultipartAsset} from './multipart';
-import type {Text as TextAsset} from './text';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import type {MentionEntity} from '../../../message/mentionEntity';
+import type {AssetRemoteData} from '../../assets/assetRemoteData';
+import type {AssetTransferState} from '../../assets/assetTransferState';
 import {AssetType} from '../../assets/assetType';
+
+export type AssetMetaData = (
+  ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaData | ProtobufAsset.IVideoMetaData
+) & {
+  duration?: number;
+  loudness?: number[];
+};
+
+/*
+ * Structural types for the asset subclasses. They are declared here instead of importing the subclasses, so the type
+ * guards below do not make this base class depend on its own subclasses.
+ */
+interface FileAssetShape {
+  readonly original_resource: ko.Observable<AssetRemoteData>;
+  readonly preview_resource: ko.Observable<AssetRemoteData>;
+  readonly downloadProgress: ko.PureComputed<number | undefined>;
+  readonly cancelDownload: () => void;
+  file_size: number;
+  meta: Partial<AssetMetaData>;
+  readonly status: ko.Observable<AssetTransferState>;
+  readonly upload_failed_reason: ko.Observable<ProtobufAsset.NotUploaded>;
+  conversationId: string;
+  correlation_id: string;
+  reload(): void;
+}
+
+interface LocationAssetShape {
+  latitude: string;
+  longitude: string;
+  name: string;
+  zoom: string;
+}
+
+interface TextAssetShape {
+  readonly mentions: ko.ObservableArray<MentionEntity>;
+  readonly previews: ko.ObservableArray<LinkPreview>;
+  readonly should_render_text: ko.PureComputed<boolean>;
+  render(selfId: QualifiedId, themeColor?: string): string;
+  isUserMentioned(userId: QualifiedId): boolean;
+}
+
+interface MultipartAssetShape extends TextAssetShape {
+  readonly attachments?: ko.ObservableArray<IAttachment>;
+  getCellAssets(): ICellAsset[];
+}
 
 export class Asset {
   public file_type?: string;
@@ -52,19 +101,19 @@ export class Asset {
     return this.type === AssetType.IMAGE;
   }
 
-  isText(): this is TextAsset {
+  isText(): this is Asset & TextAssetShape {
     return this.type === AssetType.TEXT;
   }
 
-  isMultipart(): this is MultipartAsset {
+  isMultipart(): this is Asset & MultipartAssetShape {
     return this.type === AssetType.MULTIPART;
   }
 
-  isFile(): this is FileAsset {
+  isFile(): this is Asset & FileAssetShape {
     return this.type === AssetType.FILE && !this.isVideo() && !this.isAudio();
   }
 
-  isLocation(): this is LocationAsset {
+  isLocation(): this is Asset & LocationAssetShape {
     return this.type === AssetType.LOCATION;
   }
 
