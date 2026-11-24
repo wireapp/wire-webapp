@@ -240,7 +240,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         )}
 
         {messageState === MESSAGE_STATES.RECEIPTS_OFF && (
-          <div className="message-details__empty" data-uie-name="message-details-receipts-off-placeholder">
+          <div className="panel__message-details__empty" data-uie-name="message-details-receipts-off-placeholder">
             <Icon.ReadIcon className="panel__message-details__empty__icon" />
             <p className="panel__message-details__empty__text">{translate('messageDetailsReceiptsOff')}</p>
           </div>
