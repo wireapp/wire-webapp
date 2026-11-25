@@ -42,6 +42,7 @@ import {CellsHeader} from './cellsHeader';
 import type {SharedDriveUploadController} from '../sharedDriveUploadController';
 import {SharedDriveUploadStatusProvider} from '../sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from '../sharedDriveUploadStatusPopupHost';
+import {CellsDriveAccessProvider} from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 
 const cellsNewItemButtonLabel = 'cells.newItemMenu.button';
@@ -332,6 +333,26 @@ describe('CellsHeader', () => {
 
     sessionStorage.removeItem(dismissedKey);
     sessionStorage.removeItem('conversation-viewer-permission-banner-dismissed:another-conversation@wire.com');
+  });
+
+  it('shows viewer access for an offboarding editor without showing the role restriction banner', () => {
+    const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+    const header = (isOffboarding: boolean): ReactElement => {
+      return (
+        <CellsDriveAccessProvider selfUserDriveRole="editor" isDriveOffboardingEnabled={isOffboarding}>
+          {createHeaderTree({isSearchViewOpen: false, showViewerPermission: false})}
+        </CellsDriveAccessProvider>
+      );
+    };
+    const view = render(header(true), {wrapper});
+
+    expect(screen.getByText('cells.sharedDriveAccess.viewerAccess')).toBeVisible();
+    expect(screen.queryByText('conversationFileUploadRestrictedOverlayDescription')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: cellsNewItemButtonLabel})).not.toBeInTheDocument();
+
+    view.rerender(header(false));
+    expect(screen.queryByText('cells.sharedDriveAccess.viewerAccess')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: cellsNewItemButtonLabel})).toBeVisible();
   });
 
   it('renders the new-item menu outside the recycle bin', () => {

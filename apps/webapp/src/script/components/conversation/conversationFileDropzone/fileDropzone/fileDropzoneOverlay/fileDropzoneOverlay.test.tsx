@@ -30,6 +30,8 @@ import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {FileDropzoneOverlay} from './fileDropzoneOverlay';
 
+import {CellsDriveOffboardingProvider} from '../../../conversationCells/common/cellsSelfUserDriveRole/cellsDriveOffboardingContext';
+
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
@@ -61,5 +63,17 @@ describe('FileDropzoneOverlay', () => {
     expect(screen.getByText('conversationFileUploadRestrictedOverlayDescription')).toBeInTheDocument();
     expect(screen.queryByText('conversationFileUploadOverlayTitle')).not.toBeInTheDocument();
     expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+  });
+  it('explains offboarding without claiming that the user is a viewer', () => {
+    render(
+      <StyledApp themeId={THEME_ID.DEFAULT}>
+        <CellsDriveOffboardingProvider value={true}>
+          <FileDropzoneOverlay isActive mode="restricted" />
+        </CellsDriveOffboardingProvider>
+      </StyledApp>,
+      {wrapper: rootProviderWrapper},
+    );
+    expect(screen.getByText('conversationDriveOffboardingHint')).toBeVisible();
+    expect(screen.queryByText('conversationFileUploadRestrictedOverlayDescription')).not.toBeInTheDocument();
   });
 });

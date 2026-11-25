@@ -21,6 +21,7 @@ import {type ReactElement} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
+import {Maybe} from 'true-myth';
 
 import {ConversationDetailsOption} from './conversationDetailsOption';
 
@@ -30,6 +31,7 @@ import {
   CELLS_SELF_USER_DRIVE_ROLE,
   getSelfUserDriveRole,
 } from '../../../../../components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {getConversationDriveRestriction} from '../../../../../components/conversation/getConversationDriveRestriction';
 import * as Icon from '../../../../../components/icon';
 import {PanelActions} from '../../../../../components/panel/panelActions';
 import {ReceiptModeToggle} from '../../../../../components/toggle/ReceiptModeToggle';
@@ -161,14 +163,18 @@ function ConversationDetailsOptionsContent({
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
   const isTeamConversation = isNonEmptyString(teamId);
   const isCellsConversation = isNonEmptyString(cellsState) && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
-  const isDriveOffboardingEnabled =
-    isFeatureToggleEnabled(driveOffboardingFeatureToggleName) &&
-    !isCellsEnabled &&
-    cellsState === CONVERSATION_CELLS_STATE.READY;
   const selfUserDriveRole = getSelfUserDriveRole({
     conversationTeamId: teamId,
     selfUserTeamId: selfUser.teamId,
-    isCellsEnabledForTeam: !isDriveOffboardingEnabled,
+  });
+  const driveRestriction = getConversationDriveRestriction({
+    conversationTeamId: Maybe.of(teamId),
+    selfUserTeamId: Maybe.of(selfUser.teamId),
+    selfUserDriveRole,
+    cellsState,
+    isCellsEnabled: isCellsConversation,
+    isCellsEnabledForTeam: isCellsEnabled,
+    isDriveOffboardingFeatureEnabled: isFeatureToggleEnabled(driveOffboardingFeatureToggleName),
   });
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotificationsGroup = isMutable && isGroupOrChannel;
@@ -225,7 +231,7 @@ function ConversationDetailsOptionsContent({
 
   const getSharedDriveStatusTranslationKey = ():
     'cells.sharedDriveAccess.editorAccess' | 'cells.sharedDriveAccess.viewerAccess' => {
-    return selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.EDITOR
+    return driveRestriction !== 'offboarding' && selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.EDITOR
       ? 'cells.sharedDriveAccess.editorAccess'
       : 'cells.sharedDriveAccess.viewerAccess';
   };

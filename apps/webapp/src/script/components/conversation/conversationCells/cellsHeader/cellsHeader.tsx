@@ -178,6 +178,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
 
       {showViewerPermission && !isSearchViewOpen && !isInRecycleBin && (
         <ConversationViewerPermissionBanner
+          restrictionReason="viewer"
           key={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
           conversationId={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
         />

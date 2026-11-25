@@ -28,19 +28,24 @@ import {
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
+import type {ConversationDriveRestriction} from '../getConversationDriveRestriction';
 
 interface ConversationViewerPermissionBannerProps {
   conversationId: string;
+  restrictionReason: Exclude<ConversationDriveRestriction, 'none'>;
 }
 
 export const ConversationViewerPermissionBanner: FunctionComponent<ConversationViewerPermissionBannerProps> = ({
   conversationId,
+  restrictionReason,
 }) => {
   const {translate} = useApplicationContext();
   const sharedDriveSupportUrl = Config.getConfig().URL.SUPPORT.SHARED_DRIVE;
   const storage = getSessionStorage();
+  const isOffboarding = restrictionReason === 'offboarding';
+  const dismissalId = isOffboarding ? `${conversationId}:offboarding` : conversationId;
   const [isVisible, setIsVisible] = useState(() => {
-    return !isConversationViewerPermissionBannerDismissed(storage, conversationId);
+    return !isConversationViewerPermissionBannerDismissed(storage, dismissalId);
   });
 
   if (!isVisible) {
@@ -50,24 +55,32 @@ export const ConversationViewerPermissionBanner: FunctionComponent<ConversationV
   return (
     <div className="conversation-viewer-permission-banner" role="status">
       <div className="conversation-viewer-permission-banner__content">
-        <span>{translate('conversationFileUploadRestrictedOverlayDescription')}</span>
-        <span>{translate('conversationViewerPermissionBannerMessagesAllowed')}</span>
-        <a
-          className="conversation-viewer-permission-banner__learn-more"
-          href={sharedDriveSupportUrl}
-          target="_blank"
-          rel="nofollow noopener noreferrer"
-          data-uie-name="conversation-viewer-permission-learn-more"
-        >
-          {translate('historyInfo.learnMore')}
-        </a>
+        {isOffboarding ? (
+          <span>{translate('conversationDriveOffboardingHint')}</span>
+        ) : (
+          <>
+            <span>{translate('conversationFileUploadRestrictedOverlayDescription')}</span>
+            <span>{translate('conversationViewerPermissionBannerMessagesAllowed')}</span>
+          </>
+        )}
+        {!isOffboarding && (
+          <a
+            className="conversation-viewer-permission-banner__learn-more"
+            href={sharedDriveSupportUrl}
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+            data-uie-name="conversation-viewer-permission-learn-more"
+          >
+            {translate('historyInfo.learnMore')}
+          </a>
+        )}
       </div>
       <button
         type="button"
         className="conversation-viewer-permission-banner__close"
         aria-label={translate('accessibility.rightPanel.close')}
         onClick={() => {
-          dismissConversationViewerPermissionBanner(storage, conversationId);
+          dismissConversationViewerPermissionBanner(storage, dismissalId);
           setIsVisible(false);
         }}
       >

@@ -18,25 +18,20 @@
  */
 
 import {render} from '@testing-library/react';
+
+import {SharedDrive} from './sharedDrive';
+
 import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
-import {
-  CONVERSATION_PROTOCOL,
-  FEATURE_STATUS,
-  type FeatureList,
-} from '../../../apiClient/team/feature/featureList.types';
+import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import {UserType} from '../../../apiClient/user/user';
 import {driveOffboardingFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
-
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {User} from '../../../repositories/entity/User';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../testSupport/rootContextTestSupport';
-import {translateForTest} from '../../../util/test/translateForTest';
-
-import {SharedDrive} from './sharedDrive';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
@@ -58,12 +53,6 @@ const createUser = ({id, name, teamId}: {id: string; name: string; teamId: strin
 };
 
 describe('SharedDrive', () => {
-  const teamState = new TeamState();
-
-  beforeEach(() => {
-    teamState.teamFeatures({cells: {status: FEATURE_STATUS.ENABLED}} as FeatureList);
-  });
-
   it('explains access levels and shows each participant role', () => {
     const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.teamId = 'conversation-team';
@@ -75,7 +64,7 @@ describe('SharedDrive', () => {
     conversation.participating_user_ets([editor, viewer]);
 
     const {getAllByText, getByTestId, getByText} = render(
-      <SharedDrive activeConversation={conversation} teamState={teamState} onBack={jest.fn()} onClose={jest.fn()} />,
+      <SharedDrive activeConversation={conversation} onBack={jest.fn()} onClose={jest.fn()} />,
       {wrapper: rootProviderWrapper},
     );
 
@@ -89,36 +78,47 @@ describe('SharedDrive', () => {
     expect(getByText('Viewer user')).toBeInTheDocument();
   });
 
-  it('shows existing Drive participants as viewers after team Cells is disabled', () => {
-    teamState.teamFeatures({cells: {status: FEATURE_STATUS.DISABLED}} as FeatureList);
+  it('keeps actual participant roles when the offboarding flag is enabled', () => {
     const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     conversation.teamId = 'conversation-team';
     conversation.selfUser(createUser({id: 'self-user', name: 'Self user', teamId: 'conversation-team'}));
 
-    const view = render(
-      <SharedDrive activeConversation={conversation} teamState={teamState} onBack={jest.fn()} onClose={jest.fn()} />,
-      {wrapper: offboardingRootProviderWrapper},
-    );
+    const view = render(<SharedDrive activeConversation={conversation} onBack={jest.fn()} onClose={jest.fn()} />, {
+      wrapper: offboardingRootProviderWrapper,
+    });
 
     expect(view.getByText('Self user')).toBeInTheDocument();
-    expect(view.getByText('cells.sharedDriveAccess.role.viewer')).toBeInTheDocument();
-    expect(view.queryByText('cells.sharedDriveAccess.role.editor')).not.toBeInTheDocument();
+    expect(view.getByText('cells.sharedDriveAccess.role.editor')).toBeInTheDocument();
+    expect(view.queryByText('cells.sharedDriveAccess.role.viewer')).not.toBeInTheDocument();
   });
 
   it('keeps the existing participant role when offboarding is off', () => {
-    teamState.teamFeatures({cells: {status: FEATURE_STATUS.DISABLED}} as FeatureList);
     const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     conversation.teamId = 'conversation-team';
     conversation.selfUser(createUser({id: 'self-user', name: 'Self user', teamId: 'conversation-team'}));
 
-    const view = render(
-      <SharedDrive activeConversation={conversation} teamState={teamState} onBack={jest.fn()} onClose={jest.fn()} />,
-      {wrapper: rootProviderWrapper},
-    );
+    const view = render(<SharedDrive activeConversation={conversation} onBack={jest.fn()} onClose={jest.fn()} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     expect(view.getByText('cells.sharedDriveAccess.role.editor')).toBeInTheDocument();
+  });
+
+  it('shows another team’s editors as editors when the signed-in user is a viewer', () => {
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    conversation.teamId = 'team-b';
+    conversation.selfUser(createUser({id: 'self-user', name: 'Self user', teamId: 'team-a'}));
+    conversation.participating_user_ets([createUser({id: 'editor', name: 'Team B editor', teamId: 'team-b'})]);
+
+    const view = render(<SharedDrive activeConversation={conversation} onBack={jest.fn()} onClose={jest.fn()} />, {
+      wrapper: offboardingRootProviderWrapper,
+    });
+
+    expect(view.getByText('cells.sharedDriveAccess.role.editor')).toBeInTheDocument();
+    expect(view.getByText('cells.sharedDriveAccess.role.viewer')).toBeInTheDocument();
   });
 
   it('exposes the full participant handle when it is truncated', () => {
@@ -128,7 +128,7 @@ describe('SharedDrive', () => {
     conversation.participating_user_ets([participant]);
 
     const {getByText} = render(
-      <SharedDrive activeConversation={conversation} teamState={teamState} onBack={jest.fn()} onClose={jest.fn()} />,
+      <SharedDrive activeConversation={conversation} onBack={jest.fn()} onClose={jest.fn()} />,
       {wrapper: rootProviderWrapper},
     );
 
@@ -147,7 +147,7 @@ describe('SharedDrive', () => {
     conversation.participating_user_ets([app, service]);
 
     const {queryByText} = render(
-      <SharedDrive activeConversation={conversation} teamState={teamState} onBack={jest.fn()} onClose={jest.fn()} />,
+      <SharedDrive activeConversation={conversation} onBack={jest.fn()} onClose={jest.fn()} />,
       {wrapper: rootProviderWrapper},
     );
 

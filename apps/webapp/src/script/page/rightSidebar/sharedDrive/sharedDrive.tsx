@@ -20,7 +20,6 @@
 import {useMemo, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import ko from 'knockout';
 import {noop} from 'noop-esm';
 
 import {
@@ -37,7 +36,6 @@ import {
   sharedDriveViewerRoleCss,
 } from './sharedDrive.styles';
 
-import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
 import {UserType} from '../../../apiClient/user/user';
 import {Avatar, AVATAR_SIZE} from '../../../components/avatar';
 import {
@@ -48,7 +46,6 @@ import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {ParticipantItemContent} from '../../../components/participantItemContent';
 import {BaseToggle} from '../../../components/toggle/BaseToggle';
-import {driveOffboardingFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import type {Conversation} from '../../../repositories/entity/Conversation';
 import type {User} from '../../../repositories/entity/User';
 import {TabIndex} from '../../../uiKit/utils/enums';
@@ -59,34 +56,17 @@ import {PanelHeader} from '../panelHeader';
 
 interface SharedDriveProps {
   activeConversation: Conversation;
-  teamState: {isCellsEnabled: ko.Subscribable<boolean>};
   onBack: () => void;
   onClose: () => void;
 }
 
-const SharedDrive: FunctionComponent<SharedDriveProps> = ({
-  activeConversation,
-  teamState,
-  onBack,
-  onClose,
-}: SharedDriveProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
-  const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
+const SharedDrive: FunctionComponent<SharedDriveProps> = ({activeConversation, onBack, onClose}: SharedDriveProps) => {
+  const {translate} = useApplicationContext();
   const {
-    cellsState,
     isSelfUserRemoved,
     participating_user_ets: participatingUsers,
     selfUser,
-  } = useKoSubscribableChildren(activeConversation, [
-    'cellsState',
-    'isSelfUserRemoved',
-    'participating_user_ets',
-    'selfUser',
-  ]);
-  const isDriveOffboardingEnabled =
-    isFeatureToggleEnabled(driveOffboardingFeatureToggleName) &&
-    !Boolean(isCellsEnabledForTeam) &&
-    cellsState === CONVERSATION_CELLS_STATE.READY;
+  } = useKoSubscribableChildren(activeConversation, ['isSelfUserRemoved', 'participating_user_ets', 'selfUser']);
 
   const participants = useMemo(() => {
     const users = participatingUsers.filter((participant): participant is User => {
@@ -134,7 +114,6 @@ const SharedDrive: FunctionComponent<SharedDriveProps> = ({
             const role = getSelfUserDriveRole({
               conversationTeamId: activeConversation.teamId,
               selfUserTeamId: participant.teamId,
-              isCellsEnabledForTeam: !isDriveOffboardingEnabled,
             });
             const roleTranslationKey =
               role === CELLS_SELF_USER_DRIVE_ROLE.EDITOR
