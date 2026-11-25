@@ -145,6 +145,11 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
     module: {
       rules: [
         {
+          test: /ort-wasm-simd-threaded\.jsep\.(mjs|wasm)$/,
+          type: 'asset/resource',
+          generator: {filename: 'min/note-taker/[name][ext]'},
+        },
+        {
           test: /\.[jt]sx?$/,
           include: [scriptPath, path.resolve(rootPath, 'apps/server/configuration/buildMetadata.ts')],
           exclude: /node_modules/,
@@ -330,7 +335,8 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
           },
         ],
       }),
-      new rspack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
+      // Core Crypto loads its copied WASM itself; the note taker uses a tracked asset URL.
+      new rspack.IgnorePlugin({resourceRegExp: /^(?!.*ort-wasm-simd-threaded\.jsep\.wasm$).*\.wasm/}),
       new HtmlRspackPlugin({
         inject: false,
         template: path.resolve(srcPath, 'page/index.ejs'),

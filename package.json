@@ -12,6 +12,7 @@
     "@enormora/fire-and-forget": "0.0.4",
     "@fastify/deepmerge": "3.2.4",
     "@formkit/auto-animate": "0.10.3",
+    "@huggingface/transformers": "3.8.1",
     "@internationalized/date": "3.12.4",
     "@lexical/code": "0.27.2",
     "@lexical/history": "0.27.2",
@@ -26,7 +27,7 @@
     "@smithy/fetch-http-handler": "5.8.1",
     "@tanstack/react-table": "8.21.3",
     "@tanstack/react-virtual": "3.14.27",
-    "@wireapp/avs": "10.5.44",
+    "@wireapp/avs": "10.6.12",
     "@wireapp/avs-debugger": "0.0.7",
     "@wireapp/core-crypto": "11.0.2",
     "@wireapp/cryptobox": "12.8.0",
@@ -341,7 +342,8 @@
     "dexie": "4.4.7",
     "dotenv": "16.6.1",
     "@types/react": "19.3.0",
-    "@types/react-dom": "19.3.0"
+    "@types/react-dom": "19.3.0",
+    "sharp": "0.35.5"
   },
   "version": "1.2.1",
   "packageManager": "npm@11.21.3"
