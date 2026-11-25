@@ -18,7 +18,7 @@
  */
 
 import {ContentMessage} from '../entity/message/contentMessage';
-import {Text} from '../entity/message/Text';
+import {Text} from '../entity/message/text';
 import {User} from '../entity/User';
 import type {EventService} from '../event/EventService';
 import {translateForTest} from '../../util/test/translateForTest';
