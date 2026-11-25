@@ -284,6 +284,8 @@ export class MessageRepository {
   private readonly holds = new Map<string, Hold>();
   /** The ids of the conversations whose sending prompt is open */
   private readonly openPrompts = new Set<string>();
+  /** The ids of the text and file operations that still have to go out */
+  private readonly waitingMessages = new Set<string>();
 
   private get coreServices(): NonNullable<Core['service']> {
     const coreServices = this.core.service;
@@ -2180,7 +2182,9 @@ export class MessageRepository {
     );
   }
 
-  private readonly onMessageOperationChanged = ({payload, state, queuedAt}: OperationView<MessagePayload>): void => {
+  private readonly onMessageOperationChanged = (operation: OperationView<MessagePayload>): void => {
+    this.trackWaitingMessage(operation);
+    const {payload, state, queuedAt} = operation;
     const conversation = this.conversationState.findConversation(payload.conversationId);
     if (conversation === undefined || payload.type === 'reaction' || payload.type === 'delete') {
       return;
@@ -3148,20 +3152,22 @@ export class MessageRepository {
   }
 
   /**
-   * Counts the operations in the lanes that start with a message, for the warning at logout. What a message has
-   * queued behind it counts too, and nothing that failed does.
+   * Counts the text and file messages that still have to go out, for the warning at logout. Failed messages,
+   * changes and pings don't count.
    */
   public countPendingMessages(): number {
-    if (this.outbox === undefined) {
-      return 0;
+    return this.waitingMessages.size;
+  }
+
+  /** The outbox also reports the operations it loads at startup as changed, so the count covers them too. */
+  private trackWaitingMessage({id, payload, state}: OperationView<MessagePayload>): void {
+    const isMessage = payload.type === 'text' || payload.type === 'asset';
+    const isWaiting = state === 'queued' || state === 'on-hold' || state === 'in-progress';
+    if (isMessage && isWaiting) {
+      this.waitingMessages.add(id);
+    } else {
+      this.waitingMessages.delete(id);
     }
-    const listed = this.outbox.lanes();
-    if (listed.type !== 'lanes-listed') {
-      return 0;
-    }
-    return listed.lanes.reduce((count, {first, size}) => {
-      return first.kind === 'message' ? count + 1 + size : count;
-    }, 0);
   }
 
   private pendingStateOf(pending: OperationView<MessagePayload> | undefined): 'pending' | 'sending' | undefined {
