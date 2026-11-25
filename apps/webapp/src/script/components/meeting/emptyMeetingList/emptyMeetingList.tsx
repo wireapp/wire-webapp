@@ -35,26 +35,34 @@ import {useMeetingActions} from '../useMeetingActions';
 
 export interface EmptyMeetingListProps {
   useMeetingActionsHook?: typeof useMeetingActions;
+  showCreationActions?: boolean;
 }
 
 export const EmptyMeetingList: FunctionComponent<EmptyMeetingListProps> = ({
   useMeetingActionsHook = useMeetingActions,
+  showCreationActions = true,
 }: EmptyMeetingListProps) => {
   const {translate} = useApplicationContext();
   const {handleMeetNow, handleScheduleMeeting} = useMeetingActionsHook();
 
   return (
     <div css={emptyListStyles} data-uie-name="empty-meetings-list">
-      <p css={emptyListHeadingStyles}>{translate('meetings.noMeetingsText')}</p>
-      <p css={emptyListBodyStyles}>{translate('meetings.startMeetingHelp')}</p>
-      <div css={emptyListActionButtonContainerStyles}>
-        <Button variant={ButtonVariant.TERTIARY} onClick={handleMeetNow}>
-          <CallIcon css={emptyListActionButtonsStyles} /> {translate('meetings.action.meetNow')}
-        </Button>
-        <Button variant={ButtonVariant.TERTIARY} onClick={handleScheduleMeeting} data-uie-name="schedule-meeting">
-          <CalendarIcon css={emptyListActionButtonsStyles} /> {translate('meetings.action.scheduleMeeting')}
-        </Button>
-      </div>
+      <p css={emptyListHeadingStyles}>
+        {translate(showCreationActions ? 'meetings.noMeetingsText' : 'meetings.noUpcomingMeetingsText')}
+      </p>
+      {showCreationActions && (
+        <>
+          <p css={emptyListBodyStyles}>{translate('meetings.startMeetingHelp')}</p>
+          <div css={emptyListActionButtonContainerStyles}>
+            <Button variant={ButtonVariant.TERTIARY} onClick={handleMeetNow}>
+              <CallIcon css={emptyListActionButtonsStyles} /> {translate('meetings.action.meetNow')}
+            </Button>
+            <Button variant={ButtonVariant.TERTIARY} onClick={handleScheduleMeeting} data-uie-name="schedule-meeting">
+              <CalendarIcon css={emptyListActionButtonsStyles} /> {translate('meetings.action.scheduleMeeting')}
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

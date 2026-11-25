@@ -39,7 +39,7 @@ import {SidebarTabs, useSidebarStore} from './leftSidebar/panels/conversations/u
 import {MainContent} from './mainContent';
 import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
-import {ContentState, useAppState} from './useAppState';
+import {ContentState, ListState, useAppState} from './useAppState';
 
 import {isUUID} from '../auth/util/stringUtil';
 import {CallingContainer} from '../components/calling/CallingOverlayContainer';
@@ -48,6 +48,7 @@ import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
 import {ConfigToolbar} from '../components/configToolbar/configToolbar';
 import {SharedDriveUploadStatusScope} from '../components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {ErrorFallback} from '../components/errorFallback';
+import {useLinkedMeetingStore} from '../components/meeting/linkedMeetingStore';
 import {useMeetingPrepModal} from '../components/meeting/meetingPrep/useMeetingPrepModal';
 import {CreateConversationModal} from '../components/Modals/CreateConversation/CreateConversaionModal';
 import {FileHistoryModal} from '../components/Modals/FileHistoryModal/FileHistoryModal';
@@ -70,7 +71,11 @@ import {
   initialiseMigrationOfProteusConversations,
   joinUnestablishedMixedConversations,
 } from '../mls/MLSMigration/migrationInitialiser';
-import {openLoginMeetingPrep} from '../navigation/meetingJoinDestination';
+import {
+  isLoginMeetingDestination,
+  meetingJoinLandingPath,
+  openLoginMeetingPrep,
+} from '../navigation/meetingJoinDestination';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
 import {ConversationState} from '../repositories/conversation/ConversationState';
 import {User} from '../repositories/entity/User';
@@ -196,6 +201,12 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
   const isMobileCentralColumnView = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
 
   const initializeApp = async (): Promise<void> => {
+    const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
+    const pendingJoinDestination = isNonEmptyString(conversationRedirect)
+      ? JSON.parse(conversationRedirect)?.data
+      : undefined;
+    const hasPendingMeetingJoin = isLoginMeetingDestination(pendingJoinDestination);
+
     const showMostRecentConversation = (): void => {
       const isShowingConversation = useAppState.getState().isShowingConversation();
       if (!isShowingConversation) {
@@ -205,7 +216,7 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
       const activeConversation = conversationState.activeConversation();
 
       if (selfUser.isTemporaryGuest()) {
-        return mainView.list.showTemporaryGuest();
+        return mainView.list.showTemporaryGuest(!hasPendingMeetingJoin);
       }
       if (!isNullOrUndefined(activeConversation)) {
         // There is already an active conversation, keeping state as is
@@ -313,12 +324,24 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
         return mainView.list.openPreferencesOptions();
       },
       '/meetings': () => {
+        useLinkedMeetingStore.setState({meetingId: undefined});
         return canUseMeetings({
           isTeamMeetingsFeatureEnabled: teamState.isMeetingsEnabled(),
           apiVersion: core.backendFeatures.version,
         })
           ? mainView.list.openMeetingsList()
           : navigate('/');
+      },
+      '/meetings/:meetingId/:domain': (meetingId: string, domain: string) => {
+        if (core.backendFeatures.version < Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION) {
+          navigate('/');
+          return;
+        }
+        useLinkedMeetingStore.setState({meetingId: {id: meetingId, domain}});
+        if (selfUser.isTemporaryGuest()) {
+          mainView.list.switchList(ListState.TEMPORARY_GUEST, false);
+        }
+        mainView.list.contentViewModel.switchContent(ContentState.MEETINGS);
       },
       '/user/:userId/:domain': showUserProfile,
       '/user/:domain/:userId': showUserProfile,
@@ -332,22 +355,22 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
       window.location.replace(redirect);
     }
 
-    const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-
     if (isNonEmptyString(conversationRedirect)) {
-      const destination = JSON.parse(conversationRedirect)?.data;
+      const destination = pendingJoinDestination;
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
       const openedMeetingPrep = openLoginMeetingPrep(destination, useMeetingPrepModal.getState().open);
       if (openedMeetingPrep) {
         const session = useMeetingPrepModal.getState().session;
         if (session.isJust) {
           navigate(
-            canUseMeetings({
-              isTeamMeetingsFeatureEnabled: teamState.isMeetingsEnabled(),
-              apiVersion: core.backendFeatures.version,
-            })
-              ? '/meetings'
-              : generateConversationUrl(session.value.qualifiedConversationId),
+            meetingJoinLandingPath(
+              session.value,
+              selfUser.isTemporaryGuest(),
+              canUseMeetings({
+                isTeamMeetingsFeatureEnabled: teamState.isMeetingsEnabled(),
+                apiVersion: core.backendFeatures.version,
+              }),
+            ),
           );
         }
       } else {

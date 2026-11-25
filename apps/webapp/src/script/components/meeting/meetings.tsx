@@ -17,7 +17,7 @@
  *
  */
 
-import {type FunctionComponent, useCallback, useEffect, useRef} from 'react';
+import {type FunctionComponent, useCallback, useEffect, useRef, useState} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -30,10 +30,12 @@ import {useMeetingStore} from './meetingStore/meetingStoreProvider';
 import {MeetNowModal} from './meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from './scheduleMeetingModal';
 
+import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../page/rootProvider';
 import {UserState} from '../../repositories/user/userState';
+import {matchQualifiedIds} from '../../util/qualifiedId';
 
-export const Meetings: FunctionComponent = () => {
+export const Meetings: FunctionComponent<{linkedMeetingId?: QualifiedId}> = ({linkedMeetingId}) => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const meetingSeries = useMeetingStore(state => {
@@ -48,11 +50,25 @@ export const Meetings: FunctionComponent = () => {
   const loadMeetings = useMeetingStore(state => {
     return state.loadMeetings;
   });
+  const syncMeeting = useMeetingStore(state => {
+    return state.syncMeetingByQualifiedId;
+  });
+  const [linkedMeetingIsLoading, setLinkedMeetingIsLoading] = useState(false);
+  const [linkedMeetingHasLoadError, setLinkedMeetingHasLoadError] = useState(false);
   const selfUser = container.resolve(UserState).self();
 
   const refreshMeetings = useCallback(() => {
+    if (linkedMeetingId !== undefined) {
+      setLinkedMeetingIsLoading(true);
+      setLinkedMeetingHasLoadError(false);
+      void syncMeeting(linkedMeetingId).then(result => {
+        setLinkedMeetingIsLoading(false);
+        setLinkedMeetingHasLoadError(result.isErr);
+      });
+      return;
+    }
     return fireAndForgetInvoker.fireAndForget(loadMeetings);
-  }, [fireAndForgetInvoker, loadMeetings]);
+  }, [fireAndForgetInvoker, loadMeetings, linkedMeetingId, syncMeeting]);
 
   useEffect(() => {
     refreshMeetings();
@@ -60,20 +76,27 @@ export const Meetings: FunctionComponent = () => {
 
   return (
     <div css={meetingsContentWrapperStyles}>
-      <MeetingHeader />
+      <MeetingHeader showActions={linkedMeetingId === undefined} />
       <div css={contentStyles} ref={scrollContainerRef}>
         <MeetingList
-          meetingSeries={meetingSeries}
-          isLoading={isLoading}
-          hasLoadError={hasLoadError}
+          meetingSeries={
+            linkedMeetingId === undefined
+              ? meetingSeries
+              : meetingSeries.filter(series => {
+                  return matchQualifiedIds(series.qualified_id, linkedMeetingId);
+                })
+          }
+          isLoading={linkedMeetingId === undefined ? isLoading : linkedMeetingIsLoading}
+          hasLoadError={linkedMeetingId === undefined ? hasLoadError : linkedMeetingHasLoadError}
           onRefresh={refreshMeetings}
           scrollElementRef={scrollContainerRef}
           selfUser={selfUser}
+          isLinkedMeeting={linkedMeetingId !== undefined}
         />
       </div>
       <MeetingCallingView />
-      <ScheduleMeetingModal />
-      <MeetNowModal />
+      {linkedMeetingId === undefined && <ScheduleMeetingModal />}
+      {linkedMeetingId === undefined && <MeetNowModal />}
     </div>
   );
 };
