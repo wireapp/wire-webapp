@@ -22,13 +22,13 @@ import {act, render, screen, waitFor} from '@testing-library/react';
 import {User} from '../../repositories/entity/User';
 import type {AppLockRepository} from '../../repositories/user/appLockRepository';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
+import {ContentViewModel} from '../../viewModel/contentViewModel';
 import {translateForTest} from '../../util/test/translateForTest';
 
 import {MainContent} from './mainContent';
 
 import {withTheme} from '../../auth/util/test/testUtil';
-import {MainViewModel} from '../../view_model/MainViewModel';
+import {MainViewModel} from '../../viewModel/mainViewModel';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {createRootContextValueForTest} from '../testSupport/rootContextTestSupport';
 import {RootProvider} from '../rootProvider';

@@ -63,7 +63,7 @@ import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {isKeyboardEvent} from '../../../../util/keyboardUtil';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';
 import {isConversationEntity} from '../../../../util/typePredicateUtil';
-import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {ListViewModel} from '../../../../viewModel/listViewModel';
 import {useApplicationContext} from '../../../rootProvider';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState} from '../../../useAppState';

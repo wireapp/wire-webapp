@@ -46,7 +46,7 @@ import {AssetRepository} from '../../../../../../repositories/assets/assetReposi
 import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
 import {FEATURE_STATUS} from '../../../../../../apiClient/team/feature/featureList.types';
 import {requireValueForTest} from '../../../../../../page/testSupport/rootContextTestSupport';
-import type {MainViewModel} from '../../../../../../view_model/MainViewModel';
+import type {MainViewModel} from '../../../../../../viewModel/mainViewModel';
 
 const FileAssetComponent = (props: ComponentProps<typeof RealFileAssetComponent>): ReactElement => {
   return <RealFileAssetComponent {...props} FullscreenModalComponent={PdfModalTestStub} />;

@@ -27,7 +27,7 @@ import type {Maybe} from 'true-myth';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import type {ApplicationLogDownload} from '../logger/applicationLogDownload';
 import type {Translate} from '../util/localizerUtil';
-import {MainViewModel} from '../view_model/MainViewModel';
+import {MainViewModel} from '../viewModel/mainViewModel';
 
 export type ApplicationNavigation = {
   readonly currentPathname: string;

@@ -76,7 +76,7 @@ import {OtrMessage} from '../../core/conversation/message/otrMessage';
 import {TextContentBuilder} from '../../core/conversation/message/textContentBuilder';
 import {isQualifiedUserClients} from '../../core/util';
 import {ConversationError} from '../../error/conversationError';
-import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
+import {showLegalHoldWarningModal} from '../../legalHold/legalHoldWarning';
 import {MentionEntity} from '../../message/mentionEntity';
 import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';

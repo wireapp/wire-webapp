@@ -21,7 +21,7 @@ import {isNonEmptyArray} from '@sindresorhus/is';
 import {arrayIncludes} from 'ts-extras';
 
 import {CONVERSATION_EVENT} from '../../../apiClient/event/conversationEvent';
-import {isMemberMessage} from '../../../guards/Message';
+import {isMemberMessage} from '../../../guards/message';
 import {Message as MessageEntity} from '../../../repositories/entity/message/message';
 import {ProtocolUpdateMessage} from '../../../repositories/entity/message/protocolUpdateMessage';
 import {SystemMessage} from '../../../repositories/entity/message/systemMessage';

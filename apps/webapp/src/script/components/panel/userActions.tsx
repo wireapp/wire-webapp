@@ -47,7 +47,7 @@ import type {User} from '../../repositories/entity/User';
 import {TeamState} from '../../repositories/team/TeamState';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {matchQualifiedIds} from '../../util/qualifiedId';
-import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import type {ActionsViewModel} from '../../viewModel/actionsViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import * as Icon from '../icon';
 import {PrimaryModal} from '../Modals/PrimaryModal';

@@ -76,8 +76,8 @@ import {UserRepository} from '../repositories/user/userRepository';
 import {UserState} from '../repositories/user/userState';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
-import {ViewModelRepositories} from '../view_model/MainViewModel';
-import {Warnings} from '../view_model/WarningsContainer';
+import {ViewModelRepositories} from '../viewModel/mainViewModel';
+import {Warnings} from '../viewModel/warningsContainer';
 
 const debugDumpIndentationSpaces = 2;
 const debugFrameRectangleSizeInPixels = 10;

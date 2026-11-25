@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {navigate} from './Router';
+import {navigate} from './router';
 
 import {useAppMainState, ViewType} from '../page/state';
 import {KEY} from '../util/keyboardUtil';

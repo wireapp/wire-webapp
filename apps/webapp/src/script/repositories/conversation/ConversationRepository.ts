@@ -136,9 +136,9 @@ import {AddUsersFailure, BaseCreateConversationResponse} from '../../core/conver
 import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols/mls';
 import {BASE_ERROR_TYPE, BaseError} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
-import {isMemberMessage} from '../../guards/Message';
-import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
-import type {MappedEvent} from '../../legal-hold/LegalHoldEvaluator';
+import {isMemberMessage} from '../../guards/message';
+import * as LegalHoldEvaluator from '../../legalHold/legalHoldEvaluator';
+import type {MappedEvent} from '../../legalHold/legalHoldEvaluator';
 import {MessageCategory} from '../../message/messageCategory';
 import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';

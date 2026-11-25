@@ -1,0 +1,75 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import type {Clock} from '@enormora/clock/clock';
+import {Maybe} from 'true-myth';
+
+import {AppInitStatistics, AppStatistics} from './appInitStatistics';
+import type {AppInitStatisticsValue} from './appInitStatisticsValue';
+import {AppInitTimings} from './appInitTimings';
+import type {AppInitTimingsStep} from './appInitTimingsStep';
+
+export class AppInitTelemetry {
+  private readonly appInitTimings: AppInitTimings;
+  private readonly appInitStatistics: AppInitStatistics;
+
+  constructor(clock: Clock, startedAtMonotonicMicroseconds: bigint) {
+    this.appInitTimings = new AppInitTimings(clock, startedAtMonotonicMicroseconds);
+    this.appInitStatistics = new AppInitStatistics();
+  }
+
+  addStatistic(statistic: AppInitStatisticsValue, value: string | number, bucket_size?: number): void {
+    this.appInitStatistics.add(statistic, value, bucket_size);
+  }
+
+  getStatistics(): AppStatistics {
+    return this.appInitStatistics.get();
+  }
+
+  get timings(): Partial<Record<AppInitTimingsStep, number>> {
+    return this.appInitTimings.get();
+  }
+
+  get lastStep(): Maybe<AppInitTimingsStep> {
+    return this.appInitTimings.lastStep;
+  }
+
+  logStatistics(): void {
+    this.appInitStatistics.log();
+  }
+
+  logTimings(): void {
+    this.appInitTimings.log();
+  }
+
+  report(): number {
+    this.logStatistics();
+    this.logTimings();
+
+    return this.appInitTimings.getAppLoad();
+  }
+
+  timeStep(step: AppInitTimingsStep): void {
+    return this.appInitTimings.timeStep(step);
+  }
+
+  timeStepAt(step: AppInitTimingsStep, occurredAtMonotonicMicroseconds: bigint): void {
+    return this.appInitTimings.timeStepAt(step, occurredAtMonotonicMicroseconds);
+  }
+}

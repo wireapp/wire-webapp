@@ -25,7 +25,7 @@ import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import {messageBodyWrapper} from './contentMessage/contentMessage.styles';
 
 import {Config} from '../../../Config';
-import {MotionDuration} from '../../../motion/MotionDuration';
+import {MotionDuration} from '../../../motion/motionDuration';
 import {FormattedId} from '../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../repositories/entity/message/decryptErrorMessage';

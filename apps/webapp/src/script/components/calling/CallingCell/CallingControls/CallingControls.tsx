@@ -30,7 +30,7 @@ import {DesktopScreenShareMenu} from '../../../../repositories/calling/CallState
 import {Participant} from '../../../../repositories/calling/Participant';
 import {TeamState} from '../../../../repositories/team/TeamState';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
-import {CallActions} from '../../../../view_model/CallingViewModel';
+import {CallActions} from '../../../../viewModel/callingViewModel';
 import * as Icon from '../../../icon';
 import {useCallAlertState} from '../../useCallAlertState';
 

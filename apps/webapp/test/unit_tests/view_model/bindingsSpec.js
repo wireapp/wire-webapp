@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import '../../../src/script/view_model/bindings/CommonBindings';
+import '../../../src/script/viewModel/bindings/commonBindings';
 
 describe('ko.bindingHandlers', () => {
   describe('ko.subscribable.fn.subscribe_once', () => {

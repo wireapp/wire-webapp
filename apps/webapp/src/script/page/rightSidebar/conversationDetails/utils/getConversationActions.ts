@@ -26,7 +26,7 @@ import {Config} from '../../../../Config';
 import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import * as UserPermission from '../../../../repositories/user/userPermission';
-import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../../viewModel/actionsViewModel';
 import {WebAppEvents} from '../../../../webAppEvents';
 import type {RootContextValue} from '../../../rootProvider';
 

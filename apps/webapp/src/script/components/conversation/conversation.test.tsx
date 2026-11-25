@@ -47,7 +47,7 @@ import {PropertiesService} from '../../repositories/properties/propertiesService
 import {SelfService} from '../../repositories/self/SelfService';
 import {TeamState} from '../../repositories/team/TeamState';
 import {translateForTest} from '../../util/test/translateForTest';
-import {MainViewModel, type ViewModelRepositories} from '../../view_model/MainViewModel';
+import {MainViewModel, type ViewModelRepositories} from '../../viewModel/mainViewModel';
 import {MessageListWrapper} from '../messagesList/messageListWrapper';
 import {TitleBar} from '../titleBar';
 

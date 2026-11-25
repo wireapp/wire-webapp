@@ -24,7 +24,7 @@ import {CoreCryptoUpgradeModal} from './coreCryptoUpgradeModal';
 import {renderWithCoreCryptoSupport} from './renderWithCoreCryptoSupport';
 
 import {Config} from '../Config';
-import {setAppLocale} from '../localization/Localizer';
+import {setAppLocale} from '../localization/localizer';
 import {translate} from '../util/localizerUtil';
 
 type ShowCoreCryptoUpgradeOptions = {

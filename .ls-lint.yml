@@ -1818,3 +1818,72 @@ ls:
     .ts: camelCase
     .types.ts: camelCase
     .d.ts: camelCase
+  apps/webapp/src/script/{viewModel,ViewModel,view_model,view-model}:
+    .dir: camelCase
+    .mocks.ts: camelCase
+    .*.test.ts: exists:0
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/viewModel/bindings:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/viewModel/warningsContainer:
+    .dir: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/mls:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/mls/mlsMigration:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/mls/mlsMigration/migrationFinaliser:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/mls/mlsMigration/migrationFinaliser/joinConversationsAfterMigrationFinalisation:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/mls/mlsMigration/migrationInitialiser:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/mls/mlsMigration/migrationInitialiser/joinUnestablishedMixedConversations:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/guards:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/telemetry:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/telemetry/appInit:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/{legalHold,LegalHold,legal-hold,legal_hold}:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/localization:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/router:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/motion:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/ephemeral:
+    .dir: camelCase
+    .ts: camelCase

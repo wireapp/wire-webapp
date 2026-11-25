@@ -41,8 +41,8 @@ import {
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
 
 import {Config} from '../../../Config';
-import {isCallViewOption} from '../../../guards/CallView';
-import {isMediaDevice} from '../../../guards/MediaDevice';
+import {isCallViewOption} from '../../../guards/callView';
+import {isMediaDevice} from '../../../guards/mediaDevice';
 import {useActiveWindowMatchMedia} from '../../../hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from '../../../hooks/useUserProperty';
 import {useApplicationContext} from '../../../page/rootProvider';
@@ -74,7 +74,7 @@ import {TabIndex} from '../../../uiKit/utils/enums';
 import {QUERY} from '../../../uiKit/utils/mediaQueries';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {handleKeyDown, isEscapeKey, KEY} from '../../../util/keyboardUtil';
-import {CallViewTab} from '../../../view_model/CallingViewModel';
+import {CallViewTab} from '../../../viewModel/callingViewModel';
 import {WebAppEvents} from '../../../webAppEvents';
 import * as Icon from '../../icon';
 

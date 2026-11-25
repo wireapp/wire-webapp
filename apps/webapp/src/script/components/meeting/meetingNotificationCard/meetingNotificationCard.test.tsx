@@ -36,7 +36,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
-import type {MainViewModel} from '../../../view_model/MainViewModel';
+import type {MainViewModel} from '../../../viewModel/mainViewModel';
 
 jest.mock('../useJoinMeetingCall', () => {
   return {

@@ -27,7 +27,7 @@ import type {CallingRepository} from '../../../repositories/calling/CallingRepos
 import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import type {ConversationState} from '../../../repositories/conversation/ConversationState';
 import {createConversation} from '../../../auth/util/test/testUtil';
-import type {CallingViewModel} from '../../../view_model/CallingViewModel';
+import type {CallingViewModel} from '../../../viewModel/callingViewModel';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 const qualifiedConversationId = {domain: 'example.com', id: 'meeting-conversation-id'};

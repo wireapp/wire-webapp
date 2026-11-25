@@ -28,7 +28,7 @@ import {Maybe} from 'true-myth';
 
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import type {Translate} from '../../util/localizerUtil';
-import {MainViewModel} from '../../view_model/MainViewModel';
+import {MainViewModel} from '../../viewModel/mainViewModel';
 import {RootContextValue, RootProvider} from '../rootProvider';
 
 type CreateRootContextValueForTestParameters = {

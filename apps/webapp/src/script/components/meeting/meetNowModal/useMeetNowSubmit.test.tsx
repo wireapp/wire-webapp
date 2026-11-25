@@ -32,8 +32,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
-import {MainViewModel} from '../../../view_model/MainViewModel';
-import {useWarningsState} from '../../../view_model/WarningsContainer/WarningsState';
+import {MainViewModel} from '../../../viewModel/mainViewModel';
+import {useWarningsState} from '../../../viewModel/warningsContainer/warningsState';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 import {type MeetNowSubmitResult, meetNowSubmitResults, wasMeetNowMeetingCreated} from './meetNowTypes';

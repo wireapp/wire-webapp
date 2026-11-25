@@ -22,7 +22,7 @@ import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 
 import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '../../../../../apiClient/team/feature/featureList.types';
 import {E2EIHandler} from '../../../../../e2eIdentity';
-import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../../../../guards/Protocol';
+import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../../../../guards/protocol';
 import {supportsMLS} from '../../../../../util/util';
 
 export const getE2EIConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLSE2EID] | undefined => {

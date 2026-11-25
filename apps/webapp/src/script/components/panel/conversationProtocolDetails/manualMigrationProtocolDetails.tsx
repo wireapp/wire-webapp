@@ -36,8 +36,8 @@ import {
   canManuallyMigrateConversation,
   manuallyMigrateConversation,
   type ManualMigrationFailure,
-} from '../../../mls/MLSMigration/manualMigration';
-import {useManualMigrationStore} from '../../../mls/MLSMigration/useManualMigrationStore';
+} from '../../../mls/mlsMigration/manualMigration';
+import {useManualMigrationStore} from '../../../mls/mlsMigration/useManualMigrationStore';
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import type {Conversation} from '../../../repositories/entity/Conversation';

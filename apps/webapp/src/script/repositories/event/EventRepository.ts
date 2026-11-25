@@ -56,7 +56,7 @@ import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {getLogger, type LogAttributes, Logger} from '../../util/logger';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {isAxiosError} from '../../util/typePredicateUtil';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 import {WebAppEvents} from '../../webAppEvents';
 import {ClientConversationEvent, EventBuilder} from '../conversation/EventBuilder';
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';

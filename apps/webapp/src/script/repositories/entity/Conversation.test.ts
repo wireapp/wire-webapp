@@ -29,7 +29,7 @@ import {ClientEntity} from '../client/ClientEntity';
 import {ConnectionMapper} from '../connection/connectionMapper';
 import {ConversationMapper} from '../conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
-import '../../localization/Localizer';
+import '../../localization/localizer';
 import {StatusType} from '../../message/statusType';
 import {translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';

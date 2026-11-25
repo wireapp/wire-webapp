@@ -63,7 +63,7 @@ import {
 } from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {initialiseSelfAndTeamConversations, initMLSGroupConversations, recoverMLSConversationsInBatches} from '../mls';
-import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
+import {joinConversationsAfterMigrationFinalisation} from '../mls/mlsMigration/migrationFinaliser';
 import type {ApplicationObservability} from '../observability/applicationObservability';
 import type {ApplicationStartupReport} from '../observability/applicationStartupReport';
 import {reportApplicationStartup} from '../observability/reportApplicationStartup';
@@ -130,9 +130,9 @@ import {UserService} from '../repositories/user/userService';
 import {UserState} from '../repositories/user/userState';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
-import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
-import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
-import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
+import {AppInitStatisticsValue} from '../telemetry/appInit/appInitStatisticsValue';
+import {AppInitTelemetry} from '../telemetry/appInit/appInitTelemetry';
+import {AppInitTimingsStep} from '../telemetry/appInit/appInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/windowHandler';
 import {initializeDataDog} from '../util/dataDog';
@@ -143,8 +143,8 @@ import {getLogger, Logger} from '../util/logger';
 import {matchQualifiedIds} from '../util/qualifiedId';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from '../util/timeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from '../util/util';
-import {ViewModelRepositories} from '../view_model/MainViewModel';
-import {Warnings} from '../view_model/WarningsContainer';
+import {ViewModelRepositories} from '../viewModel/mainViewModel';
+import {Warnings} from '../viewModel/warningsContainer';
 import {WebAppEvents} from '../webAppEvents';
 
 type AppConfig = {

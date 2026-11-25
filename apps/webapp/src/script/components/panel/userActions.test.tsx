@@ -40,7 +40,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../page/testSupport/rootContextTestSupport';
-import {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../viewModel/actionsViewModel';
 import {noop} from '../../util/util';
 
 import {ActionIdentifier, Actions, UserActions} from './userActions';

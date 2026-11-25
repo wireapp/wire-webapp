@@ -32,7 +32,7 @@ import {PermissionError} from '../../error/permissionError';
 import {getLogger, Logger} from '../../util/logger';
 import {toError} from '../../util/toError';
 import {isErrorWithType} from '../../util/typePredicateUtil';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 import {CallingViewMode, CallState} from '../calling/CallState';
 import {BrowserPermissionStatus} from '../permission/BrowserPermissionStatus';
 import {getPermissionStates} from '../permission/permissionHandlers';

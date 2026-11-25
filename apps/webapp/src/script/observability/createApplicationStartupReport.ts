@@ -22,9 +22,9 @@ import {Maybe} from 'true-myth';
 
 import type {ApplicationStartupReport} from './applicationStartupReport';
 
-import type {AppStatistics} from '../telemetry/app_init/AppInitStatistics';
-import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
-import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
+import type {AppStatistics} from '../telemetry/appInit/appInitStatistics';
+import {AppInitStatisticsValue} from '../telemetry/appInit/appInitStatisticsValue';
+import {AppInitTimingsStep} from '../telemetry/appInit/appInitTimingsStep';
 
 type StartupTimings = Partial<Record<AppInitTimingsStep, number>>;
 

@@ -47,7 +47,7 @@ import {setStrings, translate} from '../../util/localizerUtil';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {PanelState} from '../../page/rightSidebar/rightSidebar';
-import {ViewModelRepositories} from '../../view_model/MainViewModel';
+import {ViewModelRepositories} from '../../viewModel/mainViewModel';
 import {translateForTest} from '../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 

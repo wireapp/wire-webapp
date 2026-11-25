@@ -23,13 +23,13 @@ import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import {RadioGroup} from '../../../components/Radio';
-import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
+import {EphemeralTimings} from '../../../ephemeral/ephemeralTimings';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {formatDuration} from '../../../util/timeUtil';
-import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import {ViewModelRepositories} from '../../../viewModel/mainViewModel';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 

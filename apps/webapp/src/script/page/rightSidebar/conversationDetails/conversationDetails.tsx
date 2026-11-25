@@ -39,7 +39,7 @@ import {ManualMigrationProtocolDetails} from '../../../components/panel/conversa
 import {EnrichedFields} from '../../../components/panel/enrichedFields';
 import {ServiceDetails} from '../../../components/panel/serviceDetails';
 import {UserDetails} from '../../../components/panel/userDetails';
-import {isServiceEntity} from '../../../guards/Service';
+import {isServiceEntity} from '../../../guards/service';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {ConversationVerificationState} from '../../../repositories/conversation/ConversationVerificationState';
 import {getNotificationText} from '../../../repositories/conversation/NotificationSetting';
@@ -55,7 +55,7 @@ import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {sortUsersByPriority} from '../../../util/stringUtil';
 import {formatDuration} from '../../../util/timeUtil';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';

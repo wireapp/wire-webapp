@@ -20,13 +20,13 @@
 import {RegisteredClient} from '../../../apiClient/client/registeredClient';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS, FeatureList} from '../../../apiClient/team/feature/featureList.types';
 
-import {MLSMigrationStatus} from '../../../mls/MLSMigration/migrationStatus';
+import {MLSMigrationStatus} from '../../../mls/mlsMigration/migrationStatus';
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols';
 
-import * as mlsSupport from '../../../mls/isMLSSupportedByEnvironment';
+import * as mlsSupport from '../../../mls/isMlsSupportedByEnvironment';
 
 const testFactory = new TestFactory();
 

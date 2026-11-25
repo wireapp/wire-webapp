@@ -38,7 +38,7 @@ import {
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {UserState} from '../../../repositories/user/userState';
-import {navigate} from '../../../router/Router';
+import {navigate} from '../../../router/router';
 import {CalendarIcon} from '../../../uiKit/dataDisplay/icon/calendarIcon';
 import {CallIcon} from '../../../uiKit/dataDisplay/icon/callIcon';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';

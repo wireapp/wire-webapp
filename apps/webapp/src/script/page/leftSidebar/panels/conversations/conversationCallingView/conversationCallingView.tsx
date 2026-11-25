@@ -22,7 +22,7 @@ import type {FunctionComponent} from 'react';
 import {CallingCell} from '../../../../../components/calling/CallingCell';
 import {Call} from '../../../../../repositories/calling/Call';
 import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
-import {ListViewModel} from '../../../../../view_model/ListViewModel';
+import {ListViewModel} from '../../../../../viewModel/listViewModel';
 
 type ConversationCallingViewProps = {
   activeCalls: Call[];

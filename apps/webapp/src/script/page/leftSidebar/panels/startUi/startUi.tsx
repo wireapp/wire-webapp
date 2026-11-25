@@ -43,7 +43,7 @@ import {TeamState} from '../../../../repositories/team/TeamState';
 import {generatePermissionHelpers} from '../../../../repositories/user/userPermission';
 import {UserRepository} from '../../../../repositories/user/userRepository';
 import {UserState} from '../../../../repositories/user/userState';
-import {MainViewModel} from '../../../../view_model/MainViewModel';
+import {MainViewModel} from '../../../../viewModel/mainViewModel';
 import {useApplicationContext} from '../../../rootProvider';
 import {SidebarTabs, useSidebarStore} from '../conversations/useSidebarStore';
 import {ListWrapper} from '../listWrapper';

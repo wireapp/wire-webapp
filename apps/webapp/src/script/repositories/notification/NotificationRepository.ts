@@ -43,7 +43,7 @@ import {getRenderedTextContent} from '../../util/messageRenderer';
 import {truncate} from '../../util/stringUtil';
 import {formatDuration, TIME_IN_MILLIS} from '../../util/timeUtil';
 import {ValidationUtilError} from '../../util/validationUtil';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 import {WebAppEvents} from '../../webAppEvents';
 import {AssetRepository} from '../assets/assetRepository';
 import {AudioRepository} from '../audio/audioRepository';

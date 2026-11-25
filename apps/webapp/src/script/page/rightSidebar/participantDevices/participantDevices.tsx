@@ -23,7 +23,7 @@ import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import {UserDevices, UserDevicesState} from '../../../components/userDevices';
 import {useUserDevicesHistory} from '../../../hooks/useUserDevicesHistory';
 import type {User} from '../../../repositories/entity/User';
-import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import {ViewModelRepositories} from '../../../viewModel/mainViewModel';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 

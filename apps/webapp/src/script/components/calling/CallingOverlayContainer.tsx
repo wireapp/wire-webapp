@@ -37,7 +37,7 @@ import {MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler'
 import {useMediaDevicesStore} from '../../repositories/media/useMediaDevicesStore';
 import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
-import {CallViewTab} from '../../view_model/CallingViewModel';
+import {CallViewTab} from '../../viewModel/callingViewModel';
 
 interface CallingContainerProps {
   readonly propertiesRepository: PropertiesRepository;
