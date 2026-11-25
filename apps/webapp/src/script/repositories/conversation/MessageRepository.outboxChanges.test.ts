@@ -195,6 +195,21 @@ describe('MessageRepository routes changes through the outbox', () => {
       );
     });
 
+    it('expires after a minute in the lane of changes, and keeps the long expiry behind its pending message', async () => {
+      seedMessage(parts, {messageId: 'pending-1', state: 'on-hold'});
+      await startOutbox(parts);
+
+      await react(createMessage(parts, 'pending-1'), '❤️');
+      await react(createMessage(parts, 'sent-1', 'text', StatusType.SENT), '👍');
+
+      expect(snapshotOf(parts.store, 'pending-1:reaction')).toEqual(
+        expect.objectContaining({validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK}),
+      );
+      expect(snapshotOf(parts.store, 'sent-1:reaction')).toEqual(
+        expect.objectContaining({validUntil: 1_000_000 + TIME_IN_MILLIS.MINUTE}),
+      );
+    });
+
     it('keeps following its message once that went out, while its own reaction is still waiting', async () => {
       seedMessage(parts, {messageId: 'message-1'});
       parts.store.seed(

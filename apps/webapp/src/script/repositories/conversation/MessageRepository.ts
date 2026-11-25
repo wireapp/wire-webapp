@@ -1974,12 +1974,13 @@ export class MessageRepository {
           attempt: this.attemptReceiptOperation,
         }),
       ),
-      // A change to a message that was sent is forgotten when it can't go out, and the local change stays.
+      // A change to a message that was sent is forgotten when it can't go out, and the local change stays. Nothing
+      // shows whether it went through, so one made during a connectivity drop isn't worth sending much later.
       messageChange: handleOf(
         this.outbox.register({
           name: 'message-change',
           parsePayload: parseMessageChangePayload,
-          expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
+          expiresAfterMilliseconds: TIME_IN_MILLIS.MINUTE,
           // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
           attemptTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
           maxAttempts: 1_000,

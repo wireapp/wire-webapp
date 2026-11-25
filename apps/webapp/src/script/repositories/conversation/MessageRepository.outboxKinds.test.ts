@@ -588,7 +588,7 @@ describe('the message kinds of MessageRepository', () => {
         whenExhausted: 'delete',
         laneWhenDeadLettered: 'continues',
         laneWhenDeleted: 'continues',
-        expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
+        expiresAfterMilliseconds: TIME_IN_MILLIS.MINUTE,
         attemptTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
       });
     });
