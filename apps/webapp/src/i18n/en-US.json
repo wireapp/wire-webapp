@@ -1533,6 +1533,7 @@
   "meetings.startMeetingHelp": "Start a meeting with team members. Your communication is always end-to-end encrypted, offering the highest level of security.",
   "meetings.tabs.ariaLabel": "Meetings tabs",
   "meetings.tabs.next": "Next",
+  "mentionEveryoneDescription": "Notify everyone in this conversation",
   "messageCouldNotBeSentBackEndOffline": "Message could not be sent as the back-end of [bold]{domain}[/bold] could not be reached.",
   "messageCouldNotBeSentConnectivityIssues": "Message could not be sent due to connectivity issues.",
   "messageCouldNotBeSentRetry": "Retry",
