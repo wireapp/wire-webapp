@@ -74,6 +74,8 @@ interface RichTextEditorProps {
   showMarkdownPreview: boolean;
   disableMessagePreprocessing: boolean;
   getMentionCandidates: (search?: string | null) => User[];
+  /** Whether the mention of everyone (`@all`) can be sent in this conversation. */
+  isEveryoneMentionAvailable?: boolean;
   saveDraftState: (editor: string, plainMessage: string, replyId?: string) => void;
   loadDraftState: () => Promise<DraftState>;
   onUpdate: (content: MessageContent) => void;
@@ -100,6 +102,7 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = ({
   onEscape,
   onArrowUp,
   getMentionCandidates,
+  isEveryoneMentionAvailable = false,
   onShiftTab,
   onBlur,
   onSend,
@@ -129,7 +132,7 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = ({
 
       onUpdate({
         text,
-        mentions: parseMentions(editorRef.current, text, getMentionCandidates()),
+        mentions: parseMentions(editorRef.current, text, getMentionCandidates(), isEveryoneMentionAvailable),
       });
 
       saveDraft();
@@ -185,6 +188,7 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = ({
               return typeof search === 'string' ? getMentionCandidates(search) : [];
             }}
             openStateRef={mentionsOpen}
+            isEveryoneMentionAvailable={isEveryoneMentionAvailable}
           />
           <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
           <SendPlugin
@@ -197,7 +201,11 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = ({
           {disableMessagePreprocessing ? (
             <PlainTextPastePlugin />
           ) : (
-            <PastePlugin getMentionCandidates={getMentionCandidates} isPreviewMode={showMarkdownPreview} />
+            <PastePlugin
+              getMentionCandidates={getMentionCandidates}
+              isPreviewMode={showMarkdownPreview}
+              isEveryoneMentionAvailable={isEveryoneMentionAvailable}
+            />
           )}
         </div>
       </div>

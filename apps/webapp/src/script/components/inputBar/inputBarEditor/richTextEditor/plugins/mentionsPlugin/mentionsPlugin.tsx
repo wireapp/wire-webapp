@@ -26,8 +26,10 @@ import {isEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
+import {EveryoneMentionSuggestionsItem} from './everyoneMentionSuggestionsItem';
 import {MentionSuggestionsItem} from './mentionSuggestionsItem';
 
+import {EVERYONE_MENTION_VALUE} from '../../../../../../message/mentionEntity';
 import {User} from '../../../../../../repositories/entity/User';
 import {FadingScrollbar} from '../../../../../fadingScrollbar';
 import {IgnoreOutsideClickWrapper} from '../../../../util/clickHandlers';
@@ -59,21 +61,40 @@ function checkForMentions(text: string): MenuTextMatch | null {
   };
 }
 
+/** The target of a mention suggestion: a single user, or everyone in the conversation (`@all`). */
+type MentionTarget = {type: 'user'; user: User} | {type: 'everyone'};
+
+const everyoneMentionOptionKey = '@everyone';
+
 export class MenuOption extends _MenuOption {
-  user: User;
+  target: MentionTarget;
   value: string;
   label: string;
-  constructor(user: User, value: string, label?: string) {
-    super(value);
-    this.user = user;
+  constructor(target: MentionTarget, value: string, label?: string) {
+    super(target.type === 'everyone' ? everyoneMentionOptionKey : target.user.id);
+    this.target = target;
     this.value = value;
     this.label = label ?? value;
   }
+
+  get isEveryone(): boolean {
+    return this.target.type === 'everyone';
+  }
 }
+
+/**
+ * Checks whether the mention of everyone (`@all`) matches what the user typed after `@`.
+ * It matches a case-insensitive prefix of `all`, including an empty query.
+ */
+export const matchesEveryoneMention = (queryString: string | null | undefined): boolean => {
+  return typeof queryString === 'string' && EVERYONE_MENTION_VALUE.startsWith(queryString.toLowerCase());
+};
 
 interface MentionsPluginProps {
   onSearch: (queryString?: string | null) => User[];
   openStateRef: MutableRefObject<boolean>;
+  /** Whether the mention of everyone (`@all`) is offered. */
+  isEveryoneMentionAvailable?: boolean;
 }
 
 function MentionMenu({
@@ -100,11 +121,27 @@ function MentionMenu({
       >
         <div className="mention-suggestion-list">
           {options.map((menuOption, index) => {
+            if (menuOption.target.type === 'everyone') {
+              return (
+                <EveryoneMentionSuggestionsItem
+                  ref={menuOption.setRefElement}
+                  key={menuOption.key}
+                  isSelected={selectedIndex === index}
+                  onSuggestionClick={() => {
+                    setHighlightedIndex(index);
+                    selectOptionAndCleanUp(menuOption);
+                  }}
+                  onMouseEnter={() => {
+                    setHighlightedIndex(index);
+                  }}
+                />
+              );
+            }
             return (
               <MentionSuggestionsItem
                 ref={menuOption.setRefElement}
-                key={menuOption.user.id}
-                suggestion={menuOption.user}
+                key={menuOption.key}
+                suggestion={menuOption.target.user}
                 isSelected={selectedIndex === index}
                 onSuggestionClick={() => {
                   setHighlightedIndex(index);
@@ -122,23 +159,32 @@ function MentionMenu({
   );
 }
 
-export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps): ReactElement {
+export function MentionsPlugin({
+  onSearch,
+  openStateRef,
+  isEveryoneMentionAvailable = false,
+}: MentionsPluginProps): ReactElement {
   const [editor] = useLexicalComposerContext();
   const [queryString, setQueryString] = useState<string | null>();
 
   const results = onSearch(queryString);
 
-  const options = results
-    .map(result => {
-      return new MenuOption(result, result.name());
-    })
-    .toReversed();
+  const userOptions = results.map(result => {
+    return new MenuOption({type: 'user', user: result}, result.name());
+  });
+  const everyoneOptions =
+    isEveryoneMentionAvailable && matchesEveryoneMention(queryString)
+      ? [new MenuOption({type: 'everyone'}, EVERYONE_MENTION_VALUE)]
+      : [];
+
+  // The menu is reversed, so the last option sits closest to the input. The mention of everyone comes first.
+  const options = [...everyoneOptions, ...userOptions].toReversed();
 
   const insertMention = useCallback(
     (selectedOption: MenuOption, nodeToReplace: TextNode | null, closeMenu: () => void) => {
       editor.update(() => {
         if (!isNullOrUndefined(nodeToReplace)) {
-          const mentionNode = $createMentionNode(TRIGGER, selectedOption.value);
+          const mentionNode = $createMentionNode(TRIGGER, selectedOption.value, selectedOption.isEveryone);
           nodeToReplace.replace(mentionNode);
           mentionNode.insertAfter($createTextNode(' '));
         }

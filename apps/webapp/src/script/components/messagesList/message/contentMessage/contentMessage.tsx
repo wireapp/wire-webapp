@@ -37,6 +37,7 @@ import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {useClickOutside} from '../../../../hooks/useClickOutside';
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../../hooks/useRelativeTimestamp';
 import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';
+import {isEveryoneMentionApplicable} from '../../../../message/selfMention';
 import {StatusType} from '../../../../message/statusType';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {Conversation} from '../../../../repositories/entity/Conversation';
@@ -268,6 +269,7 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
                   onClickMessage={onClickMessage}
                   isMessageFocused={msgFocusState}
                   is1to1Conversation={conversation.is1to1()}
+                  highlightEveryoneMention={isEveryoneMentionApplicable(conversation, message)}
                   isFileShareRestricted={isFileShareRestricted}
                   onClickDetails={() => {
                     return onClickDetails(message);

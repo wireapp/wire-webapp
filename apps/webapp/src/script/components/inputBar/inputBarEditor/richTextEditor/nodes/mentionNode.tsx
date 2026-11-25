@@ -38,6 +38,8 @@ type SerializedMentionNode = Spread<
   {
     value: string;
     trigger: string;
+    /** `true` when the mention targets everyone in the conversation (`@all`). Absent in drafts saved before it existed. */
+    everyone?: boolean;
   },
   SerializedLexicalNode
 >;
@@ -45,9 +47,10 @@ type SerializedMentionNode = Spread<
 function convertElement(domNode: HTMLElement): DOMConversionOutput | null {
   const value = domNode.getAttribute('data-lexical-mention-value');
   const trigger = domNode.getAttribute('data-lexical-mention-trigger');
+  const isEveryone = domNode.getAttribute('data-lexical-mention-everyone') === 'true';
 
   if (value !== null && trigger != null) {
-    const node = $createMentionNode(trigger, value);
+    const node = $createMentionNode(trigger, value, isEveryone);
     return {node};
   }
 
@@ -67,17 +70,18 @@ type ImportDOMResult = {
 export class MentionNode extends DecoratorNode<ReactElement> {
   __value: string;
   __trigger: string;
+  __everyone: boolean;
 
   static getType(): string {
     return 'Mention';
   }
 
   static clone(node: MentionNode): MentionNode {
-    return new MentionNode(node.__trigger, node.__value, node.__key);
+    return new MentionNode(node.__trigger, node.__value, node.__everyone, node.__key);
   }
 
   static importJSON(serializedNode: SerializedMentionNode): MentionNode {
-    return $createMentionNode(serializedNode.trigger, serializedNode.value);
+    return $createMentionNode(serializedNode.trigger, serializedNode.value, serializedNode.everyone === true);
   }
 
   exportDOM(): ExportDOMResult {
@@ -85,6 +89,9 @@ export class MentionNode extends DecoratorNode<ReactElement> {
     element.setAttribute('data-lexical-mention', 'true');
     element.setAttribute('data-lexical-mention-trigger', this.__trigger);
     element.setAttribute('data-lexical-mention-value', this.__value);
+    if (this.__everyone) {
+      element.setAttribute('data-lexical-mention-everyone', 'true');
+    }
     element.textContent = this.getTextContent();
     return {element};
   }
@@ -103,16 +110,18 @@ export class MentionNode extends DecoratorNode<ReactElement> {
     };
   }
 
-  constructor(trigger: string, value: string, key?: NodeKey) {
+  constructor(trigger: string, value: string, everyone = false, key?: NodeKey) {
     super(key);
     this.__trigger = trigger;
     this.__value = value;
+    this.__everyone = everyone;
   }
 
   exportJSON(): SerializedMentionNode {
     return {
       trigger: this.__trigger,
       value: this.__value,
+      ...(this.__everyone ? {everyone: true} : {}),
       type: 'Mention',
       version: 1,
     };
@@ -140,6 +149,14 @@ export class MentionNode extends DecoratorNode<ReactElement> {
     return self.__value;
   }
 
+  /**
+   * @returns `true` when the mention targets everyone in the conversation (`@all`) rather than a single user
+   */
+  isEveryone(): boolean {
+    const self = this.getLatest();
+    return self.__everyone;
+  }
+
   setValue(value: string): void {
     const self = this.getWritable();
     self.__value = value;
@@ -165,8 +182,8 @@ export class MentionNode extends DecoratorNode<ReactElement> {
   }
 }
 
-export function $createMentionNode(trigger: string, value: string): MentionNode {
-  const mentionNode = new MentionNode(trigger, value);
+export function $createMentionNode(trigger: string, value: string, everyone = false): MentionNode {
+  const mentionNode = new MentionNode(trigger, value, everyone);
   return $applyNodeReplacement(mentionNode);
 }
 

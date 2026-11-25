@@ -31,6 +31,7 @@ const linkClosingTokenOffset = 2;
 
 interface MentionText {
   domain: string | null | undefined;
+  isEveryone: boolean;
   isSelfMentioned: boolean;
   text: string;
   userId: string;
@@ -161,7 +162,23 @@ markdownit.renderer.rules.paragraph_close = () => {
   return '';
 };
 
+export type RenderMessageOptions = {
+  /** Whether mentions of everyone (`@all`) are highlighted as mentioning the self user. */
+  highlightEveryoneMention?: boolean;
+};
+
+const renderEveryoneMention = (mentionData: MentionText): string => {
+  // A mention of everyone has no user to open, so it is not interactive.
+  const elementClasses = mentionData.isSelfMentioned ? ' everyone-mention self-mention' : ' everyone-mention';
+  const mentionText = mentionData.text.replace(/^@/, '');
+  const content = `<span class="mention-at-sign">@</span>${escape(mentionText)}`;
+  return `<span class="message-mention${elementClasses}" data-uie-name="label-everyone-mention">${content}</span>`;
+};
+
 const renderMention = (mentionData: MentionText): string => {
+  if (mentionData.isEveryone) {
+    return renderEveryoneMention(mentionData);
+  }
   const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
   let elementAttributes = mentionData.isSelfMentioned
     ? ' data-uie-name="label-self-mention" role="button"'
@@ -179,7 +196,12 @@ markdownit.normalizeLinkText = text => {
   return text;
 };
 
-export const renderMessage = (message: string, selfId?: QualifiedId, mentionEntities: MentionEntity[] = []): string => {
+export const renderMessage = (
+  message: string,
+  selfId?: QualifiedId,
+  mentionEntities: MentionEntity[] = [],
+  {highlightEveryoneMention = false}: RenderMessageOptions = {},
+): string => {
   const createMentionHash = (mention: MentionEntity): string => {
     return `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   };
@@ -197,7 +219,10 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
       const mentionKey = createMentionHash(mention);
       mentionTexts[mentionKey] = {
         domain: mention.domain,
-        isSelfMentioned: !isNullOrUndefined(selfId) && mention.targetsUser(selfId),
+        isEveryone: mention.isEveryone,
+        isSelfMentioned: mention.isEveryone
+          ? highlightEveryoneMention
+          : !isNullOrUndefined(selfId) && mention.targetsUser(selfId),
         text: mentionText,
         userId: mention.userId,
       };

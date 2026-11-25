@@ -19,6 +19,8 @@
 
 import {isEmptyArray} from '@sindresorhus/is';
 
+import type {MentionEntity} from '../../../../../../../message/mentionEntity';
+
 /**
  * Wraps mentions in a given text with a <mention> tag.
  * It's useful cause it sets the mentions apart from the rest of the text.
@@ -32,4 +34,27 @@ export const wrapMentionsWithTags = (text: string, allMentions: string[]): strin
   return allMentions.reduce((updatedText, mention) => {
     return updatedText.split(mention).join(`<mention>${mention}</mention>`);
   }, text);
+};
+
+/**
+ * Wraps the mentions of everyone (`@all`) in a given text with a <mention-everyone> tag.
+ * It uses the exact ranges of the mentions, so plain text that reads `@all` stays plain text.
+ * Run it before `wrapMentionsWithTags`, while the ranges still match the original text.
+ */
+export const wrapEveryoneMentionsWithTags = (
+  text: string,
+  mentions: Pick<MentionEntity, 'isEveryone' | 'startIndex' | 'length'>[],
+): string => {
+  return mentions
+    .filter(mention => {
+      return mention.isEveryone;
+    })
+    .toSorted((mention1, mention2) => {
+      return mention2.startIndex - mention1.startIndex;
+    })
+    .reduce((updatedText, {startIndex, length}) => {
+      const endIndex = startIndex + length;
+      const mentionText = updatedText.slice(startIndex, endIndex);
+      return `${updatedText.slice(0, startIndex)}<mention-everyone>${mentionText}</mention-everyone>${updatedText.slice(endIndex)}`;
+    }, text);
 };

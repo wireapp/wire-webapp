@@ -28,6 +28,7 @@ import {Text as TextAsset} from './text';
 
 import type {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import type {MentionCheckOptions} from '../../../message/mentionEntity';
 import type {QuoteEntity} from '../../../message/quoteEntity';
 import {SuperType} from '../../../message/superType';
 import {copyText} from '../../../util/clipboardUtil';
@@ -84,14 +85,22 @@ export class ContentMessage extends Message {
 
   /**
    * @param userId The user id to check
+   * @param options.includeEveryone Whether a mention of everyone (`@all`) counts as mentioning the user
    * @returns `true` if the message mentions the user, `false` otherwise.
    */
-  isUserMentioned(userId: QualifiedId): boolean {
-    return this.hasAssetText()
-      ? this.assets().some(assetEntity => {
-          return assetEntity.isText() && assetEntity.isUserMentioned(userId);
-        })
-      : false;
+  isUserMentioned(userId: QualifiedId, options: MentionCheckOptions = {}): boolean {
+    return this.assets().some(assetEntity => {
+      return (assetEntity.isText() || assetEntity.isMultipart()) && assetEntity.isUserMentioned(userId, options);
+    });
+  }
+
+  /**
+   * @returns `true` if the message contains a mention of everyone (`@all`), `false` otherwise.
+   */
+  hasEveryoneMention(): boolean {
+    return this.assets().some(assetEntity => {
+      return (assetEntity.isText() || assetEntity.isMultipart()) && assetEntity.hasEveryoneMention();
+    });
   }
 
   /**
@@ -107,8 +116,8 @@ export class ContentMessage extends Message {
    * @param userId The user id to check
    * @returns `true` if the user was mentioned or quoted, `false` otherwise.
    */
-  isUserTargeted(userId: QualifiedId): boolean {
-    return this.isUserMentioned(userId) || this.isUserQuoted(userId.id);
+  isUserTargeted(userId: QualifiedId, options: MentionCheckOptions = {}): boolean {
+    return this.isUserMentioned(userId, options) || this.isUserQuoted(userId.id);
   }
 
   /**

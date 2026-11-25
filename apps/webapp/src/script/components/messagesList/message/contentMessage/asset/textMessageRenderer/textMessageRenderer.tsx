@@ -130,7 +130,8 @@ const TextMessage: FC<TextMessageRendererProps> = ({
         href: href,
       };
       forwardEvent(event.nativeEvent, 'email', markdownLinkDetails);
-    } else if (!isNull(mentionElement)) {
+    } else if (!isNull(mentionElement) && !mentionElement.classList.contains('everyone-mention')) {
+      // A mention of everyone (`@all`) has no user profile to open
       const mentionMsgDetails = {
         userId: target.dataset.userId,
         userDomain: target.dataset.userDomain,

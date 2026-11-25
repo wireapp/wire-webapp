@@ -681,3 +681,26 @@ describe('getRenderedTextContent', () => {
     expect(getRenderedTextContent(input)).toBe(input);
   });
 });
+
+describe('renderMessage with a mention of everyone', () => {
+  const selfId = {domain: '', id: 'self-id'};
+  const text = 'hello @all and @toi';
+  const everyoneMention = MentionEntity.everyone(6, 4);
+  const userMention = new MentionEntity(15, 4, 'toi-id');
+
+  it('renders a mention of everyone that is not interactive', () => {
+    expect(renderMessage(text, selfId, [everyoneMention, userMention])).toBe(
+      'hello <span class="message-mention everyone-mention" data-uie-name="label-everyone-mention"><span class="mention-at-sign">@</span>all</span> and <span class="message-mention" data-uie-name="label-other-mention" data-user-id="toi-id" role="button"><span class="mention-at-sign">@</span>toi</span>',
+    );
+  });
+
+  it('highlights a mention of everyone like a self mention when asked to', () => {
+    expect(renderMessage('hello @all', selfId, [everyoneMention], {highlightEveryoneMention: true})).toBe(
+      'hello <span class="message-mention everyone-mention self-mention" data-uie-name="label-everyone-mention"><span class="mention-at-sign">@</span>all</span>',
+    );
+  });
+
+  it('keeps plain text that reads @all as text', () => {
+    expect(renderMessage('hello @all', selfId, [])).toBe('hello @all');
+  });
+});

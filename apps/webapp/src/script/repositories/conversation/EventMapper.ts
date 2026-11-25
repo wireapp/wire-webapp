@@ -1215,8 +1215,18 @@ export class EventMapper {
       return base64ToArray(base64);
     });
     return encodedMentions
-      .map(encodedMention => {
+      .map((encodedMention): MentionEntity | undefined => {
         const protoMention = Mention.decode(encodedMention);
+        if (protoMention.everyone) {
+          // A mention of everyone (`@all`) must not carry a user target
+          const hasUserTarget =
+            isNonEmptyString(protoMention.qualifiedUserId?.id) || isNonEmptyString(protoMention.userId);
+          if (hasUserTarget) {
+            this.logger.warn('Removed invalid mention when mapping message: Mention of everyone has a user target');
+            return undefined;
+          }
+          return MentionEntity.everyone(protoMention.start, protoMention.length);
+        }
         return new MentionEntity(
           protoMention.start,
           protoMention.length,
@@ -1224,17 +1234,16 @@ export class EventMapper {
           protoMention.qualifiedUserId?.domain ?? undefined,
         );
       })
+      .filter((mentionEntity): mentionEntity is MentionEntity => {
+        return !isUndefined(mentionEntity);
+      })
       .filter((mentionEntity, mentionIndex, allMentions): boolean => {
-        if (!isUndefined(mentionEntity)) {
-          try {
-            return mentionEntity.validate(messageText, allMentions);
-          } catch (error: unknown) {
-            this.logger.warn(`Removed invalid mention when mapping message: ${toError(error).message}`);
-            return false;
-          }
+        try {
+          return mentionEntity.validate(messageText, allMentions);
+        } catch (error: unknown) {
+          this.logger.warn(`Removed invalid mention when mapping message: ${toError(error).message}`);
+          return false;
         }
-
-        return false;
       });
   }
 

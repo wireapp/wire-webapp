@@ -42,7 +42,10 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {disableMessagePreprocessingFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {
+  disableMessagePreprocessingFeatureToggleName,
+  everyoneMentionFeatureToggleName,
+} from '../../featureToggles/startupFeatureToggleNames';
 import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import {useApplicationContext} from '../../page/rootProvider';
 import {CellsRepository} from '../../repositories/cells/cellsRepository';
@@ -214,6 +217,9 @@ function InputBarContent({
     return propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
   }, WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE);
 
+  const {isGroupLike} = useKoSubscribableChildren(conversation, ['isGroupLike']);
+  const isEveryoneMentionAvailable = isGroupLike && isFeatureToggleEnabled(everyoneMentionFeatureToggleName);
+
   const getMentionCandidates = useCallback(
     (search?: string | null) => {
       const candidates = conversation.participating_user_ets().filter(userEntity => {
@@ -377,6 +383,7 @@ function InputBarContent({
                   onUpdate={setMessageContent}
                   onSend={handleSendMessage}
                   getMentionCandidates={getMentionCandidates}
+                  isEveryoneMentionAvailable={isEveryoneMentionAvailable}
                   saveDraftState={draftState.save}
                   loadDraftState={draftState.load}
                   disableMessagePreprocessing={disableMessagePreprocessing}

@@ -26,7 +26,16 @@ import {PROTO_MESSAGE_TYPE} from '../repositories/cryptography/ProtoMessageType'
 import {matchQualifiedIds} from '../util/qualifiedId';
 import {isUUID} from '../util/validationUtil';
 
+/** The text value of the mention that targets everyone in a conversation (`@all`). It is wire text and never localized. */
+export const EVERYONE_MENTION_VALUE = 'all';
+
+export type MentionCheckOptions = {
+  /** Whether a mention of everyone (`@all`) counts as mentioning the user. */
+  includeEveryone?: boolean;
+};
+
 type MentionEntityJSON = {
+  everyone?: true;
   length: number;
   startIndex: number;
   userId: string;
@@ -52,18 +61,32 @@ export class MentionEntity {
   type: PROTO_MESSAGE_TYPE;
   userId: string;
   domain: string | undefined;
+  /** `true` when the mention targets everyone in the conversation (`@all`) rather than a single user. */
+  readonly isEveryone: boolean;
 
-  constructor(startIndex: number, length: number, userId: string, domain?: string) {
+  constructor(startIndex: number, length: number, userId: string, domain?: string, isEveryone = false) {
     this.startIndex = startIndex;
     this.length = length;
     this.type = PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
     this.domain = domain;
     this.userId = userId;
+    this.isEveryone = isEveryone;
   }
 
+  /**
+   * Creates a mention that targets everyone in the conversation (`@all`). It carries no user id.
+   */
+  static everyone(startIndex: number, length: number): MentionEntity {
+    return new MentionEntity(startIndex, length, '', undefined, true);
+  }
+
+  /**
+   * Checks whether this mention explicitly targets the given user.
+   * A mention of everyone never targets a single user. Use `isSelfMentioned` to apply the conversation rules for it.
+   */
   targetsUser(userId: QualifiedId): boolean {
     const isTypeUserId = this.type === PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
-    return isTypeUserId && matchQualifiedIds(this.userQualifiedId, userId);
+    return !this.isEveryone && isTypeUserId && matchQualifiedIds(this.userQualifiedId, userId);
   }
 
   get userQualifiedId(): QualifiedId {
@@ -98,7 +121,7 @@ export class MentionEntity {
     }
 
     const userIdIsString = typeof this.userId === 'string';
-    if (!userIdIsString) {
+    if (!this.isEveryone && !userIdIsString) {
       throw new Error(MentionEntity.ERROR.MISSING_USER_ID);
     }
 
@@ -117,7 +140,7 @@ export class MentionEntity {
       throw new Error(MentionEntity.ERROR.OUT_OF_BOUNDS);
     }
 
-    const isValidUserId = isUUID(this.userId);
+    const isValidUserId = this.isEveryone || isUUID(this.userId);
     if (!isValidUserId) {
       throw new Error(MentionEntity.ERROR.INVALID_USER_ID);
     }
@@ -132,6 +155,7 @@ export class MentionEntity {
 
   toJSON(): MentionEntityJSON {
     return {
+      ...(this.isEveryone ? {everyone: true as const} : {}),
       length: this.length,
       startIndex: this.startIndex,
       userId: this.userId,
@@ -139,8 +163,16 @@ export class MentionEntity {
     };
   }
 
-  toProto(): Mention {
+  /**
+   * Maps the mention to its protobuf content.
+   * A mention of everyone sets `everyone` and carries no user id, as the protocol requires.
+   */
+  toContent(): IMention {
     const options: IMention = {length: this.length, start: this.startIndex};
+    if (this.isEveryone) {
+      options.everyone = true;
+      return options;
+    }
     const isUserIdMention = this.type === PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
     if (isUserIdMention) {
       options.userId = this.userId;
@@ -148,6 +180,10 @@ export class MentionEntity {
         options.qualifiedUserId = this.userQualifiedId;
       }
     }
-    return new Mention(options);
+    return options;
+  }
+
+  toProto(): Mention {
+    return new Mention(this.toContent());
   }
 }

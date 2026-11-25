@@ -31,7 +31,9 @@ export const getMentionMarkdownTransformer = (allowedMentions: string[]): TextMa
       if (!$isMentionNode(node)) {
         return null;
       }
-      return `<mention>${node.getTextContent()}</mention>`;
+      return node.isEveryone()
+        ? `<mention-everyone>${node.getTextContent()}</mention-everyone>`
+        : `<mention>${node.getTextContent()}</mention>`;
     },
     importRegExp: /<mention>([^<]+)<\/mention>/,
     regExp: /<mention>([^<]+)<\/mention>/,
@@ -43,6 +45,28 @@ export const getMentionMarkdownTransformer = (allowedMentions: string[]): TextMa
       }
 
       const mentionNode = $createMentionNode('@', mentionText.slice(1));
+      textNode.replace(mentionNode);
+    },
+    trigger: ' ',
+    type: 'text-match',
+  };
+};
+
+// Converts mentions of everyone from the markdown (e.g. <mention-everyone>@all</mention-everyone>) to MentionNodes that target everyone.
+// They get their own tag so that they are never confused with a user mention, or with plain text, that reads the same.
+export const getEveryoneMentionMarkdownTransformer = (): TextMatchTransformer => {
+  return {
+    dependencies: [MentionNode],
+    export: node => {
+      if (!$isMentionNode(node) || !node.isEveryone()) {
+        return null;
+      }
+      return `<mention-everyone>${node.getTextContent()}</mention-everyone>`;
+    },
+    importRegExp: /<mention-everyone>(@[^<]+)<\/mention-everyone>/,
+    regExp: /<mention-everyone>(@[^<]+)<\/mention-everyone>/,
+    replace: (textNode, match) => {
+      const mentionNode = $createMentionNode('@', match[1].slice(1), true);
       textNode.replace(mentionNode);
     },
     trigger: ' ',
