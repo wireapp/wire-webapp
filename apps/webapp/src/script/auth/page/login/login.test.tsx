@@ -225,7 +225,7 @@ describe('Login', () => {
     });
     expect(errorMessage).toHaveAttribute('data-uie-value', LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN);
     expect(errorMessage).toHaveTextContent(
-      'Wire couldn’t open your local message storage. Please try signing in again.',
+      'Wire couldn’t open your local message storage. Please try logging in again.',
     );
     expect(getByTestId('do-sign-in')).toBeEnabled();
 

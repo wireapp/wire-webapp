@@ -29,7 +29,7 @@ import {withTheme} from '../util/test/testUtil';
 
 const storageErrorLabel = LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN;
 const storageErrorMessageId = 'LabeledError.GENERAL_ERRORS.CORE_CRYPTO_DATABASE_OPEN';
-const englishStorageErrorMessage = 'Wire couldn’t open your local message storage. Please try signing in again.';
+const englishStorageErrorMessage = 'Wire couldn’t open your local message storage. Please try logging in again.';
 const germanMessagesWithoutStorageError: Record<string, string> = {...germanMessages};
 delete germanMessagesWithoutStorageError[storageErrorMessageId];
 
