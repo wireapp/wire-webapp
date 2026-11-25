@@ -42,7 +42,7 @@ const breakWhere = (words: MentionEntity[], text: string): string[] => {
   );
 };
 
-type CreateNodesResult = {data: string; type: string}[];
+type CreateNodesResult = {data: string; type: string; isEveryone?: boolean}[];
 export const createNodes = (mentions: MentionEntity[], text: string): CreateNodesResult => {
   const sortedMentions = mentions.toSorted(({startIndex: o1}, {startIndex: o2}) => {
     return o1 - o2;
@@ -50,7 +50,11 @@ export const createNodes = (mentions: MentionEntity[], text: string): CreateNode
 
   return breakWhere(sortedMentions, text)
     .map((string: string, index: number) => {
-      return index % mentionSegmentCycleLength == 0 ? {data: string, type: 'text'} : {data: string, type: 'Mention'};
+      if (index % mentionSegmentCycleLength == 0) {
+        return {data: string, type: 'text'};
+      }
+      const mention = sortedMentions[(index - 1) / mentionSegmentCycleLength];
+      return mention?.isEveryone ? {data: string, type: 'Mention', isEveryone: true} : {data: string, type: 'Mention'};
     })
     .filter(({data}) => {
       return data.length > 0;

@@ -32,6 +32,6 @@ export const getMentionNodesFromMessage = (message: ContentMessage): MentionNode
       return node.type === 'Mention';
     })
     .map(node => {
-      return $createMentionNode('@', node.data.slice(1));
+      return $createMentionNode('@', node.data.slice(1), node.isEveryone === true);
     });
 };

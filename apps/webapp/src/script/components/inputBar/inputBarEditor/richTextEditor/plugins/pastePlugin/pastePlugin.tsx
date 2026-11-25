@@ -40,6 +40,8 @@ interface PastePluginProps {
   getMentionCandidates: () => User[];
   /** Whether the preview mode (render link as formatted node or raw markdown [text](url)) is enabled */
   isPreviewMode: boolean;
+  /** Whether a pasted mention of everyone (`@all`) stays a mention. When not, it is pasted as plain text. */
+  isEveryoneMentionAvailable?: boolean;
 }
 
 type Selection = BaseSelection | null;
@@ -55,7 +57,11 @@ type Selection = BaseSelection | null;
  * - If a mentioned user exists in the current conversation, the mention is preserved as a MentionNode
  * - If a mentioned user doesn't exist, the mention is converted to plain text with @ symbol
  */
-export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginProps): ReactElement | null => {
+export const PastePlugin = ({
+  getMentionCandidates,
+  isPreviewMode,
+  isEveryoneMentionAvailable = false,
+}: PastePluginProps): ReactElement | null => {
   const [editor] = useLexicalComposerContext();
 
   /**
@@ -65,13 +71,20 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
    * @returns Object containing validation result and username if valid
    */
   const validateMention = useCallback(
-    (mention: Element, availableUsers: User[]): {isValid: boolean; username?: string} => {
+    (mention: Element, availableUsers: User[]): {isValid: boolean; isEveryone?: boolean; username?: string} => {
       const value = mention.getAttribute('data-lexical-mention-value');
       if (typeof value !== 'string') {
         return {isValid: false};
       }
 
       const username = value.startsWith('@') ? value.substring(1) : value;
+
+      // A mention of everyone is never matched to a user. It stays a mention only where it can be sent.
+      const isEveryone = mention.getAttribute('data-lexical-mention-everyone') === 'true';
+      if (isEveryone) {
+        return {isValid: isEveryoneMentionAvailable, isEveryone, username};
+      }
+
       const userExists = availableUsers.some(user => {
         return user.name() === username;
       });
@@ -81,7 +94,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
         username,
       };
     },
-    [],
+    [isEveryoneMentionAvailable],
   );
 
   /**
@@ -192,7 +205,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
       }
 
       mentions.forEach(mention => {
-        const {isValid, username} = validateMention(mention, availableUsers);
+        const {isValid, isEveryone = false, username} = validateMention(mention, availableUsers);
         if (username == null || username === '' || !isValid) {
           return;
         }
@@ -207,7 +220,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
             return;
           }
           selection.setTextNodeRange(node, startOffset, node, startOffset + mentionText.length);
-          selection.insertNodes([$createMentionNode('@', username), $createTextNode(' ')]);
+          selection.insertNodes([$createMentionNode('@', username, isEveryone), $createTextNode(' ')]);
         }
       });
     },

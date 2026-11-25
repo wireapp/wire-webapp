@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-import {wrapMentionsWithTags} from './wrapMentionsWithTags';
+import {wrapEveryoneMentionsWithTags, wrapMentionsWithTags} from './wrapMentionsWithTags';
 
 type MentionTagCharacterizationTestCase = {
   readonly description: string;
@@ -83,4 +83,30 @@ describe('wrapMentionsWithTags', () => {
       expect(actualText).toBe(expectedText);
     },
   );
+});
+
+describe('wrapEveryoneMentionsWithTags', () => {
+  it('wraps only the exact ranges of mentions of everyone', () => {
+    const text = '@all said @all';
+    const mentions = [{isEveryone: true, startIndex: 10, length: 4}];
+
+    expect(wrapEveryoneMentionsWithTags(text, mentions)).toBe('@all said <mention-everyone>@all</mention-everyone>');
+  });
+
+  it('ignores user mentions', () => {
+    const mentions = [{isEveryone: false, startIndex: 0, length: 6}];
+
+    expect(wrapEveryoneMentionsWithTags('@Alice', mentions)).toBe('@Alice');
+  });
+
+  it('wraps several mentions of everyone', () => {
+    const mentions = [
+      {isEveryone: true, startIndex: 0, length: 4},
+      {isEveryone: true, startIndex: 9, length: 4},
+    ];
+
+    expect(wrapEveryoneMentionsWithTags('@all and @all', mentions)).toBe(
+      '<mention-everyone>@all</mention-everyone> and <mention-everyone>@all</mention-everyone>',
+    );
+  });
 });
