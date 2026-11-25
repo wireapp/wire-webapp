@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useRef, type FunctionComponent} from 'react';
+import {useCallback, useEffect, useRef, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -26,15 +26,11 @@ import {MeetingCallingView} from './meetingCallingView/meetingCallingView';
 import {meetingsContentWrapperStyles} from './meetingCallingView/meetingCallingView.styles';
 import {MeetingHeader} from './meetingHeader/meetingHeader';
 import {MeetingList} from './meetingList/meetingList';
-import {createMeetingPrepPreview} from './meetingPrep/createMeetingPrepPreview';
-import {MeetingPrepModal} from './meetingPrep/meetingPrepModal';
-import {useMeetingPrepJoin} from './meetingPrep/useMeetingPrepJoin';
 import {useMeetingStore} from './meetingStore/meetingStoreProvider';
 import {MeetNowModal} from './meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from './scheduleMeetingModal';
 
 import {useApplicationContext} from '../../page/rootProvider';
-import {MediaStreamHandler} from '../../repositories/media/MediaStreamHandler';
 import {UserState} from '../../repositories/user/userState';
 
 export const Meetings: FunctionComponent = () => {
@@ -53,10 +49,6 @@ export const Meetings: FunctionComponent = () => {
     return state.loadMeetings;
   });
   const selfUser = container.resolve(UserState).self();
-  const preview = useMemo(() => {
-    return createMeetingPrepPreview(container.resolve(MediaStreamHandler));
-  }, []);
-  const joinMeeting = useMeetingPrepJoin();
 
   const refreshMeetings = useCallback(() => {
     return fireAndForgetInvoker.fireAndForget(loadMeetings);
@@ -82,12 +74,6 @@ export const Meetings: FunctionComponent = () => {
       <MeetingCallingView />
       <ScheduleMeetingModal />
       <MeetNowModal />
-      <MeetingPrepModal
-        participant={selfUser}
-        requestPreviewStream={preview.requestPreviewStream}
-        releasePreviewStream={preview.releasePreviewStream}
-        joinMeeting={joinMeeting}
-      />
     </div>
   );
 };
