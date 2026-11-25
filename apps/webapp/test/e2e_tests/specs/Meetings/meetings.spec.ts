@@ -717,21 +717,25 @@ test.describe('Meetings', () => {
       },
     );
 
-    test('invitee sees a meeting they were added to', async ({createUser, createTeam, createPage}) => {
-      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
-      const member = members[0];
+    test(
+      'TC-13059: Invitee sees a meeting they were added to',
+      {tag: ['@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
+        const member = members[0];
 
-      const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
-      const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
-      const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
+        const [ownerPage, memberPage] = await loginMeetingsUsers(createPage, [owner, member]);
+        const ownerMeetings = PageManager.from(ownerPage).webapp.pages.meetings();
+        const memberMeetings = PageManager.from(memberPage).webapp.pages.meetings();
 
-      await ownerMeetings.openMeetingsTab();
-      await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
+        await ownerMeetings.openMeetingsTab();
+        await ownerMeetings.scheduleMeeting(MEETING_TITLE, [member.fullName]);
 
-      await memberMeetings.openMeetingsTab();
-      await memberMeetings.waitForMeetingInList(MEETING_TITLE);
-      await expect(memberMeetings.meetingListItem(MEETING_TITLE)).toBeVisible();
-    });
+        await memberMeetings.openMeetingsTab();
+        await memberMeetings.waitForMeetingInList(MEETING_TITLE);
+        await expect(memberMeetings.meetingListItem(MEETING_TITLE)).toBeVisible();
+      },
+    );
 
     test(
       'TC-11693: Host cannot schedule a meeting in the past',
