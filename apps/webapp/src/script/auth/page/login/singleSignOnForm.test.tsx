@@ -192,7 +192,7 @@ describe('SingleSignOnForm', () => {
 
     await waitFor(() => {
       expect(form.getByTestId(errorId)).toHaveTextContent(
-        'Wire couldn’t open your local message storage. Please try signing in again.',
+        'Wire couldn’t open your local message storage. Please try logging in again.',
       );
     });
     expect(doLogin).toHaveBeenCalledTimes(1);
@@ -214,7 +214,7 @@ describe('SingleSignOnForm', () => {
       await Promise.resolve();
     });
     expect(form.getByTestId(errorId)).toHaveTextContent(
-      'Wire couldn’t open your local message storage. Please try signing in again.',
+      'Wire couldn’t open your local message storage. Please try logging in again.',
     );
     expect(doLogin).toHaveBeenCalledTimes(1);
     expect(finalizeSSOLogin).toHaveBeenCalledTimes(1);
@@ -226,7 +226,7 @@ describe('SingleSignOnForm', () => {
       expect(finalizeSSOLogin).toHaveBeenCalledTimes(2);
     });
     expect(form.getByTestId(errorId)).toHaveTextContent(
-      'Wire couldn’t open your local message storage. Please try signing in again.',
+      'Wire couldn’t open your local message storage. Please try logging in again.',
     );
     expect(warning).toHaveBeenCalledTimes(2);
     warning.mock.calls.forEach(warningCall => {
