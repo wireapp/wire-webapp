@@ -54,6 +54,7 @@ import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeSta
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createBrowserLogDownload} from '../logger/createBrowserLogDownload';
+import {selectApplicationLogDownload} from '../logger/selectApplicationLogDownload';
 import {createBrowserLogZipArchive} from '../logger/createBrowserLogZipArchive';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
 import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
@@ -102,13 +103,20 @@ export async function startApplication(options: StartApplicationOptions): Promis
     return desktopLogOutput.isNothing || !desktopLogOutput.value.hasConfirmedDelivery();
   }
 
-  const downloadApplicationLogs = createBrowserLogDownload({
+  const browserLogDownload = createBrowserLogDownload({
     showSaveFilePicker: browserLogSaveFilePicker,
     clock,
     getDirectory() {
       return navigator.storage.getDirectory();
     },
     createArchive: createBrowserLogZipArchive,
+  });
+  const downloadApplicationLogs = selectApplicationLogDownload({
+    isElectron,
+    browserDownload: browserLogDownload,
+    readDesktopCapability() {
+      return window.desktopLogExport;
+    },
   });
   const persistentLogging = initializeLogging({
     clock,
