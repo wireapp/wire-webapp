@@ -22,7 +22,7 @@ import React, {useLayoutEffect, useRef, useEffect, type FunctionComponent} from 
 import {isFunction, isNull} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {ElementType, MessageDetails} from './contentMessage/asset/textMessageRenderer';
+import {MessageActions} from './messageActions';
 import {MessageWrapper} from './messageWrapper';
 import {ScrollToElement} from './types';
 import {useMessageFocusedTabIndex} from './util';
@@ -30,31 +30,13 @@ import {useMessageFocusedTabIndex} from './util';
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import type {MessageRepository} from '../../../repositories/conversation/MessageRepository';
 import type {Conversation} from '../../../repositories/entity/Conversation';
-import type {ContentMessage} from '../../../repositories/entity/message/contentMessage';
-import type {DecryptErrorMessage} from '../../../repositories/entity/message/decryptErrorMessage';
-import type {MemberMessage as MemberMessageEntity} from '../../../repositories/entity/message/memberMessage';
 import {Message as BaseMessage} from '../../../repositories/entity/message/message';
-import type {User} from '../../../repositories/entity/User';
-import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
 import {TeamState} from '../../../repositories/team/TeamState';
 import type {UserRepository} from '../../../repositories/user/userRepository';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from '../../../util/focusUtil';
 import {isTabKey} from '../../../util/keyboardUtil';
 import {InViewport} from '../../inViewport';
-
-export interface MessageActions {
-  onClickAvatar: (user: User | ServiceEntity) => void;
-  onClickCancelRequest: (message: MemberMessageEntity) => void;
-  onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
-  onClickInvitePeople: () => void;
-  onClickReactionDetails: (message: BaseMessage) => void;
-  onClickMessage: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
-  onClickParticipants: (participants: User[]) => void;
-  onClickDetails: (message: BaseMessage) => void;
-  onClickResetSession: (messageError: DecryptErrorMessage) => void;
-  onClickTimestamp: (messageId: string) => void;
-}
 
 export interface MessageParams extends MessageActions {
   conversation: Conversation;

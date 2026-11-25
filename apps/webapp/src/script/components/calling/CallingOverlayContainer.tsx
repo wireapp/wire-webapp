@@ -30,6 +30,7 @@ import {useCallAlertState} from './useCallAlertState';
 import {Call} from '../../repositories/calling/Call';
 import {CallingRepository} from '../../repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from '../../repositories/calling/CallState';
+import {CallViewTab} from '../../repositories/calling/enum/CallViewTab';
 import {LEAVE_CALL_REASON} from '../../repositories/calling/enum/LeaveCallReason';
 import {Participant} from '../../repositories/calling/Participant';
 import {useVideoGrid} from '../../repositories/calling/videoGridHandler';
@@ -37,7 +38,6 @@ import {MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler'
 import {useMediaDevicesStore} from '../../repositories/media/useMediaDevicesStore';
 import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
-import {CallViewTab} from '../../view_model/CallingViewModel';
 
 interface CallingContainerProps {
   readonly propertiesRepository: PropertiesRepository;

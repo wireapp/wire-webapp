@@ -27,7 +27,6 @@ import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {QualifiedId} from '../apiClient/user/qualifiedId';
-import '../components/calling/ChooseScreen';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {PrimaryModalTranslatedMessage} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from '../Config';
@@ -37,6 +36,7 @@ import type {Call} from '../repositories/calling/Call';
 import {CallingRepository} from '../repositories/calling/CallingRepository';
 import type {CallMediaChoice} from '../repositories/calling/callMediaChoice';
 import {CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
+import {CallViewTab} from '../repositories/calling/enum/CallViewTab';
 import {LEAVE_CALL_REASON} from '../repositories/calling/enum/LeaveCallReason';
 import {isMeetingConversation} from '../repositories/conversation/ConversationSelectors';
 import {ConversationState} from '../repositories/conversation/ConversationState';
@@ -71,11 +71,6 @@ export interface CallActions {
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
-}
-
-export enum CallViewTab {
-  ALL = 'all',
-  SPEAKERS = 'speakers',
 }
 
 const MAX_USERS_TO_CALL_WITHOUT_CONFIRM = Config.getConfig().FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT;

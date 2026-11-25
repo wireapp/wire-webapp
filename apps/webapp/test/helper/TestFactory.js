@@ -64,6 +64,7 @@ import {UserRepository} from '../../src/script/repositories/user/userRepository'
 import {UserService} from '../../src/script/repositories/user/userService';
 import {UserState} from '../../src/script/repositories/user/userState';
 import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
+import {showLegalHoldWarningModal} from '../../src/script/legal-hold/LegalHoldWarning';
 import {translate} from '../../src/script/util/localizerUtil';
 
 import {entities} from '../api/payloads';
@@ -356,6 +357,7 @@ export class TestFactory {
       this.assetRepository,
       new AudioRepository(),
       translate,
+      showLegalHoldWarningModal,
       userRepository['userState'],
       clientState,
     );

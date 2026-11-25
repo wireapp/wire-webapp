@@ -20,10 +20,11 @@
 import ko from 'knockout';
 
 import {ContentMessage} from './contentMessage';
+import type {CompositeMessageShape} from './message';
 
 import type {Translate} from '../../../util/localizerUtil';
 
-export class CompositeMessage extends ContentMessage {
+export class CompositeMessage extends ContentMessage implements CompositeMessageShape {
   errorButtonId: ko.Observable<string | undefined>;
   errorMessage: ko.Observable<string>;
   selectedButtonId: ko.Observable<string | undefined>;

@@ -21,7 +21,8 @@ import {isTruthy} from '@sindresorhus/is';
 
 import {EventRecord} from './eventRecord';
 
-import {MessageAddEvent, MultipartMessageAddEvent} from '../../conversation/EventBuilder';
+import {StatusType} from '../../../message/statusType';
+import {MessageAddEvent, MultipartMessageAddEvent} from '../../conversation/EventBuilder/EventBuilder.events';
 import {ClientEvent} from '../../event/Client';
 
 /**
@@ -63,4 +64,18 @@ export const hasQuoteForMessage = (event: EventRecord, quotedMessageId: string):
     return event.data.text.quote.message_id === quotedMessageId;
   }
   return false;
+};
+
+type FailedEventRecord = Omit<EventRecord, 'status'> & {
+  status: StatusType.FAILED;
+};
+type EventRecordWithFederationError = Omit<EventRecord, 'status'> & {
+  status: StatusType.FEDERATION_ERROR;
+};
+
+export const isEventRecordFailed = (event: any): event is FailedEventRecord => {
+  return 'status' in event && event.status === StatusType.FAILED;
+};
+export const isEventRecordWithFederationError = (event: any): event is EventRecordWithFederationError => {
+  return 'status' in event && event.status === StatusType.FEDERATION_ERROR;
 };

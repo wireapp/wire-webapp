@@ -76,7 +76,6 @@ import {OtrMessage} from '../../core/conversation/message/otrMessage';
 import {TextContentBuilder} from '../../core/conversation/message/textContentBuilder';
 import {isQualifiedUserClients} from '../../core/util';
 import {ConversationError} from '../../error/conversationError';
-import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
 import {MentionEntity} from '../../message/mentionEntity';
 import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
@@ -128,6 +127,12 @@ import {Segmentation} from '../tracking/segmentation';
 import {protoFromType} from '../user/availabilityMapper';
 import {UserRepository} from '../user/userRepository';
 import {UserState} from '../user/userState';
+
+type LegalHoldWarningPresenter = (
+  conversation: Conversation,
+  conversationDegraded: boolean,
+  translate: Translate,
+) => Promise<void>;
 
 type OptimisticMessageEvent = Parameters<EventRepository['injectEvent']>[0];
 
@@ -216,6 +221,7 @@ export class MessageRepository {
     private readonly assetRepository: AssetRepository,
     private readonly audioRepository: AudioRepository,
     private readonly translate: Translate,
+    private readonly showLegalHoldWarningModal: LegalHoldWarningPresenter,
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -980,7 +986,7 @@ export class MessageRepository {
   ): Promise<boolean> {
     const conversationDegraded = conversation.verification_state() === ConversationVerificationState.DEGRADED;
     if (showLegalHoldWarning) {
-      return showLegalHoldWarningModal(conversation, conversationDegraded, this.translate)
+      return this.showLegalHoldWarningModal(conversation, conversationDegraded, this.translate)
         .then(() => {
           return true;
         })

@@ -24,6 +24,7 @@ import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {useLegalHoldModalState} from './LegalHoldModal.state';
+import {LegalHoldModalType} from './LegalHoldModal.types';
 
 import {LegalHoldMemberStatus} from '../../../apiClient/team/legalhold/legalHoldMemberStatus';
 import {useUserDevicesHistory} from '../../../hooks/useUserDevicesHistory';
@@ -113,11 +114,6 @@ function renderLegalHoldDescription(options: RenderLegalHoldDescriptionOptions):
   const translatedText = isSelfInfo ? translate('legalHoldDescriptionSelf') : translate('legalHoldDescriptionOthers');
 
   return replaceReactComponents(translatedText, legalHoldDescriptionReactReplacements);
-}
-
-export enum LegalHoldModalType {
-  REQUEST = 'request',
-  USERS = 'users',
 }
 
 export interface LegalHoldModalProps {

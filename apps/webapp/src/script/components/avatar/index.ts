@@ -21,3 +21,4 @@ export * from './avatar';
 export * from './channelAvatar';
 export * from './groupAvatar';
 export * from './stackedAvatars';
+export * from './avatarConstants';

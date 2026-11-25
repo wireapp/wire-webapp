@@ -24,12 +24,12 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {Transition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
+import {AVATAR_SIZE} from './avatarConstants';
+
 import {AssetRemoteData} from '../../repositories/assets/assetRemoteData';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
 import {CSS_FILL_PARENT} from '../../util/cssMixin';
 import {InViewport} from '../inViewport';
-
-import {AVATAR_SIZE} from '.';
 
 const completedDownloadPercentage = 100;
 const avatarTransitionDurationInMilliseconds = 700;

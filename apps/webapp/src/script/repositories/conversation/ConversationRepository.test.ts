@@ -102,7 +102,8 @@ import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport
 import {createUuid} from '../../util/uuid';
 
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
-import {CONVERSATION_READONLY_STATE, ConversationRepository} from './ConversationRepository';
+import {ConversationRepository} from './ConversationRepository';
+import {CONVERSATION_READONLY_STATE} from './conversationConstants';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStatus} from './ConversationStatus';

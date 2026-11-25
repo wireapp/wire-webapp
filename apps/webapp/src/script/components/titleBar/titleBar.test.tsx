@@ -46,10 +46,10 @@ import {
 import {setStrings, translate} from '../../util/localizerUtil';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {PanelState} from '../../page/rightSidebar/rightSidebar';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {translateForTest} from '../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {PanelState} from '../../page/rightSidebar/panelState';
 
 jest.mock('../../uiKit/layout/matchMedia/matchMedia', () => {
   return {

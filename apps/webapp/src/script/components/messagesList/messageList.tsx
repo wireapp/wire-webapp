@@ -23,8 +23,9 @@ import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindr
 import cx from 'classnames';
 
 import {JumpToLastMessageButton} from './jumpToLastMessageButton';
-import {Message, MessageActions} from './message';
+import {Message} from './message';
 import {MarkerComponent} from './message/marker';
+import {MessageActions} from './message/messageActions';
 import {ScrollToElement} from './message/types';
 import {UploadAssets} from './uploadAssets';
 import {filterMessages} from './utils/messagesFilter';

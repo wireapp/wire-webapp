@@ -37,7 +37,7 @@ import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {formatLocale} from '../../../util/timeUtil';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
-import {PanelEntity, PanelState} from '../rightSidebar';
+import {PanelEntity, PanelState} from '../panelState';
 
 const MESSAGE_STATES = {
   REACTIONS: 'reactions',

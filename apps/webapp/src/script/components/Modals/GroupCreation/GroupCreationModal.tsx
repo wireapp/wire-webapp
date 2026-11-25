@@ -38,6 +38,7 @@ import {
   teamPermissionsForAccessState,
   toggleFeature,
 } from '../../../repositories/conversation/ConversationAccessPermission';
+import {CONVERSATION_MAX_NAME_LENGTH} from '../../../repositories/conversation/conversationConstants';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
@@ -240,7 +241,7 @@ const GroupCreationModal: FunctionComponent<GroupCreationModalProps> = ({
   const searchRepository = contentViewModel.repositories.search;
   const teamRepository = contentViewModel.repositories.team;
 
-  const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+  const maxNameLength = CONVERSATION_MAX_NAME_LENGTH;
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
   const onOpen = (): void => {

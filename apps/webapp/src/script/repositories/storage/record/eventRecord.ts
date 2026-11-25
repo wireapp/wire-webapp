@@ -17,18 +17,13 @@
  *
  */
 
+import type {ReadReceipt, StoredReactions} from './eventRecordReactions';
+
 import type {QualifiedUserClients} from '../../../apiClient/conversation/qualifiedUserClients';
 import type {ConversationEvent} from '../../../apiClient/event/conversationEvent';
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import type {ReactionType} from '../../../core/conversation';
 import {StatusType} from '../../../message/statusType';
-import {ClientConversationEvent} from '../../conversation/EventBuilder';
-
-export interface ReadReceipt {
-  domain?: string;
-  time: string;
-  userId: string;
-}
+import {ClientConversationEvent} from '../../conversation/EventBuilder/EventBuilder.events';
 
 export interface AssetRecord {
   domain?: string;
@@ -37,10 +32,6 @@ export interface AssetRecord {
   sha256: Uint8Array;
   token?: string;
 }
-
-/** @deprecated as of Oct 2023, this is the old format we stored reactions in */
-export type UserReactionMap = {[userId: string]: ReactionType};
-export type ReactionMap = [reaction: string, userIds: QualifiedId[]][];
 
 /**
  * Represent an event that has been sent by the current device
@@ -96,7 +87,7 @@ export type LegacyEventRecord<T = any> = {
   previews?: string[];
   qualified_conversation?: QualifiedId;
   qualified_from?: QualifiedId;
-  reactions?: ReactionMap | UserReactionMap;
+  reactions?: StoredReactions;
   read_receipts?: ReadReceipt[];
   selected_button_id?: string;
   server_time?: string;

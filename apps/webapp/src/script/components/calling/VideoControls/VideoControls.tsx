@@ -48,6 +48,7 @@ import {useUserPropertyValue} from '../../../hooks/useUserProperty';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {Call} from '../../../repositories/calling/Call';
 import {CallingViewMode, CallState} from '../../../repositories/calling/CallState';
+import {CallViewTab} from '../../../repositories/calling/enum/CallViewTab';
 import {Participant} from '../../../repositories/calling/Participant';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../../repositories/media/MediaDevicesHandler';
@@ -74,7 +75,6 @@ import {TabIndex} from '../../../uiKit/utils/enums';
 import {QUERY} from '../../../uiKit/utils/mediaQueries';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {handleKeyDown, isEscapeKey, KEY} from '../../../util/keyboardUtil';
-import {CallViewTab} from '../../../view_model/CallingViewModel';
 import {WebAppEvents} from '../../../webAppEvents';
 import * as Icon from '../../icon';
 

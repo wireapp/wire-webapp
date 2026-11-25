@@ -42,6 +42,7 @@ import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/pr
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {updateAccessRights} from './ConversationAccessPermission';
+import {CONVERSATION_READONLY_STATE} from './conversationConstants';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
@@ -128,7 +129,8 @@ import type {BackendError} from '../../apiClient/http/backendError';
 import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
-import {TYPING_TIMEOUT, useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
+import {TYPING_TIMEOUT} from '../../components/inputBar/typingIndicator/typingTimeout';
+import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator/useTypingIndicatorState/useTypingIndicatorState';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {Account} from '../../core';
@@ -157,7 +159,6 @@ import {isBackendError, isErrorWithType} from '../../util/typePredicateUtil';
 import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
 import {AssetTransferState} from '../assets/assetTransferState';
-import {CallingRepository} from '../calling/CallingRepository';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {ConnectionEntity} from '../connection/connectionEntity';
 import {ConnectionRepository} from '../connection/connectionRepository';
@@ -223,21 +224,20 @@ type OneToOneMigrationResult = {shouldOpenMLS1to1Conversation: boolean; shouldIn
 type ConversationMuteStateData = {otr_muted_ref: string; otr_muted_status: number};
 type ConversationMuteStateEvent = {data: ConversationMuteStateData; from: string};
 type IncomingEvent = ConversationEvent | ClientConversationEvent;
+interface ConversationCallingRepository {
+  findCall(conversationId: QualifiedId): {isActive: () => boolean} | undefined;
+  leaveCall(conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void;
+  pushClients(): Promise<boolean | undefined>;
+}
 type InitializedCoreServices = NonNullable<Core['service']>;
 type ConversationRepositoryConfig = {
   CONFIRMATION_THRESHOLD: TIME_IN_MILLIS;
   EXTERNAL_MESSAGE_THRESHOLD: number;
   ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY: number;
-  GROUP: {MAX_NAME_LENGTH: number; MAX_SIZE: number};
+  GROUP: {MAX_SIZE: number};
   CHANNEL: {MAX_SIZE: number};
 };
 type DeleteBotsResponse = {event?: MemberLeaveEvent};
-
-export enum CONVERSATION_READONLY_STATE {
-  READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS = 'READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS',
-  READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS = 'READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS',
-  READONLY_ONE_TO_ONE_NO_KEY_PACKAGES = 'READONLY_ONE_TO_ONE_NO_KEY_PACKAGES',
-}
 
 interface Resolve1To1ConversationOptions {
   isLiveUpdate?: boolean;
@@ -278,7 +278,6 @@ export class ConversationRepository {
       EXTERNAL_MESSAGE_THRESHOLD: externalMessageThresholdInKibibytes * bytesPerKibibyte,
       ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY: 3000,
       GROUP: {
-        MAX_NAME_LENGTH: 64,
         MAX_SIZE: Config.getConfig().MAX_GROUP_PARTICIPANTS,
       },
       CHANNEL: {
@@ -296,7 +295,7 @@ export class ConversationRepository {
     private readonly userRepository: UserRepository,
     private readonly selfRepository: SelfRepository,
     private readonly propertyRepository: PropertiesRepository,
-    private readonly callingRepository: CallingRepository,
+    private readonly callingRepository: ConversationCallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly translate: Translate,
     private readonly options: ConversationRepositoryOptions,

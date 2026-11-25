@@ -25,12 +25,12 @@ import {EventValidationError} from './eventHandlers/EventValidationError';
 import {HandledEvents, DBOperation} from './types';
 
 import {CONVERSATION_EVENT} from '../../../../apiClient/event/conversationEvent';
-import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../../message/statusType';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';
 import {fixWebsocketString} from '../../../../util/stringUtil';
 import {ConversationState} from '../../../conversation/ConversationState';
 import {User} from '../../../entity/User';
 import type {EventRecord} from '../../../storage';
+import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../storage/record/eventRecordGuards';
 import {UserFilter} from '../../../user/userFilter';
 import {CONVERSATION} from '../../Client';
 import {EventMiddleware, IncomingEvent} from '../../EventProcessor';

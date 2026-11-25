@@ -17,6 +17,7 @@
  *
  */
 
+import {CLIENT_MAPPER_CONFIG} from './clientConfig';
 import {ClientEntity} from './ClientEntity';
 import {parseClientId} from './ClientIdUtil';
 
@@ -25,17 +26,9 @@ import type {RegisteredClient} from '../../apiClient/client/registeredClient';
 import {isClientRecord, isClientWithMLSPublicKeys} from '../../util/typePredicateUtil';
 import {ClientRecord} from '../storage';
 
-type ClientMapperConfig = {CLIENT_PAYLOAD: string[]; SELF_CLIENT_PAYLOAD: string[]};
 type ClientMappingResult<T> = {client: T; wasUpdated: boolean};
 
 export class ClientMapper {
-  static get CONFIG(): ClientMapperConfig {
-    return {
-      CLIENT_PAYLOAD: ['class', 'id', 'domain'],
-      SELF_CLIENT_PAYLOAD: ['address', 'cookie', 'label', 'model', 'time', 'type'],
-    };
-  }
-
   /**
    * Maps a JSON into a Client entity.
    *
@@ -49,12 +42,12 @@ export class ClientMapper {
   ): ClientEntity {
     const clientEntity = new ClientEntity(isSelfClient, domain);
 
-    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => {
+    CLIENT_MAPPER_CONFIG.CLIENT_PAYLOAD.forEach(name => {
       ClientMapper._mapMember(clientEntity, clientPayload, name);
     });
 
     if (isSelfClient) {
-      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => {
+      CLIENT_MAPPER_CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => {
         ClientMapper._mapMember(clientEntity, clientPayload, name);
       });
     }

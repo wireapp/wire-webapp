@@ -24,6 +24,7 @@ import {
   type FunctionComponent,
 } from 'react';
 
+import {AVATAR_SIZE, STATE} from './avatarConstants';
 import {PlaceholderAvatar} from './placeholderAvatar';
 import {ServiceAvatar} from './serviceAvatar';
 import {TemporaryGuestAvatar} from './temporaryGuestAvatar';
@@ -34,46 +35,6 @@ import {User} from '../../repositories/entity/User';
 import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {handleKeyDown, isKeyboardEvent, KEY} from '../../util/keyboardUtil';
-
-export enum AVATAR_SIZE {
-  LARGE = 'avatar-l',
-  MEDIUM = 'avatar-m',
-  SMALL = 'avatar-s',
-  X_LARGE = 'avatar-xl',
-  X_SMALL = 'avatar-xs',
-  XX_SMALL = 'avatar-xxs',
-  XXX_SMALL = 'avatar-xxxs',
-}
-
-export enum STATE {
-  BLOCKED = 'blocked',
-  IGNORED = 'ignored',
-  NONE = '',
-  PENDING = 'pending',
-  SELECTED = 'selected',
-  SELF = 'self',
-  UNKNOWN = 'unknown',
-}
-
-export const DIAMETER = {
-  [AVATAR_SIZE.LARGE]: 72,
-  [AVATAR_SIZE.MEDIUM]: 40,
-  [AVATAR_SIZE.SMALL]: 28,
-  [AVATAR_SIZE.X_LARGE]: 200,
-  [AVATAR_SIZE.X_SMALL]: 24,
-  [AVATAR_SIZE.XX_SMALL]: 20,
-  [AVATAR_SIZE.XXX_SMALL]: 16,
-};
-
-export const INITIALS_SIZE = {
-  [AVATAR_SIZE.LARGE]: 24,
-  [AVATAR_SIZE.MEDIUM]: 16,
-  [AVATAR_SIZE.SMALL]: 11,
-  [AVATAR_SIZE.X_LARGE]: 32,
-  [AVATAR_SIZE.X_SMALL]: 11,
-  [AVATAR_SIZE.XX_SMALL]: 11,
-  [AVATAR_SIZE.XXX_SMALL]: 8,
-};
 
 interface AvatarProps extends HTMLProps<HTMLDivElement> {
   participant: User | ServiceEntity;
