@@ -432,7 +432,7 @@
   "cells.bulkMove.partialMoveWarning": "The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.",
   "cells.bulkMove.partialMoveWarningTitle": "Move may be incomplete",
   "cells.bulkMove.processing": "Wird verarbeitet",
-  "cells.bulkMove.refreshDrive": "Refresh Drive",
+  "cells.bulkMove.refreshDrive": "Drive aktualisieren",
   "cells.bulkMove.requestFailed": "The move request failed. Some items may have moved. Refresh Drive to check item locations before trying again.",
   "cells.bulkMove.requestFailedTitle": "Move request failed",
   "cells.bulkMove.selected": "Ausgewählt",
