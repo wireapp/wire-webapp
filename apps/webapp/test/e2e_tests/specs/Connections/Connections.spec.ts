@@ -122,7 +122,9 @@ test.describe('Connections', () => {
     'I want to archive a pending request from conversation list',
     {tag: ['@TC-371', '@regression']},
     async ({createPage}) => {
-      const pageManager = PageManager.from(await createPage(withLogin(memberA)));
+      // memberB needs a client before memberA can connect, otherwise they are still pending onboarding
+      const [memberAPage] = await Promise.all([createPage(withLogin(memberA)), createPage(withLogin(memberB))]);
+      const pageManager = PageManager.from(memberAPage);
       await sendConnectionRequest(pageManager, memberB);
 
       const {pages} = pageManager.webapp;

@@ -530,6 +530,77 @@ describe('UserActions', () => {
       expect(startConversationButton).toBeDisabled();
       expect(startConversationButton.getAttribute('aria-describedby')).toBe(pendingOnboardingInfo.id);
     });
+
+    const createPendingUnconnectedUser = (): User => {
+      const user = new User('', 'remote.example.com', translateForTest);
+      user.isPendingOnboarding(true);
+      user.connection(new ConnectionEntity());
+      user.connection()?.status(ConnectionStatus.UNKNOWN);
+      jest.spyOn(user, 'isAvailable').mockImplementation(
+        ko.pureComputed(() => {
+          return true;
+        }),
+      );
+      return user;
+    };
+
+    it('disables connect in the single action layout and explains why', () => {
+      const user = createPendingUnconnectedUser();
+      const props = {
+        actionsViewModel,
+        isSelfActivated: true,
+        onAction: noop,
+        selfUser: new User('', '', translateForTest),
+        user,
+        isModal: true,
+      };
+
+      const {getByTestId} = renderWithRootProvider(withTheme(<UserActions {...props} />));
+
+      const connectButton = getByTestId(ActionIdentifier[Actions.SEND_REQUEST]);
+      const pendingOnboardingInfo = getByTestId('status-pending-onboarding-info');
+
+      expect(connectButton).toBeDisabled();
+      expect(connectButton.getAttribute('aria-describedby')).toBe(pendingOnboardingInfo.id);
+      expect(pendingOnboardingInfo.textContent).toContain('userOnboardingPendingConnectInfo');
+      expect(getByTestId('do-close')).not.toBeDisabled();
+    });
+
+    it('disables connect in the actions list and explains why', () => {
+      const user = createPendingUnconnectedUser();
+      const props = {
+        actionsViewModel,
+        isSelfActivated: true,
+        onAction: noop,
+        selfUser: new User('', '', translateForTest),
+        user,
+      };
+
+      const {getByTestId} = renderWithRootProvider(<UserActions {...props} />);
+
+      const connectButton = getByTestId(ActionIdentifier[Actions.SEND_REQUEST]);
+      const pendingOnboardingInfo = getByTestId('status-pending-onboarding-info');
+
+      expect(connectButton).toBeDisabled();
+      expect(connectButton.getAttribute('aria-describedby')).toBe(pendingOnboardingInfo.id);
+    });
+
+    it('keeps connect enabled for users who finished onboarding', () => {
+      const user = createPendingUnconnectedUser();
+      user.isPendingOnboarding(false);
+      const props = {
+        actionsViewModel,
+        isSelfActivated: true,
+        onAction: noop,
+        selfUser: new User('', '', translateForTest),
+        user,
+      };
+
+      const {getByTestId, queryByTestId} = renderWithRootProvider(<UserActions {...props} />);
+
+      expect(getByTestId(ActionIdentifier[Actions.SEND_REQUEST])).not.toBeDisabled();
+      expect(queryByTestId('status-pending-onboarding-info')).toBeNull();
+    });
   });
 
   it('displays a list when a single action is available in sidebar', () => {
