@@ -48,6 +48,11 @@ export const messageActionsMenuButton = (isReactable = true): CSSObject => {
     alignItems: 'center',
     padding: '8px 12px',
     cursor: 'pointer',
+
+    // neighbouring buttons share one border
+    '&:not(:first-of-type)': {
+      marginLeft: '-1px',
+    },
   };
   if (isReactable) {
     return {
@@ -57,6 +62,10 @@ export const messageActionsMenuButton = (isReactable = true): CSSObject => {
       },
       '&:last-of-type': {
         borderRadius: '0px 12px 12px 0px',
+      },
+      // stronger than the global focus style (base.less), which rounds every focused element
+      '&:not(:first-of-type):not(:last-of-type)': {
+        borderRadius: 0,
       },
     };
   }
@@ -84,6 +93,8 @@ export const getActionsMenuCSS = (isActive?: boolean): CSSObject => {
       backgroundColor: 'var(--message-actions-active-background)',
       color: 'var(--accent-color)',
       outline: 'none',
+      // above a hovered neighbour, so its full border stays visible
+      zIndex: 2,
     };
   }
   return {
@@ -94,10 +105,12 @@ export const getActionsMenuCSS = (isActive?: boolean): CSSObject => {
     '&:hover': {
       backgroundColor: 'var(--message-actions-background-hover)',
       border: '1px solid var(--message-actions-border-hover)',
+      zIndex: 1,
     },
     '&:focus-visible': {
       border: '1px solid var(--accent-color-focus)',
       outline: 'none',
+      zIndex: 2,
     },
   };
 };
