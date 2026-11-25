@@ -86,6 +86,26 @@ describe('MessageActions', () => {
     expect(getByText('option1')).toBeDefined();
   });
 
+  it('keeps the reactions in place but disabled, and the reply enabled, when they are disabled', () => {
+    const handleReactionClick = jest.fn();
+    const {getByTestId} = render(
+      <MessageActionsMenu {...defaultProps} handleReactionClick={handleReactionClick} areReactionsDisabled />,
+      {wrapper: rootProviderWrapper},
+    );
+    const thumbsUpButton = getByTestId('reactwith-thumbsup-messag');
+    const emojiButton = getByTestId('reactwith-emoji-message');
+
+    fireEvent.click(thumbsUpButton);
+    fireEvent.click(emojiButton);
+    fireEvent.keyDown(emojiButton, {key: 'Enter'});
+
+    expect(thumbsUpButton).toHaveAttribute('aria-disabled', 'true');
+    expect(thumbsUpButton).toHaveAttribute('title', 'outboxNotAvailableOffline');
+    expect(emojiButton).toHaveAttribute('aria-disabled', 'true');
+    expect(handleReactionClick).not.toHaveBeenCalled();
+    expect(getByTestId('do-reply-message')).not.toHaveAttribute('aria-disabled');
+  });
+
   it('toggles the active message action on click of any action button', () => {
     const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />, {wrapper: rootProviderWrapper});
     const thumbsUpButton = getByLabelText(translate('accessibility.messageActionsMenuThumbsUp'));

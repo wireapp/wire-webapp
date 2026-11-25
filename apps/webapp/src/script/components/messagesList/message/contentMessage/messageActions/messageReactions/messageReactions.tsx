@@ -29,7 +29,7 @@ import type {Translate} from '../../../../../../util/localizerUtil';
 import {EmojiPicker} from '../../../../../emojiPicker/emojiPicker';
 import {MessageActionsId} from '../messageActions';
 import {useMessageActionsState} from '../messageActions.state';
-import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from '../messageActions.styles';
+import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS, disabledActionCSS} from '../messageActions.styles';
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';
@@ -45,6 +45,8 @@ export interface MessageReactionsProps {
   resetActionMenuStates: () => void;
   wrapperRef: RefObject<HTMLDivElement | null>;
   handleReactionClick: (emoji: string) => void;
+  /** The buttons stay focusable and in place but do nothing, and say why */
+  isDisabled?: boolean;
 }
 
 const MessageReactions: FC<MessageReactionsProps> = ({
@@ -57,6 +59,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   resetActionMenuStates,
   wrapperRef,
   handleReactionClick,
+  isDisabled = false,
 }) => {
   const isThumbUpAction = currentMsgActionName === MessageActionsId.THUMBSUP;
   const isLikeAction = currentMsgActionName === MessageActionsId.HEART;
@@ -122,6 +125,9 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const handleMsgActionClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
+    if (isDisabled) {
+      return;
+    }
     const actionType = event.currentTarget.dataset.uieName;
     switch (actionType) {
       case MessageActionsId.EMOJI:
@@ -140,6 +146,10 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const handleMsgActionKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
+    if (isDisabled) {
+      handleKeyDown(event);
+      return;
+    }
     const actionType = event.currentTarget.dataset.uieName;
     switch (actionType) {
       case MessageActionsId.EMOJI:
@@ -155,6 +165,13 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   };
 
   const emojiSize = 15;
+  const getActionProps = (actionLabel: string): {'aria-label': string; 'aria-disabled'?: true; title?: string} => {
+    if (!isDisabled) {
+      return {'aria-label': actionLabel};
+    }
+    const disabledLabel = translate('outboxNotAvailableOffline', {feature: actionLabel});
+    return {'aria-label': disabledLabel, 'aria-disabled': true, title: disabledLabel};
+  };
   return (
     <>
       <button
@@ -162,14 +179,15 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           ...messageActionsMenuButton(),
           ...getIconCSS,
           ...getActionsMenuCSS(isThumbUpAction),
+          ...(isDisabled && disabledActionCSS),
         }}
-        aria-label={translate('accessibility.messageActionsMenuThumbsUp')}
         data-uie-name={MessageActionsId.THUMBSUP}
         aria-pressed={isThumbUpAction}
         type="button"
         tabIndex={messageFocusedTabIndex}
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
+        {...getActionProps(translate('accessibility.messageActionsMenuThumbsUp'))}
       >
         <EmojiChar emoji={thumbsUpEmoji} size={emojiSize} />
       </button>
@@ -178,14 +196,15 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           ...messageActionsMenuButton(),
           ...getIconCSS,
           ...getActionsMenuCSS(isLikeAction),
+          ...(isDisabled && disabledActionCSS),
         }}
-        aria-label={translate('accessibility.messageActionsMenuLike')}
         data-uie-name={MessageActionsId.HEART}
         aria-pressed={isLikeAction}
         type="button"
         tabIndex={messageFocusedTabIndex}
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
+        {...getActionProps(translate('accessibility.messageActionsMenuLike'))}
       >
         <EmojiChar emoji={likeEmoji} size={emojiSize} />
       </button>
@@ -194,13 +213,14 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           ...messageActionsMenuButton(),
           ...getIconCSS,
           ...getActionsMenuCSS(currentMsgActionName === MessageActionsId.EMOJI),
+          ...(isDisabled && disabledActionCSS),
         }}
-        aria-label={translate('accessibility.messageActionsMenuEmoji')}
         data-uie-name={MessageActionsId.EMOJI}
         type="button"
         tabIndex={messageFocusedTabIndex}
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
+        {...getActionProps(translate('accessibility.messageActionsMenuEmoji'))}
         ref={emojiButtonRef}
       >
         <svg css={reactionImgSize} viewBox="0 0 23 23" fill="none">

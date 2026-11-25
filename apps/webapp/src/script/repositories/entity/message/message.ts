@@ -466,6 +466,18 @@ export class Message {
   }
 
   /**
+   * Whether starting a change (reaction, edit, deletion) is refused: the app is offline and the message was sent.
+   * A change to a sent message has no visible place to show whether it went through, while an outbox message
+   * (pending, or failed and waiting for a retry at the bottom of the log) sits where the user sees what happens to it.
+   * @param isOffline the app knows it is offline, with the outbox on
+   */
+  isChangeRefusedOffline(isOffline: boolean): boolean {
+    const status = this.status();
+    const isInOutbox = status === StatusType.SENDING || status === StatusType.FAILED;
+    return isOffline && !isInOutbox;
+  }
+
+  /**
    * Check if message can be replied to.
    * @param isPendingInOutbox the message waits in the outbox and no send is in flight, so what follows can queue behind it
    * @returns `true`, if message type supports replies, `false` otherwise.

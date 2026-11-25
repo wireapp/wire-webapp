@@ -63,6 +63,8 @@ export interface MessageActionsMenuProps {
   isRemovedFromConversation: boolean;
   /** The message waits in the outbox with no send in flight, so reactions and replies can queue behind it */
   isPendingInOutbox: boolean;
+  /** Offline, a reaction to a sent message can't be started; the reply stays */
+  areReactionsDisabled?: boolean;
 }
 
 const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
@@ -75,6 +77,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   reactionsTotalCount,
   isRemovedFromConversation,
   isPendingInOutbox,
+  areReactionsDisabled = false,
 }) => {
   const {translate} = useApplicationContext();
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
@@ -189,6 +192,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
               resetActionMenuStates={resetActionMenuStates}
               wrapperRef={wrapperRef}
               handleReactionClick={handleReactionClick}
+              isDisabled={areReactionsDisabled}
             />
             {message.isReplyable(isPendingInOutbox) && (
               <ReplyButton

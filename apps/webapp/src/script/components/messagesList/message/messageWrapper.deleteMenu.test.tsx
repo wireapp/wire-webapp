@@ -21,12 +21,16 @@ import {render} from '@testing-library/react';
 import type {ComponentProps} from 'react';
 
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
+import {pendingOfflineMessagesFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
+import {StatusType} from '../../../message/statusType';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {Text} from '../../../repositories/entity/message/text';
+import {useNoInternetState} from '../../../view_model/WarningsContainer/noInternetState';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {createUuid} from '../../../util/uuid';
 import {generateUser} from '../../../../../test/helper/UserGenerator';
@@ -50,7 +54,7 @@ type Setup = {
   messageActions: {deleteMessage: jest.Mock; deleteMessageEveryone: jest.Mock};
 };
 
-const renderMenu = (isNeverAttempted: boolean): Setup => {
+const renderMenu = (isNeverAttempted: boolean, status = StatusType.SENT, isOutboxEnabled = true): Setup => {
   const conversation = new Conversation(
     createUuid(),
     'test.wire.link',
@@ -61,6 +65,8 @@ const renderMenu = (isNeverAttempted: boolean): Setup => {
   const self = generateUser();
   self.isMe = true;
   message.user(self);
+  message.status(status);
+  message.assets.push(new Text(createUuid(), 'hello'));
 
   const messageRepository = {
     getOutboxState: jest.fn(),
@@ -76,7 +82,14 @@ const renderMenu = (isNeverAttempted: boolean): Setup => {
   } as unknown as ComponentProps<typeof MessageWrapper>;
 
   render(<MessageWrapper {...props} />, {
-    wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest})),
+    wrapper: createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: featureName => {
+          return isOutboxEnabled && featureName === pendingOfflineMessagesFeatureToggleName;
+        },
+      }),
+    ),
   });
 
   return {messageActions};
@@ -121,5 +134,90 @@ describe('MessageWrapper delete menu', () => {
       expect.arrayContaining(['conversationContextMenuDelete', 'conversationContextMenuDeleteEveryone']),
     );
     expect(labels()).not.toContain('outboxDeletePending');
+  });
+
+  describe('while offline', () => {
+    const changeLabels = [
+      'conversationContextMenuEdit',
+      'conversationContextMenuDelete',
+      'conversationContextMenuDeleteEveryone',
+      'outboxDeletePending',
+    ];
+    const changeEntries = (): ContextMenuEntry[] => {
+      return latestEntries.filter(({label}) => {
+        return label !== undefined && changeLabels.includes(label);
+      });
+    };
+
+    afterEach(() => {
+      useNoInternetState.setState({hasNoInternet: false});
+    });
+
+    it('disables edit and both deletes of a sent message, with the reason, and keeps their order', () => {
+      useNoInternetState.setState({hasNoInternet: true});
+
+      const {messageActions} = renderMenu(false);
+
+      expect(
+        changeEntries().map(({label, isDisabled, title}) => {
+          return [label, isDisabled, title];
+        }),
+      ).toEqual([
+        ['conversationContextMenuEdit', true, 'outboxNotAvailableOffline'],
+        ['conversationContextMenuDelete', true, 'outboxNotAvailableOffline'],
+        ['conversationContextMenuDeleteEveryone', true, 'outboxNotAvailableOffline'],
+      ]);
+      expect(messageActions.deleteMessage).not.toHaveBeenCalled();
+    });
+
+    it('keeps edit and delete of a pending message enabled', () => {
+      useNoInternetState.setState({hasNoInternet: true});
+
+      renderMenu(true, StatusType.SENDING);
+
+      expect(changeEntries()).toHaveLength(2);
+      expect(
+        changeEntries().some(({isDisabled}) => {
+          return isDisabled === true;
+        }),
+      ).toBe(false);
+      expect(labels()).toContain('outboxDeletePending');
+    });
+
+    it('keeps edit and both deletes of a failed message enabled', () => {
+      useNoInternetState.setState({hasNoInternet: true});
+
+      renderMenu(false, StatusType.FAILED);
+
+      expect(changeEntries()).toHaveLength(3);
+      expect(
+        changeEntries().some(({isDisabled}) => {
+          return isDisabled === true;
+        }),
+      ).toBe(false);
+    });
+
+    it('keeps everything enabled while online', () => {
+      renderMenu(false);
+
+      expect(changeEntries()).toHaveLength(3);
+      expect(
+        changeEntries().some(({isDisabled}) => {
+          return isDisabled === true;
+        }),
+      ).toBe(false);
+    });
+
+    it('keeps everything enabled with the toggle off', () => {
+      useNoInternetState.setState({hasNoInternet: true});
+
+      renderMenu(false, StatusType.SENT, false);
+
+      expect(
+        changeEntries().some(({isDisabled}) => {
+          return isDisabled === true;
+        }),
+      ).toBe(false);
+    });
   });
 });

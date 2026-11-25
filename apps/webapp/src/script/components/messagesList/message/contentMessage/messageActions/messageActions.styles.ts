@@ -66,6 +66,19 @@ export const messageActionsMenuButton = (isReactable = true): CSSObject => {
   };
 };
 
+export const disabledActionCSS: CSSObject = {
+  cursor: 'default',
+
+  '& > *': {
+    opacity: 0.32,
+  },
+
+  '&:hover': {
+    backgroundColor: 'var(--message-actions-background)',
+    border: '1px solid var(--message-actions-border)',
+  },
+};
+
 export const getIconCSS: CSSObject = {
   'body.theme-dark &': {
     'svg path': {

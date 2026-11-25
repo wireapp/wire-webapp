@@ -42,7 +42,10 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {disableMessagePreprocessingFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {
+  disableMessagePreprocessingFeatureToggleName,
+  pendingOfflineMessagesFeatureToggleName,
+} from '../../featureToggles/startupFeatureToggleNames';
 import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import {useApplicationContext} from '../../page/rootProvider';
 import {CellsRepository} from '../../repositories/cells/cellsRepository';
@@ -61,6 +64,7 @@ import {EventName} from '../../repositories/tracking/eventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../repositories/user/typingIndicatorMode';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {useNoInternetState} from '../../view_model/WarningsContainer/noInternetState';
 import {WebAppEvents} from '../../webAppEvents';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import {ConversationClassifiedBar} from '../classifiedBar/classifiedBar';
@@ -150,6 +154,10 @@ function InputBarContent({
   isIncomingRequest,
 }: InputBarContentProps): ReactElement {
   const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const hasNoInternet = useNoInternetState(state => {
+    return state.hasNoInternet;
+  });
+  const isOffline = isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName) && hasNoInternet;
   const {
     classifiedDomains,
     isSelfDeletingMessagesEnabled,
@@ -367,7 +375,10 @@ function InputBarContent({
                   onEscape={cancelSending}
                   onArrowUp={() => {
                     if (messageContent.text.length === 0) {
-                      editMessage(conversation.getLastEditableMessage());
+                      const lastEditableMessage = conversation.getLastEditableMessage();
+                      if (lastEditableMessage !== undefined && !lastEditableMessage.isChangeRefusedOffline(isOffline)) {
+                        editMessage(lastEditableMessage);
+                      }
                     }
                   }}
                   onShiftTab={onShiftTab}

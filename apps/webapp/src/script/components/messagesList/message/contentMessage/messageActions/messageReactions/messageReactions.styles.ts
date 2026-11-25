@@ -75,6 +75,11 @@ export const messageReactionButton: CSSObject = {
   userSelect: 'none',
 };
 
+export const disabledMessageReactionButton: CSSObject = {
+  cursor: 'default',
+  opacity: 0.5,
+};
+
 export const messageReactionButtonTooltip: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
