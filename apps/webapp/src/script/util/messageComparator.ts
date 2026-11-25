@@ -32,7 +32,8 @@ export function areMentionsDifferent(originalMessageEntity: ContentMessage, upda
   const flattenToUserId = (mentions: MentionEntity[]): string[] => {
     return mentions
       .map(mention => {
-        return mention.userId;
+        // A mention of everyone has no user id, so it gets its own key to detect a change of target in an edit
+        return mention.isEveryone ? '@everyone' : mention.userId;
       })
       .toSorted();
   };

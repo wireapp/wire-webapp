@@ -187,3 +187,68 @@ describe('parseMentions', () => {
     expect(actualMentions).toEqual(expectedMentions);
   });
 });
+
+describe('parseMentions with a mention of everyone', () => {
+  function setContent(harness: WireLexicalEditorTestHarness, build: () => void): void {
+    harness.editor.update(
+      () => {
+        $getRoot().clear();
+        build();
+      },
+      {discrete: true},
+    );
+  }
+
+  it('maps a mention of everyone to an entity with no user, when it is available', () => {
+    const harness = createWireLexicalEditorTestHarness();
+    setContent(harness, () => {
+      const paragraph = $createParagraphNode();
+      paragraph.append($createTextNode('hi '), $createMentionNode('@', 'all', true), $createTextNode(' lunch?'));
+      $getRoot().append(paragraph);
+    });
+
+    const [mention, ...rest] = parseMentions(harness.editor, 'hi @all lunch?', [], true);
+
+    expect(rest).toHaveLength(0);
+    expect(mention.isEveryone).toBe(true);
+    expect(mention.startIndex).toBe(3);
+    expect(mention.length).toBe(4);
+  });
+
+  it('sends a mention of everyone as plain text when it is not available', () => {
+    const harness = createWireLexicalEditorTestHarness();
+    setContent(harness, () => {
+      const paragraph = $createParagraphNode();
+      paragraph.append($createMentionNode('@', 'all', true));
+      $getRoot().append(paragraph);
+    });
+
+    expect(parseMentions(harness.editor, '@all', [], false)).toEqual([]);
+  });
+
+  it('maps a mention of a user named all to that user, not to everyone', () => {
+    const harness = createWireLexicalEditorTestHarness();
+    const userNamedAll = createTestUser({userId: 'all-user-id', userName: 'all'});
+    setContent(harness, () => {
+      const paragraph = $createParagraphNode();
+      paragraph.append($createMentionNode('@', 'all'));
+      $getRoot().append(paragraph);
+    });
+
+    const [mention] = parseMentions(harness.editor, '@all', [userNamedAll], true);
+
+    expect(mention.isEveryone).toBe(false);
+    expect(mention.userId).toBe('all-user-id');
+  });
+
+  it('ignores plain text that reads @all', () => {
+    const harness = createWireLexicalEditorTestHarness();
+    setContent(harness, () => {
+      const paragraph = $createParagraphNode();
+      paragraph.append($createTextNode('@all'));
+      $getRoot().append(paragraph);
+    });
+
+    expect(parseMentions(harness.editor, '@all', [], true)).toEqual([]);
+  });
+});

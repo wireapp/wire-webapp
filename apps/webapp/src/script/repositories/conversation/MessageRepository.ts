@@ -480,6 +480,10 @@ export class MessageRepository {
     return new TextContentBuilder(baseMessage)
       .withMentions(
         mentions.map(mention => {
+          if (mention.isEveryone) {
+            // A mention of everyone (`@all`) carries `everyone: true` and no user id
+            return mention.toContent();
+          }
           return {
             length: mention.length,
             qualifiedUserId: mention.userQualifiedId,
