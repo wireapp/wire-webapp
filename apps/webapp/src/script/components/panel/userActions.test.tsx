@@ -22,6 +22,7 @@ import {ConnectionStatus} from '../../apiClient/connection/connectionStatus';
 import {CONVERSATION_TYPE} from '../../apiClient/conversation/conversation';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {ClientMLSError, ClientMLSErrorLabel} from '../../core/messagingProtocols/mls';
+import {pendingOnboardingStatusFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
@@ -34,7 +35,7 @@ import {User} from '../../repositories/entity/User';
 import {TeamEntity} from '../../repositories/team/TeamEntity';
 import {TeamState} from '../../repositories/team/TeamState';
 import {UserState} from '../../repositories/user/userState';
-import {withTheme} from '../../auth/util/test/testUtil';
+import {withTheme, withThemeAndRootContext} from '../../auth/util/test/testUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
@@ -503,11 +504,26 @@ describe('UserActions', () => {
       return {user, selfUser};
     };
 
+    const pendingOnboardingEnabledWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: featureName => {
+          return featureName === pendingOnboardingStatusFeatureToggleName;
+        },
+      }),
+    );
+
+    const renderWithPendingOnboardingEnabled = (node: React.ReactElement): RenderResult => {
+      return render(node, {wrapper: pendingOnboardingEnabledWrapper});
+    };
+
     it('disables start conversation in the single action layout and explains why', () => {
       const {user, selfUser} = createPendingTeamMember();
       const props = {actionsViewModel, isSelfActivated: true, onAction: noop, selfUser, user, isModal: true};
 
-      const {getByTestId} = renderWithRootProvider(withTheme(<UserActions {...props} />));
+      const {getByTestId} = render(
+        withThemeAndRootContext(<UserActions {...props} />, pendingOnboardingEnabledWrapper),
+      );
 
       const startConversationButton = getByTestId(ActionIdentifier[Actions.START_CONVERSATION]);
       const pendingOnboardingInfo = getByTestId('status-pending-onboarding-info');
@@ -522,13 +538,23 @@ describe('UserActions', () => {
       const {user, selfUser} = createPendingTeamMember();
       const props = {actionsViewModel, isSelfActivated: true, onAction: noop, selfUser, user};
 
-      const {getByTestId} = renderWithRootProvider(<UserActions {...props} />);
+      const {getByTestId} = renderWithPendingOnboardingEnabled(<UserActions {...props} />);
 
       const startConversationButton = getByTestId(ActionIdentifier[Actions.START_CONVERSATION]);
       const pendingOnboardingInfo = getByTestId('status-pending-onboarding-info');
 
       expect(startConversationButton).toBeDisabled();
       expect(startConversationButton.getAttribute('aria-describedby')).toBe(pendingOnboardingInfo.id);
+    });
+
+    it('keeps start conversation enabled when the feature toggle is disabled', () => {
+      const {user, selfUser} = createPendingTeamMember();
+      const props = {actionsViewModel, isSelfActivated: true, onAction: noop, selfUser, user};
+
+      const {getByTestId, queryByTestId} = renderWithRootProvider(<UserActions {...props} />);
+
+      expect(getByTestId(ActionIdentifier[Actions.START_CONVERSATION])).not.toBeDisabled();
+      expect(queryByTestId('status-pending-onboarding-info')).toBeNull();
     });
   });
 

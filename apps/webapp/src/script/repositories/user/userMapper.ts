@@ -22,7 +22,6 @@ import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined
 import {isSelfAPIUser} from './userGuards';
 
 import {UserType} from '../../apiClient/user/user';
-import {Config} from '../../Config';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {type Translate} from '../../util/localizerUtil';
 import {getLogger, Logger} from '../../util/logger';
@@ -154,7 +153,7 @@ export class UserMapper {
       userEntity.supportedProtocols(supportedProtocols);
     }
 
-    if (Config.getConfig().FEATURE.ENABLE_PENDING_ONBOARDING_STATUS && !isNullOrUndefined(contactStatus)) {
+    if (!isNullOrUndefined(contactStatus)) {
       userEntity.isPendingOnboarding(contactStatus.state === 'non-contactable');
     }
 
