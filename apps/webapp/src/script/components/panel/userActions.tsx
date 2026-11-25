@@ -336,6 +336,10 @@ const UserActions: FunctionComponent<UserActionsProps> = ({
           Icon: Icon.PlusIcon,
           identifier: ActionIdentifier[Actions.SEND_REQUEST],
           label: translate('groupParticipantActionSendRequest'),
+          ...(isPendingOnboarding && {
+            disabled: true,
+            descriptionId: pendingOnboardingInfoId,
+          }),
         }
       : undefined;
 
@@ -402,10 +406,17 @@ const UserActions: FunctionComponent<UserActionsProps> = ({
     return !isNullOrUndefined(item);
   });
 
-  const pendingOnboardingInfo = start1To1Conversation?.disabled === true && (
+  const pendingOnboardingAction = start1To1Conversation ?? sendConnectionRequest;
+  const pendingOnboardingInfo = pendingOnboardingAction?.disabled === true && (
     <div id={pendingOnboardingInfoId} css={pendingOnboardingInfoStyle} data-uie-name="status-pending-onboarding-info">
       <p css={pendingOnboardingTitleStyle}>{translate('userOnboardingPending')}</p>
-      <p css={pendingOnboardingMessageStyle}>{translate('userOnboardingPendingStartConversationInfo')}</p>
+      <p css={pendingOnboardingMessageStyle}>
+        {translate(
+          pendingOnboardingAction === start1To1Conversation
+            ? 'userOnboardingPendingStartConversationInfo'
+            : 'userOnboardingPendingSendRequestInfo',
+        )}
+      </p>
     </div>
   );
 

@@ -530,6 +530,48 @@ describe('UserActions', () => {
       expect(startConversationButton).toBeDisabled();
       expect(startConversationButton.getAttribute('aria-describedby')).toBe(pendingOnboardingInfo.id);
     });
+
+    const createUnconnectedNonTeamUser = (isPendingOnboarding: boolean): {user: User; selfUser: User} => {
+      const user = new User('', '', translateForTest);
+      user.isPendingOnboarding(isPendingOnboarding);
+      const connection = new ConnectionEntity();
+      connection.status(ConnectionStatus.UNKNOWN);
+      user.connection(connection);
+      jest.spyOn(user, 'isAvailable').mockImplementation(
+        ko.pureComputed(() => {
+          return true;
+        }),
+      );
+
+      const selfUser = new User('', '', translateForTest);
+      userState.self(selfUser);
+
+      return {user, selfUser};
+    };
+
+    it('disables send connection request for a non-team user and explains why', () => {
+      const {user, selfUser} = createUnconnectedNonTeamUser(true);
+      const props = {actionsViewModel, isSelfActivated: true, onAction: noop, selfUser, user};
+
+      const {getByTestId} = renderWithRootProvider(<UserActions {...props} />);
+
+      const sendRequestButton = getByTestId(ActionIdentifier[Actions.SEND_REQUEST]);
+      const pendingOnboardingInfo = getByTestId('status-pending-onboarding-info');
+
+      expect(sendRequestButton).toBeDisabled();
+      expect(sendRequestButton.getAttribute('aria-describedby')).toBe(pendingOnboardingInfo.id);
+      expect(pendingOnboardingInfo.textContent).toContain('userOnboardingPendingSendRequestInfo');
+    });
+
+    it('keeps send connection request enabled for a non-team user who is not pending onboarding', () => {
+      const {user, selfUser} = createUnconnectedNonTeamUser(false);
+      const props = {actionsViewModel, isSelfActivated: true, onAction: noop, selfUser, user};
+
+      const {getByTestId, queryByTestId} = renderWithRootProvider(<UserActions {...props} />);
+
+      expect(getByTestId(ActionIdentifier[Actions.SEND_REQUEST])).not.toBeDisabled();
+      expect(queryByTestId('status-pending-onboarding-info')).toBeNull();
+    });
   });
 
   it('displays a list when a single action is available in sidebar', () => {
