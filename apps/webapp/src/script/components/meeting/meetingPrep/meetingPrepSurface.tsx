@@ -54,7 +54,6 @@ import type {
 import {meetingPrepDeviceKinds, meetingPrepMediaKinds, meetingPrepPreviewErrors} from './meetingPrepTypes';
 
 import {Config} from '../../../Config';
-import {renderNoCameraMessage} from '../../../page/mainContent/panels/preferences/avPreferences/cameraPreferences';
 import {InputLevel} from '../../../page/mainContent/panels/preferences/avPreferences/inputLevel';
 import {useApplicationContext} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
@@ -68,6 +67,7 @@ import {groupVideoBackgroundInitializingOverlay} from '../../calling/GroupVideoG
 import {useShowLoadingOverlay} from '../../calling/useShowLoadingOverlay';
 import {VideoControlsSelect} from '../../calling/VideoControls/VideoControlsSelect/VideoControlsSelect';
 import {CameraIcon, CameraOffIcon, ChevronIcon, MicOffIcon, MicOnIcon} from '../../icon';
+import {NoCameraMessage} from '../../noCameraMessage';
 
 export type MeetingPrepSurfaceProps = {
   meetingTitle: string;
@@ -402,7 +402,7 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
     if (showCameraPermissionError) {
       return (
         <div css={meetingPrepNoCameraStyles}>
-          {renderNoCameraMessage({brandName: Config.getConfig().BRAND_NAME, translate})}
+          <NoCameraMessage brandName={Config.getConfig().BRAND_NAME} translate={translate} />
         </div>
       );
     }

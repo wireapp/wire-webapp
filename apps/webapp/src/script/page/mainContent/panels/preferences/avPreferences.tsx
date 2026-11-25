@@ -80,6 +80,7 @@ const AVPreferencesComponent: FunctionComponent<AVPreferencesProps> = ({
       )}
       {areMediaDevicesInitialized && deviceSupport.audiooutput && (
         <AudioOutPreferences
+          translate={translate}
           refreshCallOutputSpeaker={() => {
             return callingRepository.refreshAudioOutput();
           }}

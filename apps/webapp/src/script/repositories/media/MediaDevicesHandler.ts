@@ -19,6 +19,7 @@
 
 import {isArray, isNullOrUndefined, isNonEmptyString} from '@sindresorhus/is';
 
+import type {ElectronDesktopCapturerSource} from './desktopCapturerSource';
 import {MediaDeviceType} from './MediaDeviceType';
 import {resolveActiveDeviceId} from './resolveActiveDeviceId';
 import {mediaDevicesStore} from './useMediaDevicesStore';
@@ -27,12 +28,7 @@ import {Runtime} from '../../commons/util/Runtime';
 import {getLogger, Logger} from '../../util/logger';
 import {loadValue, storeValue} from '../../util/storageUtil';
 
-export type ElectronDesktopCapturerSource = {
-  readonly display_id: string;
-  readonly id: string;
-  readonly name: string;
-  readonly thumbnail: HTMLCanvasElement;
-};
+export type {ElectronDesktopCapturerSource} from './desktopCapturerSource';
 
 type ElectronGetSourcesOptions = {
   readonly fetchWindowIcons?: boolean;
