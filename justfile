@@ -170,7 +170,7 @@ run-development-server:
 [group('setup')]
 configure-webapp:
     cd apps/webapp && node ../../tools/configuration/cli.mts ./.copyconfigrc.js
-    cd apps/webapp && ts-node ./bin/generate_react_icons.ts
+    cd apps/webapp && ts-node ./bin/generateReactIcons.ts
     cd apps/webapp && node "{{native_typescript_compiler_path}}" --project ./tsconfig.generated-icons.json --noEmit
 
 # Build and publish a Docker image after packaging the application.
@@ -214,7 +214,7 @@ translate-extract:
 # Extract FormatJS strings and merge them into the canonical English source file.
 [group('translation')]
 translate-merge:
-    cd apps/webapp && formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t
+    cd apps/webapp && formatjs extract --format './bin/translationsExtractFormatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t
 
 # Validate translated locale placeholders against the canonical English source.
 [group('translation')]

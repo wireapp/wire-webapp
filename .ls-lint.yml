@@ -1749,3 +1749,72 @@ ls:
   apps/webapp/src/script/components/inputBar/util:
     .dir: camelCase
     .tsx: camelCase
+  apps/webapp/src/style:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/fonts:
+    .dir: camelCase
+    .css: camelCase
+    .md: regex:README
+  apps/webapp/src/style/common:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/panel:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/foundation:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/content:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/content/preferences:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/content/conversation:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/components:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/components/calling:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/components/asset:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/components/asset/controls:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/components/asset/common:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/components/list:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/list:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/src/style/modal:
+    .dir: camelCase
+    .less: camelCase
+  apps/webapp/assets:
+    .dir: camelCase
+  apps/webapp/assets/images:
+    .dir: camelCase
+  apps/webapp/assets/images/backgrounds:
+    .dir: camelCase
+    .png: camelCase
+  apps/webapp/assets/mediapipeModels:
+    .dir: camelCase
+    .tflite: camelCase
+  apps/webapp/bin:
+    .ts: camelCase
+    .test.ts: camelCase
+    .js: camelCase
+    .test.js: camelCase
+  apps/webapp/src/types:
+    .dir: camelCase
+    .ts: camelCase
+    .types.ts: camelCase
+    .d.ts: camelCase
