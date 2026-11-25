@@ -24,7 +24,7 @@ const rootDir = path.join(__dirname, '..', '..');
 const pkg = require(path.join(rootDir, 'package.json'));
 const appConfigPkg = require('./app-config/package.json');
 
-const {selectConfiguration} = require('./configuration-selection');
+const {selectConfiguration} = require('./bin/configurationSelection');
 // Load repository environment files for direct setup calls too.
 require('dotenv').config({
   path: [path.join(__dirname, '.env'), path.join(rootDir, '.env')],

@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 
-import {WireModule} from './Wire.types';
+import {WireModule} from './wire.types';
 
 interface Connection {
   // See https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/effectiveType

@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-const {selectConfiguration} = require('../configuration-selection');
+const {selectConfiguration} = require('./configurationSelection');
 
 describe('selectConfiguration', () => {
   it('selects the legacy master dependency key for production', () => {
