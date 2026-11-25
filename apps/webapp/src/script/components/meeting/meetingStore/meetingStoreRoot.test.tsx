@@ -37,8 +37,11 @@ import {amplify} from 'amplify';
 import {result, task} from 'true-myth';
 import {container} from 'tsyringe';
 import {Availability} from '@wireapp/protocol-messaging';
+import {MeetingRecurrenceFrequency} from '../../../apiClient/meetings/meetingRecurrence';
+import {ThemeProvider} from '../../../uiKit/identity/theme/theme';
 
 import {useMeetingStore} from './meetingStoreProvider';
+import {MeetingNotificationHost} from '../meetingNotificationHost/meetingNotificationHost';
 import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
@@ -126,6 +129,7 @@ type RenderParameters = {
   readonly apiVersion?: number;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
   readonly initialAvailability?: Availability.Type;
+  readonly showMeetingNotificationHost?: boolean;
 };
 
 type RenderMeetingStoreRootResult = {
@@ -261,6 +265,7 @@ const renderMeetingStoreRoot = ({
   apiVersion = Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION,
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   initialAvailability = Availability.Type.AVAILABLE,
+  showMeetingNotificationHost = false,
 }: RenderParameters = {}): RenderMeetingStoreRootResult => {
   setMeetingsTeamFeature(isMeetingsFeatureEnabled ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED);
   setNegotiatedApiVersion(apiVersion);
@@ -289,6 +294,11 @@ const renderMeetingStoreRoot = ({
   const renderResult = render(
     <MeetingStoreRoot>
       <MeetingTitlesProbe />
+      {showMeetingNotificationHost && (
+        <ThemeProvider>
+          <MeetingNotificationHost isStandalone={false} />
+        </ThemeProvider>
+      )}
     </MeetingStoreRoot>,
     {wrapper: rootProviderWrapper},
   );
@@ -844,6 +854,96 @@ describe('MeetingStoreRoot', () => {
         qualifiedId: meetingId,
       }),
     ]);
+  });
+
+  it.each([
+    {
+      title: 'Older daily meeting',
+      meeting: {
+        created_at: '2026-09-01T08:00:00Z',
+        updated_at: '2026-09-01T08:00:00Z',
+        start_time: '2026-09-01T08:15:00Z',
+        end_time: '2026-09-01T08:45:00Z',
+        recurrence: {frequency: MeetingRecurrenceFrequency.DAILY, interval: 1},
+        qualified_id: {id: 'older-meeting-id', domain: 'example.com'},
+        qualified_conversation: {id: 'older-conversation-id', domain: 'example.com'},
+        qualified_creator: {id: 'creator-id', domain: 'example.com'},
+      },
+      triggerTime: '2026-11-24T09:05:00.000Z',
+      occurrenceStart: '2026-11-24T09:15:00.000Z',
+    },
+    {
+      title: 'Recent daily meeting',
+      meeting: {
+        created_at: '2026-11-23T10:20:00Z',
+        updated_at: '2026-11-23T10:30:00Z',
+        start_time: '2026-11-23T10:45:00Z',
+        end_time: '2026-11-23T11:30:00Z',
+        recurrence: {frequency: MeetingRecurrenceFrequency.DAILY, interval: 1},
+        qualified_id: {id: 'recent-meeting-id', domain: 'example.com'},
+        qualified_conversation: {id: 'recent-conversation-id', domain: 'example.com'},
+        qualified_creator: {id: 'creator-id', domain: 'example.com'},
+      },
+      triggerTime: '2026-11-24T10:35:00.000Z',
+      occurrenceStart: '2026-11-24T10:45:00.000Z',
+    },
+  ])('keeps the $title reminder in the sidebar when its system notification fires', async record => {
+    const requests: SystemNotificationRequest[] = [];
+    jest.spyOn(browserNotificationApi, 'createBrowserSystemNotificationApi').mockReturnValue({
+      isSupported: () => {
+        return true;
+      },
+      getPermission: () => {
+        return 'granted';
+      },
+      requestPermission: async () => {
+        return 'granted';
+      },
+      show: request => {
+        requests.push(request);
+        return result.ok({
+          close: () => {
+            return result.ok(undefined);
+          },
+        });
+      },
+    });
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse(record.triggerTime) - TIME_IN_MILLIS.MINUTE) * 1_000n,
+    });
+    renderMeetingStoreRoot({
+      clock,
+      showMeetingNotificationHost: true,
+      getMeetingsList: jest.fn(() => {
+        return task.resolve([{...record.meeting, title: record.title, tzid: 'Europe/Berlin'}]);
+      }),
+    });
+
+    await waitFor(() => {
+      return expect(getRenderedMeetingTitles()).toBe(record.title);
+    });
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+
+    act(() => {
+      return clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+    });
+
+    expect(requests).toHaveLength(1);
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([
+      expect.objectContaining({
+        kind: MeetingNotificationKind.REMINDER,
+        meetingTitle: record.title,
+        meetingStartTime: record.occurrenceStart,
+        qualifiedId: record.meeting.qualified_id,
+      }),
+    ]);
+    expect(screen.getByTestId('meeting-notification-host')).toHaveTextContent('meetings.notifications.total');
+
+    act(() => {
+      return clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+    });
+    expect(useMeetingNotificationStore.getState().notifications).toHaveLength(1);
+    expect(screen.getByTestId('meeting-notification-host')).toHaveTextContent('meetings.notifications.total');
   });
 
   it.each([

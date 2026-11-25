@@ -166,12 +166,30 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
     const reminderScheduler = createMeetingReminderScheduler({
       clock,
       onReminder: payload => {
+        const notificationCountBefore = useMeetingNotificationStore.getState().notifications.length;
         addNotificationUnlessAway({
           ...payload,
           kind: MeetingNotificationKind.REMINDER,
         });
+        logger.debug('meeting reminder reached notification store', {
+          availability: getAvailability(),
+          notificationCountBefore,
+          notificationCountAfter: useMeetingNotificationStore.getState().notifications.length,
+        });
         reminderOsNotifier.notify(payload);
       },
+    });
+
+    const unsubscribeFromNotificationStore = useMeetingNotificationStore.subscribe((state, previousState) => {
+      if (state.notifications !== previousState.notifications) {
+        logger.debug('meeting notification store changed', {
+          notificationCountBefore: previousState.notifications.length,
+          notificationCountAfter: state.notifications.length,
+          reminderCount: state.notifications.filter(notification => {
+            return notification.kind === MeetingNotificationKind.REMINDER;
+          }).length,
+        });
+      }
     });
 
     type GetSelfUserQualifiedIdResult = {domain: string; id: string};
@@ -207,6 +225,7 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
       unsubscribeFromMeetingLifecycleEvents();
       unsubscribeFromMeetingConversationEvents();
       unsubscribeFromMeetingStore();
+      unsubscribeFromNotificationStore();
       reminderScheduler.stop();
       reminderOsNotifier.stop();
     };

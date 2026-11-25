@@ -100,6 +100,21 @@ describe('getNextSchedulableMeetingReminder', () => {
     expect(reminder.value.fireAt).toBe(Date.parse('2026-06-08T09:50:00.000Z'));
   });
 
+  it('schedules an older weekly series across a daylight saving time change', () => {
+    const meeting = createMeetingSeries({
+      recurrence: 'weekly',
+      series_start_date: '2026-09-01T08:00:00.000Z',
+      series_end_date: '2026-09-01T09:00:00.000Z',
+      tzid: 'Europe/Berlin',
+    });
+
+    const reminder = getNextSchedulableMeetingReminder(meeting, Date.parse('2026-11-24T08:00:00.000Z'));
+
+    assert(maybe.isJust(reminder));
+    expect(reminder.value.occurrenceStart.toISOString()).toBe('2026-11-24T09:00:00.000Z');
+    expect(reminder.value.fireAt).toBe(Date.parse('2026-11-24T08:50:00.000Z'));
+  });
+
   it('skips a fired occurrence and schedules the following recurring start', () => {
     const meeting = createMeetingSeries({
       recurrence: 'weekly',
