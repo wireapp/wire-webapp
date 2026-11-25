@@ -42,7 +42,11 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {disableMessagePreprocessingFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {
+  disableMessagePreprocessingFeatureToggleName,
+  pendingOfflineMessagesFeatureToggleName,
+} from '../../featureToggles/startupFeatureToggleNames';
+import {useOutboxOffline} from '../../hooks/useOutboxOffline';
 import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import {useApplicationContext} from '../../page/rootProvider';
 import {CellsRepository} from '../../repositories/cells/cellsRepository';
@@ -150,6 +154,7 @@ function InputBarContent({
   isIncomingRequest,
 }: InputBarContentProps): ReactElement {
   const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const isOffline = useOutboxOffline(isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName));
   const {
     classifiedDomains,
     isSelfDeletingMessagesEnabled,
@@ -367,7 +372,10 @@ function InputBarContent({
                   onEscape={cancelSending}
                   onArrowUp={() => {
                     if (messageContent.text.length === 0) {
-                      editMessage(conversation.getLastEditableMessage());
+                      const lastEditableMessage = conversation.getLastEditableMessage();
+                      if (lastEditableMessage !== undefined && !lastEditableMessage.isChangeRefusedOffline(isOffline)) {
+                        editMessage(lastEditableMessage);
+                      }
                     }
                   }}
                   onShiftTab={onShiftTab}

@@ -46,6 +46,7 @@ import {
   markAsUnreadFeatureToggleName,
   pendingOfflineMessagesFeatureToggleName,
 } from '../../../featureToggles/startupFeatureToggleNames';
+import {useOutboxOffline} from '../../../hooks/useOutboxOffline';
 import {QuoteEntity} from '../../../message/quoteEntity';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {AssetRepository} from '../../../repositories/assets/assetRepository';
@@ -93,6 +94,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
   isMsgElementsFocusable,
 }: MessageParams) => {
   const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const isOffline = useOutboxOffline(isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName));
   type FindMessageResult = Promise<ContentMessage & {primary_key: string}>;
   const findMessage = async (conversation: Conversation, messageId: string): FindMessageResult => {
     const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
@@ -160,6 +162,13 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
 
     const hasDetails = !conversation.is1to1() && !message.isEphemeral() && !conversation.isSelfUserRemoved();
 
+    const isChangeRefused = message.isChangeRefusedOffline(isOffline);
+    const refusedOfflineEntry = (label: string): Partial<ContextMenuEntry> => {
+      return isChangeRefused
+        ? {isDisabled: true, title: translate('outboxNotAvailableOffline', {feature: label.replace(/…$/, '')})}
+        : {};
+    };
+
     if (message.isDownloadable() && !isFileShareRestricted) {
       entries.push({
         click: () => {
@@ -175,6 +184,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
           return amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, message);
         },
         label: translate('conversationContextMenuEdit'),
+        ...refusedOfflineEntry(translate('conversationContextMenuEdit')),
       });
     }
 
@@ -208,11 +218,13 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
     }
 
     if (message.isDeletable()) {
+      const deleteLabel = translate(isPendingDelete ? 'outboxDeletePending' : 'conversationContextMenuDelete');
       entries.push({
         click: () => {
           return messageActions.deleteMessage(conversation, message);
         },
-        label: translate(isPendingDelete ? 'outboxDeletePending' : 'conversationContextMenuDelete'),
+        label: deleteLabel,
+        ...refusedOfflineEntry(deleteLabel),
       });
     }
 
@@ -222,6 +234,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
           return messageActions.deleteMessageEveryone(conversation, message);
         },
         label: translate('conversationContextMenuDeleteEveryone'),
+        ...refusedOfflineEntry(translate('conversationContextMenuDeleteEveryone')),
       });
     }
 
@@ -229,7 +242,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
   });
 
   const handleReactionClick = (reaction: ReactionType): void => {
-    if (!message.isContent()) {
+    if (!message.isContent() || message.isChangeRefusedOffline(isOffline)) {
       return;
     }
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
