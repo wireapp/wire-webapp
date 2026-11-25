@@ -67,9 +67,57 @@ type MidnightMeetingTimes = {
 type MeetingDetailsData = {
   dateLabel: string;
   dayHeading: string;
+  year: string;
+  month: string;
+  day: string;
   startLabel: string;
   endLabel: string;
   timeRange: string;
+};
+
+type PastMeetingSelectionData = {
+  browserTime: Date;
+  yesterdayLabel: string;
+  yesterdayInCurrentMonth: boolean;
+  unavailableStartLabels: string[];
+};
+
+export const createPastMeetingSelectionData = (referenceDate: Date, timeZone: string): PastMeetingSelectionData => {
+  const {browserTime} = createScheduleMeetingDefaultsData(referenceDate, timeZone);
+
+  const yesterday = new TZDate(browserTime.getTime(), timeZone);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const currentMinutes = browserTime.getHours() * 60 + browserTime.getMinutes();
+
+  // Generate every supported time at or before the browser's current time.
+  const unavailableStartLabels = Array.from({length: Math.floor(currentMinutes / 15) + 1}, (_, index) => {
+    const time = new TZDate(browserTime.getTime(), timeZone);
+    time.setHours(0, index * 15, 0, 0);
+
+    return time
+      .toLocaleTimeString('en-US', {
+        timeZone,
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      })
+      .replace(/[\u00a0\u202f]/g, ' ');
+  });
+
+  return {
+    browserTime,
+    yesterdayLabel: yesterday.toLocaleDateString('en-US', {
+      timeZone,
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }),
+    yesterdayInCurrentMonth:
+      yesterday.getMonth() === browserTime.getMonth() && yesterday.getFullYear() === browserTime.getFullYear(),
+    unavailableStartLabels,
+  };
 };
 
 export const roundDateDownToFifteenMinutes = (date: Date): Date => {
@@ -303,6 +351,46 @@ export const createMidnightMeetingTimes = (referenceDate: Date, timeZone: string
   };
 };
 
+type ScheduleMeetingDefaultsData = {
+  browserTime: Date;
+  year: string;
+  month: string;
+  day: string;
+  dayHeading: string;
+  startLabel: string;
+  endLabel: string;
+  timeRange: string;
+};
+
+export const createScheduleMeetingDefaultsData = (
+  referenceDate: Date,
+  timeZone: string,
+): ScheduleMeetingDefaultsData => {
+  const browserTime = new TZDate(referenceDate.getTime(), timeZone);
+
+  // Use a future date so the simulated time is ahead of the backend.
+  browserTime.setDate(browserTime.getDate() + 1);
+  browserTime.setHours(10, 10, 0, 0);
+
+  const headingDate = browserTime.toLocaleDateString('en-US', {
+    timeZone,
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  return {
+    browserTime,
+    year: String(browserTime.getFullYear()),
+    month: String(browserTime.getMonth() + 1),
+    day: String(browserTime.getDate()),
+    dayHeading: `Today (${headingDate})`,
+    startLabel: '10:30 AM',
+    endLabel: '11:30 AM',
+    timeRange: '10:30 - 11:30 AM',
+  };
+};
+
 export const createMeetingDetailsData = (referenceDate: Date, timeZone: string, daysAhead = 1): MeetingDetailsData => {
   const start = new TZDate(referenceDate.getTime(), timeZone);
 
@@ -328,6 +416,9 @@ export const createMeetingDetailsData = (referenceDate: Date, timeZone: string, 
     dateLabel,
     dayHeading:
       daysAhead === 0 ? `Today (${headingDate})` : daysAhead === 1 ? `Tomorrow (${headingDate})` : headingDate,
+    year: String(start.getFullYear()),
+    month: String(start.getMonth() + 1),
+    day: String(start.getDate()),
     startLabel: '9:00 AM',
     endLabel: '10:00 AM',
     timeRange: '09:00 - 10:00 AM',
