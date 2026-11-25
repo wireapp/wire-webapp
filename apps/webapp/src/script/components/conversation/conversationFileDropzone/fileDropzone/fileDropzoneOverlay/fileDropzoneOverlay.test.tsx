@@ -64,7 +64,7 @@ describe('FileDropzoneOverlay', () => {
     expect(screen.queryByText('conversationFileUploadOverlayTitle')).not.toBeInTheDocument();
     expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
-  it('explains offboarding without claiming that the user is a viewer', () => {
+  it('shows the offboarding message instead of viewer access wording', () => {
     render(
       <StyledApp themeId={THEME_ID.DEFAULT}>
         <CellsDriveOffboardingProvider value={true}>

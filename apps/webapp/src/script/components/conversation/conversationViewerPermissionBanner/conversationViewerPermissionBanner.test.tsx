@@ -62,7 +62,7 @@ describe('ConversationViewerPermissionBanner', () => {
       sessionStorageGetter.mockRestore();
     }
   });
-  it('reuses the grey banner for offboarding without a Learn more link and can be dismissed', async () => {
+  it('shows the dismissible offboarding message without a Learn more link', async () => {
     sessionStorage.setItem('conversation-viewer-permission-banner-dismissed:conversation-1', 'true');
     renderBanner('offboarding');
 
