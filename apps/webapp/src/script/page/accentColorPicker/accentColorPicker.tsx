@@ -70,7 +70,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
             const isChecked = accentId === id;
 
             return (
-              <div data-uie-name="element-accent-color-label" data-uie-value={id} key={id}>
+              <div css={{position: 'relative'}} data-uie-name="element-accent-color-label" data-uie-value={id} key={id}>
                 <input
                   id={String(id)}
                   type="radio"
