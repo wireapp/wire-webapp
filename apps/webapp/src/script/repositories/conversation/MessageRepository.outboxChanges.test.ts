@@ -468,12 +468,66 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(parts.repository.isPendingAndNeverAttempted('unknown')).toBe(false);
     });
 
-    it('counts the operations waiting in lanes that start with a message', async () => {
+    it('counts the text and file messages waiting, not what is queued behind them or in other lanes', async () => {
       seedMessage(parts, {messageId: 'message-1'});
-      seedMessage(parts, {messageId: 'message-2', queuedSeq: 2});
+      seedMessage(parts, {messageId: 'message-2', queuedSeq: 2, state: 'on-hold'});
+      seedMessage(parts, {messageId: 'message-3', queuedSeq: 3, state: 'dead-lettered'});
+      parts.store.seed(
+        createStoredSnapshot({
+          kind: 'message',
+          id: 'operation-asset',
+          correlationKey: 'asset-1',
+          orderingKey: CONVERSATION_ID.id,
+          queuedSeq: 4,
+          payload: {
+            type: 'asset',
+            conversationId: CONVERSATION_ID,
+            messageId: 'asset-1',
+            asImage: false,
+          },
+          validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
+        }),
+      );
+      parts.store.seed(
+        createStoredSnapshot({
+          kind: 'message',
+          id: 'operation-reaction',
+          correlationKey: 'message-1:reaction',
+          orderingKey: CONVERSATION_ID.id,
+          queuedSeq: 5,
+          payload: {
+            type: 'reaction',
+            conversationId: CONVERSATION_ID,
+            targetMessageId: 'message-1',
+            reactions: '👍',
+          },
+          validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
+        }),
+      );
+      parts.store.seed(
+        createStoredSnapshot({
+          kind: 'message-change',
+          id: 'operation-hide',
+          correlationKey: 'sent-1:hide',
+          orderingKey: CHANGES_LANE,
+          payload: {type: 'hide', conversationId: CONVERSATION_ID, targetMessageId: 'sent-1'},
+          validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
+        }),
+      );
       await startOutbox(parts);
 
-      expect(parts.repository.countPendingMessages()).toBe(2);
+      expect(parts.repository.countPendingMessages()).toBe(3);
+    });
+
+    it('stops counting a message once it went out', async () => {
+      seedMessage(parts, {messageId: 'message-1'});
+      await startOutbox(parts);
+      expect(parts.repository.countPendingMessages()).toBe(1);
+
+      parts.outbox.resume();
+      await parts.clock.settle();
+
+      expect(parts.repository.countPendingMessages()).toBe(0);
     });
   });
 
