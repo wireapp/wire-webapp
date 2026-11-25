@@ -23,7 +23,7 @@ import {isEmptyString, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/
 
 import * as Icon from '../../../../../components/icon';
 import {TextInput} from '../../../../../components/TextInput';
-import {MotionDuration} from '../../../../../motion/MotionDuration';
+import {MotionDuration} from '../../../../../motion/motionDuration';
 import {IconButton, IconButtonVariant} from '../../../../../uiKit/inputs/iconButton/iconButton';
 import {isEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
 import {useIsMounted} from '../../../../../util/useIsMounted';

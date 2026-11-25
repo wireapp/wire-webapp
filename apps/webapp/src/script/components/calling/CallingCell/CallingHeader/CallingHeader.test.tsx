@@ -20,7 +20,7 @@
 import {fireEvent, render, type RenderResult} from '@testing-library/react';
 import type {ComponentProps} from 'react';
 
-import * as Router from '../../../../router/Router';
+import * as Router from '../../../../router/router';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

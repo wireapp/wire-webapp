@@ -27,7 +27,7 @@ import cx from 'classnames';
 import {DetailViewModalFooter} from './DetailViewModalFooter';
 import {DetailViewModalHeader} from './DetailViewModalHeader';
 
-import {isContentMessage} from '../../../guards/Message';
+import {isContentMessage} from '../../../guards/message';
 import {MessageCategory} from '../../../message/messageCategory';
 import {isOfCategory} from '../../../page/mainContent/panels/collection/utils';
 import {AssetRepository} from '../../../repositories/assets/assetRepository';

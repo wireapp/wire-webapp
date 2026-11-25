@@ -34,7 +34,7 @@ import {generatePermissionHelpers} from '../../../repositories/user/userPermissi
 import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 

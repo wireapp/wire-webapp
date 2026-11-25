@@ -25,7 +25,7 @@ import {UserType} from '../../apiClient/user/user';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {type Translate} from '../../util/localizerUtil';
 import {getLogger, Logger} from '../../util/logger';
-import '../../view_model/bindings/CommonBindings';
+import '../../viewModel/bindings/commonBindings';
 import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from '../assets/assetMapper';
 import {User} from '../entity/User';
 import {UserRecord} from '../storage';

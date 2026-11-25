@@ -57,7 +57,7 @@ import {ContainerXS} from '../../uiKit/layout/container/container';
 import {StyledApp} from '../../uiKit/layout/styledApp/styledApp';
 import type {Translate} from '../../util/localizerUtil';
 import {getLogger} from '../../util/logger';
-import {MainViewModel} from '../../view_model/MainViewModel';
+import {MainViewModel} from '../../viewModel/mainViewModel';
 import {RouteA11y} from '../component/routeA11Y';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';

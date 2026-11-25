@@ -23,7 +23,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Config} from '../../../../../../../Config';
 import {WireIdentity} from '../../../../../../../e2eIdentity';
-import {MotionDuration} from '../../../../../../../motion/MotionDuration';
+import {MotionDuration} from '../../../../../../../motion/motionDuration';
 import {ClientEntity} from '../../../../../../../repositories/client/ClientEntity';
 import {Button, ButtonVariant} from '../../../../../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../../../../../util/componentUtil';

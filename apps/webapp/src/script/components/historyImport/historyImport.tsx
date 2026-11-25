@@ -24,7 +24,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {BackupFileUpload} from './backupFileUpload';
 
 import {Config} from '../../Config';
-import {MotionDuration} from '../../motion/MotionDuration';
+import {MotionDuration} from '../../motion/motionDuration';
 import {useApplicationContext} from '../../page/rootProvider';
 import {ContentState} from '../../page/useAppState';
 import {BackupRepository} from '../../repositories/backup/backupRepository';

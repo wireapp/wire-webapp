@@ -15,7 +15,7 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {createRootContextValueForTest} from '../../../page/testSupport/rootContextTestSupport';
 import {RootProvider} from '../../../page/rootProvider';
-import type {MainViewModel} from '../../../view_model/MainViewModel';
+import type {MainViewModel} from '../../../viewModel/mainViewModel';
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;

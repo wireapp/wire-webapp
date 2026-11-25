@@ -23,7 +23,7 @@ import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {EphemeralTimings} from '../../../../ephemeral/EphemeralTimings';
+import {EphemeralTimings} from '../../../../ephemeral/ephemeralTimings';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {TeamState} from '../../../../repositories/team/TeamState';

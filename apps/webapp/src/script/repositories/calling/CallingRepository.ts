@@ -98,7 +98,7 @@ import {copyStyles} from '../../util/renderElement';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {toError} from '../../util/toError';
 import {createUuid} from '../../util/uuid';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 import {WebAppEvents} from '../../webAppEvents';
 import {isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';

@@ -31,7 +31,7 @@ import type {Conversation} from '../../repositories/entity/Conversation';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import type {ConversationState} from '../../repositories/conversation/ConversationState';
 import type {CallingRepository} from '../../repositories/calling/CallingRepository';
-import type {CallingViewModel} from '../../view_model/CallingViewModel';
+import type {CallingViewModel} from '../../viewModel/callingViewModel';
 
 const qualifiedConversationId = {domain: 'example.com', id: 'meeting-conversation-id'};
 const media = {cameraEnabled: true, microphoneEnabled: false};

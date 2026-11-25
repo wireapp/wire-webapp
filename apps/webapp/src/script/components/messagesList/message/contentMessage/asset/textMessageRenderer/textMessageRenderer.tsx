@@ -23,8 +23,8 @@ import {isNan, isNull} from '@sindresorhus/is';
 
 import {ShowMoreButton} from './showMoreButton';
 
-import {isKeyDownEvent} from '../../../../../../guards/Event';
-import {isAuxClickEvent, isClickEvent} from '../../../../../../guards/Mouse';
+import {isKeyDownEvent} from '../../../../../../guards/event';
+import {isAuxClickEvent, isClickEvent} from '../../../../../../guards/mouse';
 import {getAllFocusableElements, setElementsTabIndex} from '../../../../../../util/focusUtil';
 import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';
 

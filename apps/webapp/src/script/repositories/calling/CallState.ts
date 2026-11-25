@@ -29,7 +29,7 @@ import {Call} from './Call';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {Config} from '../../Config';
 import {matchQualifiedIds} from '../../util/qualifiedId';
-import {CallViewTab} from '../../view_model/CallingViewModel';
+import {CallViewTab} from '../../viewModel/callingViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
 import {EventName} from '../tracking/eventName';

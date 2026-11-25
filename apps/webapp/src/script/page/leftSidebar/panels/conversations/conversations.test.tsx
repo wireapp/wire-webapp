@@ -43,7 +43,7 @@ import {
   createRootProviderWrapperForTest,
 } from '../../../testSupport/rootContextTestSupport';
 import {ContentState, ListState, useAppState} from '../../../useAppState';
-import * as Router from '../../../../router/Router';
+import * as Router from '../../../../router/router';
 import {TestFactory} from '../../../../../../test/helper/TestFactory';
 
 import {Conversations, shouldClearDeepLinkForTab} from './';

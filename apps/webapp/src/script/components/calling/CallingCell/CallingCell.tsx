@@ -47,7 +47,7 @@ import {generateConversationUrl} from '../../../router/routeGenerator';
 import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from '../../../util/keyboardUtil';
-import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
+import {CallActions, CallViewTab} from '../../../viewModel/callingViewModel';
 import {WebAppEvents} from '../../../webAppEvents';
 import {useAppNotification} from '../../appNotification';
 import {ConversationClassifiedBar} from '../../classifiedBar/classifiedBar';

@@ -57,7 +57,7 @@ import {UserType} from '../../apiClient/user/user';
 import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
-import {isContentMessage, isDeleteMessage} from '../../guards/Message';
+import {isContentMessage, isDeleteMessage} from '../../guards/message';
 import {StatusType} from '../../message/statusType';
 import {ContentState, useAppState} from '../../page/useAppState';
 import type {Translate} from '../../util/localizerUtil';

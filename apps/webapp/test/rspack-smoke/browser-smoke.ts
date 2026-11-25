@@ -476,7 +476,7 @@ test('bundles the application and authentication entrypoints selected for the ar
     expect(sourceMapText).not.toContain(`/${directory}/${excludedEntrypoint}Entrypoint.tsx`);
     expect(sourceMapText).not.toContain('/browser/coreCryptoUpgradeModal.tsx');
     expect(sourceMapText).not.toContain('/browser/showCoreCryptoUpgrade.tsx');
-    expect(sourceMapText).not.toContain('/localization/Localizer.ts');
+    expect(sourceMapText).not.toContain('/localization/localizer.ts');
     expect(sourceMapText).not.toContain('/util/util.ts');
   }
 });

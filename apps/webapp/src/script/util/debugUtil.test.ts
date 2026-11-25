@@ -31,7 +31,7 @@ import {ConversationState} from '../repositories/conversation/ConversationState'
 import {Conversation} from '../repositories/entity/Conversation';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
-import type {ViewModelRepositories} from '../view_model/MainViewModel';
+import type {ViewModelRepositories} from '../viewModel/mainViewModel';
 import {translateForTest} from './test/translateForTest';
 
 describe('DebugUtil MLS event dropping', () => {

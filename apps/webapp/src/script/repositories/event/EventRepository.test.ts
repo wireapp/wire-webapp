@@ -35,7 +35,7 @@ import {asyncNoop} from 'noop-esm';
 import {Runtime} from '../../commons/util/Runtime';
 
 import {ClientConversationEvent} from '../conversation/EventBuilder';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 
 import {ClientEvent} from './Client';
 import {EventRepository} from './EventRepository';

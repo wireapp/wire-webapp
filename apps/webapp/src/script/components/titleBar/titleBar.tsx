@@ -48,8 +48,8 @@ import {createReactTranslationMarker, renderReactTranslation} from '../../util/l
 import type {Translate} from '../../util/localizerUtil/translationTypes';
 import {matchQualifiedIds} from '../../util/qualifiedId';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
-import {CallActions} from '../../view_model/CallingViewModel';
-import {ViewModelRepositories} from '../../view_model/MainViewModel';
+import {CallActions} from '../../viewModel/callingViewModel';
+import {ViewModelRepositories} from '../../viewModel/mainViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import {ConversationVerificationBadges} from '../badge';
 import {useCallAlertState} from '../calling/useCallAlertState';

@@ -59,7 +59,7 @@ import {
   createRootProviderWrapperForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
 import {Core} from '../../../service/coreSingleton';
-import type {MainViewModel} from '../../../view_model/MainViewModel';
+import type {MainViewModel} from '../../../viewModel/mainViewModel';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 

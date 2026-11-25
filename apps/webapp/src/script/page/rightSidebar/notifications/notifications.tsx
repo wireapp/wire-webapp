@@ -25,7 +25,7 @@ import {NOTIFICATION_STATE, getNotificationText} from '../../../repositories/con
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
-import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import {ViewModelRepositories} from '../../../viewModel/mainViewModel';
 import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 

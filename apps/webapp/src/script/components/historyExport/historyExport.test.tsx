@@ -24,7 +24,7 @@ import {ClientState} from '../../repositories/client/ClientState';
 import {User} from '../../repositories/entity/User';
 import * as RootProvider from '../../page/rootProvider';
 import {RootContextValue} from '../../page/rootProvider';
-import {MainViewModel} from '../../view_model/MainViewModel';
+import {MainViewModel} from '../../viewModel/mainViewModel';
 
 import {HistoryExport} from './historyExport';
 import {translateForTest} from '../../util/test/translateForTest';

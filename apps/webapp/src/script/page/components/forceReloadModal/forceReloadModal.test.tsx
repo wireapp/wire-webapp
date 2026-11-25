@@ -25,7 +25,7 @@ import {render} from '@testing-library/react';
 import {usePrimaryModalState} from '../../../components/Modals/PrimaryModal';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import type {DeterministicClock} from '@enormora/clock/deterministic-clock';
-import {MainViewModel} from '../../../view_model/MainViewModel';
+import {MainViewModel} from '../../../viewModel/mainViewModel';
 import {translate} from '../../../util/localizerUtil';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 

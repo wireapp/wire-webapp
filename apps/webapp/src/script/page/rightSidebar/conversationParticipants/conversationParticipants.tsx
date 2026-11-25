@@ -24,7 +24,7 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import {SearchInput} from '../../../components/SearchInput';
 import {UserSearchableList} from '../../../components/UserSearchableList';
-import {isServiceEntity} from '../../../guards/Service';
+import {isServiceEntity} from '../../../guards/service';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {User} from '../../../repositories/entity/User';

@@ -23,8 +23,8 @@ import type {ApplicationObservability} from './applicationObservability';
 import type {ApplicationStartupReport} from './applicationStartupReport';
 import {createApplicationStartupReport} from './createApplicationStartupReport';
 
-import type {AppStatistics} from '../telemetry/app_init/AppInitStatistics';
-import type {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
+import type {AppStatistics} from '../telemetry/appInit/appInitStatistics';
+import type {AppInitTimingsStep} from '../telemetry/appInit/appInitTimingsStep';
 
 type ApplicationStartupLogger = {
   readonly warn: (message: string, context: {readonly error: unknown}) => void;
