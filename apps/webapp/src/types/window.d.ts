@@ -21,6 +21,8 @@ import {amplify} from 'amplify';
 
 import {WireModule} from './wire.types';
 
+import type {DesktopLogExportCapability} from '../script/logger/desktopLogExport';
+
 interface Connection {
   // See https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/effectiveType
   effectiveType: 'slow-2g' | '2g' | '3g' | '4g';
@@ -32,6 +34,7 @@ declare global {
   interface Window {
     wire: WireModule;
     amplify: amplify.Static;
+    desktopLogExport?: DesktopLogExportCapability;
     showOpenFilePicker: () => Promise<FileSystemFileHandle[]>;
     desktopAppConfig?: {
       version: string;
