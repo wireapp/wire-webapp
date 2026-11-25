@@ -24,7 +24,6 @@ import {
   SVGProps,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type FunctionComponent,
 } from 'react';
@@ -143,7 +142,7 @@ const ContextMenu: FunctionComponent<ContextMenuProps> = ({
 }: ContextMenuProps) => {
   const {activeWindow} = useActiveWindowState();
   const [activeElement, setActiveElement] = useState<HTMLUListElement>();
-  const placeholderElement = useRef<HTMLDivElement>(null);
+  const [placeholderElement, setPlaceholderElement] = useState<HTMLDivElement>();
   const [selected, setSelected] = useState<ContextMenuEntry>();
 
   const style = useMemo<CSSProperties>(() => {
@@ -176,7 +175,7 @@ const ContextMenu: FunctionComponent<ContextMenuProps> = ({
       position: 'fixed',
       left: leftPx,
       top: topPx,
-      visibility: activeElement !== undefined || placeholderElement.current !== null ? 'unset' : 'hidden',
+      visibility: activeElement !== undefined || placeholderElement !== undefined ? 'unset' : 'hidden',
     };
   }, [activeElement, placeholderElement, anchorEl, placement, offset, posX, posY, activeWindow]);
 
@@ -240,7 +239,7 @@ const ContextMenu: FunctionComponent<ContextMenuProps> = ({
       const isOutsideClick =
         entries.length > 0
           ? activeElement !== undefined && !activeElement.contains(event.target as Node)
-          : placeholderElement.current !== null && !placeholderElement.current.contains(event.target as Node);
+          : placeholderElement !== undefined && !placeholderElement.contains(event.target as Node);
 
       if (isOutsideClick) {
         cleanUp();
@@ -259,7 +258,7 @@ const ContextMenu: FunctionComponent<ContextMenuProps> = ({
       activeWindow.removeEventListener('mousedown', onMouseDown);
       activeWindow.removeEventListener('resize', cleanUp);
     };
-  }, [activeElement, selected, activeWindow]);
+  }, [activeElement, placeholderElement, selected, activeWindow]);
 
   const {handleMenuOpen} = useMessageActionsState();
   const resetMsgMenuStates = (isOutsideClick = false): void => {
@@ -334,7 +333,13 @@ const ContextMenu: FunctionComponent<ContextMenuProps> = ({
             })}
           </ul>
         ) : (
-          <div ref={placeholderElement} className={`${contextMenuClassName}__placeholder`} style={style}>
+          <div
+            ref={el => {
+              return setPlaceholderElement(el ?? undefined);
+            }}
+            className={`${contextMenuClassName}__placeholder`}
+            style={style}
+          >
             {placeholder}
           </div>
         )}
