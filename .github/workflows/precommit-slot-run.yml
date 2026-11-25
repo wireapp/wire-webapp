@@ -194,6 +194,7 @@ jobs:
       teamManagementUrl: ${{ inputs.teamManagementUrl }}
       grep: ${{ inputs.grep }}
       testinyRunName: ${{ inputs.testinyRunName }}
+      testCommit: ${{ inputs.expectedCommit }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}

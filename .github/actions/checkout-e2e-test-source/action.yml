@@ -1,0 +1,51 @@
+name: Check out E2E test source
+description: Check out and verify the test source commit for an E2E run
+
+inputs:
+  testCommit:
+    description: Immutable source commit associated with the application artifact
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Validate requested E2E test commit
+      shell: bash
+      env:
+        TEST_COMMIT: ${{ inputs.testCommit }}
+      run: |
+        set -euo pipefail
+
+        if [[ -n "${TEST_COMMIT}" ]]; then
+          if [[ "${TEST_COMMIT}" =~ ^[[:xdigit:]]{40}$ ]]; then
+            echo "Requested E2E test commit is a full commit SHA."
+          else
+            echo "::error::Requested E2E test commit must be a full 40-character commit SHA."
+            exit 1
+          fi
+        fi
+
+    - name: Check out requested E2E test commit
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        persist-credentials: false
+        ref: ${{ inputs.testCommit }}
+
+    - name: Verify E2E test commit
+      shell: bash
+      env:
+        TEST_COMMIT: ${{ inputs.testCommit }}
+        WORKFLOW_COMMIT: ${{ github.sha }}
+      run: |
+        set -euo pipefail
+
+        expected_test_commit="$(printf '%s' "${TEST_COMMIT:-${WORKFLOW_COMMIT}}" | LC_ALL=C tr 'A-F' 'a-f')"
+        actual_test_commit="$(git rev-parse HEAD)"
+
+        echo "Resolved E2E test commit: ${expected_test_commit}"
+        echo "Checked out E2E test commit: ${actual_test_commit}"
+
+        if [[ "${actual_test_commit}" != "${expected_test_commit}" ]]; then
+          echo "::error::Checked out E2E test commit ${actual_test_commit}, expected ${expected_test_commit}."
+          exit 1
+        fi

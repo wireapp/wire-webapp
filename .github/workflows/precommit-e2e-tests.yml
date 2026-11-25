@@ -69,8 +69,9 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           USE_PUBLIC_RSPACK: ${{ inputs.usePublicRspack }}
-          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
+          WIRE_WEBAPP_BUILD_COMMIT="$(git rev-parse HEAD)"
+          export WIRE_WEBAPP_BUILD_COMMIT
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
 
