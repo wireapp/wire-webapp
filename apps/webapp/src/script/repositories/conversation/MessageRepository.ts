@@ -1959,11 +1959,12 @@ export class MessageRepository {
         laneWhenGivenUp: 'continues',
         perform: this.performReceiptOperation,
       }),
-      // A change to a message that was sent is forgotten when it can't go out, and the local change stays.
+      // A change to a message that was sent is forgotten when it can't go out, and the local change stays. Nothing
+      // shows whether it went through, so one made during a connectivity drop isn't worth sending much later.
       messageChange: this.registerKind(outbox, {
         name: 'message-change',
         parsePayload: parseMessageChangePayload,
-        expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
+        expiresAfterMilliseconds: TIME_IN_MILLIS.MINUTE,
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
         performTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
         maxAttempts: 1_000,

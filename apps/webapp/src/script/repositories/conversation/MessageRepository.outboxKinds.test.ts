@@ -555,7 +555,7 @@ describe('the message kinds of MessageRepository', () => {
         maxAttempts: 1_000,
         whenGivenUp: 'drop',
         laneWhenGivenUp: 'continues',
-        expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
+        expiresAfterMilliseconds: TIME_IN_MILLIS.MINUTE,
         performTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
       });
     });
