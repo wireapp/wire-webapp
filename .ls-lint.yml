@@ -1800,6 +1800,15 @@ ls:
     .less: camelCase
   apps/webapp/assets:
     .dir: camelCase
+  apps/webapp/assets/noteTakerModels/{tiny,base,small}:
+    .dir: regex:(tiny|base|small|[a-f0-9]{40})
+  apps/webapp/assets/noteTakerModels/{tiny,base,small}/*:
+    .dir: camelCase
+    .json: snake_case
+    .txt: snake_case
+    .md: regex:README
+  apps/webapp/assets/noteTakerModels/{tiny,base,small}/*/onnx:
+    .onnx: snake_case
   apps/webapp/assets/images:
     .dir: camelCase
   apps/webapp/assets/images/backgrounds:

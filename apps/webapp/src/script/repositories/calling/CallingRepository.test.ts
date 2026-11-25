@@ -412,6 +412,12 @@ describe('CallingRepository', () => {
     return wCall && wCall.destroy(wUser);
   });
 
+  it.each([false, true])('registers audio source notifications only when enabled (%s)', withAudioSource => {
+    const setAudioStreamHandler = jest.spyOn(wCall, 'setAudioStreamHandler');
+    callingRepository['configureCallingApi'](wCall, withAudioSource);
+    expect(setAudioStreamHandler).toHaveBeenCalledWith(expect.any(Function), withAudioSource);
+  });
+
   describe('SFT request destinations', () => {
     it('rejects an untrusted callback before POST and returns the existing AVS failure response', async () => {
       const {repository, requestConfig, sendRequest, postSftRequest, sftResponse, avsUser, requestContext} =

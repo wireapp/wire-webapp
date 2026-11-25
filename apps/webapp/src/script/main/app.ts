@@ -246,6 +246,7 @@ export class App {
     private readonly fireAndForgetInvoker: FireAndForgetInvoker,
     private readonly conversationRepositoryOptions: ConversationRepositoryOptions,
     private readonly cleanupAccountLogs: (qualifiedId: Maybe<Readonly<QualifiedId>>) => Promise<void>,
+    private readonly isNoteTakerEnabled = false,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => {
@@ -669,7 +670,7 @@ export class App {
       eventLogger.log(AppInitializationStep.SetupEventProcessors);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients(selfUser, clientRepository);
-      callingRepository.initAvs(selfUser, clientEntity.id);
+      callingRepository.initAvs(selfUser, clientEntity.id, {withAudioSource: this.isNoteTakerEnabled});
 
       onProgress(this.translate('initValidatedClient'));
 

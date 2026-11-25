@@ -161,6 +161,7 @@ jobs:
       - name: Checkout prepared release commit
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          lfs: true
           persist-credentials: false
           fetch-depth: 0
           ref: ${{ needs.prepare_release.outputs.release_commit_sha }}

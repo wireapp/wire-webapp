@@ -131,9 +131,17 @@ jobs:
         shell: bash
 
     steps:
+      - name: Ensure Git LFS is available in the browser image
+        run: |
+          if ! command -v git-lfs > /dev/null; then
+            apt-get update
+            apt-get install --no-install-recommends -y git-lfs
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          lfs: true
           persist-credentials: false
           fetch-depth: 1
 
@@ -356,6 +364,7 @@ jobs:
       - name: Checkout (pull_request)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          lfs: true
           persist-credentials: false
           fetch-depth: 1
 

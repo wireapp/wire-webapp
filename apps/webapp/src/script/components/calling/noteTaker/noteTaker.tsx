@@ -27,16 +27,26 @@ import {createPortal} from 'react-dom';
 import {Maybe} from 'true-myth';
 
 import {noteTakerPanelStyles} from './noteTaker.styles';
+import {useNoteTakerPanelStore} from './useNoteTakerPanelStore';
+
 import {
   createNoteTakerSession,
   type NoteTakerSession,
   type NoteTakerCall,
   type TranscriptEntry,
   type Speaker,
-} from './noteTakerSession';
-import {createWhisperWorkerEngine, type SpeechEngine, type SpeechEngineOptions} from './speechEngine';
-import {useNoteTakerPanelStore} from './useNoteTakerPanelStore';
-
+} from '../../../repositories/calling/noteTaker/noteTakerSession';
+import {
+  createWhisperWorkerEngine,
+  type SpeechEngine,
+  type SpeechEngineOptions,
+} from '../../../repositories/calling/noteTaker/speechEngine';
+import {speechModelIds, type SpeechModelId} from '../../../repositories/calling/noteTaker/speechModels';
+import {
+  speechDeviceSchema,
+  speechLanguageSchema,
+  type SpeechProgress,
+} from '../../../repositories/calling/noteTaker/speechWorkerProtocol';
 import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 import {DownloadIcon} from '../../../uiKit/dataDisplay/icon/downloadIcon';
 import {EditDocumentIcon} from '../../../uiKit/dataDisplay/icon/editDocumentIcon';
@@ -46,14 +56,19 @@ const SECONDS_PER_MINUTE = 60;
 const TIMESTAMP_DIGITS = 2;
 const FOLLOW_SCROLL_THRESHOLD = 32;
 const REVOKE_DELAY_MS = 1000;
-const MODEL_PRESETS = [
-  {name: 'tiny', model: 'onnx-community/whisper-tiny'},
-  {name: 'base', model: 'onnx-community/whisper-base'},
-  {name: 'small', model: 'onnx-community/whisper-small'},
-  {name: 'medium', model: 'onnx-community/whisper-medium-ONNX'},
-  {name: 'large-v3-turbo', model: 'onnx-community/whisper-large-v3-turbo'},
-  {name: 'large-v3', model: 'onnx-community/whisper-large-v3-ONNX'},
-];
+const MICROSECONDS_PER_SECOND = 1_000_000;
+function formatSpeechProgress(progress: SpeechProgress): string {
+  switch (progress.phase) {
+    case 'download':
+      return `Downloading ${progress.file}: ${Math.round(progress.percent)}%`;
+    case 'load':
+      return `Loading ${progress.device === 'webgpu' ? 'GPU' : 'CPU'} model…`;
+    case 'warmup':
+      return `Warming up ${progress.device === 'webgpu' ? 'GPU' : 'CPU'} model…`;
+    case 'fallback':
+      return `GPU unavailable; falling back to CPU: ${progress.reason}`;
+  }
+}
 
 function speakerLabel(entry: TranscriptEntry): string {
   const name = entry.speakerName ?? entry.speaker;
@@ -84,13 +99,6 @@ function TranscriptTurn({entry, live = false}: {entry: TranscriptEntry; live?: b
   );
 }
 
-// Add factories here for other speech runtimes. No capture/UI changes required.
-const engines: Record<string, () => SpeechEngine> = {
-  Whisper: () => {
-    return createWhisperWorkerEngine();
-  },
-};
-
 interface NoteTakerProps {
   call?: NoteTakerCall;
   targetDocument?: Document;
@@ -106,10 +114,9 @@ export function NoteTaker({
   createEngine,
   createSession = createNoteTakerSession,
 }: NoteTakerProps): ReactElement | null {
-  const [engineName, setEngineName] = useState('Whisper');
-  const [model, setModel] = useState('onnx-community/whisper-base');
+  const [model, setModel] = useState<SpeechModelId>('base');
   const [device, setDevice] = useState<SpeechEngineOptions['device']>('auto');
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState<SpeechEngineOptions['language']>('en');
   const [performanceInfo, setPerformanceInfo] = useState('');
   const [status, setStatus] = useState('');
   const [finishing, setFinishing] = useState(false);
@@ -128,6 +135,9 @@ export function NoteTaker({
     return createCache({key: 'call-notes', container: panelDocument.head});
   }, [panelDocument]);
   const session = useRef<Maybe<NoteTakerSession>>(Maybe.nothing());
+  const notesCall = useRef<Maybe<NoteTakerCall>>(Maybe.nothing());
+  const notesStartedAt = useRef<Maybe<bigint>>(Maybe.nothing());
+  const endedPanelShown = useRef(false);
   const engine = useRef<Maybe<SpeechEngine>>(Maybe.nothing());
   const [lifecycle] = useState(() => {
     return {generation: 0};
@@ -172,7 +182,10 @@ export function NoteTaker({
     };
   }, [setRecording]);
   useEffect(() => {
-    if (isUndefined(call) && entries.length > 0) {
+    if (!isUndefined(call)) {
+      endedPanelShown.current = false;
+    } else if (entries.length > 0 && !endedPanelShown.current) {
+      endedPanelShown.current = true;
       setOpen(true);
     }
   }, [call, entries.length, setOpen]);
@@ -228,7 +241,7 @@ export function NoteTaker({
       return;
     }
     const id = ++lifecycle.generation;
-    const speechEngine = (createEngine ?? engines[engineName])();
+    const speechEngine = (createEngine ?? createWhisperWorkerEngine)();
     engine.current = Maybe.just(speechEngine);
     setBusy(true);
     setStatus('Loading speech model…');
@@ -237,7 +250,7 @@ export function NoteTaker({
       model,
       message => {
         if (lifecycle.generation === id) {
-          setStatus(message);
+          setStatus(formatSpeechProgress(message));
         }
       },
       {device, language},
@@ -252,21 +265,26 @@ export function NoteTaker({
       setStatus(loaded.error.message);
       return;
     }
-    setEntries([]);
+    const startsNewTranscript = notesCall.current.isNothing || notesCall.current.value !== call;
+    const timestampOffsetSeconds =
+      !startsNewTranscript && notesStartedAt.current.isJust
+        ? Number(clock.currentMonotonicMicroseconds - notesStartedAt.current.value) / MICROSECONDS_PER_SECOND
+        : 0;
     setPreviews(new Map());
     followTranscript.current = true;
-    const activeSession = createSession(
+    const activeSession = createSession({
       clock,
+      timestampOffsetSeconds,
       call,
-      speechEngine,
-      entry => {
+      engine: speechEngine,
+      onEntry: entry => {
         setEntries(previous => {
           return [...previous, entry].toSorted((left, right) => {
             return left.seconds - right.seconds;
           });
         });
       },
-      error => {
+      onError: error => {
         setStatus(String(error));
         const failedSession = session.current;
         if (failedSession.isJust) {
@@ -281,12 +299,12 @@ export function NoteTaker({
           });
         }
       },
-      stats => {
+      onStats: stats => {
         setPerformanceInfo(
           `${stats.provisional === true ? 'Live preview' : 'Final'} · ${(stats.inferenceMs / REVOKE_DELAY_MS).toFixed(1)}s processing / ${stats.audioSeconds.toFixed(1)}s audio · ${stats.queuedSeconds.toFixed(0)}s queued`,
         );
       },
-      preview => {
+      onPreview: preview => {
         setPreviews(previous => {
           const current = previous.get(preview.speaker);
           if (!isUndefined(current) && current.seconds > preview.seconds) {
@@ -301,7 +319,7 @@ export function NoteTaker({
           return next;
         });
       },
-    );
+    });
     session.current = Maybe.just(activeSession);
     const started = await activeSession.start();
     if (started.isErr && lifecycle.generation === id) {
@@ -313,6 +331,11 @@ export function NoteTaker({
       return;
     }
     if (lifecycle.generation === id) {
+      if (startsNewTranscript) {
+        setEntries([]);
+        notesCall.current = Maybe.just(call);
+        notesStartedAt.current = Maybe.just(clock.currentMonotonicMicroseconds);
+      }
       setIsTranscribing(true);
       setStatus(`Transcribing locally · ${speechEngine.description ?? 'speech engine'} · live transcript`);
     }
@@ -344,12 +367,7 @@ export function NoteTaker({
   }
 
   const liveEntries = [...previews.values()];
-  const modelLabel =
-    model
-      .split('/')
-      .at(-1)
-      ?.replace('whisper-', '')
-      .replace(/-ONNX$/, '') ?? model;
+  const modelLabel = model;
 
   let stateLabel = 'Ready when you are';
   if (entries.length > 0) {
@@ -481,27 +499,22 @@ export function NoteTaker({
             <label>
               Speech model
               <select
-                aria-label="Model preset"
+                aria-label="Speech model"
                 disabled={busy}
-                value={
-                  MODEL_PRESETS.find(preset => {
-                    return model === preset.model;
-                  })?.name ?? ''
-                }
+                value={model}
                 onChange={event => {
-                  const selected = MODEL_PRESETS.find(preset => {
-                    return preset.name === event.target.value;
+                  const selected = speechModelIds.find(id => {
+                    return id === event.target.value;
                   });
                   if (!isUndefined(selected)) {
-                    setModel(selected.model);
+                    setModel(selected);
                   }
                 }}
               >
-                <option value="">Custom</option>
-                {MODEL_PRESETS.map(({name}) => {
+                {speechModelIds.map(id => {
                   return (
-                    <option key={name} value={name}>
-                      {name}
+                    <option key={id} value={id}>
+                      {id}
                     </option>
                   );
                 })}
@@ -513,7 +526,10 @@ export function NoteTaker({
                 value={language}
                 disabled={busy}
                 onChange={event => {
-                  setLanguage(event.target.value);
+                  const selected = speechLanguageSchema.safeParse(event.target.value);
+                  if (selected.success) {
+                    setLanguage(selected.data);
+                  }
                 }}
               >
                 <option value="en">English</option>
@@ -529,7 +545,10 @@ export function NoteTaker({
                 value={device}
                 disabled={busy}
                 onChange={event => {
-                  setDevice(event.target.value as SpeechEngineOptions['device']);
+                  const selected = speechDeviceSchema.safeParse(event.target.value);
+                  if (selected.success) {
+                    setDevice(selected.data);
+                  }
                 }}
               >
                 <option value="auto">GPU preferred, CPU fallback</option>
@@ -537,33 +556,10 @@ export function NoteTaker({
                 <option value="wasm">CPU (WASM)</option>
               </select>
             </label>
-            <label>
-              Engine
-              <select
-                value={engineName}
-                disabled={busy}
-                onChange={event => {
-                  setEngineName(event.target.value);
-                }}
-              >
-                {Object.keys(engines).map(name => {
-                  return <option key={name}>{name}</option>;
-                })}
-              </select>
-            </label>
-            <label className="notes-wide">
-              Whisper ONNX model
-              <input
-                value={model}
-                disabled={busy}
-                onChange={event => {
-                  setModel(event.target.value);
-                }}
-              />
-            </label>
           </div>
           <p className="notes-settings-hint">
-            Downloads only when enabled. Audio stays on this device. No summaries yet.
+            Models are served by this webapp and downloaded only when enabled. Audio stays on this device. No summaries
+            yet.
           </p>
         </details>
       </aside>

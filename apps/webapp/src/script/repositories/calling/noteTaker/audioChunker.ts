@@ -28,7 +28,7 @@ const PREVIEW_SECONDS = 1;
 const SPEECH_ENERGY = 0.00001;
 
 export interface AudioChunk {
-  audio: Float32Array;
+  audio: Float32Array<ArrayBuffer>;
   seconds: number;
   overlap: boolean;
 }

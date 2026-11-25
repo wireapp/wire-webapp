@@ -26,8 +26,8 @@ import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 
 import {NoteTaker} from './noteTaker';
 import {useNoteTakerPanelStore} from './useNoteTakerPanelStore';
-import type {NoteTakerCall, createNoteTakerSession} from './noteTakerSession';
-import type {SpeechEngine} from './speechEngine';
+import type {NoteTakerCall, createNoteTakerSession} from '../../../repositories/calling/noteTaker/noteTakerSession';
+import type {SpeechEngine} from '../../../repositories/calling/noteTaker/speechEngine';
 
 const mockLoad = jest.fn();
 const mockDispose = jest.fn();
@@ -76,7 +76,7 @@ describe('experimental note taker opt-in', () => {
     await waitFor(() => {
       return expect(mockStartCapture).toHaveBeenCalledTimes(1);
     });
-    expect(mockLoad).toHaveBeenCalledWith('onnx-community/whisper-base', expect.any(Function), {
+    expect(mockLoad).toHaveBeenCalledWith('base', expect.any(Function), {
       device: 'auto',
       language: 'en',
     });
@@ -91,7 +91,7 @@ describe('experimental note taker opt-in', () => {
       expect(mockStartCapture).toHaveBeenCalledTimes(1);
     });
     act(() => {
-      createSession.mock.calls[0][3]({seconds: 0, speaker: 'You', text: 'Keep these notes.'});
+      createSession.mock.calls[0][0].onEntry({seconds: 0, speaker: 'You', text: 'Keep these notes.'});
     });
     rerender(<NoteTaker {...dependencies} />);
     await waitFor(() => {
@@ -106,32 +106,28 @@ describe('experimental note taker opt-in', () => {
     expand();
     fireEvent.change(screen.getByLabelText('Acceleration'), {target: {value: 'webgpu'}});
     fireEvent.change(screen.getByLabelText('Language'), {target: {value: 'de'}});
-    fireEvent.change(screen.getByLabelText('Model preset'), {target: {value: 'small'}});
+    fireEvent.change(screen.getByLabelText('Speech model'), {target: {value: 'small'}});
     expect(mockLoad).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', {name: 'Enable note taker'}));
     await waitFor(() => {
       expect(mockStartCapture).toHaveBeenCalledTimes(1);
     });
-    expect(mockLoad).toHaveBeenCalledWith('onnx-community/whisper-small', expect.any(Function), {
+    expect(mockLoad).toHaveBeenCalledWith('small', expect.any(Function), {
       device: 'webgpu',
       language: 'de',
     });
   });
 
-  it.each([
-    ['medium', 'onnx-community/whisper-medium-ONNX'],
-    ['large-v3', 'onnx-community/whisper-large-v3-ONNX'],
-  ])('loads the published repository for the %s preset', async (preset, repository) => {
+  it('offers only the three self-hosted models and downloads none on selection', () => {
     render(<NoteTaker {...dependencies} call={call} />);
     expand();
-    fireEvent.change(screen.getByLabelText('Model preset'), {target: {value: preset}});
-    expect(screen.getByLabelText('Whisper ONNX model')).toHaveValue(repository);
+    expect(
+      [...screen.getByLabelText<HTMLSelectElement>('Speech model').options].map(option => {
+        return option.value;
+      }),
+    ).toEqual(['tiny', 'base', 'small']);
+    fireEvent.change(screen.getByLabelText('Speech model'), {target: {value: 'tiny'}});
     expect(mockLoad).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', {name: 'Enable note taker'}));
-    await waitFor(() => {
-      expect(mockStartCapture).toHaveBeenCalledTimes(1);
-    });
-    expect(mockLoad).toHaveBeenCalledWith(repository, expect.any(Function), {device: 'auto', language: 'en'});
   });
 
   it('revises live words in place and replaces them with the finalized transcript', async () => {
@@ -143,18 +139,18 @@ describe('experimental note taker opt-in', () => {
     });
     const args = createSession.mock.calls[0];
     act(() => {
-      args[6]?.({seconds: 0, text: 'I scream', speaker: 'You', speakerName: 'Alice'});
+      args[0].onPreview?.({seconds: 0, text: 'I scream', speaker: 'You', speakerName: 'Alice'});
     });
     expect(screen.getByLabelText('Live transcript preview')).toHaveTextContent('Alice (you)');
     expect(screen.getByLabelText('Live transcript preview')).toHaveTextContent('I scream');
     expect(screen.getByRole('button', {name: 'Export Markdown'})).toBeDisabled();
     act(() => {
-      args[6]?.({seconds: 0, text: 'Ice cream', speaker: 'You'});
+      args[0].onPreview?.({seconds: 0, text: 'Ice cream', speaker: 'You'});
     });
     expect(screen.queryByText(/I scream/)).not.toBeInTheDocument();
     act(() => {
-      args[3]({seconds: 0, text: 'Ice cream is ready.', speaker: 'You'});
-      args[6]?.({seconds: 0, text: '', speaker: 'You'});
+      args[0].onEntry({seconds: 0, text: 'Ice cream is ready.', speaker: 'You'});
+      args[0].onPreview?.({seconds: 0, text: '', speaker: 'You'});
     });
     expect(screen.getByLabelText('Live transcript preview')).toBeEmptyDOMElement();
     expect(screen.getByText(/Ice cream is ready/)).toBeVisible();
@@ -173,7 +169,7 @@ describe('experimental note taker opt-in', () => {
       throw new Error('Transcript container missing');
     }
     Object.defineProperties(container, {scrollHeight: {value: 500}, clientHeight: {value: 100}});
-    const preview = createSession.mock.calls[0][6];
+    const preview = createSession.mock.calls[0][0].onPreview;
     act(() => {
       preview?.({seconds: 0, speaker: 'You', text: 'First words'});
     });
@@ -202,7 +198,7 @@ describe('experimental note taker opt-in', () => {
     expect(mockStopCapture).not.toHaveBeenCalled();
     expect(useNoteTakerPanelStore.getState().isRecording).toBe(true);
     act(() => {
-      createSession.mock.calls[0][3]({
+      createSession.mock.calls[0][0].onEntry({
         seconds: 1,
         speaker: 'You',
         speakerName: 'Alice',
@@ -237,5 +233,76 @@ describe('experimental note taker opt-in', () => {
     });
     expect(createSession).not.toHaveBeenCalled();
     expect(screen.getByRole('button', {name: 'Enable note taker'})).toBeEnabled();
+  });
+  it('retains the previous transcript if capture in a new call fails, then resets on a successful retry', async () => {
+    const {rerender} = render(<NoteTaker {...dependencies} call={call} />);
+    expand();
+    fireEvent.click(screen.getByRole('button', {name: 'Enable note taker'}));
+    await waitFor(() => {
+      return expect(screen.getByRole('status')).toHaveTextContent('Transcribing locally');
+    });
+    act(() => {
+      createSession.mock.calls[0][0].onEntry({seconds: 0, speaker: 'You', text: 'Keep these notes'});
+    });
+    fireEvent.click(screen.getByRole('button', {name: 'Stop note taker'}));
+    await waitFor(() => {
+      return expect(screen.getByRole('button', {name: 'Enable note taker'})).toBeEnabled();
+    });
+    rerender(<NoteTaker {...dependencies} call={{} as NoteTakerCall} />);
+    mockStartCapture.mockImplementationOnce(() => {
+      return task.reject(new Error('Microphone unavailable'));
+    });
+    fireEvent.click(screen.getByRole('button', {name: 'Enable note taker'}));
+    await waitFor(() => {
+      return expect(screen.getByRole('status')).toHaveTextContent('Microphone unavailable');
+    });
+    expect(screen.getByText('Keep these notes')).toBeVisible();
+    expect(screen.getByRole('button', {name: 'Export Markdown'})).toBeEnabled();
+    fireEvent.click(screen.getByRole('button', {name: 'Enable note taker'}));
+    await waitFor(() => {
+      return expect(screen.getByRole('status')).toHaveTextContent('Transcribing locally');
+    });
+    expect(screen.queryByText('Keep these notes')).not.toBeInTheDocument();
+  });
+
+  it('keeps notes and their timeline when capture is stopped and restarted in the same call', async () => {
+    render(<NoteTaker {...dependencies} call={call} />);
+    expand();
+    fireEvent.click(screen.getByRole('button', {name: 'Enable note taker'}));
+    await waitFor(() => {
+      expect(mockStartCapture).toHaveBeenCalledTimes(1);
+    });
+    act(() => {
+      createSession.mock.calls[0][0].onEntry({seconds: 0, speaker: 'You', text: 'Before the pause'});
+    });
+    fireEvent.click(screen.getByRole('button', {name: 'Stop note taker'}));
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: 'Enable note taker'})).toBeEnabled();
+    });
+    clock.advanceByMilliseconds(5000);
+    fireEvent.click(screen.getByRole('button', {name: 'Enable note taker'}));
+    await waitFor(() => {
+      expect(mockStartCapture).toHaveBeenCalledTimes(2);
+    });
+    expect(screen.getByText('Before the pause')).toBeVisible();
+    expect(createSession.mock.calls[1][0].timestampOffsetSeconds).toBe(5);
+  });
+
+  it('does not reopen a manually closed ended-call panel when queued notes finish', async () => {
+    const {rerender} = render(<NoteTaker {...dependencies} call={call} />);
+    expand();
+    fireEvent.click(screen.getByRole('button', {name: 'Enable note taker'}));
+    await waitFor(() => {
+      expect(mockStartCapture).toHaveBeenCalledTimes(1);
+    });
+    act(() => {
+      createSession.mock.calls[0][0].onEntry({seconds: 0, speaker: 'You', text: 'First notes'});
+    });
+    rerender(<NoteTaker {...dependencies} />);
+    fireEvent.click(screen.getByRole('button', {name: 'Close call notes'}));
+    act(() => {
+      createSession.mock.calls[0][0].onEntry({seconds: 1, speaker: 'You', text: 'Queued notes'});
+    });
+    expect(screen.queryByRole('complementary', {name: 'Call notes'})).not.toBeInTheDocument();
   });
 });

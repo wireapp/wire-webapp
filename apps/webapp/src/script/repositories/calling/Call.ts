@@ -141,7 +141,7 @@ export class Call {
     return selfParticipant ?? this.selfParticipant;
   }
 
-  /** Experimental AVS hook: identity of the authenticated sender currently feeding a receiver track. */
+  /** AVS source metadata identifies the authenticated sender currently feeding a receiver track. */
   setNoteTakerAudioIdentity(trackId: string, userId: QualifiedId, clientId: ClientId): void {
     this.noteTakerAudioIdentities.set(trackId, {userId, clientId});
   }

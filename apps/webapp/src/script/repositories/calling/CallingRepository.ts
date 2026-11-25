@@ -629,12 +629,12 @@ export class CallingRepository {
     this.isSoftLock = value;
   }
 
-  async initAvs(selfUser: User, clientId: ClientId): Promise<AvsInstances> {
+  async initAvs(selfUser: User, clientId: ClientId, {withAudioSource = false} = {}): Promise<AvsInstances> {
     this.selfUser = selfUser;
     this.selfClientId = clientId;
     const callingInstance = await getAvsInstance();
 
-    this.wCall = this.configureCallingApi(callingInstance);
+    this.wCall = this.configureCallingApi(callingInstance, withAudioSource);
     this.wUser = this.createWUser(this.wCall, this.serializeQualifiedId(this.selfUser.qualifiedId), clientId);
 
     this.mediaDevicesHandler.setOnMediaDevicesRefreshHandler(this.onMediaDevicesRefresh);
@@ -665,13 +665,13 @@ export class CallingRepository {
     this.avsInitLogLength = this.callLog.length;
   }
 
-  private configureCallingApi(wCall: Wcall): Wcall {
+  private configureCallingApi(wCall: Wcall, withAudioSource: boolean): Wcall {
     wCall.setLogHandler(this.avsLogHandler);
 
     const avsEnv = Runtime.isFirefox() || Runtime.isSafari() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     wCall.init(avsEnv);
     wCall.setUserMediaHandler(this.getCallMediaStream);
-    wCall.setAudioStreamHandler(this.updateCallAudioStreams, true);
+    wCall.setAudioStreamHandler(this.updateCallAudioStreams, withAudioSource);
     wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
     this.isConferenceCallingSupported = wCall.isConferenceCallingSupported();
     let last = Date.now();

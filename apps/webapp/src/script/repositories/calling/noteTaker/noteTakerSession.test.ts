@@ -26,7 +26,7 @@ import {task} from 'true-myth';
 import {createNoteTakerSession, type NoteTakerCall, type NoteTakerAudioPlatform} from './noteTakerSession';
 import type {SpeechEngine} from './speechEngine';
 
-import {MuteState} from '../../../repositories/calling/CallState';
+import {MuteState} from '../CallState';
 
 // Audio capture must not interfere with the ongoing call's media ownership.
 describe('NoteTakerSession', () => {
@@ -42,10 +42,9 @@ describe('NoteTakerSession', () => {
   let close: jest.Mock;
   let audioPlatform: NoteTakerAudioPlatform;
   const createSession = (
-    ...args: Parameters<typeof createNoteTakerSession>
+    options: Parameters<typeof createNoteTakerSession>[0],
   ): ReturnType<typeof createNoteTakerSession> => {
-    args[7] = audioPlatform;
-    return createNoteTakerSession(...args);
+    return createNoteTakerSession({...options, audioPlatform});
   };
 
   const flushTranscription = async (): Promise<void> => {
@@ -189,7 +188,7 @@ describe('NoteTakerSession', () => {
   });
 
   it('flushes the last partial chunk and leaves the call tracks running', async () => {
-    const session = createSession(clock, call, engine, onEntry, onError);
+    const session = createSession({clock, call, engine, onEntry, onError});
     await session.start();
     emit(new Float32Array(16000).fill(0.1));
     await session.stop();
@@ -209,7 +208,7 @@ describe('NoteTakerSession', () => {
 
   it('transcribes local and remote audio separately with their speaker labels', async () => {
     tracks.push({id: 'remote-1', readyState: 'live', stop: jest.fn()} as unknown as MediaStreamTrack);
-    const session = createSession(clock, call, engine, onEntry, onError);
+    const session = createSession({clock, call, engine, onEntry, onError});
     await session.start();
     emit(new Float32Array(16000).fill(0.1), 0);
     emit(new Float32Array(16000).fill(0.2), 1);
@@ -233,7 +232,7 @@ describe('NoteTakerSession', () => {
       structuredClone(audio, {transfer: [audio.buffer]});
       return task.resolve('transferred');
     });
-    const session = createSession(clock, call, engine, onEntry, onError, stats);
+    const session = createSession({clock, call, engine, onEntry, onError, onStats: stats});
     await session.start();
     emit(new Float32Array(16000).fill(0.1));
     await session.stop();
@@ -247,7 +246,7 @@ describe('NoteTakerSession', () => {
       .mockReturnValueOnce(task.resolve('I scream'))
       .mockReturnValueOnce(task.resolve('Ice cream'))
       .mockReturnValueOnce(task.resolve('Ice cream is ready.'));
-    const session = createSession(clock, call, engine, onEntry, onError, undefined, preview);
+    const session = createSession({clock, call, engine, onEntry, onError, onPreview: preview});
     await session.start();
     emit(new Float32Array(16000).fill(0.1));
     await flushTranscription();
@@ -292,7 +291,7 @@ describe('NoteTakerSession', () => {
         },
       );
     });
-    const session = createSession(clock, call, engine, onEntry, onError, undefined, preview);
+    const session = createSession({clock, call, engine, onEntry, onError, onPreview: preview});
     await session.start();
     emit(new Float32Array(16000).fill(0.1));
     for (let second = 0; second < 10; second++) {
@@ -332,7 +331,7 @@ describe('NoteTakerSession', () => {
         },
       };
     });
-    const session = createSession(clock, call, engine, onEntry, onError);
+    const session = createSession({clock, call, engine, onEntry, onError});
     await session.start();
     emit(new Float32Array(16000).fill(0.1), 1);
     name = 'Carol';
@@ -361,7 +360,7 @@ describe('NoteTakerSession', () => {
           },
         };
       });
-      const session = createSession(clock, call, engine, onEntry, onError);
+      const session = createSession({clock, call, engine, onEntry, onError});
       const started = await session.start();
       expect(started.isOk).toBe(true);
       emit(new Float32Array(16000).fill(0.1), 1);
@@ -403,7 +402,7 @@ describe('NoteTakerSession', () => {
         },
       };
     });
-    const session = createSession(clock, call, engine, onEntry, onError);
+    const session = createSession({clock, call, engine, onEntry, onError});
     await session.start();
     emit(new Float32Array(8000).fill(0.1), 1);
     identity = 'first';
@@ -425,7 +424,7 @@ describe('NoteTakerSession', () => {
 
   it('immediately excludes a muted microphone while retaining remote audio', async () => {
     tracks.push({readyState: 'live', stop: jest.fn()} as unknown as MediaStreamTrack);
-    const session = createSession(clock, call, engine, onEntry, onError);
+    const session = createSession({clock, call, engine, onEntry, onError});
     await session.start();
     muteState(MuteState.SELF_MUTED);
     expect(
@@ -454,7 +453,7 @@ describe('NoteTakerSession', () => {
         },
       );
     });
-    const session = createSession(clock, call, engine, onEntry, onError);
+    const session = createSession({clock, call, engine, onEntry, onError});
     await session.start();
     emit(new Float32Array(16000 * 10).fill(0.1));
     const stopped = session.stop();
@@ -472,7 +471,7 @@ describe('NoteTakerSession', () => {
   });
 
   it('skips silence and reconnects replacement tracks without stopping the old track', async () => {
-    const session = createSession(clock, call, engine, onEntry, onError);
+    const session = createSession({clock, call, engine, onEntry, onError});
     await session.start();
     emit(new Float32Array(16000 * 8));
     const previousTrack = tracks[0];

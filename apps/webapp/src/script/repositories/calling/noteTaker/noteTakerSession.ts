@@ -22,7 +22,8 @@ import {isUndefined} from '@sindresorhus/is';
 import {Maybe, result, task, type Task} from 'true-myth';
 
 import {createAudioChunker, type AudioChunker, removeOverlap, type AudioChunk} from './audioChunker';
-import {toSpeechError, type SpeechEngine} from './speechEngine';
+import type {SpeechEngine} from './speechEngine';
+import {toSpeechError} from './toSpeechError';
 
 const SAMPLE_RATE = 16000;
 const BUFFER_SIZE = 4096;
@@ -75,17 +76,30 @@ const browserAudioPlatform: NoteTakerAudioPlatform = {
   },
 };
 
+export interface NoteTakerSessionOptions {
+  clock: Clock;
+  call: NoteTakerCall;
+  engine: SpeechEngine;
+  onEntry: (entry: TranscriptEntry) => void;
+  onError: (error: unknown) => void;
+  onStats?: (stats: TranscriptionStats) => void;
+  onPreview?: (entry: TranscriptEntry) => void;
+  audioPlatform?: NoteTakerAudioPlatform;
+  timestampOffsetSeconds?: number;
+}
+
 /** Separate local/remote taps. Never stops or modifies the call's tracks. */
-export function createNoteTakerSession(
-  clock: Clock,
-  call: NoteTakerCall,
-  engine: SpeechEngine,
-  onEntry: (entry: TranscriptEntry) => void,
-  onError: (error: unknown) => void,
-  onStats?: (stats: TranscriptionStats) => void,
-  onPreview?: (entry: TranscriptEntry) => void,
-  audioPlatform: NoteTakerAudioPlatform = browserAudioPlatform,
-): NoteTakerSession {
+export function createNoteTakerSession({
+  clock,
+  call,
+  engine,
+  onEntry,
+  onError,
+  onStats,
+  onPreview,
+  audioPlatform = browserAudioPlatform,
+  timestampOffsetSeconds = 0,
+}: NoteTakerSessionOptions): NoteTakerSession {
   let audioContext: Maybe<AudioContext> = Maybe.nothing();
   let timer: Maybe<ReturnType<Clock['setInterval']>> = Maybe.nothing();
   const sources = new Map<MediaStreamTrack, {source: MediaStreamAudioSourceNode; gain: GainNode; speaker: Speaker}>();
@@ -129,7 +143,7 @@ export function createNoteTakerSession(
       return;
     }
     const context = audioContext.value;
-    const offsetSeconds = context.currentTime;
+    const offsetSeconds = timestampOffsetSeconds + context.currentTime;
     let attribution = getSpeakerName(speaker, trackId);
     const chunker = createAudioChunker(chunk => {
       enqueue({...chunk, seconds: chunk.seconds + offsetSeconds, speaker, ...attribution});

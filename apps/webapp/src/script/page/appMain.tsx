@@ -46,7 +46,6 @@ import {CallingContainer} from '../components/calling/CallingOverlayContainer';
 import {ChooseScreen} from '../components/calling/ChooseScreen';
 import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
 import {NoteTaker} from '../components/calling/noteTaker/noteTaker';
-import type {NoteTakerCall} from '../components/calling/noteTaker/noteTakerSession';
 import {ConfigToolbar} from '../components/configToolbar/configToolbar';
 import {SharedDriveUploadStatusScope} from '../components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {ErrorFallback} from '../components/errorFallback';
@@ -57,7 +56,11 @@ import {LegalHoldModal} from '../components/Modals/LegalHoldModal/LegalHoldModal
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from '../components/Modals/UserModal';
 import {Config} from '../Config';
-import {driveBulkActionProgressFeatureToggleName, noteTakerFeatureToggleName, type StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
+import {
+  driveBulkActionProgressFeatureToggleName,
+  noteTakerFeatureToggleName,
+  type StartupFeatureToggleName,
+} from '../featureToggles/startupFeatureToggleNames';
 import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
@@ -69,6 +72,7 @@ import {
   joinUnestablishedMixedConversations,
 } from '../mls/mlsMigration/migrationInitialiser';
 import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from '../repositories/calling/CallState';
+import type {NoteTakerCall} from '../repositories/calling/noteTaker/noteTakerSession';
 import {ConversationState} from '../repositories/conversation/ConversationState';
 import {User} from '../repositories/entity/User';
 import {TeamState} from '../repositories/team/TeamState';

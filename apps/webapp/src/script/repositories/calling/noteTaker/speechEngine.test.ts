@@ -39,7 +39,8 @@ function createWorkerDouble(): {
     return worker as Worker;
   });
   const engine = createWhisperWorkerEngine(createWorker);
-  const message = (data: unknown): void => {
+  const message = (data: Record<string, unknown>): void => {
+    data = {requestIdentifier: postMessage.mock.calls.at(-1)?.[0].requestIdentifier, ...data};
     worker.onmessage?.call(worker as Worker, {data} as MessageEvent);
   };
   return {engine, worker, postMessage, createWorker, message};
@@ -49,13 +50,16 @@ describe('Whisper worker bridge', () => {
   it('creates its worker only on load and transfers ownership of PCM buffers', async () => {
     const {engine, worker, createWorker, message} = createWorkerDouble();
     expect(createWorker).not.toHaveBeenCalled();
-    const loaded = engine.load('test-model', jest.fn());
+    const loaded = engine.load('base', jest.fn());
     message({type: 'ready', device: 'webgpu'});
     expect((await loaded).isOk).toBe(true);
     expect(engine.description).toBe('GPU (WebGPU)');
     const audio = new Float32Array(16000);
     const transcribed = engine.transcribe(audio);
-    expect(worker.postMessage).toHaveBeenLastCalledWith({type: 'transcribe', audio}, [audio.buffer]);
+    expect(worker.postMessage).toHaveBeenLastCalledWith(
+      {type: 'transcribe', requestIdentifier: expect.any(Number), audio},
+      [audio.buffer],
+    );
     message({type: 'result', text: 'Hello'});
     const output = await transcribed;
     expect(output.isOk).toBe(true);
@@ -68,7 +72,7 @@ describe('Whisper worker bridge', () => {
 
   it('settles pending work on disposal and rejects further audio immediately', async () => {
     const {engine} = createWorkerDouble();
-    const loading = engine.load('test-model', jest.fn());
+    const loading = engine.load('base', jest.fn());
     engine.dispose();
     expect((await loading).isErr).toBe(true);
     expect((await engine.transcribe(new Float32Array(1))).isErr).toBe(true);
@@ -76,7 +80,7 @@ describe('Whisper worker bridge', () => {
 
   it('keeps the first request when another transcription arrives in flight', async () => {
     const {engine, message} = createWorkerDouble();
-    const loading = engine.load('test-model', jest.fn());
+    const loading = engine.load('base', jest.fn());
     message({type: 'ready', device: 'wasm'});
     await loading;
     const first = engine.transcribe(new Float32Array(1));
@@ -88,13 +92,37 @@ describe('Whisper worker bridge', () => {
 
   it('returns a failure when sending audio throws instead of leaving a pending operation', async () => {
     const {engine, postMessage, message} = createWorkerDouble();
-    const loading = engine.load('test-model', jest.fn());
+    const loading = engine.load('base', jest.fn());
     message({type: 'ready', device: 'wasm'});
     await loading;
     postMessage.mockImplementationOnce(() => {
       throw new DOMException('Cannot clone');
     });
     expect((await engine.transcribe(new Float32Array(1))).isErr).toBe(true);
+    engine.dispose();
+  });
+  it('rejects malformed replies instead of resolving a request as empty text', async () => {
+    const {engine, message} = createWorkerDouble();
+    const loading = engine.load('base', jest.fn());
+    message({type: 'ready', device: 'unknown'});
+    const result = await loading;
+    expect(result.isErr).toBe(true);
+    engine.dispose();
+  });
+
+  it('ignores a stale request identifier while a new transcription is pending', async () => {
+    const {engine, message} = createWorkerDouble();
+    const loading = engine.load('base', jest.fn());
+    message({type: 'ready', device: 'wasm'});
+    await loading;
+    const transcribed = engine.transcribe(new Float32Array(1));
+    message({type: 'result', requestIdentifier: 1, text: 'Stale load response'});
+    message({type: 'result', text: 'Current transcript'});
+    const result = await transcribed;
+    expect(result.isOk).toBe(true);
+    if (result.isOk) {
+      expect(result.value).toBe('Current transcript');
+    }
     engine.dispose();
   });
 });
