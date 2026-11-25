@@ -33,6 +33,10 @@ on:
         type: string
         required: false
         description: Exact team management URL expected from the deployed WebApp artifact
+      testCommit:
+        type: string
+        required: false
+        description: Immutable commit used to build the application artifact under test
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
@@ -77,9 +81,10 @@ jobs:
           - 8080:8080
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Check out E2E test source
+        uses: $/.github/actions/checkout-e2e-test-source
         with:
-          persist-credentials: false
+          testCommit: ${{ inputs.testCommit }}
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
@@ -87,6 +92,11 @@ jobs:
           cache: 'npm'
 
       - run: npm clean-install && npx just setup
+
+      - name: Ensure Chromium dependencies and headless shell for the checked-out Playwright version
+        run: |
+          npx playwright install-deps --dry-run chromium || npx playwright install-deps chromium
+          npx playwright install --only-shell chromium
 
       - name: Install unzip for 1Password CLI setup
         run: |
@@ -116,9 +126,10 @@ jobs:
       matrixShards: ${{ steps.computeShards.outputs.matrixShards }}
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Check out E2E test source
+        uses: $/.github/actions/checkout-e2e-test-source
         with:
-          persist-credentials: false
+          testCommit: ${{ inputs.testCommit }}
 
       - name: Verify Git LFS binary pointers
         uses: $/.github/actions/verify-git-lfs-files
@@ -172,9 +183,10 @@ jobs:
           - 8080:8080
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Check out E2E test source
+        uses: $/.github/actions/checkout-e2e-test-source
         with:
-          persist-credentials: false
+          testCommit: ${{ inputs.testCommit }}
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
@@ -183,6 +195,11 @@ jobs:
 
       - name: Install dependencies
         run: npm clean-install && npx just setup
+
+      - name: Ensure Chromium dependencies and headless shell for the checked-out Playwright version
+        run: |
+          npx playwright install-deps --dry-run chromium || npx playwright install-deps chromium
+          npx playwright install --only-shell chromium
 
       - name: Install 1Password CLI
         run: |
@@ -239,9 +256,10 @@ jobs:
       reportUrl: ${{ steps.generate-outputs.outputs.reportUrl }}
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Check out E2E test source
+        uses: $/.github/actions/checkout-e2e-test-source
         with:
-          persist-credentials: false
+          testCommit: ${{ inputs.testCommit }}
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
