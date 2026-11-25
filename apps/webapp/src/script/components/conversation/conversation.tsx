@@ -816,7 +816,12 @@ export function ConversationContent({
                     </div>
                   )}
                 </div>
-                {isDriveOffboardingEnabled && <ConversationDriveOffboardingBanner />}
+                {isDriveOffboardingEnabled && (
+                  <ConversationDriveOffboardingBanner
+                    title={translate('conversationDriveOffboardingTitle')}
+                    description={translate('conversationDriveOffboardingDescription')}
+                  />
+                )}
                 <ConversationTabPanel id="files" isActive={isFileTabActive}>
                   {isFileTabActive && (
                     <SharedDriveUploadProvider controller={sharedDriveUploadController}>

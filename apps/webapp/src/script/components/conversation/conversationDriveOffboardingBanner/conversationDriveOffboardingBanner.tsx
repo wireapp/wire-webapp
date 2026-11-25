@@ -21,18 +21,22 @@ import type {FunctionComponent} from 'react';
 
 import {bannerStyles} from './conversationDriveOffboardingBanner.styles';
 
-import {useApplicationContext} from '../../../page/rootProvider';
 import {InfoIcon} from '../../../uiKit/dataDisplay/icon/infoIcon';
 
-export const ConversationDriveOffboardingBanner: FunctionComponent = () => {
-  const {translate} = useApplicationContext();
+interface ConversationDriveOffboardingBannerProps {
+  title: string;
+  description: string;
+}
 
+export const ConversationDriveOffboardingBanner: FunctionComponent<ConversationDriveOffboardingBannerProps> = ({
+  title,
+  description,
+}) => {
   return (
     <div css={bannerStyles} role="status" data-uie-name="drive-offboarding-banner">
       <InfoIcon aria-hidden="true" />
       <span>
-        <strong>{translate('conversationDriveOffboardingTitle')}</strong>{' '}
-        {translate('conversationDriveOffboardingDescription')}
+        <strong>{title}</strong> {description}
       </span>
     </div>
   );
