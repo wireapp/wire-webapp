@@ -268,9 +268,7 @@ describe('Conversation', () => {
     expect(within(composerBanner).queryByRole('link')).not.toBeInTheDocument();
     const composer = view.getByTestId('input-message');
     expect(composerBanner.compareDocumentPosition(composer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    fireEvent.click(
-      within(composerBanner).getByRole('button', {name: 'accessibility.rightPanel.close'}),
-    );
+    fireEvent.click(within(composerBanner).getByRole('button', {name: 'accessibility.rightPanel.close'}));
     expect(view.container.querySelector('.conversation-viewer-permission-banner')).not.toBeInTheDocument();
     expect(view.getByTestId('drive-offboarding-banner')).toBeVisible();
     sessionStorage.removeItem(
