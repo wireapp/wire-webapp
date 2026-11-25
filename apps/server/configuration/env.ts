@@ -214,6 +214,9 @@ export type Env = {
   /** Feature to enable the press space to unmute feature */
   FEATURE_ENABLE_PRESS_SPACE_TO_UNMUTE: string;
 
+  /** Feature to show pending onboarding status for users who are not yet contactable */
+  FEATURE_ENABLE_PENDING_ONBOARDING_STATUS: string;
+
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
 

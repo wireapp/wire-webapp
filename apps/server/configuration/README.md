@@ -109,6 +109,7 @@ Notes:
 | `FEATURE_ENABLE_IN_CALL_REACTIONS` | `false` | In-call reactions feature | N/A |
 | `FEATURE_ENABLE_MEDIA_EMBEDS` | `true` | Media embeds (YouTube/Vimeo/Spotify/etc.) | May apply (also requires user preview setting enabled) |
 | `FEATURE_ENABLE_MESSAGE_FORMAT_BUTTONS` | `false` | Rich text formatting controls | May apply (format button also depends on markdown-preview preference) |
+| `FEATURE_ENABLE_PENDING_ONBOARDING_STATUS` | `false` | Pending onboarding badge and disabled 1:1 start for not-yet-contactable users | May apply (requires backend to return `contact_status`) |
 | `FEATURE_ENABLE_PING_CONFIRMATION` | `false` | Confirm modal before pinging large groups | May apply (confirmation shown only for non-1:1 conversations with participant count at/above threshold) |
 | `FEATURE_ENABLE_PRESS_SPACE_TO_UNMUTE` | `false` | Press-space-to-unmute behavior | May apply (also requires user call preference enabled) |
 | `FEATURE_ENABLE_PROTEUS_CORE_CRYPTO` | `false` | Enable Proteus core-crypto integration path | N/A |

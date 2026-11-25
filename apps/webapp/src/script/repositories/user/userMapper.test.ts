@@ -22,7 +22,7 @@ import {UserAsset, UserAssetType} from '../../apiClient/user/userAsset';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {User} from '../entity/User';
-import {ACCENT_ID} from '../../Config';
+import {ACCENT_ID, Config} from '../../Config';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 import {entities, payload} from '../../../../test/api/payloads';
 import {translate} from '../../util/localizerUtil';
@@ -174,33 +174,62 @@ describe('User Mapper', () => {
       expect(updated_user_et.username()).toBe(entities.user.jane_roe.handle);
     });
 
-    it('marks the user as pending onboarding when they are not contactable', () => {
-      const userEntity = new User('', '', translateForTest);
-      userEntity.id = entities.user.john_doe.id;
-      const data: Partial<UserRecord> = {contact_status: {state: 'non-contactable'}, id: userEntity.id};
-      mapper.updateUserFromObject(userEntity, data, '');
+    describe('pending onboarding', () => {
+      const originalFeatures = Config.getConfig().FEATURE;
 
-      expect(userEntity.isPendingOnboarding()).toBe(true);
-    });
+      const setPendingOnboardingFeature = (isEnabled: boolean): void => {
+        Config._dangerouslySetConfigFeaturesForDebug({
+          ...originalFeatures,
+          ENABLE_PENDING_ONBOARDING_STATUS: isEnabled,
+        });
+      };
 
-    it('clears the pending onboarding state when the user becomes contactable', () => {
-      const userEntity = new User('', '', translateForTest);
-      userEntity.id = entities.user.john_doe.id;
-      userEntity.isPendingOnboarding(true);
-      const data: Partial<UserRecord> = {contact_status: {state: 'contactable'}, id: userEntity.id};
-      mapper.updateUserFromObject(userEntity, data, '');
+      beforeEach(() => {
+        setPendingOnboardingFeature(true);
+      });
 
-      expect(userEntity.isPendingOnboarding()).toBe(false);
-    });
+      afterEach(() => {
+        Config._dangerouslySetConfigFeaturesForDebug(originalFeatures);
+      });
 
-    it('keeps the pending onboarding state when the contact status is missing', () => {
-      const userEntity = new User('', '', translateForTest);
-      userEntity.id = entities.user.john_doe.id;
-      userEntity.isPendingOnboarding(true);
-      const data = {id: userEntity.id, name: entities.user.jane_roe.name};
-      mapper.updateUserFromObject(userEntity, data, '');
+      it('marks the user as pending onboarding when they are not contactable', () => {
+        const userEntity = new User('', '', translateForTest);
+        userEntity.id = entities.user.john_doe.id;
+        const data: Partial<UserRecord> = {contact_status: {state: 'non-contactable'}, id: userEntity.id};
+        mapper.updateUserFromObject(userEntity, data, '');
 
-      expect(userEntity.isPendingOnboarding()).toBe(true);
+        expect(userEntity.isPendingOnboarding()).toBe(true);
+      });
+
+      it('does not mark the user as pending onboarding when the feature is disabled', () => {
+        setPendingOnboardingFeature(false);
+        const userEntity = new User('', '', translateForTest);
+        userEntity.id = entities.user.john_doe.id;
+        const data: Partial<UserRecord> = {contact_status: {state: 'non-contactable'}, id: userEntity.id};
+        mapper.updateUserFromObject(userEntity, data, '');
+
+        expect(userEntity.isPendingOnboarding()).toBe(false);
+      });
+
+      it('clears the pending onboarding state when the user becomes contactable', () => {
+        const userEntity = new User('', '', translateForTest);
+        userEntity.id = entities.user.john_doe.id;
+        userEntity.isPendingOnboarding(true);
+        const data: Partial<UserRecord> = {contact_status: {state: 'contactable'}, id: userEntity.id};
+        mapper.updateUserFromObject(userEntity, data, '');
+
+        expect(userEntity.isPendingOnboarding()).toBe(false);
+      });
+
+      it('keeps the pending onboarding state when the contact status is missing', () => {
+        const userEntity = new User('', '', translateForTest);
+        userEntity.id = entities.user.john_doe.id;
+        userEntity.isPendingOnboarding(true);
+        const data = {id: userEntity.id, name: entities.user.jane_roe.name};
+        mapper.updateUserFromObject(userEntity, data, '');
+
+        expect(userEntity.isPendingOnboarding()).toBe(true);
+      });
     });
 
     it("converts user's expiration date to local timestamp", () => {
