@@ -234,6 +234,65 @@ describe('Conversation', () => {
       expect(last_message_et.timestamp()).toBe(older_timestamp);
     });
 
+    describe('in a conversation without messages in memory', () => {
+      beforeEach(() => {
+        conversation_et.removeMessages();
+      });
+
+      it('keeps a message older than the last event out of the displayed messages', () => {
+        const lateMessage = createMessageForTest();
+        lateMessage.timestamp(first_timestamp);
+        conversation_et.last_event_timestamp(second_timestamp);
+
+        conversation_et.addMessage(lateMessage);
+
+        expect(conversation_et.messages()).toEqual([]);
+        expect(conversation_et.last_event_timestamp()).toBe(second_timestamp);
+      });
+
+      it('displays a message that is not older than the last event', () => {
+        const message = createMessageForTest();
+        message.timestamp(second_timestamp);
+        conversation_et.last_event_timestamp(second_timestamp);
+
+        conversation_et.addMessage(message);
+
+        expect(conversation_et.messages()).toEqual([message]);
+      });
+    });
+
+    describe.each([true, false])('with a message of the self user pending, keepUnsentMessagesLast %p', keepLast => {
+      beforeEach(() => {
+        Conversation.keepUnsentMessagesLast = keepLast;
+        const sent = createMessageForTest('sent');
+        sent.status(StatusType.SENT);
+        sent.timestamp(100);
+        const pending = createMessageForTest('pending');
+        pending.status(StatusType.SENDING);
+        pending.timestamp(101);
+        conversation_et.removeMessages();
+        conversation_et.messages_unordered([sent, pending]);
+        conversation_et.last_event_timestamp(100);
+      });
+
+      afterEach(() => {
+        Conversation.keepUnsentMessagesLast = false;
+      });
+
+      it('displays the incoming messages that follow', () => {
+        const first = createMessageForTest('incoming-1');
+        first.timestamp(200);
+        const second = createMessageForTest('incoming-2');
+        second.timestamp(300);
+
+        conversation_et.addMessage(first);
+        conversation_et.addMessage(second);
+
+        expect(conversation_et.messages_unordered()).toEqual(expect.arrayContaining([first, second]));
+        expect((conversation_et as any).incomingMessages()).toEqual([]);
+      });
+    });
+
     describe('affects last_event_timestamp', () => {
       it('and adding a message should update it', () => {
         const message_et = createMessageForTest();
@@ -325,6 +384,45 @@ describe('Conversation', () => {
 
         expect(conversation_et.last_read_timestamp()).toBe(first_timestamp);
       });
+    });
+  });
+
+  describe('messages order', () => {
+    function messageAt(id: string, status: StatusType, timestamp: number): Message {
+      const message = createMessageForTest(id);
+      message.status(status);
+      message.timestamp(timestamp);
+      return message;
+    }
+
+    function orderedIds(): string[] {
+      return conversation_et.messages().map(({id}) => {
+        return id;
+      });
+    }
+
+    beforeEach(() => {
+      conversation_et.messages_unordered([
+        messageAt('pending', StatusType.SENDING, 1),
+        messageAt('failed', StatusType.FAILED, 2),
+        messageAt('sent-late', StatusType.SENT, 5),
+        messageAt('federation-failed', StatusType.FEDERATION_ERROR, 0),
+        messageAt('sent-early', StatusType.SENT, 3),
+      ]);
+    });
+
+    afterEach(() => {
+      Conversation.keepUnsentMessagesLast = false;
+    });
+
+    it('is by timestamp alone by default', () => {
+      expect(orderedIds()).toEqual(['federation-failed', 'pending', 'failed', 'sent-early', 'sent-late']);
+    });
+
+    it('lists the messages that are not sent yet after all others, by timestamp, when asked to', () => {
+      Conversation.keepUnsentMessagesLast = true;
+
+      expect(orderedIds()).toEqual(['sent-early', 'sent-late', 'federation-failed', 'pending', 'failed']);
     });
   });
 

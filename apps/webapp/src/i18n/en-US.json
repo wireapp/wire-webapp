@@ -1901,6 +1901,7 @@
   "outboxDeletePendingMessage": "This message has not been sent yet and will not be sent. This cannot be undone.",
   "outboxFailedDeclined": "Message was not sent because it was declined.",
   "outboxFailedExpired": "Message could not be sent in time.",
+  "outboxFailedGeneric": "Message could not be sent.",
   "outboxFailedRejected": "Message was rejected and could not be sent.",
   "outboxFailedRemoved": "Message could not be sent as you are no longer in this conversation.",
   "outboxOfflineNotice":"You are offline. Your messages will be sent once you are online again.",

@@ -55,6 +55,7 @@ const unreachableDomainMarker = createReactTranslationMarker('complete-failure-t
 const failedReasonTranslationKeys = {
   declined: 'outboxFailedDeclined',
   expired: 'outboxFailedExpired',
+  generic: 'outboxFailedGeneric',
   rejected: 'outboxFailedRejected',
   removed: 'outboxFailedRemoved',
 } as const satisfies Record<FailedReason, TranslationKey>;
