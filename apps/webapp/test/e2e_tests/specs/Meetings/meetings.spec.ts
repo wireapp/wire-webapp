@@ -43,11 +43,11 @@ const UPDATED_DAILY_TITLE = 'Daily ongoing edit updated';
 const LONG_NAME = 'Alexandria-Marie O’Connor-Sørensen';
 const ORDERING_OCCURRENCE_COUNT = 53;
 const RECURRENCE_SCENARIOS = [
-  {label: 'Never', intervalDays: 0},
-  {label: 'Daily', intervalDays: 1},
-  {label: 'Weekly', intervalDays: 7},
-  {label: 'Every two weeks', intervalDays: 14},
-  {label: 'Every four weeks', intervalDays: 28},
+  {testCaseId: '11699', label: 'Never', intervalDays: 0},
+  {testCaseId: '11649', label: 'Daily', intervalDays: 1},
+  {testCaseId: '13604', label: 'Weekly', intervalDays: 7},
+  {testCaseId: '13605', label: 'Every two weeks', intervalDays: 14},
+  {testCaseId: '13606', label: 'Every four weeks', intervalDays: 28},
 ] as const;
 const LATE_MEETING_SCENARIOS = [
   {
@@ -421,7 +421,7 @@ test.describe('Meetings', () => {
 
     for (const scenario of RECURRENCE_SCENARIOS) {
       test(
-        `TC-11649,11699: User can view recurring meeting instances: ${scenario.label}`,
+        `TC-${scenario.testCaseId}: Host can schedule and view a meeting with Repeat set to : ${scenario.label}`,
         {tag: ['@regression']},
         async ({createUser, createTeam, createPage}) => {
           const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
@@ -644,7 +644,7 @@ test.describe('Meetings', () => {
     });
 
     test(
-      'TC-11686 TC-11687 TC-11688 ,TC-11741 : Host sees schedule defaults, title validation, and a meeting with a supported title and no other participants',
+      'TC-11686,TC-11687,TC-11688,TC-13063 : Host sees schedule defaults, title validation, and a meeting with a supported title and no other participants',
       {tag: ['@regression']},
       async ({createUser, createTeam, createPage}) => {
         const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
