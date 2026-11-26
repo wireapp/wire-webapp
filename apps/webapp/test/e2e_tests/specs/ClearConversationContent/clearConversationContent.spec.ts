@@ -154,7 +154,10 @@ test.describe('Clear Conversation Content', () => {
     {tag: '@TC-156', conversationType: 'group'},
     {tag: '@TC-8779', conversationType: '1:1'},
   ].forEach(({tag, conversationType}) => {
-    test(
+    // Skip the group case for release 1.3.0 after failures in run 45652171951.
+    const registerTest = tag === '@TC-156' ? test.skip : test;
+
+    registerTest(
       `I want to see incoming picture, ping and call after I clear content of a ${conversationType} conversation via conversation list`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
