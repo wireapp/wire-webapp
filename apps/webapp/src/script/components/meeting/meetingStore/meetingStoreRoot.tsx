@@ -109,6 +109,7 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
 
   useEffect(() => {
     if (!isMeetingsEnabled) {
+      logger.info('meeting reminder scheduler not started because meetings are disabled');
       return undefined;
     }
 
@@ -171,12 +172,19 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
     const reminderScheduler = createMeetingReminderScheduler({
       clock,
       onReminder: payload => {
+        logger.info('meeting reminder callback started', {
+          meetingId: payload.qualifiedId.id,
+          meetingStartTime: payload.meetingStartTime,
+          availability: getAvailability(),
+        });
         const notificationCountBefore = useMeetingNotificationStore.getState().notifications.length;
         addNotificationUnlessAway({
           ...payload,
           kind: MeetingNotificationKind.REMINDER,
         });
-        logger.debug('meeting reminder reached notification store', {
+        logger.info('meeting reminder reached notification store', {
+          meetingId: payload.qualifiedId.id,
+          meetingStartTime: payload.meetingStartTime,
           availability: getAvailability(),
           notificationCountBefore,
           notificationCountAfter: useMeetingNotificationStore.getState().notifications.length,
@@ -184,10 +192,11 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
         reminderOsNotifier.notify(payload);
       },
     });
+    logger.info('meeting reminder scheduler created');
 
     const unsubscribeFromNotificationStore = useMeetingNotificationStore.subscribe((state, previousState) => {
       if (state.notifications !== previousState.notifications) {
-        logger.debug('meeting notification store changed', {
+        logger.info('meeting notification store changed', {
           notificationCountBefore: previousState.notifications.length,
           notificationCountAfter: state.notifications.length,
           reminderCount: state.notifications.filter(notification => {
@@ -218,12 +227,14 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
     });
     const unsubscribeFromMeetingStore = store.subscribe((state, previousState) => {
       if (state.meetingSeries !== previousState.meetingSeries) {
+        logger.info('meeting reminder scheduler syncing', {meetingCount: state.meetingSeries.length});
         notificationHandlers.retryPendingNotifications();
         reminderScheduler.sync(state.meetingSeries);
       }
     });
 
     reminderScheduler.sync(store.getState().meetingSeries);
+    logger.info('meeting reminder scheduler initial sync', {meetingCount: store.getState().meetingSeries.length});
     dispatcher.enqueueInitialLoad();
 
     return () => {
@@ -232,6 +243,7 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
       unsubscribeFromMeetingStore();
       unsubscribeFromNotificationStore();
       reminderScheduler.stop();
+      logger.info('meeting reminder scheduler stopped');
       reminderOsNotifier.stop();
     };
   }, [isMeetingsEnabled, store, clock, mainViewModel, translate]);
