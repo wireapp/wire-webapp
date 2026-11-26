@@ -89,7 +89,14 @@ export const useMessageHandling = ({
   sendPastedFile,
   translate,
 }: UseMessageHandlingProps): UseMessageHandlingResult => {
-  const {isEditing, editedMessage, editMessage: editMessageCallback, cancelMessageEditing} = useMessageEditing();
+  const {
+    isEditing,
+    editedMessage,
+    editMessage: editMessageCallback,
+    cancelMessageEditing,
+  } = useMessageEditing({
+    messageRepository,
+  });
 
   const {isReplying, replyMessage: replyMessageCallback, replyMessageEntity} = useMessageReply();
 

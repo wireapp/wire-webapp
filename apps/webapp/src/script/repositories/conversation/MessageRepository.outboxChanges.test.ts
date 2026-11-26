@@ -17,6 +17,7 @@
  *
  */
 
+import {createFireAndForgetInvoker, type FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {amplify} from 'amplify';
 
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
@@ -50,7 +51,9 @@ import {UserState} from '../user/userState';
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
 import {MessageRepository} from './MessageRepository';
-import {WEEK_MILLISECONDS} from './outbox/durations';
+import {validate as isUuid} from 'uuid';
+
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 const CONVERSATION_ID = {id: 'conversation-1', domain: 'wire.test'};
 const CHANGES_LANE = `${CONVERSATION_ID.id}#changes`;
@@ -61,6 +64,7 @@ type Parts = {
   eventService: EventService;
   store: InMemoryOutboxStore;
   clock: FakeClock;
+  invoker: FireAndForgetInvoker;
   outbox: Outbox;
   selfUser: User;
   send: jest.Mock;
@@ -92,6 +96,7 @@ function buildParts(): Parts {
   jest.spyOn(audioRepository, 'play').mockResolvedValue(undefined as never);
   const send = jest.fn();
   const clock = createFakeClock();
+  const invoker = createFireAndForgetInvoker({reportError: jest.fn()});
   const store = createInMemoryOutboxStore();
   const outbox = createOutbox();
   const isBeingEdited = jest.fn().mockResolvedValue(false);
@@ -115,6 +120,7 @@ function buildParts(): Parts {
     createCoreTestFixture({service: {conversation: {send, messageTimer: new MessageTimer()}}}),
     outbox,
     isBeingEdited,
+    invoker,
   );
 
   const sendToBackend = jest.spyOn(repository as any, 'sendMessageToBackend').mockResolvedValue({
@@ -131,7 +137,7 @@ function buildParts(): Parts {
     failed_reason: jest.fn(),
     primary_key: 'primary-key',
   } as never);
-  jest.spyOn(eventService, 'loadEvent').mockResolvedValue({
+  const storedRecord = {
     primary_key: 'primary-key',
     id: 'message-1',
     type: 'conversation.message-add',
@@ -140,7 +146,11 @@ function buildParts(): Parts {
     time: new Date(1_000_000).toISOString(),
     status: StatusType.SENDING,
     data: {content: 'old', mentions: [], previews: []},
-  } as any);
+  } as any;
+  // The tests name their messages. An edit gets a new uuid, under which nothing is stored before the edit is shown.
+  jest.spyOn(eventService, 'loadEvent').mockImplementation(async (_conversationId, messageId) => {
+    return isUuid(messageId) ? undefined : storedRecord;
+  });
   const updateEvent = jest.spyOn(eventService, 'updateEvent').mockResolvedValue({} as any);
   const deleteEvent = jest.spyOn(eventService, 'deleteEvent').mockResolvedValue(1);
 
@@ -150,6 +160,7 @@ function buildParts(): Parts {
     eventService,
     store,
     clock,
+    invoker,
     outbox,
     selfUser,
     send,
@@ -202,7 +213,7 @@ function seedMessage(
         mentions: [],
         mayBeDelivered,
       },
-      validUntil: 1_000_000 + WEEK_MILLISECONDS,
+      validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
       ...snapshot,
     }),
   );
@@ -320,7 +331,7 @@ describe('MessageRepository routes changes through the outbox', () => {
             reactions: '👍',
           },
           queuedSeq: 2,
-          validUntil: 1_000_000 + WEEK_MILLISECONDS,
+          validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
         }),
       );
       await startOutbox(parts);
@@ -346,11 +357,11 @@ describe('MessageRepository routes changes through the outbox', () => {
       seedMessage(parts, {messageId: 'message-2', queuedSeq: 2});
       await startOutbox(parts);
 
-      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, createMessage(parts, 'message-1'));
+      void parts.repository.startEditing(createMessage(parts, 'message-1'));
       await parts.clock.settle();
       expect(snapshotOf(parts.store, 'message-1')?.state).toBe('on-hold');
 
-      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, createMessage(parts, 'message-2'));
+      void parts.repository.startEditing(createMessage(parts, 'message-2'));
       await parts.clock.settle();
       expect(snapshotOf(parts.store, 'message-1')?.state).toBe('queued');
       expect(snapshotOf(parts.store, 'message-2')?.state).toBe('on-hold');
@@ -360,7 +371,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       seedMessage(parts, {messageId: 'message-1'});
       await startOutbox(parts);
       const message = createMessage(parts, 'message-1');
-      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, message);
+      void parts.repository.startEditing(message);
       await parts.clock.settle();
 
       await parts.repository.sendMessageEdit(parts.conversation, 'new', message, []);
@@ -405,11 +416,11 @@ describe('MessageRepository routes changes through the outbox', () => {
       });
       await startOutbox(parts);
 
-      await parts.repository.reviewRestoredHolds(parts.conversation);
+      parts.repository.reviewRestoredHolds();
       await parts.clock.settle();
       expect(snapshotOf(parts.store, 'message-1')?.state).toBe('on-hold');
 
-      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, createMessage(parts, 'message-2'));
+      void parts.repository.startEditing(createMessage(parts, 'message-2'));
       await parts.clock.settle();
 
       expect(snapshotOf(parts.store, 'message-1')?.state).toBe('queued');
@@ -422,6 +433,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       const message = createMessage(parts, 'message-1');
 
       await parts.repository.sendMessageEdit(parts.conversation, 'new', message, []);
+      await parts.clock.settle();
 
       expect(snapshotOf(parts.store, 'message-1')).toEqual(
         expect.objectContaining({state: 'queued', payload: expect.objectContaining({text: 'old'})}),
@@ -446,6 +458,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       const message = createMessage(parts, 'sent-1', 'old', StatusType.SENT);
 
       await parts.repository.sendMessageEdit(parts.conversation, 'new', message, []);
+      await parts.clock.settle();
 
       expect(snapshotOf(parts.store, 'sent-1:edit')).toEqual(
         expect.objectContaining({kind: 'message-change', orderingKey: CHANGES_LANE}),
@@ -493,7 +506,9 @@ describe('MessageRepository routes changes through the outbox', () => {
           };
         });
       });
-      return () => {return finishSending()};
+      return () => {
+        return finishSending();
+      };
     }
 
     async function waitForAttempt(): Promise<void> {
@@ -544,7 +559,9 @@ describe('MessageRepository routes changes through the outbox', () => {
       await startOutbox(parts);
       const message = createMessage(parts, 'sent-1', 'text', StatusType.SENT);
       // The hide goes to the self conversations
-      jest.spyOn((parts.repository as any).conversationState, 'getSelfConversations').mockReturnValue([parts.conversation]);
+      jest
+        .spyOn((parts.repository as any).conversationState, 'getSelfConversations')
+        .mockReturnValue([parts.conversation]);
       const finishSending = await holdFirstSend();
       await parts.repository.deleteMessage(parts.conversation, message);
       await waitForAttempt();
@@ -580,7 +597,7 @@ describe('MessageRepository routes changes through the outbox', () => {
             targetMessageId: 'message-1',
             reactions: '👍',
           },
-          validUntil: 1_000_000 + WEEK_MILLISECONDS,
+          validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
         }),
       );
       await startOutbox(parts);
@@ -593,9 +610,11 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(parts.outbox.findByCorrelationKey('message-1:reaction').type).toBe('operation-not-found');
       expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
       expect(parts.sendToBackend).not.toHaveBeenCalled();
-      expect(parts.store.operationIds().filter((id) => {
-        return parts.store.history(id).at(-1)?.kind === 'message-change';
-      })).toEqual([]);
+      expect(
+        parts.store.operationIds().filter(id => {
+          return parts.store.history(id).at(-1)?.kind === 'message-change';
+        }),
+      ).toEqual([]);
     });
 
     it('for me, before sending, also sends nothing', async () => {
@@ -643,7 +662,9 @@ describe('MessageRepository routes changes through the outbox', () => {
     it('for everyone, of a message being sent, queues the deletion behind it and keeps it out of sight', async () => {
       seedMessage(parts, {messageId: 'message-1'});
       await startOutbox(parts);
-      let finishSending: () => void = () => {return undefined};
+      let finishSending: () => void = () => {
+        return undefined;
+      };
       parts.sendToBackend.mockImplementationOnce(() => {
         return new Promise(resolve => {
           finishSending = () => {
@@ -725,5 +746,4 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'sent-1');
     });
   });
-
 });

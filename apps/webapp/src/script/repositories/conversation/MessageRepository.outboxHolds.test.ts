@@ -1,0 +1,503 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {amplify} from 'amplify';
+
+import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
+import {StatusType} from '../../message/statusType';
+import {createStoredSnapshot} from '../../outbox/testing/createOutboxTestKit';
+import {translateForTest} from '../../util/test/translateForTest';
+import {WebAppEvents} from '../../webAppEvents';
+import {Conversation} from '../entity/Conversation';
+import type {ContentMessage} from '../entity/message/contentMessage';
+
+import {
+  laneOfChanges,
+  laneOfMessages,
+  laneOfReceipts,
+  messageCorrelationKey,
+  receiptCorrelationKey,
+  type MessageChangePayload,
+  type MessagePayload,
+  type ReceiptPayload,
+} from './outbox/messageOutboxTypes';
+import {
+  CONVERSATION_ID,
+  createOutboxRepository,
+  sendingRecord,
+  uploadedRecord,
+  type OutboxRepository,
+} from './outbox/testing/createOutboxRepository';
+import {
+  assetPayload,
+  confirmationPayload,
+  deletePayload,
+  editPayload,
+  hidePayload,
+  lastReadPayload,
+  pingPayload,
+  reactionPayload,
+  textPayload,
+} from './outbox/testing/payloadFactories';
+
+type Variant = {
+  name: string;
+  /** The conversation the user is asked about */
+  degraded: (parts: OutboxRepository) => Conversation;
+  prepare?: (parts: OutboxRepository) => void;
+  enqueue: (parts: OutboxRepository) => Promise<unknown>;
+  key: string;
+  /** A message shows a decline as failed, and anything else is forgotten */
+  declined: 'dead-lettered' | 'dropped';
+  expectDeclinedOnScreen: (parts: OutboxRepository) => void;
+};
+
+const inConversation = ({conversation}: OutboxRepository): Conversation => {
+  return conversation;
+};
+const inSelfConversation = ({selfConversation}: OutboxRepository): Conversation => {
+  return selfConversation;
+};
+const nothingOnScreen = ({markMessage, deleteMessage}: OutboxRepository): void => {
+  expect(markMessage).not.toHaveBeenCalled();
+  expect(deleteMessage).not.toHaveBeenCalled();
+};
+const shownAsDeclined = (messageId: string) => {
+  return ({markMessage, conversation}: OutboxRepository): void => {
+    expect(markMessage).toHaveBeenCalledWith(conversation, messageId, StatusType.FAILED, 'declined');
+  };
+};
+
+function changeOf(payload: MessageChangePayload) {
+  return ({handles}: OutboxRepository) => {
+    return handles['message-change'].enqueue({
+      payload,
+      correlationKey: messageCorrelationKey(payload),
+      orderingKey: laneOfChanges(CONVERSATION_ID),
+    });
+  };
+}
+
+function inLaneOfMessages(payload: MessagePayload) {
+  return ({handles}: OutboxRepository) => {
+    return handles.message.enqueue({
+      payload,
+      correlationKey: messageCorrelationKey(payload),
+      orderingKey: laneOfMessages(CONVERSATION_ID),
+    });
+  };
+}
+
+function receiptOf(payload: ReceiptPayload) {
+  return ({handles}: OutboxRepository) => {
+    return handles.receipt.enqueue({
+      payload,
+      correlationKey: receiptCorrelationKey(payload),
+      orderingKey: laneOfReceipts(payload),
+    });
+  };
+}
+
+const variants: Variant[] = [
+  {
+    name: 'a text',
+    degraded: inConversation,
+    prepare: ({records}) => {
+      records.set('message-1', sendingRecord());
+    },
+    enqueue: inLaneOfMessages(textPayload()),
+    key: 'message-1',
+    declined: 'dead-lettered',
+    expectDeclinedOnScreen: shownAsDeclined('message-1'),
+  },
+  {
+    name: 'an asset',
+    degraded: inConversation,
+    prepare: ({records}) => {
+      records.set('asset-1', uploadedRecord({fileData: new Blob(['bytes'])}));
+    },
+    enqueue: inLaneOfMessages(assetPayload()),
+    key: 'asset-1',
+    declined: 'dead-lettered',
+    expectDeclinedOnScreen: shownAsDeclined('asset-1'),
+  },
+  {
+    name: 'a ping',
+    degraded: inConversation,
+    enqueue: ({handles}) => {
+      return handles.ping.enqueue({
+        payload: pingPayload(),
+        correlationKey: 'ping-1',
+        orderingKey: laneOfMessages(CONVERSATION_ID),
+      });
+    },
+    key: 'ping-1',
+    declined: 'dropped',
+    expectDeclinedOnScreen: ({deleteMessage, conversation}) => {
+      expect(deleteMessage).toHaveBeenCalledWith(conversation, 'ping-1');
+    },
+  },
+  {
+    name: 'a reaction',
+    degraded: inConversation,
+    enqueue: changeOf(reactionPayload()),
+    key: 'message-1:reaction',
+    declined: 'dropped',
+    expectDeclinedOnScreen: nothingOnScreen,
+  },
+  {
+    name: 'an edit',
+    degraded: inConversation,
+    enqueue: changeOf(editPayload()),
+    key: 'message-1:edit',
+    declined: 'dropped',
+    expectDeclinedOnScreen: nothingOnScreen,
+  },
+  {
+    name: 'a deletion for everyone',
+    degraded: inConversation,
+    enqueue: changeOf(deletePayload()),
+    key: 'message-1:delete',
+    declined: 'dropped',
+    expectDeclinedOnScreen: nothingOnScreen,
+  },
+  {
+    name: 'a hide',
+    degraded: inSelfConversation,
+    enqueue: changeOf(hidePayload()),
+    key: 'message-1:hide',
+    declined: 'dropped',
+    expectDeclinedOnScreen: nothingOnScreen,
+  },
+  {
+    name: 'a reaction to a message that is still pending',
+    degraded: inConversation,
+    enqueue: inLaneOfMessages(reactionPayload()),
+    key: 'message-1:reaction',
+    declined: 'dropped',
+    expectDeclinedOnScreen: nothingOnScreen,
+  },
+  {
+    name: 'a last read',
+    degraded: inSelfConversation,
+    enqueue: receiptOf(lastReadPayload(10)),
+    key: 'last-read:conversation-1',
+    declined: 'dropped',
+    expectDeclinedOnScreen: nothingOnScreen,
+  },
+];
+
+describe('the holds of MessageRepository', () => {
+  let parts: OutboxRepository;
+
+  beforeEach(() => {
+    parts = createOutboxRepository();
+  });
+
+  afterEach(() => {
+    parts.kit.dispose();
+    amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
+  });
+
+  /** The keys of the operations this session holds */
+  function heldKeys(): string[] {
+    return [...(parts.repository as unknown as {holds: Map<string, unknown>}).holds.keys()];
+  }
+
+  function stateOf(correlationKey: string): string | undefined {
+    return parts.kit.findOperation(correlationKey)?.state;
+  }
+
+  function editingOf(messageId: string): ContentMessage {
+    return {id: messageId} as ContentMessage;
+  }
+
+  describe('asking the user before sending to a degraded conversation', () => {
+    describe.each(variants)('$name', variant => {
+      beforeEach(async () => {
+        variant.prepare?.(parts);
+        await parts.kit.start();
+      });
+
+      async function enqueueDegraded(): Promise<void> {
+        parts.degrade(variant.degraded(parts));
+        await variant.enqueue(parts);
+        await parts.kit.clock.settle();
+      }
+
+      it('is held, and asks the user once, without sending', async () => {
+        await enqueueDegraded();
+
+        expect(stateOf(variant.key)).toBe('on-hold');
+        expect(parts.prompts).toHaveLength(1);
+        expect(parts.prompts[0].conversation).toBe(variant.degraded(parts));
+        expect(parts.sendToBackend).not.toHaveBeenCalled();
+      });
+
+      it('is sent when the user accepts', async () => {
+        await enqueueDegraded();
+
+        await parts.prompts[0].answer(true);
+
+        expect(parts.sendToBackend).toHaveBeenCalled();
+        expect(parts.markMessage).not.toHaveBeenCalled();
+        expect(stateOf(variant.key)).toBeUndefined();
+        expect(heldKeys()).toEqual([]);
+      });
+
+      it(`is ${variant.declined === 'dropped' ? 'forgotten' : 'dead-lettered'} and never sent when the user declines`, async () => {
+        await enqueueDegraded();
+
+        await parts.prompts[0].answer(false);
+
+        expect(parts.sendToBackend).not.toHaveBeenCalled();
+        variant.expectDeclinedOnScreen(parts);
+        expect(stateOf(variant.key)).toBe(variant.declined === 'dead-lettered' ? 'dead-lettered' : undefined);
+        expect(heldKeys()).toEqual([]);
+      });
+
+      it('is sent without a prompt when the conversation is not degraded', async () => {
+        await variant.enqueue(parts);
+        await parts.kit.clock.settle();
+
+        expect(parts.prompts).toHaveLength(0);
+        expect(parts.sendToBackend).toHaveBeenCalled();
+      });
+    });
+
+    it('sends a confirmation without a prompt, even when the conversation is degraded', async () => {
+      await parts.kit.start();
+      parts.degrade(parts.conversation);
+
+      await receiptOf(confirmationPayload())(parts);
+      await parts.kit.clock.settle();
+
+      expect(parts.prompts).toHaveLength(0);
+      expect(parts.sendToBackend).toHaveBeenCalled();
+    });
+
+    it('sends to a self conversation at once, and lets the degraded one next to it wait for the user', async () => {
+      const otherSelfConversation = new Conversation('self-2', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      parts.selfConversations.push(otherSelfConversation);
+      parts.degrade(otherSelfConversation);
+      await parts.kit.start();
+
+      await changeOf(hidePayload())(parts);
+      await parts.kit.clock.settle();
+
+      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(parts.sendToBackend.mock.calls[0][1]).toBe(parts.selfConversation);
+      expect(
+        parts.prompts.map(({conversation}) => {
+          return conversation;
+        }),
+      ).toEqual([otherSelfConversation]);
+      expect(stateOf('message-1:hide')).toBe('on-hold');
+    });
+  });
+
+  describe('holding a message the user edits', () => {
+    beforeEach(async () => {
+      await parts.kit.start({run: false});
+      parts.records.set('message-1', sendingRecord());
+      parts.records.set('message-2', sendingRecord());
+      await inLaneOfMessages(textPayload())(parts);
+      await parts.handles.message.enqueue({
+        payload: textPayload({messageId: 'message-2', conversationId: {id: 'conversation-2', domain: 'wire.test'}}),
+        correlationKey: 'message-2',
+        orderingKey: 'conversation-2',
+      });
+      await parts.kit.clock.settle();
+    });
+
+    it('holds the message, and releases it when the user stops editing', async () => {
+      await parts.repository.startEditing(editingOf('message-1'));
+
+      expect(stateOf('message-1')).toBe('on-hold');
+
+      await parts.repository.stopEditing();
+
+      expect(stateOf('message-1')).toBe('queued');
+      expect(heldKeys()).toEqual([]);
+    });
+
+    it('releases the message edited before when the user starts editing another one', async () => {
+      await parts.repository.startEditing(editingOf('message-1'));
+      await parts.repository.startEditing(editingOf('message-2'));
+
+      expect(stateOf('message-1')).toBe('queued');
+      expect(stateOf('message-2')).toBe('on-hold');
+    });
+
+    it('keeps the hold when the user starts editing the same message again', async () => {
+      await parts.repository.startEditing(editingOf('message-1'));
+      jest.spyOn(parts.kit.outbox, 'release');
+
+      await parts.repository.startEditing(editingOf('message-1'));
+
+      expect(parts.kit.outbox.release).not.toHaveBeenCalled();
+      expect(stateOf('message-1')).toBe('on-hold');
+    });
+
+    it('holds nothing for a message the outbox does not have', async () => {
+      await parts.repository.startEditing(editingOf('sent-message'));
+
+      expect(heldKeys()).toEqual([]);
+    });
+  });
+
+  describe('holds that outlive a session', () => {
+    function seedOnHold(kind: string, payload: unknown, correlationKey: string, orderingKey: string): void {
+      parts.kit.store.seed(
+        createStoredSnapshot({
+          kind,
+          id: `stored-${correlationKey}`,
+          trigger: 'operation-held',
+          state: 'on-hold',
+          payload,
+          correlationKey,
+          orderingKey,
+        }),
+      );
+    }
+
+    async function startAndReview(): Promise<void> {
+      await parts.kit.start();
+      parts.repository.reviewRestoredHolds();
+      await parts.kit.clock.settle();
+    }
+
+    it('leaves a restored hold alone until it is reviewed', async () => {
+      parts.degrade(parts.conversation);
+      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+
+      await parts.kit.start();
+
+      expect(stateOf('message-1')).toBe('on-hold');
+      expect(parts.prompts).toHaveLength(0);
+      expect(parts.sendToBackend).not.toHaveBeenCalled();
+    });
+
+    it('does nothing when the outbox did not start yet', async () => {
+      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+
+      parts.repository.reviewRestoredHolds();
+      await parts.kit.clock.settle();
+
+      expect(parts.prompts).toHaveLength(0);
+      expect(parts.sendToBackend).not.toHaveBeenCalled();
+    });
+
+    it('releases a restored hold, whose next attempt asks again when still degraded, and sends on yes', async () => {
+      parts.records.set('message-1', sendingRecord());
+      parts.degrade(parts.conversation);
+      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+
+      await startAndReview();
+
+      expect(parts.prompts).toHaveLength(1);
+      expect(stateOf('message-1')).toBe('on-hold');
+      expect(heldKeys()).toEqual(['message-1']);
+      expect(parts.sendToBackend).not.toHaveBeenCalled();
+
+      await parts.prompts[0].answer(true);
+
+      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(stateOf('message-1')).toBeUndefined();
+    });
+
+    it('marks the message as declined and dead-letters it on no', async () => {
+      parts.records.set('message-1', sendingRecord());
+      parts.degrade(parts.conversation);
+      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+      await startAndReview();
+
+      await parts.prompts[0].answer(false);
+
+      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, 'message-1', StatusType.FAILED, 'declined');
+      expect(stateOf('message-1')).toBe('dead-lettered');
+      expect(heldKeys()).toEqual([]);
+    });
+
+    it('drops a restored change on no', async () => {
+      parts.degrade(parts.conversation);
+      seedOnHold('message-change', reactionPayload(), 'message-1:reaction', laneOfChanges(CONVERSATION_ID));
+      await startAndReview();
+
+      await parts.prompts[0].answer(false);
+
+      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(stateOf('message-1:reaction')).toBeUndefined();
+    });
+
+    it('releases a restored hold and sends when the conversation is not degraded any more', async () => {
+      parts.records.set('message-1', sendingRecord());
+      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+
+      await startAndReview();
+
+      expect(parts.prompts).toHaveLength(0);
+      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(stateOf('message-1')).toBeUndefined();
+    });
+
+    it('holds a restored text for editing while the draft edits it, even when degraded, until editing stops', async () => {
+      parts.records.set('message-1', sendingRecord());
+      parts.degrade(parts.conversation);
+      parts.edited.add('message-1');
+      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+
+      await startAndReview();
+
+      expect(parts.prompts).toHaveLength(0);
+      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(stateOf('message-1')).toBe('on-hold');
+
+      await parts.repository.stopEditing();
+      await parts.kit.clock.settle();
+
+      expect(parts.prompts).toHaveLength(1);
+    });
+
+    it('releases a restored edit, because only a text message is held for its draft', async () => {
+      parts.edited.add('message-1');
+      seedOnHold('message-change', editPayload(), 'message-1:edit', laneOfChanges(CONVERSATION_ID));
+
+      await startAndReview();
+
+      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(stateOf('message-1:edit')).toBeUndefined();
+    });
+
+    it('leaves a hold alone that this session made', async () => {
+      parts.records.set('message-1', sendingRecord());
+      await parts.kit.start({run: false});
+      await inLaneOfMessages(textPayload())(parts);
+      await parts.repository.startEditing(editingOf('message-1'));
+      parts.kit.outbox.resume();
+
+      parts.repository.reviewRestoredHolds();
+      await parts.kit.clock.settle();
+
+      expect(stateOf('message-1')).toBe('on-hold');
+      expect(parts.sendToBackend).not.toHaveBeenCalled();
+    });
+  });
+});

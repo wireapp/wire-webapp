@@ -116,7 +116,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
       const quote: OutgoingQuote | undefined =
         !isUndefined(incomingQuote) && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
 
-      await messageRepository.sendTextWithLinkPreview({
+      await messageRepository.retryTextMessage({
         conversation,
         textMessage: messageText,
         mentions,

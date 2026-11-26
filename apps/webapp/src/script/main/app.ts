@@ -370,6 +370,7 @@ export class App {
         );
         return draft?.editedMessageId === messageId;
       },
+      this.fireAndForgetInvoker,
     );
 
     repositories.calling = new CallingRepository(
@@ -442,6 +443,7 @@ export class App {
   /** A failed start leaves the outbox unstarted, so every enqueue is refused; the app carries on */
   private async startOutbox(): Promise<void> {
     const startResult = await this.outbox?.start();
+    this.repository.message.reviewRestoredHolds();
     if (startResult?.outcome === 'storage-failed' || startResult?.outcome === 'storage-full') {
       this.logger.error('Outbox failed to start and stays unstarted', {outcome: startResult.outcome});
     }

@@ -17,6 +17,7 @@
  *
  */
 
+import {createFireAndForgetInvoker, type FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
@@ -52,7 +53,7 @@ import {UserState} from '../user/userState';
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
 import {MessageRepository} from './MessageRepository';
-import {WEEK_MILLISECONDS} from './outbox/durations';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 const CONVERSATION_ID = {id: 'conversation-1', domain: 'wire.test'};
 const SENDER_ID = {id: 'sender-1', domain: 'wire.test'};
@@ -64,6 +65,7 @@ type Parts = {
   audioRepository: AudioRepository;
   store: InMemoryOutboxStore;
   clock: FakeClock;
+  invoker: FireAndForgetInvoker;
   outbox: Outbox;
   send: jest.Mock;
   inject: jest.SpyInstance;
@@ -71,6 +73,8 @@ type Parts = {
   storedMessage: {status: jest.Mock; failed_reason: jest.Mock; written_time: jest.Mock};
   /** What the repository did, in the order it did it: the store's appends and the injections */
   order: string[];
+  /** The ids of the messages the event storage has */
+  stored: Set<string>;
 };
 
 function buildParts(): Parts {
@@ -94,6 +98,7 @@ function buildParts(): Parts {
   jest.spyOn(audioRepository, 'play').mockResolvedValue(undefined as never);
   const send = jest.fn();
   const clock = createFakeClock();
+  const invoker = createFireAndForgetInvoker({reportError: jest.fn()});
   const store = createInMemoryOutboxStore();
   const outbox = createOutbox();
 
@@ -115,16 +120,20 @@ function buildParts(): Parts {
     conversationState,
     new TeamState(),
     createCoreTestFixture({service: {conversation: {send, messageTimer: new MessageTimer()}}}),
+    undefined,
+    invoker,
   );
 
   const order: string[] = [];
+  const stored = new Set<string>();
   const append = store.append.bind(store);
   jest.spyOn(store, 'append').mockImplementation(async snapshot => {
     order.push(`append:${snapshot.trigger}`);
     return append(snapshot);
   });
-  const inject = jest.spyOn(repository as any, 'injectOptimisticMessage').mockImplementation(async () => {
+  const inject = jest.spyOn(repository as any, 'injectOptimisticMessage').mockImplementation(async (message: any) => {
     order.push('inject');
+    stored.add(message.messageId);
     return true;
   });
 
@@ -138,7 +147,9 @@ function buildParts(): Parts {
     primary_key: 'primary-key',
   };
   jest.spyOn(conversation, 'getMessage').mockReturnValue(storedMessage as unknown as Message);
-  jest.spyOn(eventService, 'loadEvent').mockResolvedValue({primary_key: 'primary-key', status: StatusType.SENDING} as any);
+  jest.spyOn(eventService, 'loadEvent').mockImplementation(async (_conversationId, messageId) => {
+    return stored.has(messageId) ? ({primary_key: 'primary-key', status: StatusType.SENDING} as any) : undefined;
+  });
   const updateEvent = jest.spyOn(eventService, 'updateEvent').mockImplementation(async () => {
     order.push('updateEvent');
     return {} as any;
@@ -151,12 +162,14 @@ function buildParts(): Parts {
     audioRepository,
     store,
     clock,
+    invoker,
     outbox,
     send,
     inject,
     updateEvent,
     storedMessage,
     order,
+    stored,
   };
 }
 
@@ -192,13 +205,21 @@ describe('MessageRepository routing sends through the outbox', () => {
   });
 
   describe('a text message', () => {
-    function sendText(options: {messageId?: string; quote?: QuoteEntity} = {}): Promise<void> {
+    function sendText(options: {quote?: QuoteEntity} = {}): Promise<void> {
       return parts.repository.sendTextWithLinkPreview({
         conversation: parts.conversation,
         textMessage: 'hello',
         mentions: [],
         QuoteEntity: options.quote as never,
-        messageId: options.messageId,
+      });
+    }
+
+    function retryText(): Promise<void> {
+      return parts.repository.retryTextMessage({
+        conversation: parts.conversation,
+        textMessage: 'hello',
+        mentions: [],
+        messageId: 'message-1',
       });
     }
 
@@ -206,6 +227,7 @@ describe('MessageRepository routing sends through the outbox', () => {
       await startOutbox(parts);
 
       await expect(sendText()).resolves.toBeUndefined();
+      await parts.clock.settle();
 
       const snapshot = onlySnapshot(parts.store);
       expect(snapshot).toEqual(
@@ -226,11 +248,12 @@ describe('MessageRepository routing sends through the outbox', () => {
       expect(parts.send).not.toHaveBeenCalled();
     });
 
-    it('keeps only the ids of a quote, and uses the quote it was given to show the message', async () => {
+    it('keeps only the ids of a quote, and shows the message with it', async () => {
       await startOutbox(parts);
       const quote = new QuoteEntity({hash: new Uint8Array([1]).buffer, messageId: 'quoted-1', userId: 'quoted-user'});
 
       await sendText({quote});
+      await parts.clock.settle();
 
       expect(onlySnapshot(parts.store).payload).toEqual(
         expect.objectContaining({quote: {messageId: 'quoted-1', userId: 'quoted-user'}}),
@@ -330,7 +353,7 @@ describe('MessageRepository routing sends through the outbox', () => {
         await startWithFailedMessage();
         await parts.clock.advance(60_000);
 
-        await sendText({messageId: 'message-1'});
+        await retryText();
 
         const snapshot = onlySnapshot(parts.store);
         expect(snapshot).toEqual(
@@ -340,7 +363,7 @@ describe('MessageRepository routing sends through the outbox', () => {
             state: 'queued',
             attempts: 0,
             queuedSeq: 7,
-            validUntil: parts.clock.getServerTime() + WEEK_MILLISECONDS,
+            validUntil: parts.clock.getServerTime() + TIME_IN_MILLIS.WEEK,
             payload: {...failedPayload, mayBeDelivered: true},
           }),
         );
@@ -350,7 +373,7 @@ describe('MessageRepository routing sends through the outbox', () => {
         seedDeadLetter(0);
         await startWithFailedMessage();
 
-        await sendText({messageId: 'message-1'});
+        await retryText();
 
         expect(onlySnapshot(parts.store).payload).toEqual(failedPayload);
       });
@@ -359,7 +382,7 @@ describe('MessageRepository routing sends through the outbox', () => {
         seedDeadLetter(0, {...failedPayload, mayBeDelivered: true});
         await startWithFailedMessage();
 
-        await sendText({messageId: 'message-1'});
+        await retryText();
 
         expect(onlySnapshot(parts.store).payload).toEqual({...failedPayload, mayBeDelivered: true});
       });
@@ -368,7 +391,7 @@ describe('MessageRepository routing sends through the outbox', () => {
         seedDeadLetter(1);
         await startWithFailedMessage();
 
-        await sendText({messageId: 'message-1'});
+        await retryText();
 
         expect(parts.updateEvent).toHaveBeenCalledWith('primary-key', {
           status: StatusType.SENDING,
@@ -381,9 +404,10 @@ describe('MessageRepository routing sends through the outbox', () => {
       });
 
       it('queues a new operation under the same id when the outbox does not know the message', async () => {
+        parts.stored.add('message-1');
         await startOutbox(parts);
 
-        await sendText({messageId: 'message-1'});
+        await retryText();
 
         expect(onlySnapshot(parts.store)).toEqual(
           expect.objectContaining({
@@ -400,7 +424,7 @@ describe('MessageRepository routing sends through the outbox', () => {
         await startOutbox(parts);
         parts.store.fail('append', true);
 
-        await sendText({messageId: 'message-1'});
+        await retryText();
 
         expect(parts.updateEvent).toHaveBeenLastCalledWith('primary-key', {
           status: StatusType.FAILED,
@@ -572,7 +596,13 @@ describe('MessageRepository routing sends through the outbox', () => {
     });
 
     describe('the upload', () => {
-      const uploaded = {domain: 'wire.test', key: 'asset-key', keyBytes: new Uint8Array([1]), sha256: new Uint8Array([2]), token: 'token'};
+      const uploaded = {
+        domain: 'wire.test',
+        key: 'asset-key',
+        keyBytes: new Uint8Array([1]),
+        sha256: new Uint8Array([2]),
+        token: 'token',
+      };
 
       it('warns about leaving only while it runs, and keeps the result on the record', async () => {
         const events: string[] = [];
@@ -586,7 +616,9 @@ describe('MessageRepository routing sends through the outbox', () => {
           events.push('upload');
           return uploaded;
         });
-        jest.spyOn(parts.eventService, 'loadEvent').mockResolvedValue({primary_key: 'primary-key', data: {name: 'n'}} as any);
+        jest
+          .spyOn(parts.eventService, 'loadEvent')
+          .mockResolvedValue({primary_key: 'primary-key', data: {name: 'n'}} as any);
 
         await (parts.repository as any).uploadOutboxAsset(
           parts.conversation,
@@ -624,8 +656,20 @@ describe('MessageRepository routing sends through the outbox', () => {
           ),
         ).rejects.toThrow('offline');
 
-        const added = add.mock.calls.filter(([type]) => {return type === 'beforeunload'}).map(([, listener]) => {return listener});
-        const removed = remove.mock.calls.filter(([type]) => {return type === 'beforeunload'}).map(([, listener]) => {return listener});
+        const added = add.mock.calls
+          .filter(([type]) => {
+            return type === 'beforeunload';
+          })
+          .map(([, listener]) => {
+            return listener;
+          });
+        const removed = remove.mock.calls
+          .filter(([type]) => {
+            return type === 'beforeunload';
+          })
+          .map(([, listener]) => {
+            return listener;
+          });
         add.mockRestore();
         remove.mockRestore();
         expect(added).toHaveLength(1);
@@ -639,6 +683,7 @@ describe('MessageRepository routing sends through the outbox', () => {
       await startOutbox(parts);
 
       const result = await parts.repository.sendPing(parts.conversation);
+      await parts.clock.settle();
 
       const snapshot = onlySnapshot(parts.store);
       expect(snapshot).toEqual(
@@ -733,7 +778,7 @@ describe('MessageRepository routing sends through the outbox', () => {
       await parts.clock.settle();
     }
 
-    function sentMessage():{id: string; sentAt: string; state: string} {
+    function sentMessage(): {id: string; sentAt: string; state: string} {
       return {id: 'sent', sentAt: '2026-01-01T00:00:00.000Z', state: 'OUTGOING_SENT'};
     }
 
@@ -805,13 +850,11 @@ describe('MessageRepository routing sends through the outbox', () => {
       await startRunning();
       holdInjection({fail: true});
 
-      const sending = sendText();
-      const failure = expect(sending).rejects.toThrow('injection failed');
+      await sendText();
       await parts.clock.advance(1_000);
       expect(sendAttempts).toBe(0);
 
       release();
-      await failure;
       await parts.clock.advance(1_000);
 
       expect(sendAttempts).toBe(1);
@@ -837,7 +880,7 @@ describe('MessageRepository routing sends through the outbox', () => {
           state: 'queued',
           queuedSeq: 1,
           queuedAt: 1_000_000 - 5000,
-          validUntil: 1_000_000 + WEEK_MILLISECONDS,
+          validUntil: 1_000_000 + TIME_IN_MILLIS.WEEK,
         }),
       );
       await startRunning();
@@ -852,8 +895,12 @@ describe('MessageRepository routing sends through the outbox', () => {
       return {
         id: 'received-1',
         type: 'conversation.message-add',
-        user: () => {return {isMe: false}},
-        timestamp: () => {return Date.now()},
+        user: () => {
+          return {isMe: false};
+        },
+        timestamp: () => {
+          return Date.now();
+        },
         qualifiedFrom: SENDER_ID,
       } as unknown as Message;
     }
@@ -894,10 +941,16 @@ describe('MessageRepository routing sends through the outbox', () => {
       jest.spyOn(parts.conversation, 'is1to1').mockReturnValue(false);
 
       await parts.repository.sendConfirmationStatus(parts.conversation, receivedMessage(), Confirmation.Type.DELIVERED);
-      await parts.repository.sendConfirmationStatus(parts.conversation, {
-        ...receivedMessage(),
-        user: () => {return {isMe: true}},
-      } as unknown as Message, Confirmation.Type.DELIVERED);
+      await parts.repository.sendConfirmationStatus(
+        parts.conversation,
+        {
+          ...receivedMessage(),
+          user: () => {
+            return {isMe: true};
+          },
+        } as unknown as Message,
+        Confirmation.Type.DELIVERED,
+      );
 
       expect(parts.store.operationIds()).toEqual([]);
     });
@@ -1009,9 +1062,13 @@ describe('MessageRepository routing sends through the outbox', () => {
         status: jest.fn(),
         written_time: ko.observable<string | undefined>(undefined),
         timestamp: ko.observable(new Date(written).getTime()),
-        readReceipts: () => {return []},
+        readReceipts: () => {
+          return [];
+        },
         type: 'conversation.message-add',
-        hasAssetImage: () => {return false},
+        hasAssetImage: () => {
+          return false;
+        },
         primary_key: 'primary-key',
       };
       jest.spyOn(parts.conversation, 'getMessage').mockReturnValue(entity as unknown as Message);
@@ -1032,9 +1089,13 @@ describe('MessageRepository routing sends through the outbox', () => {
         status: jest.fn(),
         written_time: ko.observable<string | undefined>('2025-12-31T23:59:00.000Z'),
         timestamp: ko.observable(new Date('2026-01-01T00:00:00.000Z').getTime()),
-        readReceipts: () => {return []},
+        readReceipts: () => {
+          return [];
+        },
         type: 'conversation.message-add',
-        hasAssetImage: () => {return false},
+        hasAssetImage: () => {
+          return false;
+        },
         primary_key: 'primary-key',
       };
       jest.spyOn(parts.conversation, 'getMessage').mockReturnValue(entity as unknown as Message);
@@ -1077,9 +1138,13 @@ describe('MessageRepository without an outbox keeps sending directly', () => {
       status: jest.fn(),
       written_time: ko.observable<string | undefined>(undefined),
       timestamp: ko.observable(1000),
-      readReceipts: () => {return []},
+      readReceipts: () => {
+        return [];
+      },
       type: 'conversation.message-add',
-      hasAssetImage: () => {return false},
+      hasAssetImage: () => {
+        return false;
+      },
       primary_key: 'primary-key',
     };
     jest.spyOn(parts.conversation, 'getMessage').mockReturnValue(entity as unknown as Message);
@@ -1107,6 +1172,7 @@ describe('MessageRepository without an outbox keeps sending directly', () => {
       assetRepository,
       new AudioRepository(),
       translateForTest,
+      undefined,
       new UserState(),
       new ClientState(),
       new ConversationState(new UserState()),
@@ -1124,7 +1190,9 @@ describe('MessageRepository without an outbox keeps sending directly', () => {
 
     await (repository as any).uploadFile(parts.conversation, file, false);
 
-    const listeners = add.mock.calls.filter(([type]) => {return type === 'beforeunload'});
+    const listeners = add.mock.calls.filter(([type]) => {
+      return type === 'beforeunload';
+    });
     add.mockRestore();
     expect(listeners).toHaveLength(1);
     expect(assetRepository.addToProcessQueue).toHaveBeenCalledTimes(1);
