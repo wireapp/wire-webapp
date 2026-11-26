@@ -69,6 +69,7 @@ import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/m
 import type {ApplicationObservability} from '../observability/applicationObservability';
 import type {ApplicationStartupReport} from '../observability/applicationStartupReport';
 import {reportApplicationStartup} from '../observability/reportApplicationStartup';
+import type {Outbox} from '../outbox';
 import {configureDownloadPath} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/downloadPath';
 import {configureE2EI} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
 import {AssetRepository} from '../repositories/assets/assetRepository';
@@ -117,7 +118,7 @@ import {MeetingsApiDataSource} from '../repositories/meetings/meetingsApiDataSou
 import {MeetingsRepository} from '../repositories/meetings/meetingsRepository';
 import {NotificationRepository} from '../repositories/notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../repositories/notification/PreferenceNotificationRepository';
-import {createOutboxService, type OutboxService} from '../repositories/outbox/createOutboxService';
+import {createApplicationOutbox} from '../repositories/outbox/createApplicationOutbox';
 import {initializePermissions} from '../repositories/permission/permissionHandlers';
 import {PropertiesRepository} from '../repositories/properties/propertiesRepository';
 import {PropertiesService} from '../repositories/properties/propertiesService';
@@ -221,7 +222,7 @@ export class App {
   debug?: DebugUtil;
   util?: {debug: DebugUtil};
   /** Created only when the outbox toggle is on */
-  private outboxService: OutboxService | undefined;
+  private outbox: Outbox | undefined;
   private newVersionPollingCleanup: (() => void) | undefined;
   private mlsConversationRecoveryCleanup: (() => void) | undefined;
 
@@ -339,8 +340,8 @@ export class App {
     );
 
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
-    this.outboxService = startupFeatureToggles.isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName)
-      ? createOutboxService({storageService: this.service.storage, serverTimeHandler})
+    this.outbox = startupFeatureToggles.isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName)
+      ? createApplicationOutbox({storageService: this.service.storage, serverTimeHandler})
       : undefined;
 
     repositories.message = new MessageRepository(
@@ -365,7 +366,7 @@ export class App {
       undefined,
       undefined,
       undefined,
-      this.outboxService?.outbox,
+      this.outbox,
     );
 
     repositories.calling = new CallingRepository(
@@ -429,7 +430,7 @@ export class App {
       storageRepository: repositories.storage,
       userRepository: repositories.user,
       core: this.core,
-      outbox: this.outboxService?.outbox,
+      outbox: this.outbox,
     });
 
     return repositories;
@@ -437,7 +438,7 @@ export class App {
 
   /** A failed start leaves the outbox unstarted, so every enqueue is refused; the app carries on */
   private async startOutbox(): Promise<void> {
-    const outcome = await this.outboxService?.start();
+    const outcome = await this.outbox?.start();
     if (outcome?.type === 'storage-failed' || outcome?.type === 'storage-full') {
       this.logger.error('Outbox failed to start and stays unstarted', {outcome: outcome.type});
     }
