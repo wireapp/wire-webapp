@@ -21,14 +21,15 @@ import type {FunctionComponent} from 'react';
 
 import {pendingClock, pendingClockIcon} from './pendingClock.styles';
 
-import {useApplicationContext} from '../../../../page/rootProvider';
 import {PendingIcon} from '../../../../uiKit/dataDisplay/icon/pendingIcon';
 import {Tooltip} from '../../../../uiKit/dataDisplay/tooltip/tooltip';
 
-export const PendingClock: FunctionComponent = () => {
-  const {translate} = useApplicationContext();
-  const label = translate('outboxWaitingForConnection');
+interface PendingClockProps {
+  /** The translated label, passed in so that this component stays out of the import cycle of the app context */
+  label: string;
+}
 
+export const PendingClock: FunctionComponent<PendingClockProps> = ({label}) => {
   return (
     <Tooltip body={label} css={pendingClock} data-uie-name="status-message-pending">
       <span role="img" aria-label={label} css={{display: 'inline-flex'}}>

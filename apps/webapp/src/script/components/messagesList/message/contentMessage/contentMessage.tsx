@@ -31,14 +31,18 @@ import {MessageReactionsList} from './messageActions/messageReactions/messageRea
 import {MessageHeader} from './messageHeader';
 import {Quote} from './messageQuote';
 import {PendingClock} from './pendingClock';
+import {writtenTime as writtenTimeStyles} from './pendingClock.styles';
 import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './warnings';
-import {WRITTEN_TIME_SHOWN_AFTER_MILLISECONDS, WrittenTime} from './writtenTime';
 
 import {MessageActions} from '..';
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {pendingOfflineMessagesFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useClickOutside} from '../../../../hooks/useClickOutside';
-import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../../hooks/useRelativeTimestamp';
+import {
+  createRelativeTimestampFormatter,
+  useRelativeTimestamp,
+  type RelativeTimestampFormatter,
+} from '../../../../hooks/useRelativeTimestamp';
 import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';
 import {StatusType} from '../../../../message/statusType';
 import {useApplicationContext} from '../../../../page/rootProvider';
@@ -51,6 +55,7 @@ import {ContextMenuEntry} from '../../../../ui/contextMenu';
 import {OutlineCheck} from '../../../../uiKit/dataDisplay/icon/outlineCheck';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {getMessageAriaLabel} from '../../../../util/conversationMessages';
+import {TIME_IN_MILLIS, fromUnixTime, isYoungerThan1Hour} from '../../../../util/timeUtil';
 import {FileFullscreenModalSourceConversationProvider} from '../../../FileFullscreenModal/FileFullscreenModalSourceConversationContext';
 import {EphemeralTimer} from '../ephemeralTimer';
 import {MessageTime} from '../messageTime';
@@ -80,6 +85,29 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   /** Where the message is in the outbox; leaving it out treats every message as not being in it */
   getOutboxState?: (messageId: string) => 'pending' | 'sending' | undefined;
 }
+
+/** A message sent at least this long after it was written says when it was written */
+const writtenTimeShownAfterMinutes = 5;
+const WRITTEN_TIME_SHOWN_AFTER_MILLISECONDS = writtenTimeShownAfterMinutes * TIME_IN_MILLIS.MINUTE;
+
+interface WrittenTimeProps {
+  /** Unix timestamp in milliseconds */
+  timestamp: number;
+  formatter: RelativeTimestampFormatter;
+  translate: (key: 'outboxWrittenTimeAgo' | 'outboxWrittenTimeAt', substitutions: {time: string}) => string;
+}
+
+const WrittenTime: FunctionComponent<WrittenTimeProps> = ({timestamp, formatter, translate}) => {
+  const time = useRelativeTimestamp(timestamp, false, formatter);
+  const isRelative = isYoungerThan1Hour(fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND));
+  const label = translate(isRelative ? 'outboxWrittenTimeAgo' : 'outboxWrittenTimeAt', {time});
+
+  return (
+    <span css={writtenTimeStyles} data-uie-name="status-message-written-time">
+      {label}
+    </span>
+  );
+};
 
 export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = ({
   conversation,
@@ -242,9 +270,11 @@ export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = (
             </MessageTime>
           </span>
 
-          {showWrittenTime && <WrittenTime timestamp={writtenTimestamp} />}
+          {showWrittenTime && (
+            <WrittenTime timestamp={writtenTimestamp} formatter={relativeTimestampFormatter} translate={translate} />
+          )}
 
-          {isWaitingForConnection && <PendingClock />}
+          {isWaitingForConnection && <PendingClock label={translate('outboxWaitingForConnection')} />}
         </MessageHeader>
       )}
 

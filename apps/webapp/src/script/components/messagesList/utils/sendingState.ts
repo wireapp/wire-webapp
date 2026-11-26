@@ -17,30 +17,25 @@
  *
  */
 
-import {StatusType} from '../../../message/statusType';
-import type {Message} from '../../../repositories/entity/message/message';
-
-type SendingState = 'sent' | 'pending' | 'failed';
-
-function getSendingState(message: Message): SendingState {
-  const status = message.status();
-  if (status === StatusType.SENDING) {
-    return 'pending';
-  }
-  if (status === StatusType.FAILED || status === StatusType.FEDERATION_ERROR) {
-    return 'failed';
-  }
-  return 'sent';
-}
+/** Structural, so that this module stays out of the import cycle of the message entities */
+type SendingStateMessage = {
+  isContent: () => boolean;
+  sendingState: () => 'sent' | 'pending' | 'failed';
+};
 
 /** Messages in another sending state than the one before them start a group of their own, with their own header */
-export function startsSendingStateGroup(message: Message, previousMessage: Message | undefined): boolean {
-  return previousMessage !== undefined && getSendingState(message) !== getSendingState(previousMessage);
+export function startsSendingStateGroup(
+  message: SendingStateMessage,
+  previousMessage: SendingStateMessage | undefined,
+): boolean {
+  return previousMessage !== undefined && message.sendingState() !== previousMessage.sendingState();
 }
 
 /** The message the offline notice goes above: the first one that waits to be sent */
-export function findFirstPendingMessage(messages: readonly Message[]): Message | undefined {
+export function findFirstPendingMessage<Message extends SendingStateMessage>(
+  messages: readonly Message[],
+): Message | undefined {
   return messages.find(message => {
-    return message.isContent() && message.status() === StatusType.SENDING;
+    return message.isContent() && message.sendingState() === 'pending';
   });
 }

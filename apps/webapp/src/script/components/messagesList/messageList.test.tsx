@@ -86,6 +86,8 @@ function createMessageListProperties(): ComponentProps<typeof MessagesList> {
     showParticipants: noop,
     showUserDetails: noop,
     updateConversationLastRead: noop,
+    isOutboxEnabled: true,
+    offlineNotice: 'outboxOfflineNotice',
   };
 }
 
@@ -134,7 +136,9 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('MessagesList with the outbox in 
   });
 
   async function renderLoadedList(isOutboxEnabled = true): Promise<ReturnType<typeof render>> {
-    const renderedList = render(<MessagesList {...properties} />, {wrapper: createWrapper(isOutboxEnabled, themeId)});
+    const renderedList = render(<MessagesList {...properties} isOutboxEnabled={isOutboxEnabled} />, {
+      wrapper: createWrapper(isOutboxEnabled, themeId),
+    });
     await waitFor(() => {
       expect(renderedList.container.querySelector('.messages')).not.toBeNull();
     });

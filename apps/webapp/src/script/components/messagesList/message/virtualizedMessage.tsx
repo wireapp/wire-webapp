@@ -83,8 +83,11 @@ interface MessageParams extends MessageActions {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
   measureElement?: (element: HTMLElement | null) => void;
   index?: number;
-  /** Puts the offline notice right above the message, inside the measured element so that the row keeps its height */
-  showOfflineNotice?: boolean;
+  /**
+   * Puts the offline notice with this text right above the message, inside the measured element so that the row keeps
+   * its height
+   */
+  offlineNotice?: string;
 }
 
 export const Message: FunctionComponent<MessageParams> = (props: MessageParams) => {
@@ -99,7 +102,7 @@ export const Message: FunctionComponent<MessageParams> = (props: MessageParams) 
     setMsgElementsFocusable,
     measureElement,
     index,
-    showOfflineNotice = false,
+    offlineNotice,
   } = props;
   const messageElementRef = useRef<HTMLDivElement | null>(null);
   const {status, ephemeral_expires} = useKoSubscribableChildren(message, ['status', 'ephemeral_expires']);
@@ -173,7 +176,7 @@ export const Message: FunctionComponent<MessageParams> = (props: MessageParams) 
         return handleFocus(message.id);
       }}
     >
-      {showOfflineNotice && <OfflineNotice />}
+      {offlineNotice !== undefined && <OfflineNotice label={offlineNotice} />}
       <MessageWrapper
         {...props}
         hideHeader={hideHeader}

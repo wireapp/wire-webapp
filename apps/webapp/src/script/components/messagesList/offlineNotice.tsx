@@ -21,19 +21,21 @@ import type {FunctionComponent} from 'react';
 
 import {offlineNoticeIconStyles, offlineNoticeLabelStyles} from './offlineNotice.styles';
 
-import {useApplicationContext} from '../../page/rootProvider';
 import {NoInternetIcon} from '../../uiKit/dataDisplay/icon/noInternetIcon';
 
-export const OfflineNotice: FunctionComponent = () => {
-  const {translate} = useApplicationContext();
+interface OfflineNoticeProps {
+  /** The translated notice, passed in so that this component stays out of the import cycle of the app context */
+  label: string;
+}
 
+export const OfflineNotice: FunctionComponent<OfflineNoticeProps> = ({label}) => {
   return (
     <div role="status" className="message-header system-message" data-uie-name="outbox-offline-notice">
       <div className="message-header-icon" aria-hidden="true">
         <NoInternetIcon css={offlineNoticeIconStyles} />
       </div>
       <p className="message-header-label" css={offlineNoticeLabelStyles}>
-        {translate('outboxOfflineNotice')}
+        {label}
       </p>
     </div>
   );

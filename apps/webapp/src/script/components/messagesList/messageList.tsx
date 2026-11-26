@@ -34,10 +34,8 @@ import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 import {findFirstPendingMessage} from './utils/sendingState';
 import {useConversationReadBoundary} from './utils/useConversationReadBoundary';
 
-import {pendingOfflineMessagesFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useOutboxOffline} from '../../hooks/useOutboxOffline';
 import {useRoveFocus} from '../../hooks/useRoveFocus';
-import {useApplicationContext} from '../../page/rootProvider';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
 import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import {MessageRepository} from '../../repositories/conversation/MessageRepository';
@@ -87,6 +85,10 @@ interface MessagesListParams {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
   isRightSidebarOpen?: boolean;
   updateConversationLastRead: (conversation: Conversation) => void;
+  /** Passed in, like the notice, so that the list stays out of the import cycle of the app context */
+  isOutboxEnabled: boolean;
+  /** The translated notice shown while offline */
+  offlineNotice: string;
 }
 
 export const MessagesList: FC<MessagesListParams> = ({
@@ -113,6 +115,8 @@ export const MessagesList: FC<MessagesListParams> = ({
   setMsgElementsFocusable,
   isRightSidebarOpen = false,
   updateConversationLastRead,
+  isOutboxEnabled,
+  offlineNotice,
 }) => {
   const {
     messages: allMessages,
@@ -146,8 +150,6 @@ export const MessagesList: FC<MessagesListParams> = ({
   const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
 
-  const {isFeatureToggleEnabled} = useApplicationContext();
-  const isOutboxEnabled = isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName);
   const isOffline = useOutboxOffline(isOutboxEnabled);
   const firstPendingMessage = isOffline ? findFirstPendingMessage(filteredMessages) : undefined;
 
@@ -359,7 +361,7 @@ export const MessagesList: FC<MessagesListParams> = ({
 
               return (
                 <Fragment key={key}>
-                  {message === firstPendingMessage && <OfflineNotice />}
+                  {message === firstPendingMessage && <OfflineNotice label={offlineNotice} />}
                   <Message
                     onVisible={visibleCallback}
                     onVisibilityLost={lastMessageInvisibleCallback}
@@ -404,7 +406,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                           messageId,
                         );
                         conversation.removeMessages();
-                        conversationRepository.getMessagesWithOffset(conversation, messageEntity);
+                        void conversationRepository.getMessagesWithOffset(conversation, messageEntity);
                         setLoaded(true); // unblock automatic scroll triggers
                       }
                     }}
@@ -421,7 +423,7 @@ export const MessagesList: FC<MessagesListParams> = ({
             });
           })}
 
-          {isOffline && firstPendingMessage === undefined && <OfflineNotice />}
+          {isOffline && firstPendingMessage === undefined && <OfflineNotice label={offlineNotice} />}
 
           <UploadAssets assetRepository={assetRepository} conversationId={conversation.id} />
         </div>
