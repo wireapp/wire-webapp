@@ -25,6 +25,7 @@ import {PageManager} from '../../pageManager';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup, sendConnectionRequest} from '../../utils/userActions';
+import {waitForDriveConversationReady} from '../../utils/driveReadiness';
 
 interface DragAndDropOptions {
   buffer: Buffer;
@@ -49,7 +50,7 @@ test.describe('Drive file uploads', () => {
   const targetFolderName = 'Temporary upload folder';
   const conversationName = 'Drive upload conversation';
 
-  test.beforeEach(async ({createTeam, createPage, createUser}) => {
+  test.beforeEach(async ({api, createTeam, createPage, createUser}) => {
     const teamMember = await createUser();
     const team = await createTeam('Drive upload team', {
       users: [teamMember],
@@ -64,6 +65,7 @@ test.describe('Drive file uploads', () => {
     await test.step('Preconditions: Create and open a conversation with Shared Drive enabled', async () => {
       await connectWithUser(pageManager, teamMember);
       await createGroup(pages, conversationName, [teamMember], {cells: true});
+      await waitForDriveConversationReady(api, team.owner, teamMember, conversationName);
       await pages.conversationList().getConversation(conversationName).open();
       await pages.conversation().clickFilesTab();
       await expect(pages.cellsSharedDrive().newButton).toBeVisible();
@@ -195,7 +197,7 @@ test.describe('Drive file uploads for viewers', () => {
   test(
     'User without upload permission cannot start an upload',
     {tag: ['@TC-12141', '@regression']},
-    async ({createPage, createTeam, createUser}) => {
+    async ({api, createPage, createTeam, createUser}) => {
       const guestUser = await createUser();
       const team = await createTeam('Drive viewer team', {features: {cells: true}});
       const conversationName = 'Drive viewer conversation';
@@ -215,6 +217,7 @@ test.describe('Drive file uploads for viewers', () => {
         await guestPages.connectRequest().clickConnectButton();
 
         await createGroup(ownerPages, conversationName, [guestUser], {cells: true});
+        await waitForDriveConversationReady(api, team.owner, guestUser, conversationName);
         await ownerPages.conversationList().getConversation(conversationName).open();
         await ownerPages.conversation().clickFilesTab();
         await expect(ownerPages.cellsSharedDrive().newButton).toBeVisible();

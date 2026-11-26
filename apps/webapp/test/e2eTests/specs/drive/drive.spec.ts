@@ -26,6 +26,7 @@ import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup} from '../../utils/userActions';
 import {ConversationPage} from '../../pageManager/webapp/pages/conversation.page';
 import {Locator} from '@playwright/test';
+import {waitForDriveConversationReady} from '../../utils/driveReadiness';
 
 const getMultipartAssetRoot = (conversation: ConversationPage, user: User): Locator => {
   return conversation.messageItems.getByLabel(new RegExp(`^Image from ${user.fullName}`));
@@ -66,7 +67,7 @@ test.describe('Conversations', () => {
   test(
     'Uploading an file in a group conversation',
     {tag: ['@crit-flow-cells', '@regression', '@TC-8785']},
-    async ({createPage}, testInfo) => {
+    async ({api, createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
@@ -78,6 +79,7 @@ test.describe('Conversations', () => {
 
       await test.step('Preconditions: Both users log in and open the group', async () => {
         await createGroup(userAPages, conversationName, [userB], {cells: true});
+        await waitForDriveConversationReady(api, userA, userB, conversationName);
       });
 
       await test.step('User A sends an image to User B in a group conversation', async () => {
@@ -114,7 +116,7 @@ test.describe('Conversations', () => {
   test(
     'Edit multipart message in a group conversation',
     {tag: ['@crit-flow-cells', '@regression', '@TC-8786']},
-    async ({createPage}) => {
+    async ({api, createPage}) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
@@ -126,6 +128,7 @@ test.describe('Conversations', () => {
 
       await test.step('Preconditions: Create group and wait for its Shared Drive to be ready', async () => {
         await createGroup(userAPages, conversationName, [userB], {cells: true});
+        await waitForDriveConversationReady(api, userA, userB, conversationName);
         await userAPages.conversationList().getConversation(conversationName).open();
         const driveBrowseResponsePromise = userAPageManager.page.waitForResponse(response => {
           const url = new URL(response.url());
@@ -166,7 +169,7 @@ test.describe('Conversations', () => {
   test(
     'Replying to multipart message in a group conversation',
     {tag: ['@crit-flow-cells', '@regression', '@TC-8787']},
-    async ({createPage}) => {
+    async ({api, createPage}) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
@@ -178,6 +181,7 @@ test.describe('Conversations', () => {
 
       await test.step('Preconditions: Create group with drive enabled', async () => {
         await createGroup(userAPages, conversationName, [userB], {cells: true});
+        await waitForDriveConversationReady(api, userA, userB, conversationName);
       });
 
       await test.step('User A sends a multipart message to User B in a group conversation', async () => {
@@ -207,7 +211,7 @@ test.describe('Conversations', () => {
   test(
     'recovers from a failed bulk move after an explicit Drive refresh',
     {tag: ['@crit-flow-cells', '@regression']},
-    async ({createPage}) => {
+    async ({api, createPage}) => {
       const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       const pageManager = await PageManager.from(page);
       await connectWithUser(pageManager, userB);
@@ -216,6 +220,7 @@ test.describe('Conversations', () => {
       const sharedDrive = pages.cellsSharedDrive();
 
       await createGroup(pages, conversationName, [userB], {cells: true});
+      await waitForDriveConversationReady(api, userA, userB, conversationName);
       await pages.conversationList().getConversation(conversationName).open();
       await pages.conversation().clickFilesTab();
       await sharedDrive.createFolder(sourceFolderName);
@@ -285,7 +290,7 @@ test.describe('Conversations', () => {
   test(
     'Searching files in a group conversation',
     {tag: ['@crit-flow-cells', '@regression', '@TC-8788']},
-    async ({createPage}) => {
+    async ({api, createPage}) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
@@ -297,6 +302,7 @@ test.describe('Conversations', () => {
 
       await test.step('Preconditions: Create group with drive enabled', async () => {
         await createGroup(userAPages, conversationName, [userB], {cells: true});
+        await waitForDriveConversationReady(api, userA, userB, conversationName);
       });
 
       await test.step('User A sends a message with assets in a group conversation', async () => {
