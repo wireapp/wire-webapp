@@ -30,7 +30,7 @@ import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.ty
 import {RequestCancellationError} from '../../apiClient/user/userError';
 import {MessageTargetMode} from '../../core/conversation';
 import {StatusType} from '../../message/statusType';
-import type {OperationView} from '../../outbox';
+import type {OperationState, OperationView} from '../../outbox';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {WebAppEvents} from '../../webAppEvents';
 
@@ -570,6 +570,36 @@ describe('the message kinds of MessageRepository', () => {
 
         expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, 'asset-1', StatusType.FAILED, 'expired');
         expect(parts.deleteMessage).toHaveBeenCalledWith(parts.conversation, 'asset-1');
+      });
+    });
+
+    describe('the count of pending messages', () => {
+      function change(id: string, payload: MessagePayload, state: OperationState): void {
+        parts.kinds.message.onChanged?.({id, kind: 'message', payload, queuedAt: 0, state, attempts: 0});
+      }
+
+      it('counts text and file messages that wait, are on hold or are being sent', () => {
+        change('text-operation', textPayload(), 'queued');
+        change('asset-operation', assetPayload(), 'on-hold');
+        change('sending-operation', textPayload({messageId: 'message-2'}), 'in-progress');
+
+        expect(parts.repository.countPendingMessages()).toBe(3);
+      });
+
+      it('counts no reaction, edit or delete, whatever its state', () => {
+        change('reaction-operation', reactionPayload(), 'queued');
+        change('edit-operation', editPayload(), 'queued');
+        change('delete-operation', deletePayload(), 'on-hold');
+
+        expect(parts.repository.countPendingMessages()).toBe(0);
+      });
+
+      it('counts an operation once, however often it changes', () => {
+        change('text-operation', textPayload(), 'queued');
+        change('text-operation', textPayload(), 'in-progress');
+        change('text-operation', textPayload(), 'queued');
+
+        expect(parts.repository.countPendingMessages()).toBe(1);
       });
     });
 

@@ -47,7 +47,9 @@ describe('UndoneChangeNotifier', () => {
         return stopListening;
       }),
     };
-    const {unmount} = render(<UndoneChangeNotifier messageRepository={messageRepository} translate={translateForTest} />);
+    const {unmount} = render(
+      <UndoneChangeNotifier messageRepository={messageRepository} translate={translateForTest} />,
+    );
     return {
       notify: change => {
         act(() => {
