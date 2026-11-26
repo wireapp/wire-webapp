@@ -77,7 +77,7 @@ type Parts = {
   stored: Set<string>;
 };
 
-function buildParts(): Parts {
+function buildParts(maxOperations?: number): Parts {
   const selfUser = new User('selfid', '', translateForTest);
   selfUser.isMe = true;
   const userState = new UserState();
@@ -100,7 +100,12 @@ function buildParts(): Parts {
   const clock = createFakeClock();
   const invoker = createFireAndForgetInvoker({reportError: jest.fn()});
   const store = createInMemoryOutboxStore();
-  const outbox = createOutbox();
+  const outbox = createOutbox({
+    store,
+    getServerTime: clock.getServerTime,
+    logger: {info: jest.fn(), warn: jest.fn(), error: jest.fn()},
+    configuration: {maxOperations},
+  });
 
   const repository = new MessageRepository(
     () => {
@@ -173,13 +178,8 @@ function buildParts(): Parts {
   };
 }
 
-async function startOutbox({store, clock, outbox}: Parts, maxOperations?: number): Promise<void> {
-  const outcome = await outbox.start({
-    store,
-    getServerTime: clock.getServerTime,
-    logger: {info: jest.fn(), warn: jest.fn(), error: jest.fn()},
-    configuration: {maxOperations},
-  });
+async function startOutbox({clock, outbox}: Parts): Promise<void> {
+  const outcome = await outbox.start();
   expect(outcome.type).toBe('outbox-started');
   await clock.settle();
 }
@@ -298,7 +298,9 @@ describe('MessageRepository routing sends through the outbox', () => {
     });
 
     it('shows the message as failed when the outbox is full', async () => {
-      await startOutbox(parts, 0);
+      parts.clock.dispose();
+      parts = buildParts(0);
+      await startOutbox(parts);
 
       await sendText();
 

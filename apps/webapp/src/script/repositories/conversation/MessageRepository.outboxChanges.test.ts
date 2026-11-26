@@ -98,7 +98,11 @@ function buildParts(): Parts {
   const clock = createFakeClock();
   const invoker = createFireAndForgetInvoker({reportError: jest.fn()});
   const store = createInMemoryOutboxStore();
-  const outbox = createOutbox();
+  const outbox = createOutbox({
+    store,
+    getServerTime: clock.getServerTime,
+    logger: {info: jest.fn(), warn: jest.fn(), error: jest.fn()},
+  });
   const isBeingEdited = jest.fn().mockResolvedValue(false);
 
   const repository = new MessageRepository(
@@ -172,12 +176,8 @@ function buildParts(): Parts {
   };
 }
 
-async function startOutbox({store, clock, outbox}: Parts): Promise<void> {
-  const outcome = await outbox.start({
-    store,
-    getServerTime: clock.getServerTime,
-    logger: {info: jest.fn(), warn: jest.fn(), error: jest.fn()},
-  });
+async function startOutbox({clock, outbox}: Parts): Promise<void> {
+  const outcome = await outbox.start();
   expect(outcome.type).toBe('outbox-started');
   await clock.settle();
 }
