@@ -30,6 +30,7 @@ import {
   driveBulkActionProgressFeatureToggleName,
   driveOffboardingFeatureToggleName,
   markAsUnreadFeatureToggleName,
+  pendingOnboardingStatusFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
   e2ePdfPreviewFeatureToggleName,
@@ -47,6 +48,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   driveBulkActionProgressFeatureToggleName,
   driveOffboardingFeatureToggleName,
   markAsUnreadFeatureToggleName,
+  pendingOnboardingStatusFeatureToggleName,
   troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
   e2ePdfPreviewFeatureToggleName,
@@ -99,6 +101,16 @@ describe('startupFeatureToggles', function () {
     expect(disabled.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(false);
     expect(enabled.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(true);
     expect(enabled.enabledFeatureToggleNames).toEqual([markAsUnreadFeatureToggleName]);
+  });
+
+  it('keeps pending onboarding status disabled by default for release builds and allows explicit opt-in', () => {
+    const disabled = createStartupFeatureTogglesFromLocationSearch('');
+    const enabled = createStartupFeatureTogglesFromLocationSearch('?enabled-features=pending-onboarding-status');
+
+    expect(disabled.isFeatureToggleEnabled(pendingOnboardingStatusFeatureToggleName)).toBe(false);
+    expect(previewDefaultEnabledStartupFeatureToggleNames).toContain(pendingOnboardingStatusFeatureToggleName);
+    expect(enabled.isFeatureToggleEnabled(pendingOnboardingStatusFeatureToggleName)).toBe(true);
+    expect(enabled.enabledFeatureToggleNames).toEqual([pendingOnboardingStatusFeatureToggleName]);
   });
   it.each(['?enabled-features', '?enabled-features=', '?enabled-features=%20%2C%20'])(
     'resolves an explicit empty selection to no enabled features: %s',
@@ -281,6 +293,7 @@ describe('startupFeatureToggles', function () {
       driveBulkActionProgressFeatureToggleName,
       driveOffboardingFeatureToggleName,
       markAsUnreadFeatureToggleName,
+      pendingOnboardingStatusFeatureToggleName,
       troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,
       e2ePdfPreviewFeatureToggleName,

@@ -25,6 +25,7 @@ export const driveBulkRestoreFeatureToggleName = 'drive-bulk-restore';
 export const driveBulkActionProgressFeatureToggleName = 'drive-bulk-action-progress';
 export const driveOffboardingFeatureToggleName = 'drive-offboarding';
 export const markAsUnreadFeatureToggleName = 'mark-as-unread';
+export const pendingOnboardingStatusFeatureToggleName = 'pending-onboarding-status';
 export const troubleshooterFeatureToggleName = 'troubleshooter';
 
 export const sendCallLogsFeatureToggleName = 'send-call-logs';
@@ -39,6 +40,7 @@ export const startupFeatureToggleRegistry = [
   {name: driveBulkActionProgressFeatureToggleName, previewDefaultEnabled: true},
   {name: driveOffboardingFeatureToggleName, previewDefaultEnabled: true},
   {name: markAsUnreadFeatureToggleName, previewDefaultEnabled: true},
+  {name: pendingOnboardingStatusFeatureToggleName, previewDefaultEnabled: true},
   {name: troubleshooterFeatureToggleName, previewDefaultEnabled: false},
   {name: sendCallLogsFeatureToggleName, previewDefaultEnabled: false},
   {name: e2ePdfPreviewFeatureToggleName, previewDefaultEnabled: true},

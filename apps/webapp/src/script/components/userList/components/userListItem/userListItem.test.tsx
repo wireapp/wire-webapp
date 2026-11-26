@@ -20,6 +20,7 @@
 import {render, type RenderResult} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
+import {pendingOnboardingStatusFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {User} from '../../../../repositories/entity/User';
 import {translateForTest} from '../../../../util/test/translateForTest';
 import {
@@ -104,7 +105,20 @@ describe('UserListItem', () => {
       return user;
     };
 
-    const renderUserListItem = (user: User, showPendingOnboarding?: boolean): RenderResult => {
+    const pendingOnboardingEnabledWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: featureName => {
+          return featureName === pendingOnboardingStatusFeatureToggleName;
+        },
+      }),
+    );
+
+    const renderUserListItem = (
+      user: User,
+      showPendingOnboarding?: boolean,
+      wrapper = pendingOnboardingEnabledWrapper,
+    ): RenderResult => {
       return render(
         <UserListItem
           canSelect={false}
@@ -121,7 +135,7 @@ describe('UserListItem', () => {
           showPendingOnboarding={showPendingOnboarding}
           user={user}
         />,
-        {wrapper: rootProviderWrapper},
+        {wrapper},
       );
     };
 
@@ -145,6 +159,15 @@ describe('UserListItem', () => {
       const {getByTestId, queryByTestId} = renderUserListItem(createPendingUser());
 
       expect(getByTestId('status-username').textContent).toBe('@alice');
+      expect(queryByTestId('status-pending-onboarding')).toBeNull();
+    });
+
+    it('does not show the pending onboarding state when the feature toggle is disabled', () => {
+      const user = createPendingUser();
+      user.username('');
+      const {queryByText, queryByTestId} = renderUserListItem(user, true, rootProviderWrapper);
+
+      expect(queryByText('userOnboardingPending')).toBeNull();
       expect(queryByTestId('status-pending-onboarding')).toBeNull();
     });
 

@@ -22,6 +22,7 @@ import React, {ChangeEvent, useId, type FunctionComponent} from 'react';
 import {isEmptyString} from '@sindresorhus/is';
 
 import {UserlistMode} from '../..';
+import {pendingOnboardingStatusFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {User} from '../../../../repositories/entity/User';
 import {Checkbox, CheckboxLabel} from '../../../../uiKit/inputs/checkbox/checkbox';
@@ -69,7 +70,7 @@ export const UserListItem: FunctionComponent<UserListItemProps> = ({
   onClick,
   onKeyDown,
 }: UserListItemProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const checkboxId = useId();
 
   const {isDirectGuest, expirationText, isPendingOnboarding} = useKoSubscribableChildren(user, [
@@ -77,7 +78,8 @@ export const UserListItem: FunctionComponent<UserListItemProps> = ({
     'expirationText',
     'isPendingOnboarding',
   ]);
-  const isPendingOnboardingShown = showPendingOnboarding && isPendingOnboarding;
+  const isPendingOnboardingShown =
+    showPendingOnboarding && isPendingOnboarding && isFeatureToggleEnabled(pendingOnboardingStatusFeatureToggleName);
 
   const {isMe: isSelf, isFederated} = user;
   const isTemporaryGuest = user.isTemporaryGuest();
