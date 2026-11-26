@@ -40,7 +40,10 @@ runs:
         set -euo pipefail
 
         expected_test_commit="$(printf '%s' "${TEST_COMMIT:-${WORKFLOW_COMMIT}}" | LC_ALL=C tr 'A-F' 'a-f')"
-        actual_test_commit="$(git -c safe.directory="${GITHUB_WORKSPACE}" rev-parse HEAD)"
+
+        # Use the job's HOME because actions/checkout writes to a temporary one.
+        git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+        actual_test_commit="$(git rev-parse HEAD)"
 
         echo "Resolved E2E test commit: ${expected_test_commit}"
         echo "Checked out E2E test commit: ${actual_test_commit}"
