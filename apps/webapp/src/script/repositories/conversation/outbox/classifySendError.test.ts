@@ -69,7 +69,11 @@ describe('classifySendError', () => {
     ['400', backendError(400), rejected],
     ['412', backendError(412), rejected],
     ['a federation error with a 5xx code', backendError(533, BackendErrorLabel.FEDERATION_REMOTE_ERROR), federation],
-    ['a federation error without a code', new BackendError('failed', BackendErrorLabel.FEDERATION_REMOTE_ERROR), federation],
+    [
+      'a federation error without a code',
+      new BackendError('failed', BackendErrorLabel.FEDERATION_REMOTE_ERROR),
+      federation,
+    ],
     ['a cancelled request', new RequestCancellationError('cancelled'), cancelled],
     ['a cancelled request with a 5xx code', new RequestCancellationError('cancelled', undefined, 500), cancelled],
     ['an error without a code', new Error('boom'), rejected],
