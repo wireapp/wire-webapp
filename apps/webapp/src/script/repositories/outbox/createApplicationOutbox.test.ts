@@ -21,7 +21,7 @@ import type {Table} from 'dexie';
 
 import type {OperationSnapshot} from '../../outbox';
 
-import {createOutboxService} from './createOutboxService';
+import {createApplicationOutbox} from './createApplicationOutbox';
 
 function createDatabaseDouble(): {table: {toArray: jest.Mock}; db: {outbox: Table<OperationSnapshot, number>}} {
   const table = {
@@ -30,35 +30,35 @@ function createDatabaseDouble(): {table: {toArray: jest.Mock}; db: {outbox: Tabl
   return {table, db: {outbox: table as unknown as Table<OperationSnapshot, number>}};
 }
 
-describe('createOutboxService', () => {
+describe('createApplicationOutbox', () => {
   const serverTimeHandler = {toServerTimestamp: jest.fn().mockReturnValue(5000)};
 
   it('starts the outbox over the database table', async () => {
     const {table, db} = createDatabaseDouble();
-    const service = createOutboxService({storageService: {db}, serverTimeHandler});
+    const outbox = createApplicationOutbox({storageService: {db}, serverTimeHandler});
 
-    expect(service.outbox.isStarted()).toBe(false);
+    expect(outbox.isStarted()).toBe(false);
 
-    expect(await service.start()).toEqual({type: 'outbox-started'});
+    expect(await outbox.start()).toEqual({type: 'outbox-started'});
 
     expect(table.toArray).toHaveBeenCalled();
-    expect(service.outbox.isStarted()).toBe(true);
+    expect(outbox.isStarted()).toBe(true);
   });
 
   it('stops the outbox', async () => {
     const {db} = createDatabaseDouble();
-    const service = createOutboxService({storageService: {db}, serverTimeHandler});
-    await service.start();
+    const outbox = createApplicationOutbox({storageService: {db}, serverTimeHandler});
+    await outbox.start();
 
-    await service.stop();
+    await outbox.stop();
 
-    expect(service.outbox.isStarted()).toBe(false);
+    expect(outbox.isStarted()).toBe(false);
   });
 
   it('answers storage-failed and stays unstarted while the database is not open', async () => {
-    const service = createOutboxService({storageService: {db: undefined}, serverTimeHandler});
+    const outbox = createApplicationOutbox({storageService: {db: undefined}, serverTimeHandler});
 
-    expect(await service.start()).toEqual({type: 'storage-failed', errorName: 'Error'});
-    expect(service.outbox.isStarted()).toBe(false);
+    expect(await outbox.start()).toEqual({type: 'storage-failed', errorName: 'Error'});
+    expect(outbox.isStarted()).toBe(false);
   });
 });
