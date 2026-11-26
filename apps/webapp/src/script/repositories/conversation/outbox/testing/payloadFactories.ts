@@ -19,9 +19,8 @@
 
 import {Confirmation} from '@wireapp/protocol-messaging';
 
-import {CONVERSATION_ID} from './createFakeMessageOutboxPort';
+import {CONVERSATION_ID} from './createOutboxRepository';
 
-import type {OperationState, OperationView} from '../../../../outbox';
 import type {
   AssetMessagePayload,
   EditMessagePayload,
@@ -30,7 +29,7 @@ import type {
   PingPayload,
   ReceiptPayload,
   TextMessagePayload,
-} from '../payloads';
+} from '../messageOutboxTypes';
 
 export function textPayload(overrides: Partial<TextMessagePayload> = {}): TextMessagePayload {
   return {
@@ -100,12 +99,4 @@ export function lastReadPayload(timestamp: number): ReceiptPayload {
 
 export function pingPayload(overrides: Partial<PingPayload> = {}): PingPayload {
   return {conversationId: CONVERSATION_ID, messageId: 'ping-1', ...overrides};
-}
-
-export function viewOf<Payload>(
-  kind: string,
-  payload: Payload,
-  overrides: Partial<OperationView<Payload>> = {},
-): OperationView<Payload> {
-  return {id: 'operation-1', kind, payload, queuedAt: 0, state: 'queued' as OperationState, attempts: 0, ...overrides};
 }

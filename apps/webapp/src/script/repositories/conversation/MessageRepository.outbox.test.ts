@@ -17,6 +17,7 @@
  *
  */
 
+import {createFireAndForgetInvoker, type FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {amplify} from 'amplify';
 
 import {BackendError} from '../../apiClient/http/backendError';
@@ -49,7 +50,7 @@ import {UserState} from '../user/userState';
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
 import {MessageRepository} from './MessageRepository';
-import type {MessagePayload} from './outbox/payloads';
+import type {MessagePayload} from './outbox/messageOutboxTypes';
 
 const CONVERSATION_ID = {id: 'conversation-1', domain: 'wire.test'};
 
@@ -59,6 +60,7 @@ type MessageRepositoryParts = {
   conversationState: ConversationState;
   eventService: EventService;
   send: jest.Mock;
+  invoker: FireAndForgetInvoker;
 };
 
 function buildMessageRepositoryParts(outbox?: Outbox): MessageRepositoryParts {
@@ -79,6 +81,7 @@ function buildMessageRepositoryParts(outbox?: Outbox): MessageRepositoryParts {
   conversationState.conversations([selfConversation, conversation]);
   const eventService = new EventService({} as any);
   const send = jest.fn();
+  const invoker = createFireAndForgetInvoker({reportError: jest.fn()});
 
   const repository = new MessageRepository(
     () => {
@@ -98,8 +101,10 @@ function buildMessageRepositoryParts(outbox?: Outbox): MessageRepositoryParts {
     new TeamState(),
     createCoreTestFixture({service: {conversation: {send, messageTimer: new MessageTimer()}}}),
     outbox,
+    undefined,
+    invoker,
   );
-  return {repository, conversation, conversationState, eventService, send};
+  return {repository, conversation, conversationState, eventService, send, invoker};
 }
 
 function buildMessageRepository(outbox?: Outbox): MessageRepository {
@@ -136,33 +141,23 @@ describe('MessageRepository reviewing restored holds', () => {
     return {outbox, lanes};
   }
 
-  it('looks for restored holds when a conversation becomes the active one', () => {
+  it('looks for restored holds only when asked to, not when a conversation becomes the active one', () => {
     const {outbox, lanes} = createLanesOutbox();
-    const {conversation, conversationState} = buildMessageRepositoryParts(outbox);
-    expect(lanes).not.toHaveBeenCalled();
+    const {repository, conversation, conversationState} = buildMessageRepositoryParts(outbox);
 
     conversationState.activeConversation(conversation);
+    expect(lanes).not.toHaveBeenCalled();
 
+    repository.reviewRestoredHolds();
     expect(lanes).toHaveBeenCalledTimes(1);
   });
 
-  it('does not look when no conversation is active', () => {
-    const {outbox, lanes} = createLanesOutbox();
-    const {conversation, conversationState} = buildMessageRepositoryParts(outbox);
-    conversationState.activeConversation(conversation);
-    lanes.mockClear();
+  it('does nothing without an outbox', () => {
+    const {repository} = buildMessageRepositoryParts();
 
-    conversationState.activeConversation(undefined);
-
-    expect(lanes).not.toHaveBeenCalled();
-  });
-
-  it('does nothing without an outbox', async () => {
-    const {repository, conversation, conversationState} = buildMessageRepositoryParts();
-
-    conversationState.activeConversation(conversation);
-
-    await expect(repository.reviewRestoredHolds(conversation)).resolves.toBeUndefined();
+    expect(() => {
+      repository.reviewRestoredHolds();
+    }).not.toThrow();
   });
 });
 
@@ -180,7 +175,7 @@ describe('MessageRepository outbox registration', () => {
       return kind.name;
     });
 
-    expect(registeredNames).toEqual(['message', 'message-change', 'receipt', 'ping']);
+    expect(registeredNames).toEqual(['message', 'ping', 'receipt', 'message-change']);
   });
 
   it.each([{type: 'kind-name-taken', kind: 'message'} as const, {type: 'outbox-already-started'} as const])(
@@ -241,9 +236,13 @@ describe('MessageRepository as the port of the message kinds', () => {
       failed_reason: jest.fn(),
       written_time: jest.fn(),
       primary_key: 'primary-key',
-      readReceipts: () => {return []},
+      readReceipts: () => {
+        return [];
+      },
       type: 'conversation.message-add',
-      hasAssetImage: () => {return false},
+      hasAssetImage: () => {
+        return false;
+      },
       timestamp: jest.fn(),
     };
     jest.spyOn(parts.conversation, 'getMessage').mockReturnValue(storedMessage as any);
@@ -266,7 +265,11 @@ describe('MessageRepository as the port of the message kinds', () => {
 
   it('sends a text through the core without showing it again, and answers succeeded', async () => {
     const {messageKind, send} = setup();
-    send.mockResolvedValue({id: 'message-1', sentAt: new Date().toISOString(), state: MessageSendingState.OUTGOING_SENT});
+    send.mockResolvedValue({
+      id: 'message-1',
+      sentAt: new Date().toISOString(),
+      state: MessageSendingState.OUTGOING_SENT,
+    });
 
     await expect(perform(messageKind, textPayload)).resolves.toEqual({type: 'attempt-succeeded'});
 
@@ -286,7 +289,11 @@ describe('MessageRepository as the port of the message kinds', () => {
     it('gives the shown copy the timer the conversation has when the message is sent', async () => {
       const {messageKind, send, conversation, storedMessage, updateEvent} = setup();
       jest.spyOn(conversation, 'messageTimer').mockReturnValue(TEN_SECONDS);
-      send.mockResolvedValue({id: 'message-1', sentAt: new Date().toISOString(), state: MessageSendingState.OUTGOING_SENT});
+      send.mockResolvedValue({
+        id: 'message-1',
+        sentAt: new Date().toISOString(),
+        state: MessageSendingState.OUTGOING_SENT,
+      });
 
       await perform(messageKind, textPayload);
 
@@ -298,7 +305,11 @@ describe('MessageRepository as the port of the message kinds', () => {
     it('turns a shown self-deleting copy into a normal one when the conversation has no timer anymore', async () => {
       const {messageKind, send, storedMessage, updateEvent} = setup();
       storedMessage.ephemeral_expires(TEN_SECONDS);
-      send.mockResolvedValue({id: 'message-1', sentAt: new Date().toISOString(), state: MessageSendingState.OUTGOING_SENT});
+      send.mockResolvedValue({
+        id: 'message-1',
+        sentAt: new Date().toISOString(),
+        state: MessageSendingState.OUTGOING_SENT,
+      });
 
       await perform(messageKind, textPayload);
 
@@ -311,12 +322,19 @@ describe('MessageRepository as the port of the message kinds', () => {
       const {messageKind, send, conversation, storedMessage, updateEvent} = setup();
       jest.spyOn(conversation, 'messageTimer').mockReturnValue(TEN_SECONDS);
       storedMessage.status.mockReturnValue(StatusType.SENT);
-      send.mockResolvedValue({id: 'message-1', sentAt: new Date().toISOString(), state: MessageSendingState.OUTGOING_SENT});
+      send.mockResolvedValue({
+        id: 'message-1',
+        sentAt: new Date().toISOString(),
+        state: MessageSendingState.OUTGOING_SENT,
+      });
 
       await perform(messageKind, textPayload);
 
       expect(storedMessage.ephemeral_expires()).toBe(false);
-      expect(updateEvent).not.toHaveBeenCalledWith('primary-key', expect.objectContaining({ephemeral_expires: expect.anything()}));
+      expect(updateEvent).not.toHaveBeenCalledWith(
+        'primary-key',
+        expect.objectContaining({ephemeral_expires: expect.anything()}),
+      );
     });
   });
 
@@ -353,7 +371,7 @@ describe('MessageRepository as the port of the message kinds', () => {
   });
 
   it('removes a message the outbox dropped from the record and from the screen', async () => {
-    const {messageKind, eventService} = setup();
+    const {messageKind, eventService, invoker} = setup();
     const deleteEvent = jest.spyOn(eventService, 'deleteEvent').mockResolvedValue(1);
     const removed = jest.fn();
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, removed);
@@ -366,9 +384,7 @@ describe('MessageRepository as the port of the message kinds', () => {
       state: 'dropped',
       attempts: 1,
     });
-    await new Promise(resolve => {
-      setTimeout(resolve, 0);
-    });
+    await invoker.waitUntilAllSettled();
 
     expect(deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
     expect(removed).toHaveBeenCalledWith('message-1', CONVERSATION_ID.id);
@@ -376,7 +392,7 @@ describe('MessageRepository as the port of the message kinds', () => {
   });
 
   describe('a held message whose send was attempted', () => {
-    async function release(messageKind: Kind<MessagePayload>): Promise<void> {
+    async function release(messageKind: Kind<MessagePayload>, invoker: FireAndForgetInvoker): Promise<void> {
       messageKind.onChanged?.({
         id: 'operation',
         kind: 'message',
@@ -385,13 +401,11 @@ describe('MessageRepository as the port of the message kinds', () => {
         state: 'in-progress',
         attempts: 1,
       });
-      await new Promise(resolve => {
-        setTimeout(resolve, 0);
-      });
+      await invoker.waitUntilAllSettled();
     }
 
     it('is not shown again when an edit replaced its record', async () => {
-      const {messageKind, eventService, repository} = setup();
+      const {messageKind, eventService, repository, invoker} = setup();
       const inject = jest.spyOn(repository as any, 'injectOptimisticMessage').mockResolvedValue(true);
       jest.spyOn(eventService, 'loadEvent').mockResolvedValue({
         primary_key: 'edit-key',
@@ -400,18 +414,18 @@ describe('MessageRepository as the port of the message kinds', () => {
         status: StatusType.SENT,
       } as any);
 
-      await release(messageKind);
+      await release(messageKind, invoker);
 
       expect(inject).not.toHaveBeenCalled();
     });
 
     it('is shown again when no record is left', async () => {
-      const {messageKind, eventService, repository} = setup();
+      const {messageKind, eventService, repository, invoker} = setup();
       const inject = jest.spyOn(repository as any, 'injectOptimisticMessage').mockResolvedValue(true);
       jest.spyOn(repository as any, 'buildOutboxText').mockResolvedValue({} as any);
       jest.spyOn(eventService, 'loadEvent').mockResolvedValue(undefined);
 
-      await release(messageKind);
+      await release(messageKind, invoker);
 
       expect(inject).toHaveBeenCalledTimes(1);
     });

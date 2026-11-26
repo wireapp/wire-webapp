@@ -21,9 +21,15 @@ import {z} from 'zod';
 
 import {Confirmation} from '@wireapp/protocol-messaging';
 
+import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import type {MultiPartContent} from '../../../core/conversation/content';
 
-// A conversation without a domain is valid locally, so the domain may be empty
+// The kind names, payloads, correlation keys and lanes are stored with every operation. Changing their format
+// would leave the operations stored by an earlier version unreadable or unmatched.
+
+// Payloads
+
+// A conversation without a domain is valid locally, so the domain may be empty.
 const conversationIdSchema = z.object({id: z.string().min(1), domain: z.string()});
 const messageIdSchema = z.string().min(1);
 
@@ -128,7 +134,7 @@ export type MessageChangePayload = z.infer<typeof messageChangePayloadSchema>;
 export type ReceiptPayload = z.infer<typeof receiptPayloadSchema>;
 export type PingPayload = z.infer<typeof pingPayloadSchema>;
 
-/** Each of these throws on anything but a payload of its kind */
+/** Each of these throws on anything but a payload of its kind. */
 export function parseMessagePayload(value: unknown): MessagePayload {
   return messagePayloadSchema.parse(value);
 }
@@ -143,4 +149,61 @@ export function parseReceiptPayload(value: unknown): ReceiptPayload {
 
 export function parsePingPayload(value: unknown): PingPayload {
   return pingPayloadSchema.parse(value);
+}
+
+// Correlation keys
+
+/**
+ * The message kind and the message-change kind share their correlation keys, so that a message and a change to it
+ * never collide: a message is named by its id, and a change by its target and what it does to it.
+ */
+export function messageCorrelationKey(payload: MessagePayload | MessageChangePayload): string {
+  switch (payload.type) {
+    case 'text':
+    case 'asset':
+      return payload.messageId;
+    case 'reaction':
+      return `${payload.targetMessageId}:reaction`;
+    case 'edit':
+      return `${payload.originalMessageId}:edit`;
+    case 'delete':
+      return `${payload.targetMessageId}:delete`;
+    case 'hide':
+      return `${payload.targetMessageId}:hide`;
+  }
+}
+
+/** The changes a message can have waiting in the outbox. They go away when the message does. */
+export function changeCorrelationKeysOf(messageId: string): string[] {
+  return [`${messageId}:reaction`, `${messageId}:edit`, `${messageId}:delete`];
+}
+
+/** A newer last read or cleared timestamp of a conversation replaces the one that wasn't sent yet. */
+export function receiptCorrelationKey(payload: ReceiptPayload): string {
+  switch (payload.type) {
+    case 'confirmation':
+      return `receipt:${payload.conversationId.id}:${payload.confirmationType}:${payload.messageIds[0]}`;
+    case 'last-read':
+      return `last-read:${payload.conversationId.id}`;
+    case 'cleared':
+      return `cleared:${payload.conversationId.id}`;
+    case 'data-transfer':
+      return 'data-transfer';
+  }
+}
+
+// Lanes
+
+/** Messages, the changes to messages that are still pending, and pings go out one at a time, in order. */
+export function laneOfMessages(conversationId: QualifiedId): string {
+  return conversationId.id;
+}
+
+/** Changes to messages that were sent have their own lane, so that pending messages never block them. */
+export function laneOfChanges(conversationId: QualifiedId): string {
+  return `${conversationId.id}#changes`;
+}
+
+export function laneOfReceipts(payload: ReceiptPayload): string {
+  return payload.type === 'data-transfer' ? 'self#receipts' : `${payload.conversationId.id}#receipts`;
 }

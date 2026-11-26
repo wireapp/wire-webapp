@@ -25,30 +25,43 @@ import {amplify} from 'amplify';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {WebAppEvents} from '../../../../webAppEvents';
 
+/** Structural, so that the hook doesn't pull the message repository into an import cycle */
+type EditingHolds = {
+  startEditing: (message: ContentMessage) => Promise<void>;
+  stopEditing: () => Promise<void>;
+};
+
 type UseMessageEditingResult = {
   editedMessage: ContentMessage | undefined;
   editMessage: (messageEntity: ContentMessage) => void;
   isEditing: boolean;
   cancelMessageEditing: (callback?: () => void) => void;
 };
-export const useMessageEditing = (): UseMessageEditingResult => {
+export const useMessageEditing = ({messageRepository}: {messageRepository: EditingHolds}): UseMessageEditingResult => {
   const [editedMessage, setEditedMessage] = useState<ContentMessage | undefined>();
 
-  const cancelMessageEditing = useCallback((callback?: () => void) => {
-    setEditedMessage(undefined);
-    callback?.();
-  }, []);
+  const cancelMessageEditing = useCallback(
+    (callback?: () => void) => {
+      setEditedMessage(undefined);
+      void messageRepository.stopEditing();
+      callback?.();
+    },
+    [messageRepository],
+  );
 
-  const editMessage = useCallback((messageEntity: ContentMessage) => {
-    setEditedMessage(messageEntity);
-  }, []);
+  const editMessage = useCallback(
+    (messageEntity: ContentMessage) => {
+      setEditedMessage(messageEntity);
+      void messageRepository.startEditing(messageEntity);
+    },
+    [messageRepository],
+  );
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, editMessage);
 
     return () => {
-      // Only this subscription: the message repository listens to the same event
-      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, editMessage);
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
     };
   }, [editMessage]);
 

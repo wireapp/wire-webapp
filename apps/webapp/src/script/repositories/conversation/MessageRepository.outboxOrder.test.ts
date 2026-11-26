@@ -17,30 +17,41 @@
  *
  */
 
+import {amplify} from 'amplify';
+
 import type {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {BackendError} from '../../../apiClient/http/backendError';
-import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
-import {createOutboxTestKit, type OutboxTestKit} from '../../../outbox/testing/createOutboxTestKit';
+import {BackendError} from '../../apiClient/http/backendError';
+import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import {StatusType} from '../../message/statusType';
+import {WebAppEvents} from '../../webAppEvents';
 
+import {ConversationVerificationState} from './ConversationVerificationState';
 import {
-  messageChangeOrderingKey,
+  laneOfChanges,
+  laneOfMessages,
+  laneOfReceipts,
   messageCorrelationKey,
-  messageOrderingKey,
   receiptCorrelationKey,
-  receiptOrderingKey,
-} from './keys';
-import {registerMessageOutboxKinds, type MessageOutboxHandles} from './messageOutboxKinds';
-import type {MessageChangePayload, MessagePayload, PingPayload, ReceiptPayload} from './payloads';
+  type MessageChangePayload,
+  type MessagePayload,
+  type ReceiptPayload,
+} from './outbox/messageOutboxTypes';
 import {
   CONVERSATION_ID,
+  createOutboxRepository,
   OTHER_CONVERSATION_ID,
-  createFakeMessageOutboxPort,
   sendingRecord,
   sentResult,
-  type FakeMessageOutbox,
-} from './testing/createFakeMessageOutboxPort';
-import {confirmationPayload, lastReadPayload, pingPayload, reactionPayload, textPayload} from './testing/payloadFactories';
+  type OutboxRepository,
+} from './outbox/testing/createOutboxRepository';
+import {
+  confirmationPayload,
+  lastReadPayload,
+  pingPayload,
+  reactionPayload,
+  textPayload,
+} from './outbox/testing/payloadFactories';
 
 type PendingSend = {
   message: GenericMessage;
@@ -52,37 +63,33 @@ const rejection = new BackendError('invalid', BackendErrorLabel.CLIENT_ERROR, 40
 const removal = new BackendError('removed', BackendErrorLabel.CLIENT_ERROR, 403);
 
 describe('the message kinds through the outbox', () => {
-  let kit: OutboxTestKit;
-  let fake: FakeMessageOutbox;
-  let handles: MessageOutboxHandles;
+  let parts: OutboxRepository;
   let sends: PendingSend[];
 
   beforeEach(async () => {
-    kit = createOutboxTestKit();
-    fake = createFakeMessageOutboxPort(kit.clock.settle);
-    fake.port.serverTime.mockImplementation(kit.clock.getServerTime);
-    handles = registerMessageOutboxKinds(kit.outbox, fake.port);
+    parts = createOutboxRepository();
     sends = [];
-    fake.port.sendToBackend.mockImplementation(async message => {
+    parts.sendToBackend.mockImplementation(async (message: any) => {
       return new Promise((resolve, reject) => {
         sends.push({
           message,
           succeed: async () => {
             resolve(sentResult());
-            await kit.clock.settle();
+            await parts.kit.clock.settle();
           },
           fail: async error => {
             reject(error);
-            await kit.clock.settle();
+            await parts.kit.clock.settle();
           },
         });
       });
     });
-    await kit.start();
+    await parts.kit.start();
   });
 
   afterEach(() => {
-    kit.dispose();
+    parts.kit.dispose();
+    amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
   });
 
   function sentContents(): (string | undefined)[] {
@@ -103,52 +110,55 @@ describe('the message kinds through the outbox', () => {
 
   async function enqueueText(messageId: string, conversationId = CONVERSATION_ID): Promise<void> {
     const payload: MessagePayload = textPayload({messageId, conversationId});
-    fake.records.set(messageId, sendingRecord());
-    await handles.message.enqueue({
+    parts.records.set(messageId, sendingRecord());
+    await parts.handles.message.enqueue({
       payload,
       correlationKey: messageCorrelationKey(payload),
-      orderingKey: messageOrderingKey(conversationId),
+      orderingKey: laneOfMessages(conversationId),
     });
-    await kit.clock.settle();
+    await parts.kit.clock.settle();
   }
 
   async function enqueueReactionToPendingMessage(targetMessageId: string): Promise<void> {
     const payload: MessagePayload = reactionPayload({targetMessageId});
-    await handles.message.enqueue({
+    await parts.handles.message.enqueue({
       payload,
       correlationKey: messageCorrelationKey(payload),
-      orderingKey: messageOrderingKey(CONVERSATION_ID),
+      orderingKey: laneOfMessages(CONVERSATION_ID),
     });
-    await kit.clock.settle();
+    await parts.kit.clock.settle();
   }
 
   async function enqueueReactionToSentMessage(targetMessageId: string): Promise<void> {
     const payload: MessageChangePayload = reactionPayload({targetMessageId});
-    await handles.messageChange.enqueue({
+    await parts.handles['message-change'].enqueue({
       payload,
       correlationKey: messageCorrelationKey(payload),
-      orderingKey: messageChangeOrderingKey(CONVERSATION_ID),
+      orderingKey: laneOfChanges(CONVERSATION_ID),
     });
-    await kit.clock.settle();
+    await parts.kit.clock.settle();
   }
 
   async function enqueueReceipt(payload: ReceiptPayload): Promise<void> {
-    await handles.receipt.enqueue({
+    await parts.handles.receipt.enqueue({
       payload,
       correlationKey: receiptCorrelationKey(payload),
-      orderingKey: receiptOrderingKey(payload),
+      orderingKey: laneOfReceipts(payload),
     });
-    await kit.clock.settle();
+    await parts.kit.clock.settle();
   }
 
   async function enqueuePing(messageId: string): Promise<void> {
-    const payload: PingPayload = pingPayload({messageId});
-    await handles.ping.enqueue({
-      payload,
+    await parts.handles.ping.enqueue({
+      payload: pingPayload({messageId}),
       correlationKey: messageId,
-      orderingKey: messageOrderingKey(CONVERSATION_ID),
+      orderingKey: laneOfMessages(CONVERSATION_ID),
     });
-    await kit.clock.settle();
+    await parts.kit.clock.settle();
+  }
+
+  function stateOf(correlationKey: string): string | undefined {
+    return parts.kit.findOperation(correlationKey)?.state;
   }
 
   describe('order', () => {
@@ -164,7 +174,7 @@ describe('the message kinds through the outbox', () => {
       expect(sentTextIds()).toEqual(['a', 'b', 'c']);
       await sends[2].succeed();
 
-      expect(kit.lanesOf()).toEqual([]);
+      expect(parts.kit.lanesOf()).toEqual([]);
     });
 
     it('sends the messages of different conversations independently', async () => {
@@ -182,10 +192,10 @@ describe('the message kinds through the outbox', () => {
 
       await sends[0].fail(rejection);
 
-      expect(kit.findOperation('a')?.state).toBe('dead-lettered');
-      expect(kit.findOperation('b')?.state).toBe('dead-lettered');
-      expect(kit.findOperation('x')?.state).toBe('in-progress');
-      expect(kit.findOperation('y')?.state).toBe('queued');
+      expect(stateOf('a')).toBe('dead-lettered');
+      expect(stateOf('b')).toBe('dead-lettered');
+      expect(stateOf('x')).toBe('in-progress');
+      expect(stateOf('y')).toBe('queued');
       await sends[1].succeed();
       expect(sentTextIds()).toEqual(['a', 'x', 'y']);
     });
@@ -209,11 +219,11 @@ describe('the message kinds through the outbox', () => {
 
       await sends[0].fail(removal);
 
-      expect(kit.findOperation('a')?.state).toBe('dead-lettered');
-      expect(kit.findOperation('a:reaction')?.state).toBe('dead-lettered');
+      expect(stateOf('a')).toBe('dead-lettered');
+      expect(stateOf('a:reaction')).toBe('dead-lettered');
       expect(sentContents()).toEqual(['text']);
-      expect(fake.port.markFailed).toHaveBeenCalledTimes(1);
-      expect(fake.records.get('a')).toMatchObject({isFailed: true, failedReason: 'removed'});
+      expect(parts.markMessage).toHaveBeenCalledTimes(1);
+      expect(parts.records.get('a')).toMatchObject({status: StatusType.FAILED, failed_reason: 'removed'});
     });
   });
 
@@ -231,7 +241,7 @@ describe('the message kinds through the outbox', () => {
 
       await enqueueReactionToSentMessage('sent-message');
 
-      expect(kit.findOperation('a')?.state).toBe('dead-lettered');
+      expect(stateOf('a')).toBe('dead-lettered');
       expect(sentContents()).toEqual(['text', 'reaction']);
     });
   });
@@ -250,30 +260,30 @@ describe('the message kinds through the outbox', () => {
 
       await enqueueReceipt(confirmationPayload());
 
-      expect(kit.findOperation('a')?.state).toBe('dead-lettered');
+      expect(stateOf('a')).toBe('dead-lettered');
       expect(sentContents()).toEqual(['text', 'confirmation']);
     });
 
     it('send only the latest last read of a conversation', async () => {
-      kit.outbox.pause();
+      parts.kit.outbox.pause();
 
       await enqueueReceipt(lastReadPayload(1));
       await enqueueReceipt(lastReadPayload(2));
       expect(sends).toHaveLength(0);
-      kit.outbox.resume();
-      await kit.clock.settle();
+      parts.kit.outbox.resume();
+      await parts.kit.clock.settle();
 
       expect(sentContents()).toEqual(['lastRead']);
       expect(sends[0].message.lastRead?.lastReadTimestamp?.toString()).toBe('2');
     });
 
     it('keep the last read of each conversation', async () => {
-      kit.outbox.pause();
+      parts.kit.outbox.pause();
 
       await enqueueReceipt(lastReadPayload(1));
       await enqueueReceipt({type: 'last-read', conversationId: OTHER_CONVERSATION_ID, timestamp: 2});
-      kit.outbox.resume();
-      await kit.clock.settle();
+      parts.kit.outbox.resume();
+      await parts.kit.clock.settle();
 
       expect(sentContents()).toEqual(['lastRead', 'lastRead']);
     });
@@ -289,15 +299,15 @@ describe('the message kinds through the outbox', () => {
       expect(sentContents()).toEqual(['text', 'knock']);
     });
 
-    it('carries on behind a message that failed: only messages cascade', async () => {
+    it('carries on behind a message that failed, because only messages take their lane with them', async () => {
       await enqueueText('a');
       await enqueueText('b');
       await enqueuePing('ping');
 
       await sends[0].fail(rejection);
 
-      expect(kit.findOperation('a')?.state).toBe('dead-lettered');
-      expect(kit.findOperation('b')?.state).toBe('dead-lettered');
+      expect(stateOf('a')).toBe('dead-lettered');
+      expect(stateOf('b')).toBe('dead-lettered');
       expect(sentContents()).toEqual(['text', 'knock']);
     });
 
@@ -306,25 +316,25 @@ describe('the message kinds through the outbox', () => {
 
       await sends[0].fail(rejection);
 
-      expect(kit.findOperation('ping')).toBeUndefined();
-      expect(fake.port.deleteMessage).toHaveBeenCalledWith(fake.conversation, 'ping');
+      expect(parts.kit.findOperation('ping')).toBeUndefined();
+      expect(parts.deleteMessage).toHaveBeenCalledWith(parts.conversation, 'ping');
     });
   });
 
   describe('a conversation that asks before sending to unverified devices', () => {
     beforeEach(() => {
-      fake.degraded.add(fake.conversation);
+      parts.degrade(parts.conversation);
     });
 
     it('holds its lane until the user accepts, and then sends in order', async () => {
       await enqueueText('a');
       await enqueueText('b');
 
-      expect(kit.findOperation('a')?.state).toBe('on-hold');
-      expect(fake.prompts).toHaveLength(1);
+      expect(stateOf('a')).toBe('on-hold');
+      expect(parts.prompts).toHaveLength(1);
       expect(sends).toHaveLength(0);
 
-      await fake.prompts[0].answer(true);
+      await parts.prompts[0].answer(true);
 
       expect(sentTextIds()).toEqual(['a']);
       await sends[0].succeed();
@@ -342,28 +352,28 @@ describe('the message kinds through the outbox', () => {
       await enqueueText('a');
       await enqueueText('b');
 
-      await fake.prompts[0].answer(false);
+      await parts.prompts[0].answer(false);
 
       expect(sends).toHaveLength(0);
-      expect(kit.findOperation('a')?.state).toBe('dead-lettered');
-      expect(kit.findOperation('b')?.state).toBe('dead-lettered');
-      expect(fake.records.get('a')).toMatchObject({isFailed: true, failedReason: 'declined'});
-      expect(fake.records.get('b')).toMatchObject({isFailed: true, failedReason: 'generic'});
+      expect(stateOf('a')).toBe('dead-lettered');
+      expect(stateOf('b')).toBe('dead-lettered');
+      expect(parts.records.get('a')).toMatchObject({status: StatusType.FAILED, failed_reason: 'declined'});
+      expect(parts.records.get('b')).toMatchObject({status: StatusType.FAILED, failed_reason: 'generic'});
     });
 
     it('sends a declined message again once its owner took the decline back and queued it again', async () => {
       await enqueueText('a');
-      await fake.prompts[0].answer(false);
-      fake.degraded.clear();
+      await parts.prompts[0].answer(false);
+      parts.conversation.verification_state(ConversationVerificationState.UNVERIFIED);
 
-      await fake.port.markSending(fake.conversation, 'a');
+      parts.records.set('a', sendingRecord());
       const payload = textPayload({messageId: 'a'});
-      const outcome = await handles.message.enqueue({
+      const outcome = await parts.handles.message.enqueue({
         payload,
         correlationKey: 'a',
-        orderingKey: messageOrderingKey(CONVERSATION_ID),
+        orderingKey: laneOfMessages(CONVERSATION_ID),
       });
-      await kit.clock.settle();
+      await parts.kit.clock.settle();
 
       expect(outcome.type).toBe('operation-versioned');
       expect(sentTextIds()).toEqual(['a']);
@@ -371,15 +381,15 @@ describe('the message kinds through the outbox', () => {
 
     it('lets the next attempt of a declined message that was not taken back dead-letter it again', async () => {
       await enqueueText('a');
-      await fake.prompts[0].answer(false);
-      fake.degraded.clear();
+      await parts.prompts[0].answer(false);
+      parts.conversation.verification_state(ConversationVerificationState.UNVERIFIED);
 
       const payload = textPayload({messageId: 'a'});
-      await handles.message.enqueue({payload, correlationKey: 'a', orderingKey: messageOrderingKey(CONVERSATION_ID)});
-      await kit.clock.settle();
+      await parts.handles.message.enqueue({payload, correlationKey: 'a', orderingKey: laneOfMessages(CONVERSATION_ID)});
+      await parts.kit.clock.settle();
 
       expect(sends).toHaveLength(0);
-      expect(kit.findOperation('a')?.state).toBe('dead-lettered');
+      expect(stateOf('a')).toBe('dead-lettered');
     });
   });
 });
