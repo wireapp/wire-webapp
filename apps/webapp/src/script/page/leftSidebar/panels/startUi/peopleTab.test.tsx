@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import ko from 'knockout';
 
 import {withThemeAndRootContext} from '../../../../auth/util/test/testUtil';
@@ -273,5 +273,91 @@ describe('PeopleTab', () => {
       expect(screen.queryByText('Emma App')).toBeNull();
       expect(screen.getByText('Olivia App')).toBeInTheDocument();
     });
+  });
+  it('shows the pending onboarding badge for federated search results that have not onboarded yet', async () => {
+    const selfUser = createUser({id: 'self-id', name: 'Self User', username: 'selfuser'});
+    selfUser.teamId = 'self-team-id';
+    const pendingFederatedUser = new User('pending-federated-id', 'remote.example.com', translateForTest);
+    pendingFederatedUser.name('Pending Federated');
+    pendingFederatedUser.username('pendingfederated');
+    pendingFederatedUser.teamId = 'remote-team-id';
+    pendingFederatedUser.isPendingOnboarding(true);
+    const onboardedFederatedUser = new User('onboarded-federated-id', 'remote.example.com', translateForTest);
+    onboardedFederatedUser.name('Onboarded Federated');
+    onboardedFederatedUser.username('onboardedfederated');
+    onboardedFederatedUser.teamId = 'remote-team-id';
+
+    const teamState = createTeamState();
+    const conversationState = createConversationState([], teamState);
+    const searchRepositoryDouble = {
+      normalizeQuery: (query: string) => {
+        return {query: query.trim().toLowerCase(), isHandleQuery: false};
+      },
+      searchUserInSet: (query: string, users: User[]): User[] => {
+        return searchUsersByQuery(query, users);
+      },
+      searchByName: async () => {
+        return [pendingFederatedUser, onboardedFederatedUser];
+      },
+    } satisfies MinimalSearchRepository & Pick<SearchRepository, 'searchByName'>;
+    const teamRepositoryDouble = {
+      filterExternals: async (users: User[]) => {
+        return users;
+      },
+      isSelfConnectedTo: () => {
+        return false;
+      },
+      loadTeamAppsAndCollaborators: async () => {
+        return undefined;
+      },
+    } satisfies MinimalTeamRepository & Pick<TeamRepository, 'filterExternals'>;
+    const conversationRepositoryDouble = {} satisfies MinimalConversationRepository;
+    const userRepositoryDouble = {} satisfies MinimalUserRepository;
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+    const rootProviderWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        fireAndForgetInvoker,
+        translate: translateForTest,
+      }),
+    );
+
+    const properties: PeopleTabProps = {
+      canInviteTeamMembers: false,
+      canSearchUnconnectedUsers: true,
+      conversationRepository: conversationRepositoryDouble as PeopleTabProps['conversationRepository'],
+      conversationState,
+      isFederated: true,
+      isTeam: true,
+      onClickApp: jest.fn(),
+      onClickContact: jest.fn(),
+      onClickUser: jest.fn(),
+      onSearchResults: jest.fn(),
+      searchQuery: 'federated',
+      searchRepository: searchRepositoryDouble as unknown as PeopleTabProps['searchRepository'],
+      selfUser,
+      teamRepository: teamRepositoryDouble as unknown as PeopleTabProps['teamRepository'],
+      teamState,
+      userRepository: userRepositoryDouble as PeopleTabProps['userRepository'],
+      userState: new UserState(),
+    };
+
+    render(withThemeAndRootContext(<PeopleTab {...properties} />, rootProviderWrapper));
+
+    const findUserItem = async (userName: string): Promise<HTMLElement> => {
+      const userItems = await screen.findAllByTestId('item-user');
+      const userItem = userItems.find(item => {
+        return item.getAttribute('data-uie-value') === userName;
+      });
+      if (userItem === undefined) {
+        throw new Error(`No list item rendered for ${userName}`);
+      }
+      return userItem;
+    };
+
+    const pendingItem = await findUserItem('Pending Federated');
+    const onboardedItem = await findUserItem('Onboarded Federated');
+
+    expect(within(pendingItem).getByTestId('status-pending-onboarding')).toBeInTheDocument();
+    expect(within(onboardedItem).queryByTestId('status-pending-onboarding')).toBeNull();
   });
 });

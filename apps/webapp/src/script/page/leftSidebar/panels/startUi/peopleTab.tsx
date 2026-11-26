@@ -402,6 +402,7 @@ export const PeopleTab: FunctionComponent<PeopleTabProps> = ({
                 mode={UserlistMode.OTHERS}
                 conversationRepository={conversationRepository}
                 selfUser={selfUser}
+                showPendingOnboarding
               />
             </div>
           </div>

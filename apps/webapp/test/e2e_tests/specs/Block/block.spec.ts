@@ -83,12 +83,15 @@ test.describe('User Blocking', () => {
       'I want to cancel blocking a 1:1 conversation from conversation list',
       {tag: ['@TC-10908', '@regression']},
       async ({createPage}) => {
-        const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+        // User B needs a client before User A can connect, otherwise they are still pending onboarding
+        const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+        const userAPageManager = PageManager.from(userAPage);
         await sendConnectionRequest(userAPageManager, userB);
         const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
 
         // Preconditions: User B accepts the connection request
-        const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
+        const userBPages = PageManager.from(userBPage).webapp.pages;
+        await userBPages.conversationList().openPendingConnectionRequest();
         await userBPages.connectRequest().clickConnectButton();
 
         // Step 1: User A opens conversation with User B
@@ -247,7 +250,13 @@ test.describe('User Blocking', () => {
       'Verify you cannot add a person who blocked you to a group chat',
       {tag: ['@TC-10912', '@regression']},
       async ({createPage}) => {
-        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA)));
+        // User B and User C need a client before User A can connect, otherwise they are still pending onboarding
+        const [userAPage, userBPage] = await Promise.all([
+          createPage(withLogin(userA)),
+          createPage(withLogin(userB)),
+          createPage(withLogin(userC)),
+        ]);
+        const userAPageManagerInstance = PageManager.from(userAPage);
         await sendConnectionRequest(userAPageManagerInstance, userB);
         await connectWithUser(userAPageManagerInstance, userC);
         const {pages: userAPages, modals: userAModals} = userAPageManagerInstance.webapp;
@@ -255,8 +264,9 @@ test.describe('User Blocking', () => {
         const conversationName = 'Group Conversation';
 
         // Preconditions: User B accepts the connection request
-        const userBPageManagerInstance = await PageManager.from(createPage(withLogin(userB)));
+        const userBPageManagerInstance = PageManager.from(userBPage);
         const userBPages = userBPageManagerInstance.webapp.pages;
+        await userBPages.conversationList().openPendingConnectionRequest();
         await userBPages.connectRequest().clickConnectButton();
 
         // Step 1: User B blocks User A
@@ -303,13 +313,20 @@ test.describe('User Blocking', () => {
       'Verify you can unblock someone from conversation list options',
       {tag: ['@TC-10914', '@regression']},
       async ({createPage}) => {
-        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA)));
+        // User B and User C need a client before User A can connect, otherwise they are still pending onboarding
+        const [userAPage, userBPage] = await Promise.all([
+          createPage(withLogin(userA)),
+          createPage(withLogin(userB)),
+          createPage(withLogin(userC)),
+        ]);
+        const userAPageManagerInstance = PageManager.from(userAPage);
         await sendConnectionRequest(userAPageManagerInstance, userB);
         await connectWithUser(userAPageManagerInstance, userC);
         const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManagerInstance.webapp;
 
         // Preconditions: User B accepts the connection request
-        const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
+        const userBPages = PageManager.from(userBPage).webapp.pages;
+        await userBPages.conversationList().openPendingConnectionRequest();
         await userBPages.connectRequest().clickConnectButton();
 
         await test.step('User A blocks User B', async () => {
