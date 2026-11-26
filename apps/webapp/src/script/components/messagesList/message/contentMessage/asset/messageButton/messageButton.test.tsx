@@ -90,7 +90,9 @@ describe('MessageButton', () => {
 
     it('stays focusable, explains why and ignores clicks', () => {
       const onClick = jest.fn();
-      const {getByRole} = render(withTheme(<MessageButton {...createProps(onClick)} getOfflineLabel={getOfflineLabel} />));
+      const {getByRole} = render(
+        withTheme(<MessageButton {...createProps(onClick)} getOfflineLabel={getOfflineLabel} />),
+      );
 
       const button = getByRole('button', {name: 'Option, not available offline'});
       button.focus();
