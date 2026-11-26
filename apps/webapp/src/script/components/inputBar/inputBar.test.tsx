@@ -138,7 +138,10 @@ describe('InputBar', () => {
         sendTypingStop: jest.fn(),
       } as unknown as ConversationRepository,
       eventRepository,
-      messageRepository: {} as MessageRepository,
+      messageRepository: {
+        startEditing: jest.fn().mockResolvedValue(undefined),
+        stopEditing: jest.fn().mockResolvedValue(undefined),
+      } as unknown as MessageRepository,
       openGiphy: jest.fn(),
       propertiesRepository,
       searchRepository,
@@ -349,7 +352,10 @@ describe('InputBar', () => {
       return message;
     };
 
-    const pressArrowUp = async (props: ReturnType<typeof getDefaultProps>, isOutboxEnabled: boolean): Promise<boolean> => {
+    const pressArrowUp = async (
+      props: ReturnType<typeof getDefaultProps>,
+      isOutboxEnabled: boolean,
+    ): Promise<boolean> => {
       const wrapper = createRootProviderWrapperForTest(
         createRootContextValueForTest({
           translate: translateForTest,
@@ -374,9 +380,9 @@ describe('InputBar', () => {
 
     it('starts editing a sent message while online', async () => {
       const props = getDefaultProps();
-      jest.spyOn(props.conversation, 'getLastEditableMessage').mockReturnValue(
-        createLastMessage(StatusType.SENT, props.selfUser) as never,
-      );
+      jest
+        .spyOn(props.conversation, 'getLastEditableMessage')
+        .mockReturnValue(createLastMessage(StatusType.SENT, props.selfUser) as never);
 
       await expect(pressArrowUp(props, true)).resolves.toBe(true);
     });
@@ -384,9 +390,9 @@ describe('InputBar', () => {
     it('does not start editing a sent message while offline', async () => {
       useNoInternetState.setState({hasNoInternet: true});
       const props = getDefaultProps();
-      jest.spyOn(props.conversation, 'getLastEditableMessage').mockReturnValue(
-        createLastMessage(StatusType.SENT, props.selfUser) as never,
-      );
+      jest
+        .spyOn(props.conversation, 'getLastEditableMessage')
+        .mockReturnValue(createLastMessage(StatusType.SENT, props.selfUser) as never);
 
       await expect(pressArrowUp(props, true)).resolves.toBe(false);
     });
@@ -394,9 +400,9 @@ describe('InputBar', () => {
     it('starts editing a pending message while offline', async () => {
       useNoInternetState.setState({hasNoInternet: true});
       const props = getDefaultProps();
-      jest.spyOn(props.conversation, 'getLastEditableMessage').mockReturnValue(
-        createLastMessage(StatusType.SENDING, props.selfUser) as never,
-      );
+      jest
+        .spyOn(props.conversation, 'getLastEditableMessage')
+        .mockReturnValue(createLastMessage(StatusType.SENDING, props.selfUser) as never);
 
       await expect(pressArrowUp(props, true)).resolves.toBe(true);
     });
@@ -404,9 +410,9 @@ describe('InputBar', () => {
     it('starts editing a failed message while offline', async () => {
       useNoInternetState.setState({hasNoInternet: true});
       const props = getDefaultProps();
-      jest.spyOn(props.conversation, 'getLastEditableMessage').mockReturnValue(
-        createLastMessage(StatusType.FAILED, props.selfUser) as never,
-      );
+      jest
+        .spyOn(props.conversation, 'getLastEditableMessage')
+        .mockReturnValue(createLastMessage(StatusType.FAILED, props.selfUser) as never);
 
       await expect(pressArrowUp(props, true)).resolves.toBe(true);
     });
@@ -414,9 +420,9 @@ describe('InputBar', () => {
     it('starts editing a sent message while offline with the toggle off', async () => {
       useNoInternetState.setState({hasNoInternet: true});
       const props = getDefaultProps();
-      jest.spyOn(props.conversation, 'getLastEditableMessage').mockReturnValue(
-        createLastMessage(StatusType.SENT, props.selfUser) as never,
-      );
+      jest
+        .spyOn(props.conversation, 'getLastEditableMessage')
+        .mockReturnValue(createLastMessage(StatusType.SENT, props.selfUser) as never);
 
       await expect(pressArrowUp(props, false)).resolves.toBe(true);
     });

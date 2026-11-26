@@ -3339,6 +3339,21 @@ describe('ConversationRepository', () => {
     });
   });
 
+  describe('typing notifications', () => {
+    it.each(['sendTypingStart', 'sendTypingStop'] as const)(
+      'does not reject when %s fails on the backend',
+      async method => {
+        const rejection = Promise.reject(new Error('Conversation not found'));
+        const coreService = getCoreConversationServiceForTest() as any;
+        coreService[method] = jest.fn().mockReturnValue(rejection);
+
+        await expect(testFactory.conversation_repository[method](conversation_et)).resolves.toBeUndefined();
+        await expect(rejection).rejects.toThrow();
+        expect(coreService[method]).toHaveBeenCalledWith(conversation_et.qualifiedId);
+      },
+    );
+  });
+
   describe('addMissingMember', () => {
     it('injects a member-join event if unknown user is detected', () => {
       const conversationId = createUuid();

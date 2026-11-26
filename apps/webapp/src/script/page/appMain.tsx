@@ -32,6 +32,7 @@ import {AppLock} from './appLock';
 import {useE2EIFeatureConfigUpdate} from './components/featureConfigChange/featureConfigChangeHandler/features/useE2eIFeatureConfigUpdate';
 import {FeatureConfigChangeNotifier} from './components/featureConfigChange/featureConfigChangeNotifier';
 import {ForceReloadModal} from './components/forceReloadModal/forceReloadModal';
+import {UndoneChangeNotifier} from './components/undoneChangeNotifier';
 import {WindowTitleUpdater} from './components/windowTitleUpdater';
 import {LeftSidebar} from './leftSidebar';
 import {TeamCreationModalContainer} from './leftSidebar/panels/conversations/conversationTabs/teamCreation/teamCreationModalContainer';
@@ -402,6 +403,7 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
       data-uie-value="is-loaded"
     >
       {!locked && <WindowTitleUpdater translate={translate} />}
+      {!locked && <UndoneChangeNotifier messageRepository={repositories.message} translate={translate} />}
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <ForceReloadModal reloadApplication={app.refresh} />
         {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}

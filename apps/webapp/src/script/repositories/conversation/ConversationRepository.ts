@@ -3628,7 +3628,7 @@ export class ConversationRepository {
         BaseError.MESSAGE.MISSING_PARAMETER,
       );
     }
-    coreService.conversation.sendTypingStart(conversationEntity.qualifiedId);
+    this.logTypingFailure(coreService.conversation.sendTypingStart(conversationEntity.qualifiedId));
   }
 
   public async sendTypingStop(conversationEntity: Conversation): Promise<void> {
@@ -3639,7 +3639,14 @@ export class ConversationRepository {
         BaseError.MESSAGE.MISSING_PARAMETER,
       );
     }
-    coreService.conversation.sendTypingStop(conversationEntity.qualifiedId);
+    this.logTypingFailure(coreService.conversation.sendTypingStop(conversationEntity.qualifiedId));
+  }
+
+  /** Typing is best effort: a failing request (offline, removed from the conversation) must not surface as an uncaught error. */
+  private logTypingFailure(request: Promise<void>): void {
+    request.catch((error: unknown) => {
+      this.logger.warn(`Failed to send typing notification: ${toError(error).message}`, {error});
+    });
   }
 
   private async toggleArchiveConversation(
