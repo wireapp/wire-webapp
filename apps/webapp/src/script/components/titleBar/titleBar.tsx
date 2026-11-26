@@ -25,8 +25,10 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {pendingOfflineMessagesFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useConversationCall} from '../../hooks/useConversationCall';
 import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {useOutboxOffline} from '../../hooks/useOutboxOffline';
 import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
 import {useApplicationContext} from '../../page/rootProvider';
@@ -83,7 +85,7 @@ export const TitleBar: FunctionComponent<TitleBarProps> = ({
   isSharedDriveSearchViewOpen = false,
   onCloseSharedDriveSearchView,
 }: TitleBarProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const {
     is1to1,
     isRequest,
@@ -139,6 +141,12 @@ export const TitleBar: FunctionComponent<TitleBarProps> = ({
 
   // Button is disabled if starting, connecting, or already active
   const isCallButtonDisabled = isReadOnlyConversation || isStartingCallRef.current || isCallConnecting || isCallActive;
+
+  // Offline the call button stays focusable and explains itself, instead of being disabled
+  const isOffline = useOutboxOffline(isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName));
+  const callLabel = isOffline
+    ? translate('outboxNotAvailableOffline', {feature: translate('tooltipConversationCall')})
+    : translate('tooltipConversationCall');
 
   const badgeTranslationKey = useMemo(() => {
     if (is1to1 && isRequest) {
@@ -236,7 +244,7 @@ export const TitleBar: FunctionComponent<TitleBarProps> = ({
   };
 
   const startCallAndShowAlert = (): void => {
-    if (isStartingCallRef.current || isCallButtonDisabled) {
+    if (isStartingCallRef.current || isCallButtonDisabled || isOffline) {
       return;
     }
 
@@ -367,8 +375,9 @@ export const TitleBar: FunctionComponent<TitleBarProps> = ({
               <button
                 type="button"
                 className="conversation-title-bar-icon"
-                title={translate('tooltipConversationCall')}
-                aria-label={translate('tooltipConversationCall')}
+                title={callLabel}
+                aria-label={callLabel}
+                aria-disabled={isOffline || undefined}
                 onClick={event => {
                   currentFocusedElementRef.current = event.currentTarget;
                   startCallAndShowAlert();
@@ -394,9 +403,10 @@ export const TitleBar: FunctionComponent<TitleBarProps> = ({
                 </IconButton>
                 {showCallControls && (
                   <IconButton
-                    title={translate('tooltipConversationCall')}
-                    aria-label={translate('tooltipConversationCall')}
-                    css={{marginBottom: 0}}
+                    title={callLabel}
+                    aria-label={callLabel}
+                    aria-disabled={isOffline || undefined}
+                    css={{marginBottom: 0, ...(isOffline && {cursor: 'not-allowed', opacity: 0.4})}}
                     onClick={onClickStartAudio}
                     data-uie-name="do-call"
                     disabled={isCallButtonDisabled}

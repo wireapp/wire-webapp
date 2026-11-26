@@ -32,6 +32,8 @@ interface MessageButtonProps {
   label: string;
   message: CompositeMessage;
   onClick?: () => void;
+  /** Given while offline: the button stays focusable but does nothing, and takes this as its accessible name */
+  getOfflineLabel?: (label: string) => string;
 }
 
 export const MessageButton: FunctionComponent<MessageButtonProps> = ({
@@ -39,6 +41,7 @@ export const MessageButton: FunctionComponent<MessageButtonProps> = ({
   label,
   message,
   onClick = noop,
+  getOfflineLabel,
 }: MessageButtonProps) => {
   const {errorButtonId, errorMessage, selectedButtonId, waitingButtonId} = useKoSubscribableChildren(message, [
     'errorButtonId',
@@ -46,6 +49,9 @@ export const MessageButton: FunctionComponent<MessageButtonProps> = ({
     'selectedButtonId',
     'waitingButtonId',
   ]);
+
+  const offlineLabel = getOfflineLabel?.(label);
+  const isOffline = offlineLabel !== undefined;
 
   const isSelected = selectedButtonId === id;
   const isWaiting = waitingButtonId === id;
@@ -55,7 +61,10 @@ export const MessageButton: FunctionComponent<MessageButtonProps> = ({
     <>
       <Button
         variant={ButtonVariant.SECONDARY}
-        onClick={onClick}
+        onClick={isOffline ? noop : onClick}
+        aria-disabled={isOffline || undefined}
+        aria-label={offlineLabel}
+        title={offlineLabel}
         data-uie-name={label}
         data-uie-uid={id}
         data-uie-selected={isSelected}
@@ -63,7 +72,13 @@ export const MessageButton: FunctionComponent<MessageButtonProps> = ({
         showLoading={isWaiting}
         isActive={isSelected}
         loadingColor={COLOR.GRAY}
-        style={{maxWidth: '400px', width: '100%', marginTop: '8px', marginBottom: 0}}
+        style={{
+          maxWidth: '400px',
+          width: '100%',
+          marginTop: '8px',
+          marginBottom: 0,
+          ...(isOffline && {cursor: 'not-allowed', opacity: 0.4}),
+        }}
       >
         {label}
       </Button>

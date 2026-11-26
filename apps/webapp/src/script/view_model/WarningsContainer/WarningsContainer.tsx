@@ -27,6 +27,7 @@ import {CONFIG, TYPE} from './WarningsTypes';
 import {Runtime} from '../../commons/util/Runtime';
 import * as Icon from '../../components/icon';
 import {Config} from '../../Config';
+import {pendingOfflineMessagesFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../page/rootProvider';
 import {createReactTranslationMarker, renderReactTranslation} from '../../util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from '../../util/localizerUtil/translationTypes';
@@ -79,7 +80,7 @@ function renderPermissionRequestWarningMessage(options: RenderPermissionRequestT
 }
 
 const WarningsContainer: FunctionComponent<WarningProps> = ({onRefresh}) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const name = useWarningsState(state => {
     return state.name;
   });
@@ -327,7 +328,11 @@ const WarningsContainer: FunctionComponent<WarningProps> = ({onRefresh}) => {
         <div data-uie-name="connectivity-recovery" className="warning-bar warning-bar-progress" />
       )}
       {visibleWarning === type.NO_INTERNET && (
-        <div data-uie-name="no-internet" className="warning-bar warning-bar-connection">
+        <div
+          data-uie-name="no-internet"
+          className="warning-bar warning-bar-connection"
+          role={isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName) ? 'status' : undefined}
+        >
           <div className="warning-bar-message">{translate('warningConnectivityNoInternet')}</div>
         </div>
       )}

@@ -64,6 +64,23 @@ describe('Message', () => {
     });
   });
 
+  describe('isChangeRefusedOffline', () => {
+    it.each([
+      [StatusType.SENT, true, true],
+      [StatusType.DELIVERED, true, true],
+      [StatusType.FAILED, true, false],
+      [StatusType.SENDING, true, false],
+      [StatusType.FAILED, false, false],
+      [StatusType.SENT, false, false],
+      [StatusType.SENDING, false, false],
+    ])('for a %s message with offline %s: %s', (status, isOffline, expected) => {
+      const message = new ContentMessage(undefined, translateForTest);
+      message.status(status);
+
+      expect(message.isChangeRefusedOffline(isOffline)).toBe(expected);
+    });
+  });
+
   describe('translation injection', () => {
     it('uses the injected translate function for ephemeral captions', () => {
       const translate = jest.fn((translationKey: string) => {

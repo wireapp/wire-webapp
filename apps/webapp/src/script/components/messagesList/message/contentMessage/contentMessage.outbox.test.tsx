@@ -19,7 +19,7 @@
 
 import type {FunctionComponent, ReactNode} from 'react';
 
-import {render} from '@testing-library/react';
+import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
 
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
@@ -38,6 +38,7 @@ import {StyledApp} from '../../../../uiKit/layout/styledApp/styledApp';
 import {TIME_IN_MILLIS} from '../../../../util/timeUtil';
 import {translateForTest} from '../../../../util/test/translateForTest';
 import {createUuid} from '../../../../util/uuid';
+import {useNoInternetState} from '../../../../view_model/WarningsContainer/noInternetState';
 
 import {ContentMessageComponent, ContentMessageProps} from './contentMessage';
 
@@ -307,6 +308,99 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('content message with the outbox 
       const {container} = render(<ContentMessageComponent {...params} />, {wrapper: createWrapper(false)});
 
       expect(replyButton(container)).toBeInTheDocument();
+    });
+  });
+
+  describe('changes while offline', () => {
+    const thumbsUp = (container: HTMLElement): Element | null => {
+      return container.querySelector('[data-uie-name="reactwith-thumbsup-messag"]');
+    };
+    const pill = (container: HTMLElement): Element | null => {
+      return container.querySelector('[data-uie-name="emoji-pill"]');
+    };
+
+    beforeEach(() => {
+      message.reactions([['👍', [params.selfId]]]);
+    });
+
+    afterEach(() => {
+      useNoInternetState.setState({hasNoInternet: false});
+    });
+
+    it('disables the reaction buttons and the pills of a sent message, and keeps reply', () => {
+      useNoInternetState.setState({hasNoInternet: true});
+      message.status(StatusType.SENT);
+
+      const {container} = render(<ContentMessageComponent {...params} />, {wrapper: createWrapper(true)});
+
+      expect(thumbsUp(container)).toHaveAttribute('aria-disabled', 'true');
+      expect(thumbsUp(container)).toHaveAttribute('aria-label', 'outboxNotAvailableOffline');
+      expect(thumbsUp(container)).not.toHaveAttribute('disabled');
+      expect(container.querySelector('[data-uie-name="reactwith-emoji-message"]')).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      );
+      expect(pill(container)).toHaveAttribute('aria-disabled', 'true');
+      expect(container.querySelector('[data-uie-name="do-reply-message"]')).not.toHaveAttribute('aria-disabled');
+    });
+
+    it('does nothing when a disabled reaction button or pill is clicked', () => {
+      useNoInternetState.setState({hasNoInternet: true});
+      message.status(StatusType.SENT);
+
+      const {container} = render(<ContentMessageComponent {...params} />, {wrapper: createWrapper(true)});
+      fireEvent.click(thumbsUp(container) as Element);
+      fireEvent.click(container.querySelector('[data-uie-name="reactwith-emoji-message"]') as Element);
+      fireEvent.click(pill(container) as Element);
+
+      expect(params.onClickReaction).not.toHaveBeenCalled();
+    });
+
+    it('keeps the reactions of a pending message enabled', () => {
+      useNoInternetState.setState({hasNoInternet: true});
+      message.status(StatusType.SENDING);
+
+      const {container} = render(<ContentMessageComponent {...params} />, {wrapper: createWrapper(true)});
+      fireEvent.click(thumbsUp(container) as Element);
+      fireEvent.click(pill(container) as Element);
+
+      expect(thumbsUp(container)).not.toHaveAttribute('aria-disabled');
+      expect(pill(container)).not.toHaveAttribute('aria-disabled');
+      expect(params.onClickReaction).toHaveBeenCalledTimes(2);
+    });
+
+    it('keeps the reactions of a failed message enabled', () => {
+      useNoInternetState.setState({hasNoInternet: true});
+      message.status(StatusType.FAILED);
+
+      const {container} = render(<ContentMessageComponent {...params} />, {wrapper: createWrapper(true)});
+      fireEvent.click(thumbsUp(container) as Element);
+      fireEvent.click(pill(container) as Element);
+
+      expect(thumbsUp(container)).not.toHaveAttribute('aria-disabled');
+      expect(pill(container)).not.toHaveAttribute('aria-disabled');
+      expect(params.onClickReaction).toHaveBeenCalledTimes(2);
+    });
+
+    it('keeps the reactions of a sent message enabled while online', () => {
+      message.status(StatusType.SENT);
+
+      const {container} = render(<ContentMessageComponent {...params} />, {wrapper: createWrapper(true)});
+      fireEvent.click(thumbsUp(container) as Element);
+
+      expect(thumbsUp(container)).not.toHaveAttribute('aria-disabled');
+      expect(pill(container)).not.toHaveAttribute('aria-disabled');
+      expect(params.onClickReaction).toHaveBeenCalledWith('👍');
+    });
+
+    it('keeps the reactions of a sent message enabled with the toggle off', () => {
+      useNoInternetState.setState({hasNoInternet: true});
+      message.status(StatusType.SENT);
+
+      const {container} = render(<ContentMessageComponent {...params} />, {wrapper: createWrapper(false)});
+
+      expect(thumbsUp(container)).not.toHaveAttribute('aria-disabled');
+      expect(pill(container)).not.toHaveAttribute('aria-disabled');
     });
   });
 });

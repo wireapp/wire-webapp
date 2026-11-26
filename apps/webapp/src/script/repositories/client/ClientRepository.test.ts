@@ -356,6 +356,76 @@ describe('ClientRepository', () => {
     });
   });
 
+  describe('logoutClient with pending messages', () => {
+    const createRepository = (translate: Translate): ClientRepository => {
+      return new ClientRepository(
+        {} as any,
+        {} as any,
+        translate,
+        {
+          currentClient: {
+            isTemporary: () => {
+              return false;
+            },
+          },
+        } as any,
+        {} as any,
+      );
+    };
+    const translate = ((translationKey: Parameters<Translate>[0], substitutions?: Record<string, string | number>) => {
+      return `translated:${translationKey}:${substitutions?.count ?? ''}`;
+    }) as Translate;
+
+    it.each([
+      [1, 'translated:modalAccountLogoutOptionWithPendingMessage:'],
+      [3, 'translated:modalAccountLogoutOptionWithPendingMessagesPlural:3'],
+    ])('names the %s pending messages in the option label', async (count, expectedOption) => {
+      const primaryModalShow = jest.fn();
+      PrimaryModal.show = primaryModalShow;
+      const clientRepository = createRepository(translate);
+      clientRepository.setPendingMessageCounter(() => {
+        return count;
+      });
+
+      await clientRepository.logoutClient();
+
+      expect(primaryModalShow).toHaveBeenCalledWith(
+        PrimaryModal.type.OPTION,
+        expect.objectContaining({text: expect.objectContaining({option: expectedOption})}),
+        undefined,
+        translate,
+      );
+      const [, options] = primaryModalShow.mock.calls[0];
+      expect(options.text).not.toHaveProperty('message');
+    });
+
+    it('keeps the plain option label without pending messages', async () => {
+      const primaryModalShow = jest.fn();
+      PrimaryModal.show = primaryModalShow;
+      const clientRepository = createRepository(translate);
+      clientRepository.setPendingMessageCounter(() => {
+        return 0;
+      });
+
+      await clientRepository.logoutClient();
+
+      const [, options] = primaryModalShow.mock.calls[0];
+      expect(options.text.option).toBe('translated:modalAccountLogoutOption:');
+      expect(options.text).not.toHaveProperty('message');
+    });
+
+    it('keeps the plain option label when no counter was set', async () => {
+      const primaryModalShow = jest.fn();
+      PrimaryModal.show = primaryModalShow;
+
+      await createRepository(translate).logoutClient();
+
+      const [, options] = primaryModalShow.mock.calls[0];
+      expect(options.text.option).toBe('translated:modalAccountLogoutOption:');
+      expect(options.text).not.toHaveProperty('message');
+    });
+  });
+
   describe('logoutClient', () => {
     it('uses the injected translate function for the logout modal copy', async () => {
       const translate = jest.fn((translationKey: Parameters<Translate>[0]) => {

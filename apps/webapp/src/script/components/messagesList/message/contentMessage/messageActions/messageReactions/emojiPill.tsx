@@ -25,6 +25,7 @@ import {task} from 'true-myth';
 
 import {EmojiChar} from './emojiChar';
 import {
+  disabledMessageReactionButton,
   getReactionsButtonCSS,
   messageReactionButton,
   messageReactionButtonTooltip,
@@ -61,6 +62,8 @@ interface EmojiPillProps {
   reactingUsers: User[];
   reactorIds: QualifiedId[];
   loadUsersByIdsFromDb: (userIds: QualifiedId[]) => Promise<User[]>;
+  /** Toggling the reaction is refused: the pill stays focusable and shows the details, but does nothing on click */
+  isDisabled?: boolean;
 }
 
 const MAX_USER_NAMES_TO_SHOW = 2;
@@ -81,6 +84,7 @@ export const EmojiPill = ({
   reactingUsers,
   reactorIds,
   loadUsersByIdsFromDb,
+  isDisabled = false,
 }: EmojiPillProps): false | JSX.Element => {
   const [storedReactingUsers, setStoredReactingUsers] = useState<User[]>([]);
   const isLoadingStoredUsers = useRef(false);
@@ -173,6 +177,12 @@ export const EmojiPill = ({
   };
 
   const caption = conversationReactionCaption();
+  const detailsLabel =
+    emojiCount > 1
+      ? translate('accessibility.messageReactionDetailsPlural', {emojiCount: emojiCount.toString(), emojiName})
+      : translate('accessibility.messageReactionDetailsSingular', {emojiCount: emojiCount.toString(), emojiName});
+
+  const disabledLabel = translate('outboxNotAvailableOffline', {feature: detailsLabel});
 
   const content = replaceReactComponents(caption, [
     {
@@ -212,22 +222,18 @@ export const EmojiPill = ({
                 ? translate('conversationLikesCaptionReactedPlural', {emojiName})
                 : translate('conversationLikesCaptionReactedSingular', {emojiName})}
             </p>
+            {isDisabled && <p css={messageReactionButtonTooltipText}>{disabledLabel}</p>}
           </div>
         }
       >
         <button
-          css={{...messageReactionButton, ...getReactionsButtonCSS(isActive, isRemovedFromConversation)}}
-          aria-label={
-            emojiCount > 1
-              ? translate('accessibility.messageReactionDetailsPlural', {
-                  emojiCount: emojiCount.toString(),
-                  emojiName,
-                })
-              : translate('accessibility.messageReactionDetailsSingular', {
-                  emojiCount: emojiCount.toString(),
-                  emojiName,
-                })
-          }
+          css={{
+            ...messageReactionButton,
+            ...getReactionsButtonCSS(isActive, isRemovedFromConversation),
+            ...(isDisabled && disabledMessageReactionButton),
+          }}
+          aria-label={isDisabled ? disabledLabel : detailsLabel}
+          aria-disabled={isDisabled || undefined}
           title={emojiName}
           aria-pressed={isActive}
           type="button"
@@ -241,7 +247,9 @@ export const EmojiPill = ({
             void loadMissingReactingUsers();
           }}
           onClick={() => {
-            handleReactionClick(emoji);
+            if (!isDisabled) {
+              handleReactionClick(emoji);
+            }
           }}
           onKeyDown={event => {
             // is last reaction then on tab key press it should hide the reaction menu

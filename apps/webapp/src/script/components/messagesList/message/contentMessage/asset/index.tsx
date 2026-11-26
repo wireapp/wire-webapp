@@ -58,6 +58,8 @@ interface ContentAssetProps {
   isMessageFocused: boolean;
   is1to1Conversation: boolean;
   isFileShareRestricted: boolean;
+  /** Set while offline: the buttons of a composite message can't be used, and say so */
+  getOfflineButtonLabel?: (label: string) => string;
   onClickDetails: () => void;
 }
 
@@ -70,6 +72,7 @@ const ContentAsset: FunctionComponent<ContentAssetProps> = ({
   onClickButton,
   isMessageFocused,
   is1to1Conversation,
+  getOfflineButtonLabel,
   onClickDetails,
 }: ContentAssetProps) => {
   const {isObfuscated, status, senderName, timestamp} = useKoSubscribableChildren(message, [
@@ -211,6 +214,7 @@ const ContentAsset: FunctionComponent<ContentAssetProps> = ({
           label={asset.text}
           id={assetId}
           message={message as CompositeMessage}
+          getOfflineLabel={getOfflineButtonLabel}
         />
       );
   }

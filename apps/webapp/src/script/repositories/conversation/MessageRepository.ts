@@ -43,7 +43,7 @@ import {ConversationRepository} from './ConversationRepository';
 import {isMLSConversation, supportsReadReceipts} from './ConversationSelectors';
 import {ConversationState} from './ConversationState';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {EventBuilder} from './EventBuilder';
+import {EventBuilder, type ClientConversationEvent} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 import {classifySendError, type SendErrorClass} from './outbox/classifySendError';
@@ -65,6 +65,7 @@ import {
   type MessagePayload,
   type PingPayload,
   type ReceiptPayload as OutboxReceiptPayload,
+  type StoredEvent,
   type StoredMention,
   type TextMessagePayload as OutboxTextPayload,
 } from './outbox/messageOutboxTypes';
@@ -221,6 +222,9 @@ const enum SendAndInjectSendingState {
   QUEUED = 'QUEUED',
 }
 
+/** What a change keeps in its payload to be taken back when it is given up unsent */
+type PreviousState = {type: 'reactions'; reactions: string} | {type: 'event'; event: StoredEvent};
+
 type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingState | SendAndInjectSendingState};
 
 type BackendSendOptions = MessageSendingOptions & {
@@ -271,6 +275,23 @@ type PermissionHold = {
 /** Why this session keeps an operation on hold */
 type Hold = PermissionHold | {reason: 'editing'};
 
+/** The message a reply quotes or a reaction is to */
+function referencedMessageId(payload: MessagePayload): string | undefined {
+  switch (payload.type) {
+    case 'reaction':
+      return payload.targetMessageId;
+    case 'text':
+      return payload.quote?.messageId;
+    default:
+      return undefined;
+  }
+}
+
+/** An enqueue with the key of a running attempt answers how that attempt ended, whichever way it ended. */
+function endsRunningAttempt(outcome: EnqueueOutcome<unknown>): boolean {
+  return outcome.type === 'operation-succeeded' || outcome.type === 'operation-dropped';
+}
+
 export class MessageRepository {
   private readonly logger: Logger;
   private readonly eventService: EventService;
@@ -284,6 +305,11 @@ export class MessageRepository {
   private readonly holds = new Map<string, Hold>();
   /** The ids of the conversations whose sending prompt is open */
   private readonly openPrompts = new Set<string>();
+  /** The ids of the text and file operations that still have to go out */
+  private readonly waitingMessages = new Set<string>();
+  /** The unfinished replies and reactions in the lane of messages, by operation id, in the order they were first seen */
+  private readonly referrers = new Map<string, OperationView<MessagePayload>>();
+  private readonly changeUndoneListeners = new Set<(change: 'edit' | 'delete') => void>();
 
   private get coreServices(): NonNullable<Core['service']> {
     const coreServices = this.core.service;
@@ -1957,11 +1983,12 @@ export class MessageRepository {
         laneWhenGivenUp: 'continues',
         perform: this.performReceiptOperation,
       }),
-      // A change to a message that was sent is forgotten when it can't go out, and the local change stays.
+      // A change to a message that was sent is forgotten when it can't go out, and the local change stays. Nothing
+      // shows whether it went through, so one made during a connectivity drop isn't worth sending much later.
       messageChange: this.registerKind(outbox, {
         name: 'message-change',
         parsePayload: parseMessageChangePayload,
-        expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
+        expiresAfterMilliseconds: TIME_IN_MILLIS.MINUTE,
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
         performTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
         maxAttempts: 1_000,
@@ -2071,7 +2098,59 @@ export class MessageRepository {
     });
     if (!this.isAccepted(outcome)) {
       await this.markMessage(conversation, messageId, StatusType.FAILED, 'rejected');
+      return;
     }
+    await this.enqueueDependentsAgain(messageId);
+  }
+
+  /** The outbox has the message as failed. A message that was sent, or never was in the outbox, has not failed in it. */
+  private hasFailedInOutbox(messageId: string): boolean {
+    return this.findPendingMessage(messageId)?.state === 'dead-lettered';
+  }
+
+  /** The outbox also reports the operations it loads at startup as changed, so the referrers cover them too. */
+  private trackReferrer(operation: OperationView<MessagePayload>): void {
+    const isFinished = operation.state === 'succeeded' || operation.state === 'dropped';
+    if (isFinished || referencedMessageId(operation.payload) === undefined) {
+      this.referrers.delete(operation.id);
+    } else {
+      this.referrers.set(operation.id, operation);
+    }
+  }
+
+  /**
+   * The replies and reactions that failed with the message go out again behind it, in the order they were queued, so
+   * that the first one doesn't go out alone and ahead of the others. A reply counts only when it failed with the
+   * generic reason, which is the one of a reply that waited for its target or went with a message in front of it. A
+   * reply that was rejected or declined on its own stays failed.
+   */
+  private async enqueueDependentsAgain(messageId: string): Promise<void> {
+    const inQueueOrder = [...this.referrers.values()].toSorted((earlier, later) => {
+      return earlier.queuedAt - later.queuedAt;
+    });
+    for (const {payload, state} of inQueueOrder) {
+      if (state !== 'dead-lettered' || referencedMessageId(payload) !== messageId) {
+        continue;
+      }
+      if (payload.type === 'text' && !(await this.hasFailedWithGenericReason(payload))) {
+        continue;
+      }
+      const outcome = await this.outboxKinds.message.enqueue({
+        payload,
+        correlationKey: messageCorrelationKey(payload),
+        orderingKey: laneOfMessages(payload.conversationId),
+      });
+      this.logger.info('The outbox answered sending again an operation that failed with its target', {
+        outcome: outcome.type,
+      });
+    }
+  }
+
+  private async hasFailedWithGenericReason({conversationId, messageId}: OutboxTextPayload): Promise<boolean> {
+    const conversation = this.conversationState.findConversation(conversationId);
+    const record =
+      conversation === undefined ? undefined : await this.eventService.loadEvent(conversation.id, messageId);
+    return record?.failed_reason === 'generic';
   }
 
   private readonly performMessageOperation = async (
@@ -2084,6 +2163,11 @@ export class MessageRepository {
       case 'asset':
         return this.performAsset(payload, signal);
       case 'reaction':
+        // A reaction has no Retry of its own, so it fails with its target and goes out again with the target's Retry.
+        if (this.hasFailedInOutbox(payload.targetMessageId)) {
+          return {type: 'operation-dead-lettered'};
+        }
+        return this.performChangeOperation({payload});
       case 'edit':
       case 'delete':
         return this.performChangeOperation({payload});
@@ -2098,6 +2182,11 @@ export class MessageRepository {
     await this.ensureShown(conversation, payload);
     const record = await this.eventService.loadEvent(conversation.id, payload.messageId);
     if (record?.failed_reason === 'declined') {
+      return {type: 'operation-dead-lettered'};
+    }
+    // The receiver would see a quote of a message it never got, so the reply fails and goes out after its target.
+    if (payload.quote !== undefined && this.hasFailedInOutbox(payload.quote.messageId)) {
+      await this.markMessage(conversation, payload.messageId, StatusType.FAILED, 'generic');
       return {type: 'operation-dead-lettered'};
     }
     if (this.isDegraded(conversation)) {
@@ -2180,7 +2269,10 @@ export class MessageRepository {
     );
   }
 
-  private readonly onMessageOperationChanged = ({payload, state, queuedAt}: OperationView<MessagePayload>): void => {
+  private readonly onMessageOperationChanged = (operation: OperationView<MessagePayload>): void => {
+    this.trackWaitingMessage(operation);
+    this.trackReferrer(operation);
+    const {payload, state, queuedAt} = operation;
     const conversation = this.conversationState.findConversation(payload.conversationId);
     if (conversation === undefined || payload.type === 'reaction' || payload.type === 'delete') {
       return;
@@ -2361,7 +2453,9 @@ export class MessageRepository {
       });
     if (!this.isAccepted(await this.enqueueAssetOperation(payload))) {
       await this.markMessage(conversation, messageId, StatusType.FAILED, 'rejected');
+      return;
     }
+    await this.enqueueDependentsAgain(messageId);
   }
 
   /** `false` when the record could not take the bytes, e.g. the storage quota is exceeded; the shown message keeps them */
@@ -2631,12 +2725,11 @@ export class MessageRepository {
     reactions: ReactionType,
   ): Promise<SendAndInjectResult> {
     const reaction = MessageBuilder.buildReactionMessage({originalMessageId: message.id, type: reactions});
-    const outcome = await this.enqueueChange({
-      type: 'reaction',
-      conversationId: conversation.qualifiedId,
-      targetMessageId: message.id,
-      reactions,
-    });
+    const reactionsBefore = this.reactionsOfSelf(message);
+    const outcome = await this.enqueueChange(
+      {type: 'reaction', conversationId: conversation.qualifiedId, targetMessageId: message.id, reactions},
+      reactionsBefore === undefined ? undefined : {type: 'reactions', reactions: reactionsBefore},
+    );
     if (!this.isAccepted(outcome)) {
       return {id: reaction.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
     }
@@ -2712,11 +2805,16 @@ export class MessageRepository {
     mentions: MentionEntity[],
     payload: OutboxTextPayload,
   ): Promise<boolean> {
-    const outcome = await this.outboxKinds.message.enqueue({
+    const request = {
       payload: {...payload, text: textMessage, mentions: this.toStoredMentions(mentions)},
       correlationKey: originalMessage.id,
       orderingKey: laneOfMessages(payload.conversationId),
-    });
+    };
+    let outcome = await this.outboxKinds.message.enqueue(request);
+    // A running attempt that was dropped never sent the message, so the new version still takes its place.
+    if (outcome.type === 'operation-dropped') {
+      outcome = await this.outboxKinds.message.enqueue(request);
+    }
     const isAccepted = this.isAccepted(outcome);
     if (outcome.type === 'operation-succeeded') {
       return false;
@@ -2743,15 +2841,19 @@ export class MessageRepository {
       })
       .flat()
       .filter(Boolean);
-    const outcome = await this.enqueueChange({
-      type: 'edit',
-      conversationId: conversation.qualifiedId,
-      originalMessageId: originalMessage.id,
-      messageId: createUuid(),
-      text: textMessage,
-      mentions: this.toStoredMentions(mentions),
-      attachments: isNonEmptyArray(attachments) ? attachments : undefined,
-    });
+    const shownEvent = await this.eventService.loadEvent(conversation.id, originalMessage.id);
+    const outcome = await this.enqueueChange(
+      {
+        type: 'edit',
+        conversationId: conversation.qualifiedId,
+        originalMessageId: originalMessage.id,
+        messageId: createUuid(),
+        text: textMessage,
+        mentions: this.toStoredMentions(mentions),
+        attachments: isNonEmptyArray(attachments) ? attachments : undefined,
+      },
+      shownEvent === undefined ? undefined : {type: 'event', event: shownEvent},
+    );
     this.isAccepted(outcome);
   }
 
@@ -2821,9 +2923,98 @@ export class MessageRepository {
       }
     }
     if (pending === undefined || this.isUnconfirmed(pending)) {
-      this.isAccepted(await this.enqueueChange(removal));
+      const shownEvent = await this.eventService.loadEvent(conversation.id, message.id);
+      const previous = shownEvent === undefined ? undefined : ({type: 'event', event: shownEvent} as const);
+      this.isAccepted(await this.enqueueChange(removal, previous));
     }
     await this.deleteMessageById(conversation, message.id);
+  }
+
+  /**
+   * The payload with what it takes to take the change back when it is given up unsent. A change that replaces one
+   * still unsent keeps what the first one would take back to.
+   */
+  private withPreviousState(
+    payload: MessageChangePayload,
+    correlationKey: string,
+    previous: PreviousState | undefined,
+  ): MessageChangePayload {
+    if (previous === undefined) {
+      return payload;
+    }
+    switch (payload.type) {
+      case 'reaction':
+        return previous.type === 'reactions'
+          ? {...payload, previousReactions: this.unsentReactionBase(correlationKey) ?? previous.reactions}
+          : payload;
+      case 'edit':
+        return previous.type === 'event'
+          ? {...payload, previousEvent: this.unsentEditBase(payload, previous.event) ?? previous.event}
+          : payload;
+      case 'delete':
+      case 'hide':
+        return previous.type === 'event' ? {...payload, removedEvent: previous.event} : payload;
+    }
+  }
+
+  /**
+   * What the message was before the edits that still wait to be sent: the first of them has it. A later edit is of
+   * the message the earlier one made, or of the same message when the first one was replaced.
+   */
+  private unsentEditBase(payload: OutboxEditPayload, shownEvent: StoredEvent): StoredEvent | undefined {
+    const replacedMessageId = (shownEvent as {data?: {replacing_message_id?: string}}).data?.replacing_message_id;
+    const candidates = [
+      this.outboxKinds.messageChange.find(messageCorrelationKey(payload)),
+      replacedMessageId === undefined
+        ? undefined
+        : this.outboxKinds.messageChange.find(
+            messageCorrelationKey({...payload, originalMessageId: replacedMessageId}),
+          ),
+    ];
+    for (const found of candidates) {
+      if (
+        found?.type === 'operation-found' &&
+        found.operation.payload.type === 'edit' &&
+        this.isUnsent(found.operation) &&
+        (found.operation.payload.messageId === payload.originalMessageId ||
+          found.operation.payload.originalMessageId === payload.originalMessageId)
+      ) {
+        return found.operation.payload.previousEvent;
+      }
+    }
+    return undefined;
+  }
+
+  /** What the self user's reactions to the message were before the reaction that still waits to be sent */
+  private unsentReactionBase(correlationKey: string): string | undefined {
+    const found = this.outboxKinds.messageChange.find(correlationKey);
+    if (found.type !== 'operation-found' || found.operation.payload.type !== 'reaction') {
+      return undefined;
+    }
+    return this.isUnsent(found.operation) ? found.operation.payload.previousReactions : undefined;
+  }
+
+  /** An attempt in flight may never have reached the receiver, so its change isn't confirmed either. */
+  private isUnsent({state}: OperationView<unknown>): boolean {
+    return state === 'queued' || state === 'on-hold' || state === 'in-progress';
+  }
+
+  private reactionsOfSelf(message: Message): string | undefined {
+    const selfUser = this.userState.self();
+    if (selfUser === undefined || !(message instanceof ContentMessage)) {
+      return undefined;
+    }
+    return message
+      .reactions()
+      .filter(([, users]) => {
+        return users.some(user => {
+          return matchQualifiedIds(user, selfUser.qualifiedId);
+        });
+      })
+      .map(([reaction]) => {
+        return reaction;
+      })
+      .join(',');
   }
 
   /**
@@ -2897,12 +3088,105 @@ export class MessageRepository {
     state,
   }: Pick<OperationView<MessageChangePayload>, 'payload' | 'state'>): void => {
     const conversation = this.conversationState.findConversation(payload.conversationId);
-    if (conversation !== undefined && payload.type === 'edit' && state === 'queued') {
+    if (conversation === undefined) {
+      return;
+    }
+    if (state === 'dropped') {
+      this.activeFireAndForgetInvoker.fireAndForget(() => {
+        return this.takeBackUnsentChange(conversation, payload);
+      });
+      return;
+    }
+    if (payload.type === 'edit' && state === 'queued') {
       this.activeFireAndForgetInvoker.fireAndForget(() => {
         return this.ensureShown(conversation, payload);
       });
     }
   };
+
+  /**
+   * A change given up unsent is taken back, so that the sender doesn't keep a change nobody received. The sender is
+   * told about edits and removals. A change stored without what it takes to take it back stays.
+   */
+  private async takeBackUnsentChange(conversation: Conversation, payload: MessageChangePayload): Promise<void> {
+    switch (payload.type) {
+      case 'reaction':
+        if (payload.previousReactions !== undefined) {
+          const previous = MessageBuilder.buildReactionMessage({
+            originalMessageId: payload.targetMessageId,
+            type: payload.previousReactions,
+          });
+          await this.injectOptimisticMessage(previous, conversation);
+        }
+        return;
+      case 'edit':
+        if (payload.previousEvent !== undefined && (await this.restoreEditedMessage(conversation, payload))) {
+          this.notifyChangeUndone('edit');
+        }
+        return;
+      case 'delete':
+      case 'hide':
+        if (
+          payload.removedEvent !== undefined &&
+          (await this.restoreRemovedMessage(conversation, payload.removedEvent))
+        ) {
+          this.notifyChangeUndone('delete');
+        }
+    }
+  }
+
+  /**
+   * The stored record gets the version from before the edit back, with nothing left over from the edit. `false` when
+   * the edit is no longer what is shown, e.g. because a later edit replaced it.
+   */
+  private async restoreEditedMessage(
+    conversation: Conversation,
+    {messageId, previousEvent}: OutboxEditPayload,
+  ): Promise<boolean> {
+    const current = await this.eventService.loadEvent(conversation.id, messageId);
+    if (current === undefined || current.id !== messageId || previousEvent === undefined) {
+      return false;
+    }
+    const leftOver = Object.fromEntries(
+      Object.keys(current)
+        .filter(key => {
+          return !(key in previousEvent);
+        })
+        .map(key => {
+          return [key, undefined];
+        }),
+    );
+    // The shown message is replaced by the update of the record.
+    await this.eventService.replaceEvent({...leftOver, ...previousEvent, primary_key: current.primary_key});
+    return true;
+  }
+
+  /** `false` when the message is there already */
+  private async restoreRemovedMessage(conversation: Conversation, removed: StoredEvent): Promise<boolean> {
+    if (
+      typeof removed.id !== 'string' ||
+      (await this.eventService.loadEvent(conversation.id, removed.id)) !== undefined
+    ) {
+      return false;
+    }
+    const {primary_key: _primaryKey, ...event} = removed;
+    await this.eventRepository.injectEvent(event as ClientConversationEvent);
+    return true;
+  }
+
+  /** Called when an edit or a removal was taken back because it could not be sent. Returns how to stop listening. */
+  public onChangeUndone(listener: (change: 'edit' | 'delete') => void): () => void {
+    this.changeUndoneListeners.add(listener);
+    return () => {
+      this.changeUndoneListeners.delete(listener);
+    };
+  }
+
+  private notifyChangeUndone(change: 'edit' | 'delete'): void {
+    for (const listener of this.changeUndoneListeners) {
+      listener(change);
+    }
+  }
 
   // Holds
   //
@@ -3089,9 +3373,13 @@ export class MessageRepository {
   /**
    * A change goes behind its target in the lane of messages while the outbox still has the target, or an earlier
    * change to it, so that the change fails with its target. Every other change goes to the lane of changes, which
-   * pending messages never block. A hide always goes there, because it is sent to the self conversations.
+   * pending messages never block. A hide always goes there, because it is sent to the self conversations. Only a
+   * change in the lane of changes keeps what it takes to take it back, because only that lane gives changes up.
    */
-  private async enqueueChange(payload: MessageChangePayload): Promise<EnqueueOutcome<unknown>> {
+  private async enqueueChange(
+    payload: MessageChangePayload,
+    previous?: PreviousState,
+  ): Promise<EnqueueOutcome<unknown>> {
     const correlationKey = messageCorrelationKey(payload);
     const targetMessageId = payload.type === 'edit' ? payload.originalMessageId : payload.targetMessageId;
     const followsTarget =
@@ -3102,16 +3390,20 @@ export class MessageRepository {
         correlationKey,
         orderingKey: laneOfMessages(payload.conversationId),
       });
-      // When the earlier version went out meanwhile, this is a change to a message that was sent.
-      if (outcome.type !== 'operation-succeeded') {
+      // When the earlier version ended meanwhile, this is a change to a message that was sent or is gone.
+      if (!endsRunningAttempt(outcome)) {
         return outcome;
       }
     }
-    const request = {payload, correlationKey, orderingKey: laneOfChanges(payload.conversationId)};
+    const request = {
+      payload: this.withPreviousState(payload, correlationKey, previous),
+      correlationKey,
+      orderingKey: laneOfChanges(payload.conversationId),
+    };
     const outcome = await this.outboxKinds.messageChange.enqueue(request);
     // An enqueue with the key of a running attempt answers how that attempt ended, and that attempt sent an older
     // payload. So the new payload is enqueued again. The kernel should queue the new payload itself.
-    return outcome.type === 'operation-succeeded' ? this.outboxKinds.messageChange.enqueue(request) : outcome;
+    return endsRunningAttempt(outcome) ? this.outboxKinds.messageChange.enqueue(request) : outcome;
   }
 
   /** The message as the outbox still has it; `undefined` once it went through, or when it never was in the outbox */
@@ -3145,6 +3437,25 @@ export class MessageRepository {
     }
     const pending = this.findPendingMessage(messageId);
     return pending !== undefined && this.pendingStateOf(pending) === 'pending' && !this.isUnconfirmed(pending);
+  }
+
+  /**
+   * Counts the text and file messages that still have to go out, for the warning at logout. Failed messages,
+   * changes and pings don't count.
+   */
+  public countPendingMessages(): number {
+    return this.waitingMessages.size;
+  }
+
+  /** The outbox also reports the operations it loads at startup as changed, so the count covers them too. */
+  private trackWaitingMessage({id, payload, state}: OperationView<MessagePayload>): void {
+    const isMessage = payload.type === 'text' || payload.type === 'asset';
+    const isWaiting = state === 'queued' || state === 'on-hold' || state === 'in-progress';
+    if (isMessage && isWaiting) {
+      this.waitingMessages.add(id);
+    } else {
+      this.waitingMessages.delete(id);
+    }
   }
 
   private pendingStateOf(pending: OperationView<MessagePayload> | undefined): 'pending' | 'sending' | undefined {

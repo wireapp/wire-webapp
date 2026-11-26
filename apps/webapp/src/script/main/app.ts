@@ -392,6 +392,10 @@ export class App {
       this.translate,
     );
 
+    repositories.client.setPendingMessageCounter(() => {
+      return repositories.message.countPendingMessages();
+    });
+
     repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
 
     repositories.conversation = new ConversationRepository(

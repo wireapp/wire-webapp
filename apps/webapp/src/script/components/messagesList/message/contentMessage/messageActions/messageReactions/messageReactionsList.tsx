@@ -40,6 +40,8 @@ export interface MessageReactionsListProps {
   isRemovedFromConversation: boolean;
   users: User[];
   loadUsersByIdsFromDb: (userIds: QualifiedId[]) => Promise<User[]>;
+  /** Toggling a reaction is refused */
+  isDisabled?: boolean;
 }
 
 const MessageReactionsList: FunctionComponent<MessageReactionsListProps> = ({

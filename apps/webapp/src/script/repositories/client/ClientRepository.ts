@@ -62,6 +62,10 @@ type ClientRepositoryConfig = {AVERAGE_NUMBER_OF_CLIENTS: number};
 
 export class ClientRepository {
   private readonly logger: Logger;
+  /** Without the outbox nothing is pending */
+  private countPendingMessages: () => number = () => {
+    return 0;
+  };
   public selfUser: ko.Observable<User>;
 
   static get CONFIG(): ClientRepositoryConfig {
@@ -91,6 +95,11 @@ export class ClientRepository {
 
   init(selfUser: User): void {
     this.selfUser(selfUser);
+  }
+
+  /** The client repository is created before the message repository, so the count is handed over afterwards */
+  setPendingMessageCounter(countPendingMessages: () => number): void {
+    this.countPendingMessages = countPendingMessages;
   }
 
   //##############################################################################
@@ -329,6 +338,7 @@ export class ClientRepository {
         await this.deleteLocalTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       } else {
+        const pendingMessages = this.countPendingMessages();
         PrimaryModal.show(
           PrimaryModal.type.OPTION,
           {
@@ -340,7 +350,7 @@ export class ClientRepository {
               text: this.translate('modalAccountLogoutAction'),
             },
             text: {
-              option: this.translate('modalAccountLogoutOption'),
+              option: this.getLogoutOptionText(pendingMessages),
               title: this.translate('modalAccountLogoutHeadline'),
             },
           },
@@ -350,6 +360,15 @@ export class ClientRepository {
       }
     }
   };
+
+  private getLogoutOptionText(pendingMessages: number): string {
+    if (pendingMessages === 0) {
+      return this.translate('modalAccountLogoutOption');
+    }
+    return pendingMessages === 1
+      ? this.translate('modalAccountLogoutOptionWithPendingMessage')
+      : this.translate('modalAccountLogoutOptionWithPendingMessagesPlural', {count: pendingMessages});
+  }
 
   /**
    * Removes a stored client and the session connected with it.

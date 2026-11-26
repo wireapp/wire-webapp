@@ -30,9 +30,11 @@ import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.ty
 import {RequestCancellationError} from '../../apiClient/user/userError';
 import {MessageTargetMode} from '../../core/conversation';
 import {StatusType} from '../../message/statusType';
+import type {OperationState, OperationView} from '../../outbox';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {WebAppEvents} from '../../webAppEvents';
 
+import type {MessagePayload, StoredEvent} from './outbox/messageOutboxTypes';
 import {
   createOutboxRepository,
   declinedResult,
@@ -78,6 +80,16 @@ describe('the message kinds of MessageRepository', () => {
     parts.kit.dispose();
     amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
   });
+
+  /** The outbox has the message as dead-lettered */
+  function failInOutbox(messageId: string): void {
+    const find = parts.handles.message.find.bind(parts.handles.message);
+    jest.spyOn(parts.handles.message, 'find').mockImplementation(key => {
+      return key === messageId
+        ? {type: 'operation-found', operation: {state: 'dead-lettered'} as OperationView<MessagePayload>}
+        : find(key);
+    });
+  }
 
   function answerSend(result: unknown): void {
     if (result instanceof Error) {
@@ -211,6 +223,39 @@ describe('the message kinds of MessageRepository', () => {
 
         await expect(parts.perform('message', textPayload())).rejects.toThrow('quote');
       });
+
+      it('answers dead-lettered as generic, and sends nothing, for a reply to a message that failed', async () => {
+        parts.records.set('message-1', sendingRecord());
+        failInOutbox('quoted-1');
+
+        await expect(
+          parts.perform('message', textPayload({quote: {messageId: 'quoted-1', userId: 'sender'}})),
+        ).resolves.toEqual(deadLettered);
+
+        expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, 'message-1', StatusType.FAILED, 'generic');
+        expect(parts.sendToBackend).not.toHaveBeenCalled();
+      });
+
+      it('sends a reply to a message that was sent or is pending', async () => {
+        parts.records.set('message-1', sendingRecord());
+
+        await expect(
+          parts.perform('message', textPayload({quote: {messageId: 'quoted-1', userId: 'sender'}})),
+        ).resolves.toEqual(succeeded);
+
+        expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+        expect(parts.markMessage).not.toHaveBeenCalled();
+      });
+    });
+
+    it('answers dead-lettered for a reaction to a message that failed, without sending or showing a failure', async () => {
+      failInOutbox('message-1');
+
+      await expect(parts.perform('message', reactionPayload())).resolves.toEqual(deadLettered);
+
+      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.markMessage).not.toHaveBeenCalled();
+      expect(parts.deleteMessage).not.toHaveBeenCalled();
     });
 
     describe('perform of an asset', () => {
@@ -528,6 +573,36 @@ describe('the message kinds of MessageRepository', () => {
       });
     });
 
+    describe('the count of pending messages', () => {
+      function change(id: string, payload: MessagePayload, state: OperationState): void {
+        parts.kinds.message.onChanged?.({id, kind: 'message', payload, queuedAt: 0, state, attempts: 0});
+      }
+
+      it('counts text and file messages that wait, are on hold or are being sent', () => {
+        change('text-operation', textPayload(), 'queued');
+        change('asset-operation', assetPayload(), 'on-hold');
+        change('sending-operation', textPayload({messageId: 'message-2'}), 'in-progress');
+
+        expect(parts.repository.countPendingMessages()).toBe(3);
+      });
+
+      it('counts no reaction, edit or delete, whatever its state', () => {
+        change('reaction-operation', reactionPayload(), 'queued');
+        change('edit-operation', editPayload(), 'queued');
+        change('delete-operation', deletePayload(), 'on-hold');
+
+        expect(parts.repository.countPendingMessages()).toBe(0);
+      });
+
+      it('counts an operation once, however often it changes', () => {
+        change('text-operation', textPayload(), 'queued');
+        change('text-operation', textPayload(), 'in-progress');
+        change('text-operation', textPayload(), 'queued');
+
+        expect(parts.repository.countPendingMessages()).toBe(1);
+      });
+    });
+
     it('refuses payloads of another kind', () => {
       const {message} = parts.kinds;
 
@@ -555,7 +630,7 @@ describe('the message kinds of MessageRepository', () => {
         maxAttempts: 1_000,
         whenGivenUp: 'drop',
         laneWhenGivenUp: 'continues',
-        expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
+        expiresAfterMilliseconds: TIME_IN_MILLIS.MINUTE,
         performTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
       });
     });
@@ -644,6 +719,99 @@ describe('the message kinds of MessageRepository', () => {
         syncTimestamp: false,
       });
       expect(parts.sendLinkPreview).toHaveBeenCalled();
+    });
+
+    describe('onChanged of a change that is given up unsent', () => {
+      const previousEvent = {id: 'message-1', data: {content: 'old'}} as unknown as StoredEvent;
+      const removedEvent = {id: 'message-1', data: {content: 'text'}} as unknown as StoredEvent;
+      const removals = [
+        ['delete', {...deletePayload(), removedEvent}],
+        ['hide', {...hidePayload(), removedEvent}],
+      ] as const;
+      let replaceEvent: jest.SpyInstance;
+      let injectEvent: jest.SpyInstance;
+      let undone: jest.Mock;
+
+      beforeEach(() => {
+        replaceEvent = jest.spyOn((parts.repository as any).eventService, 'replaceEvent').mockResolvedValue({});
+        injectEvent = jest.spyOn((parts.repository as any).eventRepository, 'injectEvent').mockResolvedValue(undefined);
+        undone = jest.fn();
+        parts.repository.onChangeUndone(undone);
+      });
+
+      it('puts the reactions from before a reaction back, without a notice', async () => {
+        await parts.changed('message-change', reactionPayload({reactions: '', previousReactions: '👍'}), 'dropped');
+
+        expect(parts.injectOptimistic).toHaveBeenCalledTimes(1);
+        expect(parts.injectOptimistic).toHaveBeenCalledWith(
+          expect.objectContaining({reaction: expect.objectContaining({emoji: '👍'})}),
+          parts.conversation,
+        );
+        expect(undone).not.toHaveBeenCalled();
+      });
+
+      it('shows the version from before an edit again, and tells the sender', async () => {
+        parts.records.set('edit-1', sendingRecord());
+
+        await parts.changed('message-change', editPayload({previousEvent}), 'dropped');
+
+        expect(replaceEvent).toHaveBeenCalledWith(expect.objectContaining({...previousEvent, primary_key: 'edit-1'}));
+        expect(undone).toHaveBeenCalledWith('edit');
+      });
+
+      it('says nothing when the edit is not what is shown any more', async () => {
+        await parts.changed('message-change', editPayload({previousEvent}), 'dropped');
+
+        expect(replaceEvent).not.toHaveBeenCalled();
+        expect(undone).not.toHaveBeenCalled();
+      });
+
+      it.each(removals)('shows the message of a %s again, and tells the sender', async (_name, payload) => {
+        await parts.changed('message-change', payload, 'dropped');
+
+        expect(injectEvent).toHaveBeenCalledWith(removedEvent);
+        expect(undone).toHaveBeenCalledWith('delete');
+      });
+
+      it.each(removals)('says nothing when the message of a %s is shown already', async (_name, payload) => {
+        parts.records.set('message-1', sendingRecord());
+
+        await parts.changed('message-change', payload, 'dropped');
+
+        expect(injectEvent).not.toHaveBeenCalled();
+        expect(undone).not.toHaveBeenCalled();
+      });
+
+      it.each(['queued', 'on-hold', 'in-progress', 'succeeded'] as const)(
+        'takes nothing back while it is %s',
+        async state => {
+          parts.records.set('message-1', sendingRecord());
+          parts.records.set('edit-1', sendingRecord());
+
+          await parts.changed('message-change', reactionPayload({previousReactions: '👍'}), state);
+          await parts.changed('message-change', editPayload({previousEvent}), state);
+          await parts.changed('message-change', {...deletePayload(), removedEvent}, state);
+
+          expect(parts.injectOptimistic).not.toHaveBeenCalled();
+          expect(replaceEvent).not.toHaveBeenCalled();
+          expect(injectEvent).not.toHaveBeenCalled();
+          expect(undone).not.toHaveBeenCalled();
+        },
+      );
+
+      it('takes nothing back that was stored without what it was before', async () => {
+        parts.records.set('edit-1', sendingRecord());
+
+        await parts.changed('message-change', reactionPayload(), 'dropped');
+        await parts.changed('message-change', editPayload(), 'dropped');
+        await parts.changed('message-change', deletePayload(), 'dropped');
+        await parts.changed('message-change', hidePayload(), 'dropped');
+
+        expect(parts.injectOptimistic).not.toHaveBeenCalled();
+        expect(replaceEvent).not.toHaveBeenCalled();
+        expect(injectEvent).not.toHaveBeenCalled();
+        expect(undone).not.toHaveBeenCalled();
+      });
     });
 
     it('refuses payloads of another kind', () => {

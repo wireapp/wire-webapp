@@ -40,7 +40,14 @@ import {StorageRepository} from '../../repositories/storage';
 import {TeamState} from '../../repositories/team/TeamState';
 import {withThemeAndRootContext} from '../../auth/util/test/testUtil';
 import {Config} from '../../Config';
-import {disableMessagePreprocessingFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {
+  disableMessagePreprocessingFeatureToggleName,
+  pendingOfflineMessagesFeatureToggleName,
+} from '../../featureToggles/startupFeatureToggleNames';
+import {StatusType} from '../../message/statusType';
+import {ContentMessage} from '../../repositories/entity/message/contentMessage';
+import {Text} from '../../repositories/entity/message/text';
+import {useNoInternetState} from '../../view_model/WarningsContainer/noInternetState';
 import {translate} from '../../util/localizerUtil';
 import {
   createRootContextValueForTest,
@@ -131,7 +138,10 @@ describe('InputBar', () => {
         sendTypingStop: jest.fn(),
       } as unknown as ConversationRepository,
       eventRepository,
-      messageRepository: {} as MessageRepository,
+      messageRepository: {
+        startEditing: jest.fn().mockResolvedValue(undefined),
+        stopEditing: jest.fn().mockResolvedValue(undefined),
+      } as unknown as MessageRepository,
       openGiphy: jest.fn(),
       propertiesRepository,
       searchRepository,
@@ -329,6 +339,92 @@ describe('InputBar', () => {
     await waitFor(() => {
       const pastedFileControls = getByTestId('pasted-file-controls');
       expect(pastedFileControls).toBeDefined();
+    });
+  });
+
+  describe('editing the last message with arrow up', () => {
+    const createLastMessage = (status: StatusType, selfUser: User): ContentMessage => {
+      const message = new ContentMessage(createUuid(), translateForTest);
+      selfUser.isMe = true;
+      message.user(selfUser);
+      message.status(status);
+      message.assets.push(new Text(createUuid(), 'hello'));
+      return message;
+    };
+
+    const pressArrowUp = async (
+      props: ReturnType<typeof getDefaultProps>,
+      isOutboxEnabled: boolean,
+    ): Promise<boolean> => {
+      const wrapper = createRootProviderWrapperForTest(
+        createRootContextValueForTest({
+          translate: translateForTest,
+          isFeatureToggleEnabled: featureName => {
+            return isOutboxEnabled && featureName === pendingOfflineMessagesFeatureToggleName;
+          },
+        }),
+      );
+      const {getByTestId, container} = render(withThemeAndRootContext(<InputBar {...props} />, wrapper));
+      await new Promise(resolve => {
+        return setTimeout(resolve);
+      });
+      await act(async () => {
+        fireEvent.keyDown(getByTestId('input-message'), {key: 'ArrowUp', keyCode: 38});
+      });
+      return container.querySelector('.conversation-input-bar__input--editing') !== null;
+    };
+
+    afterEach(() => {
+      useNoInternetState.setState({hasNoInternet: false});
+    });
+
+    it('starts editing a sent message while online', async () => {
+      const props = getDefaultProps();
+      jest
+        .spyOn(props.conversation, 'getLastEditableMessage')
+        .mockReturnValue(createLastMessage(StatusType.SENT, props.selfUser) as never);
+
+      await expect(pressArrowUp(props, true)).resolves.toBe(true);
+    });
+
+    it('does not start editing a sent message while offline', async () => {
+      useNoInternetState.setState({hasNoInternet: true});
+      const props = getDefaultProps();
+      jest
+        .spyOn(props.conversation, 'getLastEditableMessage')
+        .mockReturnValue(createLastMessage(StatusType.SENT, props.selfUser) as never);
+
+      await expect(pressArrowUp(props, true)).resolves.toBe(false);
+    });
+
+    it('starts editing a pending message while offline', async () => {
+      useNoInternetState.setState({hasNoInternet: true});
+      const props = getDefaultProps();
+      jest
+        .spyOn(props.conversation, 'getLastEditableMessage')
+        .mockReturnValue(createLastMessage(StatusType.SENDING, props.selfUser) as never);
+
+      await expect(pressArrowUp(props, true)).resolves.toBe(true);
+    });
+
+    it('starts editing a failed message while offline', async () => {
+      useNoInternetState.setState({hasNoInternet: true});
+      const props = getDefaultProps();
+      jest
+        .spyOn(props.conversation, 'getLastEditableMessage')
+        .mockReturnValue(createLastMessage(StatusType.FAILED, props.selfUser) as never);
+
+      await expect(pressArrowUp(props, true)).resolves.toBe(true);
+    });
+
+    it('starts editing a sent message while offline with the toggle off', async () => {
+      useNoInternetState.setState({hasNoInternet: true});
+      const props = getDefaultProps();
+      jest
+        .spyOn(props.conversation, 'getLastEditableMessage')
+        .mockReturnValue(createLastMessage(StatusType.SENT, props.selfUser) as never);
+
+      await expect(pressArrowUp(props, false)).resolves.toBe(true);
     });
   });
 });

@@ -46,6 +46,13 @@ const attachmentsSchema = z.custom<NonNullable<MultiPartContent['attachments']>>
   return Array.isArray(value);
 });
 
+/** A record of a message as the app stores it; the outbox only keeps it, and the app knows what is in it */
+export type StoredEvent = Record<string, unknown>;
+
+const storedEventSchema = z.custom<StoredEvent>(value => {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+});
+
 const mayBeDeliveredSchema = z.literal(true).optional();
 
 const textSchema = z.object({
@@ -73,6 +80,8 @@ const reactionSchema = z.object({
   targetMessageId: messageIdSchema,
   /** The final reactions of the self user, comma separated; empty when all were taken back */
   reactions: z.string(),
+  /** What they were before this reaction, for putting them back when it is given up unsent; set for changes only */
+  previousReactions: z.string().optional(),
 });
 
 const editSchema = z.object({
@@ -83,12 +92,16 @@ const editSchema = z.object({
   text: z.string(),
   mentions: z.array(mentionSchema),
   attachments: attachmentsSchema.optional(),
+  /** The record of the message before this edit, for showing it again when the edit is given up unsent; set for changes only */
+  previousEvent: storedEventSchema.optional(),
 });
 
 const deleteSchema = z.object({
   type: z.literal('delete'),
   conversationId: conversationIdSchema,
   targetMessageId: messageIdSchema,
+  /** The record of the message, for showing it again when the deletion is given up unsent; set for changes only */
+  removedEvent: storedEventSchema.optional(),
 });
 
 const messagePayloadSchema = z.discriminatedUnion('type', [
@@ -103,7 +116,13 @@ const messageChangePayloadSchema = z.discriminatedUnion('type', [
   reactionSchema,
   editSchema,
   deleteSchema.extend({recipients: z.array(conversationIdSchema).optional()}),
-  z.object({type: z.literal('hide'), conversationId: conversationIdSchema, targetMessageId: messageIdSchema}),
+  z.object({
+    type: z.literal('hide'),
+    conversationId: conversationIdSchema,
+    targetMessageId: messageIdSchema,
+    /** The record of the message, for showing it again when the hide is given up unsent */
+    removedEvent: storedEventSchema.optional(),
+  }),
 ]);
 
 const confirmationTypeSchema = z.union([z.literal(Confirmation.Type.DELIVERED), z.literal(Confirmation.Type.READ)]);

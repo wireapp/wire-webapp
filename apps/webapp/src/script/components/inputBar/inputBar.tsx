@@ -42,7 +42,11 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {disableMessagePreprocessingFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {
+  disableMessagePreprocessingFeatureToggleName,
+  pendingOfflineMessagesFeatureToggleName,
+} from '../../featureToggles/startupFeatureToggleNames';
+import {useOutboxOffline} from '../../hooks/useOutboxOffline';
 import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import {useApplicationContext} from '../../page/rootProvider';
 import {CellsRepository} from '../../repositories/cells/cellsRepository';
@@ -150,6 +154,7 @@ function InputBarContent({
   isIncomingRequest,
 }: InputBarContentProps): ReactElement {
   const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const isOffline = useOutboxOffline(isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName));
   const {
     classifiedDomains,
     isSelfDeletingMessagesEnabled,
@@ -209,6 +214,8 @@ function InputBarContent({
   const hasLocalEphemeralTimer =
     isSelfDeletingMessagesEnabled && isNumber(localMessageTimer) && localMessageTimer !== 0 && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
+  const isOfflineRef = useRef(isOffline);
+  isOfflineRef.current = isOffline;
 
   const shouldReplaceEmoji = useUserPropertyValue<boolean>(() => {
     return propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
@@ -230,6 +237,10 @@ function InputBarContent({
     onTypingChange: useCallback(
       isTyping => {
         isTypingRef.current = isTyping;
+        // A typing request must not be sent (and retried later) for text written while offline
+        if (isOfflineRef.current) {
+          return;
+        }
         if (isTyping) {
           fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
             await conversationRepository.sendTypingStart(conversation);
@@ -367,12 +378,19 @@ function InputBarContent({
                   onEscape={cancelSending}
                   onArrowUp={() => {
                     if (messageContent.text.length === 0) {
-                      editMessage(conversation.getLastEditableMessage());
+                      const lastEditableMessage = conversation.getLastEditableMessage();
+                      if (lastEditableMessage !== undefined && !lastEditableMessage.isChangeRefusedOffline(isOffline)) {
+                        editMessage(lastEditableMessage);
+                      }
                     }
                   }}
                   onShiftTab={onShiftTab}
                   onBlur={() => {
-                    return isTypingRef.current && conversationRepository.sendTypingStop(conversation);
+                    if (isTypingRef.current && !isOfflineRef.current) {
+                      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+                        await conversationRepository.sendTypingStop(conversation);
+                      });
+                    }
                   }}
                   onUpdate={setMessageContent}
                   onSend={handleSendMessage}
