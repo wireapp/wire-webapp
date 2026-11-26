@@ -350,13 +350,7 @@ export class ClientRepository {
               text: this.translate('modalAccountLogoutAction'),
             },
             text: {
-              ...(pendingMessages > 0 && {
-                message:
-                  pendingMessages === 1
-                    ? this.translate('outboxLogoutPendingMessage')
-                    : this.translate('outboxLogoutPendingMessagesPlural', {count: pendingMessages}),
-              }),
-              option: this.translate('modalAccountLogoutOption'),
+              option: this.getLogoutOptionText(pendingMessages),
               title: this.translate('modalAccountLogoutHeadline'),
             },
           },
@@ -366,6 +360,15 @@ export class ClientRepository {
       }
     }
   };
+
+  private getLogoutOptionText(pendingMessages: number): string {
+    if (pendingMessages === 0) {
+      return this.translate('modalAccountLogoutOption');
+    }
+    return pendingMessages === 1
+      ? this.translate('modalAccountLogoutOptionWithPendingMessage')
+      : this.translate('modalAccountLogoutOptionWithPendingMessagesPlural', {count: pendingMessages});
+  }
 
   /**
    * Removes a stored client and the session connected with it.

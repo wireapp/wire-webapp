@@ -217,6 +217,8 @@ function InputBarContent({
   const hasLocalEphemeralTimer =
     isSelfDeletingMessagesEnabled && isNumber(localMessageTimer) && localMessageTimer !== 0 && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
+  const isOfflineRef = useRef(isOffline);
+  isOfflineRef.current = isOffline;
 
   const shouldReplaceEmoji = useUserPropertyValue<boolean>(() => {
     return propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
@@ -238,6 +240,10 @@ function InputBarContent({
     onTypingChange: useCallback(
       isTyping => {
         isTypingRef.current = isTyping;
+        // A typing request must not be sent (and retried later) for text written while offline
+        if (isOfflineRef.current) {
+          return;
+        }
         if (isTyping) {
           fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
             await conversationRepository.sendTypingStart(conversation);
@@ -383,7 +389,11 @@ function InputBarContent({
                   }}
                   onShiftTab={onShiftTab}
                   onBlur={() => {
-                    return isTypingRef.current && conversationRepository.sendTypingStop(conversation);
+                    if (isTypingRef.current && !isOfflineRef.current) {
+                      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+                        await conversationRepository.sendTypingStop(conversation);
+                      });
+                    }
                   }}
                   onUpdate={setMessageContent}
                   onSend={handleSendMessage}

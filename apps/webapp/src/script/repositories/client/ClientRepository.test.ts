@@ -377,9 +377,9 @@ describe('ClientRepository', () => {
     }) as Translate;
 
     it.each([
-      [1, 'translated:outboxLogoutPendingMessage:'],
-      [3, 'translated:outboxLogoutPendingMessagesPlural:3'],
-    ])('warns with the count of %s pending messages', async (count, expectedMessage) => {
+      [1, 'translated:modalAccountLogoutOptionWithPendingMessage:'],
+      [3, 'translated:modalAccountLogoutOptionWithPendingMessagesPlural:3'],
+    ])('names the %s pending messages in the option label', async (count, expectedOption) => {
       const primaryModalShow = jest.fn();
       PrimaryModal.show = primaryModalShow;
       const clientRepository = createRepository(translate);
@@ -391,13 +391,15 @@ describe('ClientRepository', () => {
 
       expect(primaryModalShow).toHaveBeenCalledWith(
         PrimaryModal.type.OPTION,
-        expect.objectContaining({text: expect.objectContaining({message: expectedMessage})}),
+        expect.objectContaining({text: expect.objectContaining({option: expectedOption})}),
         undefined,
         translate,
       );
+      const [, options] = primaryModalShow.mock.calls[0];
+      expect(options.text).not.toHaveProperty('message');
     });
 
-    it('shows no warning without pending messages', async () => {
+    it('keeps the plain option label without pending messages', async () => {
       const primaryModalShow = jest.fn();
       PrimaryModal.show = primaryModalShow;
       const clientRepository = createRepository(translate);
@@ -408,16 +410,18 @@ describe('ClientRepository', () => {
       await clientRepository.logoutClient();
 
       const [, options] = primaryModalShow.mock.calls[0];
+      expect(options.text.option).toBe('translated:modalAccountLogoutOption:');
       expect(options.text).not.toHaveProperty('message');
     });
 
-    it('shows no warning when no counter was set', async () => {
+    it('keeps the plain option label when no counter was set', async () => {
       const primaryModalShow = jest.fn();
       PrimaryModal.show = primaryModalShow;
 
       await createRepository(translate).logoutClient();
 
       const [, options] = primaryModalShow.mock.calls[0];
+      expect(options.text.option).toBe('translated:modalAccountLogoutOption:');
       expect(options.text).not.toHaveProperty('message');
     });
   });
