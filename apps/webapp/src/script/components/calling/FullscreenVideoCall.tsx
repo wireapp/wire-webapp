@@ -37,6 +37,7 @@ import {
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination/Pagination';
+import {ParticipantNetworkStatsProvider} from './ParticipantNetworkStats';
 import {useCallAlertState} from './useCallAlertState';
 import {VideoBackgroundPerformancePanel} from './VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
 import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
@@ -112,7 +113,7 @@ export interface FullscreenVideoCallProps {
 
 const LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL = 'DO_NOT_ASK_AGAIN_FOR_SCREEN_SHARING_CONFIRM_MODAL';
 
-const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
+const FullscreenVideoCallContent: FunctionComponent<FullscreenVideoCallProps> = ({
   call,
   canShareScreen,
   conversation,
@@ -649,6 +650,14 @@ const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
       </ModalComponent>
       <VideoBackgroundPerformancePanel backgroundEffectsHandler={backgroundEffectsHandler} />
     </div>
+  );
+};
+
+const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = props => {
+  return (
+    <ParticipantNetworkStatsProvider>
+      <FullscreenVideoCallContent {...props} />
+    </ParticipantNetworkStatsProvider>
   );
 };
 

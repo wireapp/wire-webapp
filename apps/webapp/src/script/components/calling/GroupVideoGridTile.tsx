@@ -32,6 +32,7 @@ import {
   groupVideoPauseOverlayLabel,
   groupVideoTileWrapper,
 } from './GroupVideoGridTile.styles';
+import {ParticipantNetworkStats} from './ParticipantNetworkStats';
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
@@ -193,7 +194,11 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
         </span>
       )}
 
-      {!minimized && handRaisedAt != null && <span className="group-video-grid__element__label__hand_icon">✋</span>}
+      {!minimized && handRaisedAt != null && (
+        <span className="group-video-grid__element__label__hand_icon" css={!isSelfParticipant && {left: 48}}>
+          ✋
+        </span>
+      )}
 
       {isMaximized && (
         <div className="group-video-grid__element__overlay">
@@ -212,6 +217,8 @@ const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
       )}
 
       {nameContainer}
+
+      {!minimized && !isSelfParticipant && <ParticipantNetworkStats name={name} isSelf={false} />}
 
       {(hasPausedVideo || isSwitchingVideoResolution || doVideoReconnecting) && (
         <div className="group-video-grid__pause-overlay">

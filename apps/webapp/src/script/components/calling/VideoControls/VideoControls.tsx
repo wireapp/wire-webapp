@@ -77,6 +77,7 @@ import {handleKeyDown, isEscapeKey, KEY} from '../../../util/keyboardUtil';
 import {CallViewTab} from '../../../view_model/CallingViewModel';
 import {WebAppEvents} from '../../../webAppEvents';
 import * as Icon from '../../icon';
+import {ParticipantNetworkStats} from '../ParticipantNetworkStats';
 
 type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';
 
@@ -1001,6 +1002,9 @@ export const VideoControls: FunctionComponent<VideoControlsProps> = ({
 
         {isDesktop && (
           <>
+            <li className="video-controls__item">
+              <ParticipantNetworkStats name="My connection" isSelf variant="toolbar" />
+            </li>
             {isInCallHandRaiseControlVisible && (
               <li className="video-controls__item">
                 <button

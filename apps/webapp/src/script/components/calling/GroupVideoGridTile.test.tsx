@@ -89,6 +89,15 @@ describe('GroupVideoGridTile', () => {
     });
   });
 
+  it('keeps network statistics on remote tiles only', () => {
+    const selfParticipant = createParticipant('self');
+    const selfTile = renderComponent({participant: selfParticipant});
+    expect(selfTile.queryByRole('button', {name: /Network statistics/})).not.toBeInTheDocument();
+    selfTile.unmount();
+    const remoteTile = renderComponent({participant: createParticipant('Alice'), selfParticipant});
+    expect(remoteTile.getByRole('button', {name: 'Network statistics for Alice'})).toBeInTheDocument();
+  });
+
   it('should show loading overlay when background effect is initializing', () => {
     backgroundEffectsStore.setState({
       isInitializing: true,
