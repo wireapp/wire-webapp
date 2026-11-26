@@ -18,15 +18,23 @@
  */
 
 import {createEngine, type Engine} from './createEngine';
-import type {EnqueueOutcome, FindOutcome, Kind, KindHandle, Outbox, OutboxNotStarted} from './types';
+import type {
+  EnqueueOutcome,
+  FindOutcome,
+  Kind,
+  KindHandle,
+  Outbox,
+  OutboxDependencies,
+  OutboxNotStarted,
+} from './types';
 
 const NOT_STARTED: OutboxNotStarted = {type: 'outbox-not-started'};
 
 /**
  * Holds what exists before `start` (the kinds and the wish to run) and hands everything else to an engine,
- * which exists from a successful `start` until `stop`.
+ * which is built from the dependencies and exists from a successful `start` until `stop`.
  */
-export function createOutbox(): Outbox {
+export function createOutbox(dependencies: OutboxDependencies): Outbox {
   const kinds = new Map<string, Kind<unknown>>();
   let engine: Engine | undefined;
   let isStarting = false;
@@ -70,12 +78,12 @@ export function createOutbox(): Outbox {
       return {type: 'kind-registered', handle: createHandle(kind)};
     },
 
-    async start(dependencies) {
+    async start() {
       if (engine !== undefined || isStarting) {
         return {type: 'outbox-already-started'};
       }
       isStarting = true;
-      // There is no logger before `start`, so the registrations are logged now: the names of the kinds only
+      // The registrations are logged at `start`, when they are complete: the names of the kinds only
       dependencies.logger.info('register', {kinds: [...kinds.keys()]});
       const candidate = createEngine(kinds, dependencies);
       const outcome = await candidate.load();

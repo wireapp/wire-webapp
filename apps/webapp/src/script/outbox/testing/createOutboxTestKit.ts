@@ -89,7 +89,6 @@ export function parseTestPayload(value: unknown): TestPayload {
 }
 
 export function createOutboxTestKit(configuration: OutboxDependencies['configuration'] = {}): OutboxTestKit {
-  const outbox = createOutbox();
   const store = createInMemoryOutboxStore();
   const clock = createFakeClock();
   const logger = createRecordingLogger();
@@ -101,6 +100,7 @@ export function createOutboxTestKit(configuration: OutboxDependencies['configura
     logger,
     configuration,
   };
+  const outbox = createOutbox(dependencies);
   let kindCount = 0;
 
   function registerKind(overrides: Partial<Kind<TestPayload>> = {}): TestKind {
@@ -174,7 +174,7 @@ export function createOutboxTestKit(configuration: OutboxDependencies['configura
     },
     registerKind,
     async start({run = true} = {}) {
-      const outcome = await outbox.start(dependencies);
+      const outcome = await outbox.start();
       if (outcome.type !== 'outbox-started') {
         throw new Error(`Can't start the outbox: ${outcome.type}`);
       }

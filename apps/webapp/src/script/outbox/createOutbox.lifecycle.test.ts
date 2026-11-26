@@ -55,7 +55,7 @@ describe('createOutbox lifecycle', () => {
     it('starts and reports itself started', async () => {
       kit.registerKind();
 
-      const outcome = await kit.outbox.start(kit.dependencies);
+      const outcome = await kit.outbox.start();
 
       expect(outcome).toEqual({type: 'outbox-started'});
       expect(kit.outbox.isStarted()).toBe(true);
@@ -64,32 +64,32 @@ describe('createOutbox lifecycle', () => {
     it('refuses a second start', async () => {
       await kit.start();
 
-      expect(await kit.outbox.start(kit.dependencies)).toEqual({type: 'outbox-already-started'});
+      expect(await kit.outbox.start()).toEqual({type: 'outbox-already-started'});
     });
 
     it('refuses a start while another is loading', async () => {
-      const firstStart = kit.outbox.start(kit.dependencies);
+      const firstStart = kit.outbox.start();
 
-      expect(await kit.outbox.start(kit.dependencies)).toEqual({type: 'outbox-already-started'});
+      expect(await kit.outbox.start()).toEqual({type: 'outbox-already-started'});
       await firstStart;
     });
 
     it('stays unstarted when the store fails, and may be started again', async () => {
       kit.store.fail('loadLatest', true);
 
-      const failed = await kit.outbox.start(kit.dependencies);
+      const failed = await kit.outbox.start();
 
       expect(failed).toEqual({type: 'storage-failed', errorName: 'TestFailure'});
       expect(kit.outbox.isStarted()).toBe(false);
 
       kit.store.fail('loadLatest', false);
-      expect(await kit.outbox.start(kit.dependencies)).toEqual({type: 'outbox-started'});
+      expect(await kit.outbox.start()).toEqual({type: 'outbox-started'});
     });
 
     it('answers storage-failed when the store rejects', async () => {
       kit.store.rejectWith('loadLatest', new RangeError('broken'));
 
-      expect(await kit.outbox.start(kit.dependencies)).toEqual({type: 'storage-failed', errorName: 'RangeError'});
+      expect(await kit.outbox.start()).toEqual({type: 'storage-failed', errorName: 'RangeError'});
     });
 
     it('answers storage-full when storing the interrupted attempt hits the quota', async () => {
@@ -97,7 +97,7 @@ describe('createOutbox lifecycle', () => {
       kit.store.seed(createStoredSnapshot({kind: kind.name, state: 'in-progress', attempts: 1}));
       kit.store.fill(true);
 
-      expect(await kit.outbox.start(kit.dependencies)).toEqual({type: 'storage-full'});
+      expect(await kit.outbox.start()).toEqual({type: 'storage-full'});
       expect(kit.outbox.isStarted()).toBe(false);
     });
 
@@ -160,7 +160,7 @@ describe('createOutbox lifecycle', () => {
       await kit.outbox.stop();
 
       expect(kit.outbox.isStarted()).toBe(false);
-      expect(await kit.outbox.start(kit.dependencies)).toEqual({type: 'outbox-started'});
+      expect(await kit.outbox.start()).toEqual({type: 'outbox-started'});
     });
   });
 
@@ -288,7 +288,7 @@ describe('createOutbox lifecycle', () => {
       kit.store.seed(createStoredSnapshot({kind: 'gone', id: 'orphan'}));
       kit.store.fail('remove', true);
 
-      expect(await kit.outbox.start(kit.dependencies)).toEqual({type: 'storage-failed', errorName: 'TestFailure'});
+      expect(await kit.outbox.start()).toEqual({type: 'storage-failed', errorName: 'TestFailure'});
       expect(kit.outbox.isStarted()).toBe(false);
     });
 
@@ -538,7 +538,7 @@ describe('createOutbox lifecycle', () => {
     it('logs the name of the error of a failed store', async () => {
       kit.store.rejectWith('loadLatest', new RangeError('broken'));
 
-      await kit.outbox.start(kit.dependencies);
+      await kit.outbox.start();
 
       expect(kit.logger.entriesOf('start')[0].attributes).toMatchObject({
         outcome: 'storage-failed',

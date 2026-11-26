@@ -238,7 +238,7 @@ export type Outbox = {
   /** Kinds are registered before `start` */
   register: <Payload>(kind: Kind<Payload>) => RegisterOutcome<Payload>;
   /** After a storage failure, `start` may be called again */
-  start: (dependencies: OutboxDependencies) => Promise<StartOutcome>;
+  start: () => Promise<StartOutcome>;
   pause: () => void;
   /** Also resets the backoff */
   resume: () => void;
