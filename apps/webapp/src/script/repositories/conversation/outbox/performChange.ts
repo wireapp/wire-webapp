@@ -65,14 +65,14 @@ export async function performChange<Conversation extends OutboxConversation>(
         type: payload.reactions,
       });
       const answer = await attemptSend(() => {
-        return port.sendToBackend(reaction, conversation, {skipInjection: true});
+        return port.sendToBackend(reaction, conversation, {failFast: true, skipInjection: true});
       });
       return answerForSilentSend(kind, answer);
     }
     case 'edit': {
       const edit = port.buildEdit(conversation, payload);
       const answer = await attemptSend(() => {
-        return port.sendToBackend(edit, conversation, {syncTimestamp: false});
+        return port.sendToBackend(edit, conversation, {failFast: true, syncTimestamp: false});
       });
       if (answer.type === 'sent') {
         runDetached(kind, () => {
@@ -91,6 +91,7 @@ export async function performChange<Conversation extends OutboxConversation>(
       const recipients = payload.recipients ?? port.recipientsOf(conversation);
       const answer = await attemptSend(() => {
         return port.sendToBackend(deletion, conversation, {
+          failFast: true,
           recipients,
           skipInjection: true,
           targetMode: MessageTargetMode.USERS,

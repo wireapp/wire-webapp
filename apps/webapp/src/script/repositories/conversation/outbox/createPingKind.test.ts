@@ -85,7 +85,10 @@ describe('the ping kind', () => {
       await expect(perform(pingPayload())).resolves.toEqual({type: 'attempt-succeeded'});
 
       expect(port.buildPing).toHaveBeenCalledWith(conversation, 'ping-1');
-      expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {syncTimestamp: true});
+      expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {
+        failFast: true,
+        syncTimestamp: true,
+      });
       expect(port.sendToBackend.mock.calls[0][0].messageId).toBe('ping-1');
     });
 

@@ -130,6 +130,9 @@ function buildParts(): Parts {
 
   const storedMessage = {
     status: jest.fn(),
+    ephemeral_expires: jest.fn(() => {
+      return false;
+    }),
     failed_reason: jest.fn(),
     written_time: jest.fn(),
     primary_key: 'primary-key',
@@ -455,6 +458,41 @@ describe('MessageRepository routing sends through the outbox', () => {
       expect(lane).toEqual(expect.objectContaining({type: 'lane-found'}));
       // `size` counts the operations behind the first one
       expect((lane as {lane: {size: number}}).lane.size).toBe(1);
+    });
+  });
+
+  describe('the HTTP attempts of a send', () => {
+    beforeEach(() => {
+      parts.send.mockResolvedValue({id: 'sent', sentAt: '2026-01-01T00:00:00.000Z', state: 'OUTGOING_SENT'});
+    });
+
+    it.each([
+      [
+        'a text message',
+        () => {
+          return parts.repository.sendTextWithLinkPreview({
+            conversation: parts.conversation,
+            textMessage: 'hello',
+            mentions: [],
+          });
+        },
+      ],
+      [
+        'a ping',
+        () => {
+          return parts.repository.sendPing(parts.conversation);
+        },
+      ],
+    ])('is a single one for %s sent by the outbox', async (_name, send) => {
+      await startOutbox(parts);
+      parts.outbox.resume();
+      await parts.clock.settle();
+
+      await send();
+      await parts.clock.advance(1_000);
+
+      expect(parts.send).toHaveBeenCalledTimes(1);
+      expect(parts.send).toHaveBeenCalledWith(expect.objectContaining({failFast: true}));
     });
   });
 

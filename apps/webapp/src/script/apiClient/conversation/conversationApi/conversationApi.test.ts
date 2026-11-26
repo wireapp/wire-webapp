@@ -85,4 +85,60 @@ describe('ConversationAPI', () => {
       expect(conversationApi.getConversationsByQualifiedIds).toHaveBeenCalledWith(ids);
     });
   });
+
+  describe('message posts', () => {
+    const otrMessage = {recipients: [], sender: {client: 0}} as unknown as Parameters<
+      typeof conversationApi.postOTRMessage
+    >[2];
+
+    it.each([
+      [
+        'Proteus',
+        () => {
+          return conversationApi.postOTRMessage('conversation-id', 'domain', otrMessage);
+        },
+        'sendProtocolBuffer',
+      ],
+      [
+        'MLS',
+        () => {
+          return conversationApi.postMlsMessage(new Uint8Array([1]));
+        },
+        'sendProtocolMls',
+      ],
+    ] as const)('keeps the default retries for %s messages', async (_protocol, post, method) => {
+      const send = jest.spyOn(client, method).mockResolvedValue({data: {}} as AxiosResponse);
+
+      await post();
+
+      const [config] = send.mock.calls[0];
+      expect(config['axios-retry']).toBeUndefined();
+      expect(config.requestOptions).toBeUndefined();
+    });
+
+    it.each([
+      [
+        'Proteus',
+        () => {
+          return conversationApi.postOTRMessage('conversation-id', 'domain', otrMessage, {failFast: true});
+        },
+        'sendProtocolBuffer',
+      ],
+      [
+        'MLS',
+        () => {
+          return conversationApi.postMlsMessage(new Uint8Array([1]), {failFast: true});
+        },
+        'sendProtocolMls',
+      ],
+    ] as const)('makes a single attempt for fail-fast %s messages', async (_protocol, post, method) => {
+      const send = jest.spyOn(client, method).mockResolvedValue({data: {}} as AxiosResponse);
+
+      await post();
+
+      const [config] = send.mock.calls[0];
+      expect(config['axios-retry']).toEqual({retries: 0});
+      expect(config.requestOptions).toEqual({skipIncrementalRetryBackoff: true});
+    });
+  });
 });

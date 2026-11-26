@@ -66,6 +66,14 @@ export function createMessageKind<Conversation extends OutboxConversation>(
       case 'retry':
         return {type: 'attempt-failed'};
       case 'gone':
+        // The conversation is still known here: a conversation that was deleted is gone locally before the outbox
+        // sends. The backend answers 404 to someone who was removed from it, and that message stays with Retry
+        outboxLogger.info('A message was sent to a conversation the backend does not show', {
+          kind: KIND_NAME,
+          outcome: answer.type,
+        });
+        await port.markFailed(conversation, messageId, {reason: 'removed', federation: false});
+        return {type: 'operation-dead-lettered'};
       case 'cancelled':
         outboxLogger.info('Dropping a message that can no longer be sent', {kind: KIND_NAME, outcome: answer.type});
         return {type: 'operation-dropped'};
@@ -95,7 +103,7 @@ export function createMessageKind<Conversation extends OutboxConversation>(
 
     const message = await port.buildText(conversation, payload);
     const answer = await attemptSend(() => {
-      return port.sendToBackend(message, conversation, {syncTimestamp: true});
+      return port.sendToBackend(message, conversation, {failFast: true, syncTimestamp: true});
     });
     if (answer.type === 'sent') {
       runDetached(KIND_NAME, () => {
@@ -154,7 +162,7 @@ export function createMessageKind<Conversation extends OutboxConversation>(
     // The first injection of an asset message turns the shown placeholder into the uploaded asset
     await port.injectOptimistic(message, conversation);
     const answer = await attemptSend(() => {
-      return port.sendToBackend(message, conversation, {syncTimestamp: true});
+      return port.sendToBackend(message, conversation, {failFast: true, syncTimestamp: true});
     });
     return answerForMessage(conversation, payload.messageId, answer);
   }
@@ -179,20 +187,26 @@ export function createMessageKind<Conversation extends OutboxConversation>(
     }
   }
 
+  /**
+   * A message given up without a reason of its own either expired, or waited behind one that failed and went with
+   * it: the view tells them apart by its age, and only the first one says it expired.
+   */
   async function showAsFailedUnlessItIs(
     conversation: Conversation,
-    payload: TextMessagePayload | AssetMessagePayload,
+    {payload, queuedAt}: OperationView<TextMessagePayload | AssetMessagePayload>,
   ): Promise<void> {
     const record = await port.findMessage(conversation, payload.messageId);
     if (record !== undefined && !record.isFailed) {
-      await port.markFailed(conversation, payload.messageId, {reason: 'expired', federation: false});
+      const hasExpired = port.serverTime() - queuedAt >= WEEK_MILLISECONDS;
+      await port.markFailed(conversation, payload.messageId, {
+        reason: hasExpired ? 'expired' : 'generic',
+        federation: false,
+      });
     }
   }
 
-  async function reactToChange({
-    payload,
-    state,
-  }: OperationView<TextMessagePayload | AssetMessagePayload>): Promise<void> {
+  async function reactToChange(operation: OperationView<TextMessagePayload | AssetMessagePayload>): Promise<void> {
+    const {payload, state} = operation;
     const conversation = port.findConversation(payload.conversationId);
     if (conversation === undefined) {
       return;
@@ -203,7 +217,7 @@ export function createMessageKind<Conversation extends OutboxConversation>(
       case 'in-progress':
         return showAsSending(conversation, payload);
       case 'dead-lettered':
-        return showAsFailedUnlessItIs(conversation, payload);
+        return showAsFailedUnlessItIs(conversation, operation);
       case 'dropped':
         return port.deleteMessage(conversation, payload.messageId);
       case 'succeeded':

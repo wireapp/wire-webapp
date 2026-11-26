@@ -148,6 +148,7 @@ describe('the message-change kind', () => {
     await perform(deletePayload({recipients: [{id: 'someone', domain: 'wire.test'}]}));
 
     expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {
+      failFast: true,
       recipients: [{id: 'someone', domain: 'wire.test'}],
       skipInjection: true,
       targetMode: expect.anything(),
@@ -161,7 +162,10 @@ describe('the message-change kind', () => {
     await perform({...hidePayload(), conversationId: MISSING_CONVERSATION});
 
     expect(port.sendToBackend).toHaveBeenCalledTimes(1);
-    expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), selfConversation, {skipInjection: true});
+    expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), selfConversation, {
+      failFast: true,
+      skipInjection: true,
+    });
   });
 
   it('asks for a retry when there is no self conversation to hide in yet', async () => {
@@ -176,7 +180,10 @@ describe('the message-change kind', () => {
 
     await perform(reactionPayload());
 
-    expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {skipInjection: true});
+    expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {
+      failFast: true,
+      skipInjection: true,
+    });
   });
 
   it('sends an edit with its link preview', async () => {
@@ -184,7 +191,10 @@ describe('the message-change kind', () => {
 
     await perform(editPayload());
 
-    expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {syncTimestamp: false});
+    expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {
+      failFast: true,
+      syncTimestamp: false,
+    });
     expect(port.sendLinkPreview).toHaveBeenCalled();
   });
 

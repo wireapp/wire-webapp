@@ -84,6 +84,7 @@ describe('the receipt kind', () => {
 
       expect(port.sendToBackend).toHaveBeenCalledTimes(1);
       expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {
+        failFast: true,
         nativePush: false,
         recipients: [{id: 'sender', domain: 'wire.test'}],
         silentDegradationWarning: true,
@@ -175,7 +176,10 @@ describe('the receipt kind', () => {
       await expect(perform(payload)).resolves.toEqual({type: 'attempt-succeeded'});
 
       expect(port.sendToBackend).toHaveBeenCalledTimes(1);
-      expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), selfConversation, {skipInjection: true});
+      expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), selfConversation, {
+        failFast: true,
+        skipInjection: true,
+      });
     });
 
     it('does not need the conversation it is about', async () => {

@@ -92,6 +92,9 @@ export function createFakeMessageOutboxPort(settle: () => Promise<void>): FakeMe
     supportsReadReceipts: mockOf<'supportsReadReceipts'>(() => {
       return true;
     }),
+    serverTime: jest.fn(() => {
+      return Date.now();
+    }),
     isDegraded: jest.fn(candidate => {
       return degraded.has(candidate);
     }),

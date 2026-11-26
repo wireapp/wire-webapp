@@ -63,6 +63,7 @@ import {AssetAuditData} from '../../apiClient/asset/assetApi';
 import {MessageSendingStatus} from '../../apiClient/conversation/messageSendingStatus';
 import {QualifiedUserClients} from '../../apiClient/conversation/qualifiedUserClients';
 import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import type {RequestRetryOptions} from '../../apiClient/http/failFastRequestConfig';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {RequestCancellationError} from '../../apiClient/user/userError';
@@ -203,6 +204,8 @@ const enum SendAndInjectSendingState {
 type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingState | SendAndInjectSendingState};
 
 type BackendSendOptions = MessageSendingOptions & {
+  /** For sends the outbox retries itself: one HTTP attempt, no network retries */
+  failFast?: boolean;
   silentDegradationWarning?: boolean;
   skipInjection?: boolean;
   skipSelf?: boolean;
@@ -972,6 +975,7 @@ export class MessageRepository {
     file: Blob,
     messageId: string,
     meta: Pick<FileMetaDataContent, 'name' | 'type'>,
+    retryOptions?: RequestRetryOptions,
   ): Promise<EncryptedAssetUploaded & {preview?: Asset.IPreview}> {
     const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
 
@@ -996,7 +1000,7 @@ export class MessageRepository {
       ...(isAuditLogEnabled && {auditData}),
     };
 
-    return this.assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled);
+    return this.assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled, undefined, retryOptions);
   }
 
   private async buildUploadedAssetMessage(
@@ -1251,7 +1255,7 @@ export class MessageRepository {
   private async prepareSend(
     payload: GenericMessage,
     conversation: Conversation,
-    {nativePush = true, targetMode, recipients, skipSelf, silentDegradationWarning}: BackendSendOptions = {},
+    {nativePush = true, targetMode, recipients, skipSelf, silentDegradationWarning, failFast}: BackendSendOptions = {},
   ): Promise<CoreSendOptions> {
     // Configure ephemeral messages
     this.conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
@@ -1262,9 +1266,11 @@ export class MessageRepository {
           payload,
           protocol: CONVERSATION_PROTOCOL.MLS,
           conversationId: conversation.qualifiedId,
+          failFast,
         }
       : {
           conversationId: conversation.qualifiedId,
+          failFast,
           nativePush,
           onClientMismatch: mismatch => {
             return this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning);
@@ -2146,10 +2152,13 @@ export class MessageRepository {
     // Only an upload in progress is worth a warning on leaving: a queued message is kept and sent later
     window.addEventListener('beforeunload', keepPageOpen);
     try {
-      const asset = await this.uploadToAssetService(conversation, file, payload.messageId, {
-        name: (file as File).name,
-        type: file.type,
-      });
+      const asset = await this.uploadToAssetService(
+        conversation,
+        file,
+        payload.messageId,
+        {name: (file as File).name, type: file.type},
+        {failFast: true},
+      );
       const record = await this.eventService.loadEvent(conversation.id, payload.messageId);
       if (record !== undefined) {
         await this.eventService.updateEvent(record.primary_key, {
@@ -2200,6 +2209,31 @@ export class MessageRepository {
     return this.wrapInEphemeralWhenTimed(message, conversation);
   }
 
+  /**
+   * The message is sent with the timer the conversation has at send time, which may differ from the one it was
+   * shown with. The shown copy takes the sent one, so that it expires when the receivers' copies do.
+   * A copy that was sent already keeps its timer.
+   */
+  private async matchLocalTimerToSent(conversation: Conversation, message: GenericMessage): Promise<void> {
+    try {
+      const shown = await this.getMessageInConversationById(conversation, message.messageId);
+      if (shown.status() > StatusType.SENDING) {
+        return;
+      }
+      const sentTimer = message.ephemeral?.expireAfterMillis;
+      const timer = isNullOrUndefined(sentTimer) || Number(sentTimer) === 0 ? false : Number(sentTimer);
+      if (shown.ephemeral_expires() === timer) {
+        return;
+      }
+      shown.ephemeral_expires(timer);
+      await this.eventService.updateEvent(shown.primary_key, {ephemeral_expires: timer === false ? undefined : timer});
+    } catch (error: unknown) {
+      if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+        throw error;
+      }
+    }
+  }
+
   private async setOutboxMessageStatus(
     conversation: Conversation,
     messageId: string,
@@ -2238,6 +2272,9 @@ export class MessageRepository {
       supportsReadReceipts: conversation => {
         return supportsReadReceipts(conversation);
       },
+      serverTime: () => {
+        return this.serverTimeHandler.toServerTimestamp();
+      },
       isDegraded: conversation => {
         return conversation.verification_state() === ConversationVerificationState.DEGRADED;
       },
@@ -2247,8 +2284,10 @@ export class MessageRepository {
       requestSendingPermission: conversation => {
         return this.requestUserSendingPermission(conversation, false, CONSENT_TYPE.MESSAGE);
       },
-      buildText: (conversation, payload) => {
-        return this.buildOutboxText(conversation, payload);
+      buildText: async (conversation, payload) => {
+        const message = await this.buildOutboxText(conversation, payload);
+        await this.matchLocalTimerToSent(conversation, message);
+        return message;
       },
       buildEdit: (conversation, payload) => {
         return this.buildOutboxEdit(conversation, payload);
@@ -2256,8 +2295,12 @@ export class MessageRepository {
       buildPing: (conversation, messageId) => {
         return this.buildOutboxPing(conversation, messageId);
       },
-      buildAsset: (conversation, payload) => {
-        return this.buildOutboxAsset(conversation, payload);
+      buildAsset: async (conversation, payload) => {
+        const message = await this.buildOutboxAsset(conversation, payload);
+        if (message !== undefined) {
+          await this.matchLocalTimerToSent(conversation, message);
+        }
+        return message;
       },
       sendToBackend: (message, conversation, options) => {
         return this.sendMessageToBackend(message, conversation, options);
