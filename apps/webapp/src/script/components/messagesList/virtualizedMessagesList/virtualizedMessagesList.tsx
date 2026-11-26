@@ -113,7 +113,8 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   onLoading,
   isConversationLoaded,
 }: Props) => {
-  const {fireAndForgetInvoker, isFeatureToggleEnabled} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const offlineNotice = translate('outboxOfflineNotice');
   const {
     messages: allMessages,
     lastDeliveredMessage,
@@ -397,7 +398,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
                   index={virtualItem.index}
                   message={item.message}
                   hideHeader={item.shouldGroup}
-                  showOfflineNotice={item.message === firstPendingMessage}
+                  offlineNotice={item.message === firstPendingMessage ? offlineNotice : undefined}
                   messageActions={messageActions}
                   conversation={conversation}
                   cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
@@ -450,7 +451,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
               transform: `translateY(${virtualizer.getTotalSize()}px)`,
             }}
           >
-            <OfflineNotice />
+            <OfflineNotice label={offlineNotice} />
           </div>
         )}
 

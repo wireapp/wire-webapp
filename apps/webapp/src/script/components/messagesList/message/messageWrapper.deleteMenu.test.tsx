@@ -53,7 +53,12 @@ type Setup = {
 };
 
 const renderMenu = (isOutboxEnabled: boolean, isNeverAttempted: boolean): Setup => {
-  const conversation = new Conversation(createUuid(), 'test.wire.link', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  const conversation = new Conversation(
+    createUuid(),
+    'test.wire.link',
+    CONVERSATION_PROTOCOL.PROTEUS,
+    translateForTest,
+  );
   const message = new ContentMessage(createUuid(), translateForTest);
   const self = generateUser();
   self.isMe = true;

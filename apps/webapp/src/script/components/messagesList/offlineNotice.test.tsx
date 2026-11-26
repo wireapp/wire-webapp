@@ -19,27 +19,17 @@
 
 import {render} from '@testing-library/react';
 
-import {
-  createRootContextValueForTest,
-  createRootProviderWrapperForTest,
-} from '../../page/testSupport/rootContextTestSupport';
 import {THEME_ID} from '../../uiKit/identity/theme/theme';
 import {StyledApp} from '../../uiKit/layout/styledApp/styledApp';
-import {translateForTest} from '../../util/test/translateForTest';
 
 import {OfflineNotice} from './offlineNotice';
-
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
-);
 
 describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('OfflineNotice in the %s', themeId => {
   it('is a status with the offline copy, so that assistive technology announces it', () => {
     const {getByRole} = render(
       <StyledApp themeId={themeId}>
-        <OfflineNotice />
+        <OfflineNotice label="outboxOfflineNotice" />
       </StyledApp>,
-      {wrapper: rootProviderWrapper},
     );
 
     expect(getByRole('status')).toHaveTextContent('outboxOfflineNotice');
@@ -48,9 +38,8 @@ describe.each([THEME_ID.LIGHT, THEME_ID.DARK])('OfflineNotice in the %s', themeI
   it('hides its icon from assistive technology', () => {
     const {getByRole} = render(
       <StyledApp themeId={themeId}>
-        <OfflineNotice />
+        <OfflineNotice label="outboxOfflineNotice" />
       </StyledApp>,
-      {wrapper: rootProviderWrapper},
     );
 
     expect(getByRole('status').querySelector('svg')?.closest('[aria-hidden="true"]')).not.toBeNull();

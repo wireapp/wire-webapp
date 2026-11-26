@@ -480,6 +480,18 @@ export class Message {
     );
   }
 
+  /** `pending` while the message waits to be sent, and `failed` when it could not be sent */
+  sendingState(): 'sent' | 'pending' | 'failed' {
+    const status = this.status();
+    if (status === StatusType.SENDING) {
+      return 'pending';
+    }
+    if (status === StatusType.FAILED || status === StatusType.FEDERATION_ERROR) {
+      return 'failed';
+    }
+    return 'sent';
+  }
+
   /** Start the ephemeral timer for the message. */
   readonly startMessageTimer = (timeOffset: number): void => {
     if (this.messageTimerStarted) {

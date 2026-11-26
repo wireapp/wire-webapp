@@ -21,7 +21,10 @@ import {readFileSync} from 'node:fs';
 import path from 'node:path';
 
 const minimumContrast = 4.5;
-const accentColorStyles = readFileSync(path.resolve(__dirname, '../../../../../style/common/accent-color.less'), 'utf8');
+const accentColorStyles = readFileSync(
+  path.resolve(__dirname, '../../../../../style/common/accent-color.less'),
+  'utf8',
+);
 
 function readColor(name: string): string {
   const match = new RegExp(`@${name}:\\s*(#[0-9a-fA-F]{6});`).exec(accentColorStyles);

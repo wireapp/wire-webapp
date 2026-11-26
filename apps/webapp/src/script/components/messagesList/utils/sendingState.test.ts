@@ -72,7 +72,11 @@ describe('sending states of messages', () => {
 
       expect(
         groups.map(group => {
-          return isMarker(group) ? [] : group.messages.map(({id}) => {return id});
+          return isMarker(group)
+            ? []
+            : group.messages.map(({id}) => {
+                return id;
+              });
         }),
       ).toEqual([['sent'], ['pending-1', 'pending-2'], ['failed']]);
     });
