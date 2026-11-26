@@ -21,7 +21,7 @@ import {useEffect, useLayoutEffect, useMemo, type FunctionComponent} from 'react
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
@@ -45,6 +45,7 @@ import {isUUID} from '../auth/util/stringUtil';
 import {CallingContainer} from '../components/calling/CallingOverlayContainer';
 import {ChooseScreen} from '../components/calling/ChooseScreen';
 import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
+import {NoteTaker} from '../components/calling/noteTaker/noteTaker';
 import {ConfigToolbar} from '../components/configToolbar/configToolbar';
 import {SharedDriveUploadStatusScope} from '../components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {ErrorFallback} from '../components/errorFallback';
@@ -57,6 +58,7 @@ import {showUserModal, UserModal} from '../components/Modals/UserModal';
 import {Config} from '../Config';
 import {
   driveBulkActionProgressFeatureToggleName,
+  noteTakerFeatureToggleName,
   type StartupFeatureToggleName,
 } from '../featureToggles/startupFeatureToggleNames';
 import {useActiveWindow} from '../hooks/useActiveWindow';
@@ -69,7 +71,8 @@ import {
   initialiseMigrationOfProteusConversations,
   joinUnestablishedMixedConversations,
 } from '../mls/mlsMigration/migrationInitialiser';
-import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
+import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from '../repositories/calling/CallState';
+import type {NoteTakerCall} from '../repositories/calling/noteTaker/noteTakerSession';
 import {ConversationState} from '../repositories/conversation/ConversationState';
 import {User} from '../repositories/entity/User';
 import {TeamState} from '../repositories/team/TeamState';
@@ -141,11 +144,37 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
     'isActivatedAccount',
   ]);
 
-  const {hasAvailableScreensToShare, desktopScreenShareMenu, viewMode} = useKoSubscribableChildren(callState, [
-    'hasAvailableScreensToShare',
-    'desktopScreenShareMenu',
-    'viewMode',
-  ]);
+  const {hasAvailableScreensToShare, desktopScreenShareMenu, viewMode, joinedCall, detachedWindow} =
+    useKoSubscribableChildren(callState, [
+      'hasAvailableScreensToShare',
+      'desktopScreenShareMenu',
+      'viewMode',
+      'joinedCall',
+      'detachedWindow',
+    ]);
+
+  const noteTakerCall = useMemo((): NoteTakerCall | undefined => {
+    if (isUndefined(joinedCall)) {
+      return undefined;
+    }
+    return {
+      getSelfParticipant: () => {
+        return joinedCall.getSelfParticipant();
+      },
+      getNoteTakerAudioParticipant: trackId => {
+        return joinedCall.getNoteTakerAudioParticipant(trackId);
+      },
+      getNoteTakerAudioStreams: () => {
+        return joinedCall.getNoteTakerAudioStreams();
+      },
+      isMicrophoneMuted: () => {
+        return joinedCall.muteState() !== MuteState.NOT_MUTED;
+      },
+      subscribeMicrophoneMute: listener => {
+        return joinedCall.muteState.subscribe(listener);
+      },
+    };
+  }, [joinedCall]);
 
   const teamState = container.resolve(TeamState);
   const core = container.resolve(Core);
@@ -457,6 +486,14 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
         {!locked && (
           <>
             <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
+
+            {isFeatureToggleEnabled(noteTakerFeatureToggleName) && (
+              <NoteTaker
+                clock={clock}
+                call={noteTakerCall}
+                targetDocument={viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow?.document : undefined}
+              />
+            )}
 
             {viewMode === CallingViewMode.FULL_SCREEN && (
               <CallingContainer

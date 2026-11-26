@@ -23,6 +23,7 @@ import {
   startupFeatureToggleQueryParameterName,
 } from './startupFeatureToggles';
 import {
+  noteTakerFeatureToggleName,
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
@@ -39,6 +40,7 @@ import {
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
+  noteTakerFeatureToggleName,
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   forTestsOnlyFeatureToggleName,
@@ -203,6 +205,17 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.enabledFeatureToggleNames).not.toContain('unknown-feature');
   });
 
+  it('enables the note taker only through explicit startup opt-in', () => {
+    expect(createStartupFeatureTogglesFromLocationSearch('').isFeatureToggleEnabled(noteTakerFeatureToggleName)).toBe(
+      false,
+    );
+    expect(
+      createStartupFeatureTogglesFromLocationSearch('?enabled-features=note-taker').isFeatureToggleEnabled(
+        noteTakerFeatureToggleName,
+      ),
+    ).toBe(true);
+  });
+
   it('enables the applock refactored feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}`,
@@ -273,6 +286,7 @@ describe('startupFeatureToggles', function () {
 
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
+      noteTakerFeatureToggleName,
       applockRefactoredFeatureToggleName,
       conversationListCollapseFeatureToggleName,
       forTestsOnlyFeatureToggleName,

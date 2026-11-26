@@ -92,6 +92,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          lfs: true
           persist-credentials: false
           ref: ${{ github.sha }}
           fetch-depth: 0

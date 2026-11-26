@@ -569,6 +569,7 @@ const productionConfigs = [
   {
     files: [
       'tools/buildArtifact/**/*.ts',
+      'tools/noteTakerModels/**/*.mts',
       'tools/maintenanceRelease/**/*.ts',
       'tools/productionDistribution/**/*.ts',
       'tools/releaseSummary/**/*.ts',

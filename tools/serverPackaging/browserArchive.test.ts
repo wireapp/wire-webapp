@@ -94,7 +94,7 @@ describe('browser deployment ZIP verification', () => {
     expect(verification.stderr).toContain('failed integrity verification');
   });
 
-  it('verifies the existing public package outside the Playwright container without apt-get', () => {
+  it('verifies the existing public package outside the Playwright container', () => {
     const workflow: unknown = load(readFileSync('.github/workflows/continuous-integration.yml', 'utf8'));
     expect(isPlainObject(workflow) && isPlainObject(workflow.jobs)).toBe(true);
     if (isPlainObject(workflow) === false || isPlainObject(workflow.jobs) === false) {
@@ -109,7 +109,9 @@ describe('browser deployment ZIP verification', () => {
     ) {
       throw new Error('CI workflow must define production build and package jobs');
     }
-    expect(JSON.stringify(rspackJob)).not.toMatch(/apt-get|unzip|verifyBrowserArchive/);
+    // The browser image may install Git LFS; archive verification belongs in the host job.
+    expect(JSON.stringify(rspackJob)).not.toMatch(/unzip|verifyBrowserArchive/);
+    expect(packageJob.container).toBeUndefined();
     expect(packageJob.needs).toBeUndefined();
     expect(packageJob.if).toBeUndefined();
     const packageCommands = packageJob.steps

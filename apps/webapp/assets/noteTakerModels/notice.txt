@@ -1,0 +1,14 @@
+Self-hosted Whisper ONNX model assets
+
+Original model: https://github.com/openai/whisper
+Original code and model weights: MIT license (licenseWhisper.txt).
+
+ONNX exports:
+https://huggingface.co/onnx-community/whisper-tiny
+https://huggingface.co/onnx-community/whisper-base
+https://huggingface.co/onnx-community/whisper-small
+
+The base export's model card declares Apache-2.0 (licenseApache.txt).
+Each export's original README.md is included alongside its model files.
+Exact export revisions, filenames and SHA-256 hashes are recorded in
+/tools/noteTakerModels/modelManifest.json in the source repository.

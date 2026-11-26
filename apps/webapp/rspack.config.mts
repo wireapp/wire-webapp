@@ -27,6 +27,8 @@ import {readFileSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
+import {verifyCommittedModelAssets} from '../../tools/noteTakerModels/verifyModelAssets.mts';
+
 import {generateConfig as generateClientConfig} from '../server/configuration/client.config.ts';
 import {parseBuildMetadata} from '../server/configuration/buildMetadata.ts';
 import type {BuildMetadata} from '../server/configuration/buildMetadata.ts';
@@ -43,6 +45,7 @@ const configDirectoryPath = path.dirname(configFilePath);
 const rootPath = path.resolve(configDirectoryPath, '../..');
 const srcPath = path.resolve(configDirectoryPath, 'src');
 const scriptPath = path.resolve(srcPath, 'script');
+const onnxRuntimeDirectory = path.dirname(fileURLToPath(import.meta.resolve('onnxruntime-web/webgpu')));
 const authPath = path.resolve(scriptPath, 'auth');
 const browserCheckPath = path.resolve(scriptPath, 'browser');
 const buildMetadataPath = path.resolve(
@@ -110,6 +113,7 @@ function createEnvironmentUrls(environment: Env): EnvironmentUrls {
 const templateParameters = createTemplateParameters();
 
 function createRspackConfiguration(mode: 'development' | 'production' = 'production'): Configuration {
+  verifyCommittedModelAssets({workspaceDirectory: rootPath});
   const isDevelopment = mode === 'development';
   const outputPath = path.resolve(
     rootPath,
@@ -265,6 +269,12 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
       }),
       new rspack.CopyRspackPlugin({
         patterns: [
+          ...['mjs', 'wasm'].map(extension => {
+            return {
+              from: path.join(onnxRuntimeDirectory, `ort-wasm-simd-threaded.jsep.${extension}`),
+              to: `min/onnxruntime/ort-wasm-simd-threaded.jsep.${extension}`,
+            };
+          }),
           {
             context: path.resolve(rootPath, 'node_modules/@mediapipe/tasks-vision/wasm'),
             from: '*',
