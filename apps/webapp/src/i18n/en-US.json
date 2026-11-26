@@ -419,7 +419,6 @@
   "cells.bulkDownload.failed": "Could not download the selected items. Select Download to try again.",
   "cells.bulkDownload.preparingBrowserDownload": "Preparing the archive for your browser download…",
   "cells.bulkDownload.progress": "Downloading archive · {bytes} received",
-  "cells.bulkDownload.ready": "Archive prepared. Check your browser downloads.",
   "cells.bulkDownload.starting": "Preparing archive…",
   "cells.bulkDownload.unavailable.forbidden": "You do not have permission to download every selected item.",
   "cells.bulkDownload.unavailable.selection-unavailable": "Some selected items are not available here. Refresh Shared Drive and select them again.",

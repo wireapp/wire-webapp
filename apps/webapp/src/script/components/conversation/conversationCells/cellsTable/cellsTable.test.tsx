@@ -92,9 +92,6 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkDownload.progress') {
     return `Downloading archive · ${substitutions?.bytes} received`;
   }
-  if (key === 'cells.bulkDownload.ready') {
-    return 'Archive prepared. Check browser downloads.';
-  }
   if (key === 'cells.bulkDownload.failed') {
     return 'Could not download the selected items. Select Download to try again.';
   }
@@ -496,7 +493,7 @@ describe('CellsTable selection', () => {
     Object.defineProperty(globalThis, 'ReadableStream', originalReadableStreamDescriptor);
   });
 
-  it('downloads selected files and folders through the Cells repository', async () => {
+  it('downloads selected files and folders without keeping a completion message', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/team/Shared%20Drive/Reports';
     const user = userEvent.setup();
@@ -533,8 +530,12 @@ describe('CellsTable selection', () => {
           abortController: expect.any(AbortController),
         });
       });
-      expect(await screen.findByText('Archive prepared. Check browser downloads.')).toBeInTheDocument();
-      expect(downloadBlob).toHaveBeenCalledWith(expect.any(Blob), 'bulk-download.zip', 'application/zip');
+      await waitFor(() => {
+        expect(downloadBlob).toHaveBeenCalledWith(expect.any(Blob), 'bulk-download.zip', 'application/zip');
+      });
+      expect(screen.getByRole('button', {name: 'Download'})).toBeEnabled();
+      expect(screen.getAllByRole('status')).toHaveLength(1);
+      expect(screen.getByRole('status')).toHaveTextContent('2 selected');
     } finally {
       downloadBlob.mockRestore();
       window.location.hash = originalHash;
@@ -593,8 +594,11 @@ describe('CellsTable selection', () => {
       expect(await screen.findByText('Downloading archive · 2 B received')).toBeInTheDocument();
       expect(screen.getByRole('button', {name: 'Download'})).toBeDisabled();
       closeSource?.();
-      expect(await screen.findByText('Archive prepared. Check browser downloads.')).toBeInTheDocument();
-      expect(downloadBlob).toHaveBeenCalledTimes(1);
+      await waitFor(() => {
+        expect(downloadBlob).toHaveBeenCalledTimes(1);
+      });
+      expect(screen.queryByText('Downloading archive · 2 B received')).not.toBeInTheDocument();
+      expect(screen.getByRole('button', {name: 'Download'})).toBeEnabled();
       expect(downloadSelectionArchive).toHaveBeenCalledTimes(1);
     } finally {
       downloadBlob.mockRestore();

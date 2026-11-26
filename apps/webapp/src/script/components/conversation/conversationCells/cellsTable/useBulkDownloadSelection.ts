@@ -79,10 +79,9 @@ const getStatusMessage = (state: BulkDownloadViewState, translate: Translate): s
       return translate('cells.bulkDownload.progress', {bytes: formatBytes(state.bytesReceived)});
     case 'stream-consumed':
       return translate('cells.bulkDownload.preparingBrowserDownload');
-    case 'ready':
-      return translate('cells.bulkDownload.ready');
     case 'failed':
       return translate('cells.bulkDownload.failed');
+    case 'ready':
     case 'cancelled':
     case 'idle':
       return null;
