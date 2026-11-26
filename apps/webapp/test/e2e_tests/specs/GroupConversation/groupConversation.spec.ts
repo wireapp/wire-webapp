@@ -71,7 +71,11 @@ test.describe('Group Conversation', () => {
     'I see count of participants increase and decrease when I select or unselect',
     {tag: ['@TC-516', '@regression']},
     async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA));
+      const [userAPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB)),
+        createPage(withLogin(userC)),
+      ]);
       await connectWithUser(userAPage, userB);
       await connectWithUser(userAPage, userC);
 

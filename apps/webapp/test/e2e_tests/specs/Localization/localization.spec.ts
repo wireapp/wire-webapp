@@ -128,7 +128,7 @@ test.describe('Localization', () => {
     'Verify conversation view and list has German-localized strings',
     {tag: ['@TC-1275', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(userA));
+      const [page] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       const {pages, modals, components} = PageManager.from(page).webapp;
 
       // Connect users manually due to the current locators don't work in german browser

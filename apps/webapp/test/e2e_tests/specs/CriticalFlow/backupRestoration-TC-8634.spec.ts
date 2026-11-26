@@ -38,7 +38,10 @@ test.beforeEach(async ({createTeam, createUser}) => {
 });
 
 test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({createPage}, testInfo) => {
-  const pageManager = PageManager.from(await createPage(withLogin(userA)));
+  const [pageManager] = await Promise.all([
+    PageManager.from(createPage(withLogin(userA))),
+    createPage(withLogin(userB)),
+  ]);
   await connectWithUser(pageManager, userB);
   const {pages, modals, components} = pageManager.webapp;
 
