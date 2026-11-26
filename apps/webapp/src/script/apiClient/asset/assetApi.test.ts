@@ -203,6 +203,25 @@ describe('AssetAPI', () => {
       );
     });
 
+    it.each([
+      ['keeps the default retries', undefined, undefined, undefined],
+      ['makes a single attempt when fail-fast', {failFast: true}, {retries: 0}, {skipIncrementalRetryBackoff: true}],
+    ])('%s', async (_name, retryOptions, expectedRetry, expectedRequestOptions) => {
+      mockSendRequest.mockResolvedValue({
+        data: mockUploadResponse,
+        headers: {},
+        status: StatusCode.CREATED,
+        statusText: 'Created',
+        config: {},
+      });
+
+      await assetAPI.postAsset(mockAssetData, undefined, undefined, retryOptions).response;
+
+      const [config] = mockSendRequest.mock.calls[0];
+      expect(config['axios-retry']).toEqual(expectedRetry);
+      expect(config.requestOptions).toEqual(expectedRequestOptions);
+    });
+
     it('should include default options when not provided', async () => {
       mockSendRequest.mockResolvedValue({
         data: mockUploadResponse,

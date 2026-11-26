@@ -163,6 +163,26 @@ describe('MessageService', () => {
         conversationId.id,
         conversationId.domain,
         expect.any(Object),
+        {failFast: undefined},
+      );
+    });
+
+    it('asks the API for a single attempt when sending fail-fast', async () => {
+      const [messageService, {apiClient}] = await buildMessageService();
+      jest
+        .spyOn(apiClient.api.conversation, 'postOTRMessage')
+        .mockReturnValue(Promise.resolve({} as MessageSendingStatus));
+
+      await messageService.sendMessage(clientId, generateRecipients(generateUsers(1, 1)), createMessage('hi'), {
+        conversationId,
+        failFast: true,
+      });
+
+      expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledWith(
+        conversationId.id,
+        conversationId.domain,
+        expect.any(Object),
+        {failFast: true},
       );
     });
 

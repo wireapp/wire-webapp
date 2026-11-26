@@ -88,6 +88,8 @@ export type ProtocolParam = {
 export type SendCommonParams = ProtocolParam & {
   payload: GenericMessage;
   conversationId: QualifiedId;
+  /** Post the message once, without the HTTP client's network retries; the caller handles a failure */
+  failFast?: boolean;
 };
 
 export type SendMlsMessageParams = SendCommonParams & {

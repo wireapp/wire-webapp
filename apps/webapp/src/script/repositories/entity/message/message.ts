@@ -58,6 +58,7 @@ import {
 } from '../../../util/timeUtil';
 import {AssetTransferState} from '../../assets/assetTransferState';
 import {AssetType} from '../../assets/assetType';
+import type {FailedReason} from '../../conversation/outbox/FailedReason';
 import type {ReadReceipt} from '../../storage/record/eventRecord';
 import {User} from '../User';
 
@@ -84,6 +85,10 @@ export class Message {
   public readonly isObfuscated: ko.PureComputed<boolean>;
   public legalHoldStatus?: LegalHoldStatus;
   public readonly status: ko.Observable<StatusType>;
+  /** Set with a failed status when the reason is known */
+  public readonly failed_reason: ko.Observable<FailedReason | undefined>;
+  /** Only messages sent through the outbox have one: the time it was written at, in ISO format */
+  public readonly written_time: ko.Observable<string | undefined>;
   public readonly timestamp_affects_order: ko.PureComputed<boolean>;
   public readonly timestamp: ko.Observable<number>;
   public readonly unsafeSenderName: ko.PureComputed<string>;
@@ -141,6 +146,8 @@ export class Message {
     this.legalHoldStatus = undefined;
     this.primary_key = undefined;
     this.status = ko.observable(StatusType.UNSPECIFIED);
+    this.failed_reason = ko.observable(undefined);
+    this.written_time = ko.observable(undefined);
     this.type = '';
     this.user = ko.observable(new User('', '', this.translate));
     this.version = 1;

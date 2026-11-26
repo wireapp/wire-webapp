@@ -127,6 +127,17 @@ export const useMessageSend = ({
   const sendMessageEdit = useCallback(
     (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
       const mentionEntities = mentions.slice(0);
+      const isEdit = !isUndefined(editedMessage) && !isEmptyString(messageText);
+      if (isEdit) {
+        // Sent before editing stops, so that the edit takes over the hold of its message instead of releasing it
+        messageRepository
+          .sendMessageEdit(conversation, messageText, editedMessage, mentionEntities)
+          .catch((error: unknown) => {
+            if (!isErrorWithType(error) || error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+              throw error;
+            }
+          });
+      }
       cancelMessageEditing(() => {
         replyMessageCallback(null);
         draftState.reset();
@@ -136,15 +147,7 @@ export const useMessageSend = ({
         return messageRepository.deleteMessageForEveryone(conversation, editedMessage);
       }
 
-      if (!isUndefined(editedMessage)) {
-        messageRepository
-          .sendMessageEdit(conversation, messageText, editedMessage, mentionEntities)
-          .catch((error: unknown) => {
-            if (!isErrorWithType(error) || error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
-              throw error;
-            }
-          });
-
+      if (isEdit) {
         cancelMessageReply();
       }
     },

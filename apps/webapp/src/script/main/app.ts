@@ -125,7 +125,7 @@ import {PropertiesService} from '../repositories/properties/propertiesService';
 import {SearchRepository} from '../repositories/search/searchRepository';
 import {SelfRepository} from '../repositories/self/SelfRepository';
 import {SelfService} from '../repositories/self/SelfService';
-import {StorageRepository, StorageService} from '../repositories/storage';
+import {StorageKey, StorageRepository, StorageService} from '../repositories/storage';
 import {TeamRepository} from '../repositories/team/TeamRepository';
 import {TeamService} from '../repositories/team/TeamService';
 import {EventTrackingRepository} from '../repositories/tracking/eventTrackingRepository';
@@ -367,6 +367,15 @@ export class App {
       undefined,
       undefined,
       this.outbox,
+      async (conversation, messageId) => {
+        // The input bar saves its draft under this key (`generateConversationInputStorageKey`), which can't be
+        // imported here: it would close an import cycle through the message repository
+        const draft = await repositories.storage.storageService.loadFromSimpleStorage<{editedMessageId?: string}>(
+          `${StorageKey.CONVERSATION.INPUT}|${conversation.id}`,
+        );
+        return draft?.editedMessageId === messageId;
+      },
+      this.fireAndForgetInvoker,
     );
 
     repositories.calling = new CallingRepository(
@@ -439,6 +448,7 @@ export class App {
   /** A failed start leaves the outbox unstarted, so every enqueue is refused; the app carries on */
   private async startOutbox(): Promise<void> {
     const outcome = await this.outbox?.start();
+    this.repository.message.reviewRestoredHolds();
     if (outcome?.type === 'storage-failed' || outcome?.type === 'storage-full') {
       this.logger.error('Outbox failed to start and stays unstarted', {outcome: outcome.type});
     }

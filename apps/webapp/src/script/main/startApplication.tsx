@@ -59,7 +59,9 @@ import {createBrowserLogZipArchive} from '../logger/createBrowserLogZipArchive';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
 import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
+import {MessageHasher} from '../message/messageHasher';
 import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
+import {QUOTE_EVENT_HASHER} from '../repositories/conversation/outbox/QuoteEventHasher';
 import {doSimpleRedirect} from '../repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from '../repositories/storage';
 import {APIClient} from '../service/apiClientSingleton';
@@ -298,6 +300,7 @@ export async function startApplication(options: StartApplicationOptions): Promis
 
   container.registerInstance(APIClient, apiClient);
   container.registerInstance(Core, core);
+  container.registerInstance(QUOTE_EVENT_HASHER, MessageHasher.hashEvent);
   function disposeApplicationResources(): void {
     using disposableApiClient = apiClient;
     cleanupIncrementalHttpRetryBackoffReset();

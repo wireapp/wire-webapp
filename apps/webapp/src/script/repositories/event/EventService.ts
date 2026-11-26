@@ -149,7 +149,7 @@ export class EventService {
       if (!isNullOrUndefined(this.storageService.db)) {
         const eventStore = this.storageService.db.table(StorageSchemata.OBJECT_STORE.EVENTS);
         // First lookup the event by its direct id (using the index)
-        const event = eventStore.where('id').equals(eventId).first();
+        const event = await eventStore.where('id').equals(eventId).first();
         return isTruthy(event)
           ? event
           : // If the event was not found, fallback to filtering all the events and check if a `replacing` message is found

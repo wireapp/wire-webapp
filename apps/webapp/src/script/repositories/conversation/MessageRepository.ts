@@ -17,6 +17,7 @@
  *
  */
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {
   isFunction,
   isNonEmptyArray,
@@ -31,10 +32,11 @@ import {
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {arrayIncludes} from 'ts-extras';
+import {match, P} from 'ts-pattern';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
-import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
+import {Asset, Availability, Confirmation, GenericMessage, Mention} from '@wireapp/protocol-messaging';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
@@ -44,11 +46,35 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
+import {classifySendError, type SendErrorClass} from './outbox/classifySendError';
+import type {FailedReason} from './outbox/FailedReason';
+import {
+  changeCorrelationKeysOf,
+  laneOfChanges,
+  laneOfMessages,
+  laneOfReceipts,
+  messageCorrelationKey,
+  parseMessageChangePayload,
+  parseMessagePayload,
+  parsePingPayload,
+  parseReceiptPayload,
+  receiptCorrelationKey,
+  type AssetMessagePayload,
+  type EditMessagePayload as OutboxEditPayload,
+  type MessageChangePayload,
+  type MessagePayload,
+  type PingPayload,
+  type ReceiptPayload as OutboxReceiptPayload,
+  type StoredMention,
+  type TextMessagePayload as OutboxTextPayload,
+} from './outbox/messageOutboxTypes';
+import {QUOTE_EVENT_HASHER, type QuoteEventHasher} from './outbox/QuoteEventHasher';
 
 import {AssetAuditData} from '../../apiClient/asset/assetApi';
 import {MessageSendingStatus} from '../../apiClient/conversation/messageSendingStatus';
 import {QualifiedUserClients} from '../../apiClient/conversation/qualifiedUserClients';
 import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
+import type {RequestRetryOptions} from '../../apiClient/http/failFastRequestConfig';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {RequestCancellationError} from '../../apiClient/user/userError';
@@ -74,13 +100,14 @@ import {
 import * as MessageBuilder from '../../core/conversation/message/messageBuilder';
 import {OtrMessage} from '../../core/conversation/message/otrMessage';
 import {TextContentBuilder} from '../../core/conversation/message/textContentBuilder';
+import type {EncryptedAssetUploaded} from '../../core/cryptography/assetCryptography/encryptedAsset';
 import {isQualifiedUserClients} from '../../core/util';
 import {ConversationError} from '../../error/conversationError';
 import {showLegalHoldWarningModal} from '../../legalHold/legalHoldWarning';
 import {MentionEntity} from '../../message/mentionEntity';
 import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
-import type {Outbox} from '../../outbox';
+import type {EnqueueOutcome, Kind, KindHandle, OperationView, Outbox, PerformOutcome} from '../../outbox';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {
@@ -97,7 +124,7 @@ import {matchQualifiedIds} from '../../util/qualifiedId';
 import {capitalizeFirstChar} from '../../util/stringUtil';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {isBackendError, isErrorWithCode} from '../../util/typePredicateUtil';
-import {loadUrlBlob, supportsMLS} from '../../util/util';
+import {arrayToBase64, loadUrlBlob, supportsMLS} from '../../util/util';
 import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from '../assets/assetMetaDataBuilder';
@@ -120,7 +147,7 @@ import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {PropertiesRepository} from '../properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/propertiesType';
-import type {EventRecord, ReactionMap} from '../storage';
+import type {AssetRecord, EventRecord, ReactionMap} from '../storage';
 import {TeamState} from '../team/TeamState';
 import {UserType} from '../tracking/attribute';
 import {EventName} from '../tracking/eventName';
@@ -133,6 +160,15 @@ import {UserState} from '../user/userState';
 type OptimisticMessageEvent = Parameters<EventRepository['injectEvent']>[0];
 
 const conversationStatisticsRoundingFactor = 6;
+
+type OutgoingText = {
+  conversation: Conversation;
+  textMessage: string;
+  mentions: MentionEntity[];
+  QuoteEntity?: OutgoingQuote;
+  attachments?: MultiPartContent['attachments'];
+};
+type TextMessageRetry = OutgoingText & {messageId: string};
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
@@ -181,15 +217,59 @@ type EditMultiPartMessagePayload = MultipartMessagePayload & {originalMessageId:
 
 const enum SendAndInjectSendingState {
   FAILED = 'FAILED',
+  /** Taken by the outbox, which sends it when it can */
+  QUEUED = 'QUEUED',
 }
 
 type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingState | SendAndInjectSendingState};
+
+type BackendSendOptions = MessageSendingOptions & {
+  /** For sends the outbox retries itself: one HTTP attempt, no network retries */
+  failFast?: boolean;
+  silentDegradationWarning?: boolean;
+  skipInjection?: boolean;
+  skipSelf?: boolean;
+  syncTimestamp?: boolean;
+  targetMode?: MessageTargetMode;
+};
+
+type CoreSendOptions = Parameters<ConversationService['send']>[0];
 
 /** A message that has already been stored in DB and has a primary key */
 type StoredMessage = Message & {primary_key: string};
 type StoredContentMessage = ContentMessage & {primary_key: string};
 
 type AssetMetadataMessage = {message: GenericMessage; metaData: FileMetaDataContent};
+type RecordedUpload = Pick<AssetRecord, 'otr_key' | 'sha256' | 'domain' | 'token'> & {key: string};
+
+/** What an upload attempt kept on the record of an asset message, when it got that far */
+function readRecordedUpload(record: EventRecord): RecordedUpload | undefined {
+  const data = (record as {data?: Partial<AssetRecord>}).data;
+  if (!isNonEmptyString(data?.key) || isUndefined(data.otr_key) || isUndefined(data.sha256)) {
+    return undefined;
+  }
+  return {domain: data.domain, key: data.key, otr_key: data.otr_key, sha256: data.sha256, token: data.token};
+}
+
+type OutboxHandles = {
+  message: KindHandle<MessagePayload>;
+  messageChange: KindHandle<MessageChangePayload>;
+  ping: KindHandle<PingPayload>;
+  receipt: KindHandle<OutboxReceiptPayload>;
+};
+
+/** The payloads whose operation has an optimistic message of its own */
+type ShownPayload = OutboxTextPayload | AssetMessagePayload | OutboxEditPayload | PingPayload;
+
+type PermissionHold = {
+  reason: 'sending-permission';
+  /** The degraded conversations the user still has to allow */
+  waitingOn: QualifiedId[];
+  whenDeclined: 'mark-declined' | 'drop';
+};
+
+/** Why this session keeps an operation on hold */
+type Hold = PermissionHold | {reason: 'editing'};
 
 export class MessageRepository {
   private readonly logger: Logger;
@@ -197,6 +277,13 @@ export class MessageRepository {
   private readonly event_mapper: EventMapper;
   private isBlockingNotificationHandling: boolean;
   private onClientMismatch?: ClientMismatchHandlerFn;
+  private readonly outboxHandles?: OutboxHandles;
+  /** The optimistic messages being shown, by message id */
+  private readonly showing = new Map<string, Promise<void>>();
+  /** The operations this session holds, by correlation key */
+  private readonly holds = new Map<string, Hold>();
+  /** The ids of the conversations whose sending prompt is open */
+  private readonly openPrompts = new Set<string>();
 
   private get coreServices(): NonNullable<Core['service']> {
     const coreServices = this.core.service;
@@ -223,6 +310,10 @@ export class MessageRepository {
     private readonly teamState = container.resolve(TeamState),
     private readonly core = container.resolve(Core),
     private readonly outbox?: Outbox,
+    /** Reads the conversation's draft, which lives with the input bar; only needed with an outbox */
+    private readonly isBeingEdited?: (conversation: Conversation, messageId: string) => Promise<boolean>,
+    /** Runs the work that follows an outbox operation; only needed with an outbox */
+    private readonly fireAndForgetInvoker?: FireAndForgetInvoker,
   ) {
     this.logger = getLogger('MessageRepository');
 
@@ -232,6 +323,10 @@ export class MessageRepository {
     this.isBlockingNotificationHandling = true;
 
     this.initSubscriptions();
+
+    if (this.outbox !== undefined) {
+      this.outboxHandles = this.registerOutboxKinds(this.outbox);
+    }
   }
 
   private get conversationService(): ConversationService {
@@ -293,6 +388,9 @@ export class MessageRepository {
    * @returns Resolves after sending the knock
    */
   public async sendPing(conversation: Conversation): Promise<SendAndInjectResult> {
+    if (this.outbox !== undefined) {
+      return this.enqueuePing(conversation);
+    }
     const ping = MessageBuilder.buildPingMessage({
       expectsReadConfirmation: this.expectReadReceipt(conversation),
       hotKnock: false,
@@ -519,14 +617,10 @@ export class MessageRepository {
     QuoteEntity,
     messageId,
     attachments,
-  }: {
-    conversation: Conversation;
-    textMessage: string;
-    mentions: MentionEntity[];
-    QuoteEntity?: OutgoingQuote;
-    messageId?: string;
-    attachments?: MultiPartContent['attachments'];
-  }): Promise<void> {
+  }: OutgoingText & {messageId?: string}): Promise<void> {
+    if (this.outbox !== undefined) {
+      return this.enqueueText({conversation, textMessage, mentions, QuoteEntity, attachments});
+    }
     const textPayload = {
       conversation,
       mentions,
@@ -547,6 +641,14 @@ export class MessageRepository {
     if (state !== MessageSendingState.CANCELED) {
       await this.handleLinkPreview(textPayload, conversation.qualifiedId);
     }
+  }
+
+  /** Sends a text message that failed again, under its id and from where it is in the conversation */
+  public async retryTextMessage(retry: TextMessageRetry): Promise<void> {
+    if (this.outbox !== undefined) {
+      return this.enqueueTextAgain(retry);
+    }
+    return this.sendTextWithLinkPreview(retry);
   }
 
   /**
@@ -573,6 +675,10 @@ export class MessageRepository {
         ConversationError.TYPE.NO_MESSAGE_CHANGES,
         ConversationError.MESSAGE.NO_MESSAGE_CHANGES,
       );
+    }
+
+    if (this.outbox !== undefined) {
+      return this.enqueueEdit(conversation, textMessage, originalMessage, mentions);
     }
 
     const originalMessageId = originalMessage.id;
@@ -723,6 +829,10 @@ export class MessageRepository {
     asImage: boolean = false,
     originalId?: string,
   ): Promise<EventRecord | void> {
+    if (this.outbox !== undefined) {
+      return this.enqueueAsset(conversation, file, asImage);
+    }
+
     const uploadStarted = Date.now();
     const beforeUnload = (event: Event): void => {
       event.preventDefault();
@@ -784,6 +894,9 @@ export class MessageRepository {
     asImage: boolean = false,
     originalId: string,
   ): Promise<EventRecord | void> {
+    if (this.outbox !== undefined) {
+      return this.enqueueAssetAgain(conversation, file, asImage, originalId);
+    }
     await this.uploadFile(conversation, file, asImage, originalId);
   }
 
@@ -875,19 +988,11 @@ export class MessageRepository {
     originalId?: string,
   ): Promise<AssetMetadataMessage | null> {
     try {
-      const metadata = await buildMetadata(file);
-      const meta = {
-        audio: isAudio(file) && !isUndefined(metadata) ? metadata : null,
-        video: isVideo(file) && !isUndefined(metadata) ? metadata : null,
-        image: allowImageDetection === true && isImage(file) && !isUndefined(metadata) ? metadata : null,
-        length: file.size,
-        name: (file as File).name,
-        type: file.type,
-      } as FileMetaDataContent;
+      const meta = await this.buildFileMetaData(file, allowImageDetection);
 
-      const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
+      const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta}, originalId);
       this.assetRepository.addToProcessQueue(message, conversation.id);
-      return {message, metaData: meta as FileMetaDataContent};
+      return {message, metaData: meta};
     } catch (error: unknown) {
       this.logger.error('Error while building metadata for asset', {error});
       const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${
@@ -898,13 +1003,25 @@ export class MessageRepository {
     }
   }
 
-  private async sendAssetRemotedata(
+  private async buildFileMetaData(file: Blob, allowImageDetection?: boolean): Promise<FileMetaDataContent> {
+    const metadata = await buildMetadata(file);
+    return {
+      audio: isAudio(file) && !isUndefined(metadata) ? metadata : null,
+      video: isVideo(file) && !isUndefined(metadata) ? metadata : null,
+      image: allowImageDetection === true && isImage(file) && !isUndefined(metadata) ? metadata : null,
+      length: file.size,
+      name: (file as File).name,
+      type: file.type,
+    } as FileMetaDataContent;
+  }
+
+  private async uploadToAssetService(
     conversation: Conversation,
     file: Blob,
     messageId: string,
-    asImage: boolean,
-    meta: FileMetaDataContent,
-  ): Promise<SendAndInjectResult> {
+    meta: Pick<FileMetaDataContent, 'name' | 'type'>,
+    retryOptions?: RequestRetryOptions,
+  ): Promise<EncryptedAssetUploaded & {preview?: Asset.IPreview}> {
     const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
 
     const auditData: AssetAuditData | undefined = isAuditLogEnabled
@@ -928,15 +1045,24 @@ export class MessageRepository {
       ...(isAuditLogEnabled && {auditData}),
     };
 
-    const asset = await this.assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled);
+    return this.assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled, undefined, retryOptions);
+  }
 
+  private async buildUploadedAssetMessage(
+    conversation: Conversation,
+    file: Blob,
+    messageId: string,
+    asImage: boolean,
+    meta: FileMetaDataContent,
+    asset: EncryptedAssetUploaded & {preview?: Asset.IPreview},
+  ): Promise<GenericMessage> {
     const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
     const commonMessageData = {
       asset: asset,
       expectsReadConfirmation: this.expectReadReceipt(conversation),
     };
 
-    const assetMessage = !isUndefined(metadata)
+    return !isUndefined(metadata)
       ? MessageBuilder.buildImageMessage(
           {
             ...commonMessageData,
@@ -953,6 +1079,17 @@ export class MessageRepository {
           },
           messageId,
         );
+  }
+
+  private async sendAssetRemotedata(
+    conversation: Conversation,
+    file: Blob,
+    messageId: string,
+    asImage: boolean,
+    meta: FileMetaDataContent,
+  ): Promise<SendAndInjectResult> {
+    const asset = await this.uploadToAssetService(conversation, file, messageId, meta);
+    const assetMessage = await this.buildUploadedAssetMessage(conversation, file, messageId, asImage, meta, asset);
 
     return this.sendAndInjectMessage(assetMessage, conversation, {enableEphemeral: true});
   }
@@ -1086,44 +1223,122 @@ export class MessageRepository {
       syncTimestamp: true,
     },
   ): Promise<SendAndInjectResult> {
-    const messageTimer = conversation.messageTimer();
-    const payload =
-      enableEphemeral && isNumber(messageTimer) && messageTimer !== 0
-        ? MessageBuilder.wrapInEphemeral(message, messageTimer)
-        : message;
+    const payload = enableEphemeral ? this.wrapInEphemeralWhenTimed(message, conversation) : message;
 
-    const injectOptimisticEvent = async (): Promise<boolean> => {
-      if (skipInjection !== true) {
-        const clientId = this.clientState.currentClient?.id;
-
-        if (!isNonEmptyString(clientId)) {
-          this.logger.error('No current client id found, cannot send message optimistically');
-          return true;
-        }
-
-        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const selfUser = this.userState.self();
-        if (isUndefined(selfUser)) {
-          throw new Error('No self user found, cannot send message optimistically');
-        }
-        const optimisticEvent = EventBuilder.buildMessageAdd({
-          conversationEntity: conversation,
-          currentTimestamp,
-          senderId: selfUser.id,
-          clientId,
-        });
-        this.trackContributed(conversation, payload);
-        const mappedEvent = (await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
-          payload,
-          optimisticEvent,
-        )) as OptimisticMessageEvent;
-        await this.eventRepository.injectEvent(mappedEvent);
-      }
-      return silentDegradationWarning === true
-        ? true
-        : this.requestUserSendingPermission(conversation, false, consentType);
+    const backendOptions: BackendSendOptions = {
+      syncTimestamp,
+      nativePush,
+      targetMode,
+      recipients,
+      skipSelf,
+      skipInjection,
+      silentDegradationWarning,
     };
+    const sendOptions = await this.prepareSend(payload, conversation, backendOptions);
 
+    // Without a client id nothing is injected, and the prompt is skipped as well
+    const injected = skipInjection === true ? true : await this.injectOptimisticMessage(payload, conversation);
+    const shouldProceedSending =
+      !injected || silentDegradationWarning === true
+        ? true
+        : await this.requestUserSendingPermission(conversation, false, consentType);
+    if (!shouldProceedSending) {
+      this.logger.info('User has canceled sending a message to a degraded conversation.');
+      return {id: payload.messageId, sentAt: new Date().toISOString(), state: MessageSendingState.CANCELED};
+    }
+
+    try {
+      return await this.sendMessageToBackend(payload, conversation, backendOptions, sendOptions);
+    } catch (error: unknown) {
+      await this.updateMessageAsFailed(conversation, payload.messageId, error);
+      return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
+    }
+  }
+
+  /** Wraps the message for the self-deleting timer the conversation has right now, if any */
+  private wrapInEphemeralWhenTimed(message: GenericMessage, conversation: Conversation): GenericMessage {
+    const messageTimer = conversation.messageTimer();
+    return isNumber(messageTimer) && messageTimer !== 0
+      ? MessageBuilder.wrapInEphemeral(message, messageTimer)
+      : message;
+  }
+
+  /**
+   * Injects the optimistic `message-add` event (status `SENDING`) for a message that is about to be sent.
+   * Injecting the same message id twice throws in the event storage, so this must run once per message.
+   * Resolves to `false` when nothing was injected because there is no current client id.
+   */
+  private async injectOptimisticMessage(payload: GenericMessage, conversation: Conversation): Promise<boolean> {
+    const clientId = this.clientState.currentClient?.id;
+
+    if (!isNonEmptyString(clientId)) {
+      this.logger.error('No current client id found, cannot send message optimistically');
+      return false;
+    }
+
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const selfUser = this.userState.self();
+    if (isUndefined(selfUser)) {
+      throw new Error('No self user found, cannot send message optimistically');
+    }
+    const optimisticEvent = EventBuilder.buildMessageAdd({
+      conversationEntity: conversation,
+      currentTimestamp,
+      senderId: selfUser.id,
+      clientId,
+    });
+    this.trackContributed(conversation, payload);
+    const mappedEvent = (await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
+      payload,
+      optimisticEvent,
+    )) as OptimisticMessageEvent;
+    await this.eventRepository.injectEvent(mappedEvent);
+    return true;
+  }
+
+  /** Configures the conversation timer and resolves the core send options, including the recipients. */
+  private async prepareSend(
+    payload: GenericMessage,
+    conversation: Conversation,
+    {nativePush = true, targetMode, recipients, skipSelf, silentDegradationWarning, failFast}: BackendSendOptions = {},
+  ): Promise<CoreSendOptions> {
+    // Configure ephemeral messages
+    this.conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
+
+    return isMLSConversation(conversation)
+      ? {
+          groupId: conversation.groupId,
+          payload,
+          protocol: CONVERSATION_PROTOCOL.MLS,
+          conversationId: conversation.qualifiedId,
+          failFast,
+        }
+      : {
+          conversationId: conversation.qualifiedId,
+          failFast,
+          nativePush,
+          onClientMismatch: mismatch => {
+            return this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning);
+          },
+          payload,
+          protocol: CONVERSATION_PROTOCOL.PROTEUS,
+          targetMode,
+          userIds: await this.generateRecipients(conversation, recipients, skipSelf),
+        };
+  }
+
+  /**
+   * Sends the message through the core and, when the backend accepted it, marks the message as sent.
+   * Throws whatever the send throws; it neither injects the message nor asks the degradation prompt, nor marks it as failed.
+   * Pass `preparedSendOptions` (from `prepareSend`) when they were resolved earlier; otherwise they are resolved here.
+   */
+  private async sendMessageToBackend(
+    payload: GenericMessage,
+    conversation: Conversation,
+    options: BackendSendOptions = {},
+    preparedSendOptions?: CoreSendOptions,
+  ): Promise<SendResult> {
+    const {syncTimestamp = true, skipInjection, silentDegradationWarning} = options;
     const handleSuccess = async ({sentAt, failedToSend}: SendResult): Promise<void> => {
       const injectDelta = 10; // we want to make sure the message is injected slightly before it was received by the backend
       const sentTimestamp = new Date(sentAt).getTime() - injectDelta;
@@ -1140,53 +1355,21 @@ export class MessageRepository {
       }
     };
 
-    const conversationService = this.conversationService;
-    // Configure ephemeral messages
-    conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
+    const sendOptions = preparedSendOptions ?? (await this.prepareSend(payload, conversation, options));
 
-    const sendOptions: Parameters<typeof conversationService.send>[0] = isMLSConversation(conversation)
-      ? {
-          groupId: conversation.groupId,
-          payload,
-          protocol: CONVERSATION_PROTOCOL.MLS,
-          conversationId: conversation.qualifiedId,
-        }
-      : {
-          conversationId: conversation.qualifiedId,
-          nativePush,
-          onClientMismatch: mismatch => {
-            return this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning);
-          },
-          payload,
-          protocol: CONVERSATION_PROTOCOL.PROTEUS,
-          targetMode,
-          userIds: await this.generateRecipients(conversation, recipients, skipSelf),
-        };
-
-    const shouldProceedSending = await injectOptimisticEvent();
-    if (!shouldProceedSending) {
-      this.logger.info('User has canceled sending a message to a degraded conversation.');
-      return {id: payload.messageId, sentAt: new Date().toISOString(), state: MessageSendingState.CANCELED};
+    if (isMLSConversation(conversation)) {
+      this.logger.info('Sending message to a MLS conversation, ensuring conversation exists');
+      await this.conversationRepositoryProvider().ensureConversationExists({
+        conversationId: conversation.qualifiedId,
+        groupId: conversation.groupId,
+      });
     }
+    const result = await this.conversationService.send(sendOptions);
 
-    try {
-      if (isMLSConversation(conversation)) {
-        this.logger.info('Sending message to a MLS conversation, ensuring conversation exists');
-        await this.conversationRepositoryProvider().ensureConversationExists({
-          conversationId: conversation.qualifiedId,
-          groupId: conversation.groupId,
-        });
-      }
-      const result = await this.conversationService.send(sendOptions);
-
-      if (result.state === MessageSendingState.OUTGOING_SENT) {
-        await handleSuccess(result);
-      }
-      return result;
-    } catch (error: unknown) {
-      await this.updateMessageAsFailed(conversation, payload.messageId, error);
-      return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
+    if (result.state === MessageSendingState.OUTGOING_SENT) {
+      await handleSuccess(result);
     }
+    return result;
   }
 
   public updateUserReactions(reactions: ReactionMap, userId: QualifiedId, reaction: ReactionType): string {
@@ -1298,25 +1481,13 @@ export class MessageRepository {
     type: Confirmation.Type,
     moreMessageEntities: Message[] = [],
   ): Promise<void> {
-    if (type === Confirmation.Type.READ && !supportsReadReceipts(conversationEntity)) {
+    if (this.outbox !== undefined) {
+      return this.enqueueConfirmation(conversationEntity, messageEntity, type, moreMessageEntities);
+    }
+    if (!this.shouldConfirm(conversationEntity, messageEntity, type)) {
       return;
     }
 
-    const typeToConfirm = arrayIncludes(EventTypeHandling.CONFIRM, messageEntity.type);
-
-    if (messageEntity.user().isMe || !typeToConfirm) {
-      return;
-    }
-
-    if (type === Confirmation.Type.DELIVERED) {
-      const otherUserIn1To1 = conversationEntity.is1to1();
-      const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
-      const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
-
-      if (!otherUserIn1To1 || !withinThreshold) {
-        return;
-      }
-    }
     const moreMessageIds = isNonEmptyArray(moreMessageEntities)
       ? moreMessageEntities.map(entity => {
           return entity.id;
@@ -1344,6 +1515,20 @@ export class MessageRepository {
     }
   }
 
+  private shouldConfirm(conversation: Conversation, message: Message, type: Confirmation.Type): boolean {
+    if (type === Confirmation.Type.READ && !supportsReadReceipts(conversation)) {
+      return false;
+    }
+    if (message.user().isMe || !arrayIncludes(EventTypeHandling.CONFIRM, message.type)) {
+      return false;
+    }
+    if (type !== Confirmation.Type.DELIVERED) {
+      return true;
+    }
+    const withinThreshold = message.timestamp() >= Date.now() - ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
+    return conversation.is1to1() && withinThreshold;
+  }
+
   /**
    * Send reaction to a content message in specified conversation.
    * @param conversation Conversation to send reaction in
@@ -1357,6 +1542,9 @@ export class MessageRepository {
     messageEntity: Message,
     reactions: ReactionType,
   ): Promise<SendAndInjectResult> {
+    if (this.outbox !== undefined) {
+      return this.enqueueReaction(conversation, messageEntity, reactions);
+    }
     const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: reactions});
 
     return this.sendAndInjectMessage(reaction, conversation);
@@ -1411,6 +1599,9 @@ export class MessageRepository {
       optimisticRemoval?: boolean;
     } = {},
   ): Promise<void> {
+    if (this.outbox !== undefined) {
+      return this.enqueueDelete(conversation, message, options.targetedUsers);
+    }
     const conversationId = conversation.id;
     const messageId = message.id;
 
@@ -1466,6 +1657,13 @@ export class MessageRepository {
    * @returns Resolves when message was deleted
    */
   public async deleteMessage(conversation: Conversation, message: Message): Promise<void> {
+    if (this.outbox !== undefined) {
+      return this.removeThroughOutbox(conversation, message, {
+        type: 'hide',
+        conversationId: conversation.qualifiedId,
+        targetMessageId: message.id,
+      });
+    }
     try {
       const payload = MessageBuilder.buildHideMessage({
         conversationId: conversation.id,
@@ -1500,16 +1698,23 @@ export class MessageRepository {
    * Update cleared of conversation using timestamp.
    */
   public async updateClearedTimestamp(conversation: Conversation): Promise<void> {
-    const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
-    if (!isNumber(timestamp) || timestamp === 0) {
-      return;
+    if (this.outbox !== undefined) {
+      return this.enqueueCleared(conversation);
     }
-    const clearedTimestampMilliseconds = conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
-
-    if (isNumber(clearedTimestampMilliseconds) && clearedTimestampMilliseconds !== 0) {
+    if (this.setClearedTimestamp(conversation) !== undefined) {
       const payload = MessageBuilder.buildClearedMessage(conversation.qualifiedId);
       await this.sendToSelfConversations(payload);
     }
+  }
+
+  /** Clears the conversation up to its last known message; `undefined` when the cleared timestamp didn't move */
+  private setClearedTimestamp(conversation: Conversation): number | undefined {
+    const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
+    if (!isNumber(timestamp) || timestamp === 0) {
+      return undefined;
+    }
+    const cleared = conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
+    return isNumber(cleared) && cleared !== 0 ? cleared : undefined;
   }
 
   /**
@@ -1638,7 +1843,7 @@ export class MessageRepository {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = isNonEmptyArray(messageEntity.readReceipts()) ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
-      const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend' | 'fileData'> = {
+      const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend' | 'fileData' | 'written_time'> = {
         status: updatedStatus,
         failedToSend,
         fileData: undefined,
@@ -1646,6 +1851,10 @@ export class MessageRepository {
       if (isNonEmptyString(isoDate)) {
         const timestamp = new Date(isoDate).getTime();
         if (!isNaN(timestamp)) {
+          const writtenTime = this.keepWrittenTime(messageEntity);
+          if (writtenTime !== undefined) {
+            changes.written_time = writtenTime;
+          }
           changes.time = isoDate;
           messageEntity.timestamp(timestamp);
           conversationEntity.updateTimestampServer(timestamp, true);
@@ -1662,6 +1871,24 @@ export class MessageRepository {
       }
     }
     return undefined;
+  }
+
+  /** The time the message was written at survives the send, which replaces its time with the server's */
+  private keepWrittenTime(messageEntity: Message): string | undefined {
+    if (this.outbox === undefined) {
+      return undefined;
+    }
+    const writtenTime = messageEntity.written_time();
+    if (writtenTime !== undefined) {
+      return writtenTime;
+    }
+    const writtenTimestamp = messageEntity.timestamp();
+    if (!Number.isFinite(writtenTimestamp)) {
+      return undefined;
+    }
+    const fromTimestamp = new Date(writtenTimestamp).toISOString();
+    messageEntity.written_time(fromTimestamp);
+    return fromTimestamp;
   }
 
   private async updateMessageAsFailed(
@@ -1683,6 +1910,1477 @@ export class MessageRepository {
       }
     }
     return undefined;
+  }
+
+  // The outbox
+
+  /** Throws when a kind can't be registered, which is a wiring bug */
+  private registerOutboxKinds(outbox: Outbox): OutboxHandles {
+    return {
+      // A message that can't go out stays as failed, with Retry, and the changes behind it in its lane fail with it.
+      message: this.registerKind(outbox, {
+        name: 'message',
+        parsePayload: parseMessagePayload,
+        expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
+        performTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
+        // Only an expiry or a rejection ends a message, never the number of attempts.
+        maxAttempts: 1_000,
+        whenGivenUp: 'dead-letter',
+        laneWhenGivenUp: 'follows',
+        perform: this.performMessageOperation,
+        onChanged: this.onMessageOperationChanged,
+      }),
+      // A ping that is late is pointless, so it is forgotten and leaves the screen.
+      ping: this.registerKind(outbox, {
+        name: 'ping',
+        parsePayload: parsePingPayload,
+        expiresAfterMilliseconds: TIME_IN_MILLIS.MINUTE,
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
+        performTimeoutMilliseconds: 10 * TIME_IN_MILLIS.SECOND,
+        maxAttempts: 3,
+        whenGivenUp: 'drop',
+        laneWhenGivenUp: 'continues',
+        perform: this.performPingOperation,
+        onChanged: this.onPingOperationChanged,
+      }),
+      // Nothing of a receipt is shown, and a receipt that can't go out is forgotten.
+      receipt: this.registerKind(outbox, {
+        name: 'receipt',
+        parsePayload: parseReceiptPayload,
+        expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
+        performTimeoutMilliseconds: TIME_IN_MILLIS.MINUTE,
+        maxAttempts: 100,
+        whenGivenUp: 'drop',
+        laneWhenGivenUp: 'continues',
+        perform: this.performReceiptOperation,
+      }),
+      // A change to a message that was sent is forgotten when it can't go out, and the local change stays.
+      messageChange: this.registerKind(outbox, {
+        name: 'message-change',
+        parsePayload: parseMessageChangePayload,
+        expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
+        performTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
+        maxAttempts: 1_000,
+        whenGivenUp: 'drop',
+        laneWhenGivenUp: 'continues',
+        perform: this.performChangeOperation,
+        onChanged: this.onChangeOperationChanged,
+      }),
+    };
+  }
+
+  private registerKind<Payload>(outbox: Outbox, kind: Kind<Payload>): KindHandle<Payload> {
+    const registered = outbox.register(kind);
+    if (registered.type !== 'kind-registered') {
+      throw new Error(`Can't register the '${kind.name}' outbox kind: ${registered.type}`);
+    }
+    return registered.handle;
+  }
+
+  private get outboxKinds(): OutboxHandles {
+    if (this.outboxHandles === undefined) {
+      throw new Error('The outbox is not enabled');
+    }
+    return this.outboxHandles;
+  }
+
+  private get activeOutbox(): Outbox {
+    if (this.outbox === undefined) {
+      throw new Error('The outbox is not enabled');
+    }
+    return this.outbox;
+  }
+
+  private get activeFireAndForgetInvoker(): FireAndForgetInvoker {
+    if (this.fireAndForgetInvoker === undefined) {
+      throw new Error('The outbox is not enabled');
+    }
+    return this.fireAndForgetInvoker;
+  }
+
+  // The message kind: text
+
+  private async enqueueText({
+    conversation,
+    textMessage,
+    mentions,
+    QuoteEntity,
+    attachments,
+  }: OutgoingText): Promise<void> {
+    const payload: OutboxTextPayload = {
+      type: 'text',
+      conversationId: conversation.qualifiedId,
+      messageId: createUuid(),
+      text: textMessage,
+      mentions: this.toStoredMentions(mentions),
+      quote: QuoteEntity === undefined ? undefined : {messageId: QuoteEntity.messageId, userId: QuoteEntity.userId},
+      attachments: isNonEmptyArray(attachments) ? attachments : undefined,
+    };
+    const outcome = await this.outboxKinds.message.enqueue({
+      payload,
+      correlationKey: messageCorrelationKey(payload),
+      orderingKey: laneOfMessages(payload.conversationId),
+    });
+    if (!this.isAccepted(outcome)) {
+      await this.showAsRefused(conversation, payload);
+    }
+  }
+
+  /** A message the outbox refused is shown as failed, so that it can be sent again. It is never sent around the outbox. */
+  private async showAsRefused(conversation: Conversation, payload: ShownPayload): Promise<void> {
+    await this.ensureShown(conversation, payload);
+    await this.markMessage(conversation, payload.messageId, StatusType.FAILED, 'rejected');
+  }
+
+  private async enqueueTextAgain({
+    conversation,
+    textMessage,
+    mentions,
+    messageId,
+    QuoteEntity,
+    attachments,
+  }: TextMessageRetry): Promise<void> {
+    // Otherwise the decline of the earlier attempt would dead-letter this one as well.
+    await this.markMessage(conversation, messageId, StatusType.SENDING);
+
+    const payload = match(this.outboxKinds.message.find(messageId))
+      .with({type: 'operation-found', operation: {state: 'dead-lettered', payload: {type: 'text'}}}, ({operation}) => {
+        return this.isUnconfirmed(operation)
+          ? {...operation.payload, mayBeDelivered: true as const}
+          : operation.payload;
+      })
+      .otherwise((): OutboxTextPayload => {
+        return {
+          type: 'text',
+          conversationId: conversation.qualifiedId,
+          messageId,
+          text: textMessage,
+          mentions: this.toStoredMentions(mentions),
+          quote: QuoteEntity === undefined ? undefined : {messageId: QuoteEntity.messageId, userId: QuoteEntity.userId},
+          attachments: isNonEmptyArray(attachments) ? attachments : undefined,
+        };
+      });
+    const outcome = await this.outboxKinds.message.enqueue({
+      payload,
+      correlationKey: messageCorrelationKey(payload),
+      orderingKey: laneOfMessages(payload.conversationId),
+    });
+    if (!this.isAccepted(outcome)) {
+      await this.markMessage(conversation, messageId, StatusType.FAILED, 'rejected');
+    }
+  }
+
+  private readonly performMessageOperation = async (
+    {payload}: OperationView<MessagePayload>,
+    signal: AbortSignal,
+  ): Promise<PerformOutcome> => {
+    switch (payload.type) {
+      case 'text':
+        return this.performText(payload);
+      case 'asset':
+        return this.performAsset(payload, signal);
+      case 'reaction':
+      case 'edit':
+      case 'delete':
+        return this.performChangeOperation({payload});
+    }
+  };
+
+  private async performText(payload: OutboxTextPayload): Promise<PerformOutcome> {
+    const conversation = this.conversationState.findConversation(payload.conversationId);
+    if (conversation === undefined) {
+      return this.dropForUnknownConversation();
+    }
+    await this.ensureShown(conversation, payload);
+    const record = await this.eventService.loadEvent(conversation.id, payload.messageId);
+    if (record?.failed_reason === 'declined') {
+      return {type: 'operation-dead-lettered'};
+    }
+    if (this.isDegraded(conversation)) {
+      return this.holdForPermission(payload.messageId, [conversation], 'mark-declined');
+    }
+
+    const message = await this.buildOutboxText(conversation, payload);
+    await this.matchLocalTimerToSent(conversation, message);
+    const outcome = await this.sendShownMessage(conversation, payload.messageId, message);
+    if (outcome.type === 'attempt-succeeded') {
+      this.activeFireAndForgetInvoker.fireAndForget(() => {
+        return this.sendLinkPreviewOf(conversation, payload);
+      });
+    }
+    return outcome;
+  }
+
+  /** Sends a message the user sees, and shows on it why it failed */
+  private async sendShownMessage(
+    conversation: Conversation,
+    messageId: string,
+    message: GenericMessage,
+  ): Promise<PerformOutcome> {
+    try {
+      const result = await this.sendMessageToBackend(message, conversation, {failFast: true, syncTimestamp: true});
+      if (result.state === MessageSendingState.OUTGOING_SENT) {
+        return {type: 'attempt-succeeded'};
+      }
+    } catch (error: unknown) {
+      return this.failShownMessage(conversation, messageId, classifySendError(error));
+    }
+    // The client mismatch handler declined to send to the unverified devices.
+    await this.markMessage(conversation, messageId, StatusType.FAILED, 'declined');
+    return {type: 'operation-dead-lettered'};
+  }
+
+  private async failShownMessage(
+    conversation: Conversation,
+    messageId: string,
+    error: SendErrorClass,
+  ): Promise<PerformOutcome> {
+    switch (error.type) {
+      case 'retry':
+        return {type: 'attempt-failed'};
+      case 'gone':
+        // A conversation that was deleted is gone locally before the outbox sends, so this one is still known. The
+        // backend answers 404 to a user who was removed from it, and the message stays as failed, with Retry.
+        this.logger.info('A message was sent to a conversation the backend does not show', {outcome: error.type});
+        await this.markMessage(conversation, messageId, StatusType.FAILED, 'removed');
+        return {type: 'operation-dead-lettered'};
+      case 'cancelled':
+        this.logger.info('Dropping a message that can no longer be sent', {outcome: error.type});
+        return {type: 'operation-dropped'};
+      case 'rejected':
+        this.logger.info('A message was rejected', {outcome: error.reason});
+        await this.markMessage(
+          conversation,
+          messageId,
+          error.federation ? StatusType.FEDERATION_ERROR : StatusType.FAILED,
+          error.reason,
+        );
+        return {type: 'operation-dead-lettered'};
+    }
+  }
+
+  /** The same as `sendTextWithLinkPreview` does after a send: a message with the preview replaces the sent one */
+  private async sendLinkPreviewOf(
+    conversation: Conversation,
+    {messageId, text, mentions, quote}: Pick<OutboxTextPayload, 'messageId' | 'text' | 'mentions' | 'quote'>,
+  ): Promise<void> {
+    await this.handleLinkPreview(
+      {
+        conversation,
+        message: text,
+        messageId,
+        mentions: this.toMentionEntities(mentions),
+        quote: await this.resolveOutgoingQuote(conversation, quote),
+      },
+      conversation.qualifiedId,
+    );
+  }
+
+  private readonly onMessageOperationChanged = ({payload, state, queuedAt}: OperationView<MessagePayload>): void => {
+    const conversation = this.conversationState.findConversation(payload.conversationId);
+    if (conversation === undefined || payload.type === 'reaction' || payload.type === 'delete') {
+      return;
+    }
+    if (payload.type === 'edit') {
+      this.onChangeOperationChanged({payload, state});
+      return;
+    }
+    this.activeFireAndForgetInvoker.fireAndForget(async () => {
+      switch (state) {
+        case 'queued':
+        case 'on-hold':
+        case 'in-progress':
+          await this.ensureShown(conversation, payload);
+          return this.showAsSending(conversation, payload.messageId);
+        case 'dead-lettered':
+          return this.showAsFailedUnlessItIs(conversation, payload.messageId, queuedAt);
+        case 'dropped':
+          await this.deleteMessageById(conversation, payload.messageId);
+
+        case 'succeeded':
+      }
+    });
+  };
+
+  /** Shows a message that failed as sending again, once it was retried */
+  private async showAsSending(conversation: Conversation, messageId: string): Promise<void> {
+    const record = await this.eventService.loadEvent(conversation.id, messageId);
+    // A decline stays until its owner takes it back, because the next attempt acts on it.
+    if (record !== undefined && this.isFailedRecord(record) && record.failed_reason !== 'declined') {
+      await this.markMessage(conversation, messageId, StatusType.SENDING);
+    }
+  }
+
+  /**
+   * A message that was given up without a reason of its own either expired, or waited behind a message that failed
+   * and went with it. Its age tells them apart, and only the first one says that it expired.
+   */
+  private async showAsFailedUnlessItIs(conversation: Conversation, messageId: string, queuedAt: number): Promise<void> {
+    const record = await this.eventService.loadEvent(conversation.id, messageId);
+    if (record === undefined || this.isFailedRecord(record)) {
+      return;
+    }
+    const hasExpired = this.serverTimeHandler.toServerTimestamp() - queuedAt >= TIME_IN_MILLIS.WEEK;
+    await this.markMessage(conversation, messageId, StatusType.FAILED, hasExpired ? 'expired' : 'generic');
+  }
+
+  private isFailedRecord(record: EventRecord): boolean {
+    return record.status === StatusType.FAILED || record.status === StatusType.FEDERATION_ERROR;
+  }
+
+  /**
+   * Shows the optimistic message of an operation unless it is shown already, also after a reload. A call while the
+   * message is being shown waits for that showing, so a message is never shown twice. It never rejects.
+   */
+  private ensureShown(conversation: Conversation, payload: ShownPayload): Promise<void> {
+    return (
+      this.showing.get(payload.messageId) ??
+      this.trackShowing(payload.messageId, this.showIfMissing(conversation, payload))
+    );
+  }
+
+  private trackShowing(messageId: string, showing: Promise<void>): Promise<void> {
+    const tracked = showing
+      .catch((error: unknown) => {
+        this.logger.warn('Failed to show a message of the outbox', {
+          errorName: error instanceof Error ? error.name : typeof error,
+        });
+      })
+      .finally(() => {
+        this.showing.delete(messageId);
+      });
+    this.showing.set(messageId, tracked);
+    return tracked;
+  }
+
+  private async showIfMissing(conversation: Conversation, payload: ShownPayload): Promise<void> {
+    if ((await this.eventService.loadEvent(conversation.id, payload.messageId)) !== undefined) {
+      return;
+    }
+    const message = await this.buildShownMessage(conversation, payload);
+    if (message !== undefined) {
+      await this.injectOptimisticMessage(message, conversation);
+    }
+  }
+
+  private async buildShownMessage(
+    conversation: Conversation,
+    payload: ShownPayload,
+  ): Promise<GenericMessage | undefined> {
+    if (!('type' in payload)) {
+      return this.buildOutboxPing(conversation, payload.messageId);
+    }
+    switch (payload.type) {
+      case 'text':
+        return this.buildOutboxText(conversation, payload);
+      case 'edit':
+        return this.buildOutboxEdit(conversation, payload);
+      case 'asset':
+        // The bytes of an asset are not in its payload, so only the queue side can show it.
+        return undefined;
+    }
+  }
+
+  // The message kind: assets
+
+  /**
+   * The operation holds ids only, so the queue side keeps the bytes on the record, where every attempt reads them.
+   * The asset is shown right after the enqueue. A crash in between leaves an operation without bytes, which its
+   * first attempt drops.
+   */
+  private async enqueueAsset(conversation: Conversation, file: Blob, asImage: boolean): Promise<void> {
+    let metaData: FileMetaDataContent;
+    try {
+      metaData = await this.buildFileMetaData(file, asImage);
+    } catch (error: unknown) {
+      this.logger.error('Error while building metadata for asset', {error});
+      return;
+    }
+    const message = MessageBuilder.buildFileMetaDataMessage({metaData});
+    const payload: AssetMessagePayload = {
+      type: 'asset',
+      conversationId: conversation.qualifiedId,
+      messageId: message.messageId,
+      asImage,
+    };
+    const enqueued = this.enqueueAssetOperation(payload);
+    // Tracked before the enqueue settles, so that the first attempt waits until the asset is shown with its bytes.
+    await this.trackShowing(payload.messageId, this.showNewAsset(conversation, message, file, enqueued));
+  }
+
+  private enqueueAssetOperation(payload: AssetMessagePayload): Promise<EnqueueOutcome<MessagePayload>> {
+    return this.outboxKinds.message.enqueue({
+      payload,
+      correlationKey: messageCorrelationKey(payload),
+      orderingKey: laneOfMessages(payload.conversationId),
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
+      performTimeoutMilliseconds: 10 * TIME_IN_MILLIS.MINUTE,
+    });
+  }
+
+  private async showNewAsset(
+    conversation: Conversation,
+    message: GenericMessage,
+    file: Blob,
+    enqueued: Promise<EnqueueOutcome<MessagePayload>>,
+  ): Promise<void> {
+    const isAccepted = this.isAccepted(await enqueued);
+    await this.injectOptimisticMessage(message, conversation);
+    const isKept = await this.keepFileOnMessage(conversation, message.messageId, file);
+    if (!isAccepted || !isKept) {
+      await this.markMessage(conversation, message.messageId, StatusType.FAILED, 'rejected');
+    }
+  }
+
+  private async enqueueAssetAgain(
+    conversation: Conversation,
+    file: Blob,
+    asImage: boolean,
+    messageId: string,
+  ): Promise<void> {
+    // Otherwise the decline of the earlier attempt would dead-letter this one as well.
+    await this.markMessage(conversation, messageId, StatusType.SENDING);
+
+    const record = await this.eventService.loadEvent(conversation.id, messageId);
+    if (record?.fileData === undefined && !(await this.keepFileOnMessage(conversation, messageId, file))) {
+      await this.markMessage(conversation, messageId, StatusType.FAILED, 'rejected');
+      return;
+    }
+    const payload = match(this.outboxKinds.message.find(messageId))
+      .with({type: 'operation-found', operation: {state: 'dead-lettered', payload: {type: 'asset'}}}, ({operation}) => {
+        return this.isUnconfirmed(operation)
+          ? {...operation.payload, mayBeDelivered: true as const}
+          : operation.payload;
+      })
+      .otherwise((): AssetMessagePayload => {
+        return {type: 'asset', conversationId: conversation.qualifiedId, messageId, asImage};
+      });
+    if (!this.isAccepted(await this.enqueueAssetOperation(payload))) {
+      await this.markMessage(conversation, messageId, StatusType.FAILED, 'rejected');
+    }
+  }
+
+  /** `false` when the record could not take the bytes, e.g. the storage quota is exceeded; the shown message keeps them */
+  private async keepFileOnMessage(conversation: Conversation, messageId: string, file: Blob): Promise<boolean> {
+    try {
+      await this.storeFileInDb(conversation, messageId, file);
+      return true;
+    } catch (error: unknown) {
+      this.logger.warn('Could not keep the bytes of an asset on its message', {error});
+      return false;
+    }
+  }
+
+  private async performAsset(payload: AssetMessagePayload, signal: AbortSignal): Promise<PerformOutcome> {
+    const conversation = this.conversationState.findConversation(payload.conversationId);
+    if (conversation === undefined) {
+      return this.dropForUnknownConversation();
+    }
+    await this.ensureShown(conversation, payload);
+    const record = await this.eventService.loadEvent(conversation.id, payload.messageId);
+    if (record === undefined) {
+      // The bytes were on the record, so there is nothing to upload and nothing to show as failed.
+      this.logger.info('Dropping an asset without a record', {outcome: 'record-missing'});
+      return {type: 'operation-dropped'};
+    }
+    if (record.failed_reason === 'declined') {
+      return {type: 'operation-dead-lettered'};
+    }
+    if (this.isDegraded(conversation)) {
+      return this.holdForPermission(payload.messageId, [conversation], 'mark-declined');
+    }
+    if (readRecordedUpload(record) !== undefined) {
+      return this.sendUploadedAsset(conversation, payload);
+    }
+    if (record.fileData === undefined) {
+      return this.failShownMessage(conversation, payload.messageId, {
+        type: 'rejected',
+        reason: 'rejected',
+        federation: false,
+      });
+    }
+
+    try {
+      await this.uploadOutboxAsset(conversation, payload, record.fileData, signal);
+    } catch (error: unknown) {
+      // The timeout or the outbox aborted the attempt, which is not an upload the user cancelled.
+      if (signal.aborted) {
+        return {type: 'attempt-failed'};
+      }
+      return this.failShownMessage(conversation, payload.messageId, classifySendError(error));
+    }
+    return this.sendUploadedAsset(conversation, payload);
+  }
+
+  private async sendUploadedAsset(conversation: Conversation, payload: AssetMessagePayload): Promise<PerformOutcome> {
+    const message = await this.buildOutboxAsset(conversation, payload);
+    if (message === undefined) {
+      return this.failShownMessage(conversation, payload.messageId, {
+        type: 'rejected',
+        reason: 'rejected',
+        federation: false,
+      });
+    }
+    await this.matchLocalTimerToSent(conversation, message);
+    // The first injection of an asset message turns the shown placeholder into the uploaded asset.
+    await this.injectOptimisticMessage(message, conversation);
+    return this.sendShownMessage(conversation, payload.messageId, message);
+  }
+
+  // The ping kind
+
+  private async enqueuePing(conversation: Conversation): Promise<SendAndInjectResult> {
+    const payload: PingPayload = {conversationId: conversation.qualifiedId, messageId: createUuid()};
+    const enqueued = this.outboxKinds.ping.enqueue({
+      payload,
+      correlationKey: payload.messageId,
+      orderingKey: laneOfMessages(payload.conversationId),
+    });
+    void this.audioRepository.play(AudioType.OUTGOING_PING);
+    if (this.isAccepted(await enqueued)) {
+      return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.QUEUED};
+    }
+    await this.showAsRefused(conversation, payload);
+    return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
+  }
+
+  private readonly performPingOperation = async ({payload}: OperationView<PingPayload>): Promise<PerformOutcome> => {
+    const conversation = this.conversationState.findConversation(payload.conversationId);
+    if (conversation === undefined) {
+      return this.dropForUnknownConversation();
+    }
+    await this.ensureShown(conversation, payload);
+    if (this.isDegraded(conversation)) {
+      // A declined ping is dropped like any ping that can't go out, and leaves the screen with it.
+      return this.holdForPermission(payload.messageId, [conversation], 'drop');
+    }
+    const ping = this.buildOutboxPing(conversation, payload.messageId);
+    return this.sendSilently(ping, conversation, {failFast: true, syncTimestamp: true});
+  };
+
+  private readonly onPingOperationChanged = ({payload, state}: OperationView<PingPayload>): void => {
+    const conversation = this.conversationState.findConversation(payload.conversationId);
+    if (conversation === undefined) {
+      return;
+    }
+    this.activeFireAndForgetInvoker.fireAndForget(async () => {
+      if (state === 'dropped') {
+        await this.deleteMessageById(conversation, payload.messageId);
+        return;
+      }
+      if (state === 'queued' || state === 'on-hold' || state === 'in-progress') {
+        await this.ensureShown(conversation, payload);
+      }
+    });
+  };
+
+  // The receipt kind
+
+  private async enqueueConfirmation(
+    conversation: Conversation,
+    message: Message,
+    type: Confirmation.Type,
+    moreMessages: Message[],
+  ): Promise<void> {
+    if (!this.shouldConfirm(conversation, message, type)) {
+      return;
+    }
+    await this.enqueueReceipt({
+      type: 'confirmation',
+      conversationId: conversation.qualifiedId,
+      confirmationType: type,
+      messageIds: [
+        message.id,
+        ...moreMessages.map(entity => {
+          return entity.id;
+        }),
+      ],
+      recipient: message.qualifiedFrom,
+    });
+  }
+
+  private async enqueueCleared(conversation: Conversation): Promise<void> {
+    const timestamp = this.setClearedTimestamp(conversation);
+    if (timestamp !== undefined) {
+      await this.enqueueReceipt({type: 'cleared', conversationId: conversation.qualifiedId, timestamp});
+    }
+  }
+
+  /** Nothing of a receipt is shown, so a receipt the outbox refuses is lost. */
+  private async enqueueReceipt(payload: OutboxReceiptPayload): Promise<void> {
+    const outcome = await this.outboxKinds.receipt.enqueue({
+      payload,
+      correlationKey: receiptCorrelationKey(payload),
+      orderingKey: laneOfReceipts(payload),
+    });
+    this.isAccepted(outcome);
+  }
+
+  private readonly performReceiptOperation = async ({
+    payload,
+  }: OperationView<OutboxReceiptPayload>): Promise<PerformOutcome> => {
+    const correlationKey = receiptCorrelationKey(payload);
+    switch (payload.type) {
+      case 'confirmation':
+        return this.performConfirmation(payload);
+      case 'last-read':
+        return this.performSelfSend(
+          correlationKey,
+          MessageBuilder.buildLastReadMessage(payload.conversationId, payload.timestamp),
+        );
+      case 'cleared':
+        return this.performSelfSend(
+          correlationKey,
+          MessageBuilder.buildClearedMessage(payload.conversationId, payload.timestamp),
+        );
+      case 'data-transfer':
+        return this.performSelfSend(correlationKey, MessageBuilder.buildDataTransferMessage(payload.countlyId));
+    }
+  };
+
+  /** A confirmation never asks the user about a degraded conversation. */
+  private async performConfirmation(
+    payload: Extract<OutboxReceiptPayload, {type: 'confirmation'}>,
+  ): Promise<PerformOutcome> {
+    const conversation = this.conversationState.findConversation(payload.conversationId);
+    if (conversation === undefined) {
+      return this.dropForUnknownConversation();
+    }
+    // The user may have turned read receipts off since the receipt was queued.
+    if (payload.confirmationType === Confirmation.Type.READ && !supportsReadReceipts(conversation)) {
+      this.logger.info('Dropping a read receipt', {outcome: 'read-receipts-off'});
+      return {type: 'operation-dropped'};
+    }
+
+    const [firstMessageId, ...moreMessageIds] = payload.messageIds;
+    const confirmation = MessageBuilder.buildConfirmationMessage({
+      firstMessageId,
+      moreMessageIds: moreMessageIds.length > 0 ? moreMessageIds : undefined,
+      type: payload.confirmationType,
+    });
+    const options: BackendSendOptions = {
+      failFast: true,
+      nativePush: false,
+      recipients: [payload.recipient],
+      silentDegradationWarning: true,
+      skipInjection: true,
+      targetMode: MessageTargetMode.USERS,
+    };
+    try {
+      const result = await this.sendMessageToBackend(confirmation, conversation, options);
+      if (result.state === MessageSendingState.OUTGOING_SENT) {
+        return {type: 'attempt-succeeded'};
+      }
+    } catch (error: unknown) {
+      return this.dropUnlessRetry(classifySendError(error));
+    }
+    // The send was refused over unverified devices, so it goes to the devices we know of only.
+    return this.sendSilently(confirmation, conversation, {...options, targetMode: MessageTargetMode.USERS_CLIENTS});
+  }
+
+  /**
+   * Sends to every self conversation. The degraded ones wait for the user after the others got the message, and a
+   * decline drops the operation.
+   */
+  private async performSelfSend(correlationKey: string, message: GenericMessage): Promise<PerformOutcome> {
+    const selfConversations = this.conversationState.getSelfConversations(
+      supportsMLS() && this.teamState.isMLSEnabled(),
+    );
+    const [degraded, others] = partition(selfConversations, conversation => {
+      return this.isDegraded(conversation);
+    });
+    if (degraded.length === 0) {
+      return this.sendToSelf(others, message);
+    }
+    const outcome = others.length > 0 ? await this.sendToSelf(others, message) : undefined;
+    if (outcome?.type === 'attempt-failed') {
+      return outcome;
+    }
+    return this.holdForPermission(correlationKey, degraded, 'drop');
+  }
+
+  /** One self conversation that needs a retry has the whole operation retried, which is harmless. */
+  private async sendToSelf(selfConversations: Conversation[], message: GenericMessage): Promise<PerformOutcome> {
+    if (selfConversations.length === 0) {
+      return {type: 'attempt-failed'};
+    }
+    const outcomes = await Promise.all(
+      selfConversations.map(selfConversation => {
+        return this.sendSilently(message, selfConversation, {failFast: true, skipInjection: true});
+      }),
+    );
+    return (
+      outcomes.find(outcome => {
+        return outcome.type === 'attempt-failed';
+      }) ??
+      outcomes.find(outcome => {
+        return outcome.type !== 'attempt-succeeded';
+      }) ?? {type: 'attempt-succeeded'}
+    );
+  }
+
+  // The message-change kind
+
+  private async enqueueReaction(
+    conversation: Conversation,
+    message: Message,
+    reactions: ReactionType,
+  ): Promise<SendAndInjectResult> {
+    const reaction = MessageBuilder.buildReactionMessage({originalMessageId: message.id, type: reactions});
+    const outcome = await this.enqueueChange({
+      type: 'reaction',
+      conversationId: conversation.qualifiedId,
+      targetMessageId: message.id,
+      reactions,
+    });
+    if (!this.isAccepted(outcome)) {
+      return {id: reaction.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
+    }
+    // A reaction changes a message that is shown already. It has no message of its own for the kind to show.
+    await this.injectOptimisticMessage(reaction, conversation);
+    return {id: reaction.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.QUEUED};
+  }
+
+  /**
+   * Save an edit. A message the outbox never attempted is edited where it is: the edit replaces its text, and
+   * no one else ever sees the original. Otherwise the edit is a message of its own, behind the message if the
+   * outbox still has it. A message that failed only changes locally, so that Retry sends the new text.
+   */
+  private async enqueueEdit(
+    conversation: Conversation,
+    textMessage: string,
+    originalMessage: ContentMessage,
+    mentions: MentionEntity[],
+  ): Promise<void> {
+    const originalMessageId = originalMessage.id;
+    // The edit takes over the hold for editing before anything else runs, so stopping to edit doesn't release it.
+    // The hold ends with this edit, as a version of the message or by the release below.
+    if (this.holds.get(originalMessageId)?.reason === 'editing') {
+      this.holds.delete(originalMessageId);
+    }
+    // We cancel the sending of the link preview if the user has edited the message
+    cancelSendingLinkPreview(originalMessageId);
+    try {
+      const pending = this.findPendingMessage(originalMessageId);
+      const hasFailed =
+        pending?.state === 'dead-lettered' ||
+        arrayIncludes([StatusType.FAILED, StatusType.FEDERATION_ERROR], originalMessage.status());
+      if (hasFailed) {
+        await this.updateMessageTextLocally(conversation, originalMessage, textMessage, mentions);
+      } else if (
+        pending?.payload.type === 'text' &&
+        (pending.state === 'queued' || pending.state === 'on-hold') &&
+        !this.isUnconfirmed(pending) &&
+        !originalMessage.hasMultipartAsset()
+      ) {
+        const replaced = await this.editPendingMessage(
+          conversation,
+          textMessage,
+          originalMessage,
+          mentions,
+          pending.payload,
+        );
+        if (!replaced) {
+          // An attempt started meanwhile and went through, so the message was sent.
+          await this.enqueueEditAfterMessage(conversation, textMessage, originalMessage, mentions);
+        }
+      } else {
+        await this.enqueueEditAfterMessage(conversation, textMessage, originalMessage, mentions);
+        // The message was held while its text could still be replaced. Now it goes, and the edit goes behind it.
+        if (pending?.state === 'on-hold') {
+          const outcome = await this.activeOutbox.release(originalMessageId);
+          this.logger.info('The outbox answered releasing an edited message', {outcome: outcome.type});
+        }
+      }
+    } finally {
+      clearLinkPreviewSendingState(originalMessageId);
+    }
+  }
+
+  /**
+   * A version of the message: with the new text it keeps its id, its place and its lack of an edited mark.
+   * Resolves to `false` when the message went out before the version could take its place.
+   */
+  private async editPendingMessage(
+    conversation: Conversation,
+    textMessage: string,
+    originalMessage: ContentMessage,
+    mentions: MentionEntity[],
+    payload: OutboxTextPayload,
+  ): Promise<boolean> {
+    const outcome = await this.outboxKinds.message.enqueue({
+      payload: {...payload, text: textMessage, mentions: this.toStoredMentions(mentions)},
+      correlationKey: originalMessage.id,
+      orderingKey: laneOfMessages(payload.conversationId),
+    });
+    const isAccepted = this.isAccepted(outcome);
+    if (outcome.type === 'operation-succeeded') {
+      return false;
+    }
+    if (isAccepted) {
+      await this.updateMessageTextLocally(conversation, originalMessage, textMessage, mentions);
+    } else {
+      // The message is still held for the edit that the outbox refused.
+      await this.activeOutbox.release(originalMessage.id);
+    }
+    return true;
+  }
+
+  private async enqueueEditAfterMessage(
+    conversation: Conversation,
+    textMessage: string,
+    originalMessage: ContentMessage,
+    mentions: MentionEntity[],
+  ): Promise<void> {
+    const attachments = originalMessage
+      .getMultipartAssets()
+      .map(multipart => {
+        return multipart.attachments?.() ?? [];
+      })
+      .flat()
+      .filter(Boolean);
+    const outcome = await this.enqueueChange({
+      type: 'edit',
+      conversationId: conversation.qualifiedId,
+      originalMessageId: originalMessage.id,
+      messageId: createUuid(),
+      text: textMessage,
+      mentions: this.toStoredMentions(mentions),
+      attachments: isNonEmptyArray(attachments) ? attachments : undefined,
+    });
+    this.isAccepted(outcome);
+  }
+
+  /** Changes the text of a message that is shown and stored, as it is, without an edit */
+  private async updateMessageTextLocally(
+    conversation: Conversation,
+    message: ContentMessage,
+    text: string,
+    mentions: MentionEntity[],
+  ): Promise<void> {
+    const textMessage = MessageBuilder.buildTextMessage(
+      this.decorateTextMessage({text}, conversation, {mentions}),
+      message.id,
+    );
+    const record = await this.eventService.loadEvent(conversation.id, message.id);
+    if (record === undefined) {
+      return;
+    }
+    const data = {
+      ...(record as {data?: object}).data,
+      content: text,
+      mentions: (textMessage.text?.mentions ?? []).map(mention => {
+        return arrayToBase64(Mention.encode(mention).finish());
+      }),
+    };
+    await this.eventService.updateEvent(record.primary_key, {data} as Partial<EventRecord>);
+    // The shown text is made from the stored one, as it is when the message is loaded
+    const updated = this.event_mapper.mapJsonEvent({...record, data} as EventRecord, conversation);
+    if (updated instanceof ContentMessage) {
+      message.assets(updated.assets());
+    }
+  }
+
+  /**
+   * Delete for everyone. A message that never went out is dropped with its changes and nothing is sent.
+   * A message that may have been delivered is dropped unless it is in flight, and the deletion follows it.
+   */
+  private async enqueueDelete(
+    conversation: Conversation,
+    message: Message,
+    targetedUsers?: QualifiedId[],
+  ): Promise<void> {
+    if (!message.user().isMe && !isTruthy(message.ephemeral_expires())) {
+      throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
+    }
+    await this.removeThroughOutbox(conversation, message, {
+      type: 'delete',
+      conversationId: conversation.qualifiedId,
+      targetMessageId: message.id,
+      recipients: targetedUsers,
+    });
+  }
+
+  /** Whatever is sent to remove the message, the message goes at once. */
+  private async removeThroughOutbox(
+    conversation: Conversation,
+    message: Message,
+    removal: Extract<MessageChangePayload, {type: 'delete' | 'hide'}>,
+  ): Promise<void> {
+    const pending = this.findPendingMessage(message.id);
+    // An attempt in flight isn't dropped. The removal waits for it and follows the message.
+    if (pending !== undefined && pending.state !== 'in-progress') {
+      // The changes go first, so that none is sent for a message that no longer exists.
+      for (const correlationKey of [...changeCorrelationKeysOf(message.id), message.id]) {
+        const outcome = await this.activeOutbox.drop(correlationKey);
+        this.logger.info('The outbox answered dropping an operation of a deleted message', {outcome: outcome.type});
+      }
+    }
+    if (pending === undefined || this.isUnconfirmed(pending)) {
+      this.isAccepted(await this.enqueueChange(removal));
+    }
+    await this.deleteMessageById(conversation, message.id);
+  }
+
+  /**
+   * The message of a change is never shown as failed. A change that can't go out, or that the user declines to send
+   * to a degraded conversation, is dropped and logged, and the optimistic change stays local.
+   */
+  private readonly performChangeOperation = async ({
+    payload,
+  }: Pick<OperationView<MessageChangePayload>, 'payload'>): Promise<PerformOutcome> => {
+    const correlationKey = messageCorrelationKey(payload);
+    if (payload.type === 'hide') {
+      const hide = MessageBuilder.buildHideMessage({
+        conversationId: payload.conversationId.id,
+        messageId: payload.targetMessageId,
+        qualifiedConversationId: payload.conversationId,
+      });
+      return this.performSelfSend(correlationKey, hide);
+    }
+    const conversation = this.conversationState.findConversation(payload.conversationId);
+    if (conversation === undefined) {
+      return this.dropForUnknownConversation();
+    }
+    if (payload.type === 'edit') {
+      await this.ensureShown(conversation, payload);
+    }
+    if (this.isDegraded(conversation)) {
+      return this.holdForPermission(correlationKey, [conversation], 'drop');
+    }
+
+    switch (payload.type) {
+      case 'reaction': {
+        const reaction = MessageBuilder.buildReactionMessage({
+          originalMessageId: payload.targetMessageId,
+          type: payload.reactions,
+        });
+        return this.sendSilently(reaction, conversation, {failFast: true, skipInjection: true});
+      }
+      case 'edit': {
+        const edit = this.buildOutboxEdit(conversation, payload);
+        const outcome = await this.sendSilently(edit, conversation, {failFast: true, syncTimestamp: false});
+        if (outcome.type === 'attempt-succeeded') {
+          this.activeFireAndForgetInvoker.fireAndForget(() => {
+            return this.sendLinkPreviewOf(conversation, {...payload, quote: undefined});
+          });
+        }
+        return outcome;
+      }
+      case 'delete': {
+        const deletion = MessageBuilder.buildDeleteMessage({messageId: payload.targetMessageId});
+        return this.sendSilently(deletion, conversation, {
+          failFast: true,
+          recipients: payload.recipients ?? this.membersOf(conversation),
+          skipInjection: true,
+          targetMode: MessageTargetMode.USERS,
+        });
+      }
+    }
+  };
+
+  private membersOf(conversation: Conversation): QualifiedId[] {
+    return conversation.allUserEntities().map(user => {
+      if (isUndefined(user)) {
+        throw new Error('Conversation member list contains an empty user');
+      }
+      return user.qualifiedId;
+    });
+  }
+
+  private readonly onChangeOperationChanged = ({
+    payload,
+    state,
+  }: Pick<OperationView<MessageChangePayload>, 'payload' | 'state'>): void => {
+    const conversation = this.conversationState.findConversation(payload.conversationId);
+    if (conversation !== undefined && payload.type === 'edit' && state === 'queued') {
+      this.activeFireAndForgetInvoker.fireAndForget(() => {
+        return this.ensureShown(conversation, payload);
+      });
+    }
+  };
+
+  // Holds
+  //
+  // `holds` is the only record of why this session holds an operation, and the public methods below are the only
+  // ways out of a hold. A record whose operation is gone is harmless: its release or drop answers that the operation
+  // was not found, and the record goes then.
+
+  /**
+   * Call this right after the outbox started. The holds restored from an earlier session lost their prompt or their
+   * editor: a text message the draft still edits is held for editing again, and everything else is released, so that
+   * its next attempt asks again if it needs to.
+   */
+  public reviewRestoredHolds(): void {
+    if (this.outbox === undefined) {
+      return;
+    }
+    const listed = this.outbox.lanes();
+    if (listed.type !== 'lanes-listed') {
+      return;
+    }
+    // A held operation blocks its lane, so it is always the first of its lane.
+    for (const {first} of listed.lanes) {
+      const {state, correlationKey} = first;
+      if (state === 'on-hold' && correlationKey !== undefined && !this.holds.has(correlationKey)) {
+        this.activeFireAndForgetInvoker.fireAndForget(() => {
+          return this.reviewRestoredHold(correlationKey);
+        });
+      }
+    }
+  }
+
+  /** Lets the operations that wait for the user's permission to send to this conversation go */
+  public async allowSending(conversation: Conversation): Promise<void> {
+    if (this.outbox === undefined) {
+      return;
+    }
+    for (const [correlationKey, hold] of this.holdsWaitingOn(conversation)) {
+      const waitingOn = hold.waitingOn.filter(conversationId => {
+        return !matchQualifiedIds(conversationId, conversation.qualifiedId);
+      });
+      if (waitingOn.length > 0) {
+        this.holds.set(correlationKey, {...hold, waitingOn});
+        continue;
+      }
+      this.holds.delete(correlationKey);
+      const outcome = await this.outbox.release(correlationKey);
+      this.logger.info('The outbox answered releasing an operation the user allowed', {outcome: outcome.type});
+    }
+  }
+
+  /**
+   * A message is shown as declined and released, so that its next attempt ends it as failed, with Retry. Every other
+   * operation that waits for the user's permission to send to this conversation is dropped.
+   */
+  public async declineSending(conversation: Conversation): Promise<void> {
+    if (this.outbox === undefined) {
+      return;
+    }
+    for (const [correlationKey, hold] of this.holdsWaitingOn(conversation)) {
+      this.holds.delete(correlationKey);
+      if (hold.whenDeclined === 'drop') {
+        const outcome = await this.outbox.drop(correlationKey);
+        this.logger.info('The outbox answered dropping an operation the user declined', {outcome: outcome.type});
+        continue;
+      }
+      // The correlation key of a message is its id.
+      await this.markMessage(conversation, correlationKey, StatusType.FAILED, 'declined');
+      const outcome = await this.outbox.release(correlationKey);
+      this.logger.info('The outbox answered releasing a message the user declined', {outcome: outcome.type});
+    }
+  }
+
+  /** Holds a message the user starts to edit while the outbox still has it, so that the edit can replace its text */
+  public async startEditing(message: ContentMessage): Promise<void> {
+    if (this.outbox === undefined || this.holds.get(message.id)?.reason === 'editing') {
+      return;
+    }
+    await this.stopEditing();
+    const pending = this.findPendingMessage(message.id);
+    if (pending === undefined) {
+      return;
+    }
+    if (pending.state === 'on-hold') {
+      // A hold this session didn't make was restored with the draft that edits the message.
+      if (!this.holds.has(message.id)) {
+        this.holds.set(message.id, {reason: 'editing'});
+      }
+      return;
+    }
+    this.holds.set(message.id, {reason: 'editing'});
+    const outcome = await this.outbox.hold(message.id);
+    this.logger.info('The outbox answered holding a message for editing', {outcome: outcome.type});
+    if (outcome.type !== 'operation-held') {
+      this.holds.delete(message.id);
+    }
+  }
+
+  public async stopEditing(): Promise<void> {
+    if (this.outbox === undefined) {
+      return;
+    }
+    for (const [correlationKey, hold] of [...this.holds]) {
+      if (hold.reason !== 'editing') {
+        continue;
+      }
+      this.holds.delete(correlationKey);
+      const outcome = await this.outbox.release(correlationKey);
+      this.logger.info('The outbox answered releasing a message that was held for editing', {outcome: outcome.type});
+    }
+  }
+
+  private holdsWaitingOn(conversation: Conversation): [string, PermissionHold][] {
+    return [...this.holds].filter((entry): entry is [string, PermissionHold] => {
+      const [, hold] = entry;
+      return (
+        hold.reason === 'sending-permission' &&
+        hold.waitingOn.some(conversationId => {
+          return matchQualifiedIds(conversationId, conversation.qualifiedId);
+        })
+      );
+    });
+  }
+
+  /**
+   * The user answers after the attempt that asked has ended, so the attempt returns the hold this gives.
+   * One prompt serves every operation that waits on the same conversation.
+   */
+  private holdForPermission(
+    correlationKey: string,
+    waitingOn: Conversation[],
+    whenDeclined: PermissionHold['whenDeclined'],
+  ): PerformOutcome {
+    this.holds.set(correlationKey, {
+      reason: 'sending-permission',
+      waitingOn: waitingOn.map(conversation => {
+        return conversation.qualifiedId;
+      }),
+      whenDeclined,
+    });
+    for (const conversation of waitingOn) {
+      this.activeFireAndForgetInvoker.fireAndForget(() => {
+        return this.askForPermission(conversation);
+      });
+    }
+    return {type: 'operation-held'};
+  }
+
+  private async askForPermission(conversation: Conversation): Promise<void> {
+    if (this.openPrompts.has(conversation.id)) {
+      return;
+    }
+    this.openPrompts.add(conversation.id);
+    const isAllowed = await this.requestUserSendingPermission(conversation, false, CONSENT_TYPE.MESSAGE).catch(() => {
+      return false;
+    });
+    this.openPrompts.delete(conversation.id);
+    await (isAllowed ? this.allowSending(conversation) : this.declineSending(conversation));
+  }
+
+  private async reviewRestoredHold(correlationKey: string): Promise<void> {
+    if (await this.isTextTheDraftEdits(correlationKey)) {
+      this.holds.set(correlationKey, {reason: 'editing'});
+      return;
+    }
+    // The user may have started to edit the message meanwhile.
+    if (this.holds.has(correlationKey)) {
+      return;
+    }
+    const outcome = await this.activeOutbox.release(correlationKey);
+    this.logger.info('The outbox answered releasing a restored hold', {outcome: outcome.type});
+  }
+
+  private async isTextTheDraftEdits(correlationKey: string): Promise<boolean> {
+    const payload = this.findPendingMessage(correlationKey)?.payload;
+    if (payload?.type !== 'text') {
+      return false;
+    }
+    const conversation = this.conversationState.findConversation(payload.conversationId);
+    return conversation !== undefined && (await this.isBeingEdited?.(conversation, payload.messageId)) === true;
+  }
+
+  // Change routing
+
+  /**
+   * A change goes behind its target in the lane of messages while the outbox still has the target, or an earlier
+   * change to it, so that the change fails with its target. Every other change goes to the lane of changes, which
+   * pending messages never block. A hide always goes there, because it is sent to the self conversations.
+   */
+  private async enqueueChange(payload: MessageChangePayload): Promise<EnqueueOutcome<unknown>> {
+    const correlationKey = messageCorrelationKey(payload);
+    const targetMessageId = payload.type === 'edit' ? payload.originalMessageId : payload.targetMessageId;
+    const followsTarget =
+      this.findPendingMessage(targetMessageId) !== undefined || this.findPendingMessage(correlationKey) !== undefined;
+    if (payload.type !== 'hide' && followsTarget) {
+      const outcome = await this.outboxKinds.message.enqueue({
+        payload,
+        correlationKey,
+        orderingKey: laneOfMessages(payload.conversationId),
+      });
+      // When the earlier version went out meanwhile, this is a change to a message that was sent.
+      if (outcome.type !== 'operation-succeeded') {
+        return outcome;
+      }
+    }
+    const request = {payload, correlationKey, orderingKey: laneOfChanges(payload.conversationId)};
+    const outcome = await this.outboxKinds.messageChange.enqueue(request);
+    // An enqueue with the key of a running attempt answers how that attempt ended, and that attempt sent an older
+    // payload. So the new payload is enqueued again. The kernel should queue the new payload itself.
+    return outcome.type === 'operation-succeeded' ? this.outboxKinds.messageChange.enqueue(request) : outcome;
+  }
+
+  /** The message as the outbox still has it; `undefined` once it went through, or when it never was in the outbox */
+  private findPendingMessage(messageId: string): OperationView<MessagePayload> | undefined {
+    const found = this.outboxKinds.message.find(messageId);
+    return found.type === 'operation-found' ? found.operation : undefined;
+  }
+
+  /** A send was started and got no answer, so the message may have been delivered. */
+  private isUnconfirmed({attempts, payload}: OperationView<MessagePayload>): boolean {
+    return attempts > 0 || ((payload.type === 'text' || payload.type === 'asset') && payload.mayBeDelivered === true);
+  }
+
+  // Shared by the kinds
+
+  /** For what the user doesn't see as a message: whatever isn't a success or a reason to retry is forgotten */
+  private async sendSilently(
+    message: GenericMessage,
+    conversation: Conversation,
+    options: BackendSendOptions,
+  ): Promise<PerformOutcome> {
+    try {
+      const result = await this.sendMessageToBackend(message, conversation, options);
+      if (result.state === MessageSendingState.OUTGOING_SENT) {
+        return {type: 'attempt-succeeded'};
+      }
+    } catch (error: unknown) {
+      return this.dropUnlessRetry(classifySendError(error));
+    }
+    this.logger.info('Dropping an operation the client mismatch handler declined to send', {outcome: 'declined'});
+    return {type: 'operation-dropped'};
+  }
+
+  private dropUnlessRetry(error: SendErrorClass): PerformOutcome {
+    if (error.type === 'retry') {
+      return {type: 'attempt-failed'};
+    }
+    this.logger.info('Dropping an operation that could not be sent', {outcome: error.type});
+    return {type: 'operation-dropped'};
+  }
+
+  private dropForUnknownConversation(): PerformOutcome {
+    this.logger.info('Dropping an operation of an unknown conversation', {outcome: 'conversation-unknown'});
+    return {type: 'operation-dropped'};
+  }
+
+  private isDegraded(conversation: Conversation): boolean {
+    return conversation.verification_state() === ConversationVerificationState.DEGRADED;
+  }
+
+  /** Logs what the outbox answered, without content, and says whether it took the operation */
+  private isAccepted(outcome: EnqueueOutcome<unknown>): boolean {
+    return match(outcome)
+      .with({type: P.union('operation-queued', 'operation-versioned')}, ({type}) => {
+        this.logger.info('The outbox took an operation', {outcome: type});
+        return true;
+      })
+      .with({type: P.union('operation-succeeded', 'operation-dropped')}, ({type}) => {
+        // The operation ended while the call waited for its running attempt.
+        this.logger.info('The outbox had finished the operation already', {outcome: type});
+        return false;
+      })
+      .with(
+        {
+          type: P.union(
+            'correlation-key-empty',
+            'ordering-key-empty',
+            'payload-invalid',
+            'key-taken-by-other-kind',
+            'outbox-full',
+            'outbox-not-started',
+            'storage-full',
+            'storage-failed',
+          ),
+        },
+        ({type}) => {
+          this.logger.warn('The outbox refused an operation', {outcome: type});
+          return false;
+        },
+      )
+      .exhaustive();
+  }
+
+  private toStoredMentions(mentions: MentionEntity[]): StoredMention[] {
+    return mentions.map(({startIndex, length, userId, userQualifiedId}) => {
+      return {startIndex, length, userId, userQualifiedId};
+    });
+  }
+
+  private async resolveOutgoingQuote(
+    conversation: Conversation,
+    quote: OutboxTextPayload['quote'],
+  ): Promise<OutgoingQuote | undefined> {
+    if (quote === undefined) {
+      return undefined;
+    }
+    // The hash includes the time of the quoted message, so it is made when sending. A quote of a message that
+    // is gone keeps its ids and has no hash: the receiver shows it as not found
+    const quotedEvent = await this.eventService.loadEvent(conversation.id, quote.messageId);
+    const hash =
+      quotedEvent === undefined
+        ? new Uint8Array().buffer
+        : await container.resolve<QuoteEventHasher>(QUOTE_EVENT_HASHER)(quotedEvent);
+    return new QuoteEntity({hash, messageId: quote.messageId, userId: quote.userId}) as OutgoingQuote;
+  }
+
+  private toMentionEntities(mentions: StoredMention[]): MentionEntity[] {
+    return mentions.map(({startIndex, length, userId, userQualifiedId}) => {
+      return new MentionEntity(startIndex, length, userId, userQualifiedId.domain);
+    });
+  }
+
+  /** `quote` is the one the sender already has, with its hash; without it the hash is made from the quoted message */
+  private async buildOutboxText(
+    conversation: Conversation,
+    payload: OutboxTextPayload,
+    quote?: OutgoingQuote,
+  ): Promise<GenericMessage> {
+    const text = this.decorateTextMessage({text: payload.text}, conversation, {
+      mentions: this.toMentionEntities(payload.mentions),
+      quote: quote ?? (await this.resolveOutgoingQuote(conversation, payload.quote)),
+    });
+    const message = isNonEmptyArray(payload.attachments)
+      ? MessageBuilder.buildMultipartMessage(payload.attachments, text, payload.messageId)
+      : MessageBuilder.buildTextMessage(text, payload.messageId);
+    return this.wrapInEphemeralWhenTimed(message, conversation);
+  }
+
+  private buildOutboxEdit(conversation: Conversation, payload: OutboxEditPayload): GenericMessage {
+    const text = this.decorateTextMessage(
+      {originalMessageId: payload.originalMessageId, text: payload.text},
+      conversation,
+      {
+        mentions: this.toMentionEntities(payload.mentions),
+      },
+    );
+    return isNonEmptyArray(payload.attachments)
+      ? MessageBuilder.buildEditedMultipartMessage(
+          payload.attachments,
+          text,
+          payload.originalMessageId,
+          payload.messageId,
+        )
+      : MessageBuilder.buildEditedTextMessage(text, payload.messageId);
+  }
+
+  private buildOutboxPing(conversation: Conversation, messageId: string): GenericMessage {
+    const ping = MessageBuilder.buildPingMessage({
+      expectsReadConfirmation: this.expectReadReceipt(conversation),
+      hotKnock: false,
+      legalHoldStatus: conversation.legalHoldStatus(),
+    });
+    ping.messageId = messageId;
+    return this.wrapInEphemeralWhenTimed(ping, conversation);
+  }
+
+  private async uploadOutboxAsset(
+    conversation: Conversation,
+    payload: AssetMessagePayload,
+    file: Blob,
+    signal: AbortSignal,
+  ): Promise<void> {
+    const cancelUpload = (): void => {
+      this.assetRepository.cancelUpload(payload.messageId);
+    };
+    const keepPageOpen = (event: Event): void => {
+      event.preventDefault();
+    };
+    signal.addEventListener('abort', cancelUpload, {once: true});
+    // Only an upload in progress is worth a warning on leaving: a queued message is kept and sent later
+    window.addEventListener('beforeunload', keepPageOpen);
+    try {
+      const asset = await this.uploadToAssetService(
+        conversation,
+        file,
+        payload.messageId,
+        {name: (file as File).name, type: file.type},
+        {failFast: true},
+      );
+      const record = await this.eventService.loadEvent(conversation.id, payload.messageId);
+      if (record !== undefined) {
+        await this.eventService.updateEvent(record.primary_key, {
+          data: {
+            ...(record as {data?: object}).data,
+            domain: asset.domain,
+            key: asset.key,
+            otr_key: asset.keyBytes,
+            sha256: asset.sha256,
+            token: asset.token,
+          },
+        } as Partial<EventRecord>);
+      }
+    } finally {
+      window.removeEventListener('beforeunload', keepPageOpen);
+      signal.removeEventListener('abort', cancelUpload);
+    }
+  }
+
+  private async buildOutboxAsset(
+    conversation: Conversation,
+    payload: AssetMessagePayload,
+  ): Promise<GenericMessage | undefined> {
+    const record = await this.eventService.loadEvent(conversation.id, payload.messageId);
+    const upload = record === undefined ? undefined : readRecordedUpload(record);
+    const file = record?.fileData;
+    if (upload === undefined || file === undefined) {
+      return undefined;
+    }
+    const meta = await this.buildFileMetaData(file, payload.asImage);
+    // Describing an uploaded asset needs no cipher text
+    const asset: EncryptedAssetUploaded = {
+      cipherText: new Uint8Array(),
+      domain: upload.domain ?? '',
+      key: upload.key,
+      keyBytes: upload.otr_key,
+      sha256: upload.sha256,
+      token: upload.token,
+    };
+    const message = await this.buildUploadedAssetMessage(
+      conversation,
+      file,
+      payload.messageId,
+      payload.asImage,
+      meta,
+      asset,
+    );
+    return this.wrapInEphemeralWhenTimed(message, conversation);
+  }
+
+  /**
+   * The message is sent with the timer the conversation has at send time, which may differ from the one it was
+   * shown with. The shown copy takes the sent one, so that it expires when the receivers' copies do.
+   * A copy that was sent already keeps its timer.
+   */
+  private async matchLocalTimerToSent(conversation: Conversation, message: GenericMessage): Promise<void> {
+    try {
+      const shown = await this.getMessageInConversationById(conversation, message.messageId);
+      if (shown.status() > StatusType.SENDING) {
+        return;
+      }
+      const sentTimer = message.ephemeral?.expireAfterMillis;
+      const timer = isNullOrUndefined(sentTimer) || Number(sentTimer) === 0 ? false : Number(sentTimer);
+      if (shown.ephemeral_expires() === timer) {
+        return;
+      }
+      shown.ephemeral_expires(timer);
+      await this.eventService.updateEvent(shown.primary_key, {ephemeral_expires: timer === false ? undefined : timer});
+    } catch (error: unknown) {
+      if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+        throw error;
+      }
+    }
+  }
+
+  /** Writes the status on the shown message and on its record; a message that is gone is left alone */
+  private async markMessage(
+    conversation: Conversation,
+    messageId: string,
+    status: StatusType,
+    failedReason?: FailedReason,
+  ): Promise<void> {
+    try {
+      const messageEntity = await this.getMessageInConversationById(conversation, messageId);
+      messageEntity.status(status);
+      messageEntity.failed_reason(failedReason);
+      await this.eventService.updateEvent(messageEntity.primary_key, {status, failed_reason: failedReason});
+    } catch (error: unknown) {
+      if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+        throw error;
+      }
+    }
   }
 
   private createRecipients(users: User[]): QualifiedUserClients {
@@ -1817,8 +3515,12 @@ export class MessageRepository {
    */
   public async markAsRead(conversation: Conversation): Promise<void> {
     const timestamp = conversation.last_read_timestamp();
-    const payload = MessageBuilder.buildLastReadMessage(conversation.qualifiedId, timestamp);
-    await this.sendToSelfConversations(payload);
+    if (this.outbox !== undefined) {
+      await this.enqueueReceipt({type: 'last-read', conversationId: conversation.qualifiedId, timestamp});
+    } else {
+      const payload = MessageBuilder.buildLastReadMessage(conversation.qualifiedId, timestamp);
+      await this.sendToSelfConversations(payload);
+    }
     /*
      * FIXME notification removal can be improved.
      * We can add the conversation ID in the payload of the event and only check unread messages for this particular conversation
@@ -1833,8 +3535,12 @@ export class MessageRepository {
    * @param countlyId Countly new ID
    */
   public async sendCountlySync(countlyId: string): Promise<void> {
-    const payload = MessageBuilder.buildDataTransferMessage(countlyId);
-    await this.sendToSelfConversations(payload);
+    if (this.outbox !== undefined) {
+      await this.enqueueReceipt({type: 'data-transfer', countlyId});
+    } else {
+      const payload = MessageBuilder.buildDataTransferMessage(countlyId);
+      await this.sendToSelfConversations(payload);
+    }
     this.logger.info(`Sent countly sync message with ID ${countlyId}`);
   }
 
