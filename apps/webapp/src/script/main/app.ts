@@ -55,6 +55,8 @@ import {AuthError} from '../error/authError';
 import {BaseError} from '../error/baseError';
 import {CLIENT_ERROR_TYPE} from '../error/clientError';
 import {TeamError} from '../error/teamError';
+import {pendingOfflineMessagesFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
+import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {
   createNewVersionPollingCallback,
   type FetchLatestBuildMetadata,
@@ -67,6 +69,7 @@ import {joinConversationsAfterMigrationFinalisation} from '../mls/mlsMigration/m
 import type {ApplicationObservability} from '../observability/applicationObservability';
 import type {ApplicationStartupReport} from '../observability/applicationStartupReport';
 import {reportApplicationStartup} from '../observability/reportApplicationStartup';
+import type {Outbox} from '../outbox';
 import {configureDownloadPath} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/downloadPath';
 import {configureE2EI} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
 import {AssetRepository} from '../repositories/assets/assetRepository';
@@ -115,6 +118,7 @@ import {MeetingsApiDataSource} from '../repositories/meetings/meetingsApiDataSou
 import {MeetingsRepository} from '../repositories/meetings/meetingsRepository';
 import {NotificationRepository} from '../repositories/notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../repositories/notification/PreferenceNotificationRepository';
+import {createApplicationOutbox} from '../repositories/outbox/createApplicationOutbox';
 import {initializePermissions} from '../repositories/permission/permissionHandlers';
 import {PropertiesRepository} from '../repositories/properties/propertiesRepository';
 import {PropertiesService} from '../repositories/properties/propertiesService';
@@ -217,6 +221,8 @@ export class App {
   repository: ViewModelRepositories = {} as ViewModelRepositories;
   debug?: DebugUtil;
   util?: {debug: DebugUtil};
+  /** Created only when the outbox toggle is on */
+  private outbox: Outbox | undefined;
   private newVersionPollingCleanup: (() => void) | undefined;
   private mlsConversationRecoveryCleanup: (() => void) | undefined;
 
@@ -333,6 +339,11 @@ export class App {
       this.translate,
     );
 
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
+    this.outbox = startupFeatureToggles.isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName)
+      ? createApplicationOutbox({storageService: this.service.storage, serverTimeHandler})
+      : undefined;
+
     repositories.message = new MessageRepository(
       /*
        * ToDo: there is a cyclic dependency between message and conversation repos.
@@ -350,6 +361,12 @@ export class App {
       repositories.asset,
       repositories.audio,
       this.translate,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      this.outbox,
     );
 
     repositories.calling = new CallingRepository(
@@ -413,9 +430,18 @@ export class App {
       storageRepository: repositories.storage,
       userRepository: repositories.user,
       core: this.core,
+      outbox: this.outbox,
     });
 
     return repositories;
+  }
+
+  /** A failed start leaves the outbox unstarted, so every enqueue is refused; the app carries on */
+  private async startOutbox(): Promise<void> {
+    const outcome = await this.outbox?.start();
+    if (outcome?.type === 'storage-failed' || outcome?.type === 'storage-full') {
+      this.logger.error('Outbox failed to start and stays unstarted', {outcome: outcome.type});
+    }
   }
 
   /**
@@ -875,6 +901,8 @@ export class App {
 
       // resume the notification queue now that we're fully initialized
       this.core.resumeNotificationQueue();
+
+      await this.startOutbox();
 
       this.initializeMLSConversationRecovery({
         conversationRepository,
