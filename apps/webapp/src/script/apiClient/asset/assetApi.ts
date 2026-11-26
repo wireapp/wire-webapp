@@ -32,6 +32,7 @@ import {
   RequestCancelable,
   SyntheticErrorLabel,
 } from '../http/';
+import {getRetryRequestConfig, RequestRetryOptions} from '../http/failFastRequestConfig';
 import type {BufferPlatform} from '../platform';
 import {unsafeAlphanumeric} from '../shims/node/random';
 import {QualifiedId, RequestCancellationError} from '../user';
@@ -140,6 +141,7 @@ export class AssetAPI {
     asset: Uint8Array,
     options?: AssetOptions,
     progressCallback?: ProgressCallback,
+    retryOptions: RequestRetryOptions = {},
   ): RequestCancelable<AssetUploadData> {
     const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
 
@@ -182,6 +184,7 @@ export class AssetAPI {
     const cancelSource = axios.CancelToken.source();
 
     const config: AxiosRequestConfig = {
+      ...getRetryRequestConfig(retryOptions),
       cancelToken: cancelSource.token,
       data: this.buffer.concatToBuffer(body, asset, footer),
       headers: {
@@ -265,8 +268,9 @@ export class AssetAPI {
     asset: Uint8Array,
     options?: AssetOptions,
     progressCallback?: ProgressCallback,
+    retryOptions: RequestRetryOptions = {},
   ): RequestCancelable<AssetUploadData> {
-    return this.postAssetShared('/assets', asset, options, progressCallback);
+    return this.postAssetShared('/assets', asset, options, progressCallback, retryOptions);
   }
 
   postServiceAsset(

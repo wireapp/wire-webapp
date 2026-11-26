@@ -20,6 +20,7 @@
 import {APIClient} from '../../../apiClient/apiClient';
 import {AssetOptions, AssetResponse} from '../../../apiClient/asset/assetApi';
 import {AssetUploadData} from '../../../apiClient/asset/assetApi.schema';
+import {RequestRetryOptions} from '../../../apiClient/http/failFastRequestConfig';
 import {RequestCancelable} from '../../../apiClient/http/requestCancelable';
 import {ProgressCallback} from '../../../apiClient/http/requestProgressHandler';
 import {EncryptedAsset, EncryptedAssetUploaded} from '../../cryptography';
@@ -74,8 +75,9 @@ export class AssetService {
     asset: Buffer | Uint8Array,
     options?: AssetOptions,
     progressCallback?: ProgressCallback,
+    retryOptions: RequestRetryOptions = {},
   ): RequestCancelable<AssetUploadData> {
-    return this.apiClient.api.asset.postAsset(new Uint8Array(asset), options, progressCallback);
+    return this.apiClient.api.asset.postAsset(new Uint8Array(asset), options, progressCallback, retryOptions);
   }
 
   /**
@@ -90,13 +92,14 @@ export class AssetService {
     plainText: Buffer | Uint8Array,
     options?: AssetOptions,
     progressCallback?: ProgressCallback,
+    retryOptions: RequestRetryOptions = {},
   ): Promise<RequestCancelable<EncryptedAssetUploaded>> {
     const {cipherText, keyBytes, sha256} = await encryptAsset(
       {plainText, algorithm: options?.algorithm, hash: options?.hash},
       this.crypto,
     );
 
-    const request = this.uploadRawAsset(cipherText, options, progressCallback);
+    const request = this.uploadRawAsset(cipherText, options, progressCallback, retryOptions);
 
     return {
       ...request,

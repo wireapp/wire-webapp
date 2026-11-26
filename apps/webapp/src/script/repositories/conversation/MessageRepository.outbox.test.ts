@@ -217,9 +217,19 @@ describe('MessageRepository as the port of the message kinds', () => {
 
   type PortContext = MessageRepositoryParts & {
     messageKind: Kind<MessagePayload>;
-    storedMessage: {status: jest.Mock};
+    storedMessage: {status: jest.Mock; ephemeral_expires: jest.Mock};
     updateEvent: jest.SpyInstance;
   };
+
+  function createObservable<T>(initial: T): jest.Mock {
+    let value = initial;
+    return jest.fn((next?: T) => {
+      if (next !== undefined) {
+        value = next;
+      }
+      return value;
+    });
+  }
 
   function setup(): PortContext {
     const outbox = createOutboxSpy();
@@ -227,6 +237,7 @@ describe('MessageRepository as the port of the message kinds', () => {
     const messageKind = outbox.register.mock.calls[0][0] as Kind<MessagePayload>;
     const storedMessage = {
       status: jest.fn(),
+      ephemeral_expires: createObservable<boolean | number>(false),
       failed_reason: jest.fn(),
       written_time: jest.fn(),
       primary_key: 'primary-key',
@@ -261,6 +272,52 @@ describe('MessageRepository as the port of the message kinds', () => {
 
     expect(send).toHaveBeenCalledTimes(1);
     expect(send.mock.calls[0][0].payload.messageId).toBe('message-1');
+  });
+
+  describe('the timer of a message that is sent later than it was shown', () => {
+    const ONE_SECOND = 1000;
+    const TEN_SECONDS = 10 * ONE_SECOND;
+
+    function sentTimer(send: jest.Mock): number | undefined {
+      const expireAfterMillis = send.mock.calls[0][0].payload.ephemeral?.expireAfterMillis;
+      return expireAfterMillis === undefined ? undefined : Number(expireAfterMillis);
+    }
+
+    it('gives the shown copy the timer the conversation has when the message is sent', async () => {
+      const {messageKind, send, conversation, storedMessage, updateEvent} = setup();
+      jest.spyOn(conversation, 'messageTimer').mockReturnValue(TEN_SECONDS);
+      send.mockResolvedValue({id: 'message-1', sentAt: new Date().toISOString(), state: MessageSendingState.OUTGOING_SENT});
+
+      await perform(messageKind, textPayload);
+
+      expect(sentTimer(send)).toBe(TEN_SECONDS);
+      expect(storedMessage.ephemeral_expires()).toBe(TEN_SECONDS);
+      expect(updateEvent).toHaveBeenCalledWith('primary-key', {ephemeral_expires: TEN_SECONDS});
+    });
+
+    it('turns a shown self-deleting copy into a normal one when the conversation has no timer anymore', async () => {
+      const {messageKind, send, storedMessage, updateEvent} = setup();
+      storedMessage.ephemeral_expires(TEN_SECONDS);
+      send.mockResolvedValue({id: 'message-1', sentAt: new Date().toISOString(), state: MessageSendingState.OUTGOING_SENT});
+
+      await perform(messageKind, textPayload);
+
+      expect(sentTimer(send)).toBeUndefined();
+      expect(storedMessage.ephemeral_expires()).toBe(false);
+      expect(updateEvent).toHaveBeenCalledWith('primary-key', {ephemeral_expires: undefined});
+    });
+
+    it('leaves a copy that was sent already as it is', async () => {
+      const {messageKind, send, conversation, storedMessage, updateEvent} = setup();
+      jest.spyOn(conversation, 'messageTimer').mockReturnValue(TEN_SECONDS);
+      storedMessage.status.mockReturnValue(StatusType.SENT);
+      send.mockResolvedValue({id: 'message-1', sentAt: new Date().toISOString(), state: MessageSendingState.OUTGOING_SENT});
+
+      await perform(messageKind, textPayload);
+
+      expect(storedMessage.ephemeral_expires()).toBe(false);
+      expect(updateEvent).not.toHaveBeenCalledWith('primary-key', expect.objectContaining({ephemeral_expires: expect.anything()}));
+    });
   });
 
   it('writes the failure and its reason on the record when the backend refuses a text', async () => {
@@ -316,6 +373,48 @@ describe('MessageRepository as the port of the message kinds', () => {
     expect(deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
     expect(removed).toHaveBeenCalledWith('message-1', CONVERSATION_ID.id);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, removed);
+  });
+
+  describe('a held message whose send was attempted', () => {
+    async function release(messageKind: Kind<MessagePayload>): Promise<void> {
+      messageKind.onChanged?.({
+        id: 'operation',
+        kind: 'message',
+        payload: textPayload,
+        queuedAt: 0,
+        state: 'in-progress',
+        attempts: 1,
+      });
+      await new Promise(resolve => {
+        setTimeout(resolve, 0);
+      });
+    }
+
+    it('is not shown again when an edit replaced its record', async () => {
+      const {messageKind, eventService, repository} = setup();
+      const inject = jest.spyOn(repository as any, 'injectOptimisticMessage').mockResolvedValue(true);
+      jest.spyOn(eventService, 'loadEvent').mockResolvedValue({
+        primary_key: 'edit-key',
+        id: 'edit-id',
+        data: {replacing_message_id: 'message-1'},
+        status: StatusType.SENT,
+      } as any);
+
+      await release(messageKind);
+
+      expect(inject).not.toHaveBeenCalled();
+    });
+
+    it('is shown again when no record is left', async () => {
+      const {messageKind, eventService, repository} = setup();
+      const inject = jest.spyOn(repository as any, 'injectOptimisticMessage').mockResolvedValue(true);
+      jest.spyOn(repository as any, 'buildOutboxText').mockResolvedValue({} as any);
+      jest.spyOn(eventService, 'loadEvent').mockResolvedValue(undefined);
+
+      await release(messageKind);
+
+      expect(inject).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('answers dropped for a conversation it does not know', async () => {

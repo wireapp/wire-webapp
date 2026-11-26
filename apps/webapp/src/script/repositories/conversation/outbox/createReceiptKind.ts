@@ -61,6 +61,7 @@ export function createReceiptKind<Conversation extends OutboxConversation>(
       type: payload.confirmationType,
     });
     const options = {
+      failFast: true,
       nativePush: false,
       recipients: [payload.recipient],
       silentDegradationWarning: true,

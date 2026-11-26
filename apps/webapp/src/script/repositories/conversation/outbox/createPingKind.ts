@@ -55,7 +55,7 @@ export function createPingKind<Conversation extends OutboxConversation>(
       }
       const ping = port.buildPing(conversation, payload.messageId);
       const answer = await attemptSend(() => {
-        return port.sendToBackend(ping, conversation, {syncTimestamp: true});
+        return port.sendToBackend(ping, conversation, {failFast: true, syncTimestamp: true});
       });
       return answerForSilentSend(KIND_NAME, answer);
     },

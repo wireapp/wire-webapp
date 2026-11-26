@@ -29,6 +29,8 @@ import type {MessageTargetMode, SendResult} from '../../../core/conversation';
 export type OutboxConversation = {readonly id: string};
 
 export type MessageSendOptions = {
+  /** One HTTP attempt: the outbox decides about retries, so the HTTP client must not keep retrying */
+  failFast?: boolean;
   nativePush?: boolean;
   recipients?: QualifiedId[];
   silentDegradationWarning?: boolean;
@@ -66,6 +68,8 @@ export type MessageOutboxPort<Conversation extends OutboxConversation> = {
   recipientsOf: (conversation: Conversation) => QualifiedId[];
   supportsReadReceipts: (conversation: Conversation) => boolean;
   isDegraded: (conversation: Conversation) => boolean;
+  /** The server's time in milliseconds, the clock the outbox stamps operations with */
+  serverTime: () => number;
   /** The conversation's draft is an edit of this message: its editor stays the owner of an edit that is on hold */
   isBeingEdited: (conversation: Conversation, messageId: string) => Promise<boolean>;
   /** Resolves `true` when the user agrees to send to the unverified devices; one prompt serves a conversation */

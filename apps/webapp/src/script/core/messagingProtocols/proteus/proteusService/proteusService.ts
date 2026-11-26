@@ -248,6 +248,7 @@ export class ProteusService {
     targetMode,
     payload,
     onClientMismatch,
+    failFast,
   }: SendProteusMessageParams): Promise<SendResult> {
     const messageParams = await getGenericMessageParams({
       apiClient: this.apiClient,
@@ -264,6 +265,7 @@ export class ProteusService {
     const {sendingClientId, recipients, plainText, options} = messageParams;
     const response = await this.messageService.sendMessage(sendingClientId, recipients, plainText, {
       ...options,
+      failFast,
       onClientMismatch: mismatch => {
         return onClientMismatch?.(mismatch, false);
       },

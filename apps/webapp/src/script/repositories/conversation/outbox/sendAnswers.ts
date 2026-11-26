@@ -85,7 +85,7 @@ export async function sendToSelfConversations<Conversation extends OutboxConvers
   const answers = await Promise.all(
     selfConversations.map(selfConversation => {
       return attemptSend(() => {
-        return port.sendToBackend(message, selfConversation, {skipInjection: true});
+        return port.sendToBackend(message, selfConversation, {failFast: true, skipInjection: true});
       });
     }),
   );

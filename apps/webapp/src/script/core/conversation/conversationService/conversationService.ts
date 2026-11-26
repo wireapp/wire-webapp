@@ -506,7 +506,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
   // Low-level API for sending an MLS message without any recovery logic
   private async performSendMLSMessageAPI(params: SendMlsMessageParams): Promise<SendResult> {
-    const {payload, groupId} = params;
+    const {payload, groupId, failFast} = params;
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     // immediately execute pending commits before sending the message
@@ -517,7 +517,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       GenericMessage.encode(payload).finish(),
     );
 
-    const response = await this.apiClient.api.conversation.postMlsMessage(encrypted);
+    const response = await this.apiClient.api.conversation.postMlsMessage(encrypted, {failFast});
     const sentAt = response.time?.length > 0 ? response.time : new Date().toISOString();
 
     const failedToSend =

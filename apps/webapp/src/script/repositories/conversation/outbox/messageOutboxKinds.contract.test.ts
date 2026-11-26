@@ -60,6 +60,7 @@ describe('the message kinds through the outbox', () => {
   beforeEach(async () => {
     kit = createOutboxTestKit();
     fake = createFakeMessageOutboxPort(kit.clock.settle);
+    fake.port.serverTime.mockImplementation(kit.clock.getServerTime);
     handles = registerMessageOutboxKinds(kit.outbox, fake.port);
     sends = [];
     fake.port.sendToBackend.mockImplementation(async message => {
@@ -347,7 +348,7 @@ describe('the message kinds through the outbox', () => {
       expect(kit.findOperation('a')?.state).toBe('dead-lettered');
       expect(kit.findOperation('b')?.state).toBe('dead-lettered');
       expect(fake.records.get('a')).toMatchObject({isFailed: true, failedReason: 'declined'});
-      expect(fake.records.get('b')).toMatchObject({isFailed: true, failedReason: 'expired'});
+      expect(fake.records.get('b')).toMatchObject({isFailed: true, failedReason: 'generic'});
     });
 
     it('sends a declined message again once its owner took the decline back and queued it again', async () => {

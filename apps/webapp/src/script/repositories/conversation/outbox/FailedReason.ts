@@ -17,5 +17,8 @@
  *
  */
 
-/** Why a message of this device ended as failed, when the send itself doesn't tell */
-export type FailedReason = 'rejected' | 'removed' | 'declined' | 'expired';
+/**
+ * Why a message of this device ended as failed, when the send itself doesn't tell.
+ * `generic` is a message that went with one in front of it that failed.
+ */
+export type FailedReason = 'rejected' | 'removed' | 'declined' | 'expired' | 'generic';

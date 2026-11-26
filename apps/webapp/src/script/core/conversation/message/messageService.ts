@@ -67,6 +67,7 @@ export class MessageService {
       conversationId?: QualifiedId;
       reportMissing?: boolean | QualifiedId[];
       nativePush?: boolean;
+      failFast?: boolean;
       onClientMismatch?: (mismatch: MessageSendingStatus) => void | boolean | Promise<boolean>;
     } = {},
   ): Promise<MessageSendingStatus & {canceled?: boolean; failed?: QualifiedId[]}> {
@@ -107,6 +108,7 @@ export class MessageService {
       conversationId?: QualifiedId;
       reportMissing?: boolean | QualifiedId[];
       nativePush?: boolean;
+      failFast?: boolean;
     },
   ): Promise<MessageSendingStatus> {
     const qualifiedUserEntries = Object.entries(recipients).map<ProtobufOTR.IQualifiedUserEntry>(
@@ -161,7 +163,7 @@ export class MessageService {
 
     const {id, domain} = options.conversationId;
 
-    return this.apiClient.api.conversation.postOTRMessage(id, domain, protoMessage);
+    return this.apiClient.api.conversation.postOTRMessage(id, domain, protoMessage, {failFast: options.failFast});
   }
 
   private isClientMismatchError(error: any): error is ClientMismatchError {
