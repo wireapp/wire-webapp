@@ -44,6 +44,7 @@ import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {PropertiesRepository} from '../properties/propertiesRepository';
+import {StorageKey} from '../storage';
 import {TeamState} from '../team/TeamState';
 import {UserRepository} from '../user/userRepository';
 import {UserState} from '../user/userState';
@@ -51,6 +52,7 @@ import {UserState} from '../user/userState';
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
 import {MessageRepository} from './MessageRepository';
+import {createSimpleStorage} from './outbox/testing/createOutboxRepository';
 import {validate as isUuid} from 'uuid';
 
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
@@ -72,7 +74,7 @@ type Parts = {
   inject: jest.SpyInstance;
   updateEvent: jest.SpyInstance;
   deleteEvent: jest.SpyInstance;
-  isBeingEdited: jest.Mock;
+  simpleStorage: Map<string, unknown>;
 };
 
 function buildParts(): Parts {
@@ -91,7 +93,8 @@ function buildParts(): Parts {
     translateForTest,
   );
   conversationState.conversations([selfConversation, conversation]);
-  const eventService = new EventService({} as any);
+  const simpleStorage = new Map<string, unknown>();
+  const eventService = new EventService(createSimpleStorage(simpleStorage));
   const audioRepository = new AudioRepository();
   jest.spyOn(audioRepository, 'play').mockResolvedValue(undefined as never);
   const send = jest.fn();
@@ -103,7 +106,6 @@ function buildParts(): Parts {
     getServerTime: clock.getServerTime,
     logger: {info: jest.fn(), warn: jest.fn(), error: jest.fn()},
   });
-  const isBeingEdited = jest.fn().mockResolvedValue(false);
 
   const repository = new MessageRepository(
     () => {
@@ -123,7 +125,6 @@ function buildParts(): Parts {
     new TeamState(),
     createCoreTestFixture({service: {conversation: {send, messageTimer: new MessageTimer()}}}),
     outbox,
-    isBeingEdited,
     invoker,
   );
 
@@ -172,7 +173,7 @@ function buildParts(): Parts {
     inject,
     updateEvent,
     deleteEvent,
-    isBeingEdited,
+    simpleStorage,
   };
 }
 
@@ -394,6 +395,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(message.id).toBe('message-1');
       expect(message.was_edited()).toBe(false);
       expect(parts.inject).not.toHaveBeenCalled();
+      expect(parts.simpleStorage.get(StorageKey.OUTBOX.EDITED_MESSAGES)).toEqual({});
     });
 
     it('works on a hold restored from an earlier session, which this session never registered', async () => {
@@ -411,9 +413,7 @@ describe('MessageRepository routes changes through the outbox', () => {
     it('adopts a restored hold the draft still edits, so that editing another message releases it', async () => {
       seedMessage(parts, {messageId: 'message-1', state: 'on-hold'});
       seedMessage(parts, {messageId: 'message-2', queuedSeq: 2});
-      parts.isBeingEdited.mockImplementation(async (_conversation, messageId) => {
-        return messageId === 'message-1';
-      });
+      parts.simpleStorage.set(StorageKey.OUTBOX.EDITED_MESSAGES, {[CONVERSATION_ID.id]: 'message-1'});
       await startOutbox(parts);
 
       parts.repository.reviewRestoredHolds();

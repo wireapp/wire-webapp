@@ -68,7 +68,6 @@ import {
   type StoredMention,
   type TextMessagePayload as OutboxTextPayload,
 } from './outbox/messageOutboxTypes';
-import {QUOTE_EVENT_HASHER, type QuoteEventHasher} from './outbox/QuoteEventHasher';
 
 import {AssetAuditData} from '../../apiClient/asset/assetApi';
 import {MessageSendingStatus} from '../../apiClient/conversation/messageSendingStatus';
@@ -104,10 +103,11 @@ import type {EncryptedAssetUploaded} from '../../core/cryptography/assetCryptogr
 import {isQualifiedUserClients} from '../../core/util';
 import {ConversationError} from '../../error/conversationError';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
+import {hashEvent} from '../../message/hashEvent';
 import {MentionEntity} from '../../message/mentionEntity';
 import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
-import type {EnqueueOutcome, Kind, KindHandle, OperationView, Outbox, PerformOutcome} from '../../outbox';
+import type {EnqueueOutcome, KindHandle, OperationView, Outbox, PerformOutcome, RegisterOutcome} from '../../outbox';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {
@@ -147,7 +147,7 @@ import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {PropertiesRepository} from '../properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/propertiesType';
-import type {AssetRecord, EventRecord, ReactionMap} from '../storage';
+import {StorageKey, type AssetRecord, type EventRecord, type ReactionMap} from '../storage';
 import {TeamState} from '../team/TeamState';
 import {UserType} from '../tracking/attribute';
 import {EventName} from '../tracking/eventName';
@@ -217,14 +217,13 @@ type EditMultiPartMessagePayload = MultipartMessagePayload & {originalMessageId:
 
 const enum SendAndInjectSendingState {
   FAILED = 'FAILED',
-  /** Taken by the outbox, which sends it when it can */
   QUEUED = 'QUEUED',
 }
 
 type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingState | SendAndInjectSendingState};
 
 type BackendSendOptions = MessageSendingOptions & {
-  /** For sends the outbox retries itself: one HTTP attempt, no network retries */
+  /** One HTTP attempt without network retries, because the outbox retries the send itself */
   failFast?: boolean;
   silentDegradationWarning?: boolean;
   skipInjection?: boolean;
@@ -242,7 +241,6 @@ type StoredContentMessage = ContentMessage & {primary_key: string};
 type AssetMetadataMessage = {message: GenericMessage; metaData: FileMetaDataContent};
 type RecordedUpload = Pick<AssetRecord, 'otr_key' | 'sha256' | 'domain' | 'token'> & {key: string};
 
-/** What an upload attempt kept on the record of an asset message, when it got that far */
 function readRecordedUpload(record: EventRecord): RecordedUpload | undefined {
   const data = (record as {data?: Partial<AssetRecord>}).data;
   if (!isNonEmptyString(data?.key) || isUndefined(data.otr_key) || isUndefined(data.sha256)) {
@@ -258,18 +256,26 @@ type OutboxHandles = {
   receipt: KindHandle<OutboxReceiptPayload>;
 };
 
+function handleOf<Payload>(registerOutcome: RegisterOutcome<Payload>): KindHandle<Payload> {
+  if (registerOutcome.type !== 'kind-registered') {
+    throw new Error(`Can't register an outbox kind: ${registerOutcome.type}`);
+  }
+  return registerOutcome.handle;
+}
+
 /** The payloads whose operation has an optimistic message of its own */
 type ShownPayload = OutboxTextPayload | AssetMessagePayload | OutboxEditPayload | PingPayload;
 
 type PermissionHold = {
   reason: 'sending-permission';
-  /** The degraded conversations the user still has to allow */
-  waitingOn: QualifiedId[];
+  waitingOnConversations: QualifiedId[];
   whenDeclined: 'mark-declined' | 'drop';
 };
 
-/** Why this session keeps an operation on hold */
-type Hold = PermissionHold | {reason: 'editing'};
+type Hold = PermissionHold | {reason: 'editing'; conversationId: string};
+
+/** The message each conversation's input bar edits, by conversation id, for the holds that outlive a session */
+type EditedMessages = Record<string, string>;
 
 export class MessageRepository {
   private readonly logger: Logger;
@@ -278,11 +284,11 @@ export class MessageRepository {
   private isBlockingNotificationHandling: boolean;
   private onClientMismatch?: ClientMismatchHandlerFn;
   private readonly outboxHandles?: OutboxHandles;
-  /** The optimistic messages being shown, by message id */
+  /** By message id */
   private readonly showing = new Map<string, Promise<void>>();
-  /** The operations this session holds, by correlation key */
+  /** By correlation key */
   private readonly holds = new Map<string, Hold>();
-  /** The ids of the conversations whose sending prompt is open */
+  /** Conversation ids */
   private readonly openPrompts = new Set<string>();
 
   private get coreServices(): NonNullable<Core['service']> {
@@ -310,9 +316,7 @@ export class MessageRepository {
     private readonly conversationState = container.resolve(ConversationState),
     private readonly teamState = container.resolve(TeamState),
     private readonly core = container.resolve(Core),
-    /** Reads the conversation's draft, which lives with the input bar; only needed with an outbox */
-    private readonly isBeingEdited?: (conversation: Conversation, messageId: string) => Promise<boolean>,
-    /** Runs the work that follows an outbox operation; only needed with an outbox */
+    /** Required with an outbox */
     private readonly fireAndForgetInvoker?: FireAndForgetInvoker,
   ) {
     this.logger = getLogger('MessageRepository');
@@ -325,7 +329,7 @@ export class MessageRepository {
     this.initSubscriptions();
 
     if (this.outbox !== undefined) {
-      this.outboxHandles = this.registerOutboxKinds(this.outbox);
+      this.outboxHandles = this.registerOutboxKinds();
     }
   }
 
@@ -643,7 +647,7 @@ export class MessageRepository {
     }
   }
 
-  /** Sends a text message that failed again, under its id and from where it is in the conversation */
+  /** The message keeps its id and its place in the conversation. */
   public async retryTextMessage(retry: TextMessageRetry): Promise<void> {
     if (this.outbox !== undefined) {
       return this.enqueueTextAgain(retry);
@@ -1255,7 +1259,6 @@ export class MessageRepository {
     }
   }
 
-  /** Wraps the message for the self-deleting timer the conversation has right now, if any */
   private wrapInEphemeralWhenTimed(message: GenericMessage, conversation: Conversation): GenericMessage {
     const messageTimer = conversation.messageTimer();
     return isNumber(messageTimer) && messageTimer !== 0
@@ -1264,8 +1267,7 @@ export class MessageRepository {
   }
 
   /**
-   * Injects the optimistic `message-add` event (status `SENDING`) for a message that is about to be sent.
-   * Injecting the same message id twice throws in the event storage, so this must run once per message.
+   * Must run once per message: injecting the same message id twice throws in the event storage.
    * Resolves to `false` when nothing was injected because there is no current client id.
    */
   private async injectOptimisticMessage(payload: GenericMessage, conversation: Conversation): Promise<boolean> {
@@ -1296,7 +1298,7 @@ export class MessageRepository {
     return true;
   }
 
-  /** Configures the conversation timer and resolves the core send options, including the recipients. */
+  /** Also sets the conversation's message timer in the core. */
   private async prepareSend(
     payload: GenericMessage,
     conversation: Conversation,
@@ -1328,8 +1330,8 @@ export class MessageRepository {
   }
 
   /**
-   * Sends the message through the core and, when the backend accepted it, marks the message as sent.
-   * Throws whatever the send throws; it neither injects the message nor asks the degradation prompt, nor marks it as failed.
+   * Marks the message as sent when the backend accepted it. Throws whatever the send throws; it neither injects the
+   * message nor asks the degradation prompt, nor marks it as failed.
    * Pass `preparedSendOptions` (from `prepareSend`) when they were resolved earlier; otherwise they are resolved here.
    */
   private async sendMessageToBackend(
@@ -1707,7 +1709,7 @@ export class MessageRepository {
     }
   }
 
-  /** Clears the conversation up to its last known message; `undefined` when the cleared timestamp didn't move */
+  /** `undefined` when the cleared timestamp didn't move */
   private setClearedTimestamp(conversation: Conversation): number | undefined {
     const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
     if (!isNumber(timestamp) || timestamp === 0) {
@@ -1914,69 +1916,71 @@ export class MessageRepository {
 
   // The outbox
 
-  /** Throws when a kind can't be registered, which is a wiring bug */
-  private registerOutboxKinds(outbox: Outbox): OutboxHandles {
+  private registerOutboxKinds(): OutboxHandles {
+    if (this.outbox === undefined) {
+      throw new Error('The outbox is not enabled');
+    }
     return {
       // A message that can't go out stays as failed, with Retry, and the changes behind it in its lane fail with it.
-      message: this.registerKind(outbox, {
-        name: 'message',
-        parsePayload: parseMessagePayload,
-        expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
-        performTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
-        // Only an expiry or a rejection ends a message, never the number of attempts.
-        maxAttempts: 1_000,
-        whenGivenUp: 'dead-letter',
-        laneWhenGivenUp: 'follows',
-        perform: this.performMessageOperation,
-        onChanged: this.onMessageOperationChanged,
-      }),
+      message: handleOf(
+        this.outbox.register({
+          name: 'message',
+          parsePayload: parseMessagePayload,
+          expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
+          // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
+          performTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
+          // Only an expiry or a rejection ends a message, never the number of attempts.
+          maxAttempts: 1_000,
+          whenGivenUp: 'dead-letter',
+          laneWhenGivenUp: 'follows',
+          perform: this.performMessageOperation,
+          onChanged: this.onMessageOperationChanged,
+        }),
+      ),
       // A ping that is late is pointless, so it is forgotten and leaves the screen.
-      ping: this.registerKind(outbox, {
-        name: 'ping',
-        parsePayload: parsePingPayload,
-        expiresAfterMilliseconds: TIME_IN_MILLIS.MINUTE,
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
-        performTimeoutMilliseconds: 10 * TIME_IN_MILLIS.SECOND,
-        maxAttempts: 3,
-        whenGivenUp: 'drop',
-        laneWhenGivenUp: 'continues',
-        perform: this.performPingOperation,
-        onChanged: this.onPingOperationChanged,
-      }),
+      ping: handleOf(
+        this.outbox.register({
+          name: 'ping',
+          parsePayload: parsePingPayload,
+          expiresAfterMilliseconds: TIME_IN_MILLIS.MINUTE,
+          // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
+          performTimeoutMilliseconds: 10 * TIME_IN_MILLIS.SECOND,
+          maxAttempts: 3,
+          whenGivenUp: 'drop',
+          laneWhenGivenUp: 'continues',
+          perform: this.performPingOperation,
+          onChanged: this.onPingOperationChanged,
+        }),
+      ),
       // Nothing of a receipt is shown, and a receipt that can't go out is forgotten.
-      receipt: this.registerKind(outbox, {
-        name: 'receipt',
-        parsePayload: parseReceiptPayload,
-        expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
-        performTimeoutMilliseconds: TIME_IN_MILLIS.MINUTE,
-        maxAttempts: 100,
-        whenGivenUp: 'drop',
-        laneWhenGivenUp: 'continues',
-        perform: this.performReceiptOperation,
-      }),
+      receipt: handleOf(
+        this.outbox.register({
+          name: 'receipt',
+          parsePayload: parseReceiptPayload,
+          expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
+          performTimeoutMilliseconds: TIME_IN_MILLIS.MINUTE,
+          maxAttempts: 100,
+          whenGivenUp: 'drop',
+          laneWhenGivenUp: 'continues',
+          perform: this.performReceiptOperation,
+        }),
+      ),
       // A change to a message that was sent is forgotten when it can't go out, and the local change stays.
-      messageChange: this.registerKind(outbox, {
-        name: 'message-change',
-        parsePayload: parseMessageChangePayload,
-        expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
-        performTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
-        maxAttempts: 1_000,
-        whenGivenUp: 'drop',
-        laneWhenGivenUp: 'continues',
-        perform: this.performChangeOperation,
-        onChanged: this.onChangeOperationChanged,
-      }),
+      messageChange: handleOf(
+        this.outbox.register({
+          name: 'message-change',
+          parsePayload: parseMessageChangePayload,
+          expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
+          // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
+          performTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
+          maxAttempts: 1_000,
+          whenGivenUp: 'drop',
+          laneWhenGivenUp: 'continues',
+          perform: this.performChangeOperation,
+          onChanged: this.onChangeOperationChanged,
+        }),
+      ),
     };
-  }
-
-  private registerKind<Payload>(outbox: Outbox, kind: Kind<Payload>): KindHandle<Payload> {
-    const registered = outbox.register(kind);
-    if (registered.type !== 'kind-registered') {
-      throw new Error(`Can't register the '${kind.name}' outbox kind: ${registered.type}`);
-    }
-    return registered.handle;
   }
 
   private get outboxKinds(): OutboxHandles {
@@ -2113,7 +2117,6 @@ export class MessageRepository {
     return outcome;
   }
 
-  /** Sends a message the user sees, and shows on it why it failed */
   private async sendShownMessage(
     conversation: Conversation,
     messageId: string,
@@ -2204,7 +2207,6 @@ export class MessageRepository {
     });
   };
 
-  /** Shows a message that failed as sending again, once it was retried */
   private async showAsSending(conversation: Conversation, messageId: string): Promise<void> {
     const record = await this.eventService.loadEvent(conversation.id, messageId);
     // A decline stays until its owner takes it back, because the next attempt acts on it.
@@ -2540,7 +2542,6 @@ export class MessageRepository {
     }
   };
 
-  /** A confirmation never asks the user about a degraded conversation. */
   private async performConfirmation(
     payload: Extract<OutboxReceiptPayload, {type: 'confirmation'}>,
   ): Promise<PerformOutcome> {
@@ -2580,10 +2581,6 @@ export class MessageRepository {
     return this.sendSilently(confirmation, conversation, {...options, targetMode: MessageTargetMode.USERS_CLIENTS});
   }
 
-  /**
-   * Sends to every self conversation. The degraded ones wait for the user after the others got the message, and a
-   * decline drops the operation.
-   */
   private async performSelfSend(correlationKey: string, message: GenericMessage): Promise<PerformOutcome> {
     const selfConversations = this.conversationState.getSelfConversations(
       supportsMLS() && this.teamState.isMLSEnabled(),
@@ -2659,8 +2656,8 @@ export class MessageRepository {
     // The hold ends with this edit, as a version of the message or by the release below.
     if (this.holds.get(originalMessageId)?.reason === 'editing') {
       this.holds.delete(originalMessageId);
+      await this.forgetEditedMessage(conversation.id, originalMessageId);
     }
-    // We cancel the sending of the link preview if the user has edited the message
     cancelSendingLinkPreview(originalMessageId);
     try {
       const pending = this.findPendingMessage(originalMessageId);
@@ -2753,7 +2750,7 @@ export class MessageRepository {
     this.isAccepted(outcome);
   }
 
-  /** Changes the text of a message that is shown and stored, as it is, without an edit */
+  /** Nothing is sent, and the message gets no edited mark. */
   private async updateMessageTextLocally(
     conversation: Conversation,
     message: ContentMessage,
@@ -2825,8 +2822,8 @@ export class MessageRepository {
   }
 
   /**
-   * The message of a change is never shown as failed. A change that can't go out, or that the user declines to send
-   * to a degraded conversation, is dropped and logged, and the optimistic change stays local.
+   * The message of a change is never shown as failed. A change that can't go out, or that the user declines to send,
+   * is dropped, and the optimistic change stays local.
    */
   private readonly performChangeOperation = async ({
     payload,
@@ -2910,26 +2907,27 @@ export class MessageRepository {
 
   /**
    * Call this right after the outbox started. The holds restored from an earlier session lost their prompt or their
-   * editor: a text message the draft still edits is held for editing again, and everything else is released, so that
-   * its next attempt asks again if it needs to.
+   * editor: a text message that was still being edited is held for editing again, and everything else is released,
+   * so that its next attempt asks again if it needs to.
    */
   public reviewRestoredHolds(): void {
     if (this.outbox === undefined) {
       return;
     }
+    // The restored holds are listed before anything awaits, so that no hold this session makes is taken for one.
     const listed = this.outbox.lanes();
     if (listed.type !== 'lanes-listed') {
       return;
     }
     // A held operation blocks its lane, so it is always the first of its lane.
-    for (const {first} of listed.lanes) {
-      const {state, correlationKey} = first;
-      if (state === 'on-hold' && correlationKey !== undefined && !this.holds.has(correlationKey)) {
-        this.activeFireAndForgetInvoker.fireAndForget(() => {
-          return this.reviewRestoredHold(correlationKey);
-        });
-      }
-    }
+    const restoredKeys = listed.lanes.flatMap(({first: {state, correlationKey}}) => {
+      return state === 'on-hold' && correlationKey !== undefined && !this.holds.has(correlationKey)
+        ? [correlationKey]
+        : [];
+    });
+    this.activeFireAndForgetInvoker.fireAndForget(() => {
+      return this.reviewRestoredHoldsOf(restoredKeys);
+    });
   }
 
   /** Lets the operations that wait for the user's permission to send to this conversation go */
@@ -2938,11 +2936,11 @@ export class MessageRepository {
       return;
     }
     for (const [correlationKey, hold] of this.holdsWaitingOn(conversation)) {
-      const waitingOn = hold.waitingOn.filter(conversationId => {
+      const waitingOnConversations = hold.waitingOnConversations.filter(conversationId => {
         return !matchQualifiedIds(conversationId, conversation.qualifiedId);
       });
-      if (waitingOn.length > 0) {
-        this.holds.set(correlationKey, {...hold, waitingOn});
+      if (waitingOnConversations.length > 0) {
+        this.holds.set(correlationKey, {...hold, waitingOnConversations});
         continue;
       }
       this.holds.delete(correlationKey);
@@ -2983,19 +2981,23 @@ export class MessageRepository {
     if (pending === undefined) {
       return;
     }
+    const conversationId = pending.payload.conversationId.id;
     if (pending.state === 'on-hold') {
-      // A hold this session didn't make was restored with the draft that edits the message.
+      // A hold this session didn't make was restored for the message being edited.
       if (!this.holds.has(message.id)) {
-        this.holds.set(message.id, {reason: 'editing'});
+        this.holds.set(message.id, {reason: 'editing', conversationId});
+        await this.rememberEditedMessage(conversationId, message.id);
       }
       return;
     }
-    this.holds.set(message.id, {reason: 'editing'});
+    this.holds.set(message.id, {reason: 'editing', conversationId});
     const outcome = await this.outbox.hold(message.id);
     this.logger.info('The outbox answered holding a message for editing', {outcome: outcome.type});
     if (outcome.type !== 'operation-held') {
       this.holds.delete(message.id);
+      return;
     }
+    await this.rememberEditedMessage(conversationId, message.id);
   }
 
   public async stopEditing(): Promise<void> {
@@ -3007,6 +3009,7 @@ export class MessageRepository {
         continue;
       }
       this.holds.delete(correlationKey);
+      await this.forgetEditedMessage(hold.conversationId, correlationKey);
       const outcome = await this.outbox.release(correlationKey);
       this.logger.info('The outbox answered releasing a message that was held for editing', {outcome: outcome.type});
     }
@@ -3017,7 +3020,7 @@ export class MessageRepository {
       const [, hold] = entry;
       return (
         hold.reason === 'sending-permission' &&
-        hold.waitingOn.some(conversationId => {
+        hold.waitingOnConversations.some(conversationId => {
           return matchQualifiedIds(conversationId, conversation.qualifiedId);
         })
       );
@@ -3030,17 +3033,17 @@ export class MessageRepository {
    */
   private holdForPermission(
     correlationKey: string,
-    waitingOn: Conversation[],
+    waitingOnConversations: Conversation[],
     whenDeclined: PermissionHold['whenDeclined'],
   ): PerformOutcome {
     this.holds.set(correlationKey, {
       reason: 'sending-permission',
-      waitingOn: waitingOn.map(conversation => {
+      waitingOnConversations: waitingOnConversations.map(conversation => {
         return conversation.qualifiedId;
       }),
       whenDeclined,
     });
-    for (const conversation of waitingOn) {
+    for (const conversation of waitingOnConversations) {
       this.activeFireAndForgetInvoker.fireAndForget(() => {
         return this.askForPermission(conversation);
       });
@@ -3060,26 +3063,56 @@ export class MessageRepository {
     await (isAllowed ? this.allowSending(conversation) : this.declineSending(conversation));
   }
 
-  private async reviewRestoredHold(correlationKey: string): Promise<void> {
-    if (await this.isTextTheDraftEdits(correlationKey)) {
-      this.holds.set(correlationKey, {reason: 'editing'});
-      return;
+  private async reviewRestoredHoldsOf(restoredKeys: string[]): Promise<void> {
+    const editedMessages = await this.readEditedMessages();
+    for (const correlationKey of restoredKeys) {
+      const payload = this.findPendingMessage(correlationKey)?.payload;
+      if (payload?.type === 'text' && editedMessages[payload.conversationId.id] === payload.messageId) {
+        this.holds.set(correlationKey, {reason: 'editing', conversationId: payload.conversationId.id});
+        continue;
+      }
+      // The user may have started to edit the message meanwhile.
+      if (this.holds.has(correlationKey)) {
+        continue;
+      }
+      const outcome = await this.activeOutbox.release(correlationKey);
+      this.logger.info('The outbox answered releasing a restored hold', {outcome: outcome.type});
     }
-    // The user may have started to edit the message meanwhile.
-    if (this.holds.has(correlationKey)) {
-      return;
+    for (const [conversationId, messageId] of Object.entries(editedMessages)) {
+      if (this.holds.get(messageId)?.reason !== 'editing') {
+        await this.forgetEditedMessage(conversationId, messageId);
+      }
     }
-    const outcome = await this.activeOutbox.release(correlationKey);
-    this.logger.info('The outbox answered releasing a restored hold', {outcome: outcome.type});
   }
 
-  private async isTextTheDraftEdits(correlationKey: string): Promise<boolean> {
-    const payload = this.findPendingMessage(correlationKey)?.payload;
-    if (payload?.type !== 'text') {
-      return false;
+  private async readEditedMessages(): Promise<EditedMessages> {
+    const editedMessages = await this.eventService.storageService.loadFromSimpleStorage<EditedMessages>(
+      StorageKey.OUTBOX.EDITED_MESSAGES,
+    );
+    return editedMessages ?? {};
+  }
+
+  private async writeEditedMessages(editedMessages: EditedMessages): Promise<void> {
+    await this.eventService.storageService.saveToSimpleStorage(StorageKey.OUTBOX.EDITED_MESSAGES, editedMessages);
+  }
+
+  private async rememberEditedMessage(conversationId: string, messageId: string): Promise<void> {
+    await this.writeEditedMessages({...(await this.readEditedMessages()), [conversationId]: messageId});
+  }
+
+  /** Leaves the entry alone when the conversation edits another message by then. */
+  private async forgetEditedMessage(conversationId: string, messageId: string): Promise<void> {
+    const editedMessages = await this.readEditedMessages();
+    if (editedMessages[conversationId] !== messageId) {
+      return;
     }
-    const conversation = this.conversationState.findConversation(payload.conversationId);
-    return conversation !== undefined && (await this.isBeingEdited?.(conversation, payload.messageId)) === true;
+    await this.writeEditedMessages(
+      Object.fromEntries(
+        Object.entries(editedMessages).filter(([editedIn]) => {
+          return editedIn !== conversationId;
+        }),
+      ),
+    );
   }
 
   // Change routing
@@ -3112,7 +3145,7 @@ export class MessageRepository {
     return outcome.type === 'operation-succeeded' ? this.outboxKinds.messageChange.enqueue(request) : outcome;
   }
 
-  /** The message as the outbox still has it; `undefined` once it went through, or when it never was in the outbox */
+  /** `undefined` once the message went through, or when it never was in the outbox */
   private findPendingMessage(messageId: string): OperationView<MessagePayload> | undefined {
     const found = this.outboxKinds.message.find(messageId);
     return found.type === 'operation-found' ? found.operation : undefined;
@@ -3160,7 +3193,7 @@ export class MessageRepository {
     return conversation.verification_state() === ConversationVerificationState.DEGRADED;
   }
 
-  /** Logs what the outbox answered, without content, and says whether it took the operation */
+  /** Also logs what the outbox answered, without content */
   private isAccepted(outcome: EnqueueOutcome<unknown>): boolean {
     return match(outcome)
       .with({type: P.union('operation-queued', 'operation-versioned')}, ({type}) => {
@@ -3207,12 +3240,9 @@ export class MessageRepository {
       return undefined;
     }
     // The hash includes the time of the quoted message, so it is made when sending. A quote of a message that
-    // is gone keeps its ids and has no hash: the receiver shows it as not found
+    // is gone keeps its ids and has no hash: the receiver shows it as not found.
     const quotedEvent = await this.eventService.loadEvent(conversation.id, quote.messageId);
-    const hash =
-      quotedEvent === undefined
-        ? new Uint8Array().buffer
-        : await container.resolve<QuoteEventHasher>(QUOTE_EVENT_HASHER)(quotedEvent);
+    const hash = quotedEvent === undefined ? new Uint8Array().buffer : await hashEvent(quotedEvent);
     return new QuoteEntity({hash, messageId: quote.messageId, userId: quote.userId}) as OutgoingQuote;
   }
 
@@ -3364,7 +3394,7 @@ export class MessageRepository {
     }
   }
 
-  /** Writes the status on the shown message and on its record; a message that is gone is left alone */
+  /** A message that is gone is left alone. */
   private async markMessage(
     conversation: Conversation,
     messageId: string,

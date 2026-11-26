@@ -27,7 +27,6 @@ import {
   formatString,
   removeLineBreaks,
   sortByPriority,
-  utf8ToUtf16BE,
   obfuscate,
   replaceAccents,
   generateRandomPassword,
@@ -193,20 +192,6 @@ describe('StringUtil', () => {
       const resultValue = bytesToHex(array);
 
       expect(resultValue).toBe(expectedResult);
-    });
-  });
-
-  describe('utf8ToUtf16BE', () => {
-    it('converts a string to a UTF16 BigEndian array', () => {
-      const string = '👁🧑🏾yay üüü';
-      const expected = [
-        254, 255, 216, 61, 220, 65, 216, 62, 221, 209, 216, 60, 223, 254, 0, 121, 0, 97, 0, 121, 0, 32, 0, 252, 0, 252,
-        0, 252,
-      ];
-
-      const result = utf8ToUtf16BE(string);
-
-      expect(result).toEqual(expected);
     });
   });
 

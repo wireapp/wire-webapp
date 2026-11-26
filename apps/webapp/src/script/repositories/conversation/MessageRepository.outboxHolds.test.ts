@@ -26,6 +26,7 @@ import {translateForTest} from '../../util/test/translateForTest';
 import {WebAppEvents} from '../../webAppEvents';
 import {Conversation} from '../entity/Conversation';
 import type {ContentMessage} from '../entity/message/contentMessage';
+import {StorageKey} from '../storage';
 
 import {
   laneOfChanges,
@@ -228,6 +229,14 @@ describe('the holds of MessageRepository', () => {
     return {id: messageId} as ContentMessage;
   }
 
+  function editedMessages(): unknown {
+    return parts.simpleStorage.get(StorageKey.OUTBOX.EDITED_MESSAGES);
+  }
+
+  function seedEditedMessages(entries: Record<string, string>): void {
+    parts.simpleStorage.set(StorageKey.OUTBOX.EDITED_MESSAGES, entries);
+  }
+
   describe('asking the user before sending to a degraded conversation', () => {
     describe.each(variants)('$name', variant => {
       beforeEach(async () => {
@@ -335,6 +344,22 @@ describe('the holds of MessageRepository', () => {
 
       expect(stateOf('message-1')).toBe('queued');
       expect(heldKeys()).toEqual([]);
+    });
+
+    it('records the edited message for the next session, and forgets it when the user stops editing', async () => {
+      await parts.repository.startEditing(editingOf('message-1'));
+
+      expect(editedMessages()).toEqual({[CONVERSATION_ID.id]: 'message-1'});
+
+      await parts.repository.stopEditing();
+
+      expect(editedMessages()).toEqual({});
+    });
+
+    it('records nothing when the message could not be held', async () => {
+      await parts.repository.startEditing(editingOf('sent-message'));
+
+      expect(editedMessages()).toBeUndefined();
     });
 
     it('releases the message edited before when the user starts editing another one', async () => {
@@ -458,10 +483,10 @@ describe('the holds of MessageRepository', () => {
       expect(stateOf('message-1')).toBeUndefined();
     });
 
-    it('holds a restored text for editing while the draft edits it, even when degraded, until editing stops', async () => {
+    it('holds a restored text for editing while it was being edited, even when degraded, until editing stops', async () => {
       parts.records.set('message-1', sendingRecord());
       parts.degrade(parts.conversation);
-      parts.edited.add('message-1');
+      seedEditedMessages({[CONVERSATION_ID.id]: 'message-1'});
       seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
 
       await startAndReview();
@@ -469,15 +494,29 @@ describe('the holds of MessageRepository', () => {
       expect(parts.prompts).toHaveLength(0);
       expect(parts.sendToBackend).not.toHaveBeenCalled();
       expect(stateOf('message-1')).toBe('on-hold');
+      expect(editedMessages()).toEqual({[CONVERSATION_ID.id]: 'message-1'});
 
       await parts.repository.stopEditing();
       await parts.kit.clock.settle();
 
       expect(parts.prompts).toHaveLength(1);
+      expect(editedMessages()).toEqual({});
     });
 
-    it('releases a restored edit, because only a text message is held for its draft', async () => {
-      parts.edited.add('message-1');
+    it('releases a restored text that another message of its conversation was edited instead of', async () => {
+      parts.records.set('message-1', sendingRecord());
+      seedEditedMessages({[CONVERSATION_ID.id]: 'message-2'});
+      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+
+      await startAndReview();
+
+      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(stateOf('message-1')).toBeUndefined();
+      expect(editedMessages()).toEqual({});
+    });
+
+    it('releases a restored edit, because only a text message is held for editing', async () => {
+      seedEditedMessages({[CONVERSATION_ID.id]: 'message-1'});
       seedOnHold('message-change', editPayload(), 'message-1:edit', laneOfChanges(CONVERSATION_ID));
 
       await startAndReview();
@@ -498,6 +537,7 @@ describe('the holds of MessageRepository', () => {
 
       expect(stateOf('message-1')).toBe('on-hold');
       expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(editedMessages()).toEqual({[CONVERSATION_ID.id]: 'message-1'});
     });
   });
 });

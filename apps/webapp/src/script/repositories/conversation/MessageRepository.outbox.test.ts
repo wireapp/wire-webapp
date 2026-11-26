@@ -51,6 +51,7 @@ import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
 import {MessageRepository} from './MessageRepository';
 import type {MessagePayload} from './outbox/messageOutboxTypes';
+import {createSimpleStorage} from './outbox/testing/createOutboxRepository';
 
 const CONVERSATION_ID = {id: 'conversation-1', domain: 'wire.test'};
 
@@ -79,7 +80,7 @@ function buildMessageRepositoryParts(outbox?: Outbox): MessageRepositoryParts {
     translateForTest,
   );
   conversationState.conversations([selfConversation, conversation]);
-  const eventService = new EventService({} as any);
+  const eventService = new EventService(createSimpleStorage(new Map()));
   const send = jest.fn();
   const invoker = createFireAndForgetInvoker({reportError: jest.fn()});
 
@@ -101,7 +102,6 @@ function buildMessageRepositoryParts(outbox?: Outbox): MessageRepositoryParts {
     conversationState,
     new TeamState(),
     createCoreTestFixture({service: {conversation: {send, messageTimer: new MessageTimer()}}}),
-    undefined,
     invoker,
   );
   return {repository, conversation, conversationState, eventService, send, invoker};

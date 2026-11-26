@@ -40,7 +40,7 @@ import {User} from '../../../entity/User';
 import {EventRepository} from '../../../event/EventRepository';
 import {EventService} from '../../../event/EventService';
 import {PropertiesRepository} from '../../../properties/propertiesRepository';
-import type {EventRecord} from '../../../storage';
+import type {EventRecord, StorageService} from '../../../storage';
 import {TeamState} from '../../../team/TeamState';
 import {UserRepository} from '../../../user/userRepository';
 import {UserState} from '../../../user/userState';
@@ -56,7 +56,6 @@ export const OTHER_CONVERSATION_ID = {id: 'conversation-2', domain: 'wire.test'}
 export const MISSING_CONVERSATION_ID = {id: 'gone', domain: 'wire.test'};
 export const MEMBER_ID = {id: 'member', domain: 'wire.test'};
 
-/** What the event storage keeps about a message */
 export type StoredRecord = {
   status: StatusType;
   failed_reason?: FailedReason;
@@ -75,7 +74,7 @@ type KindNames = {
 
 export type OutboxRepository = {
   repository: MessageRepository;
-  /** Runs what follows the operations; wait for it with `waitUntilAllSettled` */
+  /** Wait for what follows the operations with `waitUntilAllSettled` */
   invoker: FireAndForgetInvoker;
   kit: OutboxTestKit;
   conversation: Conversation;
@@ -83,10 +82,10 @@ export type OutboxRepository = {
   selfConversation: Conversation;
   /** What `getSelfConversations` answers */
   selfConversations: Conversation[];
-  /** The stored messages, by message id */
+  /** By message id */
   records: Map<string, StoredRecord>;
-  /** The ids of the messages the drafts edit */
-  edited: Set<string>;
+  /** What the repository keeps in simple storage, by key */
+  simpleStorage: Map<string, unknown>;
   /** The sending prompts asked so far. Each stays open until the test answers it. */
   prompts: PermissionPrompt[];
   handles: {[Name in keyof KindNames]: KindHandle<KindNames[Name]>};
@@ -124,12 +123,23 @@ export function sendingRecord(overrides: Partial<StoredRecord> = {}): StoredReco
   return {status: StatusType.SENDING, ...overrides};
 }
 
-/** The record of an asset whose upload went through */
 export function uploadedRecord(overrides: Partial<StoredRecord> = {}): StoredRecord {
   return sendingRecord({
     data: {key: 'asset-key', otr_key: new Uint8Array([1]), sha256: new Uint8Array([1])},
     ...overrides,
   });
+}
+
+/** A storage service whose simple storage is `entries`, and that has nothing else */
+export function createSimpleStorage(entries: Map<string, unknown>): StorageService {
+  return {
+    loadFromSimpleStorage: async (key: string) => {
+      return entries.get(key);
+    },
+    saveToSimpleStorage: async (key: string, value: unknown) => {
+      entries.set(key, value);
+    },
+  } as unknown as StorageService;
 }
 
 function createConversation({id, domain}: {id: string; domain: string}): Conversation {
@@ -162,7 +172,8 @@ export function createOutboxRepository(): OutboxRepository {
   jest.spyOn(conversation, 'allUserEntities').mockReturnValue([{qualifiedId: MEMBER_ID} as User]);
 
   const records = new Map<string, StoredRecord>();
-  const eventService = new EventService({} as any);
+  const simpleStorage = new Map<string, unknown>();
+  const eventService = new EventService(createSimpleStorage(simpleStorage));
   jest.spyOn(eventService, 'loadEvent').mockImplementation(async (_conversationId, messageId) => {
     const record = records.get(messageId);
     return record === undefined ? undefined : ({id: messageId, primary_key: messageId, ...record} as EventRecord);
@@ -174,7 +185,6 @@ export function createOutboxRepository(): OutboxRepository {
     }
     return {} as any;
   });
-  const edited = new Set<string>();
   const invoker = createFireAndForgetInvoker({reportError: jest.fn()});
 
   const repository = new MessageRepository(
@@ -195,9 +205,6 @@ export function createOutboxRepository(): OutboxRepository {
     new TeamState(),
     createCoreTestFixture({service: {conversation: {send: jest.fn(), messageTimer: new MessageTimer()}}}),
     kit.outbox,
-    async (_conversation, messageId) => {
-      return edited.has(messageId);
-    },
     invoker,
   );
 
@@ -292,7 +299,7 @@ export function createOutboxRepository(): OutboxRepository {
     selfConversation,
     selfConversations,
     records,
-    edited,
+    simpleStorage,
     prompts,
     handles: {
       message: handleNamed('message'),

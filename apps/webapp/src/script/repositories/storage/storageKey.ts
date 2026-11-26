@@ -33,6 +33,9 @@ export const StorageKey = {
     EMOJI_USAGE_COUNT: 'z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT',
     INPUT: 'z.storage.StorageKey.CONVERSATION.INPUT',
   },
+  OUTBOX: {
+    EDITED_MESSAGES: 'z.storage.StorageKey.OUTBOX.EDITED_MESSAGES',
+  },
   LOCALIZATION: {
     LOCALE: 'z.storage.StorageKey.LOCALIZATION.LOCALE',
   },

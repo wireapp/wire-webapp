@@ -125,7 +125,6 @@ function buildParts(maxOperations?: number): Parts {
     conversationState,
     new TeamState(),
     createCoreTestFixture({service: {conversation: {send, messageTimer: new MessageTimer()}}}),
-    undefined,
     invoker,
   );
 
