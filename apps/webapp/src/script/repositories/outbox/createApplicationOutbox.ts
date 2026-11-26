@@ -21,26 +21,17 @@ import type {Table} from 'dexie';
 
 import {createDexieOutboxStore} from './createDexieOutboxStore';
 
-import {createOutbox, type OperationSnapshot, type Outbox, type StartOutcome} from '../../outbox';
+import {createOutbox, type OperationSnapshot, type Outbox} from '../../outbox';
 import {getLogger} from '../../util/logger';
 
-/** Structural, so that the service doesn't pull the storage service and its imports into a cycle */
-type OutboxServiceDependencies = {
+/** Structural, so that this module doesn't pull the storage service and its imports into a cycle */
+type ApplicationOutboxDependencies = {
   storageService: {db?: {outbox: Table<OperationSnapshot, number>}};
   serverTimeHandler: {toServerTimestamp: () => number};
 };
 
-export type OutboxService = {
-  outbox: Outbox;
-  /** Needs the database to be open and the kinds to be registered */
-  start: () => Promise<StartOutcome>;
-  stop: () => Promise<void>;
-};
-
-export function createOutboxService({storageService, serverTimeHandler}: OutboxServiceDependencies): OutboxService {
-  const outbox = createOutbox();
-  const logger = getLogger('Outbox');
-
+/** The outbox over the app's database and server time. Starting it needs the database to be open. */
+export function createApplicationOutbox({storageService, serverTimeHandler}: ApplicationOutboxDependencies): Outbox {
   const store = createDexieOutboxStore(() => {
     if (storageService.db === undefined) {
       throw new Error('The database is not open');
@@ -48,19 +39,11 @@ export function createOutboxService({storageService, serverTimeHandler}: OutboxS
     return storageService.db.outbox;
   });
 
-  return {
-    outbox,
-    start: () => {
-      return outbox.start({
-        store,
-        getServerTime: () => {
-          return serverTimeHandler.toServerTimestamp();
-        },
-        logger,
-      });
+  return createOutbox({
+    store,
+    getServerTime: () => {
+      return serverTimeHandler.toServerTimestamp();
     },
-    stop: () => {
-      return outbox.stop();
-    },
-  };
+    logger: getLogger('Outbox'),
+  });
 }
