@@ -125,6 +125,9 @@ function buildParts(): Parts {
   const inject = jest.spyOn(repository as any, 'injectOptimisticMessage').mockResolvedValue(true);
   jest.spyOn(conversation, 'getMessage').mockReturnValue({
     status: jest.fn(),
+    ephemeral_expires: jest.fn(() => {
+      return false;
+    }),
     failed_reason: jest.fn(),
     primary_key: 'primary-key',
   } as never);
