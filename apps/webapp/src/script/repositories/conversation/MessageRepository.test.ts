@@ -277,6 +277,17 @@ describe('MessageRepository', () => {
         userIds: expect.any(Object),
       });
     });
+
+    it('keeps the default retries when the outbox is off', async () => {
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
+
+      await messageRepository.sendPing(generateConversation());
+
+      const [sendParams] = jest.mocked(getConversationServiceForTest(core).send).mock.calls[0];
+      expect(sendParams.failFast).toBeUndefined();
+    });
   });
 
   describe('sending and injecting a message', () => {

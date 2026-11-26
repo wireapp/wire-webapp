@@ -35,6 +35,7 @@ import {createPdfPreview} from './pdfPreview';
 import {AssetAuditData, AssetOptions} from '../../apiClient/asset/assetApi';
 import type {AssetResponse} from '../../apiClient/asset/assetApi';
 import {AssetRetentionPolicy} from '../../apiClient/asset/assetRetentionPolicy';
+import type {RequestRetryOptions} from '../../apiClient/http/failFastRequestConfig';
 import type {RequestCancelable} from '../../apiClient/http/requestCancelable';
 import {RequestCancellationError} from '../../apiClient/user/userError';
 import type {AssetService} from '../../core/conversation';
@@ -283,6 +284,7 @@ export class AssetRepository {
     options: AssetUploadOptions,
     isAuditLogEnabled: boolean,
     onCancel?: () => void,
+    retryOptions?: RequestRetryOptions,
   ): Promise<EncryptedAssetUploaded & {preview?: Asset.IPreview}> {
     const bytes = await loadFileBuffer(file);
     const progressObservable = ko.observable(0);
@@ -324,7 +326,7 @@ export class AssetRepository {
       onProgress?: (fraction: number) => void,
     ): Promise<EncryptedAssetUploaded> => {
       assertNotCanceled();
-      const request = await this.assetCoreService.uploadAsset(data, uploadOptions, onProgress);
+      const request = await this.assetCoreService.uploadAsset(data, uploadOptions, onProgress, retryOptions);
       cancelRequest = request.cancel;
       if (controller.signal.aborted) {
         request.cancel();

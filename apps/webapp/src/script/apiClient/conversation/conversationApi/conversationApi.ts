@@ -52,6 +52,7 @@ import {
   ConversationRenameEvent,
 } from '../../event';
 import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
+import {getRetryRequestConfig, RequestRetryOptions} from '../../http/failFastRequestConfig';
 import {CONVERSATION_PROTOCOL} from '../../team';
 import {QualifiedId} from '../../user';
 import {
@@ -697,8 +698,10 @@ export class ConversationAPI {
     conversationId: string,
     domain: string,
     messageData: ProtobufOTR.QualifiedNewOtrMessage,
+    retryOptions: RequestRetryOptions = {},
   ): Promise<MessageSendingStatus> {
     const config: AxiosRequestConfig = {
+      ...getRetryRequestConfig(retryOptions),
       /*
        * We need to slice the content of what protobuf has generated in order for Axios to send the correct data (see https://github.com/axios/axios/issues/4068)
        * FIXME: The `slice` can be removed as soon as Axios publishes a version with the dataview issue fixed.
@@ -718,8 +721,12 @@ export class ConversationAPI {
    * @see https://messaginglayersecurity.rocks/mls-protocol/draft-ietf-mls-protocol.html#name-message-framing
    * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_mls_messages
    */
-  public async postMlsMessage(messageData: Uint8Array): Promise<PostMlsMessageResponse> {
+  public async postMlsMessage(
+    messageData: Uint8Array,
+    retryOptions: RequestRetryOptions = {},
+  ): Promise<PostMlsMessageResponse> {
     const config: AxiosRequestConfig = {
+      ...getRetryRequestConfig(retryOptions),
       data: messageData,
       method: 'post',
       url: `/${ConversationAPI.URL.MLS}/${ConversationAPI.URL.MESSAGES}`,

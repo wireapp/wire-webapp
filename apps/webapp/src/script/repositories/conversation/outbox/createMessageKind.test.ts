@@ -57,7 +57,7 @@ type Context = FakeMessageOutbox & {
   release: jest.Mock;
   kind: Kind<MessagePayload>;
   perform: (payload: MessagePayload, signal?: AbortSignal) => Promise<PerformOutcome>;
-  changed: (payload: MessagePayload, state: OperationState) => Promise<void>;
+  changed: (payload: MessagePayload, state: OperationState, queuedAt?: number) => Promise<void>;
 };
 
 function setup(): Context {
@@ -75,8 +75,8 @@ function setup(): Context {
     perform: (payload: MessagePayload, signal = new AbortController().signal): Promise<PerformOutcome> => {
       return kind.perform(viewOf('message', payload), signal);
     },
-    changed: async (payload: MessagePayload, state: OperationState): Promise<void> => {
-      kind.onChanged?.(viewOf('message', payload, {state}));
+    changed: async (payload: MessagePayload, state: OperationState, queuedAt = 0): Promise<void> => {
+      kind.onChanged?.(viewOf('message', payload, {state, queuedAt}));
       await flush();
     },
   };
@@ -110,7 +110,10 @@ describe('the message kind', () => {
 
       expect(port.buildText).toHaveBeenCalledWith(conversation, textPayload());
       expect(port.sendToBackend).toHaveBeenCalledTimes(1);
-      expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {syncTimestamp: true});
+      expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {
+        failFast: true,
+        syncTimestamp: true,
+      });
       expect(port.injectOptimistic).not.toHaveBeenCalled();
     });
 
@@ -185,13 +188,16 @@ describe('the message kind', () => {
       expect(port.markFailed).not.toHaveBeenCalled();
     });
 
-    it('answers dropped when the conversation is gone for the backend', async () => {
-      const {perform, port} = setup();
+    it('answers dead-lettered as removed when the backend does not know the conversation of a known one', async () => {
+      const {perform, port, conversation} = setup();
       port.sendToBackend.mockRejectedValue(new BackendError('gone', BackendErrorLabel.NOT_FOUND, 404));
 
-      await expect(perform(textPayload())).resolves.toEqual(dropped);
+      await expect(perform(textPayload())).resolves.toEqual(deadLettered);
 
-      expect(port.markFailed).not.toHaveBeenCalled();
+      expect(port.markFailed).toHaveBeenCalledWith(conversation, 'message-1', {
+        reason: 'removed',
+        federation: false,
+      });
     });
 
     it('answers dead-lettered as removed when the self user is not in the conversation any more', async () => {
@@ -257,7 +263,10 @@ describe('the message kind', () => {
 
       expect(port.uploadAsset).toHaveBeenCalledWith(conversation, assetPayload(), file, signal);
       expect(port.injectOptimistic).toHaveBeenCalledTimes(1);
-      expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {syncTimestamp: true});
+      expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {
+        failFast: true,
+        syncTimestamp: true,
+      });
       const [uploadOrder] = port.uploadAsset.mock.invocationCallOrder;
       const [injectOrder] = port.injectOptimistic.mock.invocationCallOrder;
       const [sendOrder] = port.sendToBackend.mock.invocationCallOrder;
@@ -355,7 +364,7 @@ describe('the message kind', () => {
       ['an error that needs a retry', new NetworkError('offline'), failed],
       ['a decline', declinedResult(), deadLettered],
       ['a rejection', new BackendError('no', BackendErrorLabel.CLIENT_ERROR, 400), deadLettered],
-      ['a conversation that is gone', new BackendError('gone', BackendErrorLabel.NOT_FOUND, 404), dropped],
+      ['a conversation that is gone', new BackendError('gone', BackendErrorLabel.NOT_FOUND, 404), deadLettered],
     ])('answers for %s when sending', async (_name, sendResult, expected) => {
       const {perform, port, records} = setup();
       records.set('asset-1', sendingRecord({file: new Blob(['bytes']), hasUploadResult: true}));
@@ -438,7 +447,10 @@ describe('the message kind', () => {
 
       await perform(editPayload());
 
-      expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {syncTimestamp: false});
+      expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {
+        failFast: true,
+        syncTimestamp: false,
+      });
       expect(port.sendLinkPreview).toHaveBeenCalledWith(
         conversation,
         expect.objectContaining({messageId: 'edit-1', text: 'edited'}),
@@ -453,6 +465,7 @@ describe('the message kind', () => {
       await perform(deletePayload());
 
       expect(port.sendToBackend).toHaveBeenCalledWith(expect.anything(), conversation, {
+        failFast: true,
         recipients: [{id: 'member', domain: 'wire.test'}],
         skipInjection: true,
         targetMode: expect.anything(),
@@ -625,6 +638,28 @@ describe('the message kind', () => {
       await changed(textPayload(), 'dead-lettered');
 
       expect(port.markFailed).not.toHaveBeenCalled();
+    });
+
+    it('writes the generic reason on a message that was given up before it could expire', async () => {
+      const {changed, port, records, conversation} = setup();
+      records.set('message-1', sendingRecord());
+      const weekMilliseconds = 7 * 24 * 60 * 60 * 1000;
+      port.serverTime.mockReturnValue(weekMilliseconds + 1000);
+
+      await changed(textPayload(), 'dead-lettered', 2000);
+
+      expect(port.markFailed).toHaveBeenCalledWith(conversation, 'message-1', {reason: 'generic', federation: false});
+    });
+
+    it('writes expired on a message that is as old as the expiry', async () => {
+      const {changed, port, records, conversation} = setup();
+      records.set('message-1', sendingRecord());
+      const weekMilliseconds = 7 * 24 * 60 * 60 * 1000;
+      port.serverTime.mockReturnValue(weekMilliseconds + 1000);
+
+      await changed(textPayload(), 'dead-lettered', 1000);
+
+      expect(port.markFailed).toHaveBeenCalledWith(conversation, 'message-1', {reason: 'expired', federation: false});
     });
 
     it('removes a message that was dropped, and tolerates it being gone already', async () => {
