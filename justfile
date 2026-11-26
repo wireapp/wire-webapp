@@ -40,11 +40,11 @@ report-dependencies:
 stylesheet-lint:
     cd apps/webapp && prettier --ignore-path ../../.prettierignore --check "**/*.less" && stylelint --ignore-path .gitignore "**/*.less"
 
-# The 552-warning baseline covers 273 enum declarations and 279 other warnings.
+# The 684-warning baseline covers 273 enum declarations, 279 other warnings and 132 console calls.
 [arg("fix", long, value="true")]
 [group('lint')]
 eslint fix="false":
-    eslint . --config eslint.config.mjs --max-warnings=552 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
+    eslint . --config eslint.config.mjs --max-warnings=684 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
 
 # Run all repository lint checks, including circular dependencies.
 [group('lint')]

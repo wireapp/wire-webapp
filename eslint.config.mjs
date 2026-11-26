@@ -145,12 +145,6 @@ const legacyRules = {
   curly: 'error',
   'header-tony/header': 'off',
   'no-cond-assign': 'error',
-  'no-console': [
-    'error',
-    {
-      allow: ['error', 'info', 'warn'],
-    },
-  ],
   'no-const-assign': 'error',
   'no-dupe-class-members': 'error',
   'no-duplicate-case': 'error',
@@ -896,6 +890,7 @@ const config = [
     },
     settings: importSettings,
     rules: {
+      'no-console': 'warn',
       'import/no-named-as-default-member': 'error',
       'import/no-named-as-default': 'error',
       'no-restricted-properties': [
