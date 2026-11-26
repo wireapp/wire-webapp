@@ -21,6 +21,7 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {create} from 'zustand';
 
+import {useNoInternetState} from './noInternetState';
 import {TYPE} from './WarningsTypes';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
@@ -65,6 +66,10 @@ const useWarningsState = create<WarningsState>(set => {
     },
     warnings: [],
   };
+});
+
+useWarningsState.subscribe(({warnings}) => {
+  useNoInternetState.setState({hasNoInternet: warnings.includes(TYPE.NO_INTERNET)});
 });
 
 type Translate = (

@@ -253,6 +253,8 @@ export class ActionsViewModel {
 
   readonly deleteMessage = (conversationEntity?: Conversation, messageEntity?: Message): Promise<void> => {
     if (conversationEntity !== undefined && messageEntity !== undefined) {
+      // Nobody can have a message that was never attempted: it is deleted, not deleted "for me"
+      const isNeverAttempted = this.messageRepository.isPendingAndNeverAttempted(messageEntity.id);
       return new Promise(resolve => {
         PrimaryModal.show(
           PrimaryModal.type.CONFIRM,
@@ -262,12 +264,20 @@ export class ActionsViewModel {
                 await this.messageRepository.deleteMessage(conversationEntity, messageEntity);
                 resolve();
               },
-              text: this.translate('modalConversationDeleteMessageAction'),
+              text: this.translate(
+                isNeverAttempted ? 'outboxDeletePendingAction' : 'modalConversationDeleteMessageAction',
+              ),
             },
             text: {
-              closeBtnLabel: this.translate('modalConversationDeleteMessageCloseBtn'),
-              message: this.translate('modalConversationDeleteMessageMessage'),
-              title: this.translate('modalConversationDeleteMessageHeadline'),
+              closeBtnLabel: this.translate(
+                isNeverAttempted ? 'outboxDeletePendingCloseBtn' : 'modalConversationDeleteMessageCloseBtn',
+              ),
+              message: this.translate(
+                isNeverAttempted ? 'outboxDeletePendingMessage' : 'modalConversationDeleteMessageMessage',
+              ),
+              title: this.translate(
+                isNeverAttempted ? 'outboxDeletePendingHeadline' : 'modalConversationDeleteMessageHeadline',
+              ),
             },
           },
           undefined,

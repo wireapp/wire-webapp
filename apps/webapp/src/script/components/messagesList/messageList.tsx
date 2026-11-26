@@ -17,7 +17,7 @@
  *
  */
 
-import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {FC, Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -26,12 +26,15 @@ import {JumpToLastMessageButton} from './jumpToLastMessageButton';
 import {Message, MessageActions} from './message';
 import {MarkerComponent} from './message/marker';
 import {ScrollToElement} from './message/types';
+import {OfflineNotice} from './offlineNotice';
 import {UploadAssets} from './uploadAssets';
 import {filterMessages} from './utils/messagesFilter';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
+import {findFirstPendingMessage} from './utils/sendingState';
 import {useConversationReadBoundary} from './utils/useConversationReadBoundary';
 
+import {useOutboxOffline} from '../../hooks/useOutboxOffline';
 import {useRoveFocus} from '../../hooks/useRoveFocus';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
 import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
@@ -82,6 +85,10 @@ interface MessagesListParams {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
   isRightSidebarOpen?: boolean;
   updateConversationLastRead: (conversation: Conversation) => void;
+  /** Passed in, like the notice, so that the list stays out of the import cycle of the app context */
+  isOutboxEnabled: boolean;
+  /** The translated notice shown while offline */
+  offlineNotice: string;
 }
 
 export const MessagesList: FC<MessagesListParams> = ({
@@ -108,6 +115,8 @@ export const MessagesList: FC<MessagesListParams> = ({
   setMsgElementsFocusable,
   isRightSidebarOpen = false,
   updateConversationLastRead,
+  isOutboxEnabled,
+  offlineNotice,
 }) => {
   const {
     messages: allMessages,
@@ -141,10 +150,14 @@ export const MessagesList: FC<MessagesListParams> = ({
   const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
 
+  const isOffline = useOutboxOffline(isOutboxEnabled);
+  const firstPendingMessage = isOffline ? findFirstPendingMessage(filteredMessages) : undefined;
+
   const groupedMessages = groupMessagesBySenderAndTime({
     messages: filteredMessages,
     lastReadTimestamp: conversationLastReadTimestamp,
     includeInitialUnreadSeparator: hasManualUnreadMarker,
+    splitBySendingState: isOutboxEnabled,
   });
 
   const [messagesContainer, setMessagesContainer] = useState<HTMLDivElement | null>(null);
@@ -347,66 +360,70 @@ export const MessagesList: FC<MessagesListParams> = ({
               const isFocused = focusedId !== undefined && focusedId !== '' && focusedId === message.id;
 
               return (
-                <Message
-                  key={key}
-                  onVisible={visibleCallback}
-                  onVisibilityLost={lastMessageInvisibleCallback}
-                  message={message}
-                  hideHeader={message.timestamp() !== firstMessageTimestamp}
-                  messageActions={messageActions}
-                  conversation={conversation}
-                  cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
-                  hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
-                  isLastDeliveredMessage={isLastDeliveredMessage}
-                  isHighlighted={isHighlighted}
-                  scrollTo={scrollToElement}
-                  isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
-                  messageRepository={messageRepository}
-                  loadUsersByIdsFromDb={loadUsersByIdsFromDb}
-                  onClickAvatar={showUserDetails}
-                  onClickCancelRequest={cancelConnectionRequest}
-                  onClickImage={showImageDetails}
-                  onClickInvitePeople={() => {
-                    return invitePeople(conversation);
-                  }}
-                  onClickReactionDetails={message => {
-                    return showMessageReactions(message, true);
-                  }}
-                  onClickMessage={onClickMessage}
-                  onClickParticipants={showParticipants}
-                  onClickDetails={message => {
-                    return showMessageDetails(message);
-                  }}
-                  onClickResetSession={resetSession}
-                  onClickTimestamp={async function (messageId: string) {
-                    setHighlightedMessage(messageId);
-                    setTimeout(() => {
-                      return setHighlightedMessage(undefined);
-                    }, messageHighlightDurationInMilliseconds);
-                    const messageIsLoaded = conversation.getMessage(messageId);
+                <Fragment key={key}>
+                  {message === firstPendingMessage && <OfflineNotice label={offlineNotice} />}
+                  <Message
+                    onVisible={visibleCallback}
+                    onVisibilityLost={lastMessageInvisibleCallback}
+                    message={message}
+                    hideHeader={message.timestamp() !== firstMessageTimestamp}
+                    messageActions={messageActions}
+                    conversation={conversation}
+                    cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
+                    hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
+                    isLastDeliveredMessage={isLastDeliveredMessage}
+                    isHighlighted={isHighlighted}
+                    scrollTo={scrollToElement}
+                    isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
+                    messageRepository={messageRepository}
+                    loadUsersByIdsFromDb={loadUsersByIdsFromDb}
+                    onClickAvatar={showUserDetails}
+                    onClickCancelRequest={cancelConnectionRequest}
+                    onClickImage={showImageDetails}
+                    onClickInvitePeople={() => {
+                      return invitePeople(conversation);
+                    }}
+                    onClickReactionDetails={message => {
+                      return showMessageReactions(message, true);
+                    }}
+                    onClickMessage={onClickMessage}
+                    onClickParticipants={showParticipants}
+                    onClickDetails={message => {
+                      return showMessageDetails(message);
+                    }}
+                    onClickResetSession={resetSession}
+                    onClickTimestamp={async function (messageId: string) {
+                      setHighlightedMessage(messageId);
+                      setTimeout(() => {
+                        return setHighlightedMessage(undefined);
+                      }, messageHighlightDurationInMilliseconds);
+                      const messageIsLoaded = conversation.getMessage(messageId);
 
-                    if (isNullOrUndefined(messageIsLoaded)) {
-                      setLoaded(false); // this will block automatic scroll triggers (like loading extra messages)
-                      const messageEntity = await messageRepository.getMessageInConversationById(
-                        conversation,
-                        messageId,
-                      );
-                      conversation.removeMessages();
-                      conversationRepository.getMessagesWithOffset(conversation, messageEntity);
-                      setLoaded(true); // unblock automatic scroll triggers
-                    }
-                  }}
-                  selfId={selfUser.qualifiedId}
-                  shouldShowInvitePeople={shouldShowInvitePeople}
-                  isFocused={isFocused}
-                  handleFocus={setFocusedId}
-                  handleArrowKeyDown={handleKeyDown}
-                  isMsgElementsFocusable={isMsgElementsFocusable}
-                  setMsgElementsFocusable={setMsgElementsFocusable}
-                />
+                      if (isNullOrUndefined(messageIsLoaded)) {
+                        setLoaded(false); // this will block automatic scroll triggers (like loading extra messages)
+                        const messageEntity = await messageRepository.getMessageInConversationById(
+                          conversation,
+                          messageId,
+                        );
+                        conversation.removeMessages();
+                        void conversationRepository.getMessagesWithOffset(conversation, messageEntity);
+                        setLoaded(true); // unblock automatic scroll triggers
+                      }
+                    }}
+                    selfId={selfUser.qualifiedId}
+                    shouldShowInvitePeople={shouldShowInvitePeople}
+                    isFocused={isFocused}
+                    handleFocus={setFocusedId}
+                    handleArrowKeyDown={handleKeyDown}
+                    isMsgElementsFocusable={isMsgElementsFocusable}
+                    setMsgElementsFocusable={setMsgElementsFocusable}
+                  />
+                </Fragment>
               );
             });
           })}
+
+          {isOffline && firstPendingMessage === undefined && <OfflineNotice label={offlineNotice} />}
 
           <UploadAssets assetRepository={assetRepository} conversationId={conversation.id} />
         </div>

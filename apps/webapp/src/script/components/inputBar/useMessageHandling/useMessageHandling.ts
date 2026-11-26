@@ -194,7 +194,8 @@ export const useMessageHandling = ({
 
   const replyMessage = useCallback(
     (messageEntity: ContentMessage) => {
-      if (messageEntity.isReplyable() && messageEntity !== replyMessageEntity) {
+      const isPendingInOutbox = messageRepository.getOutboxState(messageEntity.id) === 'pending';
+      if (messageEntity.isReplyable(isPendingInOutbox) && messageEntity !== replyMessageEntity) {
         cancelMessageReply(false);
         cancelMessageEditing(() => {
           if (isEditing) {
@@ -215,6 +216,7 @@ export const useMessageHandling = ({
       editorRef,
       handleSaveDraft,
       isEditing,
+      messageRepository,
       replyMessageCallback,
       replyMessageEntity,
     ],

@@ -1859,6 +1859,8 @@ export class MessageRepository {
           messageEntity.timestamp(timestamp);
           conversationEntity.updateTimestampServer(timestamp, true);
           conversationEntity.updateTimestamps(messageEntity);
+          // A message that is not loaded is mapped from its record, without its sender: updateTimestamps can't tell it is ours
+          conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
         }
       }
       this.conversationRepositoryProvider().checkMessageTimer(messageEntity);
@@ -3121,6 +3123,41 @@ export class MessageRepository {
   /** A send was started and got no answer, so the message may have been delivered. */
   private isUnconfirmed({attempts, payload}: OperationView<MessagePayload>): boolean {
     return attempts > 0 || ((payload.type === 'text' || payload.type === 'asset') && payload.mayBeDelivered === true);
+  }
+
+  // Pending state of a message
+
+  /**
+   * `pending` while the message waits to be sent, `sending` while a send is in flight, and `undefined` when the
+   * outbox doesn't have the message or isn't enabled.
+   */
+  public getOutboxState(messageId: string): 'pending' | 'sending' | undefined {
+    if (this.outbox === undefined) {
+      return undefined;
+    }
+    return this.pendingStateOf(this.findPendingMessage(messageId));
+  }
+
+  /** A message that waits and was never attempted reached nobody, so it can't be deleted for everyone. */
+  public isPendingAndNeverAttempted(messageId: string): boolean {
+    if (this.outbox === undefined) {
+      return false;
+    }
+    const pending = this.findPendingMessage(messageId);
+    return pending !== undefined && this.pendingStateOf(pending) === 'pending' && !this.isUnconfirmed(pending);
+  }
+
+  private pendingStateOf(pending: OperationView<MessagePayload> | undefined): 'pending' | 'sending' | undefined {
+    return match(pending?.state)
+      .with('queued', 'on-hold', () => {
+        return 'pending' as const;
+      })
+      .with('in-progress', () => {
+        return 'sending' as const;
+      })
+      .otherwise(() => {
+        return undefined;
+      });
   }
 
   // Shared by the kinds

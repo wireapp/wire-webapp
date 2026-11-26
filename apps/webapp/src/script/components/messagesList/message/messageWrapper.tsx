@@ -42,7 +42,10 @@ import {VerificationMessage} from './verificationMessage';
 
 import {CONVERSATION_CELLS_STATE} from '../../../apiClient/conversation/conversation';
 import {ReactionType} from '../../../core/conversation';
-import {markAsUnreadFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import {
+  markAsUnreadFeatureToggleName,
+  pendingOfflineMessagesFeatureToggleName,
+} from '../../../featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from '../../../message/quoteEntity';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {AssetRepository} from '../../../repositories/assets/assetRepository';
@@ -147,6 +150,12 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
 
     const canDelete = message.user().isMe && !conversation.isSelfUserRemoved() && message.isDeletable();
 
+    // Nobody can have the message yet, so one delete is all there is to offer
+    const isPendingDelete =
+      canDelete &&
+      isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName) &&
+      messageRepository.isPendingAndNeverAttempted(message.id);
+
     const canEdit = message.isEditable() && !conversation.isSelfUserRemoved();
 
     const hasDetails = !conversation.is1to1() && !message.isEphemeral() && !conversation.isSelfUserRemoved();
@@ -203,11 +212,11 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
         click: () => {
           return messageActions.deleteMessage(conversation, message);
         },
-        label: translate('conversationContextMenuDelete'),
+        label: translate(isPendingDelete ? 'outboxDeletePending' : 'conversationContextMenuDelete'),
       });
     }
 
-    if (canDelete) {
+    if (canDelete && !isPendingDelete) {
       entries.push({
         click: () => {
           return messageActions.deleteMessageEveryone(conversation, message);
@@ -254,6 +263,9 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
         is1to1={conversation.is1to1()}
         isFileShareRestricted={isFileShareRestricted}
         loadUsersByIdsFromDb={loadUsersByIdsFromDb}
+        getOutboxState={messageId => {
+          return messageRepository.getOutboxState(messageId);
+        }}
       />
     );
   }

@@ -79,6 +79,14 @@ import {TeamState} from '../team/TeamState';
 const userSearchDebounceInMilliseconds = 100;
 const decimalRadix = 10;
 
+function isUnsent(message: Message): boolean {
+  if (!Conversation.keepUnsentMessagesLast) {
+    return false;
+  }
+  const status = message.status();
+  return status === StatusType.SENDING || status === StatusType.FAILED || status === StatusType.FEDERATION_ERROR;
+}
+
 export interface UnreadState {
   allEvents: Message[];
   allMessages: ContentMessage[];
@@ -221,6 +229,12 @@ export class Conversation {
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
   }
+
+  /**
+   * Set once at startup, with the outbox: messages that are not sent yet (pending, or failed and waiting for a retry)
+   * are listed after all others, so that a message sent meanwhile appears above them.
+   */
+  static keepUnsentMessagesLast = false;
 
   constructor(
     conversation_id: string,
@@ -568,7 +582,8 @@ export class Conversation {
     this.messages_unordered = ko.observableArray();
     this.messages = ko.pureComputed(() => {
       return this.messages_unordered().toSorted((message_a, message_b) => {
-        return message_a.timestamp() - message_b.timestamp();
+        const unsentOrder = Number(isUnsent(message_a)) - Number(isUnsent(message_b));
+        return unsentOrder === 0 ? message_a.timestamp() - message_b.timestamp() : unsentOrder;
       });
     });
 
@@ -929,6 +944,22 @@ export class Conversation {
     return timestampIncreased ? updatedTimestamp : false;
   }
 
+  /** Pending and failed messages carry a local timestamp, so they say nothing about how much of the history is loaded */
+  private getNewestSentMessage(): Message | undefined {
+    return this.messages().findLast(message => {
+      return !isUnsent(message);
+    });
+  }
+
+  /**
+   * With no message in memory, any message counts as the newest one. A message older than the conversation's last event
+   * (e.g. a late creation event, after messages were sent while the conversation was released) must not become the
+   * only loaded message: loading would then continue from it and skip everything newer.
+   */
+  private wouldLeaveGapAfterNewestMessage(messageEntity: Message): boolean {
+    return isUndefined(this.getNewestSentMessage()) && messageEntity.timestamp() < this.last_event_timestamp();
+  }
+
   /**
    * Adds a single message to the conversation.
    * @param messageEntity Message entity to be added to the conversation.
@@ -961,7 +992,7 @@ export class Conversation {
     if (contentState === ContentState.COLLECTION) {
       this.incomingMessages.push(messageEntity);
       this.updateTimestamps(messageEntity);
-    } else if (this.hasLastReceivedMessageLoaded()) {
+    } else if (this.hasLastReceivedMessageLoaded() && !this.wouldLeaveGapAfterNewestMessage(messageEntity)) {
       this.updateTimestamps(messageEntity);
       this.incomingMessages.remove(({id}) => {
         return messageEntity.id === id;
@@ -1296,7 +1327,7 @@ export class Conversation {
   }
 
   readonly hasLastReceivedMessageLoaded = (): boolean => {
-    const newestMessage = this.getNewestMessage();
+    const newestMessage = this.getNewestSentMessage();
     const newestMessageTimestampMilliseconds = newestMessage?.timestamp();
 
     return !isUndefined(newestMessage) &&

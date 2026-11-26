@@ -93,6 +93,7 @@ import {OnConversationE2EIVerificationStateChange} from '../repositories/convers
 import {EventBuilder} from '../repositories/conversation/EventBuilder';
 import {MessageRepository} from '../repositories/conversation/MessageRepository';
 import {CryptographyRepository} from '../repositories/cryptography/CryptographyRepository';
+import {Conversation} from '../repositories/entity/Conversation';
 import {User} from '../repositories/entity/User';
 import {EventRepository} from '../repositories/event/EventRepository';
 import {EventService} from '../repositories/event/EventService';
@@ -340,7 +341,9 @@ export class App {
     );
 
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(window.location.search);
-    this.outbox = startupFeatureToggles.isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName)
+    const isOutboxEnabled = startupFeatureToggles.isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName);
+    Conversation.keepUnsentMessagesLast = isOutboxEnabled;
+    this.outbox = isOutboxEnabled
       ? createApplicationOutbox({storageService: this.service.storage, serverTimeHandler})
       : undefined;
 

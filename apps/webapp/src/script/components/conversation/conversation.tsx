@@ -61,7 +61,10 @@ import {parseAccountDeepLink} from './utils/parseAccountDeepLink';
 import {CONVERSATION_CELLS_STATE} from '../../apiClient/conversation/conversation';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
-import {driveBulkActionProgressFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {
+  driveBulkActionProgressFeatureToggleName,
+  pendingOfflineMessagesFeatureToggleName,
+} from '../../featureToggles/startupFeatureToggleNames';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
@@ -865,6 +868,8 @@ function ConversationContent({
                 isRightSidebarOpen={isRightSidebarOpen}
                 updateConversationLastRead={updateConversationLastRead}
                 cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
+                isOutboxEnabled={isFeatureToggleEnabled(pendingOfflineMessagesFeatureToggleName)}
+                offlineNotice={translate('outboxOfflineNotice')}
               />
 
               {showViewerPermission && !isFileTabActive && (

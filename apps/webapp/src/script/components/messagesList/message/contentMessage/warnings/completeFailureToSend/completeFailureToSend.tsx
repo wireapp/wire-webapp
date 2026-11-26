@@ -23,6 +23,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Config} from '../../../../../../Config';
 import {useApplicationContext} from '../../../../../../page/rootProvider';
+import type {FailedReason} from '../../../../../../repositories/conversation/outbox/FailedReason';
 import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
 import {Link, LinkVariant} from '../../../../../../uiKit/typography/link/link';
 import {
@@ -30,17 +31,19 @@ import {
   renderReactTranslation,
 } from '../../../../../../util/localizerUtil/reactLocalizerUtil';
 import type {ReactTranslationValueReplacement} from '../../../../../../util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from '../../../../../../util/localizerUtil/translationTypes';
+import type {Translate, TranslationKey} from '../../../../../../util/localizerUtil/translationTypes';
 import {useMessageFocusedTabIndex} from '../../../util';
 import {backendErrorLink, button, warning, wrapper} from '../warnings.styles';
 
 type Props = {
+  failedReason?: FailedReason;
   isMessageFocused: boolean;
   onRetry: () => void;
   unreachableDomain?: string;
 };
 
 type RenderCompleteFailureToSendWarningOptions = {
+  readonly failedReason?: FailedReason;
   readonly messageFocusedTabIndex: number;
   readonly translate: Translate;
   readonly unreachableDomain?: string;
@@ -49,11 +52,27 @@ type RenderCompleteFailureToSendWarningOptions = {
 const config = Config.getConfig();
 const unreachableDomainMarker = createReactTranslationMarker('complete-failure-to-send-domain');
 
+const failedReasonTranslationKeys = {
+  declined: 'outboxFailedDeclined',
+  expired: 'outboxFailedExpired',
+  generic: 'outboxFailedGeneric',
+  rejected: 'outboxFailedRejected',
+  removed: 'outboxFailedRemoved',
+} as const satisfies Record<FailedReason, TranslationKey>;
+
 function renderCompleteFailureToSendWarning(options: RenderCompleteFailureToSendWarningOptions): ReactNode {
-  const {messageFocusedTabIndex, translate, unreachableDomain} = options;
+  const {failedReason, messageFocusedTabIndex, translate, unreachableDomain} = options;
 
   if (!isNonEmptyString(unreachableDomain)) {
-    return <p css={warning}>{translate('messageCouldNotBeSentConnectivityIssues')}</p>;
+    return (
+      <p css={warning}>
+        {translate(
+          failedReason === undefined
+            ? 'messageCouldNotBeSentConnectivityIssues'
+            : failedReasonTranslationKeys[failedReason],
+        )}
+      </p>
+    );
   }
 
   const translatedText = translate('messageCouldNotBeSentBackEndOffline', {
@@ -99,6 +118,7 @@ function renderCompleteFailureToSendWarning(options: RenderCompleteFailureToSend
 }
 
 export const CompleteFailureToSendWarning: FunctionComponent<Props> = ({
+  failedReason,
   isMessageFocused,
   onRetry,
   unreachableDomain,
@@ -109,6 +129,7 @@ export const CompleteFailureToSendWarning: FunctionComponent<Props> = ({
   return (
     <div css={wrapper}>
       {renderCompleteFailureToSendWarning({
+        failedReason,
         messageFocusedTabIndex,
         translate,
         unreachableDomain,

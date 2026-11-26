@@ -25,7 +25,13 @@ import {VirtualizedMessageListWrapper} from './virtualizedMessageListWrapper';
 
 import {Config} from '../../Config';
 
-export const MessageListWrapper: FunctionComponent<MessagesListParams> = ({
+type MessageListWrapperProps = MessagesListParams & {
+  /** For the non-virtualized list only, which gets them passed in to stay out of the import cycle of the app context */
+  isOutboxEnabled: boolean;
+  offlineNotice: string;
+};
+
+export const MessageListWrapper: FunctionComponent<MessageListWrapperProps> = ({
   assetRepository,
   conversation,
   cancelPendingReadReceiptsForConversation,
@@ -50,7 +56,9 @@ export const MessageListWrapper: FunctionComponent<MessagesListParams> = ({
   isRightSidebarOpen = false,
   isConversationLoaded,
   updateConversationLastRead,
-}: MessagesListParams) => {
+  isOutboxEnabled,
+  offlineNotice,
+}: MessageListWrapperProps) => {
   const isVirtualizedMessagesListEnabled = Config.getConfig().FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   if (isVirtualizedMessagesListEnabled) {
@@ -109,6 +117,8 @@ export const MessageListWrapper: FunctionComponent<MessagesListParams> = ({
       setMsgElementsFocusable={setMsgElementsFocusable}
       isRightSidebarOpen={isRightSidebarOpen}
       updateConversationLastRead={updateConversationLastRead}
+      isOutboxEnabled={isOutboxEnabled}
+      offlineNotice={offlineNotice}
     />
   );
 };

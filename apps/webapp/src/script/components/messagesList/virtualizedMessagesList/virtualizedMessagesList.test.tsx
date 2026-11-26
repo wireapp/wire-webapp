@@ -25,7 +25,7 @@ import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList
 import ko from 'knockout';
 import {noop} from 'noop-esm';
 
-import {withTheme} from '../../../auth/util/test/testUtil';
+import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 
 import {AssetRepository} from '../../../repositories/assets/assetRepository';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
@@ -38,7 +38,10 @@ import {
   createRootProviderWrapperForTest,
   requireValueForTest,
 } from '../../../page/testSupport/rootContextTestSupport';
+import {pendingOfflineMessagesFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
 import {translateForTest} from '../../../util/test/translateForTest';
+import {hideWarning, showWarning} from '../../../view_model/WarningsContainer/WarningsState';
+import {TYPE} from '../../../view_model/WarningsContainer/WarningsTypes';
 
 import {VirtualizedMessagesList} from './virtualizedMessagesList';
 
@@ -101,6 +104,53 @@ describe('VirtualizedMessagesList', () => {
     renderedList.unmount();
     jest.restoreAllMocks();
   });
+  describe('offline notice', () => {
+    afterEach(() => {
+      act(() => {
+        hideWarning(TYPE.NO_INTERNET);
+      });
+    });
+
+    function renderLoadedList(isOutboxEnabled: boolean): ReturnType<typeof render> {
+      const properties = createMessageListProperties();
+      properties.isConversationLoaded = true;
+      const rootProviderWrapper = createRootProviderWrapperForTest(
+        createRootContextValueForTest({
+          translate: translateForTest,
+          isFeatureToggleEnabled: featureName => {
+            return isOutboxEnabled && featureName === pendingOfflineMessagesFeatureToggleName;
+          },
+        }),
+      );
+      return render(withThemeAndRootContext(<VirtualizedMessagesList {...properties} />, rootProviderWrapper));
+    }
+
+    it('shows the notice at the end of the list when nothing is pending', () => {
+      act(() => {
+        showWarning(TYPE.NO_INTERNET);
+      });
+
+      const {getByRole} = renderLoadedList(true);
+      expect(getByRole('status')).toHaveTextContent('outboxOfflineNotice');
+    });
+
+    it('shows no notice while online', () => {
+      const {queryByRole} = renderLoadedList(true);
+
+      expect(queryByRole('status')).not.toBeInTheDocument();
+    });
+
+    it('shows no notice with the toggle off', () => {
+      act(() => {
+        showWarning(TYPE.NO_INTERNET);
+      });
+
+      const {queryByRole} = renderLoadedList(false);
+
+      expect(queryByRole('status')).not.toBeInTheDocument();
+    });
+  });
+
   it.each([
     {
       description: 'preserves the opening unread separator when the live read timestamp advances',
