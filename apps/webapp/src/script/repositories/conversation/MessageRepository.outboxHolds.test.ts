@@ -41,6 +41,7 @@ import {
 import {
   CONVERSATION_ID,
   createOutboxRepository,
+  OTHER_CONVERSATION_ID,
   sendingRecord,
   uploadedRecord,
   type OutboxRepository,
@@ -65,7 +66,7 @@ type Variant = {
   enqueue: (parts: OutboxRepository) => Promise<unknown>;
   key: string;
   /** A message shows a decline as failed, and anything else is forgotten */
-  declined: 'dead-lettered' | 'dropped';
+  declined: 'dead-lettered' | 'deleted';
   expectDeclinedOnScreen: (parts: OutboxRepository) => void;
 };
 
@@ -149,7 +150,7 @@ const variants: Variant[] = [
       });
     },
     key: 'ping-1',
-    declined: 'dropped',
+    declined: 'deleted',
     expectDeclinedOnScreen: ({deleteMessage, conversation}) => {
       expect(deleteMessage).toHaveBeenCalledWith(conversation, 'ping-1');
     },
@@ -159,7 +160,7 @@ const variants: Variant[] = [
     degraded: inConversation,
     enqueue: changeOf(reactionPayload()),
     key: 'message-1:reaction',
-    declined: 'dropped',
+    declined: 'deleted',
     expectDeclinedOnScreen: nothingOnScreen,
   },
   {
@@ -167,7 +168,7 @@ const variants: Variant[] = [
     degraded: inConversation,
     enqueue: changeOf(editPayload()),
     key: 'message-1:edit',
-    declined: 'dropped',
+    declined: 'deleted',
     expectDeclinedOnScreen: nothingOnScreen,
   },
   {
@@ -175,7 +176,7 @@ const variants: Variant[] = [
     degraded: inConversation,
     enqueue: changeOf(deletePayload()),
     key: 'message-1:delete',
-    declined: 'dropped',
+    declined: 'deleted',
     expectDeclinedOnScreen: nothingOnScreen,
   },
   {
@@ -183,7 +184,7 @@ const variants: Variant[] = [
     degraded: inSelfConversation,
     enqueue: changeOf(hidePayload()),
     key: 'message-1:hide',
-    declined: 'dropped',
+    declined: 'deleted',
     expectDeclinedOnScreen: nothingOnScreen,
   },
   {
@@ -191,7 +192,7 @@ const variants: Variant[] = [
     degraded: inConversation,
     enqueue: inLaneOfMessages(reactionPayload()),
     key: 'message-1:reaction',
-    declined: 'dropped',
+    declined: 'deleted',
     expectDeclinedOnScreen: nothingOnScreen,
   },
   {
@@ -199,7 +200,7 @@ const variants: Variant[] = [
     degraded: inSelfConversation,
     enqueue: receiptOf(lastReadPayload(10)),
     key: 'last-read:conversation-1',
-    declined: 'dropped',
+    declined: 'deleted',
     expectDeclinedOnScreen: nothingOnScreen,
   },
 ];
@@ -270,7 +271,7 @@ describe('the holds of MessageRepository', () => {
         expect(heldKeys()).toEqual([]);
       });
 
-      it(`is ${variant.declined === 'dropped' ? 'forgotten' : 'dead-lettered'} and never sent when the user declines`, async () => {
+      it(`is ${variant.declined === 'deleted' ? 'forgotten' : 'dead-lettered'} and never sent when the user declines`, async () => {
         await enqueueDegraded();
 
         await parts.prompts[0].answer(false);
@@ -330,7 +331,7 @@ describe('the holds of MessageRepository', () => {
       await parts.handles.message.enqueue({
         payload: textPayload({messageId: 'message-2', conversationId: {id: 'conversation-2', domain: 'wire.test'}}),
         correlationKey: 'message-2',
-        laneKey: 'conversation-2',
+        laneKey: laneOfMessages(OTHER_CONVERSATION_ID),
       });
       await parts.kit.clock.settle();
     });
@@ -410,7 +411,7 @@ describe('the holds of MessageRepository', () => {
 
     it('leaves a restored hold alone until it is reviewed', async () => {
       parts.degrade(parts.conversation);
-      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+      seedOnHold('message', textPayload(), 'message-1', laneOfMessages(CONVERSATION_ID));
 
       await parts.kit.start();
 
@@ -420,7 +421,7 @@ describe('the holds of MessageRepository', () => {
     });
 
     it('does nothing when the outbox did not start yet', async () => {
-      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+      seedOnHold('message', textPayload(), 'message-1', laneOfMessages(CONVERSATION_ID));
 
       parts.repository.reviewRestoredHolds();
       await parts.kit.clock.settle();
@@ -432,7 +433,7 @@ describe('the holds of MessageRepository', () => {
     it('releases a restored hold, whose next attempt asks again when still degraded, and sends on yes', async () => {
       parts.records.set('message-1', sendingRecord());
       parts.degrade(parts.conversation);
-      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+      seedOnHold('message', textPayload(), 'message-1', laneOfMessages(CONVERSATION_ID));
 
       await startAndReview();
 
@@ -450,7 +451,7 @@ describe('the holds of MessageRepository', () => {
     it('marks the message as declined and dead-letters it on no', async () => {
       parts.records.set('message-1', sendingRecord());
       parts.degrade(parts.conversation);
-      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+      seedOnHold('message', textPayload(), 'message-1', laneOfMessages(CONVERSATION_ID));
       await startAndReview();
 
       await parts.prompts[0].answer(false);
@@ -474,7 +475,7 @@ describe('the holds of MessageRepository', () => {
 
     it('releases a restored hold and sends when the conversation is not degraded any more', async () => {
       parts.records.set('message-1', sendingRecord());
-      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+      seedOnHold('message', textPayload(), 'message-1', laneOfMessages(CONVERSATION_ID));
 
       await startAndReview();
 
@@ -487,7 +488,7 @@ describe('the holds of MessageRepository', () => {
       parts.records.set('message-1', sendingRecord());
       parts.degrade(parts.conversation);
       seedEditedMessages({[CONVERSATION_ID.id]: 'message-1'});
-      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+      seedOnHold('message', textPayload(), 'message-1', laneOfMessages(CONVERSATION_ID));
 
       await startAndReview();
 
@@ -506,7 +507,7 @@ describe('the holds of MessageRepository', () => {
     it('releases a restored text that another message of its conversation was edited instead of', async () => {
       parts.records.set('message-1', sendingRecord());
       seedEditedMessages({[CONVERSATION_ID.id]: 'message-2'});
-      seedOnHold('message', textPayload(), 'message-1', CONVERSATION_ID.id);
+      seedOnHold('message', textPayload(), 'message-1', laneOfMessages(CONVERSATION_ID));
 
       await startAndReview();
 

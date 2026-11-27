@@ -361,6 +361,47 @@ describe('the message kinds through the outbox', () => {
       expect(parts.records.get('b')).toMatchObject({status: StatusType.FAILED, failed_reason: 'generic'});
     });
 
+    it('dead-letters the messages and deletes the ping behind them when the user declines, and asks only once', async () => {
+      await enqueueText('a');
+      await enqueueText('b');
+      await enqueuePing('ping');
+
+      await parts.prompts[0].answer(false);
+      await parts.kit.clock.settle();
+
+      expect(sends).toHaveLength(0);
+      expect(stateOf('a')).toBe('dead-lettered');
+      expect(stateOf('b')).toBe('dead-lettered');
+      expect(stateOf('ping')).toBeUndefined();
+      expect(parts.prompts).toHaveLength(1);
+    });
+
+    it('deletes a held ping at the head of the lane and dead-letters the message behind it, and asks only once', async () => {
+      await enqueuePing('ping');
+      await enqueueText('a');
+
+      expect(stateOf('ping')).toBe('on-hold');
+      await parts.prompts[0].answer(false);
+      await parts.kit.clock.settle();
+
+      expect(sends).toHaveLength(0);
+      expect(stateOf('ping')).toBeUndefined();
+      expect(stateOf('a')).toBe('dead-lettered');
+      expect(parts.prompts).toHaveLength(1);
+    });
+
+    it('dead-letters, and does not delete, a change that waits on a pending message', async () => {
+      await enqueueText('a');
+      await enqueueReactionToPendingMessage('a');
+
+      await parts.prompts[0].answer(false);
+      await parts.kit.clock.settle();
+
+      expect(stateOf('a')).toBe('dead-lettered');
+      expect(stateOf('a:reaction')).toBe('dead-lettered');
+      expect(sends).toHaveLength(0);
+    });
+
     it('sends a declined message again once its owner took the decline back and queued it again', async () => {
       await enqueueText('a');
       await parts.prompts[0].answer(false);
@@ -377,19 +418,6 @@ describe('the message kinds through the outbox', () => {
 
       expect(enqueueResult.outcome).toBe('operation-versioned');
       expect(sentTextIds()).toEqual(['a']);
-    });
-
-    it('lets the next attempt of a declined message that was not taken back dead-letter it again', async () => {
-      await enqueueText('a');
-      await parts.prompts[0].answer(false);
-      parts.conversation.verification_state(ConversationVerificationState.UNVERIFIED);
-
-      const payload = textPayload({messageId: 'a'});
-      await parts.handles.message.enqueue({payload, correlationKey: 'a', laneKey: laneOfMessages(CONVERSATION_ID)});
-      await parts.kit.clock.settle();
-
-      expect(sends).toHaveLength(0);
-      expect(stateOf('a')).toBe('dead-lettered');
     });
   });
 });

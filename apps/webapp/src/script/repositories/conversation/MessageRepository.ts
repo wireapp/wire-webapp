@@ -52,6 +52,7 @@ import {
   changeCorrelationKeysOf,
   laneOfChanges,
   laneOfMessages,
+  laneOfConversationReceipts,
   laneOfReceipts,
   messageCorrelationKey,
   parseMessageChangePayload,
@@ -269,7 +270,7 @@ type ShownPayload = OutboxTextPayload | AssetMessagePayload | OutboxEditPayload 
 type PermissionHold = {
   reason: 'sending-permission';
   waitingOnConversations: QualifiedId[];
-  whenDeclined: 'mark-declined' | 'drop';
+  whenDeclined: 'mark-declined' | 'delete';
 };
 
 type Hold = PermissionHold | {reason: 'editing'; conversationId: string};
@@ -1931,9 +1932,10 @@ export class MessageRepository {
           attemptTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
           // Only an expiry or a rejection ends a message, never the number of attempts.
           maxAttempts: 1_000,
-          whenGivenUp: 'dead-letter',
-          laneWhenGivenUp: 'follows',
-          attempt: this.performMessageOperation,
+          whenExhausted: 'dead-letter',
+          laneWhenDeadLettered: 'follows',
+          laneWhenDeleted: 'continues',
+          attempt: this.attemptMessageOperation,
           onChanged: this.onMessageOperationChanged,
         }),
       ),
@@ -1946,9 +1948,10 @@ export class MessageRepository {
           // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
           attemptTimeoutMilliseconds: 10 * TIME_IN_MILLIS.SECOND,
           maxAttempts: 3,
-          whenGivenUp: 'drop',
-          laneWhenGivenUp: 'continues',
-          attempt: this.performPingOperation,
+          whenExhausted: 'delete',
+          laneWhenDeadLettered: 'continues',
+          laneWhenDeleted: 'continues',
+          attempt: this.attemptPingOperation,
           onChanged: this.onPingOperationChanged,
         }),
       ),
@@ -1960,9 +1963,10 @@ export class MessageRepository {
           expiresAfterMilliseconds: TIME_IN_MILLIS.WEEK,
           attemptTimeoutMilliseconds: TIME_IN_MILLIS.MINUTE,
           maxAttempts: 100,
-          whenGivenUp: 'drop',
-          laneWhenGivenUp: 'continues',
-          attempt: this.performReceiptOperation,
+          whenExhausted: 'delete',
+          laneWhenDeadLettered: 'continues',
+          laneWhenDeleted: 'continues',
+          attempt: this.attemptReceiptOperation,
         }),
       ),
       // A change to a message that was sent is forgotten when it can't go out, and the local change stays.
@@ -1974,9 +1978,10 @@ export class MessageRepository {
           // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The duration reads best written out.
           attemptTimeoutMilliseconds: 2 * TIME_IN_MILLIS.MINUTE,
           maxAttempts: 1_000,
-          whenGivenUp: 'drop',
-          laneWhenGivenUp: 'continues',
-          attempt: this.performChangeOperation,
+          whenExhausted: 'delete',
+          laneWhenDeadLettered: 'continues',
+          laneWhenDeleted: 'continues',
+          attempt: this.attemptChangeOperation,
           onChanged: this.onChangeOperationChanged,
         }),
       ),
@@ -2046,7 +2051,6 @@ export class MessageRepository {
     QuoteEntity,
     attachments,
   }: TextMessageRetry): Promise<void> {
-    // Otherwise the decline of the earlier attempt would dead-letter this one as well.
     await this.markMessage(conversation, messageId, StatusType.SENDING);
 
     const payload = match(this.outboxKinds.message.find(messageId))
@@ -2079,32 +2083,28 @@ export class MessageRepository {
     }
   }
 
-  private readonly performMessageOperation = async (
+  private readonly attemptMessageOperation = async (
     {payload}: OperationView<MessagePayload>,
     signal: AbortSignal,
   ): Promise<AttemptOutcome> => {
     switch (payload.type) {
       case 'text':
-        return this.performText(payload);
+        return this.attemptText(payload);
       case 'asset':
-        return this.performAsset(payload, signal);
+        return this.attemptAsset(payload, signal);
       case 'reaction':
       case 'edit':
       case 'delete':
-        return this.performChangeOperation({payload});
+        return this.attemptChangeOperation({payload});
     }
   };
 
-  private async performText(payload: OutboxTextPayload): Promise<AttemptOutcome> {
+  private async attemptText(payload: OutboxTextPayload): Promise<AttemptOutcome> {
     const conversation = this.conversationState.findConversation(payload.conversationId);
     if (conversation === undefined) {
-      return this.dropForUnknownConversation();
+      return this.deleteForUnknownConversation();
     }
     await this.ensureShown(conversation, payload);
-    const record = await this.eventService.loadEvent(conversation.id, payload.messageId);
-    if (record?.failed_reason === 'declined') {
-      return {outcome: 'attempt-dead-lettered'};
-    }
     if (this.isDegraded(conversation)) {
       return this.holdForPermission(payload.messageId, [conversation], 'mark-declined');
     }
@@ -2153,8 +2153,8 @@ export class MessageRepository {
         await this.markMessage(conversation, messageId, StatusType.FAILED, 'removed');
         return {outcome: 'attempt-dead-lettered'};
       case 'cancelled':
-        this.logger.info('Dropping a message that can no longer be sent', {outcome: error.type});
-        return {outcome: 'attempt-dropped'};
+        this.logger.info('Deletinga message that can no longer be sent', {outcome: error.type});
+        return {outcome: 'attempt-deleted'};
       case 'rejected':
         this.logger.info('A message was rejected', {outcome: error.reason});
         await this.markMessage(
@@ -2202,7 +2202,7 @@ export class MessageRepository {
           return this.showAsSending(conversation, payload.messageId);
         case 'dead-lettered':
           return this.showAsFailedUnlessItIs(conversation, payload.messageId, queuedAt);
-        case 'dropped':
+        case 'deleted':
           await this.deleteMessageById(conversation, payload.messageId);
 
         case 'succeeded':
@@ -2212,8 +2212,7 @@ export class MessageRepository {
 
   private async showAsSending(conversation: Conversation, messageId: string): Promise<void> {
     const record = await this.eventService.loadEvent(conversation.id, messageId);
-    // A decline stays until its owner takes it back, because the next attempt acts on it.
-    if (record !== undefined && this.isFailedRecord(record) && record.failed_reason !== 'declined') {
+    if (record !== undefined && this.isFailedRecord(record)) {
       await this.markMessage(conversation, messageId, StatusType.SENDING);
     }
   }
@@ -2293,7 +2292,7 @@ export class MessageRepository {
   /**
    * The operation holds ids only, so the queue side keeps the bytes on the record, where every attempt reads them.
    * The asset is shown right after the enqueue. A crash in between leaves an operation without bytes, which its
-   * first attempt drops.
+   * first attempt deletes.
    */
   private async enqueueAsset(conversation: Conversation, file: Blob, asImage: boolean): Promise<void> {
     let metaData: FileMetaDataContent;
@@ -2345,7 +2344,6 @@ export class MessageRepository {
     asImage: boolean,
     messageId: string,
   ): Promise<void> {
-    // Otherwise the decline of the earlier attempt would dead-letter this one as well.
     await this.markMessage(conversation, messageId, StatusType.SENDING);
 
     const record = await this.eventService.loadEvent(conversation.id, messageId);
@@ -2381,20 +2379,17 @@ export class MessageRepository {
     }
   }
 
-  private async performAsset(payload: AssetMessagePayload, signal: AbortSignal): Promise<AttemptOutcome> {
+  private async attemptAsset(payload: AssetMessagePayload, signal: AbortSignal): Promise<AttemptOutcome> {
     const conversation = this.conversationState.findConversation(payload.conversationId);
     if (conversation === undefined) {
-      return this.dropForUnknownConversation();
+      return this.deleteForUnknownConversation();
     }
     await this.ensureShown(conversation, payload);
     const record = await this.eventService.loadEvent(conversation.id, payload.messageId);
     if (record === undefined) {
       // The bytes were on the record, so there is nothing to upload and nothing to show as failed.
-      this.logger.info('Dropping an asset without a record', {outcome: 'record-missing'});
-      return {outcome: 'attempt-dropped'};
-    }
-    if (record.failed_reason === 'declined') {
-      return {outcome: 'attempt-dead-lettered'};
+      this.logger.info('Deletingan asset without a record', {outcome: 'record-missing'});
+      return {outcome: 'attempt-deleted'};
     }
     if (this.isDegraded(conversation)) {
       return this.holdForPermission(payload.messageId, [conversation], 'mark-declined');
@@ -2454,15 +2449,15 @@ export class MessageRepository {
     return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
   }
 
-  private readonly performPingOperation = async ({payload}: OperationView<PingPayload>): Promise<AttemptOutcome> => {
+  private readonly attemptPingOperation = async ({payload}: OperationView<PingPayload>): Promise<AttemptOutcome> => {
     const conversation = this.conversationState.findConversation(payload.conversationId);
     if (conversation === undefined) {
-      return this.dropForUnknownConversation();
+      return this.deleteForUnknownConversation();
     }
     await this.ensureShown(conversation, payload);
     if (this.isDegraded(conversation)) {
-      // A declined ping is dropped like any ping that can't go out, and leaves the screen with it.
-      return this.holdForPermission(payload.messageId, [conversation], 'drop');
+      // A declined ping is deleted like any ping that can't go out, and leaves the screen with it.
+      return this.holdForPermission(payload.messageId, [conversation], 'delete');
     }
     const ping = this.buildOutboxPing(conversation, payload.messageId);
     return this.sendSilently(ping, conversation, {failFast: true, syncTimestamp: true});
@@ -2474,7 +2469,7 @@ export class MessageRepository {
       return;
     }
     this.activeFireAndForgetInvoker.fireAndForget(async () => {
-      if (state === 'dropped') {
+      if (state === 'deleted') {
         await this.deleteMessageById(conversation, payload.messageId);
         return;
       }
@@ -2526,39 +2521,39 @@ export class MessageRepository {
     this.isAccepted(outcome);
   }
 
-  private readonly performReceiptOperation = async ({
+  private readonly attemptReceiptOperation = async ({
     payload,
   }: OperationView<OutboxReceiptPayload>): Promise<AttemptOutcome> => {
     const correlationKey = receiptCorrelationKey(payload);
     switch (payload.type) {
       case 'confirmation':
-        return this.performConfirmation(payload);
+        return this.attemptConfirmation(payload);
       case 'last-read':
-        return this.performSelfSend(
+        return this.attemptSelfSend(
           correlationKey,
           MessageBuilder.buildLastReadMessage(payload.conversationId, payload.timestamp),
         );
       case 'cleared':
-        return this.performSelfSend(
+        return this.attemptSelfSend(
           correlationKey,
           MessageBuilder.buildClearedMessage(payload.conversationId, payload.timestamp),
         );
       case 'data-transfer':
-        return this.performSelfSend(correlationKey, MessageBuilder.buildDataTransferMessage(payload.countlyId));
+        return this.attemptSelfSend(correlationKey, MessageBuilder.buildDataTransferMessage(payload.countlyId));
     }
   };
 
-  private async performConfirmation(
+  private async attemptConfirmation(
     payload: Extract<OutboxReceiptPayload, {type: 'confirmation'}>,
   ): Promise<AttemptOutcome> {
     const conversation = this.conversationState.findConversation(payload.conversationId);
     if (conversation === undefined) {
-      return this.dropForUnknownConversation();
+      return this.deleteForUnknownConversation();
     }
     // The user may have turned read receipts off since the receipt was queued.
     if (payload.confirmationType === Confirmation.Type.READ && !supportsReadReceipts(conversation)) {
-      this.logger.info('Dropping a read receipt', {outcome: 'read-receipts-off'});
-      return {outcome: 'attempt-dropped'};
+      this.logger.info('Deletinga read receipt', {outcome: 'read-receipts-off'});
+      return {outcome: 'attempt-deleted'};
     }
 
     const [firstMessageId, ...moreMessageIds] = payload.messageIds;
@@ -2581,13 +2576,13 @@ export class MessageRepository {
         return {outcome: 'attempt-succeeded'};
       }
     } catch (error: unknown) {
-      return this.dropUnlessRetry(classifySendError(error));
+      return this.deleteUnlessRetry(classifySendError(error));
     }
     // The send was refused over unverified devices, so it goes to the devices we know of only.
     return this.sendSilently(confirmation, conversation, {...options, targetMode: MessageTargetMode.USERS_CLIENTS});
   }
 
-  private async performSelfSend(correlationKey: string, message: GenericMessage): Promise<AttemptOutcome> {
+  private async attemptSelfSend(correlationKey: string, message: GenericMessage): Promise<AttemptOutcome> {
     const selfConversations = this.conversationState.getSelfConversations(
       supportsMLS() && this.teamState.isMLSEnabled(),
     );
@@ -2601,7 +2596,7 @@ export class MessageRepository {
     if (sendResult?.outcome === 'attempt-failed') {
       return sendResult;
     }
-    return this.holdForPermission(correlationKey, degraded, 'drop');
+    return this.holdForPermission(correlationKey, degraded, 'delete');
   }
 
   /** One self conversation that needs a retry has the whole operation retried, which is harmless. */
@@ -2787,8 +2782,8 @@ export class MessageRepository {
   }
 
   /**
-   * Delete for everyone. A message that never went out is dropped with its changes and nothing is sent.
-   * A message that may have been delivered is dropped unless it is in flight, and the deletion follows it.
+   * Delete for everyone. A message that never went out is deleted with its changes and nothing is sent.
+   * A message that may have been delivered is deleted unless it is in flight, and the deletion follows it.
    */
   private async enqueueDelete(
     conversation: Conversation,
@@ -2815,56 +2810,27 @@ export class MessageRepository {
     const pending = this.findPendingMessage(message.id);
     // The changes go first, so that none is sent for a message that no longer exists.
     const correlationKeys = [...changeCorrelationKeysOf(message.id), message.id];
-    // An attempt in flight isn't dropped. The removal waits for it and follows the message.
-    const isDroppable = pending !== undefined && pending.state !== 'in-progress';
-    // Dropping an operation drops what follows it in its lane, and no other message is removed by this one.
-    const isLeftQueued = isDroppable && !this.isLastInLane(message.id, correlationKeys);
-    if (isDroppable) {
+    // An attempt in flight isn't deleted. The removal waits for it and follows the message.
+    const isDeletable = pending !== undefined && pending.state !== 'in-progress';
+    if (isDeletable) {
       for (const correlationKey of correlationKeys) {
-        if (!this.isLastInLane(correlationKey, correlationKeys)) {
-          continue;
-        }
-        const dropResult = await this.activeOutbox.drop(correlationKey);
-        this.logger.info('The outbox answered dropping an operation of a deleted message', {
-          outcome: dropResult.outcome,
+        const deleteResult = await this.activeOutbox.delete(correlationKey);
+        this.logger.info('The outbox answered deleting an operation of a deleted message', {
+          outcome: deleteResult.outcome,
         });
       }
     }
-    if (pending === undefined || this.isUnconfirmed(pending) || isLeftQueued) {
+    if (pending === undefined || !isDeletable || this.isUnconfirmed(pending)) {
       this.isAccepted(await this.enqueueChange(removal));
     }
     await this.deleteMessageById(conversation, message.id);
   }
 
-  /** Whether the operations behind the one in its lane are all among `ownKeys` */
-  private isLastInLane(correlationKey: string, ownKeys: string[]): boolean {
-    const findResult = this.activeOutbox.findByCorrelationKey(correlationKey);
-    if (findResult.outcome !== 'operation-found' || findResult.operation.lane.state !== 'in-lane') {
-      return true;
-    }
-    const {id, lane} = findResult.operation;
-    const laneResult = this.activeOutbox.lane(lane.laneKey);
-    if (laneResult.outcome !== 'lane-found') {
-      return true;
-    }
-    const {operations} = laneResult.lane;
-    const position = operations.findIndex(operation => {
-      return operation.id === id;
-    });
-    // The lane lists only the operations that still block it, so one that was given up isn't in it.
-    if (position === -1) {
-      return true;
-    }
-    return operations.slice(position + 1).every(({correlation}) => {
-      return correlation.state === 'correlated' && ownKeys.includes(correlation.correlationKey);
-    });
-  }
-
   /**
    * The message of a change is never shown as failed. A change that can't go out, or that the user declines to send,
-   * is dropped, and the optimistic change stays local.
+   * is deleted, and the optimistic change stays local.
    */
-  private readonly performChangeOperation = async ({
+  private readonly attemptChangeOperation = async ({
     payload,
   }: Pick<OperationView<MessageChangePayload>, 'payload'>): Promise<AttemptOutcome> => {
     const correlationKey = messageCorrelationKey(payload);
@@ -2874,17 +2840,17 @@ export class MessageRepository {
         messageId: payload.targetMessageId,
         qualifiedConversationId: payload.conversationId,
       });
-      return this.performSelfSend(correlationKey, hide);
+      return this.attemptSelfSend(correlationKey, hide);
     }
     const conversation = this.conversationState.findConversation(payload.conversationId);
     if (conversation === undefined) {
-      return this.dropForUnknownConversation();
+      return this.deleteForUnknownConversation();
     }
     if (payload.type === 'edit') {
       await this.ensureShown(conversation, payload);
     }
     if (this.isDegraded(conversation)) {
-      return this.holdForPermission(correlationKey, [conversation], 'drop');
+      return this.holdForPermission(correlationKey, [conversation], 'delete');
     }
 
     switch (payload.type) {
@@ -2941,7 +2907,7 @@ export class MessageRepository {
   // Holds
   //
   // `holds` is the only record of why this session holds an operation, and the public methods below are the only
-  // ways out of a hold. A record whose operation is gone is harmless: its release or drop answers that the operation
+  // ways out of a hold. A record whose operation is gone is harmless: its release or delete answers that the operation
   // was not found, and the record goes then.
 
   /**
@@ -2991,29 +2957,64 @@ export class MessageRepository {
   }
 
   /**
-   * A message is shown as declined and released, so that its next attempt ends it as failed, with Retry. Every other
-   * operation that waits for the user's permission to send to this conversation is dropped.
+   * The first message of the conversation is dead-lettered, which dead-letters the messages behind it and the changes
+   * waiting on them, so that all of them show Retry. Every other operation in the lanes of this conversation is
+   * deleted: pings, changes to sent messages and receipts are not worth sending later.
+   * The outbox queues its commands in call order, so they are all issued before any of them is awaited. Otherwise the
+   * lane moves on between two of them and what is behind it asks the user again.
    */
   public async declineSending(conversation: Conversation): Promise<void> {
     if (this.outbox === undefined) {
       return;
     }
+    const heldKeys: Record<PermissionHold['whenDeclined'], string[]> = {'mark-declined': [], delete: []};
     for (const [correlationKey, hold] of this.holdsWaitingOn(conversation)) {
       this.holds.delete(correlationKey);
-      if (hold.whenDeclined === 'drop') {
-        const dropResult = await this.outbox.drop(correlationKey);
-        this.logger.info('The outbox answered dropping an operation the user declined', {
-          outcome: dropResult.outcome,
-        });
-        continue;
-      }
+      heldKeys[hold.whenDeclined].push(correlationKey);
+    }
+    for (const correlationKey of heldKeys['mark-declined']) {
       // The correlation key of a message is its id.
       await this.markMessage(conversation, correlationKey, StatusType.FAILED, 'declined');
-      const releaseResult = await this.outbox.release(correlationKey);
-      this.logger.info('The outbox answered releasing a message the user declined', {
-        outcome: releaseResult.outcome,
-      });
     }
+
+    const {firstMessageKey, keysToDelete} = this.operationsToEndFor(conversation);
+    // A held operation may belong to the lanes of another conversation, like a change to a message.
+    const commands = [
+      ...(firstMessageKey === undefined ? [] : [this.activeOutbox.deadLetter(firstMessageKey)]),
+      ...[...new Set([...heldKeys.delete, ...keysToDelete])].map(correlationKey => {
+        return this.activeOutbox.delete(correlationKey);
+      }),
+    ];
+    for (const result of await Promise.all(commands)) {
+      this.logger.info('The outbox answered ending an operation the user declined', {outcome: result.outcome});
+    }
+  }
+
+  /** What the lanes of the conversation hold right now: the key of its first message, and the keys to delete */
+  private operationsToEndFor(conversation: Conversation): {firstMessageKey?: string; keysToDelete: string[]} {
+    const operationsOf = (laneKey: string): OperationView[] => {
+      const laneResult = this.activeOutbox.lane(laneKey);
+      return laneResult.outcome === 'lane-found' ? laneResult.lane.operations : [];
+    };
+    const keyOf = ({correlation}: OperationView): string[] => {
+      return correlation.state === 'correlated' ? [correlation.correlationKey] : [];
+    };
+    const messageLane = operationsOf(laneOfMessages(conversation.qualifiedId));
+    const firstMessage = messageLane.find(({kind}) => {
+      return kind === 'message';
+    });
+    return {
+      firstMessageKey: firstMessage === undefined ? undefined : keyOf(firstMessage)[0],
+      keysToDelete: [
+        ...messageLane
+          .filter(({kind}) => {
+            return kind !== 'message';
+          })
+          .flatMap(keyOf),
+        ...operationsOf(laneOfChanges(conversation.qualifiedId)).flatMap(keyOf),
+        ...operationsOf(laneOfConversationReceipts(conversation.qualifiedId)).flatMap(keyOf),
+      ],
+    };
   }
 
   /** Holds a message the user starts to edit while the outbox still has it, so that the edit can replace its text */
@@ -3219,23 +3220,23 @@ export class MessageRepository {
         return {outcome: 'attempt-succeeded'};
       }
     } catch (error: unknown) {
-      return this.dropUnlessRetry(classifySendError(error));
+      return this.deleteUnlessRetry(classifySendError(error));
     }
-    this.logger.info('Dropping an operation the client mismatch handler declined to send', {outcome: 'declined'});
-    return {outcome: 'attempt-dropped'};
+    this.logger.info('Deletingan operation the client mismatch handler declined to send', {outcome: 'declined'});
+    return {outcome: 'attempt-deleted'};
   }
 
-  private dropUnlessRetry(error: SendErrorClass): AttemptOutcome {
+  private deleteUnlessRetry(error: SendErrorClass): AttemptOutcome {
     if (error.type === 'retry') {
       return {outcome: 'attempt-failed'};
     }
-    this.logger.info('Dropping an operation that could not be sent', {outcome: error.type});
-    return {outcome: 'attempt-dropped'};
+    this.logger.info('Deletingan operation that could not be sent', {outcome: error.type});
+    return {outcome: 'attempt-deleted'};
   }
 
-  private dropForUnknownConversation(): AttemptOutcome {
-    this.logger.info('Dropping an operation of an unknown conversation', {outcome: 'conversation-unknown'});
-    return {outcome: 'attempt-dropped'};
+  private deleteForUnknownConversation(): AttemptOutcome {
+    this.logger.info('Deletingan operation of an unknown conversation', {outcome: 'conversation-unknown'});
+    return {outcome: 'attempt-deleted'};
   }
 
   private isDegraded(conversation: Conversation): boolean {
@@ -3249,7 +3250,7 @@ export class MessageRepository {
         this.logger.info('The outbox took an operation', {outcome});
         return true;
       })
-      .with({outcome: P.union('operation-succeeded', 'operation-dropped')}, ({outcome}) => {
+      .with({outcome: P.union('operation-succeeded', 'operation-deleted')}, ({outcome}) => {
         // The operation ended while the call waited for its running attempt.
         this.logger.info('The outbox had finished the operation already', {outcome});
         return false;

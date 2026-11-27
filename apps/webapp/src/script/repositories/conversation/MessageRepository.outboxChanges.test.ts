@@ -58,7 +58,8 @@ import {validate as isUuid} from 'uuid';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 const CONVERSATION_ID = {id: 'conversation-1', domain: 'wire.test'};
-const CHANGES_LANE = `${CONVERSATION_ID.id}#changes`;
+const MESSAGES_LANE = `${CONVERSATION_ID.id}@${CONVERSATION_ID.domain}`;
+const CHANGES_LANE = `${MESSAGES_LANE}#changes`;
 
 type Parts = {
   repository: MessageRepository;
@@ -200,7 +201,7 @@ function seedMessage(
       kind: 'message',
       id: `operation-${messageId}`,
       correlation: {state: 'correlated', correlationKey: messageId},
-      lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+      lane: {state: 'in-lane', laneKey: MESSAGES_LANE},
       payload: {
         type: 'text',
         conversationId: CONVERSATION_ID,
@@ -253,7 +254,7 @@ describe('MessageRepository routes changes through the outbox', () => {
         expect.objectContaining({
           kind: 'message',
           state: 'queued',
-          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+          lane: {state: 'in-lane', laneKey: MESSAGES_LANE},
           payload: {
             type: 'reaction',
             conversationId: CONVERSATION_ID,
@@ -323,7 +324,7 @@ describe('MessageRepository routes changes through the outbox', () => {
           kind: 'message',
           id: 'operation-reaction',
           correlation: {state: 'correlated', correlationKey: 'message-1:reaction'},
-          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+          lane: {state: 'in-lane', laneKey: MESSAGES_LANE},
           payload: {
             type: 'reaction',
             conversationId: CONVERSATION_ID,
@@ -445,7 +446,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(snapshotOf(parts.store, 'message-1:edit')).toEqual(
         expect.objectContaining({
           kind: 'message',
-          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+          lane: {state: 'in-lane', laneKey: MESSAGES_LANE},
           payload: expect.objectContaining({
             type: 'edit',
             originalMessageId: 'message-1',
@@ -593,7 +594,7 @@ describe('MessageRepository routes changes through the outbox', () => {
           kind: 'message',
           id: 'operation-reaction',
           correlation: {state: 'correlated', correlationKey: 'message-1:reaction'},
-          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+          lane: {state: 'in-lane', laneKey: MESSAGES_LANE},
           queuedSeq: 2,
           payload: {
             type: 'reaction',
@@ -634,23 +635,25 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
     });
 
-    it('a message with a later message in its conversation keeps the later one queued', async () => {
+    it('a message with a later message in its conversation deletes only itself, and the later one still goes out', async () => {
       seedMessage(parts, {messageId: 'message-1'});
       seedMessage(parts, {messageId: 'message-2', queuedSeq: 2});
       await startOutbox(parts);
 
       await deleteForEveryone(createMessage(parts, 'message-1'));
 
-      const laterResult = parts.outbox.findByCorrelationKey('message-2');
-      expect(laterResult).toEqual(
+      expect(parts.outbox.findByCorrelationKey('message-1').outcome).toBe('operation-not-found');
+      expect(parts.outbox.findByCorrelationKey('message-1:delete').outcome).toBe('operation-not-found');
+      expect(parts.outbox.findByCorrelationKey('message-2')).toEqual(
         expect.objectContaining({outcome: 'operation-found', operation: expect.objectContaining({state: 'queued'})}),
       );
-      // The message stays queued and the deletion follows it, so that it is sent and then deleted.
-      expect(parts.outbox.findByCorrelationKey('message-1').outcome).toBe('operation-found');
-      expect(snapshotOf(parts.store, 'message-1:delete')).toEqual(
-        expect.objectContaining({kind: 'message', lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id}}),
-      );
       expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
+
+      parts.outbox.resume();
+      await parts.clock.settle();
+
+      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(parts.outbox.findByCorrelationKey('message-2').outcome).toBe('operation-not-found');
     });
 
     it('for everyone, of a message that may have been delivered, drops it and sends a deletion', async () => {
@@ -705,7 +708,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(snapshotOf(parts.store, 'message-1:delete')).toEqual(
         expect.objectContaining({
           kind: 'message',
-          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+          lane: {state: 'in-lane', laneKey: MESSAGES_LANE},
           state: 'queued',
         }),
       );

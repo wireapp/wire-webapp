@@ -56,6 +56,7 @@ import {MessageRepository} from './MessageRepository';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 const CONVERSATION_ID = {id: 'conversation-1', domain: 'wire.test'};
+const MESSAGES_LANE = `${CONVERSATION_ID.id}@${CONVERSATION_ID.domain}`;
 const SENDER_ID = {id: 'sender-1', domain: 'wire.test'};
 
 type Parts = {
@@ -226,7 +227,7 @@ describe('MessageRepository routing sends through the outbox', () => {
         expect.objectContaining({
           kind: 'message',
           state: 'queued',
-          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+          lane: {state: 'in-lane', laneKey: MESSAGES_LANE},
           payload: expect.objectContaining({
             type: 'text',
             text: 'hello',
@@ -322,7 +323,7 @@ describe('MessageRepository routing sends through the outbox', () => {
             seq: 3,
             trigger: 'attempt-dead-lettered',
             correlation: {state: 'correlated', correlationKey: 'message-1'},
-            lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+            lane: {state: 'in-lane', laneKey: MESSAGES_LANE},
             payload,
             state: 'dead-lettered',
             attempts,
@@ -395,7 +396,8 @@ describe('MessageRepository routing sends through the outbox', () => {
         });
         expect(parts.storedMessage.status).toHaveBeenLastCalledWith(StatusType.SENDING);
         expect(parts.storedMessage.failed_reason).toHaveBeenLastCalledWith(undefined);
-        expect(parts.order).toEqual(['updateEvent', 'append:operation-versioned']);
+        // The mocked record stays failed, so showing the queued message writes once more after the store.
+        expect(parts.order.slice(0, 2)).toEqual(['updateEvent', 'append:operation-versioned']);
         expect(parts.inject).not.toHaveBeenCalled();
       });
 
@@ -453,7 +455,7 @@ describe('MessageRepository routing sends through the outbox', () => {
         expect.objectContaining({
           kind: 'message',
           state: 'queued',
-          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+          lane: {state: 'in-lane', laneKey: MESSAGES_LANE},
           limits: {attemptTimeout: {state: 'times-out-after', milliseconds: 10 * 60 * 1000}},
           payload: {type: 'asset', conversationId: CONVERSATION_ID, messageId: expect.any(String), asImage: false},
         }),
@@ -525,7 +527,7 @@ describe('MessageRepository routing sends through the outbox', () => {
             seq: 3,
             trigger: 'attempt-dead-lettered',
             correlation: {state: 'correlated', correlationKey: 'asset-1'},
-            lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+            lane: {state: 'in-lane', laneKey: MESSAGES_LANE},
             payload: failedPayload,
             state: 'dead-lettered',
             attempts,
@@ -689,7 +691,7 @@ describe('MessageRepository routing sends through the outbox', () => {
         expect.objectContaining({
           kind: 'ping',
           state: 'queued',
-          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+          lane: {state: 'in-lane', laneKey: MESSAGES_LANE},
           correlation: {state: 'correlated', correlationKey: result.id},
           expiry: {state: 'expires-at', serverTime: parts.clock.getServerTime() + 60_000},
           payload: {conversationId: CONVERSATION_ID, messageId: result.id},
@@ -722,7 +724,7 @@ describe('MessageRepository routing sends through the outbox', () => {
       });
       await parts.repository.sendPing(parts.conversation);
 
-      const laneResult = parts.outbox.lane(CONVERSATION_ID.id);
+      const laneResult = parts.outbox.lane(MESSAGES_LANE);
       expect(laneResult).toEqual(expect.objectContaining({outcome: 'lane-found'}));
       expect((laneResult as {lane: {operations: unknown[]}}).lane.operations).toHaveLength(2);
     });
@@ -867,7 +869,7 @@ describe('MessageRepository routing sends through the outbox', () => {
           seq: 1,
           trigger: 'operation-queued',
           correlation: {state: 'correlated', correlationKey: 'message-1'},
-          lane: {state: 'in-lane', laneKey: CONVERSATION_ID.id},
+          lane: {state: 'in-lane', laneKey: MESSAGES_LANE},
           payload: {
             type: 'text',
             conversationId: CONVERSATION_ID,
@@ -923,7 +925,7 @@ describe('MessageRepository routing sends through the outbox', () => {
             state: 'correlated',
             correlationKey: `receipt:${CONVERSATION_ID.id}:${Confirmation.Type.DELIVERED}:received-1`,
           },
-          lane: {state: 'in-lane', laneKey: `${CONVERSATION_ID.id}#receipts`},
+          lane: {state: 'in-lane', laneKey: `${CONVERSATION_ID.id}@${CONVERSATION_ID.domain}#receipts`},
           payload: {
             type: 'confirmation',
             conversationId: CONVERSATION_ID,
@@ -972,7 +974,7 @@ describe('MessageRepository routing sends through the outbox', () => {
           kind: 'receipt',
           trigger: 'operation-versioned',
           correlation: {state: 'correlated', correlationKey: `last-read:${CONVERSATION_ID.id}`},
-          lane: {state: 'in-lane', laneKey: `${CONVERSATION_ID.id}#receipts`},
+          lane: {state: 'in-lane', laneKey: `${CONVERSATION_ID.id}@${CONVERSATION_ID.domain}#receipts`},
           payload: {type: 'last-read', conversationId: CONVERSATION_ID, timestamp: 2000},
         }),
       );
@@ -990,7 +992,7 @@ describe('MessageRepository routing sends through the outbox', () => {
       expect(onlySnapshot(parts.store)).toEqual(
         expect.objectContaining({
           correlation: {state: 'correlated', correlationKey: `cleared:${CONVERSATION_ID.id}`},
-          lane: {state: 'in-lane', laneKey: `${CONVERSATION_ID.id}#receipts`},
+          lane: {state: 'in-lane', laneKey: `${CONVERSATION_ID.id}@${CONVERSATION_ID.domain}#receipts`},
           payload: {type: 'cleared', conversationId: CONVERSATION_ID, timestamp: 5000},
         }),
       );

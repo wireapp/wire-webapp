@@ -256,7 +256,7 @@ describe('MessageRepository as the port of the message kinds', () => {
     return {...parts, messageKind, storedMessage, updateEvent};
   }
 
-  function perform(messageKind: Kind<MessagePayload>, payload: MessagePayload): Promise<AttemptOutcome> {
+  function attempt(messageKind: Kind<MessagePayload>, payload: MessagePayload): Promise<AttemptOutcome> {
     return messageKind.attempt(
       {
         id: 'operation',
@@ -280,7 +280,7 @@ describe('MessageRepository as the port of the message kinds', () => {
       state: MessageSendingState.OUTGOING_SENT,
     });
 
-    await expect(perform(messageKind, textPayload)).resolves.toEqual({outcome: 'attempt-succeeded'});
+    await expect(attempt(messageKind, textPayload)).resolves.toEqual({outcome: 'attempt-succeeded'});
 
     expect(send).toHaveBeenCalledTimes(1);
     expect(send.mock.calls[0][0].payload.messageId).toBe('message-1');
@@ -304,7 +304,7 @@ describe('MessageRepository as the port of the message kinds', () => {
         state: MessageSendingState.OUTGOING_SENT,
       });
 
-      await perform(messageKind, textPayload);
+      await attempt(messageKind, textPayload);
 
       expect(sentTimer(send)).toBe(TEN_SECONDS);
       expect(storedMessage.ephemeral_expires()).toBe(TEN_SECONDS);
@@ -320,7 +320,7 @@ describe('MessageRepository as the port of the message kinds', () => {
         state: MessageSendingState.OUTGOING_SENT,
       });
 
-      await perform(messageKind, textPayload);
+      await attempt(messageKind, textPayload);
 
       expect(sentTimer(send)).toBeUndefined();
       expect(storedMessage.ephemeral_expires()).toBe(false);
@@ -337,7 +337,7 @@ describe('MessageRepository as the port of the message kinds', () => {
         state: MessageSendingState.OUTGOING_SENT,
       });
 
-      await perform(messageKind, textPayload);
+      await attempt(messageKind, textPayload);
 
       expect(storedMessage.ephemeral_expires()).toBe(false);
       expect(updateEvent).not.toHaveBeenCalledWith(
@@ -351,7 +351,7 @@ describe('MessageRepository as the port of the message kinds', () => {
     const {messageKind, send, storedMessage, updateEvent} = setup();
     send.mockRejectedValue(new BackendError('removed', BackendErrorLabel.CLIENT_ERROR, 403));
 
-    await expect(perform(messageKind, textPayload)).resolves.toEqual({outcome: 'attempt-dead-lettered'});
+    await expect(attempt(messageKind, textPayload)).resolves.toEqual({outcome: 'attempt-dead-lettered'});
 
     expect(storedMessage.status).toHaveBeenCalledWith(StatusType.FAILED);
     expect(updateEvent).toHaveBeenCalledWith('primary-key', {status: StatusType.FAILED, failed_reason: 'removed'});
@@ -361,7 +361,7 @@ describe('MessageRepository as the port of the message kinds', () => {
     const {messageKind, send, storedMessage, updateEvent} = setup();
     send.mockRejectedValue(new BackendError('remote', BackendErrorLabel.FEDERATION_REMOTE_ERROR, 533 as never));
 
-    await expect(perform(messageKind, textPayload)).resolves.toEqual({outcome: 'attempt-dead-lettered'});
+    await expect(attempt(messageKind, textPayload)).resolves.toEqual({outcome: 'attempt-dead-lettered'});
 
     expect(storedMessage.status).toHaveBeenCalledWith(StatusType.FEDERATION_ERROR);
     expect(updateEvent).toHaveBeenCalledWith('primary-key', {
@@ -374,12 +374,12 @@ describe('MessageRepository as the port of the message kinds', () => {
     const {messageKind, send, updateEvent} = setup();
     send.mockRejectedValue(new NetworkError('offline'));
 
-    await expect(perform(messageKind, textPayload)).resolves.toEqual({outcome: 'attempt-failed'});
+    await expect(attempt(messageKind, textPayload)).resolves.toEqual({outcome: 'attempt-failed'});
 
     expect(updateEvent).not.toHaveBeenCalled();
   });
 
-  it('removes a message the outbox dropped from the record and from the screen', async () => {
+  it('removes a message the outbox deleted from the record and from the screen', async () => {
     const {messageKind, eventService, invoker} = setup();
     const deleteEvent = jest.spyOn(eventService, 'deleteEvent').mockResolvedValue(1);
     const removed = jest.fn();
@@ -392,7 +392,7 @@ describe('MessageRepository as the port of the message kinds', () => {
       correlation: {state: 'uncorrelated'},
       lane: {state: 'no-lane'},
       queuedAt: 0,
-      state: 'dropped',
+      state: 'deleted',
       attempts: 1,
     });
     await invoker.waitUntilAllSettled();
@@ -444,12 +444,12 @@ describe('MessageRepository as the port of the message kinds', () => {
     });
   });
 
-  it('answers dropped for a conversation it does not know', async () => {
+  it('answers deleted for a conversation it does not know', async () => {
     const {messageKind, send} = setup();
 
     await expect(
-      perform(messageKind, {...textPayload, conversationId: {id: 'unknown', domain: 'wire.test'}}),
-    ).resolves.toEqual({outcome: 'attempt-dropped'});
+      attempt(messageKind, {...textPayload, conversationId: {id: 'unknown', domain: 'wire.test'}}),
+    ).resolves.toEqual({outcome: 'attempt-deleted'});
 
     expect(send).not.toHaveBeenCalled();
   });

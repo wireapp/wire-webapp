@@ -98,7 +98,7 @@ export type OutboxRepository = {
   buildAsset: jest.SpyInstance;
   sendLinkPreview: jest.SpyInstance;
   degrade: (conversation: Conversation) => void;
-  perform: <Name extends keyof KindNames>(
+  attempt: <Name extends keyof KindNames>(
     name: Name,
     payload: KindNames[Name],
     signal?: AbortSignal,
@@ -333,7 +333,7 @@ export function createOutboxRepository(): OutboxRepository {
     degrade: degradedConversation => {
       degradedConversation.verification_state(ConversationVerificationState.DEGRADED);
     },
-    perform: (name, payload, signal = new AbortController().signal) => {
+    attempt: (name, payload, signal = new AbortController().signal) => {
       return kindNamed(name).attempt(viewOf(name, payload, {}), signal);
     },
     changed: async (name, payload, state, queuedAt = 0) => {

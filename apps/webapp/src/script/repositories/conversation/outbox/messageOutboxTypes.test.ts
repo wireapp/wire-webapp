@@ -21,6 +21,7 @@ import {Confirmation} from '@wireapp/protocol-messaging';
 
 import {
   laneOfChanges,
+  laneOfConversationReceipts,
   laneOfMessages,
   laneOfReceipts,
   messageCorrelationKey,
@@ -73,9 +74,16 @@ describe('the stored keys of the message kinds', () => {
   });
 
   it('names the lanes of messages, of changes to sent messages and of receipts', () => {
-    expect(laneOfMessages(conversationId)).toBe('conversation-1');
-    expect(laneOfChanges(conversationId)).toBe('conversation-1#changes');
-    expect(laneOfReceipts({type: 'last-read', conversationId, timestamp: 1})).toBe('conversation-1#receipts');
+    expect(laneOfMessages(conversationId)).toBe('conversation-1@wire.test');
+    expect(laneOfChanges(conversationId)).toBe('conversation-1@wire.test#changes');
+    expect(laneOfReceipts({type: 'last-read', conversationId, timestamp: 1})).toBe('conversation-1@wire.test#receipts');
     expect(laneOfReceipts({type: 'data-transfer', countlyId: 'countly'})).toBe('self#receipts');
+  });
+
+  it('gives conversations that differ only by domain lanes of their own', () => {
+    const otherDomain = {...conversationId, domain: 'other.test'};
+    expect(laneOfMessages(otherDomain)).not.toBe(laneOfMessages(conversationId));
+    expect(laneOfChanges(otherDomain)).not.toBe(laneOfChanges(conversationId));
+    expect(laneOfConversationReceipts(otherDomain)).not.toBe(laneOfConversationReceipts(conversationId));
   });
 });

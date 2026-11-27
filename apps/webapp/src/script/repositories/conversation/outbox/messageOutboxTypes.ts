@@ -196,14 +196,18 @@ export function receiptCorrelationKey(payload: ReceiptPayload): string {
 
 /** Messages, the changes to messages that are still pending, and pings go out one at a time, in order. */
 export function laneOfMessages(conversationId: QualifiedId): string {
-  return conversationId.id;
+  return `${conversationId.id}@${conversationId.domain}`;
 }
 
 /** Changes to messages that were sent have their own lane, so that pending messages never block them. */
 export function laneOfChanges(conversationId: QualifiedId): string {
-  return `${conversationId.id}#changes`;
+  return `${laneOfMessages(conversationId)}#changes`;
+}
+
+export function laneOfConversationReceipts(conversationId: QualifiedId): string {
+  return `${laneOfMessages(conversationId)}#receipts`;
 }
 
 export function laneOfReceipts(payload: ReceiptPayload): string {
-  return payload.type === 'data-transfer' ? 'self#receipts' : `${payload.conversationId.id}#receipts`;
+  return payload.type === 'data-transfer' ? 'self#receipts' : laneOfConversationReceipts(payload.conversationId);
 }
