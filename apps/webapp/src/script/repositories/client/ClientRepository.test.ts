@@ -357,11 +357,14 @@ describe('ClientRepository', () => {
   });
 
   describe('logoutClient with pending messages', () => {
-    const createRepository = (translate: Translate): ClientRepository => {
+    const createRepository = (translate: Translate, pendingMessages: number): ClientRepository => {
       return new ClientRepository(
         {} as any,
         {} as any,
         translate,
+        () => {
+          return pendingMessages;
+        },
         {
           currentClient: {
             isTemporary: () => {
@@ -382,12 +385,7 @@ describe('ClientRepository', () => {
     ])('names the %s pending messages in the option label', async (count, expectedOption) => {
       const primaryModalShow = jest.fn();
       PrimaryModal.show = primaryModalShow;
-      const clientRepository = createRepository(translate);
-      clientRepository.setPendingMessageCounter(() => {
-        return count;
-      });
-
-      await clientRepository.logoutClient();
+      await createRepository(translate, count).logoutClient();
 
       expect(primaryModalShow).toHaveBeenCalledWith(
         PrimaryModal.type.OPTION,
@@ -402,23 +400,7 @@ describe('ClientRepository', () => {
     it('keeps the plain option label without pending messages', async () => {
       const primaryModalShow = jest.fn();
       PrimaryModal.show = primaryModalShow;
-      const clientRepository = createRepository(translate);
-      clientRepository.setPendingMessageCounter(() => {
-        return 0;
-      });
-
-      await clientRepository.logoutClient();
-
-      const [, options] = primaryModalShow.mock.calls[0];
-      expect(options.text.option).toBe('translated:modalAccountLogoutOption:');
-      expect(options.text).not.toHaveProperty('message');
-    });
-
-    it('keeps the plain option label when no counter was set', async () => {
-      const primaryModalShow = jest.fn();
-      PrimaryModal.show = primaryModalShow;
-
-      await createRepository(translate).logoutClient();
+      await createRepository(translate, 0).logoutClient();
 
       const [, options] = primaryModalShow.mock.calls[0];
       expect(options.text.option).toBe('translated:modalAccountLogoutOption:');
@@ -436,6 +418,9 @@ describe('ClientRepository', () => {
         {} as any,
         {} as any,
         translate,
+        () => {
+          return 0;
+        },
         {
           currentClient: {
             isTemporary: () => {

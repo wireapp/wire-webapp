@@ -73,7 +73,9 @@ async function buildUserRepository(translate: Translate): Promise<UserRepository
   const userService = new UserService(storageRepo['storageService']);
   const assetRepository = new AssetRepository();
   const selfService = new SelfService();
-  const clientRepository = new ClientRepository({} as any, {} as any, translate);
+  const clientRepository = new ClientRepository({} as any, {} as any, translate, () => {
+    return 0;
+  });
   const propertyRepository = new PropertiesRepository({} as any, {} as any, translate);
   const userState = new UserState();
   const teamState = new TeamState();

@@ -308,7 +308,9 @@ export class App {
     repositories.storage = new StorageRepository();
 
     repositories.cryptography = new CryptographyRepository();
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, this.translate);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, this.translate, () => {
+      return repositories.message.countPendingMessages();
+    });
     repositories.audio = new AudioRepository();
 
     repositories.user = new UserRepository(
@@ -378,10 +380,6 @@ export class App {
       backgroundEffectsHandler,
       this.translate,
     );
-
-    repositories.client.setPendingMessageCounter(() => {
-      return repositories.message.countPendingMessages();
-    });
 
     repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
 

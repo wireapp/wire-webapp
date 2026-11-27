@@ -162,6 +162,9 @@ export class TestFactory {
       this.client_service,
       cryptographyRepository,
       translate,
+      () => {
+        return 0;
+      },
       new ClientState(),
     );
 

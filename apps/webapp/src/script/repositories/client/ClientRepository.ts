@@ -62,10 +62,6 @@ type ClientRepositoryConfig = {AVERAGE_NUMBER_OF_CLIENTS: number};
 
 export class ClientRepository {
   private readonly logger: Logger;
-  /** Without the outbox nothing is pending */
-  private countPendingMessages: () => number = () => {
-    return 0;
-  };
   public selfUser: ko.Observable<User>;
 
   static get CONFIG(): ClientRepositoryConfig {
@@ -82,6 +78,8 @@ export class ClientRepository {
     public readonly clientService: ClientService,
     public readonly cryptographyRepository: CryptographyRepository,
     private readonly translate: Translate,
+    /** Called at logout only, so it may read a repository that is created later */
+    private readonly countPendingMessages: () => number,
     private readonly clientState = container.resolve(ClientState),
     private readonly core = container.resolve(Core),
   ) {
@@ -95,11 +93,6 @@ export class ClientRepository {
 
   init(selfUser: User): void {
     this.selfUser(selfUser);
-  }
-
-  /** The client repository is created before the message repository, so the count is handed over afterwards */
-  setPendingMessageCounter(countPendingMessages: () => number): void {
-    this.countPendingMessages = countPendingMessages;
   }
 
   //##############################################################################
