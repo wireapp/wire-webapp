@@ -2997,7 +2997,7 @@ export class MessageRepository {
     return this.isUnsent(findResult.operation) ? findResult.operation.payload.previousReactions : undefined;
   }
 
-  /** An attempt in flight may never have reached the receiver, so its change isn't confirmed either. */
+  /** An attempt in flight may never have reached the receiver, so what it sends isn't confirmed either. */
   private isUnsent({state}: OperationView<unknown>): boolean {
     return state === 'queued' || state === 'on-hold' || state === 'in-progress';
   }
@@ -3553,13 +3553,12 @@ export class MessageRepository {
   }
 
   /** The outbox also reports the operations it loads at startup as changed, so the count covers them too. */
-  private trackWaitingMessage({id, payload, state}: OperationView<MessagePayload>): void {
-    const isMessage = payload.type === 'text' || payload.type === 'asset';
-    const isWaiting = state === 'queued' || state === 'on-hold' || state === 'in-progress';
-    if (isMessage && isWaiting) {
-      this.waitingMessages.add(id);
+  private trackWaitingMessage(operation: OperationView<MessagePayload>): void {
+    const isMessage = operation.payload.type === 'text' || operation.payload.type === 'asset';
+    if (isMessage && this.isUnsent(operation)) {
+      this.waitingMessages.add(operation.id);
     } else {
-      this.waitingMessages.delete(id);
+      this.waitingMessages.delete(operation.id);
     }
   }
 
