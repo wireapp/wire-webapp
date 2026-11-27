@@ -76,6 +76,7 @@ import {getPermanentDeleteStatusKind} from './getPermanentDeleteStatusKind';
 import {resolveRestoreTargets} from './restoreBinSelection/resolveRestoreTargets';
 import {showBulkRestoreModal} from './restoreBinSelection/showBulkRestoreModal';
 import {useBulkRestore, type BulkRestoreReviewReason} from './restoreBinSelection/useBulkRestore';
+import {useBulkDownloadSelection} from './useBulkDownloadSelection';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
@@ -89,7 +90,7 @@ import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';
 import {TrashIcon} from '../../../../uiKit/dataDisplay/icon/trashIcon';
 import {UploadIcon} from '../../../../uiKit/dataDisplay/icon/uploadIcon';
 import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
-import {formatBytes} from '../../../../util/util';
+import {downloadBlob, formatBytes} from '../../../../util/util';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '../../../Modals/PrimaryModal';
 import {getCellsBackgroundActionEvidence} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import type {CellsBackgroundActionOutcome} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
@@ -204,7 +205,7 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
 };
 
 // Selecting rows only makes sense when at least one of these is available, e.g. never for viewers.
-const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE];
+const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE, CELLS_ACTION.DOWNLOAD];
 
 interface CapturedBulkMoveToBinSelection {
   nodeIds: string[];
@@ -395,6 +396,7 @@ export const CellsTable = ({
   const canPerformCurrentDriveActionRef = useRef(canPerformCurrentDriveAction);
   canPerformCurrentDriveActionRef.current = canPerformCurrentDriveAction;
   const permanentDeleteModalId = useId();
+  const bulkDownloadDescriptionId = useId();
   const permanentDeleteStatusReporter = useBulkActionStatusReporter(
     'permanentDelete',
     currentConversationQualifiedId,
@@ -989,6 +991,26 @@ export const CellsTable = ({
   const selectedNodes = nodes.filter(node => {
     return selectedNodeIds.has(node.id);
   });
+  const bulkDownload = useBulkDownloadSelection({
+    cellsRepository,
+    selectedNodes: selectedNodes.map(node => {
+      return {
+        path: node.path,
+        isDownloadable: canPerformCellsAction({
+          action: CELLS_ACTION.DOWNLOAD,
+          selfUserDriveRole: node.selfUserDriveRole,
+        }),
+      };
+    }),
+    selectedCount: selectedNodeIds.size,
+    canDownload: canPerformCurrentDriveAction(CELLS_ACTION.DOWNLOAD),
+    isSupportedLocation: !isInRecycleBin(),
+    isSelectionEnabled: selectionEnabled && isSelectionEnabled,
+    isSelectionDisabled,
+    translate,
+    formatBytes,
+    downloadBlob,
+  });
   const selectedFilesTotalSize =
     selectedNodes.length === selectedNodeIds.size ? getSelectedFilesTotalSize(selectedNodes) : Maybe.nothing();
   const restoreResolution = resolveRestoreTargets({selectedNodes});
@@ -1489,6 +1511,21 @@ export const CellsTable = ({
                     <span css={selectionSizeStyles}>{formatBytes(selectedFilesTotalSize.value)}</span>
                   )}
                   <div css={selectionActionsStyles}>
+                    {bulkDownload.isVisible && (
+                      <button
+                        css={bulkActionButtonStyles}
+                        type="button"
+                        disabled={bulkDownload.isDisabled}
+                        aria-describedby={
+                          bulkDownload.unavailableReason === null ? undefined : bulkDownloadDescriptionId
+                        }
+                        onClick={() => {
+                          void bulkDownload.start();
+                        }}
+                      >
+                        {translate('cells.bulkDownload.button')}
+                      </button>
+                    )}
                     {canPermanentlyDeleteSelection && (
                       <button
                         css={bulkActionButtonStyles}
@@ -1596,6 +1633,18 @@ export const CellsTable = ({
             </div>,
             selectionBarAnchor,
           )}
+        {bulkDownload.isVisible && bulkDownload.statusMessage !== null && selectedNodeIds.size > 0 && (
+          <div css={moveOutcomeMessageStyles} role={bulkDownload.isFailure ? 'alert' : 'status'}>
+            {bulkDownload.statusMessage}
+          </div>
+        )}
+        {bulkDownload.isVisible && bulkDownload.unavailableReason !== null && (
+          <div css={moveOutcomeMessageStyles} role="status">
+            <span id={bulkDownloadDescriptionId}>
+              {translate(`cells.bulkDownload.unavailable.${bulkDownload.unavailableReason}`)}
+            </span>
+          </div>
+        )}
         {(isBulkMovePreviewOpen || isBulkMoveRequestPending || isBackgroundMovePending) &&
           (canMoveSelection ||
             isBulkMoveOutcomeUnresolved ||

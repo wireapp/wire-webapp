@@ -391,6 +391,18 @@ export class CellsRepository {
     return this.apiClient.api.cells.restoreNodes({uuids});
   }
 
+  async downloadSelectionArchive({
+    paths,
+    archiveParentPath,
+    abortController,
+  }: {
+    paths: readonly string[];
+    archiveParentPath: string;
+    abortController?: AbortController;
+  }): Promise<ReadableStream<Uint8Array>> {
+    return this.apiClient.api.cells.downloadSelectionArchive({paths, archiveParentPath, abortController});
+  }
+
   async renameNode({currentPath, newName}: {currentPath: string; newName: string}): Promise<RestPerformActionResponse> {
     return this.apiClient.api.cells.renameNode({currentPath, newName});
   }
