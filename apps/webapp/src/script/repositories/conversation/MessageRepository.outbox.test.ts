@@ -505,9 +505,9 @@ describe('MessageRepository.getOutboxState', () => {
   function buildWithFoundOperation(state: string | undefined): MessageRepository {
     const outbox = createOutboxSpy();
     const find = jest.fn(() => {
-      return state === undefined ? {type: 'operation-not-found'} : {type: 'operation-found', operation: {state}};
+      return state === undefined ? {outcome: 'operation-not-found'} : {outcome: 'operation-found', operation: {state}};
     });
-    outbox.register.mockReturnValue({type: 'kind-registered', handle: {find}} as never);
+    outbox.register.mockReturnValue({outcome: 'kind-registered', handle: {find}} as never);
     return buildMessageRepository(outbox);
   }
 
