@@ -204,15 +204,82 @@ describe('createOutbox commands', () => {
     });
   });
 
-  describe('drop', () => {
+  describe('deadLetter', () => {
+    it.each(['queued', 'on-hold', 'in-progress'] as const)('dead-letters an operation that is %s', async state => {
+      await putInState(state);
+
+      expect(await kit.outbox.deadLetter('key')).toMatchObject({
+        outcome: 'operation-dead-lettered',
+        operation: {id: 'operation-1', state: 'dead-lettered', payload: {text: 'key'}},
+      });
+      expect(kit.operation('key').state).toBe('dead-lettered');
+      expect(kit.store.history('operation-1').at(-1)).toMatchObject({
+        trigger: 'operation-dead-lettered',
+        state: 'dead-lettered',
+      });
+      expect(testKind.changes.at(-1)).toMatchObject({id: 'operation-1', state: 'dead-lettered'});
+    });
+
+    it('refuses an operation that is dead-lettered already', async () => {
+      await putInState('dead-lettered');
+
+      expect(await kit.outbox.deadLetter('key')).toEqual({
+        outcome: 'transition-refused',
+        trigger: 'operation-dead-lettered',
+        operation: expect.objectContaining({state: 'dead-lettered'}),
+      });
+    });
+
+    it('aborts the running attempt, does not wait for it, and ignores its late answer', async () => {
+      await putInState('in-progress');
+      const attempt = testKind.lastAttempt();
+
+      expect(await kit.outbox.deadLetter('key')).toMatchObject({outcome: 'operation-dead-lettered'});
+      await attempt.answer({outcome: 'attempt-succeeded'});
+
+      expect(attempt.signal.aborted).toBe(true);
+      expect(kit.operation('key').state).toBe('dead-lettered');
+    });
+
+    it('can be revived by a version', async () => {
+      await enqueue('key');
+      await kit.outbox.deadLetter('key');
+
+      expect(await testKind.handle.enqueue({payload: {text: 'again'}, correlationKey: 'key'})).toMatchObject({
+        outcome: 'operation-versioned',
+        operation: {id: 'operation-1', state: 'queued'},
+      });
+    });
+
+    it('answers operation-not-found for an unknown key', async () => {
+      expect(await kit.outbox.deadLetter('unknown')).toEqual({outcome: 'operation-not-found'});
+    });
+
+    it('is not taken before the outbox is started', async () => {
+      const notStartedKit = createOutboxTestKit();
+
+      expect(await notStartedKit.outbox.deadLetter('key')).toEqual({outcome: 'outbox-not-started'});
+    });
+
+    it('answers storage-failed, keeps the operation and leaves the attempt running when it cannot be stored', async () => {
+      await putInState('in-progress');
+      kit.store.fail('append', true);
+
+      expect(await kit.outbox.deadLetter('key')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
+      expect(kit.operation('key').state).toBe('in-progress');
+      expect(testKind.lastAttempt().signal.aborted).toBe(false);
+    });
+  });
+
+  describe('delete', () => {
     it.each(['queued', 'on-hold', 'in-progress', 'dead-lettered'] as const)(
-      'drops an operation that is %s',
+      'deletes an operation that is %s',
       async state => {
         await putInState(state);
 
-        expect(await kit.outbox.drop('key')).toMatchObject({
-          outcome: 'operation-dropped',
-          operation: {id: 'operation-1', state: 'dropped', payload: {text: 'key'}},
+        expect(await kit.outbox.delete('key')).toMatchObject({
+          outcome: 'operation-deleted',
+          operation: {id: 'operation-1', state: 'deleted', payload: {text: 'key'}},
         });
         expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
       },
@@ -221,7 +288,7 @@ describe('createOutbox commands', () => {
     it('deletes every snapshot of the operation', async () => {
       await enqueue('key');
 
-      await kit.outbox.drop('key');
+      await kit.outbox.delete('key');
 
       expect(kit.store.operationIds()).toEqual([]);
       expect(kit.store.calls.at(-1)).toEqual({method: 'remove', operationIds: ['operation-1']});
@@ -230,27 +297,27 @@ describe('createOutbox commands', () => {
     it('stores the final snapshot before deleting the snapshots', async () => {
       await enqueue('key');
 
-      await kit.outbox.drop('key');
+      await kit.outbox.delete('key');
 
       expect(kit.store.calls.slice(-2)).toEqual([
-        {method: 'append', snapshot: expect.objectContaining({trigger: 'operation-dropped', state: 'dropped'})},
+        {method: 'append', snapshot: expect.objectContaining({trigger: 'operation-deleted', state: 'deleted'})},
         {method: 'remove', operationIds: ['operation-1']},
       ]);
     });
 
-    it('calls onChanged with the dropped operation', async () => {
+    it('calls onChanged with the deleted operation', async () => {
       await enqueue('key');
 
-      await kit.outbox.drop('key');
+      await kit.outbox.delete('key');
 
-      expect(testKind.changes.at(-1)).toMatchObject({id: 'operation-1', state: 'dropped'});
+      expect(testKind.changes.at(-1)).toMatchObject({id: 'operation-1', state: 'deleted'});
     });
 
     it('aborts the running attempt of an operation that is in progress', async () => {
       await putInState('in-progress');
       const {signal} = testKind.lastAttempt();
 
-      await kit.outbox.drop('key');
+      await kit.outbox.delete('key');
 
       expect(signal.aborted).toBe(true);
     });
@@ -258,32 +325,32 @@ describe('createOutbox commands', () => {
     it('does not wait for the running attempt', async () => {
       await putInState('in-progress');
 
-      expect(await kit.outbox.drop('key')).toMatchObject({outcome: 'operation-dropped'});
+      expect(await kit.outbox.delete('key')).toMatchObject({outcome: 'operation-deleted'});
       expect(testKind.attempts).toHaveLength(1);
     });
 
     it('answers operation-not-found for an unknown key', async () => {
-      expect(await kit.outbox.drop('unknown')).toEqual({outcome: 'operation-not-found'});
+      expect(await kit.outbox.delete('unknown')).toEqual({outcome: 'operation-not-found'});
     });
 
-    it('answers operation-not-found for an operation that was dropped already', async () => {
+    it('answers operation-not-found for an operation that was deleted already', async () => {
       await enqueue('key');
-      await kit.outbox.drop('key');
+      await kit.outbox.delete('key');
 
-      expect(await kit.outbox.drop('key')).toEqual({outcome: 'operation-not-found'});
+      expect(await kit.outbox.delete('key')).toEqual({outcome: 'operation-not-found'});
     });
 
     it('is not taken before the outbox is started', async () => {
       const notStartedKit = createOutboxTestKit();
 
-      expect(await notStartedKit.outbox.drop('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(await notStartedKit.outbox.delete('key')).toEqual({outcome: 'outbox-not-started'});
     });
 
     it('answers storage-failed and keeps the operation when the final snapshot cannot be stored', async () => {
       await enqueue('key');
       kit.store.fail('append', true);
 
-      expect(await kit.outbox.drop('key')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
+      expect(await kit.outbox.delete('key')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
       expect(kit.operation('key').state).toBe('queued');
     });
 
@@ -291,7 +358,7 @@ describe('createOutbox commands', () => {
       await enqueue('key');
       kit.store.fill(true);
 
-      expect(await kit.outbox.drop('key')).toEqual({outcome: 'storage-full'});
+      expect(await kit.outbox.delete('key')).toEqual({outcome: 'storage-full'});
       expect(kit.operation('key').state).toBe('queued');
     });
 
@@ -299,23 +366,23 @@ describe('createOutbox commands', () => {
       await putInState('in-progress');
       kit.store.fail('append', true);
 
-      await kit.outbox.drop('key');
+      await kit.outbox.delete('key');
 
       expect(testKind.lastAttempt().signal.aborted).toBe(false);
     });
 
-    it('answers operation-dropped once the final snapshot is stored, although deleting the snapshots failed', async () => {
+    it('answers operation-deleted once the final snapshot is stored, although deleting the snapshots failed', async () => {
       await enqueue('key');
       kit.store.fail('remove', true);
 
-      expect(await kit.outbox.drop('key')).toMatchObject({outcome: 'operation-dropped'});
+      expect(await kit.outbox.delete('key')).toMatchObject({outcome: 'operation-deleted'});
       expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
-      expect(kit.store.history('operation-1').at(-1)).toMatchObject({state: 'dropped'});
+      expect(kit.store.history('operation-1').at(-1)).toMatchObject({state: 'deleted'});
     });
 
     it('lets the key be used again by a new operation', async () => {
       await enqueue('key');
-      await kit.outbox.drop('key');
+      await kit.outbox.delete('key');
 
       expect(await testKind.handle.enqueue({payload: {text: 'again'}, correlationKey: 'key'})).toMatchObject({
         outcome: 'operation-queued',

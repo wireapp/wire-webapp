@@ -17,172 +17,177 @@
  *
  */
 
-import {isInState, isOutcome} from './tagged';
 import {
+  correlated,
   createOutboxTestKit,
   createStoredSnapshot,
   parseTestPayload,
-  type AttemptCall,
   type OutboxTestKit,
   type TestKind,
 } from './testing/createOutboxTestKit';
-import type {EnqueueRequest, Kind, OperationSnapshot, OperationState} from './types';
+import type {EndingOptions, EnqueueRequest, Kind, Cascade, OperationSnapshot, OperationState} from './types';
 
 type KindOptions = Partial<Kind<{text: string}>>;
-type LaneMode = 'follows' | 'continues';
+type Ending = 'dead-lettered' | 'deleted';
+
+const SETTING_OF = {'dead-lettered': 'laneWhenDeadLettered', deleted: 'laneWhenDeleted'} as const;
+const OTHER_ENDING: Record<Ending, Ending> = {'dead-lettered': 'deleted', deleted: 'dead-lettered'};
+const LANE_TRIGGER_OF = {'dead-lettered': 'lane-dead-lettered', deleted: 'lane-deleted'} as const;
+/** How the handle finds an operation after the ending: a deleted one is forgotten */
+const FOUND_AS: Record<Ending, OperationState | 'forgotten'> = {'dead-lettered': 'dead-lettered', deleted: 'forgotten'};
+
+function laneSetting(ending: Ending, setting: 'follows' | 'continues'): KindOptions {
+  return {[SETTING_OF[ending]]: setting};
+}
 
 type Way = {
   name: string;
+  ending: Ending;
   kindOptions: KindOptions;
-  /** The request of the operation that is given up */
+  /** The request of the operation that ends */
   request: Partial<EnqueueRequest<{text: string}>>;
-  /** Whether the outbox runs: giving up while the operation waits is seen with an outbox that sends nothing */
+  /** Whether the outbox runs: an ending while the operation waits is seen with an outbox that sends nothing */
   runs: boolean;
-  endsFollowersAs: 'dead-lettered' | 'forgotten';
-  giveUp: (kit: OutboxTestKit, testKind: TestKind) => Promise<unknown>;
+  end: (kit: OutboxTestKit, testKind: TestKind) => Promise<unknown>;
 };
 
-function attemptOf(testKind: TestKind, text: string): AttemptCall {
-  const found = testKind.attempts.find(({operation}) => {
-    return operation.payload.text === text;
-  });
-  if (found === undefined) {
-    throw new Error(`${text} was not attempted`);
-  }
-  return found;
-}
-
-function attemptedTexts(testKind: TestKind): string[] {
-  return testKind.attempts.map(({operation}) => {
-    return operation.payload.text;
-  });
-}
-
-function stateOf(testKind: TestKind, correlationKey: string): OperationState | 'forgotten' {
-  const findResult = testKind.handle.find(correlationKey);
-  return isOutcome('operation-found')(findResult) ? findResult.operation.state : 'forgotten';
-}
-
-/** The texts of the payloads, in the order their operations ended */
-function endedOrder(testKind: TestKind): string[] {
-  return testKind.changes.filter(isInState('dead-lettered', 'dropped')).map(({payload}) => {
-    return payload.text;
-  });
-}
+const ownerWays = (['dead-lettered', 'deleted'] as const).flatMap((ending): Way[] => {
+  const command = ending === 'dead-lettered' ? 'deadLetter' : 'delete';
+  return [
+    {
+      name: `the owner calls ${command} while its attempt runs`,
+      ending,
+      kindOptions: {},
+      request: {},
+      runs: true,
+      end: async kit => {
+        return kit.outbox[command]('a');
+      },
+    },
+    {
+      name: `the owner calls ${command} while it waits`,
+      ending,
+      kindOptions: {},
+      request: {},
+      runs: false,
+      end: async kit => {
+        return kit.outbox[command]('a');
+      },
+    },
+    {
+      name: `the owner calls ${command} while it is on hold`,
+      ending,
+      kindOptions: {},
+      request: {},
+      runs: false,
+      end: async kit => {
+        await kit.outbox.hold('a');
+        return kit.outbox[command]('a');
+      },
+    },
+  ];
+});
 
 const ways: Way[] = [
   {
     name: 'its attempt answers attempt-dead-lettered',
+    ending: 'dead-lettered',
     kindOptions: {},
     request: {},
     runs: true,
-    endsFollowersAs: 'dead-lettered',
-    giveUp: async (_, testKind) => {
-      return attemptOf(testKind, 'a').answer({outcome: 'attempt-dead-lettered'});
+    end: async (_, testKind) => {
+      return testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
     },
   },
   {
-    name: 'its attempt answers attempt-dropped',
+    name: 'its attempt answers attempt-deleted',
+    ending: 'deleted',
     kindOptions: {},
     request: {},
     runs: true,
-    endsFollowersAs: 'forgotten',
-    giveUp: async (_, testKind) => {
-      return attemptOf(testKind, 'a').answer({outcome: 'attempt-dropped'});
+    end: async (_, testKind) => {
+      return testKind.attemptOf('a').answer({outcome: 'attempt-deleted'});
     },
   },
   {
     name: 'its attempts run out and the kind dead-letters',
+    ending: 'dead-lettered',
     kindOptions: {maxAttempts: 1},
     request: {},
     runs: true,
-    endsFollowersAs: 'dead-lettered',
-    giveUp: async (_, testKind) => {
-      return attemptOf(testKind, 'a').answer({outcome: 'attempt-failed'});
+    end: async (_, testKind) => {
+      return testKind.attemptOf('a').answer({outcome: 'attempt-failed'});
     },
   },
   {
-    name: 'its attempts run out and the kind drops',
-    kindOptions: {maxAttempts: 1, whenGivenUp: 'drop'},
+    name: 'its attempts run out and the kind deletes',
+    ending: 'deleted',
+    kindOptions: {maxAttempts: 1, whenExhausted: 'delete'},
     request: {},
     runs: true,
-    endsFollowersAs: 'forgotten',
-    giveUp: async (_, testKind) => {
-      return attemptOf(testKind, 'a').answer({outcome: 'attempt-failed'});
+    end: async (_, testKind) => {
+      return testKind.attemptOf('a').answer({outcome: 'attempt-failed'});
     },
   },
   {
-    name: 'its last attempt errors and the kind drops',
-    kindOptions: {maxAttempts: 1, whenGivenUp: 'drop'},
+    name: 'its last attempt errors and the kind deletes',
+    ending: 'deleted',
+    kindOptions: {maxAttempts: 1, whenExhausted: 'delete'},
     request: {},
     runs: true,
-    endsFollowersAs: 'forgotten',
-    giveUp: async (_, testKind) => {
-      return attemptOf(testKind, 'a').reject(new Error('failed'));
+    end: async (_, testKind) => {
+      return testKind.attemptOf('a').reject(new Error('failed'));
     },
   },
   {
     name: 'its last attempt times out and the kind dead-letters',
+    ending: 'dead-lettered',
     kindOptions: {maxAttempts: 1},
     request: {attemptTimeoutMilliseconds: 1_000},
     runs: true,
-    endsFollowersAs: 'dead-lettered',
-    giveUp: async kit => {
+    end: async kit => {
       return kit.clock.advance(1_000);
     },
   },
   {
     name: 'it expires and the kind dead-letters',
+    ending: 'dead-lettered',
     kindOptions: {},
     request: {expiresAfterMilliseconds: 1_000},
     runs: false,
-    endsFollowersAs: 'dead-lettered',
-    giveUp: async kit => {
+    end: async kit => {
       return kit.clock.advance(1_000);
     },
   },
   {
-    name: 'it expires and the kind drops',
-    kindOptions: {whenGivenUp: 'drop'},
+    name: 'it expires and the kind deletes',
+    ending: 'deleted',
+    kindOptions: {whenExhausted: 'delete'},
     request: {expiresAfterMilliseconds: 1_000},
     runs: false,
-    endsFollowersAs: 'forgotten',
-    giveUp: async kit => {
+    end: async kit => {
       return kit.clock.advance(1_000);
     },
   },
-  {
-    name: 'the owner drops it while its attempt runs',
-    kindOptions: {},
-    request: {},
-    runs: true,
-    endsFollowersAs: 'forgotten',
-    giveUp: async kit => {
-      return kit.outbox.drop('a');
-    },
-  },
-  {
-    name: 'the owner drops it while it waits',
-    kindOptions: {},
-    request: {},
-    runs: false,
-    endsFollowersAs: 'forgotten',
-    giveUp: async kit => {
-      return kit.outbox.drop('a');
-    },
-  },
-  {
-    name: 'the owner drops it while it is on hold',
-    kindOptions: {},
-    request: {},
-    runs: false,
-    endsFollowersAs: 'forgotten',
-    giveUp: async kit => {
-      await kit.outbox.hold('a');
-      return kit.outbox.drop('a');
-    },
-  },
+  ...ownerWays,
 ];
+
+const commands = [
+  {
+    command: 'deadLetter',
+    ending: 'dead-lettered',
+    end: async (kit: OutboxTestKit, correlationKey: string, options?: EndingOptions) => {
+      return kit.outbox.deadLetter(correlationKey, options);
+    },
+  },
+  {
+    command: 'delete',
+    ending: 'deleted',
+    end: async (kit: OutboxTestKit, correlationKey: string, options?: EndingOptions) => {
+      return kit.outbox.delete(correlationKey, options);
+    },
+  },
+] as const;
 
 describe('createOutbox lanes', () => {
   let kit: OutboxTestKit;
@@ -196,7 +201,13 @@ describe('createOutbox lanes', () => {
     text: string,
     request: Partial<EnqueueRequest<{text: string}>> = {},
   ): Promise<void> {
-    await kit.enqueue(testKind, {payload: {text}, correlationKey: text, laneKey: 'lane', ...request});
+    await kit.enqueueKeyed(testKind, text, {laneKey: 'lane', ...request});
+  }
+
+  async function enqueueABC(testKind: TestKind): Promise<void> {
+    await enqueue(testKind, 'a');
+    await enqueue(testKind, 'b');
+    await enqueue(testKind, 'c');
   }
 
   function laneContents(laneKey: string): [string, OperationState][] {
@@ -205,11 +216,22 @@ describe('createOutbox lanes', () => {
     });
   }
 
-  function storedTriggers(text: string): string[] {
+  /** Every snapshot appended for the payload text, including those of an operation deleted since */
+  function storedSnapshots(text: string): OperationSnapshot[] {
     return kit.store.calls.flatMap(call => {
-      return call.method === 'append' && parseTestPayload(call.snapshot.payload).text === text
-        ? [call.snapshot.trigger]
-        : [];
+      return call.method === 'append' && parseTestPayload(call.snapshot.payload).text === text ? [call.snapshot] : [];
+    });
+  }
+
+  function storedTriggers(text: string): string[] {
+    return storedSnapshots(text).map(({trigger}) => {
+      return trigger;
+    });
+  }
+
+  function storedCascades(text: string): Cascade['state'][] {
+    return storedSnapshots(text).map(({cascade}) => {
+      return cascade.state;
     });
   }
 
@@ -217,24 +239,20 @@ describe('createOutbox lanes', () => {
     it('sends the operations of a lane one at a time, in the order they were enqueued', async () => {
       const testKind = kit.registerKind();
       await kit.start();
-      await enqueue(testKind, 'a');
-      await enqueue(testKind, 'b');
-      await enqueue(testKind, 'c');
-      expect(attemptedTexts(testKind)).toEqual(['a']);
+      await enqueueABC(testKind);
+      expect(testKind.attemptedTexts()).toEqual(['a']);
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-succeeded'});
-      expect(attemptedTexts(testKind)).toEqual(['a', 'b']);
+      await testKind.attemptOf('a').answer({outcome: 'attempt-succeeded'});
+      expect(testKind.attemptedTexts()).toEqual(['a', 'b']);
 
-      await attemptOf(testKind, 'b').answer({outcome: 'attempt-succeeded'});
-      expect(attemptedTexts(testKind)).toEqual(['a', 'b', 'c']);
+      await testKind.attemptOf('b').answer({outcome: 'attempt-succeeded'});
+      expect(testKind.attemptedTexts()).toEqual(['a', 'b', 'c']);
     });
 
     it('lists the operations of a lane in that order, the one that runs first', async () => {
       const testKind = kit.registerKind();
       await kit.start();
-      await enqueue(testKind, 'a');
-      await enqueue(testKind, 'b');
-      await enqueue(testKind, 'c');
+      await enqueueABC(testKind);
 
       expect(kit.outbox.lane('lane')).toEqual({
         outcome: 'lane-found',
@@ -256,7 +274,7 @@ describe('createOutbox lanes', () => {
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-succeeded'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-succeeded'});
 
       expect(laneContents('lane')).toEqual([['b', 'in-progress']]);
     });
@@ -266,7 +284,7 @@ describe('createOutbox lanes', () => {
       await kit.start();
       await enqueue(testKind, 'a');
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-succeeded'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-succeeded'});
 
       expect(kit.outbox.lane('lane')).toEqual({outcome: 'lane-empty'});
       expect(kit.outbox.lanes()).toEqual({outcome: 'lanes-listed', lanes: []});
@@ -297,7 +315,7 @@ describe('createOutbox lanes', () => {
       await enqueue(testKind, 'd', {laneKey: undefined});
       await enqueue(testKind, 'e', {laneKey: 'one'});
 
-      expect(attemptedTexts(testKind)).toEqual(['a', 'b', 'c', 'd']);
+      expect(testKind.attemptedTexts()).toEqual(['a', 'b', 'c', 'd']);
     });
 
     it('keeps the operations of several kinds in one lane in the order they were enqueued', async () => {
@@ -308,13 +326,13 @@ describe('createOutbox lanes', () => {
       await enqueue(second, 'x');
       await enqueue(first, 'b');
 
-      expect(attemptedTexts(first)).toEqual(['a']);
-      expect(attemptedTexts(second)).toEqual([]);
+      expect(first.attemptedTexts()).toEqual(['a']);
+      expect(second.attemptedTexts()).toEqual([]);
 
-      await attemptOf(first, 'a').answer({outcome: 'attempt-succeeded'});
+      await first.attemptOf('a').answer({outcome: 'attempt-succeeded'});
 
-      expect(attemptedTexts(second)).toEqual(['x']);
-      expect(attemptedTexts(first)).toEqual(['a']);
+      expect(second.attemptedTexts()).toEqual(['x']);
+      expect(first.attemptedTexts()).toEqual(['a']);
     });
 
     it('keeps the place of an operation that is retried, so the ones behind it wait for the backoff and the retry', async () => {
@@ -323,10 +341,10 @@ describe('createOutbox lanes', () => {
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-failed'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-failed'});
       await kit.clock.advance(4_999);
 
-      expect(attemptedTexts(testKind)).toEqual(['a']);
+      expect(testKind.attemptedTexts()).toEqual(['a']);
       expect(laneContents('lane')).toEqual([
         ['a', 'queued'],
         ['b', 'queued'],
@@ -334,36 +352,34 @@ describe('createOutbox lanes', () => {
 
       await kit.clock.advance(1);
 
-      expect(attemptedTexts(testKind)).toEqual(['a', 'a']);
+      expect(testKind.attemptedTexts()).toEqual(['a', 'a']);
     });
 
     it('lets the operations behind a dead-lettered one carry on, and no longer lists it', async () => {
       const testKind = kit.registerKind();
       await kit.start();
-      await enqueue(testKind, 'a');
-      await enqueue(testKind, 'b');
-      await enqueue(testKind, 'c');
+      await enqueueABC(testKind);
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-dead-lettered'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
 
-      expect(stateOf(testKind, 'a')).toBe('dead-lettered');
+      expect(testKind.stateOf('a')).toBe('dead-lettered');
       expect(laneContents('lane')).toEqual([
         ['b', 'in-progress'],
         ['c', 'queued'],
       ]);
     });
 
-    it('lets the operations behind one that was dropped carry on', async () => {
+    it('lets the operations behind one that was deleted carry on', async () => {
       const testKind = kit.registerKind();
       await kit.start({run: false});
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
 
-      await kit.outbox.drop('a');
+      await kit.outbox.delete('a');
       kit.outbox.resume();
       await kit.clock.settle();
 
-      expect(attemptedTexts(testKind)).toEqual(['b']);
+      expect(testKind.attemptedTexts()).toEqual(['b']);
     });
   });
 
@@ -389,7 +405,7 @@ describe('createOutbox lanes', () => {
           ],
         },
       });
-      expect(attemptedTexts(testKind)).toEqual([]);
+      expect(testKind.attemptedTexts()).toEqual([]);
     });
 
     it('does not stop the other lanes, nor the operations without a lane', async () => {
@@ -403,7 +419,7 @@ describe('createOutbox lanes', () => {
       kit.outbox.resume();
       await kit.clock.settle();
 
-      expect(attemptedTexts(testKind)).toEqual(['other', 'free']);
+      expect(testKind.attemptedTexts()).toEqual(['other', 'free']);
     });
 
     it('moves again when the held operation is released, and sends it first', async () => {
@@ -418,21 +434,19 @@ describe('createOutbox lanes', () => {
       await kit.clock.settle();
 
       expect(kit.lane('lane').state).toBe('moving');
-      expect(attemptedTexts(testKind)).toEqual(['a']);
+      expect(testKind.attemptedTexts()).toEqual(['a']);
     });
 
     it('becomes blocked when the operation that is first after the one that succeeded is on hold', async () => {
       const testKind = kit.registerKind();
       await kit.start();
-      await enqueue(testKind, 'a');
-      await enqueue(testKind, 'b');
-      await enqueue(testKind, 'c');
+      await enqueueABC(testKind);
       await kit.outbox.hold('b');
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-succeeded'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-succeeded'});
 
       expect(kit.lane('lane').state).toBe('blocked');
-      expect(attemptedTexts(testKind)).toEqual(['a']);
+      expect(testKind.attemptedTexts()).toEqual(['a']);
     });
 
     it('blocks the lane when the attempt of its first operation answers attempt-held', async () => {
@@ -441,20 +455,20 @@ describe('createOutbox lanes', () => {
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-held'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-held'});
 
       expect(laneContents('lane')).toEqual([
         ['a', 'on-hold'],
         ['b', 'queued'],
       ]);
       expect(kit.lane('lane').state).toBe('blocked');
-      expect(attemptedTexts(testKind)).toEqual(['a']);
+      expect(testKind.attemptedTexts()).toEqual(['a']);
     });
   });
 
   describe.each(ways)('when $name', way => {
-    async function setUp(laneWhenGivenUp: LaneMode): Promise<TestKind> {
-      const testKind = kit.registerKind({laneWhenGivenUp, ...way.kindOptions});
+    async function setUp(laneOptions: KindOptions): Promise<TestKind> {
+      const testKind = kit.registerKind({...laneOptions, ...way.kindOptions});
       await kit.start({run: way.runs});
       await enqueue(testKind, 'a', way.request);
       await enqueue(testKind, 'b');
@@ -464,49 +478,159 @@ describe('createOutbox lanes', () => {
       return testKind;
     }
 
-    it("ends the operations of its kind behind it the same way, in lane order, when the kind's lane follows", async () => {
-      const testKind = await setUp('follows');
+    it("ends the operations of its kind behind it the same way, after it and in lane order, when the kind's lane follows that ending", async () => {
+      const testKind = await setUp(laneSetting(way.ending, 'follows'));
 
-      await way.giveUp(kit, testKind);
+      await way.end(kit, testKind);
 
-      expect(stateOf(testKind, 'b')).toBe(way.endsFollowersAs);
-      expect(stateOf(testKind, 'c')).toBe(way.endsFollowersAs);
-      expect(endedOrder(testKind)).toEqual(['b', 'c', 'a']);
-      const expectedTrigger = way.endsFollowersAs === 'dead-lettered' ? 'lane-dead-lettered' : 'lane-dropped';
-      expect(storedTriggers('b').at(-1)).toBe(expectedTrigger);
-      expect(storedTriggers('c').at(-1)).toBe(expectedTrigger);
+      expect(testKind.stateOf('a')).toBe(FOUND_AS[way.ending]);
+      expect(testKind.stateOf('b')).toBe(FOUND_AS[way.ending]);
+      expect(testKind.stateOf('c')).toBe(FOUND_AS[way.ending]);
+      expect(testKind.endedOrder()).toEqual(['a', 'b', 'c']);
+      expect(storedTriggers('b').at(-1)).toBe(LANE_TRIGGER_OF[way.ending]);
+      expect(storedTriggers('c').at(-1)).toBe(LANE_TRIGGER_OF[way.ending]);
     });
 
     it('leaves the operations of other lanes and without a lane alone when the lane follows', async () => {
-      const testKind = await setUp('follows');
+      const testKind = await setUp(laneSetting(way.ending, 'follows'));
 
-      await way.giveUp(kit, testKind);
+      await way.end(kit, testKind);
 
       const expectedState = way.runs ? 'in-progress' : 'queued';
-      expect(stateOf(testKind, 'other')).toBe(expectedState);
-      expect(stateOf(testKind, 'free')).toBe(expectedState);
+      expect(testKind.stateOf('other')).toBe(expectedState);
+      expect(testKind.stateOf('free')).toBe(expectedState);
     });
 
     it('sends nothing of the lane that has ended when the lane follows', async () => {
-      const testKind = await setUp('follows');
+      const testKind = await setUp(laneSetting(way.ending, 'follows'));
 
-      await way.giveUp(kit, testKind);
+      await way.end(kit, testKind);
       kit.outbox.resume();
       await kit.clock.advance(120_000);
 
-      expect(attemptedTexts(testKind)).not.toContain('b');
-      expect(attemptedTexts(testKind)).not.toContain('c');
+      expect(testKind.attemptedTexts()).not.toContain('b');
+      expect(testKind.attemptedTexts()).not.toContain('c');
     });
 
-    it('lets the operations behind it carry on when the lane continues, as it does by default', async () => {
-      const testKind = await setUp('continues');
+    it('lets the operations behind it carry on when that ending continues, as it does by default', async () => {
+      const testKind = await setUp({});
 
-      await way.giveUp(kit, testKind);
+      await way.end(kit, testKind);
       await kit.clock.settle();
 
-      expect(stateOf(testKind, 'b')).toBe(way.runs ? 'in-progress' : 'queued');
-      expect(stateOf(testKind, 'c')).toBe('queued');
-      expect(endedOrder(testKind)).toEqual(['a']);
+      expect(testKind.stateOf('b')).toBe(way.runs ? 'in-progress' : 'queued');
+      expect(testKind.stateOf('c')).toBe('queued');
+      expect(testKind.endedOrder()).toEqual(['a']);
+    });
+
+    it('lets the operations behind it carry on when only the other ending follows', async () => {
+      const testKind = await setUp({
+        ...laneSetting(way.ending, 'continues'),
+        ...laneSetting(OTHER_ENDING[way.ending], 'follows'),
+      });
+
+      await way.end(kit, testKind);
+      await kit.clock.settle();
+
+      expect(testKind.stateOf('b')).toBe(way.runs ? 'in-progress' : 'queued');
+      expect(testKind.endedOrder()).toEqual(['a']);
+    });
+  });
+
+  describe.each(commands)('the lane given to $command', ({ending, end}) => {
+    it('makes the operations behind it end the same way when the kind continues', async () => {
+      const testKind = kit.registerKind(laneSetting(ending, 'continues'));
+      await kit.start({run: false});
+      await enqueueABC(testKind);
+
+      await end(kit, 'a', {lane: 'follows'});
+
+      expect(testKind.stateOf('b')).toBe(FOUND_AS[ending]);
+      expect(testKind.stateOf('c')).toBe(FOUND_AS[ending]);
+      expect(storedTriggers('c').at(-1)).toBe(LANE_TRIGGER_OF[ending]);
+    });
+
+    it('lets the operations behind it carry on when the kind follows', async () => {
+      const testKind = kit.registerKind(laneSetting(ending, 'follows'));
+      await kit.start({run: false});
+      await enqueueABC(testKind);
+
+      await end(kit, 'a', {lane: 'continues'});
+
+      expect(testKind.stateOf('b')).toBe('queued');
+      expect(testKind.stateOf('c')).toBe('queued');
+      expect(testKind.endedOrder()).toEqual(['a']);
+    });
+
+    it('is stored with the ending: pending until the operations behind it have ended, then none', async () => {
+      const testKind = kit.registerKind();
+      await kit.start({run: false});
+      await enqueueABC(testKind);
+
+      await end(kit, 'a', {lane: 'follows'});
+
+      expect(storedCascades('a')).toEqual(['none', 'pending', 'none']);
+      expect(storedCascades('b')).toEqual(['none', 'none']);
+    });
+
+    it('is stored as continues when the lane continues', async () => {
+      const testKind = kit.registerKind(laneSetting(ending, 'follows'));
+      await kit.start({run: false});
+      await enqueueABC(testKind);
+
+      await end(kit, 'a', {lane: 'continues'});
+
+      expect(storedCascades('a')).toEqual(['none', 'none']);
+    });
+
+    it('applies to that call only', async () => {
+      const testKind = kit.registerKind();
+      await kit.start({run: false});
+      await enqueue(testKind, 'a');
+      await end(kit, 'a', {lane: 'follows'});
+      await enqueue(testKind, 'd');
+      await enqueue(testKind, 'e');
+
+      await end(kit, 'd');
+
+      expect(testKind.stateOf('e')).toBe('queued');
+    });
+
+    it('aborts the running attempt, ends the operations behind it, and ignores the late answer', async () => {
+      const testKind = kit.registerKind();
+      await kit.start();
+      await enqueueABC(testKind);
+      const attempt = testKind.attemptOf('a');
+
+      expect(await end(kit, 'a', {lane: 'follows'})).toEqual({
+        outcome: ending === 'dead-lettered' ? 'operation-dead-lettered' : 'operation-deleted',
+        operation: expect.objectContaining({state: ending, payload: {text: 'a'}}),
+      });
+      await attempt.answer({outcome: 'attempt-succeeded'});
+
+      expect(attempt.signal.aborted).toBe(true);
+      expect(testKind.endedOrder()).toEqual(['a', 'b', 'c']);
+      expect(kit.outbox.lanes()).toEqual({outcome: 'lanes-listed', lanes: []});
+      expect(testKind.attemptedTexts()).toEqual(['a']);
+    });
+
+    it('survives a store failure partway and a reload, which finish the cascade from it', async () => {
+      const testKind = kit.registerKind();
+      await kit.start({run: false});
+      await enqueueABC(testKind);
+      kit.store.failAfter('append', 2);
+
+      expect(await end(kit, 'a', {lane: 'follows'})).toMatchObject({operation: {state: ending}});
+      expect(testKind.stateOf('b')).toBe(FOUND_AS[ending]);
+      expect(testKind.stateOf('c')).toBe('queued');
+
+      await kit.outbox.stop();
+      kit.store.fail('append', false);
+      await kit.start();
+
+      expect(testKind.stateOf('c')).toBe(FOUND_AS[ending]);
+      expect(storedTriggers('c').at(-1)).toBe(LANE_TRIGGER_OF[ending]);
+      expect(testKind.attemptedTexts()).toEqual([]);
     });
   });
 
@@ -517,148 +641,149 @@ describe('createOutbox lanes', () => {
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-dead-lettered'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
 
-      expect(stateOf(testKind, 'b')).toBe('in-progress');
+      expect(testKind.stateOf('b')).toBe('in-progress');
     });
 
     it('leaves the lane empty when it dead-letters everything in it', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start();
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-dead-lettered'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
 
       expect(kit.outbox.lane('lane')).toEqual({outcome: 'lane-empty'});
     });
 
     it('ends the operations of the kind behind it that are on hold as well', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start();
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
       await enqueue(testKind, 'held');
       await kit.outbox.hold('held');
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-dead-lettered'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
 
-      expect(stateOf(testKind, 'held')).toBe('dead-lettered');
-      expect(endedOrder(testKind)).toEqual(['b', 'held', 'a']);
+      expect(testKind.stateOf('held')).toBe('dead-lettered');
+      expect(testKind.endedOrder()).toEqual(['a', 'b', 'held']);
     });
 
-    it('ends only the operations of the kind that was given up, and lets the other kinds carry on', async () => {
-      const following = kit.registerKind({laneWhenGivenUp: 'follows'});
-      const other = kit.registerKind({laneWhenGivenUp: 'follows'});
+    it('ends only the operations of the kind that ended, and lets the other kinds carry on', async () => {
+      const following = kit.registerKind({laneWhenDeadLettered: 'follows'});
+      const other = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start();
       await enqueue(following, 'a');
       await enqueue(other, 'x');
       await enqueue(following, 'b');
       await enqueue(other, 'y');
 
-      await attemptOf(following, 'a').answer({outcome: 'attempt-dead-lettered'});
+      await following.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
 
-      expect(stateOf(following, 'b')).toBe('dead-lettered');
-      expect(stateOf(other, 'x')).toBe('in-progress');
-      expect(stateOf(other, 'y')).toBe('queued');
-      expect(endedOrder(following)).toEqual(['b', 'a']);
+      expect(following.stateOf('b')).toBe('dead-lettered');
+      expect(other.stateOf('x')).toBe('in-progress');
+      expect(other.stateOf('y')).toBe('queued');
+      expect(following.endedOrder()).toEqual(['a', 'b']);
     });
 
-    it('is decided by the kind that is given up: a kind that continues does not follow one that follows', async () => {
-      const following = kit.registerKind({laneWhenGivenUp: 'follows'});
+    it('is decided by the kind that ended: a kind that continues does not follow one that follows', async () => {
+      const following = kit.registerKind({laneWhenDeadLettered: 'follows'});
       const continuing = kit.registerKind();
       await kit.start();
       await enqueue(continuing, 'a');
       await enqueue(following, 'b');
 
-      await attemptOf(continuing, 'a').answer({outcome: 'attempt-dead-lettered'});
+      await continuing.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
 
-      expect(stateOf(following, 'b')).toBe('in-progress');
+      expect(following.stateOf('b')).toBe('in-progress');
     });
 
-    it('does not happen from an operation that was dead-lettered already when it is dropped', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
-      await kit.start();
-      await enqueue(testKind, 'first');
-      await attemptOf(testKind, 'first').answer({outcome: 'attempt-dead-lettered'});
-      kit.outbox.pause();
-      await enqueue(testKind, 'second');
+    it.each([{}, {lane: 'follows'}] as const)(
+      'does not happen from an operation that was dead-lettered already when it is deleted, given %o',
+      async options => {
+        const testKind = kit.registerKind({laneWhenDeadLettered: 'follows', laneWhenDeleted: 'follows'});
+        await kit.start();
+        await enqueue(testKind, 'first');
+        await testKind.attemptOf('first').answer({outcome: 'attempt-dead-lettered'});
+        kit.outbox.pause();
+        await enqueue(testKind, 'second');
 
-      await kit.outbox.drop('first');
+        await kit.outbox.delete('first', options);
 
-      expect(laneContents('lane')).toEqual([['second', 'queued']]);
-    });
+        expect(laneContents('lane')).toEqual([['second', 'queued']]);
+      },
+    );
 
     it('does not happen when an operation succeeds', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows', laneWhenDeleted: 'follows'});
       await kit.start();
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-succeeded'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-succeeded'});
 
-      expect(stateOf(testKind, 'b')).toBe('in-progress');
+      expect(testKind.stateOf('b')).toBe('in-progress');
+    });
+
+    it('does not reach the operations enqueued after it', async () => {
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
+      await kit.start();
+      await enqueue(testKind, 'a');
+      await enqueue(testKind, 'b');
+      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
+
+      await enqueue(testKind, 'later');
+
+      expect(testKind.stateOf('later')).toBe('in-progress');
     });
   });
 
-  describe('a drop by the owner that cascades while its attempt runs', () => {
-    it('aborts the attempt, drops the operations behind it, and ignores the late answer', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
-      await kit.start();
-      await enqueue(testKind, 'a');
-      await enqueue(testKind, 'b');
-      await enqueue(testKind, 'c');
-      const attempt = attemptOf(testKind, 'a');
-
-      expect(await kit.outbox.drop('a')).toEqual({
-        outcome: 'operation-dropped',
-        operation: expect.objectContaining({state: 'dropped', payload: {text: 'a'}}),
-      });
-      await attempt.answer({outcome: 'attempt-succeeded'});
-
-      expect(attempt.signal.aborted).toBe(true);
-      expect(endedOrder(testKind)).toEqual(['b', 'c', 'a']);
-      expect(kit.outbox.lanes()).toEqual({outcome: 'lanes-listed', lanes: []});
-      expect(kit.store.operationIds()).toEqual([]);
-    });
-
-    it('answers the commands parked on the attempt that the operation was dropped', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+  describe('the owner ending an operation whose attempt runs, when the lane follows', () => {
+    it('answers the commands parked on the attempt that the operation was deleted', async () => {
+      const testKind = kit.registerKind({laneWhenDeleted: 'follows'});
       await kit.start();
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
       const parked = kit.outbox.hold('a');
       await kit.clock.settle();
 
-      await kit.outbox.drop('a');
+      await kit.outbox.delete('a');
 
       expect(await parked).toEqual({
-        outcome: 'operation-dropped',
-        operation: expect.objectContaining({state: 'dropped', payload: {text: 'a'}}),
+        outcome: 'operation-deleted',
+        operation: expect.objectContaining({state: 'deleted', payload: {text: 'a'}}),
       });
-      expect(stateOf(testKind, 'b')).toBe('forgotten');
+      expect(testKind.stateOf('b')).toBe('forgotten');
     });
 
-    it('does not drop the operations behind it when the kind continues', async () => {
-      const testKind = kit.registerKind();
+    it('applies the commands parked on the attempt to the operation it dead-lettered', async () => {
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start();
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
-
-      await kit.outbox.drop('a');
+      const parked = kit.outbox.hold('a');
       await kit.clock.settle();
 
-      expect(stateOf(testKind, 'b')).toBe('in-progress');
+      await kit.outbox.deadLetter('a');
+
+      expect(await parked).toEqual({
+        outcome: 'transition-refused',
+        trigger: 'operation-held',
+        operation: expect.objectContaining({state: 'dead-lettered', payload: {text: 'a'}}),
+      });
+      expect(testKind.stateOf('b')).toBe('dead-lettered');
     });
   });
 
   describe('commands on an operation a cascade ended', () => {
     it('are refused when it was dead-lettered, as they are for any dead-lettered operation', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start();
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-dead-lettered'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
 
       expect(await kit.outbox.hold('b')).toEqual({
         outcome: 'transition-refused',
@@ -670,14 +795,19 @@ describe('createOutbox lanes', () => {
         trigger: 'operation-released',
         operation: expect.objectContaining({state: 'dead-lettered'}),
       });
+      expect(await kit.outbox.deadLetter('b')).toEqual({
+        outcome: 'transition-refused',
+        trigger: 'operation-dead-lettered',
+        operation: expect.objectContaining({state: 'dead-lettered'}),
+      });
     });
 
     it('can version it, which queues it again', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start();
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-dead-lettered'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
 
       expect(await testKind.handle.enqueue({payload: {text: 'again'}, correlationKey: 'b', laneKey: 'lane'})).toEqual({
         outcome: 'operation-versioned',
@@ -685,126 +815,141 @@ describe('createOutbox lanes', () => {
       });
     });
 
-    it('can drop it', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+    it('can delete it', async () => {
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start();
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-dead-lettered'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
 
-      expect(await kit.outbox.drop('b')).toEqual({
-        outcome: 'operation-dropped',
-        operation: expect.objectContaining({state: 'dropped', payload: {text: 'b'}}),
+      expect(await kit.outbox.delete('b')).toEqual({
+        outcome: 'operation-deleted',
+        operation: expect.objectContaining({state: 'deleted', payload: {text: 'b'}}),
       });
     });
 
-    it('answer operation-not-found when it was dropped', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows', whenGivenUp: 'drop', maxAttempts: 1});
+    it('answer operation-not-found when it was deleted', async () => {
+      const testKind = kit.registerKind({laneWhenDeleted: 'follows', whenExhausted: 'delete', maxAttempts: 1});
       await kit.start();
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-failed'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-failed'});
 
       expect(await kit.outbox.hold('b')).toEqual({outcome: 'operation-not-found'});
       expect(await kit.outbox.release('b')).toEqual({outcome: 'operation-not-found'});
-      expect(await kit.outbox.drop('b')).toEqual({outcome: 'operation-not-found'});
+      expect(await kit.outbox.deadLetter('b')).toEqual({outcome: 'operation-not-found'});
+      expect(await kit.outbox.delete('b')).toEqual({outcome: 'operation-not-found'});
     });
 
-    it('wait for the attempt of the operation that is given up, and find what the cascade left', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+    it('wait for the attempt of the operation that ended, and find what the cascade left', async () => {
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start();
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
       const parked = kit.outbox.hold('a');
       await kit.clock.settle();
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-dead-lettered'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
 
       expect(await parked).toEqual({
         outcome: 'transition-refused',
         trigger: 'operation-held',
         operation: expect.objectContaining({state: 'dead-lettered', payload: {text: 'a'}}),
       });
-      expect(stateOf(testKind, 'b')).toBe('dead-lettered');
+      expect(testKind.stateOf('b')).toBe('dead-lettered');
     });
   });
 
   describe('a cascade that a store failure interrupted', () => {
-    it('is finished when the end of the attempt is stored again, and nothing is sent meanwhile', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+    it('leaves the ending stored, keeps the lane blocked, and is finished at a later pass', async () => {
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start();
-      await enqueue(testKind, 'a');
-      await enqueue(testKind, 'b');
-      await enqueue(testKind, 'c');
-      kit.store.failAfter('append', 1);
+      await enqueueABC(testKind);
+      kit.store.failAfter('append', 2);
 
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-dead-lettered'});
+      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
 
-      expect(stateOf(testKind, 'a')).toBe('in-progress');
-      expect(stateOf(testKind, 'b')).toBe('dead-lettered');
-      expect(stateOf(testKind, 'c')).toBe('queued');
-      expect(attemptedTexts(testKind)).toEqual(['a']);
+      expect(testKind.stateOf('a')).toBe('dead-lettered');
+      expect(testKind.stateOf('b')).toBe('dead-lettered');
+      expect(testKind.stateOf('c')).toBe('queued');
+      expect(laneContents('lane')).toEqual([
+        ['a', 'dead-lettered'],
+        ['c', 'queued'],
+      ]);
 
       kit.store.fail('append', false);
-      await kit.clock.advance(60_000);
+      await kit.clock.advance(5_000);
 
-      expect(stateOf(testKind, 'a')).toBe('dead-lettered');
-      expect(stateOf(testKind, 'c')).toBe('dead-lettered');
-      expect(attemptedTexts(testKind)).toEqual(['a']);
-      expect(endedOrder(testKind)).toEqual(['b', 'c', 'a']);
+      expect(testKind.stateOf('c')).toBe('dead-lettered');
+      expect(testKind.attemptedTexts()).toEqual(['a']);
+      expect(testKind.endedOrder()).toEqual(['a', 'b', 'c']);
+      expect(storedCascades('a').at(-1)).toBe('none');
     });
 
-    it('is finished at the next pass when giving up by expiry was interrupted', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+    it('is repeated after exactly one backoff period', async () => {
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
+      await kit.start();
+      await enqueueABC(testKind);
+      kit.store.failAfter('append', 2);
+      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
+      kit.store.fail('append', false);
+
+      await kit.clock.advance(4_999);
+      expect(testKind.stateOf('c')).toBe('queued');
+      await kit.clock.advance(1);
+
+      expect(testKind.stateOf('c')).toBe('dead-lettered');
+    });
+
+    it('is finished at a later pass when an ending by expiry was interrupted', async () => {
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start({run: false});
       await enqueue(testKind, 'a', {expiresAfterMilliseconds: 1_000});
       await enqueue(testKind, 'b');
       await enqueue(testKind, 'c');
-      kit.store.failAfter('append', 1);
+      kit.store.failAfter('append', 2);
 
       await kit.clock.advance(1_000);
 
-      expect(stateOf(testKind, 'a')).toBe('queued');
-      expect(stateOf(testKind, 'b')).toBe('dead-lettered');
-      expect(stateOf(testKind, 'c')).toBe('queued');
+      expect(testKind.stateOf('a')).toBe('dead-lettered');
+      expect(testKind.stateOf('b')).toBe('dead-lettered');
+      expect(testKind.stateOf('c')).toBe('queued');
 
       kit.store.fail('append', false);
-      await kit.clock.advance(60_000);
+      await kit.clock.advance(5_000);
 
-      expect(endedOrder(testKind)).toEqual(['b', 'c', 'a']);
+      expect(testKind.endedOrder()).toEqual(['a', 'b', 'c']);
     });
 
-    it("is finished by the owner repeating the drop when the owner's drop was interrupted", async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+    it('keeps a deleted operation until the operations behind it are deleted, then forgets it', async () => {
+      const testKind = kit.registerKind({laneWhenDeleted: 'follows'});
       await kit.start({run: false});
-      await enqueue(testKind, 'a');
-      await enqueue(testKind, 'b');
-      await enqueue(testKind, 'c');
-      kit.store.failAfter('append', 1);
+      await enqueueABC(testKind);
+      kit.store.failAfter('append', 2);
 
-      expect(await kit.outbox.drop('a')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
+      expect(await kit.outbox.delete('a')).toMatchObject({outcome: 'operation-deleted'});
 
-      expect(stateOf(testKind, 'a')).toBe('queued');
-      expect(stateOf(testKind, 'b')).toBe('forgotten');
-      expect(stateOf(testKind, 'c')).toBe('queued');
+      expect(laneContents('lane')).toEqual([
+        ['a', 'deleted'],
+        ['c', 'queued'],
+      ]);
+      expect(kit.store.operationIds()).toEqual(['operation-1', 'operation-3']);
 
       kit.store.fail('append', false);
+      await kit.clock.advance(5_000);
 
-      expect(await kit.outbox.drop('a')).toEqual({
-        outcome: 'operation-dropped',
-        operation: expect.objectContaining({state: 'dropped', payload: {text: 'a'}}),
-      });
-      expect(endedOrder(testKind)).toEqual(['b', 'c', 'a']);
+      expect(kit.outbox.lanes()).toEqual({outcome: 'lanes-listed', lanes: []});
+      expect(kit.store.operationIds()).toEqual([]);
     });
 
-    it("changes nothing when the owner's drop fails at its first step", async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+    it("changes nothing when the owner's ending fails at its first step", async () => {
+      const testKind = kit.registerKind({laneWhenDeleted: 'follows'});
       await kit.start({run: false});
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
       kit.store.fail('append', true);
 
-      expect(await kit.outbox.drop('a')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
+      expect(await kit.outbox.delete('a')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
 
       expect(laneContents('lane')).toEqual([
         ['a', 'queued'],
@@ -812,18 +957,18 @@ describe('createOutbox lanes', () => {
       ]);
     });
 
-    it('keeps the attempt of the operation that is dropped running when its drop fails', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+    it('keeps the attempt of the operation running when its ending fails', async () => {
+      const testKind = kit.registerKind({laneWhenDeleted: 'follows'});
       await kit.start();
       await enqueue(testKind, 'a');
       await enqueue(testKind, 'b');
       kit.store.fail('append', true);
 
-      await kit.outbox.drop('a');
+      await kit.outbox.delete('a');
 
-      expect(attemptOf(testKind, 'a').signal.aborted).toBe(false);
-      expect(stateOf(testKind, 'a')).toBe('in-progress');
-      expect(stateOf(testKind, 'b')).toBe('queued');
+      expect(testKind.attemptOf('a').signal.aborted).toBe(false);
+      expect(testKind.stateOf('a')).toBe('in-progress');
+      expect(testKind.stateOf('b')).toBe('queued');
     });
   });
 
@@ -839,7 +984,7 @@ describe('createOutbox lanes', () => {
           kind: testKind.kind.name,
           id: text,
           payload: {text},
-          correlation: {state: 'correlated', correlationKey: text},
+          correlation: correlated(text),
           lane: {state: 'in-lane', laneKey: 'lane'},
           queuedSeq,
           ...overrides,
@@ -847,76 +992,66 @@ describe('createOutbox lanes', () => {
       );
     }
 
-    it.each([
-      {whenGivenUp: 'dead-letter', followersEnd: 'dead-lettered', trigger: 'lane-dead-lettered'},
-      {whenGivenUp: 'drop', followersEnd: 'forgotten', trigger: 'lane-dropped'},
-    ] as const)(
-      'is finished at the start for what still waits, when the kind $whenGivenUp and the last attempt was interrupted',
-      async ({whenGivenUp, followersEnd, trigger}) => {
-        const testKind = kit.registerKind({laneWhenGivenUp: 'follows', maxAttempts: 1, whenGivenUp});
-        seedInLane(testKind, 'a', 1, {state: 'in-progress', attempts: 1});
-        seedInLane(testKind, 'b', 2, {state: 'dead-lettered', trigger: 'lane-dead-lettered'});
+    it.each(commands)(
+      'is finished at the start from the decision stored with an ending in $ending, whatever the kind says',
+      async ({ending}) => {
+        const testKind = kit.registerKind();
+        const trigger = LANE_TRIGGER_OF[ending];
+        seedInLane(testKind, 'a', 1, {state: ending, cascade: {state: 'pending', trigger}});
+        seedInLane(testKind, 'b', 2, {state: 'dead-lettered', trigger, cascade: {state: 'none'}});
         seedInLane(testKind, 'c', 3);
         seedInLane(testKind, 'd', 4, {state: 'on-hold'});
 
         await kit.start();
 
-        expect(stateOf(testKind, 'a')).toBe(followersEnd);
-        expect(stateOf(testKind, 'b')).toBe('dead-lettered');
-        expect(stateOf(testKind, 'c')).toBe(followersEnd);
-        expect(stateOf(testKind, 'd')).toBe(followersEnd);
-        expect(kit.store.calls).toContainEqual({
-          method: 'append',
-          snapshot: expect.objectContaining({id: 'c', trigger}),
-        });
-        expect(attemptedTexts(testKind)).toEqual([]);
+        expect(testKind.stateOf('a')).toBe(FOUND_AS[ending]);
+        expect(testKind.stateOf('b')).toBe('dead-lettered');
+        expect(testKind.stateOf('c')).toBe(FOUND_AS[ending]);
+        expect(testKind.stateOf('d')).toBe(FOUND_AS[ending]);
+        expect(storedTriggers('c').at(-1)).toBe(trigger);
+        expect(testKind.attemptedTexts()).toEqual([]);
       },
     );
 
-    it('is repeated by the retried attempt when the crash came before the end of the attempt was stored', async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+    it.each([
+      {whenExhausted: 'dead-letter', ending: 'dead-lettered'},
+      {whenExhausted: 'delete', ending: 'deleted'},
+    ] as const)(
+      'ends what still waits at the start, when the kind $whenExhausted and the last attempt was interrupted',
+      async ({whenExhausted, ending}) => {
+        const testKind = kit.registerKind({...laneSetting(ending, 'follows'), maxAttempts: 1, whenExhausted});
+        seedInLane(testKind, 'a', 1, {state: 'in-progress', attempts: 1});
+        seedInLane(testKind, 'c', 3);
+        seedInLane(testKind, 'd', 4, {state: 'on-hold'});
+
+        await kit.start();
+
+        expect(testKind.stateOf('a')).toBe(FOUND_AS[ending]);
+        expect(testKind.stateOf('c')).toBe(FOUND_AS[ending]);
+        expect(testKind.stateOf('d')).toBe(FOUND_AS[ending]);
+        expect(testKind.attemptedTexts()).toEqual([]);
+      },
+    );
+
+    it('is repeated by the retried attempt when the crash came before the ending was stored', async () => {
+      const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
       await kit.start();
-      await enqueue(testKind, 'a');
-      await enqueue(testKind, 'b');
-      await enqueue(testKind, 'c');
-      kit.store.failAfter('append', 1);
-      await attemptOf(testKind, 'a').answer({outcome: 'attempt-dead-lettered'});
+      await enqueueABC(testKind);
+      kit.store.failAfter('append', 0);
+      await testKind.attemptOf('a').answer({outcome: 'attempt-dead-lettered'});
       await kit.outbox.stop();
       kit.store.fail('append', false);
 
       await kit.start();
 
-      expect(stateOf(testKind, 'a')).toBe('in-progress');
-      expect(stateOf(testKind, 'b')).toBe('dead-lettered');
-      expect(stateOf(testKind, 'c')).toBe('queued');
-      expect(attemptedTexts(testKind)).toEqual(['a', 'a']);
+      expect(testKind.stateOf('a')).toBe('in-progress');
+      expect(testKind.stateOf('b')).toBe('queued');
+      expect(testKind.attemptedTexts()).toEqual(['a', 'a']);
 
       await testKind.lastAttempt().answer({outcome: 'attempt-dead-lettered'});
 
-      expect(stateOf(testKind, 'a')).toBe('dead-lettered');
-      expect(stateOf(testKind, 'c')).toBe('dead-lettered');
-    });
-
-    it("is not finished by a reload when the owner's drop was interrupted, but by the owner repeating it", async () => {
-      const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
-      await kit.start({run: false});
-      await enqueue(testKind, 'a');
-      await enqueue(testKind, 'b');
-      await enqueue(testKind, 'c');
-      kit.store.failAfter('append', 1);
-      await kit.outbox.drop('a');
-      await kit.outbox.stop();
-      kit.store.fail('append', false);
-
-      await kit.start({run: false});
-
-      expect(stateOf(testKind, 'a')).toBe('queued');
-      expect(stateOf(testKind, 'b')).toBe('forgotten');
-      expect(stateOf(testKind, 'c')).toBe('queued');
-
-      await kit.outbox.drop('a');
-
-      expect(kit.store.operationIds()).toEqual([]);
+      expect(testKind.stateOf('b')).toBe('dead-lettered');
+      expect(testKind.stateOf('c')).toBe('dead-lettered');
     });
   });
 });

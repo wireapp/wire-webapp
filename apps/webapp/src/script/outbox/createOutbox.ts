@@ -203,10 +203,17 @@ export function createOutbox(dependencies: OutboxDependencies): Outbox {
         }),
       );
     },
-    drop: async correlationKey => {
-      return logged('drop')(
+    deadLetter: async (correlationKey, options = {}) => {
+      return logged('deadLetter')(
         await whenStarted(async engine => {
-          return engine.drop(correlationKey);
+          return engine.deadLetter(correlationKey, options);
+        }),
+      );
+    },
+    delete: async (correlationKey, options = {}) => {
+      return logged('delete')(
+        await whenStarted(async engine => {
+          return engine.delete(correlationKey, options);
         }),
       );
     },

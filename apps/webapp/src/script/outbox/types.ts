@@ -26,7 +26,7 @@ export type State<Tag extends string, Data extends object = Record<never, never>
 
 // Operation
 
-export type OperationState = 'queued' | 'on-hold' | 'in-progress' | 'dead-lettered' | 'succeeded' | 'dropped';
+export type OperationState = 'queued' | 'on-hold' | 'in-progress' | 'dead-lettered' | 'succeeded' | 'deleted';
 
 /** What happened to an operation; an attempt's answer is the trigger of the same name */
 export type Trigger =
@@ -34,19 +34,29 @@ export type Trigger =
   | 'operation-versioned'
   | 'operation-held'
   | 'operation-released'
-  | 'operation-dropped'
+  | 'operation-dead-lettered'
+  | 'operation-deleted'
   | 'operation-expired'
   | 'attempt-started'
   | 'attempt-succeeded'
   | 'attempt-failed'
   | 'attempt-held'
   | 'attempt-dead-lettered'
-  | 'attempt-dropped'
+  | 'attempt-deleted'
   | 'attempt-timed-out'
   | 'attempt-errored'
   | 'attempt-interrupted'
   | 'lane-dead-lettered'
-  | 'lane-dropped';
+  | 'lane-deleted';
+
+/** Whether the operations of the same kind behind one that ends in its lane end the same way, or carry on */
+export type LaneSetting = 'follows' | 'continues';
+
+/**
+ * Whether ending this operation still has to end the operations behind it. Decided and stored with the ending;
+ * while `pending`, the operation still blocks its lane, until the operations behind it have ended with `trigger`.
+ */
+export type Cascade = State<'none'> | State<'pending', {trigger: 'lane-dead-lettered' | 'lane-deleted'}>;
 
 export type Correlation = State<'correlated', {correlationKey: string}> | State<'uncorrelated'>;
 export type LaneMembership = State<'in-lane', {laneKey: string}> | State<'no-lane'>;
@@ -79,6 +89,7 @@ export type OperationData = OperationView & {
   queuedSeq: number;
   expiry: Expiry;
   limits: OperationLimits;
+  cascade: Cascade;
 };
 
 /** What a snapshot says about the transition that stored it */
@@ -126,12 +137,12 @@ export type AttemptSucceeded = Outcome<'attempt-succeeded'>;
 export type AttemptFailed = Outcome<'attempt-failed'>;
 /** Stop until the owner releases it, e.g. to ask the user */
 export type AttemptHeld = Outcome<'attempt-held'>;
-/** Given up; kept until enqueued again or dropped */
+/** Given up; kept until enqueued again or deleted */
 export type AttemptDeadLettered = Outcome<'attempt-dead-lettered'>;
 /** Given up and forgotten */
-export type AttemptDropped = Outcome<'attempt-dropped'>;
+export type AttemptDeleted = Outcome<'attempt-deleted'>;
 
-export type AttemptOutcome = AttemptSucceeded | AttemptFailed | AttemptHeld | AttemptDeadLettered | AttemptDropped;
+export type AttemptOutcome = AttemptSucceeded | AttemptFailed | AttemptHeld | AttemptDeadLettered | AttemptDeleted;
 
 export type Kind<Payload> = {
   name: string;
@@ -143,13 +154,15 @@ export type Kind<Payload> = {
   attemptTimeoutMilliseconds?: number;
   /** Attempts before giving up; default 5 */
   maxAttempts?: number;
-  /** After `maxAttempts` or at expiry; default 'dead-letter' */
-  whenGivenUp?: 'dead-letter' | 'drop';
+  /** How an operation ends when `maxAttempts` or its expiry runs out; default 'dead-letter' */
+  whenExhausted?: 'dead-letter' | 'delete';
   /**
-   * What the operations of this kind behind one that is given up in its lane do: carry on, or end the same way;
-   * default 'continues'. Operations of other kinds in the lane carry on either way.
+   * Whether the operations of this kind behind a dead-lettered one in its lane are dead-lettered too; default
+   * 'continues'. Operations of other kinds in the lane carry on either way.
    */
-  laneWhenGivenUp?: 'continues' | 'follows';
+  laneWhenDeadLettered?: LaneSetting;
+  /** The same for a deleted one; default 'continues' */
+  laneWhenDeleted?: LaneSetting;
   /** A rejection, a throw or an unknown answer is `attempt-errored` */
   attempt: (operation: OperationView<Payload>, signal: AbortSignal) => Promise<AttemptOutcome>;
   /** Fire and forget; a throw is logged */
@@ -164,8 +177,10 @@ export type OperationHeld = Outcome<'operation-held', {operation: OperationView}
 export type OperationReleased = Outcome<'operation-released', {operation: OperationView}>;
 /** The attempt a command waited for went through */
 export type OperationSucceeded = Outcome<'operation-succeeded', {operation: OperationView}>;
-/** Given up and forgotten */
-export type OperationDropped = Outcome<'operation-dropped', {operation: OperationView}>;
+/** Kept until enqueued again or deleted */
+export type OperationDeadLettered = Outcome<'operation-dead-lettered', {operation: OperationView}>;
+/** Forgotten */
+export type OperationDeleted = Outcome<'operation-deleted', {operation: OperationView}>;
 export type OperationFound<Payload> = Outcome<'operation-found', {operation: OperationView<Payload>}>;
 /** No unfinished operation has the key */
 export type OperationNotFound = Outcome<'operation-not-found'>;
@@ -194,7 +209,7 @@ export type LanesListed = Outcome<'lanes-listed', {lanes: Lane[]}>;
 /** Why the outbox couldn't take a call at all */
 export type OutboxUnavailable = OutboxNotStarted | StorageFull | StorageFailed;
 /** The attempt a command waited for ended the operation */
-export type EndedWhileWaiting = OperationSucceeded | OperationDropped;
+export type EndedWhileWaiting = OperationSucceeded | OperationDeleted;
 
 export type EnqueueOutcome<Payload> =
   | OperationQueued<Payload>
@@ -211,7 +226,8 @@ export type EnqueueOutcome<Payload> =
 export type HoldOutcome = OperationHeld | TransitionRefused | EndedWhileWaiting | OperationNotFound | OutboxUnavailable;
 export type ReleaseOutcome =
   OperationReleased | TransitionRefused | EndedWhileWaiting | OperationNotFound | OutboxUnavailable;
-export type DropOutcome = OperationDropped | TransitionRefused | OperationNotFound | OutboxUnavailable;
+export type DeadLetterOutcome = OperationDeadLettered | TransitionRefused | OperationNotFound | OutboxUnavailable;
+export type DeleteOutcome = OperationDeleted | TransitionRefused | OperationNotFound | OutboxUnavailable;
 export type FindOutcome<Payload> = OperationFound<Payload> | OperationNotFound | OutboxNotStarted;
 export type LaneOutcome = LaneFound | LaneEmpty | OutboxNotStarted;
 export type LanesOutcome = LanesListed | OutboxNotStarted;
@@ -227,6 +243,9 @@ export type EnqueueRequest<Payload> = {
   expiresAfterMilliseconds?: number;
   attemptTimeoutMilliseconds?: number;
 };
+
+/** `lane` overrides the kind's setting for this ending, for this call only */
+export type EndingOptions = {lane?: LaneSetting};
 
 export type OutboxLogger = {
   info: (message: string, attributes?: Readonly<Record<string, unknown>>) => void;
@@ -271,24 +290,32 @@ export type KindHandle<Payload> = {
 };
 
 export type Outbox = {
-  /** Kinds are registered before `start` */
+  /** Kinds are registered before `start`, or after `stop` for the next `start` */
   register: <Payload>(kind: Kind<Payload>) => RegisterOutcome<Payload>;
   /** After a storage failure, `start` may be called again */
   start: () => Promise<StartOutcome>;
   pause: () => void;
   /** Also resets the backoff */
   resume: () => void;
-  /** Aborts the running attempts and answers the commands waiting for them `outbox-not-started` */
+  /**
+   * Aborts the running attempts and answers the commands waiting for them `outbox-not-started`. The registered kinds
+   * stay, and more may be registered before the next `start`.
+   */
   stop: () => Promise<void>;
   /** Needs `queued`; waits for a running attempt */
   hold: (correlationKey: string) => Promise<HoldOutcome>;
   /** Needs `on-hold`; waits for a running attempt */
   release: (correlationKey: string) => Promise<ReleaseOutcome>;
   /**
-   * Every unfinished state accepts it; never waits, and aborts a running attempt. When the kind's lane follows,
-   * the operations of the kind behind it are dropped too, unless it was dead-lettered already.
+   * Needs `queued`, `on-hold` or `in-progress`; never waits, and aborts a running attempt. The operations of the
+   * kind behind it are dead-lettered too when `lane`, or else the kind's `laneWhenDeadLettered`, follows.
    */
-  drop: (correlationKey: string) => Promise<DropOutcome>;
+  deadLetter: (correlationKey: string, options?: EndingOptions) => Promise<DeadLetterOutcome>;
+  /**
+   * As `deadLetter`, with `laneWhenDeleted`, and also from `dead-lettered`, which never ends the operations behind
+   * it, because a dead-lettered operation no longer blocks its lane.
+   */
+  delete: (correlationKey: string, options?: EndingOptions) => Promise<DeleteOutcome>;
   findByCorrelationKey: (correlationKey: string) => FindOutcome<unknown>;
   lane: (laneKey: string) => LaneOutcome;
   lanes: () => LanesOutcome;

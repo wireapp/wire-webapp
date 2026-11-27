@@ -23,19 +23,22 @@ import {isMatching, match, P} from 'ts-pattern';
 import {
   backoffDelay,
   correlationOf,
-  doesLaneFollow,
+  decideCascade,
+  isCascadePending,
   findOperationFollowers,
   isDueToExpire,
   isFinal,
   lanesOf,
-  laneTriggerFor,
   newOperationData,
   nextQueuedSeqOf,
   planPass,
   resolveConfiguration,
   resolveTarget,
   SCHEMA_VERSION,
+  toView,
   versionOperationData,
+  type CascadingOperation,
+  type LaneSettings,
   type ResolvedKind,
   type Run,
   type TargetResolved,
@@ -45,8 +48,10 @@ import {eachUntilFailure, isInState, isOutcome, pipe} from './tagged';
 import type {
   AttemptOutcome,
   CorrelationKeyEmpty,
-  DropOutcome,
+  DeadLetterOutcome,
+  DeleteOutcome,
   EndedWhileWaiting,
+  EndingOptions,
   EnqueueOutcome,
   EnqueueRequest,
   HoldOutcome,
@@ -56,7 +61,6 @@ import type {
   LaneKeyEmpty,
   LanesListed,
   OperationData,
-  OperationDropped,
   OperationFound,
   OperationHeld,
   OperationNotFound,
@@ -70,6 +74,7 @@ import type {
   OutboxFull,
   OutboxNotStarted,
   OutboxStarted,
+  OutboxUnavailable,
   PayloadInvalid,
   ReleaseOutcome,
   SnapshotsLoaded,
@@ -90,6 +95,8 @@ type Previous = State<'initial'> | OperationSnapshot;
 
 type SnapshotFound = Outcome<'operation-found', {operation: OperationSnapshot}>;
 type Lookup = SnapshotFound | OperationNotFound;
+type CascadingFound = Outcome<'cascading-found', {operation: CascadingOperation}>;
+type EndingTrigger = 'operation-dead-lettered' | 'operation-deleted';
 type OperationTransitioned = Outcome<'operation-transitioned', {operation: OperationSnapshot}>;
 type CommitOutcome = OperationTransitioned | TransitionRefused | StorageFull | StorageFailed;
 type StepSkipped = Outcome<'step-skipped'>;
@@ -135,7 +142,8 @@ export type Engine = {
   enqueue: (kind: ResolvedKind, request: EnqueueRequest<unknown>) => Promise<EnqueueOutcome<unknown>>;
   hold: (correlationKey: string) => Promise<HoldOutcome>;
   release: (correlationKey: string) => Promise<ReleaseOutcome>;
-  drop: (correlationKey: string) => Promise<DropOutcome>;
+  deadLetter: (correlationKey: string, options: EndingOptions) => Promise<DeadLetterOutcome>;
+  delete: (correlationKey: string, options: EndingOptions) => Promise<DeleteOutcome>;
   findByCorrelationKey: (correlationKey: string) => OperationFound<unknown> | OperationNotFound;
   lane: (laneKey: string) => LaneFound | LaneEmpty;
   lanes: () => LanesListed;
@@ -152,7 +160,7 @@ const isCommandFailure = isOutcome('operation-not-found', 'transition-refused', 
 const isStepEnd = isOutcome('step-skipped', 'transition-refused', 'storage-full', 'storage-failed');
 
 const isAttemptAnswer = isMatching({
-  outcome: P.union('attempt-succeeded', 'attempt-failed', 'attempt-held', 'attempt-dead-lettered', 'attempt-dropped'),
+  outcome: P.union('attempt-succeeded', 'attempt-failed', 'attempt-held', 'attempt-dead-lettered', 'attempt-deleted'),
 });
 
 function errorNameOf(error: unknown): string {
@@ -188,8 +196,8 @@ function parsePayload(kind: ResolvedKind, value: unknown): PayloadParsed | Paylo
 
 function endedWhileWaiting(operation: OperationView): EndedWhileWaiting {
   return isInState('succeeded')(operation)
-    ? {outcome: 'operation-succeeded', operation}
-    : {outcome: 'operation-dropped', operation};
+    ? {outcome: 'operation-succeeded', operation: toView(operation)}
+    : {outcome: 'operation-deleted', operation: toView(operation)};
 }
 
 /**
@@ -270,8 +278,9 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
   }
 
   /**
-   * Settles the finished attempts, expires what is due and starts what may start. Each step checks its own
-   * precondition again, so a plan that went stale does no harm; every commit requests the next pass.
+   * Settles the finished attempts, finishes the interrupted cascades, expires what is due and starts what may
+   * start. Each step checks its own precondition again, so a plan that went stale does no harm; every commit
+   * requests the next pass.
    */
   async function runPass(): Promise<PassRun> {
     pass = {state: 'idle'};
@@ -284,10 +293,16 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
     const finished = [...attempts.values()].filter(attempt => {
       return isInState('finished')(attempt.result);
     });
+    const cascading = [...operations.values()].filter(isCascadePending);
     const results = await runInOrder([
       ...finished.map(({operationId}) => {
         return async () => {
           return settleAttempt(operationId);
+        };
+      }),
+      ...cascading.map(({id}) => {
+        return async () => {
+          return followLane(id);
         };
       }),
       ...plan.expire.map(operationId => {
@@ -311,7 +326,11 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
         return outcome;
       }),
     });
-    growBackoff();
+    // A commit that went through before the failure requests a pass that repeats the failed step at once; failing
+    // again within the backoff is the same failure, so it doesn't grow the backoff again
+    if (backoffRemaining() === 0) {
+      growBackoff();
+    }
     wake = armWake({state: 'wake-in', milliseconds: backoffRemaining()});
     return {outcome: 'pass-run'};
   }
@@ -357,27 +376,37 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
 
   function notifyChanged(operation: OperationSnapshot): void {
     try {
-      kindOf(operation).onChanged(operation);
+      kindOf(operation).onChanged(toView(operation));
     } catch (error) {
       logger.warn('onChanged threw', {kind: operation.kind, errorName: errorNameOf(error)});
     }
   }
 
-  /** Stores the snapshot first, and changes nothing if that fails. It knows nothing about attempts or callers */
-  async function commit(previous: Previous, data: OperationData, trigger: Trigger): Promise<CommitOutcome> {
-    const kind = kindOf(data);
+  /**
+   * Stores the snapshot first, and changes nothing if that fails. It knows nothing about attempts or callers.
+   * `laneWhenEnded` is the kind's, unless the owner's command overrides it.
+   */
+  async function commit(
+    previous: Previous,
+    data: OperationData,
+    trigger: Trigger,
+    laneWhenEnded: LaneSettings = kindOf(data).laneWhenEnded,
+  ): Promise<CommitOutcome> {
     return pipe(isCommitFailure)(
       () => {
-        return resolveTransition(previous, data, trigger, kind);
-      },
-      async resolved => {
-        return followLane(previous, data, trigger, kind, resolved);
+        return resolveTransition(previous, data, trigger);
       },
       async ({target}) => {
-        return appendSnapshot(previous, data, trigger, target);
+        const cascade = decideCascade(previous.state, trigger, target, laneWhenEnded);
+        return appendSnapshot(previous, {...data, cascade}, trigger, target);
       },
       forgetIfFinal,
       announceChange,
+      async transitioned => {
+        // A cascade that fails partway has ended the operation already; a later pass finishes it
+        await followLane(transitioned.operation.id);
+        return transitioned;
+      },
     );
   }
 
@@ -385,43 +414,56 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
     previous: Previous,
     data: OperationData,
     trigger: Trigger,
-    kind: ResolvedKind,
   ): TargetResolved | TransitionRefused {
+    const kind = kindOf(data);
     const targetResult = resolveTarget(previous.state, trigger, {
       attempts: data.attempts,
       maxAttempts: kind.maxAttempts,
-      whenGivenUp: kind.whenGivenUp,
+      whenExhausted: kind.whenExhausted,
     });
     if (isOutcome('target-resolved')(targetResult)) {
       return targetResult;
     }
-    return {outcome: 'transition-refused', operation: isInState('initial')(previous) ? data : previous, trigger};
+    return {
+      outcome: 'transition-refused',
+      operation: toView(isInState('initial')(previous) ? data : previous),
+      trigger,
+    };
+  }
+
+  function findCascading(operationId: string): CascadingFound | StepSkipped {
+    const lookup = findById(operationId);
+    return isOutcome('operation-found')(lookup) && isCascadePending(lookup.operation)
+      ? {outcome: 'cascading-found', operation: lookup.operation}
+      : {outcome: 'step-skipped'};
   }
 
   /**
-   * Ends the followers before the operation that is given up: its own snapshot commits the whole giving up, so a
-   * store failure or a reload partway leaves it unfinished, and the next try repeats it for whatever still waits.
-   * Nothing behind it can go out meanwhile, because it still blocks its lane.
+   * Ends the operations behind one whose stored cascade is `pending`, then stores it as done. The
+   * ending is stored before them, so a store failure or a reload partway leaves the cascade pending, and the next pass
+   * finishes the cascade from it. Nothing behind it can go out meanwhile, because it still blocks its lane.
    */
   async function followLane(
-    previous: Previous,
-    data: OperationData,
-    trigger: Trigger,
-    kind: ResolvedKind,
-    resolved: TargetResolved,
-  ): Promise<TargetResolved | StorageFull | StorageFailed> {
-    const {target} = resolved;
-    if (!doesLaneFollow(previous.state, trigger, target, kind)) {
-      return resolved;
-    }
-    const laneTrigger = laneTriggerFor(target);
-    const followers = findOperationFollowers(operations.values())(data);
-    return eachUntilFailure(isStorageProblem)(
-      followers,
-      async follower => {
-        return commit(follower, follower, laneTrigger);
+    operationId: string,
+  ): Promise<OperationTransitioned | StepSkipped | StorageFull | StorageFailed> {
+    return pipe(isOutcome('step-skipped', 'storage-full', 'storage-failed'))(
+      () => {
+        return findCascading(operationId);
       },
-      resolved,
+      async found => {
+        const {operation} = found;
+        return eachUntilFailure(isStorageProblem)(
+          findOperationFollowers(operations.values())(operation),
+          async follower => {
+            return commit(follower, follower, operation.cascade.trigger);
+          },
+          found,
+        );
+      },
+      async ({operation}) => {
+        return appendSnapshot(operation, {...operation, cascade: {state: 'none'}}, operation.trigger, operation.state);
+      },
+      forgetIfFinal,
     );
   }
 
@@ -447,10 +489,13 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
       : appendResult;
   }
 
-  /** Once the final snapshot is stored the operation has ended, whether or not deleting its snapshots worked */
+  /**
+   * Once the final snapshot is stored the operation has ended, whether or not deleting its snapshots worked. One
+   * whose cascade is still pending stays until the operations behind it have ended.
+   */
   async function forgetIfFinal(transitioned: OperationTransitioned): Promise<OperationTransitioned> {
     const {operation} = transitioned;
-    if (!isFinal(operation)) {
+    if (!isFinal(operation) || isCascadePending(operation)) {
       operations.set(operation.id, operation);
       return transitioned;
     }
@@ -473,26 +518,27 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
 
   // Commands
 
+  /** Joins the queue at call time, so commands take their turns in the order they were called */
+  async function takeCommand<Result>(turn: () => Promise<CommandTaken<Result>>): Promise<Parked<Result>> {
+    const takenResult = await serialized(turn);
+    return isOutcome('outbox-not-started')(takenResult) ? takenResult : takenResult.answer;
+  }
+
   /**
-   * Applies the command to the operation it looks up, or parks it on the operation's attempt when one runs.
+   * Applies the command to the operation it looked up, or parks it on the operation's attempt when one runs.
    * The attempt's end applies the parked commands in order, in the same task, so nothing starts in between.
    */
-  async function takeCommand<Result>(
-    lookUp: () => Lookup,
+  async function applyOrPark<Result>(
+    lookup: Lookup,
     apply: (lookup: Lookup) => Promise<Result>,
-  ): Promise<Parked<Result>> {
-    const takenResult = await serialized(async (): Promise<CommandTaken<Result>> => {
-      const lookup = lookUp();
-      const attemptResult: AttemptFound | NoAttempt = isOutcome('operation-found')(lookup)
-        ? findAttempt(lookup.operation.id)
-        : {outcome: 'no-attempt'};
-      if (isOutcome('attempt-found')(attemptResult)) {
-        return {outcome: 'command-taken', answer: parkOn(attemptResult.attempt, apply)};
-      }
-      const applied = await apply(lookup);
-      return {outcome: 'command-taken', answer: Promise.resolve(applied)};
-    });
-    return isOutcome('outbox-not-started')(takenResult) ? takenResult : takenResult.answer;
+  ): Promise<CommandTaken<Result>> {
+    const attemptResult: AttemptFound | NoAttempt = isOutcome('operation-found')(lookup)
+      ? findAttempt(lookup.operation.id)
+      : {outcome: 'no-attempt'};
+    if (isOutcome('attempt-found')(attemptResult)) {
+      return {outcome: 'command-taken', answer: parkOn(attemptResult.attempt, apply)};
+    }
+    return {outcome: 'command-taken', answer: Promise.resolve(await apply(lookup))};
   }
 
   async function parkOn<Result>(
@@ -529,35 +575,33 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
     );
   }
 
+  /** The refusals are answered in the command's turn, at once, even while an attempt runs */
   async function enqueue(kind: ResolvedKind, request: EnqueueRequest<unknown>): Promise<EnqueueOutcome<unknown>> {
-    return pipe(isOutcome('correlation-key-empty', 'lane-key-empty', 'payload-invalid'))(
-      () => {
-        return checkKeys(request);
-      },
-      () => {
-        return parsePayload(kind, request.payload);
-      },
-      async ({payload}) => {
-        return placeOperation(kind, request, payload);
-      },
-    );
+    return takeCommand(async (): Promise<CommandTaken<EnqueueOutcome<unknown>>> => {
+      const placeResult = await pipe(
+        isOutcome('correlation-key-empty', 'lane-key-empty', 'payload-invalid', 'key-taken-by-other-kind'),
+      )(
+        () => {
+          return checkKeys(request);
+        },
+        () => {
+          return parsePayload(kind, request.payload);
+        },
+        async ({payload}) => {
+          return placeOperation(kind, request, payload);
+        },
+      );
+      return isOutcome('command-taken')(placeResult)
+        ? placeResult
+        : {outcome: 'command-taken', answer: Promise.resolve(placeResult)};
+    });
   }
 
-  async function placeOperation(
-    kind: ResolvedKind,
-    request: EnqueueRequest<unknown>,
-    payload: unknown,
-  ): Promise<EnqueueOutcome<unknown>> {
-    return match(correlationOf(request))
-      .with({state: 'uncorrelated'}, async () => {
-        return serialized(async () => {
-          return createOperation(kind, request, payload);
-        });
-      })
-      .with({state: 'correlated'}, async ({correlationKey}) => {
-        return enqueueCorrelated(kind, request, payload, correlationKey);
-      })
-      .exhaustive();
+  function lookUpCorrelation(request: EnqueueRequest<unknown>): Lookup {
+    const correlation = correlationOf(request);
+    return isInState('correlated')(correlation)
+      ? findByKey(correlation.correlationKey)
+      : {outcome: 'operation-not-found'};
   }
 
   function refuseOtherKind(kind: ResolvedKind, lookup: Lookup): Lookup | KeyTakenByOtherKind {
@@ -566,32 +610,21 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
       : lookup;
   }
 
-  async function enqueueCorrelated(
+  async function placeOperation(
     kind: ResolvedKind,
     request: EnqueueRequest<unknown>,
     payload: unknown,
-    correlationKey: string,
-  ): Promise<EnqueueOutcome<unknown>> {
-    // Checked before parking as well, so another kind's key is refused at once while its attempt runs
-    const checkedLookup = refuseOtherKind(kind, findByKey(correlationKey));
-    if (isOutcome('key-taken-by-other-kind')(checkedLookup)) {
-      return checkedLookup;
-    }
-    return takeCommand(
+  ): Promise<KeyTakenByOtherKind | CommandTaken<EnqueueOutcome<unknown>>> {
+    return pipe(isOutcome('key-taken-by-other-kind'))(
       () => {
-        return findByKey(correlationKey);
+        return refuseOtherKind(kind, lookUpCorrelation(request));
       },
       async lookup => {
-        return pipe(isOutcome('key-taken-by-other-kind'))(
-          () => {
-            return refuseOtherKind(kind, lookup);
-          },
-          async current => {
-            return isOutcome('operation-found')(current)
-              ? versionOperation(current.operation, kind, request, payload)
-              : createOperation(kind, request, payload);
-          },
-        );
+        return applyOrPark(lookup, async current => {
+          return isOutcome('operation-found')(current)
+            ? versionOperation(current.operation, kind, request, payload)
+            : createOperation(kind, request, payload);
+        });
       },
     );
   }
@@ -614,7 +647,7 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
         return commit({state: 'initial'}, data, 'operation-queued');
       },
       ({operation}): OperationQueued<unknown> => {
-        return {outcome: 'operation-queued', operation};
+        return {outcome: 'operation-queued', operation: toView(operation)};
       },
     );
   }
@@ -634,17 +667,14 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
         return commit(found, data, 'operation-versioned');
       },
       ({operation}): OperationVersioned<unknown> => {
-        return {outcome: 'operation-versioned', operation};
+        return {outcome: 'operation-versioned', operation: toView(operation)};
       },
     );
   }
 
   async function hold(correlationKey: string): Promise<HoldOutcome> {
-    return takeCommand(
-      () => {
-        return findByKey(correlationKey);
-      },
-      async lookup => {
+    return takeCommand(async () => {
+      return applyOrPark(findByKey(correlationKey), async lookup => {
         return pipe(isCommandFailure)(
           () => {
             return lookup;
@@ -653,19 +683,16 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
             return commit(operation, operation, 'operation-held');
           },
           ({operation}): OperationHeld => {
-            return {outcome: 'operation-held', operation};
+            return {outcome: 'operation-held', operation: toView(operation)};
           },
         );
-      },
-    );
+      });
+    });
   }
 
   async function release(correlationKey: string): Promise<ReleaseOutcome> {
-    return takeCommand(
-      () => {
-        return findByKey(correlationKey);
-      },
-      async lookup => {
+    return takeCommand(async () => {
+      return applyOrPark(findByKey(correlationKey), async lookup => {
         return pipe(isCommandFailure)(
           () => {
             return lookup;
@@ -674,37 +701,49 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
             return commit(operation, operation, 'operation-released');
           },
           ({operation}): OperationReleased => {
-            return {outcome: 'operation-released', operation};
+            return {outcome: 'operation-released', operation: toView(operation)};
           },
         );
-      },
-    );
+      });
+    });
   }
 
-  /** Never parks: it drops the operation, then aborts and finishes its attempt */
-  async function drop(correlationKey: string): Promise<DropOutcome> {
+  /**
+   * Never parks: it ends the operation, then aborts and finishes its attempt. The owner's `lane` replaces the
+   * kind's setting for this ending.
+   */
+  async function endOperation<Ending extends EndingTrigger>(
+    trigger: Ending,
+    correlationKey: string,
+    {lane}: EndingOptions,
+  ): Promise<Outcome<Ending, {operation: OperationView}> | TransitionRefused | OperationNotFound | OutboxUnavailable> {
     return serialized(async () => {
       return pipe(isCommandFailure)(
         () => {
           return findByKey(correlationKey);
         },
         async ({operation}) => {
-          return commit(operation, operation, 'operation-dropped');
+          const laneWhenEnded =
+            lane === undefined ? kindOf(operation).laneWhenEnded : {'dead-lettered': lane, deleted: lane};
+          return commit(operation, operation, trigger, laneWhenEnded);
         },
         async ({operation}) => {
-          return endAttemptOf(operation);
+          return endAttemptOf(trigger, operation);
         },
       );
     });
   }
 
-  async function endAttemptOf(dropped: OperationSnapshot): Promise<OperationDropped> {
-    const attemptResult = findAttempt(dropped.id);
+  async function endAttemptOf<Ending extends EndingTrigger>(
+    trigger: Ending,
+    ended: OperationSnapshot,
+  ): Promise<Outcome<Ending, {operation: OperationView}>> {
+    const attemptResult = findAttempt(ended.id);
     if (isOutcome('attempt-found')(attemptResult)) {
       attemptResult.attempt.controller.abort();
-      await finishAttempt(attemptResult.attempt, dropped);
+      await finishAttempt(attemptResult.attempt, ended);
     }
-    return {outcome: 'operation-dropped', operation: dropped};
+    return {outcome: trigger, operation: toView(ended)};
   }
 
   // Attempts
@@ -755,7 +794,7 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
 
   async function askKind(operation: OperationSnapshot, signal: AbortSignal): Promise<AttemptOutcome | AttemptErrored> {
     try {
-      const answer: unknown = await kindOf(operation).attempt(operation, signal);
+      const answer: unknown = await kindOf(operation).attempt(toView(operation), signal);
       if (isAttemptAnswer(answer)) {
         return answer;
       }
@@ -858,7 +897,7 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
     if (kind === undefined) {
       return {outcome: 'snapshot-unusable', operationId: snapshot.id, reason: 'kind-not-registered'};
     }
-    if (isFinal(snapshot)) {
+    if (isFinal(snapshot) && !isCascadePending(snapshot)) {
       return {outcome: 'snapshot-unusable', operationId: snapshot.id, reason: 'operation-ended'};
     }
     try {
@@ -956,8 +995,18 @@ export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependenc
     enqueue,
     hold,
     release,
-    drop,
-    findByCorrelationKey: findByKey,
+    deadLetter: async (correlationKey, options) => {
+      return endOperation('operation-dead-lettered', correlationKey, options);
+    },
+    delete: async (correlationKey, options) => {
+      return endOperation('operation-deleted', correlationKey, options);
+    },
+    findByCorrelationKey(correlationKey) {
+      const lookup = findByKey(correlationKey);
+      return isOutcome('operation-found')(lookup)
+        ? {outcome: 'operation-found', operation: toView(lookup.operation)}
+        : lookup;
+    },
     lane(laneKey) {
       const lane = lanesOf(operations.values()).get(laneKey);
       return lane === undefined ? {outcome: 'lane-empty'} : {outcome: 'lane-found', lane};

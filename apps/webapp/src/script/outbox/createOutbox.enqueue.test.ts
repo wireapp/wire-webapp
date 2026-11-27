@@ -19,6 +19,7 @@
 
 import {createOutboxTestKit, parseTestPayload, type OutboxTestKit, type TestKind} from './testing/createOutboxTestKit';
 
+import {SCHEMA_VERSION} from './operationRules';
 import type {OperationSnapshot} from './types';
 
 describe('createOutbox enqueue', () => {
@@ -60,22 +61,44 @@ describe('createOutbox enqueue', () => {
       });
     });
 
-    it.skip('is answered as the view only, without what only the kernel reads', async () => {
-      const outcome = await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'});
+    it('is answered and announced as the view only, without what only the kernel reads', async () => {
+      const view = {
+        id: 'operation-1',
+        state: 'queued',
+        kind: testKind.kind.name,
+        payload: {text: 'hi'},
+        correlation: {state: 'correlated', correlationKey: 'key'},
+        lane: {state: 'no-lane'},
+        queuedAt: 1_000_000,
+        attempts: 0,
+      };
 
-      expect(outcome).toEqual({
+      expect(await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'})).toEqual({
         outcome: 'operation-queued',
-        operation: {
-          id: 'operation-1',
-          state: 'queued',
-          kind: testKind.kind.name,
-          payload: {text: 'hi'},
-          correlation: {state: 'correlated', correlationKey: 'key'},
-          lane: {state: 'no-lane'},
-          queuedAt: 1_000_000,
-          attempts: 0,
-        },
+        operation: view,
       });
+      expect(testKind.changes).toEqual([view]);
+      expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-found', operation: view});
+    });
+
+    it('is handed to its attempt and listed in its lane as the view only', async () => {
+      await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key', laneKey: 'lane'});
+      const view = {
+        id: 'operation-1',
+        kind: testKind.kind.name,
+        payload: {text: 'hi'},
+        correlation: {state: 'correlated', correlationKey: 'key'},
+        lane: {state: 'in-lane', laneKey: 'lane'},
+        queuedAt: 1_000_000,
+      };
+
+      expect(kit.outbox.lanes()).toEqual({
+        outcome: 'lanes-listed',
+        lanes: [{state: 'moving', laneKey: 'lane', operations: [{...view, state: 'queued', attempts: 0}]}],
+      });
+      kit.outbox.resume();
+      await kit.clock.settle();
+      expect(testKind.lastAttempt().operation).toEqual({...view, state: 'in-progress', attempts: 1});
     });
 
     it('is found by its correlation key, through the handle and the outbox', async () => {
@@ -131,7 +154,7 @@ describe('createOutbox enqueue', () => {
 
       expect(kit.store.history('operation-1')).toEqual([
         expect.objectContaining({
-          schemaVersion: 2,
+          schemaVersion: SCHEMA_VERSION,
           seq: 1,
           trigger: 'operation-queued',
           state: 'queued',
@@ -141,6 +164,7 @@ describe('createOutbox enqueue', () => {
           attempts: 0,
           queuedAt: 1_000_000,
           at: 1_000_000,
+          cascade: {state: 'none'},
         }),
       ]);
     });

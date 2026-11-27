@@ -121,13 +121,13 @@ describe('createOutbox smoke', () => {
     ).toEqual(['operation-queued', 'attempt-started', 'attempt-failed', 'operation-held']);
   });
 
-  it('drops an operation at once, aborting its running attempt and ignoring its late answer', async () => {
+  it('deletes an operation at once, aborting its running attempt and ignoring its late answer', async () => {
     const testKind = kit.registerKind();
     await kit.start();
     await kit.enqueue(testKind, {correlationKey: 'key'});
     const attempt = testKind.lastAttempt();
 
-    expect(await kit.outbox.drop('key')).toMatchObject({outcome: 'operation-dropped', operation: {state: 'dropped'}});
+    expect(await kit.outbox.delete('key')).toMatchObject({outcome: 'operation-deleted', operation: {state: 'deleted'}});
     expect(attempt.signal.aborted).toBe(true);
 
     await attempt.answer({outcome: 'attempt-succeeded'});
@@ -136,8 +136,8 @@ describe('createOutbox smoke', () => {
     expect(kit.store.operationIds()).toEqual([]);
   });
 
-  it("ends the operations of the kind behind one given up by its attempt, when the kind's lane follows", async () => {
-    const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+  it("ends the operations of the kind behind one its attempt dead-letters, when the kind's lane follows", async () => {
+    const testKind = kit.registerKind({laneWhenDeadLettered: 'follows'});
     await kit.start();
     await kit.enqueue(testKind, {correlationKey: 'first', laneKey: 'lane'});
     await kit.enqueue(testKind, {correlationKey: 'second', laneKey: 'lane'});
@@ -157,31 +157,31 @@ describe('createOutbox smoke', () => {
     });
   });
 
-  it("drops the operations of the kind behind one the owner drops, when the kind's lane follows", async () => {
-    const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+  it("deletes the operations of the kind behind one the owner deletes, when the kind's lane follows", async () => {
+    const testKind = kit.registerKind({laneWhenDeleted: 'follows'});
     await kit.start({run: false});
     await kit.enqueue(testKind, {correlationKey: 'first', laneKey: 'lane'});
     await kit.enqueue(testKind, {correlationKey: 'second', laneKey: 'lane'});
 
-    await kit.outbox.drop('first');
+    await kit.outbox.delete('first');
 
     expect(kit.outbox.lanes()).toEqual({outcome: 'lanes-listed', lanes: []});
     expect(
-      testKind.changes.filter(isInState('dropped')).map(({id}) => {
+      testKind.changes.filter(isInState('deleted')).map(({id}) => {
         return id;
       }),
-    ).toEqual(['operation-2', 'operation-1']);
+    ).toEqual(['operation-1', 'operation-2']);
   });
 
   it('does not cascade from an operation that was dead-lettered already', async () => {
-    const testKind = kit.registerKind({laneWhenGivenUp: 'follows'});
+    const testKind = kit.registerKind({laneWhenDeadLettered: 'follows', laneWhenDeleted: 'follows'});
     await kit.start();
     await kit.enqueue(testKind, {correlationKey: 'first', laneKey: 'lane'});
     await testKind.lastAttempt().answer({outcome: 'attempt-dead-lettered'});
     kit.outbox.pause();
     await kit.enqueue(testKind, {correlationKey: 'second', laneKey: 'lane'});
 
-    await kit.outbox.drop('first');
+    await kit.outbox.delete('first');
 
     expect(kit.operation('second').state).toBe('queued');
     expect(kit.lane('lane').operations).toMatchObject([{id: 'operation-2'}]);

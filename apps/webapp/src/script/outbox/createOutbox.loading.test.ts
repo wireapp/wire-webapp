@@ -17,12 +17,7 @@
  *
  */
 
-import {createOutboxTestKit, createStoredSnapshot, type OutboxTestKit} from './testing/createOutboxTestKit';
-import type {Correlation} from './types';
-
-function correlated(correlationKey: string): Correlation {
-  return {state: 'correlated', correlationKey};
-}
+import {correlated, createOutboxTestKit, createStoredSnapshot, type OutboxTestKit} from './testing/createOutboxTestKit';
 
 describe('createOutbox loading', () => {
   let kit: OutboxTestKit;
@@ -170,8 +165,8 @@ describe('createOutbox loading', () => {
       expect(testKind.attempts).toHaveLength(0);
     });
 
-    it('drops an interrupted attempt that was the last one, when the kind drops what it gives up', async () => {
-      const testKind = kit.registerKind({maxAttempts: 1, whenGivenUp: 'drop'});
+    it('deletes an interrupted attempt that was the last one, when the kind deletes what is exhausted', async () => {
+      const testKind = kit.registerKind({maxAttempts: 1, whenExhausted: 'delete'});
       kit.store.seed(
         createStoredSnapshot({
           kind: testKind.kind.name,
@@ -188,13 +183,13 @@ describe('createOutbox loading', () => {
       expect(kit.store.operationIds()).toEqual([]);
     });
 
-    it('tells the kind once, with the dropped operation, about an operation given up at load', async () => {
-      const testKind = kit.registerKind({maxAttempts: 1, whenGivenUp: 'drop'});
+    it('tells the kind once, with the deleted operation, about an operation exhausted at load', async () => {
+      const testKind = kit.registerKind({maxAttempts: 1, whenExhausted: 'delete'});
       kit.store.seed(createStoredSnapshot({kind: testKind.kind.name, state: 'in-progress', attempts: 1}));
 
       await kit.start({run: false});
 
-      expect(testKind.changes).toEqual([expect.objectContaining({id: 'stored-operation', state: 'dropped'})]);
+      expect(testKind.changes).toEqual([expect.objectContaining({id: 'stored-operation', state: 'deleted'})]);
     });
   });
 
@@ -233,7 +228,7 @@ describe('createOutbox loading', () => {
       expect(kit.store.operationIds()).toEqual([]);
     });
 
-    it.each(['succeeded', 'dropped'] as const)(
+    it.each(['succeeded', 'deleted'] as const)(
       'deletes an operation whose newest snapshot is %s, left by an interrupted delete',
       async state => {
         const {kind} = kit.registerKind();
@@ -290,11 +285,7 @@ describe('createOutbox loading', () => {
       const {kind} = kit.registerKind();
       kit.store.seed(createStoredSnapshot({kind: kind.name, id: 'usable'}));
       kit.store.seed(createStoredSnapshot({kind: 'gone', id: 'orphan'}));
-      const loadLatest = kit.store.loadLatest.bind(kit.store);
-      kit.store.loadLatest = async () => {
-        const loaded = await loadLatest();
-        return loaded.outcome === 'snapshots-loaded' ? {...loaded, quarantinedCount: 2} : loaded;
-      };
+      kit.store.quarantine(2);
 
       await kit.start({run: false});
 

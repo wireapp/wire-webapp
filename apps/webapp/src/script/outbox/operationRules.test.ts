@@ -19,7 +19,8 @@
 
 import {
   backoffDelay,
-  doesLaneFollow,
+  decideCascade,
+  isCascadePending,
   findOperationFollowers,
   lanesOf,
   newOperationData,
@@ -28,6 +29,7 @@ import {
   resolveKind,
   resolveTarget,
   versionOperationData,
+  type LaneSettings,
   type PassPlan,
   type PassSituation,
   type TransitionContext,
@@ -37,25 +39,26 @@ import type {EnqueueRequest, Kind, OperationData, OperationSnapshot, OperationSt
 
 type From = OperationState | 'initial';
 
-const allStates: From[] = ['initial', 'queued', 'on-hold', 'in-progress', 'dead-lettered', 'succeeded', 'dropped'];
+const allStates: From[] = ['initial', 'queued', 'on-hold', 'in-progress', 'dead-lettered', 'succeeded', 'deleted'];
 const allTriggers: Trigger[] = [
   'operation-queued',
   'operation-versioned',
   'operation-held',
   'operation-released',
-  'operation-dropped',
+  'operation-dead-lettered',
+  'operation-deleted',
   'operation-expired',
   'attempt-started',
   'attempt-succeeded',
   'attempt-failed',
   'attempt-held',
   'attempt-dead-lettered',
-  'attempt-dropped',
+  'attempt-deleted',
   'attempt-timed-out',
   'attempt-errored',
   'attempt-interrupted',
   'lane-dead-lettered',
-  'lane-dropped',
+  'lane-deleted',
 ];
 const failedAttemptTriggers: Trigger[] = [
   'attempt-failed',
@@ -72,7 +75,6 @@ const kindDefinition: Kind<TestPayload> = {
   },
 };
 const kind = resolveKind({...kindDefinition, expiresAfterMilliseconds: 10_000});
-const followingKind = resolveKind({...kindDefinition, laneWhenGivenUp: 'follows'});
 
 function ids(operations: {id: string}[]): string[] {
   return operations.map(({id}) => {
@@ -81,11 +83,11 @@ function ids(operations: {id: string}[]): string[] {
 }
 
 describe('resolveTarget', () => {
-  const hasAttemptsLeft: TransitionContext = {attempts: 1, maxAttempts: 3, whenGivenUp: 'dead-letter'};
-  const noAttemptsLeftDeadLetters: TransitionContext = {attempts: 3, maxAttempts: 3, whenGivenUp: 'dead-letter'};
-  const noAttemptsLeftDrops: TransitionContext = {attempts: 3, maxAttempts: 3, whenGivenUp: 'drop'};
+  const hasAttemptsLeft: TransitionContext = {attempts: 1, maxAttempts: 3, whenExhausted: 'dead-letter'};
+  const noAttemptsLeftDeadLetters: TransitionContext = {attempts: 3, maxAttempts: 3, whenExhausted: 'dead-letter'};
+  const noAttemptsLeftDeletes: TransitionContext = {attempts: 3, maxAttempts: 3, whenExhausted: 'delete'};
   const deadLetters: TransitionContext = hasAttemptsLeft;
-  const drops: TransitionContext = {...hasAttemptsLeft, whenGivenUp: 'drop'};
+  const deletes: TransitionContext = {...hasAttemptsLeft, whenExhausted: 'delete'};
 
   const resolvedRows: [From, Trigger, OperationState][] = [
     ['initial', 'operation-queued', 'queued'],
@@ -93,15 +95,17 @@ describe('resolveTarget', () => {
     ['queued', 'operation-versioned', 'queued'],
     ['queued', 'operation-held', 'on-hold'],
     ['queued', 'operation-expired', 'dead-lettered'],
-    ['queued', 'operation-dropped', 'dropped'],
+    ['queued', 'operation-dead-lettered', 'dead-lettered'],
+    ['queued', 'operation-deleted', 'deleted'],
     ['queued', 'lane-dead-lettered', 'dead-lettered'],
-    ['queued', 'lane-dropped', 'dropped'],
+    ['queued', 'lane-deleted', 'deleted'],
     ['on-hold', 'operation-released', 'queued'],
     ['on-hold', 'operation-versioned', 'queued'],
     ['on-hold', 'operation-expired', 'dead-lettered'],
-    ['on-hold', 'operation-dropped', 'dropped'],
+    ['on-hold', 'operation-dead-lettered', 'dead-lettered'],
+    ['on-hold', 'operation-deleted', 'deleted'],
     ['on-hold', 'lane-dead-lettered', 'dead-lettered'],
-    ['on-hold', 'lane-dropped', 'dropped'],
+    ['on-hold', 'lane-deleted', 'deleted'],
     ['in-progress', 'attempt-succeeded', 'succeeded'],
     ['in-progress', 'attempt-failed', 'queued'],
     ['in-progress', 'attempt-timed-out', 'queued'],
@@ -109,10 +113,11 @@ describe('resolveTarget', () => {
     ['in-progress', 'attempt-interrupted', 'queued'],
     ['in-progress', 'attempt-held', 'on-hold'],
     ['in-progress', 'attempt-dead-lettered', 'dead-lettered'],
-    ['in-progress', 'attempt-dropped', 'dropped'],
-    ['in-progress', 'operation-dropped', 'dropped'],
+    ['in-progress', 'attempt-deleted', 'deleted'],
+    ['in-progress', 'operation-dead-lettered', 'dead-lettered'],
+    ['in-progress', 'operation-deleted', 'deleted'],
     ['dead-lettered', 'operation-versioned', 'queued'],
-    ['dead-lettered', 'operation-dropped', 'dropped'],
+    ['dead-lettered', 'operation-deleted', 'deleted'],
   ];
   const refusedRows = allStates.flatMap(from => {
     return allTriggers
@@ -134,7 +139,7 @@ describe('resolveTarget', () => {
     expect(resolveTarget(from, trigger, hasAttemptsLeft)).toEqual({outcome: 'target-refused'});
   });
 
-  it.each(['succeeded', 'dropped'] as const)('%s is final and accepts nothing', from => {
+  it.each(['succeeded', 'deleted'] as const)('%s is final and accepts nothing', from => {
     for (const trigger of allTriggers) {
       expect(resolveTarget(from, trigger, hasAttemptsLeft)).toEqual({outcome: 'target-refused'});
     }
@@ -155,23 +160,23 @@ describe('resolveTarget', () => {
       });
     });
 
-    it.each(failedAttemptTriggers)('%s drops without attempts left when the kind drops', trigger => {
-      expect(resolveTarget('in-progress', trigger, noAttemptsLeftDrops)).toEqual({
+    it.each(failedAttemptTriggers)('%s deletes without attempts left when the kind deletes', trigger => {
+      expect(resolveTarget('in-progress', trigger, noAttemptsLeftDeletes)).toEqual({
         outcome: 'target-resolved',
-        target: 'dropped',
+        target: 'deleted',
       });
     });
 
     it('retries when the attempts are one short of the maximum', () => {
       expect(
-        resolveTarget('in-progress', 'attempt-failed', {attempts: 2, maxAttempts: 3, whenGivenUp: 'drop'}),
+        resolveTarget('in-progress', 'attempt-failed', {attempts: 2, maxAttempts: 3, whenExhausted: 'delete'}),
       ).toEqual({outcome: 'target-resolved', target: 'queued'});
     });
 
-    it('gives up when the attempts are past the maximum', () => {
+    it('is exhausted when the attempts are past the maximum', () => {
       expect(
-        resolveTarget('in-progress', 'attempt-failed', {attempts: 4, maxAttempts: 3, whenGivenUp: 'drop'}),
-      ).toEqual({outcome: 'target-resolved', target: 'dropped'});
+        resolveTarget('in-progress', 'attempt-failed', {attempts: 4, maxAttempts: 3, whenExhausted: 'delete'}),
+      ).toEqual({outcome: 'target-resolved', target: 'deleted'});
     });
   });
 
@@ -183,14 +188,17 @@ describe('resolveTarget', () => {
       });
     });
 
-    it.each(['queued', 'on-hold'] as const)('%s drops on expiry when the kind drops', from => {
-      expect(resolveTarget(from, 'operation-expired', drops)).toEqual({outcome: 'target-resolved', target: 'dropped'});
+    it.each(['queued', 'on-hold'] as const)('%s deletes on expiry when the kind deletes', from => {
+      expect(resolveTarget(from, 'operation-expired', deletes)).toEqual({
+        outcome: 'target-resolved',
+        target: 'deleted',
+      });
     });
 
     it('expires regardless of the attempts left', () => {
-      expect(resolveTarget('queued', 'operation-expired', noAttemptsLeftDrops)).toEqual({
+      expect(resolveTarget('queued', 'operation-expired', noAttemptsLeftDeletes)).toEqual({
         outcome: 'target-resolved',
-        target: 'dropped',
+        target: 'deleted',
       });
       expect(resolveTarget('queued', 'operation-expired', hasAttemptsLeft)).toEqual({
         outcome: 'target-resolved',
@@ -199,85 +207,114 @@ describe('resolveTarget', () => {
     });
   });
 
-  describe('the attempt giving up by its answer', () => {
-    it.each(['dead-letter', 'drop'] as const)('ignores whenGivenUp %s', whenGivenUp => {
-      const context = {...hasAttemptsLeft, whenGivenUp};
+  describe('the attempt ending the operation by its answer', () => {
+    it.each(['dead-letter', 'delete'] as const)('ignores whenExhausted %s', whenExhausted => {
+      const context = {...hasAttemptsLeft, whenExhausted};
 
       expect(resolveTarget('in-progress', 'attempt-dead-lettered', context)).toEqual({
         outcome: 'target-resolved',
         target: 'dead-lettered',
       });
-      expect(resolveTarget('in-progress', 'attempt-dropped', context)).toEqual({
+      expect(resolveTarget('in-progress', 'attempt-deleted', context)).toEqual({
         outcome: 'target-resolved',
-        target: 'dropped',
+        target: 'deleted',
       });
     });
   });
 });
 
-describe('doesLaneFollow', () => {
-  const givenUpTargets = ['dead-lettered', 'dropped'] as const;
+describe('decideCascade', () => {
+  const endings = [
+    {target: 'dead-lettered', laneTrigger: 'lane-dead-lettered'},
+    {target: 'deleted', laneTrigger: 'lane-deleted'},
+  ] as const;
   const otherTargets: OperationState[] = ['queued', 'on-hold', 'in-progress', 'succeeded'];
-  const laneTriggers: Trigger[] = ['lane-dead-lettered', 'lane-dropped'];
+  const laneTriggers: Trigger[] = ['lane-dead-lettered', 'lane-deleted'];
   const nonLaneTriggers = allTriggers.filter(trigger => {
     return !laneTriggers.includes(trigger);
   });
+  const follows: LaneSettings = {'dead-lettered': 'follows', deleted: 'follows'};
+  const continues: LaneSettings = {'dead-lettered': 'continues', deleted: 'continues'};
 
   it.each(
     nonLaneTriggers.flatMap(trigger => {
-      return givenUpTargets.map((target): [Trigger, OperationState] => {
-        return [trigger, target];
+      return endings.map(ending => {
+        return {trigger, ...ending};
       });
     }),
-  )('follows %s ending in %s when the kind follows', (trigger, target) => {
-    expect(doesLaneFollow('queued', trigger, target, followingKind)).toBe(true);
+  )(
+    'follows $trigger ending in $target with $laneTrigger when that ending follows',
+    ({trigger, target, laneTrigger}) => {
+      expect(decideCascade('queued', trigger, target, follows)).toEqual({state: 'pending', trigger: laneTrigger});
+    },
+  );
+
+  it.each(endings)('reads only the setting for $target', ({target, laneTrigger}) => {
+    const onlyThis: LaneSettings = {...continues, [target]: 'follows'};
+    const allButThis: LaneSettings = {...follows, [target]: 'continues'};
+
+    expect(decideCascade('queued', 'operation-expired', target, onlyThis)).toEqual({
+      state: 'pending',
+      trigger: laneTrigger,
+    });
+    expect(decideCascade('queued', 'operation-expired', target, allButThis)).toEqual({state: 'none'});
   });
 
   it.each(
     laneTriggers.flatMap(trigger => {
-      return givenUpTargets.map((target): [Trigger, OperationState] => {
-        return [trigger, target];
+      return endings.map(({target}) => {
+        return {trigger, target};
       });
     }),
-  )('does not follow its own cascade %s ending in %s', (trigger, target) => {
-    expect(doesLaneFollow('queued', trigger, target, followingKind)).toBe(false);
+  )('continues on its own cascade $trigger ending in $target', ({trigger, target}) => {
+    expect(decideCascade('queued', trigger, target, follows)).toEqual({state: 'none'});
   });
 
   it.each(
     allTriggers.flatMap(trigger => {
-      return otherTargets.map((target): [Trigger, OperationState] => {
-        return [trigger, target];
+      return otherTargets.map(target => {
+        return {trigger, target};
       });
     }),
-  )('does not follow %s ending in %s, which is not giving up', (trigger, target) => {
-    expect(doesLaneFollow('in-progress', trigger, target, followingKind)).toBe(false);
+  )('decides nothing on $trigger leading to $target, which does not end it that way', ({trigger, target}) => {
+    expect(decideCascade('in-progress', trigger, target, follows)).toEqual({state: 'none'});
   });
 
   it.each(
     allTriggers.flatMap(trigger => {
-      return givenUpTargets.map((target): [Trigger, OperationState] => {
-        return [trigger, target];
+      return endings.map(({target}) => {
+        return {trigger, target};
       });
     }),
   )(
-    'does not follow %s ending in %s from a dead-lettered operation, which no longer blocks its lane',
-    (trigger, target) => {
-      expect(doesLaneFollow('dead-lettered', trigger, target, followingKind)).toBe(false);
+    'continues on $trigger ending in $target from a dead-lettered operation, which no longer blocks its lane',
+    ({trigger, target}) => {
+      expect(decideCascade('dead-lettered', trigger, target, follows)).toEqual({state: 'none'});
     },
   );
 
-  it.each(
-    allTriggers.flatMap(trigger => {
-      return givenUpTargets.map((target): [Trigger, OperationState] => {
-        return [trigger, target];
-      });
-    }),
-  )('does not follow %s ending in %s when the kind continues', (trigger, target) => {
-    expect(doesLaneFollow('queued', trigger, target, kind)).toBe(false);
+  it.each(endings)('continues on an ending in $target when that ending continues', ({target}) => {
+    expect(decideCascade('queued', 'operation-expired', target, continues)).toEqual({state: 'none'});
   });
 
   it.each(['queued', 'on-hold', 'in-progress'] as const)('follows from %s', from => {
-    expect(doesLaneFollow(from, 'operation-dropped', 'dropped', followingKind)).toBe(true);
+    expect(decideCascade(from, 'operation-deleted', 'deleted', follows)).toEqual({
+      state: 'pending',
+      trigger: 'lane-deleted',
+    });
+  });
+
+  it('resolves the kind to continue on both endings by default', () => {
+    expect(kind.laneWhenEnded).toEqual(continues);
+  });
+});
+
+describe('isCascadePending', () => {
+  it.each([
+    {cascade: {state: 'pending', trigger: 'lane-deleted'}, pending: true},
+    {cascade: {state: 'none'}, pending: false},
+  ] as const)('reads $cascade.state from the stored cascade', ({cascade, pending}) => {
+    expect(isCascadePending(createStoredSnapshot({kind: 'kind', state: 'deleted', cascade}))).toBe(pending);
   });
 });
 
@@ -304,6 +341,7 @@ describe('newOperationData', () => {
       queuedSeq: 9,
       expiry: {state: 'expires-at', serverTime: 11_000},
       limits: {attemptTimeout: {state: 'never-times-out'}},
+      cascade: {state: 'none'},
     });
   });
 
@@ -540,6 +578,15 @@ describe('lanesOf and findOperationFollowers', () => {
       expect(lanes.get('lane')?.state).toBe('moving');
     });
 
+    it('keeps a dead-lettered operation in its lane, first, while it still ends the operations behind it', () => {
+      const lanes = lanesOf([
+        operation('a', 1, {state: 'dead-lettered', cascade: {state: 'pending', trigger: 'lane-dead-lettered'}}),
+        operation('b', 2),
+      ]);
+
+      expect(ids(lanes.get('lane')?.operations ?? [])).toEqual(['a', 'b']);
+    });
+
     it('is moving when the operation ahead of the first queued one is dead-lettered', () => {
       const lanes = lanesOf([operation('a', 1, {state: 'dead-lettered'}), operation('b', 2)]);
 
@@ -589,7 +636,7 @@ describe('lanesOf and findOperationFollowers', () => {
         operation('none', 4, noLane),
         operation('running', 5, {state: 'in-progress'}),
         operation('dead', 6, {state: 'dead-lettered'}),
-        operation('dropped', 7, {state: 'dropped'}),
+        operation('deleted', 7, {state: 'deleted'}),
         operation('succeeded', 8, {state: 'succeeded'}),
         operation('reached', 9),
       ])(givenUp);
@@ -679,13 +726,25 @@ describe('planPass', () => {
       expect(plan(operations).start).toEqual(['a2']);
     });
 
-    it('does not start operations that are on hold, running, dead-lettered, succeeded or dropped, outside lanes', () => {
+    it('starts nothing in a lane whose first operation is still ending the operations behind it', () => {
+      const pending = {state: 'pending', trigger: 'lane-dead-lettered'} as const;
+      const operations = [
+        operation('a1', {...inLane('lane'), state: 'dead-lettered', cascade: pending}),
+        operation('a2', inLane('lane')),
+        operation('b3', {...inLane('other'), state: 'deleted', cascade: {...pending, trigger: 'lane-deleted'}}),
+        operation('b4', inLane('other')),
+      ];
+
+      expect(plan(operations).start).toEqual([]);
+    });
+
+    it('does not start operations that are on hold, running, dead-lettered, succeeded or deleted, outside lanes', () => {
       const operations = [
         operation('a1', {state: 'on-hold'}),
         operation('b2', {state: 'in-progress'}),
         operation('c3', {state: 'dead-lettered'}),
         operation('d4', {state: 'succeeded'}),
-        operation('e5', {state: 'dropped'}),
+        operation('e5', {state: 'deleted'}),
       ];
 
       expect(plan(operations).start).toEqual([]);

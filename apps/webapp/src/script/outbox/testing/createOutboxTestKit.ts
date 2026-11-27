@@ -22,15 +22,17 @@ import {createInMemoryOutboxStore, type InMemoryOutboxStore} from './createInMem
 
 import {createOutbox} from '../createOutbox';
 import {SCHEMA_VERSION} from '../operationRules';
-import {isOutcome} from '../tagged';
+import {isInState, isOutcome} from '../tagged';
 import type {
   AttemptOutcome,
+  Correlation,
   EnqueueOutcome,
   EnqueueRequest,
   Kind,
   KindHandle,
   Lane,
   OperationSnapshot,
+  OperationState,
   OperationView,
   Outbox,
   OutboxConfiguration,
@@ -156,6 +158,14 @@ export type TestKind = {
   lastAttempt: () => AttemptCall;
   /** The operation of this kind with the key, as the handle finds it; throws when it doesn't */
   operation: (correlationKey: string) => OperationView<TestPayload>;
+  /** The state of the operation with the key, or `forgotten` when the handle doesn't find it */
+  stateOf: (correlationKey: string) => OperationState | 'forgotten';
+  /** The call of `attempt` for the payload text; throws when there was none */
+  attemptOf: (text: string) => AttemptCall;
+  /** The payload texts of every call of `attempt`, in the order they were made */
+  attemptedTexts: () => string[];
+  /** The payload texts of the operations that were dead-lettered or deleted, in the order they ended */
+  endedOrder: () => string[];
 };
 
 export type OutboxTestKit = TestDependencies & {
@@ -164,8 +174,18 @@ export type OutboxTestKit = TestDependencies & {
   registerKind: (overrides?: Partial<Kind<TestPayload>>) => TestKind;
   /** Starts the outbox and, unless told otherwise, resumes it; throws when it doesn't start */
   start: (options?: {run?: boolean}) => Promise<void>;
+  /** Registers a kind, then starts the outbox, resumed */
+  startKind: (overrides?: Partial<Kind<TestPayload>>) => Promise<TestKind>;
   /** Enqueues `{text: 'hello'}` unless the request says otherwise, and lets everything that follows settle */
   enqueue: (testKind: TestKind, request?: Partial<EnqueueRequest<TestPayload>>) => Promise<EnqueueOutcome<TestPayload>>;
+  /** Enqueues with the key as both correlation key and payload text, which is how a test tells operations apart */
+  enqueueKeyed: (
+    testKind: TestKind,
+    correlationKey: string,
+    request?: Partial<EnqueueRequest<TestPayload>>,
+  ) => Promise<EnqueueOutcome<TestPayload>>;
+  /** What was stored for the operation, one trigger per snapshot, oldest first */
+  triggersOf: (operationId: string) => string[];
   /** The operation with the key, as the outbox finds it; throws when it doesn't */
   operation: (correlationKey: string) => OperationView;
   /** The lane of the key; throws when it is empty */
@@ -236,13 +256,49 @@ export function createOutboxTestKit(configuration: OutboxConfiguration = {}): Ou
         }
         return findResult.operation;
       },
+      stateOf: correlationKey => {
+        const findResult = handle.find(correlationKey);
+        return isOutcome('operation-found')(findResult) ? findResult.operation.state : 'forgotten';
+      },
+      attemptOf: text => {
+        const found = attempts.find(({operation}) => {
+          return operation.payload.text === text;
+        });
+        if (found === undefined) {
+          throw new Error(`${text} was not attempted`);
+        }
+        return found;
+      },
+      attemptedTexts: () => {
+        return attempts.map(({operation}) => {
+          return operation.payload.text;
+        });
+      },
+      endedOrder: () => {
+        return changes.filter(isInState('dead-lettered', 'deleted')).map(({payload}) => {
+          return payload.text;
+        });
+      },
     };
   }
 
-  return {
+  const kit: OutboxTestKit = {
     ...testDependencies,
     outbox,
     registerKind,
+    async startKind(overrides = {}) {
+      const testKind = registerKind(overrides);
+      await kit.start();
+      return testKind;
+    },
+    enqueueKeyed(testKind, correlationKey, request = {}) {
+      return kit.enqueue(testKind, {payload: {text: correlationKey}, correlationKey, ...request});
+    },
+    triggersOf: operationId => {
+      return testDependencies.store.history(operationId).map(({trigger}) => {
+        return trigger;
+      });
+    },
     async start({run = true} = {}) {
       const startResult = await outbox.start();
       if (!isOutcome('outbox-started')(startResult)) {
@@ -273,6 +329,11 @@ export function createOutboxTestKit(configuration: OutboxConfiguration = {}): Ou
       return laneResult.lane;
     },
   };
+  return kit;
+}
+
+export function correlated(correlationKey: string): Correlation {
+  return {state: 'correlated', correlationKey};
 }
 
 /** A snapshot as an earlier session would have left it */
@@ -294,6 +355,7 @@ export function createStoredSnapshot(
     attempts: 0,
     expiry: {state: 'never-expires'},
     limits: {attemptTimeout: {state: 'never-times-out'}},
+    cascade: {state: 'none'},
     ...overrides,
   };
 }

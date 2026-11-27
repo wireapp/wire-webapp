@@ -17,7 +17,7 @@
  *
  */
 
-import {createOutboxTestKit, createStoredSnapshot, type OutboxTestKit} from './testing/createOutboxTestKit';
+import {correlated, createOutboxTestKit, createStoredSnapshot, type OutboxTestKit} from './testing/createOutboxTestKit';
 import type {AttemptOutcome} from './types';
 
 describe('createOutbox attempts', () => {
@@ -26,12 +26,6 @@ describe('createOutbox attempts', () => {
   beforeEach(() => {
     kit = createOutboxTestKit();
   });
-
-  function triggersOf(operationId: string): string[] {
-    return kit.store.history(operationId).map(({trigger}) => {
-      return trigger;
-    });
-  }
 
   describe('an attempt answering', () => {
     it('attempt-succeeded forgets the operation', async () => {
@@ -71,7 +65,7 @@ describe('createOutbox attempts', () => {
       await testKind.lastAttempt().answer({outcome: 'attempt-failed'});
 
       expect(kit.operation('key')).toMatchObject({state: 'queued', attempts: 1});
-      expect(triggersOf('operation-1')).toEqual(['operation-queued', 'attempt-started', 'attempt-failed']);
+      expect(kit.triggersOf('operation-1')).toEqual(['operation-queued', 'attempt-started', 'attempt-failed']);
     });
 
     it('attempt-failed makes the next attempt start after the backoff, with its attempt count raised', async () => {
@@ -117,8 +111,8 @@ describe('createOutbox attempts', () => {
       expect(testKind.attempts).toHaveLength(1);
     });
 
-    it('attempt-dead-lettered dead-letters even when the kind drops what it gives up', async () => {
-      const testKind = kit.registerKind({whenGivenUp: 'drop'});
+    it('attempt-dead-lettered dead-letters even when the kind deletes what is exhausted', async () => {
+      const testKind = kit.registerKind({whenExhausted: 'delete'});
       await kit.start();
       await kit.enqueue(testKind, {correlationKey: 'key'});
 
@@ -127,21 +121,21 @@ describe('createOutbox attempts', () => {
       expect(kit.operation('key').state).toBe('dead-lettered');
     });
 
-    it('attempt-dropped forgets the operation, recording attempt-dropped', async () => {
+    it('attempt-deleted forgets the operation, recording attempt-deleted', async () => {
       const testKind = kit.registerKind();
       await kit.start();
       await kit.enqueue(testKind, {correlationKey: 'key'});
 
-      await testKind.lastAttempt().answer({outcome: 'attempt-dropped'});
+      await testKind.lastAttempt().answer({outcome: 'attempt-deleted'});
 
       expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
       expect(kit.store.operationIds()).toEqual([]);
-      expect(testKind.changes.at(-1)).toMatchObject({state: 'dropped'});
+      expect(testKind.changes.at(-1)).toMatchObject({state: 'deleted'});
     });
 
     it.each<[string, AttemptOutcome]>([
       ['attempt-dead-lettered', {outcome: 'attempt-dead-lettered'}],
-      ['attempt-dropped', {outcome: 'attempt-dropped'}],
+      ['attempt-deleted', {outcome: 'attempt-deleted'}],
     ])('%s lets the next operation of the lane run', async (_, answer) => {
       const testKind = kit.registerKind();
       await kit.start();
@@ -280,7 +274,7 @@ describe('createOutbox attempts', () => {
       await testKind.attempts[0].answer({outcome: 'attempt-succeeded'});
 
       expect(kit.operation('key').state).toBe('queued');
-      expect(triggersOf('operation-1')).toEqual(['operation-queued', 'attempt-started', 'attempt-timed-out']);
+      expect(kit.triggersOf('operation-1')).toEqual(['operation-queued', 'attempt-started', 'attempt-timed-out']);
     });
 
     it('is cleared when the attempt answers first', async () => {
@@ -375,8 +369,8 @@ describe('createOutbox attempts', () => {
       });
     });
 
-    it('drops the operation when the kind drops what it gives up', async () => {
-      const testKind = kit.registerKind({maxAttempts: 1, whenGivenUp: 'drop'});
+    it('deletes the operation when the kind deletes what is exhausted', async () => {
+      const testKind = kit.registerKind({maxAttempts: 1, whenExhausted: 'delete'});
       await kit.start();
       await kit.enqueue(testKind, {correlationKey: 'key'});
 
@@ -384,7 +378,7 @@ describe('createOutbox attempts', () => {
 
       expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
       expect(kit.store.operationIds()).toEqual([]);
-      expect(testKind.changes.at(-1)).toMatchObject({state: 'dropped'});
+      expect(testKind.changes.at(-1)).toMatchObject({state: 'deleted'});
     });
 
     it('does not retry a dead-lettered operation, and lets its lane carry on', async () => {
@@ -505,7 +499,7 @@ describe('createOutbox attempts', () => {
       kit.store.seed(
         createStoredSnapshot({
           kind: testKind.kind.name,
-          correlation: {state: 'correlated', correlationKey: 'key'},
+          correlation: correlated('key'),
           state: 'in-progress',
           attempts: 1,
         }),

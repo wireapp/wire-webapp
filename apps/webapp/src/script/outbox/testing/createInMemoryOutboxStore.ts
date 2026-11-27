@@ -37,6 +37,8 @@ export type InMemoryOutboxStore = OutboxStore & {
   failAfter: (method: StoreMethod, successfulCalls: number) => void;
   /** Makes `append` answer `storage-full`, until `false` clears it */
   fill: (isFull: boolean) => void;
+  /** Makes `loadLatest` report that many operations as quarantined by the store itself, on top of what it loads */
+  quarantine: (count: number) => void;
   /** Makes every call of the method reject, until `undefined` clears it */
   rejectWith: (method: StoreMethod, error: Error | undefined) => void;
   /** Every call, in the order it was made, whether it was answered or not */
@@ -51,6 +53,7 @@ export function createInMemoryOutboxStore(): InMemoryOutboxStore {
   const allowances = new Map<StoreMethod, number>();
   const rejections = new Map<StoreMethod, Error>();
   let isFull = false;
+  let quarantinedCount = 0;
   const calls: StoreCall[] = [];
 
   /** Records the call, then rejects or fails it if the test says so */
@@ -81,7 +84,7 @@ export function createInMemoryOutboxStore(): InMemoryOutboxStore {
           operations: [...snapshotsByOperation.values()].flatMap(snapshots => {
             return snapshots.slice(-1);
           }),
-          quarantinedCount: 0,
+          quarantinedCount,
         }
       );
     },
@@ -126,6 +129,9 @@ export function createInMemoryOutboxStore(): InMemoryOutboxStore {
     },
     fill(full) {
       isFull = full;
+    },
+    quarantine(count) {
+      quarantinedCount = count;
     },
     rejectWith(method, error) {
       if (error !== undefined) {

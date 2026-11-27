@@ -17,7 +17,7 @@
  *
  */
 
-import {createOutboxTestKit, createStoredSnapshot, type OutboxTestKit} from './testing/createOutboxTestKit';
+import {correlated, createOutboxTestKit, createStoredSnapshot, type OutboxTestKit} from './testing/createOutboxTestKit';
 
 describe('createOutbox lifecycle', () => {
   let kit: OutboxTestKit;
@@ -55,6 +55,18 @@ describe('createOutbox lifecycle', () => {
 
       expect(kit.outbox.register({...kind, name: 'late'})).toEqual({outcome: 'outbox-already-started'});
       await starting;
+    });
+
+    it('registers a kind after stop, which the next start runs', async () => {
+      kit.registerKind();
+      await kit.start();
+      await kit.outbox.stop();
+
+      const lateKind = kit.registerKind();
+      await kit.start();
+      await kit.enqueue(lateKind);
+
+      expect(lateKind.attempts).toHaveLength(1);
     });
   });
 
@@ -104,9 +116,7 @@ describe('createOutbox lifecycle', () => {
 
     it('starts again after a storage failure', async () => {
       const testKind = kit.registerKind();
-      kit.store.seed(
-        createStoredSnapshot({kind: testKind.kind.name, correlation: {state: 'correlated', correlationKey: 'stored'}}),
-      );
+      kit.store.seed(createStoredSnapshot({kind: testKind.kind.name, correlation: correlated('stored')}));
       kit.store.fail('loadLatest', true);
       await kit.outbox.start();
       kit.store.fail('loadLatest', false);
@@ -174,7 +184,8 @@ describe('createOutbox lifecycle', () => {
       });
       expect(await kit.outbox.hold('key')).toEqual({outcome: 'outbox-not-started'});
       expect(await kit.outbox.release('key')).toEqual({outcome: 'outbox-not-started'});
-      expect(await kit.outbox.drop('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(await kit.outbox.deadLetter('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(await kit.outbox.delete('key')).toEqual({outcome: 'outbox-not-started'});
     });
 
     it('answers every read outbox-not-started before the start', () => {
@@ -193,7 +204,7 @@ describe('createOutbox lifecycle', () => {
       expect(await handle.enqueue({payload: {text: 'early'}, correlationKey: 'key'})).toEqual({
         outcome: 'outbox-not-started',
       });
-      expect(await kit.outbox.drop('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(await kit.outbox.delete('key')).toEqual({outcome: 'outbox-not-started'});
       await starting;
     });
   });
@@ -377,7 +388,8 @@ describe('createOutbox lifecycle', () => {
       expect(await testKind.handle.enqueue({payload: {text: 'late'}})).toEqual({outcome: 'outbox-not-started'});
       expect(await kit.outbox.hold('key')).toEqual({outcome: 'outbox-not-started'});
       expect(await kit.outbox.release('key')).toEqual({outcome: 'outbox-not-started'});
-      expect(await kit.outbox.drop('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(await kit.outbox.deadLetter('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(await kit.outbox.delete('key')).toEqual({outcome: 'outbox-not-started'});
       expect(testKind.handle.find('key')).toEqual({outcome: 'outbox-not-started'});
       expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'outbox-not-started'});
       expect(kit.outbox.lane('lane')).toEqual({outcome: 'outbox-not-started'});
@@ -470,13 +482,15 @@ describe('createOutbox lifecycle', () => {
       });
       await kit.outbox.hold('missing');
       await kit.outbox.release('missing');
-      await kit.outbox.drop('private-key-1');
+      await kit.outbox.deadLetter('private-key-1');
+      await kit.outbox.delete('private-key-1');
       await kit.outbox.stop();
 
       expect(kit.logger.entriesOf('enqueue')[0].attributes).toMatchObject({outcome: 'operation-queued'});
       expect(kit.logger.entriesOf('hold')[0].attributes).toMatchObject({outcome: 'operation-not-found'});
       expect(kit.logger.entriesOf('release')[0].attributes).toMatchObject({outcome: 'operation-not-found'});
-      expect(kit.logger.entriesOf('drop')[0].attributes).toMatchObject({outcome: 'operation-dropped'});
+      expect(kit.logger.entriesOf('deadLetter')[0].attributes).toMatchObject({outcome: 'operation-dead-lettered'});
+      expect(kit.logger.entriesOf('delete')[0].attributes).toMatchObject({outcome: 'operation-deleted'});
       expect(kit.logger.entriesOf('start')[0].attributes).toMatchObject({outcome: 'outbox-started'});
       expect(kit.logger.entriesOf('stop')).toHaveLength(1);
       const logged = JSON.stringify(kit.logger.entries);

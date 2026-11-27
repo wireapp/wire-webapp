@@ -18,6 +18,7 @@
  */
 
 import {
+  correlated,
   createOutboxTestKit,
   createStoredSnapshot,
   type OutboxTestKit,
@@ -49,10 +50,10 @@ const succeeded: Ending['answers'] = {
   hold: answered('operation-succeeded', 'succeeded'),
   release: answered('operation-succeeded', 'succeeded'),
 };
-const dropped: Ending['answers'] = {
-  enqueue: answered('operation-dropped', 'dropped'),
-  hold: answered('operation-dropped', 'dropped'),
-  release: answered('operation-dropped', 'dropped'),
+const deleted: Ending['answers'] = {
+  enqueue: answered('operation-deleted', 'deleted'),
+  hold: answered('operation-deleted', 'deleted'),
+  release: answered('operation-deleted', 'deleted'),
 };
 const queuedAgain: Ending['answers'] = {
   enqueue: answered('operation-versioned', 'queued'),
@@ -97,7 +98,7 @@ const failures: Pick<Ending, 'name' | 'kindOptions' | 'end'>[] = [
 const limits: {name: string; kindOptions: KindOptions; answers: Ending['answers']}[] = [
   {name: 'with attempts left', kindOptions: {maxAttempts: 2}, answers: queuedAgain},
   {name: 'without attempts left, dead-lettering', kindOptions: {maxAttempts: 1}, answers: deadLettered},
-  {name: 'without attempts left, dropping', kindOptions: {maxAttempts: 1, whenGivenUp: 'drop'}, answers: dropped},
+  {name: 'without attempts left, deleting', kindOptions: {maxAttempts: 1, whenExhausted: 'delete'}, answers: deleted},
 ];
 
 const endings: Ending[] = [
@@ -128,12 +129,12 @@ const endings: Ending[] = [
     answers: deadLettered,
   },
   {
-    name: 'dropped',
+    name: 'deleted',
     kindOptions: {},
     end: async (_, testKind) => {
-      return testKind.lastAttempt().answer({outcome: 'attempt-dropped'});
+      return testKind.lastAttempt().answer({outcome: 'attempt-deleted'});
     },
-    answers: dropped,
+    answers: deleted,
   },
   {
     name: 'held',
@@ -288,8 +289,7 @@ describe('createOutbox commands on an operation with an attempt running', () => 
   });
 
   describe('several commands waiting for the same attempt', () => {
-    // A version is parked after the holds and releases called later: it is parsed before it takes its place
-    it.skip('are applied in the order they were called, a version among them', async () => {
+    it('are applied in the order they were called, a version among them', async () => {
       const testKind = await startWithRunningAttempt({maxAttempts: 2});
       const pending = [
         call(testKind, 'hold'),
@@ -357,8 +357,8 @@ describe('createOutbox commands on an operation with an attempt running', () => 
     });
   });
 
-  describe('a drop', () => {
-    it('does not wait: it aborts the attempt and answers the waiting commands operation-dropped', async () => {
+  describe('a delete', () => {
+    it('does not wait: it aborts the attempt and answers the waiting commands operation-deleted', async () => {
       const testKind = await startWithRunningAttempt();
       const pending = COMMANDS.map(command => {
         return call(testKind, command);
@@ -366,21 +366,21 @@ describe('createOutbox commands on an operation with an attempt running', () => 
       await kit.clock.settle();
       const {signal} = testKind.lastAttempt();
 
-      const dropResult = await kit.outbox.drop('key');
+      const deleteResult = await kit.outbox.delete('key');
 
-      expect(dropResult).toMatchObject({outcome: 'operation-dropped', operation: {payload: {text: 'hello'}}});
+      expect(deleteResult).toMatchObject({outcome: 'operation-deleted', operation: {payload: {text: 'hello'}}});
       expect(signal.aborted).toBe(true);
       expect(await settleAll(pending)).toMatchObject([
-        {outcome: 'operation-dropped'},
-        {outcome: 'operation-dropped'},
-        {outcome: 'operation-dropped'},
+        {outcome: 'operation-deleted'},
+        {outcome: 'operation-deleted'},
+        {outcome: 'operation-deleted'},
       ]);
       expect(kit.store.operationIds()).toEqual([]);
     });
 
     it('ignores what the aborted attempt answers afterwards', async () => {
       const testKind = await startWithRunningAttempt();
-      await kit.outbox.drop('key');
+      await kit.outbox.delete('key');
 
       await testKind.lastAttempt().answer({outcome: 'attempt-succeeded'});
 
@@ -388,14 +388,14 @@ describe('createOutbox commands on an operation with an attempt running', () => 
         testKind.changes.map(({state}) => {
           return state;
         }),
-      ).toEqual(['queued', 'in-progress', 'dropped']);
+      ).toEqual(['queued', 'in-progress', 'deleted']);
     });
 
     it('lets the next operation of the lane run', async () => {
       const testKind = await startWithRunningAttempt();
       await kit.enqueue(testKind, {correlationKey: 'behind', laneKey: 'lane'});
 
-      await kit.outbox.drop('key');
+      await kit.outbox.delete('key');
       await kit.clock.settle();
 
       expect(
@@ -403,6 +403,64 @@ describe('createOutbox commands on an operation with an attempt running', () => 
           return operation.id;
         }),
       ).toEqual(['operation-1', 'operation-2']);
+    });
+
+    it('keeps the call order: a command parked before it answers operation-deleted, one called after it applies to what is left', async () => {
+      const testKind = await startWithRunningAttempt();
+      const held = call(testKind, 'hold');
+      const deleteResult = kit.outbox.delete('key');
+      const enqueued = call(testKind, 'enqueue', 'again');
+
+      expect(await settleAll([held, {answer: deleteResult}, enqueued])).toMatchObject([
+        {outcome: 'operation-deleted'},
+        {outcome: 'operation-deleted'},
+        {outcome: 'operation-queued', operation: {id: 'operation-2', payload: {text: 'again'}}},
+      ]);
+    });
+  });
+
+  describe('a dead-lettering', () => {
+    it('does not wait: it aborts the attempt, then applies the waiting commands to the dead-lettered operation', async () => {
+      const testKind = await startWithRunningAttempt();
+      const pending = COMMANDS.map(command => {
+        return call(testKind, command);
+      });
+      await kit.clock.settle();
+      const {signal} = testKind.lastAttempt();
+
+      expect(await kit.outbox.deadLetter('key')).toMatchObject({
+        outcome: 'operation-dead-lettered',
+        operation: {state: 'dead-lettered'},
+      });
+      expect(signal.aborted).toBe(true);
+      expect(await settleAll(pending)).toMatchObject([
+        {outcome: 'operation-versioned', operation: {state: 'queued'}},
+        {outcome: 'operation-held'},
+        {outcome: 'operation-released'},
+      ]);
+    });
+
+    it('ignores what the aborted attempt answers afterwards', async () => {
+      const testKind = await startWithRunningAttempt();
+      await kit.outbox.deadLetter('key');
+
+      await testKind.lastAttempt().answer({outcome: 'attempt-succeeded'});
+
+      expect(kit.operation('key').state).toBe('dead-lettered');
+      expect(kit.triggersOf('operation-1')).toEqual(['operation-queued', 'attempt-started', 'operation-dead-lettered']);
+    });
+
+    it('keeps the call order: a command parked before it is refused, one called after it revives the operation', async () => {
+      const testKind = await startWithRunningAttempt();
+      const held = call(testKind, 'hold');
+      const deadLetterResult = kit.outbox.deadLetter('key');
+      const enqueued = call(testKind, 'enqueue', 'again');
+
+      expect(await settleAll([held, {answer: deadLetterResult}, enqueued])).toMatchObject([
+        {outcome: 'transition-refused', trigger: 'operation-held', operation: {state: 'dead-lettered'}},
+        {outcome: 'operation-dead-lettered'},
+        {outcome: 'operation-versioned', operation: {id: 'operation-1', state: 'queued'}},
+      ]);
     });
   });
 
@@ -424,7 +482,7 @@ describe('createOutbox commands on an operation with an attempt running', () => 
       kit.store.seed(
         createStoredSnapshot({
           kind: testKind.kind.name,
-          correlation: {state: 'correlated', correlationKey: 'key'},
+          correlation: correlated('key'),
           state: 'in-progress',
           attempts: 1,
         }),

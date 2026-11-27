@@ -29,7 +29,9 @@ import type {
   Expiry,
   Kind,
   Lane,
+  Cascade,
   LaneMembership,
+  LaneSetting,
   OperationData,
   OperationSnapshot,
   OperationState,
@@ -40,11 +42,13 @@ import type {
   Trigger,
 } from './types';
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 // Kind and configuration, resolved once at the edge
 
-type WhenGivenUp = 'dead-letter' | 'drop';
+type WhenExhausted = 'dead-letter' | 'delete';
+type EndedState = 'dead-lettered' | 'deleted';
+export type LaneSettings = Record<EndedState, LaneSetting>;
 export type ExpiryLimit = State<'expires-after', {milliseconds: number}> | State<'never-expires'>;
 
 export type ResolvedKind = {
@@ -53,8 +57,8 @@ export type ResolvedKind = {
   expiresAfter: ExpiryLimit;
   attemptTimeout: AttemptTimeout;
   maxAttempts: number;
-  whenGivenUp: WhenGivenUp;
-  laneWhenGivenUp: 'continues' | 'follows';
+  whenExhausted: WhenExhausted;
+  laneWhenEnded: LaneSettings;
   attempt: (operation: OperationView, signal: AbortSignal) => Promise<AttemptOutcome>;
   onChanged: (operation: OperationView) => void;
 };
@@ -86,8 +90,11 @@ export function resolveKind<Payload>(kind: Kind<Payload>): ResolvedKind {
     expiresAfter: expiryLimitOf(kind.expiresAfterMilliseconds),
     attemptTimeout: attemptTimeoutOf(kind.attemptTimeoutMilliseconds, {state: 'never-times-out'}),
     maxAttempts: kind.maxAttempts ?? DEFAULT_MAX_ATTEMPTS,
-    whenGivenUp: kind.whenGivenUp ?? 'dead-letter',
-    laneWhenGivenUp: kind.laneWhenGivenUp ?? 'continues',
+    whenExhausted: kind.whenExhausted ?? 'dead-letter',
+    laneWhenEnded: {
+      'dead-lettered': kind.laneWhenDeadLettered ?? 'continues',
+      deleted: kind.laneWhenDeleted ?? 'continues',
+    },
     attempt: kind.attempt,
     onChanged: kind.onChanged ?? noop,
   };
@@ -109,9 +116,9 @@ export type TargetResolved = Outcome<'target-resolved', {target: OperationState}
 export type TargetRefused = Outcome<'target-refused'>;
 
 /** What the table's rules read: the operation's attempts and its kind's limits */
-export type TransitionContext = {attempts: number; maxAttempts: number; whenGivenUp: WhenGivenUp};
+export type TransitionContext = {attempts: number; maxAttempts: number; whenExhausted: WhenExhausted};
 
-type Rule = OperationState | 'given-up' | 'retried-or-given-up';
+type Rule = OperationState | 'exhausted' | 'retried-or-exhausted';
 
 const STATE_TABLE: Record<OperationState | 'initial', Partial<Record<Trigger, Rule>>> = {
   initial: {'operation-queued': 'queued'},
@@ -119,36 +126,39 @@ const STATE_TABLE: Record<OperationState | 'initial', Partial<Record<Trigger, Ru
     'attempt-started': 'in-progress',
     'operation-versioned': 'queued',
     'operation-held': 'on-hold',
-    'operation-expired': 'given-up',
-    'operation-dropped': 'dropped',
+    'operation-expired': 'exhausted',
+    'operation-dead-lettered': 'dead-lettered',
+    'operation-deleted': 'deleted',
     'lane-dead-lettered': 'dead-lettered',
-    'lane-dropped': 'dropped',
+    'lane-deleted': 'deleted',
   },
   'on-hold': {
     'operation-released': 'queued',
     'operation-versioned': 'queued',
-    'operation-expired': 'given-up',
-    'operation-dropped': 'dropped',
+    'operation-expired': 'exhausted',
+    'operation-dead-lettered': 'dead-lettered',
+    'operation-deleted': 'deleted',
     'lane-dead-lettered': 'dead-lettered',
-    'lane-dropped': 'dropped',
+    'lane-deleted': 'deleted',
   },
   'in-progress': {
     'attempt-succeeded': 'succeeded',
-    'attempt-failed': 'retried-or-given-up',
-    'attempt-timed-out': 'retried-or-given-up',
-    'attempt-errored': 'retried-or-given-up',
-    'attempt-interrupted': 'retried-or-given-up',
+    'attempt-failed': 'retried-or-exhausted',
+    'attempt-timed-out': 'retried-or-exhausted',
+    'attempt-errored': 'retried-or-exhausted',
+    'attempt-interrupted': 'retried-or-exhausted',
     'attempt-held': 'on-hold',
     'attempt-dead-lettered': 'dead-lettered',
-    'attempt-dropped': 'dropped',
-    'operation-dropped': 'dropped',
+    'attempt-deleted': 'deleted',
+    'operation-dead-lettered': 'dead-lettered',
+    'operation-deleted': 'deleted',
   },
-  'dead-lettered': {'operation-versioned': 'queued', 'operation-dropped': 'dropped'},
+  'dead-lettered': {'operation-versioned': 'queued', 'operation-deleted': 'deleted'},
   succeeded: {},
-  dropped: {},
+  deleted: {},
 };
 
-const GIVEN_UP_AS: Record<WhenGivenUp, OperationState> = {'dead-letter': 'dead-lettered', drop: 'dropped'};
+const EXHAUSTED_AS: Record<WhenExhausted, EndedState> = {'dead-letter': 'dead-lettered', delete: 'deleted'};
 
 export function resolveTarget(
   from: OperationState | 'initial',
@@ -160,11 +170,11 @@ export function resolveTarget(
     return {outcome: 'target-refused'};
   }
   const target = match(rule)
-    .with('given-up', () => {
-      return GIVEN_UP_AS[context.whenGivenUp];
+    .with('exhausted', () => {
+      return EXHAUSTED_AS[context.whenExhausted];
     })
-    .with('retried-or-given-up', () => {
-      return context.attempts < context.maxAttempts ? 'queued' : GIVEN_UP_AS[context.whenGivenUp];
+    .with('retried-or-exhausted', () => {
+      return context.attempts < context.maxAttempts ? 'queued' : EXHAUSTED_AS[context.whenExhausted];
     })
     .otherwise(state => {
       return state;
@@ -172,47 +182,62 @@ export function resolveTarget(
   return {outcome: 'target-resolved', target};
 }
 
-export const isFinal = isInState('succeeded', 'dropped');
+export const isFinal = isInState('succeeded', 'deleted');
 
 // Lane follows
 
-type GivenUpState = 'dead-lettered' | 'dropped';
-
-const isGivenUp = (state: OperationState): state is GivenUpState => {
-  return state === 'dead-lettered' || state === 'dropped';
+const isEnded = (state: OperationState): state is EndedState => {
+  return state === 'dead-lettered' || state === 'deleted';
 };
 
-const LANE_TRIGGERS: readonly Trigger[] = ['lane-dead-lettered', 'lane-dropped'];
+const LANE_TRIGGERS: readonly Trigger[] = ['lane-dead-lettered', 'lane-deleted'];
+
+const LANE_TRIGGER_FOR = {'dead-lettered': 'lane-dead-lettered', deleted: 'lane-deleted'} as const;
 
 /**
- * The operations of the same kind behind one that is given up end the same way when the kind's lane follows,
- * whoever gave it up: its attempt, its expiry or the owner's drop. Never for the cascade's own lane-* triggers,
- * and never from an operation already dead-lettered, which no longer blocks its lane.
+ * Decides, as an operation is dead-lettered or deleted, whether the operations of its kind behind it end the same
+ * way: as `laneWhenEnded` says for that ending, whoever ended it. Never for the cascade's own lane-* triggers, and
+ * never from an operation already dead-lettered, which no longer blocks its lane.
  */
-export function doesLaneFollow(
+export function decideCascade(
   from: OperationState | 'initial',
   trigger: Trigger,
   target: OperationState,
-  kind: ResolvedKind,
-): target is GivenUpState {
-  return (
-    kind.laneWhenGivenUp === 'follows' &&
-    isGivenUp(target) &&
-    from !== 'dead-lettered' &&
-    !LANE_TRIGGERS.includes(trigger)
-  );
+  laneWhenEnded: LaneSettings,
+): Cascade {
+  if (!isEnded(target)) {
+    return {state: 'none'};
+  }
+  const follows = laneWhenEnded[target] === 'follows' && from !== 'dead-lettered' && !LANE_TRIGGERS.includes(trigger);
+  return follows ? {state: 'pending', trigger: LANE_TRIGGER_FOR[target]} : {state: 'none'};
 }
 
-const LANE_TRIGGER_FOR: Record<GivenUpState, Trigger> = {
-  'dead-lettered': 'lane-dead-lettered',
-  dropped: 'lane-dropped',
-};
+type PendingCascade = Extract<Cascade, State<'pending'>>;
+export type CascadingOperation = OperationSnapshot & {cascade: PendingCascade};
 
-export function laneTriggerFor(target: GivenUpState): Trigger {
-  return LANE_TRIGGER_FOR[target];
+/** Whether the operations behind it, stored with its ending, are still to be ended */
+export function isCascadePending<Operation extends OperationData>(
+  operation: Operation,
+): operation is Operation & {cascade: PendingCascade} {
+  return isInState('pending')(operation.cascade);
 }
 
 // Operation data
+
+const VIEW_KEYS = ['state', 'id', 'kind', 'payload', 'correlation', 'lane', 'queuedAt', 'attempts'] as const;
+
+function pick<Value extends object, Key extends keyof Value>(value: Value, keys: readonly Key[]): Pick<Value, Key> {
+  return Object.fromEntries(
+    keys.map(key => {
+      return [key, value[key]];
+    }),
+  ) as Pick<Value, Key>;
+}
+
+/** What the kernel hands out of an operation: never what only the kernel reads */
+export function toView(operation: OperationView): OperationView {
+  return Object.freeze(pick(operation, VIEW_KEYS));
+}
 
 function expiryFrom(limit: ExpiryLimit, serverTime: number): Expiry {
   return match(limit)
@@ -275,6 +300,7 @@ export function newOperationData(
     queuedSeq: place.queuedSeq,
     expiry: expiryFrom(requestedExpiryLimit(request, kind), place.serverTime),
     limits: {attemptTimeout: attemptTimeoutOf(request.attemptTimeoutMilliseconds, kind.attemptTimeout)},
+    cascade: {state: 'none'},
   };
 }
 
@@ -331,15 +357,18 @@ const LANE_STATE: Record<OperationState, Lane['state']> = {
   'in-progress': 'moving',
   'dead-lettered': 'moving',
   succeeded: 'moving',
-  dropped: 'moving',
+  deleted: 'moving',
 };
 
-/** An operation that is dead-lettered doesn't block its lane, so it isn't in one */
+/**
+ * An operation that is dead-lettered doesn't block its lane, so it isn't in one. One that is still ending the
+ * operations behind it, dead-lettered or deleted, blocks it until they have ended.
+ */
 function operationsByLane(operations: Iterable<OperationSnapshot>): Map<string, OperationSnapshot[]> {
   const laned = [...operations]
     .filter(isLaned)
     .filter(operation => {
-      return !isInState('dead-lettered')(operation);
+      return !isInState('dead-lettered')(operation) || isCascadePending(operation);
     })
     .toSorted(byQueuedSeq);
   return Map.groupBy(laned, operation => {
@@ -350,26 +379,26 @@ function operationsByLane(operations: Iterable<OperationSnapshot>): Map<string, 
 export function lanesOf(operations: Iterable<OperationSnapshot>): Map<string, Lane> {
   return new Map(
     [...operationsByLane(operations)].map(([laneKey, inLane]): [string, Lane] => {
-      return [laneKey, {state: LANE_STATE[inLane[0].state], laneKey, operations: inLane}];
+      return [laneKey, {state: LANE_STATE[inLane[0].state], laneKey, operations: inLane.map(toView)}];
     }),
   );
 }
 
 /**
- * The operations a giving up reaches when its kind's lane follows it: those of the same kind behind it in its lane,
+ * The operations an ending reaches when its lane follows it: those of the same kind behind it in its lane,
  * queued or on hold, in lane order. Operations of other kinds, in other lanes or without one, are not reached.
  */
 export function findOperationFollowers(operations: Iterable<OperationSnapshot>) {
-  return (givenUp: OperationData): OperationSnapshot[] => {
+  return (ended: OperationData): OperationSnapshot[] => {
     const isWaiting = isInState('queued', 'on-hold');
     return [...operations]
       .filter(operation => {
         return (
           isWaiting(operation) &&
-          operation.kind === givenUp.kind &&
-          operation.queuedSeq > givenUp.queuedSeq &&
-          isInLane(givenUp.lane) &&
-          isSameLane(operation.lane, givenUp.lane)
+          operation.kind === ended.kind &&
+          operation.queuedSeq > ended.queuedSeq &&
+          isInLane(ended.lane) &&
+          isSameLane(operation.lane, ended.lane)
         );
       })
       .toSorted(byQueuedSeq);
