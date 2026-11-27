@@ -19,7 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {CallingCell} from '../../../components/calling/CallingCell';
+import {CallingCell} from '../../../components/calling/callingCell';
 import * as Icon from '../../../components/icon';
 import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
 import {Config} from '../../../Config';

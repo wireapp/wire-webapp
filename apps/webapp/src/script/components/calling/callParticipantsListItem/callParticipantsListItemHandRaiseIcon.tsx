@@ -1,0 +1,75 @@
+/*
+ * Wire
+ * Copyright (C) 2024 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {useEffect, useState} from 'react';
+
+import type {JSX} from '@emotion/react/jsx-runtime';
+
+import {toolTipStyles} from './callParticipantsListItemHandRaiseIcon.styles';
+
+import {TimeInMillis} from '../../../commons/util/TimeUtil';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {InviteIcon} from '../../../uiKit/dataDisplay/icon/inviteIcon';
+import {Tooltip} from '../../../uiKit/dataDisplay/tooltip/tooltip';
+import {formatDuration} from '../../../util/timeUtil';
+
+interface CallParticipantsListItemHandRaiseIconProps {
+  handRaisedAt: number;
+}
+
+export function CallParticipantsListItemHandRaiseIcon({
+  handRaisedAt,
+}: CallParticipantsListItemHandRaiseIconProps): JSX.Element | null {
+  const {translate} = useApplicationContext();
+  const [duration, setDuration] = useState<string>();
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      setDuration(formatDuration(Date.now() - handRaisedAt + TimeInMillis.SECOND, translate).text);
+    }, TimeInMillis.SECOND);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  });
+
+  if (duration === undefined || duration === '') {
+    return null;
+  }
+
+  return (
+    <>
+      <Tooltip
+        body={
+          <div css={toolTipStyles}>
+            <InviteIcon />
+            <span>
+              {translate('videoCallParticipantRaisedHandRaiseDuration', {
+                duration,
+              })}
+            </span>
+          </div>
+        }
+        data-uie-name="hand-raised-at"
+      >
+        ✋
+      </Tooltip>
+    </>
+  );
+}

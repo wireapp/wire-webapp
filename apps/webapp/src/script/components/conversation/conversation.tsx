@@ -93,7 +93,7 @@ import {safeMailOpen, safeWindowOpen} from '../../util/sanitizationUtil';
 import {formatBytes} from '../../util/util';
 import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
-import {CallingCell} from '../calling/CallingCell';
+import {CallingCell} from '../calling/callingCell';
 import {Giphy} from '../giphy';
 import {InputBar} from '../inputBar';
 import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';

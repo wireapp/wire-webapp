@@ -44,7 +44,7 @@ import {
 } from '../../page/testSupport/rootContextTestSupport';
 import {translate} from '../../util/localizerUtil';
 
-import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
+import {FullscreenVideoCall, FullscreenVideoCallProps} from './fullscreenVideoCall';
 import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
 import {KEY} from '../../util/keyboardUtil';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';

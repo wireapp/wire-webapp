@@ -1,0 +1,170 @@
+/*
+ * Wire
+ * Copyright (C) 2024 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import React, {type FunctionComponent} from 'react';
+
+import cx from 'classnames';
+
+import {
+  headerStyles,
+  labelStyles,
+  labelWithIconStyles,
+  participantListWrapperStyles,
+} from './callingParticipantList.styles';
+
+import {useApplicationContext} from '../../../../page/rootProvider';
+import {CallingRepository} from '../../../../repositories/calling/CallingRepository';
+import {Participant} from '../../../../repositories/calling/Participant';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContextMenuEntry, showContextMenu} from '../../../../ui/contextMenu';
+import {Tooltip} from '../../../../uiKit/dataDisplay/tooltip/tooltip';
+import {sortUsersByPriority} from '../../../../util/stringUtil';
+import {FadingScrollbar} from '../../../fadingScrollbar';
+import * as Icon from '../../../icon';
+import {CallParticipantsListItem} from '../../callParticipantsListItem';
+
+interface CallingParticipantListProps {
+  callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;
+  conversation: Conversation;
+  isModerator?: boolean;
+  isSelfVerified?: boolean;
+  participants: Participant[];
+  handRaisedParticipants: Participant[];
+  showParticipants?: boolean;
+  onClose: () => void;
+}
+
+export const CallingParticipantList: FunctionComponent<CallingParticipantListProps> = ({
+  callingRepository,
+  conversation,
+  isModerator,
+  isSelfVerified,
+  participants,
+  handRaisedParticipants,
+  showParticipants,
+  onClose,
+}: CallingParticipantListProps) => {
+  const {translate} = useApplicationContext();
+
+  const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant): void => {
+    event.preventDefault();
+
+    const muteParticipant = {
+      click: () => {
+        return callingRepository.sendModeratorMute(conversation.qualifiedId, [participant]);
+      },
+      icon: Icon.MicOffIcon,
+      identifier: `moderator-mute-participant`,
+      isDisabled: participant.isMuted(),
+      label: translate('moderatorMenuEntryMute'),
+    };
+
+    const muteOthers: ContextMenuEntry = {
+      click: () => {
+        callingRepository.sendModeratorMute(
+          conversation.qualifiedId,
+          participants.filter(participantCandidate => {
+            return participantCandidate !== participant;
+          }),
+        );
+      },
+      icon: Icon.MicOffIcon,
+      identifier: 'moderator-mute-others',
+      label: translate('moderatorMenuEntryMuteAllOthers'),
+    };
+
+    const entries: ContextMenuEntry[] = [muteOthers].concat(!participant.user.isMe ? muteParticipant : []);
+    showContextMenu({event, entries, identifier: 'participant-moderator-menu'});
+  };
+
+  return (
+    <div
+      className={cx('call-ui__participant-list__wrapper', {
+        'call-ui__participant-list__wrapper--active': showParticipants,
+      })}
+      css={participantListWrapperStyles}
+    >
+      <FadingScrollbar className="call-ui__participant-list__container">
+        <div css={headerStyles}>
+          <button
+            type="button"
+            className="icon-button"
+            onClick={onClose}
+            title={translate('videoCallOverlayParticipantsListCloseButton')}
+          >
+            <Icon.CloseIcon />
+          </button>
+        </div>
+        {handRaisedParticipants.length > 0 && (
+          <>
+            <p css={labelWithIconStyles}>
+              {translate('videoCallOverlayParticipantsRaisedHandListLabel', {count: handRaisedParticipants.length})}
+              <Tooltip body={translate('videoCallParticipantRaisedSortByTime')} data-uie-name="hand-sort-info">
+                <Icon.InfoIcon />
+              </Tooltip>
+            </p>
+            <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
+              {handRaisedParticipants.map((participant, index, participantsArray) => {
+                return (
+                  <li key={participant.clientId} className="call-ui__participant-list__participant">
+                    <CallParticipantsListItem
+                      handRaisedAt={participant.handRaisedAt()}
+                      key={participant.clientId}
+                      callParticipant={participant}
+                      isSelfVerified={isSelfVerified}
+                      showContextMenu={isModerator === true}
+                      onContextMenu={event => {
+                        return getParticipantContext(event, participant);
+                      }}
+                      isLast={participantsArray.length === index}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+        <p css={labelStyles}>{translate('videoCallOverlayParticipantsListLabel', {count: participants.length})}</p>
+        <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
+          {participants
+            .slice()
+            .toSorted((participantA, participantB) => {
+              return sortUsersByPriority(participantA.user, participantB.user);
+            })
+            .map((participant, index, participantsArray) => {
+              return (
+                <li key={participant.clientId} className="call-ui__participant-list__participant">
+                  <CallParticipantsListItem
+                    key={participant.clientId}
+                    callParticipant={participant}
+                    isSelfVerified={isSelfVerified}
+                    showContextMenu={isModerator === true}
+                    onContextMenu={event => {
+                      return getParticipantContext(event, participant);
+                    }}
+                    isLast={participantsArray.length === index}
+                  />
+                </li>
+              );
+            })}
+        </ul>
+      </FadingScrollbar>
+    </div>
+  );
+};

@@ -42,9 +42,9 @@ import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
 import {isUUID} from '../auth/util/stringUtil';
-import {CallingContainer} from '../components/calling/CallingOverlayContainer';
-import {ChooseScreen} from '../components/calling/ChooseScreen';
-import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
+import {CallingContainer} from '../components/calling/callingOverlayContainer';
+import {ChooseScreen} from '../components/calling/chooseScreen';
+import {DetachedCallingCell} from '../components/calling/detachedCallingCell';
 import {ConfigToolbar} from '../components/configToolbar/configToolbar';
 import {SharedDriveUploadStatusScope} from '../components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {ErrorFallback} from '../components/errorFallback';
