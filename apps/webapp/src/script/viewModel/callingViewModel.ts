@@ -27,7 +27,7 @@ import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {QualifiedId} from '../apiClient/user/qualifiedId';
-import '../components/calling/ChooseScreen';
+import '../components/calling/chooseScreen';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {PrimaryModalTranslatedMessage} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from '../Config';

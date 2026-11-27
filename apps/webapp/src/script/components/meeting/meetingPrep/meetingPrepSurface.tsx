@@ -63,9 +63,9 @@ import {Loading} from '../../../uiKit/dataDisplay/loading/loading';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
 import {formatLocale} from '../../../util/timeUtil';
 import {Avatar, AVATAR_SIZE} from '../../avatar';
-import {groupVideoBackgroundInitializingOverlay} from '../../calling/GroupVideoGridTile.styles';
+import {groupVideoBackgroundInitializingOverlay} from '../../calling/groupVideoGridTile.styles';
 import {useShowLoadingOverlay} from '../../calling/useShowLoadingOverlay';
-import {VideoControlsSelect} from '../../calling/VideoControls/VideoControlsSelect/VideoControlsSelect';
+import {VideoControlsSelect} from '../../calling/videoControls/videoControlsSelect/videoControlsSelect';
 import {CameraIcon, CameraOffIcon, ChevronIcon, MicOffIcon, MicOnIcon} from '../../icon';
 import {NoCameraMessage} from '../../noCameraMessage';
 

@@ -27,7 +27,7 @@ import {useApplicationContext, useMainViewModel} from '../../../page/rootProvide
 import {CallState} from '../../../repositories/calling/CallState';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
-import {CallingCell} from '../../calling/CallingCell';
+import {CallingCell} from '../../calling/callingCell';
 import {useMeetingNotificationStore} from '../meetingNotificationStore/meetingNotificationStore';
 
 export const MeetingCallingView: FunctionComponent = () => {

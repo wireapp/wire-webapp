@@ -783,9 +783,9 @@ const productionConfigs = [
       'apps/webapp/src/script/components/Modals/FileHistoryModal/hooks/useFileVersions.ts',
       'apps/webapp/src/script/components/Modals/DetailViewModal/DetailViewModalFooter.tsx',
       'apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx',
-      'apps/webapp/src/script/components/calling/CallingCell/CallingCell.tsx',
-      'apps/webapp/src/script/components/calling/CallingOverlayContainer.tsx',
-      'apps/webapp/src/script/components/calling/FullscreenVideoCall.tsx',
+      'apps/webapp/src/script/components/calling/callingCell/callingCell.tsx',
+      'apps/webapp/src/script/components/calling/callingOverlayContainer.tsx',
+      'apps/webapp/src/script/components/calling/fullscreenVideoCall.tsx',
     ],
     rules: {
       '@typescript-eslint/no-floating-promises': 'error',

@@ -19,7 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {CallingCell} from '../../../../../components/calling/CallingCell';
+import {CallingCell} from '../../../../../components/calling/callingCell';
 import {Call} from '../../../../../repositories/calling/Call';
 import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 import {ListViewModel} from '../../../../../viewModel/listViewModel';

@@ -25,7 +25,7 @@ import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {renderMessage} from '../../../util/messageRenderer';
 import {RestrictedVideo} from '../../asset/RestrictedVideo';
-import {ParticipantMicOnIcon} from '../../calling/ParticipantMicOnIcon';
+import {ParticipantMicOnIcon} from '../../calling/participantMicOnIcon';
 import * as Icon from '../../icon';
 import {AssetImage} from '../../image';
 import {MultipartAssetPreview} from '../../messagesList/message/contentMessage/asset/multipartAssetPreview';
