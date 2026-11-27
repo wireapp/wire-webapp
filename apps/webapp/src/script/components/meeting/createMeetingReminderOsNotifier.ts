@@ -155,6 +155,10 @@ export const createMeetingReminderOsNotifier = ({
       }
 
       openNotifications.set(tag, shownNotification.value);
+      logger.info('meeting reminder OS notification presented', {
+        meetingId: payload.qualifiedId.id,
+        meetingStartTime: payload.meetingStartTime,
+      });
     },
     stop: () => {
       for (const tag of [...openNotifications.keys()]) {

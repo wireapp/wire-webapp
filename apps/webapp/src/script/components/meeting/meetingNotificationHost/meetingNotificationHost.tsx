@@ -56,7 +56,7 @@ export const MeetingNotificationHost: FunctionComponent<MeetingNotificationHostP
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    logger.debug('meeting notification host count changed', {isStandalone, notificationCount: notifications.length});
+    logger.info('meeting notification host count changed', {isStandalone, notificationCount: notifications.length});
   }, [isStandalone, notifications.length]);
 
   useEffect(() => {
