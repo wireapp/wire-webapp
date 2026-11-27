@@ -24,10 +24,13 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {$getRoot, $setSelection} from 'lexical';
 
-import {getMentionMarkdownTransformer} from './getMentionMarkdownTransformer/getMentionMarkdownTransformer';
+import {
+  getEveryoneMentionMarkdownTransformer,
+  getMentionMarkdownTransformer,
+} from './getMentionMarkdownTransformer/getMentionMarkdownTransformer';
 import {getMentionNodesFromMessage} from './getMentionNodesFromMessage/getMentionNodesFromMessage';
 import {getRawMarkdownNodesWithMentions} from './getRawMarkdownFromMessage/getRawMarkdownFromMessage';
-import {wrapMentionsWithTags} from './wrapMentionsWithTags/wrapMentionsWithTags';
+import {wrapEveryoneMentionsWithTags, wrapMentionsWithTags} from './wrapMentionsWithTags/wrapMentionsWithTags';
 
 import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import {markdownTransformers} from '../../utils/markdownTransformers';
@@ -62,19 +65,28 @@ export function EditedMessagePlugin({message, showMarkdownPreview}: Props): null
           }
           const messageContent = firstAsset.text;
 
+          // Mentions of everyone are wrapped by their exact range, before user mentions change the text.
+          const mentionEntities = firstAsset.isText() || firstAsset.isMultipart() ? firstAsset.mentions() : [];
+          const withEveryoneMentionTags = wrapEveryoneMentionsWithTags(messageContent, mentionEntities);
+
           const mentionNodes = getMentionNodesFromMessage(message);
 
           const allowedMentions = [
             ...new Set(
-              mentionNodes.map(node => {
-                return node.getTextContent();
-              }),
+              mentionNodes
+                .filter(node => {
+                  return !node.isEveryone();
+                })
+                .map(node => {
+                  return node.getTextContent();
+                }),
             ),
           ];
 
-          const wrappedWithTags = wrapMentionsWithTags(messageContent, allowedMentions);
+          const wrappedWithTags = wrapMentionsWithTags(withEveryoneMentionTags, allowedMentions);
 
           const mentionMarkdownTransformer = getMentionMarkdownTransformer(allowedMentions);
+          const everyoneMentionMarkdownTransformer = getEveryoneMentionMarkdownTransformer();
 
           // Text comes from the message is in the raw markdown format, we need to convert it to the editor format (preview), display **bold** as bold, etc.
           // The below function do that by getting the text, and transofrming it to the desired format.
@@ -83,7 +95,7 @@ export function EditedMessagePlugin({message, showMarkdownPreview}: Props): null
           // One way of overcoming this issue is to use a custom transformer (quite a hacky way). Transformers are responisble for converting the text to the desired format (e.g. **bold** to bold).
           $convertFromMarkdownString(
             wrappedWithTags,
-            [mentionMarkdownTransformer, ...markdownTransformers],
+            [everyoneMentionMarkdownTransformer, mentionMarkdownTransformer, ...markdownTransformers],
             undefined,
             true,
           );

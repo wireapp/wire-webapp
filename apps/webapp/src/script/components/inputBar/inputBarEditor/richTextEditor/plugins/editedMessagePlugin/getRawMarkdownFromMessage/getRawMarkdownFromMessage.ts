@@ -31,7 +31,7 @@ export const getRawMarkdownNodesWithMentions = (message: ContentMessage): Paragr
 
   const paragraphs = nodes.map(node => {
     if (node.type === 'Mention') {
-      return $createMentionNode('@', node.data.slice(1));
+      return $createMentionNode('@', node.data.slice(1), node.isEveryone === true);
     }
 
     return $createTextNode(node.data);
