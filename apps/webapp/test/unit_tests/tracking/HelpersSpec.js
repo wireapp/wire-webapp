@@ -19,7 +19,7 @@
 
 import {CONVERSATION_TYPE} from '../../../src/script/apiClient/conversation/conversation';
 
-import {Conversation} from '../../../src/script/repositories/entity/Conversation';
+import {Conversation} from '../../../src/script/repositories/entity/conversation';
 import {ConversationType as ConversationTypeAttribute} from '../../../src/script/repositories/tracking/attribute';
 import * as trackingHelpers from '../../../src/script/repositories/tracking/helpers';
 import {createUuid} from '../../../src/script/util/uuid';

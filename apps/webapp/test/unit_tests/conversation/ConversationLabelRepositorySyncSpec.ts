@@ -23,8 +23,8 @@ import {
   ConversationLabelRepository,
   LabelType,
   createLabel,
-} from '../../../src/script/repositories/conversation/ConversationLabelRepository';
-import {Conversation} from '../../../src/script/repositories/entity/Conversation';
+} from '../../../src/script/repositories/conversation/conversationLabelRepository';
+import {Conversation} from '../../../src/script/repositories/entity/conversation';
 import {PropertiesService} from '../../../src/script/repositories/properties/propertiesService';
 import {SidebarTabs, useSidebarStore} from '../../../src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {translate} from '../../../src/script/util/localizerUtil';

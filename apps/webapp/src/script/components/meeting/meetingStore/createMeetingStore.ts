@@ -23,7 +23,7 @@ import {createStore, type StoreApi} from 'zustand/vanilla';
 import type {MeetingStoreDeps} from './meetingStoreDeps';
 
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import {getLogger} from '../../../util/logger';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
 import {loadMeetingsList} from '../loadMeetingsList';

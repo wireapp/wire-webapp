@@ -19,7 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useSingleInstance} from '../../hooks/useSingleInstance';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button} from '../../uiKit/inputs/button/button';

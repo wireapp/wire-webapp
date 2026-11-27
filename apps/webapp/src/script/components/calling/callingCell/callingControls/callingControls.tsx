@@ -25,10 +25,10 @@ import {container} from 'tsyringe';
 import {cellControlsList, cellControlsWrapper} from './callingControls.styles';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {Call} from '../../../../repositories/calling/Call';
-import {DesktopScreenShareMenu} from '../../../../repositories/calling/CallState';
-import {Participant} from '../../../../repositories/calling/Participant';
-import {TeamState} from '../../../../repositories/team/TeamState';
+import {Call} from '../../../../repositories/calling/call';
+import {DesktopScreenShareMenu} from '../../../../repositories/calling/callState';
+import {Participant} from '../../../../repositories/calling/participant';
+import {TeamState} from '../../../../repositories/team/teamState';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {CallActions} from '../../../../viewModel/callingViewModel';
 import * as Icon from '../../../icon';

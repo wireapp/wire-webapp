@@ -26,7 +26,7 @@ import {CustomHistorySharingOption} from './customHistorySharingOption';
 
 import {ADD_PERMISSION} from '../../../../../apiClient/conversation/conversation';
 import {useApplicationContext} from '../../../../../page/rootProvider';
-import {TeamState} from '../../../../../repositories/team/TeamState';
+import {TeamState} from '../../../../../repositories/team/teamState';
 import {Option, Select} from '../../../../../uiKit/inputs/select/select';
 import {Muted} from '../../../../../uiKit/typography/text/text';
 import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';

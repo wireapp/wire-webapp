@@ -24,9 +24,9 @@ import {amplify} from 'amplify';
 import {match} from 'ts-pattern';
 import {container} from 'tsyringe';
 
-import {Config} from '../../Config';
-import {ConversationState} from '../../repositories/conversation/ConversationState';
-import {NOTIFICATION_HANDLING_STATE} from '../../repositories/event/NotificationHandlingState';
+import {Config} from '../../config';
+import {ConversationState} from '../../repositories/conversation/conversationState';
+import {NOTIFICATION_HANDLING_STATE} from '../../repositories/event/notificationHandlingState';
 import {UserState} from '../../repositories/user/userState';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import type {Translate} from '../../util/localizerUtil';

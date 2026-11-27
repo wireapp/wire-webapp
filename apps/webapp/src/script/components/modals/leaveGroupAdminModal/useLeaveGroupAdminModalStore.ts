@@ -19,8 +19,8 @@
 
 import {create} from 'zustand';
 
-import type {Conversation} from '../../../repositories/entity/Conversation';
-import type {User} from '../../../repositories/entity/User';
+import type {Conversation} from '../../../repositories/entity/conversation';
+import type {User} from '../../../repositories/entity/user';
 
 export type LeaveGroupAdminModalParams = {
   conversation: Conversation;

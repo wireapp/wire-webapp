@@ -20,7 +20,7 @@
 import {MeetingRecurrenceFrequency} from '../../apiClient/meetings/meetingRecurrence';
 import {maybe} from 'true-myth';
 
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 import {translateForTest} from '../../util/test/translateForTest';
 
 import {mapUpdateCommandToUpdateMeeting} from './mapUpdateCommandToUpdateMeeting';

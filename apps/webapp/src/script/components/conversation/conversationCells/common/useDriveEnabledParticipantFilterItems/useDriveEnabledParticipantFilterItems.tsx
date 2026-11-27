@@ -18,9 +18,9 @@
  */
 
 import {stringifyQualifiedId} from '../../../../../core/util/qualifiedIdUtil';
-import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
-import type {Conversation} from '../../../../../repositories/entity/Conversation';
-import type {User} from '../../../../../repositories/entity/User';
+import type {ConversationRepository} from '../../../../../repositories/conversation/conversationRepository';
+import type {Conversation} from '../../../../../repositories/entity/conversation';
+import type {User} from '../../../../../repositories/entity/user';
 import {matchQualifiedIds} from '../../../../../util/qualifiedId';
 import {Avatar, AVATAR_SIZE} from '../../../../avatar';
 import type {FilterItem} from '../cellsFiltersBar/filterConfig';

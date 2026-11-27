@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {task} from 'true-myth';
 
-import {User} from '../../../../../../../repositories/entity/User';
+import {User} from '../../../../../../../repositories/entity/user';
 import {UserState} from '../../../../../../../repositories/user/userState';
 import {withTheme} from '../../../../../../../auth/util/test/testUtil';
 import {E2EIHandler, MLSStatuses, WireIdentity} from '../../../../../../../e2eIdentity';

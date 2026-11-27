@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import type {Translate} from '../../util/localizerUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import {PrimaryModal} from '../modals/primaryModal';

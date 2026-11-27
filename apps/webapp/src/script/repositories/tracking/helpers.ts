@@ -24,13 +24,13 @@ import {ConversationType, UserType, PlatformType} from './attribute';
 import {EventName} from './eventName';
 import {Segmentation} from './segmentation';
 
-import {Runtime} from '../../commons/util/Runtime';
+import {Runtime} from '../../commons/util/runtime';
 import {RatingListLabel} from '../../components/modals/qualityFeedbackModal/typings';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {WebAppEvents} from '../../webAppEvents';
-import {Call} from '../calling/Call';
-import {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
+import {Call} from '../calling/call';
+import {Conversation} from '../entity/conversation';
+import type {User} from '../entity/user';
 
 export interface GuestAttributes {
   is_allow_guests: boolean;

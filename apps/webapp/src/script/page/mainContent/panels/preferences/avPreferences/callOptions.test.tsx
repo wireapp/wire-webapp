@@ -26,7 +26,7 @@ import {
 } from '../../../../testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 
-import type {MediaConstraintsHandler} from '../../../../../repositories/media/MediaConstraintsHandler';
+import type {MediaConstraintsHandler} from '../../../../../repositories/media/mediaConstraintsHandler';
 import type {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 
 import {CallOptions} from './callOptions';

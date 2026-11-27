@@ -25,7 +25,7 @@ import {useCreateConversation} from './useCreateConversation';
 import {useCreateConversationModal} from './useCreateConversationModal';
 
 import {NonFederatingBackendsError} from '../../../../core/errors';
-import {User} from '../../../../repositories/entity/User';
+import {User} from '../../../../repositories/entity/user';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

@@ -21,8 +21,8 @@ import React, {useEffect, useRef, type FunctionComponent} from 'react';
 
 import {isNull, isUndefined} from '@sindresorhus/is';
 
-import {overlayedObserver} from '../../util/DOM/overlayedObserver';
-import {viewportObserver} from '../../util/DOM/viewportObserver';
+import {overlayedObserver} from '../../util/dom/overlayedObserver';
+import {viewportObserver} from '../../util/dom/viewportObserver';
 
 interface InViewportParams {
   onVisible: () => void;

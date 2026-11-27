@@ -36,8 +36,8 @@ import {
   getChatHistorySharingUnitOptions,
 } from '../../../components/modals/createConversation/utils';
 import {RadioGroup} from '../../../components/radio';
-import {User} from '../../../repositories/entity/User';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {User} from '../../../repositories/entity/user';
+import {TeamState} from '../../../repositories/team/teamState';
 import {Input} from '../../../uiKit/inputs/input/input';
 import {Select} from '../../../uiKit/inputs/select/select';
 import {FlexBox} from '../../../uiKit/layout/flexBox/flexBox';

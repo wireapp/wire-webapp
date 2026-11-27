@@ -21,7 +21,7 @@ import {arrayIncludes} from 'ts-extras';
 
 import {partition} from './arrayUtil';
 
-import {Config} from '../Config';
+import {Config} from '../config';
 
 export const allowsAllFiles = (): boolean => {
   const allowedExtensions = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS;

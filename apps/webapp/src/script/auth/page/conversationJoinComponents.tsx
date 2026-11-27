@@ -21,7 +21,7 @@ import React, {useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Loading} from '../../uiKit/dataDisplay/loading/loading';
 import {Button} from '../../uiKit/inputs/button/button';

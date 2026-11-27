@@ -19,7 +19,7 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {getWebEnvironment} from '../../util/environment';
 import {getLogger, Logger} from '../../util/logger';
 

@@ -23,7 +23,7 @@ import {create} from 'zustand';
 
 import {emptyMeetNowFormErrors, type MeetNowFormErrors, type MeetNowFormState} from './meetNowTypes';
 
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import {getMeetingPasswordErrors} from '../shared/validation/meetingPasswordValidation';
 import {getMeetingTitleError, getMeetingTitleInputError} from '../shared/validation/meetingTitleValidation';
 

@@ -19,7 +19,7 @@
 
 import {container} from 'tsyringe';
 
-import {TeamState} from '../../../repositories/team/TeamState';
+import {TeamState} from '../../../repositories/team/teamState';
 import type {Translate} from '../../../util/localizerUtil';
 import {showWarningModal} from '../../modals/utils/showWarningModal';
 

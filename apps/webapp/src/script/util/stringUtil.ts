@@ -22,7 +22,7 @@ import getSlug from 'speakingurl';
 
 import {randomElement} from './arrayUtil';
 
-import type {User} from '../repositories/entity/User';
+import type {User} from '../repositories/entity/user';
 
 const obfuscationExtraCharacterRange = 10;
 const wordBoundarySearchLength = 25;

@@ -27,9 +27,9 @@ import {getLogger} from './logger';
 import {supportsMLS as supportsMlsCapability} from '../browser/supportsMls';
 import {Decoder} from '../commons/base64/decoder';
 import {Encoder} from '../commons/base64/encoder';
-import {Runtime} from '../commons/util/Runtime';
+import {Runtime} from '../commons/util/runtime';
 import {AuthError} from '../error/authError';
-import type {Conversation} from '../repositories/entity/Conversation';
+import type {Conversation} from '../repositories/entity/conversation';
 
 const decimalRadix = 10;
 const environmentPollingIntervalInMilliseconds = 100;

@@ -22,7 +22,7 @@ import {useId, type FunctionComponent} from 'react';
 import {authorLabel, description, header, panel} from './serviceDetails.styles';
 
 import {useApplicationContext} from '../../page/rootProvider';
-import type {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import type {ServiceEntity} from '../../repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 

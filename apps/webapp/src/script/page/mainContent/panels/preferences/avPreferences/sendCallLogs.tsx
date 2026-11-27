@@ -31,8 +31,8 @@ import {
 } from './sendCallLogs.styles';
 
 import {PrimaryModal, removeCurrentModal} from '../../../../../components/modals/primaryModal';
-import {Config} from '../../../../../Config';
-import type {CallingRepository} from '../../../../../repositories/calling/CallingRepository';
+import {Config} from '../../../../../config';
+import type {CallingRepository} from '../../../../../repositories/calling/callingRepository';
 import {
   CallLogsReport,
   CallLogsErrorStatus,

@@ -20,7 +20,7 @@
 import {renderHook} from '@testing-library/react';
 
 import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
-import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import type {ConversationRepository} from '../../../../../repositories/conversation/conversationRepository';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

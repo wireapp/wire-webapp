@@ -24,7 +24,7 @@ import {ProteusErrors} from '../../../core/messagingProtocols/proteus';
 
 import en from '../../../../i18n/en-US.json';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../repositories/entity/message/decryptErrorMessage';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {setStrings, translate} from '../../../util/localizerUtil';
 import {

@@ -35,7 +35,7 @@ import type {ConversationJoinData} from '../../apiClient/conversation/data/conve
 import type {ConversationEvent} from '../../apiClient/event/conversationEvent';
 import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import {UrlUtil} from '../../commons/util';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Column, Columns} from '../../uiKit/layout/column/column';
 import {H1} from '../../uiKit/typography/heading/heading';

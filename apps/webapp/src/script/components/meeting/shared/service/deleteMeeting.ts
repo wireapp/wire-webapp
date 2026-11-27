@@ -21,7 +21,7 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import type {Task} from 'true-myth';
 
 import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
-import {LEAVE_CALL_REASON} from '../../../../repositories/calling/enum/LeaveCallReason';
+import {LEAVE_CALL_REASON} from '../../../../repositories/calling/enum/leaveCallReason';
 import {meetingConversationSyncErrors} from '../../meetingConversationSync';
 import {
   removeMeetingConversationLocally,

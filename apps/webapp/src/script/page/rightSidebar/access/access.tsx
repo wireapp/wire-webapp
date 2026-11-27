@@ -31,9 +31,9 @@ import {
   getConversationManagerOptions,
 } from '../../../components/modals/createConversation/utils';
 import {RadioGroup} from '../../../components/radio';
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {ConversationRoleRepository} from '../../../repositories/conversation/ConversationRoleRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {ConversationRoleRepository} from '../../../repositories/conversation/conversationRoleRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {useChannelsFeatureFlag} from '../../../util/useChannelsFeatureFlag';

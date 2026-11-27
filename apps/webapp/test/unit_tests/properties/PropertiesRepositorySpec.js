@@ -19,7 +19,7 @@
 
 import {PropertiesRepository} from '../../../src/script/repositories/properties/propertiesRepository';
 import {PropertiesService} from '../../../src/script/repositories/properties/propertiesService';
-import {SelfService} from '../../../src/script/repositories/self/SelfService';
+import {SelfService} from '../../../src/script/repositories/self/selfService';
 import {PrimaryModal} from '../../../src/script/components/modals/primaryModal';
 import {translate} from '../../../src/script/util/localizerUtil';
 

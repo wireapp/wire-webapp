@@ -86,14 +86,14 @@ type-check:
 build-server:
     rimraf apps/server/build/server
     node "{{native_typescript_compiler_path}}" --project apps/server/tsconfig.build.json --outDir apps/server/build/server
-    WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/server node apps/server/bin/copy_server_assets.js
+    WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/server node apps/server/bin/copyServerAssets.js
 
 # Type-check and bundle the production server with its runtime assets.
 [group('build')]
 build-server-bundle:
     node "{{native_typescript_compiler_path}}" --project apps/server/tsconfig.build.json --noEmit
     rspack build --config apps/server/rspack.config.mts --json=apps/server/build/server-bundle-stats.json
-    WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/bundle node apps/server/bin/copy_server_assets.js --bundle
+    WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/bundle node apps/server/bin/copyServerAssets.js --bundle
 
 # Assemble the bundle with an existing webapp build and its shared metadata.
 [group('build')]
@@ -142,7 +142,7 @@ prepare-development-server:
     rimraf apps/server/dist apps/server/build/metadata
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
     node "{{native_typescript_compiler_path}}" --project apps/server/tsconfig.build.json --incremental
-    WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/dist node apps/server/bin/copy_server_assets.js
+    WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/dist node apps/server/bin/copyServerAssets.js
     cp apps/server/build/metadata/version.json apps/server/dist/version.json
 
 # Compile the server once, then watch its sources and restart the server.

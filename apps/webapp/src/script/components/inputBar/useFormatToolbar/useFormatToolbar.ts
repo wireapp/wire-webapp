@@ -21,7 +21,7 @@ import {useState} from 'react';
 
 import {amplify} from 'amplify';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {StorageKey} from '../../../repositories/storage';
 import {EventName} from '../../../repositories/tracking/eventName';
 import {loadValue, storeValue} from '../../../util/storageUtil';

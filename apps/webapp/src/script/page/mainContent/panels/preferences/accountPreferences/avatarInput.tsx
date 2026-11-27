@@ -25,9 +25,9 @@ import {FileInput} from './fileInput';
 
 import {Avatar, AVATAR_SIZE} from '../../../../../components/avatar';
 import {PrimaryModal} from '../../../../../components/modals/primaryModal';
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {UserError} from '../../../../../error/userError';
-import {User} from '../../../../../repositories/entity/User';
+import {User} from '../../../../../repositories/entity/user';
 import {UserRepository} from '../../../../../repositories/user/userRepository';
 import {TabIndex} from '../../../../../uiKit/utils/enums';
 import {handleKeyDown, KEY} from '../../../../../util/keyboardUtil';

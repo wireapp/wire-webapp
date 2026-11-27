@@ -23,7 +23,7 @@ import {isUndefined} from '@sindresorhus/is';
 
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsConversationColumn.styles';
 
-import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {Conversation} from '../../../../../repositories/entity/conversation';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 import {GroupAvatar, ChannelAvatar} from '../../../../avatar';

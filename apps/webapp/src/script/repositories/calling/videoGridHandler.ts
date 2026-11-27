@@ -19,8 +19,8 @@
 
 import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
-import {Call} from './Call';
-import type {Participant} from './Participant';
+import {Call} from './call';
+import type {Participant} from './participant';
 
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 

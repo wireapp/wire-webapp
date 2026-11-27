@@ -20,7 +20,7 @@
 import {isInRange, isInteger} from '@sindresorhus/is';
 
 import {BackendError} from '../apiClient/http/backendError';
-import {getSafeErrorDetails} from '../commons/util/StringUtil';
+import {getSafeErrorDetails} from '../commons/util/stringUtil';
 
 const minimumHttpStatusCode = 100;
 const maximumHttpStatusCode = 599;

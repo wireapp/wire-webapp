@@ -23,15 +23,15 @@ import {amplify} from 'amplify';
 
 import {ListWrapper} from './listWrapper';
 
-import {Runtime} from '../../../commons/util/Runtime';
+import {Runtime} from '../../../commons/util/runtime';
 import * as Icon from '../../../components/icon';
 import {PrimaryModal} from '../../../components/modals/primaryModal';
 import {
   ClientNotificationData,
   Notification,
   PreferenceNotificationRepository,
-} from '../../../repositories/notification/PreferenceNotificationRepository';
-import {TeamRepository} from '../../../repositories/team/TeamRepository';
+} from '../../../repositories/notification/preferenceNotificationRepository';
+import {TeamRepository} from '../../../repositories/team/teamRepository';
 import {TabIndex} from '../../../uiKit/utils/enums';
 import {canUseTroubleshooter} from '../../../util/canUseTroubleshooter';
 import {WebAppEvents} from '../../../webAppEvents';

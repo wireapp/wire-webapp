@@ -24,7 +24,7 @@ import type {MetaClient} from '../../../core/client/clientService';
 import {ClientType} from '../../../apiClient/client/clientType';
 import {BackendError} from '../../../apiClient/http/backendError';
 import {BackendErrorLabel, SyntheticErrorLabel} from '../../../apiClient/http/backendErrorLabel';
-import {RecursivePartial} from '../../../commons/util/TypeUtil';
+import {RecursivePartial} from '../../../commons/util/typeUtil';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {arrayLast} from 'ts-extras';
 

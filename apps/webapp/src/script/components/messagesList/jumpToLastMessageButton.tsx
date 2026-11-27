@@ -24,7 +24,7 @@ import {useDebouncedCallback} from 'use-debounce';
 import {jumpToLastMessageButtonStyles, jumpToLastMessageChevronStyles} from './messageList.styles';
 
 import {useApplicationContext} from '../../page/rootProvider';
-import {Conversation} from '../../repositories/entity/Conversation';
+import {Conversation} from '../../repositories/entity/conversation';
 import {ChevronIcon} from '../../uiKit/dataDisplay/icon/chevronIcon';
 import {IconButton} from '../../uiKit/inputs/iconButton/iconButton';
 

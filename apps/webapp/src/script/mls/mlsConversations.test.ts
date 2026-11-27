@@ -27,12 +27,12 @@ import {randomUUID} from 'crypto';
 
 import {Account, MLSService} from '../core';
 
-import {ConversationService} from '../repositories/conversation/ConversationService';
-import {MLSConversation} from '../repositories/conversation/ConversationSelectors';
-import {ConversationState} from '../repositories/conversation/ConversationState';
-import {ConversationStatus} from '../repositories/conversation/ConversationStatus';
-import {Conversation} from '../repositories/entity/Conversation';
-import {User} from '../repositories/entity/User';
+import {ConversationService} from '../repositories/conversation/conversationService';
+import {MLSConversation} from '../repositories/conversation/conversationSelectors';
+import {ConversationState} from '../repositories/conversation/conversationState';
+import {ConversationStatus} from '../repositories/conversation/conversationStatus';
+import {Conversation} from '../repositories/entity/conversation';
+import {User} from '../repositories/entity/user';
 import {UserState} from '../repositories/user/userState';
 import {Core} from '../service/coreSingleton';
 import {requireValueForTest} from '../page/testSupport/rootContextTestSupport';

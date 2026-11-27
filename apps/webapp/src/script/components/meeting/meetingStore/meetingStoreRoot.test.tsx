@@ -47,11 +47,11 @@ import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
 } from '../meetingNotificationStore/meetingNotificationStore';
-import {User} from '../../../repositories/entity/User';
-import {MediaStreamHandler} from '../../../repositories/media/MediaStreamHandler';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {User} from '../../../repositories/entity/user';
+import {MediaStreamHandler} from '../../../repositories/media/mediaStreamHandler';
+import {TeamState} from '../../../repositories/team/teamState';
 import {UserState} from '../../../repositories/user/userState';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import * as browserNotificationApi from '../../../browser/notification/createSystemNotificationApiFromBrowserNotification';
 import type {SystemNotificationRequest} from '../../../notification/systemNotificationTypes';
 import {

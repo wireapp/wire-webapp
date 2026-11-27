@@ -33,8 +33,8 @@ import {
   type Translate,
 } from './primaryModalTypes';
 
-import {Config} from '../../../Config';
-import {ClientNotificationData} from '../../../repositories/notification/PreferenceNotificationRepository';
+import {Config} from '../../../config';
+import {ClientNotificationData} from '../../../repositories/notification/preferenceNotificationRepository';
 import {getLogger} from '../../../util/logger';
 import {formatLocale} from '../../../util/timeUtil';
 import {noop} from '../../../util/util';

@@ -22,7 +22,7 @@ import type {Dispatch, KeyboardEvent as ReactKeyboardEvent, SetStateAction} from
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {Conversation} from '../repositories/entity/Conversation';
+import {Conversation} from '../repositories/entity/conversation';
 import {isKey, isTabKey, KEY} from '../util/keyboardUtil';
 
 type FocusConversation = (conversationId: string) => boolean | 'pending';

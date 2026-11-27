@@ -18,7 +18,7 @@
  */
 
 import {useApplicationContext} from '../../page/rootProvider';
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {type Translate} from '../../util/localizerUtil';
 

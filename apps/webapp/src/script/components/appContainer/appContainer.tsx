@@ -35,7 +35,7 @@ import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
-import {Config, Configuration} from '../../Config';
+import {Config, Configuration} from '../../config';
 import {markAsUnreadFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {useAppSoftLock} from '../../hooks/useAppSoftLock';

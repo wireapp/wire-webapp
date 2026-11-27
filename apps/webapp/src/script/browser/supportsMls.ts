@@ -19,7 +19,7 @@
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {Runtime} from '../commons/util/Runtime';
+import {Runtime} from '../commons/util/runtime';
 
 // Disables MLS for desktop clients without secret storage support.
 export const supportsMLS = (): boolean => {

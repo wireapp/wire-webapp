@@ -21,8 +21,8 @@ import {useMemo, FC} from 'react';
 
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import {RadioGroup} from '../../../components/radio';
-import {NOTIFICATION_STATE, getNotificationText} from '../../../repositories/conversation/NotificationSetting';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {NOTIFICATION_STATE, getNotificationText} from '../../../repositories/conversation/notificationSetting';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {ViewModelRepositories} from '../../../viewModel/mainViewModel';

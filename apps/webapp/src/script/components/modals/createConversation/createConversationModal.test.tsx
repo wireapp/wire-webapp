@@ -26,11 +26,11 @@ import {withIsolatedCreateConversationTest} from './hooks/createConversationTest
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
 import {ConversationCreationStep} from './types';
 
-import {ConversationState} from '../../../repositories/conversation/ConversationState';
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {User} from '../../../repositories/entity/User';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {ConversationState} from '../../../repositories/conversation/conversationState';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {User} from '../../../repositories/entity/user';
+import {TeamState} from '../../../repositories/team/teamState';
 import {UserState} from '../../../repositories/user/userState';
 import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {

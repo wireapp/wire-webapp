@@ -35,7 +35,7 @@ import {
 } from './qualityFeedbackModal.styles';
 import {RatingListLabel} from './typings';
 
-import {CallingRepository} from '../../../repositories/calling/CallingRepository';
+import {CallingRepository} from '../../../repositories/calling/callingRepository';
 import {trackCallQualityFeedback} from '../../../repositories/tracking/helpers';
 import {UserState} from '../../../repositories/user/userState';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';

@@ -18,7 +18,7 @@
  */
 
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {
   showCallNotEstablishedModal,
   type NoInternetCallGuardCopy,

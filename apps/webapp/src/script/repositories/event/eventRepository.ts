@@ -1,0 +1,901 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import {noop} from 'noop-esm';
+import PromiseQueue from 'p-queue';
+import {Maybe} from 'true-myth';
+import {arrayIncludes} from 'ts-extras';
+import {container} from 'tsyringe';
+
+import {ClientEvent} from './client';
+import {EventMiddleware, EventProcessor, IncomingEvent} from './eventProcessor';
+import type {EventService} from './eventService';
+import {EventSource} from './eventSource';
+import {EVENT_TYPE} from './eventType';
+import {EventValidation} from './eventValidation';
+import {validateEvent} from './eventValidator';
+import {NOTIFICATION_HANDLING_STATE} from './notificationHandlingState';
+import type {NotificationService} from './notificationService';
+import {EventValidationError} from './preprocessor/eventStorageMiddleware/eventHandlers/eventValidationError';
+
+import {type BackendEvent} from '../../apiClient/event/backendEvent';
+import {
+  CONVERSATION_EVENT,
+  ConversationOtrMessageAddEvent,
+  ConversationMLSMessageAddEvent,
+} from '../../apiClient/event/conversationEvent';
+import {MEETING_EVENT} from '../../apiClient/event/meetingEvent';
+import {USER_EVENT} from '../../apiClient/event/userEvent';
+import {Runtime} from '../../commons/util/runtime';
+import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '../../core';
+import {NotificationSource, HandledEventPayload} from '../../core/notification';
+import {sequentialQueueOptions} from '../../core/queue/sequentialQueueOptions';
+import {CryptographyError} from '../../error/cryptographyError';
+import {EventError} from '../../error/eventError';
+import {getSafeNotificationErrorDetails} from '../../logger/getSafeNotificationErrorDetails';
+import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {getLogger, type LogAttributes, Logger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {isAxiosError} from '../../util/typePredicateUtil';
+import {Warnings} from '../../viewModel/warningsContainer';
+import {WebAppEvents} from '../../webAppEvents';
+import {ClientConversationEvent, EventBuilder} from '../conversation/eventBuilder';
+import {CryptographyMapper} from '../cryptography/cryptographyMapper';
+import {EventName} from '../tracking/eventName';
+import {UserState} from '../user/userState';
+
+const callEventLifetimeInSeconds = 30;
+const heartbeatIntervalInSeconds = 30;
+const outdatedMessageDecryptionErrorCode = 208;
+const duplicateMessageDecryptionErrorCode = 209;
+
+type IgnoredEventErrorType =
+  | (typeof CryptographyError.TYPE)[keyof typeof CryptographyError.TYPE]
+  | (typeof EventError.TYPE)[keyof typeof EventError.TYPE];
+type NotificationBatches = {INITIAL: number; MAX: number; SUBSEQUENT: number};
+type EventRepositoryConfig = {
+  E_CALL_EVENT_LIFETIME: number;
+  HEARTBEAT_INTERVAL: number;
+  IGNORED_ERRORS: IgnoredEventErrorType[];
+  NOTIFICATION_BATCHES: NotificationBatches;
+};
+type EventRepositorySource = {
+  BACKEND_RESPONSE: typeof EventSource.BACKEND_RESPONSE;
+  INJECTED: typeof EventSource.INJECTED;
+  STREAM: typeof EventSource.NOTIFICATION_STREAM;
+  WEB_SOCKET: typeof EventSource.WEBSOCKET;
+};
+
+type WebSocketConnectTrigger =
+  'initial' | 'online' | 'focus' | 'visibility' | 'heartbeat-closed' | 'heartbeat-unhealthy';
+
+const transitioningConnectionStates = [ConnectionState.CONNECTING, ConnectionState.PROCESSING_NOTIFICATIONS] as const;
+
+function getNotificationHandlingStateName(notificationHandlingState: NOTIFICATION_HANDLING_STATE): string {
+  return notificationHandlingState.split('.').at(-1) ?? notificationHandlingState;
+}
+
+export class EventRepository {
+  logger: Logger;
+  notificationHandlingState = ko.observable(NOTIFICATION_HANDLING_STATE.STREAM);
+  private readonly lastEventDate: ko.Observable<string | undefined> = ko.observable();
+  private eventProcessMiddlewares: EventMiddleware[] = [];
+  /** event processors are classes that are able to react and process an incoming event */
+  private eventProcessors: EventProcessor[] = [];
+
+  private eventQueue: PromiseQueue = new PromiseQueue({autoStart: true, ...sequentialQueueOptions});
+
+  static get CONFIG(): EventRepositoryConfig {
+    return {
+      E_CALL_EVENT_LIFETIME: TIME_IN_MILLIS.SECOND * callEventLifetimeInSeconds,
+      HEARTBEAT_INTERVAL: TIME_IN_MILLIS.SECOND * heartbeatIntervalInSeconds,
+      IGNORED_ERRORS: [
+        CryptographyError.TYPE.IGNORED_ASSET,
+        CryptographyError.TYPE.IGNORED_PREVIEW,
+        CryptographyError.TYPE.PREVIOUSLY_STORED,
+        CryptographyError.TYPE.UNHANDLED_TYPE,
+        EventError.TYPE.OUTDATED_E_CALL_EVENT,
+        EventError.TYPE.VALIDATION_FAILED,
+      ],
+      NOTIFICATION_BATCHES: {
+        INITIAL: 500,
+        MAX: 10000,
+        SUBSEQUENT: 5000,
+      },
+    };
+  }
+
+  // TODO: Will be replaced with "EventSource"
+  static get SOURCE(): EventRepositorySource {
+    return {
+      BACKEND_RESPONSE: EventSource.BACKEND_RESPONSE,
+      INJECTED: EventSource.INJECTED,
+      STREAM: EventSource.NOTIFICATION_STREAM,
+      WEB_SOCKET: EventSource.WEBSOCKET,
+    };
+  }
+
+  constructor(
+    readonly eventService: EventService,
+    readonly notificationService: NotificationService,
+    private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly userState = container.resolve(UserState),
+  ) {
+    this.logger = getLogger('EventRepository');
+
+    this.notificationHandlingState.subscribe(handling_state => {
+      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, handling_state);
+    });
+  }
+
+  /**
+   * Will register a pipeline that transforms an event before it is being processed by the EventProcessors.
+   * Those middleware are run sequentially one after the other. Thus the order at which they are defined matters.
+   * When one middleware fails the entire even handling process will stop and no further middleware will be executed.
+   */
+  setEventProcessMiddlewares(middlewares: EventMiddleware[]): void {
+    this.eventProcessMiddlewares = middlewares;
+  }
+
+  /**
+   * EventProcessors are classes that are able to react and process an incoming event.
+   * They will all be executed in parallel. If one processor fails the other ones are not impacted
+   * @param processors
+   */
+  setEventProcessors(processors: EventProcessor[]): void {
+    this.eventProcessors = processors;
+  }
+
+  //##############################################################################
+  // WebSocket handling
+  //##############################################################################
+
+  private readonly updateConnectivityStatus = (state: ConnectionState): void => {
+    switch (state) {
+      case ConnectionState.CONNECTING: {
+        const leavingLive = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+        if (leavingLive) {
+          this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
+        }
+        Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
+        Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        return;
+      }
+      case ConnectionState.PROCESSING_NOTIFICATIONS: {
+        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
+        Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
+        Warnings.hideWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECOVERY);
+        return;
+      }
+      case ConnectionState.CLOSED: {
+        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.CLOSED);
+        Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
+        return;
+      }
+      case ConnectionState.LIVE: {
+        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+        amplify.publish(WebAppEvents.CONNECTION.ONLINE);
+        Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
+        Warnings.hideWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        Warnings.hideWarning(Warnings.TYPE.CONNECTIVITY_RECOVERY);
+      }
+    }
+  };
+
+  /**
+   * this function will process any incoming event. It is being queued in case 2 events arrive at the same time.
+   * Processing events should happen sequentially (thus the queue)
+   */
+  private readonly handleIncomingEvent = async (
+    payload: HandledEventPayload,
+    source: NotificationSource,
+  ): Promise<void> => {
+    return this.eventQueue.add(async () => {
+      try {
+        await this.handleEvent(payload, source);
+      } catch (error: unknown) {
+        if (source === EventSource.NOTIFICATION_STREAM) {
+          const eventType = (payload as {event?: {type?: string}}).event?.type ?? 'unknown';
+          const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
+          this.logger.warn('Could not handle an event during notification catch-up', {
+            subsystem: 'websocket-lifecycle',
+            event: 'notification-event-handling-failed',
+            eventType,
+            source,
+            errorName,
+            errorMessage,
+          });
+        } else {
+          throw error;
+        }
+      }
+    });
+  };
+
+  /**
+   * Import events coming from an external source. This is only useful useful for profiling or debugging.
+   *
+   * @param events decrypted events
+   */
+  async importEvents(events: [HandledEventPayload]): Promise<void> {
+    for await (const event of events) {
+      await this.handleIncomingEvent(event, NotificationSource.NOTIFICATION_STREAM);
+    }
+  }
+
+  /**
+   * connects to the websocket with the given account
+   *
+   * @param account the account to connect to
+   * @param onNotificationStreamProgress callback when a notification for the notification stream has been processed
+   * @param dryRun when set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
+   * @returns Resolves when the notification stream has fully been processed
+   */
+  async connectWebSocket(
+    account: Account,
+    useLegacy: boolean,
+    onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
+    dryRun = false,
+  ): Promise<void> {
+    this.disconnectWebSocket();
+    const cleanupHandlers: (() => void)[] = [];
+    let connection: Maybe<{readonly cancellation: AbortController; initializing: boolean}> = Maybe.nothing();
+    let disposed = false;
+    let healthCheckInProgress = false;
+    let currentConnectionState: Maybe<ConnectionState> = Maybe.nothing();
+    let connectionStateRevision = 0;
+    let connectCycleId = 0;
+
+    const repository = this;
+
+    function getBrowserConnectionContext(): LogAttributes {
+      return {
+        connectCycleId,
+        connectionInProgress: isConnectionInitializing(),
+        notificationState: getNotificationHandlingStateName(repository.notificationHandlingState()),
+        navigatorOnline: navigator.onLine,
+        visibility: document.visibilityState,
+        focused: document.hasFocus(),
+      };
+    }
+
+    function applyConnectionState(state: ConnectionState): void {
+      connectionStateRevision += 1;
+      currentConnectionState = Maybe.just(state);
+      repository.updateConnectivityStatus(state);
+    }
+
+    function cancelConnection(reason: 'superseded' | 'offline' | 'disconnect'): void {
+      const previousCancellation = connection.map(attempt => {
+        return attempt.cancellation;
+      });
+      connection = Maybe.nothing();
+      if (previousCancellation.isJust) {
+        previousCancellation.value.abort(reason);
+      }
+    }
+
+    function isConnectionInitializing(): boolean {
+      return connection.isJust && connection.value.initializing;
+    }
+
+    function shouldSkipConnect(): boolean {
+      return disposed || isConnectionInitializing();
+    }
+
+    async function connect(trigger: WebSocketConnectTrigger): Promise<void> {
+      if (shouldSkipConnect()) {
+        repository.logger.debug('Skipped WebSocket connection attempt', {
+          subsystem: 'websocket-lifecycle',
+          event: 'connect-skip',
+          trigger,
+          ...getBrowserConnectionContext(),
+          reason: 'connection-in-progress',
+        });
+        return;
+      }
+
+      cancelConnection('superseded');
+      const currentConnectCycleId = ++connectCycleId;
+      const attempt = {
+        cancellation: new AbortController(),
+        initializing: true,
+      };
+      const currentAttempt = Maybe.just(attempt);
+      connection = currentAttempt;
+      const leavingLive = currentConnectionState.unwrapOr(ConnectionState.CLOSED) === ConnectionState.LIVE;
+      if (leavingLive) {
+        applyConnectionState(ConnectionState.CONNECTING);
+      }
+      const lifecycle = {trigger, connectCycleId: currentConnectCycleId};
+      repository.logger.info('Connection attempt started', {
+        subsystem: 'websocket-lifecycle',
+        event: 'connect-start',
+        ...lifecycle,
+      });
+      try {
+        await account.listen({
+          connectionCycle: {
+            signal: attempt.cancellation.signal,
+            connectCycleId: currentConnectCycleId,
+          },
+          useLegacy,
+          onConnectionStateChanged: (
+            connectionState: ConnectionState,
+            connectionContext: WebSocketConnectionContext | undefined,
+          ) => {
+            const isObsolete = connection !== currentAttempt;
+            if (isObsolete) {
+              return;
+            }
+            applyConnectionState(connectionState);
+            repository.logger.debug('Connection state applied', {
+              subsystem: 'websocket-lifecycle',
+              event: 'connection-state-change',
+              ...lifecycle,
+              ...connectionContext,
+              state: connectionState,
+            });
+          },
+          onEvent: repository.handleIncomingEvent,
+          onMissedNotifications: repository.triggerMissedSystemEventMessageRendering,
+          onNotificationStreamProgress,
+          dryRun,
+        });
+      } catch (error: unknown) {
+        if (connection === currentAttempt) {
+          connection = Maybe.nothing();
+          applyConnectionState(ConnectionState.CLOSED);
+          const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
+          repository.logger.warn('Connection setup failed', {
+            subsystem: 'websocket-lifecycle',
+            event: 'connect-failure',
+            ...lifecycle,
+            errorName,
+            errorMessage,
+          });
+        }
+      } finally {
+        attempt.initializing = false;
+      }
+    }
+
+    const handleOnline = (): void => {
+      if (!navigator.onLine) {
+        return;
+      }
+
+      this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
+      void connect('online');
+    };
+
+    const verifyConnectionHealthAndReconnect = async (trigger: 'focus' | 'visibility' | 'heartbeat'): Promise<void> => {
+      if (!navigator.onLine) {
+        this.logger.debug('Skipped WebSocket health check', {
+          subsystem: 'websocket-lifecycle',
+          event: 'health-check-skip',
+          trigger,
+          reason: 'offline',
+          ...getBrowserConnectionContext(),
+        });
+        return;
+      }
+
+      if (shouldSkipConnect()) {
+        this.logger.debug('Skipped WebSocket health check', {
+          subsystem: 'websocket-lifecycle',
+          event: 'health-check-skip',
+          trigger,
+          reason: 'connection-in-progress',
+          ...getBrowserConnectionContext(),
+        });
+        return;
+      }
+
+      const stateBeforeProbe = currentConnectionState;
+      const isTransitioning =
+        stateBeforeProbe.isJust && arrayIncludes(transitioningConnectionStates, stateBeforeProbe.value);
+      if (isTransitioning) {
+        this.logger.debug('Skipped WebSocket health check', {
+          subsystem: 'websocket-lifecycle',
+          event: 'health-check-skip',
+          trigger,
+          reason: 'connection-transitioning',
+          connectionState: stateBeforeProbe.value.toUpperCase(),
+          ...getBrowserConnectionContext(),
+        });
+        return;
+      }
+
+      if (this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.CLOSED) {
+        this.logger.info('WebSocket reconnect requested', {
+          subsystem: 'websocket-lifecycle',
+          event: 'reconnect-requested',
+          trigger: trigger === 'heartbeat' ? 'heartbeat-closed' : trigger,
+          connectCycleId: connectCycleId + 1,
+        });
+        await connect(`${trigger === 'heartbeat' ? 'heartbeat-closed' : trigger}`);
+        return;
+      }
+
+      if (healthCheckInProgress) {
+        this.logger.debug('Skipped WebSocket health check', {
+          subsystem: 'websocket-lifecycle',
+          event: 'health-check-skip',
+          trigger,
+          reason: 'health-check-in-progress',
+          ...getBrowserConnectionContext(),
+        });
+        return;
+      }
+
+      healthCheckInProgress = true;
+      const checkedConnection = connection;
+      const checkedStateRevision = connectionStateRevision;
+      try {
+        this.logger.debug('WebSocket health check started', {
+          subsystem: 'websocket-lifecycle',
+          event: 'health-check-start',
+          trigger,
+          connectCycleId,
+        });
+        let isHealthy: boolean;
+        try {
+          isHealthy = await account.isWebsocketHealthy();
+        } catch {
+          isHealthy = false;
+        }
+        const isObsolete =
+          disposed || connection !== checkedConnection || connectionStateRevision !== checkedStateRevision;
+        if (isObsolete) {
+          return;
+        }
+        if (isHealthy) {
+          this.logger.debug('WebSocket health check completed', {
+            subsystem: 'websocket-lifecycle',
+            event: 'health-check-result',
+            trigger,
+            connectCycleId,
+            healthy: true,
+          });
+        } else {
+          this.logger.warn('WebSocket health check completed', {
+            subsystem: 'websocket-lifecycle',
+            event: 'health-check-result',
+            trigger,
+            connectCycleId,
+            healthy: false,
+          });
+        }
+        if (!isHealthy) {
+          const reconnectTrigger: WebSocketConnectTrigger = trigger === 'heartbeat' ? 'heartbeat-unhealthy' : trigger;
+          this.logger.info('WebSocket reconnect requested', {
+            subsystem: 'websocket-lifecycle',
+            event: 'reconnect-requested',
+            trigger: reconnectTrigger,
+            connectCycleId: connectCycleId + 1,
+          });
+          await connect(reconnectTrigger);
+        }
+      } finally {
+        healthCheckInProgress = false;
+      }
+    };
+
+    const handleOffline = (): void => {
+      this.logger.warn('Internet connection lost');
+      cancelConnection('offline');
+      applyConnectionState(ConnectionState.CLOSED);
+    };
+
+    function disconnect(): void {
+      disposed = true;
+      repository.disconnectWebSocket = noop;
+      cleanupHandlers.forEach(cleanup => {
+        cleanup();
+      });
+      cancelConnection('disconnect');
+      repository.notificationHandlingState(NOTIFICATION_HANDLING_STATE.CLOSED);
+    }
+
+    this.disconnectWebSocket = disconnect;
+
+    await this.handleTimeDrift();
+    if (disposed) {
+      return;
+    }
+
+    if (Runtime.isElectron()) {
+      // In Electron, use window focus events instead of visibilitychange
+      const handleFocus = (): void => {
+        if (navigator.onLine) {
+          void verifyConnectionHealthAndReconnect('focus');
+        }
+      };
+
+      window.addEventListener('focus', handleFocus);
+      cleanupHandlers.push(() => {
+        return window.removeEventListener('focus', handleFocus);
+      });
+    } else {
+      // In browser, use visibilitychange
+      const handleVisibilityChange = (): void => {
+        if (document.visibilityState === 'visible' && navigator.onLine) {
+          void verifyConnectionHealthAndReconnect('visibility');
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      cleanupHandlers.push(() => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      });
+    }
+
+    // Online/Offline handlers work for both environments
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    cleanupHandlers.push(() => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    });
+
+    // Heartbeat intentionally verifies connection health while online, even when the
+    // connection is not CLOSED, to detect stale "open-but-unhealthy" websocket states.
+    const heartbeatInterval = window.setInterval(() => {
+      void verifyConnectionHealthAndReconnect('heartbeat');
+    }, EventRepository.CONFIG.HEARTBEAT_INTERVAL);
+
+    cleanupHandlers.push(() => {
+      window.clearInterval(heartbeatInterval);
+    });
+
+    await connect('initial');
+  }
+
+  /**
+   * Close the WebSocket connection. (will be set only once the connectWebSocket is called)
+   */
+  disconnectWebSocket: () => void = noop;
+
+  //##############################################################################
+  // Notification Stream handling
+  //##############################################################################
+  private getServerTimeFromAxiosError(errorResponse: unknown): string | undefined {
+    if (!isAxiosError<{time?: string}>(errorResponse) || !isTruthy(errorResponse.response)) {
+      return undefined;
+    }
+
+    if ('time' in errorResponse.response && typeof errorResponse.response.time === 'string') {
+      return errorResponse.response.time;
+    }
+
+    if (
+      'data' in errorResponse.response &&
+      isTruthy(errorResponse.response.data) &&
+      typeof errorResponse.response.data === 'object' &&
+      'time' in errorResponse.response.data &&
+      typeof errorResponse.response.data.time === 'string'
+    ) {
+      return errorResponse.response.data.time;
+    }
+
+    return undefined;
+  }
+
+  private async handleTimeDrift(): Promise<void> {
+    try {
+      const time = await this.notificationService.getServerTime();
+      this.serverTimeHandler.computeTimeOffset(time);
+    } catch (errorResponse: unknown) {
+      const serverTime = this.getServerTimeFromAxiosError(errorResponse);
+
+      if (!isUndefined(serverTime)) {
+        this.serverTimeHandler.computeTimeOffset(serverTime);
+      }
+    }
+  }
+
+  private getIsoDateFromEvent(event: IncomingEvent, defaultValue = false): string | void {
+    if ('time' in event && isNonEmptyString(event.time)) {
+      return event.time;
+    }
+
+    if (event.type === USER_EVENT.CLIENT_ADD) {
+      return event.client.time;
+    }
+
+    if (event.type === USER_EVENT.CONNECTION) {
+      return event.connection.last_update;
+    }
+
+    if (defaultValue) {
+      return new Date(0).toISOString();
+    }
+  }
+
+  private readonly triggerMissedSystemEventMessageRendering = async (missedNotificationId: string): Promise<void> => {
+    const notificationId = await this.notificationService.getMissedIdFromDb();
+    const shouldUpdatePersistedId = missedNotificationId !== notificationId;
+    if (shouldUpdatePersistedId) {
+      amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
+      this.notificationService.saveMissedIdToDb(missedNotificationId);
+    }
+  };
+
+  /**
+   * Persist updated last event timestamp.
+   *
+   * @param eventDate Updated last event date
+   * @returns Resolves when the last event date was stored
+   */
+  private updateLastEventDate(eventDate: string): Promise<string> | void {
+    const didDateIncrease = eventDate > (this.lastEventDate() ?? '');
+    if (didDateIncrease) {
+      this.lastEventDate(eventDate);
+      return this.notificationService.saveLastEventDateToDb(eventDate);
+    }
+  }
+
+  //##############################################################################
+  // Notification/Event handling
+  //##############################################################################
+
+  async injectEvents(
+    events: (ClientConversationEvent | IncomingEvent)[],
+    source: EventSource = EventSource.INJECTED,
+  ): Promise<void> {
+    for (const event of events) {
+      await this.injectEvent(event, source);
+    }
+  }
+
+  /**
+   * Inject event into a conversation.
+   * @note Don't add unable to decrypt to self conversation
+   *
+   * @param event Event payload to be injected
+   * @param source Source of injection
+   * @returns Resolves when the event has been processed
+   */
+  async injectEvent(
+    event: ClientConversationEvent | IncomingEvent,
+    source: EventSource = EventSource.INJECTED,
+  ): Promise<void> {
+    if (!isTruthy(event)) {
+      throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
+    }
+
+    const isHandlingWebSocket = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    if (!isHandlingWebSocket) {
+      source = EventRepository.SOURCE.INJECTED;
+    }
+
+    const conversationId = 'conversation' in event && event.conversation;
+    const inSelfConversation = conversationId === this.userState.self()?.id;
+    if (!inSelfConversation) {
+      return this.processEvent(event, source);
+    }
+    return undefined;
+  }
+
+  /**
+   * Distribute the given event.
+   *
+   * @param event Mapped event to be distributed
+   * @param source Source of notification
+   */
+  private async distributeEvent(event: IncomingEvent, source: EventSource): Promise<void> {
+    await Promise.all(
+      this.eventProcessors.map(processor => {
+        return processor.processEvent(event, source);
+      }),
+    );
+
+    const {type} = event;
+    const [category] = type.split('.');
+    switch (category) {
+      case EVENT_TYPE.CALL:
+        amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, event, source);
+        break;
+      case EVENT_TYPE.CONVERSATION:
+        amplify.publish(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, event, source);
+        break;
+      case EVENT_TYPE.MEETING:
+        this.distributeMeetingEvent(event);
+        break;
+      case EVENT_TYPE.FEATURE_CONFIG:
+      case EVENT_TYPE.TEAM:
+        amplify.publish(WebAppEvents.TEAM.EVENT_FROM_BACKEND, event, source);
+        break;
+      case EVENT_TYPE.USER:
+        amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, event, source);
+        break;
+      default:
+        amplify.publish(type, event, source);
+    }
+    // Wait for the event handlers to have finished their async tasks
+    await new Promise(res => {
+      return setTimeout(res, 0);
+    });
+  }
+
+  private distributeMeetingEvent(event: IncomingEvent): void {
+    const webAppEventByMeetingEvent: Partial<Record<MEETING_EVENT, string>> = {
+      [MEETING_EVENT.CREATE]: WebAppEvents.MEETING.CREATED,
+      [MEETING_EVENT.UPDATE]: WebAppEvents.MEETING.UPDATED,
+      [MEETING_EVENT.DELETE]: WebAppEvents.MEETING.DELETED,
+      [MEETING_EVENT.MEMBER_ADD]: WebAppEvents.MEETING.MEMBER_ADDED,
+    };
+
+    const webAppEvent = webAppEventByMeetingEvent[event.type as MEETING_EVENT];
+    if (isUndefined(webAppEvent)) {
+      amplify.publish(event.type, event);
+      return;
+    }
+
+    const meetingId = 'qualified_id' in event ? event.qualified_id : undefined;
+    const actorId = 'qualified_from' in event ? event.qualified_from : undefined;
+    const hasValidQualifiedId =
+      !isUndefined(meetingId) && typeof meetingId.id === 'string' && typeof meetingId.domain === 'string';
+    const hasValidActorId =
+      !isUndefined(actorId) && typeof actorId.id === 'string' && typeof actorId.domain === 'string';
+
+    if (!hasValidQualifiedId || !hasValidActorId) {
+      this.logger.warn('Ignored meeting event without valid qualified IDs', {eventType: event.type});
+      return;
+    }
+
+    amplify.publish(webAppEvent, meetingId, actorId);
+  }
+
+  /**
+   * Handle a single event from the notification stream or WebSocket.
+   *
+   * @param event Event coming from backend
+   * @param source Source of event
+   * @returns Resolves with the saved record or the plain event if the event was skipped
+   */
+  private async handleEvent(
+    {event, decryptedData, decryptionError}: ProcessedEventPayload,
+    source: EventSource,
+  ): Promise<void | BackendEvent> {
+    const validationResult = validateEvent(
+      event as {time: string; type: CONVERSATION_EVENT | USER_EVENT},
+      source,
+      this.lastEventDate(),
+    );
+    switch (validationResult) {
+      default: {
+        return event;
+      }
+      case EventValidation.OUTDATED_TIMESTAMP: {
+        this.logger.warn(`Ignored outdated event type: '${event.type}'`);
+        return event;
+      }
+      case EventValidation.VALID:
+        let eventToProcess: IncomingEvent | undefined = event;
+        if (event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD || event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD) {
+          eventToProcess = await this.mapEncryptedEvent(event, {decryptedData, decryptionError}, source);
+        }
+        if (!isTruthy(eventToProcess)) {
+          return event;
+        }
+
+        return this.processEvent(eventToProcess, source);
+    }
+  }
+
+  private async mapEncryptedEvent(
+    event: ConversationOtrMessageAddEvent | ConversationMLSMessageAddEvent,
+    {decryptedData, decryptionError}: Pick<HandledEventPayload, 'decryptedData' | 'decryptionError'>,
+    source: EventSource,
+  ): Promise<IncomingEvent | undefined> {
+    if (isTruthy(decryptionError)) {
+      this.logger.warn('Could not decrypt a notification event', {
+        subsystem: 'websocket-lifecycle',
+        event: 'notification-event-decryption-failed',
+        source,
+        eventType: event.type,
+        errorCode: decryptionError.code,
+      });
+
+      const ignoredCodes = [
+        outdatedMessageDecryptionErrorCode, // Outated event decyption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
+        duplicateMessageDecryptionErrorCode, // Duplicate event decryption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
+      ];
+
+      if (isTruthy(decryptionError.code) && ignoredCodes.includes(decryptionError.code)) {
+        return undefined;
+      }
+
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
+        cause: decryptionError.code,
+      });
+
+      return EventBuilder.buildUnableToDecrypt(event, decryptionError);
+    }
+
+    if (isTruthy(decryptedData)) {
+      return (await new CryptographyMapper().mapGenericMessage(decryptedData, event)) as IncomingEvent | undefined;
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Decrypts, saves and distributes an event received from the backend.
+   *
+   * @param event Backend event extracted from notification stream
+   * @param source Source of event
+   * @returns Resolves with the saved record or `true` if the event was skipped
+   */
+  private async processEvent(event: IncomingEvent | ClientConversationEvent, source: EventSource): Promise<void> {
+    try {
+      for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
+        event = await eventProcessMiddleware.processEvent(event, source);
+      }
+    } catch (error: unknown) {
+      if (error instanceof EventValidationError) {
+        const {errorName, errorMessage} = getSafeNotificationErrorDetails(error);
+        this.logger.warn('Notification event validation failed', {
+          subsystem: 'websocket-lifecycle',
+          event: 'notification-event-validation-failed',
+          eventType: event.type,
+          source,
+          errorName,
+          errorMessage,
+        });
+        return;
+      }
+      throw error;
+    }
+
+    return this.handleEventDistribution(event, source);
+  }
+
+  /**
+   * Handle a saved event and distribute it.
+   *
+   * @param event Backend event extracted from notification stream
+   * @param source Source of event
+   * @returns The distributed event
+   */
+  private async handleEventDistribution(event: IncomingEvent, source: EventSource): Promise<void> {
+    const eventDate = this.getIsoDateFromEvent(event);
+    const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
+    const canSetEventDate = !isInjectedEvent && isNonEmptyString(eventDate);
+    if (canSetEventDate) {
+      /*
+       * HOTFIX: The "conversation.voice-channel-deactivate" event is the ONLY event which we inject with a source set to WebSocket.
+       * This is wrong but changing it will break our current conversation archive functionality (WEBAPP-6435).
+       * That's why we need to explicitly list the "conversation.voice-channel-deactivate" here because injected events should NEVER
+       * modify the last event timestamp which we use to query the backend's notification stream.
+       */
+      if (event.type !== ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE) {
+        await this.updateLastEventDate(eventDate as string);
+      }
+    }
+    return this.distributeEvent(event, source);
+  }
+}

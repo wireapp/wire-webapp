@@ -22,7 +22,7 @@ import React, {type FunctionComponent} from 'react';
 import cx from 'classnames';
 
 import {useApplicationContext} from '../../page/rootProvider';
-import type {Conversation} from '../../repositories/entity/Conversation';
+import type {Conversation} from '../../repositories/entity/conversation';
 import * as Icon from '../icon';
 import {useLegalHoldModalState} from '../modals/legalHoldModal/legalHoldModal.state';
 

@@ -27,19 +27,19 @@ import {IAttachment} from '@wireapp/protocol-messaging';
 
 import {useSendFiles} from './useSendFiles/useSendFiles';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {ConversationError} from '../../../../error/conversationError';
 import {MentionEntity} from '../../../../message/mentionEntity';
 import {MessageHasher} from '../../../../message/messageHasher';
 import {QuoteEntity} from '../../../../message/quoteEntity';
 import type {RootContextValue} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
-import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
-import {ConversationVerificationState} from '../../../../repositories/conversation/ConversationVerificationState';
-import {MessageRepository, OutgoingQuote} from '../../../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
+import {ConversationVerificationState} from '../../../../repositories/conversation/conversationVerificationState';
+import {MessageRepository, OutgoingQuote} from '../../../../repositories/conversation/messageRepository';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
-import {EventRepository} from '../../../../repositories/event/EventRepository';
+import {EventRepository} from '../../../../repositories/event/eventRepository';
 import {isErrorWithType} from '../../../../util/typePredicateUtil';
 import {useFileUploadState} from '../../../conversation/useFilesUploadState/useFilesUploadState';
 import {PrimaryModal} from '../../../modals/primaryModal';

@@ -19,9 +19,9 @@
 
 import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {Account} from '../../../../core';
-import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
-import {isMixedConversation, MixedConversation} from '../../../../repositories/conversation/ConversationSelectors';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
+import {isMixedConversation, MixedConversation} from '../../../../repositories/conversation/conversationSelectors';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {initMLSGroupConversation} from '../../../mlsConversations';
 import {mlsMigrationLogger} from '../../mlsMigrationLogger';
 

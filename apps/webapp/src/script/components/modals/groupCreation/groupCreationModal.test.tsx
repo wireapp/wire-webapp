@@ -1,10 +1,10 @@
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../../apiClient/team/feature/featureList.types';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {TeamState} from '../../../repositories/team/teamState';
 import ko from 'knockout';
 import {GroupCreationModal} from './groupCreationModal';
 import {act, getByRole} from '@testing-library/react';
 import {UserState} from '../../../repositories/user/userState';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '../../../webAppEvents';
 import {mountComponent} from '../../../auth/util/test/testUtil';

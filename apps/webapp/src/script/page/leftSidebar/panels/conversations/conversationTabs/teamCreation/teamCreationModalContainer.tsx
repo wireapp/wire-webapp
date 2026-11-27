@@ -23,8 +23,8 @@ import {ConfirmLeaveModal} from './confirmLeaveModal';
 import {TeamCreationModal} from './teamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
-import {User} from '../../../../../../repositories/entity/User';
-import {TeamRepository} from '../../../../../../repositories/team/TeamRepository';
+import {User} from '../../../../../../repositories/entity/user';
+import {TeamRepository} from '../../../../../../repositories/team/teamRepository';
 import {UserRepository} from '../../../../../../repositories/user/userRepository';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 

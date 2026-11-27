@@ -23,7 +23,7 @@ import {isNull} from '@sindresorhus/is';
 
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsOwnerColumn.styles';
 
-import {User} from '../../../../../repositories/entity/User';
+import {User} from '../../../../../repositories/entity/user';
 import {Avatar, AVATAR_SIZE} from '../../../../avatar';
 import {showUserModal} from '../../../../modals/userModal';
 

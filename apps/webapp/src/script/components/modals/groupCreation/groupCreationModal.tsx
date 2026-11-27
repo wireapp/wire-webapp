@@ -27,20 +27,20 @@ import {container} from 'tsyringe';
 import {RECEIPT_MODE} from '../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
 import {mapToConversationProtocol} from '../../../apiClient/team/feature/featureList.helper';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {isNonFederatingBackendsError} from '../../../core/errors';
 import {isProtocolOption, ProtocolOption} from '../../../guards/protocol';
 import {SidebarTabs, useSidebarStore} from '../../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from '../../../page/rootProvider';
-import {ACCESS_STATE} from '../../../repositories/conversation/AccessState';
+import {ACCESS_STATE} from '../../../repositories/conversation/accessState';
 import {
   ACCESS_TYPES,
   teamPermissionsForAccessState,
   toggleFeature,
-} from '../../../repositories/conversation/ConversationAccessPermission';
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {User} from '../../../repositories/entity/User';
-import {TeamState} from '../../../repositories/team/TeamState';
+} from '../../../repositories/conversation/conversationAccessPermission';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {User} from '../../../repositories/entity/user';
+import {TeamState} from '../../../repositories/team/teamState';
 import {UserState} from '../../../repositories/user/userState';
 import {generateConversationUrl} from '../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../router/routerBindings';

@@ -23,7 +23,7 @@ import {isBoolean, isDate, isNonEmptyString, isNumber, isObject, isString} from 
 import {FormattedMessage} from 'react-intl';
 import {objectHasIn, objectHasOwn} from 'ts-extras';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {ErrorMessage} from '../../uiKit/inputs/errorMessage/errorMessage';
 import {Link} from '../../uiKit/typography/link/link';
 import {errorHandlerDefaultMessages, errorHandlerStrings} from '../../util/errorUtil';

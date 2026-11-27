@@ -48,8 +48,8 @@ import {VerifyEmailCode} from './verifyEmailCode';
 import {VerifyEmailLink} from './verifyEmailLink';
 
 import type englishMessages from '../../../i18n/en-US.json';
-import {pathWithParams} from '../../commons/util/UrlUtil';
-import {Config} from '../../Config';
+import {pathWithParams} from '../../commons/util/urlUtil';
+import {Config} from '../../config';
 import {RootProvider, type RootContextValue} from '../../page/rootProvider';
 import {Loading} from '../../uiKit/dataDisplay/loading/loading';
 import {THEME_ID} from '../../uiKit/identity/theme/theme';

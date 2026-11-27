@@ -26,7 +26,7 @@ import {useNavigate} from 'react-router';
 import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './customBackend.styles';
 import {Page} from './page';
 
-import {pathWithParams} from '../../commons/util/UrlUtil';
+import {pathWithParams} from '../../commons/util/urlUtil';
 import {LogoFullIcon} from '../../components/icon';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';

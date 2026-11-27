@@ -38,7 +38,7 @@ import {
   userNameStyles,
 } from './styles';
 
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import {Option, Select} from '../../../uiKit/inputs/select/select';
 import type {Translate} from '../../../util/localizerUtil';
 import {Avatar, AVATAR_SIZE} from '../../avatar';

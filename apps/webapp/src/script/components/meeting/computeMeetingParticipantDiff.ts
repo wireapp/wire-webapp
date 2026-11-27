@@ -18,7 +18,7 @@
  */
 
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 import {matchQualifiedIds} from '../../util/qualifiedId';
 
 export const computeParticipantDiff = (

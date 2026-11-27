@@ -21,9 +21,9 @@ import React, {useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Runtime} from '../../../commons/util/Runtime';
-import {Config} from '../../../Config';
-import {User} from '../../../repositories/entity/User';
+import {Runtime} from '../../../commons/util/runtime';
+import {Config} from '../../../config';
+import {User} from '../../../repositories/entity/user';
 import {Translate} from '../../../util/localizerUtil';
 import {renderElement} from '../../../util/renderElement';
 import * as Icon from '../../icon';

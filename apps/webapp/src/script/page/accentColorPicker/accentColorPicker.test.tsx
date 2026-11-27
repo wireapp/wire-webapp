@@ -23,7 +23,7 @@ import {noop} from 'noop-esm';
 
 import {AccentColor} from '../../commons/util';
 
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 import {translateForTest} from '../../util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from '../testSupport/rootContextTestSupport';
 

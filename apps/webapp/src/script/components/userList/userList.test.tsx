@@ -24,9 +24,9 @@ import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.ty
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {UserList} from './userList';
-import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../repositories/entity/Conversation';
-import {User} from '../../repositories/entity/User';
+import {ConversationRepository} from '../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../repositories/entity/conversation';
+import {User} from '../../repositories/entity/user';
 import type {Translate} from '../../util/localizerUtil/translationTypes';
 import {translateForTest} from '../../util/test/translateForTest';
 import {

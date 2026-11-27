@@ -20,8 +20,8 @@
 import {render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {User} from '../../../repositories/entity/User';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {User} from '../../../repositories/entity/user';
+import {TeamState} from '../../../repositories/team/teamState';
 import {withTheme} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

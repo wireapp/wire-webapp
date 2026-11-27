@@ -27,11 +27,11 @@ import {amplify} from 'amplify';
 import {noop} from 'noop-esm';
 import {maybe, task} from 'true-myth';
 
-import type {CallingRepository} from '../../../repositories/calling/CallingRepository';
-import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {EventRepository} from '../../../repositories/event/EventRepository';
-import {EventSource} from '../../../repositories/event/EventSource';
+import type {CallingRepository} from '../../../repositories/calling/callingRepository';
+import type {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {EventRepository} from '../../../repositories/event/eventRepository';
+import {EventSource} from '../../../repositories/event/eventSource';
 import type {MeetingsRepository} from '../../../repositories/meetings/meetingsRepository';
 import {unwrap, unwrapErr} from '../../../util/test/resultTestSupport';
 import {translateForTest} from '../../../util/test/translateForTest';

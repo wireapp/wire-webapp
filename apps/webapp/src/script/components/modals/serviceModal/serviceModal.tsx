@@ -20,8 +20,8 @@
 import type {FunctionComponent} from 'react';
 
 import {SidebarTabs, useSidebarStore} from '../../../page/leftSidebar/panels/conversations/useSidebarStore';
-import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
-import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {IntegrationRepository} from '../../../repositories/integration/integrationRepository';
+import {ServiceEntity} from '../../../repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {Translate} from '../../../util/localizerUtil';
 import {renderElement} from '../../../util/renderElement';

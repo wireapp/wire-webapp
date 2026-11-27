@@ -22,7 +22,7 @@ import React, {type FunctionComponent} from 'react';
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {KEY} from '../../util/keyboardUtil';
 import {selfIndicator} from '../participantItemContent/participantItem.styles';

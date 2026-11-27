@@ -26,8 +26,8 @@ import {container} from 'tsyringe';
 
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {ClientState} from '../../../../repositories/client/ClientState';
-import type {CryptographyRepository} from '../../../../repositories/cryptography/CryptographyRepository';
+import {ClientState} from '../../../../repositories/client/clientState';
+import type {CryptographyRepository} from '../../../../repositories/cryptography/cryptographyRepository';
 import {splitFingerprint} from '../../../../util/stringUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
 import {DeviceCard} from '../deviceCard';

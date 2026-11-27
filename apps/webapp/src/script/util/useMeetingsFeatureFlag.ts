@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import {canUseMeetings} from './canUseMeetings';
 import {useKoSubscribableChildren} from './componentUtil';
 
-import {TeamState} from '../repositories/team/TeamState';
+import {TeamState} from '../repositories/team/teamState';
 import {Core} from '../service/coreSingleton';
 
 type MeetingsFeatureFlagState = {isMeetingsEnabled: boolean};

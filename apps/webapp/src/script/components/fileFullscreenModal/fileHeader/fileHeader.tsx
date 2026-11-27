@@ -41,7 +41,7 @@ import {
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
-import type {Conversation} from '../../../repositories/entity/Conversation';
+import type {Conversation} from '../../../repositories/entity/conversation';
 import {BadgesWithTooltip} from '../../../uiKit/dataDisplay/badgesWithTooltip/badgesWithTooltip';
 import {CloseIcon} from '../../../uiKit/dataDisplay/icon/closeIcon';
 import {DownloadIcon} from '../../../uiKit/dataDisplay/icon/downloadIcon';

@@ -28,7 +28,7 @@ import {
   modalButtonsCss,
 } from './teamCreationSteps.styles';
 
-import {Config} from '../../../../../../../Config';
+import {Config} from '../../../../../../../config';
 import {CheckRoundIcon} from '../../../../../../../uiKit/dataDisplay/icon/checkRoundIcon';
 import {Button} from '../../../../../../../uiKit/inputs/button/button';
 import {Link} from '../../../../../../../uiKit/typography/link/link';

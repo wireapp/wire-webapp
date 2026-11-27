@@ -22,7 +22,7 @@ import {FC} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {arrayIncludes} from 'ts-extras';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {TabIndex} from '../../../uiKit/utils/enums';
 import * as Icon from '../../icon';

@@ -18,7 +18,7 @@
  */
 
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {TimeInMillis} from '../../../../commons/util/TimeUtil';
+import {TimeInMillis} from '../../../../commons/util/timeUtil';
 import axios from 'axios';
 import {Maybe, result, task, type Task} from 'true-myth';
 

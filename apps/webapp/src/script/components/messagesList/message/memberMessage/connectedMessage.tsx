@@ -22,7 +22,7 @@ import type {FunctionComponent} from 'react';
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {User} from '../../../../repositories/entity/User';
+import {User} from '../../../../repositories/entity/user';
 import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {Avatar, AVATAR_SIZE} from '../../../avatar';

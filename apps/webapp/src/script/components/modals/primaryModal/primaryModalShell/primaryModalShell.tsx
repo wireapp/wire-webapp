@@ -21,7 +21,7 @@ import {ReactNode, useEffect, type FunctionComponent} from 'react';
 
 import {largeModalStyles} from './primaryModalShell.styles';
 
-import {Runtime} from '../../../../commons/util/Runtime';
+import {Runtime} from '../../../../commons/util/runtime';
 import {ModalComponent} from '../../modalComponent';
 import {ModalSize} from '../primaryModalTypes';
 

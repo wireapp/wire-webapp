@@ -35,12 +35,12 @@ import {TeamCreationBanner} from './teamCreation/teamCreationBanner';
 
 import {openDebugToolbar} from '../../../../../components/configToolbar/debugToolbarEvents';
 import * as Icon from '../../../../../components/icon';
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {getManageTeamUrl} from '../../../../../externalRoute';
-import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../../../repositories/entity/Conversation';
-import {User} from '../../../../../repositories/entity/User';
-import {TeamState} from '../../../../../repositories/team/TeamState';
+import {ConversationRepository} from '../../../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../../../repositories/entity/conversation';
+import {User} from '../../../../../repositories/entity/user';
+import {TeamState} from '../../../../../repositories/team/teamState';
 import {FEATURES, hasAccessToFeature} from '../../../../../repositories/user/userPermission';
 import {Core} from '../../../../../service/coreSingleton';
 import {ChannelIcon} from '../../../../../uiKit/dataDisplay/icon/channelIcon';

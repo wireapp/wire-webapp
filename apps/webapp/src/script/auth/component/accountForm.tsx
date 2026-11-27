@@ -30,7 +30,7 @@ import {Exception} from './exception';
 import {BackendError} from '../../apiClient/http/backendError';
 import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import {ValidationUtil} from '../../commons/util';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Button} from '../../uiKit/inputs/button/button';
 import {Checkbox, CheckboxLabel} from '../../uiKit/inputs/checkbox/checkbox';

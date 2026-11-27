@@ -21,10 +21,10 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Config} from '../../../../../../../Config';
+import {Config} from '../../../../../../../config';
 import {WireIdentity} from '../../../../../../../e2eIdentity';
 import {MotionDuration} from '../../../../../../../motion/motionDuration';
-import {ClientEntity} from '../../../../../../../repositories/client/ClientEntity';
+import {ClientEntity} from '../../../../../../../repositories/client/clientEntity';
 import {Button, ButtonVariant} from '../../../../../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../../../../../util/componentUtil';
 import {useApplicationContext} from '../../../../../../rootProvider';

@@ -31,9 +31,9 @@ import {DefaultConversationRoleName} from '../../../apiClient/conversation/conve
 import {RECEIPT_MODE} from '../../../apiClient/conversation/data/conversationReceiptModeUpdateData';
 import {CONVERSATION_PROTOCOL} from '../../../apiClient/team/feature/featureList.types';
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import {CONVERSATION_READONLY_STATE} from '../../conversation/ConversationRepository';
-import {ConversationStatus} from '../../conversation/ConversationStatus';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {CONVERSATION_READONLY_STATE} from '../../conversation/conversationRepository';
+import {ConversationStatus} from '../../conversation/conversationStatus';
+import {ConversationVerificationState} from '../../conversation/conversationVerificationState';
 
 export interface ConversationRecord {
   access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];

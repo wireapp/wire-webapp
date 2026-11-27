@@ -32,7 +32,7 @@ import {
   BaseSelection,
 } from 'lexical';
 
-import {User} from '../../../../../../repositories/entity/User';
+import {User} from '../../../../../../repositories/entity/user';
 import {$createMentionNode} from '../../nodes/mentionNode';
 
 interface PastePluginProps {

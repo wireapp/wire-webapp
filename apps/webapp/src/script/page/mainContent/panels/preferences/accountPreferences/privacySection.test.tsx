@@ -22,7 +22,7 @@ import {render, screen} from '@testing-library/react';
 import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 import {AppLockRepository} from '../../../../../repositories/user/appLockRepository';
 import {AppLockState} from '../../../../../repositories/user/appLockState';
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {withTheme} from '../../../../../auth/util/test/testUtil';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 import {

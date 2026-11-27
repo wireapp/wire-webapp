@@ -19,7 +19,7 @@
 
 import {CONVERSATION_TYPE} from '../../../../apiClient/conversation/conversation';
 
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {
   conversationFilters,
   conversationSearchFilter,

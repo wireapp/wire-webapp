@@ -17,7 +17,7 @@
  *
  */
 
-import {User} from '../entity/User';
+import {User} from '../entity/user';
 import {UserRepository} from '../user/userRepository';
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {createUuid} from '../../util/uuid';

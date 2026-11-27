@@ -23,7 +23,7 @@ import {singleton} from 'tsyringe';
 import {translate} from '../../util/localizerUtil';
 import {sortUsersByPriority} from '../../util/stringUtil';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
-import {User} from '../entity/User';
+import {User} from '../entity/user';
 
 @singleton()
 export class UserState {

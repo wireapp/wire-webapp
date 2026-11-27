@@ -20,7 +20,7 @@
 import {act, render, waitFor} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 
 import {AppLoader} from '.';
 import {translateForTest} from '../../util/test/translateForTest';

@@ -23,10 +23,10 @@ import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureL
 import {Maybe} from 'true-myth';
 
 import en from '../../../../../i18n/en-US.json';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {E2EIVerificationMessage as VerificationMessageEntity} from '../../../../repositories/entity/message/e2eiVerificationMessage';
-import {User} from '../../../../repositories/entity/User';
-import {Config} from '../../../../Config';
+import {User} from '../../../../repositories/entity/user';
+import {Config} from '../../../../config';
 import {E2EIVerificationMessageType} from '../../../../message/e2eiVerificationMessageType';
 import {
   createRootContextValueForTest,

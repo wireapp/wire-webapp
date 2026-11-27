@@ -27,19 +27,19 @@ import {FileWithPreview} from '../conversation/useFilesUploadState/useFilesUploa
 import {InputBar} from './';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
 import {CellsRepository} from '../../repositories/cells/cellsRepository';
-import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
-import {MessageRepository} from '../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../repositories/entity/Conversation';
-import {User} from '../../repositories/entity/User';
-import {EventRepository} from '../../repositories/event/EventRepository';
+import {ConversationRepository} from '../../repositories/conversation/conversationRepository';
+import {MessageRepository} from '../../repositories/conversation/messageRepository';
+import {Conversation} from '../../repositories/entity/conversation';
+import {User} from '../../repositories/entity/user';
+import {EventRepository} from '../../repositories/event/eventRepository';
 import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
 import {PropertiesService} from '../../repositories/properties/propertiesService';
 import {SearchRepository} from '../../repositories/search/searchRepository';
-import {SelfService} from '../../repositories/self/SelfService';
+import {SelfService} from '../../repositories/self/selfService';
 import {StorageRepository} from '../../repositories/storage';
-import {TeamState} from '../../repositories/team/TeamState';
+import {TeamState} from '../../repositories/team/teamState';
 import {withThemeAndRootContext} from '../../auth/util/test/testUtil';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {disableMessagePreprocessingFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {translate} from '../../util/localizerUtil';
 import {

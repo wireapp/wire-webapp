@@ -25,8 +25,8 @@ import {container} from 'tsyringe';
 
 import {EphemeralTimings} from '../../../../ephemeral/ephemeralTimings';
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {Conversation} from '../../../../repositories/entity/Conversation';
-import {TeamState} from '../../../../repositories/team/TeamState';
+import {Conversation} from '../../../../repositories/entity/conversation';
+import {TeamState} from '../../../../repositories/team/teamState';
 import {showContextMenu, type ContextMenuEntry} from '../../../../ui/contextMenu';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {isSpaceOrEnterKey} from '../../../../util/keyboardUtil';

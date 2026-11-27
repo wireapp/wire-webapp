@@ -24,8 +24,8 @@ import {amplify} from 'amplify';
 import {ControlButtons} from './controlButtons';
 import {SendMessageButton} from './sendMessageButton/sendMessageButton';
 
-import {Config} from '../../../Config';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {Config} from '../../../config';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {WebAppEvents} from '../../../webAppEvents';
 import {MessageContent} from '../common/messageContent/messageContent';
 

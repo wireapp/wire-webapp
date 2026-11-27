@@ -24,9 +24,9 @@ import {container} from 'tsyringe';
 
 import {DetachedWindow} from './components/detachedWindow';
 
-import {Call} from '../../../repositories/calling/Call';
-import {CallingRepository} from '../../../repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../../../repositories/calling/CallState';
+import {Call} from '../../../repositories/calling/call';
+import {CallingRepository} from '../../../repositories/calling/callingRepository';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../../../repositories/calling/callState';
 import {PropertiesRepository} from '../../../repositories/properties/propertiesRepository';
 import {UserState} from '../../../repositories/user/userState';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';

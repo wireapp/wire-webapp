@@ -20,8 +20,8 @@
 import {Maybe} from 'true-myth';
 
 import {CellsSelfUserDriveRole} from '../components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {Conversation} from '../repositories/entity/Conversation';
-import {User} from '../repositories/entity/User';
+import {Conversation} from '../repositories/entity/conversation';
+import {User} from '../repositories/entity/user';
 
 export enum CellNodeType {
   FILE = 'file',

@@ -34,10 +34,10 @@ import {
   userModalWrapperStyle,
 } from './userModal.styles';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {useApplicationContext} from '../../../page/rootProvider';
-import {User} from '../../../repositories/entity/User';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {User} from '../../../repositories/entity/user';
+import {TeamState} from '../../../repositories/team/teamState';
 import {UserRepository} from '../../../repositories/user/userRepository';
 import {Core} from '../../../service/coreSingleton';
 import {Link, LinkVariant} from '../../../uiKit/typography/link/link';

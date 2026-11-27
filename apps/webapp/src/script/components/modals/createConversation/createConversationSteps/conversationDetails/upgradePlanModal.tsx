@@ -28,7 +28,7 @@ import {
   salesModalBodyButtonCss,
 } from './conversationDetails.styles';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {useApplicationContext} from '../../../../../page/rootProvider';
 import {Button} from '../../../../../uiKit/inputs/button/button';
 import {Text} from '../../../../../uiKit/typography/text/text';

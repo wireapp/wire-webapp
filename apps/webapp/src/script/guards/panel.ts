@@ -18,8 +18,8 @@
  */
 
 import {PanelEntity} from '../page/rightSidebar/rightSidebar';
-import {User} from '../repositories/entity/User';
-import {ServiceEntity} from '../repositories/integration/ServiceEntity';
+import {User} from '../repositories/entity/user';
+import {ServiceEntity} from '../repositories/integration/serviceEntity';
 
 const isServiceEntity = (entity: PanelEntity): entity is ServiceEntity => {
   return 'isService' in entity && entity.isService;

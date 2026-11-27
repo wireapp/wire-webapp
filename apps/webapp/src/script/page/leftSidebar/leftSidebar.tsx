@@ -28,7 +28,7 @@ import {TemporaryGuestConversations} from './panels/temporatyGuestConversations'
 
 import {MeetingNotificationHost} from '../../components/meeting/meetingNotificationHost/meetingNotificationHost';
 import {conversationListCollapseFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {ListViewModel} from '../../viewModel/listViewModel';
 import {WebAppEvents} from '../../webAppEvents';

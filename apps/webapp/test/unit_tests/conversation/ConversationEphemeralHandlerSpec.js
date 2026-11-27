@@ -18,9 +18,9 @@
  */
 
 import {noop} from 'noop-esm';
-import {ConversationEphemeralHandler} from '../../../src/script/repositories/conversation/ConversationEphemeralHandler';
-import {Conversation} from '../../../src/script/repositories/entity/Conversation';
-import {EventService} from '../../../src/script/repositories/event/EventService';
+import {ConversationEphemeralHandler} from '../../../src/script/repositories/conversation/conversationEphemeralHandler';
+import {Conversation} from '../../../src/script/repositories/entity/conversation';
+import {EventService} from '../../../src/script/repositories/event/eventService';
 
 const buildConversationEphemeralHandler = () => {
   const eventService = new EventService(null, null);

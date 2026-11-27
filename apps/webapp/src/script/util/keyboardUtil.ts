@@ -22,7 +22,7 @@ import type {KeyboardEvent as ReactKeyboardEvent, SyntheticEvent as ReactEvent} 
 import {isString} from '@sindresorhus/is';
 import {arrayIncludes} from 'ts-extras';
 
-import {Runtime} from '../commons/util/Runtime';
+import {Runtime} from '../commons/util/runtime';
 
 export const KEY = {
   ARROW_DOWN: Runtime.isEdge() ? 'Down' : 'ArrowDown',

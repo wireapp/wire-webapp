@@ -39,7 +39,7 @@ import {ButtonAction, PrimaryModalType} from './primaryModalTypes';
 import {SecondaryButton} from './secondaryButton/secondaryButton';
 
 import {ValidationUtil} from '../../../commons/util';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {ErrorMessage} from '../../../uiKit/inputs/errorMessage/errorMessage';
 import {isEnterKey, isEscapeKey} from '../../../util/keyboardUtil';
 import type {Translate} from '../../../util/localizerUtil';

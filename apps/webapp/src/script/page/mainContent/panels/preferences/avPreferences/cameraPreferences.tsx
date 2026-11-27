@@ -25,9 +25,9 @@ import {DeviceSelect} from './deviceSelect';
 
 import * as Icon from '../../../../../components/icon';
 import {NoCameraMessage} from '../../../../../components/noCameraMessage';
-import {Config} from '../../../../../Config';
-import {MediaStreamHandler} from '../../../../../repositories/media/MediaStreamHandler';
-import {MediaType} from '../../../../../repositories/media/MediaType';
+import {Config} from '../../../../../config';
+import {MediaStreamHandler} from '../../../../../repositories/media/mediaStreamHandler';
+import {MediaType} from '../../../../../repositories/media/mediaType';
 import {useMediaDevicesStore} from '../../../../../repositories/media/useMediaDevicesStore';
 import {getLogger} from '../../../../../util/logger';
 import {useApplicationContext} from '../../../../rootProvider';

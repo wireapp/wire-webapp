@@ -32,7 +32,7 @@ import {
 import {getScheduleMeetingFormErrors} from './scheduleMeetingValidation';
 
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import {
   getDefaultMeetingEndDateTime,
   getDefaultScheduleMeetingStartDateTime,

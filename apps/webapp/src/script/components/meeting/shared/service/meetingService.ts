@@ -26,7 +26,7 @@ import type {CreateMeeting} from '../../../../apiClient/meetings/createMeeting';
 import type {MeetingWithConversation} from '../../../../apiClient/meetings/meeting';
 import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import type {AddUsersFailure} from '../../../../core/conversation';
-import type {User} from '../../../../repositories/entity/User';
+import type {User} from '../../../../repositories/entity/user';
 import {computeParticipantDiff} from '../../computeMeetingParticipantDiff';
 import {mapMeetNowCommandToCreateMeeting} from '../../mapMeetNowCommandToCreateMeeting';
 import {mapScheduleCommandToCreateMeeting} from '../../mapScheduleCommandToCreateMeeting';

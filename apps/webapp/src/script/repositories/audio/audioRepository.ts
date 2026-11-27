@@ -27,7 +27,7 @@ import {AudioType} from './audioType';
 import {AudioPreference, WebappProperties} from '../../apiClient/user/data/userPropertiesSetData';
 import {getLogger, Logger} from '../../util/logger';
 import {WebAppEvents} from '../../webAppEvents';
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {NOTIFICATION_HANDLING_STATE} from '../event/notificationHandlingState';
 import {mediaDevicesStore} from '../media/useMediaDevicesStore';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Playback outcomes define their existing numeric values inline. */

@@ -73,7 +73,7 @@ const ignores = [
   '!apps/server/configuration/server.config.ts',
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
-  'apps/server/bin/copy_server_assets.js',
+  'apps/server/bin/copyServerAssets.js',
   'apps/server/dist/',
   'apps/server/build/',
   '**/lib/',
@@ -1008,9 +1008,9 @@ const config = [
     // These adapters intentionally consume legacy event and reaction shapes for stored-data compatibility.
     files: [
       'apps/webapp/src/script/message/messageHasher.ts',
-      'apps/webapp/src/script/repositories/conversation/EventBuilder/EventBuilder.ts',
-      'apps/webapp/src/script/repositories/conversation/EventMapper.ts',
-      'apps/webapp/src/script/repositories/event/EventService.ts',
+      'apps/webapp/src/script/repositories/conversation/eventBuilder/eventBuilder.ts',
+      'apps/webapp/src/script/repositories/conversation/eventMapper.ts',
+      'apps/webapp/src/script/repositories/event/eventService.ts',
       'apps/webapp/src/script/util/reactionUtil.ts',
     ],
     rules: {

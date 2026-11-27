@@ -20,9 +20,9 @@
 import {FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 import {container} from 'tsyringe';
 
-import {TeamState} from '../team/TeamState';
-import {TeamEntity} from '../team/TeamEntity';
-import {Config} from '../../Config';
+import {TeamState} from '../team/teamState';
+import {TeamEntity} from '../team/teamEntity';
+import {Config} from '../../config';
 import {AppLockState} from './appLockState';
 
 describe('AppLockState', () => {

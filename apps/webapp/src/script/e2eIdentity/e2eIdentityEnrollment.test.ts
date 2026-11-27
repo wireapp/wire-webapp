@@ -27,9 +27,9 @@ import {container} from 'tsyringe';
 
 import {PrimaryModal} from '../components/modals/primaryModal';
 import {PrimaryModalType} from '../components/modals/primaryModal/primaryModalTypes';
-import {ConversationState} from '../repositories/conversation/ConversationState';
-import {Conversation} from '../repositories/entity/Conversation';
-import {User} from '../repositories/entity/User';
+import {ConversationState} from '../repositories/conversation/conversationState';
+import {Conversation} from '../repositories/entity/conversation';
+import {User} from '../repositories/entity/user';
 import {UserState} from '../repositories/user/userState';
 import {Core} from '../service/coreSingleton';
 import {requireValueForTest} from '../page/testSupport/rootContextTestSupport';

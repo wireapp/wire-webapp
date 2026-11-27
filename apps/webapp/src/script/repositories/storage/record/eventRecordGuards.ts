@@ -21,8 +21,8 @@ import {isTruthy} from '@sindresorhus/is';
 
 import {EventRecord} from './eventRecord';
 
-import {MessageAddEvent, MultipartMessageAddEvent} from '../../conversation/EventBuilder';
-import {ClientEvent} from '../../event/Client';
+import {MessageAddEvent, MultipartMessageAddEvent} from '../../conversation/eventBuilder';
+import {ClientEvent} from '../../event/client';
 
 /**
  * Type guard to check if an event is a MessageAddEvent (type MESSAGE_ADD).

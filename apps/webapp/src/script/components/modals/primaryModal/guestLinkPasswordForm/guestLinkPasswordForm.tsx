@@ -19,7 +19,7 @@
 
 import type {FormEvent, FunctionComponent} from 'react';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {Form} from '../../../../uiKit/inputs/form/form';
 import type {Translate} from '../../../../util/localizerUtil';
 import {PasswordFields} from '../../../passwordFields/passwordFields';

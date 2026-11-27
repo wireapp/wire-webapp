@@ -17,7 +17,7 @@
  *
  */
 
-import {getSafeErrorDetails, redactSensitiveData, sanitizeLogMessage} from '../commons/util/StringUtil';
+import {getSafeErrorDetails, redactSensitiveData, sanitizeLogMessage} from '../commons/util/stringUtil';
 import {redactSensitiveString} from './redactSensitiveString';
 
 describe('origin sanitization', () => {

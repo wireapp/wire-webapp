@@ -27,8 +27,8 @@ import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} fro
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {DeleteMessage} from '../../../../repositories/entity/message/deleteMessage';
-import {User} from '../../../../repositories/entity/User';
-import {ServiceEntity} from '../../../../repositories/integration/ServiceEntity';
+import {User} from '../../../../repositories/entity/user';
+import {ServiceEntity} from '../../../../repositories/integration/serviceEntity';
 import {Tooltip} from '../../../../uiKit/dataDisplay/tooltip/tooltip';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {AVATAR_SIZE, Avatar} from '../../../avatar';

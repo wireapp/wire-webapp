@@ -28,11 +28,11 @@ import {noop} from 'noop-esm';
 import {withTheme} from '../../../auth/util/test/testUtil';
 
 import {AssetRepository} from '../../../repositories/assets/assetRepository';
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {MessageRepository} from '../../../repositories/conversation/messageRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
-import {User} from '../../../repositories/entity/User';
+import {User} from '../../../repositories/entity/user';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

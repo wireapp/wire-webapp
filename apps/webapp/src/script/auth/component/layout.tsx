@@ -21,7 +21,7 @@ import {ReactNode, type FunctionComponent} from 'react';
 
 import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss} from './layout.styles';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {COLOR_V2} from '../../uiKit/identity/colorsV2/colorsV2';
 import {Logo} from '../../uiKit/identity/logo/logo';

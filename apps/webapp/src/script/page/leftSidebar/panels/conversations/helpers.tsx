@@ -21,8 +21,8 @@ import {isEmptyString, isNan, isNull} from '@sindresorhus/is';
 
 import {SidebarTabs} from './useSidebarStore';
 
-import {ConversationLabel} from '../../../../repositories/conversation/ConversationLabelRepository';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ConversationLabel} from '../../../../repositories/conversation/conversationLabelRepository';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';
 import {replaceAccents} from '../../../../util/stringUtil';
 import {isConversationEntity} from '../../../../util/typePredicateUtil';

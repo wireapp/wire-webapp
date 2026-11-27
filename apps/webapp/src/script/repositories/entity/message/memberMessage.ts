@@ -30,8 +30,8 @@ import {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate, Declension, getUserName} from '../../../util/localizerUtil';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
 import {capitalizeFirstChar} from '../../../util/stringUtil';
-import {ClientEvent} from '../../event/Client';
-import {User} from '../User';
+import {ClientEvent} from '../../event/client';
+import {User} from '../user';
 
 export const groupCreationHeaderSenderNameMarkerStart = '__wire_group_creation_sender_name_start__';
 export const groupCreationHeaderSenderNameMarkerEnd = '__wire_group_creation_sender_name_end__';

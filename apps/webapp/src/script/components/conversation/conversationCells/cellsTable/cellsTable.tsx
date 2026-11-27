@@ -82,7 +82,7 @@ import {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {driveBulkRestoreFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
-import type {Conversation} from '../../../../repositories/entity/Conversation';
+import type {Conversation} from '../../../../repositories/entity/conversation';
 import {CellNode, CellNodeType} from '../../../../types/cellNode';
 import {ArrowIcon} from '../../../../uiKit/dataDisplay/icon/arrowIcon';
 import {CloseIcon} from '../../../../uiKit/dataDisplay/icon/closeIcon';

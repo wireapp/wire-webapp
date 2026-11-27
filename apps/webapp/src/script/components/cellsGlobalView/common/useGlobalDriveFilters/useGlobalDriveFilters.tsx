@@ -21,7 +21,7 @@ import {useCallback, useMemo, useState} from 'react';
 
 import type {RootContextValue} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
-import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
 import type {
   FilterConfig,
   FilterItem,

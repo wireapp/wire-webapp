@@ -23,7 +23,7 @@ import type {JSX} from '@emotion/react/jsx-runtime';
 
 import {toolTipStyles} from './callParticipantsListItemHandRaiseIcon.styles';
 
-import {TimeInMillis} from '../../../commons/util/TimeUtil';
+import {TimeInMillis} from '../../../commons/util/timeUtil';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {InviteIcon} from '../../../uiKit/dataDisplay/icon/inviteIcon';
 import {Tooltip} from '../../../uiKit/dataDisplay/tooltip/tooltip';

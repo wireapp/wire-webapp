@@ -22,8 +22,8 @@ import {ChangeEvent, useCallback, useEffect, useRef, useState, type FunctionComp
 import {amplify} from 'amplify';
 
 import type {WebappProperties} from '../../../../../apiClient/user/data/userPropertiesSetData';
-import {Config} from '../../../../../Config';
-import type {MediaConstraintsHandler} from '../../../../../repositories/media/MediaConstraintsHandler';
+import {Config} from '../../../../../config';
+import type {MediaConstraintsHandler} from '../../../../../repositories/media/mediaConstraintsHandler';
 import type {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../../repositories/properties/propertiesType';
 import {Checkbox, CheckboxLabel} from '../../../../../uiKit/inputs/checkbox/checkbox';

@@ -20,8 +20,8 @@
 import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 
-import {randomInt} from '../../commons/util/RandomUtil';
-import {TimeInMillis} from '../../commons/util/TimeUtil';
+import {randomInt} from '../../commons/util/randomUtil';
+import {TimeInMillis} from '../../commons/util/timeUtil';
 import {CredentialType} from '../../core/messagingProtocols/mls';
 import {MLSStatuses, WireIdentity} from '../e2eIdentityVerification';
 

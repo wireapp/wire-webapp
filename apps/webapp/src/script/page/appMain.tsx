@@ -54,7 +54,7 @@ import {GroupCreationModal} from '../components/modals/groupCreation/groupCreati
 import {LegalHoldModal} from '../components/modals/legalHoldModal/legalHoldModal';
 import {PrimaryModal} from '../components/modals/primaryModal';
 import {showUserModal, UserModal} from '../components/modals/userModal';
-import {Config} from '../Config';
+import {Config} from '../config';
 import {
   driveBulkActionProgressFeatureToggleName,
   type StartupFeatureToggleName,
@@ -69,10 +69,10 @@ import {
   initialiseMigrationOfProteusConversations,
   joinUnestablishedMixedConversations,
 } from '../mls/mlsMigration/migrationInitialiser';
-import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
-import {ConversationState} from '../repositories/conversation/ConversationState';
-import {User} from '../repositories/entity/User';
-import {TeamState} from '../repositories/team/TeamState';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/callState';
+import {ConversationState} from '../repositories/conversation/conversationState';
+import {User} from '../repositories/entity/user';
+import {TeamState} from '../repositories/team/teamState';
 import {AppLockRepository} from '../repositories/user/appLockRepository';
 import {showInitialModal} from '../repositories/user/availabilityModal';
 import {UserState} from '../repositories/user/userState';

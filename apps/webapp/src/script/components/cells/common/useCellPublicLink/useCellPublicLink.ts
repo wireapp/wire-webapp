@@ -23,7 +23,7 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import type {RestShareLink} from '../../../../apiClient/cells';
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import type {CellNode} from '../../../../types/cellNode';
 

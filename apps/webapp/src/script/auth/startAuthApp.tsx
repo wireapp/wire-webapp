@@ -40,8 +40,8 @@ import {initializeDesktopLogOutput} from '../browser/initializeDesktopLogOutput'
 import {initializeRuntimeErrorDiagnostics} from '../browser/initializeRuntimeErrorDiagnostics';
 import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
 import {selectBrowserLogSaveFilePicker} from '../browser/selectBrowserLogSaveFilePicker';
-import {Runtime} from '../commons/util/Runtime';
-import {Config} from '../Config';
+import {Runtime} from '../commons/util/runtime';
+import {Config} from '../config';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/localizer';

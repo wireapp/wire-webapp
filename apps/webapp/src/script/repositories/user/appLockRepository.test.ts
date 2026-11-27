@@ -19,7 +19,7 @@
 
 import {removeCurrentModal} from '../../components/modals/primaryModal';
 import {usePrimaryModalState} from '../../components/modals/primaryModal/primaryModalState';
-import {User} from '../entity/User/User';
+import {User} from '../entity/user/user';
 import type {Translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {createUuid} from '../../util/uuid';
@@ -27,8 +27,8 @@ import {createUuid} from '../../util/uuid';
 import {AppLockCrypto, AppLockRepository} from './appLockRepository';
 import {AppLockState} from './appLockState';
 import {UserState} from './userState';
-import {TeamEntity} from '../team/TeamEntity';
-import {TeamState} from '../team/TeamState';
+import {TeamEntity} from '../team/teamEntity';
+import {TeamState} from '../team/teamState';
 import {FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 
 const mockCryptoPwhashStr = jest.fn();

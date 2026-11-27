@@ -34,9 +34,9 @@ import type {ConversationEvent} from '../../../apiClient/event/conversationEvent
 import {BackendError} from '../../../apiClient/http/backendError';
 import {BackendErrorLabel} from '../../../apiClient/http/backendErrorLabel';
 import {UrlUtil} from '../../../commons/util';
-import {Runtime} from '../../../commons/util/Runtime';
-import {isValidEmail, PATTERN} from '../../../commons/util/ValidationUtil';
-import {Config} from '../../../Config';
+import {Runtime} from '../../../commons/util/runtime';
+import {isValidEmail, PATTERN} from '../../../commons/util/validationUtil';
+import {Config} from '../../../config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {APIClient} from '../../../service/apiClientSingleton';
 import {Loading} from '../../../uiKit/dataDisplay/loading/loading';

@@ -19,7 +19,7 @@
 
 import {isEmptyString, isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {Conversation} from '../../../../../repositories/entity/conversation';
 import {StorageKey} from '../../../../../repositories/storage';
 import {getLogger} from '../../../../../util/logger';
 

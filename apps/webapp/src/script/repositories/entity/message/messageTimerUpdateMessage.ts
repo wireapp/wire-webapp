@@ -25,7 +25,7 @@ import {CONVERSATION_EVENT} from '../../../apiClient/event/conversationEvent';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate} from '../../../util/localizerUtil';
 import {formatDuration} from '../../../util/timeUtil';
-import {ConversationEphemeralHandler} from '../../conversation/ConversationEphemeralHandler';
+import {ConversationEphemeralHandler} from '../../conversation/conversationEphemeralHandler';
 
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number | null;

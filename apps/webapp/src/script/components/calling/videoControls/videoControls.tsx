@@ -40,27 +40,27 @@ import {
 } from './videoControls.styles';
 import {VideoControlsSelect} from './videoControlsSelect/videoControlsSelect';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {isCallViewOption} from '../../../guards/callView';
 import {isMediaDevice} from '../../../guards/mediaDevice';
 import {useActiveWindowMatchMedia} from '../../../hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from '../../../hooks/useUserProperty';
 import {useApplicationContext} from '../../../page/rootProvider';
-import {Call} from '../../../repositories/calling/Call';
-import {CallingViewMode, CallState} from '../../../repositories/calling/CallState';
-import {Participant} from '../../../repositories/calling/Participant';
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../../repositories/media/MediaDevicesHandler';
+import {Call} from '../../../repositories/calling/call';
+import {CallingViewMode, CallState} from '../../../repositories/calling/callState';
+import {Participant} from '../../../repositories/calling/participant';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../../repositories/media/mediaDevicesHandler';
 import {useBackgroundEffectsStore} from '../../../repositories/media/useBackgroundEffectsStore';
 import {useMediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
 import {
   BackgroundEffectSelection,
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
-} from '../../../repositories/media/VideoBackgroundEffects';
+} from '../../../repositories/media/videoBackgroundEffects';
 import {PropertiesRepository} from '../../../repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../../../repositories/properties/propertiesType';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {TeamState} from '../../../repositories/team/teamState';
 import {ContextMenuEntry, showContextMenu} from '../../../ui/contextMenu';
 import {BlurHighIcon} from '../../../uiKit/dataDisplay/icon/blurHighIcon';
 import {BlurLowIcon} from '../../../uiKit/dataDisplay/icon/blurLowIcon';

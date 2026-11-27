@@ -21,9 +21,9 @@ import {useCallback, useEffect, useMemo} from 'react';
 
 import {amplify} from 'amplify';
 
-import {Config} from '../../../Config';
-import {MessageRepository, OutgoingQuote} from '../../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {Config} from '../../../config';
+import {MessageRepository, OutgoingQuote} from '../../../repositories/conversation/messageRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {WebAppEvents} from '../../../webAppEvents';
 
 interface UseGiphyProps {

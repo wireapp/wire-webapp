@@ -26,9 +26,9 @@ import {generateConversation} from '../../../../test/helper/ConversationGenerato
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {generateAPIUser} from '../../../../test/helper/UserGenerator';
 
-import {User} from '../entity/User';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import {ClientEvent} from '../event/Client';
+import {User} from '../entity/user';
+import type {ConversationRepository} from '../conversation/conversationRepository';
+import {ClientEvent} from '../event/client';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/storageSchemata';
 import {noop} from '../../util/util';
@@ -44,7 +44,7 @@ import {createMetaData} from './legacyBackup.helper';
 import {preprocessEvents} from './recordPreprocessors';
 import {handleZipEvent} from './zipWorker';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {DatabaseTypes, createStorageEngine} from '../../service/storeEngineProvider';
 import {translateForTest} from '../../util/test/translateForTest';
 

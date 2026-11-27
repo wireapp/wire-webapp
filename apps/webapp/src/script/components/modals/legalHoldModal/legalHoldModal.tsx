@@ -29,12 +29,12 @@ import {LegalHoldMemberStatus} from '../../../apiClient/team/legalhold/legalHold
 import {useUserDevicesHistory} from '../../../hooks/useUserDevicesHistory';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {ClientRepository} from '../../../repositories/client';
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
-import {CryptographyRepository} from '../../../repositories/cryptography/CryptographyRepository';
-import {User} from '../../../repositories/entity/User';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {MessageRepository} from '../../../repositories/conversation/messageRepository';
+import {CryptographyRepository} from '../../../repositories/cryptography/cryptographyRepository';
+import {User} from '../../../repositories/entity/user';
 import {SearchRepository} from '../../../repositories/search/searchRepository';
-import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TeamRepository} from '../../../repositories/team/teamRepository';
 import {handleEnterDown} from '../../../util/keyboardUtil';
 import {
   createReactTranslationMarker,

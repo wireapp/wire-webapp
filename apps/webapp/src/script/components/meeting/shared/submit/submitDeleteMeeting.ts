@@ -24,7 +24,7 @@ import {isMeetingDeletedDespiteSubmitError} from './shouldRefreshMeetingsListAft
 import {showMeetingSubmitError} from './showMeetingSubmitError';
 
 import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
-import type {User} from '../../../../repositories/entity/User';
+import type {User} from '../../../../repositories/entity/user';
 import type {Translate, TranslationKey} from '../../../../util/localizerUtil';
 import {PrimaryModal} from '../../../modals/primaryModal';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../../meetingSubmitErrors';

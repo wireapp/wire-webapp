@@ -28,7 +28,7 @@ import {
   PrimaryModalTranslatedValue,
   PrimaryModalType,
 } from '../../components/modals/primaryModal/primaryModalTypes';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import type {Translate, TranslationKey} from '../../util/localizerUtil';
 import {WebAppEvents} from '../../webAppEvents';
 

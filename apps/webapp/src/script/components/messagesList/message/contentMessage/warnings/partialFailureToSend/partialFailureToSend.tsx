@@ -24,7 +24,7 @@ import {countBy, map} from 'underscore';
 
 import type {QualifiedUserClients} from '../../../../../../apiClient/conversation/qualifiedUserClients';
 import {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
-import {Config} from '../../../../../../Config';
+import {Config} from '../../../../../../config';
 import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
 import {Link, LinkVariant} from '../../../../../../uiKit/typography/link/link';

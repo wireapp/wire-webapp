@@ -19,7 +19,7 @@
 
 import {act, fireEvent, render, waitFor, within} from '@testing-library/react';
 
-import {User} from '../../../../../../repositories/entity/User';
+import {User} from '../../../../../../repositories/entity/user';
 import {ReactionMap} from '../../../../../../repositories/storage';
 import {withTheme} from '../../../../../../auth/util/test/testUtil';
 import {generateQualifiedId} from '../../../../../../../../test/helper/UserGenerator';

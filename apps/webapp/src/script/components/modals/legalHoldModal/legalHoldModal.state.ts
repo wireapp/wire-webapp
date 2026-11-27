@@ -22,8 +22,8 @@ import {create} from 'zustand';
 
 import {LegalHoldModalType} from './legalHoldModal';
 
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {User} from '../../../repositories/entity/User';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {User} from '../../../repositories/entity/user';
 
 type LegalHoldModalState = {
   type: LegalHoldModalType | null;

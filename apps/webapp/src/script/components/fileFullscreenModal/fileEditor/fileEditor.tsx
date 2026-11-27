@@ -26,7 +26,7 @@ import * as styles from './fileEditor.styles';
 import {validateCollaboraUrl} from './validateCollaboraUrl';
 
 import {Node} from '../../../apiClient/cells/cellsApi.schema';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';

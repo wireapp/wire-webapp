@@ -25,7 +25,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {CellsShareExpirationFields, type CellsShareExpirationSelection} from './cellsShareExpirationFields';
 
 import {ValidationUtil} from '../../../commons/util';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {type RootContextValue} from '../../../page/rootProvider';
 import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR_V2} from '../../../uiKit/identity/colorsV2/colorsV2';
 import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';

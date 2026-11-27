@@ -27,7 +27,7 @@ import {ConversationOption} from './conversationOption';
 import {conversationTypeContainerCss} from './conversationType.styles';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {TeamState} from '../../../../repositories/team/TeamState';
+import {TeamState} from '../../../../repositories/team/teamState';
 import {UserState} from '../../../../repositories/user/userState';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';

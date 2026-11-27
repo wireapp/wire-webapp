@@ -34,15 +34,15 @@ import {
 } from './joinMeetingCall';
 
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {
   showCallNotEstablishedModal,
   useNoInternetCallGuard,
 } from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {useApplicationContext, useMainViewModel} from '../../page/rootProvider';
 import type {CallMediaChoice} from '../../repositories/calling/callMediaChoice';
-import {CallState} from '../../repositories/calling/CallState';
-import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {CallState} from '../../repositories/calling/callState';
+import {ConversationState} from '../../repositories/conversation/conversationState';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {matchQualifiedIds} from '../../util/qualifiedId';
 import {PrimaryModal} from '../modals/primaryModal';

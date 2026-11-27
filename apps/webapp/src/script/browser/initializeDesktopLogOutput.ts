@@ -22,7 +22,7 @@ import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {Maybe} from 'true-myth';
 import {objectHasOwn} from 'ts-extras';
 
-import {Runtime} from '../commons/util/Runtime';
+import {Runtime} from '../commons/util/runtime';
 import {createDesktopLogOutput} from '../logger/createDesktopLogOutput';
 import {selectDesktopApplicationLogWrite} from '../logger/selectDesktopApplicationLogWrite';
 

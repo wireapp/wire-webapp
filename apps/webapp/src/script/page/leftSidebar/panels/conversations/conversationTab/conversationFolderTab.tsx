@@ -23,10 +23,10 @@ import {isNan, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import * as Icons from '../../../../../components/icon';
-import {Config} from '../../../../../Config';
-import {createLabel, LabelType} from '../../../../../repositories/conversation/ConversationLabelRepository';
-import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {Config} from '../../../../../config';
+import {createLabel, LabelType} from '../../../../../repositories/conversation/conversationLabelRepository';
+import {ConversationRepository} from '../../../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../../../repositories/entity/conversation';
 import {ContextMenuEntry, showContextMenu} from '../../../../../ui/contextMenu';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {useApplicationContext} from '../../../../rootProvider';

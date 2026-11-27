@@ -37,7 +37,7 @@ import {
 
 import {currentLanguage} from '../../../auth/localeConfig';
 import {useApplicationContext} from '../../../page/rootProvider';
-import type {User} from '../../../repositories/entity/User';
+import type {User} from '../../../repositories/entity/user';
 import {CircleCloseIcon} from '../../../uiKit/dataDisplay/icon/circleCloseIcon';
 import {DatePickerField} from '../../../uiKit/inputs/datePickerField/datePickerField';
 import {combineDateAndTime, dateValueFromDate} from '../../../uiKit/inputs/dateTimePickerField/dateTimeUtils';

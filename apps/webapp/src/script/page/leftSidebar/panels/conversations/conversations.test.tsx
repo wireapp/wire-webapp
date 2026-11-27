@@ -30,11 +30,11 @@ import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureL
 import {amplify} from 'amplify';
 import {WebAppEvents} from '../../../../webAppEvents';
 
-import {CallState} from '../../../../repositories/calling/CallState';
-import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../../repositories/entity/Conversation';
-import {User} from '../../../../repositories/entity/User';
-import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import {CallState} from '../../../../repositories/calling/callState';
+import {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../../repositories/entity/conversation';
+import {User} from '../../../../repositories/entity/user';
+import {ConversationState} from '../../../../repositories/conversation/conversationState';
 import {SearchRepository} from '../../../../repositories/search/searchRepository';
 import {UserRepository} from '../../../../repositories/user/userRepository';
 import {withTheme, withThemeAndRootContext} from '../../../../auth/util/test/testUtil';

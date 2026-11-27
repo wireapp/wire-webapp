@@ -45,7 +45,7 @@ import {qualityTierFromModel} from './qualityTierMapping';
 
 import {getLogger, Logger} from '../../../util/logger';
 import {backgroundEffectsStore} from '../useBackgroundEffectsStore';
-import {BackgroundSource} from '../VideoBackgroundEffects';
+import {BackgroundSource} from '../videoBackgroundEffects';
 
 // Blur strength (0–1) maps to Gaussian sigma in pixel units for the shader.
 // The shader's blur radius is 30 px, so a sigma in the ~10–20 px range gives

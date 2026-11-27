@@ -22,12 +22,12 @@ import {GROUP_CONVERSATION_TYPE} from '../../../../apiClient/conversation/conver
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
 import {maybe, task} from 'true-myth';
 
-import type {CallingRepository} from '../../../../repositories/calling/CallingRepository';
+import type {CallingRepository} from '../../../../repositories/calling/callingRepository';
 import type {MeetingServiceDeps} from '../../meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors} from '../../meetingSubmitErrors';
-import type {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../../repositories/entity/Conversation';
-import {User} from '../../../../repositories/entity/User';
+import type {ConversationRepository} from '../../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../../repositories/entity/conversation';
+import {User} from '../../../../repositories/entity/user';
 import type {MeetingsRepository} from '../../../../repositories/meetings/meetingsRepository';
 import {translateForTest} from '../../../../util/test/translateForTest';
 import {unwrapErr} from '../../../../util/test/resultTestSupport';

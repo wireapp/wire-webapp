@@ -21,7 +21,7 @@ import React, {type FunctionComponent} from 'react';
 
 import {TopContact} from './topPeople/topContact';
 
-import {User} from '../../../../../repositories/entity/User';
+import {User} from '../../../../../repositories/entity/user';
 
 const defaultTopPeopleLimit = 9;
 

@@ -19,9 +19,9 @@
 
 import {act, render, screen, waitFor} from '@testing-library/react';
 
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 import type {AppLockRepository} from '../../repositories/user/appLockRepository';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../repositories/media/mediaDevicesHandler';
 import {ContentViewModel} from '../../viewModel/contentViewModel';
 import {translateForTest} from '../../util/test/translateForTest';
 

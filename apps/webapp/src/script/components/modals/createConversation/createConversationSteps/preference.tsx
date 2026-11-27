@@ -22,9 +22,9 @@ import {useEffect, type FunctionComponent} from 'react';
 import {container} from 'tsyringe';
 
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {TeamState} from '../../../../repositories/team/TeamState';
+import {TeamState} from '../../../../repositories/team/teamState';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {checkAppsFeatureAvailability} from '../../../../util/featureUtil';
 import {AppsDisabledNote} from '../../../note/appsDisabledNote/appsDisabledNote';

@@ -37,8 +37,8 @@ import {
 
 import * as Icon from '../../../../../components/icon';
 import {useCreateConversationModal} from '../../../../../components/modals/createConversation/hooks/useCreateConversationModal';
-import {ConversationLabel} from '../../../../../repositories/conversation/ConversationLabelRepository';
-import {User} from '../../../../../repositories/entity/User';
+import {ConversationLabel} from '../../../../../repositories/conversation/conversationLabelRepository';
+import {User} from '../../../../../repositories/entity/user';
 import {generatePermissionHelpers} from '../../../../../repositories/user/userPermission';
 import {CircleCloseIcon} from '../../../../../uiKit/dataDisplay/icon/circleCloseIcon';
 import {SearchIcon} from '../../../../../uiKit/dataDisplay/icon/searchIcon';

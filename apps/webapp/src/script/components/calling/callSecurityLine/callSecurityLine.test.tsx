@@ -36,8 +36,8 @@ import {
 } from './callSecurityLine';
 import {KEY_UPDATE_HOLD_IN_MILLISECONDS} from './keyUpdateQueue';
 
-import {Participant} from '../../../repositories/calling/Participant';
-import {User} from '../../../repositories/entity/User';
+import {Participant} from '../../../repositories/calling/participant';
+import {User} from '../../../repositories/entity/user';
 
 const startOfCallInMilliseconds = 1_000_000;
 

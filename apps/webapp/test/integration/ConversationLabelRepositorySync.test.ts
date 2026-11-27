@@ -23,8 +23,8 @@ import {asyncNoop} from 'noop-esm';
 import {
   ConversationLabelRepository,
   LabelType,
-} from '../../src/script/repositories/conversation/ConversationLabelRepository';
-import {Conversation} from '../../src/script/repositories/entity/Conversation';
+} from '../../src/script/repositories/conversation/conversationLabelRepository';
+import {Conversation} from '../../src/script/repositories/entity/conversation';
 import {PropertiesService} from '../../src/script/repositories/properties/propertiesService';
 import {translate} from '../../src/script/util/localizerUtil';
 import {createUuid} from '../../src/script/util/uuid';

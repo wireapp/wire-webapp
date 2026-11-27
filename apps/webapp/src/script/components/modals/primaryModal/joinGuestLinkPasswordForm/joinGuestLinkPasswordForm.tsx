@@ -21,7 +21,7 @@ import type {FormEvent, FunctionComponent} from 'react';
 
 import {labelStyles, inputStyles, linkStyles, linkTextStyles} from './joinGuestLinkPasswordForm.styles';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {COLOR} from '../../../../uiKit/identity/colors/colors';
 import {Form} from '../../../../uiKit/inputs/form/form';
 import {Link} from '../../../../uiKit/typography/link/link';

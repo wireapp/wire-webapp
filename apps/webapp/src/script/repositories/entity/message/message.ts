@@ -59,7 +59,7 @@ import {
 import {AssetTransferState} from '../../assets/assetTransferState';
 import {AssetType} from '../../assets/assetType';
 import type {ReadReceipt} from '../../storage/record/eventRecord';
-import {User} from '../User';
+import {User} from '../user';
 
 export class Message {
   protected readonly translate: Translate;

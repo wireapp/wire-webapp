@@ -20,9 +20,9 @@
 import {useMemo, type FunctionComponent} from 'react';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {generateCellState} from '../../../../repositories/conversation/ConversationCellState';
-import {ConversationStatusIcon} from '../../../../repositories/conversation/ConversationStatusIcon';
-import type {Conversation} from '../../../../repositories/entity/Conversation';
+import {generateCellState} from '../../../../repositories/conversation/conversationCellState';
+import {ConversationStatusIcon} from '../../../../repositories/conversation/conversationStatusIcon';
+import type {Conversation} from '../../../../repositories/entity/conversation';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import * as Icon from '../../../icon';
 

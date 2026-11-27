@@ -21,7 +21,7 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 
-import type {CallingRepository} from '../../../../repositories/calling/CallingRepository';
+import type {CallingRepository} from '../../../../repositories/calling/callingRepository';
 import {EventName} from '../../../../repositories/tracking/eventName';
 import {WebAppEvents} from '../../../../webAppEvents';
 

@@ -19,11 +19,11 @@
 
 import {act, fireEvent, renderHook} from '@testing-library/react';
 
-import {User} from '../../../repositories/entity/User';
-import type {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/user';
+import type {Conversation} from '../../../repositories/entity/conversation';
 
 import {useMeetingParticipantsPicker} from './useMeetingParticipantsPicker';
-import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import type {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
 
 const createUser = (id: string, name: string): User => {
   const user = new User(id, 'example.com', key => {

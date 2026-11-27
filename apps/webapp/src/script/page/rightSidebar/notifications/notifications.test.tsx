@@ -20,9 +20,9 @@
 import {render, screen, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {NOTIFICATION_STATE} from '../../../repositories/conversation/NotificationSetting';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {NOTIFICATION_STATE} from '../../../repositories/conversation/notificationSetting';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

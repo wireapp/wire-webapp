@@ -21,7 +21,7 @@ import type {FunctionComponent, ReactNode} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {Config} from '../../../../../../Config';
+import {Config} from '../../../../../../config';
 import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
 import {Link, LinkVariant} from '../../../../../../uiKit/typography/link/link';

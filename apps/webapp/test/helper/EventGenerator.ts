@@ -29,9 +29,9 @@ import {
   MessageAddEvent,
   MultipartMessageAddEvent,
   ReactionEvent,
-} from '../../src/script/repositories/conversation/EventBuilder';
-import {Conversation} from '../../src/script/repositories/entity/Conversation';
-import {CONVERSATION} from '../../src/script/repositories/event/Client';
+} from '../../src/script/repositories/conversation/eventBuilder';
+import {Conversation} from '../../src/script/repositories/entity/conversation';
+import {CONVERSATION} from '../../src/script/repositories/event/client';
 import {CONVERSATION_PROTOCOL} from '../../src/script/apiClient/team/feature/featureList.types';
 import {StatusType} from '../../src/script/message/statusType';
 import {translate} from '../../src/script/util/localizerUtil';

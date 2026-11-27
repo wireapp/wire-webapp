@@ -26,7 +26,7 @@ import {AvatarInitials} from './avatarInitials';
 import {AvatarWrapper} from './avatarWrapper';
 import {shouldShowBadge} from './userAvatar';
 
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 import {CSS_FILL_PARENT} from '../../util/cssMixin';
 
 import {AVATAR_SIZE, STATE, DIAMETER} from '.';

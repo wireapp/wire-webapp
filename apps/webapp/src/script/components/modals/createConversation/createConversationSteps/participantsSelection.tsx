@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {participantsSelectionListCss, participantsSelectionSearchCss} from './createConversationSteps.styles';
 
 import {useApplicationContext} from '../../../../page/rootProvider';
-import {TeamState} from '../../../../repositories/team/TeamState';
+import {TeamState} from '../../../../repositories/team/teamState';
 import {UserState} from '../../../../repositories/user/userState';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {sortUsersByPriority} from '../../../../util/stringUtil';

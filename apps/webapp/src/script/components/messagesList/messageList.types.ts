@@ -22,15 +22,15 @@ import React from 'react';
 import {MessageActions} from './message';
 
 import {AssetRepository} from '../../repositories/assets/assetRepository';
-import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
-import {MessageRepository} from '../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../repositories/entity/Conversation';
+import {ConversationRepository} from '../../repositories/conversation/conversationRepository';
+import {MessageRepository} from '../../repositories/conversation/messageRepository';
+import {Conversation} from '../../repositories/entity/conversation';
 import {ContentMessage} from '../../repositories/entity/message/contentMessage';
 import {DecryptErrorMessage} from '../../repositories/entity/message/decryptErrorMessage';
 import {MemberMessage} from '../../repositories/entity/message/memberMessage';
 import {Message as MessageEntity} from '../../repositories/entity/message/message';
-import {User} from '../../repositories/entity/User';
-import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {User} from '../../repositories/entity/user';
+import {ServiceEntity} from '../../repositories/integration/serviceEntity';
 import type {UserRepository} from '../../repositories/user/userRepository';
 
 export interface MessagesListParams {

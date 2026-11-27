@@ -27,7 +27,7 @@ import {
   screenShareIcon,
 } from './callParticipantsListItem.styles';
 
-import {Participant} from '../../../repositories/calling/Participant';
+import {Participant} from '../../../repositories/calling/participant';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import * as Icon from '../../icon';
 import {ParticipantMicOnIcon} from '../participantMicOnIcon';

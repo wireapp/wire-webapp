@@ -20,8 +20,8 @@
 import {render, waitFor} from '@testing-library/react';
 
 import {PrimaryModal, removeCurrentModal} from '../modals/primaryModal';
-import {ClientState} from '../../repositories/client/ClientState';
-import {User} from '../../repositories/entity/User';
+import {ClientState} from '../../repositories/client/clientState';
+import {User} from '../../repositories/entity/user';
 import * as RootProvider from '../../page/rootProvider';
 import {RootContextValue} from '../../page/rootProvider';
 import {MainViewModel} from '../../viewModel/mainViewModel';

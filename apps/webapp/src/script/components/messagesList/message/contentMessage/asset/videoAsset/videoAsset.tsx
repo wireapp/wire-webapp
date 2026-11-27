@@ -29,7 +29,7 @@ import {AssetRepository} from '../../../../../../repositories/assets/assetReposi
 import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
 import type {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import type {FileAsset as FileAssetType} from '../../../../../../repositories/entity/message/fileAsset';
-import {TeamState} from '../../../../../../repositories/team/TeamState';
+import {TeamState} from '../../../../../../repositories/team/teamState';
 import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/button';
 import {TabIndex} from '../../../../../../uiKit/utils/enums';
 import {useTimeout} from '../../../../../../uiKit/utils/useTimeout';

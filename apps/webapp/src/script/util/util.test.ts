@@ -17,7 +17,7 @@
  *
  */
 
-import {Conversation} from '../repositories/entity/Conversation';
+import {Conversation} from '../repositories/entity/conversation';
 import {
   arrayToBase64,
   base64ToArray,

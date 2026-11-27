@@ -32,8 +32,8 @@ import {
 } from './teamCreationSteps.styles';
 
 import {PrimaryModal} from '../../../../../../../components/modals/primaryModal';
-import {Config} from '../../../../../../../Config';
-import {TeamService} from '../../../../../../../repositories/team/TeamService';
+import {Config} from '../../../../../../../config';
+import {TeamService} from '../../../../../../../repositories/team/teamService';
 import {Button, ButtonVariant} from '../../../../../../../uiKit/inputs/button/button';
 import {Checkbox} from '../../../../../../../uiKit/inputs/checkbox/checkbox';
 import {Link} from '../../../../../../../uiKit/typography/link/link';

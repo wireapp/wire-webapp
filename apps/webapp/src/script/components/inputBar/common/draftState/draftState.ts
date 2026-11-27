@@ -19,8 +19,8 @@
 
 import {amplify} from 'amplify';
 
-import {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../../../repositories/entity/Conversation';
+import {MessageRepository} from '../../../../repositories/conversation/messageRepository';
+import {Conversation} from '../../../../repositories/entity/conversation';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {StorageKey, StorageRepository} from '../../../../repositories/storage';
 

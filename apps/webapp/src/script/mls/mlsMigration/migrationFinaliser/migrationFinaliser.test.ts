@@ -21,9 +21,9 @@ import {CONVERSATION_TYPE} from '../../../apiClient/conversation/conversation';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../../apiClient/team/feature/featureList.types';
 import type {ObservableArray} from 'knockout';
 
-import {MixedConversation, MLSConversation} from '../../../repositories/conversation/ConversationSelectors';
-import {Conversation} from '../../../repositories/entity/Conversation';
-import type {User} from '../../../repositories/entity/User';
+import {MixedConversation, MLSConversation} from '../../../repositories/conversation/conversationSelectors';
+import {Conversation} from '../../../repositories/entity/conversation';
+import type {User} from '../../../repositories/entity/user';
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {generateUser} from '../../../../../test/helper/UserGenerator';
 import {createUuid} from '../../../util/uuid';

@@ -22,10 +22,10 @@ import {ConnectionStatus} from '../../../apiClient/connection/connectionStatus';
 
 import en from '../../../../i18n/en-US.json';
 import {ConnectionEntity} from '../../../repositories/connection/connectionEntity';
-import {User} from '../../../repositories/entity/User';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {User} from '../../../repositories/entity/user';
+import {TeamState} from '../../../repositories/team/teamState';
 import {UserRepository} from '../../../repositories/user/userRepository';
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {setStrings, translate} from '../../../util/localizerUtil';

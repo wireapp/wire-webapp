@@ -30,8 +30,8 @@ import {TemporaryGuestAvatar} from './temporaryGuestAvatar';
 import {UserAvatar} from './userAvatar';
 
 import {isAppOrServiceEntity} from '../../guards/service';
-import {User} from '../../repositories/entity/User';
-import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {User} from '../../repositories/entity/user';
+import {ServiceEntity} from '../../repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {handleKeyDown, isKeyboardEvent, KEY} from '../../util/keyboardUtil';
 

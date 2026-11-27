@@ -21,7 +21,7 @@ import {isEmptyArray, isUndefined} from '@sindresorhus/is';
 
 import type {QualifiedId} from '../../../../apiClient/user/qualifiedId';
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../../core/conversation';
-import type {User} from '../../../../repositories/entity/User';
+import type {User} from '../../../../repositories/entity/user';
 import type {Translate, TranslationKey} from '../../../../util/localizerUtil';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';
 import {PrimaryModal} from '../../../modals/primaryModal';

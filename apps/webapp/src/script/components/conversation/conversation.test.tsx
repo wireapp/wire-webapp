@@ -30,7 +30,7 @@ import {
 import {CONVERSATION_CELLS_STATE} from '../../apiClient/conversation/conversation';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
 import {withThemeAndRootContext} from '../../auth/util/test/testUtil';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {driveOffboardingFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
@@ -38,14 +38,14 @@ import {
 } from '../../page/testSupport/rootContextTestSupport';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
 import {CellsRepository} from '../../repositories/cells/cellsRepository';
-import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
-import {MessageRepository} from '../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../repositories/entity/Conversation';
-import {User} from '../../repositories/entity/User';
+import {ConversationRepository} from '../../repositories/conversation/conversationRepository';
+import {MessageRepository} from '../../repositories/conversation/messageRepository';
+import {Conversation} from '../../repositories/entity/conversation';
+import {User} from '../../repositories/entity/user';
 import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
 import {PropertiesService} from '../../repositories/properties/propertiesService';
-import {SelfService} from '../../repositories/self/SelfService';
-import {TeamState} from '../../repositories/team/TeamState';
+import {SelfService} from '../../repositories/self/selfService';
+import {TeamState} from '../../repositories/team/teamState';
 import {translateForTest} from '../../util/test/translateForTest';
 import {MainViewModel, type ViewModelRepositories} from '../../viewModel/mainViewModel';
 import {MessageListWrapper} from '../messagesList/messageListWrapper';

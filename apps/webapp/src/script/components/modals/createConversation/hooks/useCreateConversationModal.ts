@@ -20,7 +20,7 @@
 import {create} from 'zustand';
 
 import {ADD_PERMISSION} from '../../../../apiClient/conversation/conversation';
-import {User} from '../../../../repositories/entity/User';
+import {User} from '../../../../repositories/entity/user';
 import {
   ConversationAccess,
   ChatHistory,

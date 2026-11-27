@@ -24,8 +24,8 @@ import {Navigate, useNavigate} from 'react-router';
 import {Page} from './page';
 import {styles} from './setAccountType.styles';
 
-import {Runtime} from '../../commons/util/Runtime';
-import {Config} from '../../Config';
+import {Runtime} from '../../commons/util/runtime';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {CheckRoundIcon} from '../../uiKit/dataDisplay/icon/checkRoundIcon';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';

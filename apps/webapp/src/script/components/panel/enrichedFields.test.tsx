@@ -20,7 +20,7 @@
 import {render, waitFor} from '@testing-library/react';
 import type {RichInfo} from '../../apiClient/user/richInfo';
 
-import {User} from '../../repositories/entity/User';
+import {User} from '../../repositories/entity/user';
 import {RichProfileRepository} from '../../repositories/user/richProfileRepository';
 import {translateForTest} from '../../util/test/translateForTest';
 import {

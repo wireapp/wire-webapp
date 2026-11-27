@@ -28,7 +28,7 @@ import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {configureLogging} from '../logger/getLogger';
-import {Runtime} from '../commons/util/Runtime';
+import {Runtime} from '../commons/util/runtime';
 
 import {createApplicationServices} from './createApplicationServices';
 import {createAccountIdentifier} from '../logger/createAccountIdentifier';
@@ -49,7 +49,7 @@ import {initializeDesktopLogOutput} from '../browser/initializeDesktopLogOutput'
 import {selectBrowserLogSaveFilePicker} from '../browser/selectBrowserLogSaveFilePicker';
 import {initializeRuntimeErrorDiagnostics} from '../browser/initializeRuntimeErrorDiagnostics';
 import {renderWithCoreCryptoSupport} from '../browser/renderWithCoreCryptoSupport';
-import {Config} from '../Config';
+import {Config} from '../config';
 import {initializeStartupFeatureToggleUrl} from '../featureToggles/initializeStartupFeatureToggleUrl';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
@@ -60,7 +60,7 @@ import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncreme
 import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
-import {doSimpleRedirect} from '../repositories/LifeCycleRepository/LifeCycleRepository';
+import {doSimpleRedirect} from '../repositories/lifeCycleRepository/lifeCycleRepository';
 import {StorageKey} from '../repositories/storage';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';

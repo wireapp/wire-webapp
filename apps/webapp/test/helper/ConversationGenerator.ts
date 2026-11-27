@@ -33,11 +33,11 @@ import {ConnectionEntity} from '../../src/script/repositories/connection/connect
 import {
   ConversationDatabaseData,
   ConversationMapper,
-} from '../../src/script/repositories/conversation/ConversationMapper';
-import {ConversationStatus} from '../../src/script/repositories/conversation/ConversationStatus';
-import {ConversationVerificationState} from '../../src/script/repositories/conversation/ConversationVerificationState';
-import {Conversation} from '../../src/script/repositories/entity/Conversation';
-import {User} from '../../src/script/repositories/entity/User';
+} from '../../src/script/repositories/conversation/conversationMapper';
+import {ConversationStatus} from '../../src/script/repositories/conversation/conversationStatus';
+import {ConversationVerificationState} from '../../src/script/repositories/conversation/conversationVerificationState';
+import {Conversation} from '../../src/script/repositories/entity/conversation';
+import {User} from '../../src/script/repositories/entity/user';
 import {translate} from '../../src/script/util/localizerUtil';
 import {createUuid} from '../../src/script/util/uuid';
 

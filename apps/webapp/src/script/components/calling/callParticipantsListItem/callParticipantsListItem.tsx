@@ -30,7 +30,7 @@ import {CallParticipantsListItemHandRaiseIcon} from './callParticipantsListItemH
 import {CallParticipantStatusIcons} from './callParticipantStatusIcons';
 
 import {useApplicationContext} from '../../../page/rootProvider';
-import {Participant} from '../../../repositories/calling/Participant';
+import {Participant} from '../../../repositories/calling/participant';
 import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../util/keyboardUtil';

@@ -18,7 +18,7 @@
  */
 
 import {FEATURE_KEY, FeatureList} from '../../../../../apiClient/team/feature/featureList.types';
-import {Runtime} from '../../../../../commons/util/Runtime';
+import {Runtime} from '../../../../../commons/util/runtime';
 import {PrimaryModal} from '../../../../../components/modals/primaryModal';
 import {ModalType, getModalOptions} from '../../../../../e2eIdentity/modals';
 import type {Translate} from '../../../../../util/localizerUtil';

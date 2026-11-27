@@ -23,12 +23,12 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {ContentState} from '../../page/useAppState';
 import {CancelError} from '../../repositories/backup/error';
-import {ClientState} from '../../repositories/client/ClientState';
-import {User} from '../../repositories/entity/User';
+import {ClientState} from '../../repositories/client/clientState';
+import {User} from '../../repositories/entity/user';
 import {EventName} from '../../repositories/tracking/eventName';
 import {Segmentation} from '../../repositories/tracking/segmentation';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';

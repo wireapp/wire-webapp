@@ -34,8 +34,8 @@ import {
   wrapper,
 } from './participantItem.styles';
 
-import {User} from '../../repositories/entity/User';
-import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {User} from '../../repositories/entity/user';
+import {ServiceEntity} from '../../repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {UserBlockedBadge, UserVerificationBadges} from '../badge';
 import * as Icon from '../icon';

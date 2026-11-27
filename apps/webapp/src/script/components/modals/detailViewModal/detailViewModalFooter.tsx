@@ -23,8 +23,8 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {ReactionType} from '../../../core/conversation';
-import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
+import {MessageRepository} from '../../../repositories/conversation/messageRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
 import {TabIndex} from '../../../uiKit/utils/enums';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';

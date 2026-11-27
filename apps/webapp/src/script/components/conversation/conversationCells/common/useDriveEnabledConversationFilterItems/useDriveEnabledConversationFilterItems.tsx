@@ -21,8 +21,8 @@ import type {JSX} from '@emotion/react/jsx-runtime';
 
 import {CONVERSATION_ACCESS} from '../../../../../apiClient/conversation/conversation';
 import {stringifyQualifiedId} from '../../../../../core/util/qualifiedIdUtil';
-import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
-import type {Conversation} from '../../../../../repositories/entity/Conversation';
+import type {ConversationRepository} from '../../../../../repositories/conversation/conversationRepository';
+import type {Conversation} from '../../../../../repositories/entity/conversation';
 import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 import {GroupAvatar, ChannelAvatar} from '../../../../avatar';
 import type {FilterItem} from '../cellsFiltersBar/filterConfig';

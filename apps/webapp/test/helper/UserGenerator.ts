@@ -22,7 +22,7 @@ import {QualifiedId} from '../../src/script/apiClient/user/qualifiedId';
 import {UserAssetType} from '../../src/script/apiClient/user/userAsset';
 import {UserType} from '../../src/script/apiClient/user/user';
 import type {User as APIClientUser} from '../../src/script/apiClient/user/user';
-import type {User} from '../../src/script/repositories/entity/User';
+import type {User} from '../../src/script/repositories/entity/user';
 import type {UserRecord} from '../../src/script/repositories/storage';
 import {UserMapper} from '../../src/script/repositories/user/userMapper';
 import {translate} from '../../src/script/util/localizerUtil';

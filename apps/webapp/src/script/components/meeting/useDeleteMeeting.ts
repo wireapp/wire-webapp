@@ -25,7 +25,7 @@ import {submitDeleteMeeting} from './shared/submit/submitDeleteMeeting';
 import type {MeetingInstance} from './types/meetingInstance';
 
 import {useApplicationContext} from '../../page/rootProvider';
-import type {User} from '../../repositories/entity/User';
+import type {User} from '../../repositories/entity/user';
 
 type UseDeleteMeetingResult = {
   openDeleteMeetingModal: (

@@ -23,7 +23,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {useApplicationContext} from '../../page/rootProvider';
-import type {User} from '../../repositories/entity/User';
+import type {User} from '../../repositories/entity/user';
 import {MAX_HANDLE_LENGTH} from '../../repositories/user/userHandleGenerator';
 import {isEnterKey} from '../../util/keyboardUtil';
 import * as Icon from '../icon';

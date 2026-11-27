@@ -33,13 +33,13 @@ import {generateAPIUser} from '../../../../test/helper/UserGenerator';
 
 import {AssetRepository} from '../assets/assetRepository';
 import {ClientRepository} from '../client';
-import {ClientMapper} from '../client/ClientMapper';
+import {ClientMapper} from '../client/clientMapper';
 import {ConnectionEntity} from '../connection/connectionEntity';
-import {User} from '../entity/User';
-import {EventRepository} from '../event/EventRepository';
+import {User} from '../entity/user';
+import {EventRepository} from '../event/eventRepository';
 import {PropertiesRepository} from '../properties/propertiesRepository';
-import {SelfService} from '../self/SelfService';
-import {TeamState} from '../team/TeamState';
+import {SelfService} from '../self/selfService';
+import {TeamState} from '../team/teamState';
 import type {UserRecord} from '../storage';
 import type {Translate} from '../../util/localizerUtil';
 import {matchQualifiedIds} from '../../util/qualifiedId';

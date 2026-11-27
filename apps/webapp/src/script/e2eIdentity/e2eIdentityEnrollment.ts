@@ -35,7 +35,7 @@ import {getModalOptions, ModalType} from './modals';
 import {OIDCService} from './oidcService';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 
-import {TypedEventEmitter} from '../commons/TypedEventEmitter/TypedEventEmitter';
+import {TypedEventEmitter} from '../commons/typedEventEmitter/typedEventEmitter';
 import {PrimaryModal, removeCurrentModal} from '../components/modals/primaryModal';
 import {CredentialType, type E2EIServiceExternal} from '../core/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '../core/util/lowPrecisionTaskScheduler';

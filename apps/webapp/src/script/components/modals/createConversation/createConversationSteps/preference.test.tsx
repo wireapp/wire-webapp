@@ -1,6 +1,6 @@
 import {getByRole, render} from '@testing-library/react';
 import {Preference} from './preference';
-import {TeamState} from '../../../../repositories/team/TeamState';
+import {TeamState} from '../../../../repositories/team/teamState';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '../../../../apiClient/team/feature/featureList.types';
 import ko from 'knockout';
 import {container} from 'tsyringe';

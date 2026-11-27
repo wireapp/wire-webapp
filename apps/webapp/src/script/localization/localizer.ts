@@ -44,7 +44,7 @@ import sl from '../../i18n/sl-SI.json';
 import tr from '../../i18n/tr-TR.json';
 import uk from '../../i18n/uk-UA.json';
 import {URLParameter} from '../auth/urlParameter';
-import {Config} from '../Config';
+import {Config} from '../config';
 import {StorageKey} from '../repositories/storage/storageKey';
 import {DEFAULT_LOCALE, setLocale, setStrings} from '../util/localizerUtil';
 import {loadValue, storeValue} from '../util/storageUtil';

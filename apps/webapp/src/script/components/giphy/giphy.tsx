@@ -26,7 +26,7 @@ import cx from 'classnames';
 import {GifImage} from './gifImage';
 
 import {useApplicationContext} from '../../page/rootProvider';
-import {Gif, GiphyRepository} from '../../repositories/extension/GiphyRepository';
+import {Gif, GiphyRepository} from '../../repositories/extension/giphyRepository';
 import {Button, ButtonVariant} from '../../uiKit/inputs/button/button';
 import {WebAppEvents} from '../../webAppEvents';
 import * as Icon from '../icon';

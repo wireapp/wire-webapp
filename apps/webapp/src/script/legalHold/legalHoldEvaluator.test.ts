@@ -21,8 +21,8 @@ import {GenericMessageType} from '../core/conversation';
 
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 
-import {CryptographyMapper} from '../repositories/cryptography/CryptographyMapper';
-import {ClientEvent} from '../repositories/event/Client';
+import {CryptographyMapper} from '../repositories/cryptography/cryptographyMapper';
+import {ClientEvent} from '../repositories/event/client';
 import {createMessageAddEvent} from '../../../test/helper/EventGenerator';
 import {createUuid} from '../util/uuid';
 

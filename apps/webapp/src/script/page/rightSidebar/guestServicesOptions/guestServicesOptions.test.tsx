@@ -20,11 +20,11 @@
 import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ACCESS_STATE} from '../../../repositories/conversation/AccessState';
-import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {TeamRepository} from '../../../repositories/team/TeamRepository';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {ACCESS_STATE} from '../../../repositories/conversation/accessState';
+import {ConversationRepository} from '../../../repositories/conversation/conversationRepository';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {TeamRepository} from '../../../repositories/team/teamRepository';
+import {TeamState} from '../../../repositories/team/teamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

@@ -23,7 +23,7 @@ import {EmojiPill} from './emojiPill';
 import {messageReactionWrapper} from './messageReactions.styles';
 
 import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
-import {User} from '../../../../../../repositories/entity/User';
+import {User} from '../../../../../../repositories/entity/user';
 import {ReactionMap} from '../../../../../../repositories/storage';
 import {getEmojiUnicode} from '../../../../../../util/emojiUtil';
 import type {Translate} from '../../../../../../util/localizerUtil';

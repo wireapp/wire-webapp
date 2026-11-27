@@ -22,8 +22,8 @@ import {useMemo} from 'react';
 import {container} from 'tsyringe';
 
 import type {QualifiedId} from '../../../../../../apiClient/user/qualifiedId';
-import {ConversationState} from '../../../../../../repositories/conversation/ConversationState';
-import type {Conversation} from '../../../../../../repositories/entity/Conversation';
+import {ConversationState} from '../../../../../../repositories/conversation/conversationState';
+import type {Conversation} from '../../../../../../repositories/entity/conversation';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 import {matchQualifiedIds} from '../../../../../../util/qualifiedId';
 

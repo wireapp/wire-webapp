@@ -23,13 +23,13 @@ import {render, waitFor} from '@testing-library/react';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
-import {Call} from '../../../repositories/calling/Call';
-import {CallingRepository} from '../../../repositories/calling/CallingRepository';
-import {Participant} from '../../../repositories/calling/Participant';
-import {Conversation} from '../../../repositories/entity/Conversation';
-import {User} from '../../../repositories/entity/User';
+import {Call} from '../../../repositories/calling/call';
+import {CallingRepository} from '../../../repositories/calling/callingRepository';
+import {Participant} from '../../../repositories/calling/participant';
+import {Conversation} from '../../../repositories/entity/conversation';
+import {User} from '../../../repositories/entity/user';
 import {PropertiesRepository} from '../../../repositories/properties/propertiesRepository';
-import {TeamState} from '../../../repositories/team/TeamState';
+import {TeamState} from '../../../repositories/team/teamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

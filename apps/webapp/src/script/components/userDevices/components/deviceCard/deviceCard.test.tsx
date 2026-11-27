@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 import {ClientClassification} from '../../../../apiClient/client/clientClassification';
 import ko from 'knockout';
 
-import type {ClientEntity} from '../../../../repositories/client/ClientEntity';
+import type {ClientEntity} from '../../../../repositories/client/clientEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

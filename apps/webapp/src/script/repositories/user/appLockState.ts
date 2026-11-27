@@ -21,8 +21,8 @@ import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
 import {FEATURE_STATUS} from '../../apiClient/team/feature/featureList.types';
-import {Config} from '../../Config';
-import {TeamState} from '../team/TeamState';
+import {Config} from '../../config';
+import {TeamState} from '../team/teamState';
 
 const defaultEnabled = true;
 const defaultEnforced = false;

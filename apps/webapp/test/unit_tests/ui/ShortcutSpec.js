@@ -17,7 +17,7 @@
  *
  */
 
-import {Runtime} from '../../../src/script/commons/util/Runtime';
+import {Runtime} from '../../../src/script/commons/util/runtime';
 
 import {Shortcut} from '../../../src/script/ui/shortcut';
 import {ShortcutType} from '../../../src/script/ui/shortcutType';
