@@ -5,13 +5,18 @@ import {ParticipantNetworkStats, ParticipantNetworkStatsProvider} from './Partic
 import type {ParticipantNetworkSample} from '../../repositories/calling/participantNetworkStats';
 
 const selfSample: ParticipantNetworkSample = {
-  receivedAt: 1000, quality: 1, rttMs: 24, peer: 'Server',
+  receivedAt: 1000,
+  quality: 1,
+  rttMs: 24,
+  peer: 'Server',
   connection: {candidate: 'Relay', protocol: 'UDP', local_proto: 'TLS', local_cand: 'Relay'},
   audio: [{bitrate: 32000, jitter: 3, loss: 0}],
   video: [{bitrate: 1240000, jitter: 8, loss: 0, width: 1280, height: 720, fps: 30}],
 };
 const peerSample: ParticipantNetworkSample = {
-  receivedAt: 1000, quality: null, rttMs: null,
+  receivedAt: 1000,
+  quality: null,
+  rttMs: null,
   audio: [{bitrate: 32000, jitter: 5, loss: 0}],
   video: [{bitrate: 1080000, jitter: 12, loss: 0.12, width: 1280, height: 720, fps: 30}],
 };
@@ -50,10 +55,19 @@ describe('participant network statistics preview', () => {
     const view = render(<ParticipantNetworkStats name="Me" isSelf variant="toolbar" />);
     await user.click(screen.getByRole('button', {name: 'My connection statistics'}));
     expect(screen.getByRole('status')).toHaveTextContent('Waiting for AVS statistics');
-    view.rerender(<ParticipantNetworkStats name="Me" isSelf variant="toolbar" sample={{
-      ...selfSample, quality: 3, rttMs: null,
-      video: [{bitrate: -1, jitter: -1, loss: -1, width: 0, height: 0, fps: -1}],
-    }} />);
+    view.rerender(
+      <ParticipantNetworkStats
+        name="Me"
+        isSelf
+        variant="toolbar"
+        sample={{
+          ...selfSample,
+          quality: 3,
+          rttMs: null,
+          video: [{bitrate: -1, jitter: -1, loss: -1, width: 0, height: 0, fps: -1}],
+        }}
+      />,
+    );
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
     expect(screen.getByText('Poor')).toBeInTheDocument();
     expect(within(screen.getByRole('region', {name: 'Video statistics'})).getAllByText('—')).toHaveLength(5);
@@ -76,9 +90,16 @@ describe('participant network statistics preview', () => {
 
   it('shows separate received video tracks without inventing an aggregate', async () => {
     const user = userEvent.setup();
-    render(<ParticipantNetworkStats name="Alice" isSelf={false} sample={{
-      ...peerSample, video: [...peerSample.video, {bitrate: 420000, jitter: 20, loss: 1, width: 640, height: 360, fps: 15}],
-    }} />);
+    render(
+      <ParticipantNetworkStats
+        name="Alice"
+        isSelf={false}
+        sample={{
+          ...peerSample,
+          video: [...peerSample.video, {bitrate: 420000, jitter: 20, loss: 1, width: 640, height: 360, fps: 15}],
+        }}
+      />,
+    );
     await user.click(screen.getByRole('button', {name: 'Network statistics for Alice'}));
     expect(screen.getByText('Video · Track 1')).toBeInTheDocument();
     expect(screen.getByText('Video · Track 2')).toBeInTheDocument();
