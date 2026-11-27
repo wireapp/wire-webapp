@@ -24,7 +24,7 @@ import {container, singleton} from 'tsyringe';
 import {AppLockState} from './appLockState';
 import {UserState} from './userState';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import type {Translate} from '../../util/localizerUtil';
 
 const APP_LOCK_STORAGE = 'app_lock';

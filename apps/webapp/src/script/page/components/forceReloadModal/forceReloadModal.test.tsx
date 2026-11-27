@@ -22,7 +22,7 @@ import {ReactElement} from 'react';
 
 import {render} from '@testing-library/react';
 
-import {usePrimaryModalState} from '../../../components/Modals/PrimaryModal';
+import {usePrimaryModalState} from '../../../components/modals/primaryModal';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import type {DeterministicClock} from '@enormora/clock/deterministic-clock';
 import {MainViewModel} from '../../../viewModel/mainViewModel';

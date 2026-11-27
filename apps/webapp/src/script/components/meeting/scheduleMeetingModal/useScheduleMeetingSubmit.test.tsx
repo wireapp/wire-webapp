@@ -29,7 +29,7 @@ import {createStore, type StoreApi} from 'zustand/vanilla';
 import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from '../meetingSubmitErrors';
-import {PrimaryModal} from '../../Modals/PrimaryModal';
+import {PrimaryModal} from '../../modals/primaryModal';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {
   createRootContextValueForTest,

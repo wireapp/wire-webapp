@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 
 import {CONVERSATION_CELLS_STATE} from '../../../../../apiClient/conversation/conversation';
 import * as Icon from '../../../../../components/icon';
-import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../../../../components/modals/primaryModal';
 import {RadioGroup} from '../../../../../components/radio';
 import {SelectText} from '../../../../../components/selectText';
 import {BaseToggle} from '../../../../../components/toggle/baseToggle';

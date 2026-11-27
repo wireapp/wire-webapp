@@ -21,7 +21,7 @@ import type {FunctionComponent} from 'react';
 
 import {CallingCell} from '../../../components/calling/callingCell';
 import * as Icon from '../../../components/icon';
-import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../../components/modals/primaryModal';
 import {Config} from '../../../Config';
 import {User} from '../../../repositories/entity/User';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';

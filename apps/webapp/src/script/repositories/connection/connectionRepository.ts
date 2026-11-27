@@ -33,7 +33,7 @@ import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import type {UserConnectionData} from '../../apiClient/user/data/userConnectionData';
 import type {UserUpdateData} from '../../apiClient/user/data/userUpdateData';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import {Config} from '../../Config';
 import {SystemMessageType} from '../../message/systemMessageType';
 import {type Translate} from '../../util/localizerUtil';

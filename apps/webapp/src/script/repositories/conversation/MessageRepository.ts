@@ -52,7 +52,7 @@ import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {RequestCancellationError} from '../../apiClient/user/userError';
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import {Config} from '../../Config';
 import {
   GenericMessageType,

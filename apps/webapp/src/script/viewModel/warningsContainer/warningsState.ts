@@ -23,7 +23,7 @@ import {create} from 'zustand';
 
 import {TYPE} from './warningsTypes';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import {Config} from '../../Config';
 import {AppPermissionState} from '../../repositories/notification/AppPermissionState';
 import type {Substitutions, TranslationKey} from '../../util/localizerUtil';

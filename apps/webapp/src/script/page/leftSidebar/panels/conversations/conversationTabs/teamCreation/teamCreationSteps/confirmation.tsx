@@ -31,7 +31,7 @@ import {
   termsCheckboxWrapperCss,
 } from './teamCreationSteps.styles';
 
-import {PrimaryModal} from '../../../../../../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../../../../../../components/modals/primaryModal';
 import {Config} from '../../../../../../../Config';
 import {TeamService} from '../../../../../../../repositories/team/TeamService';
 import {Button, ButtonVariant} from '../../../../../../../uiKit/inputs/button/button';

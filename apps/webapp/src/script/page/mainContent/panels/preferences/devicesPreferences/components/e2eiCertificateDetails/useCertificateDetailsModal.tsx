@@ -19,8 +19,8 @@
 
 import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
-import {PrimaryModal, removeCurrentModal} from '../../../../../../../components/Modals/PrimaryModal';
-import {ModalOptions} from '../../../../../../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal, removeCurrentModal} from '../../../../../../../components/modals/primaryModal';
+import {ModalOptions} from '../../../../../../../components/modals/primaryModal/primaryModalTypes';
 import {downloadFile} from '../../../../../../../util/util';
 import {useApplicationContext} from '../../../../../../rootProvider';
 

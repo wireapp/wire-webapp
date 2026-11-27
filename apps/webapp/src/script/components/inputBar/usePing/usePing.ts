@@ -24,7 +24,7 @@ import {useApplicationContext} from '../../../page/rootProvider';
 import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';
-import {PrimaryModal} from '../../Modals/PrimaryModal';
+import {PrimaryModal} from '../../modals/primaryModal';
 
 const pingTimeoutInSeconds = 2;
 

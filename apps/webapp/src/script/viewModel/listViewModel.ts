@@ -29,7 +29,7 @@ import {ContentViewModel} from './contentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './mainViewModel';
 
 import {Runtime} from '../commons/util/Runtime';
-import {PrimaryModal, usePrimaryModalState} from '../components/Modals/PrimaryModal';
+import {PrimaryModal, usePrimaryModalState} from '../components/modals/primaryModal';
 import {Config} from '../Config';
 import {
   getConversationListTab,

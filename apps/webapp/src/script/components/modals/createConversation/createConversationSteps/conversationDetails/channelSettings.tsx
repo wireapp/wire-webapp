@@ -1,0 +1,127 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import type {FunctionComponent} from 'react';
+
+import {container} from 'tsyringe';
+
+import {channelSettingsTextCss} from './conversationDetails.styles';
+import {CustomHistorySharingOption} from './customHistorySharingOption';
+
+import {ADD_PERMISSION} from '../../../../../apiClient/conversation/conversation';
+import {useApplicationContext} from '../../../../../page/rootProvider';
+import {TeamState} from '../../../../../repositories/team/TeamState';
+import {Option, Select} from '../../../../../uiKit/inputs/select/select';
+import {Muted} from '../../../../../uiKit/typography/text/text';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
+import {RadioGroup} from '../../../../radio';
+import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
+import {ChatHistory, ConversationAccess} from '../../types';
+import {getConversationAccessOptions, getChatHistoryOptions, getConversationManagerOptions} from '../../utils';
+
+export const ChannelSettings: FunctionComponent = () => {
+  const {translate} = useApplicationContext();
+  const teamState = container.resolve(TeamState);
+  const {
+    access,
+    chatHistory,
+    setChatHistory,
+    setAccess,
+    moderator,
+    setModerator,
+    setIsCustomHistoryModalOpen,
+    setIsUpgradeTeamModalOpen,
+    historySharingQuantity,
+    historySharingUnit,
+  } = useCreateConversationModal();
+  const isPremiumUser = teamState.isConferenceCallingEnabled();
+  const {isPublicChannelsEnabled, isChannelsHistorySharingEnabled} = useChannelsFeatureFlag();
+  const chatHistoryOptions = getChatHistoryOptions(
+    translate,
+    chatHistory,
+    historySharingQuantity,
+    historySharingUnit,
+    true,
+  );
+  const onChatHistoryChange = (option?: Option | null): void => {
+    if (option?.value === ChatHistory.Custom) {
+      if (!isPremiumUser) {
+        setIsUpgradeTeamModalOpen(true);
+        return;
+      }
+
+      setIsCustomHistoryModalOpen(true);
+      return;
+    }
+    setChatHistory(option?.value as ChatHistory);
+  };
+
+  return (
+    <>
+      <p className="heading-h3">Access</p>
+      <p css={channelSettingsTextCss} className="subline">
+        {translate('createConversationAccessText')}
+      </p>
+
+      <RadioGroup<ConversationAccess>
+        onChange={setAccess}
+        horizontal
+        selectedValue={access}
+        options={getConversationAccessOptions(translate, isPublicChannelsEnabled)}
+        ariaLabelledBy="conversation-access"
+        name="conversation-access"
+      />
+
+      <Muted block muted={access === ConversationAccess.Public} css={channelSettingsTextCss}>
+        {translate('createConversationManagerText')}
+      </Muted>
+
+      <RadioGroup<ADD_PERMISSION>
+        disabled={access === ConversationAccess.Public}
+        onChange={setModerator}
+        horizontal
+        selectedValue={moderator}
+        options={getConversationManagerOptions(translate)}
+        ariaLabelledBy="conversation-manager"
+        name="conversation-manager"
+      />
+      {isChannelsHistorySharingEnabled && (
+        <>
+          <p className="heading-h3">Conversation history</p>
+          <p className="subline" css={channelSettingsTextCss}>
+            {translate('conversationHistoryText')}
+          </p>
+
+          <Select
+            id="chat-history-select"
+            dataUieName="chat-history-select"
+            value={chatHistoryOptions.find(option => {
+              return option.value === chatHistory;
+            })}
+            onChange={onChatHistoryChange}
+            formatOptionLabel={option => {
+              return <CustomHistorySharingOption isPremiumUser={isPremiumUser} option={option} />;
+            }}
+            options={chatHistoryOptions}
+          />
+        </>
+      )}
+    </>
+  );
+};

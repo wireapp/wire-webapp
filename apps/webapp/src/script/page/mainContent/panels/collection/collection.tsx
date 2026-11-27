@@ -30,7 +30,7 @@ import {Category, isOfCategory} from './utils';
 
 import {CONVERSATION_CELLS_STATE} from '../../../../apiClient/conversation/conversation';
 import * as Icon from '../../../../components/icon';
-import {showDetailViewModal} from '../../../../components/Modals/DetailViewModal';
+import {showDetailViewModal} from '../../../../components/modals/detailViewModal';
 import {Config} from '../../../../Config';
 import {MessageCategory} from '../../../../message/messageCategory';
 import {AssetRepository} from '../../../../repositories/assets/assetRepository';

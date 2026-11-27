@@ -27,9 +27,9 @@ import {PeopleTab, SearchResultsData} from './peopleTab';
 import {ServicesTab} from './servicesTab';
 
 import {CONVERSATION_PROTOCOL} from '../../../../apiClient/team/feature/featureList.types';
-import {showInviteModal} from '../../../../components/Modals/InviteModal';
-import {showServiceModal} from '../../../../components/Modals/ServiceModal';
-import {showUserModal} from '../../../../components/Modals/UserModal';
+import {showInviteModal} from '../../../../components/modals/inviteModal';
+import {showServiceModal} from '../../../../components/modals/serviceModal';
+import {showUserModal} from '../../../../components/modals/userModal';
 import {SearchInput} from '../../../../components/searchInput';
 import {Config} from '../../../../Config';
 import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';

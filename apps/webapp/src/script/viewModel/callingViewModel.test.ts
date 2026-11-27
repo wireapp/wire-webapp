@@ -20,7 +20,7 @@
 import {STATE} from '@wireapp/avs';
 import {GROUP_CONVERSATION_TYPE} from '../apiClient/conversation/conversation';
 
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/modals/primaryModal';
 import {LEAVE_CALL_REASON} from '../repositories/calling/enum/LeaveCallReason';
 import {Conversation} from '../repositories/entity/Conversation';
 import {type Translate} from '../util/localizerUtil';

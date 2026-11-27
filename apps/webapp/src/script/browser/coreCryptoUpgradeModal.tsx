@@ -23,7 +23,7 @@ import {isEmptyArray} from '@sindresorhus/is';
 
 import {useCoreCryptoSupport} from './coreCryptoSupportContext';
 
-import {ModalComponent} from '../components/Modals/ModalComponent';
+import {ModalComponent} from '../components/modals/modalComponent';
 import {THEME_ID} from '../uiKit/identity/theme/theme';
 import {StyledApp} from '../uiKit/layout/styledApp/styledApp';
 import {H2} from '../uiKit/typography/heading/heading';

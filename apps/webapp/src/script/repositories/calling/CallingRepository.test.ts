@@ -46,7 +46,7 @@ import {
 import {Runtime} from '../../commons/util/Runtime';
 import {WebAppEvents} from '../../webAppEvents';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import {Conversation} from '../entity/Conversation';
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {User} from '../entity/User';

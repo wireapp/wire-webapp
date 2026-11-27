@@ -25,7 +25,7 @@ import {EventName} from './eventName';
 import {Segmentation} from './segmentation';
 
 import {Runtime} from '../../commons/util/Runtime';
-import {RatingListLabel} from '../../components/Modals/QualityFeedbackModal/typings';
+import {RatingListLabel} from '../../components/modals/qualityFeedbackModal/typings';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import {Call} from '../calling/Call';

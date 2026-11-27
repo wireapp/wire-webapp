@@ -23,7 +23,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {AccountInput, useInputDone} from './accountInput';
 
-import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../../../../components/modals/primaryModal';
 import {UserRepository} from '../../../../../repositories/user/userRepository';
 import {getLogger} from '../../../../../util/logger';
 import {isErrorWithCode} from '../../../../../util/typePredicateUtil';

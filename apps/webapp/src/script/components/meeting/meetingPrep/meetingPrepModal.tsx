@@ -32,7 +32,7 @@ import type {User} from '../../../repositories/entity/User';
 import {handleEscDown} from '../../../util/keyboardUtil';
 import {captureModalFocusContext} from '../../../util/modalFocusUtil';
 import {showNoAudioInputModal, showNoCameraModal} from '../../calling/devicePermissionModals';
-import {ModalComponent} from '../../Modals/ModalComponent';
+import {ModalComponent} from '../../modals/modalComponent';
 import {modalWrapperStyles} from '../shared/styles/meetingModalShell.styles';
 
 export type MeetingPrepModalProps = {

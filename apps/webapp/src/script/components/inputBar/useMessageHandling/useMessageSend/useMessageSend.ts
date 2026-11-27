@@ -42,8 +42,8 @@ import {ContentMessage} from '../../../../repositories/entity/message/contentMes
 import {EventRepository} from '../../../../repositories/event/EventRepository';
 import {isErrorWithType} from '../../../../util/typePredicateUtil';
 import {useFileUploadState} from '../../../conversation/useFilesUploadState/useFilesUploadState';
-import {PrimaryModal} from '../../../Modals/PrimaryModal';
-import {showWarningModal} from '../../../Modals/utils/showWarningModal';
+import {PrimaryModal} from '../../../modals/primaryModal';
+import {showWarningModal} from '../../../modals/utils/showWarningModal';
 import {MessageContent} from '../../common/messageContent/messageContent';
 
 interface UseMessageSendProps {

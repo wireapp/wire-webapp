@@ -98,10 +98,10 @@ import {Giphy} from '../giphy';
 import {InputBar} from '../inputBar';
 import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
 import {MessageListWrapper} from '../messagesList/messageListWrapper';
-import {showDetailViewModal} from '../Modals/DetailViewModal';
-import {PrimaryModal} from '../Modals/PrimaryModal';
-import {showUserModal} from '../Modals/UserModal';
-import {showWarningModal} from '../Modals/utils/showWarningModal';
+import {showDetailViewModal} from '../modals/detailViewModal';
+import {PrimaryModal} from '../modals/primaryModal';
+import {showUserModal} from '../modals/userModal';
+import {showWarningModal} from '../modals/utils/showWarningModal';
 import {TitleBar} from '../titleBar';
 
 interface ConversationProps {

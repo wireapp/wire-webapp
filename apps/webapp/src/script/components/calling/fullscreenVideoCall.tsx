@@ -77,7 +77,7 @@ import {WebAppEvents} from '../../webAppEvents';
 import {useAppNotification} from '../appNotification/appNotification';
 import {ConversationClassifiedBar} from '../classifiedBar/classifiedBar';
 import * as Icon from '../icon';
-import {ModalComponent} from '../Modals/ModalComponent';
+import {ModalComponent} from '../modals/modalComponent';
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;

@@ -52,7 +52,7 @@ import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
 import {type AccentColor} from '../../commons/util';
-import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {useLegalHoldModalState} from '../../components/modals/legalHoldModal/legalHoldModal.state';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';

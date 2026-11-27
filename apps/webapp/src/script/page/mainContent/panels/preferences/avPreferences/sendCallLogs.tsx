@@ -30,7 +30,7 @@ import {
   reportStyles,
 } from './sendCallLogs.styles';
 
-import {PrimaryModal, removeCurrentModal} from '../../../../../components/Modals/PrimaryModal';
+import {PrimaryModal, removeCurrentModal} from '../../../../../components/modals/primaryModal';
 import {Config} from '../../../../../Config';
 import type {CallingRepository} from '../../../../../repositories/calling/CallingRepository';
 import {

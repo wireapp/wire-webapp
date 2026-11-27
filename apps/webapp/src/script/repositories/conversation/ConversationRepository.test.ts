@@ -61,7 +61,7 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '../../webAppEvents';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import {buildMediaDevicesHandler, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {SystemMessageType} from '../../message/systemMessageType';
 import {Call} from '../calling/Call';

@@ -30,8 +30,8 @@ import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';
-import {PrimaryModal} from '../../Modals/PrimaryModal';
-import {removeCurrentModal} from '../../Modals/PrimaryModal/PrimaryModalState';
+import {PrimaryModal} from '../../modals/primaryModal';
+import {removeCurrentModal} from '../../modals/primaryModal/primaryModalState';
 import {FileLoader} from '../fileLoader/fileLoader';
 
 const REFRESH_BUFFER_SECONDS = 10; // Refresh 10 seconds before expiry for safety

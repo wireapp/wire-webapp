@@ -29,7 +29,7 @@ import {applockStyles} from './appLock.styles';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {ValidationUtil} from '../../commons/util';
 import * as Icon from '../../components/icon';
-import {ModalComponent} from '../../components/Modals/ModalComponent';
+import {ModalComponent} from '../../components/modals/modalComponent';
 import {Config} from '../../Config';
 import {ClientRepository} from '../../repositories/client';
 import {ClientState} from '../../repositories/client/ClientState';

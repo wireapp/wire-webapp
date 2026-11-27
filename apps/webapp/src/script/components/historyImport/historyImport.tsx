@@ -41,7 +41,7 @@ import {checkBackupEncryption} from '../../util/backupUtil';
 import {getLogger} from '../../util/logger';
 import {loadFileBuffer} from '../../util/util';
 import * as Icon from '../icon';
-import {PrimaryModal} from '../Modals/PrimaryModal';
+import {PrimaryModal} from '../modals/primaryModal';
 import {ProgressBar} from '../progressBar/progressBar';
 
 export enum HistoryImportState {

@@ -22,7 +22,7 @@ import {task} from 'true-myth';
 import {ThemeProvider} from '../../../../../uiKit/identity/theme/theme';
 import {act, fireEvent, render, screen} from '@testing-library/react';
 
-import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../../../../components/modals/primaryModal';
 import type {CallingRepository} from '../../../../../repositories/calling/CallingRepository';
 import {useCallLogsUploadSettings} from '../../../../../repositories/calling/callLogsUploadSettings';
 import {CallLogsErrorStatus, createMockCallLogsService} from '../../../../../repositories/calling/callLogsService';

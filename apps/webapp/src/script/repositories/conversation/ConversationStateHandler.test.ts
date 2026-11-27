@@ -19,7 +19,7 @@
 
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import type {Translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 

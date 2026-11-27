@@ -19,7 +19,7 @@
 
 import type {Translate} from './localizerUtil';
 
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/modals/primaryModal';
 import {AssetRepository} from '../repositories/assets/assetRepository';
 
 const CONCURRENT_UPLOAD_LIMIT = 10;

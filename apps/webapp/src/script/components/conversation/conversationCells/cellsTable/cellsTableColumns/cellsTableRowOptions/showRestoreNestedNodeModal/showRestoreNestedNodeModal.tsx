@@ -22,7 +22,7 @@ import {modalContentStyles} from './showRestoreNestedNodeModal.styles';
 import type {RootContextValue} from '../../../../../../../page/rootProvider';
 import {CellNodeType, CellNode} from '../../../../../../../types/cellNode';
 import {replaceReactComponents} from '../../../../../../../util/localizerUtil/reactLocalizerUtil';
-import {PrimaryModal} from '../../../../../../Modals/PrimaryModal';
+import {PrimaryModal} from '../../../../../../modals/primaryModal';
 
 export const showRestoreNestedNodeModal = ({
   node,

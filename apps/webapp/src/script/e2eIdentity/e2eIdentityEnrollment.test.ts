@@ -25,8 +25,8 @@ import {noop} from 'noop-esm';
 import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal} from '../components/modals/primaryModal';
+import {PrimaryModalType} from '../components/modals/primaryModal/primaryModalTypes';
 import {ConversationState} from '../repositories/conversation/ConversationState';
 import {Conversation} from '../repositories/entity/Conversation';
 import {User} from '../repositories/entity/User';

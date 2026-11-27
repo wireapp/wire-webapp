@@ -27,7 +27,7 @@ import {Button, ButtonVariant} from '../../../../uiKit/inputs/button/button';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {Avatar, AVATAR_SIZE} from '../../../avatar';
 import {UserClassifiedBar} from '../../../classifiedBar/classifiedBar';
-import {UnverifiedUserWarning} from '../../../Modals/UserModal';
+import {UnverifiedUserWarning} from '../../../modals/userModal';
 import {E2eEncryptionMessage} from '../e2eEncryptionMessage/e2eEncryptionMessage';
 
 interface ConnectedMessageProps {

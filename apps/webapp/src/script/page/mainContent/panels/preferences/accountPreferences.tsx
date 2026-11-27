@@ -41,7 +41,7 @@ import {PreferencesSection} from './components/preferencesSection';
 import {Runtime} from '../../../../commons/util/Runtime';
 import {UserVerificationBadges} from '../../../../components/badge';
 import {ErrorFallback} from '../../../../components/errorFallback';
-import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../../../components/modals/primaryModal';
 import {useEnrichedFields} from '../../../../components/panel/enrichedFields';
 import {Config} from '../../../../Config';
 import {getUserProfileUrl} from '../../../../externalRoute';

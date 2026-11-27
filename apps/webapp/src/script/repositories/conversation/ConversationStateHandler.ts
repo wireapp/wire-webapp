@@ -35,7 +35,7 @@ import {ConversationEvent} from './EventBuilder';
 import {ConversationCode} from '../../apiClient/conversation/conversationCode';
 import {ConversationAccessUpdateData} from '../../apiClient/conversation/data/conversationAccessUpdateData';
 import {CONVERSATION_EVENT} from '../../apiClient/event/conversationEvent';
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import {type Translate} from '../../util/localizerUtil';
 import type {TranslationKey} from '../../util/localizerUtil/translationTypes';
 import {isErrorWithCode} from '../../util/typePredicateUtil';

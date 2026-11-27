@@ -28,8 +28,8 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {QualifiedId} from '../apiClient/user/qualifiedId';
 import '../components/calling/chooseScreen';
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import type {PrimaryModalTranslatedMessage} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal} from '../components/modals/primaryModal';
+import type {PrimaryModalTranslatedMessage} from '../components/modals/primaryModal/primaryModalTypes';
 import {Config} from '../Config';
 import type {AudioRepository} from '../repositories/audio/audioRepository';
 import {AudioType} from '../repositories/audio/audioType';

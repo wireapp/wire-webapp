@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {FileInput} from './fileInput';
 
 import {Avatar, AVATAR_SIZE} from '../../../../../components/avatar';
-import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../../../../components/modals/primaryModal';
 import {Config} from '../../../../../Config';
 import {UserError} from '../../../../../error/userError';
 import {User} from '../../../../../repositories/entity/User';

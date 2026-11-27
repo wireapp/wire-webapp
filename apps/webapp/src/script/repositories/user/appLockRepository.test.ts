@@ -17,8 +17,8 @@
  *
  */
 
-import {removeCurrentModal} from '../../components/Modals/PrimaryModal';
-import {usePrimaryModalState} from '../../components/Modals/PrimaryModal/PrimaryModalState';
+import {removeCurrentModal} from '../../components/modals/primaryModal';
+import {usePrimaryModalState} from '../../components/modals/primaryModal/primaryModalState';
 import {User} from '../entity/User/User';
 import type {Translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';

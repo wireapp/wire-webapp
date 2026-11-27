@@ -54,7 +54,7 @@ import {RECEIPT_MODE} from '../../apiClient/conversation/data/conversationReceip
 import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {UserType} from '../../apiClient/user/user';
-import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {useLegalHoldModalState} from '../../components/modals/legalHoldModal/legalHoldModal.state';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/message';

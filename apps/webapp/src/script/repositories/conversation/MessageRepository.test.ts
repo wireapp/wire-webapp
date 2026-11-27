@@ -30,7 +30,7 @@ import {WebAppEvents} from '../../webAppEvents';
 
 import {AssetRepository} from '../assets/assetRepository';
 import {AudioRepository} from '../audio/audioRepository';
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientState} from '../client/ClientState';
 import {ConnectionEntity} from '../connection/connectionEntity';

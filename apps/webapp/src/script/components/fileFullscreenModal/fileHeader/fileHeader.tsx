@@ -63,7 +63,7 @@ import {isInRecycleBin} from '../../conversation/conversationCells/common/recycl
 import {EditIcon} from '../../icon';
 import {iconStyles} from '../../messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/common/fileAssetOptions/fileAssetOptions.styles';
 import {MessageTime} from '../../messagesList/message/messageTime';
-import {useFileHistoryModal} from '../../Modals/FileHistoryModal/hooks/useFileHistoryModal';
+import {useFileHistoryModal} from '../../modals/fileHistoryModal/hooks/useFileHistoryModal';
 
 interface FileHeaderProps {
   id: string;

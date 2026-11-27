@@ -50,7 +50,7 @@ import {errorHandlerStrings} from '../../../util/errorUtil';
 import type {TranslationKey} from '../../../util/localizerUtil';
 import {isAxiosError, isBackendError} from '../../../util/typePredicateUtil';
 import {useIsMounted} from '../../../util/useIsMounted';
-import {ModalComponent} from '../../Modals/ModalComponent';
+import {ModalComponent} from '../../modals/modalComponent';
 
 const REQUIRED_PROTOCOL_ACTIVATIONS = 5;
 

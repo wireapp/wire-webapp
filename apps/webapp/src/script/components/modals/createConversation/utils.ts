@@ -1,0 +1,212 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {isNan} from '@sindresorhus/is';
+import {container} from 'tsyringe';
+
+import {ChatHistory, ConversationAccess, ConversationType, HistorySharingUnit} from './types';
+
+import {ADD_PERMISSION} from '../../../apiClient/conversation/conversation';
+import {Config} from '../../../Config';
+import type {RootContextValue} from '../../../page/rootProvider';
+import {TeamState} from '../../../repositories/team/TeamState';
+import type {PrimaryModalTranslatedMessage} from '../primaryModal/primaryModalTypes';
+
+export type Translate = RootContextValue['translate'];
+
+export const getSharedDrivePermissionHint = (translate: Translate): string => {
+  return translate('modalCreateConversationAdminHint');
+};
+
+export type NonFederatingParticipantsModalCopy = {
+  readonly editParticipantsButtonText: string;
+  readonly leaveButtonText: string;
+  readonly titleText: string;
+  readonly getTranslatedMessage: (backendString: string) => PrimaryModalTranslatedMessage;
+};
+
+type GetConversationAccessOptionsResult = (
+  | {value: ConversationAccess; label: string; isDisabled: boolean}
+  | {value: ConversationAccess; label: string; isDisabled?: undefined}
+)[];
+export const getConversationAccessOptions = (
+  translate: Translate,
+  isPublicOptionEnabled = true,
+): GetConversationAccessOptionsResult => {
+  return [
+    {
+      value: ConversationAccess.Public,
+      label: translate('createConversationAccessOptionPublic'),
+      isDisabled: !isPublicOptionEnabled,
+    },
+    {
+      value: ConversationAccess.Private,
+      label: translate('createConversationAccessOptionPrivate'),
+    },
+  ];
+};
+
+type GetConversationManagerOptionsResult = {value: ADD_PERMISSION; label: string}[];
+export const getConversationManagerOptions = (translate: Translate): GetConversationManagerOptionsResult => {
+  return [
+    {
+      value: ADD_PERMISSION.ADMINS,
+      label: translate('createConversationManagerOptionAdmins'),
+    },
+    {
+      value: ADD_PERMISSION.EVERYONE,
+      label: translate('createConversationManagerOptionAdminsAndMembers'),
+    },
+  ];
+};
+
+type GetConversationTypeOptionsResult = {conversationType: ConversationType; label: string}[];
+export const getConversationTypeOptions = (translate: Translate): GetConversationTypeOptionsResult => {
+  return [
+    {
+      conversationType: ConversationType.Channel,
+      label: translate('conversationTypeChannelOption'),
+    },
+    {
+      conversationType: ConversationType.Group,
+      label: translate('conversationTypeGroupOption'),
+    },
+  ];
+};
+
+type GetChatHistorySharingUnitOptionsResult = {value: HistorySharingUnit; label: string}[];
+export const getChatHistorySharingUnitOptions = (
+  translate: Translate,
+  historySharingQuantity: number,
+): GetChatHistorySharingUnitOptionsResult => {
+  const chatHistorySharingUnitOptions = [
+    {
+      value: HistorySharingUnit.Days,
+      label:
+        historySharingQuantity !== 0 && !isNan(historySharingQuantity) && historySharingQuantity > 1
+          ? translate('conversationHistoryModalOptionDays')
+          : translate('conversationHistoryModalOptionDay'),
+    },
+    {
+      value: HistorySharingUnit.Weeks,
+      label:
+        historySharingQuantity !== 0 && !isNan(historySharingQuantity) && historySharingQuantity > 1
+          ? translate('conversationHistoryModalOptionWeeks')
+          : translate('conversationHistoryModalOptionWeek'),
+    },
+    {
+      value: HistorySharingUnit.Months,
+      label:
+        historySharingQuantity !== 0 && !isNan(historySharingQuantity) && historySharingQuantity > 1
+          ? translate('conversationHistoryModalOptionMonths')
+          : translate('conversationHistoryModalOptionMonth'),
+    },
+  ];
+
+  return chatHistorySharingUnitOptions;
+};
+
+type GetChatHistoryOptionsResult = {value: ChatHistory; label: string}[];
+export const getChatHistoryOptions = (
+  translate: Translate,
+  chatHistory: ChatHistory,
+  historySharingQuantity: number,
+  historySharingUnit: HistorySharingUnit,
+  enableCustomHistory?: boolean,
+): GetChatHistoryOptionsResult => {
+  const teamState = container.resolve(TeamState);
+  const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(translate, historySharingQuantity);
+
+  const chatHistoryOptions = [
+    {
+      value: ChatHistory.Off,
+      label: translate('conversationHistoryOptionOff'),
+    },
+    {
+      value: ChatHistory.OneDay,
+      label: translate('conversationHistoryOptionDay'),
+    },
+  ];
+
+  if (teamState.isConferenceCallingEnabled()) {
+    chatHistoryOptions.push(
+      {
+        value: ChatHistory.OneWeek,
+        label: translate('conversationHistoryOptionWeek'),
+      },
+      {
+        value: ChatHistory.Unlimited,
+        label: translate('conversationHistoryOptionUnlimited'),
+      },
+    );
+  }
+
+  if (enableCustomHistory === true || teamState.isConferenceCallingEnabled()) {
+    chatHistoryOptions.push({
+      value: ChatHistory.Custom,
+      label: `${translate('conversationHistoryOptionCustom')}${
+        chatHistory === ChatHistory.Custom && historySharingQuantity !== 0 && !isNan(historySharingQuantity)
+          ? ` (${historySharingQuantity} ${
+              chatHistorySharingUnitOptions.find(option => {
+                return option.value === historySharingUnit;
+              })?.label
+            })`
+          : ''
+      }`,
+    });
+  }
+
+  return chatHistoryOptions;
+};
+
+export const getNonFederatingParticipantsModalCopy = (translate: Translate): NonFederatingParticipantsModalCopy => {
+  return {
+    editParticipantsButtonText: translate('groupCreationPreferencesNonFederatingEditList'),
+    leaveButtonText: translate('groupCreationPreferencesNonFederatingLeave'),
+    titleText: translate('groupCreationPreferencesNonFederatingHeadline'),
+    getTranslatedMessage: (backendString: string): PrimaryModalTranslatedMessage => {
+      return {
+        compatibilityReplacements: [],
+        components: [
+          {
+            className: 'modal__text__read-more',
+            dataUieName: 'read-more-backends',
+            href: Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
+            kind: 'link',
+            legacyClosingTokens: [],
+            legacyOpeningTokens: [],
+            markerName: 'link',
+            rel: 'nofollow noopener noreferrer',
+            target: '_blank',
+          },
+        ],
+        kind: 'translation',
+        layout: 'default',
+        translationKey: 'groupCreationPreferencesNonFederatingMessage',
+        values: [
+          {
+            alternatePlaceholders: [],
+            placeholder: 'backends',
+            runtimeText: backendString,
+          },
+        ],
+      };
+    },
+  };
+};

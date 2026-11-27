@@ -32,8 +32,8 @@ import {
   NotificationPreference,
   WebappProperties,
 } from '../../apiClient/user/data/userPropertiesSetData';
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
-import {PrimaryModalType} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal} from '../../components/modals/primaryModal';
+import {PrimaryModalType} from '../../components/modals/primaryModal/primaryModalTypes';
 import {Config} from '../../Config';
 import {Environment} from '../../util/environment';
 import {type Translate} from '../../util/localizerUtil';

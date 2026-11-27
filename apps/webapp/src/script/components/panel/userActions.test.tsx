@@ -26,7 +26,7 @@ import {pendingOnboardingStatusFeatureToggleName} from '../../featureToggles/sta
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {PrimaryModalComponent} from '../Modals/PrimaryModal/PrimaryModal';
+import {PrimaryModalComponent} from '../modals/primaryModal/primaryModal';
 import {ConnectionEntity} from '../../repositories/connection/connectionEntity';
 import {ConversationRoleRepository} from '../../repositories/conversation/ConversationRoleRepository';
 import {ConversationState} from '../../repositories/conversation/ConversationState';

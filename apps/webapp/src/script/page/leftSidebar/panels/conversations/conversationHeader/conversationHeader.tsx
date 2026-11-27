@@ -36,7 +36,7 @@ import {
 } from './conversationHeader.styles';
 
 import * as Icon from '../../../../../components/icon';
-import {useCreateConversationModal} from '../../../../../components/Modals/CreateConversation/hooks/useCreateConversationModal';
+import {useCreateConversationModal} from '../../../../../components/modals/createConversation/hooks/useCreateConversationModal';
 import {ConversationLabel} from '../../../../../repositories/conversation/ConversationLabelRepository';
 import {User} from '../../../../../repositories/entity/User';
 import {generatePermissionHelpers} from '../../../../../repositories/user/userPermission';

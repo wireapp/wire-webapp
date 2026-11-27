@@ -706,10 +706,10 @@ const productionConfigs = [
   },
   {
     files: [
-      'apps/webapp/src/script/components/Modals/PrimaryModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Modals/LeaveGroupAdminModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Modals/QualityFeedbackModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Modals/DetailViewModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/modals/primaryModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/modals/leaveGroupAdminModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/modals/qualityFeedbackModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/modals/detailViewModal/**/*.{ts,tsx}',
     ],
     rules: {
       'no-restricted-imports': [
@@ -779,9 +779,9 @@ const productionConfigs = [
       'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/virtualizedMessagesList.tsx',
       'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/useLoadMessages.ts',
       'apps/webapp/src/script/components/messagesList/utils/useLoadConversation.ts',
-      'apps/webapp/src/script/components/Modals/FileHistoryModal/FileVersionItem.tsx',
-      'apps/webapp/src/script/components/Modals/FileHistoryModal/hooks/useFileVersions.ts',
-      'apps/webapp/src/script/components/Modals/DetailViewModal/DetailViewModalFooter.tsx',
+      'apps/webapp/src/script/components/modals/fileHistoryModal/fileVersionItem.tsx',
+      'apps/webapp/src/script/components/modals/fileHistoryModal/hooks/useFileVersions.ts',
+      'apps/webapp/src/script/components/modals/detailViewModal/detailViewModalFooter.tsx',
       'apps/webapp/src/script/components/userSearchableList/userSearchableList.tsx',
       'apps/webapp/src/script/components/calling/callingCell/callingCell.tsx',
       'apps/webapp/src/script/components/calling/callingOverlayContainer.tsx',

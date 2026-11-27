@@ -39,7 +39,7 @@ import {HistoryExport} from '../../components/historyExport';
 import {HistoryImport} from '../../components/historyImport';
 import * as Icon from '../../components/icon';
 import {Meetings} from '../../components/meeting/meetings';
-import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {useLegalHoldModalState} from '../../components/modals/legalHoldModal/legalHoldModal.state';
 import {ClientState} from '../../repositories/client/ClientState';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
 import {User} from '../../repositories/entity/User';

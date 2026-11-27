@@ -34,7 +34,7 @@ import {useMatchMedia} from '../../uiKit/layout/matchMedia/matchMedia';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import {UserClassifiedBar} from '../classifiedBar/classifiedBar';
-import {UnverifiedUserWarning} from '../Modals/UserModal';
+import {UnverifiedUserWarning} from '../modals/userModal';
 import {UserName} from '../userName';
 
 interface ConnectRequestsProps {

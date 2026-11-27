@@ -21,8 +21,8 @@ import ko from 'knockout';
 import {DefaultConversationRoleName} from '../apiClient/conversation/conversationRole';
 import {FEATURE_KEY, FEATURE_STATUS, type FeatureList} from '../apiClient/team/feature/featureList.types';
 
-import {useLeaveGroupAdminModalStore} from '../components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {useLeaveGroupAdminModalStore} from '../components/modals/leaveGroupAdminModal/useLeaveGroupAdminModalStore';
+import {PrimaryModal} from '../components/modals/primaryModal';
 import {CellsRepository} from '../repositories/cells/cellsRepository';
 import {ConnectionRepository} from '../repositories/connection/connectionRepository';
 import {ConversationRepository} from '../repositories/conversation/ConversationRepository';

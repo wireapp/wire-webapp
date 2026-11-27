@@ -1,0 +1,147 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import type {FunctionComponent} from 'react';
+
+import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
+import {container} from 'tsyringe';
+
+import {createConversationCloseButtonCss, createConversationHeaderContainerCss} from './createConversation.styles';
+import {CreateConversationSubmit} from './createConversationSubmit';
+import {useCreateConversationModal} from './hooks/useCreateConversationModal';
+import {ConversationType, ConversationCreationStep} from './types';
+
+import {useApplicationContext} from '../../../page/rootProvider';
+import {UserState} from '../../../repositories/user/userState';
+import {Button, ButtonVariant} from '../../../uiKit/inputs/button/button';
+import * as Icon from '../../icon';
+
+export const CreateConversationHeader: FunctionComponent = () => {
+  const {translate} = useApplicationContext();
+  const {
+    error,
+    gotoNextStep,
+    conversationName,
+    conversationCreationStep,
+    gotoPreviousStep,
+    conversationType,
+    gotoLastStep,
+    gotoFirstStep,
+    setDiscardTrigger,
+    setIsConfirmDiscardModalOpen,
+    hideModal,
+    isSubmitting,
+  } = useCreateConversationModal();
+  const userState = container.resolve(UserState);
+  const selfUser = userState.self();
+
+  const onNextClick = (): void => {
+    if (conversationType === ConversationType.Group) {
+      gotoLastStep();
+      return;
+    }
+
+    gotoNextStep();
+  };
+
+  const onBackClick = (): void => {
+    if (useCreateConversationModal.getState().isSubmitting) {
+      return;
+    }
+
+    if (conversationType === ConversationType.Group) {
+      gotoFirstStep();
+      return;
+    }
+
+    gotoPreviousStep();
+  };
+
+  const onModalClose = (): void => {
+    if (useCreateConversationModal.getState().isSubmitting) {
+      return;
+    }
+
+    if (conversationCreationStep !== ConversationCreationStep.ConversationDetails) {
+      setDiscardTrigger('modalClose');
+      setIsConfirmDiscardModalOpen(true);
+      return;
+    }
+    hideModal();
+  };
+
+  const isNextButtonDisabled =
+    isNonEmptyString(error) ||
+    isEmptyString(conversationName) ||
+    (selfUser?.isExternal() && conversationType === ConversationType.Group);
+
+  return (
+    <div className="modal__header modal__header--list" css={createConversationHeaderContainerCss}>
+      <button
+        className="button-reset-default"
+        type="button"
+        onClick={onModalClose}
+        disabled={isSubmitting}
+        css={createConversationCloseButtonCss}
+        aria-label={translate('accessibility.groupCreationActionCloseModal')}
+        data-uie-name="do-close"
+      >
+        <Icon.CloseIcon aria-hidden="true" className="modal__header__button" />
+      </button>
+
+      <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
+        {translate('createConversationModalHeader')}
+      </h2>
+
+      <div css={{display: 'flex', gap: '8px'}}>
+        {conversationCreationStep !== ConversationCreationStep.ConversationDetails && (
+          <Button
+            id="conversation-go-previous"
+            css={{marginBottom: 0}}
+            type="button"
+            onClick={onBackClick}
+            disabled={isSubmitting}
+            aria-label={'Back'}
+            data-uie-name="go-to-previous-step"
+            variant={ButtonVariant.TERTIARY}
+          >
+            {translate('createConversationModalHeaderBack')}
+          </Button>
+        )}
+
+        {conversationCreationStep === ConversationCreationStep.ParticipantsSelection ? (
+          <CreateConversationSubmit />
+        ) : (
+          <Button
+            id="group-go-next"
+            css={{marginBottom: 0}}
+            disabled={isNextButtonDisabled}
+            type="button"
+            onClick={onNextClick}
+            aria-label={translate('groupCreationPreferencesAction')}
+            data-uie-name="go-next"
+            variant={ButtonVariant.TERTIARY}
+          >
+            {translate('createConversationModalHeaderNext')}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};

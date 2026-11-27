@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {USER_EVENT} from '../../apiClient/event/userEvent';
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {type Translate} from '../../util/localizerUtil';
 import {getLogger, Logger} from '../../util/logger';

@@ -27,7 +27,7 @@ import type {MainViewModel, ViewModelRepositories} from './mainViewModel';
 
 import {ConnectionStatus} from '../apiClient/connection/connectionStatus';
 import {QualifiedId} from '../apiClient/user/qualifiedId';
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/modals/primaryModal';
 import {Config} from '../Config';
 import {ConversationError} from '../error/conversationError';
 import '../page/leftSidebar';

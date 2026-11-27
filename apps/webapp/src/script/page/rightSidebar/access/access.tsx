@@ -25,11 +25,11 @@ import {conversationAccessContainerCss, conversationAccessContentCss} from './ac
 
 import {ADD_PERMISSION, CONVERSATION_ACCESS} from '../../../apiClient/conversation/conversation';
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
-import {ConversationAccess} from '../../../components/Modals/CreateConversation/types';
+import {ConversationAccess} from '../../../components/modals/createConversation/types';
 import {
   getConversationAccessOptions,
   getConversationManagerOptions,
-} from '../../../components/Modals/CreateConversation/utils';
+} from '../../../components/modals/createConversation/utils';
 import {RadioGroup} from '../../../components/radio';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from '../../../repositories/conversation/ConversationRoleRepository';

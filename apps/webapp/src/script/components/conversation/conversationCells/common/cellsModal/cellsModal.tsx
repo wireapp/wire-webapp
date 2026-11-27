@@ -29,7 +29,7 @@ import {CellsModalProvider} from './cellsModalContext/cellsModalContext';
 import {CellsModalHeader} from './cellsModalHeader/cellsModalHeader';
 
 import {handleEscDown} from '../../../../../util/keyboardUtil';
-import {ModalComponent} from '../../../../Modals/ModalComponent';
+import {ModalComponent} from '../../../../modals/modalComponent';
 
 interface CellsModalProps {
   size?: 'small' | 'large';

@@ -23,7 +23,7 @@ import {GuestOptions} from './components/guestOptions';
 import {ServicesOptions} from './components/servicesOptions';
 
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
-import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../../components/modals/primaryModal';
 import {toggleFeature} from '../../../repositories/conversation/ConversationAccessPermission';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';

@@ -37,7 +37,7 @@ import {getLogger} from '../../util/logger';
 import {getCurrentDate} from '../../util/timeUtil';
 import {downloadBlob} from '../../util/util';
 import {WebAppEvents} from '../../webAppEvents';
-import {PrimaryModal} from '../Modals/PrimaryModal';
+import {PrimaryModal} from '../modals/primaryModal';
 import {ProgressBar} from '../progressBar/progressBar';
 
 enum ExportState {

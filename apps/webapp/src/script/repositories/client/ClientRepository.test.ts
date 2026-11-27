@@ -24,7 +24,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Maybe} from 'true-myth';
 
 import {Runtime} from '../../commons/util/Runtime';
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 
 import {User} from '../entity/User';
 import {ClientRecord} from '../storage/record/clientRecord';

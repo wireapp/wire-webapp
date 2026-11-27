@@ -25,7 +25,7 @@ import {ListWrapper} from './listWrapper';
 
 import {Runtime} from '../../../commons/util/Runtime';
 import * as Icon from '../../../components/icon';
-import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../../components/modals/primaryModal';
 import {
   ClientNotificationData,
   Notification,

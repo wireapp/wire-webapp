@@ -45,7 +45,7 @@ import {CallState} from '../../repositories/calling/CallState';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {matchQualifiedIds} from '../../util/qualifiedId';
-import {PrimaryModal} from '../Modals/PrimaryModal';
+import {PrimaryModal} from '../modals/primaryModal';
 
 type JoinMeetingCallResultHandlers = {
   showConversationNotFoundModal: () => void;

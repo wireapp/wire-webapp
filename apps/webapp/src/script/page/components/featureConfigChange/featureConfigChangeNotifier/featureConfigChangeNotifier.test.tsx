@@ -21,7 +21,7 @@ import {act, render, waitFor} from '@testing-library/react';
 import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '../../../../apiClient/team/feature/featureList.types';
 import {Runtime} from '../../../../commons/util/Runtime';
 
-import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../../../components/modals/primaryModal';
 import en from '../../../../../i18n/en-US.json';
 import {TeamState} from '../../../../repositories/team/TeamState';
 import {

@@ -53,7 +53,7 @@ import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {UserType} from '../../apiClient/user/user';
 import {TypedEventEmitter} from '../../commons/TypedEventEmitter/TypedEventEmitter';
 import {Runtime} from '../../commons/util/Runtime';
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import {Config} from '../../Config';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/mlsMigration/migrationStatus';

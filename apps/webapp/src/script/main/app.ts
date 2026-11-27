@@ -44,7 +44,7 @@ import {QualifiedId} from '../apiClient/user/qualifiedId';
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {createBrowserSystemNotificationApi} from '../browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {Runtime} from '../commons/util/Runtime';
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/modals/primaryModal';
 import {Config, Configuration} from '../Config';
 import {EVENTS as CoreEvents} from '../core/account';
 import {MLSServiceEvents} from '../core/messagingProtocols/mls';

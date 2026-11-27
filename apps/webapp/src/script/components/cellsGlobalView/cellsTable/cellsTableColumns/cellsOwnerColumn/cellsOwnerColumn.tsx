@@ -25,7 +25,7 @@ import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsOwnerColumn
 
 import {User} from '../../../../../repositories/entity/User';
 import {Avatar, AVATAR_SIZE} from '../../../../avatar';
-import {showUserModal} from '../../../../Modals/UserModal';
+import {showUserModal} from '../../../../modals/userModal';
 
 interface CellsTableOwnerColumnProps {
   owner: string;

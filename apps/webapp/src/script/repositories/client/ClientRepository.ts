@@ -39,7 +39,7 @@ import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '../../apiCl
 import {QualifiedId} from '../../apiClient/user/qualifiedId';
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {Runtime} from '../../commons/util/Runtime';
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';
 import {type Translate} from '../../util/localizerUtil';

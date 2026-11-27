@@ -35,7 +35,7 @@ import {Button, ButtonVariant} from '../../../../../../uiKit/inputs/button/butto
 import {ErrorMessage} from '../../../../../../uiKit/inputs/errorMessage/errorMessage';
 import {Input} from '../../../../../../uiKit/inputs/input/input';
 import * as Icon from '../../../../../icon';
-import {ModalComponent} from '../../../../../Modals/ModalComponent';
+import {ModalComponent} from '../../../../../modals/modalComponent';
 import {validateUrl} from '../../utils/url';
 
 interface LinkDialogProps {

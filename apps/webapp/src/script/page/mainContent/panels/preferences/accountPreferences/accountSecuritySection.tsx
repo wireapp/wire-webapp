@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Runtime} from '../../../../../commons/util/Runtime';
-import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../../../../components/modals/primaryModal';
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
 import {User} from '../../../../../repositories/entity/User';
 import {TeamState} from '../../../../../repositories/team/TeamState';

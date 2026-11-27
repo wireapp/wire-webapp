@@ -21,7 +21,7 @@ import {useCallback} from 'react';
 
 import {styles} from './useNoInternetCallGuard.styles';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/modals/primaryModal';
 import type {Translate} from '../../util/localizerUtil';
 import {useWarningsState} from '../../viewModel/warningsContainer/warningsState';
 import {TYPE} from '../../viewModel/warningsContainer/warningsTypes';

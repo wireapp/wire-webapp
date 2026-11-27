@@ -51,7 +51,7 @@ import {matchQualifiedIds} from '../../util/qualifiedId';
 import type {ActionsViewModel} from '../../viewModel/actionsViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import * as Icon from '../icon';
-import {PrimaryModal} from '../Modals/PrimaryModal';
+import {PrimaryModal} from '../modals/primaryModal';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',

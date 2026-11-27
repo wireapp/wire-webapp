@@ -24,13 +24,13 @@ import {AddUsersFailure, AddUsersFailureReasons} from '../../../../core/conversa
 import type {User} from '../../../../repositories/entity/User';
 import type {Translate, TranslationKey} from '../../../../util/localizerUtil';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';
-import {PrimaryModal} from '../../../Modals/PrimaryModal';
+import {PrimaryModal} from '../../../modals/primaryModal';
 import type {
   PrimaryModalTranslatedCompatibilityReplacement,
   PrimaryModalTranslatedMessage,
   PrimaryModalTranslatedTranslation,
   PrimaryModalTranslatedValue,
-} from '../../../Modals/PrimaryModal/PrimaryModalTypes';
+} from '../../../modals/primaryModal/primaryModalTypes';
 import {getUserNameWithTranslate} from '../../../userName';
 
 const singularTranslationKeyByReason = {

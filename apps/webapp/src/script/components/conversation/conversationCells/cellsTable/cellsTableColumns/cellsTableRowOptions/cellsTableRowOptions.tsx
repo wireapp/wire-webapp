@@ -40,7 +40,7 @@ import {DropdownMenu} from '../../../../../../uiKit/surface/dropdownMenu/dropdow
 import {isFileEditable} from '../../../../../../util/fileTypeUtil';
 import {forcedDownloadFile} from '../../../../../../util/util';
 import {useAppNotification} from '../../../../../appNotification/appNotification';
-import {useFileHistoryModal} from '../../../../../Modals/FileHistoryModal/hooks/useFileHistoryModal';
+import {useFileHistoryModal} from '../../../../../modals/fileHistoryModal/hooks/useFileHistoryModal';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,

@@ -52,7 +52,7 @@ import {CellsShareModalContent} from '../../../../../cells/shareModal/cellsShare
 import {serializeShareModalInput} from '../../../../../cells/shareModal/shareModalSerializer';
 import {useCellExpirationToggle} from '../../../../../cells/shareModal/useCellExpirationToggle';
 import {useCellPasswordToggle} from '../../../../../cells/shareModal/useCellPasswordToggle';
-import {PrimaryModal} from '../../../../../Modals/PrimaryModal';
+import {PrimaryModal} from '../../../../../modals/primaryModal';
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
 interface ShareModalParams {
