@@ -39,6 +39,7 @@ const defaultProps: MessageActionsMenuProps = {
   handleReactionClick: jest.fn(),
   reactionsTotalCount: 0,
   isRemovedFromConversation: false,
+  isPendingInOutbox: false,
 };
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

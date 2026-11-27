@@ -110,7 +110,7 @@ export const useMessageHandling = ({
     onLoad: draftState => {
       const reply = draftState.messageReply;
 
-      if (reply?.isReplyable() === true) {
+      if (reply?.isReplyable(messageRepository.getOutboxState(reply.id) === 'pending') === true) {
         replyMessageCallback(reply);
       }
 

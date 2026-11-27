@@ -62,7 +62,7 @@ export interface MessageActionsMenuProps {
   reactionsTotalCount: number;
   isRemovedFromConversation: boolean;
   /** The message waits in the outbox with no send in flight, so reactions and replies can queue behind it */
-  isPendingInOutbox?: boolean;
+  isPendingInOutbox: boolean;
 }
 
 const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
@@ -74,7 +74,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   handleReactionClick,
   reactionsTotalCount,
   isRemovedFromConversation,
-  isPendingInOutbox = false,
+  isPendingInOutbox,
 }) => {
   const {translate} = useApplicationContext();
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);

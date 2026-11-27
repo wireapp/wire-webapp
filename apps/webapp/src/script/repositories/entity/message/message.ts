@@ -455,7 +455,7 @@ export class Message {
    * @param isPendingInOutbox the message waits in the outbox and no send is in flight, so what follows can queue behind it
    * @returns `true`, if message type supports reactions, `false` otherwise.
    */
-  isReactable(isPendingInOutbox = false): this is ContentMessage {
+  isReactable(isPendingInOutbox: boolean): this is ContentMessage {
     return (
       this.isContent() &&
       !this.isComposite() &&
@@ -470,7 +470,7 @@ export class Message {
    * @param isPendingInOutbox the message waits in the outbox and no send is in flight, so what follows can queue behind it
    * @returns `true`, if message type supports replies, `false` otherwise.
    */
-  isReplyable(isPendingInOutbox = false): boolean {
+  isReplyable(isPendingInOutbox: boolean): boolean {
     return (
       this.isContent() &&
       !this.isComposite() &&

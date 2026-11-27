@@ -67,7 +67,8 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
   const {isSelfUserRemoved} = useKoSubscribableChildren(conversationEntity, ['isSelfUserRemoved']);
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const isMsgReactable = messageEntity.isReactable();
+  const isPendingInOutbox = messageRepository.getOutboxState(messageEntity.id) === 'pending';
+  const isMsgReactable = messageEntity.isReactable(isPendingInOutbox);
   const handleReactionClick = (reaction: ReactionType): void => {
     if (!messageEntity.isContent()) {
       return;
@@ -133,7 +134,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
             toggleActiveMenu={toggleActiveMenu}
             handleKeyDown={handleKeyDown}
           />
-          {messageEntity.isReplyable() && !isSelfUserRemoved && (
+          {messageEntity.isReplyable(isPendingInOutbox) && !isSelfUserRemoved && (
             <ReplyButton
               translate={translate}
               actionId={MESSAGE_REPLY_ID}

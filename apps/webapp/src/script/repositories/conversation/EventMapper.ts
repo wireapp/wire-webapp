@@ -537,7 +537,7 @@ export class EventMapper {
       messageEntity.selectedButtonId(selected_button_id);
       messageEntity.waitingButtonId(waiting_button_id);
     }
-    if (messageEntity.isReactable()) {
+    if (messageEntity.isReactable(false)) {
       (messageEntity as ContentMessage).reactions(
         userReactionMapToReactionMap((event as LegacyEventRecord).reactions ?? {}),
       );

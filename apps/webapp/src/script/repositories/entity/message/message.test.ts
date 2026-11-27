@@ -41,14 +41,10 @@ describe('Message', () => {
     }
 
     it('allows a sent message', () => {
-      expect(createContentMessage(StatusType.SENT)[method]()).toBe(true);
+      expect(createContentMessage(StatusType.SENT)[method](false)).toBe(true);
     });
 
-    it('refuses a message that is sending', () => {
-      expect(createContentMessage(StatusType.SENDING)[method]()).toBe(false);
-    });
-
-    it('refuses a message that is sending when the outbox has it in flight', () => {
+    it('refuses a message that is sending when it does not wait in the outbox', () => {
       expect(createContentMessage(StatusType.SENDING)[method](false)).toBe(false);
     });
 
