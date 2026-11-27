@@ -17,166 +17,41 @@
  *
  */
 
-import {createFireAndForgetInvoker, type FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {amplify} from 'amplify';
 
-import {CONVERSATION_PROTOCOL} from '../../apiClient/team/feature/featureList.types';
-import {MessageSendingState} from '../../core/conversation';
-import {MessageTimer} from '../../core/conversation/messageTimer/messageTimer';
 import {StatusType} from '../../message/statusType';
-import {createOutbox, type OperationSnapshot, type Outbox} from '../../outbox';
+import {type OperationSnapshot, type Outbox} from '../../outbox';
 import type {FakeClock} from '../../outbox/testing/createFakeClock';
 import type {InMemoryOutboxStore} from '../../outbox/testing/createInMemoryOutboxStore';
-import {createStoredSnapshot, createTestDependencies} from '../../outbox/testing/createOutboxTestKit';
-import {serverTimeHandler} from '../../time/serverTimeHandler';
-import {createCoreTestFixture} from '../../util/test/createCoreTestFixture';
+import {createStoredSnapshot} from '../../outbox/testing/createOutboxTestKit';
 import {translateForTest} from '../../util/test/translateForTest';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {WebAppEvents} from '../../webAppEvents';
-import {AssetRepository} from '../assets/assetRepository';
-import {AudioRepository} from '../audio/audioRepository';
-import {ClientEntity} from '../client/ClientEntity';
-import {ClientState} from '../client/ClientState';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {Conversation} from '../entity/Conversation';
 import {ContentMessage} from '../entity/message/contentMessage';
 import {Text as TextAsset} from '../entity/message/text';
-import {User} from '../entity/User';
-import {EventRepository} from '../event/EventRepository';
-import {EventService} from '../event/EventService';
-import {PropertiesRepository} from '../properties/propertiesRepository';
 import {StorageKey} from '../storage';
-import {TeamState} from '../team/TeamState';
-import {UserRepository} from '../user/userRepository';
-import {UserState} from '../user/userState';
 
-import {ConversationRepository} from './ConversationRepository';
-import {ConversationState} from './ConversationState';
-import {MessageRepository} from './MessageRepository';
-import {createSimpleStorage} from './outbox/testing/createOutboxRepository';
-import {validate as isUuid} from 'uuid';
-
-import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {
+  createOutboxRepository,
+  sendingRecord,
+  sentResult,
+  type OutboxRepository,
+} from './outbox/testing/createOutboxRepository';
 
 const CONVERSATION_ID = {id: 'conversation-1', domain: 'wire.test'};
 const MESSAGES_LANE = `${CONVERSATION_ID.id}@${CONVERSATION_ID.domain}`;
 const CHANGES_LANE = `${MESSAGES_LANE}#changes`;
 
-type Parts = {
-  repository: MessageRepository;
-  conversation: Conversation;
-  eventService: EventService;
-  store: InMemoryOutboxStore;
-  clock: FakeClock;
-  invoker: FireAndForgetInvoker;
-  outbox: Outbox;
-  selfUser: User;
-  send: jest.Mock;
-  sendToBackend: jest.SpyInstance;
-  inject: jest.SpyInstance;
-  updateEvent: jest.SpyInstance;
-  deleteEvent: jest.SpyInstance;
-  simpleStorage: Map<string, unknown>;
-};
+type Parts = OutboxRepository & {store: InMemoryOutboxStore; clock: FakeClock; outbox: Outbox};
 
 function buildParts(): Parts {
-  const selfUser = new User('selfid', '', translateForTest);
-  selfUser.isMe = true;
-  const userState = new UserState();
-  userState.self(selfUser);
-  const clientState = new ClientState();
-  clientState.currentClient = new ClientEntity(true, '');
-  const conversationState = new ConversationState(userState);
-  const selfConversation = new Conversation(selfUser.id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-  const conversation = new Conversation(
-    CONVERSATION_ID.id,
-    CONVERSATION_ID.domain,
-    CONVERSATION_PROTOCOL.PROTEUS,
-    translateForTest,
-  );
-  conversationState.conversations([selfConversation, conversation]);
-  const simpleStorage = new Map<string, unknown>();
-  const eventService = new EventService(createSimpleStorage(simpleStorage));
-  const audioRepository = new AudioRepository();
-  jest.spyOn(audioRepository, 'play').mockResolvedValue(undefined as never);
-  const send = jest.fn();
-  const invoker = createFireAndForgetInvoker({reportError: jest.fn()});
-  const {dependencies, store, clock} = createTestDependencies();
-  const outbox = createOutbox(dependencies);
-
-  const repository = new MessageRepository(
-    () => {
-      return {checkMessageTimer: jest.fn()} as unknown as ConversationRepository;
-    },
-    new CryptographyRepository({} as any),
-    new EventRepository(eventService, {} as any, {} as any, {} as any),
-    new PropertiesRepository({} as any, {} as any, translateForTest),
-    serverTimeHandler,
-    {} as UserRepository,
-    {} as AssetRepository,
-    audioRepository,
-    translateForTest,
-    userState,
-    clientState,
-    conversationState,
-    new TeamState(),
-    createCoreTestFixture({service: {conversation: {send, messageTimer: new MessageTimer()}}}),
-    outbox,
-    invoker,
-  );
-
-  const sendToBackend = jest.spyOn(repository as any, 'sendMessageToBackend').mockResolvedValue({
-    id: 'sent',
-    sentAt: new Date(1_000_000).toISOString(),
-    state: MessageSendingState.OUTGOING_SENT,
-  });
-  const inject = jest.spyOn(repository as any, 'injectOptimisticMessage').mockResolvedValue(true);
-  jest.spyOn(conversation, 'getMessage').mockReturnValue({
-    status: jest.fn(),
-    ephemeral_expires: jest.fn(() => {
-      return false;
-    }),
-    failed_reason: jest.fn(),
-    primary_key: 'primary-key',
-  } as never);
-  const storedRecord = {
-    primary_key: 'primary-key',
-    id: 'message-1',
-    type: 'conversation.message-add',
-    conversation: CONVERSATION_ID.id,
-    from: 'selfid',
-    time: new Date(1_000_000).toISOString(),
-    status: StatusType.SENDING,
-    data: {content: 'old', mentions: [], previews: []},
-  } as any;
-  // The tests name their messages. An edit gets a new uuid, under which nothing is stored before the edit is shown.
-  jest.spyOn(eventService, 'loadEvent').mockImplementation(async (_conversationId, messageId) => {
-    return isUuid(messageId) ? undefined : storedRecord;
-  });
-  const updateEvent = jest.spyOn(eventService, 'updateEvent').mockResolvedValue({} as any);
-  const deleteEvent = jest.spyOn(eventService, 'deleteEvent').mockResolvedValue(1);
-
-  return {
-    repository,
-    conversation,
-    eventService,
-    store,
-    clock,
-    invoker,
-    outbox,
-    selfUser,
-    send,
-    sendToBackend,
-    inject,
-    updateEvent,
-    deleteEvent,
-    simpleStorage,
-  };
+  const parts = createOutboxRepository();
+  return {...parts, store: parts.kit.store, clock: parts.kit.clock, outbox: parts.kit.outbox};
 }
 
-async function startOutbox({clock, outbox}: Parts): Promise<void> {
-  const startResult = await outbox.start();
-  expect(startResult.outcome).toBe('outbox-started');
-  await clock.settle();
+/** Starts the outbox paused */
+async function startOutbox({kit}: Parts): Promise<void> {
+  await kit.start({run: false});
 }
 
 /** The latest snapshot of the operation with this correlation key, if the store has one */
@@ -196,6 +71,7 @@ function seedMessage(
   overrides: Partial<OperationSnapshot> & {messageId?: string; mayBeDelivered?: true} = {},
 ): string {
   const {messageId = 'message-1', mayBeDelivered, ...snapshot} = overrides;
+  parts.records.set(messageId, sendingRecord({data: {content: 'old', mentions: [], previews: []}}));
   parts.store.seed(
     createStoredSnapshot({
       kind: 'message',
@@ -217,12 +93,14 @@ function seedMessage(
   return messageId;
 }
 
+/** A message the user wrote, as it is shown and stored */
 function createMessage(parts: Parts, id: string, text = 'old', status = StatusType.SENDING): ContentMessage {
+  parts.records.set(id, sendingRecord({status, data: {content: text, mentions: [], previews: []}}));
   const message = new ContentMessage(id, translateForTest);
   message.user(parts.selfUser);
   message.status(status);
   message.assets.push(new TextAsset(id, text));
-  Object.assign(message, {primary_key: 'primary-key'});
+  Object.assign(message, {primary_key: id});
   return message;
 }
 
@@ -263,8 +141,8 @@ describe('MessageRepository routes changes through the outbox', () => {
           },
         }),
       );
-      expect(parts.inject).toHaveBeenCalledTimes(1);
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.injectEvent).toHaveBeenCalledTimes(1);
+      expect(parts.send).not.toHaveBeenCalled();
     });
 
     it('is a version of itself when toggled again', async () => {
@@ -298,7 +176,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       await parts.clock.settle();
 
       expect(snapshotOf(parts.store, 'sent-1:reaction')).toBeUndefined();
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(parts.send).toHaveBeenCalledTimes(1);
       expect(snapshotOf(parts.store, 'pending-1')?.state).toBe('on-hold');
     });
 
@@ -391,15 +269,12 @@ describe('MessageRepository routes changes through the outbox', () => {
         }),
       );
       expect(snapshotOf(parts.store, 'message-1:edit')).toBeUndefined();
-      expect(parts.updateEvent).toHaveBeenCalledWith(
-        'primary-key',
-        expect.objectContaining({data: expect.objectContaining({content: 'new', mentions: []})}),
-      );
+      expect(parts.records.get('message-1')?.data).toMatchObject({content: 'new', mentions: []});
       const [shown] = message.assets() as TextAsset[];
       expect(shown.text).toBe('new');
       expect(message.id).toBe('message-1');
       expect(message.was_edited()).toBe(false);
-      expect(parts.inject).not.toHaveBeenCalled();
+      expect(parts.injectEvent).not.toHaveBeenCalled();
       expect(parts.simpleStorage.get(StorageKey.OUTBOX.EDITED_MESSAGES)).toEqual({});
     });
 
@@ -454,7 +329,7 @@ describe('MessageRepository routes changes through the outbox', () => {
           }),
         }),
       );
-      expect(parts.inject).toHaveBeenCalledTimes(1);
+      expect(parts.injectEvent).toHaveBeenCalledTimes(1);
       expect(parts.updateEvent).not.toHaveBeenCalled();
     });
 
@@ -468,7 +343,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(snapshotOf(parts.store, 'sent-1:edit')).toEqual(
         expect.objectContaining({kind: 'message-change', lane: {state: 'in-lane', laneKey: CHANGES_LANE}}),
       );
-      expect(parts.inject).toHaveBeenCalledTimes(1);
+      expect(parts.injectEvent).toHaveBeenCalledTimes(1);
     });
 
     it('only changes a failed message locally, and queues nothing', async () => {
@@ -482,10 +357,7 @@ describe('MessageRepository routes changes through the outbox', () => {
         expect.objectContaining({state: 'dead-lettered', payload: expect.objectContaining({text: 'old'})}),
       );
       expect(snapshotOf(parts.store, 'message-1:edit')).toBeUndefined();
-      expect(parts.updateEvent).toHaveBeenCalledWith(
-        'primary-key',
-        expect.objectContaining({data: expect.objectContaining({content: 'new'})}),
-      );
+      expect(parts.records.get('message-1')?.data).toMatchObject({content: 'new'});
       expect((message.assets()[0] as TextAsset).text).toBe('new');
     });
 
@@ -504,10 +376,10 @@ describe('MessageRepository routes changes through the outbox', () => {
       let finishSending: () => void = () => {
         return undefined;
       };
-      parts.sendToBackend.mockImplementationOnce(() => {
+      parts.send.mockImplementationOnce(() => {
         return new Promise(resolve => {
           finishSending = () => {
-            return resolve({id: 'sent', sentAt: new Date(1_000_000).toISOString(), state: 'OUTGOING_SENT'});
+            return resolve(sentResult());
           };
         });
       });
@@ -519,7 +391,7 @@ describe('MessageRepository routes changes through the outbox', () => {
     async function waitForAttempt(): Promise<void> {
       parts.outbox.resume();
       await parts.clock.settle();
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(parts.send).toHaveBeenCalledTimes(1);
     }
 
     it('stores and sends the second reaction after the first one', async () => {
@@ -536,10 +408,10 @@ describe('MessageRepository routes changes through the outbox', () => {
       await second;
       await parts.clock.settle();
 
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
-      expect(parts.sendToBackend.mock.calls[0][0].reaction.emoji).toBe('👍');
-      expect(parts.sendToBackend.mock.calls[1][0].reaction.emoji).toBe('');
-      expect(parts.inject).toHaveBeenCalledTimes(2);
+      expect(parts.send).toHaveBeenCalledTimes(2);
+      expect(parts.send.mock.calls[0][0].payload.reaction.emoji).toBe('👍');
+      expect(parts.send.mock.calls[1][0].payload.reaction.emoji).toBe('');
+      expect(parts.injectEvent).toHaveBeenCalledTimes(2);
     });
 
     it('sends the second edit after the first one', async () => {
@@ -555,18 +427,14 @@ describe('MessageRepository routes changes through the outbox', () => {
       await second;
       await parts.clock.settle();
 
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
-      expect(parts.sendToBackend.mock.calls[0][0].edited.text.content).toBe('new');
-      expect(parts.sendToBackend.mock.calls[1][0].edited.text.content).toBe('newer');
+      expect(parts.send).toHaveBeenCalledTimes(2);
+      expect(parts.send.mock.calls[0][0].payload.edited.text.content).toBe('new');
+      expect(parts.send.mock.calls[1][0].payload.edited.text.content).toBe('newer');
     });
 
     it('sends the second hide after the first one', async () => {
       await startOutbox(parts);
       const message = createMessage(parts, 'sent-1', 'text', StatusType.SENT);
-      // The hide goes to the self conversations
-      jest
-        .spyOn((parts.repository as any).conversationState, 'getSelfConversations')
-        .mockReturnValue([parts.conversation]);
       const finishSending = await holdFirstSend();
       await parts.repository.deleteMessage(parts.conversation, message);
       await waitForAttempt();
@@ -577,7 +445,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       await second;
       await parts.clock.settle();
 
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
+      expect(parts.send).toHaveBeenCalledTimes(2);
       expect(parts.outbox.findByCorrelationKey('sent-1:hide').outcome).toBe('operation-not-found');
     });
   });
@@ -614,7 +482,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(parts.outbox.findByCorrelationKey('message-1').outcome).toBe('operation-not-found');
       expect(parts.outbox.findByCorrelationKey('message-1:reaction').outcome).toBe('operation-not-found');
       expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.send).not.toHaveBeenCalled();
       expect(
         parts.store.operationIds().filter(id => {
           return parts.store.history(id).at(-1)?.kind === 'message-change';
@@ -631,7 +499,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       await parts.clock.settle();
 
       expect(parts.outbox.findByCorrelationKey('message-1').outcome).toBe('operation-not-found');
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.send).not.toHaveBeenCalled();
       expect(parts.deleteEvent).toHaveBeenCalledWith(CONVERSATION_ID.id, 'message-1');
     });
 
@@ -652,7 +520,7 @@ describe('MessageRepository routes changes through the outbox', () => {
         await deleteForEveryone(createMessage(parts, 'message-1'));
 
         expect(parts.deleteEvent).not.toHaveBeenCalled();
-        expect(parts.sendToBackend).not.toHaveBeenCalled();
+        expect(parts.send).not.toHaveBeenCalled();
       },
     );
 
@@ -673,7 +541,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       parts.outbox.resume();
       await parts.clock.settle();
 
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(parts.send).toHaveBeenCalledTimes(1);
       expect(parts.outbox.findByCorrelationKey('message-2').outcome).toBe('operation-not-found');
     });
 
@@ -712,10 +580,10 @@ describe('MessageRepository routes changes through the outbox', () => {
       let finishSending: () => void = () => {
         return undefined;
       };
-      parts.sendToBackend.mockImplementationOnce(() => {
+      parts.send.mockImplementationOnce(() => {
         return new Promise(resolve => {
           finishSending = () => {
-            return resolve({id: 'message-1', sentAt: new Date(1_000_000).toISOString(), state: 'OUTGOING_SENT'});
+            return resolve(sentResult('message-1'));
           };
         });
       });
@@ -738,15 +606,14 @@ describe('MessageRepository routes changes through the outbox', () => {
       finishSending();
       await parts.clock.settle();
 
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
-      expect(parts.sendToBackend.mock.calls[1][2]).toEqual(expect.objectContaining({skipInjection: true}));
+      expect(parts.send).toHaveBeenCalledTimes(2);
+      expect(parts.send.mock.calls[1][0].payload.deleted.messageId).toBe('message-1');
       expect(parts.outbox.findByCorrelationKey('message-1:delete').outcome).toBe('operation-not-found');
       // The message was not shown again
-      expect(parts.inject).not.toHaveBeenCalled();
+      expect(parts.injectEvent).not.toHaveBeenCalled();
     });
 
     it('during an attempt does not bring the message back when the attempt succeeds', async () => {
-      parts.sendToBackend.mockRestore();
       seedMessage(parts, {messageId: 'message-1'});
       await startOutbox(parts);
       let finishSending: () => void = () => {
@@ -755,7 +622,7 @@ describe('MessageRepository routes changes through the outbox', () => {
       parts.send.mockImplementationOnce(() => {
         return new Promise(resolve => {
           finishSending = () => {
-            return resolve({id: 'message-1', sentAt: new Date(1_000_000).toISOString(), state: 'OUTGOING_SENT'});
+            return resolve(sentResult('message-1'));
           };
         });
       });
@@ -764,15 +631,14 @@ describe('MessageRepository routes changes through the outbox', () => {
       expect(parts.send).toHaveBeenCalledTimes(1);
 
       await deleteForEveryone(createMessage(parts, 'message-1'));
-      jest.spyOn(parts.conversation, 'getMessage').mockReturnValue(undefined);
-      jest.spyOn(parts.eventService, 'loadEvent').mockResolvedValue(undefined);
+      expect(parts.records.has('message-1')).toBe(false);
       parts.updateEvent.mockClear();
       finishSending();
       await parts.clock.settle();
 
       expect(parts.outbox.findByCorrelationKey('message-1').outcome).toBe('operation-not-found');
       expect(parts.updateEvent).not.toHaveBeenCalled();
-      expect(parts.inject).not.toHaveBeenCalled();
+      expect(parts.injectEvent).not.toHaveBeenCalled();
     });
 
     it('of a message that was sent goes to the lane of changes, and the message goes at once', async () => {

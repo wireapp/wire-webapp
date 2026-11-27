@@ -69,10 +69,10 @@ describe('the message kinds through the outbox', () => {
   beforeEach(async () => {
     parts = createOutboxRepository();
     sends = [];
-    parts.sendToBackend.mockImplementation(async (message: any) => {
+    parts.send.mockImplementation(async ({payload}: {payload: GenericMessage}) => {
       return new Promise((resolve, reject) => {
         sends.push({
-          message,
+          message: payload,
           succeed: async () => {
             resolve(sentResult());
             await parts.kit.clock.settle();
@@ -222,7 +222,7 @@ describe('the message kinds through the outbox', () => {
       expect(stateOf('a')).toBe('dead-lettered');
       expect(stateOf('a:reaction')).toBe('dead-lettered');
       expect(sentContents()).toEqual(['text']);
-      expect(parts.markMessage).toHaveBeenCalledTimes(1);
+      expect(parts.updateEvent).toHaveBeenCalledTimes(1);
       expect(parts.records.get('a')).toMatchObject({status: StatusType.FAILED, failed_reason: 'removed'});
     });
   });

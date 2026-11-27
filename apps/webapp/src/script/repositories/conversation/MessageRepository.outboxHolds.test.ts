@@ -76,13 +76,13 @@ const inConversation = ({conversation}: OutboxRepository): Conversation => {
 const inSelfConversation = ({selfConversation}: OutboxRepository): Conversation => {
   return selfConversation;
 };
-const nothingOnScreen = ({markMessage, deleteMessage}: OutboxRepository): void => {
-  expect(markMessage).not.toHaveBeenCalled();
+const nothingOnScreen = ({updateEvent, deleteMessage}: OutboxRepository): void => {
+  expect(updateEvent).not.toHaveBeenCalled();
   expect(deleteMessage).not.toHaveBeenCalled();
 };
 const shownAsDeclined = (messageId: string) => {
-  return ({markMessage, conversation}: OutboxRepository): void => {
-    expect(markMessage).toHaveBeenCalledWith(conversation, messageId, StatusType.FAILED, 'declined');
+  return ({records}: OutboxRepository): void => {
+    expect(records.get(messageId)).toMatchObject({status: StatusType.FAILED, failed_reason: 'declined'});
   };
 };
 
@@ -132,7 +132,7 @@ const variants: Variant[] = [
     name: 'an asset',
     degraded: inConversation,
     prepare: ({records}) => {
-      records.set('asset-1', uploadedRecord({fileData: new Blob(['bytes'])}));
+      records.set('asset-1', uploadedRecord());
     },
     enqueue: inLaneOfMessages(assetPayload()),
     key: 'asset-1',
@@ -216,9 +216,27 @@ describe('the holds of MessageRepository', () => {
     amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
   });
 
-  /** The keys of the operations this session holds */
-  function heldKeys(): string[] {
-    return [...(parts.repository as unknown as {holds: Map<string, unknown>}).holds.keys()];
+  /** This session holds nothing: neither stopping to edit nor allowing to send releases an operation */
+  async function expectNothingHeld(): Promise<void> {
+    const release = jest.spyOn(parts.kit.outbox, 'release');
+    release.mockClear();
+
+    await parts.repository.stopEditing();
+    for (const conversation of [parts.conversation, parts.otherConversation, ...parts.selfConversations]) {
+      await parts.repository.allowSending(conversation);
+    }
+
+    expect(release).not.toHaveBeenCalled();
+  }
+
+  function failedMessageIds(): string[] {
+    return [...parts.records]
+      .filter(([, {status}]) => {
+        return status === StatusType.FAILED;
+      })
+      .map(([messageId]) => {
+        return messageId;
+      });
   }
 
   function stateOf(correlationKey: string): string | undefined {
@@ -257,7 +275,7 @@ describe('the holds of MessageRepository', () => {
         expect(stateOf(variant.key)).toBe('on-hold');
         expect(parts.prompts).toHaveLength(1);
         expect(parts.prompts[0].conversation).toBe(variant.degraded(parts));
-        expect(parts.sendToBackend).not.toHaveBeenCalled();
+        expect(parts.send).not.toHaveBeenCalled();
       });
 
       it('is sent when the user accepts', async () => {
@@ -265,10 +283,10 @@ describe('the holds of MessageRepository', () => {
 
         await parts.prompts[0].answer(true);
 
-        expect(parts.sendToBackend).toHaveBeenCalled();
-        expect(parts.markMessage).not.toHaveBeenCalled();
+        expect(parts.send).toHaveBeenCalled();
+        expect(failedMessageIds()).toEqual([]);
         expect(stateOf(variant.key)).toBeUndefined();
-        expect(heldKeys()).toEqual([]);
+        await expectNothingHeld();
       });
 
       it(`is ${variant.declined === 'deleted' ? 'forgotten' : 'dead-lettered'} and never sent when the user declines`, async () => {
@@ -276,10 +294,10 @@ describe('the holds of MessageRepository', () => {
 
         await parts.prompts[0].answer(false);
 
-        expect(parts.sendToBackend).not.toHaveBeenCalled();
+        expect(parts.send).not.toHaveBeenCalled();
         variant.expectDeclinedOnScreen(parts);
         expect(stateOf(variant.key)).toBe(variant.declined === 'dead-lettered' ? 'dead-lettered' : undefined);
-        expect(heldKeys()).toEqual([]);
+        await expectNothingHeld();
       });
 
       it('is sent without a prompt when the conversation is not degraded', async () => {
@@ -287,7 +305,7 @@ describe('the holds of MessageRepository', () => {
         await parts.kit.clock.settle();
 
         expect(parts.prompts).toHaveLength(0);
-        expect(parts.sendToBackend).toHaveBeenCalled();
+        expect(parts.send).toHaveBeenCalled();
       });
     });
 
@@ -299,7 +317,7 @@ describe('the holds of MessageRepository', () => {
       await parts.kit.clock.settle();
 
       expect(parts.prompts).toHaveLength(0);
-      expect(parts.sendToBackend).toHaveBeenCalled();
+      expect(parts.send).toHaveBeenCalled();
     });
 
     it('sends to a self conversation at once, and lets the degraded one next to it wait for the user', async () => {
@@ -311,8 +329,8 @@ describe('the holds of MessageRepository', () => {
       await changeOf(hidePayload())(parts);
       await parts.kit.clock.settle();
 
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
-      expect(parts.sendToBackend.mock.calls[0][1]).toBe(parts.selfConversation);
+      expect(parts.send).toHaveBeenCalledTimes(1);
+      expect(parts.send.mock.calls[0][0].conversationId).toEqual(parts.selfConversation.qualifiedId);
       expect(
         parts.prompts.map(({conversation}) => {
           return conversation;
@@ -344,7 +362,7 @@ describe('the holds of MessageRepository', () => {
       await parts.repository.stopEditing();
 
       expect(stateOf('message-1')).toBe('queued');
-      expect(heldKeys()).toEqual([]);
+      await expectNothingHeld();
     });
 
     it('records the edited message for the next session, and forgets it when the user stops editing', async () => {
@@ -384,7 +402,7 @@ describe('the holds of MessageRepository', () => {
     it('holds nothing for a message the outbox does not have', async () => {
       await parts.repository.startEditing(editingOf('sent-message'));
 
-      expect(heldKeys()).toEqual([]);
+      await expectNothingHeld();
     });
   });
 
@@ -417,7 +435,7 @@ describe('the holds of MessageRepository', () => {
 
       expect(stateOf('message-1')).toBe('on-hold');
       expect(parts.prompts).toHaveLength(0);
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.send).not.toHaveBeenCalled();
     });
 
     it('does nothing when the outbox did not start yet', async () => {
@@ -427,7 +445,7 @@ describe('the holds of MessageRepository', () => {
       await parts.kit.clock.settle();
 
       expect(parts.prompts).toHaveLength(0);
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.send).not.toHaveBeenCalled();
     });
 
     it('releases a restored hold, whose next attempt asks again when still degraded, and sends on yes', async () => {
@@ -439,12 +457,11 @@ describe('the holds of MessageRepository', () => {
 
       expect(parts.prompts).toHaveLength(1);
       expect(stateOf('message-1')).toBe('on-hold');
-      expect(heldKeys()).toEqual(['message-1']);
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.send).not.toHaveBeenCalled();
 
       await parts.prompts[0].answer(true);
 
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(parts.send).toHaveBeenCalledTimes(1);
       expect(stateOf('message-1')).toBeUndefined();
     });
 
@@ -456,10 +473,10 @@ describe('the holds of MessageRepository', () => {
 
       await parts.prompts[0].answer(false);
 
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
-      expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, 'message-1', StatusType.FAILED, 'declined');
+      expect(parts.send).not.toHaveBeenCalled();
+      expect(parts.records.get('message-1')).toMatchObject({status: StatusType.FAILED, failed_reason: 'declined'});
       expect(stateOf('message-1')).toBe('dead-lettered');
-      expect(heldKeys()).toEqual([]);
+      await expectNothingHeld();
     });
 
     it('drops a restored change on no', async () => {
@@ -469,7 +486,7 @@ describe('the holds of MessageRepository', () => {
 
       await parts.prompts[0].answer(false);
 
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.send).not.toHaveBeenCalled();
       expect(stateOf('message-1:reaction')).toBeUndefined();
     });
 
@@ -480,7 +497,7 @@ describe('the holds of MessageRepository', () => {
       await startAndReview();
 
       expect(parts.prompts).toHaveLength(0);
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(parts.send).toHaveBeenCalledTimes(1);
       expect(stateOf('message-1')).toBeUndefined();
     });
 
@@ -493,7 +510,7 @@ describe('the holds of MessageRepository', () => {
       await startAndReview();
 
       expect(parts.prompts).toHaveLength(0);
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.send).not.toHaveBeenCalled();
       expect(stateOf('message-1')).toBe('on-hold');
       expect(editedMessages()).toEqual({[CONVERSATION_ID.id]: 'message-1'});
 
@@ -511,7 +528,7 @@ describe('the holds of MessageRepository', () => {
 
       await startAndReview();
 
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(parts.send).toHaveBeenCalledTimes(1);
       expect(stateOf('message-1')).toBeUndefined();
       expect(editedMessages()).toEqual({});
     });
@@ -522,7 +539,7 @@ describe('the holds of MessageRepository', () => {
 
       await startAndReview();
 
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(parts.send).toHaveBeenCalledTimes(1);
       expect(stateOf('message-1:edit')).toBeUndefined();
     });
 
@@ -537,7 +554,7 @@ describe('the holds of MessageRepository', () => {
       await parts.kit.clock.settle();
 
       expect(stateOf('message-1')).toBe('on-hold');
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.send).not.toHaveBeenCalled();
       expect(editedMessages()).toEqual({[CONVERSATION_ID.id]: 'message-1'});
     });
   });

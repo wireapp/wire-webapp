@@ -60,6 +60,7 @@ type MessageRepositoryParts = {
   conversation: Conversation;
   conversationState: ConversationState;
   eventService: EventService;
+  eventRepository: EventRepository;
   send: jest.Mock;
   invoker: FireAndForgetInvoker;
 };
@@ -70,7 +71,7 @@ function buildMessageRepositoryParts(outbox?: Outbox): MessageRepositoryParts {
   const userState = new UserState();
   userState.self(selfUser);
   const clientState = new ClientState();
-  clientState.currentClient = new ClientEntity(true, '');
+  clientState.currentClient = new ClientEntity(true, '', 'self-client');
   const conversationState = new ConversationState(userState);
   const selfConversation = new Conversation(selfUser.id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const conversation = new Conversation(
@@ -81,6 +82,7 @@ function buildMessageRepositoryParts(outbox?: Outbox): MessageRepositoryParts {
   );
   conversationState.conversations([selfConversation, conversation]);
   const eventService = new EventService(createSimpleStorage(new Map()));
+  const eventRepository = new EventRepository(eventService, {} as any, {} as any, {} as any);
   const send = jest.fn();
   const invoker = createFireAndForgetInvoker({reportError: jest.fn()});
 
@@ -89,7 +91,7 @@ function buildMessageRepositoryParts(outbox?: Outbox): MessageRepositoryParts {
       return {checkMessageTimer: jest.fn()} as unknown as ConversationRepository;
     },
     new CryptographyRepository({} as any),
-    new EventRepository(eventService, {} as any, {} as any, {} as any),
+    eventRepository,
     new PropertiesRepository({} as any, {} as any, translateForTest),
     serverTimeHandler,
     {} as UserRepository,
@@ -104,7 +106,7 @@ function buildMessageRepositoryParts(outbox?: Outbox): MessageRepositoryParts {
     createCoreTestFixture({service: {conversation: {send, messageTimer: new MessageTimer()}}}),
     invoker,
   );
-  return {repository, conversation, conversationState, eventService, send, invoker};
+  return {repository, conversation, conversationState, eventService, eventRepository, send, invoker};
 }
 
 function buildMessageRepository(outbox?: Outbox): MessageRepository {
@@ -418,8 +420,8 @@ describe('MessageRepository as the port of the message kinds', () => {
     }
 
     it('is not shown again when an edit replaced its record', async () => {
-      const {messageKind, eventService, repository, invoker} = setup();
-      const inject = jest.spyOn(repository as any, 'injectOptimisticMessage').mockResolvedValue(true);
+      const {messageKind, eventService, eventRepository, invoker} = setup();
+      const inject = jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
       jest.spyOn(eventService, 'loadEvent').mockResolvedValue({
         primary_key: 'edit-key',
         id: 'edit-id',
@@ -433,14 +435,14 @@ describe('MessageRepository as the port of the message kinds', () => {
     });
 
     it('is shown again when no record is left', async () => {
-      const {messageKind, eventService, repository, invoker} = setup();
-      const inject = jest.spyOn(repository as any, 'injectOptimisticMessage').mockResolvedValue(true);
-      jest.spyOn(repository as any, 'buildOutboxText').mockResolvedValue({} as any);
+      const {messageKind, eventService, eventRepository, invoker} = setup();
+      const inject = jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
       jest.spyOn(eventService, 'loadEvent').mockResolvedValue(undefined);
 
       await release(messageKind, invoker);
 
       expect(inject).toHaveBeenCalledTimes(1);
+      expect(inject).toHaveBeenCalledWith(expect.objectContaining({id: 'message-1'}));
     });
   });
 

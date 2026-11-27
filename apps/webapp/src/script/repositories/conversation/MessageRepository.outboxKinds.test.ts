@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {noop} from 'noop-esm';
 
-import {Confirmation} from '@wireapp/protocol-messaging';
+import {Confirmation, type GenericMessage} from '@wireapp/protocol-messaging';
 
 import {BackendError} from '../../apiClient/http/backendError';
 import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
@@ -34,10 +34,12 @@ import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {WebAppEvents} from '../../webAppEvents';
 
 import {
+  assetBytes,
   createOutboxRepository,
   declinedResult,
-  MEMBER_ID,
   MISSING_CONVERSATION_ID,
+  SENDER_ID,
+  SENT_AT,
   sendingRecord,
   uploadedRecord,
   type OutboxRepository,
@@ -60,6 +62,8 @@ const deleted = {outcome: 'attempt-deleted'};
 const deadLettered = {outcome: 'attempt-dead-lettered'};
 const held = {outcome: 'attempt-held'};
 
+const LINK = 'https://example.com';
+
 const notDelivered: [string, unknown][] = [
   ['a decline', declinedResult()],
   ['a rejection', new BackendError('no', BackendErrorLabel.CLIENT_ERROR, 400)],
@@ -80,10 +84,21 @@ describe('the message kinds of MessageRepository', () => {
 
   function answerSend(result: unknown): void {
     if (result instanceof Error) {
-      parts.sendToBackend.mockRejectedValue(result);
+      parts.send.mockRejectedValue(result);
     } else {
-      parts.sendToBackend.mockResolvedValue(result);
+      parts.send.mockResolvedValue(result);
     }
+  }
+
+  /** The messages sent to the backend, in order */
+  function sentMessages(): GenericMessage[] {
+    return parts.send.mock.calls.map(([{payload}]) => {
+      return payload;
+    });
+  }
+
+  function sentTo(conversation = parts.conversation, options: object = {}): object {
+    return expect.objectContaining({conversationId: conversation.qualifiedId, failFast: true, ...options});
   }
 
   describe('the message kind', () => {
@@ -104,16 +119,14 @@ describe('the message kinds of MessageRepository', () => {
         parts.records.set('message-1', sendingRecord());
       });
 
-      it('sends the built message with the server time and answers succeeded', async () => {
+      it('sends the built message, takes the server time and answers succeeded', async () => {
         await expect(parts.attempt('message', textPayload())).resolves.toEqual(succeeded);
 
-        expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
-        expect(parts.sendToBackend).toHaveBeenCalledWith(expect.anything(), parts.conversation, {
-          failFast: true,
-          syncTimestamp: true,
-        });
-        expect(parts.sendToBackend.mock.calls[0][0].messageId).toBe('message-1');
-        expect(parts.injectOptimistic).not.toHaveBeenCalled();
+        expect(parts.send).toHaveBeenCalledTimes(1);
+        expect(parts.send).toHaveBeenCalledWith(sentTo());
+        expect(sentMessages()[0].messageId).toBe('message-1');
+        expect(parts.records.get('message-1')).toMatchObject({status: StatusType.SENT, time: SENT_AT});
+        expect(parts.injectEvent).not.toHaveBeenCalled();
       });
 
       it('shows a message that is missing before it sends it', async () => {
@@ -121,36 +134,36 @@ describe('the message kinds of MessageRepository', () => {
 
         await expect(parts.attempt('message', textPayload())).resolves.toEqual(succeeded);
 
-        expect(parts.injectOptimistic).toHaveBeenCalledTimes(1);
-        expect(parts.injectOptimistic.mock.invocationCallOrder[0]).toBeLessThan(
-          parts.sendToBackend.mock.invocationCallOrder[0],
-        );
+        expect(parts.injectEvent).toHaveBeenCalledTimes(1);
+        expect(parts.injectEvent.mock.invocationCallOrder[0]).toBeLessThan(parts.send.mock.invocationCallOrder[0]);
       });
 
       it('starts the link preview after the send, without waiting for it', async () => {
-        parts.sendLinkPreview.mockReturnValue(new Promise(noop));
+        parts.openGraph.mockReturnValue(new Promise(noop));
 
-        await expect(parts.attempt('message', textPayload())).resolves.toEqual(succeeded);
+        await expect(parts.attempt('message', textPayload({text: `see ${LINK}`}))).resolves.toEqual(succeeded);
+        await parts.kit.clock.settle();
 
-        expect(parts.sendLinkPreview).toHaveBeenCalledWith(
-          parts.conversation,
-          expect.objectContaining({messageId: 'message-1'}),
-        );
+        expect(parts.openGraph).toHaveBeenCalledWith(LINK);
       });
 
       it('answers succeeded when the link preview fails', async () => {
-        parts.sendLinkPreview.mockRejectedValue(new Error('preview'));
+        parts.openGraph.mockResolvedValue({title: 'Example', url: LINK, image: {data: 'data:image/png;base64,AA=='}});
+        parts.uploadLinkPreviewImage.mockRejectedValue(new Error('preview'));
 
-        await expect(parts.attempt('message', textPayload())).resolves.toEqual(succeeded);
+        await expect(parts.attempt('message', textPayload({text: `see ${LINK}`}))).resolves.toEqual(succeeded);
         await parts.invoker.waitUntilAllSettled();
+
+        expect(parts.uploadLinkPreviewImage).toHaveBeenCalledTimes(1);
       });
 
       it('sends no link preview for a message that was not sent', async () => {
         answerSend(declinedResult());
 
-        await parts.attempt('message', textPayload());
+        await parts.attempt('message', textPayload({text: `see ${LINK}`}));
+        await parts.invoker.waitUntilAllSettled();
 
-        expect(parts.sendLinkPreview).not.toHaveBeenCalled();
+        expect(parts.openGraph).not.toHaveBeenCalled();
       });
 
       it('answers dead-lettered and records the decline when the client mismatch handler declines', async () => {
@@ -158,7 +171,7 @@ describe('the message kinds of MessageRepository', () => {
 
         await expect(parts.attempt('message', textPayload())).resolves.toEqual(deadLettered);
 
-        expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, 'message-1', StatusType.FAILED, 'declined');
+        expect(parts.records.get('message-1')).toMatchObject({status: StatusType.FAILED, failed_reason: 'declined'});
       });
 
       it.each([
@@ -170,7 +183,7 @@ describe('the message kinds of MessageRepository', () => {
 
         await expect(parts.attempt('message', textPayload())).resolves.toEqual(failed);
 
-        expect(parts.markMessage).not.toHaveBeenCalled();
+        expect(parts.updateEvent).not.toHaveBeenCalled();
       });
 
       it.each([
@@ -182,7 +195,7 @@ describe('the message kinds of MessageRepository', () => {
 
         await expect(parts.attempt('message', textPayload())).resolves.toEqual(deadLettered);
 
-        expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, 'message-1', StatusType.FAILED, reason);
+        expect(parts.records.get('message-1')).toMatchObject({status: StatusType.FAILED, failed_reason: reason});
       });
 
       it('marks a federation error with the federation status', async () => {
@@ -190,12 +203,10 @@ describe('the message kinds of MessageRepository', () => {
 
         await expect(parts.attempt('message', textPayload())).resolves.toEqual(deadLettered);
 
-        expect(parts.markMessage).toHaveBeenCalledWith(
-          parts.conversation,
-          'message-1',
-          StatusType.FEDERATION_ERROR,
-          'rejected',
-        );
+        expect(parts.records.get('message-1')).toMatchObject({
+          status: StatusType.FEDERATION_ERROR,
+          failed_reason: 'rejected',
+        });
       });
 
       it('answers deleted for a conversation that is unknown', async () => {
@@ -203,44 +214,52 @@ describe('the message kinds of MessageRepository', () => {
           deleted,
         );
 
-        expect(parts.sendToBackend).not.toHaveBeenCalled();
+        expect(parts.send).not.toHaveBeenCalled();
       });
 
       it('lets an error of building the message reject, so that the outbox retries it', async () => {
-        jest.spyOn(parts.repository as any, 'buildOutboxText').mockRejectedValue(new Error('quote'));
+        const loadRecord = parts.loadEvent.getMockImplementation();
+        parts.loadEvent.mockImplementation(async (conversationId: string, messageId: string) => {
+          if (messageId === 'quoted-1') {
+            throw new Error('quote');
+          }
+          return loadRecord?.(conversationId, messageId);
+        });
 
-        await expect(parts.attempt('message', textPayload())).rejects.toThrow('quote');
+        await expect(
+          parts.attempt('message', textPayload({quote: {messageId: 'quoted-1', userId: 'quoted-user'}})),
+        ).rejects.toThrow('quote');
       });
     });
 
     describe('attempt of an asset', () => {
       it('uploads, shows the uploaded asset, sends it and answers succeeded', async () => {
-        const file = new Blob(['bytes']);
+        const file = assetBytes();
         parts.records.set('asset-1', sendingRecord({fileData: file}));
         const signal = new AbortController().signal;
 
         await expect(parts.attempt('message', assetPayload(), signal)).resolves.toEqual(succeeded);
 
-        expect(parts.uploadAsset).toHaveBeenCalledWith(parts.conversation, assetPayload(), file, signal);
-        expect(parts.injectOptimistic).toHaveBeenCalledTimes(1);
-        expect(parts.sendToBackend).toHaveBeenCalledWith(expect.anything(), parts.conversation, {
+        expect(parts.uploadFile).toHaveBeenCalledWith(file, 'asset-1', expect.anything(), false, undefined, {
           failFast: true,
-          syncTimestamp: true,
         });
-        const [uploadOrder] = parts.uploadAsset.mock.invocationCallOrder;
-        const [injectOrder] = parts.injectOptimistic.mock.invocationCallOrder;
-        const [sendOrder] = parts.sendToBackend.mock.invocationCallOrder;
+        expect(parts.injectEvent).toHaveBeenCalledTimes(1);
+        expect(parts.send).toHaveBeenCalledWith(sentTo());
+        expect(parts.records.get('asset-1')).toMatchObject({status: StatusType.SENT, time: SENT_AT});
+        const [uploadOrder] = parts.uploadFile.mock.invocationCallOrder;
+        const [injectOrder] = parts.injectEvent.mock.invocationCallOrder;
+        const [sendOrder] = parts.send.mock.invocationCallOrder;
         expect(uploadOrder).toBeLessThan(injectOrder);
         expect(injectOrder).toBeLessThan(sendOrder);
       });
 
-      it('skips the upload when an earlier attempt left its result on the record, and needs no bytes then', async () => {
+      it('skips the upload when an earlier attempt left its result on the record', async () => {
         parts.records.set('asset-1', uploadedRecord());
 
         await expect(parts.attempt('message', assetPayload())).resolves.toEqual(succeeded);
 
-        expect(parts.uploadAsset).not.toHaveBeenCalled();
-        expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+        expect(parts.uploadFile).not.toHaveBeenCalled();
+        expect(parts.send).toHaveBeenCalledTimes(1);
       });
 
       it('answers dead-lettered as rejected when there are no bytes and no upload', async () => {
@@ -248,14 +267,14 @@ describe('the message kinds of MessageRepository', () => {
 
         await expect(parts.attempt('message', assetPayload())).resolves.toEqual(deadLettered);
 
-        expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, 'asset-1', StatusType.FAILED, 'rejected');
+        expect(parts.records.get('asset-1')).toMatchObject({status: StatusType.FAILED, failed_reason: 'rejected'});
       });
 
       it('answers deleted when the record is gone, and shows nothing', async () => {
         await expect(parts.attempt('message', assetPayload())).resolves.toEqual(deleted);
 
-        expect(parts.uploadAsset).not.toHaveBeenCalled();
-        expect(parts.injectOptimistic).not.toHaveBeenCalled();
+        expect(parts.uploadFile).not.toHaveBeenCalled();
+        expect(parts.injectEvent).not.toHaveBeenCalled();
       });
 
       it.each([
@@ -268,27 +287,29 @@ describe('the message kinds of MessageRepository', () => {
         ],
       ])('answers %s', async (_name, error, expected) => {
         parts.records.set('asset-1', sendingRecord({fileData: new Blob(['bytes'])}));
-        parts.uploadAsset.mockRejectedValue(error);
+        parts.uploadFile.mockRejectedValue(error);
 
         await expect(parts.attempt('message', assetPayload())).resolves.toEqual(expected);
 
-        expect(parts.sendToBackend).not.toHaveBeenCalled();
+        expect(parts.send).not.toHaveBeenCalled();
       });
 
       it('answers attempt-failed, not deleted, when the attempt itself was aborted during the upload', async () => {
         parts.records.set('asset-1', sendingRecord({fileData: new Blob(['bytes'])}));
-        parts.uploadAsset.mockRejectedValue(new RequestCancellationError('cancelled'));
+        parts.uploadFile.mockRejectedValue(new RequestCancellationError('cancelled'));
         const controller = new AbortController();
         controller.abort();
 
         await expect(parts.attempt('message', assetPayload(), controller.signal)).resolves.toEqual(failed);
       });
 
-      it('answers dead-lettered when the upload result on the record can not be read', async () => {
-        parts.records.set('asset-1', uploadedRecord());
-        parts.buildAsset.mockResolvedValue(undefined);
+      it('answers dead-lettered as rejected when the record keeps the upload but lost the bytes', async () => {
+        parts.records.set('asset-1', uploadedRecord({fileData: undefined}));
 
         await expect(parts.attempt('message', assetPayload())).resolves.toEqual(deadLettered);
+
+        expect(parts.records.get('asset-1')).toMatchObject({status: StatusType.FAILED, failed_reason: 'rejected'});
+        expect(parts.send).not.toHaveBeenCalled();
       });
 
       it.each([
@@ -318,7 +339,7 @@ describe('the message kinds of MessageRepository', () => {
       it('answers succeeded when it is sent', async () => {
         await expect(parts.attempt('message', payload)).resolves.toEqual(succeeded);
 
-        expect(parts.sendToBackend).toHaveBeenCalledWith(expect.anything(), parts.conversation, expect.any(Object));
+        expect(parts.send).toHaveBeenCalledWith(sentTo());
       });
 
       it('answers attempt-failed when it needs a retry', async () => {
@@ -332,7 +353,7 @@ describe('the message kinds of MessageRepository', () => {
 
         await expect(parts.attempt('message', payload)).resolves.toEqual(deleted);
 
-        expect(parts.markMessage).not.toHaveBeenCalled();
+        expect(parts.updateEvent).not.toHaveBeenCalled();
       });
 
       it('answers deleted for a conversation that is unknown', async () => {
@@ -352,9 +373,9 @@ describe('the message kinds of MessageRepository', () => {
       await parts.changed('message', payload, 'dead-lettered');
       await parts.changed('message', payload, 'deleted');
 
-      expect(parts.injectOptimistic).not.toHaveBeenCalled();
+      expect(parts.injectEvent).not.toHaveBeenCalled();
       expect(parts.deleteMessage).not.toHaveBeenCalled();
-      expect(parts.markMessage).not.toHaveBeenCalled();
+      expect(parts.updateEvent).not.toHaveBeenCalled();
     });
 
     it('shows an edit once when it is queued, and leaves its message alone otherwise', async () => {
@@ -364,33 +385,33 @@ describe('the message kinds of MessageRepository', () => {
       await parts.changed('message', editPayload(), 'queued');
       await parts.changed('message', editPayload(), 'deleted');
 
-      expect(parts.injectOptimistic).toHaveBeenCalledTimes(1);
+      expect(parts.injectEvent).toHaveBeenCalledTimes(1);
       expect(parts.records.has('edit-1')).toBe(true);
       expect(parts.deleteMessage).not.toHaveBeenCalled();
     });
 
     it('sends an edit without moving the message in time, and then sends the link preview', async () => {
-      await parts.attempt('message', editPayload());
+      await parts.attempt('message', editPayload({text: `edited ${LINK}`}));
+      await parts.kit.clock.settle();
 
-      expect(parts.sendToBackend).toHaveBeenCalledWith(expect.anything(), parts.conversation, {
-        failFast: true,
-        syncTimestamp: false,
-      });
-      expect(parts.sendLinkPreview).toHaveBeenCalledWith(
-        parts.conversation,
-        expect.objectContaining({messageId: 'edit-1', text: 'edited'}),
-      );
+      expect(parts.send).toHaveBeenCalledWith(sentTo());
+      expect(parts.records.get('edit-1')).toMatchObject({status: StatusType.SENT});
+      expect(parts.records.get('edit-1')?.time).not.toBe(SENT_AT);
+      expect(parts.openGraph).toHaveBeenCalledWith(LINK);
     });
 
     it('sends a delete to the members of the conversation without showing anything', async () => {
       await parts.attempt('message', deletePayload());
 
-      expect(parts.sendToBackend).toHaveBeenCalledWith(expect.anything(), parts.conversation, {
-        failFast: true,
-        recipients: [MEMBER_ID],
-        skipInjection: true,
-        targetMode: MessageTargetMode.USERS,
-      });
+      expect(parts.send).toHaveBeenCalledWith(
+        sentTo(parts.conversation, {
+          targetMode: MessageTargetMode.USERS,
+          userIds: {'wire.test': {member: ['member-client'], sender: ['sender-client']}},
+        }),
+      );
+      expect(sentMessages()[0].deleted?.messageId).toBe('message-1');
+      expect(parts.injectEvent).not.toHaveBeenCalled();
+      expect(parts.updateEvent).not.toHaveBeenCalled();
     });
 
     describe('onChanged of a text', () => {
@@ -400,8 +421,10 @@ describe('the message kinds of MessageRepository', () => {
           await parts.changed('message', textPayload(), state);
           await parts.changed('message', textPayload(), state);
 
-          expect(parts.injectOptimistic).toHaveBeenCalledTimes(1);
-          expect(parts.injectOptimistic).toHaveBeenCalledWith(expect.anything(), parts.conversation);
+          expect(parts.injectEvent).toHaveBeenCalledTimes(1);
+          expect(parts.injectEvent).toHaveBeenCalledWith(
+            expect.objectContaining({id: 'message-1', conversation: parts.conversation.id}),
+          );
         },
       );
 
@@ -418,7 +441,7 @@ describe('the message kinds of MessageRepository', () => {
         });
         await parts.attempt('message', textPayload());
 
-        expect(parts.injectOptimistic).toHaveBeenCalledTimes(1);
+        expect(parts.injectEvent).toHaveBeenCalledTimes(1);
       });
 
       it('leaves a message that is shown as sending alone', async () => {
@@ -426,8 +449,8 @@ describe('the message kinds of MessageRepository', () => {
 
         await parts.changed('message', textPayload(), 'queued');
 
-        expect(parts.injectOptimistic).not.toHaveBeenCalled();
-        expect(parts.markMessage).not.toHaveBeenCalled();
+        expect(parts.injectEvent).not.toHaveBeenCalled();
+        expect(parts.updateEvent).not.toHaveBeenCalled();
       });
 
       it('shows a message that failed as sending again when it is queued', async () => {
@@ -435,7 +458,7 @@ describe('the message kinds of MessageRepository', () => {
 
         await parts.changed('message', textPayload(), 'queued');
 
-        expect(parts.markMessage).toHaveBeenCalledTimes(1);
+        expect(parts.updateEvent).toHaveBeenCalledTimes(1);
         expect(parts.records.get('message-1')).toMatchObject({status: StatusType.SENDING, failed_reason: undefined});
       });
 
@@ -454,8 +477,8 @@ describe('the message kinds of MessageRepository', () => {
         await parts.changed('message', textPayload(), 'dead-lettered', queuedAt);
         await parts.changed('message', textPayload(), 'dead-lettered', queuedAt);
 
-        expect(parts.markMessage).toHaveBeenCalledTimes(1);
-        expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, 'message-1', StatusType.FAILED, 'expired');
+        expect(parts.updateEvent).toHaveBeenCalledTimes(1);
+        expect(parts.records.get('message-1')).toMatchObject({status: StatusType.FAILED, failed_reason: 'expired'});
       });
 
       it('keeps the reason of a message that already failed', async () => {
@@ -463,7 +486,7 @@ describe('the message kinds of MessageRepository', () => {
 
         await parts.changed('message', textPayload(), 'dead-lettered');
 
-        expect(parts.markMessage).not.toHaveBeenCalled();
+        expect(parts.updateEvent).not.toHaveBeenCalled();
       });
 
       it.each([
@@ -475,21 +498,24 @@ describe('the message kinds of MessageRepository', () => {
 
         await parts.changed('message', textPayload(), 'dead-lettered', queuedAt);
 
-        expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, 'message-1', StatusType.FAILED, reason);
+        expect(parts.records.get('message-1')).toMatchObject({status: StatusType.FAILED, failed_reason: reason});
       });
 
       it('removes a message that was deleted, and tolerates it being gone already', async () => {
+        parts.records.set('message-1', sendingRecord());
+
         await parts.changed('message', textPayload(), 'deleted');
         await parts.changed('message', textPayload(), 'deleted');
 
         expect(parts.deleteMessage).toHaveBeenCalledTimes(2);
         expect(parts.deleteMessage).toHaveBeenCalledWith(parts.conversation, 'message-1');
+        expect(parts.records.has('message-1')).toBe(false);
       });
 
       it('does nothing when it succeeded', async () => {
         await parts.changed('message', textPayload(), 'succeeded');
 
-        expect(parts.injectOptimistic).not.toHaveBeenCalled();
+        expect(parts.injectEvent).not.toHaveBeenCalled();
         expect(parts.deleteMessage).not.toHaveBeenCalled();
       });
 
@@ -500,7 +526,7 @@ describe('the message kinds of MessageRepository', () => {
       });
 
       it('logs and swallows what the storage throws', async () => {
-        parts.markMessage.mockRejectedValue(new Error('storage'));
+        parts.updateEvent.mockRejectedValue(new Error('storage'));
         parts.records.set('message-1', sendingRecord({status: StatusType.FAILED}));
 
         await expect(parts.changed('message', textPayload(), 'queued')).resolves.toBeUndefined();
@@ -511,7 +537,7 @@ describe('the message kinds of MessageRepository', () => {
       it('does not show an asset whose record is gone, because nothing can be rebuilt without its bytes', async () => {
         await parts.changed('message', assetPayload(), 'queued');
 
-        expect(parts.injectOptimistic).not.toHaveBeenCalled();
+        expect(parts.injectEvent).not.toHaveBeenCalled();
       });
 
       it('writes expired when it is given up, and removes it when it is deleted', async () => {
@@ -525,8 +551,12 @@ describe('the message kinds of MessageRepository', () => {
         );
         await parts.changed('message', assetPayload(), 'deleted');
 
-        expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, 'asset-1', StatusType.FAILED, 'expired');
+        expect(parts.updateEvent).toHaveBeenCalledWith('asset-1', {
+          status: StatusType.FAILED,
+          failed_reason: 'expired',
+        });
         expect(parts.deleteMessage).toHaveBeenCalledWith(parts.conversation, 'asset-1');
+        expect(parts.records.has('asset-1')).toBe(false);
       });
     });
 
@@ -567,7 +597,7 @@ describe('the message kinds of MessageRepository', () => {
       it('answers succeeded when it is sent', async () => {
         await expect(parts.attempt('message-change', payload)).resolves.toEqual(succeeded);
 
-        expect(parts.sendToBackend).toHaveBeenCalled();
+        expect(parts.send).toHaveBeenCalled();
       });
 
       it('answers attempt-failed when it needs a retry', async () => {
@@ -581,7 +611,7 @@ describe('the message kinds of MessageRepository', () => {
 
         await expect(parts.attempt('message-change', payload)).resolves.toEqual(deleted);
 
-        expect(parts.markMessage).not.toHaveBeenCalled();
+        expect(parts.updateEvent).not.toHaveBeenCalled();
       });
     });
 
@@ -594,28 +624,27 @@ describe('the message kinds of MessageRepository', () => {
         parts.attempt('message-change', {...payload, conversationId: MISSING_CONVERSATION_ID}),
       ).resolves.toEqual(deleted);
 
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.send).not.toHaveBeenCalled();
     });
 
     it('sends a delete to the recipients it was queued with', async () => {
-      await parts.attempt('message-change', deletePayload({recipients: [{id: 'someone', domain: 'wire.test'}]}));
+      await parts.attempt('message-change', deletePayload({recipients: [SENDER_ID]}));
 
-      expect(parts.sendToBackend).toHaveBeenCalledWith(expect.anything(), parts.conversation, {
-        failFast: true,
-        recipients: [{id: 'someone', domain: 'wire.test'}],
-        skipInjection: true,
-        targetMode: MessageTargetMode.USERS,
-      });
+      expect(parts.send).toHaveBeenCalledWith(
+        sentTo(parts.conversation, {
+          targetMode: MessageTargetMode.USERS,
+          userIds: {'wire.test': {sender: ['sender-client']}},
+        }),
+      );
+      expect(parts.updateEvent).not.toHaveBeenCalled();
     });
 
     it('sends a hide to every self conversation, whatever the target conversation is', async () => {
       await parts.attempt('message-change', {...hidePayload(), conversationId: MISSING_CONVERSATION_ID});
 
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
-      expect(parts.sendToBackend).toHaveBeenCalledWith(expect.anything(), parts.selfConversation, {
-        failFast: true,
-        skipInjection: true,
-      });
+      expect(parts.send).toHaveBeenCalledTimes(1);
+      expect(parts.send).toHaveBeenCalledWith(sentTo(parts.selfConversation));
+      expect(parts.updateEvent).not.toHaveBeenCalled();
     });
 
     it('asks for a retry when there is no self conversation to hide in yet', async () => {
@@ -627,26 +656,22 @@ describe('the message kinds of MessageRepository', () => {
     it('sends a reaction as the final state, without showing anything', async () => {
       await parts.attempt('message-change', reactionPayload());
 
-      expect(parts.sendToBackend).toHaveBeenCalledWith(expect.anything(), parts.conversation, {
-        failFast: true,
-        skipInjection: true,
-      });
-      expect(parts.injectOptimistic).not.toHaveBeenCalled();
+      expect(parts.send).toHaveBeenCalledWith(sentTo());
+      expect(sentMessages()[0].reaction?.emoji).toBe('like');
+      expect(parts.injectEvent).not.toHaveBeenCalled();
+      expect(parts.updateEvent).not.toHaveBeenCalled();
     });
 
     it('shows an edit before it sends it, and then sends its link preview', async () => {
       parts.records.set('message-1', sendingRecord());
 
-      await parts.attempt('message-change', editPayload());
+      await parts.attempt('message-change', editPayload({text: `edited ${LINK}`}));
+      await parts.kit.clock.settle();
 
-      expect(parts.injectOptimistic.mock.invocationCallOrder[0]).toBeLessThan(
-        parts.sendToBackend.mock.invocationCallOrder[0],
-      );
-      expect(parts.sendToBackend).toHaveBeenCalledWith(expect.anything(), parts.conversation, {
-        failFast: true,
-        syncTimestamp: false,
-      });
-      expect(parts.sendLinkPreview).toHaveBeenCalled();
+      expect(parts.injectEvent.mock.invocationCallOrder[0]).toBeLessThan(parts.send.mock.invocationCallOrder[0]);
+      expect(parts.send).toHaveBeenCalledWith(sentTo());
+      expect(parts.records.get('edit-1')?.time).not.toBe(SENT_AT);
+      expect(parts.openGraph).toHaveBeenCalledWith(LINK);
     });
 
     it('refuses payloads of another kind', () => {
@@ -678,22 +703,18 @@ describe('the message kinds of MessageRepository', () => {
 
         await expect(parts.attempt('ping', pingPayload())).resolves.toEqual(succeeded);
 
-        expect(parts.sendToBackend).toHaveBeenCalledWith(expect.anything(), parts.conversation, {
-          failFast: true,
-          syncTimestamp: true,
-        });
-        expect(parts.sendToBackend.mock.calls[0][0].messageId).toBe('ping-1');
-        expect(parts.injectOptimistic).not.toHaveBeenCalled();
+        expect(parts.send).toHaveBeenCalledWith(sentTo());
+        expect(sentMessages()[0].messageId).toBe('ping-1');
+        expect(parts.records.get('ping-1')).toMatchObject({status: StatusType.SENT, time: SENT_AT});
+        expect(parts.injectEvent).not.toHaveBeenCalled();
       });
 
       it('shows a ping that is missing before it sends it', async () => {
         await parts.attempt('ping', pingPayload());
 
-        expect(parts.injectOptimistic).toHaveBeenCalledTimes(1);
-        expect(parts.injectOptimistic.mock.calls[0][0].messageId).toBe('ping-1');
-        expect(parts.injectOptimistic.mock.invocationCallOrder[0]).toBeLessThan(
-          parts.sendToBackend.mock.invocationCallOrder[0],
-        );
+        expect(parts.injectEvent).toHaveBeenCalledTimes(1);
+        expect(parts.injectEvent).toHaveBeenCalledWith(expect.objectContaining({id: 'ping-1'}));
+        expect(parts.injectEvent.mock.invocationCallOrder[0]).toBeLessThan(parts.send.mock.invocationCallOrder[0]);
       });
 
       it('answers attempt-failed when it needs a retry', async () => {
@@ -713,30 +734,33 @@ describe('the message kinds of MessageRepository', () => {
           deleted,
         );
 
-        expect(parts.sendToBackend).not.toHaveBeenCalled();
+        expect(parts.send).not.toHaveBeenCalled();
       });
     });
 
     describe('onChanged', () => {
       it('removes the ping from the conversation when it is deleted, and tolerates repeats', async () => {
+        parts.records.set('ping-1', sendingRecord());
+
         await parts.changed('ping', pingPayload(), 'deleted');
         await parts.changed('ping', pingPayload(), 'deleted');
 
         expect(parts.deleteMessage).toHaveBeenCalledTimes(2);
         expect(parts.deleteMessage).toHaveBeenCalledWith(parts.conversation, 'ping-1');
+        expect(parts.records.has('ping-1')).toBe(false);
       });
 
       it('shows a ping that is missing when it is queued', async () => {
         await parts.changed('ping', pingPayload(), 'queued');
 
-        expect(parts.injectOptimistic).toHaveBeenCalledTimes(1);
+        expect(parts.injectEvent).toHaveBeenCalledTimes(1);
       });
 
       it.each(['succeeded', 'dead-lettered'] as const)('does nothing when it is %s', async state => {
         await parts.changed('ping', pingPayload(), state);
 
         expect(parts.deleteMessage).not.toHaveBeenCalled();
-        expect(parts.injectOptimistic).not.toHaveBeenCalled();
+        expect(parts.injectEvent).not.toHaveBeenCalled();
       });
 
       it('does nothing for a conversation that is unknown', async () => {
@@ -780,32 +804,34 @@ describe('the message kinds of MessageRepository', () => {
       it('sends it to the sender only, silently and without showing it', async () => {
         await expect(parts.attempt('receipt', confirmationPayload())).resolves.toEqual(succeeded);
 
-        expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
-        expect(parts.sendToBackend).toHaveBeenCalledWith(expect.anything(), parts.conversation, {
-          failFast: true,
-          nativePush: false,
-          recipients: [{id: 'sender', domain: 'wire.test'}],
-          silentDegradationWarning: true,
-          skipInjection: true,
-          targetMode: MessageTargetMode.USERS,
-        });
+        expect(parts.send).toHaveBeenCalledTimes(1);
+        expect(parts.send).toHaveBeenCalledWith(
+          sentTo(parts.conversation, {
+            nativePush: false,
+            targetMode: MessageTargetMode.USERS,
+            userIds: {'wire.test': {sender: ['sender-client']}},
+          }),
+        );
+        expect(parts.clientMismatch).toHaveBeenCalledWith(expect.anything(), parts.conversation, true);
+        expect(parts.injectEvent).not.toHaveBeenCalled();
+        expect(parts.updateEvent).not.toHaveBeenCalled();
       });
 
       it('sends the first message id and the others of a batch', async () => {
         await parts.attempt('receipt', confirmationPayload({messageIds: ['first', 'second', 'third']}));
 
-        const [message] = parts.sendToBackend.mock.calls[0];
+        const [message] = sentMessages();
         expect(message.confirmation?.firstMessageId).toBe('first');
         expect(message.confirmation?.moreMessageIds).toEqual(['second', 'third']);
       });
 
       it('sends it once more to the known devices when the first send was declined', async () => {
-        parts.sendToBackend.mockResolvedValueOnce(declinedResult());
+        parts.send.mockResolvedValueOnce(declinedResult());
 
         await expect(parts.attempt('receipt', confirmationPayload())).resolves.toEqual(succeeded);
 
-        expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
-        expect(parts.sendToBackend.mock.calls[1][2]).toMatchObject({targetMode: MessageTargetMode.USERS_CLIENTS});
+        expect(parts.send).toHaveBeenCalledTimes(2);
+        expect(parts.send.mock.calls[1][0]).toMatchObject({targetMode: MessageTargetMode.USERS_CLIENTS});
       });
 
       it('answers deleted when both sends were declined', async () => {
@@ -813,7 +839,7 @@ describe('the message kinds of MessageRepository', () => {
 
         await expect(parts.attempt('receipt', confirmationPayload())).resolves.toEqual(deleted);
 
-        expect(parts.sendToBackend).toHaveBeenCalledTimes(2);
+        expect(parts.send).toHaveBeenCalledTimes(2);
       });
 
       it('drops a read receipt when read receipts are off now, and still sends a delivery receipt', async () => {
@@ -823,7 +849,7 @@ describe('the message kinds of MessageRepository', () => {
         await expect(
           parts.attempt('receipt', confirmationPayload({confirmationType: Confirmation.Type.READ})),
         ).resolves.toEqual(deleted);
-        expect(parts.sendToBackend).not.toHaveBeenCalled();
+        expect(parts.send).not.toHaveBeenCalled();
 
         await expect(parts.attempt('receipt', confirmationPayload())).resolves.toEqual(succeeded);
       });
@@ -833,7 +859,7 @@ describe('the message kinds of MessageRepository', () => {
           parts.attempt('receipt', confirmationPayload({conversationId: MISSING_CONVERSATION_ID})),
         ).resolves.toEqual(deleted);
 
-        expect(parts.sendToBackend).not.toHaveBeenCalled();
+        expect(parts.send).not.toHaveBeenCalled();
       });
 
       it('answers attempt-failed when it needs a retry', async () => {
@@ -853,11 +879,9 @@ describe('the message kinds of MessageRepository', () => {
       it('sends it to every self conversation without showing it', async () => {
         await expect(parts.attempt('receipt', payload)).resolves.toEqual(succeeded);
 
-        expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
-        expect(parts.sendToBackend).toHaveBeenCalledWith(expect.anything(), parts.selfConversation, {
-          failFast: true,
-          skipInjection: true,
-        });
+        expect(parts.send).toHaveBeenCalledTimes(1);
+        expect(parts.send).toHaveBeenCalledWith(sentTo(parts.selfConversation));
+        expect(parts.updateEvent).not.toHaveBeenCalled();
       });
 
       it('does not need the conversation it is about', async () => {
@@ -889,7 +913,7 @@ describe('the message kinds of MessageRepository', () => {
     it('sends the last read timestamp it was queued with', async () => {
       await parts.attempt('receipt', lastReadPayload(42));
 
-      const [message] = parts.sendToBackend.mock.calls[0];
+      const [message] = sentMessages();
       expect(message.lastRead?.lastReadTimestamp?.toString()).toBe('42');
     });
 
@@ -917,7 +941,7 @@ describe('the message kinds of MessageRepository', () => {
       await parts.kit.clock.settle();
 
       expect(parts.prompts).toHaveLength(1);
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.send).not.toHaveBeenCalled();
     });
 
     it('releases the operation when the user accepts, and the next attempt sends', async () => {
@@ -927,9 +951,9 @@ describe('the message kinds of MessageRepository', () => {
       await parts.prompts[0].answer(true);
 
       expect(parts.kit.outbox.release).toHaveBeenCalledWith(key);
-      expect(parts.markMessage).not.toHaveBeenCalled();
+      expect(parts.updateEvent).not.toHaveBeenCalled();
       await expect(parts.attempt('message', payload)).resolves.toEqual(succeeded);
-      expect(parts.sendToBackend).toHaveBeenCalledTimes(1);
+      expect(parts.send).toHaveBeenCalledTimes(1);
     });
 
     it('records the decline when the user declines, and sends nothing', async () => {
@@ -938,9 +962,9 @@ describe('the message kinds of MessageRepository', () => {
 
       await parts.prompts[0].answer(false);
 
-      expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, key, StatusType.FAILED, 'declined');
+      expect(parts.records.get(key)).toMatchObject({status: StatusType.FAILED, failed_reason: 'declined'});
       expect(parts.kit.outbox.release).not.toHaveBeenCalled();
-      expect(parts.sendToBackend).not.toHaveBeenCalled();
+      expect(parts.send).not.toHaveBeenCalled();
     });
 
     it('treats a prompt that fails as a decline', async () => {
@@ -949,7 +973,7 @@ describe('the message kinds of MessageRepository', () => {
       await parts.attempt('message', payload);
       await parts.kit.clock.settle();
 
-      expect(parts.markMessage).toHaveBeenCalledWith(parts.conversation, key, StatusType.FAILED, 'declined');
+      expect(parts.records.get(key)).toMatchObject({status: StatusType.FAILED, failed_reason: 'declined'});
     });
 
     it('asks again for a conversation that is degraded again', async () => {
