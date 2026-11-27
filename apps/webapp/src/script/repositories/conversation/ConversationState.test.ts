@@ -53,6 +53,25 @@ describe('ConversationState', () => {
   const selfMLSConversation = createConversation(CONVERSATION_PROTOCOL.MLS, CONVERSATION_TYPE.SELF);
   const regularConversation = createConversation();
 
+  describe('findMLS1to1Conversation', () => {
+    it.each([true, false])('ignores migrated team groups (canonical cached: %s)', canonicalCached => {
+      const conversationState = createConversationState();
+      const otherUserId = {id: randomUUID(), domain: ''};
+      const migratedTeamGroup = createConversation(CONVERSATION_PROTOCOL.MLS);
+      migratedTeamGroup.type(CONVERSATION_TYPE.REGULAR);
+      migratedTeamGroup.teamId = 'team';
+      migratedTeamGroup.participating_user_ids([otherUserId]);
+      const canonical = createConversation(CONVERSATION_PROTOCOL.MLS, CONVERSATION_TYPE.ONE_TO_ONE);
+      canonical.participating_user_ids([otherUserId]);
+
+      // The legacy heuristic still recognizes the migrated group as a 1:1.
+      expect(migratedTeamGroup.is1to1()).toBe(true);
+      conversationState.conversations(canonicalCached ? [migratedTeamGroup, canonical] : [migratedTeamGroup]);
+
+      expect(conversationState.findMLS1to1Conversation(otherUserId)).toBe(canonicalCached ? canonical : null);
+    });
+  });
+
   describe('getSelfProteusConversation', () => {
     it('throws if no self conversation are set', () => {
       const conversationState = createConversationState();
