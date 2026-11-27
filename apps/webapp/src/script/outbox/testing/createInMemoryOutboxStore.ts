@@ -21,6 +21,9 @@ import type {OperationSnapshot, OutboxStore, StorageFailed} from '../types';
 
 type StoreMethod = keyof OutboxStore;
 
+export type StoreCall =
+  {method: 'loadLatest'} | {method: 'append'; snapshot: OperationSnapshot} | {method: 'remove'; operationIds: string[]};
+
 export type InMemoryOutboxStore = OutboxStore & {
   /** Every snapshot of the operation, oldest first */
   history: (operationId: string) => OperationSnapshot[];
@@ -40,10 +43,7 @@ export type InMemoryOutboxStore = OutboxStore & {
   calls: StoreCall[];
 };
 
-export type StoreCall =
-  {method: 'loadLatest'} | {method: 'append'; snapshot: OperationSnapshot} | {method: 'remove'; operationIds: string[]};
-
-const failure: StorageFailed = {type: 'storage-failed', errorName: 'TestFailure'};
+const failure: StorageFailed = {outcome: 'storage-failed', errorName: 'TestFailure'};
 
 export function createInMemoryOutboxStore(): InMemoryOutboxStore {
   const snapshotsByOperation = new Map<string, OperationSnapshot[]>();
@@ -77,7 +77,7 @@ export function createInMemoryOutboxStore(): InMemoryOutboxStore {
     async loadLatest() {
       return (
         recordCall({method: 'loadLatest'}) ?? {
-          type: 'snapshots-loaded',
+          outcome: 'snapshots-loaded',
           operations: [...snapshotsByOperation.values()].flatMap(snapshots => {
             return snapshots.slice(-1);
           }),
@@ -91,10 +91,10 @@ export function createInMemoryOutboxStore(): InMemoryOutboxStore {
         return failed;
       }
       if (isFull) {
-        return {type: 'storage-full'};
+        return {outcome: 'storage-full'};
       }
       put(snapshot);
-      return {type: 'snapshot-appended'};
+      return {outcome: 'snapshot-appended'};
     },
     async remove(operationIds) {
       const failed = recordCall({method: 'remove', operationIds});
@@ -104,7 +104,7 @@ export function createInMemoryOutboxStore(): InMemoryOutboxStore {
       for (const id of operationIds) {
         snapshotsByOperation.delete(id);
       }
-      return {type: 'snapshots-removed'};
+      return {outcome: 'snapshots-removed'};
     },
     history: operationId => {
       return snapshotsByOperation.get(operationId) ?? [];

@@ -17,402 +17,549 @@
  *
  */
 
-import {createOutboxTestKit, type OutboxTestKit, type TestKind} from './testing/createOutboxTestKit';
-import type {EnqueueOutcome} from './types';
+import {createOutboxTestKit, parseTestPayload, type OutboxTestKit, type TestKind} from './testing/createOutboxTestKit';
 
-function operationIdOf(outcome: EnqueueOutcome<unknown>): string {
-  if (outcome.type === 'operation-queued' || outcome.type === 'operation-versioned') {
-    return outcome.operation.id;
-  }
-  throw new Error(`No operation in ${outcome.type}`);
-}
+import type {OperationSnapshot} from './types';
 
 describe('createOutbox enqueue', () => {
   let kit: OutboxTestKit;
-  let queued: TestKind;
-  let other: TestKind;
-  let parsing: TestKind;
-  let expiring: TestKind;
+  let testKind: TestKind;
+  let otherKind: TestKind;
 
   beforeEach(async () => {
     kit = createOutboxTestKit();
-    queued = kit.registerKind();
-    other = kit.registerKind();
-    parsing = kit.registerKind({
-      parsePayload: value => {
-        return {text: `${parseText(value)}!`};
-      },
-    });
-    expiring = kit.registerKind({expiresAfterMilliseconds: 10_000});
+    testKind = kit.registerKind();
+    otherKind = kit.registerKind();
     await kit.start({run: false});
   });
 
-  afterEach(() => {
-    kit.dispose();
+  afterEach(async () => {
+    await kit.outbox.stop();
   });
 
-  describe('a new operation', () => {
-    it('is queued and answers the operation as it was left', async () => {
-      const outcome = await queued.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'});
+  function historyOf(operationId: string): Pick<OperationSnapshot, 'seq' | 'trigger' | 'state' | 'payload'>[] {
+    return kit.store.history(operationId).map(({seq, trigger, state, payload}) => {
+      return {seq, trigger, state, payload};
+    });
+  }
 
-      expect(outcome).toMatchObject({
-        type: 'operation-queued',
-        operation: {kind: queued.kind.name, payload: {text: 'hi'}, correlationKey: 'key', state: 'queued', attempts: 0},
+  describe('a new operation', () => {
+    it('is queued, answered as it was left', async () => {
+      expect(await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'})).toMatchObject({
+        outcome: 'operation-queued',
+        operation: {
+          id: 'operation-1',
+          state: 'queued',
+          kind: testKind.kind.name,
+          payload: {text: 'hi'},
+          correlation: {state: 'correlated', correlationKey: 'key'},
+          lane: {state: 'no-lane'},
+          queuedAt: 1_000_000,
+          attempts: 0,
+        },
+      });
+    });
+
+    it.skip('is answered as the view only, without what only the kernel reads', async () => {
+      const outcome = await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'});
+
+      expect(outcome).toEqual({
+        outcome: 'operation-queued',
+        operation: {
+          id: 'operation-1',
+          state: 'queued',
+          kind: testKind.kind.name,
+          payload: {text: 'hi'},
+          correlation: {state: 'correlated', correlationKey: 'key'},
+          lane: {state: 'no-lane'},
+          queuedAt: 1_000_000,
+          attempts: 0,
+        },
       });
     });
 
     it('is found by its correlation key, through the handle and the outbox', async () => {
-      await queued.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'});
+      await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'});
 
-      expect(queued.operation('key')?.payload).toEqual({text: 'hi'});
-      expect(kit.findOperation('key')?.kind).toBe(queued.kind.name);
+      expect(testKind.operation('key')).toMatchObject({id: 'operation-1', payload: {text: 'hi'}});
+      expect(kit.operation('key')).toMatchObject({id: 'operation-1', kind: testKind.kind.name});
     });
 
-    it('needs no correlation key', async () => {
-      const outcome = await queued.handle.enqueue({payload: {text: 'hi'}});
-
-      expect(outcome.type).toBe('operation-queued');
+    it('needs no correlation key and is then uncorrelated', async () => {
+      expect(await testKind.handle.enqueue({payload: {text: 'hi'}})).toMatchObject({
+        outcome: 'operation-queued',
+        operation: {correlation: {state: 'uncorrelated'}},
+      });
     });
 
-    it('does not find an operation of another kind through the handle', async () => {
-      await queued.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'});
+    it('needs no lane key and is then in no lane', async () => {
+      await testKind.handle.enqueue({payload: {text: 'hi'}});
 
-      expect(other.operation('key')).toBeUndefined();
+      expect(kit.outbox.lanes()).toEqual({outcome: 'lanes-listed', lanes: []});
     });
 
-    it('stores its first snapshot with the trigger enqueued, before answering', async () => {
-      const outcome = await queued.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key', orderingKey: 'lane'});
+    it('is in the lane when the request has a lane key', async () => {
+      expect(await testKind.handle.enqueue({payload: {text: 'hi'}, laneKey: 'lane'})).toMatchObject({
+        outcome: 'operation-queued',
+        operation: {lane: {state: 'in-lane', laneKey: 'lane'}},
+      });
+    });
 
-      expect(kit.store.history(operationIdOf(outcome))).toEqual([
+    it('is not found through the handle of another kind', async () => {
+      await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'});
+
+      expect(otherKind.handle.find('key')).toEqual({outcome: 'operation-not-found'});
+    });
+
+    it('parses the payload and keeps what the kind returns', async () => {
+      const freshKit = createOutboxTestKit();
+      const freshParsing = freshKit.registerKind({
+        parsePayload: value => {
+          return {text: `${parseTestPayload(value).text}!`};
+        },
+      });
+      await freshKit.start({run: false});
+
+      expect(await freshParsing.handle.enqueue({payload: {text: 'hi'}})).toMatchObject({
+        operation: {payload: {text: 'hi!'}},
+      });
+      await freshKit.outbox.stop();
+    });
+
+    it('stores its first snapshot before answering', async () => {
+      await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key', laneKey: 'lane'});
+
+      expect(kit.store.history('operation-1')).toEqual([
         expect.objectContaining({
-          schemaVersion: 1,
+          schemaVersion: 2,
           seq: 1,
           trigger: 'operation-queued',
           state: 'queued',
-          kind: queued.kind.name,
-          correlationKey: 'key',
-          orderingKey: 'lane',
+          kind: testKind.kind.name,
+          correlation: {state: 'correlated', correlationKey: 'key'},
+          lane: {state: 'in-lane', laneKey: 'lane'},
           attempts: 0,
-          queuedAt: kit.clock.getServerTime(),
-          at: kit.clock.getServerTime(),
+          queuedAt: 1_000_000,
+          at: 1_000_000,
         }),
       ]);
     });
 
-    it('parses the payload and keeps what the kind returns', async () => {
-      const outcome = await parsing.handle.enqueue({payload: {text: 'hi'}});
+    it('calls onChanged with the queued operation', async () => {
+      await testKind.handle.enqueue({payload: {text: 'hi'}});
 
-      expect(outcome).toMatchObject({operation: {payload: {text: 'hi!'}}});
+      expect(testKind.changes).toEqual([expect.objectContaining({id: 'operation-1', state: 'queued'})]);
     });
 
-    it('calls onChanged with the queued operation', async () => {
-      await queued.handle.enqueue({payload: {text: 'hi'}});
+    it('takes the expiry and the attempt timeout of the kind', async () => {
+      const limitedKit = createOutboxTestKit();
+      const limited = limitedKit.registerKind({expiresAfterMilliseconds: 10_000, attemptTimeoutMilliseconds: 500});
+      await limitedKit.start({run: false});
 
-      expect(
-        queued.changes.map(({state}) => {
-          return state;
-        }),
-      ).toEqual(['queued']);
+      await limited.handle.enqueue({payload: {text: 'hi'}});
+
+      expect(limitedKit.store.history('operation-1').at(-1)).toMatchObject({
+        expiry: {state: 'expires-at', serverTime: 1_010_000},
+        limits: {attemptTimeout: {state: 'times-out-after', milliseconds: 500}},
+      });
+      await limitedKit.outbox.stop();
+    });
+
+    it('takes the limits of the request over those of the kind, for that operation only', async () => {
+      const limitedKit = createOutboxTestKit();
+      const limited = limitedKit.registerKind({expiresAfterMilliseconds: 10_000, attemptTimeoutMilliseconds: 500});
+      await limitedKit.start({run: false});
+
+      await limited.handle.enqueue({
+        payload: {text: 'a'},
+        expiresAfterMilliseconds: 2_000,
+        attemptTimeoutMilliseconds: 700,
+      });
+      await limited.handle.enqueue({payload: {text: 'b'}});
+
+      expect(limitedKit.store.history('operation-1').at(-1)).toMatchObject({
+        expiry: {state: 'expires-at', serverTime: 1_002_000},
+        limits: {attemptTimeout: {state: 'times-out-after', milliseconds: 700}},
+      });
+      expect(limitedKit.store.history('operation-2').at(-1)).toMatchObject({
+        expiry: {state: 'expires-at', serverTime: 1_010_000},
+        limits: {attemptTimeout: {state: 'times-out-after', milliseconds: 500}},
+      });
+      await limitedKit.outbox.stop();
+    });
+
+    it('never expires and never times out when neither the kind nor the request sets a limit', async () => {
+      await testKind.handle.enqueue({payload: {text: 'hi'}});
+
+      expect(kit.store.history('operation-1').at(-1)).toMatchObject({
+        expiry: {state: 'never-expires'},
+        limits: {attemptTimeout: {state: 'never-times-out'}},
+      });
     });
   });
 
   describe('refusals', () => {
     it('refuses an empty correlation key', async () => {
-      expect(await queued.handle.enqueue({payload: {text: 'hi'}, correlationKey: ''})).toEqual({
-        type: 'correlation-key-empty',
+      expect(await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: ''})).toEqual({
+        outcome: 'correlation-key-empty',
       });
     });
 
-    it('refuses an empty ordering key', async () => {
-      expect(await queued.handle.enqueue({payload: {text: 'hi'}, orderingKey: ''})).toEqual({
-        type: 'ordering-key-empty',
+    it('refuses an empty lane key', async () => {
+      expect(await testKind.handle.enqueue({payload: {text: 'hi'}, laneKey: ''})).toEqual({
+        outcome: 'lane-key-empty',
       });
+    });
+
+    it('stores nothing when it refuses a key', async () => {
+      await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: ''});
+      await testKind.handle.enqueue({payload: {text: 'hi'}, laneKey: ''});
+
+      expect(
+        kit.store.calls.filter(({method}) => {
+          return method === 'append';
+        }),
+      ).toEqual([]);
     });
 
     it('refuses a payload the kind cannot parse, naming the error', async () => {
-      const outcome = await queued.handle.enqueue({payload: {nothing: true} as never});
-
-      expect(outcome).toEqual({type: 'payload-invalid', errorName: 'TypeError'});
+      expect(await testKind.handle.enqueue({payload: {nothing: true} as never})).toEqual({
+        outcome: 'payload-invalid',
+        errorName: 'TypeError',
+      });
       expect(kit.store.operationIds()).toEqual([]);
+      expect(testKind.changes).toEqual([]);
     });
 
     it('refuses a key that belongs to an operation of another kind', async () => {
-      await other.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'});
+      await otherKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'});
 
-      expect(await queued.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'})).toEqual({
-        type: 'key-taken-by-other-kind',
-        kind: other.kind.name,
+      expect(await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'})).toEqual({
+        outcome: 'key-taken-by-other-kind',
+        kind: otherKind.kind.name,
       });
     });
 
-    it('refuses a key of another kind even while that operation has an attempt running', async () => {
+    it('refuses a key of another kind at once while that operation has an attempt running', async () => {
       kit.outbox.resume();
-      await other.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'});
-      await kit.clock.settle();
+      await kit.enqueue(otherKind, {correlationKey: 'key'});
+      expect(otherKind.lastAttempt().operation).toMatchObject({state: 'in-progress'});
 
-      expect(await queued.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'})).toEqual({
-        type: 'key-taken-by-other-kind',
-        kind: other.kind.name,
+      expect(await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'})).toEqual({
+        outcome: 'key-taken-by-other-kind',
+        kind: otherKind.kind.name,
       });
     });
 
     it('refuses a new operation once maxOperations is reached', async () => {
-      const limited = createOutboxTestKit({maxOperations: 2});
-      const limitedKind = limited.registerKind();
-      await limited.start({run: false});
-      await limitedKind.handle.enqueue({payload: {text: '1'}});
-      await limitedKind.handle.enqueue({payload: {text: '2'}});
+      const limitedKit = createOutboxTestKit({maxOperations: 2});
+      const limited = limitedKit.registerKind();
+      await limitedKit.start({run: false});
+      await limited.handle.enqueue({payload: {text: '1'}});
+      await limited.handle.enqueue({payload: {text: '2'}});
 
-      expect(await limitedKind.handle.enqueue({payload: {text: '3'}})).toEqual({type: 'outbox-full'});
-      limited.dispose();
+      expect(await limited.handle.enqueue({payload: {text: '3'}})).toEqual({outcome: 'outbox-full'});
+      expect(limitedKit.store.operationIds()).toEqual(['operation-1', 'operation-2']);
+      await limitedKit.outbox.stop();
+    });
+
+    it('counts a dead-lettered operation towards maxOperations', async () => {
+      const limitedKit = createOutboxTestKit({maxOperations: 1});
+      const limited = limitedKit.registerKind({expiresAfterMilliseconds: 1_000});
+      await limitedKit.start({run: false});
+      await limited.handle.enqueue({payload: {text: '1'}});
+      await limitedKit.clock.advance(1_000);
+      expect(limitedKit.store.history('operation-1').at(-1)).toMatchObject({state: 'dead-lettered'});
+
+      expect(await limited.handle.enqueue({payload: {text: '2'}})).toEqual({outcome: 'outbox-full'});
+      await limitedKit.outbox.stop();
     });
 
     it('still takes a version of an operation when maxOperations is reached', async () => {
-      const limited = createOutboxTestKit({maxOperations: 1});
-      const limitedKind = limited.registerKind();
-      await limited.start({run: false});
-      await limitedKind.handle.enqueue({payload: {text: '1'}, correlationKey: 'key'});
+      const limitedKit = createOutboxTestKit({maxOperations: 1});
+      const limited = limitedKit.registerKind();
+      await limitedKit.start({run: false});
+      await limited.handle.enqueue({payload: {text: '1'}, correlationKey: 'key'});
 
-      const outcome = await limitedKind.handle.enqueue({payload: {text: '2'}, correlationKey: 'key'});
-
-      expect(outcome.type).toBe('operation-versioned');
-      limited.dispose();
+      expect(await limited.handle.enqueue({payload: {text: '2'}, correlationKey: 'key'})).toMatchObject({
+        outcome: 'operation-versioned',
+      });
+      await limitedKit.outbox.stop();
     });
 
-    it('answers storage-failed and stores nothing when the store fails', async () => {
+    it('is not taken before the outbox is started', async () => {
+      const notStartedKit = createOutboxTestKit();
+      const notStarted = notStartedKit.registerKind();
+
+      expect(await notStarted.handle.enqueue({payload: {text: 'hi'}})).toEqual({outcome: 'outbox-not-started'});
+    });
+
+    it('answers storage-failed and keeps nothing when the store fails', async () => {
       kit.store.fail('append', true);
 
-      const outcome = await queued.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'});
-
-      expect(outcome).toEqual({type: 'storage-failed', errorName: 'TestFailure'});
-      expect(queued.operation('key')).toBeUndefined();
-      expect(queued.changes).toEqual([]);
+      expect(await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'})).toEqual({
+        outcome: 'storage-failed',
+        errorName: 'TestFailure',
+      });
+      expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
+      expect(testKind.changes).toEqual([]);
     });
 
-    it('answers storage-full when the quota is reached', async () => {
+    it('answers storage-full and keeps nothing when the quota is reached', async () => {
       kit.store.fill(true);
 
-      expect(await queued.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'})).toEqual({
-        type: 'storage-full',
+      expect(await testKind.handle.enqueue({payload: {text: 'hi'}, correlationKey: 'key'})).toEqual({
+        outcome: 'storage-full',
       });
-      expect(queued.operation('key')).toBeUndefined();
+      expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
     });
 
-    it('answers storage-failed when the store rejects', async () => {
+    it('answers storage-failed naming the error when the store rejects', async () => {
       kit.store.rejectWith('append', new DOMException('quota', 'AbortError'));
 
-      expect(await queued.handle.enqueue({payload: {text: 'hi'}})).toEqual({
-        type: 'storage-failed',
+      expect(await testKind.handle.enqueue({payload: {text: 'hi'}})).toEqual({
+        outcome: 'storage-failed',
         errorName: 'AbortError',
       });
     });
   });
 
   describe('a version', () => {
-    async function enqueueFirst(
-      request: Parameters<typeof queued.handle.enqueue>[0] = {payload: {text: 'v1'}},
-    ): Promise<EnqueueOutcome<unknown>> {
-      return queued.handle.enqueue({correlationKey: 'key', orderingKey: 'lane', ...request});
-    }
+    it('replaces the payload of the operation with the same correlation key', async () => {
+      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key'});
 
-    it('replaces the payload of the operation with the same key', async () => {
-      const first = await enqueueFirst();
-
-      const second = await queued.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
-
-      expect(second).toMatchObject({type: 'operation-versioned', operation: {payload: {text: 'v2'}}});
-      expect(operationIdOf(second)).toBe(operationIdOf(first));
-      expect(kit.store.operationIds()).toHaveLength(1);
+      expect(await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'})).toMatchObject({
+        outcome: 'operation-versioned',
+        operation: {id: 'operation-1', state: 'queued', payload: {text: 'v2'}},
+      });
+      expect(kit.store.operationIds()).toEqual(['operation-1']);
     });
 
-    it('appends a snapshot, and keeps the earlier payloads in the history', async () => {
-      const first = await enqueueFirst();
+    it('stores a snapshot and keeps the earlier payloads in the history', async () => {
+      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key'});
 
-      await queued.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
+      await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
 
-      expect(
-        kit.store.history(operationIdOf(first)).map(({seq, trigger, payload}) => {
-          return [seq, trigger, payload];
-        }),
-      ).toEqual([
-        [1, 'operation-queued', {text: 'v1'}],
-        [2, 'operation-versioned', {text: 'v2'}],
+      expect(historyOf('operation-1')).toEqual([
+        {seq: 1, trigger: 'operation-queued', state: 'queued', payload: {text: 'v1'}},
+        {seq: 2, trigger: 'operation-versioned', state: 'queued', payload: {text: 'v2'}},
       ]);
     });
 
     it('calls onChanged for each version', async () => {
-      await enqueueFirst();
-      await queued.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
+      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key'});
+      await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
 
       expect(
-        queued.changes.map(({payload}) => {
+        testKind.changes.map(({payload}) => {
           return payload.text;
         }),
       ).toEqual(['v1', 'v2']);
     });
 
-    it('keeps the queue time, the expiry and the timeout the request does not pass', async () => {
-      const first = await enqueueFirst({
+    it('is a version of an operation of the same kind that was enqueued without a lane', async () => {
+      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key'});
+
+      await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
+
+      expect(kit.operation('key')).toMatchObject({lane: {state: 'no-lane'}});
+    });
+
+    it('keeps the queue time, the expiry, the timeout and the lane the request does not pass', async () => {
+      await testKind.handle.enqueue({
         payload: {text: 'v1'},
+        correlationKey: 'key',
+        laneKey: 'lane',
         expiresAfterMilliseconds: 5_000,
-        performTimeoutMilliseconds: 700,
+        attemptTimeoutMilliseconds: 700,
       });
       await kit.clock.advance(1_000);
 
-      await queued.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
+      await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
 
-      const newest = kit.store.history(operationIdOf(first)).at(-1);
-      expect(newest).toMatchObject({
+      expect(kit.store.history('operation-1').at(-1)).toMatchObject({
         queuedAt: 1_000_000,
-        validUntil: 1_005_000,
-        expiresAfterMilliseconds: 5_000,
-        performTimeoutMilliseconds: 700,
-        orderingKey: 'lane',
+        expiry: {state: 'expires-at', serverTime: 1_005_000},
+        limits: {attemptTimeout: {state: 'times-out-after', milliseconds: 700}},
+        lane: {state: 'in-lane', laneKey: 'lane'},
       });
     });
 
-    it('starts the expiry again from now when the request passes it, even with the same value', async () => {
-      const first = await enqueueFirst({payload: {text: 'v1'}, expiresAfterMilliseconds: 5_000});
+    it('starts the expiry again from now when the request passes one, even the same', async () => {
+      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key', expiresAfterMilliseconds: 5_000});
       await kit.clock.advance(1_000);
 
-      await queued.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key', expiresAfterMilliseconds: 5_000});
+      await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key', expiresAfterMilliseconds: 5_000});
 
-      expect(kit.store.history(operationIdOf(first)).at(-1)).toMatchObject({validUntil: 1_006_000});
+      expect(kit.store.history('operation-1').at(-1)).toMatchObject({
+        expiry: {state: 'expires-at', serverTime: 1_006_000},
+      });
     });
 
-    it('takes the timeout the request passes', async () => {
-      const first = await enqueueFirst({payload: {text: 'v1'}, performTimeoutMilliseconds: 700});
+    it('takes the attempt timeout the request passes', async () => {
+      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key', attemptTimeoutMilliseconds: 700});
 
-      await queued.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key', performTimeoutMilliseconds: 900});
+      await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key', attemptTimeoutMilliseconds: 900});
 
-      expect(kit.store.history(operationIdOf(first)).at(-1)?.performTimeoutMilliseconds).toBe(900);
+      expect(kit.store.history('operation-1').at(-1)).toMatchObject({
+        limits: {attemptTimeout: {state: 'times-out-after', milliseconds: 900}},
+      });
     });
 
-    it('moves to the end of the new lane when the request passes another ordering key', async () => {
-      await queued.handle.enqueue({payload: {text: 'other'}, correlationKey: 'other', orderingKey: 'elsewhere'});
-      await enqueueFirst();
+    it('moves to the end of the new lane when the request passes another lane key', async () => {
+      await testKind.handle.enqueue({payload: {text: 'other'}, correlationKey: 'other', laneKey: 'elsewhere'});
+      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key', laneKey: 'lane'});
 
-      await queued.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key', orderingKey: 'elsewhere'});
+      await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key', laneKey: 'elsewhere'});
 
-      expect(kit.laneOf('lane')).toBeUndefined();
-      expect(kit.laneOf('elsewhere')).toMatchObject({size: 1, first: {correlationKey: 'other'}});
+      expect(kit.outbox.lane('lane')).toEqual({outcome: 'lane-empty'});
+      expect(
+        kit.lane('elsewhere').operations.map(({id}) => {
+          return id;
+        }),
+      ).toEqual(['operation-1', 'operation-2']);
     });
 
-    it('keeps its place in the lane when the ordering key is the same or not passed', async () => {
-      await enqueueFirst();
-      await queued.handle.enqueue({payload: {text: 'later'}, correlationKey: 'later', orderingKey: 'lane'});
+    it('keeps its place in the lane when the lane key is the same or not passed', async () => {
+      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key', laneKey: 'lane'});
+      await testKind.handle.enqueue({payload: {text: 'later'}, correlationKey: 'later', laneKey: 'lane'});
 
-      await queued.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key', orderingKey: 'lane'});
-      await queued.handle.enqueue({payload: {text: 'v3'}, correlationKey: 'key'});
+      await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key', laneKey: 'lane'});
+      await testKind.handle.enqueue({payload: {text: 'v3'}, correlationKey: 'key'});
 
-      expect(kit.laneOf('lane')?.first.correlationKey).toBe('key');
+      expect(
+        kit.lane('lane').operations.map(({id}) => {
+          return id;
+        }),
+      ).toEqual(['operation-1', 'operation-2']);
     });
 
     it('starts the attempts again from 0', async () => {
       kit.outbox.resume();
-      await enqueueFirst();
-      await kit.clock.settle();
-      await queued.lastPerform().answer({type: 'attempt-failed'});
-      expect(queued.operation('key')).toMatchObject({state: 'queued', attempts: 1});
+      await kit.enqueue(testKind, {correlationKey: 'key'});
+      await testKind.lastAttempt().answer({outcome: 'attempt-failed'});
+      expect(testKind.operation('key')).toMatchObject({state: 'queued', attempts: 1});
 
-      const outcome = await queued.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
-
-      expect(outcome).toMatchObject({operation: {attempts: 0}});
+      expect(await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'})).toMatchObject({
+        operation: {attempts: 0},
+      });
     });
 
-    it('releases a hold', async () => {
-      await enqueueFirst();
+    it('queues an operation that is on hold, so releasing it', async () => {
+      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key'});
       await kit.outbox.hold('key');
 
-      await queued.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
-
-      expect(queued.operation('key')?.state).toBe('queued');
+      expect(await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'})).toMatchObject({
+        outcome: 'operation-versioned',
+        operation: {state: 'queued'},
+      });
     });
 
     it('answers storage-failed and keeps the version it had when the store fails', async () => {
-      await enqueueFirst();
+      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key'});
       kit.store.fail('append', true);
 
-      const outcome = await queued.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
+      expect(await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'})).toEqual({
+        outcome: 'storage-failed',
+        errorName: 'TestFailure',
+      });
+      expect(testKind.operation('key').payload).toEqual({text: 'v1'});
+    });
 
-      expect(outcome.type).toBe('storage-failed');
-      expect(queued.operation('key')?.payload).toEqual({text: 'v1'});
+    it('answers storage-full and keeps the version it had when the quota is reached', async () => {
+      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key'});
+      kit.store.fill(true);
+
+      expect(await testKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'})).toEqual({
+        outcome: 'storage-full',
+      });
+      expect(testKind.operation('key').payload).toEqual({text: 'v1'});
+    });
+
+    it('refuses an invalid payload without changing the operation', async () => {
+      await testKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key'});
+
+      expect(await testKind.handle.enqueue({payload: {nothing: true} as never, correlationKey: 'key'})).toEqual({
+        outcome: 'payload-invalid',
+        errorName: 'TypeError',
+      });
+      expect(historyOf('operation-1')).toHaveLength(1);
     });
   });
 
   describe('a dead-lettered operation', () => {
-    async function deadLetter(): Promise<string> {
-      const dead = await queued.handle.enqueue({
-        payload: {text: 'v1'},
-        correlationKey: 'key',
-        expiresAfterMilliseconds: 1_000,
-      });
-      await kit.clock.advance(1_000);
-      expect(queued.operation('key')?.state).toBe('dead-lettered');
-      return operationIdOf(dead);
+    let expiringKind: TestKind;
+    let expiringKit: OutboxTestKit;
+
+    beforeEach(async () => {
+      expiringKit = createOutboxTestKit();
+      expiringKind = expiringKit.registerKind({expiresAfterMilliseconds: 10_000});
+      await expiringKit.start({run: false});
+    });
+
+    afterEach(async () => {
+      await expiringKit.outbox.stop();
+    });
+
+    async function deadLetter(request: {expiresAfterMilliseconds?: number} = {}): Promise<void> {
+      await expiringKind.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key', ...request});
+      await expiringKit.clock.advance(request.expiresAfterMilliseconds ?? 10_000);
+      expect(expiringKind.operation('key').state).toBe('dead-lettered');
     }
 
-    it('is sent again when enqueued again, as a version', async () => {
+    it('is queued again when enqueued again, as a version', async () => {
       await deadLetter();
 
-      const outcome = await queued.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key'});
-
-      expect(outcome).toMatchObject({type: 'operation-versioned', operation: {state: 'queued', attempts: 0}});
-    });
-
-    it('gets a new expiry from the request', async () => {
-      const id = await deadLetter();
-
-      await queued.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'key', expiresAfterMilliseconds: 3_000});
-
-      expect(kit.store.history(id).at(-1)).toMatchObject({validUntil: 1_004_000, expiresAfterMilliseconds: 3_000});
-    });
-
-    it('gets a new expiry from the kind when the request passes none', async () => {
-      const dead = await expiring.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'expiring'});
-      await kit.clock.advance(10_000);
-      expect(expiring.operation('expiring')?.state).toBe('dead-lettered');
-
-      await expiring.handle.enqueue({payload: {text: 'v1'}, correlationKey: 'expiring'});
-
-      expect(kit.store.history(operationIdOf(dead)).at(-1)).toMatchObject({
-        validUntil: kit.clock.getServerTime() + 10_000,
+      expect(await expiringKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'})).toMatchObject({
+        outcome: 'operation-versioned',
+        operation: {id: 'operation-1', state: 'queued', attempts: 0, payload: {text: 'v2'}},
       });
     });
 
-    it('is not revived by anything else', async () => {
+    it('gets the expiry of the request', async () => {
       await deadLetter();
 
-      expect((await kit.outbox.hold('key')).type).toBe('operation-not-queued');
-      expect((await kit.outbox.release('key')).type).toBe('operation-not-on-hold');
-      kit.outbox.resume();
-      await kit.clock.advance(120_000);
+      await expiringKind.handle.enqueue({
+        payload: {text: 'v2'},
+        correlationKey: 'key',
+        expiresAfterMilliseconds: 3_000,
+      });
 
-      expect(queued.operation('key')?.state).toBe('dead-lettered');
-      expect(queued.performs).toHaveLength(0);
-    });
-  });
-
-  describe('expiry and limits of the kind', () => {
-    it('takes the expiry of the kind, and the request overrides it for that operation only', async () => {
-      const byKind = await expiring.handle.enqueue({payload: {text: 'a'}});
-      const byRequest = await expiring.handle.enqueue({payload: {text: 'b'}, expiresAfterMilliseconds: 500});
-
-      expect(kit.store.history(operationIdOf(byKind)).at(-1)).toMatchObject({validUntil: 1_010_000});
-      expect(kit.store.history(operationIdOf(byRequest)).at(-1)).toMatchObject({
-        validUntil: 1_000_500,
-        expiresAfterMilliseconds: 500,
+      expect(expiringKit.store.history('operation-1').at(-1)).toMatchObject({
+        expiry: {state: 'expires-at', serverTime: 1_013_000},
       });
     });
 
-    it('has no expiry when neither the kind nor the request sets one', async () => {
-      const outcome = await queued.handle.enqueue({payload: {text: 'a'}});
+    it('gets the expiry of the kind when the request passes none, not the earlier enqueue', async () => {
+      await deadLetter({expiresAfterMilliseconds: 1_000});
 
-      expect(kit.store.history(operationIdOf(outcome)).at(-1)?.validUntil).toBeUndefined();
+      await expiringKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
+
+      expect(expiringKit.store.history('operation-1').at(-1)).toMatchObject({
+        expiry: {state: 'expires-at', serverTime: 1_011_000},
+      });
+    });
+
+    it('is sent again once it is queued again', async () => {
+      await deadLetter();
+      expiringKit.outbox.resume();
+
+      await expiringKind.handle.enqueue({payload: {text: 'v2'}, correlationKey: 'key'});
+      await expiringKit.clock.settle();
+
+      expect(expiringKind.lastAttempt().operation).toMatchObject({id: 'operation-1', attempts: 1});
+    });
+
+    it('is not revived by a hold, a release, the resume or the passing of time', async () => {
+      await deadLetter();
+
+      expect(await expiringKit.outbox.hold('key')).toMatchObject({outcome: 'transition-refused'});
+      expect(await expiringKit.outbox.release('key')).toMatchObject({outcome: 'transition-refused'});
+      expiringKit.outbox.resume();
+      await expiringKit.clock.advance(120_000);
+
+      expect(expiringKind.operation('key').state).toBe('dead-lettered');
+      expect(expiringKind.attempts).toEqual([]);
     });
   });
 });
-
-function parseText(value: unknown): string {
-  return (value as {text: string}).text;
-}

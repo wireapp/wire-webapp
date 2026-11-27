@@ -17,73 +17,99 @@
  *
  */
 
+// The two tagged families
+
+/** What a call produced */
+export type Outcome<Tag extends string, Data extends object = Record<never, never>> = {outcome: Tag} & Data;
+/** What something is right now */
+export type State<Tag extends string, Data extends object = Record<never, never>> = {state: Tag} & Data;
+
+// Operation
+
 export type OperationState = 'queued' | 'on-hold' | 'in-progress' | 'dead-lettered' | 'succeeded' | 'dropped';
 
-/** Named like the outcome that reports it, so mapping between them is the identity */
+/** What happened to an operation; an attempt's answer is the trigger of the same name */
 export type Trigger =
   | 'operation-queued'
   | 'operation-versioned'
   | 'operation-held'
   | 'operation-released'
   | 'operation-dropped'
-  | 'operation-dead-lettered'
   | 'operation-expired'
-  | 'lane-dead-lettered'
-  | 'lane-dropped'
   | 'attempt-started'
   | 'attempt-succeeded'
   | 'attempt-failed'
+  | 'attempt-held'
+  | 'attempt-dead-lettered'
+  | 'attempt-dropped'
   | 'attempt-timed-out'
   | 'attempt-errored'
-  | 'attempt-interrupted';
+  | 'attempt-interrupted'
+  | 'lane-dead-lettered'
+  | 'lane-dropped';
 
-/** The one read-only view of an operation, for owners, `perform` and `onChanged` */
-export type OperationView<Payload> = {
-  id: string;
-  kind: string;
-  payload: Payload;
-  correlationKey?: string;
-  queuedAt: number;
-  state: OperationState;
-  /** Since the last enqueue (new or a version) */
-  attempts: number;
+export type Correlation = State<'correlated', {correlationKey: string}> | State<'uncorrelated'>;
+export type LaneMembership = State<'in-lane', {laneKey: string}> | State<'no-lane'>;
+/** In server time */
+export type Expiry = State<'expires-at', {serverTime: number}> | State<'never-expires'>;
+export type AttemptTimeout = State<'times-out-after', {milliseconds: number}> | State<'never-times-out'>;
+
+/** The one read-only view of an operation, for owners, `attempt` and `onChanged`; its state is its tag */
+export type OperationView<Payload = unknown> = State<
+  OperationState,
+  {
+    id: string;
+    kind: string;
+    payload: Payload;
+    correlation: Correlation;
+    lane: LaneMembership;
+    /** Server time */
+    queuedAt: number;
+    /** Attempts since the last enqueue, new or a version */
+    attempts: number;
+  }
+>;
+
+/** The limits an enqueue resolved for this operation alone */
+export type OperationLimits = {attemptTimeout: AttemptTimeout};
+
+/** The view plus what only the kernel reads */
+export type OperationData = OperationView & {
+  /** Place in its lane */
+  queuedSeq: number;
+  expiry: Expiry;
+  limits: OperationLimits;
 };
+
+/** What a snapshot says about the transition that stored it */
+export type StoredHeader = {
+  schemaVersion: number;
+  /** The operation's n-th snapshot */
+  seq: number;
+  trigger: Trigger;
+  /** Server time */
+  at: number;
+};
+
+export type OperationSnapshot = OperationData & StoredHeader;
+
+/** The operations of a lane that still block it, in lane order; it is blocked while its first is on hold */
+export type Lane = State<'moving' | 'blocked', {laneKey: string; operations: OperationView[]}>;
 
 // Store
 
 /** The browser's quota reached; nothing changed */
-export type StorageFull = {type: 'storage-full'};
+export type StorageFull = Outcome<'storage-full'>;
 /** Any other store error; nothing changed */
-export type StorageFailed = {type: 'storage-failed'; errorName: string};
+export type StorageFailed = Outcome<'storage-failed', {errorName: string}>;
 
-export type OperationSnapshot = {
-  schemaVersion: number;
-  id: string;
-  /** The operation's n-th snapshot */
-  seq: number;
-  /** What led to this snapshot, and when */
-  trigger: Trigger;
-  at: number;
-  kind: string;
-  payload: unknown;
-  correlationKey?: string;
-  orderingKey?: string;
-  /** Place in its lane */
-  queuedSeq: number;
-  /** Server time */
-  queuedAt: number;
-  state: OperationState;
-  attempts: number;
-  validUntil?: number;
-  /** The enqueue's limits, when it passed them */
-  expiresAfterMilliseconds?: number;
-  performTimeoutMilliseconds?: number;
-};
+export type SnapshotsLoaded = Outcome<'snapshots-loaded', {operations: OperationSnapshot[]; quarantinedCount: number}>;
+export type SnapshotAppended = Outcome<'snapshot-appended'>;
+export type SnapshotsRemoved = Outcome<'snapshots-removed'>;
 
-export type LoadOutcome =
-  {type: 'snapshots-loaded'; operations: OperationSnapshot[]; quarantinedCount: number} | StorageFailed;
-export type AppendOutcome = {type: 'snapshot-appended'} | StorageFull | StorageFailed;
-export type RemoveOutcome = {type: 'snapshots-removed'} | StorageFailed;
+export type LoadOutcome = SnapshotsLoaded | StorageFailed;
+export type AppendOutcome = SnapshotAppended | StorageFull | StorageFailed;
+export type RemoveOutcome = SnapshotsRemoved | StorageFailed;
 
 export type OutboxStore = {
   /** The newest snapshot of every operation; an operation whose newest snapshot doesn't parse is deleted and counted */
@@ -95,18 +121,17 @@ export type OutboxStore = {
 
 // Kind
 
-export type AttemptSucceeded = {type: 'attempt-succeeded'};
+export type AttemptSucceeded = Outcome<'attempt-succeeded'>;
 /** Not this time: the outbox retries, or gives up after `maxAttempts` */
-export type AttemptFailed = {type: 'attempt-failed'};
-/** Stop until someone releases it, e.g. to ask the user */
-export type HoldUntilReleased = {type: 'operation-held'};
+export type AttemptFailed = Outcome<'attempt-failed'>;
+/** Stop until the owner releases it, e.g. to ask the user */
+export type AttemptHeld = Outcome<'attempt-held'>;
 /** Given up; kept until enqueued again or dropped */
-export type GiveUpDeadLettered = {type: 'operation-dead-lettered'};
+export type AttemptDeadLettered = Outcome<'attempt-dead-lettered'>;
 /** Given up and forgotten */
-export type GiveUpDropped = {type: 'operation-dropped'};
+export type AttemptDropped = Outcome<'attempt-dropped'>;
 
-/** How an attempt went; `operation-held` puts it on hold; a final failure gives up at once, as dead-lettered or dropped */
-export type PerformOutcome = AttemptSucceeded | AttemptFailed | HoldUntilReleased | GiveUpDeadLettered | GiveUpDropped;
+export type AttemptOutcome = AttemptSucceeded | AttemptFailed | AttemptHeld | AttemptDeadLettered | AttemptDropped;
 
 export type Kind<Payload> = {
   name: string;
@@ -114,96 +139,93 @@ export type Kind<Payload> = {
   parsePayload: (value: unknown) => Payload;
   /** Outer limit from enqueue; then `operation-expired`, and given up */
   expiresAfterMilliseconds?: number;
-  /** Limit on one perform; then aborted, `attempt-timed-out` */
-  performTimeoutMilliseconds?: number;
+  /** Limit on one attempt; then aborted, `attempt-timed-out` */
+  attemptTimeoutMilliseconds?: number;
   /** Attempts before giving up; default 5 */
   maxAttempts?: number;
   /** After `maxAttempts` or at expiry; default 'dead-letter' */
   whenGivenUp?: 'dead-letter' | 'drop';
   /**
-   * The operations of this kind behind one given up in its lane: carry on, or end the same way; default 'continues'.
-   * Operations of other kinds in the lane carry on either way.
+   * What the operations of this kind behind one that is given up in its lane do: carry on, or end the same way;
+   * default 'continues'. Operations of other kinds in the lane carry on either way.
    */
   laneWhenGivenUp?: 'continues' | 'follows';
-  /** A rejection or a throw is `attempt-errored` */
-  perform: (operation: OperationView<Payload>, signal: AbortSignal) => Promise<PerformOutcome>;
+  /** A rejection, a throw or an unknown answer is `attempt-errored` */
+  attempt: (operation: OperationView<Payload>, signal: AbortSignal) => Promise<AttemptOutcome>;
   /** Fire and forget; a throw is logged */
   onChanged?: (operation: OperationView<Payload>) => void;
 };
 
 // Outcomes
 
-/** Every outcome about an operation carries it: as the call left it, or as it ended */
-type OperationOutcome<Type extends string, Payload = unknown> = {type: Type; operation: OperationView<Payload>};
-
+export type OperationQueued<Payload> = Outcome<'operation-queued', {operation: OperationView<Payload>}>;
+export type OperationVersioned<Payload> = Outcome<'operation-versioned', {operation: OperationView<Payload>}>;
+export type OperationHeld = Outcome<'operation-held', {operation: OperationView}>;
+export type OperationReleased = Outcome<'operation-released', {operation: OperationView}>;
 /** The attempt a command waited for went through */
-export type OperationSucceeded = OperationOutcome<'operation-succeeded'>;
+export type OperationSucceeded = Outcome<'operation-succeeded', {operation: OperationView}>;
 /** Given up and forgotten */
-export type OperationDropped = OperationOutcome<'operation-dropped'>;
+export type OperationDropped = Outcome<'operation-dropped', {operation: OperationView}>;
+export type OperationFound<Payload> = Outcome<'operation-found', {operation: OperationView<Payload>}>;
 /** No unfinished operation has the key */
-export type OperationNotFound = {type: 'operation-not-found'};
+export type OperationNotFound = Outcome<'operation-not-found'>;
 
-/** Before `start`: the operations aren't loaded yet */
-export type OutboxNotStarted = {type: 'outbox-not-started'};
+/** The operation's state doesn't accept the trigger; nothing changed */
+export type TransitionRefused = Outcome<'transition-refused', {operation: OperationView; trigger: Trigger}>;
+export type CorrelationKeyEmpty = Outcome<'correlation-key-empty'>;
+export type LaneKeyEmpty = Outcome<'lane-key-empty'>;
+/** The kind's `parsePayload` threw */
+export type PayloadInvalid = Outcome<'payload-invalid', {errorName: string}>;
+export type KeyTakenByOtherKind = Outcome<'key-taken-by-other-kind', {kind: string}>;
+/** `maxOperations` reached */
+export type OutboxFull = Outcome<'outbox-full'>;
+
+/** Before `start` or after `stop` */
+export type OutboxNotStarted = Outcome<'outbox-not-started'>;
+export type OutboxAlreadyStarted = Outcome<'outbox-already-started'>;
+export type OutboxStarted = Outcome<'outbox-started'>;
+export type KindRegistered<Payload> = Outcome<'kind-registered', {handle: KindHandle<Payload>}>;
+export type KindNameTaken = Outcome<'kind-name-taken', {kind: string}>;
+
+export type LaneFound = Outcome<'lane-found', {lane: Lane}>;
+export type LaneEmpty = Outcome<'lane-empty'>;
+export type LanesListed = Outcome<'lanes-listed', {lanes: Lane[]}>;
 
 /** Why the outbox couldn't take a call at all */
 export type OutboxUnavailable = OutboxNotStarted | StorageFull | StorageFailed;
-
-export type FindOutcome<Payload> = OperationOutcome<'operation-found', Payload> | OperationNotFound | OutboxNotStarted;
-
-export type LaneOutcome = {type: 'lane-found'; lane: Lane} | {type: 'lane-empty'} | OutboxNotStarted;
-
-export type LanesOutcome = {type: 'lanes-listed'; lanes: Lane[]} | OutboxNotStarted;
-
-export type OutboxAlreadyStarted = {type: 'outbox-already-started'};
-
-export type RegisterOutcome<Payload> =
-  | {type: 'kind-registered'; handle: KindHandle<Payload>}
-  | {type: 'kind-name-taken'; kind: string}
-  | OutboxAlreadyStarted;
-
-export type StartOutcome = {type: 'outbox-started'} | OutboxAlreadyStarted | StorageFull | StorageFailed;
-
-export type HoldOutcome =
-  | OperationOutcome<'operation-held'>
-  | OperationOutcome<'operation-not-queued'>
-  | OperationSucceeded
-  | OperationDropped
-  | OperationNotFound
-  | OutboxUnavailable;
-
-export type ReleaseOutcome =
-  | OperationOutcome<'operation-released'>
-  | OperationOutcome<'operation-not-on-hold'>
-  | OperationSucceeded
-  | OperationDropped
-  | OperationNotFound
-  | OutboxUnavailable;
-
-export type DropOutcome = OperationDropped | OperationNotFound | OutboxUnavailable;
+/** The attempt a command waited for ended the operation */
+export type EndedWhileWaiting = OperationSucceeded | OperationDropped;
 
 export type EnqueueOutcome<Payload> =
-  | OperationOutcome<'operation-queued', Payload>
-  | OperationOutcome<'operation-versioned', Payload>
-  | OperationSucceeded
-  | OperationDropped
-  | {type: 'correlation-key-empty'}
-  | {type: 'ordering-key-empty'}
-  /** The kind's `parsePayload` threw */
-  | {type: 'payload-invalid'; errorName: string}
-  | {type: 'key-taken-by-other-kind'; kind: string}
-  /** `maxOperations` reached */
-  | {type: 'outbox-full'}
+  | OperationQueued<Payload>
+  | OperationVersioned<Payload>
+  | EndedWhileWaiting
+  | TransitionRefused
+  | CorrelationKeyEmpty
+  | LaneKeyEmpty
+  | PayloadInvalid
+  | KeyTakenByOtherKind
+  | OutboxFull
   | OutboxUnavailable;
+
+export type HoldOutcome = OperationHeld | TransitionRefused | EndedWhileWaiting | OperationNotFound | OutboxUnavailable;
+export type ReleaseOutcome =
+  OperationReleased | TransitionRefused | EndedWhileWaiting | OperationNotFound | OutboxUnavailable;
+export type DropOutcome = OperationDropped | TransitionRefused | OperationNotFound | OutboxUnavailable;
+export type FindOutcome<Payload> = OperationFound<Payload> | OperationNotFound | OutboxNotStarted;
+export type LaneOutcome = LaneFound | LaneEmpty | OutboxNotStarted;
+export type LanesOutcome = LanesListed | OutboxNotStarted;
+export type RegisterOutcome<Payload> = KindRegistered<Payload> | KindNameTaken | OutboxAlreadyStarted;
+export type StartOutcome = OutboxStarted | OutboxAlreadyStarted | OutboxNotStarted | StorageFull | StorageFailed;
 
 // Arguments
 
 export type EnqueueRequest<Payload> = {
   payload: Payload;
   correlationKey?: string;
-  orderingKey?: string;
+  laneKey?: string;
   expiresAfterMilliseconds?: number;
-  performTimeoutMilliseconds?: number;
+  attemptTimeoutMilliseconds?: number;
 };
 
 export type OutboxLogger = {
@@ -212,18 +234,32 @@ export type OutboxLogger = {
   error: (message: string, attributes?: Readonly<Record<string, unknown>>) => void;
 };
 
-export type OutboxDependencies = {
-  store: OutboxStore;
+export type TimerId = number;
+
+export type OutboxClock = {
+  /** Server-corrected epoch milliseconds, for timestamps and expiry; may jump when the offset is corrected */
   getServerTime: () => number;
-  /** For the backoff's jitter; defaults to `Math.random` */
-  random?: () => number;
-  /** Used as given: the caller adds the prefix, e.g. `getLogger('Outbox')` */
-  logger: OutboxLogger;
-  configuration?: {maxOperations?: number; backoff?: {minimumMilliseconds?: number; maximumMilliseconds?: number}};
+  /** Monotonic milliseconds, only for durations: backoff, attempt timeout, wake-ups */
+  getStopwatchTime: () => number;
+  setTimer: (callback: () => void, milliseconds: number) => TimerId;
+  clearTimer: (timer: TimerId) => void;
 };
 
-/** The first operation of an ordering key that may still go out, and how many wait behind it */
-export type Lane = {orderingKey: string; status: 'moving' | 'blocked'; first: OperationView<unknown>; size: number};
+export type OutboxConfiguration = {
+  maxOperations?: number;
+  backoff?: {minimumMilliseconds?: number; maximumMilliseconds?: number};
+};
+
+export type OutboxDependencies = {
+  store: OutboxStore;
+  clock: OutboxClock;
+  /** For the backoff's jitter: a number from 0 up to, but not including, 1 */
+  random: () => number;
+  createId: () => string;
+  /** Used as given: the caller adds the prefix, e.g. `getLogger('Outbox')` */
+  logger: OutboxLogger;
+  configuration?: OutboxConfiguration;
+};
 
 // Interfaces
 
@@ -242,15 +278,19 @@ export type Outbox = {
   pause: () => void;
   /** Also resets the backoff */
   resume: () => void;
+  /** Aborts the running attempts and answers the commands waiting for them `outbox-not-started` */
   stop: () => Promise<void>;
   /** Needs `queued`; waits for a running attempt */
   hold: (correlationKey: string) => Promise<HoldOutcome>;
   /** Needs `on-hold`; waits for a running attempt */
   release: (correlationKey: string) => Promise<ReleaseOutcome>;
-  /** Never refused: every unfinished state accepts it; aborts a running attempt */
+  /**
+   * Every unfinished state accepts it; never waits, and aborts a running attempt. When the kind's lane follows,
+   * the operations of the kind behind it are dropped too, unless it was dead-lettered already.
+   */
   drop: (correlationKey: string) => Promise<DropOutcome>;
   findByCorrelationKey: (correlationKey: string) => FindOutcome<unknown>;
-  lane: (orderingKey: string) => LaneOutcome;
+  lane: (laneKey: string) => LaneOutcome;
   lanes: () => LanesOutcome;
   isStarted: () => boolean;
   isRunning: () => boolean;

@@ -17,630 +17,962 @@
  *
  */
 
-import {match, P} from 'ts-pattern';
+import {noop} from 'noop-esm';
+import {isMatching, match, P} from 'ts-pattern';
 
-import {createAttempts, type Attempt, type AttemptEnding} from './createAttempts';
-import {createBackoff} from './createBackoff';
-import {createScheduler} from './createScheduler';
-import {createExclusive} from './exclusive';
-import {getErrorName, guardStore} from './guardStore';
-import {laneQueuesOf, operationsFollowing, toLane} from './lanes';
-import {guardContextOf, newOperationData, toView, versionData, type OperationData} from './operationData';
-import {FINAL_STATES, resolveTarget} from './operationStateMachine';
-import {isDueToExpire, planScheduler} from './planScheduler';
+import {
+  backoffDelay,
+  correlationOf,
+  doesLaneFollow,
+  findOperationFollowers,
+  isDueToExpire,
+  isFinal,
+  lanesOf,
+  laneTriggerFor,
+  newOperationData,
+  nextQueuedSeqOf,
+  planPass,
+  resolveConfiguration,
+  resolveTarget,
+  SCHEMA_VERSION,
+  versionOperationData,
+  type ResolvedKind,
+  type Run,
+  type TargetResolved,
+  type Wake,
+} from './operationRules';
+import {eachUntilFailure, isInState, isOutcome, pipe} from './tagged';
 import type {
+  AttemptOutcome,
+  CorrelationKeyEmpty,
   DropOutcome,
+  EndedWhileWaiting,
   EnqueueOutcome,
   EnqueueRequest,
-  FindOutcome,
   HoldOutcome,
-  Kind,
-  LaneOutcome,
-  LanesOutcome,
+  KeyTakenByOtherKind,
+  LaneEmpty,
+  LaneFound,
+  LaneKeyEmpty,
+  LanesListed,
+  OperationData,
   OperationDropped,
+  OperationFound,
+  OperationHeld,
+  OperationNotFound,
+  OperationQueued,
+  OperationReleased,
   OperationSnapshot,
-  OperationSucceeded,
+  OperationVersioned,
+  OperationView,
+  Outcome,
   OutboxDependencies,
+  OutboxFull,
   OutboxNotStarted,
+  OutboxStarted,
+  PayloadInvalid,
   ReleaseOutcome,
-  StartOutcome,
+  SnapshotsLoaded,
+  SnapshotsRemoved,
+  State,
   StorageFailed,
   StorageFull,
+  TimerId,
+  TransitionRefused,
   Trigger,
 } from './types';
 
-export const SCHEMA_VERSION = 1;
-export const DEFAULT_MAX_OPERATIONS = 1_000;
+/** A longer delay makes a timer fire at once */
+const MAXIMUM_TIMER_MILLISECONDS = 2_147_483_647;
 
-type TransitionOutcome =
-  | {type: 'operation-transitioned'; operation: OperationSnapshot}
-  | {type: 'trigger-refused'}
-  | StorageFull
-  | StorageFailed;
+type Timer = State<'armed', {timer: TimerId}> | State<'disarmed'>;
+type Previous = State<'initial'> | OperationSnapshot;
 
-const NOT_STARTED: OutboxNotStarted = {type: 'outbox-not-started'};
+type SnapshotFound = Outcome<'operation-found', {operation: OperationSnapshot}>;
+type Lookup = SnapshotFound | OperationNotFound;
+type OperationTransitioned = Outcome<'operation-transitioned', {operation: OperationSnapshot}>;
+type CommitOutcome = OperationTransitioned | TransitionRefused | StorageFull | StorageFailed;
+type StepSkipped = Outcome<'step-skipped'>;
+
+type ParkedCommand = {
+  applyTo: (lookup: Lookup) => Promise<void>;
+  answer: (answer: EndedWhileWaiting | OutboxNotStarted) => void;
+};
+type Parked<Result> = Result | EndedWhileWaiting | OutboxNotStarted;
+type CommandTaken<Result> = Outcome<'command-taken', {answer: Promise<Parked<Result>>}>;
+
+type RunningAttempt = {
+  operationId: string;
+  controller: AbortController;
+  timeout: Timer;
+  /** The first result wins */
+  result: State<'running'> | State<'finished', {trigger: Trigger}>;
+  parked: ParkedCommand[];
+};
+type AttemptFound = Outcome<'attempt-found', {attempt: RunningAttempt}>;
+type NoAttempt = Outcome<'no-attempt'>;
+type AttemptFinished = Outcome<
+  'attempt-finished',
+  {attempt: RunningAttempt; operation: OperationSnapshot; trigger: Trigger}
+>;
+type AttemptErrored = Outcome<'attempt-errored'>;
+
+type RequestValid = Outcome<'request-valid'>;
+type PayloadParsed = Outcome<'payload-parsed', {payload: unknown}>;
+type RoomLeft = Outcome<'room-left'>;
+type SnapshotUsable = Outcome<'snapshot-usable', {snapshot: OperationSnapshot}>;
+type SnapshotUnusable = Outcome<
+  'snapshot-unusable',
+  {operationId: string; reason: 'schema-unknown' | 'kind-not-registered' | 'operation-ended' | 'payload-invalid'}
+>;
+type OperationsLoaded = Outcome<'operations-loaded', {usable: OperationSnapshot[]; quarantinedCount: number}>;
+type OperationAnnounced = Outcome<'operation-announced'>;
+type PassRun = Outcome<'pass-run'>;
 
 export type Engine = {
-  /** Loads the stored operations; the engine is not usable before it answers `outbox-started` */
-  load: () => Promise<StartOutcome>;
-  enqueue: (kind: Kind<unknown>, request: EnqueueRequest<unknown>) => Promise<EnqueueOutcome<unknown>>;
+  /** Loads the stored operations; nothing else may be called before it answers `outbox-started` */
+  load: () => Promise<OutboxStarted | StorageFull | StorageFailed | OutboxNotStarted>;
+  enqueue: (kind: ResolvedKind, request: EnqueueRequest<unknown>) => Promise<EnqueueOutcome<unknown>>;
   hold: (correlationKey: string) => Promise<HoldOutcome>;
   release: (correlationKey: string) => Promise<ReleaseOutcome>;
   drop: (correlationKey: string) => Promise<DropOutcome>;
-  findByCorrelationKey: (correlationKey: string) => FindOutcome<unknown>;
-  lane: (orderingKey: string) => LaneOutcome;
-  lanes: () => LanesOutcome;
+  findByCorrelationKey: (correlationKey: string) => OperationFound<unknown> | OperationNotFound;
+  lane: (laneKey: string) => LaneFound | LaneEmpty;
+  lanes: () => LanesListed;
   pause: () => void;
+  /** Also resets the backoff */
   resume: () => void;
+  /** Nothing may be called after it */
   stop: () => Promise<void>;
 };
 
-const storageProblem = {type: P.union('storage-full', 'storage-failed')};
+const isStorageProblem = isOutcome('storage-full', 'storage-failed');
+const isCommitFailure = isOutcome('transition-refused', 'storage-full', 'storage-failed');
+const isCommandFailure = isOutcome('operation-not-found', 'transition-refused', 'storage-full', 'storage-failed');
+const isStepEnd = isOutcome('step-skipped', 'transition-refused', 'storage-full', 'storage-failed');
 
-async function sleep(milliseconds: number): Promise<void> {
-  await new Promise<void>(resolve => {
-    setTimeout(resolve, milliseconds);
-  });
+const isAttemptAnswer = isMatching({
+  outcome: P.union('attempt-succeeded', 'attempt-failed', 'attempt-held', 'attempt-dead-lettered', 'attempt-dropped'),
+});
+
+function errorNameOf(error: unknown): string {
+  return error instanceof Error ? error.name : 'UnknownError';
 }
 
-export function createEngine(kinds: ReadonlyMap<string, Kind<unknown>>, dependencies: OutboxDependencies): Engine {
-  const {getServerTime, logger, configuration} = dependencies;
-  const store = guardStore(dependencies.store);
-  const maxOperations = configuration?.maxOperations ?? DEFAULT_MAX_OPERATIONS;
-  const backoff = createBackoff(
-    configuration?.backoff?.minimumMilliseconds,
-    configuration?.backoff?.maximumMilliseconds,
-    dependencies.random,
-  );
-  const exclusive = createExclusive();
-  const attempts = createAttempts(kinds, logger);
+async function runInOrder<Result>(tasks: readonly (() => Promise<Result>)[]): Promise<Result[]> {
+  return tasks.reduce<Promise<Result[]>>(async (done, task) => {
+    return [...(await done), await task()];
+  }, Promise.resolve([]));
+}
+
+function checkKeys(request: EnqueueRequest<unknown>): RequestValid | CorrelationKeyEmpty | LaneKeyEmpty {
+  return match(request)
+    .with({correlationKey: ''}, (): CorrelationKeyEmpty => {
+      return {outcome: 'correlation-key-empty'};
+    })
+    .with({laneKey: ''}, (): LaneKeyEmpty => {
+      return {outcome: 'lane-key-empty'};
+    })
+    .otherwise((): RequestValid => {
+      return {outcome: 'request-valid'};
+    });
+}
+
+function parsePayload(kind: ResolvedKind, value: unknown): PayloadParsed | PayloadInvalid {
+  try {
+    return {outcome: 'payload-parsed', payload: kind.parsePayload(value)};
+  } catch (error) {
+    return {outcome: 'payload-invalid', errorName: errorNameOf(error)};
+  }
+}
+
+function endedWhileWaiting(operation: OperationView): EndedWhileWaiting {
+  return isInState('succeeded')(operation)
+    ? {outcome: 'operation-succeeded', operation}
+    : {outcome: 'operation-dropped', operation};
+}
+
+/**
+ * Owns all runtime state of a started outbox. Commands, scheduler passes and load run one after another through
+ * `serialized`; the timer and kind callbacks only record a result and request a pass.
+ */
+export function createEngine(kinds: ReadonlyMap<string, ResolvedKind>, dependencies: OutboxDependencies): Engine {
+  const {store, clock, random, createId, logger} = dependencies;
+  const configuration = resolveConfiguration(dependencies.configuration);
 
   const operations = new Map<string, OperationSnapshot>();
-  const waitingCommands = new Map<string, number>();
-  let nextQueuedSeq = 1;
-  let isStopped = false;
-  let isRunning = false;
+  const attempts = new Map<string, RunningAttempt>();
+  let queue: State<'open' | 'closed', {tail: Promise<unknown>}> = {state: 'open', tail: Promise.resolve()};
+  let run: Run = {state: 'paused'};
+  let pass: State<'idle'> | State<'queued'> = {state: 'idle'};
+  let wake: Timer = {state: 'disarmed'};
+  /** In stopwatch time */
+  let backoff = {failures: 0, waitsUntil: 0};
 
-  const scheduler = createScheduler({
-    plan: afterStoreFailure => {
-      return planScheduler({
-        operations: [...operations.values()],
-        serverNow: getServerTime(),
-        isRunning,
-        backoffRemainingMilliseconds: backoff.remainingMilliseconds(),
-        operationIdsWithWaitingCommands: new Set(waitingCommands.keys()),
-        afterStoreFailure,
-      });
-    },
-    expire: async operationId => {
-      return expire(operationId);
-    },
-    start: async operationId => {
-      return startAttempt(operationId);
-    },
-    onStoreFailure: () => {
-      backoff.grow();
-    },
-  });
+  /** An operation only exists while its kind is registered: load deletes the others, and kinds are fixed once started */
+  function kindOf(operation: {kind: string}): ResolvedKind {
+    return kinds.get(operation.kind) as ResolvedKind;
+  }
 
-  function findByKey(correlationKey: string): OperationSnapshot | undefined {
-    return [...operations.values()].find(operation => {
-      return operation.correlationKey === correlationKey;
+  // Serialization and passes
+
+  /** Runs the task after every earlier one; once the queue is closed, it answers `outbox-not-started` instead */
+  function serialized<Result>(task: () => Promise<Result>): Promise<Result | OutboxNotStarted> {
+    const result = queue.tail.then(async (): Promise<Result | OutboxNotStarted> => {
+      return isInState('open')(queue) ? task() : {outcome: 'outbox-not-started'};
     });
+    queue = {...queue, tail: result};
+    return result;
   }
 
-  function notifyChanged(operation: OperationSnapshot): void {
-    try {
-      kinds.get(operation.kind)?.onChanged?.(toView(operation));
-    } catch (error) {
-      logger.warn('onChanged threw', {kind: operation.kind, errorName: getErrorName(error)});
-    }
-  }
-
-  // Transitions
-
-  function endingOf(operation: OperationSnapshot): AttemptEnding {
-    return match(operation.state)
-      .with('succeeded', () => {
-        return {type: 'operation-succeeded' as const, operation: toView(operation)};
-      })
-      .with('dropped', () => {
-        return {type: 'operation-dropped' as const, operation: toView(operation)};
-      })
-      .otherwise(() => {
-        return {type: 'operation-continues' as const};
-      });
-  }
-
-  /** The attempt of the operation is over: the backoff follows how it went, and the commands waiting for it go on */
-  function concludeAttempt(operation: OperationSnapshot, trigger: Trigger): void {
-    const attempt = attempts.take(operation.id);
-    if (attempt === undefined) {
+  function requestPass(): void {
+    if (isInState('queued')(pass)) {
       return;
     }
-    if (trigger === 'attempt-succeeded') {
-      backoff.reset();
-    } else if (operation.state === 'queued') {
-      backoff.grow();
-    }
-    attempt.end(endingOf(operation));
+    pass = {state: 'queued'};
+    void serialized(runPass);
   }
 
-  /**
-   * Stores the snapshot first, and changes nothing if that fails. A final snapshot is followed by deleting the
-   * operation's snapshots; once the final one is stored the operation has ended, whether or not the delete worked.
-   */
-  async function commit(
-    previous: OperationSnapshot | undefined,
-    data: OperationData,
-    trigger: Trigger,
-    {cascades}: {cascades: boolean} = {cascades: true},
-  ): Promise<TransitionOutcome> {
-    const target = resolveTarget(previous?.state ?? 'initial', trigger, guardContextOf(data, kinds.get(data.kind)));
-    if (target === undefined) {
-      return {type: 'trigger-refused'};
-    }
-    const isGivenUp = target === 'dead-lettered' || target === 'dropped';
-    if (previous !== undefined && cascades && isGivenUp && kinds.get(data.kind)?.laneWhenGivenUp === 'follows') {
-      const failure = await endFollowing(previous, target);
-      if (failure !== undefined) {
-        return failure;
-      }
-    }
-    const next: OperationSnapshot = {
-      ...data,
-      schemaVersion: SCHEMA_VERSION,
-      seq: (previous?.seq ?? 0) + 1,
-      trigger,
-      at: getServerTime(),
-      state: target,
-    };
-    const appended = await store.append(next);
-    if (appended.type === 'storage-full' || appended.type === 'storage-failed') {
-      return appended;
-    }
-    if (FINAL_STATES.includes(target)) {
-      const removed = await store.remove([next.id]);
-      if (removed.type === 'storage-failed') {
-        // Load deletes what the failed delete left behind
-        logger.warn('Operation not deleted', {errorName: removed.errorName});
-      }
-      operations.delete(next.id);
-    } else {
-      operations.set(next.id, next);
-    }
-    if (previous?.state === 'in-progress') {
-      concludeAttempt(next, trigger);
-    }
-    notifyChanged(next);
-    scheduler.pump();
-    return {type: 'operation-transitioned', operation: next};
+  function armTimer(callback: () => void, milliseconds: number): Timer {
+    return {state: 'armed', timer: clock.setTimer(callback, Math.min(milliseconds, MAXIMUM_TIMER_MILLISECONDS))};
   }
 
-  /** Moves an operation on by the trigger, changing what `changes` says */
-  async function transition(
-    previous: OperationSnapshot,
-    trigger: Trigger,
-    changes: Partial<OperationData> = {},
-    options?: {cascades: boolean},
-  ): Promise<TransitionOutcome> {
-    return commit(previous, {...previous, ...changes}, trigger, options);
-  }
-
-  /**
-   * Ends the operations that follow an operation which is about to be given up, the way it will end, in lane order.
-   * They end before it does: its own transition is what commits the whole giving up, so a store failure or a reload
-   * partway leaves it unfinished, and the next try repeats it for whatever is still waiting. Nothing behind it can go
-   * out meanwhile, because it still blocks its lane. Answers the failure of the store, if any.
-   */
-  async function endFollowing(
-    givenUp: OperationSnapshot,
-    endsAs: 'dead-lettered' | 'dropped',
-  ): Promise<StorageFull | StorageFailed | undefined> {
-    const laneTrigger = endsAs === 'dead-lettered' ? 'lane-dead-lettered' : 'lane-dropped';
-    for (const following of operationsFollowing(operations.values(), givenUp)) {
-      const outcome = await transition(following, laneTrigger, {}, {cascades: false});
-      const failure = answerTransition(outcome, () => {
-        return undefined;
-      });
-      if (failure !== undefined) {
-        return failure;
-      }
+  function disarm(timer: Timer): Timer {
+    if (isInState('armed')(timer)) {
+      clock.clearTimer(timer.timer);
     }
-    return undefined;
+    return {state: 'disarmed'};
   }
 
-  /**
-   * The answer of a command to how its transition went. A trigger the table lists in every state the command can
-   * find the operation in is never refused; the table is the source of truth, so a refusal there is a defect, and
-   * is answered as a failure of the store, with its name.
-   */
-  function answerTransition<Answer>(
-    outcome: TransitionOutcome,
-    onTransitioned: (operation: OperationSnapshot) => Answer,
-    onRefused: () => Answer | StorageFailed = () => {
-      logger.error('Transition refused where the table lists it', {});
-      return {type: 'storage-failed', errorName: 'TransitionRefused'};
-    },
-  ): Answer | StorageFull | StorageFailed {
-    return match(outcome)
-      .with({type: 'operation-transitioned'}, ({operation}) => {
-        return onTransitioned(operation);
+  function armWake(planned: Wake): Timer {
+    disarm(wake);
+    return match(planned)
+      .with({state: 'wake-in'}, ({milliseconds}) => {
+        return armTimer(requestPass, milliseconds);
       })
-      .with({type: 'trigger-refused'}, onRefused)
-      .with(storageProblem, failure => {
-        return failure;
+      .with({state: 'no-wake'}, (): Timer => {
+        return {state: 'disarmed'};
       })
       .exhaustive();
   }
 
-  // Commands
-
-  function addWaitingCommand(operationId: string): void {
-    waitingCommands.set(operationId, (waitingCommands.get(operationId) ?? 0) + 1);
+  function backoffRemaining(): number {
+    return Math.max(0, backoff.waitsUntil - clock.getStopwatchTime());
   }
 
-  function removeWaitingCommand(operationId: string): void {
-    const remaining = (waitingCommands.get(operationId) ?? 1) - 1;
-    if (remaining > 0) {
-      waitingCommands.set(operationId, remaining);
-    } else {
-      waitingCommands.delete(operationId);
-    }
-    scheduler.pump();
+  function growBackoff(): void {
+    const delay = backoffDelay(backoff.failures, configuration.backoff, random);
+    backoff = {failures: backoff.failures + 1, waitsUntil: clock.getStopwatchTime() + delay};
+  }
+
+  function resetBackoff(): void {
+    backoff = {failures: 0, waitsUntil: 0};
   }
 
   /**
-   * Applies the command to the operation with the key, once no attempt is running on it.
-   * Commands waiting for the same attempt are applied in the order they were called.
+   * Settles the finished attempts, expires what is due and starts what may start. Each step checks its own
+   * precondition again, so a plan that went stale does no harm; every commit requests the next pass.
    */
-  async function afterAttempt<Outcome extends {type: string}>(
-    correlationKey: string,
-    apply: (found: OperationSnapshot | undefined) => Promise<Outcome>,
-  ): Promise<Outcome | OperationSucceeded | OperationDropped | OutboxNotStarted> {
-    let waitingOn: string | undefined;
+  async function runPass(): Promise<PassRun> {
+    pass = {state: 'idle'};
+    const plan = planPass({
+      operations: [...operations.values()],
+      serverTime: clock.getServerTime(),
+      run,
+      backoffRemainingMilliseconds: backoffRemaining(),
+    });
+    const finished = [...attempts.values()].filter(attempt => {
+      return isInState('finished')(attempt.result);
+    });
+    const results = await runInOrder([
+      ...finished.map(({operationId}) => {
+        return async () => {
+          return settleAttempt(operationId);
+        };
+      }),
+      ...plan.expire.map(operationId => {
+        return async () => {
+          return expireOperation(operationId);
+        };
+      }),
+      ...plan.start.map(operationId => {
+        return async () => {
+          return startAttempt(operationId);
+        };
+      }),
+    ]);
+    const storageProblems = results.filter(isStorageProblem);
+    if (storageProblems.length === 0) {
+      wake = armWake(plan.wake);
+      return {outcome: 'pass-run'};
+    }
+    logger.warn('Pass hit a store failure', {
+      outcomes: storageProblems.map(({outcome}) => {
+        return outcome;
+      }),
+    });
+    growBackoff();
+    wake = armWake({state: 'wake-in', milliseconds: backoffRemaining()});
+    return {outcome: 'pass-run'};
+  }
+
+  // Store and lookups
+
+  async function callStore<Result extends {outcome: string}>(
+    call: () => Promise<Result>,
+  ): Promise<Result | StorageFailed> {
     try {
-      for (;;) {
-        const found = findByKey(correlationKey);
-        const attempt = found?.state === 'in-progress' ? attempts.get(found.id) : undefined;
-        if (found !== undefined && attempt !== undefined) {
-          if (waitingOn === undefined) {
-            waitingOn = found.id;
-            addWaitingCommand(found.id);
-          }
-          const ending = await attempt.ended;
-          if (ending.type !== 'operation-continues') {
-            return ending;
-          }
-          continue;
-        }
-        // `undefined`: an attempt started while the command waited for its turn, so it has to wait for that
-        const outcome = await exclusive.run(async () => {
-          if (isStopped) {
-            return NOT_STARTED;
-          }
-          const current = findByKey(correlationKey);
-          return current?.state === 'in-progress' ? undefined : apply(current);
-        });
-        if (outcome !== undefined) {
-          return outcome;
-        }
-      }
-    } finally {
-      if (waitingOn !== undefined) {
-        removeWaitingCommand(waitingOn);
-      }
+      return await call();
+    } catch (error) {
+      return {outcome: 'storage-failed', errorName: errorNameOf(error)};
     }
   }
 
-  async function createOperation(
-    kind: Kind<unknown>,
+  function findByKey(correlationKey: string): Lookup {
+    const found = [...operations.values()].find(({correlation}) => {
+      return isInState('correlated')(correlation) && correlation.correlationKey === correlationKey;
+    });
+    return found === undefined ? {outcome: 'operation-not-found'} : {outcome: 'operation-found', operation: found};
+  }
+
+  function findById(operationId: string): Lookup {
+    const found = operations.get(operationId);
+    return found === undefined ? {outcome: 'operation-not-found'} : {outcome: 'operation-found', operation: found};
+  }
+
+  function findWhen(
+    operationId: string,
+    isReady: (operation: OperationSnapshot) => boolean,
+  ): SnapshotFound | StepSkipped {
+    const lookup = findById(operationId);
+    return isOutcome('operation-found')(lookup) && isReady(lookup.operation) ? lookup : {outcome: 'step-skipped'};
+  }
+
+  function findAttempt(operationId: string): AttemptFound | NoAttempt {
+    const attempt = attempts.get(operationId);
+    return attempt === undefined ? {outcome: 'no-attempt'} : {outcome: 'attempt-found', attempt};
+  }
+
+  // commit
+
+  function notifyChanged(operation: OperationSnapshot): void {
+    try {
+      kindOf(operation).onChanged(operation);
+    } catch (error) {
+      logger.warn('onChanged threw', {kind: operation.kind, errorName: errorNameOf(error)});
+    }
+  }
+
+  /** Stores the snapshot first, and changes nothing if that fails. It knows nothing about attempts or callers */
+  async function commit(previous: Previous, data: OperationData, trigger: Trigger): Promise<CommitOutcome> {
+    const kind = kindOf(data);
+    return pipe(isCommitFailure)(
+      () => {
+        return resolveTransition(previous, data, trigger, kind);
+      },
+      async resolved => {
+        return followLane(previous, data, trigger, kind, resolved);
+      },
+      async ({target}) => {
+        return appendSnapshot(previous, data, trigger, target);
+      },
+      forgetIfFinal,
+      announceChange,
+    );
+  }
+
+  function resolveTransition(
+    previous: Previous,
+    data: OperationData,
+    trigger: Trigger,
+    kind: ResolvedKind,
+  ): TargetResolved | TransitionRefused {
+    const targetResult = resolveTarget(previous.state, trigger, {
+      attempts: data.attempts,
+      maxAttempts: kind.maxAttempts,
+      whenGivenUp: kind.whenGivenUp,
+    });
+    if (isOutcome('target-resolved')(targetResult)) {
+      return targetResult;
+    }
+    return {outcome: 'transition-refused', operation: isInState('initial')(previous) ? data : previous, trigger};
+  }
+
+  /**
+   * Ends the followers before the operation that is given up: its own snapshot commits the whole giving up, so a
+   * store failure or a reload partway leaves it unfinished, and the next try repeats it for whatever still waits.
+   * Nothing behind it can go out meanwhile, because it still blocks its lane.
+   */
+  async function followLane(
+    previous: Previous,
+    data: OperationData,
+    trigger: Trigger,
+    kind: ResolvedKind,
+    resolved: TargetResolved,
+  ): Promise<TargetResolved | StorageFull | StorageFailed> {
+    const {target} = resolved;
+    if (!doesLaneFollow(previous.state, trigger, target, kind)) {
+      return resolved;
+    }
+    const laneTrigger = laneTriggerFor(target);
+    const followers = findOperationFollowers(operations.values())(data);
+    return eachUntilFailure(isStorageProblem)(
+      followers,
+      async follower => {
+        return commit(follower, follower, laneTrigger);
+      },
+      resolved,
+    );
+  }
+
+  async function appendSnapshot(
+    previous: Previous,
+    data: OperationData,
+    trigger: Trigger,
+    target: OperationSnapshot['state'],
+  ): Promise<OperationTransitioned | StorageFull | StorageFailed> {
+    const snapshot: OperationSnapshot = Object.freeze({
+      ...data,
+      schemaVersion: SCHEMA_VERSION,
+      seq: (isInState('initial')(previous) ? 0 : previous.seq) + 1,
+      trigger,
+      at: clock.getServerTime(),
+      state: target,
+    });
+    const appendResult = await callStore(async () => {
+      return store.append(snapshot);
+    });
+    return isOutcome('snapshot-appended')(appendResult)
+      ? {outcome: 'operation-transitioned', operation: snapshot}
+      : appendResult;
+  }
+
+  /** Once the final snapshot is stored the operation has ended, whether or not deleting its snapshots worked */
+  async function forgetIfFinal(transitioned: OperationTransitioned): Promise<OperationTransitioned> {
+    const {operation} = transitioned;
+    if (!isFinal(operation)) {
+      operations.set(operation.id, operation);
+      return transitioned;
+    }
+    operations.delete(operation.id);
+    const removeResult = await callStore(async () => {
+      return store.remove([operation.id]);
+    });
+    if (isOutcome('storage-failed')(removeResult)) {
+      // Load deletes what the failed delete left behind
+      logger.warn('Operation not deleted', {errorName: removeResult.errorName});
+    }
+    return transitioned;
+  }
+
+  function announceChange(transitioned: OperationTransitioned): OperationTransitioned {
+    notifyChanged(transitioned.operation);
+    requestPass();
+    return transitioned;
+  }
+
+  // Commands
+
+  /**
+   * Applies the command to the operation it looks up, or parks it on the operation's attempt when one runs.
+   * The attempt's end applies the parked commands in order, in the same task, so nothing starts in between.
+   */
+  async function takeCommand<Result>(
+    lookUp: () => Lookup,
+    apply: (lookup: Lookup) => Promise<Result>,
+  ): Promise<Parked<Result>> {
+    const takenResult = await serialized(async (): Promise<CommandTaken<Result>> => {
+      const lookup = lookUp();
+      const attemptResult: AttemptFound | NoAttempt = isOutcome('operation-found')(lookup)
+        ? findAttempt(lookup.operation.id)
+        : {outcome: 'no-attempt'};
+      if (isOutcome('attempt-found')(attemptResult)) {
+        return {outcome: 'command-taken', answer: parkOn(attemptResult.attempt, apply)};
+      }
+      const applied = await apply(lookup);
+      return {outcome: 'command-taken', answer: Promise.resolve(applied)};
+    });
+    return isOutcome('outbox-not-started')(takenResult) ? takenResult : takenResult.answer;
+  }
+
+  async function parkOn<Result>(
+    attempt: RunningAttempt,
+    apply: (lookup: Lookup) => Promise<Result>,
+  ): Promise<Parked<Result>> {
+    const {promise, resolve} = Promise.withResolvers<Parked<Result>>();
+    const command: ParkedCommand = {
+      applyTo: async lookup => {
+        return resolve(await apply(lookup));
+      },
+      answer: resolve,
+    };
+    attempts.set(attempt.operationId, {...attempt, parked: [...attempt.parked, command]});
+    return promise;
+  }
+
+  /** Each parked command answers how the operation ended, or applies to it as the earlier ones left it */
+  async function finishAttempt(attempt: RunningAttempt, operation: OperationView): Promise<void> {
+    attempts.delete(attempt.operationId);
+    disarm(attempt.timeout);
+    if (isFinal(operation)) {
+      for (const command of attempt.parked) {
+        command.answer(endedWhileWaiting(operation));
+      }
+      return;
+    }
+    await runInOrder(
+      attempt.parked.map(command => {
+        return async () => {
+          return command.applyTo(findById(operation.id));
+        };
+      }),
+    );
+  }
+
+  async function enqueue(kind: ResolvedKind, request: EnqueueRequest<unknown>): Promise<EnqueueOutcome<unknown>> {
+    return pipe(isOutcome('correlation-key-empty', 'lane-key-empty', 'payload-invalid'))(
+      () => {
+        return checkKeys(request);
+      },
+      () => {
+        return parsePayload(kind, request.payload);
+      },
+      async ({payload}) => {
+        return placeOperation(kind, request, payload);
+      },
+    );
+  }
+
+  async function placeOperation(
+    kind: ResolvedKind,
     request: EnqueueRequest<unknown>,
     payload: unknown,
   ): Promise<EnqueueOutcome<unknown>> {
-    if (operations.size >= maxOperations) {
-      return {type: 'outbox-full'};
+    return match(correlationOf(request))
+      .with({state: 'uncorrelated'}, async () => {
+        return serialized(async () => {
+          return createOperation(kind, request, payload);
+        });
+      })
+      .with({state: 'correlated'}, async ({correlationKey}) => {
+        return enqueueCorrelated(kind, request, payload, correlationKey);
+      })
+      .exhaustive();
+  }
+
+  function refuseOtherKind(kind: ResolvedKind, lookup: Lookup): Lookup | KeyTakenByOtherKind {
+    return isOutcome('operation-found')(lookup) && lookup.operation.kind !== kind.name
+      ? {outcome: 'key-taken-by-other-kind', kind: lookup.operation.kind}
+      : lookup;
+  }
+
+  async function enqueueCorrelated(
+    kind: ResolvedKind,
+    request: EnqueueRequest<unknown>,
+    payload: unknown,
+    correlationKey: string,
+  ): Promise<EnqueueOutcome<unknown>> {
+    // Checked before parking as well, so another kind's key is refused at once while its attempt runs
+    const checkedLookup = refuseOtherKind(kind, findByKey(correlationKey));
+    if (isOutcome('key-taken-by-other-kind')(checkedLookup)) {
+      return checkedLookup;
     }
-    const data = newOperationData(kind, request, payload, {
-      id: crypto.randomUUID(),
-      queuedSeq: nextQueuedSeq++,
-      now: getServerTime(),
-    });
-    const outcome = await commit(undefined, data, 'operation-queued');
-    return answerTransition(outcome, operation => {
-      return {type: 'operation-queued' as const, operation: toView(operation)};
-    });
+    return takeCommand(
+      () => {
+        return findByKey(correlationKey);
+      },
+      async lookup => {
+        return pipe(isOutcome('key-taken-by-other-kind'))(
+          () => {
+            return refuseOtherKind(kind, lookup);
+          },
+          async current => {
+            return isOutcome('operation-found')(current)
+              ? versionOperation(current.operation, kind, request, payload)
+              : createOperation(kind, request, payload);
+          },
+        );
+      },
+    );
+  }
+
+  async function createOperation(
+    kind: ResolvedKind,
+    request: EnqueueRequest<unknown>,
+    payload: unknown,
+  ): Promise<OperationQueued<unknown> | OutboxFull | TransitionRefused | StorageFull | StorageFailed> {
+    return pipe(isOutcome('outbox-full', 'transition-refused', 'storage-full', 'storage-failed'))(
+      (): RoomLeft | OutboxFull => {
+        return operations.size >= configuration.maxOperations ? {outcome: 'outbox-full'} : {outcome: 'room-left'};
+      },
+      async () => {
+        const data = newOperationData(kind, request, payload, {
+          id: createId(),
+          queuedSeq: nextQueuedSeqOf(operations.values()),
+          serverTime: clock.getServerTime(),
+        });
+        return commit({state: 'initial'}, data, 'operation-queued');
+      },
+      ({operation}): OperationQueued<unknown> => {
+        return {outcome: 'operation-queued', operation};
+      },
+    );
   }
 
   async function versionOperation(
     found: OperationSnapshot,
-    kind: Kind<unknown>,
+    kind: ResolvedKind,
     request: EnqueueRequest<unknown>,
     payload: unknown,
-  ): Promise<EnqueueOutcome<unknown>> {
-    const data = versionData(found, kind, request, payload, {queuedSeq: nextQueuedSeq++, now: getServerTime()});
-    const outcome = await transition(found, 'operation-versioned', data);
-    return answerTransition(outcome, operation => {
-      return {type: 'operation-versioned' as const, operation: toView(operation)};
-    });
-  }
-
-  async function enqueue(kind: Kind<unknown>, request: EnqueueRequest<unknown>): Promise<EnqueueOutcome<unknown>> {
-    if (isStopped) {
-      return NOT_STARTED;
-    }
-    const {correlationKey, orderingKey} = request;
-    if (correlationKey === '') {
-      return {type: 'correlation-key-empty'};
-    }
-    if (orderingKey === '') {
-      return {type: 'ordering-key-empty'};
-    }
-    let payload: unknown;
-    try {
-      payload = kind.parsePayload(request.payload);
-    } catch (error) {
-      return {type: 'payload-invalid', errorName: getErrorName(error)};
-    }
-    if (correlationKey === undefined) {
-      return exclusive.run(async () => {
-        return isStopped ? NOT_STARTED : createOperation(kind, request, payload);
-      });
-    }
-    const existing = findByKey(correlationKey);
-    if (existing !== undefined && existing.kind !== kind.name) {
-      return {type: 'key-taken-by-other-kind', kind: existing.kind};
-    }
-    return afterAttempt(correlationKey, async found => {
-      return found === undefined
-        ? createOperation(kind, request, payload)
-        : versionOperation(found, kind, request, payload);
-    });
+  ): Promise<OperationVersioned<unknown> | TransitionRefused | StorageFull | StorageFailed> {
+    return pipe(isCommitFailure)(
+      async () => {
+        const data = versionOperationData(found, kind, request, payload, {
+          queuedSeq: nextQueuedSeqOf(operations.values()),
+          serverTime: clock.getServerTime(),
+        });
+        return commit(found, data, 'operation-versioned');
+      },
+      ({operation}): OperationVersioned<unknown> => {
+        return {outcome: 'operation-versioned', operation};
+      },
+    );
   }
 
   async function hold(correlationKey: string): Promise<HoldOutcome> {
-    return afterAttempt(correlationKey, async (found): Promise<HoldOutcome> => {
-      if (found === undefined) {
-        return {type: 'operation-not-found'};
-      }
-      const outcome = await transition(found, 'operation-held');
-      return answerTransition<HoldOutcome>(
-        outcome,
-        operation => {
-          return {type: 'operation-held' as const, operation: toView(operation)};
-        },
-        () => {
-          return {type: 'operation-not-queued' as const, operation: toView(found)};
-        },
-      );
-    });
+    return takeCommand(
+      () => {
+        return findByKey(correlationKey);
+      },
+      async lookup => {
+        return pipe(isCommandFailure)(
+          () => {
+            return lookup;
+          },
+          async ({operation}) => {
+            return commit(operation, operation, 'operation-held');
+          },
+          ({operation}): OperationHeld => {
+            return {outcome: 'operation-held', operation};
+          },
+        );
+      },
+    );
   }
 
   async function release(correlationKey: string): Promise<ReleaseOutcome> {
-    return afterAttempt(correlationKey, async (found): Promise<ReleaseOutcome> => {
-      if (found === undefined) {
-        return {type: 'operation-not-found'};
-      }
-      const outcome = await transition(found, 'operation-released');
-      return answerTransition<ReleaseOutcome>(
-        outcome,
-        operation => {
-          return {type: 'operation-released' as const, operation: toView(operation)};
-        },
+    return takeCommand(
+      () => {
+        return findByKey(correlationKey);
+      },
+      async lookup => {
+        return pipe(isCommandFailure)(
+          () => {
+            return lookup;
+          },
+          async ({operation}) => {
+            return commit(operation, operation, 'operation-released');
+          },
+          ({operation}): OperationReleased => {
+            return {outcome: 'operation-released', operation};
+          },
+        );
+      },
+    );
+  }
+
+  /** Never parks: it drops the operation, then aborts and finishes its attempt */
+  async function drop(correlationKey: string): Promise<DropOutcome> {
+    return serialized(async () => {
+      return pipe(isCommandFailure)(
         () => {
-          return {type: 'operation-not-on-hold' as const, operation: toView(found)};
+          return findByKey(correlationKey);
+        },
+        async ({operation}) => {
+          return commit(operation, operation, 'operation-dropped');
+        },
+        async ({operation}) => {
+          return endAttemptOf(operation);
         },
       );
     });
   }
 
-  async function drop(correlationKey: string): Promise<DropOutcome> {
-    return exclusive.run(async (): Promise<DropOutcome> => {
-      if (isStopped) {
-        return NOT_STARTED;
-      }
-      const found = findByKey(correlationKey);
-      if (found === undefined) {
-        return {type: 'operation-not-found'};
-      }
-      const attempt = attempts.get(found.id);
-      const outcome = await transition(found, 'operation-dropped', {}, {cascades: false});
-      return answerTransition(outcome, operation => {
-        attempt?.controller.abort();
-        return {type: 'operation-dropped' as const, operation: toView(operation)};
-      });
-    });
+  async function endAttemptOf(dropped: OperationSnapshot): Promise<OperationDropped> {
+    const attemptResult = findAttempt(dropped.id);
+    if (isOutcome('attempt-found')(attemptResult)) {
+      attemptResult.attempt.controller.abort();
+      await finishAttempt(attemptResult.attempt, dropped);
+    }
+    return {outcome: 'operation-dropped', operation: dropped};
   }
 
   // Attempts
 
-  /** Stores how the attempt ended; a store that fails is tried again after the backoff */
-  async function settleAttempt(operationId: string, attempt: Attempt, trigger: Trigger): Promise<void> {
-    for (;;) {
-      const settled = await exclusive.run(async () => {
-        const current = operations.get(operationId);
-        if (isStopped || current === undefined || attempts.get(operationId) !== attempt) {
-          return {type: 'attempt-superseded'} as const;
-        }
-        return transition(current, trigger);
-      });
-      if (settled.type !== 'storage-full' && settled.type !== 'storage-failed') {
-        return;
+  async function startAttempt(operationId: string): Promise<CommitOutcome | StepSkipped> {
+    return pipe(isStepEnd)(
+      () => {
+        return findWhen(operationId, operation => {
+          return isInState('queued')(operation) && isInState('running')(run) && backoffRemaining() === 0;
+        });
+      },
+      async ({operation}) => {
+        return commit(operation, {...operation, attempts: operation.attempts + 1}, 'attempt-started');
+      },
+      launchAttempt,
+    );
+  }
+
+  function launchAttempt(started: OperationTransitioned): OperationTransitioned {
+    const {operation} = started;
+    const controller = new AbortController();
+    const timeout = match(operation.limits.attemptTimeout)
+      .with({state: 'times-out-after'}, ({milliseconds}) => {
+        return armTimer(() => {
+          controller.abort();
+          recordResult(operation.id, controller, 'attempt-timed-out');
+        }, milliseconds);
+      })
+      .with({state: 'never-times-out'}, (): Timer => {
+        return {state: 'disarmed'};
+      })
+      .exhaustive();
+    attempts.set(operation.id, {
+      operationId: operation.id,
+      controller,
+      timeout,
+      result: {state: 'running'},
+      parked: [],
+    });
+    void runAttempt(operation, controller);
+    return started;
+  }
+
+  async function runAttempt(operation: OperationSnapshot, controller: AbortController): Promise<void> {
+    const answer = await askKind(operation, controller.signal);
+    recordResult(operation.id, controller, answer.outcome);
+  }
+
+  async function askKind(operation: OperationSnapshot, signal: AbortSignal): Promise<AttemptOutcome | AttemptErrored> {
+    try {
+      const answer: unknown = await kindOf(operation).attempt(operation, signal);
+      if (isAttemptAnswer(answer)) {
+        return answer;
       }
-      logger.warn('Attempt result not stored', {outcome: settled.type});
-      await sleep(backoff.grow());
+      logger.warn('Attempt errored', {kind: operation.kind, errorName: 'UnknownAnswer'});
+      return {outcome: 'attempt-errored'};
+    } catch (error) {
+      // An attempt that was aborted is over; its rejection is the kind honouring the signal
+      if (!signal.aborted) {
+        logger.warn('Attempt errored', {kind: operation.kind, errorName: errorNameOf(error)});
+      }
+      return {outcome: 'attempt-errored'};
     }
   }
 
-  async function startAttempt(operationId: string): Promise<boolean> {
-    return exclusive.run(async () => {
-      const current = operations.get(operationId);
-      const mayStart =
-        !isStopped &&
-        isRunning &&
-        current?.state === 'queued' &&
-        !waitingCommands.has(operationId) &&
-        backoff.remainingMilliseconds() === 0;
-      if (!mayStart) {
-        return true;
-      }
-      const outcome = await transition(current, 'attempt-started', {attempts: current.attempts + 1});
-      if (outcome.type !== 'operation-transitioned') {
-        logger.warn('Attempt not started', {outcome: outcome.type});
-        return false;
-      }
-      attempts.begin(outcome.operation, async (attempt, trigger) => {
-        await settleAttempt(operationId, attempt, trigger);
-      });
-      return true;
-    });
+  /** Called by the kind's answer and by the timeout; only the first result of the attempt still running counts */
+  function recordResult(operationId: string, controller: AbortController, trigger: Trigger): void {
+    match(findAttempt(operationId))
+      .with(
+        {
+          outcome: 'attempt-found',
+          attempt: {
+            controller: P.when(current => {
+              return current === controller;
+            }),
+            result: {state: 'running'},
+          },
+        },
+        ({attempt}) => {
+          attempts.set(operationId, {
+            ...attempt,
+            timeout: disarm(attempt.timeout),
+            result: {state: 'finished', trigger},
+          });
+          requestPass();
+        },
+      )
+      .otherwise(noop);
   }
 
-  async function expire(operationId: string): Promise<boolean> {
-    return exclusive.run(async () => {
-      const current = operations.get(operationId);
-      if (isStopped || current === undefined || !isDueToExpire(current, getServerTime())) {
-        return true;
-      }
-      const outcome = await transition(current, 'operation-expired');
-      if (outcome.type !== 'operation-transitioned') {
-        logger.warn('Operation not expired', {outcome: outcome.type});
-      }
-      return outcome.type === 'operation-transitioned';
-    });
+  function findFinished(operationId: string): AttemptFinished | StepSkipped {
+    return match({attemptResult: findAttempt(operationId), lookup: findById(operationId)})
+      .with(
+        {
+          attemptResult: {outcome: 'attempt-found', attempt: {result: {state: 'finished'}}},
+          lookup: {outcome: 'operation-found'},
+        },
+        ({attemptResult: {attempt}, lookup: {operation}}): AttemptFinished => {
+          return {outcome: 'attempt-finished', attempt, operation, trigger: attempt.result.trigger};
+        },
+      )
+      .otherwise((): StepSkipped => {
+        return {outcome: 'step-skipped'};
+      });
+  }
+
+  /** A store failure leaves the attempt finished, to be settled again at a later pass */
+  async function settleAttempt(operationId: string): Promise<CommitOutcome | StepSkipped> {
+    const finished = findFinished(operationId);
+    if (isOutcome('step-skipped')(finished)) {
+      return finished;
+    }
+    const {attempt, operation, trigger} = finished;
+    const commitResult = await commit(operation, operation, trigger);
+    if (isStorageProblem(commitResult)) {
+      return commitResult;
+    }
+    if (trigger === 'attempt-succeeded') {
+      resetBackoff();
+    } else if (isInState('queued')(commitResult.operation)) {
+      growBackoff();
+    }
+    // A stop while the result was stored has answered the parked commands already
+    const currentResult = findAttempt(operationId);
+    if (isOutcome('attempt-found')(currentResult) && currentResult.attempt.controller === attempt.controller) {
+      await finishAttempt(currentResult.attempt, commitResult.operation);
+    }
+    return commitResult;
+  }
+
+  async function expireOperation(operationId: string): Promise<CommitOutcome | StepSkipped> {
+    return pipe(isStepEnd)(
+      () => {
+        return findWhen(operationId, operation => {
+          return isDueToExpire(operation, clock.getServerTime());
+        });
+      },
+      async ({operation}) => {
+        return commit(operation, operation, 'operation-expired');
+      },
+    );
   }
 
   // Loading
 
-  /** The snapshot with its payload parsed, or `undefined` when it can't be used any more */
-  function parseStored(snapshot: OperationSnapshot): OperationSnapshot | undefined {
+  function parseStoredSnapshot(snapshot: OperationSnapshot): SnapshotUsable | SnapshotUnusable {
     const kind = kinds.get(snapshot.kind);
-    const isUnfinished = !FINAL_STATES.includes(snapshot.state);
-    if (snapshot.schemaVersion !== SCHEMA_VERSION || kind === undefined || !isUnfinished) {
-      return undefined;
+    if (snapshot.schemaVersion !== SCHEMA_VERSION) {
+      return {outcome: 'snapshot-unusable', operationId: snapshot.id, reason: 'schema-unknown'};
+    }
+    if (kind === undefined) {
+      return {outcome: 'snapshot-unusable', operationId: snapshot.id, reason: 'kind-not-registered'};
+    }
+    if (isFinal(snapshot)) {
+      return {outcome: 'snapshot-unusable', operationId: snapshot.id, reason: 'operation-ended'};
     }
     try {
-      return {...snapshot, payload: kind.parsePayload(snapshot.payload)};
+      return {
+        outcome: 'snapshot-usable',
+        snapshot: Object.freeze({...snapshot, payload: kind.parsePayload(snapshot.payload)}),
+      };
     } catch {
-      return undefined;
+      return {outcome: 'snapshot-unusable', operationId: snapshot.id, reason: 'payload-invalid'};
     }
   }
 
-  async function load(): Promise<StartOutcome> {
-    const loaded = await store.loadLatest();
-    if (loaded.type === 'storage-failed') {
-      return loaded;
+  async function removeUnusable(unusable: SnapshotUnusable[]): Promise<SnapshotsRemoved | StorageFailed> {
+    if (unusable.length === 0) {
+      return {outcome: 'snapshots-removed'};
     }
-    const usable: OperationSnapshot[] = [];
-    const unusableIds: string[] = [];
-    for (const snapshot of loaded.operations) {
-      const parsed = parseStored(snapshot);
-      if (parsed === undefined) {
-        unusableIds.push(snapshot.id);
-      } else {
-        usable.push(parsed);
-      }
-    }
-    if (unusableIds.length > 0) {
-      const removed = await store.remove(unusableIds);
-      if (removed.type === 'storage-failed') {
-        return removed;
-      }
-    }
-    for (const snapshot of usable) {
-      operations.set(snapshot.id, snapshot);
-      nextQueuedSeq = Math.max(nextQueuedSeq, snapshot.queuedSeq + 1);
-    }
-    for (const snapshot of usable) {
-      if (snapshot.state !== 'in-progress') {
-        notifyChanged(snapshot);
-        continue;
-      }
-      const outcome = await transition(snapshot, 'attempt-interrupted');
-      const failure = answerTransition(outcome, () => {
-        return undefined;
-      });
-      if (failure !== undefined) {
-        return failure;
-      }
-    }
-    logger.info('Operations loaded', {
-      count: operations.size,
-      quarantinedCount: loaded.quarantinedCount + unusableIds.length,
+    return callStore(async () => {
+      return store.remove(
+        unusable.map(({operationId}) => {
+          return operationId;
+        }),
+      );
     });
-    scheduler.activate();
-    return {type: 'outbox-started'};
+  }
+
+  async function keepUsable(loaded: SnapshotsLoaded): Promise<OperationsLoaded | StorageFailed> {
+    const parsed = loaded.operations.map(parseStoredSnapshot);
+    const usable = parsed.filter(isOutcome('snapshot-usable')).map(({snapshot}) => {
+      return snapshot;
+    });
+    const unusable = parsed.filter(isOutcome('snapshot-unusable'));
+    return pipe(isOutcome('storage-failed'))(
+      async () => {
+        return removeUnusable(unusable);
+      },
+      (): OperationsLoaded => {
+        for (const snapshot of usable) {
+          operations.set(snapshot.id, snapshot);
+        }
+        return {outcome: 'operations-loaded', usable, quarantinedCount: loaded.quarantinedCount + unusable.length};
+      },
+    );
+  }
+
+  async function resumeOperation(snapshot: OperationSnapshot): Promise<CommitOutcome | OperationAnnounced> {
+    if (isInState('in-progress')(snapshot)) {
+      return commit(snapshot, snapshot, 'attempt-interrupted');
+    }
+    notifyChanged(snapshot);
+    return {outcome: 'operation-announced'};
+  }
+
+  async function load(): Promise<OutboxStarted | StorageFull | StorageFailed | OutboxNotStarted> {
+    return serialized(async () => {
+      return pipe(isStorageProblem)(
+        async () => {
+          return callStore(async () => {
+            return store.loadLatest();
+          });
+        },
+        keepUsable,
+        async loaded => {
+          return eachUntilFailure(isStorageProblem)(loaded.usable, resumeOperation, loaded);
+        },
+        ({quarantinedCount}): OutboxStarted => {
+          logger.info('Operations loaded', {count: operations.size, quarantinedCount});
+          requestPass();
+          return {outcome: 'outbox-started'};
+        },
+      );
+    });
   }
 
   // Lifecycle
 
   async function stop(): Promise<void> {
-    isStopped = true;
-    scheduler.stop();
-    attempts.abortAll(NOT_STARTED);
-    await exclusive.whenIdle();
-  }
-
-  async function logged<Outcome extends {type: string}>(
-    call: string,
-    outcome: Promise<Outcome>,
-    attributes: Readonly<Record<string, unknown>> = {},
-  ): Promise<Outcome> {
-    const answered = await outcome;
-    const errorName = 'errorName' in answered ? {errorName: answered.errorName} : {};
-    logger.info(call, {...attributes, ...errorName, outcome: answered.type});
-    return answered;
+    queue = {state: 'closed', tail: queue.tail};
+    run = {state: 'paused'};
+    const stopped = [...attempts.values()];
+    attempts.clear();
+    for (const attempt of stopped) {
+      attempt.controller.abort();
+      disarm(attempt.timeout);
+      for (const command of attempt.parked) {
+        command.answer({outcome: 'outbox-not-started'});
+      }
+    }
+    await queue.tail;
+    // A pass that was running when the queue closed may have armed it again
+    wake = disarm(wake);
   }
 
   return {
-    load: async () => {
-      return logged('start', load());
-    },
-    enqueue: async (kind, request) => {
-      return logged('enqueue', enqueue(kind, request), {kind: kind.name});
-    },
-    hold: async correlationKey => {
-      return logged('hold', hold(correlationKey));
-    },
-    release: async correlationKey => {
-      return logged('release', release(correlationKey));
-    },
-    drop: async correlationKey => {
-      return logged('drop', drop(correlationKey));
-    },
-    findByCorrelationKey(correlationKey) {
-      if (isStopped) {
-        return NOT_STARTED;
-      }
-      const found = findByKey(correlationKey);
-      return found === undefined ? {type: 'operation-not-found'} : {type: 'operation-found', operation: toView(found)};
-    },
-    lane(orderingKey) {
-      if (isStopped) {
-        return NOT_STARTED;
-      }
-      const queue = laneQueuesOf(operations.values()).get(orderingKey);
-      return queue === undefined ? {type: 'lane-empty'} : {type: 'lane-found', lane: toLane(queue)};
+    load,
+    enqueue,
+    hold,
+    release,
+    drop,
+    findByCorrelationKey: findByKey,
+    lane(laneKey) {
+      const lane = lanesOf(operations.values()).get(laneKey);
+      return lane === undefined ? {outcome: 'lane-empty'} : {outcome: 'lane-found', lane};
     },
     lanes() {
-      if (isStopped) {
-        return NOT_STARTED;
-      }
-      return {type: 'lanes-listed', lanes: [...laneQueuesOf(operations.values()).values()].map(toLane)};
+      return {outcome: 'lanes-listed', lanes: [...lanesOf(operations.values()).values()]};
     },
     pause() {
-      isRunning = false;
-      logger.info('pause', {outcome: 'outbox-paused'});
+      run = {state: 'paused'};
     },
     resume() {
-      isRunning = true;
-      backoff.reset();
-      scheduler.pump();
-      logger.info('resume', {outcome: 'outbox-resumed'});
+      run = {state: 'running'};
+      resetBackoff();
+      requestPass();
     },
-    stop: async () => {
-      await stop();
-      logger.info('stop', {outcome: 'outbox-stopped'});
-    },
+    stop,
   };
 }

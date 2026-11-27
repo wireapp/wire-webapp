@@ -26,28 +26,35 @@ describe('createOutbox lifecycle', () => {
     kit = createOutboxTestKit();
   });
 
-  afterEach(() => {
-    kit.dispose();
-  });
-
   describe('register', () => {
     it('registers a kind and hands out its handle', () => {
-      const registered = kit.outbox.register({...kit.registerKind().kind, name: 'another'});
+      const result = kit.outbox.register({...kit.registerKind().kind, name: 'another'});
 
-      expect(registered.type).toBe('kind-registered');
+      expect(result).toEqual({
+        outcome: 'kind-registered',
+        handle: {enqueue: expect.any(Function), find: expect.any(Function)},
+      });
     });
 
     it('refuses a name that is taken', () => {
       const {kind} = kit.registerKind();
 
-      expect(kit.outbox.register(kind)).toEqual({type: 'kind-name-taken', kind: kind.name});
+      expect(kit.outbox.register(kind)).toEqual({outcome: 'kind-name-taken', kind: kind.name});
     });
 
     it('refuses a kind once the outbox has started', async () => {
       const {kind} = kit.registerKind();
       await kit.start();
 
-      expect(kit.outbox.register({...kind, name: 'late'})).toEqual({type: 'outbox-already-started'});
+      expect(kit.outbox.register({...kind, name: 'late'})).toEqual({outcome: 'outbox-already-started'});
+    });
+
+    it('refuses a kind while the outbox is loading', async () => {
+      const {kind} = kit.registerKind();
+      const starting = kit.outbox.start();
+
+      expect(kit.outbox.register({...kind, name: 'late'})).toEqual({outcome: 'outbox-already-started'});
+      await starting;
     });
   });
 
@@ -55,41 +62,65 @@ describe('createOutbox lifecycle', () => {
     it('starts and reports itself started', async () => {
       kit.registerKind();
 
-      const outcome = await kit.outbox.start();
-
-      expect(outcome).toEqual({type: 'outbox-started'});
+      expect(await kit.outbox.start()).toEqual({outcome: 'outbox-started'});
       expect(kit.outbox.isStarted()).toBe(true);
+    });
+
+    it('does not run until it is resumed', async () => {
+      kit.registerKind();
+
+      await kit.start({run: false});
+
+      expect(kit.outbox.isStarted()).toBe(true);
+      expect(kit.outbox.isRunning()).toBe(false);
     });
 
     it('refuses a second start', async () => {
       await kit.start();
 
-      expect(await kit.outbox.start()).toEqual({type: 'outbox-already-started'});
+      expect(await kit.outbox.start()).toEqual({outcome: 'outbox-already-started'});
     });
 
     it('refuses a start while another is loading', async () => {
       const firstStart = kit.outbox.start();
 
-      expect(await kit.outbox.start()).toEqual({type: 'outbox-already-started'});
-      await firstStart;
+      expect(await kit.outbox.start()).toEqual({outcome: 'outbox-already-started'});
+      expect(await firstStart).toEqual({outcome: 'outbox-started'});
     });
 
-    it('stays unstarted when the store fails, and may be started again', async () => {
+    it('reports itself not started while loading', async () => {
+      const starting = kit.outbox.start();
+
+      expect(kit.outbox.isStarted()).toBe(false);
+      await starting;
+    });
+
+    it('stays unstarted when the store fails', async () => {
       kit.store.fail('loadLatest', true);
 
-      const failed = await kit.outbox.start();
-
-      expect(failed).toEqual({type: 'storage-failed', errorName: 'TestFailure'});
+      expect(await kit.outbox.start()).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
       expect(kit.outbox.isStarted()).toBe(false);
+    });
 
+    it('starts again after a storage failure', async () => {
+      const testKind = kit.registerKind();
+      kit.store.seed(
+        createStoredSnapshot({kind: testKind.kind.name, correlation: {state: 'correlated', correlationKey: 'stored'}}),
+      );
+      kit.store.fail('loadLatest', true);
+      await kit.outbox.start();
       kit.store.fail('loadLatest', false);
-      expect(await kit.outbox.start()).toEqual({type: 'outbox-started'});
+
+      expect(await kit.outbox.start()).toEqual({outcome: 'outbox-started'});
+      expect(kit.outbox.isStarted()).toBe(true);
+      expect(kit.outbox.findByCorrelationKey('stored')).toMatchObject({outcome: 'operation-found'});
     });
 
     it('answers storage-failed when the store rejects', async () => {
       kit.store.rejectWith('loadLatest', new RangeError('broken'));
 
-      expect(await kit.outbox.start()).toEqual({type: 'storage-failed', errorName: 'RangeError'});
+      expect(await kit.outbox.start()).toEqual({outcome: 'storage-failed', errorName: 'RangeError'});
+      expect(kit.outbox.isStarted()).toBe(false);
     });
 
     it('answers storage-full when storing the interrupted attempt hits the quota', async () => {
@@ -97,53 +128,95 @@ describe('createOutbox lifecycle', () => {
       kit.store.seed(createStoredSnapshot({kind: kind.name, state: 'in-progress', attempts: 1}));
       kit.store.fill(true);
 
-      expect(await kit.outbox.start()).toEqual({type: 'storage-full'});
+      expect(await kit.outbox.start()).toEqual({outcome: 'storage-full'});
       expect(kit.outbox.isStarted()).toBe(false);
     });
 
-    it('answers every call and every read before the start with outbox-not-started', async () => {
+    it('fails the start when the unusable operations cannot be deleted', async () => {
+      kit.registerKind();
+      kit.store.seed(createStoredSnapshot({kind: 'gone', id: 'orphan'}));
+      kit.store.fail('remove', true);
+
+      expect(await kit.outbox.start()).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
+      expect(kit.outbox.isStarted()).toBe(false);
+    });
+
+    it('starts again after the unusable operations could not be deleted, and deletes them then', async () => {
+      kit.registerKind();
+      kit.store.seed(createStoredSnapshot({kind: 'gone', id: 'orphan'}));
+      kit.store.fail('remove', true);
+      await kit.outbox.start();
+      kit.store.fail('remove', false);
+
+      expect(await kit.outbox.start()).toEqual({outcome: 'outbox-started'});
+      expect(kit.store.operationIds()).toEqual([]);
+    });
+
+    it('does not run attempts of a failed start', async () => {
+      const testKind = kit.registerKind();
+      kit.store.seed(createStoredSnapshot({kind: testKind.kind.name, state: 'in-progress', attempts: 1}));
+      kit.store.fill(true);
+      kit.outbox.resume();
+
+      await kit.outbox.start();
+      await kit.clock.settle();
+
+      expect(testKind.attempts).toHaveLength(0);
+    });
+  });
+
+  describe('calls while the outbox is not started', () => {
+    it('answers every command outbox-not-started before the start', async () => {
       const {handle} = kit.registerKind();
 
       expect(await handle.enqueue({payload: {text: 'early'}, correlationKey: 'key'})).toEqual({
-        type: 'outbox-not-started',
+        outcome: 'outbox-not-started',
       });
-      expect(await kit.outbox.hold('key')).toEqual({type: 'outbox-not-started'});
-      expect(await kit.outbox.release('key')).toEqual({type: 'outbox-not-started'});
-      expect(await kit.outbox.drop('key')).toEqual({type: 'outbox-not-started'});
-      expect(handle.find('key')).toEqual({type: 'outbox-not-started'});
-      expect(kit.outbox.findByCorrelationKey('key')).toEqual({type: 'outbox-not-started'});
-      expect(kit.outbox.lane('lane')).toEqual({type: 'outbox-not-started'});
-      expect(kit.outbox.lanes()).toEqual({type: 'outbox-not-started'});
+      expect(await kit.outbox.hold('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(await kit.outbox.release('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(await kit.outbox.drop('key')).toEqual({outcome: 'outbox-not-started'});
     });
 
-    it('answers the reads with outcomes once started', async () => {
-      const {kind, handle} = kit.registerKind();
-      kit.store.seed(createStoredSnapshot({kind: kind.name, correlationKey: 'stored', orderingKey: 'lane'}));
-      await kit.start({run: false});
-
-      expect(handle.find('stored')).toMatchObject({type: 'operation-found', operation: {correlationKey: 'stored'}});
-      expect(handle.find('missing')).toEqual({type: 'operation-not-found'});
-      expect(kit.outbox.findByCorrelationKey('stored')).toMatchObject({type: 'operation-found'});
-      expect(kit.outbox.findByCorrelationKey('missing')).toEqual({type: 'operation-not-found'});
-      expect(kit.outbox.lane('lane')).toMatchObject({type: 'lane-found', lane: {orderingKey: 'lane', size: 0}});
-      expect(kit.outbox.lane('missing')).toEqual({type: 'lane-empty'});
-      expect(kit.outbox.lanes()).toMatchObject({type: 'lanes-listed', lanes: [{orderingKey: 'lane'}]});
-    });
-
-    it('lists no lanes as lanes-listed once started', async () => {
-      kit.registerKind();
-      await kit.start({run: false});
-
-      expect(kit.outbox.lanes()).toEqual({type: 'lanes-listed', lanes: []});
-    });
-
-    it('answers the reads of a stopped outbox with outbox-not-started', async () => {
+    it('answers every read outbox-not-started before the start', () => {
       const {handle} = kit.registerKind();
-      await kit.start();
-      await kit.outbox.stop();
 
-      expect(handle.find('key')).toEqual({type: 'outbox-not-started'});
-      expect(kit.outbox.lanes()).toEqual({type: 'outbox-not-started'});
+      expect(handle.find('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(kit.outbox.lane('lane')).toEqual({outcome: 'outbox-not-started'});
+      expect(kit.outbox.lanes()).toEqual({outcome: 'outbox-not-started'});
+    });
+
+    it('answers the commands outbox-not-started while it is loading', async () => {
+      const {handle} = kit.registerKind();
+      const starting = kit.outbox.start();
+
+      expect(await handle.enqueue({payload: {text: 'early'}, correlationKey: 'key'})).toEqual({
+        outcome: 'outbox-not-started',
+      });
+      expect(await kit.outbox.drop('key')).toEqual({outcome: 'outbox-not-started'});
+      await starting;
+    });
+  });
+
+  describe('reads once started', () => {
+    it('finds an operation by its correlation key, through the outbox and through the handle of its kind', async () => {
+      const testKind = kit.registerKind();
+      await kit.start({run: false});
+      await kit.enqueue(testKind, {correlationKey: 'key'});
+
+      expect(testKind.handle.find('key')).toMatchObject({outcome: 'operation-found', operation: {id: 'operation-1'}});
+      expect(kit.outbox.findByCorrelationKey('key')).toMatchObject({
+        outcome: 'operation-found',
+        operation: {id: 'operation-1'},
+      });
+    });
+
+    it('does not find an operation nothing has enqueued', async () => {
+      const testKind = kit.registerKind();
+      await kit.start({run: false});
+
+      expect(testKind.handle.find('missing')).toEqual({outcome: 'operation-not-found'});
+      expect(kit.outbox.findByCorrelationKey('missing')).toEqual({outcome: 'operation-not-found'});
     });
 
     it('does not find an operation of another kind through the handle of a kind', async () => {
@@ -152,312 +225,247 @@ describe('createOutbox lifecycle', () => {
       await kit.start({run: false});
       await kit.enqueue(first, {correlationKey: 'key'});
 
-      expect(second.handle.find('key')).toEqual({type: 'operation-not-found'});
-      expect(first.handle.find('key')).toMatchObject({type: 'operation-found'});
+      expect(second.handle.find('key')).toEqual({outcome: 'operation-not-found'});
+      expect(kit.outbox.findByCorrelationKey('key')).toMatchObject({outcome: 'operation-found'});
     });
 
-    it('does nothing when stopped before the start', async () => {
-      await kit.outbox.stop();
-
-      expect(kit.outbox.isStarted()).toBe(false);
-      expect(await kit.outbox.start()).toEqual({type: 'outbox-started'});
-    });
-  });
-
-  describe('loading', () => {
-    it('loads the stored operations, in their lanes', async () => {
-      const {kind, handle} = kit.registerKind();
-      kit.store.seed(createStoredSnapshot({kind: kind.name, correlationKey: 'stored', orderingKey: 'lane'}));
-
-      await kit.start({run: false});
-
-      expect(kit.findOperation('stored')?.payload).toEqual({text: 'stored'});
-      expect(kit.laneOf('lane')?.first.correlationKey).toBe('stored');
-      expect(handle.find('stored').type).toBe('operation-found');
-    });
-
-    it('retries an attempt that was running, as interrupted', async () => {
-      const {kind, handle} = kit.registerKind();
-      kit.store.seed(
-        createStoredSnapshot({
-          kind: kind.name,
-          id: 'running',
-          correlationKey: 'running',
-          state: 'in-progress',
-          attempts: 1,
-        }),
-      );
-
-      await kit.start({run: false});
-
-      expect(kit.findOperation('running')?.state).toBe('queued');
-      expect(handle.find('running').type).toBe('operation-found');
-      const newest = kit.store.history('running').at(-1);
-      expect(newest).toMatchObject({trigger: 'attempt-interrupted', state: 'queued', seq: 2});
-    });
-
-    it('gives up on an interrupted attempt that was the last one, as the kind says', async () => {
-      const {kind} = kit.registerKind({maxAttempts: 1});
-      const dropping = kit.registerKind({maxAttempts: 1, whenGivenUp: 'drop'});
-      kit.store.seed(
-        createStoredSnapshot({kind: kind.name, id: 'a', correlationKey: 'a', state: 'in-progress', attempts: 1}),
-      );
-      kit.store.seed(
-        createStoredSnapshot({
-          kind: dropping.kind.name,
-          id: 'b',
-          correlationKey: 'b',
-          state: 'in-progress',
-          attempts: 1,
-        }),
-      );
-
-      await kit.start({run: false});
-
-      expect(kit.findOperation('a')?.state).toBe('dead-lettered');
-      expect(kit.findOperation('b')).toBeUndefined();
-      expect(kit.store.operationIds()).toEqual(['a']);
-    });
-
-    it('tells the kind once about an operation that was given up on at load, so it can untrack it', async () => {
-      const dropping = kit.registerKind({maxAttempts: 1, whenGivenUp: 'drop'});
-      kit.store.seed(
-        createStoredSnapshot({
-          kind: dropping.kind.name,
-          id: 'b',
-          correlationKey: 'b',
-          state: 'in-progress',
-          attempts: 1,
-        }),
-      );
-
-      await kit.start({run: false});
-
-      expect(
-        dropping.changes.map(({state}) => {
-          return state;
-        }),
-      ).toEqual(['dropped']);
-    });
-
-    it('deletes an operation whose newest snapshot has another schema version', async () => {
-      const {kind} = kit.registerKind();
-      kit.store.seed(createStoredSnapshot({kind: kind.name, id: 'old', correlationKey: 'old', schemaVersion: 0}));
-
-      await kit.start({run: false});
-
-      expect(kit.findOperation('old')).toBeUndefined();
-      expect(kit.store.operationIds()).toEqual([]);
-    });
-
-    it.each(['succeeded', 'dropped'] as const)(
-      'deletes an operation whose newest snapshot is %s, left by an interrupted delete',
-      async state => {
-        const {kind} = kit.registerKind();
-        kit.store.seed(createStoredSnapshot({kind: kind.name, id: 'done', correlationKey: 'done', state}));
-
-        await kit.start({run: false});
-
-        expect(kit.findOperation('done')).toBeUndefined();
-        expect(kit.store.operationIds()).toEqual([]);
-      },
-    );
-
-    it('deletes an operation whose payload no longer parses', async () => {
-      const {kind} = kit.registerKind();
-      kit.store.seed(
-        createStoredSnapshot({kind: kind.name, id: 'bad', correlationKey: 'bad', payload: {unexpected: 1}}),
-      );
-
-      await kit.start({run: false});
-
-      expect(kit.findOperation('bad')).toBeUndefined();
-      expect(kit.store.operationIds()).toEqual([]);
-    });
-
-    it('deletes an operation whose kind is not registered', async () => {
-      kit.store.seed(createStoredSnapshot({kind: 'gone', id: 'orphan', correlationKey: 'orphan'}));
-
-      await kit.start({run: false});
-
-      expect(kit.store.operationIds()).toEqual([]);
-    });
-
-    it('fails the start when the unusable operations cannot be deleted', async () => {
+    it('lists no lanes when no operation is in one', async () => {
       kit.registerKind();
-      kit.store.seed(createStoredSnapshot({kind: 'gone', id: 'orphan'}));
-      kit.store.fail('remove', true);
-
-      expect(await kit.outbox.start()).toEqual({type: 'storage-failed', errorName: 'TestFailure'});
-      expect(kit.outbox.isStarted()).toBe(false);
-    });
-
-    it('calls onChanged once for each loaded operation', async () => {
-      const queued = kit.registerKind();
-      kit.store.seed(createStoredSnapshot({kind: queued.kind.name, id: 'a', correlationKey: 'a'}));
-      kit.store.seed(
-        createStoredSnapshot({kind: queued.kind.name, id: 'b', correlationKey: 'b', state: 'in-progress', attempts: 1}),
-      );
-
       await kit.start({run: false});
 
-      expect(
-        queued.changes
-          .map(({id, state}) => {
-            return [id, state];
-          })
-          .sort(),
-      ).toEqual([
-        ['a', 'queued'],
-        ['b', 'queued'],
-      ]);
-    });
-
-    it('keeps the lane order of the stored operations for what is enqueued afterwards', async () => {
-      const {kind, handle} = kit.registerKind();
-      kit.store.seed(
-        createStoredSnapshot({
-          kind: kind.name,
-          id: 'stored',
-          correlationKey: 'stored',
-          orderingKey: 'lane',
-          queuedSeq: 7,
-        }),
-      );
-      await kit.start({run: false});
-
-      await handle.enqueue({payload: {text: 'new'}, correlationKey: 'new', orderingKey: 'lane'});
-
-      expect(kit.laneOf('lane')?.first.id).toBe('stored');
-      expect(kit.store.history(kit.findOperation('new')?.id ?? '').at(-1)?.queuedSeq).toBe(8);
+      expect(kit.outbox.lanes()).toEqual({outcome: 'lanes-listed', lanes: []});
+      expect(kit.outbox.lane('lane')).toEqual({outcome: 'lane-empty'});
     });
   });
 
-  describe('pause, resume and isRunning', () => {
-    it('waits for resume after the start', async () => {
-      const queued = kit.registerKind();
-      await kit.start({run: false});
+  describe('pause, resume, isRunning', () => {
+    it('is not running before the start, however often it was resumed', () => {
+      kit.registerKind();
 
-      await kit.enqueue(queued);
+      kit.outbox.resume();
 
       expect(kit.outbox.isRunning()).toBe(false);
-      expect(queued.performs).toHaveLength(0);
     });
 
-    it('runs after resume', async () => {
-      const queued = kit.registerKind();
+    it('waits for resume after the start', async () => {
+      const testKind = kit.registerKind();
       await kit.start({run: false});
-      await kit.enqueue(queued);
+
+      await kit.enqueue(testKind);
+
+      expect(kit.outbox.isRunning()).toBe(false);
+      expect(testKind.attempts).toHaveLength(0);
+    });
+
+    it('runs the queued operations after resume', async () => {
+      const testKind = kit.registerKind();
+      await kit.start({run: false});
+      await kit.enqueue(testKind);
 
       kit.outbox.resume();
       await kit.clock.settle();
 
       expect(kit.outbox.isRunning()).toBe(true);
-      expect(queued.performs).toHaveLength(1);
+      expect(testKind.attempts).toHaveLength(1);
     });
 
-    it('stops new attempts on pause, and lets the one running finish', async () => {
-      const queued = kit.registerKind();
+    it('lets the attempt that is running finish after pause, and starts no other', async () => {
+      const testKind = kit.registerKind();
       await kit.start();
-      await kit.enqueue(queued, {correlationKey: 'first'});
-      await kit.enqueue(queued, {correlationKey: 'second'});
-      expect(queued.performs).toHaveLength(2);
+      await kit.enqueue(testKind, {correlationKey: 'first'});
+      await kit.enqueue(testKind, {correlationKey: 'second'});
 
       kit.outbox.pause();
-      await kit.enqueue(queued, {correlationKey: 'third'});
+      await kit.enqueue(testKind, {correlationKey: 'third'});
 
       expect(kit.outbox.isRunning()).toBe(false);
-      expect(queued.performs).toHaveLength(2);
-      await queued.performs[0].answer({type: 'attempt-succeeded'});
-      expect(kit.findOperation('first')).toBeUndefined();
-      expect(queued.performs).toHaveLength(2);
+      expect(testKind.attempts).toHaveLength(2);
+
+      await testKind.attempts[0].answer({outcome: 'attempt-succeeded'});
+
+      expect(kit.outbox.findByCorrelationKey('first')).toEqual({outcome: 'operation-not-found'});
+      expect(testKind.attempts).toHaveLength(2);
+    });
+
+    it('runs the queued operations again after pause and resume', async () => {
+      const testKind = kit.registerKind();
+      await kit.start();
+      kit.outbox.pause();
+      await kit.enqueue(testKind, {correlationKey: 'key'});
+
+      kit.outbox.resume();
+      await kit.clock.settle();
+
+      expect(testKind.attempts).toHaveLength(1);
     });
 
     it('remembers a resume before the start, and runs once started', async () => {
-      const queued = kit.registerKind();
-      kit.store.seed(createStoredSnapshot({kind: queued.kind.name, correlationKey: 'stored'}));
+      const testKind = kit.registerKind();
+      kit.store.seed(createStoredSnapshot({kind: testKind.kind.name}));
       kit.outbox.resume();
-      expect(kit.outbox.isRunning()).toBe(false);
 
       await kit.start({run: false});
 
       expect(kit.outbox.isRunning()).toBe(true);
-      expect(queued.performs).toHaveLength(1);
+      expect(testKind.attempts).toHaveLength(1);
     });
 
     it('remembers a pause before the start, which cancels an earlier resume', async () => {
-      const queued = kit.registerKind();
-      kit.store.seed(createStoredSnapshot({kind: queued.kind.name, correlationKey: 'stored'}));
+      const testKind = kit.registerKind();
+      kit.store.seed(createStoredSnapshot({kind: testKind.kind.name}));
       kit.outbox.resume();
       kit.outbox.pause();
 
       await kit.start({run: false});
 
       expect(kit.outbox.isRunning()).toBe(false);
-      expect(queued.performs).toHaveLength(0);
+      expect(testKind.attempts).toHaveLength(0);
+    });
+
+    it('counts a resume while loading', async () => {
+      const testKind = kit.registerKind();
+      kit.store.seed(createStoredSnapshot({kind: testKind.kind.name}));
+      const starting = kit.outbox.start();
+
+      kit.outbox.resume();
+      await starting;
+      await kit.clock.settle();
+
+      expect(kit.outbox.isRunning()).toBe(true);
+      expect(testKind.attempts).toHaveLength(1);
+    });
+
+    it('counts a pause while loading', async () => {
+      const testKind = kit.registerKind();
+      kit.store.seed(createStoredSnapshot({kind: testKind.kind.name}));
+      kit.outbox.resume();
+      const starting = kit.outbox.start();
+
+      kit.outbox.pause();
+      await starting;
+      await kit.clock.settle();
+
+      expect(kit.outbox.isRunning()).toBe(false);
+      expect(testKind.attempts).toHaveLength(0);
     });
   });
 
   describe('stop', () => {
-    it('stops the outbox, which answers outbox-not-started again', async () => {
-      const queued = kit.registerKind();
+    it('stops the outbox, which is neither started nor running afterwards', async () => {
+      kit.registerKind();
       await kit.start();
 
       await kit.outbox.stop();
 
       expect(kit.outbox.isStarted()).toBe(false);
       expect(kit.outbox.isRunning()).toBe(false);
-      expect(await queued.handle.enqueue({payload: {text: 'late'}})).toEqual({type: 'outbox-not-started'});
+    });
+
+    it('does nothing when it was not started', async () => {
+      await kit.outbox.stop();
+
+      expect(kit.outbox.isStarted()).toBe(false);
+      expect(await kit.outbox.start()).toEqual({outcome: 'outbox-started'});
+    });
+
+    it('answers every command and read outbox-not-started afterwards', async () => {
+      const testKind = kit.registerKind();
+      await kit.start();
+      await kit.enqueue(testKind, {correlationKey: 'key', laneKey: 'lane'});
+      await kit.outbox.stop();
+
+      expect(await testKind.handle.enqueue({payload: {text: 'late'}})).toEqual({outcome: 'outbox-not-started'});
+      expect(await kit.outbox.hold('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(await kit.outbox.release('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(await kit.outbox.drop('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(testKind.handle.find('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'outbox-not-started'});
+      expect(kit.outbox.lane('lane')).toEqual({outcome: 'outbox-not-started'});
+      expect(kit.outbox.lanes()).toEqual({outcome: 'outbox-not-started'});
     });
 
     it('aborts a running attempt and leaves the operation stored as it was', async () => {
-      const queued = kit.registerKind();
+      const testKind = kit.registerKind();
       await kit.start();
-      const outcome = await kit.enqueue(queued, {correlationKey: 'key'});
-      const {signal} = queued.lastPerform();
+      await kit.enqueue(testKind, {correlationKey: 'key'});
+      const {signal} = testKind.lastAttempt();
 
       await kit.outbox.stop();
 
       expect(signal.aborted).toBe(true);
-      const id = outcome.type === 'operation-queued' ? outcome.operation.id : '';
-      expect(kit.store.history(id).at(-1)?.state).toBe('in-progress');
+      expect(kit.store.history('operation-1').at(-1)).toMatchObject({state: 'in-progress'});
     });
 
     it('ignores what an aborted attempt answers afterwards', async () => {
-      const queued = kit.registerKind();
+      const testKind = kit.registerKind();
       await kit.start();
-      const outcome = await kit.enqueue(queued, {correlationKey: 'key'});
-      const attempt = queued.lastPerform();
+      await kit.enqueue(testKind, {correlationKey: 'key'});
+      const attempt = testKind.lastAttempt();
       await kit.outbox.stop();
 
-      await attempt.answer({type: 'attempt-succeeded'});
+      await attempt.answer({outcome: 'attempt-succeeded'});
 
-      const id = outcome.type === 'operation-queued' ? outcome.operation.id : '';
-      expect(kit.store.history(id).at(-1)?.state).toBe('in-progress');
+      expect(kit.store.history('operation-1').at(-1)).toMatchObject({state: 'in-progress'});
     });
 
-    it('can be started again, and interrupts the attempt that was running', async () => {
-      const queued = kit.registerKind();
+    it('arms no timer afterwards', async () => {
+      const testKind = kit.registerKind({attemptTimeoutMilliseconds: 10_000});
       await kit.start();
-      await kit.enqueue(queued, {correlationKey: 'key'});
+      await kit.enqueue(testKind, {correlationKey: 'key'});
+      await testKind.lastAttempt().answer({outcome: 'attempt-failed'});
+
+      await kit.outbox.stop();
+
+      expect(kit.clock.pendingTimers()).toEqual([]);
+    });
+
+    it('starts no attempt after a restart that was not resumed', async () => {
+      const testKind = kit.registerKind();
+      await kit.start();
+      await kit.outbox.stop();
+
+      await kit.start({run: false});
+      await kit.enqueue(testKind);
+
+      expect(testKind.attempts).toHaveLength(0);
+    });
+
+    it('can be started again, which interrupts the attempt that was running and retries it', async () => {
+      const testKind = kit.registerKind();
+      await kit.start();
+      await kit.enqueue(testKind, {correlationKey: 'key'});
       await kit.outbox.stop();
 
       await kit.start();
 
-      expect(queued.operation('key')?.state).toBe('in-progress');
-      expect(queued.performs).toHaveLength(2);
-      expect(queued.performs[1].operation.attempts).toBe(2);
+      expect(kit.store.history('operation-1').at(-2)).toMatchObject({state: 'queued', trigger: 'attempt-interrupted'});
+      expect(kit.operation('key')).toMatchObject({state: 'in-progress', attempts: 2});
+      expect(testKind.attempts).toHaveLength(2);
+    });
+
+    it('starts again after a failed restart', async () => {
+      const testKind = kit.registerKind();
+      await kit.start();
+      await kit.enqueue(testKind, {correlationKey: 'key'});
+      await kit.outbox.stop();
+      kit.store.fail('loadLatest', true);
+      await kit.outbox.start();
+      kit.store.fail('loadLatest', false);
+
+      await kit.start();
+
+      expect(kit.operation('key')).toMatchObject({state: 'in-progress', attempts: 2});
     });
   });
 
   describe('logging', () => {
     it('logs each call next to its outcome, and never the payload or the keys', async () => {
-      const queued = kit.registerKind();
+      const testKind = kit.registerKind();
       await kit.start();
 
-      await kit.enqueue(queued, {
+      await kit.enqueue(testKind, {
         correlationKey: 'private-key-1',
-        orderingKey: 'private-lane-1',
+        laneKey: 'private-lane-1',
         payload: {text: 'secret'},
       });
       await kit.outbox.hold('missing');
@@ -471,9 +479,10 @@ describe('createOutbox lifecycle', () => {
       expect(kit.logger.entriesOf('drop')[0].attributes).toMatchObject({outcome: 'operation-dropped'});
       expect(kit.logger.entriesOf('start')[0].attributes).toMatchObject({outcome: 'outbox-started'});
       expect(kit.logger.entriesOf('stop')).toHaveLength(1);
-      expect(JSON.stringify(kit.logger.entries)).not.toContain('secret');
-      expect(JSON.stringify(kit.logger.entries)).not.toContain('private-key-1');
-      expect(JSON.stringify(kit.logger.entries)).not.toContain('private-lane-1');
+      const logged = JSON.stringify(kit.logger.entries);
+      expect(logged).not.toContain('secret');
+      expect(logged).not.toContain('private-key-1');
+      expect(logged).not.toContain('private-lane-1');
     });
 
     it('logs the names of the registered kinds, and nothing else about them, when it starts', async () => {
@@ -487,7 +496,7 @@ describe('createOutbox lifecycle', () => {
       ]);
     });
 
-    it('logs pause, resume and stop once the outbox runs, with what they did', async () => {
+    it('logs pause, resume and stop with what they did', async () => {
       kit.registerKind();
       await kit.start({run: false});
 
@@ -506,10 +515,9 @@ describe('createOutbox lifecycle', () => {
       ]);
     });
 
-    it('logs a resume remembered before the start when the outbox starts, and then that it took effect', async () => {
+    it('logs a resume remembered before the start, and then that it took effect', async () => {
       kit.registerKind();
       kit.outbox.resume();
-      expect(kit.logger.entries).toEqual([]);
 
       await kit.start({run: false});
 
@@ -520,16 +528,20 @@ describe('createOutbox lifecycle', () => {
       ).toEqual([{outcome: 'outbox-remembered-until-start'}, {outcome: 'outbox-resumed'}]);
     });
 
-    it('logs only the last of a pause and a resume called before the start', async () => {
+    it('logs a resume and a pause called before the start as remembered until the start', async () => {
       kit.registerKind();
       kit.outbox.resume();
       kit.outbox.pause();
 
       await kit.start({run: false});
 
-      expect(kit.logger.entriesOf('resume')).toEqual([]);
       expect(
         kit.logger.entriesOf('pause').map(({attributes}) => {
+          return attributes;
+        }),
+      ).toEqual([{outcome: 'outbox-remembered-until-start'}]);
+      expect(
+        kit.logger.entriesOf('resume').map(({attributes}) => {
           return attributes;
         }),
       ).toEqual([{outcome: 'outbox-remembered-until-start'}]);
@@ -540,10 +552,7 @@ describe('createOutbox lifecycle', () => {
 
       await kit.outbox.start();
 
-      expect(kit.logger.entriesOf('start')[0].attributes).toMatchObject({
-        outcome: 'storage-failed',
-        errorName: 'RangeError',
-      });
+      expect(kit.logger.entriesOf('start')[0].attributes).toEqual({outcome: 'storage-failed', errorName: 'RangeError'});
     });
   });
 });

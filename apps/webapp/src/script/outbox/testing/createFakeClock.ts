@@ -17,39 +17,96 @@
  *
  */
 
-export type FakeClock = {
-  /** Server time, which only moves when the test moves it */
-  getServerTime: () => number;
-  /** Moves the timers and the server time forward together, letting every promise settle on the way */
+import type {OutboxClock, TimerId} from '../types';
+
+export type PendingTimer = {id: TimerId; dueInMilliseconds: number};
+
+export type FakeClock = OutboxClock & {
+  /**
+   * Moves stopwatch time and server time forward together, firing the timers that fall due in order, and lets
+   * every promise settle after each
+   */
   advance: (milliseconds: number) => Promise<void>;
   /** Lets every promise settle without moving time */
   settle: () => Promise<void>;
-  /** Moves the server time alone, as when the device clock and the server's disagree */
+  /** Moves server time alone, as when the server's clock offset is corrected */
   jumpServerTime: (milliseconds: number) => void;
-  dispose: () => void;
+  /** The timers not fired or cleared yet, the soonest first */
+  pendingTimers: () => PendingTimer[];
 };
 
-/** Installs jest's fake timers; the test must call `dispose` */
-export function createFakeClock(initialServerTime = 1_000_000): FakeClock {
-  jest.useFakeTimers();
+type ScheduledTimer = {id: TimerId; dueAt: number; callback: () => void};
+
+/** A manual clock, without jest's fake timers: time only moves when the test moves it */
+export function createFakeClock({serverTime: initialServerTime = 1_000_000} = {}): FakeClock {
+  let stopwatchTime = 0;
   let serverTime = initialServerTime;
+  let nextTimerId = 1;
+  let timers: ScheduledTimer[] = [];
+
+  const bySoonest = (earlier: ScheduledTimer, later: ScheduledTimer): number => {
+    return earlier.dueAt === later.dueAt ? earlier.id - later.id : earlier.dueAt - later.dueAt;
+  };
+
+  // A real macrotask runs only once every microtask queued before it, and by them, has run
+  const settle = async (): Promise<void> => {
+    await new Promise(resolve => {
+      setTimeout(resolve, 0);
+    });
+  };
+
+  const moveTo = (time: number): void => {
+    serverTime += time - stopwatchTime;
+    stopwatchTime = time;
+  };
 
   return {
     getServerTime: () => {
       return serverTime;
     },
+    getStopwatchTime: () => {
+      return stopwatchTime;
+    },
+    setTimer: (callback, milliseconds) => {
+      const id = nextTimerId++;
+      timers = [...timers, {id, dueAt: stopwatchTime + Math.max(0, milliseconds), callback}];
+      return id;
+    },
+    clearTimer: timer => {
+      timers = timers.filter(({id}) => {
+        return id !== timer;
+      });
+    },
     async advance(milliseconds) {
-      serverTime += milliseconds;
-      await jest.advanceTimersByTimeAsync(milliseconds);
+      const target = stopwatchTime + milliseconds;
+      await settle();
+      for (;;) {
+        const [due] = timers
+          .filter(({dueAt}) => {
+            return dueAt <= target;
+          })
+          .toSorted(bySoonest);
+        if (due === undefined) {
+          break;
+        }
+        timers = timers.filter(({id}) => {
+          return id !== due.id;
+        });
+        moveTo(due.dueAt);
+        due.callback();
+        await settle();
+      }
+      moveTo(target);
+      await settle();
     },
-    async settle() {
-      await jest.advanceTimersByTimeAsync(0);
-    },
+    settle,
     jumpServerTime(milliseconds) {
       serverTime += milliseconds;
     },
-    dispose() {
-      jest.useRealTimers();
+    pendingTimers: () => {
+      return timers.toSorted(bySoonest).map(({id, dueAt}) => {
+        return {id, dueInMilliseconds: dueAt - stopwatchTime};
+      });
     },
   };
 }

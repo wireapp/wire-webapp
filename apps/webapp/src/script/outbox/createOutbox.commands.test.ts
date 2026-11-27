@@ -18,147 +18,224 @@
  */
 
 import {createOutboxTestKit, type OutboxTestKit, type TestKind} from './testing/createOutboxTestKit';
+import type {OperationState} from './types';
+
+type CommandState = Extract<OperationState, 'queued' | 'on-hold' | 'in-progress' | 'dead-lettered'>;
 
 describe('createOutbox commands', () => {
   let kit: OutboxTestKit;
-  let queued: TestKind;
+  let testKind: TestKind;
 
   beforeEach(async () => {
     kit = createOutboxTestKit();
-    queued = kit.registerKind({expiresAfterMilliseconds: 10_000});
+    testKind = kit.registerKind({expiresAfterMilliseconds: 10_000});
     await kit.start({run: false});
   });
 
-  afterEach(() => {
-    kit.dispose();
+  afterEach(async () => {
+    await kit.outbox.stop();
   });
 
-  async function enqueue(correlationKey: string, orderingKey?: string): Promise<string> {
-    const outcome = await queued.handle.enqueue({payload: {text: correlationKey}, correlationKey, orderingKey});
-    return outcome.type === 'operation-queued' ? outcome.operation.id : '';
+  async function enqueue(correlationKey: string, laneKey?: string): Promise<void> {
+    await testKind.handle.enqueue({payload: {text: correlationKey}, correlationKey, laneKey});
   }
 
-  function triggersOf(id: string): string[] {
-    return kit.store.history(id).map(({trigger, state}) => {
+  /** Brings the operation `key` into the state; `in-progress` leaves its attempt unanswered */
+  async function putInState(state: CommandState): Promise<void> {
+    await enqueue('key');
+    if (state === 'on-hold') {
+      await kit.outbox.hold('key');
+    }
+    if (state === 'dead-lettered') {
+      await kit.clock.advance(10_000);
+    }
+    if (state === 'in-progress') {
+      kit.outbox.resume();
+      await kit.clock.settle();
+    }
+    expect(kit.operation('key').state).toBe(state);
+  }
+
+  function triggersOf(operationId: string): string[] {
+    return kit.store.history(operationId).map(({trigger, state}) => {
       return `${trigger}>${state}`;
     });
   }
 
   describe('hold', () => {
-    it('puts a queued operation on hold, stored as held', async () => {
-      const id = await enqueue('key');
+    it('puts a queued operation on hold', async () => {
+      await enqueue('key');
 
-      const outcome = await kit.outbox.hold('key');
+      expect(await kit.outbox.hold('key')).toMatchObject({
+        outcome: 'operation-held',
+        operation: {id: 'operation-1', state: 'on-hold'},
+      });
+    });
 
-      expect(outcome).toMatchObject({type: 'operation-held', operation: {state: 'on-hold'}});
-      expect(triggersOf(id)).toEqual(['operation-queued>queued', 'operation-held>on-hold']);
-      expect(queued.changes.at(-1)?.state).toBe('on-hold');
+    it('stores the hold and calls onChanged', async () => {
+      await enqueue('key');
+
+      await kit.outbox.hold('key');
+
+      expect(triggersOf('operation-1')).toEqual(['operation-queued>queued', 'operation-held>on-hold']);
+      expect(testKind.changes.at(-1)).toMatchObject({state: 'on-hold'});
+    });
+
+    it('keeps the attempts and the payload of the operation', async () => {
+      await enqueue('key');
+
+      expect(await kit.outbox.hold('key')).toMatchObject({operation: {attempts: 0, payload: {text: 'key'}}});
     });
 
     it('answers operation-not-found for an unknown key', async () => {
-      expect(await kit.outbox.hold('unknown')).toEqual({type: 'operation-not-found'});
+      expect(await kit.outbox.hold('unknown')).toEqual({outcome: 'operation-not-found'});
     });
 
-    it('answers operation-not-queued with the operation when it is already on hold', async () => {
-      await enqueue('key');
+    it.each(['on-hold', 'dead-lettered'] as const)('refuses an operation that is %s', async state => {
+      await putInState(state);
+
+      expect(await kit.outbox.hold('key')).toEqual({
+        outcome: 'transition-refused',
+        operation: expect.objectContaining({state}),
+        trigger: 'operation-held',
+      });
+    });
+
+    it('stores nothing when it refuses', async () => {
+      await putInState('on-hold');
+
       await kit.outbox.hold('key');
 
-      expect(await kit.outbox.hold('key')).toMatchObject({type: 'operation-not-queued', operation: {state: 'on-hold'}});
+      expect(triggersOf('operation-1')).toEqual(['operation-queued>queued', 'operation-held>on-hold']);
     });
 
-    it('answers operation-not-queued when the operation is dead-lettered', async () => {
-      await queued.handle.enqueue({payload: {text: 'x'}, correlationKey: 'key', expiresAfterMilliseconds: 100});
-      await kit.clock.advance(100);
+    it('is not taken before the outbox is started', async () => {
+      const notStartedKit = createOutboxTestKit();
 
-      expect(await kit.outbox.hold('key')).toMatchObject({
-        type: 'operation-not-queued',
-        operation: {state: 'dead-lettered'},
-      });
+      expect(await notStartedKit.outbox.hold('key')).toEqual({outcome: 'outbox-not-started'});
     });
 
     it('answers storage-failed and leaves the operation queued when the store fails', async () => {
       await enqueue('key');
       kit.store.fail('append', true);
 
-      expect(await kit.outbox.hold('key')).toEqual({type: 'storage-failed', errorName: 'TestFailure'});
-      expect(queued.operation('key')?.state).toBe('queued');
+      expect(await kit.outbox.hold('key')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
+      expect(kit.operation('key').state).toBe('queued');
     });
 
-    it('answers storage-full when the quota is reached', async () => {
+    it('answers storage-full and leaves the operation queued when the quota is reached', async () => {
       await enqueue('key');
       kit.store.fill(true);
 
-      expect(await kit.outbox.hold('key')).toEqual({type: 'storage-full'});
+      expect(await kit.outbox.hold('key')).toEqual({outcome: 'storage-full'});
+      expect(kit.operation('key').state).toBe('queued');
     });
   });
 
   describe('release', () => {
-    it('queues an operation on hold again, stored as released', async () => {
-      const id = await enqueue('key');
-      await kit.outbox.hold('key');
+    it('queues an operation on hold again', async () => {
+      await putInState('on-hold');
 
-      const outcome = await kit.outbox.release('key');
+      expect(await kit.outbox.release('key')).toMatchObject({
+        outcome: 'operation-released',
+        operation: {id: 'operation-1', state: 'queued'},
+      });
+    });
 
-      expect(outcome).toMatchObject({type: 'operation-released', operation: {state: 'queued'}});
-      expect(triggersOf(id)).toEqual([
+    it('stores the release and calls onChanged', async () => {
+      await putInState('on-hold');
+
+      await kit.outbox.release('key');
+
+      expect(triggersOf('operation-1')).toEqual([
         'operation-queued>queued',
         'operation-held>on-hold',
         'operation-released>queued',
       ]);
+      expect(testKind.changes.at(-1)).toMatchObject({state: 'queued'});
     });
 
     it('answers operation-not-found for an unknown key', async () => {
-      expect(await kit.outbox.release('unknown')).toEqual({type: 'operation-not-found'});
+      expect(await kit.outbox.release('unknown')).toEqual({outcome: 'operation-not-found'});
     });
 
-    it('answers operation-not-on-hold with the operation when it is queued', async () => {
-      await enqueue('key');
+    it.each(['queued', 'dead-lettered'] as const)('refuses an operation that is %s', async state => {
+      await putInState(state);
 
-      expect(await kit.outbox.release('key')).toMatchObject({
-        type: 'operation-not-on-hold',
-        operation: {state: 'queued'},
+      expect(await kit.outbox.release('key')).toEqual({
+        outcome: 'transition-refused',
+        operation: expect.objectContaining({state}),
+        trigger: 'operation-released',
       });
     });
 
-    it('answers storage-failed and leaves the operation on hold when the store fails', async () => {
-      await enqueue('key');
-      await kit.outbox.hold('key');
-      kit.store.fail('append', true);
-
-      expect(await kit.outbox.release('key')).toEqual({type: 'storage-failed', errorName: 'TestFailure'});
-      expect(queued.operation('key')?.state).toBe('on-hold');
-    });
-
     it('lets the operation run once released', async () => {
-      await enqueue('key');
-      await kit.outbox.hold('key');
+      await putInState('on-hold');
       kit.outbox.resume();
       await kit.clock.settle();
-      expect(queued.performs).toHaveLength(0);
+      expect(testKind.attempts).toEqual([]);
 
       await kit.outbox.release('key');
       await kit.clock.settle();
 
-      expect(queued.performs).toHaveLength(1);
+      expect(testKind.lastAttempt().operation).toMatchObject({id: 'operation-1', attempts: 1});
+    });
+
+    it('is not taken before the outbox is started', async () => {
+      const notStartedKit = createOutboxTestKit();
+
+      expect(await notStartedKit.outbox.release('key')).toEqual({outcome: 'outbox-not-started'});
+    });
+
+    it('answers storage-failed and leaves the operation on hold when the store fails', async () => {
+      await putInState('on-hold');
+      kit.store.fail('append', true);
+
+      expect(await kit.outbox.release('key')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
+      expect(kit.operation('key').state).toBe('on-hold');
+    });
+
+    it('answers storage-full and leaves the operation on hold when the quota is reached', async () => {
+      await putInState('on-hold');
+      kit.store.fill(true);
+
+      expect(await kit.outbox.release('key')).toEqual({outcome: 'storage-full'});
+      expect(kit.operation('key').state).toBe('on-hold');
     });
   });
 
   describe('drop', () => {
-    it.each(['queued', 'on-hold', 'dead-lettered'] as const)('drops an operation that is %s', async state => {
-      const id = await enqueue('key');
-      if (state === 'on-hold') {
-        await kit.outbox.hold('key');
-      }
-      if (state === 'dead-lettered') {
-        await kit.clock.advance(10_000);
-      }
-      expect(queued.operation('key')?.state).toBe(state);
+    it.each(['queued', 'on-hold', 'in-progress', 'dead-lettered'] as const)(
+      'drops an operation that is %s',
+      async state => {
+        await putInState(state);
 
-      const outcome = await kit.outbox.drop('key');
+        expect(await kit.outbox.drop('key')).toMatchObject({
+          outcome: 'operation-dropped',
+          operation: {id: 'operation-1', state: 'dropped', payload: {text: 'key'}},
+        });
+        expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
+      },
+    );
 
-      expect(outcome).toMatchObject({type: 'operation-dropped', operation: {payload: {text: 'key'}}});
-      expect(queued.operation('key')).toBeUndefined();
-      expect(kit.store.history(id)).toEqual([]);
+    it('deletes every snapshot of the operation', async () => {
+      await enqueue('key');
+
+      await kit.outbox.drop('key');
+
+      expect(kit.store.operationIds()).toEqual([]);
+      expect(kit.store.calls.at(-1)).toEqual({method: 'remove', operationIds: ['operation-1']});
+    });
+
+    it('stores the final snapshot before deleting the snapshots', async () => {
+      await enqueue('key');
+
+      await kit.outbox.drop('key');
+
+      expect(kit.store.calls.slice(-2)).toEqual([
+        {method: 'append', snapshot: expect.objectContaining({trigger: 'operation-dropped', state: 'dropped'})},
+        {method: 'remove', operationIds: ['operation-1']},
+      ]);
     });
 
     it('calls onChanged with the dropped operation', async () => {
@@ -166,75 +243,118 @@ describe('createOutbox commands', () => {
 
       await kit.outbox.drop('key');
 
-      expect(queued.changes.at(-1)).toMatchObject({state: 'dropped'});
+      expect(testKind.changes.at(-1)).toMatchObject({id: 'operation-1', state: 'dropped'});
     });
 
-    it('answers operation-not-found for an unknown key, and for one that was dropped', async () => {
+    it('aborts the running attempt of an operation that is in progress', async () => {
+      await putInState('in-progress');
+      const {signal} = testKind.lastAttempt();
+
+      await kit.outbox.drop('key');
+
+      expect(signal.aborted).toBe(true);
+    });
+
+    it('does not wait for the running attempt', async () => {
+      await putInState('in-progress');
+
+      expect(await kit.outbox.drop('key')).toMatchObject({outcome: 'operation-dropped'});
+      expect(testKind.attempts).toHaveLength(1);
+    });
+
+    it('answers operation-not-found for an unknown key', async () => {
+      expect(await kit.outbox.drop('unknown')).toEqual({outcome: 'operation-not-found'});
+    });
+
+    it('answers operation-not-found for an operation that was dropped already', async () => {
       await enqueue('key');
       await kit.outbox.drop('key');
 
-      expect(await kit.outbox.drop('key')).toEqual({type: 'operation-not-found'});
-      expect(await kit.outbox.drop('unknown')).toEqual({type: 'operation-not-found'});
+      expect(await kit.outbox.drop('key')).toEqual({outcome: 'operation-not-found'});
     });
 
-    it('answers storage-failed and keeps the operation when its final snapshot cannot be stored', async () => {
+    it('is not taken before the outbox is started', async () => {
+      const notStartedKit = createOutboxTestKit();
+
+      expect(await notStartedKit.outbox.drop('key')).toEqual({outcome: 'outbox-not-started'});
+    });
+
+    it('answers storage-failed and keeps the operation when the final snapshot cannot be stored', async () => {
       await enqueue('key');
       kit.store.fail('append', true);
 
-      expect(await kit.outbox.drop('key')).toEqual({type: 'storage-failed', errorName: 'TestFailure'});
-      expect(queued.operation('key')?.state).toBe('queued');
+      expect(await kit.outbox.drop('key')).toEqual({outcome: 'storage-failed', errorName: 'TestFailure'});
+      expect(kit.operation('key').state).toBe('queued');
     });
 
-    it('answers operation-dropped once its final snapshot is stored, although deleting the snapshots failed', async () => {
-      const id = await enqueue('key');
+    it('answers storage-full and keeps the operation when the quota is reached', async () => {
+      await enqueue('key');
+      kit.store.fill(true);
+
+      expect(await kit.outbox.drop('key')).toEqual({outcome: 'storage-full'});
+      expect(kit.operation('key').state).toBe('queued');
+    });
+
+    it('leaves the attempt running when the final snapshot cannot be stored', async () => {
+      await putInState('in-progress');
+      kit.store.fail('append', true);
+
+      await kit.outbox.drop('key');
+
+      expect(testKind.lastAttempt().signal.aborted).toBe(false);
+    });
+
+    it('answers operation-dropped once the final snapshot is stored, although deleting the snapshots failed', async () => {
+      await enqueue('key');
       kit.store.fail('remove', true);
 
-      expect(await kit.outbox.drop('key')).toMatchObject({type: 'operation-dropped'});
-      expect(queued.operation('key')).toBeUndefined();
-      expect(kit.store.history(id).at(-1)).toMatchObject({state: 'dropped'});
+      expect(await kit.outbox.drop('key')).toMatchObject({outcome: 'operation-dropped'});
+      expect(kit.outbox.findByCorrelationKey('key')).toEqual({outcome: 'operation-not-found'});
+      expect(kit.store.history('operation-1').at(-1)).toMatchObject({state: 'dropped'});
     });
 
     it('lets the key be used again by a new operation', async () => {
-      const first = await enqueue('key');
+      await enqueue('key');
       await kit.outbox.drop('key');
 
-      const second = await enqueue('key');
-
-      expect(second).not.toBe(first);
+      expect(await testKind.handle.enqueue({payload: {text: 'again'}, correlationKey: 'key'})).toMatchObject({
+        outcome: 'operation-queued',
+        operation: {id: 'operation-2'},
+      });
     });
   });
 
   describe('lanes', () => {
-    it('reads the first operation and the size of a lane', async () => {
+    it('reads the operations of a lane in lane order, and not those of other lanes', async () => {
       await enqueue('a', 'lane');
       await enqueue('b', 'lane');
       await enqueue('c', 'other');
 
-      expect(kit.laneOf('lane')).toMatchObject({
-        orderingKey: 'lane',
-        status: 'moving',
-        first: {correlationKey: 'a'},
-        size: 1,
+      expect(kit.outbox.lane('lane')).toEqual({
+        outcome: 'lane-found',
+        lane: {
+          state: 'moving',
+          laneKey: 'lane',
+          operations: [expect.objectContaining({id: 'operation-1'}), expect.objectContaining({id: 'operation-2'})],
+        },
       });
-      expect(kit.outbox.lane('lane')).toMatchObject({type: 'lane-found'});
-      expect(
-        kit
-          .lanesOf()
-          .map(({orderingKey}) => {
-            return orderingKey;
-          })
-          .sort(),
-      ).toEqual(['lane', 'other']);
+    });
+
+    it('lists every lane', async () => {
+      await enqueue('a', 'lane');
+      await enqueue('c', 'other');
+
+      expect(kit.outbox.lanes()).toMatchObject({
+        outcome: 'lanes-listed',
+        lanes: [expect.objectContaining({laneKey: 'lane'}), expect.objectContaining({laneKey: 'other'})],
+      });
     });
 
     it('is blocked while its first operation is on hold', async () => {
       await enqueue('a', 'lane');
       await kit.outbox.hold('a');
 
-      expect(kit.laneOf('lane')).toMatchObject({
-        status: 'blocked',
-        first: {correlationKey: 'a', state: 'on-hold'},
-      });
+      expect(kit.lane('lane')).toMatchObject({state: 'blocked', operations: [{id: 'operation-1', state: 'on-hold'}]});
     });
 
     it('is moving again once the hold is released', async () => {
@@ -242,42 +362,47 @@ describe('createOutbox commands', () => {
       await kit.outbox.hold('a');
       await kit.outbox.release('a');
 
-      expect(kit.laneOf('lane')?.status).toBe('moving');
+      expect(kit.lane('lane').state).toBe('moving');
     });
 
-    it('skips a dead-lettered operation: it does not block its lane', async () => {
-      await queued.handle.enqueue({
+    it('does not count a dead-lettered operation: it does not block its lane', async () => {
+      await testKind.handle.enqueue({
         payload: {text: 'a'},
         correlationKey: 'a',
-        orderingKey: 'lane',
+        laneKey: 'lane',
         expiresAfterMilliseconds: 100,
       });
       await enqueue('b', 'lane');
       await kit.clock.advance(100);
 
-      expect(kit.laneOf('lane')).toMatchObject({first: {correlationKey: 'b'}, size: 0});
+      expect(kit.lane('lane').operations).toEqual([expect.objectContaining({id: 'operation-2'})]);
     });
 
-    it('has no lane when only dead-lettered operations remain, or none was ever queued', async () => {
-      await queued.handle.enqueue({
+    it('is empty when only dead-lettered operations remain, or none was ever queued', async () => {
+      await testKind.handle.enqueue({
         payload: {text: 'a'},
         correlationKey: 'a',
-        orderingKey: 'lane',
+        laneKey: 'lane',
         expiresAfterMilliseconds: 100,
       });
       await kit.clock.advance(100);
 
-      expect(kit.laneOf('lane')).toBeUndefined();
-      expect(kit.laneOf('never')).toBeUndefined();
-      expect(kit.outbox.lane('lane')).toEqual({type: 'lane-empty'});
-      expect(kit.outbox.lane('never')).toEqual({type: 'lane-empty'});
-      expect(kit.outbox.lanes()).toEqual({type: 'lanes-listed', lanes: []});
+      expect(kit.outbox.lane('lane')).toEqual({outcome: 'lane-empty'});
+      expect(kit.outbox.lane('never')).toEqual({outcome: 'lane-empty'});
+      expect(kit.outbox.lanes()).toEqual({outcome: 'lanes-listed', lanes: []});
     });
 
-    it('does not make a lane of operations without an ordering key', async () => {
+    it('does not make a lane of operations without a lane key', async () => {
       await enqueue('a');
 
-      expect(kit.lanesOf()).toEqual([]);
+      expect(kit.outbox.lanes()).toEqual({outcome: 'lanes-listed', lanes: []});
+    });
+
+    it('is not read before the outbox is started', () => {
+      const notStartedKit = createOutboxTestKit();
+
+      expect(notStartedKit.outbox.lane('lane')).toEqual({outcome: 'outbox-not-started'});
+      expect(notStartedKit.outbox.lanes()).toEqual({outcome: 'outbox-not-started'});
     });
   });
 });
